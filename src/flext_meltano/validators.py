@@ -245,7 +245,7 @@ class FlextMeltanoValidators:
             >>> result = FlextMeltanoValidators.validate_meltano_project_business_rules(
             ...     config
             ... )
-            >>> if result.is_success and result.unwrap():
+            >>> if result.is_success and result.value:
             ...     print("Project configuration is valid")
 
         """
@@ -298,7 +298,7 @@ class FlextMeltanoValidators:
             ...         config
             ...     )
             ... )
-            >>> if result.is_success and result.unwrap():
+            >>> if result.is_success and result.value:
             ...     print("Transformation configuration is valid")
 
         """
@@ -347,7 +347,7 @@ class FlextMeltanoValidators:
             >>> result = FlextMeltanoValidators.validate_pipeline_project_structure(
             ...     project_path
             ... )
-            >>> if result.is_success and result.unwrap():
+            >>> if result.is_success and result.value:
             ...     print("Project structure is valid")
 
         """
@@ -411,7 +411,7 @@ class FlextMeltanoValidators:
             ...     FlextMeltanoValidators.validate_connection_config(config)
             ... )
             >>> if result.is_success:
-            ...     validated_config: dict[str, object] = result.unwrap()
+            ...     validated_config: dict[str, object] = result.value
             ...     print(f"Validated config: {validated_config}")
 
         """

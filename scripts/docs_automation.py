@@ -105,7 +105,7 @@ class DocumentationAutomation(s):
                 quality_check_result.error or "Quality threshold validation failed",
             )
 
-        success_status = quality_check_result.unwrap()
+        success_status = quality_check_result.value
         if success_status:
             self.logger.info("CI documentation quality checks passed")
         else:
@@ -366,7 +366,7 @@ class DocumentationAutomation(s):
             self.logger.error("Hook generation failed", error=error_msg)
             return
 
-        hook_content = hook_result.unwrap()
+        hook_content = hook_result.value
         pre_commit_hook.write_text(hook_content)
         pre_commit_hook.chmod(0o755)
 
@@ -386,7 +386,7 @@ def _handle_ci_check(automation: DocumentationAutomation) -> int:
     """Handle CI check command."""
     result = automation.run_ci_checks()
     if result.is_success:
-        success = result.unwrap()
+        success = result.value
         return 0 if success else 1
     return 1
 

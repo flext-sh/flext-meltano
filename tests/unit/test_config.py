@@ -114,7 +114,7 @@ class TestFlextMeltanoConfig:
         result = config.get_absolute_config_dir()
 
         assert result.is_success
-        config_dir = result.unwrap()
+        config_dir = result.value
         assert isinstance(config_dir, Path)
         # Since config_dir gets resolved by validator, check if it's absolute
         assert config_dir.is_absolute()
@@ -163,7 +163,7 @@ class TestFlextMeltanoConfig:
             result = config.validate_project_structure()
 
             assert result.is_success
-            assert result.unwrap() is True
+            assert result.value is True
 
     def test_get_environment_variables(self) -> None:
         """Test environment variables extraction."""
@@ -211,7 +211,7 @@ class TestFlextMeltanoConfig:
             )
 
             assert result.is_success
-            config = result.unwrap()
+            config = result.value
             assert config.project_root == Path(tmp_dir).resolve()
 
     def test_create_from_project_root_with_defaults(self) -> None:
@@ -226,7 +226,7 @@ class TestFlextMeltanoConfig:
             )
 
             assert result.is_success
-            config = result.unwrap()
+            config = result.value
             assert config.project_root == Path(tmp_dir).resolve()
 
     def test_create_for_environment_factory(self) -> None:
@@ -349,7 +349,7 @@ class TestFlextMeltanoConfigIntegration:
             )
 
             assert result.is_success
-            config = result.unwrap()
+            config = result.value
 
             # Validate project structure
             validation_result = config.validate_project_structure()

@@ -77,7 +77,7 @@ class FlextMeltanoLibraryRunner:
                 )
 
             # Convert execution result to ELT pipeline result
-            execution_result = result.unwrap()
+            execution_result = result.value
             elt_result: t.Processing.EltPipelineResult = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
@@ -122,7 +122,7 @@ class FlextMeltanoLibraryRunner:
                     result.error or "DBT transformation failed",
                 )
 
-            execution_result = result.unwrap()
+            execution_result = result.value
             dbt_result = cast(
                 "t.Processing.DbtTransformationResult",
                 {
@@ -195,7 +195,7 @@ class FlextMeltanoLibraryRunner:
                     result.error or "EL pipeline execution failed",
                 )
 
-            execution_result = result.unwrap()
+            execution_result = result.value
             elt_result: t.Processing.EltPipelineResult = {
                 "success": execution_result.success,
                 "tap_name": tap_name,

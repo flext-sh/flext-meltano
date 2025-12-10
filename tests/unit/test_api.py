@@ -457,7 +457,7 @@ class TestFlextMeltanoExecuteMethod:
         result = api.execute()
 
         assert result.is_success
-        assert "version" in result.unwrap()
+        assert "version" in result.value
 
     def test_execute_unknown_command(self) -> None:
         """Test execute method with unknown command."""

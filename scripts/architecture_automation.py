@@ -135,7 +135,7 @@ class PlantUMLRenderer(s):
                     error=exec_result.error,
                 )
             else:
-                process = exec_result.unwrap()
+                process = exec_result.value
                 if process.returncode == 0 and png_file.exists():
                     result.is_valid = True
                     result.rendered_path = str(png_file)
@@ -265,7 +265,7 @@ class PlantUMLRenderer(s):
             self.logger.info("Rendering diagram", diagram=str(puml_file))
             result = self.render_diagram(puml_file)
             if result.is_success:
-                results.append(result.unwrap())
+                results.append(result.value)
             else:
                 self.logger.warning(
                     "Failed to render diagram",
@@ -626,7 +626,7 @@ class ArchitectureDocumentationManager:
         )
 
         if render_result.is_success:
-            for diagram_result in render_result.unwrap():
+            for diagram_result in render_result.value:
                 if diagram_result.is_valid and diagram_result.rendered_path:
                     result.generated_files.append(diagram_result.rendered_path)
         else:

@@ -52,9 +52,9 @@ class TestFlextDbtProgrammaticRunner:
 
                 # Type annotation to help type checker
                 assert result.is_success
-                assert result.unwrap()["success"] is True
-                assert result.unwrap()["models_run"] == ["model1", "model2"]
-                assert result.unwrap()["execution_method"] == "dbt_runner_programmatic"
+                assert result.value["success"] is True
+                assert result.value["models_run"] == ["model1", "model2"]
+                assert result.value["execution_method"] == "dbt_runner_programmatic"
 
 
 class TestFlextSingerProtocolManager:
@@ -92,9 +92,9 @@ class TestFlextSingerProtocolManager:
 
         # Type annotation to help type checker
         assert result.is_success
-        assert result.unwrap()["success"] == "True"
-        assert result.unwrap()["execution_method"] == "singer_protocol_compliant"
-        assert result.unwrap()["streams_processed"] == 1
+        assert result.value["success"] == "True"
+        assert result.value["execution_method"] == "singer_protocol_compliant"
+        assert result.value["streams_processed"] == 1
 
 
 class TestFlextMeltanoLibraryRunner:
@@ -163,7 +163,7 @@ class TestFlextMeltanoLibraryRunner:
 
         assert result.is_success
         # Get the pipeline data from the result
-        pipeline_data: t.Processing.EltPipelineResult = result.unwrap()
+        pipeline_data: t.Processing.EltPipelineResult = result.value
         # Check that the pipeline data has the expected structure
         assert isinstance(pipeline_data, dict)
         assert "extraction" in pipeline_data

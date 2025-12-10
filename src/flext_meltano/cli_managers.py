@@ -57,7 +57,7 @@ class FlextMeltanoCommandRouter:
             self.logger.error(f"Command error: {handler_result.error}")
             return 1
 
-        handler = handler_result.unwrap()
+        handler = handler_result.value
         execute_result = self._execute_command(handler, command_args)
         if execute_result.is_failure:
             self.logger.error(f"Execution error: {execute_result.error}")
@@ -119,7 +119,7 @@ class FlextMeltanoPipelineManager:
         if handler_result.is_failure:
             return r[None].fail(handler_result.error)
 
-        handler = handler_result.unwrap()
+        handler = handler_result.value
         return self._execute_pipeline_operation(handler, subcommand_args)
 
     def _get_pipeline_handler(

@@ -340,7 +340,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             condition=target_result.is_success,
             message="Target creation should succeed",
         )
-        target = target_result.unwrap()
+        target = target_result.value
 
         # Test successful schema message processing (lines 249-289)
         schema: dict[str, object] = {
@@ -401,7 +401,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = target_result.unwrap()
+        target = target_result.value
 
         # Test record processing without schema (lines 315-317)
         record: dict[str, object] = {"id": 1, "name": "John Doe"}
@@ -433,7 +433,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = target_result.unwrap()
+        target = target_result.value
 
         schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
@@ -478,7 +478,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             message="Batch loading should succeed",
         )
 
-        batch_info = batch_result.unwrap()
+        batch_info = batch_result.value
         self.test_assertions.assert_equals(
             actual=cast("int", batch_info["records_attempted"]),
             expected=3,
@@ -505,7 +505,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = target_result.unwrap()
+        target = target_result.value
 
         # Add schema and data
         schema: dict[str, object] = {
@@ -544,7 +544,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             message="Target finalization should succeed",
         )
 
-        finalization_info = finalization_result.unwrap()
+        finalization_info = finalization_result.value
         self.test_assertions.assert_equals(
             actual=cast("str", finalization_info["status"]),
             expected="completed",
@@ -567,7 +567,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = target_result.unwrap()
+        target = target_result.value
 
         schema: dict[str, object] = {
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
@@ -700,7 +700,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             message="Instance creation should succeed",
         )
 
-        instance = instance_result.unwrap()
+        instance = instance_result.value
         self.test_assertions.assert_true(
             condition=isinstance(instance, FlextMeltanoTargetAbstractions),
             message="Should create FlextMeltanoTargetAbstractions instance",
@@ -714,7 +714,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             "connection_config": {"output_path": "test.jsonl"},
         }
         target_result = self.target_abstractions.create_flext_target(target_config)
-        target = target_result.unwrap()
+        target = target_result.value
 
         # Test finalization of non-existent stream
         result = self.target_abstractions.finalize_stream(target, "non_existent_stream")

@@ -34,7 +34,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["tap-postgres"]
 
     def test_translate_tap_run_discover_mode(self) -> None:
@@ -47,7 +47,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["tap-postgres", "--discover"]
 
     def test_translate_tap_run_with_config(self) -> None:
@@ -61,7 +61,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["tap-postgres", "--config", "/path/to/config.json"]
 
     def test_translate_tap_run_with_catalog(self) -> None:
@@ -75,7 +75,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["tap-postgres", "--catalog", "/path/to/catalog.json"]
 
     def test_translate_tap_run_with_state(self) -> None:
@@ -89,7 +89,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["tap-postgres", "--state", "/path/to/state.json"]
 
     def test_translate_tap_run_with_properties(self) -> None:
@@ -103,7 +103,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["tap-postgres", "--properties", "/path/to/properties.json"]
 
     def test_translate_tap_run_with_all_parameters(self) -> None:
@@ -120,7 +120,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "tap-postgres",
             "--config",
@@ -145,7 +145,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         # Should only include tap name and --discover flag
         assert command == ["tap-postgres", "--discover"]
 
@@ -162,7 +162,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["target-postgres"]
 
     def test_translate_target_run_with_config(self) -> None:
@@ -175,7 +175,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["target-postgres", "--config", "/path/to/config.json"]
 
     def test_translate_target_run_with_input(self) -> None:
@@ -188,7 +188,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["target-postgres", "--input", "/path/to/input.jsonl"]
 
     def test_translate_target_run_with_all_parameters(self) -> None:
@@ -202,7 +202,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "target-postgres",
             "--config",
@@ -225,7 +225,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
-        tap_command, target_command = result.unwrap()
+        tap_command, target_command = result.value
         assert tap_command == ["tap-postgres"]
         assert target_command == ["target-postgres"]
 
@@ -240,7 +240,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
-        tap_command, target_command = result.unwrap()
+        tap_command, target_command = result.value
         assert tap_command == ["tap-postgres", "--config", "/path/to/tap-config.json"]
         assert target_command == ["target-postgres"]
 
@@ -255,7 +255,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
-        tap_command, target_command = result.unwrap()
+        tap_command, target_command = result.value
         assert tap_command == ["tap-postgres"]
         assert target_command == [
             "target-postgres",
@@ -274,7 +274,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
-        tap_command, target_command = result.unwrap()
+        tap_command, target_command = result.value
         assert tap_command == ["tap-postgres", "--catalog", "/path/to/catalog.json"]
         assert target_command == ["target-postgres"]
 
@@ -289,7 +289,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
-        tap_command, target_command = result.unwrap()
+        tap_command, target_command = result.value
         assert tap_command == ["tap-postgres", "--state", "/path/to/state.json"]
         assert target_command == ["target-postgres"]
 
@@ -307,7 +307,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
 
         assert result.is_success
-        tap_command, target_command = result.unwrap()
+        tap_command, target_command = result.value
         assert tap_command == [
             "tap-postgres",
             "--config",
@@ -336,7 +336,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == ["dbt", "run", "--project-dir", "/path/to/dbt/project"]
 
     def test_translate_dbt_run_with_models(self) -> None:
@@ -349,7 +349,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "dbt",
             "run",
@@ -369,7 +369,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "dbt",
             "run",
@@ -389,7 +389,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "dbt",
             "run",
@@ -409,7 +409,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "dbt",
             "run",
@@ -428,7 +428,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "dbt",
             "run",
@@ -452,7 +452,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
 
         assert result.is_success
-        command = result.unwrap()
+        command = result.value
         assert command == [
             "dbt",
             "run",
@@ -489,7 +489,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         ])
 
         assert result.is_success
-        output = result.unwrap()
+        output = result.value
         assert output["stdout"] == "Success output"
         assert not output["stderr"]
         assert output["returncode"] == 0
@@ -584,14 +584,14 @@ class TestFlextMeltanoSingerCliTranslatorFileValidation:
         result = FlextMeltanoSingerCliTranslator.validate_file_path(None)
 
         assert result.is_success
-        assert result.unwrap() is None
+        assert result.value is None
 
     def test_validate_file_path_empty_string(self) -> None:
         """Test file path validation with empty string."""
         result = FlextMeltanoSingerCliTranslator.validate_file_path("")
 
         assert result.is_success
-        assert result.unwrap() is None
+        assert result.value is None
 
     def test_validate_file_path_valid(self, tmp_path: Path) -> None:
         """Test file path validation with valid file."""
@@ -601,7 +601,7 @@ class TestFlextMeltanoSingerCliTranslatorFileValidation:
         result = FlextMeltanoSingerCliTranslator.validate_file_path(str(test_file))
 
         assert result.is_success
-        validated_path = result.unwrap()
+        validated_path = result.value
         assert validated_path == test_file
         assert validated_path.exists()
 

@@ -53,7 +53,7 @@ class TestTapService:
         """Test TapService creation and initialization."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         assert isinstance(tap_service, FlextMeltanoService)
         assert hasattr(tap_service, "tap_name")
 
@@ -65,14 +65,14 @@ class TestTapService:
             host="localhost",
         )
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         assert isinstance(tap_service, FlextMeltanoService)
 
     def test_tap_service_adapter_property(self) -> None:
         """Test TapService has container for dependency injection."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         # Test that service has internal container (unified architecture)
         assert hasattr(tap_service, "_container")
         assert tap_service._container is not None
@@ -81,7 +81,7 @@ class TestTapService:
         """Test TapService execute method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         result = tap_service.execute()
         assert isinstance(result, r)
         # The result will depend on the actual implementation
@@ -90,7 +90,7 @@ class TestTapService:
         """Test TapService validate_config method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         result = tap_service.validate_config()
         assert isinstance(result, r)
 
@@ -98,7 +98,7 @@ class TestTapService:
         """Test TapService get_info method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         result = tap_service.get_info()
         assert isinstance(result, r)
 
@@ -106,7 +106,7 @@ class TestTapService:
         """Test TapService create_tap_instance method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"file_path": tmp_file.name}
             result = tap_service.create_instance(config)
@@ -116,7 +116,7 @@ class TestTapService:
         """Test TapService validate_tap_config method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
@@ -126,7 +126,7 @@ class TestTapService:
         """Test TapService get_default_config method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         result = tap_service.get_default_config()
         assert isinstance(result, r)
 
@@ -134,7 +134,7 @@ class TestTapService:
         """Test TapService validate_service method."""
         service_result = self.create_tap_service("tap-csv")
         assert service_result.is_success
-        tap_service = service_result.unwrap()
+        tap_service = service_result.value
         result = tap_service.validate_service()
         assert isinstance(result, r)
 
@@ -152,7 +152,7 @@ class TestTargetService:
         """Test TargetService creation and initialization."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         assert isinstance(target_service, FlextMeltanoService)
         assert hasattr(target_service, "target_name")
 
@@ -164,14 +164,14 @@ class TestTargetService:
             host="localhost",
         )
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         assert isinstance(target_service, FlextMeltanoService)
 
     def test_target_service_has_container(self) -> None:
         """Test TargetService has container for dependency injection."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         # Test that service has internal container (unified architecture)
         assert hasattr(target_service, "_container")
         assert target_service._container is not None
@@ -180,7 +180,7 @@ class TestTargetService:
         """Test TargetService execute method."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         result = target_service.execute()
         assert isinstance(result, r)
 
@@ -188,7 +188,7 @@ class TestTargetService:
         """Test TargetService get_info method."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         result = target_service.get_info()
         assert isinstance(result, r)
 
@@ -196,7 +196,7 @@ class TestTargetService:
         """Test TargetService create_target_instance method."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"output_path": tmp_file.name}
             result = target_service.create_instance(config)
@@ -206,7 +206,7 @@ class TestTargetService:
         """Test TargetService validate_target_config method."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
@@ -216,7 +216,7 @@ class TestTargetService:
         """Test TargetService get_default_config method."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         result = target_service.get_default_config()
         assert isinstance(result, r)
 
@@ -224,7 +224,7 @@ class TestTargetService:
         """Test TargetService validate_service method."""
         service_result = self.create_target_service("target-csv")
         assert service_result.is_success
-        target_service = service_result.unwrap()
+        target_service = service_result.value
         result = target_service.validate_service()
         assert isinstance(result, r)
 
@@ -242,7 +242,7 @@ class TestDbtService:
         """Test DbtService creation and initialization."""
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
-        dbt_service = service_result.unwrap()
+        dbt_service = service_result.value
         assert isinstance(dbt_service, FlextMeltanoService)
         assert hasattr(dbt_service, "project_name")
 
@@ -254,14 +254,14 @@ class TestDbtService:
             target="dev",
         )
         assert service_result.is_success
-        dbt_service = service_result.unwrap()
+        dbt_service = service_result.value
         assert isinstance(dbt_service, FlextMeltanoService)
 
     def test_dbt_service_has_container(self) -> None:
         """Test DbtService has container for dependency injection."""
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
-        dbt_service = service_result.unwrap()
+        dbt_service = service_result.value
         # Test that service has internal container (unified architecture)
         assert hasattr(dbt_service, "_container")
         assert dbt_service._container is not None
@@ -270,7 +270,7 @@ class TestDbtService:
         """Test DbtService execute method."""
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
-        dbt_service = service_result.unwrap()
+        dbt_service = service_result.value
         result = dbt_service.execute()
         assert isinstance(result, r)
 
@@ -278,7 +278,7 @@ class TestDbtService:
         """Test DbtService get_info method."""
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
-        dbt_service = service_result.unwrap()
+        dbt_service = service_result.value
         result = dbt_service.get_info()
         assert isinstance(result, r)
 
@@ -286,7 +286,7 @@ class TestDbtService:
         """Test DbtService get_profiles_config method."""
         service_result = self.create_dbt_service("my_dbt_project")
         assert service_result.is_success
-        dbt_service = service_result.unwrap()
+        dbt_service = service_result.value
         result = dbt_service.get_profiles_config()
         assert isinstance(result, r)
 

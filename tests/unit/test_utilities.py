@@ -36,7 +36,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert result.is_success
-        config_dict = result.unwrap()
+        config_dict = result.value
 
         assert config_dict["project_id"] == "test-project"
         assert config_dict["version"] == "1.0.0"
@@ -59,7 +59,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert result.is_success
-        config_dict = cast("dict[str, object]", result.unwrap())
+        config_dict = cast("dict[str, object]", result.value)
 
         assert config_dict["project_id"] == "etl-project"
         plugins_dict = cast("dict[str, list[dict[str, str]]]", config_dict["plugins"])
@@ -81,7 +81,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert config_result.is_success
-        config_dict = cast("dict[str, object]", config_result.unwrap())
+        config_dict = cast("dict[str, object]", config_result.value)
 
         assert config_dict["project_id"] == "multi-env-project"
         env_dict = cast(
@@ -368,7 +368,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert result.is_success
-        config_dict = result.unwrap()
+        config_dict = result.value
 
         assert config_dict["project_id"] == "test-project"
         assert config_dict["version"] == 1  # Default value
@@ -386,7 +386,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
 
         assert result.is_success
-        config_dict = result.unwrap()
+        config_dict = result.value
 
         assert config_dict["project_id"] == "test-project"
         assert config_dict["version"] == 1  # Default value
