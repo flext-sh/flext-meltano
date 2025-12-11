@@ -22,10 +22,10 @@ import meltano
 from flext_core import FlextLogger, FlextResult
 
 from flext_meltano import u
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
@@ -39,9 +39,9 @@ m = FlextMeltanoModels
 class FlextMeltanoAdapter:
     """Legacy adapter class - delegates to focused adapter classes."""
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize legacy adapter with focused adapters."""
-        self._config = config if config is not None else FlextMeltanoConfig()
+        self._config = config if config is not None else FlextMeltanoSettings()
         self._library_runner_instance: FlextMeltanoLibraryRunner | None = None
         self.project_adapter = self.Project(config)
         self.plugin_adapter = self.Plugin(config)
@@ -69,9 +69,9 @@ class FlextMeltanoAdapter:
     class Project:
         """Focused adapter for Meltano project management following SOLID principles."""
 
-        def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+        def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
             """Initialize Project with flext-core patterns."""
-            self._config = config if config is not None else FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoSettings()
             self.logger: FlextLogger = FlextLogger(__name__)
             self._current_project: object | None = None
 
@@ -124,9 +124,9 @@ class FlextMeltanoAdapter:
     class Plugin:
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
-        def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+        def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
             """Initialize Plugin with flext-core patterns."""
-            self._config = config if config is not None else FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoSettings()
             self.logger: FlextLogger = FlextLogger(__name__)
 
         @staticmethod
@@ -152,9 +152,9 @@ class FlextMeltanoAdapter:
     class Pipeline:
         """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
-        def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+        def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
             """Initialize Pipeline with flext-core patterns."""
-            self._config = config if config is not None else FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoSettings()
             self.logger: FlextLogger = FlextLogger(__name__)
 
         @staticmethod
@@ -197,9 +197,9 @@ class FlextMeltanoAdapter:
     class Singer:
         """Focused adapter for Singer protocol operations following SOLID principles."""
 
-        def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+        def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
             """Initialize Singer with flext-core patterns."""
-            self._config = config if config is not None else FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoSettings()
             self.logger: FlextLogger = FlextLogger(__name__)
 
         @staticmethod
@@ -239,9 +239,9 @@ class FlextMeltanoAdapter:
     class Dbt:
         """Focused adapter for DBT operations following SOLID principles."""
 
-        def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+        def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
             """Initialize Dbt with flext-core patterns."""
-            self._config = config if config is not None else FlextMeltanoConfig()
+            self._config = config if config is not None else FlextMeltanoSettings()
             self.logger: FlextLogger = FlextLogger(__name__)
 
         @staticmethod

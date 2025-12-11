@@ -95,9 +95,9 @@ transforms:
 ### Configuration Validation
 
 ```python
-from flext_meltano import FlextMeltanoConfig
+from flext_meltano import FlextMeltanoSettings
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -117,7 +117,7 @@ from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
-config = FlextMeltanoConfig()
+config = FlextMeltanoSettings()
 validation_result: FlextResult[bool] = config.validate_meltano_config()
 
 if validation_result.is_success:
@@ -133,7 +133,7 @@ else:
 ### Tap Configuration
 
 ```python
-from flext_meltano import TapConfig, FlextMeltanoConfigBuilders
+from flext_meltano import TapConfig, FlextMeltanoSettingsBuilders
 
 # Create tap configuration
 tap_config = TapConfig(
@@ -151,21 +151,21 @@ tap_config = TapConfig(
 )
 
 # Build pipeline configuration
-builder = FlextMeltanoConfigBuilders()
+builder = FlextMeltanoSettingsBuilders()
 pipeline_config = builder.build_tap_config(tap_config.dict())
 ```
 
 ### Target Configuration
 
 ```python
-from flext_meltano import FlextMeltanoConfigBuilders
+from flext_meltano import FlextMeltanoSettingsBuilders
 
 target_settings = {
     "destination_path": "output/",
     "file_naming_scheme": "{stream_name}.jsonl"
 }
 
-builder = FlextMeltanoConfigBuilders()
+builder = FlextMeltanoSettingsBuilders()
 target_config = builder.build_target_config(target_settings)
 ```
 
@@ -262,10 +262,10 @@ result = dbt_service.execute_dbt_operation()
 ### Complete ELT Pipeline
 
 ```python
-from flext_meltano import FlextMeltanoService, FlextMeltanoConfigBuilders
+from flext_meltano import FlextMeltanoService, FlextMeltanoSettingsBuilders
 
 # Build complete pipeline configuration
-builder = FlextMeltanoConfigBuilders()
+builder = FlextMeltanoSettingsBuilders()
 
 # Tap configuration
 tap_config = {
@@ -352,9 +352,9 @@ environments:
 ### Environment Switching
 
 ```python
-from flext_meltano import FlextMeltanoConfig
+from flext_meltano import FlextMeltanoSettings
 
-config = FlextMeltanoConfig()
+config = FlextMeltanoSettings()
 
 # Load development configuration
 dev_config = config.load_configuration("dev")
@@ -473,7 +473,7 @@ Due to compliance issues:
 
 ### Workarounds
 
-1. **Use Abstractions**: Leverage existing FlextMeltanoConfig where possible
+1. **Use Abstractions**: Leverage existing FlextMeltanoSettings where possible
 2. **Monitor Progress**: Track abstraction layer implementation
 3. **Plan Migration**: Prepare for wrapper layer adoption
 4. **Validate Patterns**: Use FlextResult patterns consistently

@@ -13,8 +13,8 @@ from flext_core import FlextLogger
 # Import ONLY what actually exists
 from flext_meltano import (
     FlextMeltanoBridge,
-    FlextMeltanoConfig,
     FlextMeltanoExecutor,
+    FlextMeltanoSettings,
 )
 
 logger = FlextLogger(__name__)
@@ -49,11 +49,11 @@ def simple_executor_example() -> None:
 
 
 def simple_config_example() -> None:
-    """Example using real FlextMeltanoConfig functionality."""
+    """Example using real FlextMeltanoSettings functionality."""
     # Create config using real API
-    config = FlextMeltanoConfig()
+    config = FlextMeltanoSettings()
 
-    # Use actual existing method from FlextMeltanoConfig
+    # Use actual existing method from FlextMeltanoSettings
     logger.info("Config created: %s", config)
 
     # Show environment value

@@ -1,10 +1,10 @@
 """FLEXT-Meltano Documentation Configuration Service.
 
-Centralized configuration management for documentation automation using FlextConfig.
+Centralized configuration management for documentation automation using FlextSettings.
 All hardcoded values and thresholds are centralized here for maintainability and consistency.
 
 ARCHITECTURAL INTEGRATION:
-- FlextConfig: Base configuration class with validation and environment variable support
+- FlextSettings: Base configuration class with validation and environment variable support
 - FlextContainer: Singleton pattern for global configuration access
 - Railway Pattern: r[T] for configuration loading and validation
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import ClassVar, cast
 
 import yaml
-from flext_core import FlextConfig, FlextContainer, FlextResult, u
+from flext_core import FlextContainer, FlextResult, FlextSettings, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -28,10 +28,10 @@ c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
-class DocsConfig(FlextConfig):
+class DocsConfig(FlextSettings):
     """Centralized configuration for documentation automation.
 
-    Extends FlextConfig with documentation-specific settings.
+    Extends FlextSettings with documentation-specific settings.
     All hardcoded values from throughout the codebase are centralized here.
 
     Attributes:
@@ -102,7 +102,7 @@ class DocsConfig(FlextConfig):
         return instance
 
     def load_from_file(self, config_path: str | Path | None = None) -> r[DocsConfig]:
-        """Load configuration from YAML file using FlextConfig patterns.
+        """Load configuration from YAML file using FlextSettings patterns.
 
         Args:
             config_path: Path to configuration file (uses self.config_path if None)

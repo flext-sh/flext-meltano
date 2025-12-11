@@ -35,7 +35,6 @@ from flext_meltano.__version__ import __version__, __version_info__
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.api import FlextMeltano
 from flext_meltano.bridge import FlextMeltanoBridge
-from flext_meltano.config import FlextMeltanoConfig
 
 # =========================================================================
 # FOUNDATION LAYER - Core patterns and definitions
@@ -86,6 +85,7 @@ from flext_meltano.protocols import (
     FlextMeltanoSingerProtocols,
 )
 from flext_meltano.services import FlextMeltanoService
+from flext_meltano.settings import FlextMeltanoSettings
 
 # =========================================================================
 # SINGER DOMAIN - Deep singer-sdk integration (NO CLI)
@@ -129,7 +129,6 @@ __all__ = [
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoCatalogManager",
-    "FlextMeltanoConfig",
     # Foundation
     "FlextMeltanoConstants",
     # DBT domain - Deep dbt-core integration (NO CLI)
@@ -148,6 +147,7 @@ __all__ = [
     "FlextMeltanoProjectManager",
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
+    "FlextMeltanoSettings",
     "FlextMeltanoSingerProtocols",
     "FlextMeltanoSingerService",
     "FlextMeltanoStateManager",

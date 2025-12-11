@@ -17,8 +17,8 @@ from typing import cast
 from flext_core import r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.project_service import FlextMeltanoProjectService
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 
 
@@ -30,13 +30,13 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoConfig
+    _config: FlextMeltanoSettings
     _abstractions: FlextMeltanoAbstractions
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute(

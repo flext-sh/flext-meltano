@@ -533,7 +533,7 @@ All FLEXT projects follow consistent integration patterns:
 ```python
 # Standard FLEXT project structure
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext

@@ -159,7 +159,7 @@ Description of what users should see when running the example.
 
 object
 
-from flext_meltano import FlextMeltanoConfig
+from flext_meltano import FlextMeltanoSettings
 
 def demonstrate_pattern() -> t.Dict:
     """Demonstrate specific pattern with clear documentation.

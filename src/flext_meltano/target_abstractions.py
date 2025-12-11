@@ -17,9 +17,9 @@ from typing import cast
 from flext_core import FlextResult, FlextService
 
 from flext_meltano import u
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 
 # Import aliases for concise usage
@@ -42,11 +42,11 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Instance attributes (declared for type checker)
-    _config: FlextMeltanoConfig
+    _config: FlextMeltanoSettings
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified sink abstractions with FLEXT configuration."""
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
 
         # Initialize FlextService parent class
         super().__init__()

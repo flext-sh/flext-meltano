@@ -1,4 +1,4 @@
-"""FlextMeltanoLoggingConfig - Consolidated logging configuration for pipeline operations.
+"""FlextMeltanoLoggingSettings - Consolidated logging configuration for pipeline operations.
 
 Organizes 62+ logging boolean fields into coherent categories:
 - Pipeline operations logging
@@ -19,7 +19,7 @@ from flext_core import FlextModels
 from pydantic import Field, computed_field
 
 
-class FlextMeltanoLoggingConfig(FlextModels):
+class FlextMeltanoLoggingSettings(FlextModels):
     """Consolidated logging configuration for all pipeline operations.
 
     Single responsibility: manage logging configuration across all domains.
@@ -323,4 +323,4 @@ class FlextMeltanoLoggingConfig(FlextModels):
         }
 
 
-__all__ = ["FlextMeltanoLoggingConfig"]
+__all__ = ["FlextMeltanoLoggingSettings"]

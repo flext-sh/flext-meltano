@@ -6,7 +6,7 @@ for documentation quality assurance using complete FLEXT ecosystem integration.
 
 ARCHITECTURAL INTEGRATION:
 - r[T]: Railway pattern error handling
-- FlextConfig: Centralized configuration management
+- FlextSettings: Centralized configuration management
 - FlextLogger: Structured logging with correlation
 - FlextService: Service base class with dependency injection
 - FlextCli: CLI utilities for subprocess operations

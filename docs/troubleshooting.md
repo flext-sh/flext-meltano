@@ -62,7 +62,7 @@ make type-check
 # Ensure proper type hints
 from typing import Optional
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -250,7 +250,7 @@ class UtilityClass:
 
 # ✅ Correct
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext

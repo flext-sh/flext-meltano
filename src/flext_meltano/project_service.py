@@ -24,9 +24,9 @@ from flext_core import (
 )
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
@@ -50,10 +50,10 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     Extends flext-core foundation for enterprise data pipeline orchestration.
     """
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
         self.logger: FlextLogger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
         self._abstractions = FlextMeltanoAbstractions()

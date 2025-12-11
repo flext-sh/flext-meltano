@@ -13,9 +13,9 @@ from flext_core import FlextResult, FlextService
 from singer_sdk import Stream, Tap
 
 from flext_meltano import u
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -43,7 +43,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def __init__(self, config: object | None = None) -> None:
         """Initialize unified source abstractions with FLEXT configuration."""
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
 
         # Initialize FlextService parent class
         super().__init__()

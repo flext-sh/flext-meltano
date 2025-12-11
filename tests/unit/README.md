@@ -10,7 +10,7 @@ This directory contains **isolated unit tests** for FLEXT Meltano's bridge archi
 
 #### **Foundation Module Tests**
 
-- **Configuration Tests**: FlextMeltanoConfig validation and initialization
+- **Configuration Tests**: FlextMeltanoSettings validation and initialization
 - **Base Service Tests**: Service factory patterns and dependency injection
 - **Exception Tests**: Error hierarchy and context management
 - **Utility Tests**: Common functions and validation utilities
@@ -104,7 +104,7 @@ pytest tests/unit/ -m "unit" --tb=short  # Unit tests only
 # Standard mocking patterns for unit tests
 from unittest.mock import Mock, patch
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -140,12 +140,12 @@ def test_execution_with_mock(mock_subprocess):
 ```python
 # Reusable test fixtures for unit tests
 import pytest
-from flext_meltano.base import FlextMeltanoConfig
+from flext_meltano.base import FlextMeltanoSettings
 
 @pytest.fixture
 def test_config():
     """Provide test configuration for unit tests."""
-    return FlextMeltanoConfig(
+    return FlextMeltanoSettings(
         project_root="/tmp/test",
         environment="test"
     )
