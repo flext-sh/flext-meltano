@@ -135,12 +135,12 @@ export MELTANO_ENVIRONMENT=test
 ```python
 # Integration test pattern for service interaction
 import pytest
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoConfig
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoSettings
 
 @pytest.mark.integration
 def test_bridge_meltano_integration():
     """Test real bridge to Meltano CLI integration."""
-    config = FlextMeltanoConfig(project_root="./test_project")
+    config = FlextMeltanoSettings(project_root="./test_project")
     bridge = FlextMeltanoBridge(config)
 
     # Test actual Meltano CLI interaction

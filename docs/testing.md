@@ -289,7 +289,7 @@ def test_service_with_meltano_integration(mock_meltano_adapter):
 @pytest.fixture
 def sample_config():
     """Provide sample configuration for testing."""
-    return FlextMeltanoConfig(
+    return FlextMeltanoSettings(
         project_root=Path("/tmp/test"),
         environment="test",
         plugins=[{"name": "tap-csv", "variant": "meltano"}]

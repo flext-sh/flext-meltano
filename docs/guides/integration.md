@@ -28,7 +28,7 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 ```python
 # Example: flext-tap-oracle integration
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -72,7 +72,7 @@ class FlextOracleTapService(FlextService):
 ```python
 # Example: flext-target-oracle integration
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -116,7 +116,7 @@ class FlextOracleTargetService(FlextService):
 ```python
 # Example: flext-dbt-oracle integration
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -162,7 +162,7 @@ class FlextOracleDbtService(FlextService):
 
 ```python
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -372,7 +372,7 @@ flext-cli = "^0.9.9"      # CLI development tools
 
 ```python
 from flext_core import FlextBus
-from flext_core import FlextConfig
+from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
@@ -402,9 +402,9 @@ container.register("target_abstractions", FlextMeltanoTargetAbstractions)
 **2. Configuration Management**:
 
 ```python
-from flext_meltano import FlextMeltanoConfigBuilders
+from flext_meltano import FlextMeltanoSettingsBuilders
 
-builder = FlextMeltanoConfigBuilders()
+builder = FlextMeltanoSettingsBuilders()
 config = builder.build_pipeline_config(tap_settings, target_settings)
 ```
 

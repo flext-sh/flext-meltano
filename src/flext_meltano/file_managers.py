@@ -155,7 +155,7 @@ class FlextMeltanoFileManagers:
 
             # DSL: Use u.ensure for type narrowing
             ensured_result: object = u.ensure(
-                cast("t_core.GeneralValueType", config_data),
+                cast("t_core.t.GeneralValueType", config_data),
                 target_type="dict",
                 default={},
             )

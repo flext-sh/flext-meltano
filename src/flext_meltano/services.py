@@ -20,9 +20,9 @@ from flext_core import (
     u,
 )
 
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -71,11 +71,11 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     source_name: str | None = None
     sink_name: str | None = None
     transformation_name: str | None = None
-    _config: FlextMeltanoConfig
+    _config: FlextMeltanoSettings
     _service_type: str | None = None
 
     @property
-    def config(self) -> FlextMeltanoConfig:
+    def config(self) -> FlextMeltanoSettings:
         """Get the service configuration instance."""
         return self._config
 
@@ -106,7 +106,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def __init__(
         self,
-        config: FlextMeltanoConfig | None = None,
+        config: FlextMeltanoSettings | None = None,
         service_name: str = "flext_meltano_service",
         version: str = "0.9.9",
         source_name: str | None = None,
@@ -142,7 +142,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             msg = "Service name cannot be empty"
             raise e.ValidationError(msg)
 
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
 
         # Map domain-specific parameters to generic parameters (SOLID mapping)
         mapped_source_name = source_name or tap_name

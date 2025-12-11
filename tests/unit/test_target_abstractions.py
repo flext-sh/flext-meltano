@@ -31,7 +31,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     # =========================================================================
 
     def test_flext_target_config_validation(self) -> None:
-        """Test FlextTargetConfig validation using flext_tests."""
+        """Test FlextTargetSettings validation using flext_tests."""
         # Create test config using flext_tests utilities
         test_config_data = {
             "target_type": "jsonl",
@@ -62,7 +62,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         )
 
     def test_flext_target_config_validation_errors(self) -> None:
-        """Test FlextTargetConfig validation errors using flext_tests."""
+        """Test FlextTargetSettings validation errors using flext_tests."""
         # Test invalid target_type using flext_tests error patterns
         try:
             m.TargetConfig(

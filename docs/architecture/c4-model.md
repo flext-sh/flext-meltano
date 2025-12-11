@@ -130,8 +130,8 @@ Rel(dbt_cli, data_targets, "Transforms", "SQL")
 | **API Layer**     | FastAPI/Python     | External interface   | `FlextMeltano`, `FlextMeltanoCLI`               |
 | **Service Layer** | Python             | Business logic       | `FlextMeltanoService`, `FlextMeltanoExecutor`   |
 | **Adapter Layer** | Python             | External integration | `FlextMeltanoAdapter`, `FlextMeltanoDbtService` |
-| **Domain Model**  | Pydantic/Python    | Data validation      | `FlextMeltanoModels`, `FlextMeltanoConfig`      |
-| **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoConfig`, environment variables     |
+| **Domain Model**  | Pydantic/Python    | Data validation      | `FlextMeltanoModels`, `FlextMeltanoSettings`      |
+| **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoSettings`, environment variables     |
 | **State Store**   | File System/SQLite | Persistence          | JSON files, SQLite database                     |
 
 ---
@@ -274,10 +274,10 @@ Package "Domain Model" as models {
         +TapRunParams
         +TargetRunParams
         +PipelineConfig
-        +FlextPluginConfig
+        +FlextPluginSettings
     }
 
-    Class FlextMeltanoConfig {
+    Class FlextMeltanoSettings {
         +load_from_file()
         +validate_config()
         +get_environment_vars()
@@ -292,7 +292,7 @@ FlextMeltanoExecutor --> FlextMeltanoDbtService : orchestrates
 FlextMeltanoPluginService --> FlextMeltanoAdapter : manages
 
 FlextMeltanoService --> FlextMeltanoModels : validates
-FlextMeltanoService --> FlextMeltanoConfig : configures
+FlextMeltanoService --> FlextMeltanoSettings : configures
 
 note right of FlextMeltanoService
     Railway-oriented error handling
@@ -311,7 +311,7 @@ end note
 | **FlextMeltanoAdapter**  | Meltano integration      | CLI operations, project management    | Meltano CLI, file system    |
 | **FlextMeltanoExecutor** | Pipeline orchestration   | Tap/target execution, monitoring      | Singer service, DBT service |
 | **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |
-| **FlextMeltanoConfig**   | Configuration management | Settings loading, validation          | YAML, environment variables |
+| **FlextMeltanoSettings**   | Configuration management | Settings loading, validation          | YAML, environment variables |
 
 ---
 

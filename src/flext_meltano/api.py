@@ -31,10 +31,10 @@ from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes, t
 
 # Import aliases for simplified usage
@@ -64,7 +64,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     - Pattern matching for operation dispatch
 
     **Pydantic Integration:**
-    - FlextMeltanoConfig for configuration management
+    - FlextMeltanoSettings for configuration management
     - Type-safe configuration with validation
     - Proper model inheritance and composition
 
@@ -84,7 +84,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     # Core service attributes with proper typing
     service_name: str
     version: str = cast("str", __version__)
-    _config: FlextMeltanoConfig
+    _config: FlextMeltanoSettings
 
     @property
     def constants(self) -> type[FlextMeltanoConstants]:
@@ -103,7 +103,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
 
     def __init__(
         self,
-        config: FlextMeltanoConfig | None = None,
+        config: FlextMeltanoSettings | None = None,
         service_name: str = "flext_meltano_api",
         version: str | None = None,
         project_root: str | None = None,
@@ -119,7 +119,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         # DSL: Build config with project_root if provided
         if config is None:
             if project_root is not None:
-                config = FlextMeltanoConfig.model_validate({
+                config = FlextMeltanoSettings.model_validate({
                     "project_root": project_root,
                 })
             else:
@@ -127,12 +127,12 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         if config is None:
             if project_root:
                 # Use Pydantic model_validate for type-safe initialization
-                self._config = FlextMeltanoConfig.model_validate({
+                self._config = FlextMeltanoSettings.model_validate({
                     "project_root": project_root,
                 })
             else:
                 # DSL: Create config instance - AutoConfig pattern handles initialization
-                self._config = FlextMeltanoConfig.model_validate({})
+                self._config = FlextMeltanoSettings.model_validate({})
         else:
             self._config = config
 

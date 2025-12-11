@@ -12,9 +12,9 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextService
 from singer_sdk import Target
 
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -42,7 +42,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def __init__(self, config: object | None = None) -> None:
         """Initialize unified sink abstractions with FLEXT configuration."""
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
         # Initialize FlextService base - logger comes from FlextMixins
         super().__init__()
 

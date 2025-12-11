@@ -190,8 +190,8 @@ def meltano_test_project(tmp_path):
 # Service configuration templates
 @pytest.fixture
 def flext_meltano_config():
-    """Standard FlextMeltanoConfig for testing."""
-    return FlextMeltanoConfig(
+    """Standard FlextMeltanoSettings for testing."""
+    return FlextMeltanoSettings(
         project_root="/tmp/test_project",
         environment="test",
         log_level="debug",

@@ -19,10 +19,10 @@ from pathlib import Path
 from flext_core import FlextLogger, FlextResult, FlextService
 
 from flext_meltano import u
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 
 # Import aliases for concise usage
@@ -43,10 +43,10 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
     Following FLEXT 'one namespace class per domain' pattern.
     """
 
-    def __init__(self, config: FlextMeltanoConfig | None = None) -> None:
+    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified Singer class with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoConfig()
+        self._config = config or FlextMeltanoSettings()
         self._logger = FlextLogger(__name__)
         self._library_runner = FlextMeltanoLibraryRunner()
 

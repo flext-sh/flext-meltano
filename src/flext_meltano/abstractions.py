@@ -283,7 +283,7 @@ class FlextMeltanoAbstractions:
             # Simplified implementation - would validate and add plugin
             self.logger.info(
                 "Adding plugin",
-                plugin_config=cast("t_core.GeneralValueType", plugin_config),
+                plugin_config=cast("t_core.t.GeneralValueType", plugin_config),
             )
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

@@ -21,10 +21,10 @@ from flext_meltano import u
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.config import FlextMeltanoConfig
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
@@ -43,7 +43,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoConfig
+    _config: FlextMeltanoSettings
     _bridge: FlextMeltanoBridge
     _adapter: FlextMeltanoAdapter | None
 
@@ -54,12 +54,12 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         config_guard = u.guard(config, dict, return_value=True)
         if config_guard:
             try:
-                self._config = FlextMeltanoConfig.model_validate(config_guard)
+                self._config = FlextMeltanoSettings.model_validate(config_guard)
             except (ValueError, TypeError, KeyError, AttributeError, OSError):
                 # Fall back to default config if validation fails
-                self._config = FlextMeltanoConfig()
+                self._config = FlextMeltanoSettings()
         else:
-            self._config = FlextMeltanoConfig()
+            self._config = FlextMeltanoSettings()
         self._bridge = FlextMeltanoBridge()
         self._adapter = None
         # Type guard for mypy - logger is always initialized

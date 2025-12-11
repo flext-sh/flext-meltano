@@ -819,12 +819,12 @@ def plugins(self) -> list[FlextMeltanoModels.PluginInfo]:
 
 ## 🔧 Configuration Management
 
-### FlextMeltanoConfig
+### FlextMeltanoSettings
 
 **Meltano configuration management**
 
 ```python
-class FlextMeltanoConfig(FlextConfig):
+class FlextMeltanoSettings(FlextSettings):
     """Meltano-specific configuration management."""
 ```
 
@@ -996,12 +996,12 @@ class FlextMeltanoPipelineException(FlextMeltanoException):
     """Exception raised for pipeline execution errors."""
 ```
 
-#### FlextMeltanoConfigurationException
+#### FlextMeltanoSettingsurationException
 
 **Configuration-related errors**
 
 ```python
-class FlextMeltanoConfigurationException(FlextMeltanoException):
+class FlextMeltanoSettingsurationException(FlextMeltanoException):
     """Exception raised for configuration errors."""
 ```
 
