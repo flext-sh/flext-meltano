@@ -42,7 +42,7 @@ from flext_meltano.bridge import FlextMeltanoBridge
 # Domain-specific aliases
 from flext_meltano.constants import (
     FlextMeltanoConstants,
-    FlextMeltanoConstants as c,
+    c,
 )
 
 # =========================================================================
@@ -81,8 +81,8 @@ from flext_meltano.models import (
 from flext_meltano.protocols import (
     FlextMeltanoPluginProtocols,
     FlextMeltanoProtocols,
-    FlextMeltanoProtocols as p,
     FlextMeltanoSingerProtocols,
+    p,
 )
 from flext_meltano.services import FlextMeltanoService
 from flext_meltano.settings import FlextMeltanoSettings
@@ -103,11 +103,11 @@ from flext_meltano.singer import (
 )
 from flext_meltano.typings import (
     FlextMeltanoTypes,
-    FlextMeltanoTypes as t,
+    t,
 )
 from flext_meltano.utilities import (
     FlextMeltanoUtilities,
-    FlextMeltanoUtilities as u,
+    u,
 )
 from flext_meltano.validators import FlextMeltanoValidators
 
