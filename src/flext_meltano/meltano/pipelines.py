@@ -182,13 +182,13 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                     elt_context_result.error or "Failed to create ELT context",
                 )
 
-            elt_context_result.value
+            elt_context = elt_context_result.value
 
             context_data: t.MeltanoCore.RunContextDict = {
-                "t.Dbt.Project": "t.Dbt.Project",
-                "elt_context": "elt_context",
-                "extractor_plugin": "extractor_plugin",
-                "loader_plugin": "loader_plugin",
+                "t.Dbt.Project": t.Dbt.Project,
+                "elt_context": elt_context,
+                "extractor_plugin": extractor_plugin_obj,
+                "loader_plugin": loader_plugin_obj,
             }
 
             return r[dict[str, object]].ok(context_data)
