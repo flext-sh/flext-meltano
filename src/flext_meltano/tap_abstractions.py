@@ -12,6 +12,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import cast
+
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.utilities import u
@@ -418,7 +420,10 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 )
 
             # Create batches
-            batches: list[list[dict[str, object]]] = u.chunk(records, batch_size)
+            batches: list[list[dict[str, object]]] = cast(
+                "list[list[dict[str, object]]]",
+                u.chunk(records, batch_size),
+            )
 
             self.logger.info(
                 "Records batched successfully",
