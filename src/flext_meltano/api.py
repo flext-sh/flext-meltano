@@ -761,7 +761,9 @@ class FlextMeltano(s[t_core.JsonValue]):
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
-            return service.extract(config or {}).map(
+            return service.extract(
+                cast("dict[str, object]", config or {})
+            ).map(
                 lambda v: cast("t_core.JsonValue", v)
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -777,7 +779,9 @@ class FlextMeltano(s[t_core.JsonValue]):
             service = FlextMeltanoService(config=self.config, sink_name=sink_name)
             # DSL: Use u.empty for conditional check
             if records is not None and not u.empty(records):
-                return service.load_batch(records).map(
+                return service.load_batch(
+                    cast("list[dict[str, object]]", records)
+                ).map(
                     lambda v: cast("t_core.JsonValue", v)
                 )
             return r[t_core.JsonValue].ok({"status": "initialized"})
@@ -849,7 +853,7 @@ class FlextMeltano(s[t_core.JsonValue]):
         result = self.create_pipeline(
             tap_name,
             target_name,
-            config,
+            cast("t.MeltanoCore.MeltanoConfigDict | None", config),
         )
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t_core.JsonValue", v))
