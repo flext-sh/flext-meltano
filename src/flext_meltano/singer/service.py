@@ -48,7 +48,7 @@ class FlextMeltanoSingerService(s):
 
     """
 
-    class PipelineConfig(FlextMeltanoModels):
+    class PipelineConfig(FlextMeltanoModels.Entity):
         """Configuration for a Singer pipeline."""
 
         tap_config_path: Path | None = Field(
@@ -69,7 +69,7 @@ class FlextMeltanoSingerService(s):
             description="Specific streams to sync",
         )
 
-    class SyncResult(FlextMeltanoModels):
+    class SyncResult(FlextMeltanoModels.Entity):
         """Result of a Singer sync operation."""
 
         records_processed: int = Field(description="Number of records processed")

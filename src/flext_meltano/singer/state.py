@@ -134,7 +134,9 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
             if stream_name not in self._state:
                 self._state[stream_name] = {}
 
-            self._state[stream_name][bookmark_key] = bookmark_value
+            state_entry = self._state.get(stream_name)
+            if isinstance(state_entry, dict):
+                state_entry[bookmark_key] = bookmark_value
             self.logger.debug(
                 "Bookmark updated",
                 stream=stream_name,
@@ -158,8 +160,10 @@ class FlextMeltanoStateManager(FlextService[dict[str, object]]):
         """
         try:
             if stream_name in self._state:
-                value = self._state[stream_name].get(bookmark_key)
-                return r[str | None].ok(value)
+                state_entry = self._state[stream_name]
+                if isinstance(state_entry, dict):
+                    value = state_entry.get(bookmark_key)
+                    return r[str | None].ok(value)
             return r[str | None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to get bookmark", error=str(e))

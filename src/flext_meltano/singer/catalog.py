@@ -151,7 +151,10 @@ class FlextMeltanoCatalogManager(FlextService):
             streams = streams_raw if isinstance(streams_raw, list) else []
             selected = u.filter(streams, lambda s: u.get(s, "name") in stream_names)
 
-            filtered_catalog = {"streams": selected}
+            filtered_catalog = cast(
+                "dict[str, object]",
+                {"streams": selected},
+            )
             self.logger.info(
                 "Streams selected",
                 total=u.count(streams),

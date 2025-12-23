@@ -95,6 +95,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import cast
+
 from flext_core import FlextResult
 
 from flext_meltano.utilities import u
@@ -210,7 +212,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_dbt_run(
-        params: FlextMeltanoModels.CliParameters.TransformationParams,
+        params: "m.CliParameters.TransformationParams",
     ) -> r[list[str]]:
         """Convert TransformationParams to transformation CLI command.
 
@@ -261,42 +263,41 @@ class FlextMeltanoSingerCliTranslator:
         r containing execution results with stdout/stderr
 
         """
-        # Use u.CommandExecution.run_external_command for standardized subprocess execution
-        process_input = input_data.encode() if input_data else None
+        import subprocess
 
-        # Execute command with u (includes complete error handling)
-        result = u.CommandExecution.run_external_command(
-            cmd=command,
-            capture_output=True,
-            check=False,  # Don't raise exception on non-zero exit
-            timeout=timeout,
-            command_input=process_input,
-            text=True,  # Get string output automatically
-        )
+        try:
+            process_input = input_data.encode() if input_data else None
 
-        # Handle execution failure
-        if result.is_failure:
-            return r[dict[str, object]].fail(result.error or "Command execution failed")
-
-        # Extract completed process
-        completed_process = result.value
-
-        # Check for non-zero exit code
-        if completed_process.returncode != 0:
-            error_msg = completed_process.stderr or "Unknown error"
-            return r[dict[str, object]].fail(
-                f"Command failed with code {completed_process.returncode}: {error_msg}",
+            # Execute command with subprocess
+            proc_result = subprocess.run(
+                command,
+                capture_output=True,
+                input=process_input,
+                timeout=timeout,
+                check=False,
             )
 
-        # Prepare output data with decoded strings
-        output_data: dict[str, object] = {
-            "stdout": completed_process.stdout or "",
-            "stderr": completed_process.stderr or "",
-            "returncode": completed_process.returncode,
-            "command": " ".join(command),
-        }
+            # Return execution results
+            output_dict = cast(
+                "dict[str, object]",
+                {
+                    "stdout": proc_result.stdout.decode() if proc_result.stdout else "",
+                    "stderr": proc_result.stderr.decode() if proc_result.stderr else "",
+                    "returncode": proc_result.returncode,
+                },
+            )
 
-        return r[dict[str, object]].ok(output_data)
+            # Handle execution failure
+            if proc_result.returncode != 0:
+                return r[dict[str, object]].fail(
+                    output_dict.get("stderr", "Command execution failed"),  # type: ignore
+                )
+
+            return r[dict[str, object]].ok(output_dict)
+        except subprocess.TimeoutExpired as e:
+            return r[dict[str, object]].fail(f"Command timeout: {e}")
+        except Exception as e:
+            return r[dict[str, object]].fail(f"Command execution failed: {e}")
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

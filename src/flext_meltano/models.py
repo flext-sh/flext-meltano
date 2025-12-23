@@ -60,16 +60,25 @@ class FlextMeltanoModels(FlextModels):
 
         # DSL: Use process + any_ for unified checking
         def is_sensitive(k: str) -> bool:
+            from flext_core import FlextResult as core_r
+
             normalized = u.normalize(k, case="lower")
             checks_result = u.process(
-                sensitive_keys,
-                lambda s: cast("str", s) in normalized,
+                cast("list[object]", sensitive_keys),
+                lambda s: core_r[bool].ok(cast("str", s) in normalized),
             )
             if checks_result.is_success and isinstance(checks_result.value, list):
                 return u.any_(*checks_result.value)
             return False
 
-        return cast("dict[str, object]", u.map(value, lambda k, v: "[PROTECTED]" if is_sensitive(k) else v))
+        # Transform dict values with protection for sensitive fields
+        protected = {}
+        if isinstance(value, dict):
+            for k, v in value.items():
+                key_str = k if isinstance(k, str) else str(k)
+                protected[key_str] = "[PROTECTED]" if is_sensitive(key_str) else v
+
+        return cast("dict[str, object]", protected)
 
     # Constants for magic values used throughout the models
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
@@ -1228,11 +1237,13 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
+            from flext_core import FlextResult as core_r
+
             prod_environments = {"prod", "production", "live"}
             # DSL: Use process + any_ for unified checking
             normalized_envs_result = u.process(
                 self.environments,
-                lambda e: u.normalize(e, case="lower"),
+                lambda e: core_r[str].ok(u.normalize(e, case="lower")),
             )
             normalized_envs = (
                 normalized_envs_result.value
@@ -1248,11 +1259,13 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def project_maturity(self) -> str:
             """Project maturity assessment."""
+            from flext_core import FlextResult as core_r
+
             prod_envs = {"prod", "production", "live"}
             # DSL: Use process + any_ for unified checking
             normalized_envs_result = u.process(
                 self.environments,
-                lambda e: u.normalize(e, case="lower"),
+                lambda e: core_r[str].ok(u.normalize(e, case="lower")),
             )
             normalized_envs = (
                 normalized_envs_result.value

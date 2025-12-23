@@ -54,7 +54,6 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
         self._config = config or FlextMeltanoSettings()
-        self.logger: FlextLogger = FlextLogger(__name__)
         self._container = FlextContainer.get_global()
         self._abstractions = FlextMeltanoAbstractions()
 

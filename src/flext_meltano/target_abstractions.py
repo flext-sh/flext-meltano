@@ -388,12 +388,15 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     ) -> r[dict[str, object]]:
         """Create target configuration for flext-target usage."""
         try:
-            config = {
-                "target_type": target_type,
-                "connection_config": connection_config,
-                "batch_size": batch_size,
-                "max_batches": max_batches,
-            }
+            config = cast(
+                "dict[str, object]",
+                {
+                    "target_type": target_type,
+                    "connection_config": connection_config,
+                    "batch_size": batch_size,
+                    "max_batches": max_batches,
+                },
+            )
             return r[dict[str, object]].ok(config)
         except Exception as e:
             return r[dict[str, object]].fail(f"Failed to create target config: {e}")
@@ -406,13 +409,14 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             # Create sink definition from config
             sink_def = m.DataSinkDefinition(
+                sink_name="flext-target",
                 sink_type=cast("str", config.get("target_type", "jsonl")),
-                config=m.DataSinkConfig(
-                    connection_config=cast(
-                        "dict[str, object]",
-                        config.get("connection_config", {}),
-                    ),
-                    batch_size=cast("int", config.get("batch_size", 1000)),
+                config=cast(
+                    "dict[str, object]",
+                    {
+                        "connection_config": config.get("connection_config", {}),
+                        "batch_size": config.get("batch_size", 1000),
+                    },
                 ),
             )
             return r[m.DataSinkDefinition].ok(sink_def)
