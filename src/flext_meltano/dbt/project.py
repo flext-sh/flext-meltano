@@ -141,18 +141,21 @@ class FlextMeltanoDbtProjectManager(s):
                     nodes_list,
                     lambda node: u.get(node, "resource_type", default="") == "model",
                 )
-                models = u.map(
-                    model_nodes,
-                    lambda node: {
-                        "name": u.get(node, "name"),
-                        "path": u.get(node, "path"),
-                        "description": u.get(node, "description"),
-                        "fqn": ".".join(
-                            u.get(node, "fqn", default=[])
-                            if isinstance(u.get(node, "fqn", default=[]), list)
-                            else [],
-                        ),
-                    },
+                models = cast(
+                    "list[dict[str, object]]",
+                    u.map(
+                        model_nodes,
+                        lambda node: {
+                            "name": u.get(node, "name"),
+                            "path": u.get(node, "path"),
+                            "description": u.get(node, "description"),
+                            "fqn": ".".join(
+                                u.get(node, "fqn", default=[])
+                                if isinstance(u.get(node, "fqn", default=[]), list)
+                                else [],
+                            ),
+                        },
+                    ),
                 )
 
             self.logger.info("Models retrieved", count=u.count(models))
@@ -185,18 +188,21 @@ class FlextMeltanoDbtProjectManager(s):
                     nodes_list,
                     lambda node: u.get(node, "resource_type", default="") == "test",
                 )
-                tests = u.map(
-                    test_nodes,
-                    lambda node: {
-                        "name": u.get(node, "name"),
-                        "path": u.get(node, "path"),
-                        "description": u.get(node, "description"),
-                        "fqn": ".".join(
-                            u.get(node, "fqn", default=[])
-                            if isinstance(u.get(node, "fqn", default=[]), list)
-                            else [],
-                        ),
-                    },
+                tests = cast(
+                    "list[dict[str, object]]",
+                    u.map(
+                        test_nodes,
+                        lambda node: {
+                            "name": u.get(node, "name"),
+                            "path": u.get(node, "path"),
+                            "description": u.get(node, "description"),
+                            "fqn": ".".join(
+                                u.get(node, "fqn", default=[])
+                                if isinstance(u.get(node, "fqn", default=[]), list)
+                                else [],
+                            ),
+                        },
+                    ),
                 )
 
             self.logger.info("Tests retrieved", count=u.count(tests))
