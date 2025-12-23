@@ -97,8 +97,7 @@ class DocsConfig(FlextSettings):
             return cast("DocsConfig", config_result.value)
 
         # Create and return new instance
-        instance = cls()
-        return instance
+        return cls()
 
     def load_from_file(self, config_path: str | Path | None = None) -> r[DocsConfig]:
         """Load configuration from YAML file using FlextSettings patterns.

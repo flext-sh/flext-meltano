@@ -17,7 +17,6 @@ from typing import cast
 import yaml
 from flext_core import (
     FlextContainer,
-    FlextLogger,
     FlextResult,
     FlextService,
     u,

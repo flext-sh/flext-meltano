@@ -12,11 +12,11 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextService
 from singer_sdk import Stream, Tap
 
-from flext_meltano.utilities import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.utilities import u
 
 # Import aliases for simplified usage
 r = FlextResult

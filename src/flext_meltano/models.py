@@ -18,6 +18,7 @@ from typing import cast
 from flext_core import (
     FlextConstants,
     FlextModels,
+    FlextResult,
 )
 from flext_core.utilities import u as flext_u
 from pydantic import (
@@ -60,12 +61,10 @@ class FlextMeltanoModels(FlextModels):
 
         # DSL: Use process + any_ for unified checking
         def is_sensitive(k: str) -> bool:
-            from flext_core import FlextResult as core_r
-
             normalized = u.normalize(k, case="lower")
             checks_result = u.process(
                 cast("list[object]", sensitive_keys),
-                lambda s: core_r[bool].ok(cast("str", s) in normalized),
+                lambda s: FlextResult[bool].ok(cast("str", s) in normalized),
             )
             if checks_result.is_success and isinstance(checks_result.value, list):
                 return u.any_(*checks_result.value)
@@ -1237,13 +1236,11 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
-            from flext_core import FlextResult as core_r
-
             prod_environments = {"prod", "production", "live"}
             # DSL: Use process + any_ for unified checking
             normalized_envs_result = u.process(
                 self.environments,
-                lambda e: core_r[str].ok(u.normalize(e, case="lower")),
+                lambda e: FlextResult[str].ok(u.normalize(e, case="lower")),
             )
             normalized_envs = (
                 normalized_envs_result.value
@@ -1259,13 +1256,11 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def project_maturity(self) -> str:
             """Project maturity assessment."""
-            from flext_core import FlextResult as core_r
-
             prod_envs = {"prod", "production", "live"}
             # DSL: Use process + any_ for unified checking
             normalized_envs_result = u.process(
                 self.environments,
-                lambda e: core_r[str].ok(u.normalize(e, case="lower")),
+                lambda e: FlextResult[str].ok(u.normalize(e, case="lower")),
             )
             normalized_envs = (
                 normalized_envs_result.value
