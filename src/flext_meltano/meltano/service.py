@@ -14,7 +14,7 @@ from pathlib import Path
 from flext_core import FlextResult, FlextService
 from pydantic import BaseModel, Field
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.meltano.project import FlextMeltanoProjectManager
 from flext_meltano.models import FlextMeltanoModels

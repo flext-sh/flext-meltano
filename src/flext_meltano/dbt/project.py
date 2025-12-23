@@ -15,7 +15,7 @@ from pathlib import Path
 from flext_core import r, s
 from pydantic import BaseModel, Field
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 
 
 class FlextMeltanoDbtProjectManager(s):

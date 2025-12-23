@@ -9,9 +9,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import cast
+
 from flext_core import FlextResult
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -62,7 +64,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         tap_name = u.get(fields_dict, "tap_name", default="")
@@ -75,7 +76,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.create_pipeline(tap_name, target_name, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "Pipeline creation failed"
+            lambda _: "Pipeline creation failed"
         )
 
     def handle_execute_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -94,7 +95,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         pipeline_id = u.get(fields_dict, "pipeline_id", default="")
@@ -106,7 +106,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.execute_pipeline(pipeline_id, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "Pipeline execution failed"
+            lambda _: "Pipeline execution failed"
         )
 
     def handle_install_plugin_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -126,7 +126,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         plugin_type = u.get(fields_dict, "plugin_type", default="")
@@ -139,7 +138,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.install_plugin(plugin_type, plugin_name, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "Plugin installation failed"
+            lambda _: "Plugin installation failed"
         )
 
     def handle_list_plugins_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -153,7 +152,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.list_plugins(plugin_type)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "Plugin listing failed"
+            lambda _: "Plugin listing failed"
         )
 
     def handle_configure_environment_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -172,7 +171,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         environment_name = u.get(fields_dict, "environment_name", default="")
@@ -184,7 +182,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.configure_environment(environment_name, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "Environment configuration failed"
+            lambda _: "Environment configuration failed"
         )
 
     def handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -206,7 +204,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         models = u.get(fields_dict, "models", default=[])
@@ -215,7 +212,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.run_dbt_models(models, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "DBT models execution failed"
+            lambda _: "DBT models execution failed"
         )
 
     def handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -237,7 +234,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         models = u.get(fields_dict, "models", default=[])
@@ -246,7 +242,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.test_dbt_models(models, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "DBT models testing failed"
+            lambda _: "DBT models testing failed"
         )
 
     def handle_run_elt_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
@@ -270,7 +266,6 @@ class FlextMeltanoAPIOperations:
                     "ops": {"ensure": "dict", "ensure_default": {}},
                 },
             },
-            on_error="stop",
         )
 
         tap_name = u.get(fields_dict, "tap_name", default="")
@@ -284,7 +279,7 @@ class FlextMeltanoAPIOperations:
         result = self.api.run_elt_pipeline(tap_name, target_name, dbt_models, config)
         # Convert specific type to JsonValue
         return result.map(lambda v: cast("t.JsonValue", v)).map_error(
-            lambda e: "ELT pipeline execution failed"
+            lambda _: "ELT pipeline execution failed"
         )
 
 

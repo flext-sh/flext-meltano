@@ -15,7 +15,7 @@ from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 
 
 class FlextMeltanoProjectManager(FlextService):

@@ -17,7 +17,7 @@ from typing import cast
 
 from flext_core import FlextResult, FlextService
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
@@ -85,7 +85,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
 
             self.logger.info("FlextMeltanoExecutor executed successfully")
             return r[t.MeltanoCore.JsonValue].ok(
-                data=cast("t.MeltanoCore.JsonValue", config_data),
+                cast("t.MeltanoCore.JsonValue", config_data),
             )
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

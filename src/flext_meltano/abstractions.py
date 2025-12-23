@@ -154,7 +154,7 @@ class FlextMeltanoAbstractions:
             # Type narrowing: ensure list[dict[str, object]]
             if isinstance(filtered_components, (list, tuple)):
                 return r[list[dict[str, object]]].ok(
-                    cast("list[dict[str, object]]", list(filtered_components)),
+                    list(filtered_components),
                 )
             return r[list[dict[str, object]]].ok([])
 
@@ -269,7 +269,7 @@ class FlextMeltanoAbstractions:
             # Type narrowing: ensure dict[str, dict[str, object]]
             if isinstance(filtered_plugins, dict):
                 return r[dict[str, dict[str, object]]].ok(
-                    cast("dict[str, dict[str, object]]", filtered_plugins),
+                    filtered_plugins,
                 )
             return r[dict[str, dict[str, object]]].ok({})
 
