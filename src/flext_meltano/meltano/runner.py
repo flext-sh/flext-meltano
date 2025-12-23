@@ -48,7 +48,6 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
     def __init__(self) -> None:
         """Initialize the library runner."""
         super().__init__()
-        self.logger: FlextLogger = FlextLogger(__name__)
         self._executor = FlextMeltanoExecutor()
         self._bridge = FlextMeltanoBridge()
 

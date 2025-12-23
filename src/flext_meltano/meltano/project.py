@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
@@ -185,10 +186,13 @@ class FlextMeltanoProjectManager(FlextService):
 
             # Plugin installation would typically use meltano CLI or SDK
             # For now, just log the operation
-            plugin_info = {
-                "name": name,
-                "status": "installing",
-            }
+            plugin_info = cast(
+                "dict[str, object]",
+                {
+                    "name": name,
+                    "status": "installing",
+                },
+            )
 
             self.logger.info("Plugin installed", name=name)
             return r[dict[str, object]].ok(plugin_info)

@@ -131,7 +131,7 @@ class FlextMeltanoMeltanoService(s):
             self.logger.info("Discovering plugins", type=plugin_type)
             result = self.project_manager.get_plugins(plugin_type)
             if result.is_success:
-                plugins = u.val(result, default=[])
+                plugins = result.value if isinstance(result.value, list) else []
                 self.logger.info("Plugins discovered", count=u.count(plugins))
             return result
         except Exception as e:

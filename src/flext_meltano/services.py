@@ -72,12 +72,11 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     sink_name: str | None = None
     transformation_name: str | None = None
     _service_type: str | None = None
-    _config: FlextMeltanoSettings  # Always initialized in __init__
 
     @property
     def config(self) -> FlextMeltanoSettings:
         """Get the service configuration instance."""
-        return self._config
+        return cast("FlextMeltanoSettings", self._config)
 
     @property
     def container(self) -> FlextContainer:
@@ -547,13 +546,6 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(True)
 
-    def create_instance(
-        self,
-        _config: t.MeltanoCore.MeltanoConfigDict,
-    ) -> r[FlextMeltanoService]:
-        """Create service instance with configuration."""
-        return r[FlextMeltanoService].ok(self)
-
     @staticmethod
     def _create_service_generic(
         service_type: str,
@@ -570,7 +562,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             "transformation": FlextMeltanoService.create_transformation_service,
         }
         handler = u.get(service_map, service_type)
-        if handler:
+        if handler and callable(handler):
             return handler(name, **config)
         return r[FlextMeltanoService].fail(f"Unknown service type: {service_type}")
 
