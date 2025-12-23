@@ -394,7 +394,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             "health": self._execute_health_command,
         }
         handler = u.get(command_map, command)
-        if handler:
+        if handler and callable(handler):
             return handler()
         return self._execute_action_command(command, args)
 
