@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
 from flext_core import FlextResult, FlextService
 
@@ -55,8 +56,9 @@ class FlextMeltanoCatalogManager(FlextService):
 
             catalog = tap.discover()
             catalog_guard = u.guard(catalog, dict, return_value=True)
-            self._catalog = (
-                catalog_guard if catalog_guard is not None else {"streams": []}
+            self._catalog = cast(
+                "dict[str, object]",
+                catalog_guard if catalog_guard is not None else {"streams": []},
             )
 
             streams_raw = u.get(self._catalog, "streams", default=[])

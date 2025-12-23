@@ -925,7 +925,10 @@ class FlextMeltano(s[t_core.JsonValue]):
             return u.cast(fields_result, default_error="Field extraction failed")
         plugin_type = u.get(fields_result, "plugin_type", default="")
         plugin_name = u.get(fields_result, "plugin_name", default="")
-        config = u.guard(u.get(fields_result, "config"), dict, return_value=True) or {}
+        config = cast(
+            "t.MeltanoCore.MeltanoConfigDict",
+            u.guard(u.get(fields_result, "config"), dict, return_value=True) or {},
+        )
 
         if u.none_(plugin_type, plugin_name):
             return r[t_core.JsonValue].fail("plugin_type and plugin_name are required")
@@ -972,7 +975,10 @@ class FlextMeltano(s[t_core.JsonValue]):
         if isinstance(fields_result, r):
             return u.cast(fields_result, default_error="Field extraction failed")
         environment_name = u.get(fields_result, "environment_name", default="")
-        config = u.guard(u.get(fields_result, "config"), dict, return_value=True) or {}
+        config = cast(
+            "t.MeltanoCore.MeltanoConfigDict",
+            u.guard(u.get(fields_result, "config"), dict, return_value=True) or {},
+        )
 
         if u.empty(environment_name):
             return r[t_core.JsonValue].fail("environment_name is required")
@@ -993,7 +999,7 @@ class FlextMeltano(s[t_core.JsonValue]):
         models_raw = u.get(payload_guard, "models") if payload_guard else None
         config_raw = u.get(payload_guard, "config") if payload_guard else None
         models = cast("list[str] | None", u.guard(models_raw, list, return_value=True))
-        config = cast("dict[str, object] | None", u.guard(config_raw, dict, return_value=True))
+        config = cast("t.MeltanoCore.MeltanoConfigDict | None", u.guard(config_raw, dict, return_value=True))
 
         result = self.run_dbt_models(models, config)
         # Convert specific type to JsonValue with explicit wrapping
@@ -1013,7 +1019,7 @@ class FlextMeltano(s[t_core.JsonValue]):
             models_raw = u.get(payload_guard, "models")
             config_raw = u.get(payload_guard, "config")
             models = cast("list[str] | None", u.guard(models_raw, list, return_value=True))
-            config = cast("dict[str, object] | None", u.guard(config_raw, dict, return_value=True))
+            config = cast("t.MeltanoCore.MeltanoConfigDict | None", u.guard(config_raw, dict, return_value=True))
 
         result = self.test_dbt_models(models, config)
         # Convert specific type to JsonValue with explicit wrapping

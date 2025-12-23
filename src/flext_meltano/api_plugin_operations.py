@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import cast
+
 from flext_core import FlextResult
 
 from flext_meltano.utilities import u
@@ -78,14 +80,19 @@ class FlextMeltanoAPIPluginOperations:
                 "settings": config or {},
             }
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "plugin_name": plugin_name,
-                "plugin_type": plugin_type,
-                "status": "installed",
-                "configuration": plugin_config,
-                "installed_at": str(__import__("time").time()),
-                "api_version": self.api.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast(
+                    "t.MeltanoCore.MeltanoConfigDict",
+                    {
+                        "plugin_name": plugin_name,
+                        "plugin_type": plugin_type,
+                        "status": "installed",
+                        "configuration": plugin_config,
+                        "installed_at": str(__import__("time").time()),
+                        "api_version": self.api.version,
+                    },
+                ),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Plugin installation failed: {e}",

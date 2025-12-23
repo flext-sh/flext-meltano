@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
+from typing import cast
 
 from flext_core import FlextResult
 
@@ -107,7 +108,9 @@ class FlextMeltanoAPIPipelineOperations:
                     u.from_(config_obj, "project_root", as_type=str, default="."),
                 ),
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(pipeline_config)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast("t.MeltanoCore.MeltanoConfigDict", pipeline_config),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline creation failed: {e}",
@@ -136,7 +139,9 @@ class FlextMeltanoAPIPipelineOperations:
                 "configuration": u.or_(config, {}),
                 "api_version": self.api.version,
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(execution_result)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast("t.MeltanoCore.MeltanoConfigDict", execution_result),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline execution failed: {e}",
@@ -179,7 +184,9 @@ class FlextMeltanoAPIPipelineOperations:
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(elt_result)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast("t.MeltanoCore.MeltanoConfigDict", elt_result),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"ELT pipeline execution failed: {e}",
@@ -206,13 +213,18 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "tap_name": tap_name,
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.api.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast(
+                    "t.MeltanoCore.MeltanoConfigDict",
+                    {
+                        "tap_name": tap_name,
+                        "status": "completed",
+                        "execution_duration": execution_duration,
+                        "executed_at": str(time.time()),
+                        "api_version": self.api.version,
+                    },
+                ),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
 
@@ -232,13 +244,18 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "target_name": target_name,
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.api.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast(
+                    "t.MeltanoCore.MeltanoConfigDict",
+                    {
+                        "target_name": target_name,
+                        "status": "completed",
+                        "execution_duration": execution_duration,
+                        "executed_at": str(time.time()),
+                        "api_version": self.api.version,
+                    },
+                ),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Target execution failed: {e}",

@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
+from typing import cast
 
 from flext_core import FlextResult
 
@@ -93,7 +94,9 @@ class FlextMeltanoAPIDBTOperations:
                     u.from_(config_obj, "project_root", as_type=str, default="."),
                 ),
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(result_dict)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast("t.MeltanoCore.MeltanoConfigDict", result_dict),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT models execution failed: {e}",
@@ -118,15 +121,20 @@ class FlextMeltanoAPIDBTOperations:
                 f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s",
             )
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "models": models_to_test,
-                "status": "passed",
-                "tests_executed": tests_count,
-                "execution_duration": execution_duration,
-                "configuration": u.or_(config, {}),
-                "executed_at": str(time.time()),
-                "api_version": self.api.version,
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast(
+                    "t.MeltanoCore.MeltanoConfigDict",
+                    {
+                        "models": models_to_test,
+                        "status": "passed",
+                        "tests_executed": tests_count,
+                        "execution_duration": execution_duration,
+                        "configuration": u.or_(config, {}),
+                        "executed_at": str(time.time()),
+                        "api_version": self.api.version,
+                    },
+                ),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT model testing failed: {e}",
@@ -138,14 +146,19 @@ class FlextMeltanoAPIDBTOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok({
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.api.version,
-                "docs_generated": True,
-                "docs_path": "./target/docs/index.html",
-            })
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(
+                cast(
+                    "t.MeltanoCore.MeltanoConfigDict",
+                    {
+                        "status": "completed",
+                        "execution_duration": execution_duration,
+                        "executed_at": str(time.time()),
+                        "api_version": self.api.version,
+                        "docs_generated": True,
+                        "docs_path": "./target/docs/index.html",
+                    },
+                ),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"DBT documentation generation failed: {e}",
