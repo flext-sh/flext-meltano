@@ -992,8 +992,8 @@ class FlextMeltano(s[t_core.JsonValue]):
         # Use u.when() for conditional extraction (DSL pattern)
         models_raw = u.get(payload_guard, "models") if payload_guard else None
         config_raw = u.get(payload_guard, "config") if payload_guard else None
-        models = u.guard(models_raw, list, return_value=True)
-        config = u.guard(config_raw, dict, return_value=True)
+        models = cast("list[str] | None", u.guard(models_raw, list, return_value=True))
+        config = cast("dict[str, object] | None", u.guard(config_raw, dict, return_value=True))
 
         result = self.run_dbt_models(models, config)
         # Convert specific type to JsonValue with explicit wrapping
@@ -1012,8 +1012,8 @@ class FlextMeltano(s[t_core.JsonValue]):
         if payload_guard:
             models_raw = u.get(payload_guard, "models")
             config_raw = u.get(payload_guard, "config")
-            models = u.guard(models_raw, list, return_value=True)
-            config = u.guard(config_raw, dict, return_value=True)
+            models = cast("list[str] | None", u.guard(models_raw, list, return_value=True))
+            config = cast("dict[str, object] | None", u.guard(config_raw, dict, return_value=True))
 
         result = self.test_dbt_models(models, config)
         # Convert specific type to JsonValue with explicit wrapping
@@ -1037,8 +1037,8 @@ class FlextMeltano(s[t_core.JsonValue]):
 
         dbt_models: t.MeltanoCore.DbtModelList | None = None
         config: t.MeltanoCore.MeltanoConfigDict | None = None
-        dbt_models = u.guard(dbt_models_raw, list, return_value=True)
-        config = u.guard(config_raw, dict, return_value=True)
+        dbt_models = cast("list[str] | None", u.guard(dbt_models_raw, list, return_value=True))
+        config = cast("dict[str, object] | None", u.guard(config_raw, dict, return_value=True))
 
         # Use u.none_() for validation (DSL pattern)
         if u.none_(tap_name, target_name):
