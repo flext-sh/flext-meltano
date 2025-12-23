@@ -22,6 +22,7 @@ from flext_core import (
 from flext_core.typings import t
 
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.file_managers import FlextMeltanoFileManagers
 
 # Import aliases for simplified usage
 r = FlextResult
@@ -310,9 +311,6 @@ class FlextMeltanoUtilities(FlextUtilities):
                 u.ensure(config_typed, target_type="dict", default={}),
             )
             return ensured
-
-        # Import here to avoid circular import
-        from flext_meltano.file_managers import FlextMeltanoFileManagers
 
         result = (
             r[Path]

@@ -128,6 +128,35 @@ class FlextMeltanoProjectManager(FlextService):
                 f"Failed to load project: {e}",
             )
 
+    def _extract_plugins(
+        self, plugin_type: str | None
+    ) -> list[dict[str, object]]:
+        """Extract plugins from project, optionally filtered by type."""
+        plugins: list[dict[str, object]] = []
+        if not hasattr(self.project, "plugins"):
+            return plugins
+
+        try:
+            plugins_attr = getattr(self.project, "plugins", None)
+            if plugins_attr is None:
+                return plugins
+
+            for plugin in plugins_attr:
+                if not (hasattr(plugin, "name") and hasattr(plugin, "type")):
+                    continue
+                if plugin_type is not None and plugin.type != plugin_type:
+                    continue
+
+                plugins.append({
+                    "name": plugin.name,
+                    "type": plugin.type,
+                    "variant": getattr(plugin, "variant", None),
+                })
+        except (TypeError, AttributeError):
+            pass
+
+        return plugins
+
     def get_plugins(
         self,
         plugin_type: str | None = None,
@@ -145,19 +174,7 @@ class FlextMeltanoProjectManager(FlextService):
             if not self.project:
                 return r[list[dict[str, object]]].fail("No project loaded")
 
-            plugins = []
-            if hasattr(self.project, "plugins"):
-                try:
-                    for plugin in self.project.plugins:  # type: ignore
-                        plugin_dict = {
-                            "name": plugin.name,
-                            "type": plugin.type,
-                            "variant": getattr(plugin, "variant", None),
-                        }
-                        if plugin_type is None or plugin.type == plugin_type:
-                            plugins.append(plugin_dict)
-                except (TypeError, AttributeError):
-                    pass
+            plugins = self._extract_plugins(plugin_type)
 
             self.logger.info(
                 "Plugins retrieved",

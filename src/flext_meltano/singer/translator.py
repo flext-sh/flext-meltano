@@ -95,11 +95,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import subprocess  # noqa: S404
 from typing import cast
 
 from flext_core import FlextResult
 
-from flext_meltano.utilities import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
@@ -212,7 +212,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_dbt_run(
-        params: "m.CliParameters.TransformationParams",
+        params: m.CliParameters.TransformationParams,
     ) -> r[list[str]]:
         """Convert TransformationParams to transformation CLI command.
 
@@ -263,13 +263,11 @@ class FlextMeltanoSingerCliTranslator:
         r containing execution results with stdout/stderr
 
         """
-        import subprocess
-
         try:
             process_input = input_data.encode() if input_data else None
 
             # Execute command with subprocess
-            proc_result = subprocess.run(
+            proc_result = subprocess.run(  # noqa: S603
                 command,
                 capture_output=True,
                 input=process_input,
@@ -289,9 +287,10 @@ class FlextMeltanoSingerCliTranslator:
 
             # Handle execution failure
             if proc_result.returncode != 0:
-                return r[dict[str, object]].fail(
-                    output_dict.get("stderr", "Command execution failed"),  # type: ignore
-                )
+                stderr_msg = output_dict.get("stderr", "Command execution failed")
+                if not isinstance(stderr_msg, str):
+                    stderr_msg = "Command execution failed"
+                return r[dict[str, object]].fail(stderr_msg)
 
             return r[dict[str, object]].ok(output_dict)
         except subprocess.TimeoutExpired as e:

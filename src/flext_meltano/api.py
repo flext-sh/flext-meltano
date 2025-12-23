@@ -30,6 +30,7 @@ from flext_core import (
 from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
+from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService
@@ -728,7 +729,6 @@ class FlextMeltano(s[t_core.JsonValue]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
-            from flext_meltano.adapters import FlextMeltanoAdapter
             adapter = FlextMeltanoAdapter(self.config)
             return cast(
                 "r[t.MeltanoCore.MeltanoConfigDict]",
@@ -894,10 +894,11 @@ class FlextMeltano(s[t_core.JsonValue]):
         pipeline_id = u.get(fields_dict, "pipeline_id", default="")
         config_val = u.get(fields_dict, "config", default={})
         config_guard_result: object = u.guard(config_val, dict, return_value=True)
-        config = (
-            config_guard_result  # type: dict[str, object]
+        config = cast(
+            "dict[str, object]",
+            config_guard_result
             if isinstance(config_guard_result, dict)
-            else {}
+            else {},
         )
 
         if u.none_(pipeline_id):

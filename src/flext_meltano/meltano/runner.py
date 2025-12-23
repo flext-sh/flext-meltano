@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import cast
 
 from flext_core import (
-    FlextLogger,
     FlextResult,
     FlextService,
     t as t_core,

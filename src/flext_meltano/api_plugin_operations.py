@@ -13,11 +13,11 @@ from typing import cast
 
 from flext_core import FlextResult
 
-from flext_meltano.utilities import u
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.utilities import u
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes
