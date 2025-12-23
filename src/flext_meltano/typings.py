@@ -204,6 +204,7 @@ class FlextMeltanoTypes(FlextTypes):
         type EnvironmentDict = dict[str, str]
         type VariablesDict = dict[str, str]
         type SettingsDict = dict[str, object]
+        type MetadataDict = dict[str, object]
         type CommandDict = dict[str, object]
         type ScheduleDict = dict[str, object]
         type JobDict = dict[str, object]

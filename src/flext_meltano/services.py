@@ -561,7 +561,10 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         **config: object,
     ) -> r[FlextMeltanoService]:
         """Generic service factory - delegates to specific creators."""
-        service_map: dict[str, Callable[[str], r[FlextMeltanoService]]] = {
+        service_map: dict[
+            str,
+            Callable[[str], r[FlextMeltanoService]] | Callable[..., r[FlextMeltanoService]],
+        ] = {
             "source": FlextMeltanoService.create_source_service,
             "sink": FlextMeltanoService.create_sink_service,
             "transformation": FlextMeltanoService.create_transformation_service,
