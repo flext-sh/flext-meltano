@@ -193,9 +193,9 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         return r[t.MeltanoCore.JsonValue].ok({"streams": []})
 
     @staticmethod
-    def extract(_schema: t.MeltanoCore.JsonValue) -> r[t.MeltanoCore.JsonValue]:
+    def extract(_schema: dict[str, object]) -> r[dict[str, object]]:
         """Extract data from source - railway-oriented operation."""
-        return r[t.MeltanoCore.JsonValue].ok({"status": "completed"})
+        return r[dict[str, object]].ok({"status": "completed"})
 
     # ============================================================================
     # DATA SINK PROTOCOL - Generic sink operations
@@ -208,10 +208,10 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def load_batch(
-        _records: list[t.MeltanoCore.JsonValue],
-    ) -> r[t.MeltanoCore.JsonValue]:
+        _records: list[dict[str, object]],
+    ) -> r[dict[str, object]]:
         """Load batch of records to sink - railway-oriented operation."""
-        return r[t.MeltanoCore.JsonValue].ok({"status": "completed"})
+        return r[dict[str, object]].ok({"status": "completed"})
 
     # ============================================================================
     # PIPELINE OPERATIONS - Generic pipeline orchestration

@@ -78,7 +78,8 @@ All methods return `r[T]` for type-safe error handling:
 ```python
 # Example: Chain operations with FlextResult
 result = (
-    FlextMeltanoSingerCliTranslator.translate_tap_run(tap_params)
+    FlextMeltanoSingerCliTranslator
+    .translate_tap_run(tap_params)
     .flat_map(lambda cmd: FlextMeltanoSingerCliTranslator.execute_singer_command(cmd))
     .map(lambda output: output["stdout"])
 )
@@ -96,7 +97,7 @@ from __future__ import annotations
 
 from flext_core import FlextResult
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes

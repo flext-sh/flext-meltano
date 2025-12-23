@@ -13,7 +13,7 @@ import time
 
 from flext_core import FlextResult
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels

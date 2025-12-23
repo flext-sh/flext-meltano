@@ -29,7 +29,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 
 
 class FlextMeltanoModels(FlextModels):
@@ -60,7 +60,7 @@ class FlextMeltanoModels(FlextModels):
 
         # DSL: Use process + any_ for unified checking
         def is_sensitive(k: str) -> bool:
-            normalized = cast("str", u.normalize(k, case="lower"))
+            normalized = u.normalize(k, case="lower")
             checks_result = u.process(
                 sensitive_keys,
                 lambda s: cast("str", s) in normalized,
@@ -983,7 +983,7 @@ class FlextMeltanoModels(FlextModels):
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
             result = u.agg(streams_list, "records_extracted", fn=sum)
-            return cast("int", result) if isinstance(result, int) else 0
+            return result if isinstance(result, int) else 0
 
         @computed_field
         def is_ready_for_extraction(self) -> bool:

@@ -18,7 +18,7 @@ from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult, FlextService
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from flext_core import FlextResult, FlextService
 
-from flext_meltano import u
+from flext_meltano.utilities import u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
