@@ -12,7 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_core import FlextResult, FlextService
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from flext_meltano import u
 from flext_meltano.constants import FlextMeltanoConstants
@@ -57,7 +57,7 @@ class FlextMeltanoMeltanoService(s):
             description="Additional selection filter",
         )
 
-    class PipelineResult(FlextMeltanoModels):
+    class PipelineResult(BaseModel):
         """Result of a Meltano pipeline execution."""
 
         success: bool = Field(description="Whether pipeline succeeded")
@@ -88,7 +88,7 @@ class FlextMeltanoMeltanoService(s):
             return result
         except Exception as e:
             self.logger.exception("Failed to create project", error=str(e))
-            return u.fail[FlextMeltanoProjectManager.ProjectInfo](
+            return r[FlextMeltanoProjectManager.ProjectInfo].fail(
                 f"Failed to create project: {e}",
             )
 
@@ -110,7 +110,7 @@ class FlextMeltanoMeltanoService(s):
             return result
         except Exception as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return u.fail[FlextMeltanoProjectManager.ProjectInfo](
+            return r[FlextMeltanoProjectManager.ProjectInfo].fail(
                 f"Failed to load project: {e}",
             )
 
@@ -136,7 +136,7 @@ class FlextMeltanoMeltanoService(s):
             return result
         except Exception as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
-            return u.fail[list[dict[str, object]]](f"Failed to discover plugins: {e}")
+            return r[list[dict[str, object]]].fail(f"Failed to discover plugins: {e}")
 
     def execute_pipeline(
         self,
@@ -160,7 +160,7 @@ class FlextMeltanoMeltanoService(s):
             # Load project first
             project_result = self.project_manager.load_project(config.project_root)
             if project_result.is_failure:
-                return u.fail[FlextMeltanoMeltanoService.PipelineResult](
+                return r[FlextMeltanoMeltanoService.PipelineResult].fail(
                     project_result.error,
                 )
 
@@ -173,10 +173,10 @@ class FlextMeltanoMeltanoService(s):
             )
 
             self.logger.info("Meltano pipeline executed", status=result.status)
-            return u.ok(result)
+            return r[FlextMeltanoMeltanoService.PipelineResult].ok(result)
         except Exception as e:
             self.logger.exception("Failed to execute pipeline", error=str(e))
-            return u.fail[FlextMeltanoMeltanoService.PipelineResult](
+            return r[FlextMeltanoMeltanoService.PipelineResult].fail(
                 f"Failed to execute pipeline: {e}",
             )
 

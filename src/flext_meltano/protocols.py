@@ -159,6 +159,81 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Execute service operation (implements Service)."""
                 ...
 
+        @runtime_checkable
+        class CLIManagerProtocol(Protocol):
+            """Base protocol for CLI managers."""
+
+            def handle_command(self, args: list[str]) -> int:
+                """Handle CLI command."""
+                ...
+
+        @runtime_checkable
+        class SingerManagerProtocol(Protocol):
+            """Protocol for Singer CLI manager."""
+
+            def handle_command(self, args: list[str]) -> int:
+                """Handle CLI command."""
+                ...
+
+            def handle_tap_command(self, args: list[str]) -> int:
+                """Handle tap command."""
+                ...
+
+            def handle_target_command(self, args: list[str]) -> int:
+                """Handle target command."""
+                ...
+
+        @runtime_checkable
+        class StatusManagerProtocol(Protocol):
+            """Protocol for Status CLI manager."""
+
+            def handle_command(self, args: list[str]) -> int:
+                """Handle CLI command."""
+                ...
+
+            def handle_version_command(self) -> int:
+                """Handle version command."""
+                ...
+
+        @runtime_checkable
+        class CLIProtocol(Protocol):
+            """CLI protocol for manager composition - avoids circular imports."""
+
+            # Manager attributes with proper protocol types
+            pipeline_manager: FlextMeltanoProtocols.Meltano.CLIManagerProtocol
+            singer_manager: FlextMeltanoProtocols.Meltano.SingerManagerProtocol
+            dbt_manager: FlextMeltanoProtocols.Meltano.CLIManagerProtocol
+            plugin_manager: FlextMeltanoProtocols.Meltano.CLIManagerProtocol
+            status_manager: FlextMeltanoProtocols.Meltano.StatusManagerProtocol
+
+            def show_banner(self) -> None:
+                """Show CLI banner."""
+                ...
+
+            def show_pipeline_help(self) -> None:
+                """Show pipeline help."""
+                ...
+
+            def show_dbt_help(self) -> None:
+                """Show DBT help."""
+                ...
+
+            def show_plugin_help(self) -> None:
+                """Show plugin help."""
+                ...
+
+            def show_tap_help(self) -> None:
+                """Show tap help."""
+                ...
+
+            def show_target_help(self) -> None:
+                """Show target help."""
+                ...
+
+            def show_status_help(self) -> None:
+                """Show status help."""
+                ...
+
 
 # Runtime alias for simplified usage
 p = FlextMeltanoProtocols

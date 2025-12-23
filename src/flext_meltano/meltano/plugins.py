@@ -40,7 +40,6 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoSettings
     _abstractions: FlextMeltanoAbstractions
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
@@ -68,7 +67,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             }
 
             self.logger.info("FlextMeltanoPluginService executed successfully")
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Plugin service execution failed: {e}"
@@ -147,30 +146,26 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             if extractors_result.is_success:
                 extractors_dict = extractors_result.value
-                extractors_keys = u.take(extractors_dict, 10)
-                extractors_plugins_result = u.process(
-                    extractors_dict,
-                    lambda k, v: build_plugin_info(k, v, "extractor"),
-                    filter_keys=set(extractors_keys.keys()),
-                )
-                if extractors_plugins_result.is_success:
-                    plugins.extend(u.vals(extractors_plugins_result))
+                # Limit to first 10 extractors
+                max_extractors = 10
+                for idx, (k, v) in enumerate(extractors_dict.items()):
+                    if idx >= max_extractors:
+                        break
+                    plugins.append(build_plugin_info(k, v, "extractor"))
 
-            # Process loaders using u.process() with limit via filter_keys
+            # Process loaders - limit to first 5
             loaders_result = self._abstractions.get_plugins_of_type(
                 cast("object", working_project),
                 "loaders",
             )
             if loaders_result.is_success:
                 loaders_dict = loaders_result.value
-                loaders_keys = u.take(loaders_dict, 5)
-                loaders_plugins_result = u.process(
-                    loaders_dict,
-                    lambda k, v: build_plugin_info(k, v, "loader"),
-                    filter_keys=set(loaders_keys.keys()),
-                )
-                if loaders_plugins_result.is_success:
-                    plugins.extend(u.vals(loaders_plugins_result))
+                # Limit to first 5 loaders
+                max_loaders = 5
+                for idx, (k, v) in enumerate(loaders_dict.items()):
+                    if idx >= max_loaders:
+                        break
+                    plugins.append(build_plugin_info(k, v, "loader"))
 
             self.logger.info(f"Discovered {u.count(plugins)} plugins")
             return r[list[dict[str, str]]].ok(plugins)

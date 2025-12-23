@@ -21,6 +21,7 @@ from flext_core import (
 )
 from flext_core.utilities import u as flext_u
 from pydantic import (
+    BaseModel,
     Field,
     computed_field,
     field_serializer,
@@ -87,7 +88,7 @@ class FlextMeltanoModels(FlextModels):
     # LOGGING CONFIGURATION - Consolidated logging settings
     # ========================================================================
 
-    class LoggingConfig(FlextModels):
+    class LoggingConfig(BaseModel):
         """Consolidated logging configuration for all pipeline operations.
 
         Organizes 62+ logging boolean fields into coherent categories:
@@ -628,12 +629,12 @@ class FlextMeltanoModels(FlextModels):
             default_factory=dict,
             description="Stream-specific configuration",
         )
-        version: str = Field(default="latest", description="Tap version")
+        tap_version: str = Field(default="latest", description="Tap version")
 
         @computed_field
         def tap_identifier(self) -> str:
             """Unique tap identifier."""
-            return f"{self.tap_type}:{self.version}"
+            return f"{self.tap_type}:{self.tap_version}"
 
         @computed_field
         def has_stream_config(self) -> bool:
@@ -697,12 +698,12 @@ class FlextMeltanoModels(FlextModels):
             default=None,
             description="Batch wait limit in seconds",
         )
-        version: str = Field(default="latest", description="Target version")
+        target_version: str = Field(default="latest", description="Target version")
 
         @computed_field
         def target_identifier(self) -> str:
             """Unique target identifier."""
-            return f"{self.target_type}:{self.version}"
+            return f"{self.target_type}:{self.target_version}"
 
         @computed_field
         def has_connection_config(self) -> bool:
@@ -746,12 +747,12 @@ class FlextMeltanoModels(FlextModels):
             default_factory=dict,
             description="Stream-specific configuration",
         )
-        version: str = Field(default="latest", description="Source version")
+        source_version: str = Field(default="latest", description="Source version")
 
         @computed_field
         def source_identifier(self) -> str:
             """Unique source identifier."""
-            return f"{self.source_type}:{self.version}"
+            return f"{self.source_type}:{self.source_version}"
 
         @computed_field
         def has_stream_config(self) -> bool:
@@ -1123,7 +1124,7 @@ class FlextMeltanoModels(FlextModels):
             default=0,
             description="Number of batches processed",
         )
-        created_at: str = Field(description="Creation timestamp")
+        stream_created_at: str = Field(description="Creation timestamp")
 
         @computed_field
         def has_processed_data(self) -> bool:
@@ -1170,7 +1171,7 @@ class FlextMeltanoModels(FlextModels):
         """Generic Meltano project configuration with validation."""
 
         project_id: str = Field(description="Unique project identifier")
-        version: str = Field(default="1", description="Project version")
+        project_version: str = Field(default="1", description="Project version")
         default_environment: str = Field(
             default="dev",
             description="Default environment name",
@@ -1368,7 +1369,7 @@ class FlextMeltanoModels(FlextModels):
 
         name: str = Field(description="DBT project name")
         profile: str = Field(description="DBT profile name")
-        version: str = Field(default="1.0.0", description="DBT project version")
+        dbt_version: str = Field(default="1.0.0", description="DBT project version")
         config: dict[str, object] = Field(
             default_factory=dict,
             description="DBT project configuration",
@@ -1403,7 +1404,7 @@ class FlextMeltanoModels(FlextModels):
         """Generic transformation project configuration with validation."""
 
         name: str = Field(min_length=1, description="Project name")
-        version: str = Field(description="Project version")
+        transformation_version: str = Field(description="Project version")
         profile: str = Field(description="Profile name")
         model_paths: list[str] = Field(
             default=["models"],

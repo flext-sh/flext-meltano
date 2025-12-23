@@ -126,14 +126,17 @@ class FlextMeltanoValidators:
         # Pipeline business rule: sink component names
         if (
             name.startswith("target-")
-            and len(name) < c.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
+            and len(name) < c.Meltano.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
                 "Sink component names must be at least 8 characters",
             )
 
         # Pipeline business rule: source component names
-        if name.startswith("tap-") and len(name) < c.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH:
+        if (
+            name.startswith("tap-")
+            and len(name) < c.Meltano.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
+        ):
             validation_errors.append(
                 "Source component names must be at least 5 characters",
             )

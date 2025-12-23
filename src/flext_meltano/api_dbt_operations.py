@@ -54,7 +54,7 @@ class FlextMeltanoAPIDBTOperations:
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute DBT models with configuration and monitoring."""
         try:
-            models_to_run = u.or_(models, ["all_models"])
+            models_to_run: list[str] = models if models is not None else ["all_models"]
 
             self.api.logger.info(f"Running DBT models: {', '.join(models_to_run)}")
 
@@ -70,11 +70,11 @@ class FlextMeltanoAPIDBTOperations:
                 if hasattr(self.api, "config")
                 else None
             )
-            result_dict = {
+            result_dict: dict[str, object] = {
                 "models": models_to_run,
                 "status": "completed",
                 "execution_duration": execution_duration,
-                "configuration": u.or_(config, {}),
+                "configuration": config if config is not None else {},
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
                 "timeout_seconds": u.from_(
@@ -106,7 +106,7 @@ class FlextMeltanoAPIDBTOperations:
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute DBT model tests with complete validation."""
         try:
-            models_to_test = u.or_(models, ["all_models"])
+            models_to_test: list[str] = models if models is not None else ["all_models"]
 
             self.api.logger.info(f"Testing DBT models: {', '.join(models_to_test)}")
 

@@ -46,7 +46,6 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoSettings
     _abstractions: FlextMeltanoAbstractions
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
@@ -115,11 +114,12 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             sink_name,
             runner_result.value,
         )
-        return final_result.or_else_get(
-            lambda: r[dict[str, str]].fail(
-                f"Pipeline execution failed for {source_name} -> {sink_name}",
-            ),
-        )
+        if final_result.is_failure:
+            return r[dict[str, str]].fail(
+                final_result.error
+                or f"Pipeline execution failed for {source_name} -> {sink_name}",
+            )
+        return final_result
 
     # Private helper methods (extracted from adapters.py)
 

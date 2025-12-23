@@ -15,7 +15,7 @@ from flext_core import FlextResult, FlextService
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
-from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
+from flext_meltano.dbt.runner import DbtRunResult, DbtTestResult, FlextMeltanoDbtRunner
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
@@ -103,7 +103,7 @@ class FlextMeltanoDbtService(FlextService):
         self,
         models: list[str] | None = None,
         **kwargs: object,
-    ) -> FlextResult[FlextMeltanoDbtRunner.RunResult]:
+    ) -> FlextResult[DbtRunResult]:
         """Run DBT models.
 
         Args:
@@ -126,7 +126,7 @@ class FlextMeltanoDbtService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("DBT run failed", error=str(e))
-            return FlextResult[FlextMeltanoDbtRunner.RunResult].fail(
+            return FlextResult[DbtRunResult].fail(
                 f"DBT run failed: {e}",
             )
 
@@ -134,7 +134,7 @@ class FlextMeltanoDbtService(FlextService):
         self,
         models: list[str] | None = None,
         **kwargs: object,
-    ) -> FlextResult[FlextMeltanoDbtRunner.TestResult]:
+    ) -> FlextResult[DbtTestResult]:
         """Run DBT tests.
 
         Args:
@@ -157,7 +157,7 @@ class FlextMeltanoDbtService(FlextService):
             return result
         except Exception as e:
             self.logger.exception("DBT tests failed", error=str(e))
-            return FlextResult[FlextMeltanoDbtRunner.TestResult].fail(
+            return FlextResult[DbtTestResult].fail(
                 f"DBT tests failed: {e}",
             )
 

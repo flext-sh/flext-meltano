@@ -217,6 +217,12 @@ class FlextMeltanoTypes(FlextTypes):
         # Type aliases for protocols.py
         type JsonObject = FlextTypes.JsonValue
 
+        # JSON value type (re-export from FlextTypes for convenience)
+        type JsonValue = FlextTypes.JsonValue
+
+        # Run context for pipeline execution
+        type RunContextDict = dict[str, object]
+
         # Type aliases for file_managers.py
         FileConfigDict = dict[str, str | int | list[str]] | dict[str, str | list[str]]
         PathDict = dict[str, str | Path]

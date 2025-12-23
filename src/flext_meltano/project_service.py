@@ -77,7 +77,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             }
 
             self.logger.info("FlextMeltanoProjectService executed successfully")
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Project service execution failed: {e}"
@@ -261,7 +261,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _write_meltano_config(project_path: Path, config: dict[str, object]) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
-            config_file = project_path / c.Paths.MELTANO_PROJECT_FILE
+            config_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
             with config_file.open("w", encoding="utf-8") as f:
                 yaml.safe_dump(config, f, default_flow_style=False)
             return r[Path].ok(project_path)
@@ -301,7 +301,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     @staticmethod
     def _validate_meltano_config_exists(project_root: Path) -> r[Path]:
         """Validate meltano.yml exists in project directory."""
-        meltano_yml = project_root / c.Paths.MELTANO_PROJECT_FILE
+        meltano_yml = project_root / c.Meltano.Paths.MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
             return r[Path].fail(
                 f"Not a Meltano project: meltano.yml not found in {project_root}",
@@ -400,7 +400,7 @@ environments:
                 "project_path": str(project_path),
                 "creation_method": "manual_file_creation",
                 "meltano_yml_exists": str(
-                    (project_path / c.Paths.MELTANO_PROJECT_FILE).exists(),
+                    (project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE).exists(),
                 ),
             }
 

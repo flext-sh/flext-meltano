@@ -227,7 +227,7 @@ class FlextMeltanoAbstractions:
         try:
             # Simplified implementation - in production would orchestrate actual
             # singer pipeline
-            result = {
+            result: dict[str, object] = {
                 "status": "completed",
                 "records_processed": 0,
                 "elt_context": elt_context,
@@ -260,11 +260,12 @@ class FlextMeltanoAbstractions:
                 },
             }
 
-            # DSL: Use filter for unified filtering
-            filtered_plugins = u.filter(
-                plugins,
-                lambda _k, v: u.get(v, "type", default="") == plugin_type,
-            )
+            # DSL: Use dict comprehension for filtering (u.filter expects single-arg predicate)
+            filtered_plugins = {
+                k: v
+                for k, v in plugins.items()
+                if u.get(v, "type", default="") == plugin_type
+            }
             # Type narrowing: ensure dict[str, dict[str, object]]
             if isinstance(filtered_plugins, dict):
                 return r[dict[str, dict[str, object]]].ok(
@@ -283,7 +284,7 @@ class FlextMeltanoAbstractions:
             # Simplified implementation - would validate and add plugin
             self.logger.info(
                 "Adding plugin",
-                plugin_config=cast("t_core.t.GeneralValueType", plugin_config),
+                plugin_config=cast("t_core.GeneralValueType", plugin_config),
             )
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
