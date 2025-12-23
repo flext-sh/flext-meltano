@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 # Import aliases for simplified usage
 from flext_core import FlextResult, FlextService
