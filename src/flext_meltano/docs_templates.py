@@ -7,6 +7,7 @@ using FLEXT architectural patterns.
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import cast
 
 from flext_core import FlextLogger, FlextResult, u
 
@@ -59,7 +60,7 @@ class DocsTemplates:
                     },
                     "cron_schedule": {"value": self._get_cron_schedule(config)},
                 },
-                source=automation,
+                source=cast("dict[str, object] | None", automation),
             )
 
             workflow_content = self._ci_workflow_template.format(**template_vars)

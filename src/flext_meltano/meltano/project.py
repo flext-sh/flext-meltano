@@ -146,18 +146,18 @@ class FlextMeltanoProjectManager(FlextService):
                 return r[list[dict[str, object]]].fail("No project loaded")
 
             plugins = []
-            if hasattr(self.project, "plugins") and hasattr(
-                self.project.plugins,
-                "__iter__",
-            ):
-                for plugin in self.project.plugins:
-                    plugin_dict = {
-                        "name": plugin.name,
-                        "type": plugin.type,
-                        "variant": getattr(plugin, "variant", None),
-                    }
-                    if plugin_type is None or plugin.type == plugin_type:
-                        plugins.append(plugin_dict)
+            if hasattr(self.project, "plugins"):
+                try:
+                    for plugin in self.project.plugins:  # type: ignore
+                        plugin_dict = {
+                            "name": plugin.name,
+                            "type": plugin.type,
+                            "variant": getattr(plugin, "variant", None),
+                        }
+                        if plugin_type is None or plugin.type == plugin_type:
+                            plugins.append(plugin_dict)
+                except (TypeError, AttributeError):
+                    pass
 
             self.logger.info(
                 "Plugins retrieved",

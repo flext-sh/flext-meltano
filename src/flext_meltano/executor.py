@@ -207,7 +207,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         """Get Meltano adapter with lazy initialization."""
         if self._adapter is None:
             from flext_meltano.adapters import FlextMeltanoAdapter
-            self._adapter = FlextMeltanoAdapter(self._config)
+            self._adapter = FlextMeltanoAdapter(cast("FlextMeltanoSettings | None", self._config))
         return self._adapter
 
     @property
