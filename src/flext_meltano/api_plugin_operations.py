@@ -121,7 +121,9 @@ class FlextMeltanoAPIPluginOperations:
                 lambda plugin: {**plugin, "api_version": self.api.version},
             )
 
-            return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
+            return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
+                cast("list[t.MeltanoCore.MeltanoConfigDict]", plugins_data),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",

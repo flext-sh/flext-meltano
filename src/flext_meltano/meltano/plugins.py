@@ -118,7 +118,12 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 variants_obj = u.get(indexed_plugin, "variants")
                 variants_dict = u.guard(variants_obj, dict, return_value=True)
                 variants_str = (
-                    u.join(u.map(variants_dict, str), sep=",") if variants_dict else ""
+                    u.join(
+                        cast("list[str]", u.map(variants_dict, str)),
+                        sep=",",
+                    )
+                    if variants_dict
+                    else ""
                 )
                 return cast(
                     "dict[str, str]",
