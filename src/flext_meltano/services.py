@@ -72,6 +72,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     sink_name: str | None = None
     transformation_name: str | None = None
     _service_type: str | None = None
+    _config: FlextMeltanoSettings  # Always initialized in __init__
 
     @property
     def config(self) -> FlextMeltanoSettings:

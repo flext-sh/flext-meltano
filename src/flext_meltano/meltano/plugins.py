@@ -120,23 +120,26 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 variants_str = (
                     u.join(u.map(variants_dict, str), sep=",") if variants_dict else ""
                 )
-                return u.construct(
-                    {
-                        "name": {"value": plugin_name},
-                        "type": {"value": plugin_type},
-                        "default_variant": {
-                            "field": "default_variant",
-                            "default": "",
-                            "ops": {"ensure": "str"},
+                return cast(
+                    "dict[str, str]",
+                    u.construct(
+                        {
+                            "name": {"value": plugin_name},
+                            "type": {"value": plugin_type},
+                            "default_variant": {
+                                "field": "default_variant",
+                                "default": "",
+                                "ops": {"ensure": "str"},
+                            },
+                            "variants": {"value": variants_str},
+                            "logo_url": {
+                                "field": "logo_url",
+                                "default": "",
+                                "ops": {"ensure": "str"},
+                            },
                         },
-                        "variants": {"value": variants_str},
-                        "logo_url": {
-                            "field": "logo_url",
-                            "default": "",
-                            "ops": {"ensure": "str"},
-                        },
-                    },
-                    source=indexed_plugin,
+                        source=indexed_plugin,
+                    ),
                 )
 
             # Process extractors using u.process() with limit via filter_keys

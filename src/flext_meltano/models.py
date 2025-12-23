@@ -69,7 +69,7 @@ class FlextMeltanoModels(FlextModels):
                 return u.any_(*checks_result.value)
             return False
 
-        return u.map(value, lambda k, v: "[PROTECTED]" if is_sensitive(k) else v)
+        return cast("dict[str, object]", u.map(value, lambda k, v: "[PROTECTED]" if is_sensitive(k) else v))
 
     # Constants for magic values used throughout the models
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
@@ -929,9 +929,12 @@ class FlextMeltanoModels(FlextModels):
             streams_list = (
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
-            return u.filter(
-                streams_list,
-                lambda s: s.status in {"discovered", "selected"},
+            return cast(
+                "list[FlextMeltanoModels.StreamInfo]",
+                u.filter(
+                    streams_list,
+                    lambda s: s.status in {"discovered", "selected"},
+                ),
             )
 
     class DataSourceInstance(FlextModels.Entity):

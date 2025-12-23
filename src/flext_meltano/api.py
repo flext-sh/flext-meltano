@@ -695,7 +695,7 @@ class FlextMeltano(s[t_core.JsonValue]):
 
     def get_service_status(
         self,
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t_core.JsonValue]:
         """Get service status using flext-core patterns."""
         return self.execute()
 
@@ -931,10 +931,10 @@ class FlextMeltano(s[t_core.JsonValue]):
             return r[t_core.JsonValue].fail("plugin_type and plugin_name are required")
 
         result = self.install_plugin(plugin_type, plugin_name, config)
-        # Convert specific type to JsonValue
-        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
-            lambda _: "Plugin installation failed"
-        )
+        # Convert specific type to JsonValue with explicit wrapping
+        if result.is_success:
+            return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
+        return r[t_core.JsonValue].fail(result.error or "Plugin installation failed")
 
     def _handle_list_plugins_call(
         self,
@@ -947,10 +947,10 @@ class FlextMeltano(s[t_core.JsonValue]):
         plugin_type = str(plugin_type_raw) if plugin_type_raw else None
 
         result = self.list_plugins(plugin_type)
-        # Convert specific type to JsonValue
-        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
-            lambda _: "Plugin listing failed"
-        )
+        # Convert specific type to JsonValue with explicit wrapping
+        if result.is_success:
+            return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
+        return r[t_core.JsonValue].fail(result.error or "Plugin listing failed")
 
     def _handle_configure_environment_call(
         self,
@@ -978,10 +978,10 @@ class FlextMeltano(s[t_core.JsonValue]):
             return r[t_core.JsonValue].fail("environment_name is required")
 
         result = self.configure_environment(environment_name, config)
-        # Convert specific type to JsonValue
-        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
-            lambda _: "Environment configuration failed"
-        )
+        # Convert specific type to JsonValue with explicit wrapping
+        if result.is_success:
+            return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
+        return r[t_core.JsonValue].fail(result.error or "Environment configuration failed")
 
     def _handle_run_dbt_models_call(
         self,
@@ -996,10 +996,10 @@ class FlextMeltano(s[t_core.JsonValue]):
         config = u.guard(config_raw, dict, return_value=True)
 
         result = self.run_dbt_models(models, config)
-        # Convert specific type to JsonValue
-        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
-            lambda _: "DBT models execution failed"
-        )
+        # Convert specific type to JsonValue with explicit wrapping
+        if result.is_success:
+            return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
+        return r[t_core.JsonValue].fail(result.error or "DBT models execution failed")
 
     def _handle_test_dbt_models_call(
         self,
@@ -1016,10 +1016,10 @@ class FlextMeltano(s[t_core.JsonValue]):
             config = u.guard(config_raw, dict, return_value=True)
 
         result = self.test_dbt_models(models, config)
-        # Convert specific type to JsonValue
-        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
-            lambda _: "DBT models testing failed"
-        )
+        # Convert specific type to JsonValue with explicit wrapping
+        if result.is_success:
+            return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
+        return r[t_core.JsonValue].fail(result.error or "DBT models testing failed")
 
     def _handle_run_elt_pipeline_call(
         self,
@@ -1045,10 +1045,10 @@ class FlextMeltano(s[t_core.JsonValue]):
             return r[t_core.JsonValue].fail("tap_name and target_name are required")
 
         result = self.run_elt_pipeline(tap_name, target_name, dbt_models, config)
-        # Convert specific type to JsonValue
-        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
-            lambda _: "ELT pipeline execution failed"
-        )
+        # Convert specific type to JsonValue with explicit wrapping
+        if result.is_success:
+            return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
+        return r[t_core.JsonValue].fail(result.error or "ELT pipeline execution failed")
 
 
 __all__ = ["FlextMeltano"]
