@@ -275,7 +275,10 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 )
 
             # Create batches
-            batches: list[list[dict[str, object]]] = u.chunk(records, batch_size)
+            batches: list[list[dict[str, object]]] = cast(
+                "list[list[dict[str, object]]]",
+                u.chunk(records, batch_size),
+            )
 
             self.logger.info(
                 "Records batched for insert successfully",

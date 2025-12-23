@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from typing import cast
 
 from flext_cli import FlextCli
 from flext_core import FlextLogger
@@ -23,6 +24,7 @@ from flext_meltano.cli_managers import (
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
+    _CLIProtocol,
 )
 
 
@@ -48,13 +50,16 @@ class FlextMeltanoCLI:
         self._api = FlextMeltano()
         self.output = self._cli.output
 
+        # Cast self to _CLIProtocol for manager composition
+        cli_protocol: _CLIProtocol = cast("_CLIProtocol", self)
+
         # Initialize specialized components using composition
-        self.command_router = FlextMeltanoCommandRouter(self)
-        self.pipeline_manager = FlextMeltanoPipelineManager(self)
-        self.singer_manager = FlextMeltanoSingerManager(self)
-        self.dbt_manager = FlextMeltanoDbtManager(self)
-        self.plugin_manager = FlextMeltanoPluginManager(self)
-        self.status_manager = FlextMeltanoStatusManager(self)
+        self.command_router = FlextMeltanoCommandRouter(cli_protocol)
+        self.pipeline_manager = FlextMeltanoPipelineManager(cli_protocol)
+        self.singer_manager = FlextMeltanoSingerManager(cli_protocol)
+        self.dbt_manager = FlextMeltanoDbtManager(cli_protocol)
+        self.plugin_manager = FlextMeltanoPluginManager(cli_protocol)
+        self.status_manager = FlextMeltanoStatusManager(cli_protocol)
 
     def show_pipeline_help(self) -> None:
         """Show pipeline help."""
