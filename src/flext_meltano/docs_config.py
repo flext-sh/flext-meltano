@@ -96,9 +96,8 @@ class DocsConfig(FlextSettings):
         if config_result.is_success:
             return cast("DocsConfig", config_result.value)
 
-        # Create and register new instance
+        # Create and return new instance
         instance = cls()
-        container.register_service("DocsConfig", instance)
         return instance
 
     def load_from_file(self, config_path: str | Path | None = None) -> r[DocsConfig]:
@@ -128,9 +127,10 @@ class DocsConfig(FlextSettings):
             config_data = config_guard
 
             # Update instance with loaded values
-            for key, value in config_data.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
+            if isinstance(config_data, dict):
+                for key, value in config_data.items():
+                    if hasattr(self, key):
+                        setattr(self, key, value)
 
             return r.ok(self)
 

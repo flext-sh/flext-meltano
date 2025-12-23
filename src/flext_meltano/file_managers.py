@@ -68,7 +68,7 @@ class FlextMeltanoFileManagers:
         def _create() -> r[Path]:
             # Use direct tempfile.mkdtemp for temporary directory creation
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-            logger.info("Created temporary directory: %s", temp_dir)
+            logger.info(f"Created temporary directory: {temp_dir}")
             return r[Path].ok(temp_dir)
 
         result = u.try_(

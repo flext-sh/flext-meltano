@@ -162,10 +162,13 @@ class FlextMeltanoDbtRunner(FlextService[str]):
             )
 
             # DBT docs generate would be executed here
-            result = {
-                "status": "completed",
-                "docs_path": str(self.project_root / "target" / "index.html"),
-            }
+            result = cast(
+                "dict[str, object]",
+                {
+                    "status": "completed",
+                    "docs_path": str(self.project_root / "target" / "index.html"),
+                },
+            )
 
             self.logger.info("DBT documentation generated")
             return FlextResult[dict[str, object]].ok(result)

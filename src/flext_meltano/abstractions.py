@@ -153,9 +153,11 @@ class FlextMeltanoAbstractions:
             )
             # Type narrowing: ensure list[dict[str, object]]
             if isinstance(filtered_components, (list, tuple)):
-                return r[list[dict[str, object]]].ok(
+                result_list = cast(
+                    "list[dict[str, object]]",
                     list(filtered_components),
                 )
+                return r[list[dict[str, object]]].ok(result_list)
             return r[list[dict[str, object]]].ok([])
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
