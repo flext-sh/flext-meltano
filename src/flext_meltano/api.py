@@ -30,7 +30,6 @@ from flext_core import (
 from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
-from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService
@@ -729,6 +728,7 @@ class FlextMeltano(s[t_core.JsonValue]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
+            from flext_meltano.adapters import FlextMeltanoAdapter
             adapter = FlextMeltanoAdapter(self.config)
             return cast(
                 "r[t.MeltanoCore.MeltanoConfigDict]",
