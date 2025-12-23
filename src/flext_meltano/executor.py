@@ -18,7 +18,6 @@ from typing import cast
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.utilities import u
-from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants
@@ -44,7 +43,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
 
     # Instance attributes for type checker
     _bridge: FlextMeltanoBridge
-    _adapter: FlextMeltanoAdapter | None
+    _adapter: object | None
 
     def __init__(self, config: t.MeltanoCore.MeltanoConfigDict | None = None) -> None:
         """Initialize executor with configuration."""
@@ -204,9 +203,10 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         return Path.cwd()
 
     @property
-    def meltano_adapter(self) -> FlextMeltanoAdapter:
+    def meltano_adapter(self) -> object:
         """Get Meltano adapter with lazy initialization."""
         if self._adapter is None:
+            from flext_meltano.adapters import FlextMeltanoAdapter
             self._adapter = FlextMeltanoAdapter(self._config)
         return self._adapter
 
