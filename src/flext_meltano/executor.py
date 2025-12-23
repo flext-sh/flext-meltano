@@ -43,7 +43,6 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoSettings
     _bridge: FlextMeltanoBridge
     _adapter: FlextMeltanoAdapter | None
 
@@ -97,7 +96,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     def execute_command(
         self,
         command: list[str],
-        timeout: int = c.Network.MELTANO_DEFAULT_TIMEOUT,
+        timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> r[FlextMeltanoExecutionResult]:
         """Execute a Meltano command with timeout and error handling.
@@ -348,7 +347,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             "command": "version",
             "command_type": "version",
             "status": "success",
-            "version": c.FLEXT_MELTANO_VERSION,
+            "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "success": True,
             "cli_type": "flext_meltano",
         })

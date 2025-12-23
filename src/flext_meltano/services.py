@@ -71,7 +71,6 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     source_name: str | None = None
     sink_name: str | None = None
     transformation_name: str | None = None
-    _config: FlextMeltanoSettings
     _service_type: str | None = None
 
     @property
@@ -80,7 +79,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         return self._config
 
     @property
-    def _container(self) -> FlextContainer:
+    def container(self) -> FlextContainer:
         """Get FlextContainer instance - delegates to global container."""
         return FlextContainer.get_global()
 

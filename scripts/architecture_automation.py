@@ -228,8 +228,7 @@ class PlantUMLRenderer(s):
         result = DiagramValidationResult(diagram_path=str(puml_file), is_valid=True)
 
         try:
-            with Path(puml_file).open(encoding="utf-8") as f:
-                content = f.read()
+            content = Path(puml_file).read_text(encoding="utf-8")
 
             # Basic syntax validation
             if not self._validate_basic_syntax(content, result):
@@ -303,8 +302,7 @@ class C4ModelValidator(s):
         result = DiagramValidationResult(diagram_path=str(c4_file), is_valid=True)
 
         try:
-            with Path(c4_file).open(encoding="utf-8") as f:
-                content = f.read()
+            content = Path(c4_file).read_text(encoding="utf-8")
 
             # Determine C4 level
             level = self._determine_c4_level(content)
@@ -429,8 +427,7 @@ class ArchitectureDiagramGenerator:
             output_path = Path(output_file)
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with Path(output_path).open("w", encoding="utf-8") as f:
-                f.write(puml_content)
+            Path(output_path).write_text(puml_content, encoding="utf-8")
 
             return True
 
@@ -446,8 +443,7 @@ class ArchitectureDiagramGenerator:
 
         for py_file in module_path.rglob("*.py"):
             try:
-                with Path(py_file).open(encoding="utf-8") as f:
-                    content = f.read()
+                content = Path(py_file).read_text(encoding="utf-8")
 
                 tree = ast.parse(content)
 
@@ -572,8 +568,7 @@ Auto-generated from code analysis
             output_path = Path(output_file)
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with Path(output_path).open("w", encoding="utf-8") as f:
-                f.write(puml_content)
+            Path(output_path).write_text(puml_content, encoding="utf-8")
 
             return True
 
@@ -690,8 +685,7 @@ class ArchitectureDocumentationManager:
 
         for arch_file in arch_files:
             try:
-                with Path(arch_file).open(encoding="utf-8") as f:
-                    content = f.read()
+                content = Path(arch_file).read_text(encoding="utf-8")
 
                 # Update timestamp patterns
                 timestamp_patterns = [
@@ -708,8 +702,7 @@ class ArchitectureDocumentationManager:
                 for pattern, replacement in timestamp_patterns:
                     content = re.sub(pattern, replacement, content)
 
-                with Path(arch_file).open("w", encoding="utf-8") as f:
-                    f.write(content)
+                Path(arch_file).write_text(content, encoding="utf-8")
 
             except Exception as e:
                 self.logger.warning(
@@ -782,8 +775,7 @@ class ArchitectureDocumentationManager:
 *This report is automatically generated. Run `make docs-architecture-report` to update.*
 """
 
-        with Path(report_path).open("w", encoding="utf-8") as f:
-            f.write(report_content)
+        Path(report_path).write_text(report_content, encoding="utf-8")
 
         return str(report_path)
 

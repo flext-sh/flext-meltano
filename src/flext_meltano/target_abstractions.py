@@ -41,15 +41,14 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     Following FLEXT 'one class per module' pattern.
     """
 
-    # Instance attributes (declared for type checker)
-    _config: FlextMeltanoSettings
-
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified sink abstractions with FLEXT configuration."""
-        self._config = config or FlextMeltanoSettings()
-
         # Initialize FlextService parent class
         super().__init__()
+        # Store meltano-specific config (use different name to avoid override)
+        self._meltano_config: FlextMeltanoSettings = (
+            config if config is not None else FlextMeltanoSettings()
+        )
 
     def configure_sink(self, sink_config: m.DataSinkConfig) -> r[m.DataSinkDefinition]:
         """Configure a sink for a sink configuration.
@@ -424,5 +423,5 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         # This would orchestrate the overall sink abstraction workflow
         # For now, return the current configuration
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
-            self._config.model_dump(),
+            self._meltano_config.model_dump(),
         )

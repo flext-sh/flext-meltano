@@ -30,7 +30,6 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoSettings
     _abstractions: FlextMeltanoAbstractions
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
@@ -58,7 +57,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             }
 
             self.logger.info("FlextMeltanoPluginService executed successfully")
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(data=config_data)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Plugin service execution failed: {e}"

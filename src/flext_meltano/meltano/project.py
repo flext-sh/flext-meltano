@@ -13,10 +13,9 @@ from pathlib import Path
 
 from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from flext_meltano import u
-from flext_meltano.models import m
 
 
 class FlextMeltanoProjectManager(FlextService):
@@ -31,7 +30,7 @@ class FlextMeltanoProjectManager(FlextService):
 
     """
 
-    class ProjectInfo(m):
+    class ProjectInfo(BaseModel):
         """Information about a Meltano project."""
 
         root: Path = Field(description="Project root directory")

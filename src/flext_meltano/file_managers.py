@@ -102,7 +102,7 @@ class FlextMeltanoFileManagers:
             # Ensure parent directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
-            with file_path.open("w", encoding=c_base.Mixins.DEFAULT_ENCODING) as f:
+            with file_path.open("w", encoding=c_base.Utilities.DEFAULT_ENCODING) as f:
                 yaml.dump(
                     config,
                     f,
@@ -146,7 +146,7 @@ class FlextMeltanoFileManagers:
                     f"YAML file not found: {file_path}",
                 )
 
-            with file_path.open("r", encoding=c_base.Mixins.DEFAULT_ENCODING) as f:
+            with file_path.open("r", encoding=c_base.Utilities.DEFAULT_ENCODING) as f:
                 config_data: object = yaml.safe_load(f)
 
             # DSL: Use u.when for conditional handling
@@ -155,7 +155,7 @@ class FlextMeltanoFileManagers:
 
             # DSL: Use u.ensure for type narrowing
             ensured_result: object = u.ensure(
-                cast("t_core.t.GeneralValueType", config_data),
+                cast("t_core.GeneralValueType", config_data),
                 target_type="dict",
                 default={},
             )
@@ -206,7 +206,7 @@ class FlextMeltanoFileManagers:
             if not file_path.exists():
                 return r[bool].fail(f"YAML file not found: {file_path}")
 
-            with file_path.open("r", encoding=c_base.Mixins.DEFAULT_ENCODING) as f:
+            with file_path.open("r", encoding=c_base.Utilities.DEFAULT_ENCODING) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
             return r[bool].ok(True)
@@ -277,7 +277,7 @@ class FlextMeltanoFileManagers:
 
             # Create essential config files
             configs = {
-                c.Paths.MELTANO_PROJECT_FILE: {
+                c.Meltano.Paths.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": "project_name",
                     "project_name": "project_name",

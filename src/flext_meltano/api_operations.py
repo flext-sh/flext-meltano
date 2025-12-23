@@ -73,7 +73,10 @@ class FlextMeltanoAPIOperations:
             return r[t.JsonValue].fail("tap_name and target_name are required")
 
         result = self.api.create_pipeline(tap_name, target_name, config)
-        return u.cast(result, default_error="Pipeline creation failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "Pipeline creation failed"
+        )
 
     def handle_execute_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle execute_pipeline operation call."""
@@ -101,7 +104,10 @@ class FlextMeltanoAPIOperations:
             return r[t.JsonValue].fail("pipeline_id is required")
 
         result = self.api.execute_pipeline(pipeline_id, config)
-        return u.cast(result, default_error="Pipeline execution failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "Pipeline execution failed"
+        )
 
     def handle_install_plugin_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle install_plugin operation call."""
@@ -131,7 +137,10 @@ class FlextMeltanoAPIOperations:
             return r[t.JsonValue].fail("plugin_type and plugin_name are required")
 
         result = self.api.install_plugin(plugin_type, plugin_name, config)
-        return u.cast(result, default_error="Plugin installation failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "Plugin installation failed"
+        )
 
     def handle_list_plugins_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle list_plugins operation call."""
@@ -142,7 +151,10 @@ class FlextMeltanoAPIOperations:
         plugin_type = str(plugin_type_raw) if plugin_type_raw else None
 
         result = self.api.list_plugins(plugin_type)
-        return u.cast(result, default_error="Plugin listing failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "Plugin listing failed"
+        )
 
     def handle_configure_environment_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle configure_environment operation call."""
@@ -170,7 +182,10 @@ class FlextMeltanoAPIOperations:
             return r[t.JsonValue].fail("environment_name is required")
 
         result = self.api.configure_environment(environment_name, config)
-        return u.cast(result, default_error="Environment configuration failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "Environment configuration failed"
+        )
 
     def handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle run_dbt_models operation call."""
@@ -198,7 +213,10 @@ class FlextMeltanoAPIOperations:
         config = u.get(fields_dict, "config", default={})
 
         result = self.api.run_dbt_models(models, config)
-        return u.cast(result, default_error="DBT models execution failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "DBT models execution failed"
+        )
 
     def handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle test_dbt_models operation call."""
@@ -226,7 +244,10 @@ class FlextMeltanoAPIOperations:
         config = u.get(fields_dict, "config", default={})
 
         result = self.api.test_dbt_models(models, config)
-        return u.cast(result, default_error="DBT models testing failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "DBT models testing failed"
+        )
 
     def handle_run_elt_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
         """Handle run_elt_pipeline operation call."""
@@ -261,7 +282,10 @@ class FlextMeltanoAPIOperations:
             return r[t.JsonValue].fail("tap_name and target_name are required")
 
         result = self.api.run_elt_pipeline(tap_name, target_name, dbt_models, config)
-        return u.cast(result, default_error="ELT pipeline execution failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t.JsonValue", v)).map_error(
+            lambda e: "ELT pipeline execution failed"
+        )
 
 
 __all__ = ["FlextMeltanoAPIOperations"]

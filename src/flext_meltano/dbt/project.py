@@ -13,10 +13,9 @@ import json
 from pathlib import Path
 
 from flext_core import r, s
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from flext_meltano import u
-from flext_meltano.models import m
 
 
 class FlextMeltanoDbtProjectManager(s):
@@ -31,7 +30,7 @@ class FlextMeltanoDbtProjectManager(s):
 
     """
 
-    class ProjectInfo(m):
+    class ProjectInfo(BaseModel):
         """Information about a DBT project."""
 
         root: Path = Field(description="Project root directory")

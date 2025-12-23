@@ -18,7 +18,6 @@ from flext_core import (
     FlextExceptions,
     FlextResult,
     FlextSettings,
-    u,
 )
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
@@ -39,7 +38,7 @@ c = FlextMeltanoConstants
 
 
 @FlextSettings.auto_register("meltano")
-class FlextMeltanoSettings(FlextSettings.AutoConfig):
+class FlextMeltanoSettings(FlextSettings):
     """Pipeline configuration management with validation using AutoConfig pattern.
 
     **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
@@ -87,8 +86,10 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
     MELTANO_VERSION: ClassVar[str] = (
         FlextMeltanoConstants.Meltano.Versions.MELTANO_REQUIRED
     )
-    SINGER_SDK_VERSION: ClassVar[str] = FlextMeltanoConstants.SDK_VERSION_REQUIRED
-    DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.VERSION_REQUIRED_DBT
+    SINGER_SDK_VERSION: ClassVar[str] = (
+        FlextMeltanoConstants.Meltano.SDK_VERSION_REQUIRED
+    )
+    DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.Meltano.VERSION_REQUIRED_DBT
 
     # Use FlextMeltanoConstants for file constants (SOURCE OF TRUTH)
     PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.PROJECT_FILE
@@ -574,13 +575,13 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
         """
         try:
             env_type = FlextMeltanoConstants.Meltano.Environment(environment.lower())
-        except ValueError as e:
+        except ValueError:
             msg = f"Invalid environment: {environment}"
-            raise e.ValidationError(msg) from e
+            raise ValueError(msg) from None
 
         # Filter and type-cast kwargs to valid fields only
         valid_fields = cls.model_fields.keys()
-        filtered_kwargs_dict = u.filter(kwargs, lambda k, _v: k in valid_fields)
+        filtered_kwargs_dict = {k: v for k, v in kwargs.items() if k in valid_fields}
         filtered_kwargs = (
             filtered_kwargs_dict if isinstance(filtered_kwargs_dict, dict) else {}
         )
@@ -609,18 +610,14 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
 
         if "run_mode" in filtered_kwargs:
             run_mode_raw = str(filtered_kwargs["run_mode"]).lower()
-            run_mode_enum = c.RunMode(run_mode_raw)
+            run_mode_enum = c.Meltano.RunMode(run_mode_raw)
             config_data["run_mode"] = run_mode_enum.value
 
         # Apply all other valid kwargs with proper type handling
         excluded_keys = {"project_root", "log_level", "run_mode", "environment"}
-        filtered_update_dict = u.filter(
-            filtered_kwargs,
-            lambda k, _v: k not in excluded_keys,
-        )
-        filtered_update = (
-            filtered_update_dict if isinstance(filtered_update_dict, dict) else {}
-        )
+        filtered_update = {
+            k: v for k, v in filtered_kwargs.items() if k not in excluded_keys
+        }
         config_data.update(filtered_update)
 
         return cls.model_validate(config_data)
@@ -658,8 +655,7 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
     def set_global_instance(cls, instance: FlextSettings) -> None:
         """Set the SINGLETON GLOBAL Meltano configuration instance.
 
-        This method delegates to FlextSettings.set_global_instance() since FlextSettings
-        is the source of truth for all configuration.
+        Uses FlextSettings singleton registry pattern to store the instance.
 
         Args:
         instance: The configuration to set as global.
@@ -670,10 +666,11 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
         """
         if not isinstance(instance, FlextMeltanoSettings):
             error_msg = "instance must be a FlextMeltanoSettings instance"
-            raise e.ValidationError(error_msg)
+            raise TypeError(error_msg)
 
-        # Delegate to FlextSettings since it's the source of truth
-        FlextSettings.set_global_instance(instance)
+        # Use FlextSettings singleton registry pattern
+        with FlextSettings._lock:  # noqa: SLF001
+            FlextSettings._instances[cls] = instance  # noqa: SLF001
 
     @classmethod
     def get_version(cls: object) -> str:
@@ -1052,9 +1049,7 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
                     FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value
                 )
                 config.debug = True
-                config.log_level = str(
-                    c.Settings.LogLevel.DEBUG.value,
-                )
+                config.log_level = c.Settings.LogLevel.DEBUG
                 config.network_timeout = 300
                 config.max_concurrent_jobs = 2
                 return r[FlextMeltanoSettings].ok(config)
@@ -1081,9 +1076,7 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
                     FlextMeltanoConstants.Meltano.Environment.PRODUCTION.value
                 )
                 config.debug = False
-                config.log_level = str(
-                    c.Settings.LogLevel.WARNING.value,
-                )
+                config.log_level = c.Settings.LogLevel.WARNING
                 config.network_timeout = 600
                 config.max_concurrent_jobs = 10
                 config.meltano_database_uri = SecretStr(database_url)
@@ -1108,9 +1101,7 @@ class FlextMeltanoSettings(FlextSettings.AutoConfig):
                     FlextMeltanoConstants.Meltano.Environment.TESTING.value
                 )
                 config.debug = True
-                config.log_level = str(
-                    c.Settings.LogLevel.DEBUG.value,
-                )
+                config.log_level = c.Settings.LogLevel.DEBUG
                 config.network_timeout = 60
                 config.max_concurrent_jobs = 1
                 return r[FlextMeltanoSettings].ok(config)

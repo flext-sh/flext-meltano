@@ -38,15 +38,14 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     Following FLEXT 'one class per module' pattern.
     """
 
-    # Instance attributes (declared for type checker)
-    _config: object
-
-    def __init__(self, config: object | None = None) -> None:
+    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified source abstractions with FLEXT configuration."""
-        self._config = config or FlextMeltanoSettings()
-
         # Initialize FlextService parent class
         super().__init__()
+        # Store meltano-specific config (use different name to avoid override)
+        self._meltano_config: FlextMeltanoSettings = (
+            config if config is not None else FlextMeltanoSettings()
+        )
 
     def discover_streams(
         self,
@@ -206,7 +205,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         """Execute source abstraction operations (implements Service)."""
         # This would orchestrate the overall source abstraction workflow
         # For now, return the current configuration
-        return r[t.MeltanoCore.MeltanoConfigDict].ok(self._config.model_dump())
+        return r[t.MeltanoCore.MeltanoConfigDict].ok(self._meltano_config.model_dump())
 
 
 # Export Singer SDK types with FLEXT naming

@@ -84,7 +84,6 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     # Core service attributes with proper typing
     service_name: str
     version: str = cast("str", __version__)
-    _config: FlextMeltanoSettings
 
     @property
     def constants(self) -> type[FlextMeltanoConstants]:
@@ -100,6 +99,14 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     def models(self) -> type[FlextMeltanoModels]:
         """Get FlextMeltanoModels - delegates to domain layer."""
         return FlextMeltanoModels
+
+    @property
+    def config(self) -> FlextMeltanoSettings:
+        """Get typed config - type-safe access to FlextMeltanoSettings."""
+        if isinstance(self._config, FlextMeltanoSettings):
+            return self._config
+        # Fallback to default if _config is None or wrong type
+        return FlextMeltanoSettings()
 
     def __init__(
         self,
@@ -152,16 +159,14 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     # SERVICE LIFECYCLE - FlextService protocol implementation
     # ============================================================================
 
-    def execute(self, **_kwargs: object) -> r[r[t_core.JsonValue]]:
+    def execute(self, **_kwargs: object) -> r[t_core.JsonValue]:
         """Execute service lifecycle using flext-core railway patterns."""
-        return r[r[t_core.JsonValue]].ok(
-            r[t_core.JsonValue].ok({
-                "service_name": self.service_name,
-                "version": self.version,
-                "status": "active",
-                "operations": ["pipeline", "plugin", "dbt", "environment"],
-            }),
-        )
+        return r[t_core.JsonValue].ok({
+            "service_name": self.service_name,
+            "version": self.version,
+            "status": "active",
+            "operations": ["pipeline", "plugin", "dbt", "environment"],
+        })
 
     # ============================================================================
     # OPERATION DISPATCH - Advanced pattern matching with flext-core
@@ -691,7 +696,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
 
     def get_service_status(
         self,
-    ) -> r[r[t.MeltanoCore.MeltanoConfigDict]]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Get service status using flext-core patterns."""
         return self.execute()
 
@@ -724,7 +729,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
-            adapter = FlextMeltanoAdapter(self._config)
+            adapter = FlextMeltanoAdapter(self.config)
             return cast(
                 "r[t.MeltanoCore.MeltanoConfigDict]",
                 adapter.project_adapter.create_project(
@@ -740,7 +745,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     def validate_project(self, _project_path: str) -> r[bool]:
         """Validate Meltano project - delegates to config."""
         try:
-            return self._config.validate_project_structure()
+            return self.config.validate_project_structure()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project: {e}")
 
@@ -755,7 +760,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     ) -> r[t_core.JsonValue]:
         """Extract data from source - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self._config, source_name=source_name)
+            service = FlextMeltanoService(config=self.config, source_name=source_name)
             return service.extract(cast("dict[str, object]", config or {}))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t_core.JsonValue].fail(f"Failed to extract data: {e}")
@@ -767,7 +772,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     ) -> r[t_core.JsonValue]:
         """Load data to sink - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self._config, sink_name=sink_name)
+            service = FlextMeltanoService(config=self.config, sink_name=sink_name)
             # DSL: Use u.empty for conditional check
             if records is not None and not u.empty(records):
                 return service.load_batch(cast("list[dict[str, object]]", records))
@@ -778,7 +783,7 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
     def discover_catalog(self, source_name: str) -> r[t_core.JsonValue]:
         """Discover source schema - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self._config, source_name=source_name)
+            service = FlextMeltanoService(config=self.config, source_name=source_name)
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t_core.JsonValue].fail(f"Failed to discover catalog: {e}")
@@ -837,11 +842,13 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         if u.none_(tap_name, target_name):
             return r[t_core.JsonValue].fail("tap_name and target_name are required")
 
-        return self.create_pipeline(
+        result = self.create_pipeline(
             tap_name,
             target_name,
             config,
         )
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v))
 
     def _handle_execute_pipeline_call(
         self,
@@ -888,7 +895,9 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         if u.none_(pipeline_id):
             return r[t_core.JsonValue].fail("pipeline_id is required")
 
-        return self.execute_pipeline(pipeline_id, config)
+        result = self.execute_pipeline(pipeline_id, config)
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v))
 
     def _handle_install_plugin_call(
         self,
@@ -918,7 +927,10 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             return r[t_core.JsonValue].fail("plugin_type and plugin_name are required")
 
         result = self.install_plugin(plugin_type, plugin_name, config)
-        return u.cast(result, default_error="Plugin installation failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
+            lambda e: "Plugin installation failed"
+        )
 
     def _handle_list_plugins_call(
         self,
@@ -931,7 +943,10 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         plugin_type = str(plugin_type_raw) if plugin_type_raw else None
 
         result = self.list_plugins(plugin_type)
-        return u.cast(result, default_error="Plugin listing failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
+            lambda e: "Plugin listing failed"
+        )
 
     def _handle_configure_environment_call(
         self,
@@ -959,7 +974,10 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             return r[t_core.JsonValue].fail("environment_name is required")
 
         result = self.configure_environment(environment_name, config)
-        return u.cast(result, default_error="Environment configuration failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
+            lambda e: "Environment configuration failed"
+        )
 
     def _handle_run_dbt_models_call(
         self,
@@ -974,7 +992,10 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
         config = u.guard(config_raw, dict, return_value=True)
 
         result = self.run_dbt_models(models, config)
-        return u.cast(result, default_error="DBT models execution failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
+            lambda e: "DBT models execution failed"
+        )
 
     def _handle_test_dbt_models_call(
         self,
@@ -991,7 +1012,10 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             config = u.guard(config_raw, dict, return_value=True)
 
         result = self.test_dbt_models(models, config)
-        return u.cast(result, default_error="DBT models testing failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
+            lambda e: "DBT models testing failed"
+        )
 
     def _handle_run_elt_pipeline_call(
         self,
@@ -1017,7 +1041,10 @@ class FlextMeltano(s[r[t_core.JsonValue]]):
             return r[t_core.JsonValue].fail("tap_name and target_name are required")
 
         result = self.run_elt_pipeline(tap_name, target_name, dbt_models, config)
-        return u.cast(result, default_error="ELT pipeline execution failed")
+        # Convert specific type to JsonValue
+        return result.map(lambda v: cast("t_core.JsonValue", v)).map_error(
+            lambda e: "ELT pipeline execution failed"
+        )
 
 
 __all__ = ["FlextMeltano"]

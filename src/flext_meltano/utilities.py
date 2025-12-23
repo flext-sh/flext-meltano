@@ -59,21 +59,16 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "plugins": plugins,
             }
 
-            # Process environments with fallback using DSL
-            envs_result = u.process(
-                c.Metadata.DEFAULT_ENVIRONMENTS,
-                lambda env: {"name": env},
-            )
-            default_envs = u.or_(
-                envs_result.value if envs_result.is_success else None,
-                [],
-            )
+            # Process environments with fallback using simple list comprehension
+            default_envs: list[dict[str, str]] = [
+                {"name": env} for env in c.Meltano.Metadata.DEFAULT_ENVIRONMENTS
+            ]
 
             # Build config using DSL pattern with transform
             project_id_val = cast("str", raw.get("project_id", ""))
             project_name_val = cast(
                 "str",
-                u.or_(raw.get("project_name"), raw.get("project_id"), default=""),
+                raw.get("project_name") or raw.get("project_id") or "",
             )
             # Build with transform for dict pass-through
             cfg = u.build(
@@ -87,12 +82,12 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "version": cfg_dict.get("version", 1),
                 "project_id": u.Text.safe_string(project_id_val),
                 "project_name": u.Text.safe_string(project_name_val),
-                "environments": u.or_(cfg_dict.get("environments"), default_envs),
+                "environments": cfg_dict.get("environments") or default_envs,
                 "plugins": plugins_val if plugins_val is not None else {},
                 "metadata": {
-                    "created_by": c.Metadata.CREATED_BY,
+                    "created_by": c.Meltano.Metadata.CREATED_BY,
                     "created_at": u.Generators.generate_iso_timestamp(),
-                    "flext_version": c.FLEXT_MELTANO_VERSION,
+                    "flext_version": c.Meltano.FLEXT_MELTANO_VERSION,
                 },
             }
             # Add default_environment conditionally (only if provided or when project_name is empty)
@@ -102,7 +97,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             elif (
                 not project_name
             ):  # Only add default when project_name is empty (test case)
-                result_cfg["default_environment"] = c.Metadata.DEFAULT_ENVIRONMENTS[0]
+                result_cfg["default_environment"] = (
+                    c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0]
+                )
             cfg = result_cfg
             return r[dict[str, object]].ok(cfg)
         except (
@@ -168,7 +165,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             finally:
                 cleanup_file_handle(resource)
         except Exception as e:
-            return r[bool].fail(f"Writing {c.Paths.MELTANO_PROJECT_FILE}: {e}")
+            return r[bool].fail(f"Writing {c.Meltano.Paths.MELTANO_PROJECT_FILE}: {e}")
 
     @classmethod
     def _open_yaml_file_for_writing(cls, target_path: Path) -> r[TextIO]:
@@ -185,7 +182,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             # Validate parent directory exists
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
-            file_handle = target_path.open("w", encoding=c_base.Mixins.DEFAULT_ENCODING)
+            file_handle = target_path.open(
+                "w", encoding=c_base.Utilities.DEFAULT_ENCODING
+            )
             return r[TextIO].ok(file_handle)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[TextIO].fail(f"Failed to open file for writing: {e}")
@@ -200,9 +199,9 @@ class FlextMeltanoUtilities(FlextUtilities):
         if not hasattr(file_handle, "write"):
             return r[bool].fail("Invalid file handle: missing write method")
 
-        # DSL: Use try_ for safe YAML serialization
+        # Safe YAML serialization using FlextResult pattern
         # Allow non-serializable objects to be written (they'll fail on load, which is expected)
-        def dump_yaml() -> bool:
+        try:
             # Use Dumper (not SafeDumper) to allow serialization of objects
             # This allows write to succeed, but load will fail (as expected by tests)
             yaml.dump(
@@ -213,16 +212,9 @@ class FlextMeltanoUtilities(FlextUtilities):
                 indent=2,
                 allow_unicode=True,
             )
-            return True
-
-        result = u.try_(
-            dump_yaml,
-            default=False,
-            catch=(yaml.YAMLError, ValueError, TypeError, AttributeError),
-        )
-        if result:
             return r[bool].ok(True)
-        return r[bool].fail("Failed to write YAML content: non-serializable object")
+        except (yaml.YAMLError, ValueError, TypeError, AttributeError):
+            return r[bool].fail("Failed to write YAML content: non-serializable object")
 
     @classmethod
     def _close_file_handle(cls, file_handle: TextIO) -> r[None]:
@@ -280,7 +272,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 "settings": {},
                 "config": {},
                 "metadata": {
-                    "created_by": c.Metadata.CREATED_BY,
+                    "created_by": c.Meltano.Metadata.CREATED_BY,
                     "created_at": u.Generators.generate_iso_timestamp(),
                 },
             }
@@ -358,34 +350,27 @@ class FlextMeltanoUtilities(FlextUtilities):
     @staticmethod
     def validate_project_structure(project_path: Path) -> r[bool]:
         """Validate Meltano project structure."""
-
-        # DSL: Use or_ for fallback chain of config files
-        def check_config() -> r[bool]:
+        try:
             if not project_path.exists():
                 return r.fail(f"Project path does not exist: {project_path}")
 
             # Check for config files: pipeline.yml or meltano.yml
-            config_file = u.or_(
-                project_path / c.Paths.MELTANO_PROJECT_FILE
-                if (project_path / c.Paths.MELTANO_PROJECT_FILE).exists()
-                else None,
-                project_path / "meltano.yml"
-                if (project_path / "meltano.yml").exists()
-                else None,
-                default=None,
+            meltano_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
+            fallback_file = project_path / "meltano.yml"
+            config_file = (
+                meltano_file
+                if meltano_file.exists()
+                else fallback_file
+                if fallback_file.exists()
+                else None
             )
             if config_file:
                 return r.ok(True)
             return r.fail(
-                f"Meltano config file not found: {project_path / c.Paths.MELTANO_PROJECT_FILE}",
+                f"Meltano config file not found: {meltano_file}",
             )
-
-        result = u.try_(check_config, catch=(OSError, ValueError))
-        return (
-            result
-            if isinstance(result, r)
-            else r.fail("Failed to validate project structure")
-        )
+        except (OSError, ValueError) as e:
+            return r.fail(f"Failed to validate project structure: {e}")
 
     @staticmethod
     def create_project_file(
@@ -397,8 +382,8 @@ class FlextMeltanoUtilities(FlextUtilities):
         if content_guard is None:
             return r.fail("Invalid content type: must be string or dict")
 
-        # DSL: Use try_ for safe file operations
-        def write_file() -> Path:
+        # Safe file operations using try/except
+        try:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             if isinstance(content_guard, dict):
                 yaml_content = yaml.dump(
@@ -410,12 +395,9 @@ class FlextMeltanoUtilities(FlextUtilities):
                 _ = file_path.write_text(yaml_content, encoding="utf-8")
             elif isinstance(content_guard, str):
                 _ = file_path.write_text(content_guard, encoding="utf-8")
-            return file_path
-
-        result = u.try_(write_file, catch=(OSError, ValueError, yaml.YAMLError))
-        if result:
-            return r.ok(result)
-        return r.fail("Failed to create project file")
+            return r.ok(file_path)
+        except (OSError, ValueError, yaml.YAMLError) as e:
+            return r.fail(f"Failed to create project file: {e}")
 
     @classmethod
     def load_yaml_file(cls, file_path: Path) -> r[dict[str, object]]:

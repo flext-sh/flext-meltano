@@ -38,7 +38,6 @@ class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Instance attributes for type checker
-    _config: FlextMeltanoSettings
     _library_runner: FlextMeltanoLibraryRunner
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
