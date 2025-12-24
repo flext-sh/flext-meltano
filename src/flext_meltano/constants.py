@@ -5,8 +5,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final
 
-from flext_core import FlextConstants
-
+from flext import FlextConstants
 from flext_meltano.typings import t
 
 # Import aliases for simplified usage

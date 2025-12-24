@@ -14,9 +14,9 @@ import urllib.request
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextLogger, u
 from pydantic import BaseModel, ConfigDict
 
+from flext import FlextLogger, u
 from flext_meltano import r, s
 from flext_meltano.docs_config import DocsConfig
 
@@ -706,7 +706,7 @@ class ArchitectureDocumentationManager:
 
             except Exception as e:
                 self.logger.warning(
-                    "Failed to update timestamps in %s: %s", arch_file, e
+                    "Failed to update timestamps in %s: %s", arch_file, e,
                 )
 
     def _update_diagram_references(self) -> None:

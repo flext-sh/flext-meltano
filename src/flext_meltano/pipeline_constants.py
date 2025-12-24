@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from enum import StrEnum
 from typing import Final, Literal
 
-from flext_core import FlextConstants
+from flext import FlextConstants
+from flext_meltano.constants import c
 
 
 class FlextMeltanoConstants(FlextConstants):
@@ -69,52 +69,12 @@ class FlextMeltanoConstants(FlextConstants):
     DEFAULT_ORACLE_PORT: Final[int] = 1521
 
 
-# Enums for pipeline domain - single responsibility
-class PipelinePluginTypes(StrEnum):
-    """Pipeline plugin types enumeration."""
-
-    EXTRACTORS = "extractors"
-    LOADERS = "loaders"
-    TRANSFORMS = "transforms"
-    ORCHESTRATORS = "orchestrators"
-
-
-class PipelineReplicationMethods(StrEnum):
-    """Pipeline replication methods enumeration."""
-
-    FULL_TABLE = "FULL_TABLE"
-    INCREMENTAL = "INCREMENTAL"
-    LOG_BASED = "LOG_BASED"
-
-
-class PipelineOperationStatus(StrEnum):
-    """Pipeline operation status enumeration."""
-
-    PENDING = "pending"
-    RUNNING = "running"
-    SUCCESS = "success"
-    ERROR = "error"
-    TIMEOUT = "timeout"
-    CANCELLED = "cancelled"
-
-
-class PipelineRunMode(StrEnum):
-    """Pipeline run mode enumeration."""
-
-    FULL = "full"
-    INCREMENTAL = "incremental"
-    DRY_RUN = "dry_run"
-    TEST = "test"
-
-
-class PipelineEnvironment(StrEnum):
-    """Pipeline environment types enumeration."""
-
-    DEVELOPMENT = "development"
-    STAGING = "staging"
-    PRODUCTION = "production"
-    TESTING = "testing"
-    LOCAL = "local"
+# Pipeline enums moved to constants.py as c.Meltano.Enums.* (DRY pattern)
+PipelinePluginTypes = c.Meltano.Enums.PluginType
+PipelineReplicationMethods = c.Meltano.Enums.ReplicationMethod
+PipelineOperationStatus = c.Meltano.Enums.OperationStatus
+PipelineRunMode = c.Meltano.Enums.RunMode
+PipelineEnvironment = c.Meltano.Enums.Environment
 
 
 # Literal types for pipeline domain - Python 3.13+ syntax

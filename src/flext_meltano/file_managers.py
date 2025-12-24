@@ -16,12 +16,9 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-from flext_core import (
-    FlextConstants,
-    FlextLogger,
+from flext import FlextLogger,
     FlextResult,
-    u,
-)
+    u
 from flext_core.typings import t as t_core
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -30,12 +27,10 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.validators import FlextMeltanoValidators
 
 # Import aliases for simplified usage
-# u is already imported from flext_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 r = FlextResult
-c_base = FlextConstants
 
 logger = FlextLogger(__name__)
 
@@ -68,7 +63,7 @@ class FlextMeltanoFileManagers:
         def _create() -> r[Path]:
             # Use direct tempfile.mkdtemp for temporary directory creation
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-            logger.info(f"Created temporary directory: {temp_dir}")
+            logger.info("Created temporary directory: %s", temp_dir)
             return r[Path].ok(temp_dir)
 
         result = u.try_(
@@ -102,7 +97,7 @@ class FlextMeltanoFileManagers:
             # Ensure parent directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)
             # Write YAML with proper encoding
-            with file_path.open("w", encoding=c_base.Utilities.DEFAULT_ENCODING) as f:
+            with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.dump(
                     config,
                     f,
@@ -146,7 +141,7 @@ class FlextMeltanoFileManagers:
                     f"YAML file not found: {file_path}",
                 )
 
-            with file_path.open("r", encoding=c_base.Utilities.DEFAULT_ENCODING) as f:
+            with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 config_data: object = yaml.safe_load(f)
 
             # DSL: Use u.when for conditional handling
@@ -206,7 +201,7 @@ class FlextMeltanoFileManagers:
             if not file_path.exists():
                 return r[bool].fail(f"YAML file not found: {file_path}")
 
-            with file_path.open("r", encoding=c_base.Utilities.DEFAULT_ENCODING) as f:
+            with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
             return r[bool].ok(True)
