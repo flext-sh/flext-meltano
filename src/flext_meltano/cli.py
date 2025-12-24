@@ -14,8 +14,8 @@ import sys
 from typing import cast
 
 from flext_cli import FlextCli
+from flext_core import FlextLogger
 
-from flext import FlextLogger
 from flext_meltano.api import FlextMeltano
 from flext_meltano.cli_managers import (
     FlextMeltanoCommandRouter,

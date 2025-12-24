@@ -12,11 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext import (
-    FlextService,
-)
-    FlextResult,
-    u
+from flext_core import FlextResult, FlextService, u
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants

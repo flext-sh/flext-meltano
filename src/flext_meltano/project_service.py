@@ -14,12 +14,7 @@ import tempfile
 from pathlib import Path
 
 import yaml
-from flext import (
-    r,
-)
-    FlextContainer,
-    s,
-    u
+from flext_core import FlextContainer, r, s, u
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import c

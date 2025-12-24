@@ -27,7 +27,7 @@ import schedule
 from flext_cli import (
     FlextCliCmd,
 )
-from flext import FlextContainer,
+from flext_core import  FlextContainer,
     FlextLogger,
     e,
     r,

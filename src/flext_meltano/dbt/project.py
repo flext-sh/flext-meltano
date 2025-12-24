@@ -13,9 +13,9 @@ import json
 from pathlib import Path
 from typing import cast
 
+from flext_core import r, s
 from pydantic import BaseModel, Field
 
-from flext import r, s
 from flext_meltano.utilities import u
 
 

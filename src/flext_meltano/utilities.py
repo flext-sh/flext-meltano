@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import TextIO, cast
 
 import yaml
-from flext import (
+from flext_core import  (
     FlextLogger,
 )
     FlextExceptions,

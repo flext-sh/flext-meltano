@@ -21,14 +21,14 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from flext_core.typings import t as t_core
-
-from flext import (
+from flext_core import (
     FlextExceptions,
     FlextResult,
     FlextService,
     u,
 )
+from flext_core.typings import t as t_core
+
 from flext_meltano import __version__
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants

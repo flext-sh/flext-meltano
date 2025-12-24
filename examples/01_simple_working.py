@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 """
 
-from flext import FlextLogger
+from flext_core import FlextLogger
 
 # Import ONLY what actually exists
 from flext_meltano import (

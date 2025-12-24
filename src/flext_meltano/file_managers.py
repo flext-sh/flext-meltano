@@ -16,13 +16,13 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-from flext_core.typings import t as t_core
-
-from flext import (
+from flext_core import (
     FlextLogger,
     FlextResult,
     u,
 )
+from flext_core.typings import t as t_core
+
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes

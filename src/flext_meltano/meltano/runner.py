@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from flext import (
+from flext_core import  (
     FlextService,
 )
     FlextResult,

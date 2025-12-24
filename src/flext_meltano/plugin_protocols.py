@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext import t
+from flext_core import t
 
 
 class FlextMeltanoPluginProtocols:
