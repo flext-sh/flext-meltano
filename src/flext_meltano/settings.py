@@ -13,23 +13,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, cast
 
-from flext_core import (
-    FlextConstants,
-    FlextExceptions,
+from flext import FlextExceptions,
     FlextResult,
-    FlextSettings,
-)
+    FlextSettings
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
 # Import aliases for simplified usage
-# u is already imported from flext_core
-c_base = FlextConstants
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
 r = FlextResult
@@ -105,20 +101,16 @@ class FlextMeltanoSettings(FlextSettings):
     # ENUMS - All enumerated types as class enums
     # ============================================================================
 
-    # ALL ENUMS MUST COME FROM FlextConstants or FlextMeltanoConstants - NO ALIASES
-    PluginType: ClassVar[type[FlextMeltanoConstants.Meltano.PluginTypes]] = (
-        FlextMeltanoConstants.Meltano.PluginTypes
-    )
-    EnvironmentType: ClassVar[type[FlextMeltanoConstants.Meltano.Environment]] = (
-        FlextMeltanoConstants.Meltano.Environment
+    # ALL ENUMS MUST USE INNERMOST NAMESPACE - NO ALIASES
+    PluginType: ClassVar[type[c.Meltano.Enums.PluginType]] = c.Meltano.Enums.PluginType
+    EnvironmentType: ClassVar[type[c.Meltano.Enums.Environment]] = (
+        c.Meltano.Enums.Environment
     )
     LogLevel: ClassVar[type[c.Settings.LogLevel]] = c.Settings.LogLevel
-    OperationStatus: ClassVar[type[FlextMeltanoConstants.Meltano.OperationStatus]] = (
-        FlextMeltanoConstants.Meltano.OperationStatus
+    OperationStatus: ClassVar[type[c.Meltano.Enums.OperationStatus]] = (
+        c.Meltano.Enums.OperationStatus
     )
-    RunMode: ClassVar[type[FlextMeltanoConstants.Meltano.RunMode]] = (
-        FlextMeltanoConstants.Meltano.RunMode
-    )
+    RunMode: ClassVar[type[c.Meltano.Enums.RunMode]] = c.Meltano.Enums.RunMode
 
     # ============================================================================
     # MELTANO-SPECIFIC CONFIGURATION FIELDS - Additional to FlextSettings
@@ -150,7 +142,7 @@ class FlextMeltanoSettings(FlextSettings):
 
     # Environment configuration
     environment: str = Field(
-        default=FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value,
+        default=c.Meltano.Enums.Environment.DEVELOPMENT.value,
         description="Deployment environment",
     )
 
@@ -312,7 +304,7 @@ class FlextMeltanoSettings(FlextSettings):
     )
 
     run_mode: str = Field(
-        default=FlextMeltanoConstants.Meltano.RunMode.FULL.value,
+        default=c.Meltano.Enums.RunMode.FULL.value,
         description="Execution mode for operations",
     )
 
@@ -574,7 +566,7 @@ class FlextMeltanoSettings(FlextSettings):
 
         """
         try:
-            env_type = FlextMeltanoConstants.Meltano.Environment(environment.lower())
+            env_type = c.Meltano.Enums.Environment(environment.lower())
         except ValueError:
             msg = f"Invalid environment: {environment}"
             raise ValueError(msg) from None
@@ -695,16 +687,16 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def get_supported_plugin_types(cls) -> t.MeltanoCore.PluginTypeList:
         """Get list of supported plugin types."""
-        return FlextMeltanoConstants.Meltano.Plugin.supported_types()
+        return FlextMeltanoUtilities.Plugin.supported_types()
 
     @classmethod
     def get_supported_environments(cls) -> t.MeltanoCore.PluginNameList:
         """Get list of supported environments."""
         return [
-            FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value,
-            FlextMeltanoConstants.Meltano.Environment.STAGING.value,
-            FlextMeltanoConstants.Meltano.Environment.PRODUCTION.value,
-            FlextMeltanoConstants.Meltano.Environment.TESTING.value,
+            c.Meltano.Enums.Environment.DEVELOPMENT.value,
+            c.Meltano.Enums.Environment.STAGING.value,
+            c.Meltano.Enums.Environment.PRODUCTION.value,
+            c.Meltano.Enums.Environment.TESTING.value,
         ]
 
     @classmethod
@@ -1046,7 +1038,7 @@ class FlextMeltanoSettings(FlextSettings):
                 config = FlextMeltanoSettings()
                 # Apply development-specific settings
                 config.environment = (
-                    FlextMeltanoConstants.Meltano.Environment.DEVELOPMENT.value
+                    c.Meltano.Enums.Environment.DEVELOPMENT.value
                 )
                 config.debug = True
                 config.log_level = c.Settings.LogLevel.DEBUG
@@ -1073,7 +1065,7 @@ class FlextMeltanoSettings(FlextSettings):
                 config = FlextMeltanoSettings()
                 # Apply production-specific settings
                 config.environment = (
-                    FlextMeltanoConstants.Meltano.Environment.PRODUCTION.value
+                    c.Meltano.Enums.Environment.PRODUCTION.value
                 )
                 config.debug = False
                 config.log_level = c.Settings.LogLevel.WARNING
@@ -1083,7 +1075,7 @@ class FlextMeltanoSettings(FlextSettings):
                 return r[FlextMeltanoSettings].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[FlextMeltanoSettings].fail(
-                    f"Failed to create prod config: {e}"
+                    f"Failed to create prod config: {e}",
                 )
 
         @staticmethod
@@ -1098,7 +1090,7 @@ class FlextMeltanoSettings(FlextSettings):
                 config = FlextMeltanoSettings()
                 # Apply testing-specific settings
                 config.environment = (
-                    FlextMeltanoConstants.Meltano.Environment.TESTING.value
+                    c.Meltano.Enums.Environment.TESTING.value
                 )
                 config.debug = True
                 config.log_level = c.Settings.LogLevel.DEBUG
@@ -1107,7 +1099,7 @@ class FlextMeltanoSettings(FlextSettings):
                 return r[FlextMeltanoSettings].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[FlextMeltanoSettings].fail(
-                    f"Failed to create test config: {e}"
+                    f"Failed to create test config: {e}",
                 )
 
 

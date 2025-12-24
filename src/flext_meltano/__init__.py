@@ -15,14 +15,12 @@ from __future__ import annotations
 # =========================================================================
 # IMPORT ALIASES FOR SIMPLIFIED USAGE
 # =========================================================================
-from flext_core import (
-    FlextDecorators,
+from flext import FlextDecorators,
     FlextExceptions,
     FlextHandlers,
     FlextMixins,
     FlextResult,
-    FlextService,
-)
+    FlextService
 
 # =========================================================================
 # VERSION

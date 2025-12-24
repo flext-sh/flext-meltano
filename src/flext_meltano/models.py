@@ -15,11 +15,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from flext_core import (
-    FlextConstants,
+from flext import FlextConstants,
     FlextModels,
-    FlextResult,
-)
+    FlextResult
+from flext_core._models.base import FlextModelsBase
 from flext_core.utilities import u as flext_u
 from pydantic import (
     BaseModel,
@@ -30,7 +29,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano.utilities import u
+# Use flext_u directly to avoid circular import
 
 
 class FlextMeltanoModels(FlextModels):
@@ -56,18 +55,18 @@ class FlextMeltanoModels(FlextModels):
         # DSL: Helper to count dict keys
         def dict_count(d: dict[str, object] | list[object] | tuple[object, ...]) -> int:
             if isinstance(d, dict):
-                return u.count(list(d.keys()))
-            return u.count(d)
+                return flext_u.count(list(d.keys()))
+            return flext_u.count(d)
 
         # DSL: Use process + any_ for unified checking
         def is_sensitive(k: str) -> bool:
-            normalized = u.normalize(k, case="lower")
-            checks_result = u.process(
+            normalized = flext_u.normalize(k, case="lower")
+            checks_result = flext_u.process(
                 cast("list[object]", sensitive_keys),
                 lambda s: FlextResult[bool].ok(cast("str", s) in normalized),
             )
             if checks_result.is_success and isinstance(checks_result.value, list):
-                return u.any_(*checks_result.value)
+                return flext_u.any_(*checks_result.value)
             return False
 
         # Transform dict values with protection for sensitive fields
@@ -663,7 +662,7 @@ class FlextMeltanoModels(FlextModels):
                 if isinstance(self.stream_config, dict)
                 else []
             )
-            return u.count(conn_keys) + u.count(stream_keys)
+            return flext_u.count(conn_keys) + flext_u.count(stream_keys)
 
         @model_validator(mode="after")
         def validate_tap_config(self) -> FlextMeltanoModels.TapConfig:
@@ -781,7 +780,7 @@ class FlextMeltanoModels(FlextModels):
                 if isinstance(self.stream_config, dict)
                 else []
             )
-            return u.count(conn_keys) + u.count(stream_keys)
+            return flext_u.count(conn_keys) + flext_u.count(stream_keys)
 
         @model_validator(mode="after")
         def validate_source_config(self) -> FlextMeltanoModels.DataSourceConfig:
@@ -894,7 +893,7 @@ class FlextMeltanoModels(FlextModels):
         def config_keys_count(self) -> int:
             """Number of config keys."""
             keys = list(self.config.keys()) if isinstance(self.config, dict) else []
-            return u.count(keys)
+            return flext_u.count(keys)
 
         @model_validator(mode="after")
         def validate_sink_definition(self) -> FlextMeltanoModels.DataSinkDefinition:
@@ -939,7 +938,7 @@ class FlextMeltanoModels(FlextModels):
             )
             return cast(
                 "list[FlextMeltanoModels.StreamInfo]",
-                u.filter(
+                flext_u.filter(
                     streams_list,
                     lambda s: s.status in {"discovered", "selected"},
                 ),
@@ -993,7 +992,7 @@ class FlextMeltanoModels(FlextModels):
             streams_list = (
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
-            result = u.agg(streams_list, "records_extracted", fn=sum)
+            result = flext_u.agg(streams_list, "records_extracted", fn=sum)
             return result if isinstance(result, int) else 0
 
         @computed_field
@@ -1004,7 +1003,7 @@ class FlextMeltanoModels(FlextModels):
             )
             return (
                 self.discovered
-                and u.count(streams_list) > 0
+                and flext_u.count(streams_list) > 0
                 and self.status == "configured"
             )
 
@@ -1231,16 +1230,16 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def environment_count(self) -> int:
             """Number of environments."""
-            return u.count(self.environments)
+            return flext_u.count(self.environments)
 
         @computed_field
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
             prod_environments = {"prod", "production", "live"}
             # DSL: Use process + any_ for unified checking
-            normalized_envs_result = u.process(
+            normalized_envs_result = flext_u.process(
                 self.environments,
-                lambda e: FlextResult[str].ok(u.normalize(e, case="lower")),
+                lambda e: FlextResult[str].ok(flext_u.normalize(e, case="lower")),
             )
             normalized_envs = (
                 normalized_envs_result.value
@@ -1248,8 +1247,8 @@ class FlextMeltanoModels(FlextModels):
                 and isinstance(normalized_envs_result.value, list)
                 else []
             )
-            return u.any_(*[
-                u.in_(env, cast("list[object]", prod_environments))
+            return flext_u.any_(*[
+                flext_u.in_(env, cast("list[object]", prod_environments))
                 for env in normalized_envs
             ])
 
@@ -1258,9 +1257,9 @@ class FlextMeltanoModels(FlextModels):
             """Project maturity assessment."""
             prod_envs = {"prod", "production", "live"}
             # DSL: Use process + any_ for unified checking
-            normalized_envs_result = u.process(
+            normalized_envs_result = flext_u.process(
                 self.environments,
-                lambda e: FlextResult[str].ok(u.normalize(e, case="lower")),
+                lambda e: FlextResult[str].ok(flext_u.normalize(e, case="lower")),
             )
             normalized_envs = (
                 normalized_envs_result.value
@@ -1268,10 +1267,11 @@ class FlextMeltanoModels(FlextModels):
                 and isinstance(normalized_envs_result.value, list)
                 else []
             )
-            has_prod = u.any_(*[
-                u.in_(env, cast("list[object]", prod_envs)) for env in normalized_envs
+            has_prod = flext_u.any_(*[
+                flext_u.in_(env, cast("list[object]", prod_envs))
+                for env in normalized_envs
             ])
-            env_count = u.count(self.environments)
+            env_count = flext_u.count(self.environments)
 
             if (
                 has_prod
@@ -1300,7 +1300,7 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
-    class PluginModel(FlextModels.Entity):
+    class PluginModel(FlextModelsBase.TimestampedModel):
         """Generic plugin configuration for pipeline operations."""
 
         name: str = Field(min_length=1, description="Plugin name")
@@ -1338,12 +1338,12 @@ class FlextMeltanoModels(FlextModels):
         def settings_count(self) -> int:
             """Number of plugin settings."""
             keys = list(self.settings.keys()) if isinstance(self.settings, dict) else []
-            return u.count(keys)
+            return flext_u.count(keys)
 
         @computed_field
         def plugin_complexity(self) -> str:
             """Plugin complexity assessment."""
-            settings_count = u.count(self.settings)
+            settings_count = flext_u.count(self.settings)
             if settings_count == 0:
                 return "minimal"
             if (
@@ -1441,13 +1441,13 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def total_path_count(self) -> int:
             """Total number of configured paths."""
-            # Use u.count() for unified counting (DSL pattern)
+            # Use flext_u.count() for unified counting (DSL pattern)
             return (
-                u.count(self.model_paths)
-                + u.count(self.analysis_paths)
-                + u.count(self.test_paths)
-                + u.count(self.seed_paths)
-                + u.count(self.macro_paths)
+                flext_u.count(self.model_paths)
+                + flext_u.count(self.analysis_paths)
+                + flext_u.count(self.test_paths)
+                + flext_u.count(self.seed_paths)
+                + flext_u.count(self.macro_paths)
             )
 
         @computed_field
@@ -1466,13 +1466,13 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def project_structure_complexity(self) -> str:
             """Project structure complexity."""
-            # Use u.count() for unified counting (DSL pattern)
+            # Use flext_u.count() for unified counting (DSL pattern)
             total_path_count = (
-                u.count(self.model_paths)
-                + u.count(self.analysis_paths)
-                + u.count(self.test_paths)
-                + u.count(self.seed_paths)
-                + u.count(self.macro_paths)
+                flext_u.count(self.model_paths)
+                + flext_u.count(self.analysis_paths)
+                + flext_u.count(self.test_paths)
+                + flext_u.count(self.seed_paths)
+                + flext_u.count(self.macro_paths)
             )
             if total_path_count <= FlextMeltanoModels.TRANSFORMATION_SIMPLE_MAX_PATHS:
                 return "simple"

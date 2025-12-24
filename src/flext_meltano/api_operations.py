@@ -11,8 +11,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult
-
+from flext import FlextResult
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -108,7 +107,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "Pipeline execution failed")
@@ -144,7 +142,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "Plugin installation failed")
@@ -162,7 +159,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "Plugin listing failed")
@@ -196,7 +192,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "Environment configuration failed")
@@ -230,7 +225,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "DBT models execution failed")
@@ -264,7 +258,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "DBT models testing failed")
@@ -305,7 +298,6 @@ class FlextMeltanoAPIOperations:
         # Convert specific type to JsonValue with explicit wrapping
 
         if result.is_success:
-
             return r[t.JsonValue].ok(cast("t.JsonValue", result.value))
 
         return r[t.JsonValue].fail(result.error or "ELT pipeline execution failed")

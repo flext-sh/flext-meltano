@@ -16,17 +16,22 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import meltano
-from flext_core import FlextLogger, FlextResult
 
+from flext import FlextLogger, FlextResult
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import u
+
+if TYPE_CHECKING:
+    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+from flext_meltano.utilities import FlextMeltanoUtilities, u
+
+if TYPE_CHECKING:
+    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 
 # Import aliases for concise usage
 # u is already imported from flext_core
@@ -53,6 +58,8 @@ class FlextMeltanoAdapter:
     def _library_runner(self) -> FlextMeltanoLibraryRunner:
         """Lazy-loaded library runner to avoid circular imports."""
         if self._library_runner_instance is None:
+            from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+
             self._library_runner_instance = FlextMeltanoLibraryRunner()
         return self._library_runner_instance
 
@@ -135,8 +142,8 @@ class FlextMeltanoAdapter:
         ) -> r[list[dict[str, object]]]:
             """Discover available plugins of specified type."""
             try:
-                # Use FlextMeltanoConstants for plugin discovery
-                plugins = FlextMeltanoConstants.Meltano.Plugin.get_all_plugins()
+                # Use FlextMeltanoUtilities for plugin discovery
+                plugins = FlextMeltanoUtilities.Plugin.get_all_plugins()
                 if plugin_type:
                     plugins = u.filter(
                         plugins,

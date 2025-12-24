@@ -12,13 +12,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import cast
 
-from flext_core import (
-    FlextContainer,
+from flext import FlextContainer,
     e,
     r,
     s,
-    u,
-)
+    u
 
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t

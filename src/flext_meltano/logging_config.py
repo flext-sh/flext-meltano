@@ -15,8 +15,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextModels
 from pydantic import Field, computed_field
+
+from flext import FlextModels
 
 
 class FlextMeltanoLoggingSettings(FlextModels):

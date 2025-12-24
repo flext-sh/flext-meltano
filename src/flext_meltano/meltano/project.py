@@ -12,10 +12,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
+from flext import FlextService, r
 from flext_meltano.utilities import u
 
 
@@ -128,9 +128,7 @@ class FlextMeltanoProjectManager(FlextService):
                 f"Failed to load project: {e}",
             )
 
-    def _extract_plugins(
-        self, plugin_type: str | None
-    ) -> list[dict[str, object]]:
+    def _extract_plugins(self, plugin_type: str | None) -> list[dict[str, object]]:
         """Extract plugins from project, optionally filtered by type."""
         plugins: list[dict[str, object]] = []
         if not hasattr(self.project, "plugins"):

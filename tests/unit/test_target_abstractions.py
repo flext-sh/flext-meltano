@@ -2,7 +2,7 @@
 
 from typing import cast
 
-from flext_core import FlextLogger, u
+from flext import FlextLogger, u
 from pydantic import ValidationError
 
 from flext_meltano import FlextMeltanoTargetAbstractions, m, r

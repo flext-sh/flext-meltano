@@ -12,29 +12,18 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import cast
 
 import yaml
-from flext_core import (
-    FlextContainer,
-    FlextResult,
-    FlextService,
-    u,
-)
+from flext import FlextContainer,
+    r,
+    s,
+    u
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.constants import c
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import t
 from flext_meltano.validators import FlextMeltanoValidators
-
-# Import aliases for concise usage
-r = FlextResult
-s = FlextService
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
 
 
 class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -113,8 +102,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             .flat_map(
                 lambda config_data: self._write_meltano_config(
-                    cast("Path", config_data["path"]),
-                    cast("dict[str, object]", config_data["config"]),
+                    config_data["path"],
+                    config_data["config"],
                 ),
             )
             .flat_map(self._initialize_project_instance)
@@ -186,8 +175,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             ._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
-                    cast("str", params["name"]),
-                    cast("Path", params["parent_dir"]),
+                    params["name"],
+                    params["parent_dir"],
                 ),
             )
             .flat_map(self._create_project_structure)
@@ -276,7 +265,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[object].fail(
                 project_result.error or "Failed to initialize project",
             )
-        return cast("r[object]", project_result)
+        return project_result
 
     @staticmethod
     def _convert_to_project_dict(project: object) -> r[t.Dbt.Project]:
@@ -316,7 +305,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[object].fail(
                 project_result.error or "Failed to load Meltano project",
             )
-        return cast("r[object]", project_result)
+        return project_result
 
     @staticmethod
     def _validate_project_creation_params(

@@ -15,8 +15,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from flext_core import FlextResult, FlextService
-
+from flext import FlextResult, FlextService
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
@@ -207,7 +206,11 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     def meltano_adapter(self) -> object:
         """Get Meltano adapter with lazy initialization."""
         if self._adapter is None:
-            self._adapter = FlextMeltanoAdapter(cast("FlextMeltanoSettings | None", self._config))
+            # Import here to avoid circular import
+
+            self._adapter = FlextMeltanoAdapter(
+                cast("FlextMeltanoSettings | None", self._config),
+            )
         return self._adapter
 
     @property

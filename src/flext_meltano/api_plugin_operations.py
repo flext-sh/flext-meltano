@@ -11,8 +11,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from flext_core import FlextResult
-
+from flext import FlextResult
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels

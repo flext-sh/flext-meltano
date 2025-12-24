@@ -21,12 +21,10 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from flext_core import (
-    FlextExceptions,
+from flext import FlextExceptions,
     FlextResult,
     FlextService,
-    u,
-)
+    u
 from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
@@ -729,6 +727,7 @@ class FlextMeltano(s[t_core.JsonValue]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
+            # Import here to avoid circular import
             adapter = FlextMeltanoAdapter(self.config)
             return cast(
                 "r[t.MeltanoCore.MeltanoConfigDict]",
@@ -761,10 +760,8 @@ class FlextMeltano(s[t_core.JsonValue]):
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
-            return service.extract(
-                cast("dict[str, object]", config or {})
-            ).map(
-                lambda v: cast("t_core.JsonValue", v)
+            return service.extract(cast("dict[str, object]", config or {})).map(
+                lambda v: cast("t_core.JsonValue", v),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t_core.JsonValue].fail(f"Failed to extract data: {e}")
@@ -779,10 +776,8 @@ class FlextMeltano(s[t_core.JsonValue]):
             service = FlextMeltanoService(config=self.config, sink_name=sink_name)
             # DSL: Use u.empty for conditional check
             if records is not None and not u.empty(records):
-                return service.load_batch(
-                    cast("list[dict[str, object]]", records)
-                ).map(
-                    lambda v: cast("t_core.JsonValue", v)
+                return service.load_batch(cast("list[dict[str, object]]", records)).map(
+                    lambda v: cast("t_core.JsonValue", v),
                 )
             return r[t_core.JsonValue].ok({"status": "initialized"})
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -896,9 +891,7 @@ class FlextMeltano(s[t_core.JsonValue]):
         config_guard_result: object = u.guard(config_val, dict, return_value=True)
         config = cast(
             "dict[str, object]",
-            config_guard_result
-            if isinstance(config_guard_result, dict)
-            else {},
+            config_guard_result if isinstance(config_guard_result, dict) else {},
         )
 
         if u.none_(pipeline_id):
@@ -992,7 +985,9 @@ class FlextMeltano(s[t_core.JsonValue]):
         # Convert specific type to JsonValue with explicit wrapping
         if result.is_success:
             return r[t_core.JsonValue].ok(cast("t_core.JsonValue", result.value))
-        return r[t_core.JsonValue].fail(result.error or "Environment configuration failed")
+        return r[t_core.JsonValue].fail(
+            result.error or "Environment configuration failed",
+        )
 
     def _handle_run_dbt_models_call(
         self,
@@ -1004,7 +999,10 @@ class FlextMeltano(s[t_core.JsonValue]):
         models_raw = u.get(payload_guard, "models") if payload_guard else None
         config_raw = u.get(payload_guard, "config") if payload_guard else None
         models = cast("list[str] | None", u.guard(models_raw, list, return_value=True))
-        config = cast("t.MeltanoCore.MeltanoConfigDict | None", u.guard(config_raw, dict, return_value=True))
+        config = cast(
+            "t.MeltanoCore.MeltanoConfigDict | None",
+            u.guard(config_raw, dict, return_value=True),
+        )
 
         result = self.run_dbt_models(models, config)
         # Convert specific type to JsonValue with explicit wrapping
@@ -1023,8 +1021,13 @@ class FlextMeltano(s[t_core.JsonValue]):
         if payload_guard:
             models_raw = u.get(payload_guard, "models")
             config_raw = u.get(payload_guard, "config")
-            models = cast("list[str] | None", u.guard(models_raw, list, return_value=True))
-            config = cast("t.MeltanoCore.MeltanoConfigDict | None", u.guard(config_raw, dict, return_value=True))
+            models = cast(
+                "list[str] | None", u.guard(models_raw, list, return_value=True),
+            )
+            config = cast(
+                "t.MeltanoCore.MeltanoConfigDict | None",
+                u.guard(config_raw, dict, return_value=True),
+            )
 
         result = self.test_dbt_models(models, config)
         # Convert specific type to JsonValue with explicit wrapping
@@ -1048,8 +1051,12 @@ class FlextMeltano(s[t_core.JsonValue]):
 
         dbt_models: t.MeltanoCore.DbtModelList | None = None
         config: t.MeltanoCore.MeltanoConfigDict | None = None
-        dbt_models = cast("list[str] | None", u.guard(dbt_models_raw, list, return_value=True))
-        config = cast("dict[str, object] | None", u.guard(config_raw, dict, return_value=True))
+        dbt_models = cast(
+            "list[str] | None", u.guard(dbt_models_raw, list, return_value=True),
+        )
+        config = cast(
+            "dict[str, object] | None", u.guard(config_raw, dict, return_value=True),
+        )
 
         # Use u.none_() for validation (DSL pattern)
         if u.none_(tap_name, target_name):

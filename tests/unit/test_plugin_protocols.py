@@ -13,7 +13,7 @@ from __future__ import annotations
 import unittest
 from unittest import TestCase
 
-from flext_core import t
+from flext import t
 
 import flext_meltano.plugin_protocols as protocols_module
 from flext_meltano import FlextMeltanoPluginProtocols

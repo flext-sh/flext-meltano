@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from flext_core import T_co, t
 from flext_core.protocols import FlextProtocols
 
+from flext import T_co, t
 from flext_meltano.singer.protocols import (
     FlextMeltanoPluginProtocols,
     FlextMeltanoSingerProtocols,
@@ -111,7 +111,7 @@ class FlextMeltanoProtocols(FlextProtocols):
             """Singer Target protocol extending Service for ELT operations."""
 
             def handle_record(
-                self, record: t.JsonValue
+                self, record: t.JsonValue,
             ) -> FlextProtocols.Result[t.JsonValue]:
                 """Handle a single record with r."""
                 ...

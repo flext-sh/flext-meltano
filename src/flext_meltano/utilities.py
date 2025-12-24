@@ -11,14 +11,11 @@ from pathlib import Path
 from typing import TextIO, cast
 
 import yaml
-from flext_core import (
-    FlextConstants,
-    FlextExceptions,
+from flext import FlextExceptions,
     FlextLogger,
     FlextResult,
     FlextUtilities,
-    u,
-)
+    u
 from flext_core.typings import t
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -27,7 +24,6 @@ from flext_meltano.file_managers import FlextMeltanoFileManagers
 # Import aliases for simplified usage
 r = FlextResult
 e = FlextExceptions
-c_base = FlextConstants
 c = FlextMeltanoConstants
 
 
@@ -183,7 +179,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             file_handle = target_path.open(
-                "w", encoding=c_base.Utilities.DEFAULT_ENCODING
+                "w", encoding=c.Utilities.DEFAULT_ENCODING,
             )
             return r[TextIO].ok(file_handle)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -299,6 +295,7 @@ class FlextMeltanoUtilities(FlextUtilities):
 
         """
 
+        # Import here to avoid circular import
         # MONADIC COMPOSITION: Chain file operations with automatic error handling
         def convert_to_dict(
             config_dict: object,
@@ -413,6 +410,39 @@ class FlextMeltanoUtilities(FlextUtilities):
             if result.is_success
             else r.fail(result.error or "Failed to save YAML file")
         )
+
+    class Plugin:
+        """Plugin-related utility methods.
+
+        NOTE: These methods were moved from constants.py to follow
+        FLEXT pattern: constants contain ONLY pure constants, no methods.
+        """
+
+        @staticmethod
+        def supported_types() -> list[str]:
+            """Return the supported plugin type identifiers."""
+            return [
+                plugin_type.value
+                for plugin_type in c.Meltano.Enums.PluginType.__members__.values()
+            ]
+
+        @classmethod
+        def default_catalog(cls) -> list[t.Plugin.PluginDefinition]:
+            """Provide default plugin catalog entries for discovery workflows."""
+            return [
+                {
+                    "type": plugin_type.value,
+                    "variant": c.Meltano.Plugin.DEFAULT_VARIANT,
+                    "registry": c.Meltano.Plugin.HUB_URL,
+                    "identifiers": [plugin_type.value],
+                }
+                for plugin_type in c.Meltano.Enums.PluginType.__members__.values()
+            ]
+
+        @classmethod
+        def get_all_plugins(cls) -> list[t.Plugin.PluginDefinition]:
+            """Compatibility shim for existing discovery logic."""
+            return cls.default_catalog()
 
 
 __all__ = ["FlextMeltanoUtilities"]

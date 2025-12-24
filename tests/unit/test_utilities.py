@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import cast
 from unittest.mock import patch
 
-from flext_core import u
+from flext import u
 
 from flext_meltano.utilities import FlextMeltanoUtilities
 
