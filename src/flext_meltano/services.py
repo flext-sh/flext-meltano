@@ -14,25 +14,14 @@ from typing import cast
 
 from flext_core import (
     FlextContainer,
-    FlextExceptions,
-    FlextResult,
-    FlextService,
+    e,
+    r,
+    s,
     u,
 )
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
-
-# Import aliases for simplified usage
-# u is already imported from flext_core
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-r = FlextResult
-e = FlextExceptions
-s = FlextService
+from flext_meltano.typings import t
 
 
 class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -76,7 +65,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     @property
     def config(self) -> FlextMeltanoSettings:
         """Get the service configuration instance."""
-        return cast("FlextMeltanoSettings", self._config)
+        return self._config
 
     @property
     def container(self) -> FlextContainer:
@@ -381,9 +370,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
                 lambda c: u.get(c, "type") == component_type,
             )
 
-        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
-            cast("list[t.MeltanoCore.MeltanoConfigDict]", components),
-        )
+        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(components)
 
     @staticmethod
     def install_component(
@@ -408,15 +395,12 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
-            cast(
-                "t.MeltanoCore.MeltanoConfigDict",
-                {
-                    "component_name": component_name,
-                    "component_type": component_type,
-                    "status": "installed",
-                    "configuration": config or {},
-                },
-            ),
+            {
+                "component_name": component_name,
+                "component_type": component_type,
+                "status": "installed",
+                "configuration": config or {},
+            },
         )
 
     @staticmethod
@@ -437,14 +421,11 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
-            cast(
-                "t.MeltanoCore.MeltanoConfigDict",
-                {
-                    "environment": environment_name,
-                    "configuration": config or {},
-                    "status": "configured",
-                },
-            ),
+            {
+                "environment": environment_name,
+                "configuration": config or {},
+                "status": "configured",
+            },
         )
 
     @staticmethod
@@ -455,14 +436,11 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Run transformation models."""
         models_to_run = models or ["all_models"]
         return r[t.MeltanoCore.MeltanoConfigDict].ok(
-            cast(
-                "t.MeltanoCore.MeltanoConfigDict",
-                {
-                    "models": models_to_run,
-                    "status": "completed",
-                    "configuration": config or {},
-                },
-            ),
+            {
+                "models": models_to_run,
+                "status": "completed",
+                "configuration": config or {},
+            },
         )
 
     @staticmethod
@@ -555,7 +533,8 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Generic service factory - delegates to specific creators."""
         service_map: dict[
             str,
-            Callable[[str], r[FlextMeltanoService]] | Callable[..., r[FlextMeltanoService]],
+            Callable[[str], r[FlextMeltanoService]]
+            | Callable[..., r[FlextMeltanoService]],
         ] = {
             "source": FlextMeltanoService.create_source_service,
             "sink": FlextMeltanoService.create_sink_service,
