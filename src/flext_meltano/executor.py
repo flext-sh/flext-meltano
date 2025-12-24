@@ -15,7 +15,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from flext import FlextResult, FlextService
+from flext_core import FlextResult, FlextService
+
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI

@@ -17,9 +17,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
+from flext_core import FlextTypes
 from singer_sdk import typing as singer_sdk_typing
-
-from flext import FlextTypes
 
 
 class FlextMeltanoTypes(FlextTypes):

@@ -15,11 +15,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from flext import (
-    FlextModels,
-)
+from flext_core import (
     FlextConstants,
-    FlextResult
+    FlextModels,
+    FlextResult,
+)
 from flext_core._models.base import FlextModelsBase
 from flext_core.utilities import u as flext_u
 from pydantic import (
@@ -30,8 +30,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
-# Use flext_u directly to avoid circular import
 
 
 class FlextMeltanoModels(FlextModels):

@@ -15,7 +15,7 @@ from __future__ import annotations
 # =========================================================================
 # IMPORT ALIASES FOR SIMPLIFIED USAGE
 # =========================================================================
-from flext import (
+from flext_core import (
     FlextDecorators,
     FlextExceptions,
     FlextHandlers,

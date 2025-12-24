@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import meltano
+from flext_core import FlextLogger, FlextResult
 
-from flext import FlextLogger, FlextResult
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings

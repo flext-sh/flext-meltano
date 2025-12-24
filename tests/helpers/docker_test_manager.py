@@ -19,8 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
-from flext import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult
 
 
 class ContainerManager:

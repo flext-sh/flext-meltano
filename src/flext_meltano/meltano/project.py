@@ -12,10 +12,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
-from flext import FlextService, r
 from flext_meltano.utilities import u
 
 

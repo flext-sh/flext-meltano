@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext import t
+from flext_core import t
 
 
 class FlextMeltanoSingerProtocols:
