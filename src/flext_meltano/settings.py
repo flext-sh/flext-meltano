@@ -13,9 +13,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, cast
 
-from flext import FlextExceptions,
+from flext_core import (
+    FlextExceptions,
     FlextResult,
-    FlextSettings
+    FlextSettings,
+)
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
@@ -661,8 +663,8 @@ class FlextMeltanoSettings(FlextSettings):
             raise TypeError(error_msg)
 
         # Use FlextSettings singleton registry pattern
-        with FlextSettings._lock:  # noqa: SLF001
-            FlextSettings._instances[cls] = instance  # noqa: SLF001
+        with FlextSettings._lock:
+            FlextSettings._instances[cls] = instance
 
     @classmethod
     def get_version(cls: object) -> str:
@@ -1037,9 +1039,7 @@ class FlextMeltanoSettings(FlextSettings):
             try:
                 config = FlextMeltanoSettings()
                 # Apply development-specific settings
-                config.environment = (
-                    c.Meltano.Enums.Environment.DEVELOPMENT.value
-                )
+                config.environment = c.Meltano.Enums.Environment.DEVELOPMENT.value
                 config.debug = True
                 config.log_level = c.Settings.LogLevel.DEBUG
                 config.network_timeout = 300
@@ -1064,9 +1064,7 @@ class FlextMeltanoSettings(FlextSettings):
             try:
                 config = FlextMeltanoSettings()
                 # Apply production-specific settings
-                config.environment = (
-                    c.Meltano.Enums.Environment.PRODUCTION.value
-                )
+                config.environment = c.Meltano.Enums.Environment.PRODUCTION.value
                 config.debug = False
                 config.log_level = c.Settings.LogLevel.WARNING
                 config.network_timeout = 600
@@ -1089,9 +1087,7 @@ class FlextMeltanoSettings(FlextSettings):
             try:
                 config = FlextMeltanoSettings()
                 # Apply testing-specific settings
-                config.environment = (
-                    c.Meltano.Enums.Environment.TESTING.value
-                )
+                config.environment = c.Meltano.Enums.Environment.TESTING.value
                 config.debug = True
                 config.log_level = c.Settings.LogLevel.DEBUG
                 config.network_timeout = 60
