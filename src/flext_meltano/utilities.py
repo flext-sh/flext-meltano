@@ -11,8 +11,10 @@ from pathlib import Path
 from typing import TextIO, cast
 
 import yaml
-from flext import FlextExceptions,
+from flext import (
     FlextLogger,
+)
+    FlextExceptions,
     FlextResult,
     FlextUtilities,
     u

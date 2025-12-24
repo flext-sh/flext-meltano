@@ -15,11 +15,12 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
-from flext import FlextResult,
+from flext import (
+    FlextResult,
     FlextService,
     t as t_core,
-    u
-
+    u,
+)
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels

@@ -14,8 +14,10 @@ import tempfile
 from pathlib import Path
 
 import yaml
-from flext import FlextContainer,
+from flext import (
     r,
+)
+    FlextContainer,
     s,
     u
 

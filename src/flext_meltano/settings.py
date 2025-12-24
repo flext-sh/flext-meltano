@@ -27,6 +27,9 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
+# Global singleton instance (avoids accessing private members)
+_global_instance: FlextMeltanoSettings | None = None
+
 # Import aliases for simplified usage
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
@@ -635,8 +638,13 @@ class FlextMeltanoSettings(FlextSettings):
         FlextMeltanoSettings: The global configuration instance (created if needed).
 
         """
-        # Use enhanced singleton pattern from FlextSettings - create directly and apply overrides
-        instance = cls()
+        global _global_instance
+
+        # Use global singleton pattern (avoids accessing private members)
+        if _global_instance is None:
+            _global_instance = cls()
+
+        instance = _global_instance
         if overrides:
             # Apply overrides to the instance
             for key, value in overrides.items():
@@ -662,9 +670,9 @@ class FlextMeltanoSettings(FlextSettings):
             error_msg = "instance must be a FlextMeltanoSettings instance"
             raise TypeError(error_msg)
 
-        # Use FlextSettings singleton registry pattern
-        with FlextSettings._lock:
-            FlextSettings._instances[cls] = instance
+        # Use module-level singleton pattern (avoiding private member access)
+        global _global_instance
+        _global_instance = instance
 
     @classmethod
     def get_version(cls: object) -> str:
