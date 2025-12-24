@@ -21,12 +21,14 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import cast
 
-from flext import FlextExceptions,
-    FlextResult,
-    FlextService,
-    u
 from flext_core.typings import t as t_core
 
+from flext import (
+    FlextExceptions,
+    FlextResult,
+    FlextService,
+    u,
+)
 from flext_meltano import __version__
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
@@ -1022,7 +1024,8 @@ class FlextMeltano(s[t_core.JsonValue]):
             models_raw = u.get(payload_guard, "models")
             config_raw = u.get(payload_guard, "config")
             models = cast(
-                "list[str] | None", u.guard(models_raw, list, return_value=True),
+                "list[str] | None",
+                u.guard(models_raw, list, return_value=True),
             )
             config = cast(
                 "t.MeltanoCore.MeltanoConfigDict | None",
@@ -1052,10 +1055,12 @@ class FlextMeltano(s[t_core.JsonValue]):
         dbt_models: t.MeltanoCore.DbtModelList | None = None
         config: t.MeltanoCore.MeltanoConfigDict | None = None
         dbt_models = cast(
-            "list[str] | None", u.guard(dbt_models_raw, list, return_value=True),
+            "list[str] | None",
+            u.guard(dbt_models_raw, list, return_value=True),
         )
         config = cast(
-            "dict[str, object] | None", u.guard(config_raw, dict, return_value=True),
+            "dict[str, object] | None",
+            u.guard(config_raw, dict, return_value=True),
         )
 
         # Use u.none_() for validation (DSL pattern)

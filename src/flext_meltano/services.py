@@ -12,8 +12,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import cast
 
-from flext import FlextContainer,
+from flext import (
     e,
+)
+    FlextContainer,
     r,
     s,
     u

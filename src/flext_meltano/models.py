@@ -15,8 +15,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from flext import FlextConstants,
+from flext import (
     FlextModels,
+)
+    FlextConstants,
     FlextResult
 from flext_core._models.base import FlextModelsBase
 from flext_core.utilities import u as flext_u

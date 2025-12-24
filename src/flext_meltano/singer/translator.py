@@ -263,6 +263,15 @@ class FlextMeltanoSingerCliTranslator:
         r containing execution results with stdout/stderr
 
         """
+        # Validate command to prevent execution of untrusted input
+        if not command or not isinstance(command, list):
+            return r[dict[str, object]].fail("Invalid command: must be non-empty list")
+
+        if not all(isinstance(arg, str) for arg in command):
+            return r[dict[str, object]].fail(
+                "Invalid command: all arguments must be strings"
+            )
+
         try:
             process_input = input_data.encode() if input_data else None
 
