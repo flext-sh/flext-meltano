@@ -10,7 +10,6 @@ from datetime import UTC, datetime
 from typing import cast
 
 from flext import FlextLogger, FlextResult, u
-
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes

@@ -13,11 +13,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from flext_core import  (
-    FlextService,
-)
+from flext_core import (
     FlextResult,
-    t as t_core
+    FlextService,
+    t as t_core,
+)
 
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.constants import FlextMeltanoConstants

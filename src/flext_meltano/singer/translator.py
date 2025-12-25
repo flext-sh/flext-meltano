@@ -95,7 +95,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
+import subprocess  # noqa: S404
 from typing import cast
 
 from flext_core import FlextResult
@@ -276,7 +276,7 @@ class FlextMeltanoSingerCliTranslator:
             process_input = input_data.encode() if input_data else None
 
             # Execute command with subprocess
-            proc_result = subprocess.run(
+            proc_result = subprocess.run(  # noqa: S603
                 command,
                 capture_output=True,
                 input=process_input,

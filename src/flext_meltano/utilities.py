@@ -11,13 +11,13 @@ from pathlib import Path
 from typing import TextIO, cast
 
 import yaml
-from flext_core import  (
-    FlextLogger,
-)
+from flext_core import (
     FlextExceptions,
+    FlextLogger,
     FlextResult,
     FlextUtilities,
-    u
+    u,
+)
 from flext_core.typings import t
 
 from flext_meltano.constants import FlextMeltanoConstants

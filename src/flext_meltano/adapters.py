@@ -16,25 +16,18 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import meltano
 from flext_core import FlextLogger, FlextResult
 
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
-
-if TYPE_CHECKING:
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.utilities import FlextMeltanoUtilities, u
 
-if TYPE_CHECKING:
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-
-# Import aliases for concise usage
-# u is already imported from flext_core
 r = FlextResult
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
@@ -58,8 +51,6 @@ class FlextMeltanoAdapter:
     def _library_runner(self) -> FlextMeltanoLibraryRunner:
         """Lazy-loaded library runner to avoid circular imports."""
         if self._library_runner_instance is None:
-            from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-
             self._library_runner_instance = FlextMeltanoLibraryRunner()
         return self._library_runner_instance
 

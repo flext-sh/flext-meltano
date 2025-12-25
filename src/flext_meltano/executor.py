@@ -17,7 +17,6 @@ from typing import cast
 
 from flext_core import FlextResult, FlextService
 
-from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants
@@ -208,6 +207,9 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         """Get Meltano adapter with lazy initialization."""
         if self._adapter is None:
             # Import here to avoid circular import
+            from flext_meltano.adapters import (  # noqa: PLC0415
+                FlextMeltanoAdapter,
+            )
 
             self._adapter = FlextMeltanoAdapter(
                 cast("FlextMeltanoSettings | None", self._config),
