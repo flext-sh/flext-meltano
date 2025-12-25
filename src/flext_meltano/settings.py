@@ -1,7 +1,7 @@
-"""FLEXT Meltano Configuration Management - Enterprise ELT configuration patterns.
+"""FLEXT Meltano configuration management.
 
-This module provides configuration management for Meltano ELT operations
-following FLEXT architectural patterns with Pydantic validation.
+Provides configuration management for Meltano ELT operations
+with Pydantic validation.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -30,7 +30,6 @@ from flext_meltano.validators import FlextMeltanoValidators
 # Global singleton instance (avoids accessing private members)
 _global_instance: FlextMeltanoSettings | None = None
 
-# Import aliases for simplified usage
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
 r = FlextResult
@@ -40,30 +39,13 @@ c = FlextMeltanoConstants
 
 @FlextSettings.auto_register("meltano")
 class FlextMeltanoSettings(FlextSettings):
-    """Pipeline configuration management with validation using AutoConfig pattern.
-
-    **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
-
-    This class uses FlextSettings.AutoConfig for automatic:
-    - Singleton pattern (thread-safe)
-    - Namespace registration (accessible via config.meltano)
-    - Environment variable loading from FLEXT_MELTANO_* variables
-    - .env file loading (production/development)
-    - Automatic type conversion and validation via Pydantic v2
+    """Pipeline configuration management with validation.
 
     Extends FlextSettings to provide complete pipeline configuration
-    with validation using flext-core patterns. This class serves as the single
-    source of truth for all pipeline configuration across the application.
-
-    Features:
-    - Uses Pydantic 2.11+ features (SettingsConfigDict, SecretStr for sensitive data)
-    - Complete type annotations with Python 3.13+ syntax
-    - Environment-specific factory methods for different deployment contexts
+    with validation. Uses Pydantic for type-safe configuration management.
 
     """
 
-    # Model configuration using Pydantic 2.11+ SettingsConfigDict
-    # Use FlextSettings.resolve_env_file() to ensure all FLEXT configs use same .env
     model_config = SettingsConfigDict(
         env_prefix="FLEXT_MELTANO_",
         env_file=FlextSettings.resolve_env_file(),
@@ -79,11 +61,6 @@ class FlextMeltanoSettings(FlextSettings):
         strict=False,
     )
 
-    # ============================================================================
-    # MELTANO-SPECIFIC CONSTANTS - Using FlextMeltanoConstants as SOURCE OF TRUTH
-    # ============================================================================
-
-    # Use FlextMeltanoConstants for all version constants (SOURCE OF TRUTH)
     MELTANO_VERSION: ClassVar[str] = (
         FlextMeltanoConstants.Meltano.Versions.MELTANO_REQUIRED
     )
@@ -92,7 +69,6 @@ class FlextMeltanoSettings(FlextSettings):
     )
     DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.Meltano.VERSION_REQUIRED_DBT
 
-    # Use FlextMeltanoConstants for file constants (SOURCE OF TRUTH)
     PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.PROJECT_FILE
     STATE_DIR: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.STATE_DIR
     VENV_DIR: ClassVar[str] = ".meltano/python"
@@ -638,7 +614,7 @@ class FlextMeltanoSettings(FlextSettings):
         FlextMeltanoSettings: The global configuration instance (created if needed).
 
         """
-        global _global_instance
+        global _global_instance  # noqa: PLW0603
 
         # Use global singleton pattern (avoids accessing private members)
         if _global_instance is None:
@@ -671,7 +647,7 @@ class FlextMeltanoSettings(FlextSettings):
             raise TypeError(error_msg)
 
         # Use module-level singleton pattern (avoiding private member access)
-        global _global_instance
+        global _global_instance  # noqa: PLW0603
         _global_instance = instance
 
     @classmethod

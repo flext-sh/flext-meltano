@@ -27,11 +27,13 @@ import schedule
 from flext_cli import (
     FlextCliCmd,
 )
-from flext_core import  FlextContainer,
+from flext_core import (
+    FlextContainer,
     FlextLogger,
     e,
     r,
-    s
+    s,
+)
 
 from flext_meltano.docs_config import DocsConfig
 from flext_meltano.docs_templates import DocsTemplates

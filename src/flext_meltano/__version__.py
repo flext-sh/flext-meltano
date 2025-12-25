@@ -1,10 +1,10 @@
-"""Version and package metadata using importlib.metadata.
+"""Package version and metadata information.
 
-Single source of truth pattern following flext-core standards.
-All metadata comes from pyproject.toml via importlib.metadata.
+Provides version information and package metadata using standard library
+metadata extraction.
 
-Copyright (c) 2025 Algar Telecom. Todos os direitos reservados.
-SPDX-License-Identifier: Proprietary
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

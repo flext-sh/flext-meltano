@@ -1,12 +1,9 @@
-"""FLEXT Generic Pipeline Models - Generic Pydantic models for data pipeline operations.
+"""FLEXT pipeline models.
+
+Provides Pydantic models for data pipeline operations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
-This module provides generic, reusable models for data pipeline operations.
-All models are designed to be domain-agnostic and follow SOLID principles.
-
-Each class has a single responsibility and follows the Open/Closed Principle.
 """
 
 from __future__ import annotations
@@ -33,10 +30,9 @@ from pydantic import (
 
 
 class FlextMeltanoModels(FlextModels):
-    """Generic pipeline models following SOLID principles.
+    """Generic pipeline models.
 
-    Each inner class has a single responsibility and can be used independently.
-    All models are domain-agnostic and reusable across different pipeline types.
+    Provides reusable Pydantic models for pipeline operations.
     """
 
     def __init_subclass__(cls, **kwargs: object) -> None:
@@ -52,13 +48,11 @@ class FlextMeltanoModels(FlextModels):
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
-        # DSL: Helper to count dict keys
         def dict_count(d: dict[str, object] | list[object] | tuple[object, ...]) -> int:
             if isinstance(d, dict):
                 return flext_u.count(list(d.keys()))
             return flext_u.count(d)
 
-        # DSL: Use process + any_ for unified checking
         def is_sensitive(k: str) -> bool:
             normalized = flext_u.normalize(k, case="lower")
             checks_result = flext_u.process(
@@ -78,7 +72,6 @@ class FlextMeltanoModels(FlextModels):
 
         return cast("dict[str, object]", protected)
 
-    # Constants for magic values used throughout the models
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
     PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
     PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS: int = 5
@@ -90,10 +83,6 @@ class FlextMeltanoModels(FlextModels):
     PERFORMANCE_HIGH_THRESHOLD: int = 1000
     PERFORMANCE_GOOD_THRESHOLD: int = 500
     PERFORMANCE_MODERATE_THRESHOLD: int = 100
-
-    # ========================================================================
-    # LOGGING CONFIGURATION - Consolidated logging settings
-    # ========================================================================
 
     class LoggingConfig(BaseModel):
         """Consolidated logging configuration for all pipeline operations.
@@ -651,7 +640,6 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def config_size(self) -> int:
             """Total number of configuration parameters."""
-            # DSL: Count dict keys using list conversion
             conn_keys = (
                 list(self.connection_config.keys())
                 if isinstance(self.connection_config, dict)
@@ -769,7 +757,6 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def config_size(self) -> int:
             """Total number of configuration parameters."""
-            # DSL: Count dict keys using list conversion
             conn_keys = (
                 list(self.connection_config.keys())
                 if isinstance(self.connection_config, dict)
@@ -932,7 +919,6 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def active_streams(self) -> list[FlextMeltanoModels.StreamInfo]:
             """Active streams for extraction."""
-            # DSL: Convert dict values to list for filtering
             streams_list = (
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
@@ -988,7 +974,6 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
-            # DSL: Use agg for unified aggregation
             streams_list = (
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
@@ -1236,7 +1221,6 @@ class FlextMeltanoModels(FlextModels):
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
             prod_environments = {"prod", "production", "live"}
-            # DSL: Use process + any_ for unified checking
             normalized_envs_result = flext_u.process(
                 self.environments,
                 lambda e: FlextResult[str].ok(flext_u.normalize(e, case="lower")),
@@ -1256,7 +1240,6 @@ class FlextMeltanoModels(FlextModels):
         def project_maturity(self) -> str:
             """Project maturity assessment."""
             prod_envs = {"prod", "production", "live"}
-            # DSL: Use process + any_ for unified checking
             normalized_envs_result = flext_u.process(
                 self.environments,
                 lambda e: FlextResult[str].ok(flext_u.normalize(e, case="lower")),

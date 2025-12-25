@@ -1,4 +1,4 @@
-"""FLEXT Meltano constants following the unified FlextConstants pattern."""
+"""FLEXT Meltano constants."""
 
 from __future__ import annotations
 
@@ -9,21 +9,11 @@ from flext_core import FlextConstants
 
 from flext_meltano.typings import t
 
-# Import aliases for simplified usage
 c_base = FlextConstants
 
 
 class FlextMeltanoConstants(FlextConstants):
-    """Domain constants for the flext-meltano package.
-
-    Usage:
-    ```python
-    from flext_meltano.constants import FlextMeltanoConstants
-
-    version = FlextMeltanoConstants.Meltano.Versions.MELTANO_REQUIRED
-    project_file = FlextMeltanoConstants.Meltano.Paths.PROJECT_FILE
-    ```
-    """
+    """Domain constants for the flext-meltano package."""
 
     class Meltano:
         """Meltano domain constants namespace.

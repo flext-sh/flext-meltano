@@ -1,14 +1,6 @@
-"""FLEXT Meltano API - unified facade with flext-core patterns.
+"""FLEXT Meltano API.
 
-This module provides a unified API facade for Meltano operations using flext-core
- patterns with railway-oriented programming, composition, and Python 3.13+ features.
-
-** Patterns Used:**
-- Railway-oriented programming for all operations
-- Python 3.13+ type parameter syntax for generics
-- Single class per module following SOLID principles
-- Direct flext-core integration without wrappers or aliases
-- Pydantic models for configuration and data validation
+Unified facade for Meltano operations with flext-core integration.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -30,15 +22,12 @@ from flext_core import (
 from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
-from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes, t
 
-# Import aliases for simplified usage
-# u is already imported from flext_core
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 r = FlextResult
@@ -47,41 +36,13 @@ s = FlextService
 
 
 class FlextMeltano(s[t_core.JsonValue]):
-    """Advanced FLEXT Meltano API with direct flext-core integration.
+    """FLEXT Meltano API facade.
 
-    Provides complete Meltano integration using flext-core advanced patterns
-    with railway-oriented programming, Pydantic models, and SOLID principles.
-
-    **Direct Flext-Core Integration:**
-    - FlextResult[T] for all operations (no wrappers or aliases)
-    - FlextService inheritance for service lifecycle
-    - FlextExceptions for all error handling
-    - t for type-safe operations
-
-    **Railway-Oriented Programming:**
-    - All operations return r[T] for composable error handling
-    - FlatMap operations for chaining dependent operations
-    - Pattern matching for operation dispatch
-
-    **Pydantic Integration:**
-    - FlextMeltanoSettings for configuration management
-    - Type-safe configuration with validation
-    - Proper model inheritance and composition
-
-    Attributes:
-        service_name: API service instance name
-        version: API version for compatibility
-        _config: Pydantic-based configuration instance
-
-    Example:
-        >>> api = FlextMeltano()
-        >>> result = api.create_pipeline("tap-csv", "target-postgres")
-        >>> if result.is_success:
-        ...     pipeline = result.value
+    Provides a unified interface for Meltano operations with direct flext-core
+    integration, railway-oriented programming, and Pydantic validation.
 
     """
 
-    # Core service attributes with proper typing
     service_name: str
     version: str = __version__
 
@@ -115,15 +76,24 @@ class FlextMeltano(s[t_core.JsonValue]):
         version: str | None = None,
         project_root: str | None = None,
     ) -> None:
-        """Initialize API with Pydantic configuration and flext-core patterns."""
+        """Initialize API with Pydantic configuration.
+
+        Args:
+            config: Optional Pydantic configuration instance.
+            service_name: Name identifier for the API service.
+            version: Optional version string, defaults to package version.
+            project_root: Optional project root directory path.
+
+        Raises:
+            ValidationError: If service_name is empty.
+
+        """
         if u.empty(service_name):
             msg = "API service name cannot be empty"
             raise e.ValidationError(msg, error_code="INVALID_SERVICE_NAME")
 
-        # DSL: Use conditional value
         version = version if version is not None else __version__
 
-        # DSL: Build config with project_root if provided
         if config is None:
             if project_root is not None:
                 config = FlextMeltanoSettings.model_validate({
@@ -133,34 +103,32 @@ class FlextMeltano(s[t_core.JsonValue]):
                 config = None
         if config is None:
             if project_root:
-                # Use Pydantic model_validate for type-safe initialization
                 self._config = FlextMeltanoSettings.model_validate({
                     "project_root": project_root,
                 })
             else:
-                # DSL: Create config instance - AutoConfig pattern handles initialization
                 self._config = FlextMeltanoSettings.model_validate({})
         else:
             self._config = config
 
-        # Initialize parent with only valid service fields - NO **kwargs anti-pattern
         super().__init__(
             service_name=service_name,
             version=version,
         )
 
         self.logger.info(
-            "FlextMeltano API '%s' v%s initialized with flext-core patterns",
+            "FlextMeltano API '%s' v%s initialized",
             service_name,
             version,
         )
 
-    # ============================================================================
-    # SERVICE LIFECYCLE - FlextService protocol implementation
-    # ============================================================================
-
     def execute(self, **_kwargs: object) -> r[t_core.JsonValue]:
-        """Execute service lifecycle using flext-core railway patterns."""
+        """Execute service lifecycle.
+
+        Returns:
+            Service status information as JSON.
+
+        """
         return r[t_core.JsonValue].ok({
             "service_name": self.service_name,
             "version": self.version,
@@ -168,17 +136,17 @@ class FlextMeltano(s[t_core.JsonValue]):
             "operations": ["pipeline", "plugin", "dbt", "environment"],
         })
 
-    # ============================================================================
-    # OPERATION DISPATCH - Advanced pattern matching with flext-core
-    # ============================================================================
-
     def call(self, operation: str, payload: t_core.JsonValue) -> r[t_core.JsonValue]:
-        """Route operations using dispatch table with flext-core patterns.
+        """Route operations using dispatch table.
 
-        Implements ServiceCallProtocol through structural subtyping with
-        railway-oriented operation routing and Python 3.13+ patterns.
+        Args:
+            operation: Operation name to execute.
+            payload: Operation payload data.
+
+        Returns:
+            Operation result as JSON value.
+
         """
-        # Dispatch table pattern using flext-core railway programming
         operation_dispatch: dict[
             str,
             Callable[[t_core.JsonValue], r[t_core.JsonValue]],
@@ -193,16 +161,11 @@ class FlextMeltano(s[t_core.JsonValue]):
             "run_elt_pipeline": self._handle_run_elt_pipeline_call,
         }
 
-        # Direct dispatch using flext-core patterns
         if operation in operation_dispatch:
             handler = operation_dispatch[operation]
             return handler(payload)
 
         return r[t_core.JsonValue].fail(f"Unknown operation: {operation}")
-
-    # ============================================================================
-    # PIPELINE OPERATIONS - Railway-oriented with flext-core patterns
-    # ============================================================================
 
     def create_pipeline(
         self,
@@ -210,7 +173,20 @@ class FlextMeltano(s[t_core.JsonValue]):
         target_name: str,
         config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Create pipeline using flext-core railway patterns and Pydantic validation."""
+        """Create pipeline using railway patterns and Pydantic validation.
+
+        Args:
+            tap_name: Name of the Singer tap (must start with 'tap-').
+            target_name: Name of the Singer target (must start with 'target-').
+            config: Optional pipeline configuration dictionary.
+
+        Returns:
+            Pipeline configuration on success.
+
+        Raises:
+            ValidationError: If tap/target names are invalid.
+
+        """
 
         def _validate_inputs() -> r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]]:
             if u.none_(tap_name, target_name):
@@ -218,7 +194,6 @@ class FlextMeltano(s[t_core.JsonValue]):
                     "Both tap_name and target_name are required for pipeline creation",
                 )
 
-            # DSL: Use u.starts for prefix checking
             if not u.starts(tap_name, "tap-"):
                 return r[tuple[str, str, t.MeltanoCore.MeltanoConfigDict]].fail(
                     f"Invalid tap name format: {tap_name}. Must start with 'tap-'",
@@ -241,10 +216,8 @@ class FlextMeltano(s[t_core.JsonValue]):
             target_name: str,
             config: t.MeltanoCore.MeltanoConfigDict,
         ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-            # DSL: Use u.try_ for unified error handling
             def _build() -> r[t.MeltanoCore.MeltanoConfigDict]:
                 pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
-                # DSL: Use u.get() for safe attribute access
                 pipeline_config = {
                     "pipeline_id": pipeline_id,
                     "tap": tap_name,
@@ -289,13 +262,21 @@ class FlextMeltano(s[t_core.JsonValue]):
         pipeline_id: str,
         config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Execute pipeline using flext-core railway patterns."""
+        """Execute pipeline using railway patterns.
+
+        Args:
+            pipeline_id: Unique identifier of the pipeline to execute.
+            config: Optional execution configuration.
+
+        Returns:
+            Execution result with status and metrics.
+
+        """
         if u.none_(pipeline_id):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Pipeline ID is required for execution",
             )
 
-        # DSL: Use u.try_ for unified error handling
         def _execute() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
@@ -328,14 +309,23 @@ class FlextMeltano(s[t_core.JsonValue]):
         dbt_models: t.MeltanoCore.DbtModelList | None = None,
         config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Run complete ELT pipeline using flext-core railway patterns."""
-        # Use u.none_() for validation (DSL pattern)
+        """Run complete ELT pipeline using railway patterns.
+
+        Args:
+            tap_name: Name of the Singer tap.
+            target_name: Name of the Singer target.
+            dbt_models: Optional list of DBT models to run.
+            config: Optional pipeline configuration.
+
+        Returns:
+            ELT execution result with stage durations.
+
+        """
         if u.none_(tap_name, target_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Both tap_name and target_name are required",
             )
 
-        # DSL: Use u.try_ for unified error handling
         def _execute_elt() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
 
@@ -378,23 +368,33 @@ class FlextMeltano(s[t_core.JsonValue]):
 
     @staticmethod
     def list_pipelines() -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
-        """List configured pipelines using flext-core patterns."""
+        """List configured pipelines.
+
+        Returns:
+            List of pipeline configurations.
+
+        """
         return r[list[t.MeltanoCore.MeltanoConfigDict]].ok([])
 
     def run_tap(self, tap_name: str) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Execute Singer tap using flext-core patterns."""
-        # Use u.when() for validation (DSL pattern)
+        """Execute Singer tap.
+
+        Args:
+            tap_name: Name of the Singer tap (must start with 'tap-').
+
+        Returns:
+            Tap execution result.
+
+        """
         if u.none_(tap_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Tap name is required for execution",
             )
-        # DSL: Use u.starts for prefix checking
         if not u.starts(tap_name, "tap-"):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid tap name format: {tap_name}",
             )
 
-        # DSL: Use u.try_ for unified error handling
         def _execute_tap() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
@@ -417,19 +417,25 @@ class FlextMeltano(s[t_core.JsonValue]):
         return result
 
     def run_target(self, target_name: str) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Execute Singer target using flext-core patterns."""
+        """Execute Singer target.
+
+        Args:
+            target_name: Name of the Singer target (must start with 'target-').
+
+        Returns:
+            Target execution result.
+
+        """
         if u.none_(target_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Target name is required for execution",
             )
 
-        # DSL: Use u.starts for prefix checking
         if not u.starts(target_name, "target-"):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid target name format: {target_name}",
             )
 
-        # DSL: Use u.try_ for unified error handling
         def _execute_target() -> r[t.MeltanoCore.MeltanoConfigDict]:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
@@ -451,31 +457,34 @@ class FlextMeltano(s[t_core.JsonValue]):
             return r[t.MeltanoCore.MeltanoConfigDict].fail("Target execution failed")
         return result
 
-    # ============================================================================
-    # PLUGIN OPERATIONS - Railway-oriented with flext-core patterns
-    # ============================================================================
-
     def install_plugin(
         self,
         plugin_type: str,
         plugin_name: str,
         config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Install Meltano plugin using flext-core railway patterns."""
-        # Use u.none_() for validation (DSL pattern)
+        """Install Meltano plugin.
+
+        Args:
+            plugin_type: Type of plugin (extractors, loaders, transformers, orchestrators).
+            plugin_name: Name of the plugin (must start with tap-, target-, or dbt-).
+            config: Optional plugin configuration.
+
+        Returns:
+            Plugin installation result.
+
+        """
         if u.none_(plugin_type, plugin_name):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 "Plugin type and name are required",
             )
 
-        # DSL: Use u.in_ for membership checking
         valid_types = {"extractors", "loaders", "transformers", "orchestrators"}
         if not u.in_(plugin_type, cast("list[object]", list(valid_types))):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
 
-        # DSL: Use u.starts for multiple prefix checking
         if not u.starts(plugin_name, "tap-", "target-", "dbt-"):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Invalid plugin name format: {plugin_name}",
@@ -548,10 +557,6 @@ class FlextMeltano(s[t_core.JsonValue]):
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",
             )
-
-    # ============================================================================
-    # DBT OPERATIONS - Railway-oriented with flext-core patterns
-    # ============================================================================
 
     def run_dbt_models(
         self,
@@ -656,10 +661,6 @@ class FlextMeltano(s[t_core.JsonValue]):
                 f"DBT documentation generation failed: {e}",
             )
 
-    # ============================================================================
-    # ENVIRONMENT OPERATIONS - Railway-oriented with flext-core patterns
-    # ============================================================================
-
     @staticmethod
     def configure_environment(
         environment_name: str,
@@ -690,10 +691,6 @@ class FlextMeltano(s[t_core.JsonValue]):
             ),
         )
 
-    # ============================================================================
-    # SERVICE MANAGEMENT - Flext-core service operations
-    # ============================================================================
-
     def get_service_status(
         self,
     ) -> r[t_core.JsonValue]:
@@ -718,10 +715,6 @@ class FlextMeltano(s[t_core.JsonValue]):
             "description": "FLEXT Meltano API Service",
         })
 
-    # ============================================================================
-    # PROJECT OPERATIONS - Generic project management (delegates to service)
-    # ============================================================================
-
     def create_project(
         self,
         project_name: str,
@@ -730,6 +723,10 @@ class FlextMeltano(s[t_core.JsonValue]):
         """Create Meltano project - delegates to adapter."""
         try:
             # Import here to avoid circular import
+            from flext_meltano.adapters import (  # noqa: PLC0415
+                FlextMeltanoAdapter,
+            )
+
             adapter = FlextMeltanoAdapter(self.config)
             return cast(
                 "r[t.MeltanoCore.MeltanoConfigDict]",
@@ -749,10 +746,6 @@ class FlextMeltano(s[t_core.JsonValue]):
             return self.config.validate_project_structure()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project: {e}")
-
-    # ============================================================================
-    # DATA OPERATIONS - Generic data pipeline operations (delegates to service)
-    # ============================================================================
 
     def extract_data(
         self,
