@@ -26,7 +26,7 @@ class TestTapConfigEnhanced:
         assert config.tap_type == "tap-postgres"
         assert config.connection_config == {"host": "localhost"}
         assert config.stream_config == {}
-        assert config.version == "latest"
+        assert config.tap_version == "latest"
 
     def test_tap_config_with_full_data(self) -> None:
         """Test TapConfig with all fields populated."""
@@ -42,14 +42,14 @@ class TestTapConfigEnhanced:
                 "users": {"schema": "public"},
                 "orders": {"schema": "commerce"},
             },
-            version="1.0.0",
+            tap_version="1.0.0",
         )
 
         assert config.tap_type == "tap-mysql"
         assert config.connection_config["host"] == "db.example.com"
         assert config.connection_config["port"] == 3306
         assert "users" in config.stream_config
-        assert config.version == "1.0.0"
+        assert config.tap_version == "1.0.0"
 
     def test_tap_config_validation_empty_tap_type(self) -> None:
         """Test TapConfig validation with empty tap_type."""
@@ -161,7 +161,7 @@ class TestStreamInfoEnhanced:
             m.StreamInfo(
                 stream_name="",
                 stream_schema={"type": "object"},
-                created_at="2025-01-01T00:00:00Z",
+                stream_created_at="2025-01-01T00:00:00Z",
             )
 
     def test_stream_info_validation_invalid_schema_type(self) -> None:
@@ -170,7 +170,7 @@ class TestStreamInfoEnhanced:
             m.StreamInfo(
                 stream_name="users",
                 stream_schema="invalid",  # Should be dict
-                created_at="2025-01-01T00:00:00Z",
+                stream_created_at="2025-01-01T00:00:00Z",
             )
 
 
@@ -182,7 +182,7 @@ class TestMeltanoProjectModelEnhanced:
         project = m.MeltanoProjectModel(project_id="test-project")
 
         assert project.project_id == "test-project"
-        assert project.version == "1"
+        assert project.project_version == "1"
         assert project.default_environment == "dev"
         assert project.plugins == {}
         assert project.environments == {}
@@ -191,7 +191,7 @@ class TestMeltanoProjectModelEnhanced:
         """Test MeltanoProjectModel with all fields populated."""
         project = m.MeltanoProjectModel(
             project_id="analytics-project",
-            version="2.0",
+            project_version="2.0",
             default_environment="production",
             plugins={
                 "extractors": [{"name": "tap-postgres"}],
@@ -204,7 +204,7 @@ class TestMeltanoProjectModelEnhanced:
         )
 
         assert project.project_id == "analytics-project"
-        assert project.version == "2.0"
+        assert project.project_version == "2.0"
         assert project.default_environment == "production"
         assert "extractors" in project.plugins
         assert "dev" in project.environments
@@ -297,13 +297,13 @@ class TestDbtProjectModelEnhanced:
         """Test DbtProjectModel with minimal required data."""
         dbt_project = m.DbtProjectModel(
             name="analytics",
-            version="1.0.0",
+            dbt_version="1.0.0",
             profile="default",
         )
 
         assert dbt_project.name == "analytics"
         assert dbt_project.profile == "default"
-        assert dbt_project.version == "1.0.0"
+        assert dbt_project.dbt_version == "1.0.0"
         assert dbt_project.config == {}
         assert dbt_project.models == {}
         assert dbt_project.sources == {}
@@ -314,7 +314,7 @@ class TestDbtProjectModelEnhanced:
         dbt_project = m.DbtProjectModel(
             name="data-warehouse",
             profile="postgres",
-            version="2.1.0",
+            dbt_version="2.1.0",
             config={"materialized": "table", "on_schema_change": "fail_safe"},
             models={
                 "staging": {
@@ -328,7 +328,7 @@ class TestDbtProjectModelEnhanced:
 
         assert dbt_project.name == "data-warehouse"
         assert dbt_project.profile == "postgres"
-        assert dbt_project.version == "2.1.0"
+        assert dbt_project.dbt_version == "2.1.0"
         assert dbt_project.config["materialized"] == "table"
         assert "staging" in dbt_project.models
         assert "raw_data" in dbt_project.sources
@@ -397,7 +397,7 @@ class TestModelIntegration:
             stream_name="users",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             key_properties=["id"],
-            created_at="2025-01-01T00:00:00Z",
+            stream_created_at="2025-01-01T00:00:00Z",
         )
 
         tap_config = m.TapConfig(

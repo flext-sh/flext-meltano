@@ -21,6 +21,7 @@ from flext_core import FlextLogger, FlextResult, FlextService
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 from flext_meltano.utilities import u
@@ -28,6 +29,7 @@ from flext_meltano.utilities import u
 # Import aliases for concise usage
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
+p = FlextMeltanoProtocols
 r = FlextResult
 s = FlextService
 
@@ -52,8 +54,8 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def execute_pipeline(
         self,
-        tap_instance: object,
-        target_instance: object,
+        tap_instance: p.Meltano.TapProtocol,
+        target_instance: p.Meltano.TargetProtocol,
     ) -> r[t.Processing.SingerExecutionResult]:
         """Execute Singer pipeline with protocol management.
 

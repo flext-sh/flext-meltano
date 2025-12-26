@@ -21,11 +21,14 @@ import meltano
 from flext_core import FlextResult, FlextService, FlextSettings, FlextUtilities as u
 
 from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano.typings import FlextMeltanoTypes
 
+# Import aliases following order: c -> t -> p -> r -> m -> u
+t = FlextMeltanoTypes
 r = FlextResult
 
 
-class ProjectAdapter(FlextService[dict[str, object]]):
+class ProjectAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Focused adapter for Meltano project management following SOLID principles."""
 
     @classmethod
@@ -33,27 +36,27 @@ class ProjectAdapter(FlextService[dict[str, object]]):
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
-    def execute(self) -> r[dict[str, object]]:
+    def execute(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute default project operation."""
         return self.get_version()
 
-    def get_version(self) -> r[dict[str, object]]:
+    def get_version(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get Meltano version information using native API."""
         meltano_version = getattr(meltano, "__version__", "3.9.1")
 
-        version_info: dict[str, object] = {
+        version_info: t.MeltanoCore.ExecutionResultDict = {
             "version": meltano_version,
             "meltano": meltano_version,
             "cli_type": "native_meltano_api",
             "integration": "flext-core",
         }
 
-        return r[dict[str, object]].ok(version_info)
+        return r[t.MeltanoCore.ExecutionResultDict].ok(version_info)
 
     def initialize_project(
         self,
         project_root: Path,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Initialize Meltano project using railway pattern for composable steps."""
         return self.create_project(
             project_name=project_root.name,
@@ -64,24 +67,26 @@ class ProjectAdapter(FlextService[dict[str, object]]):
         self,
         project_name: str,
         project_dir: Path,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Create new Meltano project with SOLID delegation."""
         try:
             project_path = Path(project_dir) / project_name
             project_path.mkdir(parents=True, exist_ok=True)
 
-            result: dict[str, object] = {
+            result: t.MeltanoCore.ExecutionResultDict = {
                 "project_name": project_name,
                 "project_path": str(project_path),
                 "status": "created",
                 "created_at": str(time.time()),
             }
-            return r[dict[str, object]].ok(result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Project creation failed: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].ok(result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                f"Project creation failed: {ex}",
+            )
 
 
-class PluginAdapter(FlextService[list[dict[str, object]]]):
+class PluginAdapter(FlextService[list[t.Plugin.PluginDefinition]]):
     """Focused adapter for Meltano plugin management following SOLID principles."""
 
     @classmethod
@@ -89,33 +94,37 @@ class PluginAdapter(FlextService[list[dict[str, object]]]):
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
-    def execute(self) -> r[list[dict[str, object]]]:
+    def execute(self) -> r[list[t.Plugin.PluginDefinition]]:
         """Execute default plugin operation."""
         return self.discover_plugins()
 
     def discover_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[dict[str, object]]]:
+    ) -> r[list[t.Plugin.PluginDefinition]]:
         """Discover available plugins of specified type.
 
         Note: Real plugin discovery requires FlextMeltanoUtilities.
         Use FlextMeltano.discover_plugins() for full implementation.
         """
         try:
-            plugins: list[dict[str, object]] = [
+            plugins: list[t.Plugin.PluginDefinition] = [
                 {"name": "tap-postgres", "type": "tap", "variant": "meltanolabs"},
                 {"name": "target-jsonl", "type": "target", "variant": "meltanolabs"},
             ]
             if plugin_type:
-                plugins = [p for p in plugins if u.get(p, "type") == plugin_type]
+                plugins = [
+                    plugin for plugin in plugins if u.get(plugin, "type") == plugin_type
+                ]
 
-            return r[list[dict[str, object]]].ok(plugins)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[dict[str, object]]].fail(f"Plugin discovery failed: {e}")
+            return r[list[t.Plugin.PluginDefinition]].ok(plugins)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            return r[list[t.Plugin.PluginDefinition]].fail(
+                f"Plugin discovery failed: {ex}",
+            )
 
 
-class PipelineAdapter(FlextService[dict[str, object]]):
+class PipelineAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
     @classmethod
@@ -123,28 +132,28 @@ class PipelineAdapter(FlextService[dict[str, object]]):
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
-    def execute(self) -> r[dict[str, object]]:
+    def execute(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute default pipeline operation."""
-        return r[dict[str, object]].ok({"status": "ready"})
+        return r[t.MeltanoCore.ExecutionResultDict].ok({"status": "ready"})
 
     def execute_pipeline(
         self,
         tap_name: str,
         target_name: str,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute ELT pipeline using Meltano."""
         try:
             if not tap_name.startswith("tap-"):
-                return r[dict[str, object]].fail(
+                return r[t.MeltanoCore.ExecutionResultDict].fail(
                     f"Invalid tap name format: {tap_name}",
                 )
 
             if not target_name.startswith("target-"):
-                return r[dict[str, object]].fail(
+                return r[t.MeltanoCore.ExecutionResultDict].fail(
                     f"Invalid target name format: {target_name}",
                 )
 
-            execution_result: dict[str, object] = {
+            execution_result: t.MeltanoCore.ExecutionResultDict = {
                 "pipeline_id": f"{tap_name}_{target_name}_{int(time.time())}",
                 "tap": tap_name,
                 "target": target_name,
@@ -156,12 +165,14 @@ class PipelineAdapter(FlextService[dict[str, object]]):
                 },
             }
 
-            return r[dict[str, object]].ok(execution_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Pipeline execution failed: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].ok(execution_result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                f"Pipeline execution failed: {ex}",
+            )
 
 
-class SingerAdapter(FlextService[dict[str, object]]):
+class SingerAdapter(FlextService[t.MeltanoCore.SingerCatalogDict]):
     """Focused adapter for Singer protocol operations following SOLID principles."""
 
     @classmethod
@@ -169,14 +180,14 @@ class SingerAdapter(FlextService[dict[str, object]]):
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
-    def execute(self) -> r[dict[str, object]]:
+    def execute(self) -> r[t.MeltanoCore.SingerCatalogDict]:
         """Execute default singer operation."""
         return self.create_tap_stream_catalog()
 
-    def create_tap_stream_catalog(self) -> r[dict[str, object]]:
+    def create_tap_stream_catalog(self) -> r[t.MeltanoCore.SingerCatalogDict]:
         """Create Singer tap stream catalog."""
         try:
-            catalog: dict[str, object] = {
+            catalog: t.MeltanoCore.SingerCatalogDict = {
                 "streams": [
                     {
                         "tap_stream_id": "users",
@@ -202,12 +213,14 @@ class SingerAdapter(FlextService[dict[str, object]]):
                 ],
             }
 
-            return r[dict[str, object]].ok(catalog)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Catalog creation failed: {e}")
+            return r[t.MeltanoCore.SingerCatalogDict].ok(catalog)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            return r[t.MeltanoCore.SingerCatalogDict].fail(
+                f"Catalog creation failed: {ex}",
+            )
 
 
-class DbtAdapter(FlextService[dict[str, object]]):
+class DbtAdapter(FlextService[t.MeltanoCore.DbtResultDict]):
     """Focused adapter for DBT operations following SOLID principles."""
 
     @classmethod
@@ -215,27 +228,35 @@ class DbtAdapter(FlextService[dict[str, object]]):
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
-    def execute(self) -> r[dict[str, object]]:
+    def execute(self) -> r[t.MeltanoCore.DbtResultDict]:
         """Execute default DBT operation."""
         return self.execute_dbt_operation()
 
-    def execute_dbt_operation(self) -> r[dict[str, object]]:
+    def execute_dbt_operation(self) -> r[t.MeltanoCore.DbtResultDict]:
         """Execute DBT operation."""
         try:
-            dbt_result: dict[str, object] = {
+            dbt_result: t.MeltanoCore.DbtResultDict = {
                 "status": "completed",
                 "models_run": 5,
                 "tests_run": 12,
                 "execution_time": 45.2,
             }
 
-            return r[dict[str, object]].ok(dbt_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"DBT operation failed: {e}")
+            return r[t.MeltanoCore.DbtResultDict].ok(dbt_result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            return r[t.MeltanoCore.DbtResultDict].fail(
+                f"DBT operation failed: {ex}",
+            )
 
 
 class FlextMeltanoAdapter:
     """Legacy adapter class - delegates to focused adapter classes."""
+
+    project_adapter: ProjectAdapter
+    plugin_adapter: PluginAdapter
+    pipeline_adapter: PipelineAdapter
+    singer_adapter: SingerAdapter
+    dbt_adapter: DbtAdapter
 
     def __init__(self) -> None:
         """Initialize legacy adapter with focused adapters."""
@@ -245,14 +266,47 @@ class FlextMeltanoAdapter:
         self.singer_adapter = SingerAdapter()
         self.dbt_adapter = DbtAdapter()
 
-    def __getattr__(self, name: str) -> object:
-        """Delegate method calls to appropriate focused adapter."""
-        for adapter_name in ["project", "plugin", "pipeline", "singer", "dbt"]:
-            adapter = getattr(self, f"{adapter_name}_adapter")
-            if hasattr(adapter, name):
-                return getattr(adapter, name)
-        msg = f"'{self.__class__.__name__}' object has no attribute '{name}'"
-        raise AttributeError(msg)
+    def get_version(self) -> r[t.MeltanoCore.ExecutionResultDict]:
+        """Get Meltano version information."""
+        return self.project_adapter.get_version()
+
+    def initialize_project(
+        self,
+        project_root: Path,
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
+        """Initialize Meltano project."""
+        return self.project_adapter.initialize_project(project_root)
+
+    def create_project(
+        self,
+        project_name: str,
+        project_dir: Path,
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
+        """Create new Meltano project."""
+        return self.project_adapter.create_project(project_name, project_dir)
+
+    def discover_plugins(
+        self,
+        plugin_type: str | None = None,
+    ) -> r[list[t.Plugin.PluginDefinition]]:
+        """Discover available plugins."""
+        return self.plugin_adapter.discover_plugins(plugin_type)
+
+    def execute_pipeline(
+        self,
+        tap_name: str,
+        target_name: str,
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
+        """Execute ELT pipeline."""
+        return self.pipeline_adapter.execute_pipeline(tap_name, target_name)
+
+    def create_tap_stream_catalog(self) -> r[t.MeltanoCore.SingerCatalogDict]:
+        """Create Singer tap stream catalog."""
+        return self.singer_adapter.create_tap_stream_catalog()
+
+    def execute_dbt_operation(self) -> r[t.MeltanoCore.DbtResultDict]:
+        """Execute DBT operation."""
+        return self.dbt_adapter.execute_dbt_operation()
 
 
 __all__ = [

@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from flext_meltano.typings import FlextMeltanoTypes as t
+
 
 class FlextMeltanoSingerProtocols:
     """Unified Singer protocols for Meltano ELT operations.
@@ -25,13 +27,13 @@ class FlextMeltanoSingerProtocols:
 
         streams: list[str]
         name: str
-        state: dict[str, object]
+        state: t.MeltanoCore.SingerStateDict
 
-        def get_records(self, stream_name: str) -> list[dict[str, object]]:
+        def get_records(self, stream_name: str) -> list[t.MeltanoCore.SingerRecordDict]:
             """Get records for a specific stream."""
             ...
 
-        def get_state(self) -> dict[str, object]:
+        def get_state(self) -> t.MeltanoCore.SingerStateDict:
             """Get current state."""
             ...
 

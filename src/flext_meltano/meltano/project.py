@@ -10,12 +10,13 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar
 
-from flext_core import FlextService, r
+from flext_core import FlextService, r, t as t_base
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
+from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import u
 
 
@@ -128,9 +129,11 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 f"Failed to load project: {e}",
             )
 
-    def _extract_plugins(self, plugin_type: str | None) -> list[dict[str, object]]:
+    def _extract_plugins(
+        self, plugin_type: str | None
+    ) -> list[t.Plugin.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
-        plugins: list[dict[str, object]] = []
+        plugins: list[t.Plugin.PluginDefinition] = []
         if not hasattr(self.project, "plugins"):
             return plugins
 
@@ -145,11 +148,32 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 if plugin_type is not None and plugin.type != plugin_type:
                     continue
 
-                plugins.append({
+                # Type narrowing for variant attribute
+                variant_raw = getattr(plugin, "variant", None)
+
+                plugin_def: t.Plugin.PluginDefinition = {
                     "name": plugin.name,
                     "type": plugin.type,
-                    "variant": getattr(plugin, "variant", None),
-                })
+                }
+
+                # Add variant if present and properly typed
+                if isinstance(variant_raw, str):
+                    plugin_def["variant"] = variant_raw
+                elif isinstance(variant_raw, list):
+                    # Convert list items to strings for consistency
+                    plugin_def["variant"] = [str(item) for item in variant_raw]
+                elif isinstance(variant_raw, dict):
+                    # Convert dict values to JsonValue
+                    variant_dict: dict[str, t_base.JsonValue] = {}
+                    for k, v in variant_raw.items():
+                        if isinstance(v, (str, int, float, bool, type(None))):
+                            variant_dict[k] = v
+                        elif isinstance(v, (list, dict)):
+                            # For complex nested structures, convert to string
+                            variant_dict[k] = str(v)
+                    plugin_def["variant"] = variant_dict
+
+                plugins.append(plugin_def)
         except (TypeError, AttributeError):
             pass
 
@@ -158,7 +182,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
     def get_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[dict[str, object]]]:
+    ) -> r[list[t.Plugin.PluginDefinition]]:
         """Get plugins from the project.
 
         Args:
@@ -170,7 +194,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         """
         try:
             if not self.project:
-                return r[list[dict[str, object]]].fail("No project loaded")
+                return r[list[t.Plugin.PluginDefinition]].fail("No project loaded")
 
             plugins = self._extract_plugins(plugin_type)
 
@@ -179,14 +203,14 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 count=u.count(plugins),
                 type=plugin_type,
             )
-            return r[list[dict[str, object]]].ok(plugins)
+            return r[list[t.Plugin.PluginDefinition]].ok(plugins)
         except Exception as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[list[dict[str, object]]].fail(
+            return r[list[t.Plugin.PluginDefinition]].fail(
                 f"Failed to get plugins: {e}",
             )
 
-    def install_plugin(self, name: str) -> r[dict[str, object]]:
+    def install_plugin(self, name: str) -> r[t.Plugin.PluginInfo]:
         """Install a plugin in the project.
 
         Args:
@@ -201,21 +225,18 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
 
             # Plugin installation would typically use meltano CLI or SDK
             # For now, just log the operation
-            plugin_info = cast(
-                "dict[str, object]",
-                {
-                    "name": name,
-                    "status": "installing",
-                },
-            )
+            plugin_info: t.Plugin.PluginInfo = {
+                "name": name,
+                "status": "installing",
+            }
 
             self.logger.info("Plugin installed", name=name)
-            return r[dict[str, object]].ok(plugin_info)
+            return r[t.Plugin.PluginInfo].ok(plugin_info)
         except Exception as e:
             self.logger.exception("Failed to install plugin", error=str(e))
-            return r[dict[str, object]].fail(f"Failed to install plugin: {e}")
+            return r[t.Plugin.PluginInfo].fail(f"Failed to install plugin: {e}")
 
-    def execute(self, **_kwargs: object) -> r[MeltanoProjectInfo]:
+    def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             info = MeltanoProjectInfo(

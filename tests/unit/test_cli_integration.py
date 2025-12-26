@@ -32,7 +32,7 @@ class TestCliModelConverterWithTapRunParams:
             "properties_file": None,
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -40,9 +40,8 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model: m.TapRunParams = result.value
         assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
-        assert model.discover is False
         assert model.config_file is None
+        assert model.discover is False
 
     def test_converter_tap_run_params_with_config(self) -> None:
         """Test converting dict[str, object] with config to TapRunParams model."""
@@ -52,7 +51,7 @@ class TestCliModelConverterWithTapRunParams:
             "discover": False,
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -60,7 +59,6 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model = result.value
         assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
         assert model.config_file == "/path/to/config.json"
 
     def test_converter_tap_run_params_discover_mode(self) -> None:
@@ -70,7 +68,7 @@ class TestCliModelConverterWithTapRunParams:
             "discover": True,
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -78,7 +76,7 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model = result.value
         assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
+        assert model.config_file is None
         assert model.discover is True
 
     def test_converter_tap_run_params_all_fields(self) -> None:
@@ -92,7 +90,7 @@ class TestCliModelConverterWithTapRunParams:
             "discover": False,
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -100,7 +98,6 @@ class TestCliModelConverterWithTapRunParams:
         assert result.is_success
         model = result.value
         assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
         assert model.config_file == "/config.json"
         assert model.catalog_file == "/catalog.json"
         assert model.state_file == "/state.json"
@@ -114,7 +111,7 @@ class TestCliModelConverterWithTapRunParams:
             # Missing required tap_name
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -130,7 +127,7 @@ class TestCliModelConverterWithTapRunParams:
             "discover": "not-a-boolean",  # Should be bool
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -150,7 +147,7 @@ class TestCliModelConverterWithTargetRunParams:
             "input_file": None,
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TargetRunParams,
             cli_args,
         )
@@ -168,7 +165,7 @@ class TestCliModelConverterWithTargetRunParams:
             "config_file": "/path/to/config.json",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TargetRunParams,
             cli_args,
         )
@@ -185,7 +182,7 @@ class TestCliModelConverterWithTargetRunParams:
             "input_file": "/path/to/input.jsonl",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TargetRunParams,
             cli_args,
         )
@@ -203,7 +200,7 @@ class TestCliModelConverterWithTargetRunParams:
             "input_file": "/input.jsonl",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TargetRunParams,
             cli_args,
         )
@@ -221,7 +218,7 @@ class TestCliModelConverterWithTargetRunParams:
             # Missing required target_name
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TargetRunParams,
             cli_args,
         )
@@ -241,7 +238,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "config_file": "/path/to/config.json",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TapRunParams,
             cli_args,
         )
@@ -252,13 +249,13 @@ class TestCliModelConverterWithPipelineRunParams:
         assert model.config_file == "/path/to/config.json"
 
     def test_converter_target_run_params_with_config(self) -> None:
-        """Test converting dict[str, object] with config to TargetRunParams model."""
+        """Test converting dict[str, object] with config_file to TargetRunParams model."""
         cli_args: dict[str, object] = {
             "target_name": "target-postgres",
-            "config": {"host": "localhost", "database": "test"},
+            "config_file": "/path/to/config.json",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.TargetRunParams,
             cli_args,
         )
@@ -266,6 +263,7 @@ class TestCliModelConverterWithPipelineRunParams:
         assert result.is_success
         model = result.value
         assert model.target_name == "target-postgres"
+        assert model.config_file == "/path/to/config.json"
 
     def test_converter_pipeline_run_params_with_catalog_state(self) -> None:
         """Test converting dict[str, object] with catalog/state to PipelineRunParams model."""
@@ -276,7 +274,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "state_file": "/state.json",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.PipelineRunParams,
             cli_args,
         )
@@ -297,7 +295,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "state_file": "/state.json",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.PipelineRunParams,
             cli_args,
         )
@@ -305,7 +303,6 @@ class TestCliModelConverterWithPipelineRunParams:
         assert result.is_success
         model = result.value
         assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
         assert model.target_name == "target-postgres"
         assert model.tap_config == "/tap-config.json"
         assert model.target_config == "/target-config.json"
@@ -319,7 +316,7 @@ class TestCliModelConverterWithPipelineRunParams:
             # Missing required tap_name
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.PipelineRunParams,
             cli_args,
         )
@@ -334,7 +331,7 @@ class TestCliModelConverterWithPipelineRunParams:
             # Missing required target_name
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.PipelineRunParams,
             cli_args,
         )
@@ -352,7 +349,7 @@ class TestCliModelConverterWithDbtRunParams:
             "project_dir": "/dbt/project",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.DbtRunParams,
             cli_args,
         )
@@ -370,7 +367,7 @@ class TestCliModelConverterWithDbtRunParams:
             "models": "users orders",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.DbtRunParams,
             cli_args,
         )
@@ -387,7 +384,7 @@ class TestCliModelConverterWithDbtRunParams:
             "exclude": "tag:deprecated",
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.DbtRunParams,
             cli_args,
         )
@@ -404,7 +401,7 @@ class TestCliModelConverterWithDbtRunParams:
             "full_refresh": True,
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.DbtRunParams,
             cli_args,
         )
@@ -420,7 +417,7 @@ class TestCliModelConverterWithDbtRunParams:
             # Missing required project_dir
         }
 
-        result = FlextCliModels.CliModelConverter.cli_args_to_model(
+        result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.DbtRunParams,
             cli_args,
         )

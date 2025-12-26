@@ -10,8 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 from flext_core import FlextLogger, FlextResult, FlextTypes, u
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -41,7 +39,7 @@ class FlextMeltanoBridge:
     def execute_command(
         command: str,
         args: dict[str, t_base.JsonValue] | None = None,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -55,15 +53,18 @@ class FlextMeltanoBridge:
         try:
             # Placeholder implementation - in real implementation this would
             # communicate with Go bridge via JSON API
-            result = {
+            # ExecutionResultDict is dict[str, JsonValue]
+            result_data: t.MeltanoCore.ExecutionResultDict = {
                 "command": command,
                 "args": args or {},
                 "status": "executed",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return r[dict[str, object]].ok(cast("dict[str, object]", result))
+            return r[t.MeltanoCore.ExecutionResultDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Bridge command failed: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                f"Bridge command failed: {e}"
+            )
 
     @staticmethod
     def get_version() -> r[str]:
@@ -84,20 +85,20 @@ class FlextMeltanoBridge:
             return r[bool].fail(f"Bridge connection validation failed: {e}")
 
     @staticmethod
-    def discover_plugins() -> r[dict[str, object]]:
+    def discover_plugins() -> r[dict[str, t_base.JsonValue]]:
         """Discover available plugins through the Go bridge."""
         try:
             # Placeholder - real implementation would query Go bridge for plugins
-            result = {
+            result_data: dict[str, t_base.JsonValue] = {
                 "extractors": ["tap-csv", "tap-postgres", "tap-json"],
                 "loaders": ["target-csv", "target-postgres", "target-jsonl"],
                 "transformers": ["dbt-postgres", "dbt-snowflake"],
                 "status": "discovered",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return r[dict[str, object]].ok(cast("dict[str, object]", result))
+            return r[dict[str, t_base.JsonValue]].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Plugin discovery failed: {e}")
+            return r[dict[str, t_base.JsonValue]].fail(f"Plugin discovery failed: {e}")
 
 
 __all__ = ["FlextMeltanoBridge"]

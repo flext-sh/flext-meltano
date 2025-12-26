@@ -11,19 +11,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
 
-# Import aliases for simplified usage
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
-
-# u is already imported from flext_core
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
 @dataclass
@@ -46,7 +37,7 @@ class DbtTestResult:
     status: str = "unknown"
 
 
-class FlextMeltanoDbtRunner(FlextService[str]):
+class FlextMeltanoDbtRunner(s[str]):
     """Executes DBT commands programmatically with deep SDK integration.
 
     Provides programmatic DBT execution for run, test, and documentation
@@ -65,13 +56,13 @@ class FlextMeltanoDbtRunner(FlextService[str]):
 
         """
         super().__init__()
-        self.project_root = project_root
+        self.project_root: Path | None = project_root
 
     def run_models(
         self,
         models: list[str] | None = None,
         **_kwargs: object,
-    ) -> FlextResult[DbtRunResult]:
+    ) -> r[DbtRunResult]:
         """Run DBT models.
 
         Args:
@@ -84,7 +75,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """
         try:
             if not self.project_root:
-                return FlextResult[DbtRunResult].fail("No project root set")
+                return r[DbtRunResult].fail("No project root set")
 
             self.logger.info(
                 "Starting DBT run",
@@ -100,16 +91,16 @@ class FlextMeltanoDbtRunner(FlextService[str]):
             )
 
             self.logger.info("DBT run completed", models_run=result.models_run)
-            return FlextResult[DbtRunResult].ok(result)
+            return r[DbtRunResult].ok(result)
         except Exception as e:
             self.logger.exception("DBT run failed", error=str(e))
-            return FlextResult[DbtRunResult].fail(f"DBT run failed: {e}")
+            return r[DbtRunResult].fail(f"DBT run failed: {e}")
 
     def run_tests(
         self,
         models: list[str] | None = None,
         **_kwargs: object,
-    ) -> FlextResult[DbtTestResult]:
+    ) -> r[DbtTestResult]:
         """Run DBT tests.
 
         Args:
@@ -122,7 +113,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """
         try:
             if not self.project_root:
-                return FlextResult[DbtTestResult].fail("No project root set")
+                return r[DbtTestResult].fail("No project root set")
 
             self.logger.info(
                 "Starting DBT tests",
@@ -138,12 +129,12 @@ class FlextMeltanoDbtRunner(FlextService[str]):
             )
 
             self.logger.info("DBT tests completed", tests_run=result.tests_run)
-            return FlextResult[DbtTestResult].ok(result)
+            return r[DbtTestResult].ok(result)
         except Exception as e:
             self.logger.exception("DBT tests failed", error=str(e))
-            return FlextResult[DbtTestResult].fail(f"DBT tests failed: {e}")
+            return r[DbtTestResult].fail(f"DBT tests failed: {e}")
 
-    def docs_generate(self, **_kwargs: object) -> FlextResult[dict[str, object]]:
+    def docs_generate(self, **_kwargs: object) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -155,7 +146,7 @@ class FlextMeltanoDbtRunner(FlextService[str]):
         """
         try:
             if not self.project_root:
-                return FlextResult[dict[str, object]].fail("No project root set")
+                return r[mt.MeltanoCore.ExecutionResultDict].fail("No project root set")
 
             self.logger.info(
                 "Generating DBT documentation",
@@ -163,28 +154,25 @@ class FlextMeltanoDbtRunner(FlextService[str]):
             )
 
             # DBT docs generate would be executed here
-            result = cast(
-                "dict[str, object]",
-                {
-                    "status": "completed",
-                    "docs_path": str(self.project_root / "target" / "index.html"),
-                },
-            )
+            result: mt.MeltanoCore.ExecutionResultDict = {
+                "status": "completed",
+                "docs_path": str(self.project_root / "target" / "index.html"),
+            }
 
             self.logger.info("DBT documentation generated")
-            return FlextResult[dict[str, object]].ok(result)
+            return r[mt.MeltanoCore.ExecutionResultDict].ok(result)
         except Exception as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return FlextResult[dict[str, object]].fail(
+            return r[mt.MeltanoCore.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",
             )
 
-    def execute(self, **_kwargs: object) -> FlextResult[str]:
+    def execute(self, **_kwargs: object) -> r[str]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             msg = f"DBT runner: {self.project_root}"
-            return FlextResult[str].ok(msg)
-        return FlextResult[str].fail("No project root set")
+            return r[str].ok(msg)
+        return r[str].fail("No project root set")
 
 
 __all__ = [

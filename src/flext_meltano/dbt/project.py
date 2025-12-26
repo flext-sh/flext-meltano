@@ -11,15 +11,25 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import cast
+from typing import ClassVar
 
-from flext_core import r, s
+from flext_core import r, s, u
 from pydantic import BaseModel, Field
 
-from flext_meltano.utilities import u
+from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
-class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo"]):
+class DbtProjectInfo(BaseModel):
+    """Information about a DBT project."""
+
+    root: Path = Field(description="Project root directory")
+    name: str = Field(description="Project name")
+    dbt_version: str | None = Field(default=None, description="DBT version")
+    models_count: int = Field(default=0, description="Number of models")
+    tests_count: int = Field(default=0, description="Number of tests")
+
+
+class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
     """Manages DBT projects with deep SDK integration.
 
     Provides programmatic access to DBT projects, manifests, and
@@ -31,14 +41,8 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
 
     """
 
-    class ProjectInfo(BaseModel):
-        """Information about a DBT project."""
-
-        root: Path = Field(description="Project root directory")
-        name: str = Field(description="Project name")
-        dbt_version: str | None = Field(default=None, description="DBT version")
-        models_count: int = Field(default=0, description="Number of models")
-        tests_count: int = Field(default=0, description="Number of tests")
+    # Alias for backward compatibility
+    ProjectInfo: ClassVar[type[DbtProjectInfo]] = DbtProjectInfo
 
     def __init__(self, root: Path | None = None) -> None:
         """Initialize DBT project manager.
@@ -49,9 +53,9 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
         """
         super().__init__()
         self.project_root = root
-        self.manifest = None
+        self.manifest: mt.Dbt.ManifestData | None = None
 
-    def load_project(self, root: Path) -> r[FlextMeltanoDbtProjectManager.ProjectInfo]:
+    def load_project(self, root: Path) -> r[DbtProjectInfo]:
         """Load a DBT project.
 
         Args:
@@ -63,13 +67,13 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
         """
         try:
             if not root.exists():
-                return r[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
+                return r[DbtProjectInfo].fail(
                     f"DBT project directory not found: {root}",
                 )
 
             self.project_root = root
 
-            info = FlextMeltanoDbtProjectManager.ProjectInfo(
+            info = DbtProjectInfo(
                 root=root,
                 name=str(root.name),
             )
@@ -78,14 +82,16 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
                 "DBT project loaded",
                 root=str(root),
             )
-            return r[FlextMeltanoDbtProjectManager.ProjectInfo].ok(info)
+            return r[DbtProjectInfo].ok(info)
         except Exception as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
+            return r[DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
             )
 
-    def load_manifest(self, manifest_path: Path | None = None) -> r[dict[str, object]]:
+    def load_manifest(
+        self, manifest_path: Path | None = None
+    ) -> r[mt.Dbt.ManifestData]:
         """Load DBT manifest.
 
         Args:
@@ -98,25 +104,28 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
         try:
             if manifest_path is None:
                 if self.project_root is None:
-                    return r[dict[str, object]].fail("No project loaded")
+                    return r[mt.Dbt.ManifestData].fail("No project loaded")
                 manifest_path = self.project_root / "target" / "manifest.json"
 
             if not manifest_path.exists():
-                return r[dict[str, object]].fail(f"Manifest not found: {manifest_path}")
+                return r[mt.Dbt.ManifestData].fail(
+                    f"Manifest not found: {manifest_path}"
+                )
 
             with manifest_path.open() as f:
-                self.manifest = json.load(f)
+                manifest_data: mt.Dbt.ManifestData = json.load(f)
+                self.manifest = manifest_data
 
             self.logger.info(
                 "DBT manifest loaded",
                 file=str(manifest_path),
             )
-            return r[dict[str, object]].ok(self.manifest or {})
+            return r[mt.Dbt.ManifestData].ok(self.manifest)
         except Exception as e:
             self.logger.exception("Failed to load manifest", error=str(e))
-            return r[dict[str, object]].fail(f"Failed to load manifest: {e}")
+            return r[mt.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
 
-    def get_models(self) -> r[list[dict[str, object]]]:
+    def get_models(self) -> r[list[mt.Dbt.ModelConfiguration]]:
         """Get all models from manifest.
 
         Returns:
@@ -127,43 +136,60 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return r[list[dict[str, object]]].fail(
+                    return r[list[mt.Dbt.ModelConfiguration]].fail(
                         manifest_result.error or "Unknown error",
                     )
 
-            models: list[dict[str, object]] = []
+            models: list[mt.Dbt.ModelConfiguration] = []
             if self.manifest:
-                nodes_raw = u.get(self.manifest, "nodes", default={})
-                nodes = nodes_raw if isinstance(nodes_raw, dict) else {}
-                nodes_list = list(nodes.values()) if nodes else []
+                nodes_raw = u.get(self.manifest, "nodes")
+                if not isinstance(nodes_raw, dict):
+                    nodes_raw = {}
+                nodes_list = list(nodes_raw.values()) if nodes_raw else []
                 model_nodes = u.filter(
                     nodes_list,
-                    lambda node: u.get(node, "resource_type", default="") == "model",
+                    lambda node: isinstance(node, dict)
+                    and u.get(node, "resource_type") == "model",
                 )
-                models = cast(
-                    "list[dict[str, object]]",
-                    u.map(
-                        model_nodes,
-                        lambda node: {
-                            "name": u.get(node, "name"),
-                            "path": u.get(node, "path"),
-                            "description": u.get(node, "description"),
-                            "fqn": ".".join(
-                                u.get(node, "fqn", default=[])
-                                if isinstance(u.get(node, "fqn", default=[]), list)
-                                else [],
-                            ),
-                        },
-                    ),
-                )
+                for node in model_nodes:
+                    if not isinstance(node, dict):
+                        continue
+                    name_raw = u.get(node, "name")
+                    path_raw = u.get(node, "path")
+                    desc_raw = u.get(node, "description")
+                    fqn_raw = u.get(node, "fqn")
 
-            self.logger.info("Models retrieved", count=u.count(models))
-            return r[list[dict[str, object]]].ok(models)
+                    # Build fqn string
+                    fqn_str = ".".join(fqn_raw) if isinstance(fqn_raw, list) else ""
+
+                    # Create model dict with proper type narrowing
+                    model_dict: mt.Dbt.ModelConfiguration = {
+                        "name": name_raw
+                        if isinstance(
+                            name_raw, (str, int, float, bool, type(None), list, dict)
+                        )
+                        else None,
+                        "path": path_raw
+                        if isinstance(
+                            path_raw, (str, int, float, bool, type(None), list, dict)
+                        )
+                        else None,
+                        "description": desc_raw
+                        if isinstance(
+                            desc_raw, (str, int, float, bool, type(None), list, dict)
+                        )
+                        else None,
+                        "fqn": fqn_str,
+                    }
+                    models.append(model_dict)
+
+            self.logger.info("Models retrieved", count=len(models))
+            return r[list[mt.Dbt.ModelConfiguration]].ok(models)
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[list[dict[str, object]]].fail(f"Failed to get models: {e}")
+            return r[list[mt.Dbt.ModelConfiguration]].fail(f"Failed to get models: {e}")
 
-    def get_tests(self) -> r[list[dict[str, object]]]:
+    def get_tests(self) -> r[list[mt.Dbt.TestConfiguration]]:
         """Get all tests from manifest.
 
         Returns:
@@ -174,53 +200,68 @@ class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return r[list[dict[str, object]]].fail(
+                    return r[list[mt.Dbt.TestConfiguration]].fail(
                         manifest_result.error or "Unknown error",
                     )
 
-            tests: list[dict[str, object]] = []
+            tests: list[mt.Dbt.TestConfiguration] = []
             if self.manifest:
-                nodes_raw = u.get(self.manifest, "nodes", default={})
-                nodes = nodes_raw if isinstance(nodes_raw, dict) else {}
-                nodes_list = list(nodes.values()) if nodes else []
+                nodes_raw = u.get(self.manifest, "nodes")
+                if not isinstance(nodes_raw, dict):
+                    nodes_raw = {}
+                nodes_list = list(nodes_raw.values()) if nodes_raw else []
                 test_nodes = u.filter(
                     nodes_list,
-                    lambda node: u.get(node, "resource_type", default="") == "test",
+                    lambda node: isinstance(node, dict)
+                    and u.get(node, "resource_type") == "test",
                 )
-                tests = cast(
-                    "list[dict[str, object]]",
-                    u.map(
-                        test_nodes,
-                        lambda node: {
-                            "name": u.get(node, "name"),
-                            "path": u.get(node, "path"),
-                            "description": u.get(node, "description"),
-                            "fqn": ".".join(
-                                u.get(node, "fqn", default=[])
-                                if isinstance(u.get(node, "fqn", default=[]), list)
-                                else [],
-                            ),
-                        },
-                    ),
-                )
+                for node in test_nodes:
+                    if not isinstance(node, dict):
+                        continue
+                    name_raw = u.get(node, "name")
+                    path_raw = u.get(node, "path")
+                    desc_raw = u.get(node, "description")
+                    fqn_raw = u.get(node, "fqn")
 
-            self.logger.info("Tests retrieved", count=u.count(tests))
-            return r[list[dict[str, object]]].ok(tests)
+                    # Build fqn string
+                    fqn_str = ".".join(fqn_raw) if isinstance(fqn_raw, list) else ""
+
+                    # Create test dict with proper type narrowing
+                    test_dict: mt.Dbt.TestConfiguration = {
+                        "name": name_raw
+                        if isinstance(
+                            name_raw, (str, int, float, bool, type(None), list, dict)
+                        )
+                        else None,
+                        "path": path_raw
+                        if isinstance(
+                            path_raw, (str, int, float, bool, type(None), list, dict)
+                        )
+                        else None,
+                        "description": desc_raw
+                        if isinstance(
+                            desc_raw, (str, int, float, bool, type(None), list, dict)
+                        )
+                        else None,
+                        "fqn": fqn_str,
+                    }
+                    tests.append(test_dict)
+
+            self.logger.info("Tests retrieved", count=len(tests))
+            return r[list[mt.Dbt.TestConfiguration]].ok(tests)
         except Exception as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return r[list[dict[str, object]]].fail(f"Failed to get tests: {e}")
+            return r[list[mt.Dbt.TestConfiguration]].fail(f"Failed to get tests: {e}")
 
-    def execute(
-        self, **_kwargs: object
-    ) -> r[FlextMeltanoDbtProjectManager.ProjectInfo]:
+    def execute(self, **_kwargs: object) -> r[DbtProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
-            info = FlextMeltanoDbtProjectManager.ProjectInfo(
+            info = DbtProjectInfo(
                 root=self.project_root,
                 name=str(self.project_root.name),
             )
-            return r["FlextMeltanoDbtProjectManager.ProjectInfo"].ok(info)
-        return r["FlextMeltanoDbtProjectManager.ProjectInfo"].fail("No project loaded")
+            return r[DbtProjectInfo].ok(info)
+        return r[DbtProjectInfo].fail("No project loaded")
 
 
 __all__ = [

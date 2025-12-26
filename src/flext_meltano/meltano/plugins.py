@@ -12,23 +12,23 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.project_service import FlextMeltanoProjectService
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
-# Import aliases for concise usage
-t = FlextMeltanoTypes
+# Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
-m = FlextMeltanoModels
+t = FlextMeltanoTypes
+p = FlextMeltanoProtocols
 r = FlextResult
+m = FlextMeltanoModels
 s = FlextService
 
 
@@ -76,7 +76,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def discover_plugins(
         self,
-        project: object | None = None,
+        project: p.Meltano.MeltanoProjectProtocol | None = None,
     ) -> r[list[dict[str, str]]]:
         """Discover plugins from Meltano Hub using native API.
 
@@ -91,6 +91,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.info("Discovering Meltano plugins")
 
             # Use provided project or create temporary one
+            working_project: p.Meltano.MeltanoProjectProtocol
             if project:
                 working_project = project
             else:
@@ -102,16 +103,21 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
-                # For now, we'll work with dict[str, object] - need to convert back to Project object
-                # This is a simplification; in real implementation we'd maintain Project objects
-                working_project = temp_project_result.value
+
+                # Type narrowing: ensure result is a protocol-compliant project
+                temp_project = temp_project_result.value
+                if not isinstance(temp_project, p.Meltano.MeltanoProjectProtocol):
+                    return r[list[dict[str, str]]].fail(
+                        "Temporary project does not satisfy MeltanoProjectProtocol",
+                    )
+                working_project = temp_project
 
             plugins = []
 
             # DSL Builder Pattern: Process plugins using u.construct() mnemonic pattern
             def build_plugin_info(
                 plugin_name: str,
-                indexed_plugin: object,
+                indexed_plugin: t.Plugin.PluginDefinition,
                 plugin_type: str,
             ) -> dict[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
@@ -122,31 +128,48 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 if variants_dict:
                     items_list = list(variants_dict.keys())
                     variants_str = u.join(items_list, separator=",")
-                return cast(
-                    "dict[str, str]",
-                    u.construct(
-                        {
-                            "name": {"value": plugin_name},
-                            "type": {"value": plugin_type},
-                            "default_variant": {
-                                "field": "default_variant",
-                                "default": "",
-                                "ops": {"ensure": "str"},
-                            },
-                            "variants": {"value": variants_str},
-                            "logo_url": {
-                                "field": "logo_url",
-                                "default": "",
-                                "ops": {"ensure": "str"},
-                            },
+
+                constructed = u.construct(
+                    {
+                        "name": {"value": plugin_name},
+                        "type": {"value": plugin_type},
+                        "default_variant": {
+                            "field": "default_variant",
+                            "default": "",
+                            "ops": {"ensure": "str"},
                         },
-                        source=indexed_plugin,
-                    ),
+                        "variants": {"value": variants_str},
+                        "logo_url": {
+                            "field": "logo_url",
+                            "default": "",
+                            "ops": {"ensure": "str"},
+                        },
+                    },
+                    source=indexed_plugin,
                 )
 
+                # Type narrowing: u.construct() returns dict[str, str] when all values are str
+                if not isinstance(constructed, dict):
+                    return {}
+
+                # Ensure all values are strings
+                result: dict[str, str] = {}
+                for key, value in constructed.items():
+                    if isinstance(key, str):
+                        result[key] = str(value) if value is not None else ""
+
+                return result
+
             # Process extractors using u.process() with limit via filter_keys
+            # Type narrowing: ensure working_project satisfies the protocol
+            if not isinstance(working_project, p.Meltano.MeltanoProjectProtocol):
+                # Create a protocol-compliant wrapper if needed
+                return r[list[dict[str, str]]].fail(
+                    "Invalid project type - does not satisfy MeltanoProjectProtocol",
+                )
+
             extractors_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project),
+                working_project,
                 "extractors",
             )
             if extractors_result.is_success:
@@ -160,7 +183,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Process loaders - limit to first 5
             loaders_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project),
+                working_project,
                 "loaders",
             )
             if loaders_result.is_success:
@@ -182,7 +205,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def add_plugin(
         self,
-        project: object,
+        project: p.Meltano.MeltanoProjectProtocol,
         plugin_type: str,
         plugin_name: str,
     ) -> r[dict[str, str]]:
@@ -202,8 +225,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """
         # RAILWAY PATTERN: Chain validations and operations
         return (
-            self
-            ._log_plugin_addition_start(plugin_name, plugin_type)
+            self._log_plugin_addition_start(plugin_name, plugin_type)
             .flat_map(lambda _: self._validate_plugin_type(plugin_type))
             .flat_map(
                 lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
@@ -273,33 +295,56 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             if not isinstance(data, dict):
                 data = {}
 
-            variants_raw = u.get(data, "variants", default={})
+            # Use .get() for dict access with proper defaults
+            variants_raw = data.get("variants", {})
+            default_variant_raw = data.get("default_variant")
+            description_raw = data.get("description")
+            logo_url_raw = data.get("logo_url")
+
             plugin_info: dict[str, str] = {
                 "name": plugin_name,
                 "type": plugin_type,
-                "default_variant": str(u.get(data, "default_variant", default="")),
+                "default_variant": str(default_variant_raw)
+                if default_variant_raw
+                else "",
                 "variants": transform_variants_dict(variants_raw),
-                "description": str(u.get(data, "description", default="")),
-                "logo_url": str(u.get(data, "logo_url", default="")),
+                "description": str(description_raw) if description_raw else "",
+                "logo_url": str(logo_url_raw) if logo_url_raw else "",
             }
             return r[dict[str, str]].ok(plugin_info)
 
         try:
             # Use monadic composition to chain operations (DSL pattern)
-            return (
-                FlextMeltanoProjectService()
-                .create_temporary_project(
-                    project_id="temp-info-project",
-                    prefix="flext_plugin_info_",
-                )
-                .flat_map(
-                    lambda p: self._abstractions.get_plugins_of_type(
-                        cast("object", p),
-                        plugin_type,
-                    ),
-                )
-                .flat_map(extract_plugin_info)
+            # Create temporary project and ensure it satisfies protocol
+            temp_project_result = FlextMeltanoProjectService().create_temporary_project(
+                project_id="temp-info-project",
+                prefix="flext_plugin_info_",
             )
+
+            if temp_project_result.is_failure:
+                return r[dict[str, str]].fail(
+                    temp_project_result.error or "Failed to create temporary project",
+                )
+
+            # Type narrowing: ensure project satisfies protocol
+            temp_project = temp_project_result.value
+            if not isinstance(temp_project, p.Meltano.MeltanoProjectProtocol):
+                return r[dict[str, str]].fail(
+                    "Temporary project does not satisfy MeltanoProjectProtocol",
+                )
+
+            # Get plugins and extract info
+            plugins_result = self._abstractions.get_plugins_of_type(
+                temp_project,
+                plugin_type,
+            )
+
+            if plugins_result.is_failure:
+                return r[dict[str, str]].fail(
+                    plugins_result.error or "Failed to get plugins",
+                )
+
+            return extract_plugin_info(plugins_result.value)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
@@ -329,15 +374,16 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def _execute_plugin_addition(
         self,
-        project: object,
+        project: p.Meltano.MeltanoProjectProtocol,
         plugin_type_str: str,
         plugin_name: str,
     ) -> r[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         try:
             # Use abstraction layer for plugin addition
-            plugin_config = {
-                "project": project,
+            # Build properly typed plugin config
+            plugin_config: t.Plugin.PluginConfiguration = {
+                "project_root": str(project.root_dir),
                 "plugin_type": plugin_type_str,
                 "plugin_name": plugin_name,
             }

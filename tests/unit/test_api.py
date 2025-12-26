@@ -58,7 +58,7 @@ class TestFlextMeltanoInitialization:
         api = FlextMeltano()
         version = api.version
 
-        assert version == c.FLEXT_MELTANO_VERSION
+        assert version == c.Meltano.FLEXT_MELTANO_VERSION
 
     def test_api_constants_property(self) -> None:
         """Test API constants property."""
@@ -288,13 +288,15 @@ class TestFlextMeltanoDbtOperations:
     """Test FlextMeltano DBT operations."""
 
     def test_run_dbt_models_without_models(self) -> None:
-        """Test DBT run without model list."""
+        """Test DBT run with empty model list uses all_models default."""
         api = FlextMeltano()
 
         result = api.run_dbt_models(models=[])
 
-        assert result.is_failure
-        assert result.error is not None
+        # Empty list defaults to all_models - valid operation
+        assert result.is_success
+        assert result.value is not None
+        assert result.value.get("models") == ["all_models"]
 
     def test_run_dbt_models_without_project(self) -> None:
         """Test DBT run without valid project."""
@@ -305,13 +307,15 @@ class TestFlextMeltanoDbtOperations:
         assert result.is_failure or result.is_success
 
     def test_test_dbt_models_without_models(self) -> None:
-        """Test DBT test without model list."""
+        """Test DBT test with empty model list uses all_models default."""
         api = FlextMeltano()
 
         result = api.test_dbt_models(models=[])
 
-        assert result.is_failure
-        assert result.error is not None
+        # Empty list defaults to all_models - valid operation
+        assert result.is_success
+        assert result.value is not None
+        assert result.value.get("models") == ["all_models"]
 
     def test_run_dbt_models_with_project(self) -> None:
         """Test DBT run with project root."""
@@ -532,9 +536,10 @@ class TestFlextMeltanoSuccessPaths:
         """Test data extraction exception handling."""
         api = FlextMeltano()
 
+        # extract_data(source_name: str, config: dict | None)
         result = api.extract_data(
-            tap_name="nonexistent-tap",
-            stream_name="nonexistent-stream",
+            source_name="nonexistent-source",
+            config={"stream": "nonexistent-stream"},
         )
 
         assert result.is_failure or result.is_success
@@ -543,9 +548,9 @@ class TestFlextMeltanoSuccessPaths:
         """Test data loading exception handling."""
         api = FlextMeltano()
 
+        # load_data(sink_name: str, records: list | None)
         result = api.load_data(
-            target_name="nonexistent-target",
-            stream_name="test",
+            sink_name="nonexistent-target",
             records=[],
         )
 

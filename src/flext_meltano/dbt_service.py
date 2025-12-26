@@ -51,7 +51,7 @@ class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_dir: Path,
         models: list[str] | None = None,
         **_options: object,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.DbtResultDict]:
         """Run transformations using programmatic API.
 
         Args:
@@ -73,13 +73,15 @@ class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
             # Use library runner for transformation operations
             transformation_runner_result = self._library_runner.get_dbt_runner()
             if transformation_runner_result.is_failure:
-                return r[dict[str, object]].fail(
+                return r[t.MeltanoCore.DbtResultDict].fail(
                     transformation_runner_result.error
                     or "Failed to get transformation runner",
                 )
 
             # For now, just return success since runner is just a dict
-            result = r[dict[str, object]].ok(transformation_runner_result.value)
+            result = r[t.MeltanoCore.DbtResultDict].ok(
+                transformation_runner_result.value
+            )
 
             if result.is_success:
                 _ = self.logger.info(
@@ -97,7 +99,7 @@ class FlextMeltanoTransformationService(s[t.MeltanoCore.MeltanoConfigDict]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to run transformations: {e}"
             _ = self.logger.exception(error_msg)
-            return r[dict[str, object]].fail(error_msg)
+            return r[t.MeltanoCore.DbtResultDict].fail(error_msg)
 
 
 __all__ = [

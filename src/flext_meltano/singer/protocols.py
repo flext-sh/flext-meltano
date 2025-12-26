@@ -11,7 +11,13 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_core import t
+from flext_core import FlextTypes
+
+from flext_meltano.typings import FlextMeltanoTypes
+
+# Import aliases - using meltano types for domain-specific definitions
+t = FlextMeltanoTypes
+t_core = FlextTypes
 
 
 class FlextMeltanoSingerProtocols:
@@ -33,9 +39,32 @@ class FlextMeltanoSingerProtocols:
 
         streams: list[str]
         name: str
-        state: dict[str, object]
+        state: t.Singer.TapConfig
 
-        def get_records(self, stream_name: str) -> list[dict[str, object]]:
+        def discover(self) -> t.Singer.StreamCatalog:
+            """Discover available streams and schemas.
+
+            Returns:
+            Stream catalog with schema definitions
+
+            """
+            ...
+
+        def sync(
+            self,
+            catalog: t.Singer.StreamCatalog,
+            state: t.Singer.TapConfig,
+        ) -> None:
+            """Synchronize data from source to stdout.
+
+            Args:
+            catalog: Stream catalog defining what to extract
+            state: Current state for incremental sync
+
+            """
+            ...
+
+        def get_records(self, stream_name: str) -> t.Singer.MessageBatch:
             """Get records for a specific stream.
 
             Args:
@@ -47,7 +76,7 @@ class FlextMeltanoSingerProtocols:
             """
             ...
 
-        def get_state(self) -> dict[str, object]:
+        def get_state(self) -> t.Singer.TapConfig:
             """Get current state.
 
             Returns:
@@ -64,6 +93,19 @@ class FlextMeltanoSingerProtocols:
         """
 
         name: str
+        config: t.Singer.TargetConfig
+
+        def consume(self, records: t.Singer.MessageBatch) -> int:
+            """Consume records batch.
+
+            Args:
+            records: Batch of records to consume
+
+            Returns:
+            Number of records consumed
+
+            """
+            ...
 
 
 class FlextMeltanoPluginProtocols:
@@ -75,15 +117,15 @@ class FlextMeltanoPluginProtocols:
     All protocol types are accessed through this single class - NO ALIASES.
     """
 
-    # Core plugin types (JSON-based for external Meltano plugins)
-    TapPlugin = t.JsonValue
-    TargetPlugin = t.JsonValue
-    DbtPlugin = t.JsonValue
+    # Core plugin types - use proper type aliases
+    TapPlugin = t.Plugin.PluginDefinition
+    TargetPlugin = t.Plugin.PluginDefinition
+    DbtPlugin = t.Plugin.PluginDefinition
 
-    # Service protocols (JSON-based for service integration)
-    TapServiceProtocol = t.JsonValue
-    TargetServiceProtocol = t.JsonValue
-    DbtServiceProtocol = t.JsonValue
+    # Service protocols - use proper configuration types
+    TapServiceProtocol = t.Plugin.PluginConfiguration
+    TargetServiceProtocol = t.Plugin.PluginConfiguration
+    DbtServiceProtocol = t.Plugin.PluginConfiguration
 
 
 __all__ = [

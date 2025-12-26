@@ -9,9 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
@@ -73,26 +71,22 @@ class FlextMeltanoAPIPluginOperations:
             )
 
         try:
-            plugin_config = {
+            plugin_config: dict[str, FlextTypes.JsonValue] = {
                 "name": plugin_name,
                 "namespace": plugin_name.replace("-", "_"),
                 "pip_url": f"pipelinewise-{plugin_name}",
                 "settings": config or {},
             }
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast(
-                    "t.MeltanoCore.MeltanoConfigDict",
-                    {
-                        "plugin_name": plugin_name,
-                        "plugin_type": plugin_type,
-                        "status": "installed",
-                        "configuration": plugin_config,
-                        "installed_at": str(__import__("time").time()),
-                        "api_version": self.api.version,
-                    },
-                ),
-            )
+            result_dict: dict[str, FlextTypes.JsonValue] = {
+                "plugin_name": plugin_name,
+                "plugin_type": plugin_type,
+                "status": "installed",
+                "configuration": plugin_config,
+                "installed_at": str(__import__("time").time()),
+                "api_version": self.api.version,
+            }
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(result_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Plugin installation failed: {e}",
@@ -116,14 +110,12 @@ class FlextMeltanoAPIPluginOperations:
                 else all_plugins
             )
 
-            plugins_data = u.map(
+            plugins_data: list[dict[str, FlextTypes.JsonValue]] = u.map(
                 filtered_plugins,
                 lambda plugin: {**plugin, "api_version": self.api.version},
             )
 
-            return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
-                cast("list[t.MeltanoCore.MeltanoConfigDict]", plugins_data),
-            )
+            return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",

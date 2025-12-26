@@ -15,7 +15,7 @@ from flext_core import FlextResult, FlextService
 from pydantic import BaseModel, Field
 
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.meltano.project import FlextMeltanoProjectManager
+from flext_meltano.meltano.project import FlextMeltanoProjectManager, MeltanoProjectInfo
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
@@ -70,7 +70,7 @@ class FlextMeltanoMeltanoService(s[str]):
         super().__init__()
         self.project_manager = FlextMeltanoProjectManager()
 
-    def create_project(self, root: Path) -> r[FlextMeltanoProjectManager.ProjectInfo]:
+    def create_project(self, root: Path) -> r[MeltanoProjectInfo]:
         """Create a new Meltano project.
 
         Args:
@@ -88,11 +88,11 @@ class FlextMeltanoMeltanoService(s[str]):
             return result
         except Exception as e:
             self.logger.exception("Failed to create project", error=str(e))
-            return r[FlextMeltanoProjectManager.ProjectInfo].fail(
+            return r[MeltanoProjectInfo].fail(
                 f"Failed to create project: {e}",
             )
 
-    def load_project(self, root: Path) -> r[FlextMeltanoProjectManager.ProjectInfo]:
+    def load_project(self, root: Path) -> r[MeltanoProjectInfo]:
         """Load an existing Meltano project.
 
         Args:
@@ -110,14 +110,14 @@ class FlextMeltanoMeltanoService(s[str]):
             return result
         except Exception as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return r[FlextMeltanoProjectManager.ProjectInfo].fail(
+            return r[MeltanoProjectInfo].fail(
                 f"Failed to load project: {e}",
             )
 
     def discover_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[dict[str, object]]]:
+    ) -> r[list[t.Plugin.PluginDefinition]]:
         """Discover plugins in the project.
 
         Args:
@@ -136,7 +136,9 @@ class FlextMeltanoMeltanoService(s[str]):
             return result
         except Exception as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
-            return r[list[dict[str, object]]].fail(f"Failed to discover plugins: {e}")
+            return r[list[t.Plugin.PluginDefinition]].fail(
+                f"Failed to discover plugins: {e}"
+            )
 
     def execute_pipeline(
         self,
@@ -180,11 +182,10 @@ class FlextMeltanoMeltanoService(s[str]):
                 f"Failed to execute pipeline: {e}",
             )
 
-    @staticmethod
-    def execute() -> r[str]:
+    def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
         msg = "Meltano service initialized"
-        return u.ok(msg)
+        return r[str].ok(msg)
 
 
 __all__ = [
