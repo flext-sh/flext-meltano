@@ -258,7 +258,9 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             # Extract context data
             elt_context_obj = context_data["elt_context"]
             project_obj = context_data["t.Dbt.Project"]
-            execution_result_raw = u.get(context_data, "execution_result", default={})
+            execution_result_raw: dict[str, object] | None = u.get(
+                context_data, "execution_result", default={}
+            )
             execution_result = (
                 u.guard(execution_result_raw, dict, return_value=True) or {}
             )
@@ -281,7 +283,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                     else [],
                     lambda item: isinstance(item[1], (str, int, bool)),
                 )
-                if filtered_items:
+                if filtered_items and isinstance(filtered_items, (list, tuple)):
                     pipeline_result.update({k: str(v) for k, v in filtered_items})
 
             self.logger.info(

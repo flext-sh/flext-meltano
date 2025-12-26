@@ -45,7 +45,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoSettings()
+        self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute(
@@ -61,8 +61,8 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             config_data: t.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
-                "config": self._config.model_dump()
-                if hasattr(self._config, "model_dump")
+                "config": self._meltano_config.model_dump()
+                if hasattr(self._meltano_config, "model_dump")
                 else {},
             }
 
@@ -116,15 +116,12 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             ) -> dict[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
                 variants_obj = u.get(indexed_plugin, "variants")
-                variants_dict = u.guard(variants_obj, dict, return_value=True)
-                variants_str = (
-                    u.join(
-                        cast("list[str]", u.map(variants_dict, str)),
-                        sep=",",
-                    )
-                    if variants_dict
-                    else ""
-                )
+                variants_raw = u.guard(variants_obj, dict, return_value=True)
+                variants_dict = variants_raw if isinstance(variants_raw, dict) else {}
+                variants_str = ""
+                if variants_dict:
+                    items_list = list(variants_dict.keys())
+                    variants_str = u.join(items_list, separator=",")
                 return cast(
                     "dict[str, str]",
                     u.construct(
@@ -237,8 +234,9 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """
 
         # Use monadic composition to reduce returns (DSL pattern)
-        def extract_plugin_info(plugins_dict: dict[str, object]) -> r[dict[str, str]]:
+        def extract_plugin_info(plugins_data: object) -> r[dict[str, str]]:
             """Extract plugin info from plugins dict."""
+            plugins_dict = plugins_data if isinstance(plugins_data, dict) else {}
             # Use u.not_() + u.in_() for membership check (DSL pattern)
             if u.not_(u.in_(plugin_name, plugins_dict)) or u.empty(
                 u.get(plugins_dict, plugin_name),
@@ -256,31 +254,35 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "logo_url": "",
             }
             fields_result = u.fields(indexed_plugin, fields_spec)
-            if isinstance(fields_result, r):
-                return u.cast(fields_result, default_error="Field extraction failed")
+            if isinstance(fields_result, r) and fields_result.is_failure:
+                error_msg = fields_result.error or "Field extraction failed"
+                return r[dict[str, str]].fail(error_msg)
 
-            # Use u.build() for unified transformation (DSL pattern)
-            def transform_variants(v: dict[str, object]) -> str:
+            # Extract values directly with type narrowing
+            def transform_variants_dict(v: object) -> str:
                 """Transform variants dict to string."""
-                return u.join(u.map(v, str), sep=",") if v else ""
+                if not isinstance(v, dict):
+                    return ""
+                items_list = list(v.keys())
+                return u.join(items_list, separator=",") if items_list else ""
 
-            plugin_info_raw = u.build(
-                fields_result,
-                ops={
-                    "map": lambda d: {
-                        "name": plugin_name,
-                        "type": plugin_type,
-                        "default_variant": str(u.get(d, "default_variant", default="")),
-                        "variants": transform_variants(
-                            u.guard(u.get(d, "variants"), dict, return_value=True)
-                            or {},
-                        ),
-                        "description": str(u.get(d, "description", default="")),
-                        "logo_url": str(u.get(d, "logo_url", default="")),
-                    },
-                },
+            # Get data from fields_result
+            data = (
+                fields_result.value if isinstance(fields_result, r) else fields_result
             )
-            return r[dict[str, str]].ok(cast("dict[str, str]", plugin_info_raw))
+            if not isinstance(data, dict):
+                data = {}
+
+            variants_raw = u.get(data, "variants", default={})
+            plugin_info: dict[str, str] = {
+                "name": plugin_name,
+                "type": plugin_type,
+                "default_variant": str(u.get(data, "default_variant", default="")),
+                "variants": transform_variants_dict(variants_raw),
+                "description": str(u.get(data, "description", default="")),
+                "logo_url": str(u.get(data, "logo_url", default="")),
+            }
+            return r[dict[str, str]].ok(plugin_info)
 
         try:
             # Use monadic composition to chain operations (DSL pattern)
@@ -342,7 +344,8 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             add_result = self._abstractions.add_plugin(plugin_config)
 
             if add_result.is_failure:
-                return r[bool].fail(u.err(add_result, default="Plugin addition failed"))
+                error_msg = add_result.error or "Plugin addition failed"
+                return r[bool].fail(error_msg)
 
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

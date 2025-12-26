@@ -184,10 +184,10 @@ class TestFlextMeltanoValidatorsComprehensive:
             cast("t.JsonValue", target_config),
         )
 
-        tm.ok(meltano_result, True)
-        tm.ok(dbt_result, True)
-        tm.ok(tap_result, True)
-        tm.ok(target_result, True)
+        tm.ok(meltano_result)
+        tm.ok(dbt_result)
+        tm.ok(tap_result)
+        tm.ok(target_result)
 
     def test_validator_architecture_compliance(self) -> None:
         assert hasattr(FlextMeltanoValidators, "validate_plugin_config")

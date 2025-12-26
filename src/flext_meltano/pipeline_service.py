@@ -233,7 +233,9 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             # Extract context data
             elt_context_obj = context_data["elt_context"]
             project_obj = context_data["project"]
-            execution_result_raw = u.get(context_data, "execution_result", default={})
+            execution_result_raw: dict[str, object] | None = u.get(
+                context_data, "execution_result", default={}
+            )
             execution_result = (
                 execution_result_raw if isinstance(execution_result_raw, dict) else {}
             )

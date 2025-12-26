@@ -64,13 +64,13 @@ class FlextMeltanoModels(FlextModels):
             return False
 
         # Transform dict values with protection for sensitive fields
-        protected = {}
+        protected: dict[str, object] = {}
         if isinstance(value, dict):
             for k, v in value.items():
                 key_str = k if isinstance(k, str) else str(k)
                 protected[key_str] = "[PROTECTED]" if is_sensitive(key_str) else v
 
-        return cast("dict[str, object]", protected)
+        return protected
 
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
     PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
@@ -501,30 +501,6 @@ class FlextMeltanoModels(FlextModels):
                 description="Path to write final state",
             )
 
-    class PipelineRunParams(FlextModels.Entity):
-        """Parameters for pipeline run operations."""
-
-        tap_name: str = Field(description="Name of the tap to run")
-        target_name: str = Field(description="Name of the target to run")
-        catalog_file: str | None = Field(
-            default=None,
-            description="Path to catalog file",
-        )
-        state_file: str | None = Field(default=None, description="Path to state file")
-        state_output_file: str | None = Field(
-            default=None,
-            description="Path to write final state",
-        )
-        tap_config: str | None = Field(
-            default=None,
-            description="Path to tap configuration file",
-        )
-        target_config: str | None = Field(
-            default=None,
-            description="Path to target configuration file",
-        )
-        full_refresh: bool = Field(default=False, description="Run with full refresh")
-
         class TransformationParams(FlextModels.Entity):
             """Generic parameters for transformation operations."""
 
@@ -557,6 +533,30 @@ class FlextMeltanoModels(FlextModels):
                 default=None,
                 description="Specific plugin variant",
             )
+
+    class PipelineRunParams(FlextModels.Entity):
+        """Parameters for pipeline run operations."""
+
+        tap_name: str = Field(description="Name of the tap to run")
+        target_name: str = Field(description="Name of the target to run")
+        catalog_file: str | None = Field(
+            default=None,
+            description="Path to catalog file",
+        )
+        state_file: str | None = Field(default=None, description="Path to state file")
+        state_output_file: str | None = Field(
+            default=None,
+            description="Path to write final state",
+        )
+        tap_config: str | None = Field(
+            default=None,
+            description="Path to tap configuration file",
+        )
+        target_config: str | None = Field(
+            default=None,
+            description="Path to target configuration file",
+        )
+        full_refresh: bool = Field(default=False, description="Run with full refresh")
 
     # ========================================================================
     # DATA SOURCE MODELS - Generic data source configurations and instances
@@ -919,16 +919,7 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def active_streams(self) -> list[FlextMeltanoModels.StreamInfo]:
             """Active streams for extraction."""
-            streams_list = (
-                list(self.streams.values()) if isinstance(self.streams, dict) else []
-            )
-            return cast(
-                "list[FlextMeltanoModels.StreamInfo]",
-                flext_u.filter(
-                    streams_list,
-                    lambda s: s.status in {"discovered", "selected"},
-                ),
-            )
+            return [s for s in self.streams if s.status in {"discovered", "selected"}]
 
     class DataSourceInstance(FlextModels.Entity):
         """Generic data source instance for pipeline operations."""
@@ -974,7 +965,7 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
-            streams_list = (
+            streams_list: list[FlextMeltanoModels.StreamDefinition] = (
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
             result = flext_u.agg(streams_list, "records_extracted", fn=sum)
@@ -983,7 +974,7 @@ class FlextMeltanoModels(FlextModels):
         @computed_field
         def is_ready_for_extraction(self) -> bool:
             """Check if source is ready for data extraction."""
-            streams_list = (
+            streams_list: list[FlextMeltanoModels.StreamDefinition] = (
                 list(self.streams.values()) if isinstance(self.streams, dict) else []
             )
             return (
@@ -1770,6 +1761,13 @@ class FlextMeltanoModels(FlextModels):
                 msg = f"Overall status must be one of: {', '.join(valid_statuses)}"
                 raise ValueError(msg)
             return v
+
+
+# ==========================================================================
+# ==========================================================================
+# Model rebuild calls removed to avoid forward reference resolution issues
+# These were causing NameError during import due to complex inheritance chains
+# ==========================================================================
 
 
 m = FlextMeltanoModels

@@ -80,7 +80,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 "source_type": source_config.source_type,
             }
 
-            streams_raw = u.get(catalog, "streams", default=[])
+            streams_raw: list[object] = u.get(catalog, "streams", default=[])
             streams = streams_raw if isinstance(streams_raw, list) else []
             stream_count = u.count(streams)
             self.logger.info(

@@ -16,6 +16,7 @@ from typing import ClassVar, cast
 
 import yaml
 from flext_core import FlextContainer, FlextResult, FlextSettings, u
+from flext_core.protocols import p
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -91,7 +92,7 @@ class DocsConfig(FlextSettings):
     def get_instance(cls) -> DocsConfig:
         """Get singleton instance through FlextContainer."""
         container = FlextContainer.get_global()
-        config_result = container.get("DocsConfig")
+        config_result: p.Result[object] = container.get("DocsConfig")
 
         if config_result.is_success:
             return cast("DocsConfig", config_result.value)

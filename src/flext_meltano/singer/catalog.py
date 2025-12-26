@@ -28,7 +28,7 @@ c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
-class FlextMeltanoCatalogManager(FlextService):
+class FlextMeltanoCatalogManager(FlextService[dict[str, object]]):
     """Manages Singer catalogs (schemas and stream definitions).
 
     Handles catalog discovery, loading, validation, and manipulation
@@ -61,7 +61,7 @@ class FlextMeltanoCatalogManager(FlextService):
                 catalog_guard if catalog_guard is not None else {"streams": []},
             )
 
-            streams_raw = u.get(self._catalog, "streams", default=[])
+            streams_raw: list[object] = u.get(self._catalog, "streams", default=[])
             stream_count = u.count(streams_raw) if isinstance(streams_raw, list) else 0
             self.logger.info(
                 "Streams discovered",
@@ -91,7 +91,7 @@ class FlextMeltanoCatalogManager(FlextService):
             with catalog_file.open(encoding="utf-8") as f:
                 self._catalog = json.load(f)
 
-            streams_raw = u.get(self._catalog, "streams", default=[])
+            streams_raw: list[object] = u.get(self._catalog, "streams", default=[])
             stream_count = u.count(streams_raw) if isinstance(streams_raw, list) else 0
             self.logger.info(
                 "Catalog loaded from file",
@@ -147,14 +147,11 @@ class FlextMeltanoCatalogManager(FlextService):
 
         """
         try:
-            streams_raw = u.get(self._catalog, "streams", default=[])
+            streams_raw: list[object] = u.get(self._catalog, "streams", default=[])
             streams = streams_raw if isinstance(streams_raw, list) else []
             selected = u.filter(streams, lambda s: u.get(s, "name") in stream_names)
 
-            filtered_catalog = cast(
-                "dict[str, object]",
-                {"streams": selected},
-            )
+            filtered_catalog: dict[str, object] = {"streams": selected}
             self.logger.info(
                 "Streams selected",
                 total=u.count(streams),
@@ -176,11 +173,13 @@ class FlextMeltanoCatalogManager(FlextService):
 
         """
         try:
-            streams_raw = u.get(self._catalog, "streams", default=[])
+            streams_raw: list[object] = u.get(self._catalog, "streams", default=[])
             streams = streams_raw if isinstance(streams_raw, list) else []
             found_stream = u.find(streams, lambda s: u.get(s, "name") == stream_name)
             if found_stream is not None:
-                schema_raw = u.get(found_stream, "schema", default={})
+                schema_raw: dict[str, object] | None = u.get(
+                    found_stream, "schema", default={}
+                )
                 schema = schema_raw if isinstance(schema_raw, dict) else {}
                 self.logger.debug(
                     "Stream schema retrieved",

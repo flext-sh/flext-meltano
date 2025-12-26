@@ -28,7 +28,7 @@ r = FlextResult
 s = FlextService
 
 
-class FlextMeltanoMeltanoService(s):
+class FlextMeltanoMeltanoService(s[str]):
     """Orchestrates Meltano ELT operations with deep SDK integration.
 
     Provides complete Meltano orchestration including:

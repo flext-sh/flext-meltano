@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
-from flext import FlextResult
+from flext_core import FlextResult
 
 from flext_meltano import FlextMeltanoAdapter
 from tests.flext_tests_compat import FlextTestsMatchers

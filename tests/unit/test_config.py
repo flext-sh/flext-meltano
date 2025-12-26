@@ -16,7 +16,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext import FlextConstants, FlextSettings
+from flext_core import FlextConstants, FlextSettings
 
 from flext_meltano import FlextMeltanoSettings
 
@@ -194,8 +194,8 @@ class TestFlextMeltanoSettings:
         assert isinstance(plugin_types, list)
         assert "extractors" in plugin_types
         assert "loaders" in plugin_types
-        # Use "transformers" not "transforms" - matches actual implementation
-        assert "transformers" in plugin_types
+        # Meltano uses "transforms" as the plugin type
+        assert "transforms" in plugin_types
 
         assert isinstance(log_levels, list)
         assert "INFO" in log_levels

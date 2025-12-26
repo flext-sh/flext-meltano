@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar
 
 from flext_core import (
     FlextExceptions,
@@ -26,9 +26,6 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
-
-# Global singleton instance (avoids accessing private members)
-_global_instance: FlextMeltanoSettings | None = None
 
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
@@ -60,6 +57,9 @@ class FlextMeltanoSettings(FlextSettings):
         validate_default=True,
         strict=False,
     )
+
+    # Singleton instance (class-level, avoids PLW0603 global statement)
+    _instance: ClassVar[FlextMeltanoSettings | None] = None
 
     MELTANO_VERSION: ClassVar[str] = (
         FlextMeltanoConstants.Meltano.Versions.MELTANO_REQUIRED
@@ -309,7 +309,7 @@ class FlextMeltanoSettings(FlextSettings):
     # FIELD VALIDATORS - Pydantic validation methods
     # ============================================================================
 
-    @field_validator("project_root", "venv_dir")
+    @field_validator("project_root", "venv_dir", mode="before")
     @classmethod
     def validate_absolute_paths(cls, v: Path | str) -> Path:
         """Validate and convert absolute path fields.
@@ -614,13 +614,11 @@ class FlextMeltanoSettings(FlextSettings):
         FlextMeltanoSettings: The global configuration instance (created if needed).
 
         """
-        global _global_instance  # noqa: PLW0603
+        # Use class-level singleton pattern (avoids PLW0603 global statement)
+        if cls._instance is None:
+            cls._instance = cls()
 
-        # Use global singleton pattern (avoids accessing private members)
-        if _global_instance is None:
-            _global_instance = cls()
-
-        instance = _global_instance
+        instance = cls._instance
         if overrides:
             # Apply overrides to the instance
             for key, value in overrides.items():
@@ -646,9 +644,8 @@ class FlextMeltanoSettings(FlextSettings):
             error_msg = "instance must be a FlextMeltanoSettings instance"
             raise TypeError(error_msg)
 
-        # Use module-level singleton pattern (avoiding private member access)
-        global _global_instance  # noqa: PLW0603
-        _global_instance = instance
+        # Use class-level singleton pattern (avoids PLW0603 global statement)
+        cls._instance = instance
 
     @classmethod
     def get_version(cls: object) -> str:
@@ -874,8 +871,11 @@ class FlextMeltanoSettings(FlextSettings):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-        merged_config = {**config_dict, **additional_config}
-        return cast("t.MeltanoCore.SettingsDict", merged_config)
+        merged_config: t.MeltanoCore.SettingsDict = {
+            **config_dict,
+            **additional_config,
+        }
+        return merged_config
 
     def get_metadata(self) -> t.MeltanoCore.MetadataDict:
         """Get configuration metadata including override tracking.

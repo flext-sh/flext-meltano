@@ -84,7 +84,7 @@ class FlextMeltanoSinger(s[t.MeltanoCore.MeltanoConfigDict]):
             # Build SingerExecutionResult with known fields from get_singer_manager
             singer_data = singer_manager_result.value
             capabilities_obj = singer_data.get("capabilities", [])
-            capabilities: list[object] = (
+            capabilities = (
                 list(capabilities_obj) if isinstance(capabilities_obj, list) else []
             )
             execution_result: t.Processing.SingerExecutionResult = {

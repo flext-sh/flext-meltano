@@ -119,7 +119,7 @@ class TestStreamInfoEnhanced:
         stream = m.StreamInfo(
             stream_name="users",
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
-            created_at="2025-01-01T00:00:00Z",
+            stream_created_at="2025-01-01T00:00:00Z",
         )
 
         assert stream.stream_name == "users"
@@ -127,7 +127,7 @@ class TestStreamInfoEnhanced:
         assert stream.status == "initialized"
         assert stream.records_loaded == 0
         assert stream.batches_processed == 0
-        assert stream.created_at == "2025-01-01T00:00:00Z"
+        assert stream.stream_created_at == "2025-01-01T00:00:00Z"
 
     def test_stream_info_with_full_data(self) -> None:
         """Test StreamInfo with all fields populated."""
@@ -144,7 +144,7 @@ class TestStreamInfoEnhanced:
             key_properties=["id"],
             replication_method="FULL_TABLE",
             replication_key="order_date",
-            created_at="2025-01-01T00:00:00Z",
+            stream_created_at="2025-01-01T00:00:00Z",
         )
 
         assert stream.stream_name == "orders"

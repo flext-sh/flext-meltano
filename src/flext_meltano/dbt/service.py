@@ -26,7 +26,7 @@ c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
-class FlextMeltanoDbtService(FlextService):
+class FlextMeltanoDbtService(FlextService[str]):
     """Orchestrates DBT transformations with deep SDK integration.
 
     Provides complete DBT orchestration including:

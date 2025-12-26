@@ -12,8 +12,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 from flext_core import r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
@@ -35,7 +33,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoSettings()
+        self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
     def execute(
@@ -51,8 +49,8 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             config_data: t.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
-                "config": self._config.model_dump()
-                if hasattr(self._config, "model_dump")
+                "config": self._meltano_config.model_dump()
+                if hasattr(self._meltano_config, "model_dump")
                 else {},
             }
 
@@ -100,7 +98,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Discover extractors using abstraction layer
             extractors_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project),
+                working_project,
                 "extractors",
             )
             if extractors_result.is_success:
@@ -121,7 +119,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Discover loaders using abstraction layer
             loaders_result = self._abstractions.get_plugins_of_type(
-                cast("object", working_project),
+                working_project,
                 "loaders",
             )
             if loaders_result.is_success:
@@ -213,7 +211,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Get plugins of type
             plugins_result = self._abstractions.get_plugins_of_type(
-                cast("object", project_result.value),
+                project_result.value,
                 plugin_type,
             )
 
