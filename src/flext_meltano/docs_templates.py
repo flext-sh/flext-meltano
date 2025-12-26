@@ -7,9 +7,9 @@ using FLEXT architectural patterns.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import cast
 
 from flext_core import FlextLogger, FlextResult, u
+
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
@@ -40,9 +40,14 @@ class DocsTemplates:
         """
         try:
             # DSL mnemonic pattern: extract automation fields and construct template vars
-            automation_result: r[dict[str, object] | None] = u.extract(config, "automation", default={})
-            automation_raw: dict[str, object] | None = automation_result.map_or({})
+            automation_raw = config.get("automation", {})
             automation = u.guard(automation_raw, dict, default={}, return_value=True)
+
+            # Type narrowing: automation is guaranteed to be dict from u.guard
+            automation_source: dict[str, t.JsonValue] | None = None
+            if isinstance(automation, dict):
+                automation_source = dict(automation)
+
             template_vars = u.construct(
                 {
                     "generated_at": {
@@ -60,7 +65,7 @@ class DocsTemplates:
                     },
                     "cron_schedule": {"value": self._get_cron_schedule(config)},
                 },
-                source=cast("dict[str, object] | None", automation),
+                source=automation_source,
             )
 
             workflow_content = self._ci_workflow_template.format(**template_vars)
@@ -121,14 +126,15 @@ class DocsTemplates:
     @staticmethod
     def _get_cron_schedule(config: dict[str, object]) -> str:
         """Convert audit schedule to cron format."""
-        automation_result: r[dict[str, object] | None] = u.extract(config, "automation", default={})
-        automation_raw: dict[str, object] | None = automation_result.value if automation_result.is_success else {}
+        automation_raw = config.get("automation", {})
         automation_config = u.guard(automation_raw, dict, default={}, return_value=True)
-        audit_day = u.normalize(
-            str(u.extract(automation_config, "audit_day", default="monday")),
-            case="lower",
-        )
-        audit_time = str(u.extract(automation_config, "audit_time", default="09:00"))
+
+        # Extract audit_day and audit_time with proper type handling
+        audit_day_raw = automation_config.get("audit_day", "monday") if isinstance(automation_config, dict) else "monday"
+        audit_time_raw = automation_config.get("audit_time", "09:00") if isinstance(automation_config, dict) else "09:00"
+
+        audit_day = u.Conversion.normalize(str(audit_day_raw), case="lower")
+        audit_time = str(audit_time_raw)
 
         hour, minute = map(int, audit_time.split(":"))
 

@@ -12,22 +12,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
+from flext_core import FlextResult, FlextService, u
 
-from flext_core import FlextResult, FlextService
-
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import u
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 # Import aliases for concise usage
 r = FlextResult
 s = FlextService
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
 
 
 class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -54,7 +47,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     def discover_streams(
         self,
         source_config: m.DataSourceConfig,
-    ) -> r[dict[str, object]]:
+    ) -> r[dict[str, t.JsonValue]]:
         """Discover available streams for a source configuration.
 
         Args:
@@ -73,30 +66,33 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Validate source configuration
             if not source_config.source_type:
-                return r[dict[str, object]].fail(
+                return r[dict[str, t.JsonValue]].fail(
                     "Source configuration must have name and type for discovery",
                 )
 
             # For now, return empty catalog - would integrate with actual Singer taps
-            catalog: dict[str, object] = {
+            # Using dict comprehension for proper type inference
+            catalog_dict: dict[str, t.JsonValue] = {
                 "streams": [],
                 "source_name": source_config.source_type,
                 "source_type": source_config.source_type,
             }
 
-            streams_raw: list[object] = u.get(catalog, "streams", default=[])
-            streams = streams_raw if isinstance(streams_raw, list) else []
-            stream_count = u.count(streams)
+            # Extract streams using proper type handling
+            streams_value = u.Mapper.get(catalog_dict, "streams", default=[])
+            streams = streams_value if isinstance(streams_value, list) else []
+            stream_count = u.Collection.count(streams)
             self.logger.info(
                 "Stream discovery completed",
                 stream_count=stream_count,
             )
 
-            return r[dict[str, object]].ok(catalog)
+            # Type narrowing for return - catalog is a general dict
+            return r[dict[str, t.JsonValue]].ok(catalog_dict)
 
         except Exception as e:
             self.logger.exception("Stream discovery failed", error=str(e))
-            return r[dict[str, object]].fail(f"Stream discovery failed: {e}")
+            return r[dict[str, t.JsonValue]].fail(f"Stream discovery failed: {e}")
 
     def validate_stream_schema(self, stream_def: m.StreamDefinition) -> r[bool]:
         """Validate a stream definition's schema.
@@ -118,7 +114,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             if not stream_def.stream_schema:
                 return r[bool].fail("Stream schema cannot be empty")
 
-            # Schema is already typed as dict[str, object] in StreamDefinition
+            # Schema is properly typed in StreamDefinition
             if "properties" not in stream_def.stream_schema:
                 return r[bool].fail("Stream schema must contain properties")
 
@@ -206,7 +202,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     def build_singer_catalog(
         self,
         streams: list[m.StreamDefinition],
-    ) -> r[dict[str, object]]:
+    ) -> r[dict[str, t.JsonValue]]:
         """Build a Singer catalog from stream definitions.
 
         Args:
@@ -219,19 +215,19 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             self.logger.info(
                 "Building Singer catalog",
-                stream_count=u.count(streams),
+                stream_count=u.Collection.count(streams),
             )
 
             # Validate stream definitions
             if not streams:
-                return r[dict[str, object]].fail(
+                return r[dict[str, t.JsonValue]].fail(
                     "Stream list cannot be empty for catalog building",
                 )
 
-            # Build catalog structure
-            catalog_streams = []
+            # Build catalog structure - using JsonValue for flexibility
+            catalog_streams: list[dict[str, t.JsonValue]] = []
             for stream in streams:
-                stream_catalog: dict[str, object] = {
+                stream_catalog: dict[str, t.JsonValue] = {
                     "tap_stream_id": stream.stream_name,
                     "key_properties": [],
                     "schema": stream.stream_schema,
@@ -243,32 +239,34 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 }
                 catalog_streams.append(stream_catalog)
 
-            catalog: dict[str, object] = {
+            # Use general dict type for catalog
+            catalog_dict: dict[str, t.JsonValue] = {
                 "streams": catalog_streams,
             }
 
             self.logger.info(
                 "Singer catalog built successfully",
-                stream_count=u.count(catalog_streams),
+                stream_count=u.Collection.count(catalog_streams),
             )
 
-            return r[dict[str, object]].ok(catalog)
+            # Return general dict as StreamCatalog
+            return r[dict[str, t.JsonValue]].ok(catalog_dict)
 
         except Exception as e:
             self.logger.exception("Catalog building failed", error=str(e))
-            return r[dict[str, object]].fail(f"Catalog building failed: {e}")
+            return r[dict[str, t.JsonValue]].fail(f"Catalog building failed: {e}")
 
     def create_stream_from_schema(
         self,
         name: str,
-        schema: dict[str, object],
+        schema: dict[str, t.JsonValue],
         source_type: str | None = None,
     ) -> r[m.StreamDefinition]:
         """Create a Singer stream definition from name and schema.
 
         Args:
             name: Stream name
-            schema: Stream schema dictionary
+            schema: Stream schema dictionary (JSON compatible)
             source_type: Source type this stream belongs to (optional)
 
         Returns:
@@ -293,7 +291,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                     "Stream schema must contain properties",
                 )
 
-            # Create stream definition
+            # Create stream definition - schema matches expected type
             stream = m.StreamDefinition(
                 stream_name=name,
                 stream_schema=schema,
@@ -311,7 +309,10 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.exception("Stream creation failed", error=str(e))
             return r[m.StreamDefinition].fail(f"Stream creation failed: {e}")
 
-    def load_replication_state(self, state_file: str) -> r[dict[str, object]]:
+    def load_replication_state(
+        self,
+        state_file: str,
+    ) -> r[t.MeltanoCore.SingerStateDict]:
         """Load Singer replication state from file.
 
         Args:
@@ -328,11 +329,13 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if not state_file:
-                return r[dict[str, object]].fail("State file path cannot be empty")
+                return r[t.MeltanoCore.SingerStateDict].fail(
+                    "State file path cannot be empty",
+                )
 
             # In a real implementation, this would read from the file
             # For now, return empty state structure
-            state: dict[str, object] = {
+            state: t.MeltanoCore.SingerStateDict = {
                 "bookmarks": {},
             }
 
@@ -341,15 +344,15 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 state_file=state_file,
             )
 
-            return r[dict[str, object]].ok(state)
+            return r[t.MeltanoCore.SingerStateDict].ok(state)
 
         except Exception as e:
             self.logger.exception("State loading failed", error=str(e))
-            return r[dict[str, object]].fail(f"State loading failed: {e}")
+            return r[t.MeltanoCore.SingerStateDict].fail(f"State loading failed: {e}")
 
     def save_replication_state(
         self,
-        state: dict[str, object],
+        state: t.MeltanoCore.SingerStateDict,
         state_file: str,
     ) -> r[bool]:
         """Save Singer replication state to file.
@@ -389,9 +392,9 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def batch_records(
         self,
-        records: list[dict[str, object]],
+        records: list[t.MeltanoCore.SingerRecordDict],
         batch_size: int = 1000,
-    ) -> r[list[list[dict[str, object]]]]:
+    ) -> r[list[list[t.MeltanoCore.SingerRecordDict]]]:
         """Batch records for efficient processing.
 
         Args:
@@ -405,38 +408,39 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             self.logger.debug(
                 "Batching records",
-                record_count=u.count(records),
+                record_count=u.Collection.count(records),
                 batch_size=batch_size,
             )
 
             if not records:
-                return r[list[list[dict[str, object]]]].fail(
+                return r[list[list[t.MeltanoCore.SingerRecordDict]]].fail(
                     "Record list cannot be empty",
                 )
 
             if batch_size <= 0:
-                return r[list[list[dict[str, object]]]].fail(
+                return r[list[list[t.MeltanoCore.SingerRecordDict]]].fail(
                     "Batch size must be positive",
                 )
 
-            # Create batches
-            batches: list[list[dict[str, object]]] = cast(
-                "list[list[dict[str, object]]]",
-                u.chunk(records, batch_size),
+            # Create batches using Collection.chunk
+            batches: list[list[t.MeltanoCore.SingerRecordDict]] = u.Collection.chunk(
+                records, batch_size
             )
 
             self.logger.info(
                 "Records batched successfully",
-                record_count=u.count(records),
-                batch_count=u.count(batches),
+                record_count=u.Collection.count(records),
+                batch_count=u.Collection.count(batches),
                 batch_size=batch_size,
             )
 
-            return r[list[list[dict[str, object]]]].ok(batches)
+            return r[list[list[t.MeltanoCore.SingerRecordDict]]].ok(batches)
 
         except Exception as e:
             self.logger.exception("Record batching failed", error=str(e))
-            return r[list[list[dict[str, object]]]].fail(f"Record batching failed: {e}")
+            return r[list[list[t.MeltanoCore.SingerRecordDict]]].fail(
+                f"Record batching failed: {e}",
+            )
 
     def execute(
         self,
@@ -444,4 +448,6 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         """Execute source abstraction operations (implements Service)."""
         # This would orchestrate the overall source abstraction workflow
         # For now, return the current configuration
-        return r[t.MeltanoCore.MeltanoConfigDict].ok(self._meltano_config.model_dump())
+        return r[t.MeltanoCore.MeltanoConfigDict].ok(
+            self._meltano_config.model_dump(),
+        )

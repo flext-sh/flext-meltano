@@ -11,10 +11,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from typing import cast
+from typing import Protocol
 
 from flext_cli import FlextCli
-from flext_core import FlextLogger
+from flext_cli.protocols import FlextCliProtocols
+from flext_core import FlextLogger, FlextResult
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.cli_managers import (
@@ -24,8 +25,20 @@ from flext_meltano.cli_managers import (
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
-    _CLIProtocol,
+    _ManagerProtocol,
+    _SingerManagerProtocol,
+    _StatusManagerProtocol,
 )
+
+# Import alias for protocol types
+p_cli = FlextCliProtocols
+r = FlextResult
+
+
+class _OutputProtocol(Protocol):
+    """Protocol for CLI output with print_message method."""
+
+    def print_message(self, message: str, style: str | None = None) -> r[bool]: ...
 
 
 class FlextMeltanoCLI:
@@ -36,6 +49,18 @@ class FlextMeltanoCLI:
     Single class per module following SOLID principles strictly.
     """
 
+    # Declare attributes to satisfy _CLIProtocol at class level
+    # Use protocol types to match _CLIProtocol expectations
+    logger: FlextLogger
+    output: _OutputProtocol  # FlextCliOutput (actual type from flext_cli)
+    _api: FlextMeltano
+    pipeline_manager: _ManagerProtocol
+    singer_manager: _SingerManagerProtocol
+    dbt_manager: _ManagerProtocol
+    plugin_manager: _ManagerProtocol
+    status_manager: _StatusManagerProtocol
+    command_router: FlextMeltanoCommandRouter
+
     def __init__(self) -> None:
         """Initialize CLI with SOLID delegation.
 
@@ -43,23 +68,25 @@ class FlextMeltanoCLI:
         DBT operations, plugin management, and monitoring.
         """
         super().__init__()
-        self.logger: FlextLogger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Initialize core dependencies
         self._cli = FlextCli()
         self._api = FlextMeltano()
         self.output = self._cli.output
 
-        # Cast self to _CLIProtocol for manager composition
-        cli_protocol: _CLIProtocol = cast("_CLIProtocol", self)
+        # Chicken-and-egg: managers need self, but self needs managers for _CLIProtocol
+        # Solution: Create a temporary typed variable that we know will satisfy the protocol
+        # after all managers are assigned
+        temp_self = self
 
         # Initialize specialized components using composition
-        self.command_router = FlextMeltanoCommandRouter(cli_protocol)
-        self.pipeline_manager = FlextMeltanoPipelineManager(cli_protocol)
-        self.singer_manager = FlextMeltanoSingerManager(cli_protocol)
-        self.dbt_manager = FlextMeltanoDbtManager(cli_protocol)
-        self.plugin_manager = FlextMeltanoPluginManager(cli_protocol)
-        self.status_manager = FlextMeltanoStatusManager(cli_protocol)
+        self.pipeline_manager = FlextMeltanoPipelineManager(temp_self)
+        self.singer_manager = FlextMeltanoSingerManager(temp_self)
+        self.dbt_manager = FlextMeltanoDbtManager(temp_self)
+        self.plugin_manager = FlextMeltanoPluginManager(temp_self)
+        self.status_manager = FlextMeltanoStatusManager(temp_self)
+        self.command_router = FlextMeltanoCommandRouter(temp_self)
 
     def show_pipeline_help(self) -> None:
         """Show pipeline help."""

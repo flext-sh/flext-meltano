@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
 from flext_core import (
     FlextResult,
@@ -36,7 +35,7 @@ c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
-class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
+class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Unified library runner providing complete Meltano functionality.
 
     This class consolidates all Meltano operations (DBT transformations, Singer
@@ -129,19 +128,16 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
                 )
 
             execution_result = result.value
-            dbt_result = cast(
-                "t.Processing.DbtTransformationResult",
-                {
-                    "success": execution_result.success,
-                    "exit_code": execution_result.exit_code,
-                    "models_run": models or ["all"],
-                    "execution_method": "library_runner",
-                    "project_dir": str(project_dir) if project_dir else None,
-                    "execution_time": execution_result.execution_time,
-                    "output": execution_result.output,
-                    "error": execution_result.error,
-                },
-            )
+            dbt_result: t.Processing.DbtTransformationResult = {
+                "success": execution_result.success,
+                "exit_code": execution_result.exit_code,
+                "models_run": models or ["all"],
+                "execution_method": "library_runner",
+                "project_dir": str(project_dir) if project_dir else None,
+                "execution_time": execution_result.execution_time,
+                "output": execution_result.output,
+                "error": execution_result.error,
+            }
 
             return r[t.Processing.DbtTransformationResult].ok(dbt_result)
 
@@ -151,32 +147,36 @@ class FlextMeltanoLibraryRunner(FlextService[dict[str, object]]):
             return r[t.Processing.DbtTransformationResult].fail(error_msg)
 
     @staticmethod
-    def get_dbt_runner() -> r[dict[str, object]]:
+    def get_dbt_runner() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get DBT runner instance for DBT operations."""
         try:
             # Placeholder - real implementation would return DBT runner
-            dbt_runner = {
+            dbt_runner: t.MeltanoCore.ExecutionResultDict = {
                 "type": "dbt_runner",
                 "status": "available",
                 "capabilities": ["run", "test", "docs", "seed"],
             }
-            return r[dict[str, object]].ok(cast("dict[str, object]", dbt_runner))
+            return r[t.MeltanoCore.ExecutionResultDict].ok(dbt_runner)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Failed to get DBT runner: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                f"Failed to get DBT runner: {e}"
+            )
 
     @staticmethod
-    def get_singer_manager() -> r[dict[str, object]]:
+    def get_singer_manager() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get Singer manager instance for Singer operations."""
         try:
             # Placeholder - real implementation would return Singer manager
-            singer_manager = {
+            singer_manager: t.MeltanoCore.ExecutionResultDict = {
                 "type": "singer_manager",
                 "status": "available",
                 "capabilities": ["discover", "sync", "validate"],
             }
-            return r[dict[str, object]].ok(cast("dict[str, object]", singer_manager))
+            return r[t.MeltanoCore.ExecutionResultDict].ok(singer_manager)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Failed to get Singer manager: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                f"Failed to get Singer manager: {e}"
+            )
 
     def execute_complete_elt_pipeline(
         self,

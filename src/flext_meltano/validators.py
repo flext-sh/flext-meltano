@@ -10,16 +10,18 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
-# Import aliases for simplified usage
+# Import aliases following order: c -> t -> p -> r -> m -> u
 from flext_core import FlextLogger, FlextResult
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
-# u is already imported from flext_core
-t = FlextMeltanoTypes
 c = FlextMeltanoConstants
+t = FlextMeltanoTypes
+p = FlextMeltanoProtocols
+r = FlextResult
 m = FlextMeltanoModels
 
 logger = FlextLogger(__name__)
@@ -56,7 +58,7 @@ class FlextMeltanoValidators:
     def validate_pipeline_component_business_rules(
         cls,
         config: t.JsonValue,
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Validate pipeline component business rules using monadic error accumulation.
 
         Uses FlextResult.accumulate_errors() to collect all validation errors
@@ -70,7 +72,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or accumulated error details.
 
         """
-        return FlextResult.accumulate_errors(
+        return r.accumulate_errors(
             cls._validate_config_is_dict(config),
             cls._validate_plugin_name(config),
             cls._validate_plugin_namespace(config),
@@ -80,7 +82,7 @@ class FlextMeltanoValidators:
         ).map(lambda _: True)  # Convert successful validations to boolean result
 
     @classmethod
-    def _validate_config_is_dict(cls, config: t.JsonValue) -> FlextResult[bool]:
+    def _validate_config_is_dict(cls, config: t.JsonValue) -> r[bool]:
         """Validate that config is a dictionary.
 
         Args:
@@ -91,27 +93,27 @@ class FlextMeltanoValidators:
 
         """
         if not isinstance(config, dict):
-            return FlextResult.fail(
+            return r.fail(
                 "Plugin config validation failed: config must be a dictionary",
             )
-        return FlextResult.ok(True)
+        return r.ok(True)
 
     @classmethod
-    def _validate_plugin_name(cls, config: t.JsonValue) -> FlextResult[bool]:
+    def _validate_plugin_name(cls, config: t.JsonValue) -> r[bool]:
         if not isinstance(config, dict):
-            return FlextResult.fail("Config must be dictionary for name validation")
+            return r.fail("Config must be dictionary for name validation")
 
         name = config.get("name", "")
         if not isinstance(name, str):
-            return FlextResult.fail("Plugin name must be a string")
+            return r.fail("Plugin name must be a string")
 
         if not name or not name.strip():
-            return FlextResult.fail("Plugin name cannot be empty")
+            return r.fail("Plugin name cannot be empty")
 
         return cls._validate_pipeline_name_business_rules(name.strip())
 
     @classmethod
-    def _validate_pipeline_name_business_rules(cls, name: str) -> FlextResult[bool]:
+    def _validate_pipeline_name_business_rules(cls, name: str) -> r[bool]:
         """Validate pipeline-specific name business rules.
 
         Args:
@@ -129,7 +131,7 @@ class FlextMeltanoValidators:
             and len(name) < c.Meltano.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
         ):
             validation_errors.append(
-                "Sink component names must be at least 8 characters",
+                "Target plugin names must be at least 8 characters",
             )
 
         # Pipeline business rule: source component names
@@ -142,70 +144,70 @@ class FlextMeltanoValidators:
             )
 
         if validation_errors:
-            return FlextResult.fail("; ".join(validation_errors))
+            return r.fail("; ".join(validation_errors))
 
-        return FlextResult.ok(True)
+        return r.ok(True)
 
     @classmethod
-    def _validate_plugin_namespace(cls, config: t.JsonValue) -> FlextResult[bool]:
+    def _validate_plugin_namespace(cls, config: t.JsonValue) -> r[bool]:
         if not isinstance(config, dict):
-            return FlextResult.fail(
+            return r.fail(
                 "Config must be dictionary for namespace validation",
             )
 
         namespace = config.get("namespace")
         if namespace is None:
-            return FlextResult.fail("Plugin namespace is required")
+            return r.fail("Plugin namespace is required")
 
         if not isinstance(namespace, str):
-            return FlextResult.fail("Plugin namespace must be a string")
+            return r.fail("Plugin namespace must be a string")
 
         if not namespace.strip():
-            return FlextResult.fail("Plugin namespace cannot be empty")
+            return r.fail("Plugin namespace cannot be empty")
 
-        return FlextResult.ok(True)
+        return r.ok(True)
 
     @classmethod
-    def _validate_plugin_pip_url(cls, config: t.JsonValue) -> FlextResult[bool]:
+    def _validate_plugin_pip_url(cls, config: t.JsonValue) -> r[bool]:
         if not isinstance(config, dict):
-            return FlextResult.fail("Config must be dictionary for pip_url validation")
+            return r.fail("Config must be dictionary for pip_url validation")
 
         pip_url = config.get("pip_url")
         if pip_url is None:
-            return FlextResult.fail("Plugin pip_url is required")
+            return r.fail("Plugin pip_url is required")
 
         if not isinstance(pip_url, str):
-            return FlextResult.fail("Plugin pip_url must be a string")
+            return r.fail("Plugin pip_url must be a string")
 
         if not pip_url.strip():
-            return FlextResult.fail("Plugin pip_url cannot be empty")
+            return r.fail("Plugin pip_url cannot be empty")
 
-        return FlextResult.ok(True)
+        return r.ok(True)
 
     @classmethod
-    def _validate_plugin_executable(cls, config: t.JsonValue) -> FlextResult[bool]:
+    def _validate_plugin_executable(cls, config: t.JsonValue) -> r[bool]:
         if not isinstance(config, dict):
-            return FlextResult.fail(
+            return r.fail(
                 "Config must be dictionary for executable validation",
             )
 
         executable = config.get("executable")
         if executable is None:
-            return FlextResult.fail("Plugin executable is required")
+            return r.fail("Plugin executable is required")
 
         if not isinstance(executable, str):
-            return FlextResult.fail("Plugin executable must be a string")
+            return r.fail("Plugin executable must be a string")
 
         if not executable.strip():
-            return FlextResult.fail("Plugin executable cannot be empty")
+            return r.fail("Plugin executable cannot be empty")
 
-        return FlextResult.ok(True)
+        return r.ok(True)
 
     @classmethod
     def _validate_pipeline_specific_rules(
         cls,
         config: t.JsonValue,
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Validate additional pipeline-specific business rules.
 
         Args:
@@ -216,19 +218,19 @@ class FlextMeltanoValidators:
 
         """
         if not isinstance(config, dict):
-            return FlextResult.fail(
+            return r.fail(
                 "Config must be dictionary for Meltano rules validation",
             )
 
         # Additional Meltano-specific validations can be added here
         # For now, return success as placeholder
-        return FlextResult.ok(True)
+        return r.ok(True)
 
     @classmethod
     def validate_pipeline_project_business_rules(
         cls,
         config: t.JsonValue,
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Validate pipeline project business rules.
 
         Validates pipeline project configuration including version requirements
@@ -252,13 +254,22 @@ class FlextMeltanoValidators:
             ...     print("Project configuration is valid")
 
         """
-        # Validate config is dict[str, object] using direct validation
+        # Validate config is dict using direct validation
         if not isinstance(config, dict):
-            return FlextResult[bool].fail(
+            return r[bool].fail(
                 "Project config validation failed: config must be a dictionary",
             )
 
-        config_dict: dict[str, object] = dict[str, object](config)
+        # Use proper type for dict validation
+        if not all(isinstance(k, str) for k in config):
+            return r[bool].fail("All config keys must be strings")
+
+        # Type narrow config values to JsonValue
+        config_dict: dict[str, t.JsonValue] = {
+            str(k): val
+            for k, val in config.items()
+            if isinstance(val, (str, int, float, bool, dict, list)) or val is None
+        }
 
         # DOMAIN-SPECIFIC: Pipeline project business rules
         class PipelineProjectBusinessRules(m.PipelineProjectModel):
@@ -271,15 +282,15 @@ class FlextMeltanoValidators:
         # Use Pydantic model validation directly
         try:
             PipelineProjectBusinessRules.model_validate(config_dict)
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[bool].fail(f"Project validation failed: {e}")
+            return r[bool].fail(f"Project validation failed: {e}")
 
     @classmethod
     def validate_transformation_business_rules(
         cls,
         config: t.JsonValue,
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Validate transformation-specific business rules.
 
         Validates transformation project configuration including project name format
@@ -305,13 +316,22 @@ class FlextMeltanoValidators:
             ...     print("Transformation configuration is valid")
 
         """
-        # Validate config is dict[str, object] using direct validation
+        # Validate config is dict using direct validation
         if not isinstance(config, dict):
-            return FlextResult[bool].fail(
+            return r[bool].fail(
                 "Transformation config validation failed: config must be a dictionary",
             )
 
-        config_dict: dict[str, object] = dict[str, object](config)
+        # Use proper type for dict validation
+        if not all(isinstance(k, str) for k in config):
+            return r[bool].fail("All config keys must be strings")
+
+        # Type narrow config values to JsonValue
+        config_dict: dict[str, t.JsonValue] = {
+            str(k): val
+            for k, val in config.items()
+            if isinstance(val, (str, int, float, bool, dict, list)) or val is None
+        }
 
         # DOMAIN-SPECIFIC: Transformation business rules
         class TransformationBusinessRules(m.TransformationProjectModel):
@@ -324,15 +344,15 @@ class FlextMeltanoValidators:
         # Use Pydantic model validation directly
         try:
             TransformationBusinessRules.model_validate(config_dict)
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[bool].fail(f"Transformation validation failed: {e}")
+            return r[bool].fail(f"Transformation validation failed: {e}")
 
     @classmethod
     def validate_pipeline_project_structure(
         cls,
         project_path: Path,
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Validate pipeline project structure with domain-specific business rules.
 
         Performs complete validation of the pipeline project directory
@@ -357,19 +377,19 @@ class FlextMeltanoValidators:
         try:
             # Check if path exists and is directory
             if not project_path.exists():
-                return FlextResult[bool].fail(
+                return r[bool].fail(
                     f"Project path does not exist: {project_path}",
                 )
 
             if not project_path.is_dir():
-                return FlextResult[bool].fail(
+                return r[bool].fail(
                     f"Project path is not a directory: {project_path}",
                 )
 
             # Check for required pipeline files
             pipeline_config = project_path / "pipeline.yml"
             if not pipeline_config.exists():
-                return FlextResult[
+                return r[
                     bool
                 ].fail(
                     f"pipeline.yml not found in {project_path}",  # Test expectation compliance
@@ -382,17 +402,17 @@ class FlextMeltanoValidators:
                 with contextlib.suppress(OSError):
                     transform_dir.mkdir(parents=True, exist_ok=True)
 
-            return FlextResult[bool].ok(True)
+            return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
             logger.exception(error_msg)
-            return FlextResult[bool].fail(error_msg)
+            return r[bool].fail(error_msg)
 
     @classmethod
     def validate_connection_config(
         cls,
-        config: dict[str, object],
-    ) -> FlextResult[dict[str, object]]:
+        config: dict[str, t.JsonValue],
+    ) -> r[dict[str, t.JsonValue]]:
         """Validate connection configuration with domain-specific business rules.
 
         Validates connection configuration data for pipeline services,
@@ -405,37 +425,37 @@ class FlextMeltanoValidators:
             FlextResult containing validated configuration or error details.
 
         Example:
-            >>> config: dict[str, object] = {
+            >>> config: dict[str, t.JsonValue] = {
             ...     "host": "localhost",
             ...     "port": 5432,
             ...     "database": "mydb",
             ... }
-            >>> result: FlextResult[object] = (
+            >>> result: r[dict[str, t.JsonValue]] = (
             ...     FlextMeltanoValidators.validate_connection_config(config)
             ... )
             >>> if result.is_success:
-            ...     validated_config: dict[str, object] = result.value
+            ...     validated_config: dict[str, t.JsonValue] = result.value
             ...     print(f"Validated config: {validated_config}")
 
         """
         try:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
-                return FlextResult[dict[str, object]].fail(
+                return r[dict[str, t.JsonValue]].fail(
                     "Connection configuration cannot be empty",
                 )
 
-            return FlextResult[dict[str, object]].ok(config)
+            return r[dict[str, t.JsonValue]].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return FlextResult[dict[str, object]].fail(error_msg)
+            return r[dict[str, t.JsonValue]].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(
         cls,
         config: t.JsonValue,
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Validate plugin configuration with complete business rules.
 
         Validates plugin configuration data for Meltano plugins,

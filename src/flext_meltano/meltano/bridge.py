@@ -10,8 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 from flext_core import FlextLogger, FlextResult, t as t_core
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -43,7 +41,7 @@ class FlextMeltanoBridge:
     def execute_command(
         command: str,
         args: dict[str, t.JsonValue] | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[t.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -57,15 +55,19 @@ class FlextMeltanoBridge:
         try:
             # Placeholder implementation - in real implementation this would
             # communicate with Go bridge via JSON API
-            result = {
+            # Build result dict with proper typing
+            args_dict: dict[str, t.JsonValue] = args if args is not None else {}
+            result: t.Bridge.BridgeStatus = {
                 "command": command,
-                "args": args or {},
+                "args": args_dict,
                 "status": "executed",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
+            return FlextResult[t.Bridge.BridgeStatus].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[dict[str, object]].fail(f"Bridge command failed: {e}")
+            return FlextResult[t.Bridge.BridgeStatus].fail(
+                f"Bridge command failed: {e}"
+            )
 
     @staticmethod
     def get_version() -> FlextResult[str]:
@@ -86,20 +88,53 @@ class FlextMeltanoBridge:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
 
     @staticmethod
-    def discover_plugins() -> FlextResult[dict[str, object]]:
+    def discover_plugins() -> FlextResult[t.Plugin.PluginCatalog]:
         """Discover available plugins through the Go bridge."""
         try:
             # Placeholder - real implementation would query Go bridge for plugins
-            result = {
-                "extractors": ["tap-csv", "tap-postgres", "tap-json"],
-                "loaders": ["target-csv", "target-postgres", "target-jsonl"],
-                "transformers": ["dbt-postgres", "dbt-snowflake"],
-                "status": "discovered",
-                "timestamp": u.Generators.generate_iso_timestamp(),
+            extractor1: t.Plugin.PluginDefinition = {
+                "name": "tap-csv",
+                "type": "extractors",
             }
-            return FlextResult[dict[str, object]].ok(cast("dict[str, object]", result))
+            extractor2: t.Plugin.PluginDefinition = {
+                "name": "tap-postgres",
+                "type": "extractors",
+            }
+            extractor3: t.Plugin.PluginDefinition = {
+                "name": "tap-json",
+                "type": "extractors",
+            }
+            loader1: t.Plugin.PluginDefinition = {
+                "name": "target-csv",
+                "type": "loaders",
+            }
+            loader2: t.Plugin.PluginDefinition = {
+                "name": "target-postgres",
+                "type": "loaders",
+            }
+            loader3: t.Plugin.PluginDefinition = {
+                "name": "target-jsonl",
+                "type": "loaders",
+            }
+            transformer1: t.Plugin.PluginDefinition = {
+                "name": "dbt-postgres",
+                "type": "transformers",
+            }
+            transformer2: t.Plugin.PluginDefinition = {
+                "name": "dbt-snowflake",
+                "type": "transformers",
+            }
+
+            result: t.Plugin.PluginCatalog = {
+                "extractors": [extractor1, extractor2, extractor3],
+                "loaders": [loader1, loader2, loader3],
+                "transformers": [transformer1, transformer2],
+            }
+            return FlextResult[t.Plugin.PluginCatalog].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[dict[str, object]].fail(f"Plugin discovery failed: {e}")
+            return FlextResult[t.Plugin.PluginCatalog].fail(
+                f"Plugin discovery failed: {e}"
+            )
 
 
 __all__ = ["FlextMeltanoBridge"]

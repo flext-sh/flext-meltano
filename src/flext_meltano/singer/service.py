@@ -11,21 +11,21 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextModels, FlextResult, FlextService
 from pydantic import Field
 
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
 from flext_meltano.typings import FlextMeltanoTypes
 
-# Import aliases for simplified usage
-# u is already imported from flext_core
-t = FlextMeltanoTypes
+# Import aliases following order: c -> t -> p -> r -> m -> s
 c = FlextMeltanoConstants
-m = FlextMeltanoModels
+t = FlextMeltanoTypes
+singer_p = FlextMeltanoSingerProtocols
 r = FlextResult
+m = FlextModels
 s = FlextService
 
 
@@ -48,7 +48,7 @@ class FlextMeltanoSingerService(s[str]):
 
     """
 
-    class PipelineConfig(FlextMeltanoModels.Entity):
+    class PipelineConfig(m.Entity):
         """Configuration for a Singer pipeline."""
 
         tap_config_path: Path | None = Field(
@@ -69,13 +69,15 @@ class FlextMeltanoSingerService(s[str]):
             description="Specific streams to sync",
         )
 
-    class SyncResult(FlextMeltanoModels.Entity):
+    class SyncResult(m.Entity):
         """Result of a Singer sync operation."""
 
         records_processed: int = Field(description="Number of records processed")
         records_written: int = Field(description="Number of records written")
         errors: int = Field(description="Number of errors")
-        state: dict[str, object] | None = Field(default=None, description="Final state")
+        state: t.Singer.TapConfig | None = Field(
+            default=None, description="Final state"
+        )
         duration_seconds: float = Field(description="Execution duration")
 
     def __init__(self) -> None:
@@ -84,7 +86,10 @@ class FlextMeltanoSingerService(s[str]):
         self.catalog_manager = FlextMeltanoCatalogManager()
         self.state_manager = FlextMeltanoStateManager()
 
-    def discover_tap_catalog(self, tap: object) -> r[dict[str, object]]:
+    def discover_tap_catalog(
+        self,
+        tap: singer_p.SingerTap,
+    ) -> r[t.Singer.StreamCatalog]:
         """Discover catalog from a tap instance.
 
         Args:
@@ -102,14 +107,14 @@ class FlextMeltanoSingerService(s[str]):
             return result
         except Exception as e:
             self.logger.exception("Tap discovery failed", error=str(e))
-            return r[dict[str, object]].fail(f"Tap discovery failed: {e}")
+            return r[t.Singer.StreamCatalog].fail(f"Tap discovery failed: {e}")
 
     def execute_sync(
         self,
-        tap: object,
-        target: object,
-        catalog: dict[str, object],
-        state: dict[str, object] | None = None,
+        tap: singer_p.SingerTap,
+        target: singer_p.SingerTarget,
+        catalog: t.Singer.StreamCatalog,
+        state: t.Singer.TapConfig | None = None,
     ) -> r[FlextMeltanoSingerService.SyncResult]:
         """Execute a complete Singer sync pipeline.
 
@@ -124,15 +129,6 @@ class FlextMeltanoSingerService(s[str]):
 
         """
         try:
-            if not hasattr(tap, "sync"):
-                return r[FlextMeltanoSingerService.SyncResult].fail(
-                    "Tap must have sync() method",
-                )
-            if not hasattr(target, "consume"):
-                return r[FlextMeltanoSingerService.SyncResult].fail(
-                    "Target must have consume() method",
-                )
-
             self.logger.info("Starting Singer sync")
 
             records_processed = 0
@@ -143,12 +139,11 @@ class FlextMeltanoSingerService(s[str]):
             state_dict = state or {}
 
             # Get records from tap
-            if hasattr(tap, "sync"):
-                tap.sync(catalog, state_dict)
+            records: t.Singer.MessageBatch = []
+            tap.sync(catalog, state_dict)
 
             # The target consumes from tap's output
-            if hasattr(target, "consume"):
-                target.consume(None)
+            target.consume(records)
 
             result = FlextMeltanoSingerService.SyncResult(
                 records_processed=records_processed,
@@ -170,7 +165,7 @@ class FlextMeltanoSingerService(s[str]):
                 f"Singer sync failed: {e}",
             )
 
-    def load_catalog_from_file(self, catalog_path: Path) -> r[dict[str, object]]:
+    def load_catalog_from_file(self, catalog_path: Path) -> r[t.Singer.StreamCatalog]:
         """Load catalog from file.
 
         Args:
@@ -184,7 +179,7 @@ class FlextMeltanoSingerService(s[str]):
 
     def save_catalog_to_file(
         self,
-        catalog: dict[str, object],
+        catalog: t.Singer.StreamCatalog,
         catalog_path: Path,
     ) -> r[None]:
         """Save catalog to file.
@@ -203,7 +198,7 @@ class FlextMeltanoSingerService(s[str]):
     def load_state_from_file(
         self,
         state_path: Path | None = None,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.Singer.TapConfig]:
         """Load state from file.
 
         Args:

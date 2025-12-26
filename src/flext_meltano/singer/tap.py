@@ -12,21 +12,16 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextService
 from singer_sdk import Stream, Tap
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
+# Import order: c -> t -> p -> r -> m -> u
+from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import u
+from flext_meltano.typings import FlextMeltanoTypes as t
 
-# Import aliases for simplified usage
+# Result alias
 r = FlextResult
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-s = FlextService
 
 
-class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
+class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
     """UNIFIED Source Abstractions class consolidating ALL source functionality.
 
     This single class provides:
@@ -50,7 +45,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     def discover_streams(
         self,
         source_config: m.DataSourceConfig,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.Singer.StreamCatalog]:
         """Discover available streams for a source configuration.
 
         Args:
@@ -69,30 +64,24 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Validate source configuration
             if not source_config.source_type:
-                return r[dict[str, object]].fail(
+                return r[t.Singer.StreamCatalog].fail(
                     "Source configuration must have name and type for discovery",
                 )
 
-            # For now, return empty catalog - would integrate with actual Singer taps
-            catalog: dict[str, object] = {
-                "streams": [],
-                "source_name": source_config.source_type,
-                "source_type": source_config.source_type,
-            }
+            # Return empty catalog - would integrate with actual Singer taps
+            catalog: t.Singer.StreamCatalog = {"streams": []}
 
-            streams_raw: list[object] = u.get(catalog, "streams", default=[])
-            streams = streams_raw if isinstance(streams_raw, list) else []
-            stream_count = u.count(streams)
+            streams = catalog.get("streams", [])
             self.logger.info(
                 "Stream discovery completed",
-                stream_count=stream_count,
+                stream_count=len(streams),
             )
 
-            return r[dict[str, object]].ok(catalog)
+            return r[t.Singer.StreamCatalog].ok(catalog)
 
         except Exception as e:
             self.logger.exception("Stream discovery failed", error=str(e))
-            return r[dict[str, object]].fail(f"Stream discovery failed: {e}")
+            return r[t.Singer.StreamCatalog].fail(f"Stream discovery failed: {e}")
 
     def validate_stream_schema(self, stream_def: m.StreamDefinition) -> r[bool]:
         """Validate a stream definition's schema.
@@ -199,13 +188,15 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
-    def execute(
-        self,
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Execute source abstraction operations (implements Service)."""
-        # This would orchestrate the overall source abstraction workflow
-        # For now, return the current configuration
-        return r[t.MeltanoCore.MeltanoConfigDict].ok(self._meltano_config.model_dump())
+    def execute(self) -> r[t.Singer.StreamCatalog]:
+        """Execute source abstraction operations (implements Service).
+
+        Returns:
+            FlextResult containing empty stream catalog ready for discovery
+
+        """
+        # Return empty catalog ready for stream discovery
+        return r[t.Singer.StreamCatalog].ok({"streams": []})
 
 
 # Export Singer SDK types with FLEXT naming

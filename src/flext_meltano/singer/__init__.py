@@ -3,42 +3,25 @@
 This module provides deep integration with singer-sdk following the Singer
 specification with FLEXT ecosystem patterns and railway-oriented programming.
 
+NOTE: Heavy modules (service, tap, target) are NOT imported at package level
+to avoid circular imports. Import them explicitly when needed:
+    from flext_meltano.singer.service import FlextMeltanoSingerService
+    from flext_meltano.singer.tap import FlextMeltanoTap
+
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
-from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+# Only import lightweight modules that don't depend on models.py
 from flext_meltano.singer.protocols import (
     FlextMeltanoPluginProtocols,
     FlextMeltanoSingerProtocols,
 )
-from flext_meltano.singer.service import FlextMeltanoSingerService
-from flext_meltano.singer.state import FlextMeltanoStateManager
-from flext_meltano.singer.tap import (
-    FlextMeltanoStream,
-    FlextMeltanoTap,
-    FlextMeltanoTapAbstractions,
-)
-from flext_meltano.singer.target import (
-    FlextMeltanoTarget,
-    FlextMeltanoTargetAbstractions,
-)
 
 __all__ = [
-    # Managers
-    "FlextMeltanoCatalogManager",
+    # Protocols only - other modules must be imported explicitly
     "FlextMeltanoPluginProtocols",
-    # Protocols
     "FlextMeltanoSingerProtocols",
-    # Service orchestration
-    "FlextMeltanoSingerService",
-    "FlextMeltanoStateManager",
-    # Core SDK wrappers
-    "FlextMeltanoStream",
-    "FlextMeltanoTap",
-    "FlextMeltanoTapAbstractions",
-    "FlextMeltanoTarget",
-    "FlextMeltanoTargetAbstractions",
 ]

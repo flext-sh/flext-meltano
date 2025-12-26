@@ -10,9 +10,8 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from typing import cast
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.constants import FlextMeltanoConstants
@@ -77,7 +76,7 @@ class FlextMeltanoAPIPipelineOperations:
                 if hasattr(self.api, "config")
                 else None
             )
-            pipeline_config = {
+            pipeline_config: dict[str, FlextTypes.JsonValue] = {
                 "pipeline_id": pipeline_id,
                 "tap": tap_name,
                 "target": target_name,
@@ -108,9 +107,7 @@ class FlextMeltanoAPIPipelineOperations:
                     u.from_(config_obj, "project_root", as_type=str, default="."),
                 ),
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast("t.MeltanoCore.MeltanoConfigDict", pipeline_config),
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(pipeline_config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline creation failed: {e}",
@@ -131,7 +128,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            execution_result = {
+            execution_result: dict[str, FlextTypes.JsonValue] = {
                 "pipeline_id": pipeline_id,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -139,9 +136,7 @@ class FlextMeltanoAPIPipelineOperations:
                 "configuration": u.or_(config, {}),
                 "api_version": self.api.version,
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast("t.MeltanoCore.MeltanoConfigDict", execution_result),
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(execution_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Pipeline execution failed: {e}",
@@ -169,7 +164,7 @@ class FlextMeltanoAPIPipelineOperations:
             transform_duration = 0.7 if bool(dbt_models) else 0.0
             total_duration = time.time() - execution_start
 
-            elt_result = {
+            elt_result: dict[str, FlextTypes.JsonValue] = {
                 "tap": tap_name,
                 "target": target_name,
                 "dbt_models": u.or_(dbt_models, []),
@@ -184,9 +179,7 @@ class FlextMeltanoAPIPipelineOperations:
                 "executed_at": str(time.time()),
                 "api_version": self.api.version,
             }
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast("t.MeltanoCore.MeltanoConfigDict", elt_result),
-            )
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"ELT pipeline execution failed: {e}",
@@ -213,18 +206,14 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast(
-                    "t.MeltanoCore.MeltanoConfigDict",
-                    {
-                        "tap_name": tap_name,
-                        "status": "completed",
-                        "execution_duration": execution_duration,
-                        "executed_at": str(time.time()),
-                        "api_version": self.api.version,
-                    },
-                ),
-            )
+            result_dict: dict[str, FlextTypes.JsonValue] = {
+                "tap_name": tap_name,
+                "status": "completed",
+                "execution_duration": execution_duration,
+                "executed_at": str(time.time()),
+                "api_version": self.api.version,
+            }
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(result_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
 
@@ -244,18 +233,14 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(
-                cast(
-                    "t.MeltanoCore.MeltanoConfigDict",
-                    {
-                        "target_name": target_name,
-                        "status": "completed",
-                        "execution_duration": execution_duration,
-                        "executed_at": str(time.time()),
-                        "api_version": self.api.version,
-                    },
-                ),
-            )
+            result_dict: dict[str, FlextTypes.JsonValue] = {
+                "target_name": target_name,
+                "status": "completed",
+                "execution_duration": execution_duration,
+                "executed_at": str(time.time()),
+                "api_version": self.api.version,
+            }
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(result_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Target execution failed: {e}",

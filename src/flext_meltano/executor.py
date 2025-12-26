@@ -11,31 +11,24 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
 
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
-from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import u
 
 # Import aliases for simplified usage
 r = FlextResult
-s = FlextService
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
 
 
-class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
+class FlextMeltanoExecutor(FlextService[t.JsonValue]):
     """Unified executor architecture following flext-core patterns.
 
     Provides complete Meltano command execution with proper error handling,
@@ -44,7 +37,8 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
 
     # Instance attributes for type checker
     _bridge: FlextMeltanoBridge
-    _adapter: object | None
+    _adapter: FlextMeltanoAdapter | None
+    _meltano_config: FlextMeltanoSettings
 
     def __init__(self, config: t.MeltanoCore.MeltanoConfigDict | None = None) -> None:
         """Initialize executor with configuration."""
@@ -53,12 +47,12 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         config_guard = u.guard(config, dict, return_value=True)
         if config_guard:
             try:
-                self._config = FlextMeltanoSettings.model_validate(config_guard)
+                self._meltano_config = FlextMeltanoSettings.model_validate(config_guard)
             except (ValueError, TypeError, KeyError, AttributeError, OSError):
                 # Fall back to default config if validation fails
-                self._config = FlextMeltanoSettings()
+                self._meltano_config = FlextMeltanoSettings()
         else:
-            self._config = FlextMeltanoSettings()
+            self._meltano_config = FlextMeltanoSettings()
         self._bridge = FlextMeltanoBridge()
         self._adapter = None
         # Type guard for mypy - logger is always initialized
@@ -66,7 +60,7 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             error_msg = "Logger initialization failed"
             raise RuntimeError(error_msg)
 
-    def execute(self) -> r[t.MeltanoCore.JsonValue]:
+    def execute(self) -> r[t.JsonValue]:
         """Execute the Meltano executor service.
 
         Returns:
@@ -74,24 +68,23 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
 
         """
         try:
-            config_data: t.MeltanoCore.MeltanoConfigDict = {
+            # Type narrowing: dict is already JsonValue compatible
+            config_data: t.MeltanoCore.ExecutionResultDict = {
                 "executor_type": "flext_meltano_executor",
                 "status": "ready",
                 "execution_timestamp": str(time.time()),
-                "config": self._config.model_dump()
-                if self._config is not None and hasattr(self._config, "model_dump")
+                "config": self._meltano_config.model_dump()
+                if hasattr(self._meltano_config, "model_dump")
                 else {},
             }
 
             self.logger.info("FlextMeltanoExecutor executed successfully")
-            return r[t.MeltanoCore.JsonValue].ok(
-                cast("t.MeltanoCore.JsonValue", config_data),
-            )
+            return r[t.JsonValue].ok(config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Executor execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MeltanoCore.JsonValue].fail(error_msg)
+            return r[t.JsonValue].fail(error_msg)
 
     def execute_command(
         self,
@@ -198,17 +191,15 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
     @property
     def project_root(self) -> Path:
         """Get project root directory - delegates to config."""
-        project_root = getattr(self._config, "project_root", None)
+        project_root = getattr(self._meltano_config, "project_root", None)
         if isinstance(project_root, (str, Path)):
             return Path(project_root)
         return Path.cwd()
 
     @property
-    def meltano_adapter(self) -> object:
+    def meltano_adapter(self) -> FlextMeltanoAdapter:
         """Get Meltano adapter with lazy initialization."""
         if self._adapter is None:
-            # Import here to avoid circular import
-
             self._adapter = FlextMeltanoAdapter()
         return self._adapter
 
@@ -227,38 +218,40 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             return r[int].ok(1)
         return self._route_command(args[0], args[1:]).map(lambda _: 0)
 
-    def run(self, args: list[str]) -> r[dict[str, object]]:
+    def run(self, args: list[str]) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Run command with arguments - delegates to command router."""
         if not args:
-            return r[dict[str, object]].fail("Arguments cannot be empty")
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                "Arguments cannot be empty"
+            )
         command = args[0]
         command_args = args[1:]
         return self._route_command(command, command_args)
 
-    def run_cli(self, args: list[str] | None) -> r[dict[str, object]]:
+    def run_cli(self, args: list[str] | None) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
-            return r[dict[str, object]].ok({
+            return r[t.MeltanoCore.ExecutionResultDict].ok({
                 "status": "ready",
                 "command_type": "cli",
                 "message": "CLI ready for commands",
             })
         return self.run(args)
 
-    def version(self) -> r[dict[str, object]]:
+    def version(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get version information - delegates to handler."""
         return self._execute_version_command()
 
-    def help(self) -> r[dict[str, object]]:
+    def help(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get help information - delegates to handler."""
         return self._execute_help_command()
 
-    def health(self) -> r[dict[str, object]]:
+    def health(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Check system health - delegates to handler."""
         return self._execute_health_command()
 
     @staticmethod
-    def list_commands() -> r[dict[str, object]]:
+    def list_commands() -> r[t.MeltanoCore.ExecutionResultDict]:
         """List available commands - returns command list."""
         commands_list = [
             "version",
@@ -271,81 +264,89 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
             "invoke",
             "select",
         ]
-        return r[dict[str, object]].ok({
+        available = [c for c in commands_list if c in {"version", "help", "health"}]
+        return r[t.MeltanoCore.ExecutionResultDict].ok({
             "commands": commands_list,
-            "available_commands": u.filter(
-                commands_list,
-                lambda c: c in {"version", "help", "health"},
-            ),
+            "available_commands": available,
         })
 
     @staticmethod
-    def list_plugins() -> r[list[dict[str, object]]]:
+    def list_plugins() -> r[list[t.Plugin.PluginDefinition]]:
         """List available plugins - delegates to adapter."""
         try:
             # Return empty list - full implementation delegates to adapter
-            return r[list[dict[str, object]]].ok([])
+            return r[list[t.Plugin.PluginDefinition]].ok([])
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[dict[str, object]]].fail(f"Failed to list plugins: {e}")
+            return r[list[t.Plugin.PluginDefinition]].fail(
+                f"Failed to list plugins: {e}"
+            )
 
-    def run_pipeline(self, tap_name: str, target_name: str) -> r[dict[str, object]]:
+    def run_pipeline(
+        self,
+        tap_name: str,
+        target_name: str,
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Run complete ELT pipeline - delegates to execute_pipeline."""
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
-            lambda r: {
-                "status": "success" if r.success else "failed",
+            lambda execution_result: {
+                "status": "success" if execution_result.success else "failed",
                 "command": f"{tap_name} -> {target_name}",
-                "exit_code": r.exit_code,
-                "output": r.output,
+                "exit_code": execution_result.exit_code,
+                "output": execution_result.output,
             },
         )
 
     @staticmethod
-    def create_flext_cli() -> r[object]:
+    def create_flext_cli() -> r[FlextMeltanoCLI]:
         """Create FLEXT CLI instance - delegates to CLI module."""
         try:
             cli = FlextMeltanoCLI()
-            return r[object].ok(cli)
+            return r[FlextMeltanoCLI].ok(cli)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[object].fail(f"Failed to create CLI: {e}")
+            return r[FlextMeltanoCLI].fail(f"Failed to create CLI: {e}")
 
     @staticmethod
-    def create_cli_runner(args: list[str]) -> r[dict[str, object]]:
+    def create_cli_runner(args: list[str]) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
             return (
                 executor.run(args)
                 if args
-                else r[dict[str, object]].ok({
+                else r[t.MeltanoCore.ExecutionResultDict].ok({
                     "status": "ready",
                     "command_type": "cli_runner",
                     "args": args,
                 })
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Failed to create CLI runner: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].fail(
+                f"Failed to create CLI runner: {e}"
+            )
 
     # ========================================================================
     # PRIVATE DELEGATION HANDLERS - Using SOLID pattern with single purpose
     # ========================================================================
 
-    def _handle_version_command(self) -> r[dict[str, object]]:
+    def _handle_version_command(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle version command - delegates to executor."""
         return self._execute_version_command()
 
-    def _handle_help_command(self) -> r[dict[str, object]]:
+    def _handle_help_command(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle help command - delegates to executor."""
         return self._execute_help_command()
 
-    def _handle_default_command(self, args: list[str]) -> r[dict[str, object]]:
+    def _handle_default_command(
+        self, args: list[str]
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle default command - delegates to action executor."""
         return self._execute_action_command("default", args)
 
     @staticmethod
-    def _execute_version_command() -> r[dict[str, object]]:
+    def _execute_version_command() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute version command - returns version info."""
-        return r[dict[str, object]].ok({
+        return r[t.MeltanoCore.ExecutionResultDict].ok({
             "command": "version",
             "command_type": "version",
             "status": "success",
@@ -355,9 +356,9 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         })
 
     @staticmethod
-    def _execute_help_command() -> r[dict[str, object]]:
+    def _execute_help_command() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute help command - returns help info."""
-        return r[dict[str, object]].ok({
+        return r[t.MeltanoCore.ExecutionResultDict].ok({
             "command": "help",
             "command_type": "help",
             "status": "success",
@@ -365,9 +366,9 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         })
 
     @staticmethod
-    def _execute_health_command() -> r[dict[str, object]]:
+    def _execute_health_command() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute health command - delegates to adapter."""
-        return r[dict[str, object]].ok({
+        return r[t.MeltanoCore.ExecutionResultDict].ok({
             "command": "health",
             "command_type": "health",
             "status": "healthy",
@@ -376,51 +377,58 @@ class FlextMeltanoExecutor(s[t.MeltanoCore.JsonValue]):
         })
 
     @staticmethod
-    def _execute_action_command(action: str, args: list[str]) -> r[dict[str, object]]:
+    def _execute_action_command(
+        action: str, args: list[str]
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute action command - delegates to appropriate handler."""
         try:
-            return r[dict[str, object]].ok({
+            return r[t.MeltanoCore.ExecutionResultDict].ok({
                 "command": action,
                 "action": action,
                 "args": args,
                 "status": "executed",
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, object]].fail(f"Action failed: {e}")
+            return r[t.MeltanoCore.ExecutionResultDict].fail(f"Action failed: {e}")
 
-    def _route_command(self, command: str, args: list[str]) -> r[dict[str, object]]:
+    def _route_command(
+        self,
+        command: str,
+        args: list[str],
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Route command to appropriate handler - delegates to handlers."""
-        command_map: dict[str, Callable[[], r[dict[str, object]]]] = {
-            "version": self._execute_version_command,
-            "help": self._execute_help_command,
-            "health": self._execute_health_command,
-        }
-        handler = u.get(command_map, command)
-        if handler and callable(handler):
-            return handler()
+        # Map commands directly without using u.get to maintain type safety
+        if command == "version":
+            return self._execute_version_command()
+        if command == "help":
+            return self._execute_help_command()
+        if command == "health":
+            return self._execute_health_command()
         return self._execute_action_command(command, args)
 
     @staticmethod
-    def _handle_cli_no_args() -> r[dict[str, object]]:
+    def _handle_cli_no_args() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle CLI with no arguments - delegates to ready state."""
-        return r[dict[str, object]].ok({
+        return r[t.MeltanoCore.ExecutionResultDict].ok({
             "status": "ready",
             "command_type": "cli",
             "message": "No arguments provided - ready for commands",
         })
 
-    def _handle_cli_version_args(self) -> r[dict[str, object]]:
+    def _handle_cli_version_args(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle CLI version arguments - delegates to version handler."""
         return self._execute_version_command()
 
-    def _handle_cli_help_args(self) -> r[dict[str, object]]:
+    def _handle_cli_help_args(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle CLI help arguments - delegates to help handler."""
         return self._execute_help_command()
 
-    def _handle_cli_other_args(self, args: list[str]) -> r[dict[str, object]]:
+    def _handle_cli_other_args(
+        self, args: list[str]
+    ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Handle CLI other arguments - delegates to action executor."""
         if not args:
-            return r[dict[str, object]].ok({
+            return r[t.MeltanoCore.ExecutionResultDict].ok({
                 "status": "ready",
                 "command_type": "cli",
                 "message": "Ready for commands",

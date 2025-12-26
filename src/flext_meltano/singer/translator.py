@@ -78,8 +78,7 @@ All methods return `r[T]` for type-safe error handling:
 ```python
 # Example: Chain operations with FlextResult
 result = (
-    FlextMeltanoSingerCliTranslator
-    .translate_tap_run(tap_params)
+    FlextMeltanoSingerCliTranslator.translate_tap_run(tap_params)
     .flat_map(lambda cmd: FlextMeltanoSingerCliTranslator.execute_singer_command(cmd))
     .map(lambda output: output["stdout"])
 )
@@ -250,7 +249,7 @@ class FlextMeltanoSingerCliTranslator:
         command: list[str],
         input_data: str | None = None,
         timeout: int = 300,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.CLI.ProcessResult]:
         """Execute Singer SDK command and capture output.
 
         Args:
@@ -264,10 +263,12 @@ class FlextMeltanoSingerCliTranslator:
         """
         # Validate command to prevent execution of untrusted input
         if not command or not isinstance(command, list):
-            return r[dict[str, object]].fail("Invalid command: must be non-empty list")
+            return r[t.CLI.ProcessResult].fail(
+                "Invalid command: must be non-empty list"
+            )
 
         if not all(isinstance(arg, str) for arg in command):
-            return r[dict[str, object]].fail(
+            return r[t.CLI.ProcessResult].fail(
                 "Invalid command: all arguments must be strings"
             )
 
@@ -285,7 +286,7 @@ class FlextMeltanoSingerCliTranslator:
             )
 
             # Return execution results
-            output_dict: dict[str, object] = {
+            output_dict: t.CLI.ProcessResult = {
                 "stdout": proc_result.stdout.decode() if proc_result.stdout else "",
                 "stderr": proc_result.stderr.decode() if proc_result.stderr else "",
                 "returncode": proc_result.returncode,
@@ -296,13 +297,13 @@ class FlextMeltanoSingerCliTranslator:
                 stderr_msg = output_dict.get("stderr", "Command execution failed")
                 if not isinstance(stderr_msg, str):
                     stderr_msg = "Command execution failed"
-                return r[dict[str, object]].fail(stderr_msg)
+                return r[t.CLI.ProcessResult].fail(stderr_msg)
 
-            return r[dict[str, object]].ok(output_dict)
+            return r[t.CLI.ProcessResult].ok(output_dict)
         except subprocess.TimeoutExpired as e:
-            return r[dict[str, object]].fail(f"Command timeout: {e}")
+            return r[t.CLI.ProcessResult].fail(f"Command timeout: {e}")
         except Exception as e:
-            return r[dict[str, object]].fail(f"Command execution failed: {e}")
+            return r[t.CLI.ProcessResult].fail(f"Command execution failed: {e}")
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

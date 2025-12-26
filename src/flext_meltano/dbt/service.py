@@ -11,22 +11,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
+from flext_meltano.dbt.project import DbtProjectInfo, FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import DbtRunResult, DbtTestResult, FlextMeltanoDbtRunner
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
-
-# Import aliases for simplified usage
-# u is already imported from flext_core
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
-class FlextMeltanoDbtService(FlextService[str]):
+class FlextMeltanoDbtService(s[str]):
     """Orchestrates DBT transformations with deep SDK integration.
 
     Provides complete DBT orchestration including:
@@ -54,7 +46,7 @@ class FlextMeltanoDbtService(FlextService[str]):
     def load_project(
         self,
         root: Path,
-    ) -> FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo]:
+    ) -> r[DbtProjectInfo]:
         """Load a DBT project.
 
         Args:
@@ -73,13 +65,13 @@ class FlextMeltanoDbtService(FlextService[str]):
             return result
         except Exception as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return FlextResult[FlextMeltanoDbtProjectManager.ProjectInfo].fail(
+            return r[DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
             )
 
     def get_project_models(
         self,
-    ) -> FlextResult[list[dict[str, object]]]:
+    ) -> r[list[mt.MeltanoCore.DbtModelDict]]:
         """Get all models from the project.
 
         Returns:
@@ -95,7 +87,7 @@ class FlextMeltanoDbtService(FlextService[str]):
             return result
         except Exception as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return FlextResult[list[dict[str, object]]].fail(
+            return r[list[mt.MeltanoCore.DbtModelDict]].fail(
                 f"Failed to get models: {e}",
             )
 
@@ -103,7 +95,7 @@ class FlextMeltanoDbtService(FlextService[str]):
         self,
         models: list[str] | None = None,
         **kwargs: object,
-    ) -> FlextResult[DbtRunResult]:
+    ) -> r[DbtRunResult]:
         """Run DBT models.
 
         Args:
@@ -126,7 +118,7 @@ class FlextMeltanoDbtService(FlextService[str]):
             return result
         except Exception as e:
             self.logger.exception("DBT run failed", error=str(e))
-            return FlextResult[DbtRunResult].fail(
+            return r[DbtRunResult].fail(
                 f"DBT run failed: {e}",
             )
 
@@ -134,7 +126,7 @@ class FlextMeltanoDbtService(FlextService[str]):
         self,
         models: list[str] | None = None,
         **kwargs: object,
-    ) -> FlextResult[DbtTestResult]:
+    ) -> r[DbtTestResult]:
         """Run DBT tests.
 
         Args:
@@ -157,11 +149,11 @@ class FlextMeltanoDbtService(FlextService[str]):
             return result
         except Exception as e:
             self.logger.exception("DBT tests failed", error=str(e))
-            return FlextResult[DbtTestResult].fail(
+            return r[DbtTestResult].fail(
                 f"DBT tests failed: {e}",
             )
 
-    def generate_docs(self, **kwargs: object) -> FlextResult[dict[str, object]]:
+    def generate_docs(self, **kwargs: object) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -179,15 +171,14 @@ class FlextMeltanoDbtService(FlextService[str]):
             return result
         except Exception as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return FlextResult[dict[str, object]].fail(
+            return r[mt.MeltanoCore.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",
             )
 
-    @staticmethod
-    def execute() -> FlextResult[str]:
+    def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
         msg = "DBT service initialized"
-        return FlextResult[str].ok(msg)
+        return r[str].ok(msg)
 
 
 __all__ = [

@@ -12,21 +12,21 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import t
-from flext_meltano.utilities import u
+from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.utilities import FlextMeltanoUtilities
 
-# Import aliases for concise usage
-r = FlextResult
-s = FlextService
+# Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
+t = FlextMeltanoTypes
+r = FlextResult
 m = FlextMeltanoModels
+u = FlextMeltanoUtilities
+s = FlextService
 
 
 class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -155,7 +155,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.exception("Sink instance creation failed", error=str(e))
             return r[m.DataSinkInstance].fail(f"Sink instance creation failed: {e}")
 
-    def handle_schema_message(self, schema: dict[str, object]) -> r[bool]:
+    def handle_schema_message(self, schema: t.MeltanoCore.SingerSchemaDict) -> r[bool]:
         """Handle Singer SCHEMA message for target.
 
         Args:
@@ -186,7 +186,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.exception("Schema message handling failed", error=str(e))
             return r[bool].fail(f"Schema message handling failed: {e}")
 
-    def handle_record_message(self, record: dict[str, object]) -> r[bool]:
+    def handle_record_message(self, record: t.MeltanoCore.SingerRecordDict) -> r[bool]:
         """Handle Singer RECORD message for target.
 
         Args:
@@ -214,7 +214,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.exception("Record message handling failed", error=str(e))
             return r[bool].fail(f"Record message handling failed: {e}")
 
-    def handle_state_message(self, state: dict[str, object]) -> r[bool]:
+    def handle_state_message(self, state: t.MeltanoCore.SingerStateDict) -> r[bool]:
         """Handle Singer STATE message for target.
 
         Args:
@@ -244,9 +244,9 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def batch_records_for_insert(
         self,
-        records: list[dict[str, object]],
+        records: list[t.MeltanoCore.SingerRecordDict],
         batch_size: int = 500,
-    ) -> r[list[list[dict[str, object]]]]:
+    ) -> r[list[list[t.MeltanoCore.SingerRecordDict]]]:
         """Batch records for efficient insert operations.
 
         Args:
@@ -265,19 +265,18 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if not records:
-                return r[list[list[dict[str, object]]]].fail(
+                return r[list[list[t.MeltanoCore.SingerRecordDict]]].fail(
                     "Record list cannot be empty",
                 )
 
             if batch_size <= 0:
-                return r[list[list[dict[str, object]]]].fail(
+                return r[list[list[t.MeltanoCore.SingerRecordDict]]].fail(
                     "Batch size must be positive",
                 )
 
             # Create batches
-            batches: list[list[dict[str, object]]] = cast(
-                "list[list[dict[str, object]]]",
-                u.chunk(records, batch_size),
+            batches: list[list[t.MeltanoCore.SingerRecordDict]] = u.chunk(
+                records, batch_size
             )
 
             self.logger.info(
@@ -287,17 +286,19 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 batch_size=batch_size,
             )
 
-            return r[list[list[dict[str, object]]]].ok(batches)
+            return r[list[list[t.MeltanoCore.SingerRecordDict]]].ok(batches)
 
         except Exception as e:
             self.logger.exception("Record batching failed", error=str(e))
-            return r[list[list[dict[str, object]]]].fail(f"Record batching failed: {e}")
+            return r[list[list[t.MeltanoCore.SingerRecordDict]]].fail(
+                f"Record batching failed: {e}"
+            )
 
     def process_record_as_upsert(
         self,
-        record: dict[str, object],
+        record: t.MeltanoCore.SingerRecordDict,
         unique_keys: list[str],
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.SingerRecordDict]:
         """Prepare record for upsert operation.
 
         Args:
@@ -315,22 +316,22 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if not record:
-                return r[dict[str, object]].fail("Record cannot be empty")
+                return r[t.MeltanoCore.SingerRecordDict].fail("Record cannot be empty")
 
             if not unique_keys:
-                return r[dict[str, object]].fail(
+                return r[t.MeltanoCore.SingerRecordDict].fail(
                     "Unique keys cannot be empty for upsert",
                 )
 
             # Validate all unique keys exist in record
             missing_keys = u.filter(unique_keys, lambda key: key not in record)
             if missing_keys:
-                return r[dict[str, object]].fail(
+                return r[t.MeltanoCore.SingerRecordDict].fail(
                     f"Record missing unique keys: {missing_keys}",
                 )
 
             # Add upsert operation metadata
-            processed_record = dict(record)
+            processed_record: t.MeltanoCore.SingerRecordDict = dict(record)
             processed_record["__sdc_operation"] = "UPSERT"
             processed_record["__sdc_key_columns"] = unique_keys
 
@@ -338,16 +339,18 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 "Record processed for upsert",
             )
 
-            return r[dict[str, object]].ok(processed_record)
+            return r[t.MeltanoCore.SingerRecordDict].ok(processed_record)
 
         except Exception as e:
             self.logger.exception("Record upsert processing failed", error=str(e))
-            return r[dict[str, object]].fail(f"Record upsert processing failed: {e}")
+            return r[t.MeltanoCore.SingerRecordDict].fail(
+                f"Record upsert processing failed: {e}"
+            )
 
     def process_record_as_insert(
         self,
-        record: dict[str, object],
-    ) -> r[dict[str, object]]:
+        record: t.MeltanoCore.SingerRecordDict,
+    ) -> r[t.MeltanoCore.SingerRecordDict]:
         """Prepare record for insert operation.
 
         Args:
@@ -363,54 +366,57 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if not record:
-                return r[dict[str, object]].fail("Record cannot be empty")
+                return r[t.MeltanoCore.SingerRecordDict].fail("Record cannot be empty")
 
             # Add insert operation metadata
-            processed_record = dict(record)
+            processed_record: t.MeltanoCore.SingerRecordDict = dict(record)
             processed_record["__sdc_operation"] = "INSERT"
 
             self.logger.debug(
                 "Record processed for insert",
             )
 
-            return r[dict[str, object]].ok(processed_record)
+            return r[t.MeltanoCore.SingerRecordDict].ok(processed_record)
 
         except Exception as e:
             self.logger.exception("Record insert processing failed", error=str(e))
-            return r[dict[str, object]].fail(f"Record insert processing failed: {e}")
+            return r[t.MeltanoCore.SingerRecordDict].fail(
+                f"Record insert processing failed: {e}"
+            )
 
     @staticmethod
     def create_flext_target_config(
         target_type: str,
-        connection_config: dict[str, object],
+        connection_config: t.Singer.TargetConfig,
         batch_size: int = 1000,
         max_batches: int = 10,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.Singer.TargetConfig]:
         """Create target configuration for flext-target usage."""
         try:
-            config = cast(
-                "dict[str, object]",
-                {
-                    "target_type": target_type,
-                    "connection_config": connection_config,
-                    "batch_size": batch_size,
-                    "max_batches": max_batches,
-                },
-            )
-            return r[dict[str, object]].ok(config)
+            config: t.Singer.TargetConfig = {
+                "target_type": target_type,
+                "connection_config": connection_config,
+                "batch_size": batch_size,
+                "max_batches": max_batches,
+            }
+            return r[t.Singer.TargetConfig].ok(config)
         except Exception as e:
-            return r[dict[str, object]].fail(f"Failed to create target config: {e}")
+            return r[t.Singer.TargetConfig].fail(f"Failed to create target config: {e}")
 
     @staticmethod
     def create_flext_target(
-        config: dict[str, object],
+        config: t.Singer.TargetConfig,
     ) -> r[m.DataSinkDefinition]:
         """Create flext target instance from configuration."""
         try:
             # Create sink definition from config
+            target_type_value = config.get("target_type", "jsonl")
+            sink_type_str = (
+                target_type_value if isinstance(target_type_value, str) else "jsonl"
+            )
             sink_def = m.DataSinkDefinition(
                 sink_name="flext-target",
-                sink_type=cast("str", config.get("target_type", "jsonl")),
+                sink_type=sink_type_str,
                 config={
                     "connection_config": config.get("connection_config", {}),
                     "batch_size": config.get("batch_size", 1000),

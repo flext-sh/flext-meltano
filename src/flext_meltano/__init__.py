@@ -42,20 +42,20 @@ from flext_meltano.models import (
     FlextMeltanoModels as m,
 )
 from flext_meltano.protocols import (
-    FlextMeltanoPluginProtocols,
     FlextMeltanoProtocols,
-    FlextMeltanoSingerProtocols,
     p,
 )
 from flext_meltano.services import FlextMeltanoService
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.singer import (
-    FlextMeltanoCatalogManager,
-    FlextMeltanoSingerService,
-    FlextMeltanoStateManager,
+from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+from flext_meltano.singer.service import FlextMeltanoSingerService
+from flext_meltano.singer.state import FlextMeltanoStateManager
+from flext_meltano.singer.tap import (
     FlextMeltanoStream,
     FlextMeltanoTap,
     FlextMeltanoTapAbstractions,
+)
+from flext_meltano.singer.target import (
     FlextMeltanoTarget,
     FlextMeltanoTargetAbstractions,
 )
@@ -91,12 +91,10 @@ __all__ = [
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoMeltanoService",
     "FlextMeltanoModels",
-    "FlextMeltanoPluginProtocols",
     "FlextMeltanoProjectManager",
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
     "FlextMeltanoSettings",
-    "FlextMeltanoSingerProtocols",
     "FlextMeltanoSingerService",
     "FlextMeltanoStateManager",
     "FlextMeltanoStream",

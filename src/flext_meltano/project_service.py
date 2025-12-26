@@ -12,10 +12,9 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import cast
 
 import yaml
-from flext_core import FlextContainer, r, s, u
+from flext_core import FlextContainer, r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import c
@@ -88,8 +87,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self
-            ._validate_project_parameters(project_id, prefix)
+            self._validate_project_parameters(project_id, prefix)
             .flat_map(
                 lambda params: self._create_temp_directory(params["prefix"]).flat_map(
                     lambda temp_path: self._generate_minimal_config(
@@ -98,12 +96,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
                     ),
                 ),
             )
-            .flat_map(
-                lambda config_data: self._write_meltano_config(
-                    cast("Path", config_data["path"]),
-                    cast("dict[str, object]", config_data["config"]),
-                ),
-            )
+            .flat_map(self._extract_and_write_config)
             .flat_map(self._initialize_project_instance)
             .flat_map(self._convert_to_project_dict)
         )
@@ -127,8 +120,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self
-            ._validate_project_path(project_root)
+            self._validate_project_path(project_root)
             .flat_map(self._validate_meltano_config_exists)
             .flat_map(self._load_project_from_path)
             .flat_map(self._convert_to_project_dict)
@@ -169,8 +161,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self
-            ._validate_project_creation_params(project_name, project_dir)
+            self._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
                     str(params["name"]),
@@ -248,6 +239,38 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         })
 
     @staticmethod
+    def _extract_and_write_config(config_data: dict[str, object]) -> r[Path]:
+        """Extract and validate path and config from generated config data.
+
+        Args:
+            config_data: Dictionary containing 'path' and 'config' keys
+
+        Returns:
+            r containing project path after writing config
+
+        """
+        path_obj = config_data.get("path")
+        config_obj = config_data.get("config")
+
+        # Validate path is a Path object
+        if not isinstance(path_obj, Path):
+            return r[Path].fail(
+                f"Expected Path object, got {type(path_obj).__name__}",
+            )
+
+        # Validate config is a dict
+        if not isinstance(config_obj, dict):
+            return r[Path].fail(
+                f"Expected dict object, got {type(config_obj).__name__}",
+            )
+
+        # Now we have proper types, call _write_meltano_config
+        return FlextMeltanoProjectService._write_meltano_config(
+            path_obj,
+            config_obj,
+        )
+
+    @staticmethod
     def _write_meltano_config(project_path: Path, config: dict[str, object]) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -268,14 +291,20 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         return project_result
 
     @staticmethod
-    def _convert_to_project_dict(project: object) -> r[t.Dbt.Project]:
+    def _convert_to_project_dict(project: t.GeneralValueType) -> r[t.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
+            # Extract attributes using getattr with type narrowing
+            name_attr = getattr(project, "name", None)
+            root_attr = getattr(project, "root", None)
+            settings_attr = getattr(project, "settings", None)
+            version_attr = getattr(project, "meltano_version", None)
+
             project_dict: t.Dbt.Project = {
-                "name": u.get(project, "name", default="meltano_project"),
-                "root": u.get(project, "root", default="unknown"),
-                "settings": u.get(project, "settings", default=""),
-                "meltano_version": u.get(project, "meltano_version", default=""),
+                "name": str(name_attr) if name_attr else "meltano_project",
+                "root": str(root_attr) if root_attr else "unknown",
+                "settings": str(settings_attr) if settings_attr else "",
+                "meltano_version": str(version_attr) if version_attr else "",
             }
             return r[t.Dbt.Project].ok(project_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

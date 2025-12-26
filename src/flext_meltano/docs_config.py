@@ -12,11 +12,10 @@ ARCHITECTURAL INTEGRATION:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar, cast
+from typing import ClassVar
 
 import yaml
 from flext_core import FlextContainer, FlextResult, FlextSettings, u
-from flext_core.protocols import p
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -92,10 +91,13 @@ class DocsConfig(FlextSettings):
     def get_instance(cls) -> DocsConfig:
         """Get singleton instance through FlextContainer."""
         container = FlextContainer.get_global()
-        config_result: p.Result[object] = container.get("DocsConfig")
+        config_result = container.get("DocsConfig")
 
-        if config_result.is_success:
-            return cast("DocsConfig", config_result.value)
+        if config_result.is_success and config_result.value is not None:
+            # Type narrowing: verify instance type before returning
+            value = config_result.value
+            if isinstance(value, cls):
+                return value
 
         # Create and return new instance
         return cls()

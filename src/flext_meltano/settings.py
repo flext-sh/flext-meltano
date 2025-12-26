@@ -11,12 +11,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Self
 
 from flext_core import (
-    FlextExceptions,
     FlextResult,
     FlextSettings,
+    FlextTypes,
 )
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
@@ -27,11 +27,14 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
-t = FlextMeltanoTypes
-m = FlextMeltanoModels
-r = FlextResult
-e = FlextExceptions
+# FLEXT aliases - all AFTER imports per import order rules
+# Order: c → t → r → m → u
 c = FlextMeltanoConstants
+t = FlextMeltanoTypes
+t_core = FlextTypes  # Core types for JsonValue
+r = FlextResult
+m = FlextMeltanoModels
+u = FlextMeltanoUtilities
 
 
 @FlextSettings.auto_register("meltano")
@@ -528,8 +531,8 @@ class FlextMeltanoSettings(FlextSettings):
     def create_for_environment(
         cls,
         environment: str,
-        **kwargs: object,
-    ) -> FlextMeltanoSettings:
+        **kwargs: t_core.JsonValue,
+    ) -> Self:
         """Create configuration for specific environment.
 
         Creates a new configuration instance optimized for the specified
@@ -596,12 +599,12 @@ class FlextMeltanoSettings(FlextSettings):
         return cls.model_validate(config_data)
 
     # ============================================================================
-    # SINGLETON METHODS - Global instance management using FlextSettings as SOURCE OF TRUTH
+    # SINGLETON METHODS - Global instance management (FlextSettings SOURCE)
     # ============================================================================
 
     @classmethod
-    def get_global_instance(cls, **overrides: object) -> FlextMeltanoSettings:
-        """Get the SINGLETON GLOBAL Meltano configuration instance using enhanced pattern.
+    def get_global_instance(cls, **overrides: t_core.JsonValue) -> Self:
+        """Get SINGLETON GLOBAL Meltano config instance (enhanced pattern).
 
         This method ensures a single source of truth for Meltano configuration across
         the entire application. It uses the enhanced singleton pattern with inverse
@@ -648,23 +651,43 @@ class FlextMeltanoSettings(FlextSettings):
         cls._instance = instance
 
     @classmethod
-    def get_version(cls: object) -> str:
-        """Get the version of flext-meltano."""
+    def get_version(cls) -> str:
+        """Get the version of flext-meltano.
+
+        Returns:
+            str: The version string for flext-meltano.
+
+        """
         return "0.9.0"
 
     @classmethod
-    def get_name(cls: object) -> str:
-        """Get the name of flext-meltano."""
+    def get_name(cls) -> str:
+        """Get the name of flext-meltano.
+
+        Returns:
+            str: The name string for flext-meltano.
+
+        """
         return "flext-meltano"
 
     @classmethod
-    def get_default_timeout(cls: object) -> int:
-        """Get the default timeout value."""
+    def get_default_timeout(cls) -> int:
+        """Get the default timeout value.
+
+        Returns:
+            int: The default timeout in seconds.
+
+        """
         return c.Network.DEFAULT_TIMEOUT
 
     @classmethod
-    def get_default_batch_size(cls: object) -> int:
-        """Get the default batch size value."""
+    def get_default_batch_size(cls) -> int:
+        """Get the default batch size value.
+
+        Returns:
+            int: The default batch size for data processing.
+
+        """
         return c.Performance.BatchProcessing.DEFAULT_SIZE
 
     @classmethod
@@ -704,7 +727,7 @@ class FlextMeltanoSettings(FlextSettings):
         # Clear global instance for this class
         # Parent class doesn't have this method, so we implement it here
 
-    def apply_overrides(self, **overrides: object) -> r[None]:
+    def apply_overrides(self, **overrides: t_core.JsonValue) -> r[None]:
         """Apply configuration overrides to this instance.
 
         This method allows runtime modification of configuration values,
@@ -801,7 +824,7 @@ class FlextMeltanoSettings(FlextSettings):
         }
 
         # Add Meltano-specific environment variables
-        # Get log_level from global FlextSettings since FlextMeltanoSettings doesn't have it
+        # Get log_level from global FlextSettings
         global_config = FlextSettings.get_global_instance()
         meltano_env_vars = {
             self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),

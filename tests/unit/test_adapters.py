@@ -14,7 +14,6 @@ from pathlib import Path
 from flext_core import FlextResult
 
 from flext_meltano import FlextMeltanoAdapter
-from tests.flext_tests_compat import FlextTestsMatchers
 
 
 class TestFlextMeltanoAdapter:
@@ -23,41 +22,20 @@ class TestFlextMeltanoAdapter:
     def setup_method(self) -> None:
         """Setup for each test."""
         self.adapter = FlextMeltanoAdapter()
-        # tm is static, no need to instantiate
 
     def test_adapter_initialization(self) -> None:
         """Test adapter initialization."""
         adapter = FlextMeltanoAdapter()
 
-        # Test basic initialization
-        self.test_matchers.assert_is_not_none(
-            adapter,
-            message="Adapter should be initialized",
-        )
-        self.test_matchers.assert_true(
-            condition=hasattr(adapter, "project_adapter"),
-            message="Should have project_adapter",
-        )
-        self.test_matchers.assert_true(
-            condition=hasattr(adapter, "plugin_adapter"),
-            message="Should have plugin_adapter",
-        )
-        self.test_matchers.assert_true(
-            condition=hasattr(adapter, "pipeline_adapter"),
-            message="Should have pipeline_adapter",
-        )
-        self.test_matchers.assert_true(
-            condition=hasattr(adapter, "singer_adapter"),
-            message="Should have singer_adapter",
-        )
-        self.test_matchers.assert_true(
-            condition=hasattr(adapter, "dbt_adapter"),
-            message="Should have dbt_adapter",
-        )
+        assert adapter is not None, "Adapter should be initialized"
+        assert hasattr(adapter, "project_adapter"), "Should have project_adapter"
+        assert hasattr(adapter, "plugin_adapter"), "Should have plugin_adapter"
+        assert hasattr(adapter, "pipeline_adapter"), "Should have pipeline_adapter"
+        assert hasattr(adapter, "singer_adapter"), "Should have singer_adapter"
+        assert hasattr(adapter, "dbt_adapter"), "Should have dbt_adapter"
 
     def test_adapter_project_operations(self) -> None:
         """Test adapter project operations."""
-        # Test project creation
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir) / "test_project"
             result = self.adapter.project_adapter.create_project(
@@ -65,54 +43,28 @@ class TestFlextMeltanoAdapter:
                 project_path,
             )
 
-            # Verify result type
-            self.test_matchers.assert_true(
-                condition=isinstance(result, FlextResult),
-                message="Should return FlextResult",
-            )
+            assert isinstance(result, FlextResult), "Should return FlextResult"
 
     def test_adapter_plugin_operations(self) -> None:
         """Test adapter plugin operations."""
-        # Test plugin discovery
         result = self.adapter.plugin_adapter.discover_plugins()
 
-        # Verify result type
-        FlextTestsMatchers.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
-        )
+        assert isinstance(result, FlextResult), "Should return FlextResult"
 
     def test_adapter_pipeline_operations(self) -> None:
         """Test adapter pipeline operations."""
-        # Test pipeline execution
         result = self.adapter.pipeline_adapter.execute_pipeline(
             "tap-csv",
             "target-jsonl",
         )
 
-        # Verify result type
-        FlextTestsMatchers.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
-        )
+        assert isinstance(result, FlextResult), "Should return FlextResult"
 
     def test_adapter_failure_handling(self) -> None:
         """Test adapter failure handling."""
-        # Test with invalid path (non-existent directory)
         invalid_path = Path("/nonexistent/directory")
         result = self.adapter.project_adapter.create_project("test", invalid_path)
 
-        # Should return failure due to invalid path
-        FlextTestsMatchers.assert_true(
-            condition=isinstance(result, FlextResult),
-            message="Should return FlextResult",
-        )
-        # Note: Current implementation may not fail, so we'll just test the structure
-        FlextTestsMatchers.assert_true(
-            condition=hasattr(result, "is_success"),
-            message="Should have is_success",
-        )
-        FlextTestsMatchers.assert_true(
-            condition=hasattr(result, "error"),
-            message="Should have error",
-        )
+        assert isinstance(result, FlextResult), "Should return FlextResult"
+        assert hasattr(result, "is_success"), "Should have is_success"
+        assert hasattr(result, "error"), "Should have error"

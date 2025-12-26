@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import cast
-
 from flext_core import FlextContainer, e, r, s, u
 
 from flext_meltano.settings import FlextMeltanoSettings
@@ -101,7 +98,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         tap_name: str | None = None,
         target_name: str | None = None,
         project_name: str | None = None,
-        **_data: object,
+        **_data: t.MeltanoCore.JsonValue,
     ) -> None:
         """Initialize generic pipeline service with composition-based architecture.
 
@@ -179,9 +176,9 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         return r[t.MeltanoCore.JsonValue].ok({"streams": []})
 
     @staticmethod
-    def extract(_schema: dict[str, object]) -> r[dict[str, object]]:
+    def extract(_schema: t.MeltanoCore.SchemaDict) -> r[t.MeltanoCore.ResultDict]:
         """Extract data from source - railway-oriented operation."""
-        return r[dict[str, object]].ok({"status": "completed"})
+        return r[t.MeltanoCore.ResultDict].ok({"status": "completed"})
 
     # ============================================================================
     # DATA SINK PROTOCOL - Generic sink operations
@@ -194,10 +191,10 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def load_batch(
-        _records: list[dict[str, object]],
-    ) -> r[dict[str, object]]:
+        _records: list[t.MeltanoCore.RecordDict],
+    ) -> r[t.MeltanoCore.ResultDict]:
         """Load batch of records to sink - railway-oriented operation."""
-        return r[dict[str, object]].ok({"status": "completed"})
+        return r[t.MeltanoCore.ResultDict].ok({"status": "completed"})
 
     # ============================================================================
     # PIPELINE OPERATIONS - Generic pipeline orchestration
@@ -248,7 +245,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     @staticmethod
     def create_source_service(
         source_name: str,
-        **_config: object,
+        **_config: t.MeltanoCore.JsonValue,
     ) -> r[FlextMeltanoService]:
         """Create data source service using railway pattern."""
         try:
@@ -257,15 +254,15 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
                 source_name=source_name,
             )
             return r[FlextMeltanoService].ok(service)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[FlextMeltanoService].fail(
-                f"Failed to create source service '{source_name}': {e}",
+                f"Failed to create source service '{source_name}': {ex}",
             )
 
     @staticmethod
     def create_sink_service(
         sink_name: str,
-        **_config: object,
+        **_config: t.MeltanoCore.JsonValue,
     ) -> r[FlextMeltanoService]:
         """Create data sink service using railway pattern."""
         try:
@@ -274,15 +271,15 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
                 sink_name=sink_name,
             )
             return r[FlextMeltanoService].ok(service)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[FlextMeltanoService].fail(
-                f"Failed to create sink service '{sink_name}': {e}",
+                f"Failed to create sink service '{sink_name}': {ex}",
             )
 
     @staticmethod
     def create_transformation_service(
         transformation_name: str,
-        **_config: object,
+        **_config: t.MeltanoCore.JsonValue,
     ) -> r[FlextMeltanoService]:
         """Create transformation service using railway pattern."""
         try:
@@ -291,27 +288,33 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
                 transformation_name=transformation_name,
             )
             return r[FlextMeltanoService].ok(service)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[FlextMeltanoService].fail(
-                f"Failed to create transformation service '{transformation_name}': {e}",
+                f"Failed to create transformation service '{transformation_name}': {ex}",
             )
 
     # Domain-specific factory methods (DRY delegation to generic methods)
     @staticmethod
-    def create_tap_service(tap_name: str, **config: object) -> r[FlextMeltanoService]:
+    def create_tap_service(
+        tap_name: str,
+        **config: t.MeltanoCore.JsonValue,
+    ) -> r[FlextMeltanoService]:
         """Create Singer tap service - delegates to generic source service."""
         return FlextMeltanoService.create_source_service(tap_name, **config)
 
     @staticmethod
     def create_target_service(
         target_name: str,
-        **config: object,
+        **config: t.MeltanoCore.JsonValue,
     ) -> r[FlextMeltanoService]:
         """Create Singer target service - delegates to generic sink service."""
         return FlextMeltanoService.create_sink_service(target_name, **config)
 
     @staticmethod
-    def create_dbt_service(dbt_name: str, **config: object) -> r[FlextMeltanoService]:
+    def create_dbt_service(
+        dbt_name: str,
+        **config: t.MeltanoCore.JsonValue,
+    ) -> r[FlextMeltanoService]:
         """Create DBT transformation service - delegates to generic transformation service."""
         return FlextMeltanoService.create_transformation_service(dbt_name, **config)
 
@@ -368,9 +371,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             components = list(filtered) if isinstance(filtered, (list, tuple)) else []
 
-        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
-            cast("list[t.MeltanoCore.MeltanoConfigDict]", components)
-        )
+        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(components)
 
     @staticmethod
     def install_component(
@@ -450,17 +451,14 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Test transformation models."""
         models_to_test = models or ["all_models"]
-        return r[t.MeltanoCore.MeltanoConfigDict].ok(
-            cast(
-                "t.MeltanoCore.MeltanoConfigDict",
-                {
-                    "models": models_to_test,
-                    "status": "passed",
-                    "tests_executed": u.mul(u.count(models_to_test), 3),
-                    "configuration": config or {},
-                },
-            ),
-        )
+        # Type narrowing: dict literal is already MeltanoConfigDict compatible
+        result_dict: t.MeltanoCore.MeltanoConfigDict = {
+            "models": models_to_test,
+            "status": "passed",
+            "tests_executed": u.mul(u.count(models_to_test), 3),
+            "configuration": config or {},
+        }
+        return r[t.MeltanoCore.MeltanoConfigDict].ok(result_dict)
 
     @staticmethod
     def run_source(source_name: str) -> r[t.MeltanoCore.MeltanoConfigDict]:
@@ -524,25 +522,23 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(True)
 
+    def validate_config(self) -> r[bool]:
+        """Validate the current service configuration."""
+        return self.validate_service_config(self.meltano_config.model_dump())
+
     @staticmethod
     def _create_service_generic(
         service_type: str,
         name: str,
-        **config: object,
+        **config: t.MeltanoCore.JsonValue,
     ) -> r[FlextMeltanoService]:
         """Generic service factory - delegates to specific creators."""
-        service_map: dict[
-            str,
-            Callable[[str], r[FlextMeltanoService]]
-            | Callable[..., r[FlextMeltanoService]],
-        ] = {
-            "source": FlextMeltanoService.create_source_service,
-            "sink": FlextMeltanoService.create_sink_service,
-            "transformation": FlextMeltanoService.create_transformation_service,
-        }
-        handler = u.get(service_map, service_type)
-        if handler and callable(handler):
-            return handler(name, **config)
+        if service_type == "source":
+            return FlextMeltanoService.create_source_service(name, **config)
+        if service_type == "sink":
+            return FlextMeltanoService.create_sink_service(name, **config)
+        if service_type == "transformation":
+            return FlextMeltanoService.create_transformation_service(name, **config)
         return r[FlextMeltanoService].fail(f"Unknown service type: {service_type}")
 
 

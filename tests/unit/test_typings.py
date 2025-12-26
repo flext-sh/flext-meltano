@@ -9,236 +9,133 @@ SPDX-License-Identifier: MIT
 """
 
 from flext_meltano import t
-from tests.flext_tests_compat import FlextTestsMatchers
 
 
 class Testt:
     """Unit test suite for t."""
 
-    def setup_method(self) -> None:
-        """Setup for each test using flext_tests patterns."""
-        self.test_assertions = FlextTestsMatchers()
-
     def test_plugin_namespace(self) -> None:
         """Test Plugin namespace types."""
         # Test that Plugin namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Plugin"),
-            message="Plugin namespace should exist",
-        )
+        assert hasattr(t, "Plugin"), "Plugin namespace should exist"
 
         # Test Plugin types
         plugin_types = t.Plugin
-        self.test_assertions.assert_true(
-            condition=hasattr(plugin_types, "PluginType"),
-            message="PluginType should exist in Plugin namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(plugin_types, "PluginVariant"),
-            message="PluginVariant should exist in Plugin namespace",
-        )
+        assert hasattr(plugin_types, "PluginType"), "PluginType should exist in Plugin namespace"
+        assert hasattr(plugin_types, "PluginVariant"), "PluginVariant should exist in Plugin namespace"
 
     def test_singer_namespace(self) -> None:
         """Test Singer namespace types."""
         # Test that Singer namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Singer"),
-            message="Singer namespace should exist",
-        )
+        assert hasattr(t, "Singer"), "Singer namespace should exist"
 
         # Test Singer types
         singer_types = t.Singer
-        self.test_assertions.assert_true(
-            condition=hasattr(singer_types, "Record"),
-            message="Record should exist in Singer namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(singer_types, "Schema"),
-            message="Schema should exist in Singer namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(singer_types, "State"),
-            message="State should exist in Singer namespace",
-        )
+        assert hasattr(singer_types, "Record"), "Record should exist in Singer namespace"
+        assert hasattr(singer_types, "Schema"), "Schema should exist in Singer namespace"
+        assert hasattr(singer_types, "State"), "State should exist in Singer namespace"
 
     def test_dbt_namespace(self) -> None:
         """Test DBT namespace types."""
         # Test that DBT namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Dbt"),
-            message="DBT namespace should exist",
-        )
+        assert hasattr(t, "Dbt"), "DBT namespace should exist"
 
         # Test DBT types
         dbt_types = t.Dbt
-        self.test_assertions.assert_true(
-            condition=hasattr(dbt_types, "Model"),
-            message="Model should exist in DBT namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(dbt_types, "Test"),
-            message="Test should exist in DBT namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(dbt_types, "Seed"),
-            message="Seed should exist in DBT namespace",
-        )
+        assert hasattr(dbt_types, "Model"), "Model should exist in DBT namespace"
+        assert hasattr(dbt_types, "Test"), "Test should exist in DBT namespace"
+        assert hasattr(dbt_types, "Seed"), "Seed should exist in DBT namespace"
 
     def test_project_namespace(self) -> None:
         """Test Project namespace types."""
         # Test that Project namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Project"),
-            message="Project namespace should exist",
-        )
+        assert hasattr(t, "Project"), "Project namespace should exist"
 
         # Test Project types
         project_types = t.Project
-        self.test_assertions.assert_true(
-            condition=hasattr(project_types, "ProjectConfig"),
-            message="ProjectConfig should exist in Project namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(project_types, "ProjectMetadata"),
-            message="ProjectMetadata should exist in Project namespace",
-        )
+        assert hasattr(project_types, "ProjectConfig"), "ProjectConfig should exist in Project namespace"
+        assert hasattr(project_types, "ProjectMetadata"), "ProjectMetadata should exist in Project namespace"
 
     def test_pipeline_namespace(self) -> None:
         """Test Pipeline namespace types."""
         # Test that Pipeline namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Pipeline"),
-            message="Pipeline namespace should exist",
-        )
+        assert hasattr(t, "Pipeline"), "Pipeline namespace should exist"
 
         # Test Pipeline types
         pipeline_types = t.Pipeline
-        self.test_assertions.assert_true(
-            condition=hasattr(pipeline_types, "PipelineConfig"),
-            message="PipelineConfig should exist in Pipeline namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(pipeline_types, "PipelineStatus"),
-            message="PipelineStatus should exist in Pipeline namespace",
-        )
+        assert hasattr(pipeline_types, "PipelineConfig"), "PipelineConfig should exist in Pipeline namespace"
+        assert hasattr(pipeline_types, "PipelineStatus"), "PipelineStatus should exist in Pipeline namespace"
 
     def test_bridge_namespace(self) -> None:
         """Test Bridge namespace types."""
         # Test that Bridge namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Bridge"),
-            message="Bridge namespace should exist",
-        )
+        assert hasattr(t, "Bridge"), "Bridge namespace should exist"
 
         # Test Bridge types
         bridge_types = t.Bridge
-        self.test_assertions.assert_true(
-            condition=hasattr(bridge_types, "BridgeMessage"),
-            message="BridgeMessage should exist in Bridge namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(bridge_types, "BridgeResponse"),
-            message="BridgeResponse should exist in Bridge namespace",
-        )
+        assert hasattr(bridge_types, "BridgeMessage"), "BridgeMessage should exist in Bridge namespace"
+        assert hasattr(bridge_types, "BridgeResponse"), "BridgeResponse should exist in Bridge namespace"
 
     def test_cli_namespace(self) -> None:
         """Test CLI namespace types."""
         # Test that CLI namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "CLI"),
-            message="CLI namespace should exist",
-        )
+        assert hasattr(t, "CLI"), "CLI namespace should exist"
 
         # Test CLI types
         cli_types = t.CLI
-        self.test_assertions.assert_true(
-            condition=hasattr(cli_types, "Command"),
-            message="Command should exist in CLI namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(cli_types, "CommandResult"),
-            message="CommandResult should exist in CLI namespace",
-        )
+        assert hasattr(cli_types, "Command"), "Command should exist in CLI namespace"
+        assert hasattr(cli_types, "CommandResult"), "CommandResult should exist in CLI namespace"
 
     def test_elt_namespace(self) -> None:
         """Test ELT namespace types."""
         # Test that ELT namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "ELT"),
-            message="ELT namespace should exist",
-        )
+        assert hasattr(t, "ELT"), "ELT namespace should exist"
 
         # Test ELT types
         elt_types = t.ELT
-        self.test_assertions.assert_true(
-            condition=hasattr(elt_types, "ExtractConfig"),
-            message="ExtractConfig should exist in ELT namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(elt_types, "LoadConfig"),
-            message="LoadConfig should exist in ELT namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(elt_types, "TransformConfig"),
-            message="TransformConfig should exist in ELT namespace",
-        )
+        assert hasattr(elt_types, "ExtractConfig"), "ExtractConfig should exist in ELT namespace"
+        assert hasattr(elt_types, "LoadConfig"), "LoadConfig should exist in ELT namespace"
+        assert hasattr(elt_types, "TransformConfig"), "TransformConfig should exist in ELT namespace"
 
     def test_processing_namespace(self) -> None:
         """Test Processing namespace types."""
         # Test that Processing namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "Processing"),
-            message="Processing namespace should exist",
-        )
+        assert hasattr(t, "Processing"), "Processing namespace should exist"
 
         # Test Processing types
         processing_types = t.Processing
-        self.test_assertions.assert_true(
-            condition=hasattr(processing_types, "SingerExecutionResult"),
-            message="SingerExecutionResult should exist in Processing namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(processing_types, "DbtTransformationResult"),
-            message="DbtTransformationResult should exist in Processing namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(processing_types, "EltPipelineResult"),
-            message="EltPipelineResult should exist in Processing namespace",
-        )
+        assert hasattr(
+            processing_types, "SingerExecutionResult"
+        ), "SingerExecutionResult should exist in Processing namespace"
+        assert hasattr(
+            processing_types, "DbtTransformationResult"
+        ), "DbtTransformationResult should exist in Processing namespace"
+        assert hasattr(
+            processing_types, "EltPipelineResult"
+        ), "EltPipelineResult should exist in Processing namespace"
 
     def test_meltano_core_namespace(self) -> None:
         """Test MeltanoCore namespace types."""
         # Test that MeltanoCore namespace exists
-        self.test_assertions.assert_true(
-            condition=hasattr(t, "MeltanoCore"),
-            message="MeltanoCore namespace should exist",
-        )
+        assert hasattr(t, "MeltanoCore"), "MeltanoCore namespace should exist"
 
         # Test MeltanoCore types
         meltano_core_types = t.MeltanoCore
-        self.test_assertions.assert_true(
-            condition=hasattr(meltano_core_types, "MeltanoConfigDict"),
-            message="MeltanoConfigDict should exist in MeltanoCore namespace",
-        )
-        self.test_assertions.assert_true(
-            condition=hasattr(meltano_core_types, "PluginConfigDict"),
-            message="PluginConfigDict should exist in MeltanoCore namespace",
-        )
+        assert hasattr(
+            meltano_core_types, "MeltanoConfigDict"
+        ), "MeltanoConfigDict should exist in MeltanoCore namespace"
+        assert hasattr(
+            meltano_core_types, "PluginConfigDict"
+        ), "PluginConfigDict should exist in MeltanoCore namespace"
 
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
         # Test that types are properly annotated
         plugin_definition = t.Plugin.PluginDefinition
-        self.test_assertions.assert_true(
-            condition=plugin_definition is not None,
-            message="PluginDefinition should be properly annotated",
-        )
+        assert plugin_definition is not None, "PluginDefinition should be properly annotated"
 
         singer_catalog = t.Singer.CatalogEntry
-        self.test_assertions.assert_true(
-            condition=singer_catalog is not None,
-            message="Singer CatalogEntry should be properly annotated",
-        )
+        assert singer_catalog is not None, "Singer CatalogEntry should be properly annotated"
 
     def test_namespace_organization(self) -> None:
         """Test that types are properly organized in namespaces."""
@@ -257,10 +154,7 @@ class Testt:
         ]
 
         for namespace in expected_namespaces:
-            self.test_assertions.assert_true(
-                condition=hasattr(t, namespace),
-                message=f"Types should have {namespace} namespace",
-            )
+            assert hasattr(t, namespace), f"Types should have {namespace} namespace"
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
@@ -281,33 +175,21 @@ class Testt:
             pass
 
         # If we get here without errors, the types are compatible
-        self.test_assertions.assert_true(
-            condition=True,
-            message="Types should be compatible with type annotations",
-        )
+        assert True, "Types should be compatible with type annotations"
 
     def test_export_completeness(self) -> None:
         """Test that all necessary types are exported."""
         # Test that t is exported
-        self.test_assertions.assert_true(
-            condition=t is not None,
-            message="t should be exported",
-        )
+        assert t is not None, "t should be exported"
 
     def test_type_hierarchy(self) -> None:
         """Test that type hierarchy is properly structured."""
         # Test that namespaces are properly nested
         plugin_namespace = t.Plugin
-        self.test_assertions.assert_true(
-            condition=hasattr(plugin_namespace, "PluginType"),
-            message="Plugin namespace should contain PluginType",
-        )
+        assert hasattr(plugin_namespace, "PluginType"), "Plugin namespace should contain PluginType"
 
         singer_namespace = t.Singer
-        self.test_assertions.assert_true(
-            condition=hasattr(singer_namespace, "Record"),
-            message="Singer namespace should contain Record",
-        )
+        assert hasattr(singer_namespace, "Record"), "Singer namespace should contain Record"
 
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
@@ -316,11 +198,5 @@ class Testt:
         singer_catalog = t.Singer.CatalogEntry
 
         # Both should be type annotations
-        self.test_assertions.assert_true(
-            condition=plugin_definition is not None,
-            message="PluginDefinition should be a valid type",
-        )
-        self.test_assertions.assert_true(
-            condition=singer_catalog is not None,
-            message="Singer CatalogEntry should be a valid type",
-        )
+        assert plugin_definition is not None, "PluginDefinition should be a valid type"
+        assert singer_catalog is not None, "Singer CatalogEntry should be a valid type"

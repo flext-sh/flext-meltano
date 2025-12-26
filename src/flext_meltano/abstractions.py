@@ -12,19 +12,19 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
 from flext_core import FlextLogger, FlextResult, u
-from flext_core.typings import t as t_core
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
-# Import aliases for concise usage
-r = FlextResult
-t = FlextMeltanoTypes
+# Import aliases for concise usage following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
+t = FlextMeltanoTypes
+p = FlextMeltanoProtocols
+r = FlextResult
 m = FlextMeltanoModels
 
 
@@ -68,25 +68,25 @@ class FlextMeltanoAbstractions:
 
         def execute_data_pipeline(
             self,
-            _pipeline_context: dict[str, object],
-            source_config: dict[str, object],
-            sink_config: dict[str, object],
-        ) -> r[dict[str, object]]:
+            _pipeline_context: t.MeltanoCore.NestedJsonDict,
+            source_config: t.MeltanoCore.MeltanoConfigDict,
+            sink_config: t.MeltanoCore.MeltanoConfigDict,
+        ) -> r[t.ELT.PipelineResult]:
             """Execute data pipeline with given context and configurations."""
             try:
                 # This is a simplified implementation
                 # In production, would orchestrate the actual data pipeline
-                result: dict[str, object] = {
+                result: t.ELT.PipelineResult = {
                     "status": "completed",
                     "source": u.get(source_config, "name", default="unknown"),
                     "sink": u.get(sink_config, "name", default="unknown"),
                     "records_processed": 0,
                 }
-                return r[dict[str, object]].ok(result)
+                return r[t.ELT.PipelineResult].ok(result)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 error_msg = f"Failed to execute data pipeline: {e}"
                 self.logger.exception(error_msg)
-                return r[dict[str, object]].fail(error_msg)
+                return r[t.ELT.PipelineResult].fail(error_msg)
 
     # MAIN UNIFIED CLASS INTERFACE
     # ========================================================================
@@ -132,11 +132,14 @@ class FlextMeltanoAbstractions:
             return r[Path].fail(f"Failed to get project root: {e}")
 
     # Component operations
-    def get_components_of_type(self, component_type: str) -> r[list[dict[str, object]]]:
+    def get_components_of_type(
+        self,
+        component_type: str,
+    ) -> r[list[t.Plugin.PluginDefinition]]:
         """Get components of specified type."""
         try:
             # Generic component listing - would be implemented based on actual needs
-            components: list[dict[str, object]] = [
+            components: list[t.Plugin.PluginDefinition] = [
                 {"name": "source-csv", "type": "sources", "status": "available"},
                 {"name": "sink-postgres", "type": "sinks", "status": "available"},
                 {
@@ -151,19 +154,16 @@ class FlextMeltanoAbstractions:
                 components,
                 lambda comp: u.get(comp, "type", default="") == component_type,
             )
-            # Type narrowing: ensure list[dict[str, object]]
+            # Type narrowing: ensure list[t.Plugin.PluginDefinition]
             if isinstance(filtered_components, (list, tuple)):
-                result_list = cast(
-                    "list[dict[str, object]]",
-                    list(filtered_components),
-                )
-                return r[list[dict[str, object]]].ok(result_list)
-            return r[list[dict[str, object]]].ok([])
+                result_list: list[t.Plugin.PluginDefinition] = list(filtered_components)
+                return r[list[t.Plugin.PluginDefinition]].ok(result_list)
+            return r[list[t.Plugin.PluginDefinition]].ok([])
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get components of type {component_type}: {e}"
             self.logger.exception(error_msg)
-            return r[list[dict[str, object]]].fail(error_msg)
+            return r[list[t.Plugin.PluginDefinition]].fail(error_msg)
 
     # Runner operations
     def create_pipeline_context(
@@ -183,17 +183,17 @@ class FlextMeltanoAbstractions:
 
     def execute_data_pipeline(
         self,
-        source_config: dict[str, object],
-        sink_config: dict[str, object],
-    ) -> r[dict[str, object]]:
+        source_config: t.MeltanoCore.MeltanoConfigDict,
+        sink_config: t.MeltanoCore.MeltanoConfigDict,
+    ) -> r[t.ELT.PipelineResult]:
         """Execute data pipeline."""
-        pipeline_context = {
-            "project_path": self._project_path,
+        pipeline_context: t.MeltanoCore.NestedJsonDict = {
+            "project_path": str(self._project_path) if self._project_path else None,
             "status": "initialized",
         }
 
         return self._runner_helper.execute_data_pipeline(
-            cast("dict[str, object]", pipeline_context),
+            pipeline_context,
             source_config,
             sink_config,
         )
@@ -201,55 +201,55 @@ class FlextMeltanoAbstractions:
     # ELT operations
     def create_elt_context(
         self,
-        project: object,
+        project: p.Meltano.MeltanoProjectProtocol,
         extractor_name: str,
         loader_name: str,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create ELT context for pipeline execution."""
         try:
-            elt_context = {
-                "project": project,
+            elt_context: t.MeltanoCore.MeltanoConfigDict = {
+                "project": str(project.root_dir),
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
                 "status": "initialized",
             }
-            return r[dict[str, object]].ok(elt_context)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(elt_context)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to create ELT context: {e}"
             self.logger.exception(error_msg)
-            return r[dict[str, object]].fail(error_msg)
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
 
     def execute_singer_pipeline(
         self,
-        elt_context: dict[str, object],
-        _extractor_plugin: object,
-        _loader_plugin: object,
-    ) -> r[dict[str, object]]:
+        elt_context: t.MeltanoCore.MeltanoConfigDict,
+        _extractor_plugin: p.Meltano.PluginProtocol[t.JsonValue],
+        _loader_plugin: p.Meltano.PluginProtocol[t.JsonValue],
+    ) -> r[t.ELT.PipelineResult]:
         """Execute singer pipeline."""
         try:
             # Simplified implementation - in production would orchestrate actual
             # singer pipeline
-            result: dict[str, object] = {
+            result: t.ELT.PipelineResult = {
                 "status": "completed",
                 "records_processed": 0,
                 "elt_context": elt_context,
             }
-            return r[dict[str, object]].ok(result)
+            return r[t.ELT.PipelineResult].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             self.logger.exception(error_msg)
-            return r[dict[str, object]].fail(error_msg)
+            return r[t.ELT.PipelineResult].fail(error_msg)
 
     # Plugin operations
     def get_plugins_of_type(
         self,
-        _project: object,
+        _project: p.Meltano.MeltanoProjectProtocol,
         plugin_type: str,
-    ) -> r[dict[str, dict[str, object]]]:
+    ) -> r[dict[str, t.Plugin.PluginDefinition]]:
         """Get plugins of specified type."""
         try:
             # Simplified implementation - would need actual plugin discovery
-            plugins: dict[str, dict[str, object]] = {
+            plugins: dict[str, t.Plugin.PluginDefinition] = {
                 "tap-csv": {
                     "name": "tap-csv",
                     "type": "extractors",
@@ -263,30 +263,25 @@ class FlextMeltanoAbstractions:
             }
 
             # DSL: Use dict comprehension for filtering (u.filter expects single-arg predicate)
-            filtered_plugins = {
+            filtered_plugins: dict[str, t.Plugin.PluginDefinition] = {
                 k: v
                 for k, v in plugins.items()
                 if u.get(v, "type", default="") == plugin_type
             }
-            # Type narrowing: ensure dict[str, dict[str, object]]
-            if isinstance(filtered_plugins, dict):
-                return r[dict[str, dict[str, object]]].ok(
-                    filtered_plugins,
-                )
-            return r[dict[str, dict[str, object]]].ok({})
+            return r[dict[str, t.Plugin.PluginDefinition]].ok(filtered_plugins)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
-            return r[dict[str, dict[str, object]]].fail(error_msg)
+            return r[dict[str, t.Plugin.PluginDefinition]].fail(error_msg)
 
-    def add_plugin(self, plugin_config: dict[str, object]) -> r[bool]:
+    def add_plugin(self, plugin_config: t.Plugin.PluginConfiguration) -> r[bool]:
         """Add a plugin."""
         try:
             # Simplified implementation - would validate and add plugin
             self.logger.info(
                 "Adding plugin",
-                plugin_config=cast("t_core.GeneralValueType", plugin_config),
+                plugin_config=plugin_config,
             )
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

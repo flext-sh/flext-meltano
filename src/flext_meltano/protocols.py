@@ -7,15 +7,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from flext_core import T_co, t
 from flext_core.protocols import FlextProtocols
 
-from flext_meltano.singer.protocols import (
-    FlextMeltanoPluginProtocols,
-    FlextMeltanoSingerProtocols,
-)
+# Lazy import to break circular dependency - imported on-demand when needed
+# from flext_meltano.singer.protocols import (
+#     FlextMeltanoPluginProtocols,
+#     FlextMeltanoSingerProtocols,
+# )
 
 
 class FlextMeltanoProtocols(FlextProtocols):
@@ -60,13 +62,13 @@ class FlextMeltanoProtocols(FlextProtocols):
             # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
-            variants: dict[str, object] | None
+            variants: dict[str, t.JsonValue] | None
 
-            def get_config(self) -> dict[str, object]:
+            def get_config(self) -> dict[str, t.JsonValue]:
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(self, config: dict[str, object]) -> bool:
+            def validate_config(self, config: dict[str, t.JsonValue]) -> bool:
                 """Validate plugin configuration."""
                 ...
 
@@ -91,7 +93,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
         @runtime_checkable
-        class TapProtocol(FlextProtocols.Service[object], Protocol):
+        class TapProtocol(FlextProtocols.Service[t.JsonValue], Protocol):
             """Singer Tap protocol extending Service for ELT operations."""
 
             def discover(self) -> FlextProtocols.Result[t.JsonValue]:
@@ -102,12 +104,12 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Sync data from source with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[object]:
+            def execute(self) -> FlextProtocols.Result[t.JsonValue]:
                 """Execute the tap extraction (implements Service)."""
                 ...
 
         @runtime_checkable
-        class TargetProtocol(FlextProtocols.Service[object], Protocol):
+        class TargetProtocol(FlextProtocols.Service[t.JsonValue], Protocol):
             """Singer Target protocol extending Service for ELT operations."""
 
             def handle_record(
@@ -124,12 +126,12 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Handle a batch of records with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[object]:
+            def execute(self) -> FlextProtocols.Result[t.JsonValue]:
                 """Execute the target loading (implements Service)."""
                 ...
 
         @runtime_checkable
-        class DbtRunnerProtocol(FlextProtocols.Service[object], Protocol):
+        class DbtRunnerProtocol(FlextProtocols.Service[t.JsonValue], Protocol):
             """DBT Runner protocol extending Service for ELT operations."""
 
             def run(self, models: list[str]) -> FlextProtocols.Result[t.JsonValue]:
@@ -140,12 +142,12 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Test DBT models with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[object]:
+            def execute(self) -> FlextProtocols.Result[t.JsonValue]:
                 """Execute DBT transformations (implements Service)."""
                 ...
 
         @runtime_checkable
-        class ServiceCallProtocol(FlextProtocols.Service[object], Protocol):
+        class ServiceCallProtocol(FlextProtocols.Service[t.JsonValue], Protocol):
             """Service call protocol extending Service."""
 
             def call(
@@ -156,7 +158,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Execute service call with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[object]:
+            def execute(self) -> FlextProtocols.Result[t.JsonValue]:
                 """Execute service operation (implements Service)."""
                 ...
 
@@ -235,13 +237,77 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Show status help."""
                 ...
 
+        @runtime_checkable
+        class MeltanoProjectProtocol(Protocol):
+            """Meltano Project protocol for type-safe project operations.
+
+            Represents the interface for a Meltano project object that can be
+            passed to plugin discovery, pipeline execution, and other operations.
+            """
+
+            @property
+            def root_dir(self) -> Path:
+                """Get project root directory."""
+                ...
+
+            def find_plugins(self, plugin_type: str) -> list[t.JsonValue]:
+                """Find plugins of specified type."""
+                ...
+
+        @runtime_checkable
+        class AdapterProtocol(Protocol):
+            """Protocol for data adapters (tap/target/sink adapters).
+
+            Represents the interface for adapters used in data extraction,
+            loading, and transformation operations.
+            """
+
+            def connect(self) -> FlextProtocols.Result[bool]:
+                """Establish connection to the data source/sink."""
+                ...
+
+            def disconnect(self) -> FlextProtocols.Result[bool]:
+                """Close connection to the data source/sink."""
+                ...
+
+            @property
+            def is_connected(self) -> bool:
+                """Check if adapter is currently connected."""
+                ...
+
+        @runtime_checkable
+        class IndexedPluginProtocol(Protocol):
+            """Protocol for indexed plugin objects used in plugin discovery.
+
+            Represents plugin metadata accessed via u.get() for attributes
+            like variants, default_variant, logo_url.
+            """
+
+            @property
+            def name(self) -> str:
+                """Plugin name."""
+                ...
+
+            @property
+            def default_variant(self) -> str | None:
+                """Default variant name."""
+                ...
+
+            @property
+            def variants(self) -> dict[str, t.JsonValue] | None:
+                """Available variants."""
+                ...
+
+            @property
+            def logo_url(self) -> str | None:
+                """Plugin logo URL."""
+                ...
+
 
 # Runtime alias for simplified usage
 p = FlextMeltanoProtocols
 
 __all__ = [
-    "FlextMeltanoPluginProtocols",
     "FlextMeltanoProtocols",
-    "FlextMeltanoSingerProtocols",
     "p",
 ]

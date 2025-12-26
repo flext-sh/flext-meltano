@@ -269,7 +269,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         assert not result.is_success
         assert result.error is not None
         assert result.error is not None
-        assert "Tap plugin names must be at least 5 characters" in result.error
+        assert "Source component names must be at least 5 characters" in result.error
 
     def test_validate_target_plugin_name_valid(self) -> None:
         config: dict[str, object] = {
