@@ -16,7 +16,7 @@ from unittest import TestCase
 from flext_core import t
 
 import flext_meltano.plugin_protocols as protocols_module
-from flext_meltano import FlextMeltanoPluginProtocols
+from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
 
 
 class TestFlextMeltanoPluginProtocolsUnified(TestCase):
@@ -112,7 +112,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         """Test unified class has proper structure."""
         assert hasattr(FlextMeltanoPluginProtocols, "__module__")
         assert (
-            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.singer.protocols"
+            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.plugin_protocols"
         )
 
     def test_direct_api_access_only(self) -> None:
