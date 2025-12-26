@@ -55,11 +55,14 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     sink_name: str | None = None
     transformation_name: str | None = None
     _service_type: str | None = None
+    _meltano_config: FlextMeltanoSettings | None = None
 
     @property
-    def config(self) -> FlextMeltanoSettings:
-        """Get the service configuration instance."""
-        return self._config
+    def meltano_config(self) -> FlextMeltanoSettings:
+        """Get the Meltano-specific service configuration instance."""
+        if self._meltano_config is None:
+            self._meltano_config = FlextMeltanoSettings()
+        return self._meltano_config
 
     @property
     def container(self) -> FlextContainer:
@@ -124,7 +127,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             msg = "Service name cannot be empty"
             raise e.ValidationError(msg)
 
-        self._config = config or FlextMeltanoSettings()
+        self._meltano_config = config or FlextMeltanoSettings()
 
         # Map domain-specific parameters to generic parameters (SOLID mapping)
         mapped_source_name = source_name or tap_name
@@ -348,7 +351,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         component_type: str | None = None,
     ) -> r[list[t.MeltanoCore.MeltanoConfigDict]]:
         """List available pipeline components."""
-        components = [
+        components: list[t.MeltanoCore.MeltanoConfigDict] = [
             {"name": "source-csv", "type": "sources", "status": "installed"},
             {"name": "sink-postgres", "type": "sinks", "status": "installed"},
             {
@@ -359,12 +362,15 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         ]
 
         if component_type:
-            components = u.filter(
+            filtered = u.filter(
                 components,
                 lambda c: u.get(c, "type") == component_type,
             )
+            components = list(filtered) if isinstance(filtered, (list, tuple)) else []
 
-        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(components)
+        return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(
+            cast("list[t.MeltanoCore.MeltanoConfigDict]", components)
+        )
 
     @staticmethod
     def install_component(

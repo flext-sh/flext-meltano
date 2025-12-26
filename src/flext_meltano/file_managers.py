@@ -21,7 +21,6 @@ from flext_core import (
     FlextResult,
     u,
 )
-from flext_core.typings import t as t_core
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -150,17 +149,12 @@ class FlextMeltanoFileManagers:
             if config_data is None:
                 return r[t.MeltanoCore.FileConfigDict].ok({})
 
-            # DSL: Use u.ensure for type narrowing
-            ensured_result: object = u.ensure(
-                cast("t_core.GeneralValueType", config_data),
-                target_type="dict",
-                default={},
-            )
-            if not isinstance(ensured_result, dict):
+            # Ensure config_data is a dict
+            if not isinstance(config_data, dict):
                 return r[t.MeltanoCore.FileConfigDict].fail(
                     "YAML content is not a dictionary",
                 )
-            ensured: dict[str, object] = cast("dict[str, object]", ensured_result)
+            ensured: dict[str, object] = cast("dict[str, object]", config_data)
 
             return r[t.MeltanoCore.FileConfigDict].ok(
                 cast("t.MeltanoCore.FileConfigDict", ensured),

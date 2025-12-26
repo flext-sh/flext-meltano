@@ -22,6 +22,7 @@ from flext_core import (
 from flext_core.typings import t as t_core
 
 from flext_meltano import __version__
+from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.services import FlextMeltanoService
@@ -722,18 +723,11 @@ class FlextMeltano(s[t_core.JsonValue]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         try:
-            # Import here to avoid circular import
-            from flext_meltano.adapters import (  # noqa: PLC0415
-                FlextMeltanoAdapter,
-            )
-
             adapter = FlextMeltanoAdapter(self.config)
-            return cast(
-                "r[t.MeltanoCore.MeltanoConfigDict]",
-                adapter.project_adapter.create_project(
-                    project_name=project_name,
-                    project_dir=Path(project_dir) if project_dir else Path.cwd(),
-                ),
+            # Type narrowing: create_project returns MeltanoConfigDict
+            return adapter.project_adapter.create_project(
+                project_name=project_name,
+                project_dir=Path(project_dir) if project_dir else Path.cwd(),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(

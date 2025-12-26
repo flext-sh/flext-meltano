@@ -18,10 +18,10 @@ from flext_core import (
     FlextUtilities,
     u,
 )
-from flext_core.typings import t
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano.typings import t
 
 # Import aliases for simplified usage
 r = FlextResult
@@ -181,7 +181,8 @@ class FlextMeltanoUtilities(FlextUtilities):
             target_path.parent.mkdir(parents=True, exist_ok=True)
 
             file_handle = target_path.open(
-                "w", encoding=c.Utilities.DEFAULT_ENCODING,
+                "w",
+                encoding=c.Utilities.DEFAULT_ENCODING,
             )
             return r[TextIO].ok(file_handle)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -304,11 +305,9 @@ class FlextMeltanoUtilities(FlextUtilities):
         ) -> dict[str, object]:
             """Type-safe conversion from ConfigDict to dict[str, object]."""
             # ConfigDict is compatible with dict["str", "JsonValue"] but MyPy needs explicit conversion
-            config_typed: t.GeneralValueType = cast("t.GeneralValueType", config_dict)
-            ensured: dict[str, object] = cast(
-                "dict[str, object]",
-                u.ensure(config_typed, target_type="dict", default={}),
-            )
+            if not isinstance(config_dict, dict):
+                return {}
+            ensured: dict[str, object] = cast("dict[str, object]", config_dict)
             return ensured
 
         result = (
@@ -447,4 +446,4 @@ class FlextMeltanoUtilities(FlextUtilities):
             return cls.default_catalog()
 
 
-__all__ = ["FlextMeltanoUtilities"]
+__all__ = ["FlextMeltanoUtilities", "u"]

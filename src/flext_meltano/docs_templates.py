@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import cast
 
-from flext import FlextLogger, FlextResult, u
+from flext_core import FlextLogger, FlextResult, u
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
@@ -40,7 +40,8 @@ class DocsTemplates:
         """
         try:
             # DSL mnemonic pattern: extract automation fields and construct template vars
-            automation_raw = u.extract(config, "automation", default={})
+            automation_result: r[dict[str, object] | None] = u.extract(config, "automation", default={})
+            automation_raw: dict[str, object] | None = automation_result.map_or({})
             automation = u.guard(automation_raw, dict, default={}, return_value=True)
             template_vars = u.construct(
                 {
@@ -120,7 +121,8 @@ class DocsTemplates:
     @staticmethod
     def _get_cron_schedule(config: dict[str, object]) -> str:
         """Convert audit schedule to cron format."""
-        automation_raw = u.extract(config, "automation", default={})
+        automation_result: r[dict[str, object] | None] = u.extract(config, "automation", default={})
+        automation_raw: dict[str, object] | None = automation_result.value if automation_result.is_success else {}
         automation_config = u.guard(automation_raw, dict, default={}, return_value=True)
         audit_day = u.normalize(
             str(u.extract(automation_config, "audit_day", default="monday")),

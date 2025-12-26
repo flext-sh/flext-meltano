@@ -38,7 +38,7 @@ class CliRunnerProtocol(Protocol):
 def set_test_environment() -> Generator[None]:
     """Set test environment variables."""
     os.environ["FLEXT_ENV"] = "test"
-    os.environ["FLEXT_LOG_LEVEL"] = "debug"
+    os.environ["FLEXT_LOG_LEVEL"] = "DEBUG"
     os.environ["MELTANO_ENVIRONMENT"] = "test"
     yield
     # Cleanup
@@ -283,7 +283,7 @@ def test_environment_config() -> dict[str, object]:
         "config": {
             "project_id": "test-meltano-project",
             "cli": {
-                "log_level": "debug",
+                "log_level": "DEBUG",
                 "log_config": False,
             },
         },

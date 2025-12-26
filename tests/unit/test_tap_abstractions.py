@@ -5,7 +5,6 @@ import tempfile
 from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoTapAbstractions, m, r
-from tests.flext_tests_compat import FlextTestsUtilities
 
 # Create convenient aliases for model classes
 StreamDefinition = m.StreamDefinition
@@ -14,24 +13,18 @@ TapInstance = m.TapInstance
 
 
 class TestFlextMeltanoTapAbstractionsComplete:
-    """Complete test suite for FlextMeltanoTapAbstractions using flext_tests exclusively."""
+    """Complete test suite for FlextMeltanoTapAbstractions."""
 
     def setup_method(self) -> None:
-        """Setup for each test using flext_tests patterns."""
+        """Setup for each test."""
         self.tap_abstractions = FlextMeltanoTapAbstractions()
-        self.test_utils = FlextTestsUtilities.utilities()
-        self.test_assertions = FlextTestsUtilities.assertion()
-        self.functional_service = FlextTestsUtilities.functional_service(
-            "tap_abstractions",
-        )
 
     # =========================================================================
     # PYDANTIC MODELS TESTING - Using flext_tests data patterns
     # =========================================================================
 
     def test_tap_config_validation(self) -> None:
-        """Test m.TapConfig Pydantic validation using flext_tests."""
-        # Create test config with explicit typing
+        """Test m.TapConfig Pydantic validation."""
         connection_config: dict[str, object] = {
             "host": "localhost",
             "port": 5432,
@@ -46,21 +39,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
             version="v1.2.0",
         )
 
-        # Use flext_tests assertions
-        self.test_assertions.assert_equal(
-            actual=config.tap_type,
-            expected="tap-postgres",
-            message="Tap type should match",
-        )
-        self.test_assertions.assert_equal(
-            actual=config.version,
-            expected="v1.2.0",
-            message="Version should match",
-        )
-        self.test_assertions.assert_true(
-            condition="users" in config.stream_config,
-            message="Stream config should contain users",
-        )
+        assert config.tap_type == "tap-postgres"
+        assert config.version == "v1.2.0"
+        assert "users" in config.stream_config
 
     def test_stream_definition_validation(self) -> None:
         """Test m.StreamDefinition Pydantic validation using flext_tests."""

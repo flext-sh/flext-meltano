@@ -320,7 +320,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             validate_yaml_result = FlextMeltanoFileManagers.validate_yaml_file(
                 config_path,
             )
-            tm.ok(validate_yaml_result, True)
+            tm.ok(validate_yaml_result)
 
             # Load config back
             load_result = FlextMeltanoFileManagers.load_yaml_config(config_path)
@@ -341,7 +341,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             validate_structure_result = (
                 FlextMeltanoFileManagers.validate_project_structure(project_root)
             )
-            tm.ok(validate_structure_result, True)
+            tm.ok(validate_structure_result)
 
         finally:
             # Clean up temp directory

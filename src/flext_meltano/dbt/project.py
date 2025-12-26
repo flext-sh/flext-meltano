@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 from flext_meltano.utilities import u
 
 
-class FlextMeltanoDbtProjectManager(s):
+class FlextMeltanoDbtProjectManager(s["FlextMeltanoDbtProjectManager.ProjectInfo"]):
     """Manages DBT projects with deep SDK integration.
 
     Provides programmatic access to DBT projects, manifests, and
@@ -69,12 +69,10 @@ class FlextMeltanoDbtProjectManager(s):
 
             self.project_root = root
 
-            # Create ProjectInfo instance - avoid mypy confusion with built-in ProjectInfo
-            info_dict = {
-                "root": root,
-                "name": str(root.name),
-            }
-            info = FlextMeltanoDbtProjectManager.ProjectInfo(**info_dict)
+            info = FlextMeltanoDbtProjectManager.ProjectInfo(
+                root=root,
+                name=str(root.name),
+            )
 
             self.logger.info(
                 "DBT project loaded",
@@ -212,12 +210,17 @@ class FlextMeltanoDbtProjectManager(s):
             self.logger.exception("Failed to get tests", error=str(e))
             return r[list[dict[str, object]]].fail(f"Failed to get tests: {e}")
 
-    def execute(self, **_kwargs: object) -> r[str]:
+    def execute(
+        self, **_kwargs: object
+    ) -> r[FlextMeltanoDbtProjectManager.ProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
-            msg = f"DBT project: {self.project_root}"
-            return r[str].ok(msg)
-        return r[str].fail("No project loaded")
+            info = FlextMeltanoDbtProjectManager.ProjectInfo(
+                root=self.project_root,
+                name=str(self.project_root.name),
+            )
+            return r["FlextMeltanoDbtProjectManager.ProjectInfo"].ok(info)
+        return r["FlextMeltanoDbtProjectManager.ProjectInfo"].fail("No project loaded")
 
 
 __all__ = [

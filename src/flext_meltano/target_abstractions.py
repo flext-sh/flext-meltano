@@ -411,13 +411,10 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             sink_def = m.DataSinkDefinition(
                 sink_name="flext-target",
                 sink_type=cast("str", config.get("target_type", "jsonl")),
-                config=cast(
-                    "dict[str, object]",
-                    {
-                        "connection_config": config.get("connection_config", {}),
-                        "batch_size": config.get("batch_size", 1000),
-                    },
-                ),
+                config={
+                    "connection_config": config.get("connection_config", {}),
+                    "batch_size": config.get("batch_size", 1000),
+                },
             )
             return r[m.DataSinkDefinition].ok(sink_def)
         except Exception as e:

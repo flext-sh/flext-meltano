@@ -29,7 +29,7 @@ r = FlextResult
 s = FlextService
 
 
-class FlextMeltanoSingerService(s):
+class FlextMeltanoSingerService(s[str]):
     """Orchestrates Singer ELT pipelines (tap -> target) with deep SDK integration.
 
     Provides complete Singer protocol orchestration including:
@@ -150,15 +150,13 @@ class FlextMeltanoSingerService(s):
             if hasattr(target, "consume"):
                 target.consume(None)
 
-            # Create SyncResult instance - avoid mypy confusion with built-in types
-            result_dict = {
-                "records_processed": records_processed,
-                "records_written": records_written,
-                "errors": errors,
-                "state": state_dict,
-                "duration_seconds": 0.0,
-            }
-            result = FlextMeltanoSingerService.SyncResult(**result_dict)
+            result = FlextMeltanoSingerService.SyncResult(
+                records_processed=records_processed,
+                records_written=records_written,
+                errors=errors,
+                state=state_dict,
+                duration_seconds=0.0,
+            )
 
             self.logger.info(
                 "Singer sync completed",
@@ -229,8 +227,7 @@ class FlextMeltanoSingerService(s):
         """
         return self.state_manager.save_state(state_path)
 
-    @staticmethod
-    def execute(**_kwargs: object) -> r[str]:
+    def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
         msg = "Singer service initialized"
         return r[str].ok(msg)

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 import yaml
 from flext_core import FlextContainer, r, s, u
@@ -38,7 +39,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
-        self._config = config or FlextMeltanoSettings()
+        self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
         self._container = FlextContainer.get_global()
         self._abstractions = FlextMeltanoAbstractions()
 
@@ -55,8 +56,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             config_data: t.MeltanoCore.MeltanoConfigDict = {
                 "service_type": "flext_meltano_project_service",
                 "status": "ready",
-                "config": self._config.model_dump()
-                if hasattr(self._config, "model_dump")
+                "config": self._meltano_config.model_dump()
+                if hasattr(self._meltano_config, "model_dump")
                 else {},
             }
 
@@ -99,8 +100,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
             .flat_map(
                 lambda config_data: self._write_meltano_config(
-                    config_data["path"],
-                    config_data["config"],
+                    cast("Path", config_data["path"]),
+                    cast("dict[str, object]", config_data["config"]),
                 ),
             )
             .flat_map(self._initialize_project_instance)
@@ -172,8 +173,10 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             ._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
-                    params["name"],
-                    params["parent_dir"],
+                    str(params["name"]),
+                    params["parent_dir"]
+                    if isinstance(params["parent_dir"], Path)
+                    else Path(str(params["parent_dir"])),
                 ),
             )
             .flat_map(self._create_project_structure)
@@ -255,11 +258,11 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Path].fail(f"Failed to write meltano.yml: {e}")
 
-    def _initialize_project_instance(self, project_path: Path) -> r[object]:
+    def _initialize_project_instance(self, project_path: Path) -> r[Path]:
         """Initialize Meltano project instance using abstractions."""
         project_result = self._abstractions.find_project(project_path)
         if project_result.is_failure:
-            return r[object].fail(
+            return r[Path].fail(
                 project_result.error or "Failed to initialize project",
             )
         return project_result
@@ -295,11 +298,11 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
         return r[Path].ok(project_root)
 
-    def _load_project_from_path(self, project_root: Path) -> r[object]:
+    def _load_project_from_path(self, project_root: Path) -> r[Path]:
         """Load Meltano project from validated path."""
         project_result = self._abstractions.find_project(project_root)
         if project_result.is_failure:
-            return r[object].fail(
+            return r[Path].fail(
                 project_result.error or "Failed to load Meltano project",
             )
         return project_result
@@ -308,17 +311,17 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _validate_project_creation_params(
         project_name: str,
         project_dir: Path,
-    ) -> r[dict[str, object]]:
+    ) -> r[dict[str, str | Path]]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return r[dict[str, object]].fail("Project name cannot be empty")
+            return r[dict[str, str | Path]].fail("Project name cannot be empty")
 
         if not project_dir.exists():
-            return r[dict[str, object]].fail(
+            return r[dict[str, str | Path]].fail(
                 f"Parent directory not found: {project_dir}",
             )
 
-        return r[dict[str, object]].ok({
+        return r[dict[str, str | Path]].ok({
             "name": project_name.strip(),
             "parent_dir": project_dir,
         })

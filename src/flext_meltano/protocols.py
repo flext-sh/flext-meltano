@@ -91,7 +91,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
         @runtime_checkable
-        class TapProtocol(FlextProtocols.Service, Protocol):
+        class TapProtocol(FlextProtocols.Service[object], Protocol):
             """Singer Tap protocol extending Service for ELT operations."""
 
             def discover(self) -> FlextProtocols.Result[t.JsonValue]:
@@ -107,7 +107,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
         @runtime_checkable
-        class TargetProtocol(FlextProtocols.Service, Protocol):
+        class TargetProtocol(FlextProtocols.Service[object], Protocol):
             """Singer Target protocol extending Service for ELT operations."""
 
             def handle_record(
@@ -129,7 +129,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
         @runtime_checkable
-        class DbtRunnerProtocol(FlextProtocols.Service, Protocol):
+        class DbtRunnerProtocol(FlextProtocols.Service[object], Protocol):
             """DBT Runner protocol extending Service for ELT operations."""
 
             def run(self, models: list[str]) -> FlextProtocols.Result[t.JsonValue]:
@@ -145,7 +145,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
         @runtime_checkable
-        class ServiceCallProtocol(FlextProtocols.Service, Protocol):
+        class ServiceCallProtocol(FlextProtocols.Service[object], Protocol):
             """Service call protocol extending Service."""
 
             def call(
