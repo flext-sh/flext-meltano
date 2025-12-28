@@ -6,7 +6,7 @@ from collections.abc import MutableMapping
 from pathlib import Path
 from unittest import mock
 
-from flext_core import FlextLogger
+from flext_core import FlextTypes as t, FlextLogger
 
 from flext_meltano import FlextMeltanoExecutor, r
 
@@ -643,7 +643,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict[str, object] before dictionary operations
+        # Type guard: verify cli_app is a dict[str, t.GeneralValueType] before dictionary operations
         if isinstance(cli_app, dict):
             assert "name" in cli_app, "CLI should have name property"
             assert "executor" in cli_app, "CLI should have executor property"
@@ -671,7 +671,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict[str, object] before dictionary operations
+        # Type guard: verify cli_app is a dict[str, t.GeneralValueType] before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
             # The "executor" key is a string "self", use the actual executor instance
@@ -740,7 +740,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict[str, object] before dictionary operations
+        # Type guard: verify cli_app is a dict[str, t.GeneralValueType] before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
             # The "executor" key is a string "self", use the actual executor instance

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from flext_core import FlextLogger, FlextResult, u
+from flext_core import FlextLogger, FlextResult, FlextTypes, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -16,6 +16,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes
+t_core = FlextTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 r = FlextResult
@@ -28,7 +29,7 @@ class DocsTemplates:
         """Initialize templates with optional logger."""
         self._logger = logger
 
-    def generate_ci_workflow(self, config: dict[str, object]) -> r[str]:
+    def generate_ci_workflow(self, config: dict[str, t_core.GeneralValueType]) -> r[str]:
         """Generate GitHub Actions workflow using template pattern.
 
         Args:
@@ -124,7 +125,7 @@ class DocsTemplates:
             return r.fail(error_msg)
 
     @staticmethod
-    def _get_cron_schedule(config: dict[str, object]) -> str:
+    def _get_cron_schedule(config: dict[str, t_core.GeneralValueType]) -> str:
         """Convert audit schedule to cron format."""
         automation_raw = config.get("automation", {})
         automation_config = u.guard(automation_raw, dict, default={}, return_value=True)

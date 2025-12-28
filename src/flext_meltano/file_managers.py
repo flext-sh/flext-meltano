@@ -18,6 +18,7 @@ import yaml
 from flext_core import (
     FlextLogger,
     FlextResult,
+    FlextTypes,
     u,
 )
 
@@ -26,6 +27,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
 t = FlextMeltanoTypes
+t_core = FlextTypes
 c = FlextMeltanoConstants
 r = FlextResult
 
@@ -151,7 +153,7 @@ class FlextMeltanoFileManagers:
                     "YAML content is not a dictionary",
                 )
 
-            # Type narrowing: config_data is now dict[str, object]
+            # Type narrowing: config_data is now dict[str, t_core.GeneralValueType]
             # Validate dict keys are strings
             if not all(isinstance(k, str) for k in config_data):
                 return r[t.MeltanoCore.FileConfigDict].fail(
@@ -159,7 +161,7 @@ class FlextMeltanoFileManagers:
                 )
 
             # Type-safe assignment after validation
-            validated_config: dict[str, object] = config_data
+            validated_config: dict[str, t_core.GeneralValueType] = config_data
             return r[t.MeltanoCore.FileConfigDict].ok(validated_config)
 
         result = u.try_(
@@ -273,8 +275,8 @@ class FlextMeltanoFileManagers:
                 created_paths[directory] = dir_path
 
             # Create essential config files
-            # Explicitly type as dict[str, dict[str, object]] to satisfy FileConfigDict
-            configs: dict[str, dict[str, object]] = {
+            # Explicitly type as dict[str, dict[str, t_core.GeneralValueType]] to satisfy FileConfigDict
+            configs: dict[str, dict[str, t_core.GeneralValueType]] = {
                 c.Meltano.Paths.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": "project_name",
@@ -301,8 +303,8 @@ class FlextMeltanoFileManagers:
                     return r[t.MeltanoCore.PathDict].fail(
                         f"Invalid config data for {filename}: expected dict",
                     )
-                # After isinstance check, config_data is dict[str, object]
-                # FileConfigDict now supports dict[str, object] values
+                # After isinstance check, config_data is dict[str, t_core.GeneralValueType]
+                # FileConfigDict now supports dict[str, t_core.GeneralValueType] values
                 save_result = cls.save_yaml_config(
                     config_data,
                     config_path,

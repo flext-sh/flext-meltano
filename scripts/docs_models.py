@@ -14,6 +14,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import ClassVar
 
+from flext_core import FlextTypes as t
 from pydantic import BaseModel, ConfigDict
 
 
@@ -51,7 +52,7 @@ class DocumentationMetrics(BaseModel):
     missing_images: int = 0
     code_blocks: int = 0
     headings: ClassVar[dict[int, int]] = defaultdict(int)
-    issues: ClassVar[list[dict[str, object]]] = []
+    issues: ClassVar[list[dict[str, t.GeneralValueType]]] = []
     quality_score: float = 0.0
 
 

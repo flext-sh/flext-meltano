@@ -12,20 +12,14 @@ from typing import TextIO
 
 import yaml
 from flext_core import (
-    FlextExceptions,
     FlextLogger,
-    FlextResult,
     FlextUtilities,
-    u,
+    r,
 )
 
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.typings import FlextMeltanoTypes as t
-
-# Import aliases for simplified usage
-r = FlextResult
-e = FlextExceptions
 
 
 class FlextMeltanoUtilities(FlextUtilities):
@@ -122,7 +116,7 @@ class FlextMeltanoUtilities(FlextUtilities):
     ) -> r[bool]:
         """Write MELTANO-SPECIFIC YAML configuration using monadic resource management.
 
-        Uses FlextResult.with_resource() for automatic file handle management
+        Uses r.with_resource() for automatic file handle management
         and composable error handling with proper resource cleanup.
         DOMAIN-SPECIFIC: YAML writing (cannot be generalized to flext-core).
 
@@ -131,7 +125,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         target_path: Path where to write the YAML file.
 
         Returns:
-        FlextResult indicating write operation success.
+        r indicating write operation success.
 
         """
         # MONADIC RESOURCE MANAGEMENT: Automatic file handle cleanup
@@ -174,7 +168,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         target_path: Path to open for writing.
 
         Returns:
-        FlextResult containing file handle or error.
+        r containing file handle or error.
 
         """
         try:
@@ -199,7 +193,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         if not hasattr(file_handle, "write"):
             return r[bool].fail("Invalid file handle: missing write method")
 
-        # Safe YAML serialization using FlextResult pattern
+        # Safe YAML serialization using r pattern
         # Allow non-serializable objects to be written
         # (they'll fail on load, which is expected)
         try:
@@ -225,7 +219,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         file_handle: File handle to close.
 
         Returns:
-        FlextResult indicating close operation result.
+        r indicating close operation result.
 
         """
         try:
@@ -295,7 +289,7 @@ class FlextMeltanoUtilities(FlextUtilities):
     def load_yaml_config(cls, path: Path) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Load YAML config using monadic composition with resource management.
 
-        Uses FlextResult monadic patterns to chain file loading, validation,
+        Uses r monadic patterns to chain file loading, validation,
         and type conversion with automatic error propagation and resource cleanup.
         ZERO DUPLICATION: Delegates to FlextMeltanoFileManagers as SOURCE OF TRUTH.
 
@@ -303,7 +297,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         path: Path to YAML configuration file.
 
         Returns:
-        FlextResult containing loaded configuration dictionary.
+        r containing loaded configuration dictionary.
 
         """
 
@@ -313,11 +307,11 @@ class FlextMeltanoUtilities(FlextUtilities):
             config_dict: t.MeltanoCore.FileConfigDict,
         ) -> t.MeltanoCore.MeltanoConfigDict:
             """Type-safe conversion from FileConfigDict to MeltanoConfigDict."""
-            # FileConfigDict (dict[str, object]) needs conversion to MeltanoConfigDict
+            # FileConfigDict (dict[str, t.GeneralValueType]) needs conversion to MeltanoConfigDict
             # Type narrowing via isinstance check - no cast needed
             if not isinstance(config_dict, dict):
                 return {}
-            # Convert dict[str, object] to dict[str, JsonValue]
+            # Convert dict[str, t.GeneralValueType] to dict[str, JsonValue]
             # by reconstructing
             valid_types = (str, int, float, bool, list, dict, type(None))
             result: t.MeltanoCore.MeltanoConfigDict = {
@@ -463,5 +457,8 @@ class FlextMeltanoUtilities(FlextUtilities):
             """Compatibility shim for existing discovery logic."""
             return cls.default_catalog()
 
+
+# Alias for simplified usage (FLEXT pattern: short alias for own utilities class)
+u = FlextMeltanoUtilities
 
 __all__ = ["FlextMeltanoUtilities", "u"]

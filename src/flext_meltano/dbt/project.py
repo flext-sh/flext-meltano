@@ -148,8 +148,10 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 nodes_list = list(nodes_raw.values()) if nodes_raw else []
                 model_nodes = u.filter(
                     nodes_list,
-                    lambda node: isinstance(node, dict)
-                    and u.get(node, "resource_type") == "model",
+                    lambda node: (
+                        isinstance(node, dict)
+                        and u.get(node, "resource_type") == "model"
+                    ),
                 )
                 for node in model_nodes:
                     if not isinstance(node, dict):
@@ -212,8 +214,10 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 nodes_list = list(nodes_raw.values()) if nodes_raw else []
                 test_nodes = u.filter(
                     nodes_list,
-                    lambda node: isinstance(node, dict)
-                    and u.get(node, "resource_type") == "test",
+                    lambda node: (
+                        isinstance(node, dict)
+                        and u.get(node, "resource_type") == "test"
+                    ),
                 )
                 for node in test_nodes:
                     if not isinstance(node, dict):

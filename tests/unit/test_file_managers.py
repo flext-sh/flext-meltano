@@ -9,6 +9,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
+from flext_core import FlextTypes as t
 from pydantic import ConfigDict
 
 from flext_meltano import FlextMeltanoFileManagers
@@ -45,7 +46,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, object] = {
+        config: dict[str, t.GeneralValueType] = {
             "test": "data",
         }
         invalid_path = Path("/nonexistent/directory/config.yml")
@@ -56,7 +57,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config: dict[str, object] = {
+        config: dict[str, t.GeneralValueType] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -96,7 +97,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: dict[str, object] = {
+        config: dict[str, t.GeneralValueType] = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -155,7 +156,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         )
         tm.ok(result)
 
-        # Should return empty dict[str, object] but succeed
+        # Should return empty dict[str, t.GeneralValueType] but succeed
         created_paths = result.value
         assert isinstance(created_paths, dict)
         assert len(created_paths) == 0
@@ -303,7 +304,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             tm.ok(setup_result)
 
             # Create and save config
-            config: dict[str, object] = {
+            config: dict[str, t.GeneralValueType] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
