@@ -20,7 +20,6 @@ from flext_core import (
 )
 from flext_core.typings import t as t_core
 
-from flext_meltano import __version__
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -47,7 +46,7 @@ class FlextMeltano(FlextService[t_core.JsonValue]):
     """
 
     service_name: str
-    version: str = __version__
+    version: str = ""  # Will be set in __init__
 
     @property
     def constants(self) -> type[FlextMeltanoConstants]:
@@ -95,7 +94,7 @@ class FlextMeltano(FlextService[t_core.JsonValue]):
             msg = "API service name cannot be empty"
             raise e.ValidationError(msg, error_code="INVALID_SERVICE_NAME")
 
-        version = version if version is not None else __version__
+        version = version if version is not None else "0.9.0"
 
         if config is None:
             if project_root is not None:
@@ -488,7 +487,7 @@ class FlextMeltano(FlextService[t_core.JsonValue]):
             )
 
         try:
-            plugin_config = {
+            plugin_config: t_core.JsonValue = {
                 "name": plugin_name,
                 "namespace": plugin_name.replace("-", "_"),
                 "pip_url": f"pipelinewise-{plugin_name}",
@@ -545,10 +544,10 @@ class FlextMeltano(FlextService[t_core.JsonValue]):
                 ),
             )
 
-            # Convert to list for type compatibility
-            plugins_data: list[t.MeltanoCore.MeltanoConfigDict] = list(plugins_data_raw)
+            # Convert to list (using generic list to accommodate variable item types)
+            plugins_data: list = list(plugins_data_raw)
 
-            return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
+            return r[list].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",
