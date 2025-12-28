@@ -170,8 +170,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """
         # RAILWAY PATTERN: Chain validations and operations
         return (
-            self
-            ._log_plugin_addition_start(plugin_name, plugin_type)
+            self._log_plugin_addition_start(plugin_name, plugin_type)
             .flat_map(lambda _: self._validate_plugin_type(plugin_type))
             .flat_map(
                 lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
