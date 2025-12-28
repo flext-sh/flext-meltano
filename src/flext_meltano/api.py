@@ -545,9 +545,9 @@ class FlextMeltano(FlextService[t_core.JsonValue]):
             )
 
             # Convert to list (using generic list to accommodate variable item types)
-            plugins_data: list = list(plugins_data_raw)
+            plugins_data: list[t_core.JsonValue] = list(plugins_data_raw)
 
-            return r[list].ok(plugins_data)
+            return r[list[t_core.JsonValue]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",

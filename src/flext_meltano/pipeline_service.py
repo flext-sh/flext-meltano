@@ -161,7 +161,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
         extractor_name: str,
         loader_name: str,
         plugins: tuple[dict[str, t.JsonValue], dict[str, t.JsonValue]],
-    ) -> r[t.MeltanoCore.RunContextDict]:
+    ) -> r[dict[str, t_core.GeneralValueType]]:
         """Create ELT context for pipeline execution."""
         try:
             # Create a simple ELT context for now (placeholder implementation)
@@ -189,8 +189,8 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
                     execution_result.error or "Pipeline execution failed",
                 )
 
-            # Build context data with proper typing (use generic dict to accommodate complex nested data)
-            context_data: dict = {
+            # Build context data with proper typing
+            context_data: dict[str, t_core.GeneralValueType] = {
                 "project": project,
                 "elt_context": elt_context_obj,
                 "extractor_plugin": extractor_plugin_obj,
@@ -198,7 +198,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
                 "execution_result": execution_result.value or {},
             }
 
-            return r[dict].ok(context_data)
+            return r[dict[str, t_core.GeneralValueType]].ok(context_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.RunContextDict].fail(
                 f"Failed to create ELT context: {e}"
