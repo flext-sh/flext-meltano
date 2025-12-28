@@ -30,6 +30,7 @@ from flext_cli import (
 from flext_core import (
     FlextContainer,
     FlextLogger,
+    FlextTypes as t,
     e,
     r,
     s,
@@ -227,7 +228,7 @@ class DocumentationAutomation(s):
         elif schedule_type == "monthly":
             self._schedule_monthly(automation_config)
 
-    def _schedule_daily(self, config: dict[str, object]) -> None:
+    def _schedule_daily(self, config: dict[str, t.GeneralValueType]) -> None:
         """Schedule daily maintenance."""
         if schedule is None:
             self.logger.warning("Schedule library not available, skipping scheduling")
@@ -240,7 +241,7 @@ class DocumentationAutomation(s):
             self._run_scheduled_audit,
         )
 
-    def _schedule_weekly(self, config: dict[str, object]) -> None:
+    def _schedule_weekly(self, config: dict[str, t.GeneralValueType]) -> None:
         """Schedule weekly maintenance."""
         if schedule is None:
             self.logger.warning("Schedule library not available, skipping scheduling")
@@ -267,7 +268,7 @@ class DocumentationAutomation(s):
             )
 
     @staticmethod
-    def _schedule_monthly(config: dict[str, object]) -> None:
+    def _schedule_monthly(config: dict[str, t.GeneralValueType]) -> None:
         """Schedule monthly maintenance."""
         # Run on the 1st of each month
         audit_time = str(config.get("audit_time", "09:00"))

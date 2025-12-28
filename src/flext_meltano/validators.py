@@ -16,10 +16,9 @@ from flext_core import FlextLogger, FlextResult
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 c = FlextMeltanoConstants
-t = FlextMeltanoTypes
 p = FlextMeltanoProtocols
 r = FlextResult
 m = FlextMeltanoModels
@@ -42,7 +41,7 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config: dict[str, object] = {
+        >>> config: dict[str, t.GeneralValueType] = {
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
@@ -243,7 +242,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: dict[str, object] = {
+            >>> config: dict[str, t.GeneralValueType] = {
             ...     "version": 1,
             ...     "project_id": my - meltano - project,
             ... }
@@ -303,7 +302,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: dict[str, object] = {
+            >>> config: dict[str, t.GeneralValueType] = {
             ...     "name": "my_transformation_project",
             ...     "version": 1.0.0,
             ... }

@@ -14,13 +14,16 @@ import tempfile
 from pathlib import Path
 
 import yaml
-from flext_core import FlextContainer, r, s
+from flext_core import FlextContainer, FlextTypes, r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import c
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 from flext_meltano.validators import FlextMeltanoValidators
+
+# Additional alias
+t_core = FlextTypes
 
 
 class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -83,11 +86,12 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         prefix: Temporary directory prefix for organization
 
         Returns:
-        r containing project dict[str, object] with standardized structure
+        r containing project dict[str, t_core.GeneralValueType] with standardized structure
 
         """
         return (
-            self._validate_project_parameters(project_id, prefix)
+            self
+            ._validate_project_parameters(project_id, prefix)
             .flat_map(
                 lambda params: self._create_temp_directory(params["prefix"]).flat_map(
                     lambda temp_path: self._generate_minimal_config(
@@ -116,11 +120,12 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_root: Directory path containing meltano.yml
 
         Returns:
-        r containing initialized project dict[str, object] or validation error
+        r containing initialized project dict[str, t_core.GeneralValueType] or validation error
 
         """
         return (
-            self._validate_project_path(project_root)
+            self
+            ._validate_project_path(project_root)
             .flat_map(self._validate_meltano_config_exists)
             .flat_map(self._load_project_from_path)
             .flat_map(self._convert_to_project_dict)
@@ -161,7 +166,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self._validate_project_creation_params(project_name, project_dir)
+            self
+            ._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
                     str(params["name"]),
@@ -214,7 +220,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _generate_minimal_config(
         temp_path: Path,
         project_id: str,
-    ) -> r[dict[str, object]]:
+    ) -> r[dict[str, t_core.GeneralValueType]]:
         """Generate minimal meltano.yml configuration."""
         config = {
             "version": 1,
@@ -233,13 +239,15 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
                 },
             ],
         }
-        return r[dict[str, object]].ok({
+        return r[dict[str, t_core.GeneralValueType]].ok({
             "path": temp_path,
             "config": config,
         })
 
     @staticmethod
-    def _extract_and_write_config(config_data: dict[str, object]) -> r[Path]:
+    def _extract_and_write_config(
+        config_data: dict[str, t_core.GeneralValueType],
+    ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
         Args:
@@ -271,7 +279,9 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         )
 
     @staticmethod
-    def _write_meltano_config(project_path: Path, config: dict[str, object]) -> r[Path]:
+    def _write_meltano_config(
+        project_path: Path, config: dict[str, t_core.GeneralValueType]
+    ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
             config_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
@@ -291,8 +301,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         return project_result
 
     @staticmethod
-    def _convert_to_project_dict(project: t.GeneralValueType) -> r[t.Dbt.Project]:
-        """Convert Meltano project object to FLEXT dict[str, object] representation."""
+    def _convert_to_project_dict(project: t_core.GeneralValueType) -> r[t.Dbt.Project]:
+        """Convert Meltano project object to FLEXT dict[str, t_core.GeneralValueType] representation."""
         try:
             # Extract attributes using getattr with type narrowing
             name_attr = getattr(project, "name", None)

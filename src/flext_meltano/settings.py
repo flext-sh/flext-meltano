@@ -563,7 +563,9 @@ class FlextMeltanoSettings(FlextSettings):
         )
 
         # Create config data with environment
-        config_data: dict[str, object] = {"environment": env_type.value}
+        config_data: dict[str, t_core.GeneralValueType] = {
+            "environment": env_type.value
+        }
 
         # Handle debug/environment conflict: production cannot have debug=True
         if env_type.value == "production":
@@ -858,7 +860,7 @@ class FlextMeltanoSettings(FlextSettings):
         Delegates to consolidated logging model for maintainability.
 
         Returns:
-        dict[str, object]: Dictionary containing Meltano logging configuration.
+        dict[str, t_core.GeneralValueType]: Dictionary containing Meltano logging configuration.
 
         """
         config_dict = self.logging.model_dump()
@@ -904,7 +906,7 @@ class FlextMeltanoSettings(FlextSettings):
         """Get configuration metadata including override tracking.
 
         Returns:
-        dict[str, object]: Configuration metadata dictionary.
+        dict[str, t_core.GeneralValueType]: Configuration metadata dictionary.
 
         """
         # Return the metadata with proper typing
@@ -954,7 +956,9 @@ class FlextMeltanoSettings(FlextSettings):
                 }
                 return r[t.Dbt.ProjectConfiguration].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[dict[str, object]].fail(f"Failed to create DBT config: {e}")
+                return r[t.Dbt.ProjectConfiguration].fail(
+                    f"Failed to create DBT config: {e}"
+                )
 
         @staticmethod
         def create_dbt_profile_config(
@@ -992,7 +996,7 @@ class FlextMeltanoSettings(FlextSettings):
                 }
                 return r[t.Dbt.ProfileConfiguration].ok(profile_config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[dict[str, object]].fail(
+                return r[t.Dbt.ProfileConfiguration].fail(
                     f"Failed to create DBT profile config: {e}",
                 )
 
@@ -1031,7 +1035,7 @@ class FlextMeltanoSettings(FlextSettings):
                 }
                 return r[t.MeltanoCore.MeltanoConfigDict].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[dict[str, object]].fail(
+                return r[t.MeltanoCore.MeltanoConfigDict].fail(
                     f"Failed to create Meltano config: {e}",
                 )
 

@@ -226,7 +226,9 @@ class FlextMeltanoTypes(FlextTypes):
         type RunContextDict = dict[str, FlextTypes.JsonValue]
 
         # Type aliases for file_managers.py
-        FileConfigDict = dict[str, object]  # Accepts any YAML-compatible structure
+        FileConfigDict = dict[
+            str, FlextTypes.GeneralValueType
+        ]  # Accepts any YAML-compatible structure
         PathDict = dict[str, str | Path]
 
         # Plugin and execution types

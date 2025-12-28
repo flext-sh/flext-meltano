@@ -171,7 +171,7 @@ class Testt:
         ) -> None:
             pass
 
-        def test_dbt_function(project: dict[str, object]) -> None:
+        def test_dbt_function(project: dict[str, t.GeneralValueType]) -> None:
             pass
 
         # If we get here without errors, the types are compatible

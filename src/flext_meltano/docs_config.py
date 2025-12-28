@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import yaml
-from flext_core import FlextContainer, FlextResult, FlextSettings, u
+from flext_core import FlextContainer, FlextResult, FlextSettings, FlextTypes, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -24,6 +24,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 # Import aliases for simplified usage
 r = FlextResult
 t = FlextMeltanoTypes
+t_core = FlextTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
@@ -140,7 +141,7 @@ class DocsConfig(FlextSettings):
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return r[DocsConfig].fail(error_msg)
 
-    def get_schedule_config(self) -> dict[str, object]:
+    def get_schedule_config(self) -> dict[str, t_core.GeneralValueType]:
         """Get scheduling configuration as dictionary for backward compatibility.
 
         Returns:
@@ -154,7 +155,7 @@ class DocsConfig(FlextSettings):
             "audit_time": self.audit_time,
         }
 
-    def get_quality_thresholds(self) -> dict[str, object]:
+    def get_quality_thresholds(self) -> dict[str, t_core.GeneralValueType]:
         """Get quality thresholds as dictionary for backward compatibility.
 
         Returns:
@@ -170,7 +171,7 @@ class DocsConfig(FlextSettings):
             "fail_on_critical_issues": self.fail_on_critical_issues,
         }
 
-    def get_reporting_config(self) -> dict[str, object]:
+    def get_reporting_config(self) -> dict[str, t_core.GeneralValueType]:
         """Get reporting configuration as dictionary for backward compatibility.
 
         Returns:
@@ -181,7 +182,7 @@ class DocsConfig(FlextSettings):
             "output_directory": self.reports_output_dir,
         }
 
-    def get_link_validation_config(self) -> dict[str, object]:
+    def get_link_validation_config(self) -> dict[str, t_core.GeneralValueType]:
         """Get link validation configuration as dictionary for backward compatibility.
 
         Returns:
@@ -193,7 +194,7 @@ class DocsConfig(FlextSettings):
             "retries": self.link_validation_retries,
         }
 
-    def get_audit_thresholds(self) -> dict[str, object]:
+    def get_audit_thresholds(self) -> dict[str, t_core.GeneralValueType]:
         """Get audit thresholds as dictionary for backward compatibility.
 
         Returns:

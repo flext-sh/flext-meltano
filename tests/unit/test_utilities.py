@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from flext_core import u
+from flext_core import FlextTypes as t, u
 
 from flext_meltano.utilities import FlextMeltanoUtilities
 
@@ -47,7 +47,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test Meltano config dictionary creation with plugins."""
         utilities = FlextMeltanoUtilities()
 
-        plugins: dict[str, object] = {
+        plugins: dict[str, t.GeneralValueType] = {
             "extractors": [{"name": "tap-postgres"}],
             "loaders": [{"name": "target-csv"}],
         }
@@ -81,7 +81,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test Meltano config dictionary creation with environments."""
         utilities = FlextMeltanoUtilities()
 
-        environments: dict[str, object] = {
+        environments: dict[str, t.GeneralValueType] = {
             "dev": {"plugins": {"extractors": []}},
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
@@ -199,7 +199,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
-            content: dict[str, object] = {
+            content: dict[str, t.GeneralValueType] = {
                 "project_id": "test-project",
                 "version": "1.0.0",
             }
@@ -222,7 +222,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
         # Try to create file in non-existent directory
         file_path = Path("/nonexistent/directory/pipeline.yml")
-        content: dict[str, object] = {"project_id": "test"}
+        content: dict[str, t.GeneralValueType] = {"project_id": "test"}
 
         result = utilities.create_project_file(
             file_path,
@@ -240,7 +240,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
-            # Pass invalid content (not dict[str, object] or string)
+            # Pass invalid content (not dict[str, t.GeneralValueType] or string)
             # Using integer directly - runtime will handle the type mismatch
             invalid_content: object = 123
             result = utilities.create_project_file(
@@ -302,7 +302,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "output.yml"
-            content: dict[str, object] = {
+            content: dict[str, t.GeneralValueType] = {
                 "project_id": "save-test",
                 "version": "2.0.0",
             }
