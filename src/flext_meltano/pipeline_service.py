@@ -165,29 +165,23 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
         """Create ELT context for pipeline execution."""
         try:
             # Create a simple ELT context for now (placeholder implementation)
-            elt_context_result = r[t.MeltanoCore.RunContextDict].ok({
+            elt_context_obj: t_core.GeneralValueType = {
                 "project": project,
                 "extractor": extractor_name,
                 "loader": loader_name,
                 "plugins": plugins,
-            })
-            elt_context_obj = elt_context_result.value
+            }
 
             # Create plugin objects from the plugins tuple
             extractor_plugin_obj = plugins[0]
             loader_plugin_obj = plugins[1]
 
             # Create a simple execution result for now (placeholder implementation)
-            execution_result = r[t.MeltanoCore.ExecutionResultDict].ok({
+            execution_result_value: t_core.GeneralValueType = {
                 "status": "completed",
                 "extractor": extractor_name,
                 "loader": loader_name,
-            })
-
-            if execution_result.is_failure:
-                return r[t.MeltanoCore.RunContextDict].fail(
-                    execution_result.error or "Pipeline execution failed",
-                )
+            }
 
             # Build context data with proper typing
             context_data: dict[str, t_core.GeneralValueType] = {
@@ -195,19 +189,19 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
                 "elt_context": elt_context_obj,
                 "extractor_plugin": extractor_plugin_obj,
                 "loader_plugin": loader_plugin_obj,
-                "execution_result": execution_result.value or {},
+                "execution_result": execution_result_value,
             }
 
             return r[dict[str, t_core.GeneralValueType]].ok(context_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.RunContextDict].fail(
+            return r[dict[str, t_core.GeneralValueType]].fail(
                 f"Failed to create ELT context: {e}"
             )
 
     @staticmethod
     def _execute_singer_runner(
-        context_data: t.MeltanoCore.RunContextDict,
-    ) -> r[t.MeltanoCore.RunContextDict]:
+        context_data: dict[str, t_core.GeneralValueType],
+    ) -> r[dict[str, t_core.GeneralValueType]]:
         """Execute Singer runner with context data."""
         try:
             # Extract context data
@@ -215,19 +209,17 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             extractor_plugin_obj = context_data["extractor_plugin"]
             loader_plugin_obj = context_data["loader_plugin"]
 
-            # Use duck typing for plugin validation
-            if not hasattr(extractor_plugin_obj, "name") or not hasattr(
-                extractor_plugin_obj,
-                "type",
+            # Validate plugin structure (duck typing with type guards)
+            if isinstance(extractor_plugin_obj, dict) and (
+                "name" not in extractor_plugin_obj or "type" not in extractor_plugin_obj
             ):
-                return r[t.MeltanoCore.RunContextDict].fail(
+                return r[dict[str, t_core.GeneralValueType]].fail(
                     "Invalid extractor plugin: missing required attributes",
                 )
-            if not hasattr(loader_plugin_obj, "name") or not hasattr(
-                loader_plugin_obj,
-                "type",
+            if isinstance(loader_plugin_obj, dict) and (
+                "name" not in loader_plugin_obj or "type" not in loader_plugin_obj
             ):
-                return r[t.MeltanoCore.RunContextDict].fail(
+                return r[dict[str, t_core.GeneralValueType]].fail(
                     "Invalid loader plugin: missing required attributes",
                 )
 
@@ -235,10 +227,10 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             context_data["execution_completed"] = True
             context_data["execution_result"] = {"status": "completed"}
 
-            return r[t.MeltanoCore.RunContextDict].ok(context_data)
+            return r[dict[str, t_core.GeneralValueType]].ok(context_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.RunContextDict].fail(
+            return r[dict[str, t_core.GeneralValueType]].fail(
                 f"Unexpected error in ELT pipeline: {e}"
             )
 
@@ -246,7 +238,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
         self,
         extractor_name: str,
         loader_name: str,
-        context_data: t.MeltanoCore.RunContextDict,
+        context_data: dict[str, t_core.GeneralValueType],
     ) -> r[dict[str, str]]:
         """Build successful pipeline result."""
         try:
@@ -254,7 +246,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             elt_context_obj = context_data["elt_context"]
             project_obj = context_data["project"]
             execution_result_raw = context_data.get("execution_result", {})
-            execution_result: dict[str, t.JsonValue] = {}
+            execution_result: dict[str, t_core.GeneralValueType] = {}
             if isinstance(execution_result_raw, dict):
                 execution_result = {
                     str(k): val
