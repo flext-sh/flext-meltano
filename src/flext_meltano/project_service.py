@@ -90,8 +90,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self
-            ._validate_project_parameters(project_id, prefix)
+            self._validate_project_parameters(project_id, prefix)
             .flat_map(
                 lambda params: self._create_temp_directory(params["prefix"]).flat_map(
                     lambda temp_path: self._generate_minimal_config(
@@ -124,8 +123,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self
-            ._validate_project_path(project_root)
+            self._validate_project_path(project_root)
             .flat_map(self._validate_meltano_config_exists)
             .flat_map(self._load_project_from_path)
             .flat_map(self._convert_to_project_dict)
@@ -166,8 +164,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self
-            ._validate_project_creation_params(project_name, project_dir)
+            self._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
                     str(params["name"]),
