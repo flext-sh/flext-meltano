@@ -605,7 +605,7 @@ class FlextMeltanoSettings(FlextSettings):
     # ============================================================================
 
     @classmethod
-    def get_global_instance(cls, **overrides: t_core.JsonValue) -> Self:
+    def get_global_instance(cls, **overrides: t_core.JsonValue) -> FlextMeltanoSettings:
         """Get SINGLETON GLOBAL Meltano config instance (enhanced pattern).
 
         This method ensures a single source of truth for Meltano configuration across
@@ -623,6 +623,8 @@ class FlextMeltanoSettings(FlextSettings):
         if cls._instance is None:
             cls._instance = cls()
 
+        # After check above, _instance is guaranteed non-None
+        assert cls._instance is not None
         instance = cls._instance
         if overrides:
             # Apply overrides to the instance

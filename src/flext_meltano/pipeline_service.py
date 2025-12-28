@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, FlextTypes
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants
@@ -22,6 +22,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes
+t_core = FlextTypes
 r = FlextResult
 s = FlextService
 c = FlextMeltanoConstants
@@ -188,15 +189,16 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
                     execution_result.error or "Pipeline execution failed",
                 )
 
-            # Build context data with proper typing
-            context_data: t.MeltanoCore.RunContextDict = {}
-            context_data["project"] = project
-            context_data["elt_context"] = elt_context_obj
-            context_data["extractor_plugin"] = extractor_plugin_obj
-            context_data["loader_plugin"] = loader_plugin_obj
-            context_data["execution_result"] = execution_result.value or {}
+            # Build context data with proper typing (use generic dict to accommodate complex nested data)
+            context_data: dict = {
+                "project": project,
+                "elt_context": elt_context_obj,
+                "extractor_plugin": extractor_plugin_obj,
+                "loader_plugin": loader_plugin_obj,
+                "execution_result": execution_result.value or {},
+            }
 
-            return r[t.MeltanoCore.RunContextDict].ok(context_data)
+            return r[dict].ok(context_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.RunContextDict].fail(
                 f"Failed to create ELT context: {e}"

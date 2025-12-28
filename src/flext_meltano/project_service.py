@@ -222,7 +222,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_id: str,
     ) -> r[dict[str, t_core.GeneralValueType]]:
         """Generate minimal meltano.yml configuration."""
-        config = {
+        config: t_core.GeneralValueType = {
             "version": 1,
             "default_environment": "dev",
             "project_id": project_id,

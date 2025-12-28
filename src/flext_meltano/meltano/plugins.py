@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, FlextTypes
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants
@@ -26,6 +26,7 @@ from flext_meltano.utilities import u
 # Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
+t_core = FlextTypes
 p = FlextMeltanoProtocols
 r = FlextResult
 m = FlextMeltanoModels
@@ -270,9 +271,9 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             indexed_plugin = u.get(plugins_dict, plugin_name)
             # Use u.fields() + u.build() for unified extraction and transformation (DSL pattern)
-            fields_spec = {
+            fields_spec: dict[str, str] = {
                 "default_variant": "",
-                "variants": {},
+                "variants": "{}",
                 "description": "",
                 "logo_url": "",
             }
