@@ -11,16 +11,12 @@ import contextlib
 from pathlib import Path
 
 # Import aliases following order: c -> t -> p -> r -> m -> u
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult as r
 
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.typings import FlextMeltanoTypes as t
 
-c = FlextMeltanoConstants
-p = FlextMeltanoProtocols
-r = FlextResult
 m = FlextMeltanoModels
 
 logger = FlextLogger(__name__)

@@ -14,25 +14,22 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_core import (
-    FlextResult,
+    FlextResult as r,
     FlextSettings,
     FlextTypes,
 )
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.constants import FlextMeltanoConstants, FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 
 # FLEXT aliases - all AFTER imports per import order rules
 # Order: c → t → r → m → u
-c = FlextMeltanoConstants
-t = FlextMeltanoTypes
 t_core = FlextTypes  # Core types for JsonValue
-r = FlextResult
 m = FlextMeltanoModels
 u = FlextMeltanoUtilities
 
@@ -623,9 +620,11 @@ class FlextMeltanoSettings(FlextSettings):
         if cls._instance is None:
             cls._instance = cls()
 
-        # After check above, _instance is guaranteed non-None
-        assert cls._instance is not None
+        # After check above, _instance is guaranteed non-None by control flow
         instance = cls._instance
+        if instance is None:
+            msg = "Settings instance unexpectedly None after initialization"
+            raise RuntimeError(msg)
         if overrides:
             # Apply overrides to the instance
             for key, value in overrides.items():

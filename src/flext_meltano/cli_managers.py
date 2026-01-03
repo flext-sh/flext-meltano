@@ -13,16 +13,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Protocol
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextResult as r
 
-from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-r = FlextResult
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 

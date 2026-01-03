@@ -18,18 +18,16 @@ import yaml
 from flext_core import (
     FlextLogger,
     FlextResult,
+    FlextResult as r,
     FlextTypes,
     u,
 )
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 # Import aliases for simplified usage
-t = FlextMeltanoTypes
 t_core = FlextTypes
-c = FlextMeltanoConstants
-r = FlextResult
 
 logger = FlextLogger(__name__)
 

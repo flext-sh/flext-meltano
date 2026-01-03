@@ -11,19 +11,15 @@ from __future__ import annotations
 
 import time
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextTypes, r
 
 from flext_meltano.api import FlextMeltano
-from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import t
 from flext_meltano.utilities import u
 
 # Import aliases for concise usage
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
 m = FlextMeltanoModels
-r = FlextResult
 
 
 class FlextMeltanoAPIDBTOperations:
@@ -65,11 +61,7 @@ class FlextMeltanoAPIDBTOperations:
                 f"DBT models executed successfully in {execution_duration:.2f}s",
             )
 
-            config_obj = (
-                getattr(self.api, "config", None)
-                if hasattr(self.api, "config")
-                else None
-            )
+            config_obj = self.api.config if hasattr(self.api, "config") else None
             result_dict: dict[str, FlextTypes.JsonValue] = {
                 "models": models_to_run,
                 "status": "completed",

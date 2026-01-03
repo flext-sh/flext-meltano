@@ -179,6 +179,7 @@ class FlextMeltanoConstants(FlextConstants):
             EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1_000
             EXECUTION_GOOD_PERFORMANCE_THRESHOLD: Final[int] = 100
             EXECUTION_MODERATE_PERFORMANCE_THRESHOLD: Final[int] = 10
+            MAX_WORKERS_THRESHOLD: Final[int] = 50
 
         class Enums:
             """Domain specific enumerations."""
@@ -287,6 +288,7 @@ class FlextMeltanoConstants(FlextConstants):
         Environment = Enums.Environment
 
 
+# Short alias for FLEXT namespace pattern
 c = FlextMeltanoConstants
 
 __all__ = ["FlextMeltanoConstants", "c"]

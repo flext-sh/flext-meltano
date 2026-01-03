@@ -12,20 +12,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult as r, FlextService, FlextTypes
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 # Import aliases for concise usage
-t = FlextMeltanoTypes
 t_core = FlextTypes
-r = FlextResult
 s = FlextService
-c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
