@@ -15,17 +15,12 @@ from pathlib import Path
 from typing import ClassVar
 
 import yaml
-from flext_core import FlextContainer, FlextResult, FlextSettings, FlextTypes, u
+from flext_core import FlextContainer, FlextResult as r, FlextSettings, FlextTypes, u
 
-from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
-r = FlextResult
-t = FlextMeltanoTypes
 t_core = FlextTypes
-c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 

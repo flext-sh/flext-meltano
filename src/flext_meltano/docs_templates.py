@@ -15,11 +15,8 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
-t = FlextMeltanoTypes
 t_core = FlextTypes
-c = FlextMeltanoConstants
 m = FlextMeltanoModels
-r = FlextResult
 
 
 class DocsTemplates:

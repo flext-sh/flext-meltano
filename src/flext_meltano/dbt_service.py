@@ -14,19 +14,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult as r, FlextService
 
-from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 # Import aliases for concise usage
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
 m = FlextMeltanoModels
-r = FlextResult
 s = FlextService
 
 

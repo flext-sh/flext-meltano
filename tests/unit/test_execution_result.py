@@ -40,7 +40,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         assert result.command == command
-        assert result.success is True
+        assert result.is_success is True
         assert result.exit_code == 0
         assert result.output == "Successfully executed"
         assert not result.error
@@ -59,7 +59,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         assert result.command == command
-        assert result.success is False
+        assert result.is_success is False
         assert result.exit_code == 1
         assert not result.output
         assert result.error == "Plugin not found"
@@ -78,7 +78,7 @@ class TestFlextMeltanoExecutionResult:
         )
 
         assert result.command == []
-        assert result.success is False
+        assert result.is_success is False
         assert result.exit_code == -1
         assert not result.output
         assert result.error == "No command provided"

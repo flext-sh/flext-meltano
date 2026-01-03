@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 import yaml
-from flext_core import FlextContainer, FlextTypes, r, s
+from flext_core import FlextTypes, r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import c
@@ -42,8 +42,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
         self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
-        self._container = FlextContainer.get_global()
         self._abstractions = FlextMeltanoAbstractions()
+        # Note: container and logger are provided automatically by FlextService (s[T])
 
     def execute(
         self,
@@ -90,7 +90,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self._validate_project_parameters(project_id, prefix)
+            self
+            ._validate_project_parameters(project_id, prefix)
             .flat_map(
                 lambda params: self._create_temp_directory(params["prefix"]).flat_map(
                     lambda temp_path: self._generate_minimal_config(
@@ -123,7 +124,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self._validate_project_path(project_root)
+            self
+            ._validate_project_path(project_root)
             .flat_map(self._validate_meltano_config_exists)
             .flat_map(self._load_project_from_path)
             .flat_map(self._convert_to_project_dict)
@@ -164,7 +166,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         return (
-            self._validate_project_creation_params(project_name, project_dir)
+            self
+            ._validate_project_creation_params(project_name, project_dir)
             .flat_map(
                 lambda params: self._create_project_directory(
                     str(params["name"]),

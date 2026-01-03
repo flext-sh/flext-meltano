@@ -12,11 +12,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from flext_core import (
-    FlextConstants,
     FlextModels,
     FlextResult,
+    FlextTypes as t,
 )
-from flext_core._models.base import FlextModelsBase
 from flext_core.utilities import u as flext_u
 from pydantic import (
     BaseModel,
@@ -27,15 +26,8 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.typings import FlextMeltanoTypes
-
 # Import aliases following order: c -> t -> p -> r -> m -> u
-c = FlextMeltanoConstants
-t = FlextMeltanoTypes
-p = FlextMeltanoProtocols
-r = FlextResult
+# Runtime aliases defined at module level per FLEXT standards
 
 
 class FlextMeltanoModels(FlextModels):
@@ -92,14 +84,20 @@ class FlextMeltanoModels(FlextModels):
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
     PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
     PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS: int = 5
-    PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS: int = 15
+    PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS: int = (
+        c.Meltano.ModelValidation.COMPLEXITY_MODERATE_MAX_SETTINGS
+    )
     TRANSFORMATION_SIMPLE_MAX_PATHS: int = 5
     TRANSFORMATION_MODERATE_MAX_PATHS: int = 10
     EXECUTION_SIMPLE_THRESHOLD: int = 10
-    EXECUTION_MODERATE_THRESHOLD: int = 50
+    EXECUTION_MODERATE_THRESHOLD: int = c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD
     PERFORMANCE_HIGH_THRESHOLD: int = 1000
-    PERFORMANCE_GOOD_THRESHOLD: int = 500
-    PERFORMANCE_MODERATE_THRESHOLD: int = 100
+    PERFORMANCE_GOOD_THRESHOLD: int = (
+        c.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_WARNING
+    )
+    PERFORMANCE_MODERATE_THRESHOLD: int = (
+        c.Meltano.ModelValidation.EXECUTION_GOOD_PERFORMANCE_THRESHOLD
+    )
 
     class LoggingConfig(BaseModel):
         """Consolidated logging configuration for all pipeline operations.
@@ -922,7 +920,9 @@ class FlextMeltanoModels(FlextModels):
         tap_id: str | None = Field(default=None, description="Unique tap identifier")
         tap_type: str = Field(description="Type of the tap")
         config: FlextMeltanoModels.TapConfig = Field(description="Tap configuration")
-        adapter: object | None = Field(default=None, description="Tap adapter instance")
+        adapter: t.GeneralValueType | None = Field(
+            default=None, description="Tap adapter instance"
+        )
         streams: list[FlextMeltanoModels.StreamInfo] = Field(
             default_factory=list,
             description="Available streams",
@@ -946,7 +946,7 @@ class FlextMeltanoModels(FlextModels):
         config: FlextMeltanoModels.DataSourceConfig = Field(
             description="Source configuration",
         )
-        adapter: object | None = Field(
+        adapter: t.GeneralValueType | None = Field(
             default=None,
             description="Adapter instance",
         )
@@ -1022,7 +1022,7 @@ class FlextMeltanoModels(FlextModels):
         config: FlextMeltanoModels.DataSinkConfig = Field(
             description="Sink configuration",
         )
-        adapter: object | None = Field(
+        adapter: t.GeneralValueType | None = Field(
             default=None,
             description="Adapter instance",
         )
@@ -1047,11 +1047,11 @@ class FlextMeltanoModels(FlextModels):
             description="Connection configuration dictionary",
         )
         batch_size: int = Field(
-            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
+            default=c.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Batch size for record processing",
         )
         max_batches: int = Field(
-            default=FlextConstants.Performance.BatchProcessing.DEFAULT_SIZE,
+            default=c.Performance.BatchProcessing.DEFAULT_SIZE,
             description="Maximum number of batches to process",
         )
 
@@ -1081,7 +1081,7 @@ class FlextMeltanoModels(FlextModels):
                 msg = "Sink type must be non-empty string"
                 raise ValueError(msg)
 
-            max_reasonable_batch_size = 10000
+            max_reasonable_batch_size = c.Meltano.MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
             if self.batch_size > max_reasonable_batch_size:
                 msg = f"Batch size too large (max {max_reasonable_batch_size})"
                 raise ValueError(msg)
@@ -1294,7 +1294,7 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
-    class PluginModel(FlextModelsBase.TimestampedModel):
+    class PluginModel(FlextModels.TimestampedModel):
         """Generic plugin configuration for pipeline operations."""
 
         name: str = Field(min_length=1, description="Plugin name")
@@ -1547,7 +1547,9 @@ class FlextMeltanoModels(FlextModels):
             self,
         ) -> FlextMeltanoModels.TransformationExecutionModel:
             """Validate execution consistency."""
-            max_threads = 32
+            max_threads = (
+                c.Performance.MAX_WORKERS_VALIDATION // 3
+            )  # ~33, reasonable thread limit
             if self.threads > max_threads:
                 msg = f"Thread count cannot exceed {max_threads}"
                 raise ValueError(msg)
@@ -1645,7 +1647,7 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
-        @field_validator("status")
+        @field_validator("status", mode="before")
         @classmethod
         def validate_status(cls, v: str) -> str:
             """Validate execution status."""
@@ -1777,7 +1779,7 @@ class FlextMeltanoModels(FlextModels):
 
             return self
 
-        @field_validator("overall_status")
+        @field_validator("overall_status", mode="before")
         @classmethod
         def validate_overall_status(cls, v: str) -> str:
             """Validate overall pipeline status."""

@@ -72,7 +72,7 @@ class FlextMeltanoLibraryRunner:
             # Convert execution result to ELT pipeline result
             execution_result = result.value
             elt_result: t.Processing.EltPipelineResult = {
-                "success": execution_result.success,
+                "success": execution_result.is_success,
                 "tap_name": tap.name,
                 "target_name": target.name,
                 "execution_time": execution_result.execution_time,
@@ -117,7 +117,7 @@ class FlextMeltanoLibraryRunner:
 
             execution_result = result.value
             dbt_result: t.Processing.DbtTransformationResult = {
-                "success": execution_result.success,
+                "success": execution_result.is_success,
                 "exit_code": execution_result.exit_code,
                 "models_run": models or ["all"],
                 "execution_method": "library_runner",
@@ -212,7 +212,7 @@ class FlextMeltanoLibraryRunner:
 
             execution_result = result.value
             elt_result: t.Processing.EltPipelineResult = {
-                "success": execution_result.success,
+                "success": execution_result.is_success,
                 "tap_name": tap_name,
                 "target_name": target_name,
                 "execution_time": execution_result.execution_time,
