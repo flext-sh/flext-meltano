@@ -33,7 +33,7 @@ class FlextMeltanoTypes(FlextTypes):
     # MELTANO DOMAIN NAMESPACES - Following FLEXT pattern
     # =========================================================================
 
-    class Plugin:
+    class Meltano:
         """Meltano plugin complex types namespace."""
 
         type PluginDefinition = dict[
@@ -267,23 +267,6 @@ class FlextMeltanoTypes(FlextTypes):
         type ExecutionLogsDict = dict[str, FlextTypes.JsonValue]
         type MetricsDict = dict[str, float]
         type ErrorsDict = dict[str, str]
-
-    class Meltano:
-        """Meltano types namespace for cross-project access.
-
-        Provides organized access to all Meltano types for other FLEXT projects.
-        Usage: Other projects can reference `t.Meltano.Plugin.*`, `t.Meltano.Singer.*`, etc.
-        This enables consistent namespace patterns for cross-project type access.
-
-        Examples:
-            from flext_meltano.typings import t
-            plugin: t.Meltano.Plugin.PluginDefinition = ...
-            catalog: t.Meltano.Singer.CatalogEntry = ...
-
-        Note: Namespace composition via inheritance - no aliases needed.
-        Access parent namespaces directly through inheritance.
-
-        """
 
 
 t = FlextMeltanoTypes

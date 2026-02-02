@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
 from flext_core.result import r
 
 from flext_meltano.api import FlextMeltano
@@ -69,14 +68,14 @@ class FlextMeltanoAPIPluginOperations:
             )
 
         try:
-            plugin_config: dict[str, FlextTypes.JsonValue] = {
+            plugin_config: dict[str, t.JsonValue] = {
                 "name": plugin_name,
                 "namespace": plugin_name.replace("-", "_"),
                 "pip_url": f"pipelinewise-{plugin_name}",
                 "settings": config or {},
             }
 
-            result_dict: dict[str, FlextTypes.JsonValue] = {
+            result_dict: dict[str, t.JsonValue] = {
                 "plugin_name": plugin_name,
                 "plugin_type": plugin_type,
                 "status": "installed",
@@ -108,7 +107,7 @@ class FlextMeltanoAPIPluginOperations:
                 else all_plugins
             )
 
-            plugins_data: list[dict[str, FlextTypes.JsonValue]] = u.map(
+            plugins_data: list[dict[str, t.JsonValue]] = u.map(
                 filtered_plugins,
                 lambda plugin: {**plugin, "api_version": self.api.version},
             )
