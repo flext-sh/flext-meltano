@@ -424,7 +424,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             else r.fail(result.error or "Failed to save YAML file")
         )
 
-    class Plugin:
+    class Meltano:
         """Plugin-related utility methods.
 
         NOTE: These methods were moved from constants.py to follow

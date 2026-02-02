@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import time
 
-from flext_core import FlextTypes
 from flext_core.result import r
 
 from flext_meltano.api import FlextMeltano
@@ -74,7 +73,7 @@ class FlextMeltanoAPIPipelineOperations:
                 if hasattr(self.api, "config")
                 else None
             )
-            pipeline_config: dict[str, FlextTypes.JsonValue] = {
+            pipeline_config: dict[str, t.JsonValue] = {
                 "pipeline_id": pipeline_id,
                 "tap": tap_name,
                 "target": target_name,
@@ -126,7 +125,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            execution_result: dict[str, FlextTypes.JsonValue] = {
+            execution_result: dict[str, t.JsonValue] = {
                 "pipeline_id": pipeline_id,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -162,7 +161,7 @@ class FlextMeltanoAPIPipelineOperations:
             transform_duration = 0.7 if bool(dbt_models) else 0.0
             total_duration = time.time() - execution_start
 
-            elt_result: dict[str, FlextTypes.JsonValue] = {
+            elt_result: dict[str, t.JsonValue] = {
                 "tap": tap_name,
                 "target": target_name,
                 "dbt_models": u.or_(dbt_models, []),
@@ -204,7 +203,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            result_dict: dict[str, FlextTypes.JsonValue] = {
+            result_dict: dict[str, t.JsonValue] = {
                 "tap_name": tap_name,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -231,7 +230,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            result_dict: dict[str, FlextTypes.JsonValue] = {
+            result_dict: dict[str, t.JsonValue] = {
                 "target_name": target_name,
                 "status": "completed",
                 "execution_duration": execution_duration,

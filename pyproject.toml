@@ -118,6 +118,69 @@
 [tool.deptry]
     known_first_party = [
         "flext_meltano",
+        "flext_core",
+        "flext_cli",
+        "flext_api",
+        "flext_observability",
+        "flext_plugin",
+    ]
+    pep621_dev_dependency_groups = [
+        "dev",
+        "test",
+        "typings",
+        "security",
+    ]
+
+[tool.deptry.package_module_name_map]
+    pyyaml = "yaml"
+
+[tool.deptry.per_rule_ignores]
+    DEP002 = [
+        # CLI tools (invoked from command line, not imported)
+        "autoflake",
+        "bandit",
+        "black",
+        "codespell",
+        "commitizen",
+        "detect-secrets",
+        "isort",
+        "pip-audit",
+        "pre-commit",
+        "pylint",
+        "pyrefly",
+        "pyupgrade",
+        "radon",
+        "ruff",
+        "vulture",
+        # Type stubs
+        "numpy",
+        "pandas-stubs",
+        "scipy-stubs",
+        "types-jsonschema",
+        "types-openpyxl",
+        "types-psutil",
+        "types-python-dateutil",
+        "types-pyyaml",
+        "types-redis",
+        "types-requests",
+        "types-setuptools",
+        "types-toml",
+        "types-xlrd",
+        # Runtime deps used indirectly (via dbt-core, singer-sdk, meltano)
+        "alembic",
+        "beartype",
+        "dbt-core",
+        "duckdb",
+        "injectable",
+        "meltano",
+        "pandas",
+        "pydantic-core",
+        "pytest-cov",
+        "referencing",
+        "schedule",
+        "setuptools",
+        "singer-sdk",
+        "wrapt",
     ]
 
 [tool.ruff]
