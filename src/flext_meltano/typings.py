@@ -49,6 +49,10 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Plugin type literals
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
+        PluginVariant = Literal["default", "singer", "custom"]
+
+    # Alias so t.Plugin.PluginDefinition etc. work (adapters and others use t.Plugin.*)
+    Plugin = Meltano
 
     class Singer:
         """Singer protocol complex types namespace."""
@@ -59,6 +63,9 @@ class FlextMeltanoTypes(FlextTypes):
         type TargetConfig = dict[str, FlextTypes.JsonValue]
         type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
         type StreamCatalog = dict[str, list[CatalogEntry]]
+        type Record = dict[str, FlextTypes.JsonValue]
+        type Schema = dict[str, FlextTypes.JsonValue]
+        type State = dict[str, FlextTypes.JsonValue]
 
         # Singer protocol Literal types
         ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
@@ -109,6 +116,9 @@ class FlextMeltanoTypes(FlextTypes):
     class Project:
         """Meltano-specific project types."""
 
+        type ProjectConfig = dict[str, FlextTypes.JsonValue]
+        type ProjectMetadata = dict[str, str | int | bool | FlextTypes.JsonValue]
+
         # Meltano-specific project types extending the generic ones
         type MeltanoProjectType = Literal[
             # Generic types inherited from t
@@ -139,6 +149,8 @@ class FlextMeltanoTypes(FlextTypes):
     class Bridge:
         """Bridge operation complex types namespace."""
 
+        type BridgeMessage = dict[str, FlextTypes.JsonValue]
+        type BridgeResponse = dict[str, FlextTypes.JsonValue]
         type VersionInfo = dict[str, str | int]
         type ConnectionInfo = dict[str, str | int | bool]
         type BridgeConfig = dict[str, FlextTypes.JsonValue]
@@ -147,6 +159,7 @@ class FlextMeltanoTypes(FlextTypes):
     class CLI:
         """CLI operation complex types namespace."""
 
+        type Command = list[str]
         type ProcessResult = dict[str, str | int | float | bool | list[str]]
         type CommandResult = dict[str, str | int | bool]
         type ExecutionResult = dict[str, str | int | bool | FlextTypes.JsonValue]
@@ -164,6 +177,9 @@ class FlextMeltanoTypes(FlextTypes):
             | FlextTypes.JsonValue
             | list[FlextTypes.JsonValue],
         ]
+        type ExtractConfig = dict[str, FlextTypes.JsonValue]
+        type LoadConfig = dict[str, FlextTypes.JsonValue]
+        type TransformConfig = dict[str, FlextTypes.JsonValue]
         type ExtractionResult = dict[str, str | int | bool | FlextTypes.JsonValue]
         type LoadingResult = dict[str, str | int | bool | FlextTypes.JsonValue]
         type TransformationResult = dict[str, str | int | bool | FlextTypes.JsonValue]

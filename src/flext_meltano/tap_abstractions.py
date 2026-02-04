@@ -126,6 +126,17 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             self.logger.exception("Schema validation failed", error=str(e))
             return r[bool].fail(f"Schema validation failed: {e}")
 
+    def get_stream_config(
+        self,
+        config: m.TapConfig,
+        stream_name: str,
+    ) -> dict[str, t.JsonValue]:
+        """Return stream-specific config for a stream, or empty dict if missing."""
+        if not config.stream_config or not isinstance(config.stream_config, dict):
+            return {}
+        val = config.stream_config.get(stream_name, {})
+        return dict(val) if isinstance(val, dict) else {}
+
     def create_source_instance(
         self,
         source_config: m.DataSourceConfig,

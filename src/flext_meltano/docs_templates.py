@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from flext_core import FlextLogger, FlextResult, FlextTypes, u
+from flext_core import FlextLogger, FlextResult, FlextTypes, FlextResult as r, u
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -16,6 +16,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t_core = FlextTypes
+t = FlextTypes
 m = FlextMeltanoModels
 
 

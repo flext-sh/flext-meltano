@@ -9,12 +9,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_core import (
-    FlextDecorators,
-    FlextExceptions,
-    FlextHandlers,
-    FlextMixins,
-    FlextResult,
-    FlextService,
+    FlextDecorators as d,
+    FlextExceptions as e,
+    FlextHandlers as h,
+    FlextMixins as x,
+    FlextResult as r,
+    FlextService as s,
 )
 
 from flext_meltano.__version__ import __version__, __version_info__
@@ -68,14 +68,6 @@ from flext_meltano.utilities import (
     u,
 )
 from flext_meltano.validators import FlextMeltanoValidators
-
-r = FlextResult
-e = FlextExceptions
-d = FlextDecorators
-s = FlextService
-x = FlextMixins
-h = FlextHandlers
-
 
 __all__ = [
     "FlextMeltano",

@@ -290,7 +290,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
             lambda execution_result: {
-                "status": "success" if execution_result.is_success else "failed",
+                "status": "success" if execution_result.success else "failed",
                 "command": f"{tap_name} -> {target_name}",
                 "exit_code": execution_result.exit_code,
                 "output": execution_result.output,

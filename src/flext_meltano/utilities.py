@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, TypeVar
 
 import yaml
 from flext_core import (
@@ -21,6 +21,8 @@ from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.typings import FlextMeltanoTypes as t
 
+T = TypeVar("T")
+
 
 class FlextMeltanoUtilities(FlextUtilities):
     """DOMAIN-SPECIFIC Meltano utilities.
@@ -28,6 +30,38 @@ class FlextMeltanoUtilities(FlextUtilities):
     ONLY what cannot be generalized to flext-core.
     Inherits from FlextUtilities to avoid duplication and ensure consistency.
     """
+
+    @staticmethod
+    def from_(
+        obj: object | None,
+        key: str,
+        *,
+        as_type: type[T],
+        default: T,
+    ) -> T:
+        """Extract value from object by key with type conversion and default.
+
+        Args:
+            obj: Source object (dict-like or with attributes)
+            key: Key or attribute name
+            as_type: Type to convert to (e.g. int, str)
+            default: Default value when key missing or conversion fails
+
+        Returns:
+            Converted value or default
+
+        """
+        if obj is None:
+            return default
+        val = getattr(obj, key, None)
+        if val is None and isinstance(obj, dict):
+            val = obj.get(key)
+        if val is None:
+            return default
+        try:
+            return as_type(val)
+        except (TypeError, ValueError):
+            return default
 
     @classmethod
     def create_meltano_config_dict(

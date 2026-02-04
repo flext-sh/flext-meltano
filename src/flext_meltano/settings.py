@@ -139,8 +139,8 @@ class FlextMeltanoSettings(FlextSettings):
     )
 
     # Consolidated logging configuration
-    logging: m.LoggingConfig = Field(
-        default_factory=m.LoggingConfig,
+    logging: m.Meltano.LoggingConfig = Field(
+        default_factory=m.Meltano.LoggingConfig,
         description="Complete logging configuration for all pipeline operations",
     )
 
@@ -321,7 +321,9 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Resolved absolute path.
 
         """
-        if isinstance(v, str):
+        if not isinstance(v, (str, Path)):
+            v = Path(str(v))
+        elif isinstance(v, str):
             v = Path(v)
         return v.expanduser().resolve()
 
@@ -696,7 +698,7 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def get_supported_plugin_types(cls) -> t.MeltanoCore.PluginTypeList:
         """Get list of supported plugin types."""
-        return FlextMeltanoUtilities.Plugin.supported_types()
+        return FlextMeltanoUtilities.Meltano.supported_types()
 
     @classmethod
     def get_supported_environments(cls) -> t.MeltanoCore.PluginNameList:
