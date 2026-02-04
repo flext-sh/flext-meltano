@@ -40,11 +40,11 @@ class Testt:
         # Test that DBT namespace exists
         assert hasattr(t, "Dbt"), "DBT namespace should exist"
 
-        # Test DBT types
+        # Test DBT types (namespace has ModelConfiguration, TestConfiguration, Project, etc.)
         dbt_types = t.Dbt
-        assert hasattr(dbt_types, "Model"), "Model should exist in DBT namespace"
-        assert hasattr(dbt_types, "Test"), "Test should exist in DBT namespace"
-        assert hasattr(dbt_types, "Seed"), "Seed should exist in DBT namespace"
+        assert hasattr(dbt_types, "ModelConfiguration"), "ModelConfiguration should exist in DBT namespace"
+        assert hasattr(dbt_types, "TestConfiguration"), "TestConfiguration should exist in DBT namespace"
+        assert hasattr(dbt_types, "Project"), "Project should exist in DBT namespace"
 
     def test_project_namespace(self) -> None:
         """Test Project namespace types."""

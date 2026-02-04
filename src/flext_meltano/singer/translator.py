@@ -45,7 +45,7 @@ if command_result.is_success:
     execution_result = FlextMeltanoSingerCliTranslator.execute_singer_command(
         singer_command
     )
-    if execution_result.is_success:
+    if execution_result.success:
         output = execution_result.value
         print(f"Source executed: {output['stdout']}")
 ```
@@ -95,6 +95,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import json
 import subprocess
 
 from flext_core import FlextResult
@@ -241,7 +242,9 @@ class FlextMeltanoSingerCliTranslator:
         if params.full_refresh:
             command.append("--full-refresh")
 
-        # Note: vars parameter not currently supported in TransformationParams
+        vars_val = getattr(params, "vars", None)
+        if vars_val and isinstance(vars_val, dict):
+            command.extend(["--vars", json.dumps(vars_val)])
 
         return r[list[str]].ok(command)
 

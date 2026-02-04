@@ -13,9 +13,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextProtocols as p, r, u
+from flext_core import FlextLogger, r, u
 
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.protocols import p
 from flext_meltano.typings import FlextMeltanoTypes as t
 
 # Import aliases for concise usage following order: c -> t -> p -> r -> m -> u

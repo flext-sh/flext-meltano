@@ -336,6 +336,14 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Get default configuration."""
         return r[t.MeltanoCore.MeltanoConfigDict].ok({})
 
+    def create_from_config(
+        self,
+        config: t.MeltanoCore.MeltanoConfigDict | dict[str, t.GeneralValueType],
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+        """Create a service instance from configuration (config-as-instance placeholder)."""
+        cfg: t.MeltanoCore.MeltanoConfigDict = dict(config)
+        return r[t.MeltanoCore.MeltanoConfigDict].ok(cfg)
+
     @staticmethod
     def get_profiles_config() -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Get transformation profiles configuration."""

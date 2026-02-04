@@ -313,9 +313,13 @@ class FlextMeltano(FlextService[t.JsonValue]):
             ELT execution result with stage durations.
 
         """
-        if u.none_(tap_name, target_name):
+        if not (tap_name and tap_name.strip()):
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                "Both tap_name and target_name are required",
+                "tap_name is required",
+            )
+        if not (target_name and target_name.strip()):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                "target_name is required",
             )
 
         def _execute_elt() -> r[t.MeltanoCore.MeltanoConfigDict]:
@@ -538,10 +542,13 @@ class FlextMeltano(FlextService[t.JsonValue]):
                 ),
             )
 
-            # Convert to list (using generic list to accommodate variable item types)
-            plugins_data: list[t.JsonValue] = list(plugins_data_raw)
+            # Convert to list of dicts (MeltanoConfigDict-compatible)
+            plugins_data: list[dict[str, t.JsonValue]] = [
+                x if isinstance(x, dict) else {"raw": x}
+                for x in plugins_data_raw
+            ]
 
-            return r[list[t.JsonValue]].ok(plugins_data)
+            return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.MeltanoCore.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",
@@ -701,6 +708,10 @@ class FlextMeltano(FlextService[t.JsonValue]):
         project_dir: str | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
+        if not (project_name and project_name.strip()):
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                "Project name cannot be empty",
+            )
         try:
             adapter = FlextMeltanoAdapter()
             # Type narrowing: create_project returns MeltanoConfigDict

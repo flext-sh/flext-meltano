@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextRuntime, FlextService
 from singer_sdk import Stream, Tap
 
 # Import order: c -> t -> p -> r -> m -> u
@@ -35,12 +35,16 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified source abstractions with FLEXT configuration."""
-        # Initialize FlextService parent class
         super().__init__()
-        # Store meltano-specific config (use different name to avoid override)
         self._meltano_config: FlextMeltanoSettings = (
             config if config is not None else FlextMeltanoSettings()
         )
+
+    @classmethod
+    def create_instance(cls) -> r[FlextMeltanoTapAbstractions]:
+        """Create a tap abstractions instance wrapped in Result."""
+        instance = FlextRuntime.create_instance(cls)
+        return r[FlextMeltanoTapAbstractions].ok(instance)
 
     def discover_streams(
         self,
@@ -56,14 +60,17 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
         """
         try:
+            source_type_val = getattr(
+                source_config, "source_type", None
+            ) or getattr(source_config, "tap_type", None)
             self.logger.info(
                 "Discovering streams for source",
-                source_type=source_config.source_type,
-                source_name=source_config.source_type,
+                source_type=source_type_val,
+                source_name=source_type_val,
             )
 
             # Validate source configuration
-            if not source_config.source_type:
+            if not source_type_val:
                 return r[t.Singer.StreamCatalog].fail(
                     "Source configuration must have name and type for discovery",
                 )
