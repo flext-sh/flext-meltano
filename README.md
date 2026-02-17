@@ -6,7 +6,9 @@
 
 **FLEXT-Meltano** is the enterprise integration framework for extending Meltano capabilities within the FLEXT ecosystem. It provides comprehensive tooling for Singer protocol implementation, plugin development scaffolding, and robust data pipeline orchestration.
 
-Part of the [FLEXT](https://github.com/flext-sh/flext) ecosystem.
+**Reviewed**: 2026-02-17 | **Version**: 0.10.0-dev
+
+Part of the [FLEXT](https://github.com/flext/flext) ecosystem.
 
 ## 🚀 Key Features
 
