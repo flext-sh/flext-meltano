@@ -179,7 +179,9 @@ class FlextMeltanoCatalogManager(FlextService[t.Singer.StreamCatalog]):
             streams: list[t.Singer.CatalogEntry] = (
                 streams_raw if isinstance(streams_raw, list) else []
             )
-            found_stream = u.find(streams, lambda value: u.get(value, "name") == stream_name)
+            found_stream = u.find(
+                streams, lambda value: u.get(value, "name") == stream_name
+            )
             if found_stream is not None:
                 schema_raw = u.get(found_stream, "schema", default={})
                 schema: t.Singer.StreamSchema = (

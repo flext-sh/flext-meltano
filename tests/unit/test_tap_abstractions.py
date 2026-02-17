@@ -1,4 +1,5 @@
 """Test module for flext-meltano."""
+
 from flext_core import FlextTypes as t
 
 import tempfile
@@ -228,7 +229,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_get_stream_config(self) -> None:
         """Test get_stream_config method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_stream_config"):
-            pytest.skip("get_stream_config not available on this FlextMeltanoTapAbstractions")
+            pytest.skip(
+                "get_stream_config not available on this FlextMeltanoTapAbstractions"
+            )
         config = m.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -268,6 +271,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test create_tap_from_config success using flext_tests."""
         if not hasattr(self.tap_abstractions, "create_tap_from_config"):
             import pytest
+
             pytest.skip("create_tap_from_config not available (use PYTHONPATH=src)")
         connection_config = {
             "host": "localhost",
@@ -472,7 +476,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_get_stream_by_name(self) -> None:
         """Test get_stream_by_name method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_stream_by_name"):
-            pytest.skip("get_stream_by_name not available on this FlextMeltanoTapAbstractions")
+            pytest.skip(
+                "get_stream_by_name not available on this FlextMeltanoTapAbstractions"
+            )
         config = m.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -528,6 +534,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test generate_catalog success using flext_tests."""
         if not hasattr(self.tap_abstractions, "generate_catalog"):
             import pytest
+
             pytest.skip("generate_catalog not available (use PYTHONPATH=src)")
         config = m.TapConfig(
             tap_type="tap-postgres",
@@ -624,6 +631,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test extract_records for users stream using flext_tests."""
         if not hasattr(self.tap_abstractions, "extract_records"):
             import pytest
+
             pytest.skip("extract_records not available (use PYTHONPATH=src)")
         stream = m.StreamDefinition(
             stream_name="users",
@@ -678,6 +686,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test extract_records with limit using flext_tests."""
         if not hasattr(self.tap_abstractions, "extract_records"):
             import pytest
+
             pytest.skip("extract_records not available (use PYTHONPATH=src)")
         stream = m.StreamDefinition(
             stream_name="orders",
@@ -709,6 +718,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test extract_records for products stream using flext_tests."""
         if not hasattr(self.tap_abstractions, "extract_records"):
             import pytest
+
             pytest.skip("extract_records not available (use PYTHONPATH=src)")
         stream = m.StreamDefinition(
             stream_name="products",
@@ -776,6 +786,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
         if not hasattr(self.tap_abstractions, "sync_stream"):
             import pytest
+
             pytest.skip("sync_stream not available")
         result = self.tap_abstractions.sync_stream(tap_instance, "users", mock_target)
 
@@ -842,7 +853,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_list_streams(self) -> None:
         """Test list_streams method using flext_tests."""
         if not hasattr(self.tap_abstractions, "list_streams"):
-            pytest.skip("list_streams not available on this FlextMeltanoTapAbstractions")
+            pytest.skip(
+                "list_streams not available on this FlextMeltanoTapAbstractions"
+            )
         config = m.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -874,7 +887,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_get_tap_type(self) -> None:
         """Test get_tap_type method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_tap_type"):
-            pytest.skip("get_tap_type not available on this FlextMeltanoTapAbstractions")
+            pytest.skip(
+                "get_tap_type not available on this FlextMeltanoTapAbstractions"
+            )
         config = m.TapConfig(tap_type="tap-csv", connection_config={"file": "test.csv"})
         tap_instance = m.TapInstance(
             tap_type="tap-csv",
@@ -921,7 +936,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_create_instance_factory(self) -> None:
         """Test create_instance factory method using flext_tests."""
-        result = FlextMeltanoTapAbstractions.create_instance()
+        result = FlextMeltanoTapAbstractions.create_result_instance()
 
         self.test_assertions.assert_true(
             condition=isinstance(result, r),
@@ -1068,6 +1083,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test tap abstractions performance using flext_tests."""
         if not hasattr(self.tap_abstractions, "extract_records"):
             import pytest
+
             pytest.skip("extract_records not available (use PYTHONPATH=src)")
         # Test with multiple streams and operations
         config = m.TapConfig(

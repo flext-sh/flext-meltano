@@ -377,7 +377,6 @@ kubectl logs -f deployment/flext-meltano-monitor
 
 The FLEXT ecosystem provides comprehensive automated quality assurance that ensures enterprise-grade standards across all projects.
 
-
 ## 📚 Documentation
 
 Complete documentation available in the `docs/` directory:
@@ -393,14 +392,15 @@ Complete documentation available in the `docs/` directory:
 ---
 
 ## 🤝 Contributing
+
 ### Quality Standards
 
 All contributions must:
+
 - Maintain architectural layering and dependency rules
 - Preserve complete type safety
 - Follow established testing patterns
 - Pass automated quality validation
-
 
 ### **Development Setup**
 
