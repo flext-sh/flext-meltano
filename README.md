@@ -1,452 +1,114 @@
 # FLEXT-Meltano
 
-**Advanced Meltano integration framework** for the FLEXT ecosystem, providing comprehensive Singer protocol implementation, plugin development tools, and enterprise data pipeline orchestration.
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-> **STATUS**: Version 0.9.0 - **Production-Capable** with 100% type safety, complete Singer protocol support, and enterprise-grade pipeline orchestration 🚧
->
-> **Quality Gates**: ✅ MyPy (100%) | ✅ Ruff (100%) | ❌ Tests (0% - BLOCKED) | ❌ Coverage (0% - BLOCKED)
+**FLEXT-Meltano** is the enterprise integration framework for extending Meltano capabilities within the FLEXT ecosystem. It provides comprehensive tooling for Singer protocol implementation, plugin development scaffolding, and robust data pipeline orchestration.
 
----
+## 🚀 Key Features
 
-## 🎯 Purpose and Role in FLEXT Ecosystem
+- **Singer Protocol Compliance**: Full support for building custom Taps (extractors) and Targets (loaders) adhering to the Singer spec.
+- **Plugin Scaffolding**: Automated generation of new plugin projects with boilerplate, configuration, and testing infrastructure.
+- **Pipeline Orchestration**: Manage complex ELT workflows with dependencies, retries, and monitoring.
+- **Schema Discovery**: Automatic schema inference and catalog generation for data sources.
+- **State Management**: Robust handling of incremental sync state and bookmarks.
+- **FLEXT Integration**: Seamlessly integrates with `flext-cli` for command-line control and `flext-observability` for pipeline metrics.
 
-### **For the FLEXT Data Integration Platform**
+## 📦 Installation
 
-FLEXT-Meltano provides the **Meltano integration foundation** for the FLEXT data platform, enabling Singer protocol implementations, plugin development, and enterprise data pipeline orchestration across the entire FLEXT ecosystem.
+To install `flext-meltano`:
 
-### **Key Responsibilities**
-
-1. **Singer Protocol Implementation** - Complete tap and target development framework
-2. **Plugin Development Tools** - Automated plugin scaffolding and validation
-3. **Pipeline Orchestration** - Enterprise-grade ELT pipeline management
-4. **Meltano Integration** - Native Meltano project and plugin support
-5. **Data Pipeline Management** - Advanced pipeline execution and monitoring
-6. **Plugin Registry** - Extensible plugin discovery and management system
-
-### **Integration Points**
-
-- **[flext-core](https://github.com/organization/flext/tree/main/flext-core/README.md)** → Foundation patterns (FlextResult, FlextContainer, FlextService)
-- **[flext-cli](https://github.com/organization/flext/tree/main/flext-cli/README.md)** → Pipeline execution and management commands
-- **Singer Protocol Projects** → Foundation for all flext-tap-_and flext-target-_ projects
-- **Enterprise Data Platform** → Data pipeline orchestration and management
-
----
-
-## 🚀 Advanced Features
-
-### **Complete Singer Protocol Implementation**
-
-FLEXT-Meltano provides **complete Singer.io specification compliance** with enterprise extensions:
-
-**Singer Protocol Support**:
-
-- **Tap Development Framework** - Complete tap implementation with discovery, sync, and state management
-- **Target Development Framework** - Complete target implementation with batch processing and error handling
-- **Schema Discovery** - Automatic schema inference and catalog generation
-- **State Management** - Robust state file handling with bookmark support
-- **Incremental Sync** - Efficient incremental data synchronization
-- **Batch Processing** - High-performance batch processing for large datasets
-
-**Protocol Extensions**:
-
-- **Enterprise Metadata** - Extended metadata for enterprise requirements
-- **Custom State Storage** - Flexible state storage backends (file, database, cloud)
-- **Advanced Error Recovery** - Comprehensive error handling and recovery mechanisms
-- **Performance Monitoring** - Built-in performance metrics and optimization
-
-### **Plugin Development Framework**
-
-Comprehensive plugin development tools for the Meltano ecosystem:
-
-**Plugin Scaffolding**:
-
-- **Automatic Project Generation** - Complete plugin project structure creation
-- **Template System** - Extensible templates for different plugin types
-- **Configuration Management** - Automated configuration file generation
-- **Testing Framework** - Built-in testing utilities and fixtures
-- **Documentation Generation** - Automatic README and documentation creation
-
-**Plugin Lifecycle Management**:
-
-- **Discovery System** - Automatic plugin detection and registration
-- **Dependency Resolution** - Plugin dependency management and resolution
-- **Version Management** - Plugin versioning and compatibility checking
-- **Quality Validation** - Plugin validation and quality gates
-
-### **Enterprise Pipeline Orchestration**
-
-Advanced pipeline orchestration for enterprise data integration:
-
-**Pipeline Management**:
-
-- **Multi-Pipeline Support** - Concurrent pipeline execution and management
-- **Dependency Resolution** - Pipeline dependency graph resolution
-- **Resource Management** - Resource allocation and optimization
-- **Failure Recovery** - Comprehensive failure handling and retry logic
-- **Monitoring Integration** - Real-time pipeline monitoring and alerting
-
-**Orchestration Features**:
-
-- **Workflow Engine** - Advanced workflow definition and execution
-- **Conditional Logic** - Conditional pipeline execution based on data conditions
-- **Parallel Processing** - Parallel pipeline execution for performance
-- **Resource Pooling** - Shared resource management across pipelines
-
----
-
-## 🏗️ Architecture Overview
-
-### **Layered Architecture**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 🎯 FLEXT-Meltano - Enterprise Data Pipeline Integration    │
-├─────────────────────────────────────────────────────────────┤
-│ 🔧 Plugin Layer     │ Plugin scaffolding & development tools   │
-│ 📦 Protocol Layer   │ Singer protocol implementation          │
-│ 🚀 Orchestration    │ Pipeline execution & management         │
-│ 🔗 Integration      │ Meltano & ecosystem integration        │
-├─────────────────────────────────────────────────────────────┤
-│ 🎨 flext-core       │ Foundation patterns & services         │
-│ 🎯 flext-cli        │ CLI integration & control              │
-│ 📊 flext-quality    │ Testing & quality assurance            │
-└─────────────────────────────────────────────────────────────┘
+```bash
+pip install flext-meltano
 ```
 
-### **Core Services**
+Or with Poetry:
 
-#### FlextMeltanoService
+```bash
+poetry add flext-meltano
+```
 
-**Primary service for Meltano project management and plugin operations**
+## 🛠️ Usage
+
+### Discovering Plugins
+
+Programmatically inspect available plugins in a Meltano project.
 
 ```python
 from flext_meltano import FlextMeltanoService
 
-service = FlextMeltanoService(project_root="/path/to/meltano/project")
-result = service.discover_plugins()
+# 1. Initialize Service
+service = FlextMeltanoService(project_root="/path/to/project")
+
+# 2. Discover Plugins
+plugins_result = service.discover_plugins()
+
+if plugins_result.is_success:
+    plugins = plugins_result.unwrap()
+    print(f"Found {len(plugins)} plugins:")
+    for p in plugins:
+        print(f" - {p.name} ({p.type})")
 ```
 
-#### FlextMeltanoAdapter
+### Executing a Tap
 
-**Core adapter for Meltano CLI integration and execution**
+Run a specific extractor with custom state and configuration.
 
 ```python
 from flext_meltano import FlextMeltanoAdapter
 
-adapter = FlextMeltanoAdapter()
-result = adapter.run_tap("tap-csv", state={"bookmarks": {...}})
-```
-
-#### FlextMeltanoExecutor
-
-**Pipeline execution engine with advanced orchestration**
-
-```python
-from flext_meltano import FlextMeltanoExecutor
-
-executor = FlextMeltanoExecutor()
-result = executor.execute_pipeline("tap-csv", "target-postgres")
-```
-
----
-
-## 📋 API Reference Summary
-
-### **Plugin Management**
-
-```python
-from flext_meltano import FlextMeltanoService
-
-service = FlextMeltanoService()
-
-# Plugin discovery
-plugins = service.discover_plugins()
-available_taps = service.list_taps()
-
-# Plugin operations
-result = service.install_plugin("tap-gitlab")
-result = service.test_plugin("tap-gitlab")
-```
-
-### **Singer Protocol Operations**
-
-```python
-from flext_meltano import FlextMeltanoAdapter
-
+# 1. Initialize Adapter
 adapter = FlextMeltanoAdapter()
 
-# Tap execution
-result = adapter.run_tap("tap-csv", config={"files": ["data.csv"]})
-
-# Target execution
-result = adapter.run_target("target-postgres", config={"host": "localhost"})
-
-# Full pipeline
-result = adapter.run_pipeline("tap-csv", "target-postgres")
-```
-
-### **Pipeline Orchestration**
-
-```python
-from flext_meltano import FlextMeltanoExecutor
-
-executor = FlextMeltanoExecutor()
-
-# Execute with advanced options
-result = executor.execute_pipeline(
-    tap="tap-salesforce",
-    target="target-snowflake",
-    options={
-        "incremental": True,
-        "parallelism": 4,
-        "state_file": "state.json"
-    }
+# 2. Run Tap
+result = adapter.run_tap(
+    tap_name="tap-postgres",
+    config={"host": "localhost", "port": 5432},
+    state={"bookmarks": {"users": {"last_updated": "2023-01-01"}}}
 )
+
+if result.is_success:
+    print("Tap execution completed successfully.")
+else:
+    print(f"Tap failed: {result.error}")
 ```
 
----
+### Orchestrating a Pipeline
 
-## 🔧 Configuration Management
-
-### **Meltano Project Configuration**
-
-FLEXT-Meltano supports comprehensive Meltano project configuration:
-
-```yaml
-# meltano.yml
-version: 1
-default_environment: dev
-project_id: flext-data-platform
-
-environments:
-  - name: dev
-  - name: staging
-  - name: prod
-
-plugins:
-  extractors:
-    - name: tap-gitlab
-      variant: meltano
-      pip_url: git+https://github.com/meltano/tap-gitlab.git
-      config:
-        api_url: https://gitlab.example.com/api/v4
-        private_token: $GITLAB_TOKEN
-        start_date: "2023-01-01T00:00:00Z"
-
-  loaders:
-    - name: target-postgres
-      variant: meltano
-      pip_url: git+https://github.com/meltano/target-postgres.git
-      config:
-        host: $POSTGRES_HOST
-        port: 5432
-        user: $POSTGRES_USER
-        password: $POSTGRES_PASSWORD
-        database: analytics
-        schema: gitlab
-```
-
-### **FLEXT Integration Configuration**
+Execute a full EL (Extract-Load) pipeline.
 
 ```python
-# flext_meltano_config.yml
-meltano:
-  project_root: "/path/to/meltano/project"
-  default_environment: "dev"
-  log_level: "INFO"
+from flext_meltano import FlextMeltanoExecutor
 
-pipelines:
-  - name: "gitlab-to-postgres"
-    tap: "tap-gitlab"
-    target: "target-postgres"
-    schedule: "0 */4 * * *"  # Every 4 hours
+# 1. Initialize Executor
+executor = FlextMeltanoExecutor()
 
-  - name: "incremental-sync"
-    tap: "tap-salesforce"
-    target: "target-snowflake"
-    incremental: true
-    parallelism: 4
+# 2. Run Pipeline
+pipeline_result = executor.execute_pipeline(
+    tap="tap-gitlab",
+    target="target-snowflake",
+    options={"incremental": True}
+)
 
-quality:
-  enable_type_checking: true
-  enable_linting: true
-  enable_testing: true
-  coverage_threshold: 95
+if pipeline_result.is_success:
+    metrics = pipeline_result.unwrap()
+    print(f"Pipeline finished. Records processed: {metrics.record_count}")
 ```
 
----
+## 🏗️ Architecture
 
-## 🧪 Testing Framework
+FLEXT-Meltano bridges the gap between raw Singer components and enterprise requirements:
 
-### **Comprehensive Testing Infrastructure**
-
-FLEXT-Meltano includes enterprise-grade testing capabilities:
-
-```bash
-# Run all tests
-make test
-
-# Run with coverage
-make coverage
-
-# Run integration tests
-make integration-test
-
-# Run performance tests
-make performance-test
-
-# Quality gates
-make validate
-```
-
-### **Documentation Maintenance**
-
-Automated documentation quality assurance and maintenance:
-
-```bash
-# Run comprehensive documentation audit
-make docs-comprehensive
-
-# Quick quality check
-make docs-audit
-
-# Set up quality gates and automation
-make docs-setup
-
-# View quality reports
-make docs-view-report
-```
-
-### **Test Categories**
-
-- **Unit Tests** - Individual component testing
-- **Integration Tests** - Component interaction testing
-- **Plugin Tests** - Plugin functionality validation
-- **Pipeline Tests** - End-to-end pipeline testing
-- **Performance Tests** - Load and performance testing
-
----
-
-## 🚢 Deployment and Operations
-
-### **Container Integration**
-
-```dockerfile
-# Dockerfile for FLEXT-Meltano
-FROM python:3.13-slim
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY . /app
-WORKDIR /app
-
-# Expose ports for Meltano UI (optional)
-EXPOSE 5000
-
-# Default command
-CMD ["meltano", "--help"]
-```
-
-### **Production Deployment**
-
-```bash
-# Build container
-make docker-build
-
-# Deploy to Kubernetes
-kubectl apply -f k8s/
-
-# Scale pipeline workers
-kubectl scale deployment flext-meltano-worker --replicas=5
-
-# Monitor pipeline execution
-kubectl logs -f deployment/flext-meltano-monitor
-```
-
----
-
-## 🔧 Quality Assurance
-
-The FLEXT ecosystem provides comprehensive automated quality assurance that ensures enterprise-grade standards across all projects.
-
-## 📚 Documentation
-
-Complete documentation available in the `docs/` directory:
-
-- **[API Reference](docs/api-reference.md)** - Complete API documentation
-- **[Architecture Guide](docs/architecture.md)** - System architecture overview
-- **[Configuration Guide](docs/configuration.md)** - Configuration management
-- **[Development Guide](docs/development.md)** - Development workflow
-- **[Getting Started](docs/getting-started.md)** - Quick start guide
-- **[Integration Guide](docs/guides/integration.md)** - Integration patterns
-- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
-
----
+- **Plugin Layer**: Scaffolding and lifecycle management for custom connectors.
+- **Protocol Layer**: Strict implementation of the Singer spec for interoperability.
+- **Orchestration Layer**: Execution engine for managing data flows and error recovery.
+- **Integration Layer**: Adapters for Meltano CLI and project configuration.
 
 ## 🤝 Contributing
 
-### Quality Standards
-
-All contributions must:
-
-- Maintain architectural layering and dependency rules
-- Preserve complete type safety
-- Follow established testing patterns
-- Pass automated quality validation
-
-### **Development Setup**
-
-```bash
-# 1. Clone repository
-git clone https://github.com/flext/flext-meltano.git
-cd flext-meltano
-
-# 2. Install dependencies
-poetry install
-
-# 3. Setup development environment
-make setup
-
-# 4. Run tests
-make test
-
-# 5. Run quality checks
-make validate
-```
-
-### **Code Standards**
-
-- **Python 3.13+** - Latest Python features and performance
-- **Pydantic v2** - Modern data validation
-- **Type Hints** - Complete type safety
-- **Async Support** - Modern async/await patterns
-- **Clean Architecture** - Proper separation of concerns
-
----
+We welcome contributions! Please see our [Contributing Guide](docs/development.md) for details on creating new plugins, enhancing the orchestration engine, and submitting pull requests.
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🆘 Support
-
-- **Documentation** - Complete guides in `docs/` directory
-- **Issues** - Bug reports and feature requests via GitHub Issues
-- **Discussions** - Community discussions via GitHub Discussions
-- **Enterprise Support** - Contact the FLEXT team for enterprise deployments
-
----
-
-**Project Status**: 🚧 Production-Capable (Test Infrastructure Blocked) | **Version**: 0.9.0 | **Last Updated**: 2025-10-10
-
-## Test commit
