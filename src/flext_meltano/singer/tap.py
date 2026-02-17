@@ -41,10 +41,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         )
 
     @classmethod
-    def create_instance(cls) -> r[FlextMeltanoTapAbstractions]:
+    def create_result_instance(cls) -> r[FlextMeltanoTapAbstractions]:
         """Create a tap abstractions instance wrapped in Result."""
-        instance = FlextRuntime.create_instance(cls)
-        return r[FlextMeltanoTapAbstractions].ok(instance)
+        return r[FlextMeltanoTapAbstractions].ok(FlextRuntime.create_instance(cls))
 
     def discover_streams(
         self,
@@ -60,9 +59,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
         """
         try:
-            source_type_val = getattr(
-                source_config, "source_type", None
-            ) or getattr(source_config, "tap_type", None)
+            source_type_val = getattr(source_config, "source_type", None) or getattr(
+                source_config, "tap_type", None
+            )
             self.logger.info(
                 "Discovering streams for source",
                 source_type=source_type_val,

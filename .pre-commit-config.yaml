@@ -8,8 +8,8 @@ default_stages: [pre-commit, pre-push]
 default_language_version:
   python: python3.13
 
-repos: []  # DISABLED BY SCRIPT - All hooks disabled
-# 
+repos: [] # DISABLED BY SCRIPT - All hooks disabled
+#
 # CI configuration
 ci:
   autofix_prs: false # No automatic fixes - must be intentional

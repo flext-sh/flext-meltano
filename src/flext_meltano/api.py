@@ -544,8 +544,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
 
             # Convert to list of dicts (MeltanoConfigDict-compatible)
             plugins_data: list[dict[str, t.JsonValue]] = [
-                x if isinstance(x, dict) else {"raw": x}
-                for x in plugins_data_raw
+                x if isinstance(x, dict) else {"raw": x} for x in plugins_data_raw
             ]
 
             return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
