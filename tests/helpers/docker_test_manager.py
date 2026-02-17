@@ -163,7 +163,7 @@ class FlextTestsDocker(ContainerManager):
                 return FlextResult[bool].fail("Services failed health checks")
 
             self.logger.info("Docker services started successfully")
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(value=True)
 
         except Exception as e:
             return FlextResult[bool].fail(f"Error starting Docker services: {e}")
@@ -180,7 +180,7 @@ class FlextTestsDocker(ContainerManager):
         """
         try:
             if not self.containers_started:
-                return FlextResult[bool].ok(True)
+                return FlextResult[bool].ok(value=True)
 
             cmd = ["down"]
             if remove_volumes:
@@ -195,7 +195,7 @@ class FlextTestsDocker(ContainerManager):
 
             self.containers_started = False
             self.logger.info("Docker services stopped successfully")
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(value=True)
 
         except Exception as e:
             return FlextResult[bool].fail(f"Error stopping Docker services: {e}")

@@ -104,7 +104,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Additional validation logic would go here
             # For now, just return success
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         except Exception as e:
             self.logger.exception(

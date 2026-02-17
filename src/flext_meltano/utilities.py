@@ -241,7 +241,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 indent=2,
                 allow_unicode=True,
             )
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (yaml.YAMLError, ValueError, TypeError, AttributeError):
             return r[bool].fail("Failed to write YAML content: non-serializable object")
 

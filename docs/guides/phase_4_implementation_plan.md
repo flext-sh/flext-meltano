@@ -50,7 +50,7 @@
 
 - Poetry configuration missing flext-tests as path dependency
 - Test environment cannot resolve flext-tests imports
-- Confirmed: `Path /home/marlonsc/flext/flext-tests for flext-tests does not exist`
+- Confirmed: `Path flext-tests for flext-tests does not exist`
 - Cascading failure prevents any test execution
 
 **Resolution Plan:**

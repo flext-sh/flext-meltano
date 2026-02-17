@@ -250,7 +250,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             if add_result.is_failure:
                 return r[bool].fail(add_result.error or "Plugin addition failed")
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Plugin addition failed: {e}")
 
