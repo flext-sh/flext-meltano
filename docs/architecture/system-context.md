@@ -357,7 +357,7 @@ class ExternalSystemAdapter(Protocol):
         """Execute operation on external system."""
         ...
 
-    def disconnect(self) -> FlextResult[None]:
+    def disconnect(self) -> FlextResult[bool]:
         """Clean up connection to external system."""
         ...
 
@@ -382,7 +382,7 @@ class PluginManager:
         self.plugin_registry: Dict[str, PluginInfo] = {}
         self.plugin_loaders: List[PluginLoader] = []
 
-    def register_plugin(self, plugin_info: PluginInfo) -> FlextResult[None]:
+    def register_plugin(self, plugin_info: PluginInfo) -> FlextResult[bool]:
         """Register a plugin in the ecosystem."""
         if plugin_info.name in self.plugin_registry:
             return FlextResult.fail(
@@ -396,7 +396,7 @@ class PluginManager:
 
         self.plugin_registry[plugin_info.name] = plugin_info
         self.logger.info(f"Registered plugin: {plugin_info.name}")
-        return FlextResult.ok(None)
+        return FlextResult.| ok(value=True)
 
     def load_plugin(self, name: str) -> FlextResult[Plugin]:
         """Load and initialize a plugin."""
@@ -583,7 +583,7 @@ class FLEXTPluginRegistry:
     def __init__(self):
         self.registered_plugins: Dict[str, PluginMetadata] = {}
 
-    def register_flext_plugin(self, plugin: FLEXTPlugin) -> FlextResult[None]:
+    def register_flext_plugin(self, plugin: FLEXTPlugin) -> FlextResult[bool]:
         """Register a FLEXT plugin in the ecosystem."""
 
         # Validate plugin compatibility
@@ -605,7 +605,7 @@ class FLEXTPluginRegistry:
             capabilities=plugin.capabilities
         )
 
-        return FlextResult.ok(None)
+        return FlextResult.| ok(value=True)
 
     def discover_compatible_plugins(self, requirements: PluginRequirements) -> List[PluginMetadata]:
         """Discover plugins that meet specific requirements."""
@@ -810,7 +810,7 @@ class EventDrivenIntegration:
         self.event_queue = event_queue
         self.event_handlers = event_handlers
 
-    def publish_event(self, event: IntegrationEvent) -> FlextResult[None]:
+    def publish_event(self, event: IntegrationEvent) -> FlextResult[bool]:
         """Publish integration event to queue."""
 
         try:
@@ -825,7 +825,7 @@ class EventDrivenIntegration:
             # Log event
             self.logger.info(f"Published event: {event.event_type}")
 
-            return FlextResult.ok(None)
+            return FlextResult.| ok(value=True)
 
         except Exception as e:
             return FlextResult.fail(EventPublishingError(f"Failed to publish event: {e}"))
@@ -866,7 +866,7 @@ class MessageQueueIntegration:
         self.dead_letter_queue = dead_letter_queue
         self.max_retries = 3
 
-    def send_message(self, message: QueueMessage) -> FlextResult[None]:
+    def send_message(self, message: QueueMessage) -> FlextResult[bool]:
         """Send message to queue with reliability guarantees."""
 
         try:
@@ -881,7 +881,7 @@ class MessageQueueIntegration:
             )
 
             self.logger.info(f"Sent message: {message_id}")
-            return FlextResult.ok(None)
+            return FlextResult.| ok(value=True)
 
         except Exception as e:
             return FlextResult.fail(QueueError(f"Failed to send message: {e}"))

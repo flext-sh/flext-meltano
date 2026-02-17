@@ -277,7 +277,7 @@ class FlextMeltanoValidators:
         # Use Pydantic model validation directly
         try:
             PipelineProjectBusinessRules.model_validate(config_dict)
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Project validation failed: {e}")
 
@@ -339,7 +339,7 @@ class FlextMeltanoValidators:
         # Use Pydantic model validation directly
         try:
             TransformationBusinessRules.model_validate(config_dict)
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Transformation validation failed: {e}")
 
@@ -397,7 +397,7 @@ class FlextMeltanoValidators:
                 with contextlib.suppress(OSError):
                     transform_dir.mkdir(parents=True, exist_ok=True)
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
             logger.exception(error_msg)

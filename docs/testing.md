@@ -48,7 +48,7 @@ FLEXT-Meltano has a **comprehensive testing framework** with enterprise-grade te
 
 #### **Test Execution - 0% Functional (Confirmed)**
 
-- ❌ **VERIFIED: Missing flext-tests Dependency**: Confirmed `Path /home/marlonsc/flext/flext-tests for flext-tests does not exist`
+- ❌ **VERIFIED: Missing flext-tests Dependency**: Confirmed `Path flext-tests for flext-tests does not exist`
 - ❌ **VERIFIED: Model Inheritance Issues**: Confirmed `AttributeError: type object 'FlextModels' has no attribute 'BaseModel'`
 - ❌ **VERIFIED: Import Failures**: All tests fail at collection phase due to above issues
 - ❌ **Runtime Environment**: Test execution environment properly configured but blocked by above
@@ -119,7 +119,7 @@ Test File: `test_pipeline_integration.py` - Status: 🚧 Planned - Coverage Targ
 ### **Blocker 1: Missing flext-tests Dependency (VERIFIED)**
 
 **Impact**: Critical - Prevents all test execution
-**Root Cause**: flext-tests project does not exist in workspace (`Path /home/marlonsc/flext/flext-tests for flext-tests does not exist`)
+**Root Cause**: flext-tests project does not exist in workspace (`Path flext-tests for flext-tests does not exist`)
 **Status**: 🚧 **VERIFIED - RESOLUTION PLANNING REQUIRED**
 
 **Resolution Steps:**

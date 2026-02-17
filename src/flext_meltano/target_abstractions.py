@@ -108,7 +108,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Additional validation logic would go here
             # For now, just return success
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         except Exception as e:
             self.logger.exception(
@@ -180,7 +180,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 "Schema message handled successfully",
             )
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         except Exception as e:
             self.logger.exception("Schema message handling failed", error=str(e))
@@ -208,7 +208,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 "Record message handled successfully",
             )
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         except Exception as e:
             self.logger.exception("Record message handling failed", error=str(e))
@@ -236,7 +236,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 "State message handled successfully",
             )
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         except Exception as e:
             self.logger.exception("State message handling failed", error=str(e))

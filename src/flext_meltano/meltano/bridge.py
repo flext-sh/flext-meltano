@@ -83,7 +83,7 @@ class FlextMeltanoBridge:
         """Validate connection to Go bridge."""
         try:
             # Placeholder - real implementation would test Go bridge connectivity
-            return FlextResult[bool].ok(True)
+            return FlextResult[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
 

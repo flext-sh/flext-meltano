@@ -102,7 +102,7 @@ class FlextMeltanoFileManagers:
                     default_flow_style=False,
                     sort_keys=False,
                 )
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         result = u.try_(
             _save,
@@ -206,7 +206,7 @@ class FlextMeltanoFileManagers:
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.safe_load(f)  # This will raise an exception if invalid YAML
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         # DSL: Handle YAML-specific errors separately
         try:
@@ -329,7 +329,7 @@ class FlextMeltanoFileManagers:
         try:
             if temp_path.exists() and temp_path.is_dir():
                 shutil.rmtree(temp_path)
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to cleanup temp directory: {e}")
 
@@ -354,7 +354,7 @@ class FlextMeltanoFileManagers:
             if not pipeline_config.exists():
                 return r[bool].fail(f"pipeline.yml not found in {project_root}")
 
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project structure: {e}")
 

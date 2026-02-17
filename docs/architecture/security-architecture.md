@@ -809,12 +809,12 @@ class DataPrivacyController:
             'preferences': self.data_store.get_user_preferences(user_id)
         }
 
-    def _delete_user_data(self, user_id: str) -> FlextResult[None]:
+    def _delete_user_data(self, user_id: str) -> FlextResult[bool]:
         """Delete all user data."""
         try:
             # Anonymize instead of delete for audit purposes
             self.data_store.anonymize_user_data(user_id)
-            return FlextResult.ok(None)
+            return FlextResult.| ok(value=True)
         except Exception as e:
             return FlextResult.fail(DataDeletionError(f"Failed to delete user data: {e}"))
 ```

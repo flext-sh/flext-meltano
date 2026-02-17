@@ -278,7 +278,7 @@ class FlextMeltanoAbstractions:
                 "Adding plugin",
                 plugin_config=plugin_config,
             )
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"
             self.logger.exception(error_msg)

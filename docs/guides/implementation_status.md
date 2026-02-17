@@ -66,7 +66,7 @@ FLEXT-Meltano has achieved **production-capable status** with comprehensive Sing
 
 #### **Test Infrastructure - 60% Complete (Critical Verified Blocker)**
 
-- ❌ **VERIFIED: Missing flext-tests Dependency**: Confirmed `Path /home/marlonsc/flext/flext-tests for flext-tests does not exist`
+- ❌ **VERIFIED: Missing flext-tests Dependency**: Confirmed `Path flext-tests for flext-tests does not exist`
 - ❌ **VERIFIED: Model Compatibility Issues**: Confirmed `AttributeError: type object 'FlextModels' has no attribute 'BaseModel'`
 - ❌ **VERIFIED: Test Execution Blocked**: All tests fail at collection phase due to above issues
 - ✅ **Test Structure**: Comprehensive test suite with 20+ test files exists and is ready
