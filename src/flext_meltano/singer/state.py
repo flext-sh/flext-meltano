@@ -107,7 +107,7 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
                 "State saved to file",
                 file=str(state_file),
             )
-            return r[None].ok(None)
+            return r[None].ok(True)
         except Exception as e:
             self.logger.exception("Failed to save state", error=str(e))
             return r[None].fail(f"Failed to save state: {e}")
@@ -141,7 +141,7 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
                 stream=stream_name,
                 key=bookmark_key,
             )
-            return r[None].ok(None)
+            return r[None].ok(True)
         except Exception as e:
             self.logger.exception("Failed to update bookmark", error=str(e))
             return r[None].fail(f"Failed to update bookmark: {e}")
@@ -164,11 +164,11 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
                     value = state_entry.get(bookmark_key)
                     # Type narrow to str | None for result
                     if value is None:
-                        return r[str | None].ok(None)
+                        return r[str | None].ok(True)
                     if isinstance(value, str):
                         return r[str | None].ok(value)
                     return r[str | None].ok(str(value))
-            return r[str | None].ok(None)
+            return r[str | None].ok(True)
         except Exception as e:
             self.logger.exception("Failed to get bookmark", error=str(e))
             return r[str | None].fail(f"Failed to get bookmark: {e}")
