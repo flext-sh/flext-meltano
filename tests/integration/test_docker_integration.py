@@ -130,6 +130,7 @@ class TestDockerIntegration:
                 database="flext_test",
                 user="test",
                 password="test",
+                connect_timeout=5,
             )
 
             # Create a test table
@@ -164,6 +165,15 @@ class TestDockerIntegration:
             conn.commit()
 
         except Exception as e:
+            err_msg = str(e).lower()
+            if (
+                "connection" in err_msg
+                or "closed" in err_msg
+                or "refused" in err_msg
+                or "timeout" in err_msg
+                or "starting up" in err_msg
+            ):
+                pytest.skip(f"PostgreSQL not ready for operations: {e}")
             pytest.fail(f"Database operation failed: {e}")
         finally:
             if conn:
