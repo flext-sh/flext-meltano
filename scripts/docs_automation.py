@@ -143,9 +143,9 @@ class DocumentationAutomation(s):
             if hasattr(maintenance_module, "run_comprehensive_audit"):
                 result = maintenance_module.run_comprehensive_audit(*args)
                 if isinstance(result, dict) and result.get("success", False):
-                    return r.ok(None)
+                    return r.ok(True)
                 if result:
-                    return r.ok(None)
+                    return r.ok(True)
                 return r.fail("Maintenance audit completed with warnings")
             return r.fail(
                 f"No run_comprehensive_audit function found in {self.maintenance_script}",

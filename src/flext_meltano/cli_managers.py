@@ -142,7 +142,7 @@ class FlextMeltanoPipelineManager:
         """Handle pipeline command using composition."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_pipeline_help()
-            return r[None].ok(None)
+            return r[None].ok(True)
 
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -188,32 +188,32 @@ class FlextMeltanoPipelineManager:
     def _create_pipeline(self, _args: list[str]) -> r[None]:
         """Create new pipeline."""
         self.logger.info("Pipeline creation not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _run_pipeline(self, _args: list[str]) -> r[None]:
         """Run pipeline."""
         self.logger.info("Pipeline execution not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _list_pipelines(self, _args: list[str]) -> r[None]:
         """List pipelines."""
         self.logger.info("Pipeline listing not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _get_pipeline_status(self, _args: list[str]) -> r[None]:
         """Get pipeline status."""
         self.logger.info("Pipeline status not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _stop_pipeline(self, _args: list[str]) -> r[None]:
         """Stop pipeline."""
         self.logger.info("Pipeline stopping not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _delete_pipeline(self, _args: list[str]) -> r[None]:
         """Delete pipeline."""
         self.logger.info("Pipeline deletion not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
 
 class FlextMeltanoSingerManager:
@@ -233,7 +233,7 @@ class FlextMeltanoSingerManager:
         """Handle tap command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_tap_help()
-            return r[None].ok(None)
+            return r[None].ok(True)
 
         subcommand = args[0]
         return self._execute_tap_operation(subcommand, args[1:])
@@ -242,7 +242,7 @@ class FlextMeltanoSingerManager:
         """Handle target command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_target_help()
-            return r[None].ok(None)
+            return r[None].ok(True)
 
         subcommand = args[0]
         return self._execute_target_operation(subcommand, args[1:])
@@ -257,7 +257,7 @@ class FlextMeltanoSingerManager:
             "Tap operation '%s' not implemented in this refactor",
             operation,
         )
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _execute_target_operation(
         self,
@@ -269,7 +269,7 @@ class FlextMeltanoSingerManager:
             "Target operation '%s' not implemented in this refactor",
             operation,
         )
-        return r[None].ok(None)
+        return r[None].ok(True)
 
 
 class FlextMeltanoDbtManager:
@@ -289,7 +289,7 @@ class FlextMeltanoDbtManager:
         """Handle DBT command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_dbt_help()
-            return r[None].ok(None)
+            return r[None].ok(True)
 
         subcommand = args[0]
         return self._execute_dbt_operation(subcommand, args[1:])
@@ -304,7 +304,7 @@ class FlextMeltanoDbtManager:
             "DBT operation '%s' not implemented in this refactor",
             operation,
         )
-        return r[None].ok(None)
+        return r[None].ok(True)
 
 
 class FlextMeltanoPluginManager:
@@ -324,7 +324,7 @@ class FlextMeltanoPluginManager:
         """Handle plugin command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_plugin_help()
-            return r[None].ok(None)
+            return r[None].ok(True)
 
         subcommand = args[0]
         return self._execute_plugin_operation(subcommand, args[1:])
@@ -339,7 +339,7 @@ class FlextMeltanoPluginManager:
             "Plugin operation '%s' not implemented in this refactor",
             operation,
         )
-        return r[None].ok(None)
+        return r[None].ok(True)
 
 
 class FlextMeltanoStatusManager:
@@ -359,7 +359,7 @@ class FlextMeltanoStatusManager:
         """Handle status command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_status_help()
-            return r[None].ok(None)
+            return r[None].ok(True)
 
         subcommand = args[0]
         return self._execute_status_operation(subcommand, args[1:])
@@ -367,7 +367,7 @@ class FlextMeltanoStatusManager:
     def handle_version_command(self, _args: list[str]) -> r[None]:
         """Handle version command."""
         self.logger.info("FLEXT Meltano version not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None].ok(True)
 
     def _execute_status_operation(
         self,
@@ -379,7 +379,7 @@ class FlextMeltanoStatusManager:
             "Status operation '%s' not implemented in this refactor",
             operation,
         )
-        return r[None].ok(None)
+        return r[None].ok(True)
 
 
 __all__ = [
