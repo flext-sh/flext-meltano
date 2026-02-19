@@ -501,7 +501,7 @@ cloud "FLEXT Ecosystem" as ecosystem {
         }
 
         rectangle "Specialized Projects" as specialized {
-            component "client-a-OUD-Mig" as client-a [
+            component "flext-oud-mig" as flext [
                 Oracle Migration
                 Legacy System Integration
             ]
