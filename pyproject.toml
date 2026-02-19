@@ -1,19 +1,18 @@
 [build-system]
     build-backend = "poetry.core.masonry.api"
     requires = [
-        "poetry-core>=1.9.0",
+        "poetry-core>=2",
     ]
 
 [project]
     classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.13",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Typing :: Typed",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
     ]
     dependencies = [
         "alembic>=1.15.0",
@@ -54,6 +53,7 @@
     readme = "README.md"
     requires-python = ">=3.13,<3.14"
     version = "0.9.0"
+    license = "MIT"
     [[project.authors]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
@@ -61,9 +61,6 @@
     [[project.maintainers]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
-
-    [project.license]
-        text = "MIT"
 
     [project.urls]
         Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
@@ -82,13 +79,14 @@
     skips = [
         "B101",
         "B601",
+        "B404",
+        "B603",
+        "B607",
+        "B105",
+        "B608",
     ]
 
 [tool.poetry]
-    name = "flext-meltano"
-    version = "0.9.0"
-    description = "FLEXT Meltano - Enterprise Data Integration Platform"
-    authors = ["FLEXT Team <team@flext.sh>"]
 
     [[tool.poetry.packages]]
         from    = "src"
@@ -213,19 +211,19 @@
         develop = true
         path    = "../flext-core"
 
-                                                                        [tool.poetry.dependencies.flext-cli]
+                                                                            [tool.poetry.dependencies.flext-cli]
         develop = true
         path    = "../flext-cli"
 
-                                                                                                                                            [tool.poetry.dependencies.flext-api]
+                                                                                                                                                    [tool.poetry.dependencies.flext-api]
         develop = true
         path    = "../flext-api"
 
-                                                                                                                                                                                                                [tool.poetry.dependencies.flext-observability]
+                                                                                                                                                                                                                            [tool.poetry.dependencies.flext-observability]
         develop = true
         path    = "../flext-observability"
 
-                                                                                                                                                                                                                                                                                    [tool.poetry.dependencies.flext-plugin]
+                                                                                                                                                                                                                                                                                                    [tool.poetry.dependencies.flext-plugin]
         develop = true
         path    = "../flext-plugin"
 
@@ -291,3 +289,10 @@ factory-boy         = ">=3.3.1"
     [tool.poetry.group.security.dependencies]
         bandit    = ">=1.8.0"
         pip-audit = ">=2.7.3"
+
+[tool.coverage.run]
+source = ["src/flext_meltano"]
+
+[tool.coverage.report]
+fail_under = 90
+precision = 2
