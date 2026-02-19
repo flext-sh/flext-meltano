@@ -42,9 +42,9 @@ jobs:
       - name: Sync workspace docs scripts
         run: |
           if [ -d "flext-meltano" ]; then
-            make -C flext-meltano docs-sync-scripts
+            make -C flext-meltano docs
           else
-            make docs-sync-scripts
+            make docs
           fi
 
       - name: Run documentation quality audit

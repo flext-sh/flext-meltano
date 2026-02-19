@@ -60,10 +60,10 @@ make docs DOCS_PHASE=audit
 
 ```bash
 # Install Git hooks (recommended)
-make docs-hooks
+make docs
 
 # Generate CI/CD workflow
-make docs-workflow
+make docs
 ```
 
 ## 📊 Understanding Your Results
@@ -206,7 +206,7 @@ pip install PyYAML requests
 
 ```bash
 # Reinstall hooks
-make docs-hooks
+make docs
 
 # Check permissions
 ls -la .git/hooks/pre-commit
@@ -241,7 +241,7 @@ automation:
 
 ```bash
 # Start continuous monitoring
-make docs-schedule
+make docs
 
 # Runs automatically according to schedule
 ```
@@ -263,7 +263,7 @@ Track these indicators of maintenance success:
 
 1. **Run your first comprehensive audit**: `make docs`
 2. **Review and fix high-priority issues** from the report
-3. **Set up automated quality gates**: `make docs-setup`
+3. **Set up automated quality gates**: `make docs`
 4. **Monitor quality trends** weekly
 5. **Customize configuration** as needed
 

@@ -106,19 +106,19 @@ This directory contains comprehensive architecture documentation for FLEXT-Melta
 
 ```bash
 # Validate all architecture documentation
-make docs-architecture-validate
+make docs
 
 # Generate diagrams from code analysis
-make docs-architecture-generate
+make docs
 
 # Update documentation timestamps and references
-make docs-architecture-update
+make docs
 
 # Create comprehensive architecture status report
-make docs-architecture-report
+make docs
 
 # Run all architecture maintenance tasks
-make docs-architecture-comprehensive
+make docs
 ```
 
 ## 📈 Quality Metrics

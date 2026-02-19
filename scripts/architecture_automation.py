@@ -774,7 +774,7 @@ class ArchitectureDocumentationManager:
 
 ---
 
-*This report is automatically generated. Run `make docs-architecture-report` to update.*
+*This report is automatically generated. Run `make docs` to update.*
 """
 
         Path(report_path).write_text(report_content, encoding="utf-8")
