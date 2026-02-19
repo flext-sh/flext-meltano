@@ -10,13 +10,13 @@ on:
     paths:
       - "docs/**"
       - "**.md"
-      - "scripts/docs_maintenance.py"
+      - "scripts/documentation/**"
   pull_request:
     branches: [main, develop]
     paths:
       - "docs/**"
       - "**.md"
-      - "scripts/docs_maintenance.py"
+      - "scripts/documentation/**"
   schedule:
     # Run weekly audit on monday at 09:00 UTC
     - cron: "0 9 * * 1"
@@ -37,20 +37,38 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install PyYAML requests
+          pip install mkdocs
+
+      - name: Sync workspace docs scripts
+        run: |
+          if [ -d "flext-meltano" ]; then
+            make -C flext-meltano docs-sync-scripts
+          else
+            make docs-sync-scripts
+          fi
 
       - name: Run documentation quality audit
-        run: python scripts/docs_maintenance.py --comprehensive
+        run: |
+          if [ -d "flext-meltano" ]; then
+            make docs DOCS_PHASE=audit PROJECT=flext-meltano
+          else
+            make docs DOCS_PHASE=audit
+          fi
 
       - name: Check quality thresholds
-        run: python scripts/docs_automation.py --ci-check
+        run: |
+          if [ -d "flext-meltano" ]; then
+            make docs DOCS_PHASE=validate PROJECT=flext-meltano
+          else
+            make docs DOCS_PHASE=validate
+          fi
 
       - name: Upload quality reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: docs-quality-reports
-          path: docs/reports/
+          path: .reports/docs/
 
       - name: Comment PR with quality report
         if: github.event_name == 'pull_request'
@@ -61,12 +79,12 @@ jobs:
             const path = require('path');
 
             // Read the quality summary
-            const summaryPath = path.join(process.cwd(), 'docs/reports/docs_quality_summary.json');
+            const summaryPath = path.join(process.cwd(), '.reports/docs/validate-summary.json');
             if (fs.existsSync(summaryPath)) {
               const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
 
-              const qualityScore = summary.quality_score;
-              const totalIssues = summary.issues.total;
+              const qualityScore = summary.summary?.result === 'OK' ? 100 : 0;
+              const totalIssues = summary.details?.missing_adr_skills?.length || 0;
 
               const body = `
               ## 📊 Documentation Quality Report
@@ -75,9 +93,9 @@ jobs:
               **Total Issues:** ${totalIssues}
 
               ### Details
-              - Files: ${summary.metrics.total_files}
-              - Words: ${summary.metrics.total_words.toLocaleString()}
-              - Links: ${summary.metrics.total_links}
+              - Scope: ${summary.summary?.scope || 'unknown'}
+              - Validation result: ${summary.summary?.result || 'unknown'}
+              - Message: ${summary.summary?.message || 'n/a'}
 
               [View detailed report](https://github.com/${github.repository}/actions/runs/${github.run_id})
               `;

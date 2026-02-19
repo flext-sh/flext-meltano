@@ -1,5 +1,37 @@
 # Architecture Documentation
 
+
+<!-- TOC START -->
+- [📋 Documentation Overview](#-documentation-overview)
+- [🏗️ Documentation Framework](#-documentation-framework)
+  - [C4 Model Architecture](#c4-model-architecture)
+  - [Architecture Decision Records (ADRs)](#architecture-decision-records-adrs)
+  - [PlantUML Diagrams](#plantuml-diagrams)
+- [📊 Specialized Architecture Views](#-specialized-architecture-views)
+  - [System Context & Integration](#system-context-integration)
+  - [Data Architecture](#data-architecture)
+  - [Security Architecture](#security-architecture)
+  - [Quality Attributes](#quality-attributes)
+- [🔧 Automation & Maintenance](#-automation-maintenance)
+  - [Architecture Automation Tools](#architecture-automation-tools)
+  - [Maintenance Commands](#maintenance-commands)
+- [📈 Quality Metrics](#-quality-metrics)
+  - [Documentation Health](#documentation-health)
+  - [Architecture Quality](#architecture-quality)
+- [🎯 Key Architectural Decisions](#-key-architectural-decisions)
+  - [Core Principles](#core-principles)
+  - [Technology Choices](#technology-choices)
+  - [Integration Patterns](#integration-patterns)
+- [🚀 Usage Guidelines](#-usage-guidelines)
+  - [For Architects](#for-architects)
+  - [For Developers](#for-developers)
+  - [For Operations](#for-operations)
+- [📚 Related Documentation](#-related-documentation)
+- [🎯 Architecture Evolution](#-architecture-evolution)
+  - [Current State](#current-state)
+  - [Future Directions](#future-directions)
+<!-- TOC END -->
+
 **FLEXT-Meltano Enterprise Data Integration Platform - Architecture Documentation**
 
 ## 📋 Documentation Overview

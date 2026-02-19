@@ -1,5 +1,32 @@
 # FLEXT Meltano Test Suite
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [Test Organization](#test-organization)
+  - [Test Categories](#test-categories)
+- [Test Execution](#test-execution)
+  - [Quality Gates Integration](#quality-gates-integration)
+  - [Test Configuration](#test-configuration)
+- [Active Test Files](#active-test-files)
+  - [Core Functionality Tests](#core-functionality-tests)
+  - [Data Integration Tests](#data-integration-tests)
+  - [Plugin Management Tests](#plugin-management-tests)
+- [Test Standards](#test-standards)
+  - [Test Documentation Requirements](#test-documentation-requirements)
+  - [Test Implementation Standards](#test-implementation-standards)
+- [Test Scope](#test-scope)
+- [Test Organization](#test-organization)
+  - [Quality Requirements](#quality-requirements)
+- [Deprecated/Archived Tests](#deprecatedarchived-tests)
+- [Test Development Workflow](#test-development-workflow)
+  - [Adding New Tests](#adding-new-tests)
+  - [Test Execution Patterns](#test-execution-patterns)
+- [Integration with Quality Gates](#integration-with-quality-gates)
+  - [CI/CD Integration](#cicd-integration)
+  - [Pre-commit Hooks](#pre-commit-hooks)
+<!-- TOC END -->
+
 **Enterprise-Grade Testing Infrastructure**
 
 ## Overview
@@ -213,9 +240,8 @@ pytest tests/ -k "test_specific"     # Run tests matching pattern
 pytest tests/ --collect-only         # Show available tests
 pytest tests/ --durations=10         # Show slowest tests
 
-# Coverage analysis
-pytest tests/ --cov=src/flext_meltano --cov-report=html
-pytest tests/ --cov-fail-under=90    # Enforce coverage minimum
+# Coverage analysis (thresholds configured in pyproject.toml)
+make test
 
 # Quality validation
 pytest tests/ --doctest-modules      # Validate docstring examples

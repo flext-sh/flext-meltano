@@ -1,5 +1,39 @@
 # FLEXT Meltano End-to-End Tests
 
+
+<!-- TOC START -->
+- [🎭 End-to-End Testing Overview](#-end-to-end-testing-overview)
+  - [**E2E Test Categories**](#e2e-test-categories)
+- [🎯 E2E Testing Principles](#-e2e-testing-principles)
+  - [**Production-Like Environment**](#production-like-environment)
+  - [**Comprehensive Validation**](#comprehensive-validation)
+- [🔧 E2E Test Structure](#-e2e-test-structure)
+  - [**Test Organization**](#test-organization)
+  - [**Test Execution**](#test-execution)
+- [🏗️ E2E Environment Setup](#-e2e-environment-setup)
+  - [**Complete Stack Configuration**](#complete-stack-configuration)
+  - [**E2E Environment Variables**](#e2e-environment-variables)
+- [⚡ E2E Performance Standards](#-e2e-performance-standards)
+  - [**Execution Time Expectations**](#execution-time-expectations)
+  - [**Resource Requirements**](#resource-requirements)
+- [🛡️ E2E Test Patterns](#-e2e-test-patterns)
+  - [**Complete Workflow Testing**](#complete-workflow-testing)
+  - [**Production Scenario Testing**](#production-scenario-testing)
+  - [**Error Recovery Testing**](#error-recovery-testing)
+- [📊 E2E Quality Standards](#-e2e-quality-standards)
+  - [**Test Coverage Requirements**](#test-coverage-requirements)
+  - [**Quality Gates**](#quality-gates)
+- [🔍 Test Data Management](#-test-data-management)
+  - [**E2E Test Data Strategy**](#e2e-test-data-strategy)
+  - [**Data Lifecycle Management**](#data-lifecycle-management)
+- [📈 E2E Monitoring and Metrics](#-e2e-monitoring-and-metrics)
+  - [**Test Execution Monitoring**](#test-execution-monitoring)
+  - [**Production Readiness Validation**](#production-readiness-validation)
+- [📋 E2E Testing Status](#-e2e-testing-status)
+  - [**Production Readiness**](#production-readiness)
+  - [**E2E Quality Metrics**](#e2e-quality-metrics)
+<!-- TOC END -->
+
 **✅ STATUS**: Enterprise end-to-end testing framework with complete workflow validation and production-like scenario testing.
 
 ## 🎭 End-to-End Testing Overview
@@ -242,7 +276,7 @@ def test_complete_error_recovery_e2e():
 # E2E test quality validation
 pytest tests/e2e/ --e2e --maxfail=5 --tb=short
 pytest tests/e2e/ --e2e --durations=10  # Show slowest tests
-pytest tests/e2e/ --e2e --cov=src/flext_meltano --cov-fail-under=70
+make test                              # Coverage thresholds in pyproject.toml
 ```
 
 ## 🔍 Test Data Management

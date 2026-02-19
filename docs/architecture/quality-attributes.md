@@ -1,5 +1,53 @@
 # Quality Attributes Documentation
 
+
+<!-- TOC START -->
+- [📋 Table of Contents](#-table-of-contents)
+- [🎯 Quality Attributes Overview](#-quality-attributes-overview)
+  - [Architectural Quality Goals](#architectural-quality-goals)
+  - [Quality Attribute Scenarios](#quality-attribute-scenarios)
+- [⚡ Performance](#-performance)
+  - [Performance Architecture](#performance-architecture)
+  - [Performance Characteristics](#performance-characteristics)
+  - [Performance Optimization Strategies](#performance-optimization-strategies)
+  - [Performance Monitoring](#performance-monitoring)
+- [📈 Scalability](#-scalability)
+  - [Scalability Architecture](#scalability-architecture)
+  - [Scaling Strategies](#scaling-strategies)
+- [🛡️ Reliability](#-reliability)
+  - [Reliability Architecture](#reliability-architecture)
+  - [Reliability Patterns](#reliability-patterns)
+  - [Reliability Monitoring](#reliability-monitoring)
+- [⏱️ Availability](#-availability)
+  - [Availability Architecture](#availability-architecture)
+  - [Availability Targets](#availability-targets)
+  - [High Availability Implementation](#high-availability-implementation)
+- [🔧 Maintainability](#-maintainability)
+  - [Maintainability Architecture](#maintainability-architecture)
+  - [Maintainability Metrics](#maintainability-metrics)
+  - [Code Quality Automation](#code-quality-automation)
+- [🎨 Usability](#-usability)
+  - [API Design Principles](#api-design-principles)
+  - [Usability Metrics](#usability-metrics)
+  - [User Experience Optimization](#user-experience-optimization)
+- [🧪 Testability](#-testability)
+  - [Testing Architecture](#testing-architecture)
+  - [Testability Patterns](#testability-patterns)
+  - [Test Quality Metrics](#test-quality-metrics)
+  - [Testing Automation](#testing-automation)
+- [🔄 Cross-Cutting Concerns](#-cross-cutting-concerns)
+  - [Logging Architecture](#logging-architecture)
+  - [Monitoring and Observability](#monitoring-and-observability)
+  - [Configuration Management](#configuration-management)
+  - [Caching Strategy](#caching-strategy)
+  - [Internationalization (i18n)](#internationalization-i18n)
+- [📈 Architecture Evolution](#-architecture-evolution)
+  - [Current Architecture Assessment](#current-architecture-assessment)
+  - [Architecture Roadmap](#architecture-roadmap)
+  - [Technical Debt Management](#technical-debt-management)
+  - [Risk Mitigation](#risk-mitigation)
+<!-- TOC END -->
+
 **FLEXT-Meltano Quality Attributes and Cross-Cutting Concerns**
 
 **Version**: 1.0 | **Last Updated**: 2025-10-10
@@ -2331,9 +2379,8 @@ class QualityGate:
             result.issues = ["New code files require corresponding tests"]
             return result
 
-        # Run coverage check
-        cmd = ['pytest', '--cov=flext_meltano', '--cov-report=term-missing',
-               '--cov-fail-under=95', 'tests/']
+        # Run coverage check (thresholds configured in pyproject.toml)
+        cmd = ['pytest', '--cov', '--cov-report=term-missing', 'tests/']
         process = subprocess.run(cmd, capture_output=True, text=True)
 
         if process.returncode != 0:

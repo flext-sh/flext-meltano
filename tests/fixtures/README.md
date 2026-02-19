@@ -1,5 +1,41 @@
 # FLEXT Meltano Test Fixtures
 
+
+<!-- TOC START -->
+- [🧪 Test Fixtures Overview](#-test-fixtures-overview)
+  - [**Fixture Categories**](#fixture-categories)
+- [🎯 Fixture Design Principles](#-fixture-design-principles)
+  - [**Consistency and Isolation**](#consistency-and-isolation)
+  - [**Reusability and Maintainability**](#reusability-and-maintainability)
+- [🔧 Fixture Structure](#-fixture-structure)
+  - [**Directory Organization**](#directory-organization)
+  - [**Fixture Loading Patterns**](#fixture-loading-patterns)
+- [📊 Data Fixtures](#-data-fixtures)
+  - [**Sample Data Categories**](#sample-data-categories)
+  - [**Schema Fixtures**](#schema-fixtures)
+- [🔧 Configuration Fixtures](#-configuration-fixtures)
+  - [**Meltano Project Fixtures**](#meltano-project-fixtures)
+  - [**Service Configuration Fixtures**](#service-configuration-fixtures)
+- [🎭 Mock Fixtures](#-mock-fixtures)
+  - [**Mock Service Implementations**](#mock-service-implementations)
+  - [**Database Mock Fixtures**](#database-mock-fixtures)
+- [⚡ Performance Fixtures](#-performance-fixtures)
+  - [**Fixture Loading Performance**](#fixture-loading-performance)
+  - [**Fixture Optimization**](#fixture-optimization)
+- [🛡️ Fixture Quality Standards](#-fixture-quality-standards)
+  - [**Data Quality**](#data-quality)
+  - [**Code Quality**](#code-quality)
+- [📋 Fixture Management](#-fixture-management)
+  - [**Fixture Discovery**](#fixture-discovery)
+  - [**Fixture Validation**](#fixture-validation)
+- [🔍 Usage Examples](#-usage-examples)
+  - [**Basic Fixture Usage**](#basic-fixture-usage)
+  - [**Advanced Fixture Composition**](#advanced-fixture-composition)
+- [📋 Test Fixtures Status](#-test-fixtures-status)
+  - [**Production Readiness**](#production-readiness)
+  - [**Fixture Quality Metrics**](#fixture-quality-metrics)
+<!-- TOC END -->
+
 **STATUS**: Active Development — Enterprise test fixture framework functional; stabilization in progress.
 
 ## 🧪 Test Fixtures Overview

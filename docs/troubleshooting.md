@@ -1,5 +1,31 @@
 # Troubleshooting flext-meltano
 
+
+<!-- TOC START -->
+- [🚨 Architecture Compliance Issues](#-architecture-compliance-issues)
+  - [**Direct Import Violations**](#direct-import-violations)
+- [🔧 Development Issues](#-development-issues)
+  - [**Import Errors**](#import-errors)
+  - [**Type Check Failures**](#type-check-failures)
+  - [**Test Failures**](#test-failures)
+- [📦 Dependency Issues](#-dependency-issues)
+  - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
+  - [**Virtual Environment Issues**](#virtual-environment-issues)
+- [🧪 Testing Issues](#-testing-issues)
+  - [**Coverage Issues**](#coverage-issues)
+  - [**Slow Tests**](#slow-tests)
+- [🔍 Quality Gate Failures](#-quality-gate-failures)
+  - [**Linting Errors**](#linting-errors)
+  - [**Security Issues**](#security-issues)
+- [🚫 Common Mistakes](#-common-mistakes)
+  - [**FlextResult Pattern Violations**](#flextresult-pattern-violations)
+  - [**Service Pattern Violations**](#service-pattern-violations)
+- [🆘 Getting Help](#-getting-help)
+  - [**Debug Information**](#debug-information)
+  - [**Support Channels**](#support-channels)
+- [📋 Debugging Checklist](#-debugging-checklist)
+<!-- TOC END -->
+
 **Common issues and solutions** for flext-meltano development and usage.
 
 ---

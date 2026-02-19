@@ -1,5 +1,35 @@
 # FLEXT Meltano Extensions Tests
 
+
+<!-- TOC START -->
+- [🔌 Extensions Testing Overview](#-extensions-testing-overview)
+  - [**Extension Test Categories**](#extension-test-categories)
+- [🎯 Extension Testing Principles](#-extension-testing-principles)
+  - [**Specialized Component Validation**](#specialized-component-validation)
+  - [**Enterprise Standards Compliance**](#enterprise-standards-compliance)
+- [🔧 Extension Test Structure](#-extension-test-structure)
+  - [**Test Organization**](#test-organization)
+  - [**Test Execution**](#test-execution)
+- [⚡ Performance Standards](#-performance-standards)
+  - [**Extension Performance Limits**](#extension-performance-limits)
+  - [**Resource Requirements**](#resource-requirements)
+- [🛡️ Extension Test Patterns](#-extension-test-patterns)
+  - [**Custom Component Testing**](#custom-component-testing)
+  - [**Oracle OIC Extension Testing**](#oracle-oic-extension-testing)
+  - [**Compliance Extension Testing**](#compliance-extension-testing)
+- [📊 Extension Quality Standards](#-extension-quality-standards)
+  - [**Test Categories and Markers**](#test-categories-and-markers)
+  - [**Quality Gates**](#quality-gates)
+- [🔍 Extension Fixture Management](#-extension-fixture-management)
+  - [**Extension-Specific Fixtures**](#extension-specific-fixtures)
+  - [**Enterprise Data Fixtures**](#enterprise-data-fixtures)
+- [🚀 Extension Development Standards](#-extension-development-standards)
+  - [**Custom Extension Implementation**](#custom-extension-implementation)
+- [📋 Extensions Testing Status](#-extensions-testing-status)
+  - [**Production Readiness**](#production-readiness)
+  - [**Extension Metrics**](#extension-metrics)
+<!-- TOC END -->
+
 **✅ STATUS**: Enterprise extension testing framework with comprehensive validation for specialized components and custom integrations.
 
 ## 🔌 Extensions Testing Overview
@@ -194,7 +224,7 @@ from tests.extensions.compliance import ComplianceExtension
 ```bash
 # Extension test quality validation
 pytest tests/extensions/ -m "extension and not slow" --maxfail=5
-pytest tests/extensions/ --cov=src/flext_meltano/extensions --cov-fail-under=85
+make test                              # Coverage thresholds in pyproject.toml
 pytest tests/extensions/ --timeout=1800  # 30 minute timeout for complex extensions
 ```
 

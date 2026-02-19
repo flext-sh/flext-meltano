@@ -1,5 +1,39 @@
 # Data Architecture Documentation
 
+
+<!-- TOC START -->
+- [📋 Table of Contents](#-table-of-contents)
+- [🏗️ Data Flow Architecture](#-data-flow-architecture)
+  - [High-Level Data Flow](#high-level-data-flow)
+  - [Data Flow Patterns](#data-flow-patterns)
+  - [Data Transformation Stages](#data-transformation-stages)
+- [💾 Data Storage Strategy](#-data-storage-strategy)
+  - [Storage Layer Architecture](#storage-layer-architecture)
+  - [Storage Technologies](#storage-technologies)
+  - [Data Persistence Patterns](#data-persistence-patterns)
+- [📊 Data Models and Schemas](#-data-models-and-schemas)
+  - [Core Data Models](#core-data-models)
+  - [Data Validation Rules](#data-validation-rules)
+- [🔄 Data Processing Pipeline](#-data-processing-pipeline)
+  - [Pipeline Execution Flow](#pipeline-execution-flow)
+  - [Processing Stages](#processing-stages)
+- [🛡️ Data Quality and Validation](#-data-quality-and-validation)
+  - [Quality Gates](#quality-gates)
+  - [Data Quality Metrics](#data-quality-metrics)
+  - [Error Handling Strategies](#error-handling-strategies)
+- [🎯 Data Governance](#-data-governance)
+  - [Data Lineage Tracking](#data-lineage-tracking)
+  - [Data Classification and Security](#data-classification-and-security)
+  - [Data Retention Policies](#data-retention-policies)
+- [⚡ Performance and Scalability](#-performance-and-scalability)
+  - [Performance Characteristics](#performance-characteristics)
+  - [Scalability Patterns](#scalability-patterns)
+  - [Monitoring and Observability](#monitoring-and-observability)
+- [📈 Architecture Evolution](#-architecture-evolution)
+  - [Current Limitations](#current-limitations)
+  - [Future Enhancements](#future-enhancements)
+<!-- TOC END -->
+
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**
 
 **Version**: 1.0 | **Last Updated**: 2025-10-10

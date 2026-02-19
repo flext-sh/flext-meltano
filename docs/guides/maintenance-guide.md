@@ -1,5 +1,56 @@
 # Documentation Maintenance Guide
 
+
+<!-- TOC START -->
+- [🎯 Overview](#-overview)
+- [🏗️ Architecture](#-architecture)
+  - [Core Components](#core-components)
+  - [Key Features](#key-features)
+- [🚀 Quick Start](#-quick-start)
+  - [1. Run Comprehensive Audit](#1-run-comprehensive-audit)
+  - [2. View Quality Reports](#2-view-quality-reports)
+  - [3. Set Up Quality Gates](#3-set-up-quality-gates)
+- [📋 Quality Metrics](#-quality-metrics)
+  - [Overall Quality Score (0-100)](#overall-quality-score-0-100)
+  - [Issue Classification](#issue-classification)
+- [🔧 Maintenance Commands](#-maintenance-commands)
+  - [Quality Assessment](#quality-assessment)
+  - [Automation & CI/CD](#automation-cicd)
+  - [Maintenance Tasks](#maintenance-tasks)
+- [📊 Quality Thresholds](#-quality-thresholds)
+  - [Default Configuration](#default-configuration)
+  - [CI/CD Quality Gates](#cicd-quality-gates)
+- [🔍 Issue Resolution Guide](#-issue-resolution-guide)
+  - [Common Issues & Solutions](#common-issues-solutions)
+- [H2: Section](#h2-section)
+  - [H3: Subsection](#h3-subsection)
+- [H2: Another Section](#h2-another-section)
+- [⚙️ Configuration](#-configuration)
+  - [Maintenance Configuration](#maintenance-configuration)
+  - [Custom Rules](#custom-rules)
+- [🔄 Automation Features](#-automation-features)
+  - [Scheduled Audits](#scheduled-audits)
+  - [Pre-commit Hooks](#pre-commit-hooks)
+  - [CI/CD Integration](#cicd-integration)
+- [📈 Monitoring & Analytics](#-monitoring-analytics)
+  - [Quality Trends](#quality-trends)
+  - [Metrics Dashboard](#metrics-dashboard)
+- [🚨 Troubleshooting](#-troubleshooting)
+  - [Audit Failures](#audit-failures)
+  - [Link Validation Issues](#link-validation-issues)
+  - [Git Hook Issues](#git-hook-issues)
+- [📚 Best Practices](#-best-practices)
+  - [Content Creation](#content-creation)
+  - [Quality Maintenance](#quality-maintenance)
+  - [Link Management](#link-management)
+- [🎯 Advanced Features](#-advanced-features)
+  - [Custom Validators](#custom-validators)
+  - [Integration APIs](#integration-apis)
+- [📞 Support & Resources](#-support-resources)
+  - [Getting Help](#getting-help)
+  - [Related Documentation](#related-documentation)
+<!-- TOC END -->
+
 **FLEXT-Meltano Documentation Quality Assurance & Maintenance Framework**
 
 ## 🎯 Overview
@@ -12,8 +63,8 @@ This guide provides comprehensive documentation for the automated documentation 
 
 ```
 📚 Documentation Maintenance System
-├── 🔍 docs_maintenance.py      # Core audit & validation engine
-├── ⚙️  docs_automation.py       # CI/CD integration & scheduling
+├── 🔍 scripts/documentation/audit.py      # Core audit engine (workspace SSOT)
+├── ✅ scripts/documentation/validate.py    # Validation gate engine (workspace SSOT)
 ├── 📊 Quality Reporting        # Automated report generation
 ├── 🔗 Link Validation         # External/internal link checking
 └── 📈 Quality Metrics         # Scoring and trend analysis
@@ -34,17 +85,17 @@ This guide provides comprehensive documentation for the automated documentation 
 
 ```bash
 # Run full documentation quality assessment
-make docs-comprehensive
+make docs
 
 # Or directly with Python
-python scripts/docs_maintenance.py --comprehensive
+make docs DOCS_PHASE=all PROJECT=flext-meltano
 ```
 
 ### 2. View Quality Reports
 
 ```bash
 # View latest quality summary
-make docs-view-report
+make docs DOCS_PHASE=audit
 
 # Open detailed report
 cat docs/reports/docs_quality_report_*.md
@@ -88,16 +139,16 @@ Calculated from weighted components:
 
 ```bash
 # Run quality audit only
-make docs-audit
-python scripts/docs_maintenance.py --audit
+make docs DOCS_PHASE=audit
+make docs DOCS_PHASE=audit PROJECT=flext-meltano
 
 # Validate external links
-make docs-validate
-python scripts/docs_maintenance.py --validate
+make docs DOCS_PHASE=validate
+make docs DOCS_PHASE=validate PROJECT=flext-meltano
 
 # Generate quality reports
 make docs-report
-python scripts/docs_maintenance.py --report
+make docs DOCS_PHASE=audit PROJECT=flext-meltano
 ```
 
 ### Automation & CI/CD
@@ -105,15 +156,15 @@ python scripts/docs_maintenance.py --report
 ```bash
 # Run CI quality checks
 make docs-ci-check
-python scripts/docs_automation.py --ci-check
+make docs DOCS_PHASE=validate PROJECT=flext-meltano
 
 # Start scheduled monitoring
 make docs-schedule
-python scripts/docs_automation.py --schedule
+make docs DOCS_PHASE=audit PROJECT=flext-meltano
 
 # Set up Git hooks
 make docs-hooks
-python scripts/docs_automation.py --setup-hooks
+make docs-sync-scripts
 ```
 
 ### Maintenance Tasks
@@ -168,7 +219,7 @@ grep "broken_internal_link" docs/reports/docs_quality_report_*.md
 
 # Fix by updating link paths or creating missing files
 # Re-run audit to verify
-make docs-comprehensive
+make docs
 ```
 
 #### 🟡 Medium Priority: Missing Structure
@@ -315,7 +366,7 @@ Key metrics to monitor:
 
 ### Audit Failures
 
-**Issue**: `docs_maintenance.py --audit` fails
+**Issue**: `scripts/documentation/audit.py` fails
 
 **Solutions**:
 
@@ -327,7 +378,7 @@ python --version  # Should be 3.13+
 pip install PyYAML requests
 
 # Verify script permissions
-ls -la scripts/docs_maintenance.py
+ls -la scripts/documentation/audit.py
 
 # Check for file encoding issues
 file docs/some_file.md  # Should be UTF-8
@@ -442,7 +493,7 @@ auditor.generate_custom_report("api_quality.md")
 ### Getting Help
 
 1. **Check This Guide**: Comprehensive troubleshooting section
-2. **Run Diagnostics**: `python scripts/docs_maintenance.py --comprehensive --verbose`
+2. **Run Diagnostics**: `make docs DOCS_PHASE=all PROJECT=flext-meltano`
 3. **View Reports**: Check `docs/reports/` for detailed issue analysis
 4. **GitHub Issues**: Report bugs or request features
 

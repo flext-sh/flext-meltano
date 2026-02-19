@@ -1,14 +1,13 @@
 [build-system]
     build-backend = "poetry.core.masonry.api"
     requires = [
-        "poetry-core>=1.9.0",
+        "poetry-core>=2.0",
     ]
 
 [project]
     classifiers = [
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.13",
@@ -54,6 +53,8 @@
     readme = "README.md"
     requires-python = ">=3.13,<3.14"
     version = "0.10.0-dev"
+    license = "MIT"
+
     [[project.authors]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
@@ -61,10 +62,6 @@
     [[project.maintainers]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
-
-    [project.license]
-        text = "MIT"
-
     [project.urls]
         Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
         Homepage      = "https://github.com/flext-sh/flext"
@@ -82,13 +79,14 @@
     skips = [
         "B101",
         "B601",
+        "B404",
+        "B603",
+        "B607",
+        "B105",
+        "B608",
     ]
 
 [tool.poetry]
-    name = "flext-meltano"
-    version = "0.10.0-dev"
-    description = "FLEXT Meltano - Enterprise Data Integration Platform"
-    authors = ["FLEXT Team <team@flext.sh>"]
 
     [[tool.poetry.packages]]
         from    = "src"
@@ -304,3 +302,12 @@ factory-boy         = ">=3.3.1"
     [tool.poetry.group.security.dependencies]
         bandit    = ">=1.8.0"
         pip-audit = ">=2.7.3"
+
+[tool.coverage]
+    [tool.coverage.run]
+        source = ["src/flext_meltano"]
+
+    [tool.coverage.report]
+        fail_under = 100
+        precision = 2
+

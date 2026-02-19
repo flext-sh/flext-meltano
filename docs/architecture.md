@@ -1,5 +1,39 @@
 # flext-meltano Architecture
 
+
+<!-- TOC START -->
+- [🎯 Architectural Overview](#-architectural-overview)
+  - [**Design Principles**](#design-principles)
+- [🏗️ Module Architecture](#-module-architecture)
+  - [**Foundation Layer**](#foundation-layer)
+  - [**Service Layer**](#service-layer)
+  - [**Execution Layer**](#execution-layer)
+  - [**Abstraction Layer**](#abstraction-layer)
+  - [**Configuration Layer**](#configuration-layer)
+- [🔄 Data Flow Architecture](#-data-flow-architecture)
+  - [**ELT Pipeline Flow**](#elt-pipeline-flow)
+  - [**Error Handling Flow**](#error-handling-flow)
+- [🏛️ Clean Architecture Implementation](#-clean-architecture-implementation)
+  - [**Layer Dependencies**](#layer-dependencies)
+  - [**Dependency Rules**](#dependency-rules)
+- [🔧 Integration Patterns](#-integration-patterns)
+  - [**FLEXT Ecosystem Integration**](#flext-ecosystem-integration)
+  - [**External Library Integration**](#external-library-integration)
+- [📊 Type System Architecture](#-type-system-architecture)
+  - [**FlextMeltanoTypes Hierarchy**](#flextmeltanotypes-hierarchy)
+  - [**Pydantic Model Integration**](#pydantic-model-integration)
+- [🛡️ Error Handling Architecture](#-error-handling-architecture)
+  - [**FlextResult Pattern Implementation**](#flextresult-pattern-implementation)
+  - [**Exception Hierarchy**](#exception-hierarchy)
+- [🎯 Current Status and Technical Debt](#-current-status-and-technical-debt)
+  - [**Architecture Compliance Status**](#architecture-compliance-status)
+  - [**Technical Debt**](#technical-debt)
+- [🚀 Future Architecture](#-future-architecture)
+  - [**Target State**](#target-state)
+  - [**Migration Path**](#migration-path)
+- [Related Documentation](#related-documentation)
+<!-- TOC END -->
+
 **Enterprise Meltano integration library architecture for the FLEXT ecosystem**
 
 **Version**: 0.9.9 RC | **Last Updated**: 2025-09-17

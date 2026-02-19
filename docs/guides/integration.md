@@ -1,5 +1,32 @@
 # flext-meltano Integration Patterns
 
+
+<!-- TOC START -->
+- [🎯 ELT Foundation Role](#-elt-foundation-role)
+- [🔌 Singer Ecosystem Integration](#-singer-ecosystem-integration)
+  - [Tap Implementation Pattern](#tap-implementation-pattern)
+  - [Target Implementation Pattern](#target-implementation-pattern)
+- [🛠️ dbt Integration Patterns](#-dbt-integration-patterns)
+  - [dbt Project Foundation](#dbt-project-foundation)
+- [🚀 Complete ELT Pipeline Integration](#-complete-elt-pipeline-integration)
+  - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
+- [🔗 Bridge Communication Patterns](#-bridge-communication-patterns)
+  - [Go ↔ Python Integration](#go-python-integration)
+- [📊 Integration Matrix](#-integration-matrix)
+  - [FLEXT Project Integration Status](#flext-project-integration-status)
+  - [Integration Requirements](#integration-requirements)
+- [🌍 Environment Integration](#-environment-integration)
+  - [FLEXT Workspace Setup](#flext-workspace-setup)
+  - [Consumer Project Dependencies](#consumer-project-dependencies)
+- [⚠️ Integration Limitations](#-integration-limitations)
+  - [Current Constraints](#current-constraints)
+  - [Workaround Strategies](#workaround-strategies)
+  - [Resolution Timeline](#resolution-timeline)
+- [🔧 Integration Best Practices](#-integration-best-practices)
+  - [Design Patterns](#design-patterns)
+  - [Quality Standards](#quality-standards)
+<!-- TOC END -->
+
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
 > **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration patterns. Full ecosystem compatibility requires abstraction layer.

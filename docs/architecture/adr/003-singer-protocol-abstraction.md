@@ -1,5 +1,29 @@
 # ADR-003: Singer Protocol Abstraction Layer
 
+
+<!-- TOC START -->
+- [Context](#context)
+- [Decision](#decision)
+- [Rationale](#rationale)
+  - [Why Abstraction Layer](#why-abstraction-layer)
+  - [Why Not Direct SDK Usage](#why-not-direct-sdk-usage)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Risks](#risks)
+  - [Mitigation Strategies](#mitigation-strategies)
+- [Alternatives Considered](#alternatives-considered)
+  - [1. Direct Singer SDK Usage](#1-direct-singer-sdk-usage)
+  - [2. Thin Wrapper Only](#2-thin-wrapper-only)
+  - [3. Complete Protocol Reimplementation](#3-complete-protocol-reimplementation)
+- [Implementation Details](#implementation-details)
+  - [Abstraction Hierarchy](#abstraction-hierarchy)
+  - [Error Handling Integration](#error-handling-integration)
+  - [State Management](#state-management)
+- [Related ADRs](#related-adrs)
+- [Notes](#notes)
+<!-- TOC END -->
+
 **Status**: Accepted | **Date**: 2025-02-01 | **Category**: 🏗️ Architecture
 
 ## Context
