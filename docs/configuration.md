@@ -1,5 +1,45 @@
 # flext-meltano Configuration
 
+
+<!-- TOC START -->
+- [🎯 Configuration Overview](#-configuration-overview)
+- [📋 Environment Setup](#-environment-setup)
+  - [Required Environment Variables](#required-environment-variables)
+  - [Virtual Environment Setup](#virtual-environment-setup)
+- [⚙️ Meltano Project Configuration](#-meltano-project-configuration)
+  - [Basic meltano.yml Structure](#basic-meltanoyml-structure)
+  - [Configuration Validation](#configuration-validation)
+- [🔌 Singer Plugin Configuration](#-singer-plugin-configuration)
+  - [Tap Configuration](#tap-configuration)
+  - [Target Configuration](#target-configuration)
+  - [Singer Catalog Configuration](#singer-catalog-configuration)
+- [🛠️ dbt Configuration](#-dbt-configuration)
+  - [dbt Project Structure](#dbt-project-structure)
+  - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbtprojectyml)
+  - [dbt Service Configuration](#dbt-service-configuration)
+- [🏗️ Pipeline Configuration](#-pipeline-configuration)
+  - [Complete ELT Pipeline](#complete-elt-pipeline)
+  - [Configuration Validation](#configuration-validation)
+- [🌍 Environment Management](#-environment-management)
+  - [Development Environment](#development-environment)
+  - [Production Environment](#production-environment)
+  - [Environment Switching](#environment-switching)
+- [🔧 Configuration File Management](#-configuration-file-management)
+  - [Reading Configuration Files](#reading-configuration-files)
+  - [Writing Configuration Files](#writing-configuration-files)
+  - [Configuration Backup](#configuration-backup)
+- [🔍 Configuration Validation](#-configuration-validation)
+  - [Schema Validation](#schema-validation)
+  - [Runtime Validation](#runtime-validation)
+- [🚨 Current Limitations](#-current-limitations)
+  - [Architecture Compliance Issues](#architecture-compliance-issues)
+  - [Configuration Restrictions](#configuration-restrictions)
+  - [Workarounds](#workarounds)
+- [🔄 Configuration Migration](#-configuration-migration)
+  - [Resolution Timeline](#resolution-timeline)
+  - [Migration Planning](#migration-planning)
+<!-- TOC END -->
+
 **Configuration management for FLEXT ecosystem ELT foundation library**
 
 > **⚠️ COMPLIANCE NOTE**: Current configuration patterns require abstraction layer for full FLEXT compliance due to direct meltano.core usage.

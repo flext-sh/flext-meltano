@@ -1,5 +1,29 @@
 # FLEXT Meltano Unit Tests
 
+
+<!-- TOC START -->
+- [🔬 Unit Testing Overview](#-unit-testing-overview)
+  - [**Unit Test Categories**](#unit-test-categories)
+- [🎯 Unit Testing Principles](#-unit-testing-principles)
+  - [**Isolation Requirements**](#isolation-requirements)
+  - [**Coverage Standards**](#coverage-standards)
+- [🔧 Unit Test Structure](#-unit-test-structure)
+  - [**Test Organization**](#test-organization)
+  - [**Test Execution**](#test-execution)
+- [⚡ Performance Standards](#-performance-standards)
+  - [**Execution Speed**](#execution-speed)
+  - [**Quality Gates**](#quality-gates)
+- [🛡️ Test Patterns](#-test-patterns)
+  - [**Mock Patterns**](#mock-patterns)
+  - [**Fixture Patterns**](#fixture-patterns)
+- [📊 Unit Test Quality](#-unit-test-quality)
+  - [**Coverage Metrics**](#coverage-metrics)
+  - [**Test Categories**](#test-categories)
+- [📋 Unit Testing Status](#-unit-testing-status)
+  - [**Production Readiness**](#production-readiness)
+  - [**Quality Metrics**](#quality-metrics)
+<!-- TOC END -->
+
 **✅ STATUS**: Enterprise unit testing framework with comprehensive module coverage and isolated testing patterns.
 
 ## 🔬 Unit Testing Overview
@@ -90,8 +114,8 @@ pytest tests/unit/ -m "not slow" -v
 ### **Quality Gates**
 
 ```bash
-# Unit test quality validation
-pytest tests/unit/ --cov=src/flext_meltano --cov-fail-under=95
+# Unit test quality validation (coverage thresholds in pyproject.toml)
+make test
 pytest tests/unit/ --maxfail=1 -x  # Fail fast on first error
 pytest tests/unit/ -m "unit" --tb=short  # Unit tests only
 ```

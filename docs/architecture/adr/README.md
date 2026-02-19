@@ -1,5 +1,36 @@
 # Architecture Decision Records (ADRs)
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [ADR Process](#adr-process)
+  - [Creating an ADR](#creating-an-adr)
+  - [ADR Template](#adr-template)
+- [Context](#context)
+- [Decision](#decision)
+- [Rationale](#rationale)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Risks](#risks)
+- [Alternatives Considered](#alternatives-considered)
+- [Related ADRs](#related-adrs)
+- [Notes](#notes)
+- [Current ADRs](#current-adrs)
+- [ADR Status Definitions](#adr-status-definitions)
+- [Categories](#categories)
+- [Tools and Automation](#tools-and-automation)
+  - [ADR Management Tools](#adr-management-tools)
+  - [Validation Rules](#validation-rules)
+- [Contributing](#contributing)
+  - [Creating New ADRs](#creating-new-adrs)
+  - [Updating ADRs](#updating-adrs)
+- [Best Practices](#best-practices)
+  - [Writing Effective ADRs](#writing-effective-adrs)
+  - [Review Process](#review-process)
+- [Related Documentation](#related-documentation)
+<!-- TOC END -->
+
 **FLEXT-Meltano Architectural Decisions and Rationale**
 
 ## Overview

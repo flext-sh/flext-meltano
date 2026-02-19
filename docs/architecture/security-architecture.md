@@ -1,5 +1,43 @@
 # Security Architecture Documentation
 
+
+<!-- TOC START -->
+- [📋 Table of Contents](#-table-of-contents)
+- [🛡️ Security Architecture Overview](#-security-architecture-overview)
+  - [Security Principles](#security-principles)
+  - [Security Architecture Layers](#security-architecture-layers)
+  - [Security Controls Matrix](#security-controls-matrix)
+- [🔐 Authentication and Authorization](#-authentication-and-authorization)
+  - [Authentication Architecture](#authentication-architecture)
+  - [Authentication Methods](#authentication-methods)
+  - [Authorization Model](#authorization-model)
+  - [Session Management](#session-management)
+- [🔒 Data Protection and Encryption](#-data-protection-and-encryption)
+  - [Data Encryption Strategy](#data-encryption-strategy)
+  - [Encryption Implementation](#encryption-implementation)
+  - [Data Classification and Handling](#data-classification-and-handling)
+- [🌐 Network Security](#-network-security)
+  - [Network Architecture](#network-architecture)
+  - [Network Security Controls](#network-security-controls)
+- [📊 Security Monitoring and Logging](#-security-monitoring-and-logging)
+  - [Security Event Monitoring](#security-event-monitoring)
+  - [Security Event Types](#security-event-types)
+  - [Audit Logging Implementation](#audit-logging-implementation)
+- [📋 Compliance Framework](#-compliance-framework)
+  - [Compliance Requirements](#compliance-requirements)
+  - [Compliance Controls](#compliance-controls)
+- [🎯 Threat Model](#-threat-model)
+  - [STRIDE Threat Analysis](#stride-threat-analysis)
+  - [Attack Surface Analysis](#attack-surface-analysis)
+  - [Risk Assessment Matrix](#risk-assessment-matrix)
+- [🚨 Incident Response](#-incident-response)
+  - [Incident Response Plan](#incident-response-plan)
+  - [Incident Response Procedures](#incident-response-procedures)
+- [📈 Security Metrics and KPIs](#-security-metrics-and-kpis)
+  - [Key Security Metrics](#key-security-metrics)
+  - [Security Health Dashboard](#security-health-dashboard)
+<!-- TOC END -->
+
 **FLEXT-Meltano Security Architecture and Compliance Framework**
 
 **Version**: 1.0 | **Last Updated**: 2025-10-10

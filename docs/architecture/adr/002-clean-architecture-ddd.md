@@ -1,5 +1,30 @@
 # ADR-002: Clean Architecture with Domain-Driven Design
 
+
+<!-- TOC START -->
+- [Context](#context)
+- [Decision](#decision)
+- [Rationale](#rationale)
+  - [Why Clean Architecture](#why-clean-architecture)
+  - [Why Domain-Driven Design](#why-domain-driven-design)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Risks](#risks)
+  - [Mitigation Strategies](#mitigation-strategies)
+- [Alternatives Considered](#alternatives-considered)
+  - [1. Traditional Layered Architecture](#1-traditional-layered-architecture)
+  - [2. Hexagonal Architecture (Ports & Adapters)](#2-hexagonal-architecture-ports-adapters)
+  - [3. Microservices Architecture](#3-microservices-architecture)
+  - [4. Event-Driven Architecture](#4-event-driven-architecture)
+- [Implementation Details](#implementation-details)
+  - [Layer Structure](#layer-structure)
+  - [Layer Interaction Rules](#layer-interaction-rules)
+  - [Dependency Injection](#dependency-injection)
+- [Related ADRs](#related-adrs)
+- [Notes](#notes)
+<!-- TOC END -->
+
 **Status**: Accepted | **Date**: 2025-01-20 | **Category**: 🏗️ Architecture
 
 ## Context

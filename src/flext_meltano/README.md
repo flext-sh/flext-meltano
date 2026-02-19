@@ -1,5 +1,24 @@
 # FLEXT Meltano Source Code Documentation
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [Module Organization](#module-organization)
+  - [[`flext_meltano/`](flext_meltano/)](#flextmeltanoflextmeltano)
+- [Documentation Standards](#documentation-standards)
+  - [Current Status: ✅ **ENTERPRISE READY**](#current-status-enterprise-ready)
+  - [Documentation Structure Per Module](#documentation-structure-per-module)
+- [Quality Assurance](#quality-assurance)
+  - [Code Quality Status](#code-quality-status)
+  - [Enterprise Standards Compliance](#enterprise-standards-compliance)
+- [Integration Architecture](#integration-architecture)
+  - [Primary Use Case: Go Service Bridge](#primary-use-case-go-service-bridge)
+  - [Key Integration Points](#key-integration-points)
+- [Development Standards](#development-standards)
+  - [Code Organization](#code-organization)
+  - [Testing Approach](#testing-approach)
+<!-- TOC END -->
+
 **Enterprise-Grade Data Integration Bridge Library**
 
 ## Overview

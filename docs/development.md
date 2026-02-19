@@ -1,5 +1,36 @@
 # Development Guide
 
+
+<!-- TOC START -->
+- [🎯 Project Overview](#-project-overview)
+- [🛠️ Development Setup](#-development-setup)
+  - [**Prerequisites**](#prerequisites)
+  - [**Initial Setup**](#initial-setup)
+- [🔧 Development Workflow](#-development-workflow)
+  - [**Quality Gates**](#quality-gates)
+  - [**Code Standards**](#code-standards)
+  - [**Testing Strategy**](#testing-strategy)
+- [🏗️ Architecture Constraints](#-architecture-constraints)
+  - [**Current Compliance Issues**](#current-compliance-issues)
+  - [**FLEXT Ecosystem Requirements**](#flext-ecosystem-requirements)
+- [📊 Code Metrics](#-code-metrics)
+  - [**Current Implementation**](#current-implementation)
+  - [**Priority Improvements**](#priority-improvements)
+- [🧪 Testing Guidelines](#-testing-guidelines)
+  - [**Test Organization**](#test-organization)
+  - [**Running Tests**](#running-tests)
+- [🔍 Debugging and Development](#-debugging-and-development)
+  - [**Common Issues**](#common-issues)
+  - [**Development Tools**](#development-tools)
+- [📚 Contributing Guidelines](#-contributing-guidelines)
+  - [**Code Review Checklist**](#code-review-checklist)
+  - [**Architecture Compliance**](#architecture-compliance)
+- [🎯 Development Priorities](#-development-priorities)
+  - [**Immediate (Next Sprint)**](#immediate-next-sprint)
+  - [**Short Term (Next Month)**](#short-term-next-month)
+  - [**Long Term (Next Quarter)**](#long-term-next-quarter)
+<!-- TOC END -->
+
 **Development workflow for the flext-meltano project**
 
 **Last Updated**: 2025-09-17

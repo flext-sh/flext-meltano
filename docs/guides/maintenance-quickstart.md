@@ -1,5 +1,38 @@
 # Documentation Maintenance Quick Start
 
+
+<!-- TOC START -->
+- [🚀 Quick Setup](#-quick-setup)
+  - [1. Install Maintenance System](#1-install-maintenance-system)
+  - [2. Run Your First Audit](#2-run-your-first-audit)
+  - [3. Set Up Quality Gates](#3-set-up-quality-gates)
+- [📊 Understanding Your Results](#-understanding-your-results)
+  - [Quality Score Interpretation](#quality-score-interpretation)
+  - [Issue Priority Guide](#issue-priority-guide)
+- [🔧 Common Fixes](#-common-fixes)
+  - [Fix Broken Internal Links](#fix-broken-internal-links)
+  - [Add Missing Structure](#add-missing-structure)
+- [Section 1](#section-1)
+- [Section 2](#section-2)
+  - [Fix Long Lines](#fix-long-lines)
+- [📈 Monitoring Progress](#-monitoring-progress)
+  - [Daily Checks](#daily-checks)
+  - [Weekly Maintenance](#weekly-maintenance)
+  - [CI/CD Status](#cicd-status)
+- [🎯 Quality Targets](#-quality-targets)
+  - [Minimum Standards](#minimum-standards)
+  - [Excellence Targets](#excellence-targets)
+- [🚨 Getting Help](#-getting-help)
+  - [Quick Diagnosis](#quick-diagnosis)
+  - [Common Issues](#common-issues)
+- [📚 Advanced Usage](#-advanced-usage)
+  - [Custom Configuration](#custom-configuration)
+  - [Scheduled Maintenance](#scheduled-maintenance)
+  - [Custom Validators](#custom-validators)
+- [🎉 Success Metrics](#-success-metrics)
+- [📞 Next Steps](#-next-steps)
+<!-- TOC END -->
+
 **Get started with automated documentation quality assurance in 5 minutes**
 
 ## 🚀 Quick Setup
@@ -10,17 +43,17 @@ The maintenance system is already included in FLEXT-Meltano. All tools are ready
 
 ```bash
 # Verify installation
-ls scripts/docs_maintenance.py scripts/docs_automation.py
+ls scripts/documentation/audit.py scripts/documentation/validate.py
 ```
 
 ### 2. Run Your First Audit
 
 ```bash
 # Run comprehensive quality audit
-make docs-comprehensive
+make docs
 
 # View results
-make docs-view-report
+make docs DOCS_PHASE=audit
 ```
 
 ### 3. Set Up Quality Gates
@@ -102,17 +135,17 @@ This is a very long line that exceeds the recommended
 
 ```bash
 # Quick quality check
-make docs-audit
+make docs DOCS_PHASE=audit
 
 # View summary
-make docs-view-report
+make docs DOCS_PHASE=audit
 ```
 
 ### Weekly Maintenance
 
 ```bash
 # Comprehensive audit
-make docs-comprehensive
+make docs
 
 # Review and fix issues
 # Check docs/reports/ for detailed reports
@@ -148,7 +181,7 @@ The system automatically runs quality checks on:
 
 ```bash
 # Check system status
-python scripts/docs_maintenance.py --audit
+make docs DOCS_PHASE=audit PROJECT=flext-meltano
 
 # View configuration
 cat docs/.maintenance_config.yaml
@@ -186,7 +219,7 @@ ls -la .git/hooks/pre-commit
 mkdir -p docs/reports
 
 # Run with verbose output
-python scripts/docs_maintenance.py --comprehensive
+make docs DOCS_PHASE=all PROJECT=flext-meltano
 ```
 
 ## 📚 Advanced Usage
@@ -228,7 +261,7 @@ Track these indicators of maintenance success:
 
 ## 📞 Next Steps
 
-1. **Run your first comprehensive audit**: `make docs-comprehensive`
+1. **Run your first comprehensive audit**: `make docs`
 2. **Review and fix high-priority issues** from the report
 3. **Set up automated quality gates**: `make docs-setup`
 4. **Monitor quality trends** weekly

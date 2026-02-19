@@ -1,5 +1,28 @@
 # flext-meltano Documentation
 
+
+<!-- TOC START -->
+- [📋 Documentation Index](#-documentation-index)
+  - [**Getting Started**](#getting-started)
+  - [**Development**](#development)
+  - [**Examples**](#examples)
+- [🎯 Purpose and Architecture](#-purpose-and-architecture)
+  - [**Current Status**](#current-status)
+- [🏗️ Implementation Details](#-implementation-details)
+  - [**Source Code Structure**](#source-code-structure)
+  - [**Key Components**](#key-components)
+  - [**Architecture Compliance Issues**](#architecture-compliance-issues)
+- [🚀 Quick Navigation](#-quick-navigation)
+  - [**Essential Documentation**](#essential-documentation)
+  - [**Advanced Topics**](#advanced-topics)
+- [📋 Development Workflow](#-development-workflow)
+  - [**Quality Gates**](#quality-gates)
+  - [**FLEXT Compliance Requirements**](#flext-compliance-requirements)
+- [📞 Support and Resources](#-support-and-resources)
+  - [**Development Support**](#development-support)
+  - [**FLEXT Ecosystem Links**](#flext-ecosystem-links)
+<!-- TOC END -->
+
 **Documentation for the FLEXT ecosystem ELT foundation library** providing Meltano, dbt, and Singer integration.
 
 **Version**: 0.9.9 RC | **Last Updated**: 2025-09-17

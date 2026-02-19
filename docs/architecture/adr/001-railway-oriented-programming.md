@@ -1,5 +1,30 @@
 # ADR-001: Railway-Oriented Programming with FlextResult[T]
 
+
+<!-- TOC START -->
+- [Context](#context)
+- [Decision](#decision)
+- [Rationale](#rationale)
+  - [Why Railway-Oriented Programming](#why-railway-oriented-programming)
+  - [Why FlextResult[T] from flext-core](#why-flextresultt-from-flext-core)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Risks](#risks)
+  - [Mitigation Strategies](#mitigation-strategies)
+- [Alternatives Considered](#alternatives-considered)
+  - [1. Traditional Exception Handling](#1-traditional-exception-handling)
+  - [2. Custom Result Type](#2-custom-result-type)
+  - [3. Async Exception Handling](#3-async-exception-handling)
+  - [4. Callback-Based Error Handling](#4-callback-based-error-handling)
+- [Implementation Details](#implementation-details)
+  - [Error Type Hierarchy](#error-type-hierarchy)
+  - [Railway Pattern Usage](#railway-pattern-usage)
+  - [Testing Error Scenarios](#testing-error-scenarios)
+- [Related ADRs](#related-adrs)
+- [Notes](#notes)
+<!-- TOC END -->
+
 **Status**: Accepted | **Date**: 2025-01-15 | **Category**: 🏗️ Architecture
 
 ## Context

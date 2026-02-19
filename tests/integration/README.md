@@ -1,5 +1,36 @@
 # FLEXT Meltano Integration Tests
 
+
+<!-- TOC START -->
+- [🔗 Integration Testing Overview](#-integration-testing-overview)
+  - [**Integration Test Categories**](#integration-test-categories)
+- [🎯 Integration Testing Principles](#-integration-testing-principles)
+  - [**Realistic Environment Testing**](#realistic-environment-testing)
+  - [**Integration Coverage Standards**](#integration-coverage-standards)
+- [🔧 Integration Test Structure](#-integration-test-structure)
+  - [**Test Organization**](#test-organization)
+  - [**Test Execution**](#test-execution)
+- [🐳 Test Environment Setup](#-test-environment-setup)
+  - [**Docker Compose Integration**](#docker-compose-integration)
+  - [**Environment Configuration**](#environment-configuration)
+- [⚡ Performance Standards](#-performance-standards)
+  - [**Execution Time Limits**](#execution-time-limits)
+  - [**Resource Limits**](#resource-limits)
+- [🛡️ Integration Test Patterns](#-integration-test-patterns)
+  - [**Service Interaction Testing**](#service-interaction-testing)
+  - [**Database Integration Testing**](#database-integration-testing)
+  - [**Pipeline Integration Testing**](#pipeline-integration-testing)
+- [📊 Integration Quality Standards](#-integration-quality-standards)
+  - [**Test Categories and Markers**](#test-categories-and-markers)
+  - [**Quality Gates**](#quality-gates)
+- [🔍 Test Data Management](#-test-data-management)
+  - [**Test Data Strategy**](#test-data-strategy)
+  - [**Data Isolation**](#data-isolation)
+- [📋 Integration Testing Status](#-integration-testing-status)
+  - [**Production Readiness**](#production-readiness)
+  - [**Integration Metrics**](#integration-metrics)
+<!-- TOC END -->
+
 **✅ STATUS**: Enterprise integration testing framework with comprehensive cross-component validation and realistic environment testing.
 
 ## 🔗 Integration Testing Overview
@@ -207,7 +238,7 @@ def test_complete_pipeline_integration():
 ```bash
 # Integration test quality validation
 pytest tests/integration/ -m "integration and not slow" --maxfail=3
-pytest tests/integration/ --cov=src/flext_meltano --cov-fail-under=80
+make test                              # Coverage thresholds in pyproject.toml
 pytest tests/integration/ --timeout=1800  # 30 minute timeout
 ```
 

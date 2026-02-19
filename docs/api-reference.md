@@ -1,5 +1,41 @@
 # FLEXT-Meltano API Reference
 
+
+<!-- TOC START -->
+- [🎯 Library Overview](#-library-overview)
+  - [**Architecture Principles**](#architecture-principles)
+  - [**Core Modules**](#core-modules)
+- [🎯 Core Services](#-core-services)
+  - [FlextMeltanoService](#flextmeltanoservice)
+  - [FlextMeltanoAdapter](#flextmeltanoadapter)
+  - [FlextMeltanoExecutor](#flextmeltanoexecutor)
+- [🔌 Singer Protocol Abstractions](#-singer-protocol-abstractions)
+  - [FlextSingerTap](#flextsingertap)
+  - [FlextSingerTarget](#flextsingertarget)
+- [🛠️ Plugin Management Services](#-plugin-management-services)
+  - [FlextPluginService](#flextpluginservice)
+  - [FlextPluginRegistry](#flextpluginregistry)
+- [🚀 Pipeline Services](#-pipeline-services)
+  - [FlextMeltanoService](#flextmeltanoservice)
+  - [FlextMeltanoExecutor](#flextmeltanoexecutor)
+- [📁 Project Management](#-project-management)
+  - [FlextProjectService](#flextprojectservice)
+  - [FlextMeltanoProject](#flextmeltanoproject)
+- [🔧 Configuration Management](#-configuration-management)
+  - [FlextMeltanoSettings](#flextmeltanosettings)
+- [📊 Models and Types](#-models-and-types)
+  - [Core Models](#core-models)
+  - [Execution Models](#execution-models)
+- [🛡️ Exception Hierarchy](#-exception-hierarchy)
+  - [FlextMeltanoException](#flextmeltanoexception)
+  - [Specific Exceptions](#specific-exceptions)
+- [🔄 Integration Examples](#-integration-examples)
+  - [Basic Pipeline Execution](#basic-pipeline-execution)
+  - [Advanced Pipeline Orchestration](#advanced-pipeline-orchestration)
+  - [Plugin Management](#plugin-management)
+- [Related Documentation](#related-documentation)
+<!-- TOC END -->
+
 **Complete API documentation for FLEXT-Meltano v0.9.9 - Enterprise Data Pipeline Integration**
 
 **Updated**: 2025-10-05 | **Status**: ✅ Production Ready | **Quality**: 100% Type Safe | **Coverage**: 95%+

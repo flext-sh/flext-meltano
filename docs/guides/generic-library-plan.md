@@ -1,5 +1,33 @@
 # FLEXT-Meltano Generic Library Implementation Plan
 
+
+<!-- TOC START -->
+- [Table of Contents](#table-of-contents)
+- [Current State Analysis](#current-state-analysis)
+  - [Current Architecture Issues](#current-architecture-issues)
+  - [Generic Library Requirements](#generic-library-requirements)
+- [Implementation Strategy](#implementation-strategy)
+  - [Phase 1: CLI Abstraction Layer (✅ Complete)](#phase-1-cli-abstraction-layer-complete)
+  - [Phase 2: Singer Protocol Independence (🚧 In Progress)](#phase-2-singer-protocol-independence-in-progress)
+  - [Phase 3: Generic Plugin Registry (📋 Planned)](#phase-3-generic-plugin-registry-planned)
+- [Architecture Transformation](#architecture-transformation)
+  - [Before: CLI-Centric Architecture](#before-cli-centric-architecture)
+  - [After: Generic Library Architecture](#after-generic-library-architecture)
+  - [Service Architecture](#service-architecture)
+- [API Design](#api-design)
+  - [Generic Plugin Interface](#generic-plugin-interface)
+  - [Singer Protocol API](#singer-protocol-api)
+  - [Pipeline Orchestration API](#pipeline-orchestration-api)
+- [Migration Plan](#migration-plan)
+  - [Backward Compatibility Strategy](#backward-compatibility-strategy)
+  - [Testing Strategy](#testing-strategy)
+  - [Rollout Strategy](#rollout-strategy)
+- [Benefits of Generic Architecture](#benefits-of-generic-architecture)
+  - [For Library Users](#for-library-users)
+  - [For Plugin Developers](#for-plugin-developers)
+  - [For Enterprise Integration](#for-enterprise-integration)
+<!-- TOC END -->
+
 **Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2025-10-05
 
 Implementation plan for transforming FLEXT-Meltano into a **generic, reusable library** following the same patterns as FLEXT-LDIF, with complete abstraction from CLI dependencies and external Meltano tooling.

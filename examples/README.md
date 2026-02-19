@@ -1,5 +1,30 @@
 # FLEXT Meltano Examples
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [Example Categories](#example-categories)
+  - [**Foundation Examples (Production Ready)**](#foundation-examples-production-ready)
+  - [**Enterprise Architecture Examples**](#enterprise-architecture-examples)
+  - [**Code Quality & Architecture Examples**](#code-quality-architecture-examples)
+  - [**Utility & Helper Examples**](#utility-helper-examples)
+- [Usage Patterns](#usage-patterns)
+  - [Running Examples](#running-examples)
+  - [Development Workflow](#development-workflow)
+- [Example Standards](#example-standards)
+  - [Documentation Requirements](#documentation-requirements)
+  - [Code Quality Standards](#code-quality-standards)
+- [Usage](#usage)
+- [Expected Output](#expected-output)
+  - [Testing Integration](#testing-integration)
+- [Integration with Documentation](#integration-with-documentation)
+  - [Cross-Reference System](#cross-reference-system)
+  - [Example Categories in Documentation](#example-categories-in-documentation)
+- [Contributing Examples](#contributing-examples)
+  - [Adding New Examples](#adding-new-examples)
+  - [Quality Requirements](#quality-requirements)
+<!-- TOC END -->
+
 **Enterprise Integration Examples and Usage Patterns**
 
 ## Overview
