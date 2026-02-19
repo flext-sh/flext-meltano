@@ -216,15 +216,15 @@ class FlextMeltanoTypes(FlextTypes):
         type NestedJsonDict = dict[str, NestedJsonValue]
 
         # Meltano configuration and data types
-        type MeltanoConfigDict = dict[str, FlextTypes.JsonValue]
-        type PluginConfigDict = dict[str, FlextTypes.JsonValue]
+        type MeltanoConfigDict = dict[str, FlextTypes.GeneralValueType]
+        type PluginConfigDict = dict[str, FlextTypes.GeneralValueType]
         type EnvironmentDict = dict[str, str]
         type VariablesDict = dict[str, str]
-        type SettingsDict = dict[str, FlextTypes.JsonValue]
-        type MetadataDict = dict[str, FlextTypes.JsonValue]
-        type CommandDict = dict[str, FlextTypes.JsonValue]
-        type ScheduleDict = dict[str, FlextTypes.JsonValue]
-        type JobDict = dict[str, FlextTypes.JsonValue]
+        type SettingsDict = dict[str, FlextTypes.GeneralValueType]
+        type MetadataDict = dict[str, FlextTypes.GeneralValueType]
+        type CommandDict = dict[str, FlextTypes.GeneralValueType]
+        type ScheduleDict = dict[str, FlextTypes.GeneralValueType]
+        type JobDict = dict[str, FlextTypes.GeneralValueType]
 
         # Type aliases for singer.py
         RecordDict = dict[str, FlextTypes.JsonValue]
@@ -251,9 +251,9 @@ class FlextMeltanoTypes(FlextTypes):
         type PluginList = list[str]
         type PluginNameList = list[str]
         type PluginTypeList = list[str]
-        type ExecutionResultDict = dict[str, FlextTypes.JsonValue]
+        type ExecutionResultDict = dict[str, FlextTypes.GeneralValueType]
         type ExecutionStatusDict = dict[str, str]
-        type RuntimeConfigDict = dict[str, FlextTypes.JsonValue]
+        type RuntimeConfigDict = dict[str, FlextTypes.GeneralValueType]
 
         # Singer protocol types
         type SingerRecordDict = dict[str, FlextTypes.JsonValue]

@@ -132,7 +132,7 @@ class FlextMeltanoOrchestrationService(s[dict[str, str]]):
             extractor=extractor_name,
             loader=loader_name,
         )
-        return r.ok(True)
+        return r[None].ok(None)
 
     @staticmethod
     def _find_required_plugins(

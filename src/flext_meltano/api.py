@@ -12,7 +12,7 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
-from flext import (
+from flext_core import (
     FlextExceptions,
     FlextService,
     r,

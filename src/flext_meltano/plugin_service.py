@@ -218,7 +218,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return r.ok(True)
+        return r[None].ok(None)
 
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> r[str]:

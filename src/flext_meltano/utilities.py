@@ -259,11 +259,11 @@ class FlextMeltanoUtilities(FlextUtilities):
         try:
             if hasattr(file_handle, "close"):
                 file_handle.close()
-            return r.ok(True)
+            return r[None].ok(None)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
             # Log but don't fail on close errors
             FlextLogger(__name__).warning(f"Error closing file handle: {err}")
-            return r.ok(True)
+            return r[None].ok(None)
 
     # Note: create_temp_directory moved to FlextMeltanoFileManagers
     # (proper domain responsibility)
