@@ -1,7 +1,7 @@
 # ADR-001: Railway-Oriented Programming with FlextResult[T]
 
-
 <!-- TOC START -->
+
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -23,6 +23,7 @@
   - [Testing Error Scenarios](#testing-error-scenarios)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
+
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-01-15 | **Category**: 🏗️ Architecture
@@ -51,10 +52,10 @@ Implement railway-oriented programming using `FlextResult[T]` from flext-core, e
 **Key Implementation Points:**
 
 1. **All public APIs return `FlextResult[T]`**
-2. **Internal methods may use exceptions for programming errors**
-3. **Error types are specific and actionable**
-4. **Railway pattern used for operation chaining**
-5. **Type safety maintained in error flows**
+1. **Internal methods may use exceptions for programming errors**
+1. **Error types are specific and actionable**
+1. **Railway pattern used for operation chaining**
+1. **Type safety maintained in error flows**
 
 ## Rationale
 
@@ -202,9 +203,9 @@ def test_pipeline_failure_handling():
 **Migration Plan:**
 
 1. Phase 1: Core services (Completed)
-2. Phase 2: Adapter layer (Completed)
-3. Phase 3: API layer (Completed)
-4. Phase 4: Legacy code cleanup (In Progress)
+1. Phase 2: Adapter layer (Completed)
+1. Phase 3: API layer (Completed)
+1. Phase 4: Legacy code cleanup (In Progress)
 
 **Performance Impact:**
 

@@ -130,23 +130,25 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     items_list = list(variants_dict.keys())
                     variants_str = u.join(items_list, separator=",")
 
+                source_fields: t.MeltanoCore.MeltanoConfigDict = {
+                    "default_variant": str(
+                        u.get(indexed_plugin, "default_variant", default=""),
+                    ),
+                    "logo_url": str(u.get(indexed_plugin, "logo_url", default="")),
+                }
+
                 constructed = u.construct(
                     {
                         "name": {"value": plugin_name},
                         "type": {"value": plugin_type},
                         "default_variant": {
-                            "field": "default_variant",
-                            "default": "",
-                            "ops": {"ensure": "str"},
+                            "value": source_fields.get("default_variant", ""),
                         },
                         "variants": {"value": variants_str},
                         "logo_url": {
-                            "field": "logo_url",
-                            "default": "",
-                            "ops": {"ensure": "str"},
+                            "value": source_fields.get("logo_url", ""),
                         },
                     },
-                    source=indexed_plugin,
                 )
 
                 # Type narrowing: u.construct() returns dict[str, str] when all values are str

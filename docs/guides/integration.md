@@ -1,37 +1,38 @@
 # flext-meltano Integration Patterns
 
-
 <!-- TOC START -->
-- [🎯 ELT Foundation Role](#-elt-foundation-role)
-- [🔌 Singer Ecosystem Integration](#-singer-ecosystem-integration)
+
+- [🎯 ELT Foundation Role](#elt-foundation-role)
+- [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
   - [Tap Implementation Pattern](#tap-implementation-pattern)
   - [Target Implementation Pattern](#target-implementation-pattern)
-- [🛠️ dbt Integration Patterns](#-dbt-integration-patterns)
+- [🛠️ dbt Integration Patterns](#dbt-integration-patterns)
   - [dbt Project Foundation](#dbt-project-foundation)
-- [🚀 Complete ELT Pipeline Integration](#-complete-elt-pipeline-integration)
+- [🚀 Complete ELT Pipeline Integration](#complete-elt-pipeline-integration)
   - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
-- [🔗 Bridge Communication Patterns](#-bridge-communication-patterns)
+- [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
   - [Go ↔ Python Integration](#go-python-integration)
-- [📊 Integration Matrix](#-integration-matrix)
+- [📊 Integration Matrix](#integration-matrix)
   - [FLEXT Project Integration Status](#flext-project-integration-status)
   - [Integration Requirements](#integration-requirements)
-- [🌍 Environment Integration](#-environment-integration)
+- [🌍 Environment Integration](#environment-integration)
   - [FLEXT Workspace Setup](#flext-workspace-setup)
   - [Consumer Project Dependencies](#consumer-project-dependencies)
-- [⚠️ Integration Limitations](#-integration-limitations)
+- [⚠️ Integration Limitations](#integration-limitations)
   - [Current Constraints](#current-constraints)
   - [Workaround Strategies](#workaround-strategies)
   - [Resolution Timeline](#resolution-timeline)
-- [🔧 Integration Best Practices](#-integration-best-practices)
+- [🔧 Integration Best Practices](#integration-best-practices)
   - [Design Patterns](#design-patterns)
   - [Quality Standards](#quality-standards)
+
 <!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
 > **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration patterns. Full ecosystem compatibility requires abstraction layer.
 
----
+______________________________________________________________________
 
 ## 🎯 ELT Foundation Role
 
@@ -44,7 +45,7 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 
 **Integration Authority**: All FLEXT projects requiring ELT operations must use flext-meltano patterns.
 
----
+______________________________________________________________________
 
 ## 🔌 Singer Ecosystem Integration
 
@@ -132,7 +133,7 @@ class FlextOracleTargetService(FlextService):
         return self._target_abstractions.load_data("target-oracle", records)
 ```
 
----
+______________________________________________________________________
 
 ## 🛠️ dbt Integration Patterns
 
@@ -179,7 +180,7 @@ class FlextOracleDbtService(FlextService):
 
 **Current Limitation**: dbt integration is placeholder implementation requiring dbt programmatic API integration.
 
----
+______________________________________________________________________
 
 ## 🚀 Complete ELT Pipeline Integration
 
@@ -244,7 +245,7 @@ class EnterpriseELTService(FlextService):
         })
 ```
 
----
+______________________________________________________________________
 
 ## 🔗 Bridge Communication Patterns
 
@@ -279,7 +280,7 @@ response = bridge.handle_bridge_request({
 }
 ```
 
----
+______________________________________________________________________
 
 ## 📊 Integration Matrix
 
@@ -300,25 +301,25 @@ response = bridge.handle_bridge_request({
 \__For flext-tap-_ projects\_\*:
 
 1. Use FlextMeltanoTapAbstractions for all Singer operations
-2. Follow FlextResult patterns for error handling
-3. Implement stream discovery and data extraction
-4. Maintain Singer protocol compliance
+1. Follow FlextResult patterns for error handling
+1. Implement stream discovery and data extraction
+1. Maintain Singer protocol compliance
 
 \__For flext-target-_ projects\_\*:
 
 1. Use FlextMeltanoTargetAbstractions for all load operations
-2. Implement record loading with validation
-3. Handle Singer message processing
-4. Follow FLEXT service patterns
+1. Implement record loading with validation
+1. Handle Singer message processing
+1. Follow FLEXT service patterns
 
 \__For flext-dbt-_ projects\_\*:
 
 1. Use FlextMeltanoDbtService for transformations
-2. Plan for dbt programmatic API integration
-3. Implement model execution workflows
-4. Maintain transformation validation
+1. Plan for dbt programmatic API integration
+1. Implement model execution workflows
+1. Maintain transformation validation
 
----
+______________________________________________________________________
 
 ## 🌍 Environment Integration
 
@@ -352,7 +353,7 @@ flext-meltano = "^0.9.9"  # Mandatory ELT foundation
 flext-cli = "^0.9.9"      # CLI development tools
 ```
 
----
+______________________________________________________________________
 
 ## ⚠️ Integration Limitations
 
@@ -376,9 +377,9 @@ flext-cli = "^0.9.9"      # CLI development tools
 **Current Development Approach**:
 
 1. **Use Working Abstractions**: FlextMeltanoTapAbstractions and FlextMeltanoTargetAbstractions are fully functional
-2. **Follow FlextResult Patterns**: Maintain consistency for future compatibility
-3. **Plan for Updates**: Design integration patterns to accommodate resolution
-4. **Document Limitations**: Clear communication about current constraints
+1. **Follow FlextResult Patterns**: Maintain consistency for future compatibility
+1. **Plan for Updates**: Design integration patterns to accommodate resolution
+1. **Document Limitations**: Clear communication about current constraints
 
 ### Resolution Timeline
 
@@ -389,7 +390,7 @@ flext-cli = "^0.9.9"      # CLI development tools
 - **Phase 3** (2-3 weeks): Modern ELT patterns adoption
 - **Phase 4** (1-2 weeks): Complete ecosystem integration validation
 
----
+______________________________________________________________________
 
 ## 🔧 Integration Best Practices
 
@@ -454,6 +455,6 @@ if result.is_failure:
 - Maintain Singer protocol compliance
 - Use FLEXT service architecture patterns
 
----
+______________________________________________________________________
 
 **Integration Guide v0.9.9** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.

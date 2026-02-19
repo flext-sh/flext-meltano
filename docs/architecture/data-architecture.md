@@ -1,56 +1,57 @@
 # Data Architecture Documentation
 
-
 <!-- TOC START -->
-- [📋 Table of Contents](#-table-of-contents)
-- [🏗️ Data Flow Architecture](#-data-flow-architecture)
+
+- [📋 Table of Contents](#table-of-contents)
+- [🏗️ Data Flow Architecture](#data-flow-architecture)
   - [High-Level Data Flow](#high-level-data-flow)
   - [Data Flow Patterns](#data-flow-patterns)
   - [Data Transformation Stages](#data-transformation-stages)
-- [💾 Data Storage Strategy](#-data-storage-strategy)
+- [💾 Data Storage Strategy](#data-storage-strategy)
   - [Storage Layer Architecture](#storage-layer-architecture)
   - [Storage Technologies](#storage-technologies)
   - [Data Persistence Patterns](#data-persistence-patterns)
-- [📊 Data Models and Schemas](#-data-models-and-schemas)
+- [📊 Data Models and Schemas](#data-models-and-schemas)
   - [Core Data Models](#core-data-models)
   - [Data Validation Rules](#data-validation-rules)
-- [🔄 Data Processing Pipeline](#-data-processing-pipeline)
+- [🔄 Data Processing Pipeline](#data-processing-pipeline)
   - [Pipeline Execution Flow](#pipeline-execution-flow)
   - [Processing Stages](#processing-stages)
-- [🛡️ Data Quality and Validation](#-data-quality-and-validation)
+- [🛡️ Data Quality and Validation](#data-quality-and-validation)
   - [Quality Gates](#quality-gates)
   - [Data Quality Metrics](#data-quality-metrics)
   - [Error Handling Strategies](#error-handling-strategies)
-- [🎯 Data Governance](#-data-governance)
+- [🎯 Data Governance](#data-governance)
   - [Data Lineage Tracking](#data-lineage-tracking)
   - [Data Classification and Security](#data-classification-and-security)
   - [Data Retention Policies](#data-retention-policies)
-- [⚡ Performance and Scalability](#-performance-and-scalability)
+- [⚡ Performance and Scalability](#performance-and-scalability)
   - [Performance Characteristics](#performance-characteristics)
   - [Scalability Patterns](#scalability-patterns)
   - [Monitoring and Observability](#monitoring-and-observability)
-- [📈 Architecture Evolution](#-architecture-evolution)
+- [📈 Architecture Evolution](#architecture-evolution)
   - [Current Limitations](#current-limitations)
   - [Future Enhancements](#future-enhancements)
+
 <!-- TOC END -->
 
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**
 
 **Version**: 1.0 | **Last Updated**: 2025-10-10
 
----
+______________________________________________________________________
 
 ## 📋 Table of Contents
 
 1. [Data Flow Architecture](#data-flow-architecture)
-2. [Data Storage Strategy](#data-storage-strategy)
-3. [Data Models and Schemas](#data-models-and-schemas)
-4. [Data Processing Pipeline](#data-processing-pipeline)
-5. [Data Quality and Validation](#data-quality-and-validation)
-6. [Data Governance](#data-governance)
-7. [Performance and Scalability](#performance-and-scalability)
+1. [Data Storage Strategy](#data-storage-strategy)
+1. [Data Models and Schemas](#data-models-and-schemas)
+1. [Data Processing Pipeline](#data-processing-pipeline)
+1. [Data Quality and Validation](#data-quality-and-validation)
+1. [Data Governance](#data-governance)
+1. [Performance and Scalability](#performance-and-scalability)
 
----
+______________________________________________________________________
 
 ## 🏗️ Data Flow Architecture
 
@@ -140,7 +141,7 @@ Record Buffer ← Streaming Ingestion ← JSONL Parsing ← Schema Validation �
 | **Transformation** | Raw Tables      | DBT Models      | Analytics Tables | Business logic, cleansing          |
 | **Orchestration**  | Pipeline Config | FLEXT-Meltano   | Execution State  | Workflow coordination              |
 
----
+______________________________________________________________________
 
 ## 💾 Data Storage Strategy
 
@@ -257,7 +258,7 @@ class ErrorStore:
         pipeline_stage: str
 ```
 
----
+______________________________________________________________________
 
 ## 📊 Data Models and Schemas
 
@@ -346,7 +347,7 @@ class SchemaValidator:
         return FlextResult.ok(ValidatedSchema(schema=schema))
 ```
 
----
+______________________________________________________________________
 
 ## 🔄 Data Processing Pipeline
 
@@ -429,7 +430,7 @@ stop
 - **Output**: Analytics-ready tables
 - **Error Handling**: Model validation, dependency resolution
 
----
+______________________________________________________________________
 
 ## 🛡️ Data Quality and Validation
 
@@ -491,7 +492,7 @@ class DataQualityMetrics:
 - Graceful degradation strategies
 - Alert escalation for critical failures
 
----
+______________________________________________________________________
 
 ## 🎯 Data Governance
 
@@ -552,7 +553,7 @@ class RetentionPolicy:
         return self.archive_strategy
 ```
 
----
+______________________________________________________________________
 
 ## ⚡ Performance and Scalability
 
@@ -560,11 +561,11 @@ class RetentionPolicy:
 
 | Operation                  | Target Latency | Throughput    | Scaling Strategy   |
 | -------------------------- | -------------- | ------------- | ------------------ |
-| **Schema Discovery**       | <30s           | N/A           | Parallel discovery |
-| **Data Extraction**        | <5min          | 1000 rec/sec  | Horizontal scaling |
-| **Data Loading**           | <10min         | 5000 rec/sec  | Batch optimization |
-| **DBT Transformation**     | <15min         | Variable      | Query optimization |
-| **Pipeline Orchestration** | <1min          | 10 concurrent | Load balancing     |
+| **Schema Discovery**       | \<30s          | N/A           | Parallel discovery |
+| **Data Extraction**        | \<5min         | 1000 rec/sec  | Horizontal scaling |
+| **Data Loading**           | \<10min        | 5000 rec/sec  | Batch optimization |
+| **DBT Transformation**     | \<15min        | Variable      | Query optimization |
+| **Pipeline Orchestration** | \<1min         | 10 concurrent | Load balancing     |
 
 ### Scalability Patterns
 
@@ -651,7 +652,7 @@ class AlertRule:
         return condition_met and cooldown_expired
 ```
 
----
+______________________________________________________________________
 
 ## 📈 Architecture Evolution
 
@@ -670,7 +671,7 @@ class AlertRule:
 - **AI/ML Integration**: Intelligent data quality assessment
 - **Event-Driven Processing**: Asynchronous pipeline execution
 
----
+______________________________________________________________________
 
 **Data Architecture**: FLEXT-Meltano Enterprise Data Processing
 _Comprehensive data flow, storage, and processing architecture documentation_

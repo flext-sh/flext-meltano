@@ -1,44 +1,45 @@
 # flext-meltano Architecture
 
-
 <!-- TOC START -->
-- [🎯 Architectural Overview](#-architectural-overview)
+
+- [🎯 Architectural Overview](#architectural-overview)
   - [**Design Principles**](#design-principles)
-- [🏗️ Module Architecture](#-module-architecture)
+- [🏗️ Module Architecture](#module-architecture)
   - [**Foundation Layer**](#foundation-layer)
   - [**Service Layer**](#service-layer)
   - [**Execution Layer**](#execution-layer)
   - [**Abstraction Layer**](#abstraction-layer)
   - [**Configuration Layer**](#configuration-layer)
-- [🔄 Data Flow Architecture](#-data-flow-architecture)
+- [🔄 Data Flow Architecture](#data-flow-architecture)
   - [**ELT Pipeline Flow**](#elt-pipeline-flow)
   - [**Error Handling Flow**](#error-handling-flow)
-- [🏛️ Clean Architecture Implementation](#-clean-architecture-implementation)
+- [🏛️ Clean Architecture Implementation](#clean-architecture-implementation)
   - [**Layer Dependencies**](#layer-dependencies)
   - [**Dependency Rules**](#dependency-rules)
-- [🔧 Integration Patterns](#-integration-patterns)
+- [🔧 Integration Patterns](#integration-patterns)
   - [**FLEXT Ecosystem Integration**](#flext-ecosystem-integration)
   - [**External Library Integration**](#external-library-integration)
-- [📊 Type System Architecture](#-type-system-architecture)
+- [📊 Type System Architecture](#type-system-architecture)
   - [**FlextMeltanoTypes Hierarchy**](#flextmeltanotypes-hierarchy)
   - [**Pydantic Model Integration**](#pydantic-model-integration)
-- [🛡️ Error Handling Architecture](#-error-handling-architecture)
+- [🛡️ Error Handling Architecture](#error-handling-architecture)
   - [**FlextResult Pattern Implementation**](#flextresult-pattern-implementation)
   - [**Exception Hierarchy**](#exception-hierarchy)
-- [🎯 Current Status and Technical Debt](#-current-status-and-technical-debt)
+- [🎯 Current Status and Technical Debt](#current-status-and-technical-debt)
   - [**Architecture Compliance Status**](#architecture-compliance-status)
   - [**Technical Debt**](#technical-debt)
-- [🚀 Future Architecture](#-future-architecture)
+- [🚀 Future Architecture](#future-architecture)
   - [**Target State**](#target-state)
   - [**Migration Path**](#migration-path)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **Enterprise Meltano integration library architecture for the FLEXT ecosystem**
 
 **Version**: 0.9.9 RC | **Last Updated**: 2025-09-17
 
----
+______________________________________________________________________
 
 ## 🎯 Architectural Overview
 
@@ -47,10 +48,10 @@ flext-meltano serves as the foundational library for ELT operations within the F
 ### **Design Principles**
 
 1. **Type Safety First** - Comprehensive type annotations with Pydantic models
-2. **Railway-Oriented Programming** - FlextResult[T] pattern for error handling
-3. **Single Responsibility** - One class per module with nested helpers
-4. **FLEXT Ecosystem Integration** - Built on flext-core foundation patterns
-5. **Abstraction Layers** - Clear separation between external libraries and FLEXT interfaces
+1. **Railway-Oriented Programming** - FlextResult[T] pattern for error handling
+1. **Single Responsibility** - One class per module with nested helpers
+1. **FLEXT Ecosystem Integration** - Built on flext-core foundation patterns
+1. **Abstraction Layers** - Clear separation between external libraries and FLEXT interfaces
 
 ## 🏗️ Module Architecture
 
@@ -182,9 +183,9 @@ graph TD
 ### **Dependency Rules**
 
 1. **Interface Layer** depends on Application Layer
-2. **Application Layer** depends on Domain Layer
-3. **Domain Layer** is independent (only flext-core dependencies)
-4. **Infrastructure Layer** implements Domain interfaces
+1. **Application Layer** depends on Domain Layer
+1. **Domain Layer** is independent (only flext-core dependencies)
+1. **Infrastructure Layer** implements Domain interfaces
 
 ## 🔧 Integration Patterns
 
@@ -362,18 +363,18 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 ### **Target State**
 
 1. **Complete Abstraction**: All external libraries wrapped behind FLEXT interfaces
-2. **Enhanced Integration**: Full ecosystem integration with plugin architecture
-3. **Production Readiness**: 100% test coverage with real API integration
-4. **Performance Optimization**: Efficient processing for enterprise data volumes
+1. **Enhanced Integration**: Full ecosystem integration with plugin architecture
+1. **Production Readiness**: 100% test coverage with real API integration
+1. **Performance Optimization**: Efficient processing for enterprise data volumes
 
 ### **Migration Path**
 
 1. **Phase 1**: Implement library wrapper for direct imports
-2. **Phase 2**: Expand integration testing coverage
-3. **Phase 3**: Complete plugin architecture foundation
-4. **Phase 4**: Performance optimization and production hardening
+1. **Phase 2**: Expand integration testing coverage
+1. **Phase 3**: Complete plugin architecture foundation
+1. **Phase 4**: Performance optimization and production hardening
 
----
+______________________________________________________________________
 
 **Architecture Summary**: flext-meltano provides a robust, type-safe foundation for ELT operations within the FLEXT ecosystem, with clear separation of concerns, comprehensive error handling, and strong integration patterns. The current architecture debt primarily involves abstracting direct library dependencies behind FLEXT-compatible interfaces.
 

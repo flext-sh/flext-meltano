@@ -16,7 +16,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for concise usage
 t_core = FlextTypes
-t = FlextTypes
+t = FlextMeltanoTypes
 m = FlextMeltanoModels
 
 
@@ -27,7 +27,9 @@ class DocsTemplates:
         """Initialize templates with optional logger."""
         self._logger = logger
 
-    def generate_ci_workflow(self, config: dict[str, t_core.GeneralValueType]) -> r[str]:
+    def generate_ci_workflow(
+        self, config: dict[str, t_core.GeneralValueType]
+    ) -> r[str]:
         """Generate GitHub Actions workflow using template pattern.
 
         Args:
@@ -43,9 +45,24 @@ class DocsTemplates:
             automation = u.guard(automation_raw, dict, default={}, return_value=True)
 
             # Type narrowing: automation is guaranteed to be dict from u.guard
-            automation_source: dict[str, t.JsonValue] | None = None
+            automation_source: dict[str, t_core.GeneralValueType] | None = None
             if isinstance(automation, dict):
-                automation_source = dict(automation)
+                automation_source = {
+                    str(k): v
+                    for k, v in automation.items()
+                    if isinstance(v, (str, int, float, bool, dict, list)) or v is None
+                }
+
+            audit_day_value = (
+                str(automation_source.get("audit_day", "monday"))
+                if isinstance(automation_source, dict)
+                else "monday"
+            )
+            audit_time_value = (
+                str(automation_source.get("audit_time", "09:00"))
+                if isinstance(automation_source, dict)
+                else "09:00"
+            )
 
             template_vars = u.construct(
                 {
@@ -53,18 +70,13 @@ class DocsTemplates:
                         "value": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
                     },
                     "audit_day": {
-                        "field": "audit_day",
-                        "default": "monday",
-                        "ops": {"ensure": "str"},
+                        "value": audit_day_value,
                     },
                     "audit_time": {
-                        "field": "audit_time",
-                        "default": "09:00",
-                        "ops": {"ensure": "str"},
+                        "value": audit_time_value,
                     },
                     "cron_schedule": {"value": self._get_cron_schedule(config)},
                 },
-                source=automation_source,
             )
 
             workflow_content = self._ci_workflow_template.format(**template_vars)
@@ -129,8 +141,16 @@ class DocsTemplates:
         automation_config = u.guard(automation_raw, dict, default={}, return_value=True)
 
         # Extract audit_day and audit_time with proper type handling
-        audit_day_raw = automation_config.get("audit_day", "monday") if isinstance(automation_config, dict) else "monday"
-        audit_time_raw = automation_config.get("audit_time", "09:00") if isinstance(automation_config, dict) else "09:00"
+        audit_day_raw = (
+            automation_config.get("audit_day", "monday")
+            if isinstance(automation_config, dict)
+            else "monday"
+        )
+        audit_time_raw = (
+            automation_config.get("audit_time", "09:00")
+            if isinstance(automation_config, dict)
+            else "09:00"
+        )
 
         audit_day = u.Conversion.normalize(str(audit_day_raw), case="lower")
         audit_time = str(audit_time_raw)

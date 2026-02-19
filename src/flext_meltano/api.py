@@ -18,6 +18,7 @@ from flext_core import (
     r,
     u,
 )
+
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -543,7 +544,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
             )
 
             # Convert to list of dicts (MeltanoConfigDict-compatible)
-            plugins_data: list[dict[str, t.JsonValue]] = [
+            plugins_data: list[t.MeltanoCore.MeltanoConfigDict] = [
                 x if isinstance(x, dict) else {"raw": x} for x in plugins_data_raw
             ]
 
@@ -739,8 +740,19 @@ class FlextMeltano(FlextService[t.JsonValue]):
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
             # Type narrowing: config is already MeltanoConfigDict or None
-            config_dict: t.MeltanoCore.MeltanoConfigDict = config or {}
-            return service.extract(config_dict).map(lambda v: v)
+            config_dict: dict[str, t.JsonValue] = {
+                str(k): v
+                for k, v in (config or {}).items()
+                if isinstance(v, (str, int, float, bool, dict, list)) or v is None
+            }
+            extract_result = service.extract(config_dict)
+            if extract_result.is_failure:
+                return r[t.JsonValue].fail(
+                    extract_result.error or "Failed to extract data",
+                )
+            return r[t.JsonValue].ok({
+                str(k): v for k, v in extract_result.value.items()
+            })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.JsonValue].fail(f"Failed to extract data: {e}")
 
@@ -767,7 +779,14 @@ class FlextMeltano(FlextService[t.JsonValue]):
                         })
                     else:
                         records_batch.append({})
-                return service.load_batch(records_batch).map(lambda val: val)
+                load_result = service.load_batch(records_batch)
+                if load_result.is_failure:
+                    return r[t.JsonValue].fail(
+                        load_result.error or "Failed to load data",
+                    )
+                return r[t.JsonValue].ok({
+                    str(k): v for k, v in load_result.value.items()
+                })
             return r[t.JsonValue].ok({"status": "initialized"})
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.JsonValue].fail(f"Failed to load data: {e}")
@@ -836,7 +855,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
         config_val = u.get(fields_dict, "config", default={})
         config_guard_result = u.guard(config_val, dict, return_value=True)
         # Type narrowing: check isinstance before using
-        config: dict[str, t.JsonValue] = (
+        config: t.MeltanoCore.MeltanoConfigDict = (
             config_guard_result if isinstance(config_guard_result, dict) else {}
         )
 
@@ -890,7 +909,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
         config_val = u.get(fields_dict, "config", default={})
         config_guard_result = u.guard(config_val, dict, return_value=True)
         # Type narrowing: check isinstance before using
-        config: dict[str, t.JsonValue] = (
+        config: t.MeltanoCore.MeltanoConfigDict = (
             config_guard_result if isinstance(config_guard_result, dict) else {}
         )
 
@@ -1060,7 +1079,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
         dbt_models: list[str] | None = None
         if isinstance(dbt_models_raw, list):
             dbt_models = [str(item) for item in dbt_models_raw]
-        config: dict[str, t.JsonValue] | None = None
+        config: t.MeltanoCore.MeltanoConfigDict | None = None
         if isinstance(config_raw, dict):
             config = {
                 str(k): val

@@ -1,34 +1,35 @@
 # Troubleshooting flext-meltano
 
-
 <!-- TOC START -->
-- [🚨 Architecture Compliance Issues](#-architecture-compliance-issues)
+
+- [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
   - [**Direct Import Violations**](#direct-import-violations)
-- [🔧 Development Issues](#-development-issues)
+- [🔧 Development Issues](#development-issues)
   - [**Import Errors**](#import-errors)
   - [**Type Check Failures**](#type-check-failures)
   - [**Test Failures**](#test-failures)
-- [📦 Dependency Issues](#-dependency-issues)
+- [📦 Dependency Issues](#dependency-issues)
   - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
   - [**Virtual Environment Issues**](#virtual-environment-issues)
-- [🧪 Testing Issues](#-testing-issues)
+- [🧪 Testing Issues](#testing-issues)
   - [**Coverage Issues**](#coverage-issues)
   - [**Slow Tests**](#slow-tests)
-- [🔍 Quality Gate Failures](#-quality-gate-failures)
+- [🔍 Quality Gate Failures](#quality-gate-failures)
   - [**Linting Errors**](#linting-errors)
   - [**Security Issues**](#security-issues)
-- [🚫 Common Mistakes](#-common-mistakes)
+- [🚫 Common Mistakes](#common-mistakes)
   - [**FlextResult Pattern Violations**](#flextresult-pattern-violations)
   - [**Service Pattern Violations**](#service-pattern-violations)
-- [🆘 Getting Help](#-getting-help)
+- [🆘 Getting Help](#getting-help)
   - [**Debug Information**](#debug-information)
   - [**Support Channels**](#support-channels)
-- [📋 Debugging Checklist](#-debugging-checklist)
+- [📋 Debugging Checklist](#debugging-checklist)
+
 <!-- TOC END -->
 
 **Common issues and solutions** for flext-meltano development and usage.
 
----
+______________________________________________________________________
 
 ## 🚨 Architecture Compliance Issues
 
@@ -51,7 +52,7 @@ from meltano.core.project import Project
 from flext_meltano import FlextMeltanoAdapter
 ```
 
----
+______________________________________________________________________
 
 ## 🔧 Development Issues
 
@@ -129,10 +130,10 @@ pytest tests/integration/ -v  # Integration tests
 **Solution**: Common test issues
 
 1. **Missing test data**: Ensure test fixtures are available
-2. **Environment setup**: Activate correct virtual environment
-3. **Dependencies**: Run `poetry install --with dev,test`
+1. **Environment setup**: Activate correct virtual environment
+1. **Dependencies**: Run `poetry install --with dev,test`
 
----
+______________________________________________________________________
 
 ## 📦 Dependency Issues
 
@@ -163,7 +164,7 @@ source .venv/bin/activate
 cd flext-meltano
 ```
 
----
+______________________________________________________________________
 
 ## 🧪 Testing Issues
 
@@ -182,8 +183,8 @@ open htmlcov/index.html
 **Solution**: Focus on critical paths
 
 1. **Core Services**: Ensure service classes have test coverage
-2. **Error Handling**: Test FlextResult error paths
-3. **Integration Points**: Test abstractions with real scenarios
+1. **Error Handling**: Test FlextResult error paths
+1. **Integration Points**: Test abstractions with real scenarios
 
 ### **Slow Tests**
 
@@ -197,7 +198,7 @@ pytest -m "not slow"
 pytest tests/unit/
 ```
 
----
+______________________________________________________________________
 
 ## 🔍 Quality Gate Failures
 
@@ -237,7 +238,7 @@ bandit -r src/ -f json
 - **SQL injection**: Use parameterized queries
 - **Path traversal**: Validate file paths
 
----
+______________________________________________________________________
 
 ## 🚫 Common Mistakes
 
@@ -302,7 +303,7 @@ class FlextMeltanoUtilityService(FlextService):
         pass
 ```
 
----
+______________________________________________________________________
 
 ## 🆘 Getting Help
 
@@ -328,7 +329,7 @@ make validate 2>&1 | head -50
 - **Issues**: [GitHub Issues](https://github.com/flext-sh/flext/issues)
 - **Architecture**: Review [architecture.md](architecture.md)
 
----
+______________________________________________________________________
 
 ## 📋 Debugging Checklist
 
@@ -341,6 +342,6 @@ Before reporting issues:
 - [ ] Reviewed error messages carefully
 - [ ] Checked documentation for similar issues
 
----
+______________________________________________________________________
 
 **Need more help?** Check the [Development Guide](development.md) for detailed contributing guidelines.

@@ -130,12 +130,18 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         self,
         config: m.TapConfig,
         stream_name: str,
-    ) -> dict[str, t.JsonValue]:
+    ) -> t.MeltanoCore.MeltanoConfigDict:
         """Return stream-specific config for a stream, or empty dict if missing."""
         if not config.stream_config or not isinstance(config.stream_config, dict):
             return {}
         val = config.stream_config.get(stream_name, {})
-        return dict(val) if isinstance(val, dict) else {}
+        if not isinstance(val, dict):
+            return {}
+        return {
+            str(k): v
+            for k, v in val.items()
+            if isinstance(v, (str, int, float, bool, dict, list)) or v is None
+        }
 
     def create_source_instance(
         self,
@@ -213,7 +219,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     def build_singer_catalog(
         self,
         streams: list[m.StreamDefinition],
-    ) -> r[dict[str, t.JsonValue]]:
+    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Build a Singer catalog from stream definitions.
 
         Args:
@@ -231,14 +237,14 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Validate stream definitions
             if not streams:
-                return r[dict[str, t.JsonValue]].fail(
+                return r[t.MeltanoCore.MeltanoConfigDict].fail(
                     "Stream list cannot be empty for catalog building",
                 )
 
             # Build catalog structure - using JsonValue for flexibility
-            catalog_streams: list[dict[str, t.JsonValue]] = []
+            catalog_streams: list[t.MeltanoCore.MeltanoConfigDict] = []
             for stream in streams:
-                stream_catalog: dict[str, t.JsonValue] = {
+                stream_catalog: t.MeltanoCore.MeltanoConfigDict = {
                     "tap_stream_id": stream.stream_name,
                     "key_properties": [],
                     "schema": stream.stream_schema,
@@ -251,7 +257,7 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 catalog_streams.append(stream_catalog)
 
             # Use general dict type for catalog
-            catalog_dict: dict[str, t.JsonValue] = {
+            catalog_dict: t.MeltanoCore.MeltanoConfigDict = {
                 "streams": catalog_streams,
             }
 
@@ -261,11 +267,13 @@ class FlextMeltanoTapAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             # Return general dict as StreamCatalog
-            return r[dict[str, t.JsonValue]].ok(catalog_dict)
+            return r[t.MeltanoCore.MeltanoConfigDict].ok(catalog_dict)
 
         except Exception as e:
             self.logger.exception("Catalog building failed", error=str(e))
-            return r[dict[str, t.JsonValue]].fail(f"Catalog building failed: {e}")
+            return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                f"Catalog building failed: {e}",
+            )
 
     def create_stream_from_schema(
         self,

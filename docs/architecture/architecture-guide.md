@@ -1,16 +1,16 @@
 # Architecture Documentation Guide
 
-
 <!-- TOC START -->
-- [🎯 Overview](#-overview)
-- [🏗️ Documentation Framework](#-documentation-framework)
+
+- [🎯 Overview](#overview)
+- [🏗️ Documentation Framework](#documentation-framework)
   - [C4 Model Structure](#c4-model-structure)
   - [Documentation Organization](#documentation-organization)
-- [🔧 Automation Tools](#-automation-tools)
+- [🔧 Automation Tools](#automation-tools)
   - [Architecture Automation Script](#architecture-automation-script)
   - [Makefile Integration](#makefile-integration)
   - [CI/CD Integration](#cicd-integration)
-- [📝 Creating Architecture Documentation](#-creating-architecture-documentation)
+- [📝 Creating Architecture Documentation](#creating-architecture-documentation)
   - [Writing C4 Model Documents](#writing-c4-model-documents)
   - [Writing Architecture Decision Records](#writing-architecture-decision-records)
 - [Context](#context)
@@ -24,31 +24,32 @@
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
   - [Creating PlantUML Diagrams](#creating-plantuml-diagrams)
-- [🔍 Validation and Quality Assurance](#-validation-and-quality-assurance)
+- [🔍 Validation and Quality Assurance](#validation-and-quality-assurance)
   - [Automated Validation](#automated-validation)
   - [Manual Review Checklist](#manual-review-checklist)
   - [Quality Metrics](#quality-metrics)
-- [🚀 Advanced Features](#-advanced-features)
+- [🚀 Advanced Features](#advanced-features)
   - [Code-to-Diagram Generation](#code-to-diagram-generation)
   - [Documentation Synchronization](#documentation-synchronization)
   - [Custom Validation Rules](#custom-validation-rules)
-- [👥 Team Collaboration](#-team-collaboration)
+- [👥 Team Collaboration](#team-collaboration)
   - [Roles and Responsibilities](#roles-and-responsibilities)
   - [Review Process](#review-process)
   - [Communication Channels](#communication-channels)
-- [📊 Metrics and Reporting](#-metrics-and-reporting)
+- [📊 Metrics and Reporting](#metrics-and-reporting)
   - [Architecture Health Dashboard](#architecture-health-dashboard)
   - [Automated Reporting](#automated-reporting)
-- [🛠️ Troubleshooting](#-troubleshooting)
+- [🛠️ Troubleshooting](#troubleshooting)
   - [Common Issues](#common-issues)
   - [Getting Help](#getting-help)
-- [🎯 Best Practices](#-best-practices)
+- [🎯 Best Practices](#best-practices)
   - [Documentation Principles](#documentation-principles)
   - [Architecture Decision Making](#architecture-decision-making)
   - [Maintenance Approach](#maintenance-approach)
-- [📚 Resources](#-resources)
+- [📚 Resources](#resources)
   - [External References](#external-references)
   - [Internal Documentation](#internal-documentation)
+
 <!-- TOC END -->
 
 **FLEXT-Meltano Architecture Documentation Framework and Best Practices**
@@ -276,13 +277,13 @@ Rel(service, external, "[Interaction]")
 #### ADR Workflow
 
 1. **Identify Decision**: Recognize when an architectural decision is needed
-2. **Gather Context**: Collect requirements, constraints, and background information
-3. **Evaluate Options**: Research and evaluate multiple approaches
-4. **Document ADR**: Create ADR in `proposed` status
-5. **Review**: Get feedback from architecture team
-6. **Finalize**: Update status to `accepted` or `rejected`
-7. **Implement**: Put decision into practice
-8. **Maintain**: Update ADR as decision evolves
+1. **Gather Context**: Collect requirements, constraints, and background information
+1. **Evaluate Options**: Research and evaluate multiple approaches
+1. **Document ADR**: Create ADR in `proposed` status
+1. **Review**: Get feedback from architecture team
+1. **Finalize**: Update status to `accepted` or `rejected`
+1. **Implement**: Put decision into practice
+1. **Maintain**: Update ADR as decision evolves
 
 ### Creating PlantUML Diagrams
 
@@ -313,11 +314,11 @@ end note
 #### Diagram Best Practices
 
 1. **Clear Naming**: Use descriptive, consistent names
-2. **Technology Labels**: Include technology choices in component definitions
-3. **Relationship Descriptions**: Explain what data or actions flow between components
-4. **Layout**: Use logical grouping and flow direction
-5. **Notes**: Add explanatory notes for complex relationships
-6. **Consistency**: Follow established patterns from existing diagrams
+1. **Technology Labels**: Include technology choices in component definitions
+1. **Relationship Descriptions**: Explain what data or actions flow between components
+1. **Layout**: Use logical grouping and flow direction
+1. **Notes**: Add explanatory notes for complex relationships
+1. **Consistency**: Follow established patterns from existing diagrams
 
 ## 🔍 Validation and Quality Assurance
 
@@ -416,10 +417,10 @@ class CustomArchitectureValidator(ArchitectureValidator):
 ### Review Process
 
 1. **Author**: Creates or updates architecture documentation
-2. **Self-Review**: Validates against quality checklist
-3. **Peer Review**: Technical review by team member
-4. **Architect Review**: Architecture team approval for major changes
-5. **Implementation**: Put approved changes into practice
+1. **Self-Review**: Validates against quality checklist
+1. **Peer Review**: Technical review by team member
+1. **Architect Review**: Architecture team approval for major changes
+1. **Implementation**: Put approved changes into practice
 
 ### Communication Channels
 
@@ -489,36 +490,36 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 ### Getting Help
 
 1. **Check This Guide**: Comprehensive troubleshooting section
-2. **Run Diagnostics**: `make docs`
-3. **Review Reports**: Check `docs/architecture/architecture-report.md`
-4. **Team Consultation**: Reach out to architecture team
-5. **GitHub Issues**: Report framework bugs or request features
+1. **Run Diagnostics**: `make docs`
+1. **Review Reports**: Check `docs/architecture/architecture-report.md`
+1. **Team Consultation**: Reach out to architecture team
+1. **GitHub Issues**: Report framework bugs or request features
 
 ## 🎯 Best Practices
 
 ### Documentation Principles
 
 1. **Audience-Aware**: Write for the intended audience (architects, developers, operations)
-2. **Change-Friendly**: Structure documentation to accommodate evolution
-3. **Tool-Supported**: Use automation to reduce manual maintenance burden
-4. **Reviewable**: Keep documents small enough for effective review
-5. **Searchable**: Use consistent terminology and structure
+1. **Change-Friendly**: Structure documentation to accommodate evolution
+1. **Tool-Supported**: Use automation to reduce manual maintenance burden
+1. **Reviewable**: Keep documents small enough for effective review
+1. **Searchable**: Use consistent terminology and structure
 
 ### Architecture Decision Making
 
 1. **Evidence-Based**: Ground decisions in data and experience
-2. **Trade-off Aware**: Clearly document costs and benefits
-3. **Reversible**: Design for change and evolution
-4. **Communicated**: Ensure team understanding and buy-in
-5. **Reviewed**: Get appropriate stakeholder input
+1. **Trade-off Aware**: Clearly document costs and benefits
+1. **Reversible**: Design for change and evolution
+1. **Communicated**: Ensure team understanding and buy-in
+1. **Reviewed**: Get appropriate stakeholder input
 
 ### Maintenance Approach
 
 1. **Incremental Updates**: Regular small updates over large rewrites
-2. **Automated Checks**: Use validation to catch issues early
-3. **Version Control**: Track changes and evolution over time
-4. **Team Involvement**: Distribute maintenance responsibilities
-5. **Quality Focus**: Maintain high standards consistently
+1. **Automated Checks**: Use validation to catch issues early
+1. **Version Control**: Track changes and evolution over time
+1. **Team Involvement**: Distribute maintenance responsibilities
+1. **Quality Focus**: Maintain high standards consistently
 
 ## 📚 Resources
 
@@ -536,7 +537,7 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 - [architecture-report.md](architecture-report.md) - Automated status reports
 - [../../scripts/architecture_automation.py](../../scripts/architecture_automation.py) - Automation tools
 
----
+______________________________________________________________________
 
 **Architecture Documentation Guide**: FLEXT-Meltano Architecture Framework
 _Comprehensive guide for creating, maintaining, and evolving enterprise architecture documentation_

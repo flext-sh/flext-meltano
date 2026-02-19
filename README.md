@@ -1,7 +1,7 @@
 # FLEXT-Meltano
 
-
 <!-- TOC START -->
+
 - [🚀 Key Features](#-key-features)
 - [📦 Installation](#-installation)
 - [🛠️ Usage](#-usage)
@@ -11,6 +11,7 @@
 - [🏗️ Architecture](#-architecture)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
+
 <!-- TOC END -->
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)

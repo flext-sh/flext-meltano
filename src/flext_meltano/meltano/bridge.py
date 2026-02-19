@@ -56,7 +56,15 @@ class FlextMeltanoBridge:
             # Placeholder implementation - in real implementation this would
             # communicate with Go bridge via JSON API
             # Build result dict with proper typing
-            args_dict: dict[str, t.JsonValue] = args if args is not None else {}
+            args_dict: t.MeltanoCore.MeltanoConfigDict = (
+                {
+                    str(k): v
+                    for k, v in args.items()
+                    if isinstance(v, (str, int, float, bool, dict, list)) or v is None
+                }
+                if isinstance(args, dict)
+                else {}
+            )
             result: t.Bridge.BridgeStatus = {
                 "command": command,
                 "args": args_dict,
