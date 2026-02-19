@@ -1,7 +1,7 @@
 # ADR-003: Singer Protocol Abstraction Layer
 
-
 <!-- TOC START -->
+
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -22,6 +22,7 @@
   - [State Management](#state-management)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
+
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-02-01 | **Category**: 🏗️ Architecture
@@ -44,9 +45,9 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 **Key Abstractions:**
 
 1. **FlextMeltanoTap** - Abstract base class for Singer taps
-2. **FlextMeltanoTarget** - Abstract base class for Singer targets
-3. **FlextMeltanoStream** - Stream abstraction with FLEXT patterns
-4. **SingerProtocolService** - Protocol coordination and state management
+1. **FlextMeltanoTarget** - Abstract base class for Singer targets
+1. **FlextMeltanoStream** - Stream abstraction with FLEXT patterns
+1. **SingerProtocolService** - Protocol coordination and state management
 
 ## Rationale
 

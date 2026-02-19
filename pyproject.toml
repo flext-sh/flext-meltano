@@ -185,12 +185,7 @@
     extend = "../ruff-shared.toml"
 
 [tool.pytest.ini_options]
-    addopts = [
-        "--maxfail=1",
-        "--strict-config",
-        "--tb=short",
-        "-ra",
-    ]
+    addopts = [ "--strict-config", "--strict-markers", "--tb=short", "-p no:sugar", "-q", "-ra", "--timeout=30", "--timeout-method=signal", "--durations=0" ]
     markers = [
         "concurrency: Concurrency tests",
         "e2e: End-to-end tests",

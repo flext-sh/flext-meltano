@@ -1,52 +1,53 @@
 # C4 Model Architecture Documentation
 
-
 <!-- TOC START -->
-- [📋 Table of Contents](#-table-of-contents)
-- [🎯 Context Diagram (Level 1)](#-context-diagram-level-1)
+
+- [📋 Table of Contents](#table-of-contents)
+- [🎯 Context Diagram (Level 1)](#context-diagram-level-1)
   - [System Purpose](#system-purpose)
   - [Key Relationships](#key-relationships)
-- [🏗️ Container Diagram (Level 2)](#-container-diagram-level-2)
+- [🏗️ Container Diagram (Level 2)](#container-diagram-level-2)
   - [Container Overview](#container-overview)
   - [Container Responsibilities](#container-responsibilities)
-- [🔧 Component Diagram (Level 3)](#-component-diagram-level-3)
+- [🔧 Component Diagram (Level 3)](#component-diagram-level-3)
   - [Service Layer Components](#service-layer-components)
   - [Adapter Layer Components](#adapter-layer-components)
   - [Component Interactions](#component-interactions)
-- [💻 Code Diagram (Level 4)](#-code-diagram-level-4)
+- [💻 Code Diagram (Level 4)](#code-diagram-level-4)
   - [Service Layer Code Structure](#service-layer-code-structure)
   - [Key Classes and Interfaces](#key-classes-and-interfaces)
-- [📋 Architecture Decision Records](#-architecture-decision-records)
+- [📋 Architecture Decision Records](#architecture-decision-records)
   - [ADR-001: Railway-Oriented Programming with FlextResult[T]](#adr-001-railway-oriented-programming-with-flextresultt)
   - [ADR-002: Clean Architecture with Domain-Driven Design](#adr-002-clean-architecture-with-domain-driven-design)
   - [ADR-003: Singer Protocol Abstraction Layer](#adr-003-singer-protocol-abstraction-layer)
-- [🏆 Quality Attributes](#-quality-attributes)
+- [🏆 Quality Attributes](#quality-attributes)
   - [Performance](#performance)
   - [Reliability](#reliability)
   - [Security](#security)
   - [Maintainability](#maintainability)
   - [Usability](#usability)
-- [🔄 Evolution & Technical Debt](#-evolution-technical-debt)
+- [🔄 Evolution & Technical Debt](#evolution-technical-debt)
   - [Current Architecture Health](#current-architecture-health)
   - [Future Evolution Considerations](#future-evolution-considerations)
+
 <!-- TOC END -->
 
 **FLEXT-Meltano Enterprise Data Integration Platform**
 
 **Framework**: C4 Model | **Version**: 1.0 | **Last Updated**: 2025-10-10
 
----
+______________________________________________________________________
 
 ## 📋 Table of Contents
 
 1. [Context Diagram (Level 1)](#context-diagram-level-1)
-2. [Container Diagram (Level 2)](#container-diagram-level-2)
-3. [Component Diagram (Level 3)](#component-diagram-level-3)
-4. [Code Diagram (Level 4)](#code-diagram-level-4)
-5. [Architecture Decision Records](#architecture-decision-records)
-6. [Quality Attributes](#quality-attributes)
+1. [Container Diagram (Level 2)](#container-diagram-level-2)
+1. [Component Diagram (Level 3)](#component-diagram-level-3)
+1. [Code Diagram (Level 4)](#code-diagram-level-4)
+1. [Architecture Decision Records](#architecture-decision-records)
+1. [Quality Attributes](#quality-attributes)
 
----
+______________________________________________________________________
 
 ## 🎯 Context Diagram (Level 1)
 
@@ -106,7 +107,7 @@ Rel(flext_meltano, data_destinations, "Loads data to", "Singer protocol")
 | **FLEXT-Meltano → FLEXT-Core**      | Foundation patterns                 | Python imports          |
 | **FLEXT Ecosystem → FLEXT-Meltano** | 32+ dependent projects              | Python dependencies     |
 
----
+______________________________________________________________________
 
 ## 🏗️ Container Diagram (Level 2)
 
@@ -165,7 +166,7 @@ Rel(dbt_cli, data_targets, "Transforms", "SQL")
 | **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoSettings`, environment variables   |
 | **State Store**   | File System/SQLite | Persistence          | JSON files, SQLite database                     |
 
----
+______________________________________________________________________
 
 ## 🔧 Component Diagram (Level 3)
 
@@ -249,7 +250,7 @@ Rel(dbt_adapter, file_manager, "Manages", "DBT project structure")
 | **State Manager**         | Persistence layer              | Pipeline execution tracking, bookmark storage   |
 | **Error Handler**         | Railway pattern implementation | All services for error propagation              |
 
----
+______________________________________________________________________
 
 ## 💻 Code Diagram (Level 4)
 
@@ -344,7 +345,7 @@ end note
 | **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |
 | **FlextMeltanoSettings** | Configuration management | Settings loading, validation          | YAML, environment variables |
 
----
+______________________________________________________________________
 
 ## 📋 Architecture Decision Records
 
@@ -407,13 +408,13 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 - ⚠️ **Negative**: Additional complexity over direct SDK usage
 - ✅ **Mitigation**: Comprehensive documentation and examples
 
----
+______________________________________________________________________
 
 ## 🏆 Quality Attributes
 
 ### Performance
 
-- **Response Time**: <100ms for API operations, <5s for pipeline startup
+- **Response Time**: \<100ms for API operations, \<5s for pipeline startup
 - **Throughput**: Support for concurrent pipeline execution
 - **Scalability**: Horizontal scaling through stateless design
 - **Resource Usage**: Memory-efficient streaming for large datasets
@@ -446,7 +447,7 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 - **Configuration**: YAML-based configuration with validation
 - **Monitoring**: Comprehensive logging and metrics
 
----
+______________________________________________________________________
 
 ## 🔄 Evolution & Technical Debt
 
@@ -464,7 +465,7 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 - **Cloud-Native Features**: Kubernetes operators, service mesh integration
 - **Multi-Cloud Support**: Cloud-agnostic deployment patterns
 
----
+______________________________________________________________________
 
 **C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture
 _Comprehensive system documentation following industry-standard C4 modeling approach_

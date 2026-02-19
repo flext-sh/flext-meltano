@@ -73,7 +73,7 @@ class FlextMeltanoAPIPipelineOperations:
                 if hasattr(self.api, "config")
                 else None
             )
-            pipeline_config: dict[str, t.JsonValue] = {
+            pipeline_config: t.MeltanoCore.MeltanoConfigDict = {
                 "pipeline_id": pipeline_id,
                 "tap": tap_name,
                 "target": target_name,
@@ -125,7 +125,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            execution_result: dict[str, t.JsonValue] = {
+            execution_result: t.MeltanoCore.MeltanoConfigDict = {
                 "pipeline_id": pipeline_id,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -161,7 +161,7 @@ class FlextMeltanoAPIPipelineOperations:
             transform_duration = 0.7 if bool(dbt_models) else 0.0
             total_duration = time.time() - execution_start
 
-            elt_result: dict[str, t.JsonValue] = {
+            elt_result: t.MeltanoCore.MeltanoConfigDict = {
                 "tap": tap_name,
                 "target": target_name,
                 "dbt_models": u.or_(dbt_models, []),
@@ -203,7 +203,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            result_dict: dict[str, t.JsonValue] = {
+            result_dict: t.MeltanoCore.MeltanoConfigDict = {
                 "tap_name": tap_name,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -230,7 +230,7 @@ class FlextMeltanoAPIPipelineOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            result_dict: dict[str, t.JsonValue] = {
+            result_dict: t.MeltanoCore.MeltanoConfigDict = {
                 "target_name": target_name,
                 "status": "completed",
                 "execution_duration": execution_duration,

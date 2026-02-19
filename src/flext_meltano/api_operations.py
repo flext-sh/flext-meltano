@@ -67,7 +67,7 @@ class FlextMeltanoAPIOperations:
         # Type narrowing for API call
         tap_name = str(tap_name_raw) if tap_name_raw else ""
         target_name = str(target_name_raw) if target_name_raw else ""
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 
@@ -103,7 +103,7 @@ class FlextMeltanoAPIOperations:
 
         # Type narrowing for API call
         pipeline_id = str(pipeline_id_raw) if pipeline_id_raw else ""
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 
@@ -141,7 +141,7 @@ class FlextMeltanoAPIOperations:
         # Type narrowing for API call
         plugin_type = str(plugin_type_raw) if plugin_type_raw else ""
         plugin_name = str(plugin_name_raw) if plugin_name_raw else ""
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 
@@ -189,7 +189,7 @@ class FlextMeltanoAPIOperations:
 
         # Type narrowing for API call
         environment_name = str(environment_name_raw) if environment_name_raw else ""
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 
@@ -229,7 +229,7 @@ class FlextMeltanoAPIOperations:
         models: list[str] | None = (
             [str(m) for m in models_raw] if isinstance(models_raw, list) else None
         )
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 
@@ -266,7 +266,7 @@ class FlextMeltanoAPIOperations:
         models: list[str] | None = (
             [str(m) for m in models_raw] if isinstance(models_raw, list) else None
         )
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 
@@ -311,7 +311,7 @@ class FlextMeltanoAPIOperations:
             if isinstance(dbt_models_raw, list)
             else None
         )
-        config: dict[str, t.JsonValue] | None = (
+        config: t.MeltanoCore.MeltanoConfigDict | None = (
             config_raw if isinstance(config_raw, dict) else None
         )
 

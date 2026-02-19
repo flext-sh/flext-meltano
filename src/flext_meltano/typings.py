@@ -59,8 +59,8 @@ class FlextMeltanoTypes(FlextTypes):
 
         type CatalogEntry = dict[str, str | dict[str, FlextTypes.JsonValue]]
         type StreamSchema = dict[str, dict[str, FlextTypes.JsonValue]]
-        type TapConfig = dict[str, FlextTypes.JsonValue]
-        type TargetConfig = dict[str, FlextTypes.JsonValue]
+        type TapConfig = dict[str, FlextTypes.GeneralValueType]
+        type TargetConfig = dict[str, FlextTypes.GeneralValueType]
         type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
         type StreamCatalog = dict[str, list[CatalogEntry]]
         type Record = dict[str, FlextTypes.JsonValue]
@@ -239,7 +239,7 @@ class FlextMeltanoTypes(FlextTypes):
         type JsonValue = FlextTypes.JsonValue
 
         # Run context for pipeline execution
-        type RunContextDict = dict[str, FlextTypes.JsonValue]
+        type RunContextDict = dict[str, FlextTypes.GeneralValueType]
 
         # Type aliases for file_managers.py
         FileConfigDict = dict[

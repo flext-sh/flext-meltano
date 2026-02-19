@@ -1,39 +1,40 @@
 # FLEXT-Meltano API Reference
 
-
 <!-- TOC START -->
-- [🎯 Library Overview](#-library-overview)
+
+- [🎯 Library Overview](#library-overview)
   - [**Architecture Principles**](#architecture-principles)
   - [**Core Modules**](#core-modules)
-- [🎯 Core Services](#-core-services)
+- [🎯 Core Services](#core-services)
   - [FlextMeltanoService](#flextmeltanoservice)
   - [FlextMeltanoAdapter](#flextmeltanoadapter)
   - [FlextMeltanoExecutor](#flextmeltanoexecutor)
-- [🔌 Singer Protocol Abstractions](#-singer-protocol-abstractions)
+- [🔌 Singer Protocol Abstractions](#singer-protocol-abstractions)
   - [FlextSingerTap](#flextsingertap)
   - [FlextSingerTarget](#flextsingertarget)
-- [🛠️ Plugin Management Services](#-plugin-management-services)
+- [🛠️ Plugin Management Services](#plugin-management-services)
   - [FlextPluginService](#flextpluginservice)
   - [FlextPluginRegistry](#flextpluginregistry)
-- [🚀 Pipeline Services](#-pipeline-services)
+- [🚀 Pipeline Services](#pipeline-services)
   - [FlextMeltanoService](#flextmeltanoservice)
   - [FlextMeltanoExecutor](#flextmeltanoexecutor)
-- [📁 Project Management](#-project-management)
+- [📁 Project Management](#project-management)
   - [FlextProjectService](#flextprojectservice)
   - [FlextMeltanoProject](#flextmeltanoproject)
-- [🔧 Configuration Management](#-configuration-management)
+- [🔧 Configuration Management](#configuration-management)
   - [FlextMeltanoSettings](#flextmeltanosettings)
-- [📊 Models and Types](#-models-and-types)
+- [📊 Models and Types](#models-and-types)
   - [Core Models](#core-models)
   - [Execution Models](#execution-models)
-- [🛡️ Exception Hierarchy](#-exception-hierarchy)
+- [🛡️ Exception Hierarchy](#exception-hierarchy)
   - [FlextMeltanoException](#flextmeltanoexception)
   - [Specific Exceptions](#specific-exceptions)
-- [🔄 Integration Examples](#-integration-examples)
+- [🔄 Integration Examples](#integration-examples)
   - [Basic Pipeline Execution](#basic-pipeline-execution)
   - [Advanced Pipeline Orchestration](#advanced-pipeline-orchestration)
   - [Plugin Management](#plugin-management)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **Complete API documentation for FLEXT-Meltano v0.9.9 - Enterprise Data Pipeline Integration**
@@ -42,7 +43,7 @@
 
 Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin development tools, and enterprise data pipeline orchestration.
 
----
+______________________________________________________________________
 
 ## 🎯 Library Overview
 
@@ -57,10 +58,10 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 ### **Architecture Principles**
 
 1. **Singer Protocol Compliance** - Full Singer.io specification implementation with enterprise extensions
-2. **Plugin-Centric Design** - Plugin-first architecture with automated development tools
-3. **Pipeline Orchestration** - Advanced pipeline execution with monitoring and recovery
-4. **Enterprise Integration** - Production-ready deployment and operations support
-5. **Type Safety** - 100% type coverage with Pydantic v2 models
+1. **Plugin-Centric Design** - Plugin-first architecture with automated development tools
+1. **Pipeline Orchestration** - Advanced pipeline execution with monitoring and recovery
+1. **Enterprise Integration** - Production-ready deployment and operations support
+1. **Type Safety** - 100% type coverage with Pydantic v2 models
 
 ### **Core Modules**
 
@@ -73,7 +74,7 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 | `pipeline_service.py` | Pipeline orchestration         | `FlextMeltanoService`, `FlextMeltanoExecutor` |
 | `project_service.py`  | Project management             | `FlextProjectService`, `FlextMeltanoProject`  |
 
----
+______________________________________________________________________
 
 ## 🎯 Core Services
 
@@ -305,7 +306,7 @@ def execute_parallel_pipelines(
     """
 ```
 
----
+______________________________________________________________________
 
 ## 🔌 Singer Protocol Abstractions
 
@@ -451,7 +452,7 @@ def validate_config(self) -> FlextResult[FlextMeltanoModels.ValidationResult]:
     """
 ```
 
----
+______________________________________________________________________
 
 ## 🛠️ Plugin Management Services
 
@@ -613,7 +614,7 @@ def list_plugins_by_type(
     """
 ```
 
----
+______________________________________________________________________
 
 ## 🚀 Pipeline Services
 
@@ -738,7 +739,7 @@ def execute_conditional_pipeline(
     """
 ```
 
----
+______________________________________________________________________
 
 ## 📁 Project Management
 
@@ -851,7 +852,7 @@ def plugins(self) -> list[FlextMeltanoModels.PluginInfo]:
     """Get list of configured plugins."""
 ```
 
----
+______________________________________________________________________
 
 ## 🔧 Configuration Management
 
@@ -896,7 +897,7 @@ def pipeline_configs(self) -> dict[str, FlextMeltanoModels.PipelineConfig]:
     """Get pipeline execution configurations."""
 ```
 
----
+______________________________________________________________________
 
 ## 📊 Models and Types
 
@@ -999,7 +1000,7 @@ class PipelineResult(FlextBaseModel):
     error: str | None = None
 ```
 
----
+______________________________________________________________________
 
 ## 🛡️ Exception Hierarchy
 
@@ -1041,7 +1042,7 @@ class FlextMeltanoSettingsurationException(FlextMeltanoException):
     """Exception raised for configuration errors."""
 ```
 
----
+______________________________________________________________________
 
 ## 🔄 Integration Examples
 
@@ -1111,7 +1112,7 @@ taps = plugin_service.discover_plugins()
 available_taps = [p for p in taps.unwrap() if p.plugin_type == "tap"]
 ```
 
----
+______________________________________________________________________
 
 **Document Status**: ✅ Complete | **Last Reviewed**: 2025-10-05
 

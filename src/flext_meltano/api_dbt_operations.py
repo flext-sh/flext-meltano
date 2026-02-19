@@ -62,7 +62,7 @@ class FlextMeltanoAPIDBTOperations:
             )
 
             config_obj = self.api.config if hasattr(self.api, "config") else None
-            result_dict: dict[str, t.JsonValue] = {
+            result_dict: t.MeltanoCore.MeltanoConfigDict = {
                 "models": models_to_run,
                 "status": "completed",
                 "execution_duration": execution_duration,
@@ -110,7 +110,7 @@ class FlextMeltanoAPIDBTOperations:
                 f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s",
             )
 
-            result_dict: dict[str, t.JsonValue] = {
+            result_dict: t.MeltanoCore.MeltanoConfigDict = {
                 "models": models_to_test,
                 "status": "passed",
                 "tests_executed": tests_count,
@@ -131,7 +131,7 @@ class FlextMeltanoAPIDBTOperations:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
 
-            result_dict: dict[str, t.JsonValue] = {
+            result_dict: t.MeltanoCore.MeltanoConfigDict = {
                 "status": "completed",
                 "execution_duration": execution_duration,
                 "executed_at": str(time.time()),

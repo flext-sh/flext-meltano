@@ -333,7 +333,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                     result_data[key] = value
                 elif isinstance(value, dict):
                     # Recursively ensure dict values are JSON-compatible
-                    json_dict: dict[str, t_core.JsonValue] = {
+                    json_dict: t.MeltanoCore.MeltanoConfigDict = {
                         k: v
                         for k, v in value.items()
                         if isinstance(v, (str, int, float, bool, type(None)))

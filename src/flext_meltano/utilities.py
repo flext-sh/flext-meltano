@@ -70,13 +70,13 @@ class FlextMeltanoUtilities(FlextUtilities):
         project_name: str = "",
         version: str | None = None,
         default_environment: str | None = None,
-        plugins: dict[str, t.JsonValue] | None = None,
-        environments: dict[str, t.JsonValue] | None = None,
+        plugins: t.MeltanoCore.MeltanoConfigDict | None = None,
+        environments: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         try:
             # DSL Builder pattern: compose config with defaults
-            raw_config: dict[str, t.JsonValue] = {
+            raw_config: t.MeltanoCore.MeltanoConfigDict = {
                 "project_id": project_id,
                 "project_name": project_name or project_id,
                 "version": version or 1,

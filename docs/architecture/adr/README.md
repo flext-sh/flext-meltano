@@ -1,7 +1,7 @@
 # Architecture Decision Records (ADRs)
 
-
 <!-- TOC START -->
+
 - [Overview](#overview)
 - [ADR Process](#adr-process)
   - [Creating an ADR](#creating-an-adr)
@@ -29,6 +29,7 @@
   - [Writing Effective ADRs](#writing-effective-adrs)
   - [Review Process](#review-process)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **FLEXT-Meltano Architectural Decisions and Rationale**
@@ -42,12 +43,12 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 ### Creating an ADR
 
 1. **Identify Decision**: Recognize when an architectural decision needs to be made
-2. **Gather Context**: Collect relevant information about the problem and constraints
-3. **Evaluate Options**: Consider multiple approaches and their trade-offs
-4. **Make Decision**: Choose the best approach based on analysis
-5. **Document ADR**: Record the decision following the template below
-6. **Implement**: Put the decision into practice
-7. **Review**: Periodically review and update ADRs as needed
+1. **Gather Context**: Collect relevant information about the problem and constraints
+1. **Evaluate Options**: Consider multiple approaches and their trade-offs
+1. **Make Decision**: Choose the best approach based on analysis
+1. **Document ADR**: Record the decision following the template below
+1. **Implement**: Put the decision into practice
+1. **Review**: Periodically review and update ADRs as needed
 
 ### ADR Template
 
@@ -97,18 +98,18 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 
 ## Current ADRs
 
-| ADR                                            | Title                                            | Status   | Date       |
-| ---------------------------------------------- | ------------------------------------------------ | -------- | ---------- | --------------------------- |
+| ADR | Title | Status | Date |
+| \---------------------------------------------- | ------------------------------------------------ | -------- | ---------- | --------------------------- |
 | [ADR-001](001-railway-oriented-programming.md) | Railway-Oriented Programming with FlextResult[T] | Accepted | 2025-01-15 |
-| [ADR-002](002-clean-architecture-ddd.md)       | Clean Architecture with Domain-Driven Design     | Accepted | 2025-01-20 |
-| [ADR-003](003-singer-protocol-abstraction.md)  | Singer Protocol Abstraction Layer                | Accepted | 2025-02-01 |
-| ADR-004                                        | Type Safety First with Python 3.13+              | Accepted | 2025-02-05 | _Documentation coming soon_ |
-| ADR-005                                        | Plugin-Centric Architecture                      | Accepted | 2025-02-10 | _Documentation coming soon_ |
-| ADR-006                                        | FLEXT-Core Integration Pattern                   | Accepted | 2025-02-15 | _Documentation coming soon_ |
-| ADR-007                                        | State Management Strategy                        | Accepted | 2025-02-20 | _Documentation coming soon_ |
-| ADR-008                                        | Error Handling Strategy                          | Accepted | 2025-02-25 | _Documentation coming soon_ |
-| ADR-009                                        | API Design Principles                            | Accepted | 2025-03-01 | _Documentation coming soon_ |
-| ADR-010                                        | Testing Strategy and Infrastructure              | Accepted | 2025-03-05 | _Documentation coming soon_ |
+| [ADR-002](002-clean-architecture-ddd.md) | Clean Architecture with Domain-Driven Design | Accepted | 2025-01-20 |
+| [ADR-003](003-singer-protocol-abstraction.md) | Singer Protocol Abstraction Layer | Accepted | 2025-02-01 |
+| ADR-004 | Type Safety First with Python 3.13+ | Accepted | 2025-02-05 | _Documentation coming soon_ |
+| ADR-005 | Plugin-Centric Architecture | Accepted | 2025-02-10 | _Documentation coming soon_ |
+| ADR-006 | FLEXT-Core Integration Pattern | Accepted | 2025-02-15 | _Documentation coming soon_ |
+| ADR-007 | State Management Strategy | Accepted | 2025-02-20 | _Documentation coming soon_ |
+| ADR-008 | Error Handling Strategy | Accepted | 2025-02-25 | _Documentation coming soon_ |
+| ADR-009 | API Design Principles | Accepted | 2025-03-01 | _Documentation coming soon_ |
+| ADR-010 | Testing Strategy and Infrastructure | Accepted | 2025-03-05 | _Documentation coming soon_ |
 
 ## ADR Status Definitions
 
@@ -153,35 +154,35 @@ ADRs must:
 ### Creating New ADRs
 
 1. Use the next available ADR number
-2. Follow the template exactly
-3. Include comprehensive context and analysis
-4. Get approval from architecture team
-5. Implement the decision
-6. Update status to "Accepted"
+1. Follow the template exactly
+1. Include comprehensive context and analysis
+1. Get approval from architecture team
+1. Implement the decision
+1. Update status to "Accepted"
 
 ### Updating ADRs
 
 1. Create a new ADR that supersedes the old one
-2. Link ADRs with "Related ADRs" section
-3. Update status of superseded ADR to "Superseded"
-4. Update implementation to reflect new decision
+1. Link ADRs with "Related ADRs" section
+1. Update status of superseded ADR to "Superseded"
+1. Update implementation to reflect new decision
 
 ## Best Practices
 
 ### Writing Effective ADRs
 
 1. **Be Specific**: Clearly state what was decided and why
-2. **Include Context**: Provide enough background for future readers
-3. **Document Trade-offs**: Explain what was gained and lost
-4. **Link to Implementation**: Connect decisions to actual code
-5. **Keep Updated**: Review and update ADRs as architecture evolves
+1. **Include Context**: Provide enough background for future readers
+1. **Document Trade-offs**: Explain what was gained and lost
+1. **Link to Implementation**: Connect decisions to actual code
+1. **Keep Updated**: Review and update ADRs as architecture evolves
 
 ### Review Process
 
 1. **Technical Review**: Ensure technical accuracy
-2. **Architectural Alignment**: Verify consistency with overall architecture
-3. **Implementation Feasibility**: Confirm decision can be implemented
-4. **Documentation Quality**: Ensure ADR is clear and complete
+1. **Architectural Alignment**: Verify consistency with overall architecture
+1. **Implementation Feasibility**: Confirm decision can be implemented
+1. **Documentation Quality**: Ensure ADR is clear and complete
 
 ## Related Documentation
 

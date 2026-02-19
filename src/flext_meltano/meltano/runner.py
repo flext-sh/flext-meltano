@@ -53,7 +53,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
         self,
         tap: SingerTap,
         target: SingerTarget,
-        config: dict[str, t_base.JsonValue] | None = None,
+        config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Run a complete ELT pipeline from tap to target.
 
@@ -183,7 +183,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
         tap_name: str,
         target_name: str,
         dbt_models: list[str] | None = None,
-        config: dict[str, t_base.JsonValue] | None = None,
+        config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:

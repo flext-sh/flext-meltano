@@ -1,41 +1,42 @@
 # Development Guide
 
-
 <!-- TOC START -->
-- [🎯 Project Overview](#-project-overview)
-- [🛠️ Development Setup](#-development-setup)
+
+- [🎯 Project Overview](#project-overview)
+- [🛠️ Development Setup](#development-setup)
   - [**Prerequisites**](#prerequisites)
   - [**Initial Setup**](#initial-setup)
-- [🔧 Development Workflow](#-development-workflow)
+- [🔧 Development Workflow](#development-workflow)
   - [**Quality Gates**](#quality-gates)
   - [**Code Standards**](#code-standards)
   - [**Testing Strategy**](#testing-strategy)
-- [🏗️ Architecture Constraints](#-architecture-constraints)
+- [🏗️ Architecture Constraints](#architecture-constraints)
   - [**Current Compliance Issues**](#current-compliance-issues)
   - [**FLEXT Ecosystem Requirements**](#flext-ecosystem-requirements)
-- [📊 Code Metrics](#-code-metrics)
+- [📊 Code Metrics](#code-metrics)
   - [**Current Implementation**](#current-implementation)
   - [**Priority Improvements**](#priority-improvements)
-- [🧪 Testing Guidelines](#-testing-guidelines)
+- [🧪 Testing Guidelines](#testing-guidelines)
   - [**Test Organization**](#test-organization)
   - [**Running Tests**](#running-tests)
-- [🔍 Debugging and Development](#-debugging-and-development)
+- [🔍 Debugging and Development](#debugging-and-development)
   - [**Common Issues**](#common-issues)
   - [**Development Tools**](#development-tools)
-- [📚 Contributing Guidelines](#-contributing-guidelines)
+- [📚 Contributing Guidelines](#contributing-guidelines)
   - [**Code Review Checklist**](#code-review-checklist)
   - [**Architecture Compliance**](#architecture-compliance)
-- [🎯 Development Priorities](#-development-priorities)
+- [🎯 Development Priorities](#development-priorities)
   - [**Immediate (Next Sprint)**](#immediate-next-sprint)
   - [**Short Term (Next Month)**](#short-term-next-month)
   - [**Long Term (Next Quarter)**](#long-term-next-quarter)
+
 <!-- TOC END -->
 
 **Development workflow for the flext-meltano project**
 
 **Last Updated**: 2025-09-17
 
----
+______________________________________________________________________
 
 ## 🎯 Project Overview
 
@@ -46,7 +47,7 @@ This is a dual-purpose project:
 
 **Current Status**: 7,286 lines of source code with 13,970 lines of tests. Architecture compliance needs improvement.
 
----
+______________________________________________________________________
 
 ## 🛠️ Development Setup
 
@@ -72,7 +73,7 @@ poetry install --with dev,test
 make lint type-check test
 ```
 
----
+______________________________________________________________________
 
 ## 🔧 Development Workflow
 
@@ -99,7 +100,7 @@ make test               # Test suite execution
 - **Integration Tests**: Real API integration where possible
 - **Test Coverage**: Current 2:1 test-to-source ratio (comprehensive)
 
----
+______________________________________________________________________
 
 ## 🏗️ Architecture Constraints
 
@@ -116,7 +117,7 @@ make test               # Test suite execution
 - Follow single responsibility principle
 - Maintain comprehensive type safety
 
----
+______________________________________________________________________
 
 ## 📊 Code Metrics
 
@@ -131,11 +132,11 @@ make test               # Test suite execution
 ### **Priority Improvements**
 
 1. Resolve direct import violations
-2. Implement abstraction layer for external libraries
-3. Expand Meltano plugin configuration
-4. Complete integration testing coverage
+1. Implement abstraction layer for external libraries
+1. Expand Meltano plugin configuration
+1. Complete integration testing coverage
 
----
+______________________________________________________________________
 
 ## 🧪 Testing Guidelines
 
@@ -163,7 +164,7 @@ pytest tests/integration/ -v
 pytest --cov=src --cov-report=html
 ```
 
----
+______________________________________________________________________
 
 ## 🔍 Debugging and Development
 
@@ -185,7 +186,7 @@ make t          # test
 make tc         # type-check
 ```
 
----
+______________________________________________________________________
 
 ## 📚 Contributing Guidelines
 
@@ -204,28 +205,28 @@ make tc         # type-check
 - Implement proper error handling with FlextResult
 - Maintain comprehensive documentation
 
----
+______________________________________________________________________
 
 ## 🎯 Development Priorities
 
 ### **Immediate (Next Sprint)**
 
 1. Implement abstraction layer for meltano.core imports
-2. Expand integration test coverage
-3. Document actual vs claimed functionality
+1. Expand integration test coverage
+1. Document actual vs claimed functionality
 
 ### **Short Term (Next Month)**
 
 1. Complete plugin architecture foundation
-2. Resolve all architecture compliance issues
-3. Expand Meltano project configuration
+1. Resolve all architecture compliance issues
+1. Expand Meltano project configuration
 
 ### **Long Term (Next Quarter)**
 
 1. Production deployment readiness
-2. Performance optimization
-3. Comprehensive ecosystem integration
+1. Performance optimization
+1. Comprehensive ecosystem integration
 
----
+______________________________________________________________________
 
 **Development Status**: Active development with focus on architecture compliance and realistic capability documentation.

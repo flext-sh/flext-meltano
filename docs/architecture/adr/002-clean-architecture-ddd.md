@@ -1,7 +1,7 @@
 # ADR-002: Clean Architecture with Domain-Driven Design
 
-
 <!-- TOC START -->
+
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -23,6 +23,7 @@
   - [Dependency Injection](#dependency-injection)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
+
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-01-20 | **Category**: 🏗️ Architecture
@@ -44,9 +45,9 @@ Traditional layered architecture approaches often lead to tight coupling between
 Implement Clean Architecture with Domain-Driven Design, establishing clear boundaries between:
 
 1. **API Layer** - External interfaces and adapters
-2. **Application Layer** - Use cases and application logic
-3. **Domain Layer** - Business rules and entities
-4. **Infrastructure Layer** - External system integration
+1. **Application Layer** - Use cases and application logic
+1. **Domain Layer** - Business rules and entities
+1. **Infrastructure Layer** - External system integration
 
 **Key Architectural Elements:**
 

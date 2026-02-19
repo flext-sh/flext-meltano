@@ -1,50 +1,51 @@
 # flext-meltano Configuration
 
-
 <!-- TOC START -->
-- [🎯 Configuration Overview](#-configuration-overview)
-- [📋 Environment Setup](#-environment-setup)
+
+- [🎯 Configuration Overview](#configuration-overview)
+- [📋 Environment Setup](#environment-setup)
   - [Required Environment Variables](#required-environment-variables)
   - [Virtual Environment Setup](#virtual-environment-setup)
-- [⚙️ Meltano Project Configuration](#-meltano-project-configuration)
+- [⚙️ Meltano Project Configuration](#meltano-project-configuration)
   - [Basic meltano.yml Structure](#basic-meltanoyml-structure)
   - [Configuration Validation](#configuration-validation)
-- [🔌 Singer Plugin Configuration](#-singer-plugin-configuration)
+- [🔌 Singer Plugin Configuration](#singer-plugin-configuration)
   - [Tap Configuration](#tap-configuration)
   - [Target Configuration](#target-configuration)
   - [Singer Catalog Configuration](#singer-catalog-configuration)
-- [🛠️ dbt Configuration](#-dbt-configuration)
+- [🛠️ dbt Configuration](#dbt-configuration)
   - [dbt Project Structure](#dbt-project-structure)
   - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbtprojectyml)
   - [dbt Service Configuration](#dbt-service-configuration)
-- [🏗️ Pipeline Configuration](#-pipeline-configuration)
+- [🏗️ Pipeline Configuration](#pipeline-configuration)
   - [Complete ELT Pipeline](#complete-elt-pipeline)
   - [Configuration Validation](#configuration-validation)
-- [🌍 Environment Management](#-environment-management)
+- [🌍 Environment Management](#environment-management)
   - [Development Environment](#development-environment)
   - [Production Environment](#production-environment)
   - [Environment Switching](#environment-switching)
-- [🔧 Configuration File Management](#-configuration-file-management)
+- [🔧 Configuration File Management](#configuration-file-management)
   - [Reading Configuration Files](#reading-configuration-files)
   - [Writing Configuration Files](#writing-configuration-files)
   - [Configuration Backup](#configuration-backup)
-- [🔍 Configuration Validation](#-configuration-validation)
+- [🔍 Configuration Validation](#configuration-validation)
   - [Schema Validation](#schema-validation)
   - [Runtime Validation](#runtime-validation)
-- [🚨 Current Limitations](#-current-limitations)
+- [🚨 Current Limitations](#current-limitations)
   - [Architecture Compliance Issues](#architecture-compliance-issues)
   - [Configuration Restrictions](#configuration-restrictions)
   - [Workarounds](#workarounds)
-- [🔄 Configuration Migration](#-configuration-migration)
+- [🔄 Configuration Migration](#configuration-migration)
   - [Resolution Timeline](#resolution-timeline)
   - [Migration Planning](#migration-planning)
+
 <!-- TOC END -->
 
 **Configuration management for FLEXT ecosystem ELT foundation library**
 
 > **⚠️ COMPLIANCE NOTE**: Current configuration patterns require abstraction layer for full FLEXT compliance due to direct meltano.core usage.
 
----
+______________________________________________________________________
 
 ## 🎯 Configuration Overview
 
@@ -56,7 +57,7 @@ flext-meltano provides enterprise-grade configuration management for ELT operati
 - **Environment Management** - Development, staging, and production configurations
 - **FLEXT Integration** - flext-core pattern compliance and validation
 
----
+______________________________________________________________________
 
 ## 📋 Environment Setup
 
@@ -94,7 +95,7 @@ cd flext-meltano
 poetry install --with dev,test
 ```
 
----
+______________________________________________________________________
 
 ## ⚙️ Meltano Project Configuration
 
@@ -166,7 +167,7 @@ else:
     print(f"Configuration error: {validation_result.error}")
 ```
 
----
+______________________________________________________________________
 
 ## 🔌 Singer Plugin Configuration
 
@@ -233,7 +234,7 @@ stream = StreamDefinition(
 )
 ```
 
----
+______________________________________________________________________
 
 ## 🛠️ dbt Configuration
 
@@ -295,7 +296,7 @@ result = dbt_service.execute_dbt_operation()
 # {"dbt_status": "ready", "models": []}
 ```
 
----
+______________________________________________________________________
 
 ## 🏗️ Pipeline Configuration
 
@@ -345,7 +346,7 @@ if validation_result.is_failure:
     print(f"Pipeline validation failed: {validation_result.error}")
 ```
 
----
+______________________________________________________________________
 
 ## 🌍 Environment Management
 
@@ -403,7 +404,7 @@ dev_config = config.load_configuration("dev")
 prod_config = config.load_configuration("prod")
 ```
 
----
+______________________________________________________________________
 
 ## 🔧 Configuration File Management
 
@@ -452,7 +453,7 @@ if backup_result.is_success:
     print(f"Backed up {len(backup_files)} configuration files")
 ```
 
----
+______________________________________________________________________
 
 ## 🔍 Configuration Validation
 
@@ -493,15 +494,15 @@ if env_validation.is_failure:
     print(f"Environment validation failed: {env_validation.error}")
 ```
 
----
+______________________________________________________________________
 
 ## 🚨 Current Limitations
 
 ### Architecture Compliance Issues
 
 1. **Direct Import Violations**: Configuration system uses direct meltano.core imports
-2. **Abstraction Layer Missing**: Requires wrapper implementation for full FLEXT compliance
-3. **dbt Integration**: Current configuration returns placeholder data
+1. **Abstraction Layer Missing**: Requires wrapper implementation for full FLEXT compliance
+1. **dbt Integration**: Current configuration returns placeholder data
 
 ### Configuration Restrictions
 
@@ -514,11 +515,11 @@ Due to compliance issues:
 ### Workarounds
 
 1. **Use Abstractions**: Leverage existing FlextMeltanoSettings where possible
-2. **Monitor Progress**: Track abstraction layer implementation
-3. **Plan Migration**: Prepare for wrapper layer adoption
-4. **Validate Patterns**: Use FlextResult patterns consistently
+1. **Monitor Progress**: Track abstraction layer implementation
+1. **Plan Migration**: Prepare for wrapper layer adoption
+1. **Validate Patterns**: Use FlextResult patterns consistently
 
----
+______________________________________________________________________
 
 ## 🔄 Configuration Migration
 
@@ -531,10 +532,10 @@ Due to compliance issues:
 ### Migration Planning
 
 1. **Current State**: Document existing configuration patterns
-2. **Target Architecture**: Plan abstraction layer implementation
-3. **Transition Strategy**: Gradual migration with backward compatibility
-4. **Validation**: Ensure all configuration patterns maintain functionality
+1. **Target Architecture**: Plan abstraction layer implementation
+1. **Transition Strategy**: Gradual migration with backward compatibility
+1. **Validation**: Ensure all configuration patterns maintain functionality
 
----
+______________________________________________________________________
 
 **Configuration Guide v0.9.9** - Reflects current configuration capabilities with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.
