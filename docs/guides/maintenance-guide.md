@@ -105,10 +105,10 @@ cat docs/reports/docs_quality_report_*.md
 
 ```bash
 # Install Git hooks for pre-commit quality checks
-make docs-hooks
+make docs
 
 # Generate GitHub Actions workflow
-make docs-workflow
+make docs
 ```
 
 ## 📋 Quality Metrics
@@ -147,7 +147,7 @@ make docs DOCS_PHASE=validate
 make docs DOCS_PHASE=validate PROJECT=flext-meltano
 
 # Generate quality reports
-make docs-report
+make docs
 make docs DOCS_PHASE=audit PROJECT=flext-meltano
 ```
 
@@ -155,26 +155,26 @@ make docs DOCS_PHASE=audit PROJECT=flext-meltano
 
 ```bash
 # Run CI quality checks
-make docs-ci-check
+make docs
 make docs DOCS_PHASE=validate PROJECT=flext-meltano
 
 # Start scheduled monitoring
-make docs-schedule
+make docs
 make docs DOCS_PHASE=audit PROJECT=flext-meltano
 
 # Set up Git hooks
-make docs-hooks
-make docs-sync-scripts
+make docs
+make docs
 ```
 
 ### Maintenance Tasks
 
 ```bash
 # Clean up old reports
-make docs-clean
+make docs
 
 # View comprehensive setup instructions
-make docs-setup
+make docs
 ```
 
 ## 📊 Quality Thresholds
@@ -312,7 +312,7 @@ Configure automatic quality checks:
 
 ```bash
 # Start continuous monitoring
-make docs-schedule
+make docs
 
 # Runs according to config schedule (default: weekly Mondays 09:00 UTC)
 ```
@@ -323,7 +323,7 @@ Automatic quality enforcement:
 
 ```bash
 # Install Git hooks
-make docs-hooks
+make docs
 
 # Now quality checks run before each commit
 git commit -m "docs: update api reference"
@@ -420,7 +420,7 @@ chmod +x .git/hooks/pre-commit
 .git/hooks/pre-commit
 
 # Reinstall hooks
-make docs-hooks
+make docs
 ```
 
 ## 📚 Best Practices

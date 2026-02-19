@@ -136,11 +136,11 @@ Convenient Makefile targets for common tasks:
 
 ```bash
 # Architecture validation and maintenance
-make docs-architecture-validate     # Validate documentation
-make docs-architecture-generate     # Generate diagrams
-make docs-architecture-update       # Update documentation
-make docs-architecture-report       # Create status report
-make docs-architecture-comprehensive # Run all tasks
+make docs     # Validate documentation
+make docs     # Generate diagrams
+make docs       # Update documentation
+make docs       # Create status report
+make docs # Run all tasks
 ```
 
 ### CI/CD Integration
@@ -162,7 +162,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate Architecture
-        run: make docs-architecture-comprehensive
+        run: make docs
 ```
 
 ## 📝 Creating Architecture Documentation
@@ -372,10 +372,10 @@ Keep documentation synchronized with code:
 
 ```bash
 # Update all timestamps and references
-make docs-architecture-update
+make docs
 
 # Validate all cross-references
-make docs-architecture-validate
+make docs
 ```
 
 ### Custom Validation Rules
@@ -443,7 +443,7 @@ Key metrics tracked:
 
 ```bash
 # Generate comprehensive status report
-make docs-architecture-report
+make docs
 
 # Includes:
 # - Documentation completeness metrics
@@ -470,7 +470,7 @@ java -jar plantuml.jar docs/architecture/diagrams.puml
 
 ```bash
 # Validate all links
-make docs-architecture-validate
+make docs
 
 # Check specific document
 grep -r "broken link" docs/architecture/
@@ -489,7 +489,7 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 ### Getting Help
 
 1. **Check This Guide**: Comprehensive troubleshooting section
-2. **Run Diagnostics**: `make docs-architecture-comprehensive`
+2. **Run Diagnostics**: `make docs`
 3. **Review Reports**: Check `docs/architecture/architecture-report.md`
 4. **Team Consultation**: Reach out to architecture team
 5. **GitHub Issues**: Report framework bugs or request features
