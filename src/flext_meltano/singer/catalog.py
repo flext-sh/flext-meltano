@@ -131,7 +131,7 @@ class FlextMeltanoCatalogManager(FlextService[t.Singer.StreamCatalog]):
                 "Catalog saved to file",
                 file=str(catalog_file),
             )
-            return r[None].ok(True)
+            return r[None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to save catalog", error=str(e))
             return r[None].fail(f"Failed to save catalog: {e}")
@@ -193,7 +193,7 @@ class FlextMeltanoCatalogManager(FlextService[t.Singer.StreamCatalog]):
                 )
                 return r[t.Singer.StreamSchema | None].ok(schema)
 
-            return r[t.Singer.StreamSchema | None].ok(True)
+            return r[t.Singer.StreamSchema | None].ok(None)
         except Exception as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
             return r[t.Singer.StreamSchema | None].fail(f"Failed to get schema: {e}")
