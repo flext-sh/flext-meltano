@@ -323,7 +323,7 @@ def job_run_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> Generator[FlextTestsDocker]:
+def docker_manager() -> FlextTestsDocker:
     """Session-scoped Docker manager fixture."""
     return FlextTestsDocker(keep_running=True)
     # Cleanup will happen via atexit

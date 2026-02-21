@@ -1271,7 +1271,7 @@ class FlextMeltanoModels(FlextModels):
                 default="STATE",
                 description="Singer message discriminator",
             )
-            value: dict[str, dict[str, str]] = Field(
+            value: dict[str, t.GeneralValueType] = Field(
                 default_factory=dict,
                 description="Singer state bookmark payload",
             )
