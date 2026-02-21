@@ -7,7 +7,6 @@ import argparse
 from pathlib import Path
 
 from libs.versioning import current_workspace_version
-
 from release.shared import (
     bump_version,
     parse_semver,
