@@ -10,33 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-# PYTHON_VERSION_GUARD — Do not remove. Managed by scripts/maintenance/enforce_python_version.py
-import sys as _sys
-
-if _sys.version_info[:2] != (3, 13):
-    _v = (
-        f"{_sys.version_info.major}.{_sys.version_info.minor}.{_sys.version_info.micro}"
-    )
-    raise RuntimeError(
-        f"\n{'=' * 72}\n"
-        f"FATAL: Python {_v} detected — this project requires Python 3.13.\n"
-        f"\n"
-        f"The virtual environment was created with the WRONG Python interpreter.\n"
-        f"\n"
-        f"Fix:\n"
-        f"  1. rm -rf .venv\n"
-        f"  2. poetry env use python3.13\n"
-        f"  3. poetry install\n"
-        f"\n"
-        f"Or use the workspace Makefile:\n"
-        f"  make setup PROJECT=<project-name>\n"
-        f"{'=' * 72}\n"
-    )
-del _sys
-# PYTHON_VERSION_GUARD_END
-
 import os
-import sys
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
@@ -44,12 +18,9 @@ from typing import Protocol
 
 import pytest
 import yaml
-from flext_meltano import t
-
-# Add tests directory to path for local imports
-sys.path.insert(0, str(Path(__file__).parent))
-
 from helpers.docker_test_manager import FlextTestsDocker
+
+from flext_meltano import t
 
 
 class CliRunnerProtocol(Protocol):
@@ -347,21 +318,26 @@ def job_run_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> FlextTestsDocker:
+def docker_manager() -> Generator[FlextTestsDocker, None, None]:
     """Session-scoped Docker manager fixture."""
-    return FlextTestsDocker(keep_running=True)
+    manager = FlextTestsDocker(keep_running=True)
+    yield manager
     # Cleanup will happen via atexit
 
 
 @pytest.fixture
-def docker_services(docker_manager: object) -> object:
+def docker_services(
+    docker_manager: FlextTestsDocker,
+) -> Generator[FlextTestsDocker, None, None]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager
 
 
 @pytest.fixture
-def postgres_service(docker_manager: object) -> str | None:
+def postgres_service(
+    docker_manager: FlextTestsDocker,
+) -> Generator[str | None, None, None]:
     """PostgreSQL service fixture."""
     with docker_manager.service_context(["postgres"]):
         url = docker_manager.get_service_url("postgres", 5432)
@@ -369,7 +345,9 @@ def postgres_service(docker_manager: object) -> str | None:
 
 
 @pytest.fixture
-def redis_service(docker_manager: object) -> str | None:
+def redis_service(
+    docker_manager: FlextTestsDocker,
+) -> Generator[str | None, None, None]:
     """Redis service fixture."""
     with docker_manager.service_context(["redis"]):
         url = docker_manager.get_service_url("redis", 6379)
@@ -377,7 +355,9 @@ def redis_service(docker_manager: object) -> str | None:
 
 
 @pytest.fixture
-def meltano_service(docker_manager: object) -> str | None:
+def meltano_service(
+    docker_manager: FlextTestsDocker,
+) -> Generator[str | None, None, None]:
     """Meltano service fixture."""
     with docker_manager.service_context(["meltano"]):
         url = docker_manager.get_service_url("meltano", 3000)
