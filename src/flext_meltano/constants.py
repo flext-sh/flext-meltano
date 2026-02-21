@@ -9,7 +9,7 @@ from flext_core import FlextConstants
 
 from flext_meltano.typings import t
 
-c_base = FlextConstants
+c = FlextConstants
 
 
 class FlextMeltanoConstants(FlextConstants):
@@ -73,12 +73,12 @@ class FlextMeltanoConstants(FlextConstants):
             """Network defaults derived from flext-core."""
 
             MELTANO_DEFAULT_TIMEOUT: Final[int] = (
-                c_base.Performance.DEFAULT_TIMEOUT_LIMIT
+                c.Performance.DEFAULT_TIMEOUT_LIMIT
             )
-            DEFAULT_TIMEOUT: Final[int] = c_base.Network.DEFAULT_TIMEOUT
-            DISCOVERY_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT * 2
-            REQUEST_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT * 2
-            CONNECTION_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT
+            DEFAULT_TIMEOUT: Final[int] = c.Network.DEFAULT_TIMEOUT
+            DISCOVERY_TIMEOUT: Final[int] = c.Defaults.TIMEOUT * 2
+            REQUEST_TIMEOUT: Final[int] = c.Defaults.TIMEOUT * 2
+            CONNECTION_TIMEOUT: Final[int] = c.Defaults.TIMEOUT
             BUFFER_SIZE: Final[int] = 8192
             MAX_PARALLEL_STREAMS: Final[int] = 4
 
@@ -89,7 +89,7 @@ class FlextMeltanoConstants(FlextConstants):
             MYSQL: Final[int] = 3306
             ORACLE: Final[int] = 1521
 
-            PERFORMANCE_LEVEL = c_base.Settings.LogLevel.WARNING
+            PERFORMANCE_LEVEL = c.Settings.LogLevel.WARNING
             MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5_000
             MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10_000
             HIGH_MEMORY_THRESHOLD: Final[int] = 1_073_741_824
@@ -105,7 +105,7 @@ class FlextMeltanoConstants(FlextConstants):
             PREFIX_TAP: Final[str] = "tap"
             PREFIX_TARGET: Final[str] = "target"
             PREFIX_DBT: Final[str] = "dbt"
-            INSTALLATION_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT * 10
+            INSTALLATION_TIMEOUT: Final[int] = c.Defaults.TIMEOUT * 10
             MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
             MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
 

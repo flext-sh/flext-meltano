@@ -26,7 +26,9 @@ from flext_meltano import t
 class CliRunnerProtocol(Protocol):
     """Protocol for CLI runner interface."""
 
-    def invoke(self, *args: object, **kwargs: object) -> object:
+    def invoke(
+        self, *args: t.GeneralValueType, **kwargs: t.GeneralValueType
+    ) -> t.GeneralValueType:
         """Invoke CLI command."""
 
 
@@ -174,17 +176,20 @@ def sample_csv_data() -> str:
 
 
 # Meltano CLI fixtures
+class MockCliRunner:
+    """Mock CLI runner."""
+
+    @staticmethod
+    def invoke(
+        *_args: t.GeneralValueType, **_kwargs: t.GeneralValueType
+    ) -> t.GeneralValueType:
+        """Mock invoke method."""
+        return type("Result", (), {"exit_code": 0, "output": ""})()
+
+
 @pytest.fixture
-def meltano_cli_runner() -> CliRunnerProtocol:
+def meltano_cli_runner() -> MockCliRunner:
     """Meltano CLI runner for testing using flext-cli patterns."""
-
-    # FLEXT-TEAM: Use flext-cli test runner patterns when flext-cli test infrastructure is available
-    # For now, return a simple mock that matches expected interface
-    class MockCliRunner:
-        @staticmethod
-        def invoke(*_args: object, **_kwargs: object) -> object:
-            return type("Result", (), {"exit_code": 0, "output": ""})()
-
     return MockCliRunner()
 
 
@@ -318,17 +323,16 @@ def job_run_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> Generator[FlextTestsDocker, None, None]:
+def docker_manager() -> Generator[FlextTestsDocker]:
     """Session-scoped Docker manager fixture."""
-    manager = FlextTestsDocker(keep_running=True)
-    yield manager
+    return FlextTestsDocker(keep_running=True)
     # Cleanup will happen via atexit
 
 
 @pytest.fixture
 def docker_services(
     docker_manager: FlextTestsDocker,
-) -> Generator[FlextTestsDocker, None, None]:
+) -> Generator[FlextTestsDocker]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager
@@ -337,7 +341,7 @@ def docker_services(
 @pytest.fixture
 def postgres_service(
     docker_manager: FlextTestsDocker,
-) -> Generator[str | None, None, None]:
+) -> Generator[str | None]:
     """PostgreSQL service fixture."""
     with docker_manager.service_context(["postgres"]):
         url = docker_manager.get_service_url("postgres", 5432)
@@ -347,7 +351,7 @@ def postgres_service(
 @pytest.fixture
 def redis_service(
     docker_manager: FlextTestsDocker,
-) -> Generator[str | None, None, None]:
+) -> Generator[str | None]:
     """Redis service fixture."""
     with docker_manager.service_context(["redis"]):
         url = docker_manager.get_service_url("redis", 6379)
@@ -357,7 +361,7 @@ def redis_service(
 @pytest.fixture
 def meltano_service(
     docker_manager: FlextTestsDocker,
-) -> Generator[str | None, None, None]:
+) -> Generator[str | None]:
     """Meltano service fixture."""
     with docker_manager.service_context(["meltano"]):
         url = docker_manager.get_service_url("meltano", 3000)
@@ -379,68 +383,72 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 # Mock services
+class MockMeltanoService:
+    """Mock Meltano service."""
+
+    @staticmethod
+    def create_project(
+        _config: dict[str, t.GeneralValueType],
+    ) -> dict[str, t.GeneralValueType]:
+        return {"project_id": "test-project", "status": "created"}
+
+    @staticmethod
+    def install_plugin(
+        _plugin_type: str, plugin_name: str
+    ) -> dict[str, t.GeneralValueType]:
+        return {"plugin": plugin_name, "status": "installed"}
+
+    @staticmethod
+    def run_pipeline(_extractor: str, _loader: str) -> dict[str, t.GeneralValueType]:
+        return {"execution_id": "test-execution", "status": "running"}
+
+
 @pytest.fixture
-def mock_meltano_service() -> object:
+def mock_meltano_service() -> MockMeltanoService:
     """Mock Meltano service for testing."""
-
-    class MockMeltanoService:
-        @staticmethod
-        def create_project(
-            _config: dict[str, t.GeneralValueType],
-        ) -> dict[str, t.GeneralValueType]:
-            return {"project_id": "test-project", "status": "created"}
-
-        @staticmethod
-        def install_plugin(
-            _plugin_type: str, plugin_name: str
-        ) -> dict[str, t.GeneralValueType]:
-            return {"plugin": plugin_name, "status": "installed"}
-
-        @staticmethod
-        def run_pipeline(
-            _extractor: str, _loader: str
-        ) -> dict[str, t.GeneralValueType]:
-            return {"execution_id": "test-execution", "status": "running"}
-
     return MockMeltanoService()
 
 
+class MockSingerTap:
+    """Mock Singer tap."""
+
+    def __init__(self, config: dict[str, t.GeneralValueType]) -> None:
+        """Initialize the instance."""
+        super().__init__()
+        self.config = config
+
+    def discover(self) -> dict[str, t.GeneralValueType]:
+        _ = self.config  # Use self to avoid PLR6301
+        return {"streams": [{"stream": "test_entity", "schema": {}}]}
+
+    def extract(self) -> list[dict[str, t.GeneralValueType]]:
+        _ = self.config  # Use self to avoid PLR6301
+        return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
+
+
 @pytest.fixture
-def mock_singer_tap() -> type[object]:
+def mock_singer_tap() -> type[MockSingerTap]:
     """Mock Singer tap for testing."""
-
-    class MockSingerTap:
-        def __init__(self, config: dict[str, t.GeneralValueType]) -> None:
-            """Initialize the instance."""
-            super().__init__()
-            self.config = config
-
-        def discover(self) -> dict[str, t.GeneralValueType]:
-            _ = self.config  # Use self to avoid PLR6301
-            return {"streams": [{"stream": "test_entity", "schema": {}}]}
-
-        def extract(self) -> list[dict[str, t.GeneralValueType]]:
-            _ = self.config  # Use self to avoid PLR6301
-            return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
-
     return MockSingerTap
 
 
+class MockSingerTarget:
+    """Mock Singer target."""
+
+    def __init__(self, config: dict[str, t.GeneralValueType]) -> None:
+        """Initialize the instance."""
+        super().__init__()
+        self.config = config
+
+    def load(
+        self,
+        records: list[dict[str, t.GeneralValueType]],
+    ) -> dict[str, t.GeneralValueType]:
+        _ = self.config  # Use self to avoid PLR6301
+        return {"records_loaded": len(records), "status": "success"}
+
+
 @pytest.fixture
-def mock_singer_target() -> object:
+def mock_singer_target() -> type[MockSingerTarget]:
     """Mock Singer target for testing."""
-
-    class MockSingerTarget:
-        def __init__(self, config: dict[str, t.GeneralValueType]) -> None:
-            """Initialize the instance."""
-            super().__init__()
-            self.config = config
-
-        def load(
-            self,
-            records: list[dict[str, t.GeneralValueType]],
-        ) -> dict[str, t.GeneralValueType]:
-            _ = self.config  # Use self to avoid PLR6301
-            return {"records_loaded": len(records), "status": "success"}
-
     return MockSingerTarget

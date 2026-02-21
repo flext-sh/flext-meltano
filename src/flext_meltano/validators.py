@@ -10,7 +10,7 @@ from __future__ import annotations
 import contextlib
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult as r
+from flext_core import FlextLogger, r
 from pydantic import ValidationError
 
 from flext_meltano.models import FlextMeltanoModels

@@ -18,7 +18,7 @@ import time
 from pathlib import Path
 
 import meltano
-from flext_core import FlextResult, FlextService, FlextSettings, FlextUtilities as u
+from flext_core import FlextResult, FlextService, FlextSettings, u
 
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes

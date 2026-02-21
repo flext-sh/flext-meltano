@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 from flext_core import (
     FlextLogger,
-    FlextResult as r,
+    r,
     u,
 )
 

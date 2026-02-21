@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_core import (
-    FlextResult as r,
     FlextSettings,
     FlextTypes,
+    r,
 )
 from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import SettingsConfigDict

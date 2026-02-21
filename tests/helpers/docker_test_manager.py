@@ -17,8 +17,10 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
+import typing
 
 import pytest
+
 from flext_core import FlextLogger, FlextResult
 
 
@@ -218,12 +220,17 @@ class FlextTestsDocker(ContainerManager):
             result = self.run_compose_command(cmd, timeout=30)
             if result.is_success:
                 # Parse output like "0.0.0.0:5433"
-                host_port = result.value.stdout.strip().split(":")
+                process = typing.cast("subprocess.CompletedProcess[str]", result.value)
+                host_port = process.stdout.strip().split(":")
                 if len(host_port) == 2:
                     return f"localhost:{host_port[1]}"
 
         except Exception as e:
-            self.logger.warning("Failed to get service URL for %s: %s", service_name, e)
+            self.logger.warning(
+                "Failed to get service URL for %s: %s",
+                service_name,
+                e,  # type: ignore[arg-type]
+            )
 
         return None
 
@@ -316,7 +323,7 @@ class FlextTestsDocker(ContainerManager):
                     return True
 
             except Exception as e:
-                self.logger.warning("Error checking service health: %s", e)
+                self.logger.warning("Error checking service health: %s", e)  # type: ignore[arg-type]
 
             time.sleep(2)
 
@@ -348,7 +355,7 @@ class FlextTestsDocker(ContainerManager):
             return True
 
         except Exception as e:
-            self.logger.warning("Health check failed: %s", e)
+            self.logger.warning("Health check failed: %s", e)  # type: ignore[arg-type]
             return False
 
     def _cleanup_containers(self) -> None:
@@ -360,7 +367,9 @@ class FlextTestsDocker(ContainerManager):
                 self.logger.exception("Failed to cleanup containers")
 
     @contextmanager
-    def service_context(self, services: list[str] | None = None) -> Generator[None]:
+    def service_context(
+        self, services: list[str] | None = None
+    ) -> Generator[FlextTestsDocker]:
         """Context manager for service lifecycle.
 
         Args:
@@ -384,7 +393,9 @@ def docker_manager() -> FlextTestsDocker:
 
 
 @pytest.fixture
-def docker_services(docker_manager: object) -> object:
+def docker_services(
+    docker_manager: FlextTestsDocker,
+) -> Generator[FlextTestsDocker]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager

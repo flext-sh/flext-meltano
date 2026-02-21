@@ -17,9 +17,9 @@ import yaml
 from flext_core import (
     FlextModels,
     FlextResult,
-    FlextTypes as t,
+    t,
 )
-from flext_core.utilities import u as flext_u
+from flext_core.utilities import u
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -54,10 +54,10 @@ class FlextMeltanoModels(FlextModels):
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
         def is_sensitive(k: str) -> bool:
-            normalized = flext_u.Conversion.normalize(k, case="lower")
+            normalized = u.Conversion.normalize(k, case="lower")
             # Convert set to list of str for processing
             sensitive_keys_list: list[str] = list(sensitive_keys)
-            checks_result = flext_u.process(
+            checks_result = u.process(
                 sensitive_keys_list,
                 lambda s: FlextResult[bool].ok(
                     s in normalized,
@@ -69,7 +69,7 @@ class FlextMeltanoModels(FlextModels):
                 },
             ).items
             if checks:
-                return flext_u.any_(*checks)
+                return u.any_(*checks)
             return False
 
         # Transform dict values with protection for sensitive fields
@@ -729,7 +729,7 @@ class FlextMeltanoModels(FlextModels):
                 """Total number of configuration parameters."""
                 conn_keys = list(self.connection_config.keys())
                 stream_keys = list(self.stream_config.keys())
-                return flext_u.count(conn_keys) + flext_u.count(stream_keys)
+                return u.count(conn_keys) + u.count(stream_keys)
 
             @model_validator(mode="after")
             def validate_tap_config(self) -> Self:
@@ -830,7 +830,7 @@ class FlextMeltanoModels(FlextModels):
                 """Total number of configuration parameters."""
                 conn_keys = list(self.connection_config.keys())
                 stream_keys = list(self.stream_config.keys())
-                return flext_u.count(conn_keys) + flext_u.count(stream_keys)
+                return u.count(conn_keys) + u.count(stream_keys)
 
             @model_validator(mode="after")
             def validate_source_config(self) -> Self:
@@ -942,7 +942,7 @@ class FlextMeltanoModels(FlextModels):
             def config_keys_count(self) -> int:
                 """Number of config keys."""
                 keys = list(self.config.keys())
-                return flext_u.count(keys)
+                return u.count(keys)
 
             @model_validator(mode="after")
             def validate_sink_definition(self) -> Self:
@@ -1038,7 +1038,7 @@ class FlextMeltanoModels(FlextModels):
                 streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
                     self.streams.values(),
                 )
-                result = flext_u.agg(streams_list, "records_extracted", fn=sum)
+                result = u.agg(streams_list, "records_extracted", fn=sum)
                 return result if isinstance(result, int) else 0
 
             @computed_field
@@ -1049,7 +1049,7 @@ class FlextMeltanoModels(FlextModels):
                 )
                 return (
                     self.discovered
-                    and flext_u.count(streams_list) > 0
+                    and u.count(streams_list) > 0
                     and self.status == "configured"
                 )
 
@@ -1961,19 +1961,19 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def environment_count(self) -> int:
                 """Number of environments."""
-                return flext_u.count(self.environments)
+                return u.count(self.environments)
 
             @computed_field
             def has_production_environment(self) -> bool:
                 """Check if production environment exists."""
                 prod_environments = {"prod", "production", "live"}
                 normalized_envs = [
-                    flext_u.normalize(env, case="lower") for env in self.environments
+                    u.normalize(env, case="lower") for env in self.environments
                 ]
-                # Convert prod_environments set to list for flext_u.in_
+                # Convert prod_environments set to list for u.in_
                 prod_envs_list: list[str] = list(prod_environments)
-                return flext_u.any_(*[
-                    flext_u.in_(env, prod_envs_list) for env in normalized_envs
+                return u.any_(*[
+                    u.in_(env, prod_envs_list) for env in normalized_envs
                 ])
 
             @computed_field
@@ -1981,14 +1981,14 @@ class FlextMeltanoModels(FlextModels):
                 """Project maturity assessment."""
                 prod_envs = {"prod", "production", "live"}
                 normalized_envs = [
-                    flext_u.normalize(env, case="lower") for env in self.environments
+                    u.normalize(env, case="lower") for env in self.environments
                 ]
-                # Convert prod_envs set to list for flext_u.in_
+                # Convert prod_envs set to list for u.in_
                 prod_envs_list: list[str] = list(prod_envs)
-                has_prod = flext_u.any_(*[
-                    flext_u.in_(env, prod_envs_list) for env in normalized_envs
+                has_prod = u.any_(*[
+                    u.in_(env, prod_envs_list) for env in normalized_envs
                 ])
-                env_count = flext_u.count(self.environments)
+                env_count = u.count(self.environments)
 
                 if (
                     has_prod
@@ -2061,13 +2061,13 @@ class FlextMeltanoModels(FlextModels):
             def settings_count(self) -> int:
                 """Number of plugin settings."""
                 keys: list[str] = list(self.settings.keys())
-                return flext_u.count(keys)
+                return u.count(keys)
 
             @computed_field
             def plugin_complexity(self) -> str:
                 """Plugin complexity assessment."""
                 settings_keys = list(self.settings.keys())
-                settings_count = flext_u.count(settings_keys)
+                settings_count = u.count(settings_keys)
                 if settings_count == 0:
                     return "minimal"
                 if (
@@ -2165,13 +2165,13 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def total_path_count(self) -> int:
                 """Total number of configured paths."""
-                # Use flext_u.count() for unified counting (DSL pattern)
+                # Use u.count() for unified counting (DSL pattern)
                 return (
-                    flext_u.count(self.model_paths)
-                    + flext_u.count(self.analysis_paths)
-                    + flext_u.count(self.test_paths)
-                    + flext_u.count(self.seed_paths)
-                    + flext_u.count(self.macro_paths)
+                    u.count(self.model_paths)
+                    + u.count(self.analysis_paths)
+                    + u.count(self.test_paths)
+                    + u.count(self.seed_paths)
+                    + u.count(self.macro_paths)
                 )
 
             @computed_field
@@ -2190,13 +2190,13 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def project_structure_complexity(self) -> str:
                 """Project structure complexity."""
-                # Use flext_u.count() for unified counting (DSL pattern)
+                # Use u.count() for unified counting (DSL pattern)
                 total_path_count = (
-                    flext_u.count(self.model_paths)
-                    + flext_u.count(self.analysis_paths)
-                    + flext_u.count(self.test_paths)
-                    + flext_u.count(self.seed_paths)
-                    + flext_u.count(self.macro_paths)
+                    u.count(self.model_paths)
+                    + u.count(self.analysis_paths)
+                    + u.count(self.test_paths)
+                    + u.count(self.seed_paths)
+                    + u.count(self.macro_paths)
                 )
                 if (
                     total_path_count

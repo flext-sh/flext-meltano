@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Protocol
 
-from flext_core import FlextLogger, FlextResult, FlextResult as r
+from flext_core import FlextLogger, FlextResult, r
 
 from flext_meltano.models import FlextMeltanoModels
 

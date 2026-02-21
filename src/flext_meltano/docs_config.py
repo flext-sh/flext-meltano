@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import yaml
-from flext_core import FlextContainer, FlextResult as r, FlextSettings, u
+from flext_core import FlextContainer, FlextSettings, r, u
 
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as t
