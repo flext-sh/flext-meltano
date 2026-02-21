@@ -72,9 +72,7 @@ class FlextMeltanoConstants(FlextConstants):
         class Network:
             """Network defaults derived from flext-core."""
 
-            MELTANO_DEFAULT_TIMEOUT: Final[int] = (
-                c.Performance.DEFAULT_TIMEOUT_LIMIT
-            )
+            MELTANO_DEFAULT_TIMEOUT: Final[int] = c.Performance.DEFAULT_TIMEOUT_LIMIT
             DEFAULT_TIMEOUT: Final[int] = c.Network.DEFAULT_TIMEOUT
             DISCOVERY_TIMEOUT: Final[int] = c.Defaults.TIMEOUT * 2
             REQUEST_TIMEOUT: Final[int] = c.Defaults.TIMEOUT * 2

@@ -1972,9 +1972,7 @@ class FlextMeltanoModels(FlextModels):
                 ]
                 # Convert prod_environments set to list for u.in_
                 prod_envs_list: list[str] = list(prod_environments)
-                return u.any_(*[
-                    u.in_(env, prod_envs_list) for env in normalized_envs
-                ])
+                return u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
 
             @computed_field
             def project_maturity(self) -> str:
