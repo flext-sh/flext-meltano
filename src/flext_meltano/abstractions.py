@@ -150,10 +150,10 @@ class FlextMeltanoAbstractions:
                 lambda comp: u.get(comp, "type", default="") == component_type,
             )
             # Type narrowing: ensure list[t.Plugin.PluginDefinition]
-            if isinstance(filtered_components, (list, tuple)):
-                result_list: list[t.Plugin.PluginDefinition] = list(filtered_components)
-                return r[list[t.Plugin.PluginDefinition]].ok(result_list)
-            return r[list[t.Plugin.PluginDefinition]].ok([])
+            result_list: list[t.Plugin.PluginDefinition] = (
+                list(filtered_components) if filtered_components else []
+            )
+            return r[list[t.Plugin.PluginDefinition]].ok(result_list)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get components of type {component_type}: {e}"

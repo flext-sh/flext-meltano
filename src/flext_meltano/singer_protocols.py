@@ -12,7 +12,11 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes
+
+m = FlextMeltanoModels
+t = FlextMeltanoTypes
 
 
 class FlextMeltanoSingerProtocols:
@@ -27,13 +31,25 @@ class FlextMeltanoSingerProtocols:
 
         streams: list[str]
         name: str
-        state: t.MeltanoCore.SingerStateDict
+        state: m.Meltano.SingerStateMessage
 
-        def get_records(self, stream_name: str) -> list[t.MeltanoCore.SingerRecordDict]:
+        def discover(self) -> m.Meltano.SingerCatalog:
+            """Discover and return the tap Singer catalog."""
+            ...
+
+        def sync(
+            self,
+            catalog: m.Meltano.SingerCatalog,
+            state: m.Meltano.SingerStateMessage,
+        ) -> None:
+            """Synchronize records using catalog and state."""
+            ...
+
+        def get_records(self, stream_name: str) -> list[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
 
-        def get_state(self) -> t.MeltanoCore.SingerStateDict:
+        def get_state(self) -> m.Meltano.SingerStateMessage:
             """Get current state."""
             ...
 

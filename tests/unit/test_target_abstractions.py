@@ -6,9 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes as t, FlextLogger, u
+from flext_core import FlextLogger
 
-from flext_meltano import FlextMeltanoTargetAbstractions, m, r
+from flext_meltano import FlextMeltanoTargetAbstractions, m, r, t, u
 
 logger = FlextLogger(__name__)
 
@@ -30,6 +30,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test create_flext_target_config method."""
         if not hasattr(self.target_abstractions, "create_flext_target_config"):
             import pytest
+
             pytest.skip("create_flext_target_config not available (use PYTHONPATH=src)")
         connection_config: dict[str, t.GeneralValueType] = {"output_path": "test.jsonl"}
 
@@ -51,6 +52,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test create_flext_target static method."""
         if not hasattr(FlextMeltanoTargetAbstractions, "create_flext_target"):
             import pytest
+
             pytest.skip("create_flext_target not available (use PYTHONPATH=src)")
         test_config: dict[str, t.GeneralValueType] = {
             "target_type": "jsonl",
@@ -75,7 +77,9 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         assert "T" in timestamp
 
         # Test nested value retrieval
-        test_data: dict[str, t.GeneralValueType] = {"level1": {"level2": {"level3": "found_value"}}}
+        test_data: dict[str, t.GeneralValueType] = {
+            "level1": {"level2": {"level3": "found_value"}}
+        }
         level1 = test_data.get("level1", {})
         if isinstance(level1, dict):
             level2 = level1.get("level2", {})

@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants
@@ -26,7 +26,6 @@ from flext_meltano.utilities import u
 # Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
-t_core = FlextTypes
 p = FlextMeltanoProtocols
 r = FlextResult
 m = FlextMeltanoModels
@@ -122,54 +121,31 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 plugin_type: str,
             ) -> dict[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
-                variants_obj = u.get(indexed_plugin, "variants")
-                variants_raw = u.guard(variants_obj, dict, return_value=True)
-                variants_dict = variants_raw if isinstance(variants_raw, dict) else {}
-                variants_str = ""
-                if variants_dict:
-                    items_list = list(variants_dict.keys())
-                    variants_str = u.join(items_list, separator=",")
-
-                source_fields: t.MeltanoCore.MeltanoConfigDict = {
-                    "default_variant": str(
-                        u.get(indexed_plugin, "default_variant", default=""),
-                    ),
-                    "logo_url": str(u.get(indexed_plugin, "logo_url", default="")),
-                }
+                source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
+                variants_str = (
+                    u.join(list(source.variants.keys()), separator=",")
+                    if source.variants
+                    else ""
+                )
 
                 constructed = u.construct(
                     {
                         "name": {"value": plugin_name},
                         "type": {"value": plugin_type},
                         "default_variant": {
-                            "value": source_fields.get("default_variant", ""),
+                            "value": source.default_variant,
                         },
                         "variants": {"value": variants_str},
                         "logo_url": {
-                            "value": source_fields.get("logo_url", ""),
+                            "value": source.logo_url,
                         },
+                        "description": {"value": source.description},
                     },
                 )
 
-                # Type narrowing: u.construct() returns dict[str, str] when all values are str
-                if not isinstance(constructed, dict):
-                    return {}
-
-                # Ensure all values are strings
-                result: dict[str, str] = {}
-                for key, value in constructed.items():
-                    if isinstance(key, str):
-                        result[key] = str(value) if value is not None else ""
-
-                return result
-
-            # Process extractors using u.process() with limit via filter_keys
-            # Type narrowing: ensure working_project satisfies the protocol
-            if not isinstance(working_project, p.Meltano.MeltanoProjectProtocol):
-                # Create a protocol-compliant wrapper if needed
-                return r[list[dict[str, str]]].fail(
-                    "Invalid project type - does not satisfy MeltanoProjectProtocol",
-                )
+                return m.Meltano.PluginDiscoveryItem.model_validate(
+                    constructed,
+                ).model_dump()
 
             extractors_result = self._abstractions.get_plugins_of_type(
                 working_project,
@@ -262,7 +238,9 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         # Use monadic composition to reduce returns (DSL pattern)
         def extract_plugin_info(plugins_data: object) -> r[dict[str, str]]:
             """Extract plugin info from plugins dict."""
-            plugins_dict = plugins_data if isinstance(plugins_data, dict) else {}
+            plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate(
+                {"plugins": plugins_data},
+            ).plugins
             # Use u.not_() + u.in_() for membership check (DSL pattern)
             if u.not_(u.in_(plugin_name, plugins_dict)) or u.empty(
                 u.get(plugins_dict, plugin_name),
@@ -271,50 +249,23 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     f"Plugin '{plugin_name}' not found in {plugin_type}",
                 )
 
-            indexed_plugin = u.get(plugins_dict, plugin_name)
-            # Use u.fields() + u.build() for unified extraction and transformation (DSL pattern)
-            fields_spec: dict[str, str] = {
-                "default_variant": "",
-                "variants": "{}",
-                "description": "",
-                "logo_url": "",
-            }
-            fields_result = u.fields(indexed_plugin, fields_spec)
-            if isinstance(fields_result, r) and fields_result.is_failure:
-                error_msg = fields_result.error or "Field extraction failed"
-                return r[dict[str, str]].fail(error_msg)
-
-            # Extract values directly with type narrowing
-            def transform_variants_dict(v: object) -> str:
-                """Transform variants dict to string."""
-                if not isinstance(v, dict):
-                    return ""
-                items_list = list(v.keys())
-                return u.join(items_list, separator=",") if items_list else ""
-
-            # Get data from fields_result
-            data = (
-                fields_result.value if isinstance(fields_result, r) else fields_result
+            indexed_plugin = plugins_dict[plugin_name]
+            variants_str = (
+                u.join(list(indexed_plugin.variants.keys()), separator=",")
+                if indexed_plugin.variants
+                else ""
             )
-            if not isinstance(data, dict):
-                data = {}
 
-            # Use .get() for dict access with proper defaults
-            variants_raw = data.get("variants", {})
-            default_variant_raw = data.get("default_variant")
-            description_raw = data.get("description")
-            logo_url_raw = data.get("logo_url")
-
-            plugin_info: dict[str, str] = {
-                "name": plugin_name,
-                "type": plugin_type,
-                "default_variant": str(default_variant_raw)
-                if default_variant_raw
-                else "",
-                "variants": transform_variants_dict(variants_raw),
-                "description": str(description_raw) if description_raw else "",
-                "logo_url": str(logo_url_raw) if logo_url_raw else "",
-            }
+            plugin_info = m.Meltano.PluginDiscoveryItem.model_validate(
+                {
+                    "name": plugin_name,
+                    "type": plugin_type,
+                    "default_variant": indexed_plugin.default_variant,
+                    "variants": variants_str,
+                    "description": indexed_plugin.description,
+                    "logo_url": indexed_plugin.logo_url,
+                },
+            ).model_dump()
             return r[dict[str, str]].ok(plugin_info)
 
         try:

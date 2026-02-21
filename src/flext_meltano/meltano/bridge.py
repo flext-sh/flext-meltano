@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, t as t_core
+from flext_core import FlextLogger, FlextResult
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -18,9 +18,7 @@ from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
 # Import aliases for simplified usage
-# u is already imported from flext_core
 r = FlextResult
-t_base = t_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -55,14 +53,12 @@ class FlextMeltanoBridge:
         try:
             # Placeholder implementation - in real implementation this would
             # communicate with Go bridge via JSON API
-            # Build result dict with proper typing
+            # Build result dict with proper typing via model normalization
             args_dict: t.MeltanoCore.MeltanoConfigDict = (
-                {
-                    str(k): v
-                    for k, v in args.items()
-                    if isinstance(v, (str, int, float, bool, dict, list)) or v is None
-                }
-                if isinstance(args, dict)
+                m.Meltano.JsonCompatibleConfigPayload.model_validate(
+                    {"values": args},
+                ).values
+                if args
                 else {}
             )
             result: t.Bridge.BridgeStatus = {

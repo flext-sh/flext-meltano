@@ -18,7 +18,6 @@ from pathlib import Path
 from flext_core import (
     FlextResult,
     FlextService,
-    t as t_core,
 )
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
@@ -29,10 +28,8 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
-# u is already imported from flext_core
 r = FlextResult
 s = FlextService
-t_base = t_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -243,8 +240,13 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
             }
+            typed_context = m.Meltano.PipelineExecutionContext.model_validate(
+                context_data,
+            )
 
-            return r[t.MeltanoCore.ExecutionResultDict].ok(context_data)
+            return r[t.MeltanoCore.ExecutionResultDict].ok(
+                typed_context.model_dump(mode="python"),
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.ExecutionResultDict].fail(
                 f"Failed to create ELT context: {e}"
@@ -253,31 +255,12 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _execute_singer_runner(
         self,
         context_data: t.MeltanoCore.RunContextDict,
-    ) -> r[dict[str, t_core.JsonValue]]:
+    ) -> r[dict[str, t.JsonValue]]:
         """Execute Singer runner with context data."""
         try:
-            # Extract context data
-            elt_context_obj = context_data.get("elt_context")
-            extractor_name = context_data.get("extractor_name")
-            loader_name = context_data.get("loader_name")
-
-            # Type narrowing: verify elt_context_obj is a properly typed dict
-            if not isinstance(elt_context_obj, dict):
-                return r[dict[str, t_core.JsonValue]].fail(
-                    "Invalid ELT context: expected dict",
-                )
-
-            # Type narrowing for names
-            if not isinstance(extractor_name, str) or not isinstance(loader_name, str):
-                return r[dict[str, t_core.JsonValue]].fail(
-                    "Invalid extractor/loader names: expected str",
-                )
-
-            # Create properly typed MeltanoConfigDict from elt_context_obj
-            typed_elt_context: t.MeltanoCore.MeltanoConfigDict = {}
-            for key, value in elt_context_obj.items():
-                if isinstance(value, (str, int, float, bool, type(None), list, dict)):
-                    typed_elt_context[key] = value
+            parsed_context = m.Meltano.PipelineExecutionContext.model_validate(
+                context_data,
+            )
 
             # For simplified implementation, create mock plugins
             # In real implementation, would retrieve actual plugins
@@ -304,54 +287,37 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                     return {}
 
             extractor_plugin_obj: p.Meltano.PluginProtocol[t.JsonValue] = MockPlugin(
-                name=extractor_name
+                name=parsed_context.extractor_name
             )
             loader_plugin_obj: p.Meltano.PluginProtocol[t.JsonValue] = MockPlugin(
-                name=loader_name
+                name=parsed_context.loader_name
             )
 
             execution_result = self._abstractions.execute_singer_pipeline(
-                typed_elt_context,
+                parsed_context.elt_context,
                 extractor_plugin_obj,
                 loader_plugin_obj,
             )
 
             if execution_result.is_failure:
-                return r[dict[str, t_core.JsonValue]].fail(
+                return r[dict[str, t.JsonValue]].fail(
                     execution_result.error or "Pipeline execution failed",
                 )
 
-            # Add execution results to context
-            context_data["execution_completed"] = True
-            context_data["execution_result"] = execution_result.value
+            result_context = m.Meltano.PipelineExecutionContext.model_validate(
+                {
+                    **parsed_context.model_dump(mode="python"),
+                    "execution_completed": True,
+                    "execution_result": execution_result.value,
+                },
+            )
 
-            # Build properly typed result dict with JSON-compatible values
-            result_data: dict[str, t_core.JsonValue] = {}
-            for key, value in context_data.items():
-                # Type narrowing for JSON-serializable values
-                if isinstance(value, (str, int, float, bool, type(None))):
-                    result_data[key] = value
-                elif isinstance(value, dict):
-                    # Recursively ensure dict values are JSON-compatible
-                    json_dict: t.MeltanoCore.MeltanoConfigDict = {
-                        k: v
-                        for k, v in value.items()
-                        if isinstance(v, (str, int, float, bool, type(None)))
-                    }
-                    result_data[key] = json_dict
-                elif isinstance(value, list):
-                    # Filter list to only JSON-compatible items
-                    json_list: list[t_core.JsonValue] = [
-                        item
-                        for item in value
-                        if isinstance(item, (str, int, float, bool, type(None)))
-                    ]
-                    result_data[key] = json_list
-
-            return r[dict[str, t_core.JsonValue]].ok(result_data)
+            return r[dict[str, t.JsonValue]].ok(
+                result_context.model_dump(mode="python"),
+            )
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, t_core.JsonValue]].fail(
+            return r[dict[str, t.JsonValue]].fail(
                 f"Unexpected error in ELT pipeline: {e}",
             )
 
@@ -359,18 +325,16 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         self,
         extractor_name: str,
         loader_name: str,
-        context_data: Mapping[str, t_core.JsonValue],
+        context_data: Mapping[str, t.JsonValue],
     ) -> r[dict[str, str]]:
         """Build successful pipeline result."""
         try:
-            # Extract context data with type narrowing
-            project_root_raw = context_data.get("project_root")
-            execution_result_raw = context_data.get("execution_result")
-
-            # Type narrowing
-            project_root = (
-                str(project_root_raw) if project_root_raw is not None else "unknown"
+            parsed_context = m.Meltano.PipelineResultContext.model_validate(
+                context_data
             )
+            execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate(
+                {"values": parsed_context.execution_result},
+            ).values
 
             # Build pipeline result using available data
             pipeline_result: dict[str, str] = {
@@ -378,16 +342,12 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "extractor": extractor_name,
                 "loader": loader_name,
                 "execution_method": "singer_runner_abstracted",
-                "project_root": project_root,
+                "project_root": parsed_context.project_root,
                 "run_id": "unknown",  # Would be extracted from elt_context in real implementation
             }
 
             # Add execution result data if available
-            if isinstance(execution_result_raw, dict):
-                # Filter for string-convertible values
-                for key, value in execution_result_raw.items():
-                    if isinstance(value, (str, int, bool, float)):
-                        pipeline_result[key] = str(value)
+            pipeline_result.update(execution_values)
 
             self.logger.info(
                 "ELT pipeline executed successfully",

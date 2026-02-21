@@ -3,13 +3,12 @@
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 # SPDX-License-Identifier: MIT
 from __future__ import annotations
-from flext_core import FlextTypes as t
 
 import tempfile
 
 import pytest
 
-from flext_meltano import FlextMeltanoService, r, s
+from flext_meltano import FlextMeltanoService, r, s, t
 
 
 class TestFlextMeltanoServiceInitialization:
@@ -114,7 +113,10 @@ class TestTapService:
                 result = tap_service.create_instance(config)
             except TypeError:
                 import pytest
-                pytest.skip("create_instance(config) not available (use PYTHONPATH=src)")
+
+                pytest.skip(
+                    "create_instance(config) not available (use PYTHONPATH=src)"
+                )
             assert isinstance(result, r)
 
     def test_tap_service_validate_tap_config(self) -> None:
@@ -208,7 +210,10 @@ class TestTargetService:
                 result = target_service.create_instance(config)
             except TypeError:
                 import pytest
-                pytest.skip("create_instance(config) not available (use PYTHONPATH=src)")
+
+                pytest.skip(
+                    "create_instance(config) not available (use PYTHONPATH=src)"
+                )
             assert isinstance(result, r)
 
     def test_target_service_validate_target_config(self) -> None:

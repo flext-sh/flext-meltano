@@ -10,84 +10,67 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from pathlib import Path
-from typing import Self
+from typing import ClassVar
 
-from flext_core import FlextModels, FlextResult, FlextService
-from pydantic import Field, model_validator
+from flext_core import FlextResult, FlextService
 
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
-m = FlextModels
+m = FlextMeltanoModels
 r = FlextResult
-s = FlextService
 
 
-class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
+class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
     """Manages Singer state (bookmarks, incremental sync state).
 
     Handles loading, updating, and persisting state for incremental
     syncs with proper error handling and FlextResult patterns.
     """
 
-    class StateEntry(m):
-        """Singer state entry for a stream."""
-
-        stream_name: str = Field(description="Name of the stream")
-        bookmark_key: str | None = Field(
-            default=None,
-            description="Bookmark field for incremental",
-        )
-        bookmark_value: str | None = Field(
-            default=None,
-            description="Current bookmark value",
-        )
-        updated_at: datetime = Field(
-            default_factory=datetime.now,
-            description="Last update time",
-        )
-
-        @model_validator(mode="after")
-        def validate_bookmark(self) -> Self:
-            """Ensure bookmark_key and bookmark_value are both set or both None."""
-            if (self.bookmark_key is None) != (self.bookmark_value is None):
-                msg = "bookmark_key and bookmark_value must both be set or both be None"
-                raise ValueError(msg)
-            return self
+    # StateEntry is now canonical in m.Meltano.SingerStateEntry
+    StateEntry: ClassVar[type[m.Meltano.SingerStateEntry]] = m.Meltano.SingerStateEntry
 
     def __init__(self) -> None:
         """Initialize state manager."""
         super().__init__()
-        self._state: t.Singer.TapConfig = {}
+        self._state: dict[str, dict[str, str]] = {}
 
-    def load_state(self, state_file: Path | None = None) -> r[t.Singer.TapConfig]:
+    def load_state(
+        self, state_file: Path | None = None
+    ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file or memory.
 
         Args:
         state_file: Path to state file (optional)
 
         Returns:
-        FlextResult containing loaded state dictionary
+        FlextResult containing loaded state as SingerStateMessage
 
         """
         try:
             if state_file and state_file.exists():
                 with state_file.open() as f:
-                    self._state = json.load(f)
+                    state_message = m.Meltano.SingerStateMessage.model_validate(
+                        json.load(f),
+                    )
+                self._state = state_message.value
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),
                     entries=len(self._state),
                 )
-            return r[t.Singer.TapConfig].ok(self._state)
+            return r[m.Meltano.SingerStateMessage].ok(
+                m.Meltano.SingerStateMessage(value=self._state)
+            )
         except Exception as e:
             self.logger.exception("Failed to load state", error=str(e))
-            return r[t.Singer.TapConfig].fail(f"Failed to load state: {e}")
+            return r[m.Meltano.SingerStateMessage].fail(f"Failed to load state: {e}")
 
     def save_state(self, state_file: Path) -> r[None]:
         """Save state to file.
@@ -101,8 +84,9 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
         """
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
+            state_msg = m.Meltano.SingerStateMessage(value=self._state)
             with state_file.open("w", encoding="utf-8") as f:
-                json.dump(self._state, f, indent=2, default=str)
+                f.write(state_msg.model_dump_json(indent=2))
             self.logger.info(
                 "State saved to file",
                 file=str(state_file),
@@ -133,9 +117,8 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
             if stream_name not in self._state:
                 self._state[stream_name] = {}
 
-            state_entry = self._state.get(stream_name)
-            if isinstance(state_entry, dict):
-                state_entry[bookmark_key] = bookmark_value
+            stream_state = self._state[stream_name]
+            stream_state[bookmark_key] = bookmark_value
             self.logger.debug(
                 "Bookmark updated",
                 stream=stream_name,
@@ -146,7 +129,7 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
             self.logger.exception("Failed to update bookmark", error=str(e))
             return r[None].fail(f"Failed to update bookmark: {e}")
 
-    def get_bookmark(self, stream_name: str, bookmark_key: str) -> r[str | None]:
+    def get_bookmark(self, stream_name: str, bookmark_key: str) -> r[str]:
         """Get current bookmark value.
 
         Args:
@@ -158,24 +141,27 @@ class FlextMeltanoStateManager(FlextService[t.Singer.TapConfig]):
 
         """
         try:
-            if stream_name in self._state:
-                state_entry = self._state[stream_name]
-                if isinstance(state_entry, dict):
-                    value = state_entry.get(bookmark_key)
-                    # Type narrow to str | None for result
-                    if value is None:
-                        return r[str | None].ok(None)
-                    if isinstance(value, str):
-                        return r[str | None].ok(value)
-                    return r[str | None].ok(str(value))
-            return r[str | None].ok(None)
+            stream_state = self._state.get(stream_name)
+            if stream_state is None:
+                return r[str].fail(f"Stream state not found: {stream_name}")
+
+            value = stream_state.get(bookmark_key)
+            if value is None:
+                return r[str].fail(
+                    f"Bookmark not found: {stream_name}.{bookmark_key}",
+                )
+            return r[str].ok(value)
         except Exception as e:
             self.logger.exception("Failed to get bookmark", error=str(e))
-            return r[str | None].fail(f"Failed to get bookmark: {e}")
+            return r[str].fail(f"Failed to get bookmark: {e}")
 
-    def execute(self, **_kwargs: t.JsonValue) -> r[t.Singer.TapConfig]:
+    def to_state_message(self) -> m.Meltano.SingerStateMessage:
+        """Build a SingerStateMessage from current internal state."""
+        return m.Meltano.SingerStateMessage(value=self._state)
+
+    def execute(self, **_kwargs: t.JsonValue) -> r[m.Meltano.SingerStateMessage]:
         """Execute (implements Service pattern)."""
-        return r[t.Singer.TapConfig].ok(self._state)
+        return r[m.Meltano.SingerStateMessage].ok(self.to_state_message())
 
 
 __all__ = [

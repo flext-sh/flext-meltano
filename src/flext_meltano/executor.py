@@ -20,12 +20,14 @@ from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import u
 
 # Import aliases for simplified usage
 r = FlextResult
+m = FlextMeltanoModels
 
 
 class FlextMeltanoExecutor(FlextService[t.JsonValue]):
@@ -192,8 +194,8 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
     def project_root(self) -> Path:
         """Get project root directory - delegates to config."""
         project_root = getattr(self._meltano_config, "project_root", None)
-        if isinstance(project_root, (str, Path)):
-            return Path(project_root)
+        if project_root is not None:
+            return m.Meltano.PathPayload.model_validate({"value": project_root}).value
         return Path.cwd()
 
     @property

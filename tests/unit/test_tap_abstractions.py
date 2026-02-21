@@ -1,14 +1,12 @@
 """Test module for flext-meltano."""
 
-from flext_core import FlextTypes as t
-
 import tempfile
 import unittest
 
 import pytest
 from pydantic_core import ValidationError
 
-from flext_meltano import FlextMeltanoTapAbstractions, m, r
+from flext_meltano import FlextMeltanoTapAbstractions, m, r, t
 
 # Create convenient aliases for model classes
 StreamDefinition = m.StreamDefinition

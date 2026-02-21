@@ -12,11 +12,10 @@ SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
-from flext_core import FlextTypes as t
 
 from flext_cli import FlextCliModels
 
-from flext_meltano import m
+from flext_meltano import m, t
 
 
 class TestCliModelConverterWithTapRunParams:

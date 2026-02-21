@@ -14,16 +14,16 @@ import tempfile
 from pathlib import Path
 
 import yaml
-from flext_core import FlextTypes, r, s
+from flext_core import r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import c
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 from flext_meltano.validators import FlextMeltanoValidators
 
-# Additional alias
-t_core = FlextTypes
+m = FlextMeltanoModels
 
 
 class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -86,7 +86,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         prefix: Temporary directory prefix for organization
 
         Returns:
-        r containing project dict[str, t_core.GeneralValueType] with standardized structure
+        r containing project dict[str, t.GeneralValueType] with standardized structure
 
         """
         return (
@@ -120,7 +120,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_root: Directory path containing meltano.yml
 
         Returns:
-        r containing initialized project dict[str, t_core.GeneralValueType] or validation error
+        r containing initialized project dict[str, t.GeneralValueType] or validation error
 
         """
         return (
@@ -171,9 +171,9 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             .flat_map(
                 lambda params: self._create_project_directory(
                     str(params["name"]),
-                    params["parent_dir"]
-                    if isinstance(params["parent_dir"], Path)
-                    else Path(str(params["parent_dir"])),
+                    m.Meltano.PathPayload.model_validate({
+                        "value": params["parent_dir"],
+                    }).value,
                 ),
             )
             .flat_map(self._create_project_structure)
@@ -220,9 +220,9 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _generate_minimal_config(
         temp_path: Path,
         project_id: str,
-    ) -> r[dict[str, t_core.GeneralValueType]]:
+    ) -> r[dict[str, t.GeneralValueType]]:
         """Generate minimal meltano.yml configuration."""
-        config: t_core.GeneralValueType = {
+        config: t.GeneralValueType = {
             "version": 1,
             "default_environment": "dev",
             "project_id": project_id,
@@ -239,14 +239,14 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
                 },
             ],
         }
-        return r[dict[str, t_core.GeneralValueType]].ok({
+        return r[dict[str, t.GeneralValueType]].ok({
             "path": temp_path,
             "config": config,
         })
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: dict[str, t_core.GeneralValueType],
+        config_data: dict[str, t.GeneralValueType],
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -260,27 +260,22 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         path_obj = config_data.get("path")
         config_obj = config_data.get("config")
 
-        # Validate path is a Path object
-        if not isinstance(path_obj, Path):
-            return r[Path].fail(
-                f"Expected Path object, got {type(path_obj).__name__}",
-            )
-
-        # Validate config is a dict
-        if not isinstance(config_obj, dict):
-            return r[Path].fail(
-                f"Expected dict object, got {type(config_obj).__name__}",
-            )
+        normalized_path = m.Meltano.PathPayload.model_validate({
+            "value": path_obj
+        }).value
+        normalized_config = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": config_obj,
+        }).values
 
         # Now we have proper types, call _write_meltano_config
         return FlextMeltanoProjectService._write_meltano_config(
-            path_obj,
-            config_obj,
+            normalized_path,
+            normalized_config,
         )
 
     @staticmethod
     def _write_meltano_config(
-        project_path: Path, config: dict[str, t_core.GeneralValueType]
+        project_path: Path, config: dict[str, t.GeneralValueType]
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -301,8 +296,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         return project_result
 
     @staticmethod
-    def _convert_to_project_dict(project: t_core.GeneralValueType) -> r[t.Dbt.Project]:
-        """Convert Meltano project object to FLEXT dict[str, t_core.GeneralValueType] representation."""
+    def _convert_to_project_dict(project: t.GeneralValueType) -> r[t.Dbt.Project]:
+        """Convert Meltano project object to FLEXT dict[str, t.GeneralValueType] representation."""
         try:
             # Extract attributes using getattr with type narrowing
             name_attr = getattr(project, "name", None)

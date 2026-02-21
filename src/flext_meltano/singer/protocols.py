@@ -11,13 +11,12 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_core import FlextTypes
-
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
-# Import aliases - using meltano types for domain-specific definitions
+# Import aliases
 t = FlextMeltanoTypes
-t_core = FlextTypes
+m = FlextMeltanoModels
 
 
 class FlextMeltanoSingerProtocols:
@@ -39,48 +38,48 @@ class FlextMeltanoSingerProtocols:
 
         streams: list[str]
         name: str
-        state: t.Singer.TapConfig
+        state: m.Meltano.SingerStateMessage
 
-        def discover(self) -> t.Singer.StreamCatalog:
+        def discover(self) -> m.Meltano.SingerCatalog:
             """Discover available streams and schemas.
 
             Returns:
-            Stream catalog with schema definitions
+            Singer catalog model
 
             """
             ...
 
         def sync(
             self,
-            catalog: t.Singer.StreamCatalog,
-            state: t.Singer.TapConfig,
+            catalog: m.Meltano.SingerCatalog,
+            state: m.Meltano.SingerStateMessage,
         ) -> None:
             """Synchronize data from source to stdout.
 
             Args:
-            catalog: Stream catalog defining what to extract
+            catalog: Singer catalog model
             state: Current state for incremental sync
 
             """
             ...
 
-        def get_records(self, stream_name: str) -> t.Singer.MessageBatch:
+        def get_records(self, stream_name: str) -> list[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream.
 
             Args:
             stream_name: Name of the stream to extract records from
 
             Returns:
-            List of record dictionaries for the stream
+            List of Singer record messages for the stream
 
             """
             ...
 
-        def get_state(self) -> t.Singer.TapConfig:
+        def get_state(self) -> m.Meltano.SingerStateMessage:
             """Get current state.
 
             Returns:
-            Dictionary containing the current sync state
+            Singer state message containing sync state
 
             """
             ...
@@ -93,9 +92,9 @@ class FlextMeltanoSingerProtocols:
         """
 
         name: str
-        config: t.Singer.TargetConfig
+        config: m.Meltano.TargetConfig
 
-        def consume(self, records: t.Singer.MessageBatch) -> int:
+        def consume(self, records: list[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
 
             Args:

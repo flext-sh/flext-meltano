@@ -47,7 +47,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
     def discover_streams(
         self,
-        source_config: m.DataSourceConfig,
+        source_config: m.Meltano.DataSourceConfig,
     ) -> r[t.Singer.StreamCatalog]:
         """Discover available streams for a source configuration.
 
@@ -89,7 +89,10 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             self.logger.exception("Stream discovery failed", error=str(e))
             return r[t.Singer.StreamCatalog].fail(f"Stream discovery failed: {e}")
 
-    def validate_stream_schema(self, stream_def: m.StreamDefinition) -> r[bool]:
+    def validate_stream_schema(
+        self,
+        stream_def: m.Meltano.StreamDefinition,
+    ) -> r[bool]:
         """Validate a stream definition's schema.
 
         Args:
@@ -123,8 +126,8 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
     def create_source_instance(
         self,
-        source_config: m.DataSourceConfig,
-    ) -> r[m.DataSourceInstance]:
+        source_config: m.Meltano.DataSourceConfig,
+    ) -> r[m.Meltano.DataSourceInstance]:
         """Create a source instance from configuration.
 
         Args:
@@ -145,7 +148,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             source_id = f"{source_config.source_type}:{source_config.source_identifier}"
 
             # Create source instance
-            source_instance = m.DataSourceInstance(
+            source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_config.source_type,
                 config=source_config,
                 status="configured",
@@ -157,13 +160,15 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
                 source_name=source_instance.config.source_type,
             )
 
-            return r[m.DataSourceInstance].ok(source_instance)
+            return r[m.Meltano.DataSourceInstance].ok(source_instance)
 
         except Exception as e:
             self.logger.exception("Source instance creation failed", error=str(e))
-            return r[m.DataSourceInstance].fail(f"Source instance creation failed: {e}")
+            return r[m.Meltano.DataSourceInstance].fail(
+                f"Source instance creation failed: {e}",
+            )
 
-    def process(self, source_config: m.DataSourceConfig) -> r[bool]:
+    def process(self, source_config: m.Meltano.DataSourceConfig) -> r[bool]:
         """Process a source configuration for validation.
 
         Args:

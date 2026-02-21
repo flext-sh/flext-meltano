@@ -11,9 +11,7 @@ SPDX-License-Identifier: MIT
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextResult
-
-from flext_meltano import FlextMeltanoAdapter
+from flext_meltano import FlextMeltanoAdapter, r
 
 
 class TestFlextMeltanoAdapter:
@@ -43,13 +41,13 @@ class TestFlextMeltanoAdapter:
                 project_path,
             )
 
-            assert isinstance(result, FlextResult), "Should return FlextResult"
+            assert isinstance(result, r), "Should return FlextResult"
 
     def test_adapter_plugin_operations(self) -> None:
         """Test adapter plugin operations."""
         result = self.adapter.plugin_adapter.discover_plugins()
 
-        assert isinstance(result, FlextResult), "Should return FlextResult"
+        assert isinstance(result, r), "Should return FlextResult"
 
     def test_adapter_pipeline_operations(self) -> None:
         """Test adapter pipeline operations."""
@@ -58,13 +56,13 @@ class TestFlextMeltanoAdapter:
             "target-jsonl",
         )
 
-        assert isinstance(result, FlextResult), "Should return FlextResult"
+        assert isinstance(result, r), "Should return FlextResult"
 
     def test_adapter_failure_handling(self) -> None:
         """Test adapter failure handling."""
         invalid_path = Path("/nonexistent/directory")
         result = self.adapter.project_adapter.create_project("test", invalid_path)
 
-        assert isinstance(result, FlextResult), "Should return FlextResult"
+        assert isinstance(result, r), "Should return FlextResult"
         assert hasattr(result, "is_success"), "Should have is_success"
         assert hasattr(result, "error"), "Should have error"

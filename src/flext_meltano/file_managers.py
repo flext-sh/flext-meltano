@@ -17,17 +17,15 @@ from pathlib import Path
 import yaml
 from flext_core import (
     FlextLogger,
-    FlextResult,
     FlextResult as r,
-    FlextTypes,
     u,
 )
 
 from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as t
 
-# Import aliases for simplified usage
-t_core = FlextTypes
+m = FlextMeltanoModels
 
 logger = FlextLogger(__name__)
 
@@ -145,21 +143,9 @@ class FlextMeltanoFileManagers:
             if config_data is None:
                 return r[t.MeltanoCore.FileConfigDict].ok({})
 
-            # Ensure config_data is a dict
-            if not isinstance(config_data, dict):
-                return r[t.MeltanoCore.FileConfigDict].fail(
-                    "YAML content is not a dictionary",
-                )
-
-            # Type narrowing: config_data is now dict[str, t_core.GeneralValueType]
-            # Validate dict keys are strings
-            if not all(isinstance(k, str) for k in config_data):
-                return r[t.MeltanoCore.FileConfigDict].fail(
-                    "YAML dict contains non-string keys",
-                )
-
-            # Type-safe assignment after validation
-            validated_config: dict[str, t_core.GeneralValueType] = config_data
+            validated_config = m.Meltano.ConfigMappingPayload.model_validate(
+                {"values": config_data},
+            ).values
             return r[t.MeltanoCore.FileConfigDict].ok(validated_config)
 
         result = u.try_(
@@ -174,12 +160,9 @@ class FlextMeltanoFileManagers:
             ),
             default=None,
         )
-        # Type narrowing: result is object | None, need to check if it's a FlextResult
+        # Type narrowing: result is object | None
         if result is None:
             return r[t.MeltanoCore.FileConfigDict].fail("Failed to load YAML config")
-        # Type guard: result must be FlextResult[FileConfigDict] here
-        if not isinstance(result, FlextResult):
-            return r[t.MeltanoCore.FileConfigDict].fail("Invalid result type from try_")
         return result
 
     @classmethod
@@ -273,8 +256,7 @@ class FlextMeltanoFileManagers:
                 created_paths[directory] = dir_path
 
             # Create essential config files
-            # Explicitly type as dict[str, dict[str, t_core.GeneralValueType]] to satisfy FileConfigDict
-            configs: dict[str, dict[str, t_core.GeneralValueType]] = {
+            configs = {
                 c.Meltano.Paths.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": "project_name",
@@ -296,15 +278,11 @@ class FlextMeltanoFileManagers:
 
             for filename, config_data in configs.items():
                 config_path = project_root / filename
-                # Validate config_data is a dict before saving
-                if not isinstance(config_data, dict):
-                    return r[t.MeltanoCore.PathDict].fail(
-                        f"Invalid config data for {filename}: expected dict",
-                    )
-                # After isinstance check, config_data is dict[str, t_core.GeneralValueType]
-                # FileConfigDict now supports dict[str, t_core.GeneralValueType] values
+                validated_config = m.Meltano.ConfigMappingPayload.model_validate(
+                    {"values": config_data},
+                ).values
                 save_result = cls.save_yaml_config(
-                    config_data,
+                    validated_config,
                     config_path,
                 )
                 if save_result.is_success:

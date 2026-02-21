@@ -8,9 +8,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Literal, Self
 
+import yaml
 from flext_core import (
     FlextModels,
     FlextResult,
@@ -19,6 +22,7 @@ from flext_core import (
 from flext_core.utilities import u as flext_u
 from pydantic import (
     BaseModel,
+    ConfigDict,
     Field,
     computed_field,
     field_serializer,
@@ -39,12 +43,8 @@ class FlextMeltanoModels(FlextModels):
     """
 
     def __init_subclass__(cls, **kwargs: t.JsonValue) -> None:
-        """Warn when FlextMeltanoModels is subclassed directly."""
+        """Allow downstream projects to inherit FlextMeltanoModels for namespace composition."""
         super().__init_subclass__(**kwargs)
-        flext_u.Deprecation.warn_once(
-            f"subclass:{cls.__name__}",
-            "Subclassing FlextMeltanoModels is deprecated. Use FlextModels directly with composition instead.",
-        )
 
     @staticmethod
     def _protect_sensitive_config(
@@ -53,13 +53,6 @@ class FlextMeltanoModels(FlextModels):
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
-        def dict_count(
-            d: dict[str, t.JsonValue] | list[t.JsonValue] | tuple[t.JsonValue, ...],
-        ) -> int:
-            if isinstance(d, dict):
-                return flext_u.count(list(d.keys()))
-            return flext_u.count(d)
-
         def is_sensitive(k: str) -> bool:
             normalized = flext_u.Conversion.normalize(k, case="lower")
             # Convert set to list of str for processing
@@ -67,21 +60,33 @@ class FlextMeltanoModels(FlextModels):
             checks_result = flext_u.process(
                 sensitive_keys_list,
                 lambda s: FlextResult[bool].ok(
-                    isinstance(s, str) and s in normalized,
+                    s in normalized,
                 ),
             )
-            if checks_result.is_success and isinstance(checks_result.value, list):
-                return flext_u.any_(*checks_result.value)
+            checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate(
+                {
+                    "items": checks_result.value if checks_result.is_success else [],
+                },
+            ).items
+            if checks:
+                return flext_u.any_(*checks)
             return False
 
         # Transform dict values with protection for sensitive fields
         protected: dict[str, t.JsonValue] = {}
-        if isinstance(value, dict):
-            for k, v in value.items():
-                key_str = k if isinstance(k, str) else str(k)
-                protected[key_str] = "[PROTECTED]" if is_sensitive(key_str) else v
+        for key, item in value.items():
+            protected[key] = "[PROTECTED]" if is_sensitive(key) else item
 
         return protected
+
+    @staticmethod
+    def _validated_string_list(
+        value: object,
+    ) -> list[str]:
+        """Normalize arbitrary values into a validated list of strings."""
+        return FlextMeltanoModels.Meltano.StringListValue.model_validate(
+            {"items": value},
+        ).items
 
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
     PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
@@ -103,6 +108,38 @@ class FlextMeltanoModels(FlextModels):
 
     class Meltano:
         """Meltano domain namespace."""
+
+        class StringListValue(FlextModels.ArbitraryTypesModel):
+            """Validated string list wrapper for result normalization."""
+
+            items: list[str] = Field(
+                default_factory=list,
+                description="Normalized list of string values",
+            )
+
+            @field_validator("items", mode="before")
+            @classmethod
+            def normalize_items(cls, value: t.GeneralValueType) -> list[str]:
+                """Convert sequence-like values into string lists."""
+                if isinstance(value, list | tuple | set):
+                    return [str(item) for item in value if item is not None]
+                return []
+
+        class BooleanListValue(FlextModels.ArbitraryTypesModel):
+            """Validated boolean list wrapper for process output."""
+
+            items: list[bool] = Field(
+                default_factory=list,
+                description="Normalized list of boolean values",
+            )
+
+            @field_validator("items", mode="before")
+            @classmethod
+            def normalize_items(cls, value: t.GeneralValueType) -> list[bool]:
+                """Convert sequence-like values into booleans."""
+                if isinstance(value, list | tuple | set):
+                    return [bool(item) for item in value]
+                return []
 
         class LoggingConfig(BaseModel):
             """Consolidated logging configuration for all pipeline operations.
@@ -690,20 +727,12 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def config_size(self) -> int:
                 """Total number of configuration parameters."""
-                conn_keys = (
-                    list(self.connection_config.keys())
-                    if isinstance(self.connection_config, dict)
-                    else []
-                )
-                stream_keys = (
-                    list(self.stream_config.keys())
-                    if isinstance(self.stream_config, dict)
-                    else []
-                )
+                conn_keys = list(self.connection_config.keys())
+                stream_keys = list(self.stream_config.keys())
                 return flext_u.count(conn_keys) + flext_u.count(stream_keys)
 
             @model_validator(mode="after")
-            def validate_tap_config(self) -> FlextMeltanoModels.TapConfig:
+            def validate_tap_config(self) -> Self:
                 """Validate tap configuration consistency."""
                 if not self.tap_type or not self.tap_type.strip():
                     msg = "tap_type cannot be empty"
@@ -721,11 +750,7 @@ class FlextMeltanoModels(FlextModels):
                 value: dict[str, t.JsonValue],
             ) -> dict[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
-                return (
-                    FlextMeltanoModels._protect_sensitive_config(value)
-                    if isinstance(value, dict)
-                    else value
-                )
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class TargetConfig(FlextModels.Entity):
             """Generic target configuration for data loading."""
@@ -761,7 +786,7 @@ class FlextMeltanoModels(FlextModels):
                 return len(self.connection_config)
 
             @model_validator(mode="after")
-            def validate_target_config(self) -> FlextMeltanoModels.TargetConfig:
+            def validate_target_config(self) -> Self:
                 """Validate target configuration consistency."""
                 if not self.target_type or not self.target_type.strip():
                     msg = "target_type cannot be empty"
@@ -775,11 +800,7 @@ class FlextMeltanoModels(FlextModels):
                 value: dict[str, t.JsonValue],
             ) -> dict[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
-                return (
-                    FlextMeltanoModels._protect_sensitive_config(value)
-                    if isinstance(value, dict)
-                    else value
-                )
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class DataSourceConfig(FlextModels.Entity):
             """Generic data source configuration with validation."""
@@ -807,20 +828,12 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def config_size(self) -> int:
                 """Total number of configuration parameters."""
-                conn_keys = (
-                    list(self.connection_config.keys())
-                    if isinstance(self.connection_config, dict)
-                    else []
-                )
-                stream_keys = (
-                    list(self.stream_config.keys())
-                    if isinstance(self.stream_config, dict)
-                    else []
-                )
+                conn_keys = list(self.connection_config.keys())
+                stream_keys = list(self.stream_config.keys())
                 return flext_u.count(conn_keys) + flext_u.count(stream_keys)
 
             @model_validator(mode="after")
-            def validate_source_config(self) -> FlextMeltanoModels.DataSourceConfig:
+            def validate_source_config(self) -> Self:
                 """Validate source configuration consistency."""
                 if not self.source_type or not self.source_type.strip():
                     msg = "Source type cannot be empty"
@@ -838,11 +851,7 @@ class FlextMeltanoModels(FlextModels):
                 value: dict[str, t.JsonValue],
             ) -> dict[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
-                return (
-                    FlextMeltanoModels._protect_sensitive_config(value)
-                    if isinstance(value, dict)
-                    else value
-                )
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class StreamDefinition(FlextModels.Entity):
             """Generic stream definition for data pipeline operations."""
@@ -882,7 +891,7 @@ class FlextMeltanoModels(FlextModels):
                 return 0
 
             @model_validator(mode="after")
-            def validate_stream_definition(self) -> FlextMeltanoModels.StreamDefinition:
+            def validate_stream_definition(self) -> Self:
                 """Validate stream definition consistency."""
                 if "properties" not in self.stream_schema:
                     msg = "Stream schema must contain properties"
@@ -932,11 +941,11 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def config_keys_count(self) -> int:
                 """Number of config keys."""
-                keys = list(self.config.keys()) if isinstance(self.config, dict) else []
+                keys = list(self.config.keys())
                 return flext_u.count(keys)
 
             @model_validator(mode="after")
-            def validate_sink_definition(self) -> FlextMeltanoModels.DataSinkDefinition:
+            def validate_sink_definition(self) -> Self:
                 """Validate sink definition consistency."""
                 valid_statuses = {
                     "initialized",
@@ -958,13 +967,13 @@ class FlextMeltanoModels(FlextModels):
                 default=None, description="Unique tap identifier"
             )
             tap_type: str = Field(description="Type of the tap")
-            config: FlextMeltanoModels.TapConfig = Field(
+            config: FlextMeltanoModels.Meltano.TapConfig = Field(
                 description="Tap configuration"
             )
             adapter: t.GeneralValueType | None = Field(
                 default=None, description="Tap adapter instance"
             )
-            streams: list[FlextMeltanoModels.StreamInfo] = Field(
+            streams: list[FlextMeltanoModels.Meltano.StreamInfo] = Field(
                 default_factory=list,
                 description="Available streams",
             )
@@ -976,7 +985,7 @@ class FlextMeltanoModels(FlextModels):
                 return len(self.streams)
 
             @computed_field
-            def active_streams(self) -> list[FlextMeltanoModels.StreamInfo]:
+            def active_streams(self) -> list[FlextMeltanoModels.Meltano.StreamInfo]:
                 """Active streams for extraction."""
                 return [
                     s for s in self.streams if s.status in {"discovered", "selected"}
@@ -986,7 +995,7 @@ class FlextMeltanoModels(FlextModels):
             """Generic data source instance for pipeline operations."""
 
             source_type: str = Field(description="Type of the data source")
-            config: FlextMeltanoModels.DataSourceConfig = Field(
+            config: FlextMeltanoModels.Meltano.DataSourceConfig = Field(
                 description="Source configuration",
             )
             adapter: t.GeneralValueType | None = Field(
@@ -994,7 +1003,7 @@ class FlextMeltanoModels(FlextModels):
                 description="Adapter instance",
             )
             status: str = Field(default="initialized", description="Current status")
-            streams: dict[str, FlextMeltanoModels.StreamDefinition] = Field(
+            streams: dict[str, FlextMeltanoModels.Meltano.StreamDefinition] = Field(
                 default_factory=dict,
                 description="Discovered streams",
             )
@@ -1026,10 +1035,8 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def total_records_extracted(self) -> int:
                 """Total records extracted across all streams."""
-                streams_list: list[FlextMeltanoModels.StreamDefinition] = (
-                    list(self.streams.values())
-                    if isinstance(self.streams, dict)
-                    else []
+                streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
+                    self.streams.values(),
                 )
                 result = flext_u.agg(streams_list, "records_extracted", fn=sum)
                 return result if isinstance(result, int) else 0
@@ -1037,10 +1044,8 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def is_ready_for_extraction(self) -> bool:
                 """Check if source is ready for data extraction."""
-                streams_list: list[FlextMeltanoModels.StreamDefinition] = (
-                    list(self.streams.values())
-                    if isinstance(self.streams, dict)
-                    else []
+                streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
+                    self.streams.values(),
                 )
                 return (
                     self.discovered
@@ -1049,7 +1054,7 @@ class FlextMeltanoModels(FlextModels):
                 )
 
             @model_validator(mode="after")
-            def validate_source_instance(self) -> FlextMeltanoModels.DataSourceInstance:
+            def validate_source_instance(self) -> Self:
                 """Validate source instance consistency."""
                 if self.config.source_type != self.source_type:
                     msg = "Source type must match between instance and config"
@@ -1068,7 +1073,7 @@ class FlextMeltanoModels(FlextModels):
                 default=None, description="Unique sink identifier"
             )
             sink_type: str = Field(description="Type of the data sink")
-            config: FlextMeltanoModels.DataSinkConfig = Field(
+            config: FlextMeltanoModels.Meltano.DataSinkConfig = Field(
                 description="Sink configuration",
             )
             adapter: t.GeneralValueType | None = Field(
@@ -1124,7 +1129,7 @@ class FlextMeltanoModels(FlextModels):
                 return "low"
 
             @model_validator(mode="after")
-            def validate_sink_config(self) -> FlextMeltanoModels.DataSinkConfig:
+            def validate_sink_config(self) -> Self:
                 """Validate sink configuration consistency."""
                 if not self.sink_type or not self.sink_type.strip():
                     msg = "Sink type must be non-empty string"
@@ -1145,11 +1150,7 @@ class FlextMeltanoModels(FlextModels):
                 value: dict[str, t.JsonValue],
             ) -> dict[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
-                return (
-                    FlextMeltanoModels._protect_sensitive_config(value)
-                    if isinstance(value, dict)
-                    else value
-                )
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class StreamInfo(FlextModels.Entity):
             """Generic stream information for data pipeline operations."""
@@ -1207,7 +1208,7 @@ class FlextMeltanoModels(FlextModels):
                 return "pending"
 
             @model_validator(mode="after")
-            def validate_stream_info(self) -> FlextMeltanoModels.StreamInfo:
+            def validate_stream_info(self) -> Self:
                 """Validate stream information consistency."""
                 if self.records_loaded > 0 and self.batches_processed == 0:
                     msg = "Records loaded but no batches processed"
@@ -1219,6 +1220,687 @@ class FlextMeltanoModels(FlextModels):
                     raise ValueError(msg)
 
                 return self
+
+        class SingerSchemaMessage(FlextModels.ArbitraryTypesModel):
+            """Canonical Singer SCHEMA message model."""
+
+            type: Literal["SCHEMA"] = Field(
+                default="SCHEMA",
+                description="Singer message discriminator",
+            )
+            stream: str = Field(min_length=1, description="Singer stream name")
+            schema_definition: dict[str, t.JsonValue] = Field(
+                alias="schema",
+                serialization_alias="schema",
+                validation_alias="schema",
+                description="Singer JSON schema payload",
+            )
+            key_properties: list[str] = Field(
+                default_factory=list,
+                description="Singer stream key properties",
+            )
+            bookmark_properties: list[str] = Field(
+                default_factory=list,
+                description="Singer bookmark columns for incremental replication",
+            )
+
+        class SingerRecordMessage(FlextModels.ArbitraryTypesModel):
+            """Canonical Singer RECORD message model."""
+
+            type: Literal["RECORD"] = Field(
+                default="RECORD",
+                description="Singer message discriminator",
+            )
+            stream: str = Field(min_length=1, description="Singer stream name")
+            record: dict[str, t.JsonValue] = Field(
+                description="Singer record payload",
+            )
+            time_extracted: str | None = Field(
+                default=None,
+                description="ISO 8601 timestamp when the record was extracted",
+            )
+            version: int | None = Field(
+                default=None,
+                description="Stream version number for activate_version protocol",
+            )
+
+        class SingerStateMessage(FlextModels.ArbitraryTypesModel):
+            """Canonical Singer STATE message model."""
+
+            type: Literal["STATE"] = Field(
+                default="STATE",
+                description="Singer message discriminator",
+            )
+            value: dict[str, dict[str, str]] = Field(
+                default_factory=dict,
+                description="Singer state bookmark payload",
+            )
+
+        class SingerActivateVersionMessage(FlextModels.ArbitraryTypesModel):
+            """Canonical Singer ACTIVATE_VERSION message model.
+
+            Sent by a tap to signal that all records for a stream version
+            have been emitted. The target should remove any records not
+            matching this version.
+            """
+
+            type: Literal["ACTIVATE_VERSION"] = Field(
+                default="ACTIVATE_VERSION",
+                description="Singer message discriminator",
+            )
+            stream: str = Field(min_length=1, description="Singer stream name")
+            version: int = Field(description="Stream version to activate")
+
+        class SingerStateEntry(FlextModels.Entity):
+            """Singer state entry for a stream bookmark.
+
+            Tracks per-stream incremental sync bookmarks with validation
+            ensuring bookmark_key and bookmark_value are both set or both None.
+            """
+
+            stream_name: str = Field(description="Name of the stream")
+            bookmark_key: str | None = Field(
+                default=None,
+                description="Bookmark field for incremental",
+            )
+            bookmark_value: str | None = Field(
+                default=None,
+                description="Current bookmark value",
+            )
+
+            @model_validator(mode="after")
+            def validate_bookmark(self) -> Self:
+                """Ensure bookmark_key and bookmark_value are both set or both None."""
+                if (self.bookmark_key is None) != (self.bookmark_value is None):
+                    msg = "bookmark_key and bookmark_value must both be set or both be None"
+                    raise ValueError(msg)
+                return self
+
+        class SingerCatalogMetadata(FlextModels.ArbitraryTypesModel):
+            """Singer catalog metadata block model."""
+
+            breadcrumb: list[str] = Field(
+                default_factory=list,
+                description="Singer metadata breadcrumb path",
+            )
+            metadata: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Singer metadata properties",
+            )
+
+        class SingerCatalogEntry(FlextModels.ArbitraryTypesModel):
+            """Singer catalog stream entry model."""
+
+            tap_stream_id: str = Field(
+                min_length=1,
+                description="Tap stream identifier",
+            )
+            stream: str = Field(min_length=1, description="Singer stream name")
+            schema_definition: dict[str, t.JsonValue] = Field(
+                alias="schema",
+                serialization_alias="schema",
+                validation_alias="schema",
+                description="Singer stream schema payload",
+            )
+            metadata: list[FlextMeltanoModels.Meltano.SingerCatalogMetadata] = Field(
+                default_factory=list,
+                description="Singer stream metadata blocks",
+            )
+            key_properties: list[str] = Field(
+                default_factory=list,
+                description="Primary key columns for this stream",
+            )
+            replication_key: str | None = Field(
+                default=None,
+                description="Column used for incremental replication",
+            )
+            replication_method: (
+                Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None
+            ) = Field(
+                default=None,
+                description="Replication method for this stream",
+            )
+            is_view: bool | None = Field(
+                default=None,
+                description="Whether this stream is a database view",
+            )
+            table_name: str | None = Field(
+                default=None,
+                description="Source table name",
+            )
+            database_name: str | None = Field(
+                default=None,
+                description="Source database name",
+            )
+            row_count: int | None = Field(
+                default=None,
+                description="Estimated row count from source",
+            )
+
+        class SingerCatalog(FlextModels.ArbitraryTypesModel):
+            """Singer catalog response model."""
+
+            type: Literal["CATALOG"] = Field(
+                default="CATALOG",
+                description="Singer catalog message discriminator",
+            )
+            streams: list[FlextMeltanoModels.Meltano.SingerCatalogEntry] = Field(
+                default_factory=list,
+                description="Singer catalog stream entries",
+            )
+
+        class SingerPipelineConfig(FlextModels.Entity):
+            """Configuration for a Singer ELT pipeline."""
+
+            tap_config_path: Path | None = Field(
+                default=None,
+                description="Path to tap configuration",
+            )
+            target_config_path: Path | None = Field(
+                default=None,
+                description="Path to target configuration",
+            )
+            catalog_path: Path | None = Field(
+                default=None,
+                description="Path to catalog file",
+            )
+            state_path: Path | None = Field(
+                default=None,
+                description="Path to state file",
+            )
+            selected_streams: list[str] | None = Field(
+                default=None,
+                description="Specific streams to sync",
+            )
+
+        class SingerSyncResult(FlextModels.Entity):
+            """Result of a Singer sync operation."""
+
+            records_processed: int = Field(
+                ge=0, description="Number of records processed"
+            )
+            records_written: int = Field(ge=0, description="Number of records written")
+            errors: int = Field(ge=0, description="Number of errors")
+            state: dict[str, dict[str, str]] = Field(
+                default_factory=dict,
+                description="Final state payload",
+            )
+            duration_seconds: float = Field(ge=0.0, description="Execution duration")
+
+        # ========================================================================
+        # API PAYLOAD MODELS - Typed payloads for API operations
+        # ========================================================================
+
+        class CreatePipelinePayload(FlextModels.ArbitraryTypesModel):
+            """Payload for create_pipeline operation."""
+
+            tap_name: str = Field(min_length=1, description="Singer tap name")
+            target_name: str = Field(min_length=1, description="Singer target name")
+            config: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Pipeline config",
+            )
+
+        class ExecutePipelinePayload(FlextModels.ArbitraryTypesModel):
+            """Payload for execute_pipeline operation."""
+
+            pipeline_id: str = Field(min_length=1, description="Pipeline identifier")
+            config: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Execution config",
+            )
+
+        class InstallPluginPayload(FlextModels.ArbitraryTypesModel):
+            """Payload for install_plugin operation."""
+
+            plugin_type: str = Field(min_length=1, description="Plugin type")
+            plugin_name: str = Field(min_length=1, description="Plugin name")
+            config: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Plugin config",
+            )
+
+        class ListPluginsPayload(FlextModels.ArbitraryTypesModel):
+            """Payload for list_plugins operation."""
+
+            plugin_type: str | None = Field(
+                default=None,
+                description="Filter by plugin type",
+            )
+
+        class ConfigureEnvironmentPayload(FlextModels.ArbitraryTypesModel):
+            """Payload for configure_environment operation."""
+
+            environment_name: str = Field(min_length=1, description="Environment name")
+            config: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Environment config",
+            )
+
+        class RunDbtModelsPayload(FlextModels.ArbitraryTypesModel):
+            """Payload for run/test dbt models operation."""
+
+            models: list[str] | None = Field(default=None, description="Models to run")
+            config: dict[str, t.GeneralValueType] | None = Field(
+                default=None,
+                description="Execution config",
+            )
+
+        class RunEltPipelinePayload(FlextModels.ArbitraryTypesModel):
+            """Payload for run_elt_pipeline operation."""
+
+            tap_name: str = Field(min_length=1, description="Singer tap name")
+            target_name: str = Field(min_length=1, description="Singer target name")
+            dbt_models: list[str] | None = Field(
+                default=None,
+                description="DBT models to run",
+            )
+            config: dict[str, t.GeneralValueType] | None = Field(
+                default=None,
+                description="Pipeline config",
+            )
+
+        class JsonSchemaPayload(FlextModels.ArbitraryTypesModel):
+            """Typed schema payload used by API extract flow."""
+
+            schema_definition: dict[str, t.JsonValue] = Field(
+                default_factory=dict,
+                alias="schema",
+                serialization_alias="schema",
+                validation_alias="schema",
+                description="Schema-like JSON payload",
+            )
+
+            @field_validator("schema_definition", mode="before")
+            @classmethod
+            def normalize_schema(cls, value: object) -> object:
+                """Normalize mapping input before JSON validation."""
+                if isinstance(value, Mapping):
+                    return {str(key): item for key, item in value.items()}
+                return {}
+
+        class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
+            """Typed record batch payload used by API load flow."""
+
+            records: list[dict[str, t.JsonValue]] = Field(
+                default_factory=list,
+                description="Normalized record payloads",
+            )
+
+            @field_validator("records", mode="before")
+            @classmethod
+            def normalize_records(cls, value: object) -> object:
+                """Normalize mixed record input into dict records."""
+                if isinstance(value, list | tuple):
+                    return [
+                        {str(key): item for key, item in record.items()}
+                        for record in value
+                        if isinstance(record, Mapping)
+                    ]
+                return []
+
+        class ConfigMappingPayload(FlextModels.ArbitraryTypesModel):
+            """Normalized mapping payload with string keys."""
+
+            values: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Normalized mapping values",
+            )
+
+            @field_validator("values", mode="before")
+            @classmethod
+            def normalize_values(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, t.GeneralValueType]:
+                """Normalize mapping-like payloads to dict[str, value]."""
+                if isinstance(value, Mapping):
+                    return {str(key): item for key, item in value.items()}
+                return {}
+
+        class JsonCompatibleConfigPayload(FlextModels.ArbitraryTypesModel):
+            """Normalize config map values into JSON-compatible payloads."""
+
+            values: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="JSON-compatible config values",
+            )
+
+            @field_validator("values", mode="before")
+            @classmethod
+            def normalize_json_values(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, t.GeneralValueType]:
+                """Coerce top-level config values to JSON-compatible values."""
+                normalized = (
+                    FlextMeltanoModels.Meltano.ConfigMappingPayload.model_validate(
+                        {"values": value},
+                    ).values
+                )
+                valid_types = (str, int, float, bool, list, dict, type(None))
+                return {
+                    key: item if isinstance(item, valid_types) else str(item)
+                    for key, item in normalized.items()
+                }
+
+        class PathPayload(FlextModels.ArbitraryTypesModel):
+            """Path normalization payload for runtime path conversions."""
+
+            value: Path = Field(default_factory=Path, description="Normalized path")
+
+            @field_validator("value", mode="before")
+            @classmethod
+            def normalize_path(cls, value: t.GeneralValueType) -> Path:
+                """Normalize mixed path input into Path objects."""
+                if value is None:
+                    return Path()
+                return Path(str(value))
+
+        class FileContentPayload(FlextModels.ArbitraryTypesModel):
+            """Normalize str|dict content to writable string for file operations."""
+
+            content: str = Field(
+                default="",
+                description="Normalized writable string content",
+            )
+
+            @field_validator("content", mode="before")
+            @classmethod
+            def normalize_content(cls, value: object) -> str:
+                """Normalize dict content via yaml.dump, pass str through."""
+                if isinstance(value, Mapping):
+                    return yaml.dump(
+                        dict(value),
+                        default_flow_style=False,
+                        indent=2,
+                        allow_unicode=True,
+                    )
+                if value is None:
+                    return ""
+                return str(value)
+
+        class VariantPayload(FlextModels.ArbitraryTypesModel):
+            """Normalize plugin variant from external extraction (str|list|dict)."""
+
+            value: str | list[str] | dict[str, t.JsonValue] | None = Field(
+                default=None,
+                description="Normalized variant value",
+            )
+
+            @field_validator("value", mode="before")
+            @classmethod
+            def normalize_variant(
+                cls,
+                value: object,
+            ) -> str | list[str] | dict[str, t.JsonValue] | None:
+                """Normalize variant_raw into typed union."""
+                if value is None:
+                    return None
+                if isinstance(value, str):
+                    return value
+                if isinstance(value, list | tuple):
+                    return [str(item) for item in value]
+                if isinstance(value, Mapping):
+                    result: dict[str, t.JsonValue] = {}
+                    for k, v in value.items():
+                        if isinstance(v, str | int | float | bool | type(None)):
+                            result[str(k)] = v
+                        elif isinstance(v, list | dict):
+                            result[str(k)] = str(v)
+                    return result
+                return str(value)
+
+        class PluginDiscoverySource(FlextModels.ArbitraryTypesModel):
+            """Normalized raw plugin discovery payload from external sources."""
+
+            default_variant: str = Field(
+                default="",
+                description="Plugin default variant",
+            )
+            variants: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Available plugin variants",
+            )
+            logo_url: str = Field(default="", description="Plugin logo URL")
+            description: str = Field(
+                default="",
+                description="Plugin description",
+            )
+
+            @field_validator(
+                "default_variant", "logo_url", "description", mode="before"
+            )
+            @classmethod
+            def normalize_string_fields(
+                cls,
+                value: t.GeneralValueType,
+            ) -> str:
+                """Normalize optional string fields from external payloads."""
+                return "" if value is None else str(value)
+
+            @field_validator("variants", mode="before")
+            @classmethod
+            def normalize_variants(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, t.GeneralValueType]:
+                """Normalize variant maps from external payloads."""
+                if isinstance(value, Mapping):
+                    return {str(key): item for key, item in value.items()}
+                return {}
+
+            model_config = ConfigDict(extra="allow")
+
+        class PluginDiscoveryItem(FlextModels.ArbitraryTypesModel):
+            """Typed plugin discovery response item."""
+
+            name: str = Field(min_length=1, description="Plugin name")
+            type: str = Field(min_length=1, description="Plugin type")
+            default_variant: str = Field(
+                default="",
+                description="Default plugin variant",
+            )
+            variants: str = Field(default="", description="Comma-separated variants")
+            logo_url: str = Field(default="", description="Plugin logo URL")
+            description: str = Field(default="", description="Plugin description")
+
+        class PluginDiscoveryCatalog(FlextModels.ArbitraryTypesModel):
+            """Typed plugin discovery catalog keyed by plugin name."""
+
+            plugins: dict[str, FlextMeltanoModels.Meltano.PluginDiscoverySource] = (
+                Field(default_factory=dict, description="Discovered plugins catalog")
+            )
+
+            @field_validator("plugins", mode="before")
+            @classmethod
+            def normalize_plugins(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, t.GeneralValueType]:
+                """Normalize plugin catalog mapping."""
+                if isinstance(value, Mapping):
+                    return {str(key): item for key, item in value.items()}
+                return {}
+
+            model_config = ConfigDict(extra="allow")
+
+        class PipelineExecutionContext(FlextModels.ArbitraryTypesModel):
+            """Typed context envelope for ELT pipeline execution."""
+
+            project_root: str = Field(description="Project root path")
+            elt_context: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="ELT execution context",
+            )
+            extractor_name: str = Field(min_length=1, description="Extractor name")
+            loader_name: str = Field(min_length=1, description="Loader name")
+            execution_completed: bool = Field(
+                default=False,
+                description="Execution completion flag",
+            )
+            execution_result: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Execution result payload",
+            )
+
+            @field_validator(
+                "project_root", "extractor_name", "loader_name", mode="before"
+            )
+            @classmethod
+            def normalize_required_strings(
+                cls,
+                value: t.GeneralValueType,
+            ) -> str:
+                """Normalize required string fields from context payloads."""
+                normalized = "" if value is None else str(value)
+                return normalized.strip()
+
+            @field_validator("elt_context", "execution_result", mode="before")
+            @classmethod
+            def normalize_json_maps(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, t.GeneralValueType]:
+                """Normalize mapping-like payloads into JSON dictionaries."""
+                if isinstance(value, Mapping):
+                    return {str(key): item for key, item in value.items()}
+                return {}
+
+            model_config = ConfigDict(extra="allow")
+
+        class PipelineResultContext(FlextModels.ArbitraryTypesModel):
+            """Typed subset for extracting final pipeline result fields."""
+
+            project_root: str = Field(
+                default="unknown", description="Project root path"
+            )
+            execution_result: dict[str, t.GeneralValueType] = Field(
+                default_factory=dict,
+                description="Execution result payload",
+            )
+
+            @field_validator("project_root", mode="before")
+            @classmethod
+            def normalize_project_root(cls, value: t.GeneralValueType) -> str:
+                """Normalize project root from mixed payload values."""
+                normalized = "unknown" if value is None else str(value)
+                return normalized.strip() or "unknown"
+
+            @field_validator("execution_result", mode="before")
+            @classmethod
+            def normalize_execution_result(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, t.GeneralValueType]:
+                """Normalize execution result map payload."""
+                if isinstance(value, Mapping):
+                    return {str(key): item for key, item in value.items()}
+                return {}
+
+            model_config = ConfigDict(extra="allow")
+
+        class PipelineExecutionScalarMap(FlextModels.ArbitraryTypesModel):
+            """Scalar-only pipeline execution values normalized to strings."""
+
+            values: dict[str, str] = Field(
+                default_factory=dict,
+                description="Execution values filtered to scalar strings",
+            )
+
+            @field_validator("values", mode="before")
+            @classmethod
+            def normalize_values(
+                cls,
+                value: t.GeneralValueType,
+            ) -> dict[str, str]:
+                """Keep scalar execution values and stringify them."""
+                if not isinstance(value, Mapping):
+                    return {}
+
+                return {
+                    str(key): str(item)
+                    for key, item in value.items()
+                    if isinstance(item, str | int | bool | float)
+                }
+
+            model_config = ConfigDict(extra="allow")
+
+        class PluginComponentConfig(FlextModels.Entity):
+            """Validated plugin component configuration for pipeline validators."""
+
+            name: str = Field(min_length=1, description="Plugin name")
+            namespace: str = Field(min_length=1, description="Plugin namespace")
+            pip_url: str = Field(min_length=1, description="Plugin pip URL")
+            executable: str = Field(min_length=1, description="Plugin executable")
+            type: str = Field(default="extractor", description="Plugin type")
+
+            @field_validator("name")
+            @classmethod
+            def validate_name_business_rules(cls, v: str) -> str:
+                """Validate plugin name business rules."""
+                v = v.strip()
+                if not v:
+                    msg = "Plugin name cannot be empty"
+                    raise ValueError(msg)
+                if (
+                    v.startswith("target-")
+                    and len(v) < c.Meltano.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
+                ):
+                    msg = "Target plugin names must be at least 8 characters"
+                    raise ValueError(msg)
+                if (
+                    v.startswith("tap-")
+                    and len(v) < c.Meltano.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
+                ):
+                    msg = "Source component names must be at least 5 characters"
+                    raise ValueError(msg)
+                return v
+
+        class DbtManifestNode(FlextModels.ArbitraryTypesModel):
+            """Parsed dbt manifest node with typed fields."""
+
+            name: str | None = Field(default=None, description="Node name")
+            path: str | None = Field(default=None, description="Node path")
+            description: str | None = Field(
+                default=None, description="Node description"
+            )
+            fqn: list[str] = Field(
+                default_factory=list,
+                description="Fully qualified name parts",
+            )
+            resource_type: str = Field(
+                default="",
+                description="Node resource type (model, test, etc.)",
+            )
+
+            @computed_field
+            def fqn_string(self) -> str:
+                """Fully qualified name as dot-separated string."""
+                return ".".join(self.fqn) if self.fqn else ""
+
+            model_config = ConfigDict(extra="allow")
+
+        class DbtManifest(FlextModels.ArbitraryTypesModel):
+            """Parsed dbt manifest with typed nodes."""
+
+            nodes: dict[str, FlextMeltanoModels.Meltano.DbtManifestNode] = Field(
+                default_factory=dict,
+                description="Manifest nodes keyed by node_id",
+            )
+
+            def get_nodes_by_type(
+                self,
+                resource_type: str,
+            ) -> list[FlextMeltanoModels.Meltano.DbtManifestNode]:
+                """Get all nodes of a specific resource type."""
+                return [
+                    node
+                    for node in self.nodes.values()
+                    if node.resource_type == resource_type
+                ]
+
+            model_config = ConfigDict(extra="allow")
 
         # ========================================================================
         # PROJECT MODELS - Generic project configuration and validation
@@ -1245,7 +1927,7 @@ class FlextMeltanoModels(FlextModels):
             @model_validator(mode="after")
             def validate_meltano_project(
                 self,
-            ) -> FlextMeltanoModels.MeltanoProjectModel:
+            ) -> Self:
                 """Validate Meltano project configuration consistency."""
                 if not self.project_id or not self.project_id.strip():
                     msg = "project_id cannot be empty"
@@ -1285,16 +1967,9 @@ class FlextMeltanoModels(FlextModels):
             def has_production_environment(self) -> bool:
                 """Check if production environment exists."""
                 prod_environments = {"prod", "production", "live"}
-                normalized_envs_result = flext_u.process(
-                    self.environments,
-                    lambda e: FlextResult[str].ok(flext_u.normalize(e, case="lower")),
-                )
-                normalized_envs = (
-                    normalized_envs_result.value
-                    if normalized_envs_result.is_success
-                    and isinstance(normalized_envs_result.value, list)
-                    else []
-                )
+                normalized_envs = [
+                    flext_u.normalize(env, case="lower") for env in self.environments
+                ]
                 # Convert prod_environments set to list for flext_u.in_
                 prod_envs_list: list[str] = list(prod_environments)
                 return flext_u.any_(*[
@@ -1305,16 +1980,9 @@ class FlextMeltanoModels(FlextModels):
             def project_maturity(self) -> str:
                 """Project maturity assessment."""
                 prod_envs = {"prod", "production", "live"}
-                normalized_envs_result = flext_u.process(
-                    self.environments,
-                    lambda e: FlextResult[str].ok(flext_u.normalize(e, case="lower")),
-                )
-                normalized_envs = (
-                    normalized_envs_result.value
-                    if normalized_envs_result.is_success
-                    and isinstance(normalized_envs_result.value, list)
-                    else []
-                )
+                normalized_envs = [
+                    flext_u.normalize(env, case="lower") for env in self.environments
+                ]
                 # Convert prod_envs set to list for flext_u.in_
                 prod_envs_list: list[str] = list(prod_envs)
                 has_prod = flext_u.any_(*[
@@ -1338,7 +2006,7 @@ class FlextMeltanoModels(FlextModels):
             @model_validator(mode="after")
             def validate_project_consistency(
                 self,
-            ) -> FlextMeltanoModels.PipelineProjectModel:
+            ) -> Self:
                 """Validate project consistency."""
                 if self.default_environment not in self.environments:
                     msg = (
@@ -1392,19 +2060,13 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def settings_count(self) -> int:
                 """Number of plugin settings."""
-                if not isinstance(self.settings, dict):
-                    return 0
                 keys: list[str] = list(self.settings.keys())
                 return flext_u.count(keys)
 
             @computed_field
             def plugin_complexity(self) -> str:
                 """Plugin complexity assessment."""
-                settings_keys = (
-                    list(self.settings.keys())
-                    if isinstance(self.settings, dict)
-                    else []
-                )
+                settings_keys = list(self.settings.keys())
                 settings_count = flext_u.count(settings_keys)
                 if settings_count == 0:
                     return "minimal"
@@ -1421,7 +2083,7 @@ class FlextMeltanoModels(FlextModels):
                 return "complex"
 
             @model_validator(mode="after")
-            def validate_plugin_consistency(self) -> FlextMeltanoModels.PluginModel:
+            def validate_plugin_consistency(self) -> Self:
                 """Validate plugin consistency."""
                 if "." in self.namespace:
                     msg = "Plugin namespace cannot contain dots"
@@ -1461,7 +2123,7 @@ class FlextMeltanoModels(FlextModels):
             )
 
             @model_validator(mode="after")
-            def validate_dbt_project(self) -> FlextMeltanoModels.DbtProjectModel:
+            def validate_dbt_project(self) -> Self:
                 """Validate DBT project configuration consistency."""
                 if not self.name or not self.name.strip():
                     msg = "name cannot be empty"
@@ -1551,7 +2213,7 @@ class FlextMeltanoModels(FlextModels):
             @model_validator(mode="after")
             def validate_project_consistency(
                 self,
-            ) -> FlextMeltanoModels.TransformationProjectModel:
+            ) -> Self:
                 """Validate project consistency."""
                 if not self.model_paths:
                     msg = "Project must have at least one model path"
@@ -1614,7 +2276,7 @@ class FlextMeltanoModels(FlextModels):
             @model_validator(mode="after")
             def validate_execution_consistency(
                 self,
-            ) -> FlextMeltanoModels.TransformationExecutionModel:
+            ) -> Self:
                 """Validate execution consistency."""
                 max_threads = (
                     c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD // 3
@@ -1700,7 +2362,7 @@ class FlextMeltanoModels(FlextModels):
                 return "low_performance"
 
             @model_validator(mode="after")
-            def validate_execution_result(self) -> FlextMeltanoModels.ExecutionResult:
+            def validate_execution_result(self) -> Self:
                 """Validate execution result consistency."""
                 if self.start_time and self.end_time:
                     calculated_duration = (
@@ -1732,17 +2394,19 @@ class FlextMeltanoModels(FlextModels):
             """Generic pipeline execution result with complete validation."""
 
             pipeline_id: str = Field(description="Pipeline identifier")
-            source_result: FlextMeltanoModels.ExecutionResult | None = Field(
+            source_result: FlextMeltanoModels.Meltano.ExecutionResult | None = Field(
                 default=None,
                 description="Source execution result",
             )
-            sink_result: FlextMeltanoModels.ExecutionResult | None = Field(
+            sink_result: FlextMeltanoModels.Meltano.ExecutionResult | None = Field(
                 default=None,
                 description="Sink execution result",
             )
-            transformation_result: FlextMeltanoModels.ExecutionResult | None = Field(
-                default=None,
-                description="Transformation execution result",
+            transformation_result: FlextMeltanoModels.Meltano.ExecutionResult | None = (
+                Field(
+                    default=None,
+                    description="Transformation execution result",
+                )
             )
             overall_status: str = Field(
                 default="pending",
@@ -1819,7 +2483,7 @@ class FlextMeltanoModels(FlextModels):
                 return total
 
             @model_validator(mode="after")
-            def validate_pipeline_result(self) -> FlextMeltanoModels.PipelineResult:
+            def validate_pipeline_result(self) -> Self:
                 """Validate pipeline result consistency."""
                 total_from_stages = 0
                 if self.source_result:
@@ -1868,6 +2532,16 @@ class FlextMeltanoModels(FlextModels):
     DataSourceInstance = Meltano.DataSourceInstance
     StreamDefinition = Meltano.StreamDefinition
     StreamInfo = Meltano.StreamInfo
+    SingerSchemaMessage = Meltano.SingerSchemaMessage
+    SingerRecordMessage = Meltano.SingerRecordMessage
+    SingerStateMessage = Meltano.SingerStateMessage
+    SingerActivateVersionMessage = Meltano.SingerActivateVersionMessage
+    SingerStateEntry = Meltano.SingerStateEntry
+    SingerCatalogMetadata = Meltano.SingerCatalogMetadata
+    SingerCatalogEntry = Meltano.SingerCatalogEntry
+    SingerCatalog = Meltano.SingerCatalog
+    SingerPipelineConfig = Meltano.SingerPipelineConfig
+    SingerSyncResult = Meltano.SingerSyncResult
     TapConfig = Meltano.TapConfig
     TargetConfig = Meltano.TargetConfig
     TapInstance = Meltano.TapInstance
@@ -1884,6 +2558,27 @@ class FlextMeltanoModels(FlextModels):
     PluginModel = Meltano.PluginModel
     DbtProjectModel = Meltano.DbtProjectModel
     TransformationProjectModel = Meltano.TransformationProjectModel
+    PluginComponentConfig = Meltano.PluginComponentConfig
+    PluginDiscoverySource = Meltano.PluginDiscoverySource
+    PluginDiscoveryItem = Meltano.PluginDiscoveryItem
+    PluginDiscoveryCatalog = Meltano.PluginDiscoveryCatalog
+    PipelineExecutionContext = Meltano.PipelineExecutionContext
+    PipelineResultContext = Meltano.PipelineResultContext
+    PipelineExecutionScalarMap = Meltano.PipelineExecutionScalarMap
+    DbtManifestNode = Meltano.DbtManifestNode
+    DbtManifest = Meltano.DbtManifest
+    CreatePipelinePayload = Meltano.CreatePipelinePayload
+    ExecutePipelinePayload = Meltano.ExecutePipelinePayload
+    InstallPluginPayload = Meltano.InstallPluginPayload
+    ListPluginsPayload = Meltano.ListPluginsPayload
+    ConfigureEnvironmentPayload = Meltano.ConfigureEnvironmentPayload
+    RunDbtModelsPayload = Meltano.RunDbtModelsPayload
+    RunEltPipelinePayload = Meltano.RunEltPipelinePayload
+    JsonSchemaPayload = Meltano.JsonSchemaPayload
+    JsonRecordBatchPayload = Meltano.JsonRecordBatchPayload
+    ConfigMappingPayload = Meltano.ConfigMappingPayload
+    JsonCompatibleConfigPayload = Meltano.JsonCompatibleConfigPayload
+    PathPayload = Meltano.PathPayload
 
 
 # ==========================================================================
@@ -1894,10 +2589,8 @@ class FlextMeltanoModels(FlextModels):
 
 
 m = FlextMeltanoModels
-m_meltano = FlextMeltanoModels
 
 __all__ = [
     "FlextMeltanoModels",
     "m",
-    "m_meltano",
 ]

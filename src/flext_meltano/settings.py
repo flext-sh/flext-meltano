@@ -18,7 +18,7 @@ from flext_core import (
     FlextSettings,
     FlextTypes,
 )
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_meltano.constants import FlextMeltanoConstants, FlextMeltanoConstants as c
@@ -29,7 +29,6 @@ from flext_meltano.validators import FlextMeltanoValidators
 
 # FLEXT aliases - all AFTER imports per import order rules
 # Order: c → t → r → m → u
-t_core = FlextTypes  # Core types for JsonValue
 m = FlextMeltanoModels
 u = FlextMeltanoUtilities
 
@@ -321,11 +320,8 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Resolved absolute path.
 
         """
-        if not isinstance(v, (str, Path)):
-            v = Path(str(v))
-        elif isinstance(v, str):
-            v = Path(v)
-        return v.expanduser().resolve()
+        path_value = m.Meltano.PathPayload.model_validate({"value": v}).value
+        return path_value.expanduser().resolve()
 
     @field_validator("config_dir", "logs_dir")
     @classmethod
@@ -339,9 +335,8 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Expanded but not resolved path to allow relative paths.
 
         """
-        if isinstance(v, str):
-            v = Path(v)
-        return v.expanduser()  # Don't resolve to allow relative paths
+        path_value = m.Meltano.PathPayload.model_validate({"value": v}).value
+        return path_value.expanduser()  # Don't resolve to allow relative paths
 
     @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
     @classmethod
@@ -371,9 +366,9 @@ class FlextMeltanoSettings(FlextSettings):
         """
         if v is None:
             return None
-        if isinstance(v, str):
-            return SecretStr(v)
-        return v
+        if hasattr(v, "get_secret_value"):
+            return v
+        return SecretStr(str(v))
 
     # ============================================================================
     # CONFIGURATION METHODS - Business logic methods
@@ -530,7 +525,7 @@ class FlextMeltanoSettings(FlextSettings):
     def create_for_environment(
         cls,
         environment: str,
-        **kwargs: t_core.JsonValue,
+        **kwargs: FlextTypes.JsonValue,
     ) -> Self:
         """Create configuration for specific environment.
 
@@ -557,12 +552,10 @@ class FlextMeltanoSettings(FlextSettings):
         # Filter and type-cast kwargs to valid fields only
         valid_fields = cls.model_fields.keys()
         filtered_kwargs_dict = {k: v for k, v in kwargs.items() if k in valid_fields}
-        filtered_kwargs = (
-            filtered_kwargs_dict if isinstance(filtered_kwargs_dict, dict) else {}
-        )
+        filtered_kwargs = filtered_kwargs_dict
 
         # Create config data with environment
-        config_data: dict[str, t_core.GeneralValueType] = {
+        config_data: dict[str, FlextTypes.GeneralValueType] = {
             "environment": env_type.value
         }
 
@@ -573,12 +566,9 @@ class FlextMeltanoSettings(FlextSettings):
         # Handle specific type conversions
         if "project_root" in filtered_kwargs:
             project_root_value = filtered_kwargs["project_root"]
-            if isinstance(project_root_value, str):
-                config_data["project_root"] = Path(project_root_value)
-            elif isinstance(project_root_value, Path):
-                config_data["project_root"] = project_root_value
-            else:
-                config_data["project_root"] = Path()
+            config_data["project_root"] = m.Meltano.PathPayload.model_validate(
+                {"value": project_root_value},
+            ).value
 
         if "log_level" in filtered_kwargs:
             log_level_raw = str(filtered_kwargs["log_level"]).upper()
@@ -604,7 +594,10 @@ class FlextMeltanoSettings(FlextSettings):
     # ============================================================================
 
     @classmethod
-    def get_global_instance(cls, **overrides: t_core.JsonValue) -> FlextMeltanoSettings:
+    def get_global_instance(
+        cls,
+        **overrides: FlextTypes.JsonValue,
+    ) -> FlextMeltanoSettings:
         """Get SINGLETON GLOBAL Meltano config instance (enhanced pattern).
 
         This method ensures a single source of truth for Meltano configuration across
@@ -648,12 +641,17 @@ class FlextMeltanoSettings(FlextSettings):
         TypeError: If instance is not a FlextMeltanoSettings instance.
 
         """
-        if not isinstance(instance, FlextMeltanoSettings):
-            error_msg = "instance must be a FlextMeltanoSettings instance"
-            raise TypeError(error_msg)
+        try:
+            instance_payload = (
+                instance.model_dump() if hasattr(instance, "model_dump") else instance
+            )
+            normalized_instance = cls.model_validate(instance_payload)
+        except ValidationError as err:
+            error_msg = "instance must be a FlextMeltanoSettings-compatible payload"
+            raise TypeError(error_msg) from err
 
         # Use class-level singleton pattern (avoids PLW0603 global statement)
-        cls._instance = instance
+        cls._instance = normalized_instance
 
     @classmethod
     def get_version(cls) -> str:
@@ -732,7 +730,7 @@ class FlextMeltanoSettings(FlextSettings):
         # Clear global instance for this class
         # Parent class doesn't have this method, so we implement it here
 
-    def apply_overrides(self, **overrides: t_core.JsonValue) -> r[None]:
+    def apply_overrides(self, **overrides: FlextTypes.JsonValue) -> r[None]:
         """Apply configuration overrides to this instance.
 
         This method allows runtime modification of configuration values,
@@ -863,7 +861,7 @@ class FlextMeltanoSettings(FlextSettings):
         Delegates to consolidated logging model for maintainability.
 
         Returns:
-        dict[str, t_core.GeneralValueType]: Dictionary containing Meltano logging configuration.
+        dict[str, t.GeneralValueType]: Dictionary containing Meltano logging configuration.
 
         """
         config_dict = self.logging.model_dump()
@@ -909,7 +907,7 @@ class FlextMeltanoSettings(FlextSettings):
         """Get configuration metadata including override tracking.
 
         Returns:
-        dict[str, t_core.GeneralValueType]: Configuration metadata dictionary.
+        dict[str, t.GeneralValueType]: Configuration metadata dictionary.
 
         """
         # Return the metadata with proper typing

@@ -44,7 +44,7 @@ from typing import Protocol
 
 import pytest
 import yaml
-from flext_core import FlextTypes as t
+from flext_meltano import t
 
 # Add tests directory to path for local imports
 sys.path.insert(0, str(Path(__file__).parent))

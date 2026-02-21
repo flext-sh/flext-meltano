@@ -46,7 +46,10 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             config if config is not None else FlextMeltanoSettings()
         )
 
-    def configure_sink(self, sink_config: m.DataSinkConfig) -> r[m.DataSinkDefinition]:
+    def configure_sink(
+        self,
+        sink_config: m.Meltano.DataSinkConfig,
+    ) -> r[m.Meltano.DataSinkDefinition]:
         """Configure a sink for a sink configuration.
 
         Args:
@@ -64,7 +67,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             # Create sink definition
-            sink_def = m.DataSinkDefinition(
+            sink_def = m.Meltano.DataSinkDefinition(
                 sink_name=f"{sink_config.sink_type}_sink",
                 sink_type=sink_config.sink_type,
                 config=sink_config.model_dump(),
@@ -76,13 +79,15 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 sink_name=sink_def.sink_name,
             )
 
-            return r[m.DataSinkDefinition].ok(sink_def)
+            return r[m.Meltano.DataSinkDefinition].ok(sink_def)
 
         except Exception as e:
             self.logger.exception("Sink configuration failed", error=str(e))
-            return r[m.DataSinkDefinition].fail(f"Sink configuration failed: {e}")
+            return r[m.Meltano.DataSinkDefinition].fail(
+                f"Sink configuration failed: {e}",
+            )
 
-    def validate_sink_config(self, sink_config: m.DataSinkConfig) -> r[bool]:
+    def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
         """Validate a sink configuration.
 
         Args:
@@ -115,8 +120,8 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def create_sink_instance(
         self,
-        sink_config: m.DataSinkConfig,
-    ) -> r[m.DataSinkInstance]:
+        sink_config: m.Meltano.DataSinkConfig,
+    ) -> r[m.Meltano.DataSinkInstance]:
         """Create a sink instance from configuration.
 
         Args:
@@ -134,7 +139,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             # Create sink instance
-            sink_instance = m.DataSinkInstance(
+            sink_instance = m.Meltano.DataSinkInstance(
                 sink_type=sink_config.sink_type,
                 config=sink_config,
                 status="configured",
@@ -145,11 +150,13 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 sink_name=sink_instance.config.sink_type,
             )
 
-            return r[m.DataSinkInstance].ok(sink_instance)
+            return r[m.Meltano.DataSinkInstance].ok(sink_instance)
 
         except Exception as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
-            return r[m.DataSinkInstance].fail(f"Sink instance creation failed: {e}")
+            return r[m.Meltano.DataSinkInstance].fail(
+                f"Sink instance creation failed: {e}",
+            )
 
     def execute(
         self,

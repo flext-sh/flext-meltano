@@ -19,7 +19,10 @@ from flext_core import (
 
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as t
+
+m = FlextMeltanoModels
 
 
 class FlextMeltanoUtilities(FlextUtilities):
@@ -66,12 +69,9 @@ class FlextMeltanoUtilities(FlextUtilities):
                 raw_config,
                 ops={"transform": {"normalize": False, "strip_none": False}},
             )
-            # Apply custom transformations after build - type narrowing
-            if not isinstance(cfg, dict):
-                return r[t.MeltanoCore.MeltanoConfigDict].fail(
-                    "Build returned unexpected type"
-                )
-            cfg_dict: dict[str, t.JsonValue] = cfg
+            cfg_dict = m.Meltano.ConfigMappingPayload.model_validate(
+                {"values": cfg},
+            ).values
             plugins_val = cfg_dict.get("plugins")
             result_cfg: t.MeltanoCore.MeltanoConfigDict = {
                 "version": cfg_dict.get("version", 1),
@@ -254,11 +254,13 @@ class FlextMeltanoUtilities(FlextUtilities):
         }
 
         # Helper: safe string with fallback
-        def safe_str(val: t.JsonValue) -> str:
+        def safe_str(val: t.GeneralValueType) -> str:
             return u.Text.safe_string(str(val)) if val else ""
 
         # Build config using DSL with process for string fields
-        def build_plugin(d: dict[str, t.JsonValue]) -> t.MeltanoCore.PluginConfigDict:
+        def build_plugin(
+            d: t.MeltanoCore.PluginConfigDict,
+        ) -> t.MeltanoCore.PluginConfigDict:
             type_val = d.get("type", "extractor")
             return {
                 "name": safe_str(d.get("name", "")),
@@ -276,12 +278,9 @@ class FlextMeltanoUtilities(FlextUtilities):
 
         # Build with transform (no map needed for dict pass-through)
         cfg = u.build(raw, ops={"transform": {"normalize": False, "strip_none": False}})
-        # Type narrowing with isinstance
-        if not isinstance(cfg, dict):
-            return r[t.MeltanoCore.PluginConfigDict].fail(
-                "Build returned unexpected type"
-            )
-        cfg_dict: dict[str, t.JsonValue] = cfg
+        cfg_dict = m.Meltano.ConfigMappingPayload.model_validate(
+            {"values": cfg},
+        ).values
         result = build_plugin(cfg_dict)
         return r[t.MeltanoCore.PluginConfigDict].ok(result)
 
@@ -307,18 +306,9 @@ class FlextMeltanoUtilities(FlextUtilities):
             config_dict: t.MeltanoCore.FileConfigDict,
         ) -> t.MeltanoCore.MeltanoConfigDict:
             """Type-safe conversion from FileConfigDict to MeltanoConfigDict."""
-            # FileConfigDict (dict[str, t.GeneralValueType]) needs conversion to MeltanoConfigDict
-            # Type narrowing via isinstance check - no cast needed
-            if not isinstance(config_dict, dict):
-                return {}
-            # Convert dict[str, t.GeneralValueType] to dict[str, JsonValue]
-            # by reconstructing
-            valid_types = (str, int, float, bool, list, dict, type(None))
-            result: t.MeltanoCore.MeltanoConfigDict = {
-                key: value if isinstance(value, valid_types) else str(value)
-                for key, value in config_dict.items()
-            }
-            return result
+            return m.Meltano.JsonCompatibleConfigPayload.model_validate(
+                {"values": config_dict},
+            ).values
 
         result = (
             r[Path]
@@ -393,16 +383,10 @@ class FlextMeltanoUtilities(FlextUtilities):
         # Safe file operations using try/except
         try:
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            if isinstance(content_guard, dict):
-                yaml_content = yaml.dump(
-                    content_guard,
-                    default_flow_style=False,
-                    indent=2,
-                    allow_unicode=True,
-                )
-                _ = file_path.write_text(yaml_content, encoding="utf-8")
-            elif isinstance(content_guard, str):
-                _ = file_path.write_text(content_guard, encoding="utf-8")
+            content_str = m.Meltano.FileContentPayload.model_validate(
+                {"content": content_guard},
+            ).content
+            _ = file_path.write_text(content_str, encoding="utf-8")
             return r.ok(file_path)
         except (OSError, ValueError, yaml.YAMLError) as err:
             return r.fail(f"Failed to create project file: {err}")

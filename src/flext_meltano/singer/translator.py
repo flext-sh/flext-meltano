@@ -28,7 +28,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 # Create source parameters
-source_params = FlextMeltanoModels.CliParameters.DataSourceParams(
+source_params = m.Meltano.CliParameters.DataSourceParams(
     source_name="source-postgres",
     config_file="config/source-config.json",
     catalog_file="config/catalog.json",
@@ -54,7 +54,7 @@ if command_result.is_success:
 
 ```python
 # Create pipeline parameters
-pipeline_params = FlextMeltanoModels.PipelineRunParams(
+pipeline_params = m.PipelineRunParams(
     tap_name="tap-postgres",
     target_name="target-jsonl",
     tap_config="config/tap-config.json",
@@ -120,7 +120,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_tap_run(
-        params: FlextMeltanoModels.CliParameters.DataSourceParams,
+        params: FlextMeltanoModels.Meltano.CliParameters.DataSourceParams,
     ) -> r[list[str]]:
         """Convert DataSourceParams to Singer SDK source CLI command.
 
@@ -153,7 +153,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_target_run(
-        params: FlextMeltanoModels.CliParameters.DataSinkParams,
+        params: FlextMeltanoModels.Meltano.CliParameters.DataSinkParams,
     ) -> r[list[str]]:
         """Convert DataSinkParams to Singer SDK sink CLI command.
 
@@ -176,7 +176,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_pipeline_run(
-        params: FlextMeltanoModels.CliParameters.PipelineParams,
+        params: FlextMeltanoModels.Meltano.CliParameters.PipelineParams,
     ) -> r[tuple[list[str], list[str]]]:
         """Convert PipelineParams to source and sink CLI commands.
 
@@ -212,7 +212,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_dbt_run(
-        params: m.CliParameters.TransformationParams,
+        params: m.Meltano.CliParameters.TransformationParams,
     ) -> r[list[str]]:
         """Convert TransformationParams to transformation CLI command.
 
@@ -243,8 +243,11 @@ class FlextMeltanoSingerCliTranslator:
             command.append("--full-refresh")
 
         vars_val = getattr(params, "vars", None)
-        if vars_val and isinstance(vars_val, dict):
-            command.extend(["--vars", json.dumps(vars_val)])
+        if vars_val:
+            vars_dict = m.Meltano.ConfigMappingPayload.model_validate(
+                {"values": vars_val},
+            ).values
+            command.extend(["--vars", json.dumps(vars_dict)])
 
         return r[list[str]].ok(command)
 
@@ -298,9 +301,9 @@ class FlextMeltanoSingerCliTranslator:
 
             # Handle execution failure
             if proc_result.returncode != 0:
-                stderr_msg = output_dict.get("stderr", "Command execution failed")
-                if not isinstance(stderr_msg, str):
-                    stderr_msg = "Command execution failed"
+                stderr_msg = str(
+                    output_dict.get("stderr", "Command execution failed"),
+                )
                 return r[t.CLI.ProcessResult].fail(stderr_msg)
 
             return r[t.CLI.ProcessResult].ok(output_dict)

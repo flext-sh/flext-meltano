@@ -15,7 +15,6 @@ from pathlib import Path
 from flext_core import (
     FlextResult,
     FlextService,
-    t as t_core,
 )
 
 from flext_meltano.bridge import FlextMeltanoBridge
@@ -26,10 +25,8 @@ from flext_meltano.singer_protocols import SingerTap, SingerTarget
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
-# u is already imported from flext_core
 r = FlextResult
 s = FlextService
-t_base = t_core
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels

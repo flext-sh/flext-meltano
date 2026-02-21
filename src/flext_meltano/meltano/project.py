@@ -12,12 +12,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextService, r, t as t_base
+from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
+from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import u
+
+m = FlextMeltanoModels
 
 
 class MeltanoProjectInfo(BaseModel):
@@ -156,22 +159,12 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                     "type": plugin.type,
                 }
 
-                # Add variant if present and properly typed
-                if isinstance(variant_raw, str):
-                    plugin_def["variant"] = variant_raw
-                elif isinstance(variant_raw, list):
-                    # Convert list items to strings for consistency
-                    plugin_def["variant"] = [str(item) for item in variant_raw]
-                elif isinstance(variant_raw, dict):
-                    # Convert dict values to JsonValue
-                    variant_dict: dict[str, t_base.JsonValue] = {}
-                    for k, v in variant_raw.items():
-                        if isinstance(v, (str, int, float, bool, type(None))):
-                            variant_dict[k] = v
-                        elif isinstance(v, (list, dict)):
-                            # For complex nested structures, convert to string
-                            variant_dict[k] = str(v)
-                    plugin_def["variant"] = variant_dict
+                # Add variant if present — normalize via model
+                variant_normalized = m.Meltano.VariantPayload.model_validate(
+                    {"value": variant_raw},
+                ).value
+                if variant_normalized is not None:
+                    plugin_def["variant"] = variant_normalized
 
                 plugins.append(plugin_def)
         except (TypeError, AttributeError):

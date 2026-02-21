@@ -51,8 +51,9 @@ class FlextMeltanoTypes(FlextTypes):
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
         PluginVariant = Literal["default", "singer", "custom"]
 
-    # Alias so t.Plugin.PluginDefinition etc. work (adapters and others use t.Plugin.*)
-    Plugin = Meltano
+    # Namespace bridge so t.Plugin.PluginDefinition resolves in type checkers.
+    class Plugin(Meltano):
+        """Compatibility namespace for plugin-related aliases."""
 
     class Singer:
         """Singer protocol complex types namespace."""
