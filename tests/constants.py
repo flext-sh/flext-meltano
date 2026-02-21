@@ -28,11 +28,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     2. FlextMeltanoConstants - for domain constants (.Meltano.*)
 
     Access patterns:
-    - tc.Tests.Docker.* (container testing)
-    - tc.Tests.Matcher.* (assertion messages)
-    - tc.Tests.Factory.* (test data generation)
-    - tc.Meltano.* (domain constants from production)
-    - tc.Paths.* (project-specific test data)
+    - c.Tests.Docker.* (container testing)
+    - c.Tests.Matcher.* (assertion messages)
+    - c.Tests.Factory.* (test data generation)
+    - c.Meltano.* (domain constants from production)
+    - c.Paths.* (project-specific test data)
 
     Rules:
     - NEVER duplicate constants from FlextTestsConstants or FlextMeltanoConstants

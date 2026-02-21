@@ -32,9 +32,6 @@ from pydantic import (
 
 from flext_meltano.constants import FlextMeltanoConstants as c
 
-# Import aliases following order: c -> t -> p -> r -> m -> u
-# Runtime aliases defined at module level per FLEXT standards
-
 
 class FlextMeltanoModels(FlextModels):
     """Generic pipeline models.
@@ -1421,7 +1418,7 @@ class FlextMeltanoModels(FlextModels):
             )
             records_written: int = Field(ge=0, description="Number of records written")
             errors: int = Field(ge=0, description="Number of errors")
-            state: dict[str, dict[str, str]] = Field(
+            state: dict[str, t.GeneralValueType] = Field(
                 default_factory=dict,
                 description="Final state payload",
             )
@@ -2522,64 +2519,7 @@ class FlextMeltanoModels(FlextModels):
                     raise ValueError(msg)
                 return v
 
-    # Top-level aliases for m.* (used by tests and abstractions)
-    DataSourceConfig = Meltano.DataSourceConfig
-    DataSinkConfig = Meltano.DataSinkConfig
-    DataSinkInstance = Meltano.DataSinkInstance
-    DataSinkDefinition = Meltano.DataSinkDefinition
-    DataSourceInstance = Meltano.DataSourceInstance
-    StreamDefinition = Meltano.StreamDefinition
-    StreamInfo = Meltano.StreamInfo
-    SingerSchemaMessage = Meltano.SingerSchemaMessage
-    SingerRecordMessage = Meltano.SingerRecordMessage
-    SingerStateMessage = Meltano.SingerStateMessage
-    SingerActivateVersionMessage = Meltano.SingerActivateVersionMessage
-    SingerStateEntry = Meltano.SingerStateEntry
-    SingerCatalogMetadata = Meltano.SingerCatalogMetadata
-    SingerCatalogEntry = Meltano.SingerCatalogEntry
-    SingerCatalog = Meltano.SingerCatalog
-    SingerPipelineConfig = Meltano.SingerPipelineConfig
-    SingerSyncResult = Meltano.SingerSyncResult
-    TapConfig = Meltano.TapConfig
-    TargetConfig = Meltano.TargetConfig
-    TapInstance = Meltano.TapInstance
-    TransformationExecutionModel = Meltano.TransformationExecutionModel
-    ExecutionResult = Meltano.ExecutionResult
-    PipelineResult = Meltano.PipelineResult
-    DbtRunParams = Meltano.DbtRunParams
-    TapRunParams = Meltano.TapRunParams
-    TargetRunParams = Meltano.TargetRunParams
-    PipelineRunParams = Meltano.PipelineRunParams
-    CliParameters = Meltano.CliParameters
-    MeltanoProjectModel = Meltano.MeltanoProjectModel
-    PipelineProjectModel = Meltano.PipelineProjectModel
-    PluginModel = Meltano.PluginModel
-    DbtProjectModel = Meltano.DbtProjectModel
-    TransformationProjectModel = Meltano.TransformationProjectModel
-    PluginComponentConfig = Meltano.PluginComponentConfig
-    PluginDiscoverySource = Meltano.PluginDiscoverySource
-    PluginDiscoveryItem = Meltano.PluginDiscoveryItem
-    PluginDiscoveryCatalog = Meltano.PluginDiscoveryCatalog
-    PipelineExecutionContext = Meltano.PipelineExecutionContext
-    PipelineResultContext = Meltano.PipelineResultContext
-    PipelineExecutionScalarMap = Meltano.PipelineExecutionScalarMap
-    DbtManifestNode = Meltano.DbtManifestNode
-    DbtManifest = Meltano.DbtManifest
-    CreatePipelinePayload = Meltano.CreatePipelinePayload
-    ExecutePipelinePayload = Meltano.ExecutePipelinePayload
-    InstallPluginPayload = Meltano.InstallPluginPayload
-    ListPluginsPayload = Meltano.ListPluginsPayload
-    ConfigureEnvironmentPayload = Meltano.ConfigureEnvironmentPayload
-    RunDbtModelsPayload = Meltano.RunDbtModelsPayload
-    RunEltPipelinePayload = Meltano.RunEltPipelinePayload
-    JsonSchemaPayload = Meltano.JsonSchemaPayload
-    JsonRecordBatchPayload = Meltano.JsonRecordBatchPayload
-    ConfigMappingPayload = Meltano.ConfigMappingPayload
-    JsonCompatibleConfigPayload = Meltano.JsonCompatibleConfigPayload
-    PathPayload = Meltano.PathPayload
 
-
-# ==========================================================================
 # ==========================================================================
 # Model rebuild calls removed to avoid forward reference resolution issues
 # These were causing NameError during import due to complex inheritance chains

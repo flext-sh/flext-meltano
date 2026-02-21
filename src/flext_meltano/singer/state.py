@@ -39,7 +39,7 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
     def __init__(self) -> None:
         """Initialize state manager."""
         super().__init__()
-        self._state: dict[str, dict[str, str]] = {}
+        self._state_msg: m.Meltano.SingerStateMessage = m.Meltano.SingerStateMessage()
 
     def load_state(
         self, state_file: Path | None = None
@@ -56,18 +56,15 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
         try:
             if state_file and state_file.exists():
                 with state_file.open() as f:
-                    state_message = m.Meltano.SingerStateMessage.model_validate(
+                    self._state_msg = m.Meltano.SingerStateMessage.model_validate(
                         json.load(f),
                     )
-                self._state = state_message.value
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),
-                    entries=len(self._state),
+                    entries=len(self._state_msg.value),
                 )
-            return r[m.Meltano.SingerStateMessage].ok(
-                m.Meltano.SingerStateMessage(value=self._state)
-            )
+            return r[m.Meltano.SingerStateMessage].ok(self._state_msg)
         except Exception as e:
             self.logger.exception("Failed to load state", error=str(e))
             return r[m.Meltano.SingerStateMessage].fail(f"Failed to load state: {e}")
@@ -84,9 +81,8 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
         """
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
-            state_msg = m.Meltano.SingerStateMessage(value=self._state)
             with state_file.open("w", encoding="utf-8") as f:
-                f.write(state_msg.model_dump_json(indent=2))
+                f.write(self._state_msg.model_dump_json(indent=2))
             self.logger.info(
                 "State saved to file",
                 file=str(state_file),
@@ -114,11 +110,12 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
 
         """
         try:
-            if stream_name not in self._state:
-                self._state[stream_name] = {}
+            if stream_name not in self._state_msg.value:
+                self._state_msg.value[stream_name] = {}
 
-            stream_state = self._state[stream_name]
-            stream_state[bookmark_key] = bookmark_value
+            stream_bookmarks = self._state_msg.value[stream_name]
+            if isinstance(stream_bookmarks, dict):
+                stream_bookmarks[bookmark_key] = bookmark_value
             self.logger.debug(
                 "Bookmark updated",
                 stream=stream_name,
@@ -141,23 +138,26 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
 
         """
         try:
-            stream_state = self._state.get(stream_name)
+            stream_state = self._state_msg.value.get(stream_name)
             if stream_state is None:
                 return r[str].fail(f"Stream state not found: {stream_name}")
+
+            if not isinstance(stream_state, dict):
+                return r[str].fail(f"Stream state for {stream_name} is not a dict")
 
             value = stream_state.get(bookmark_key)
             if value is None:
                 return r[str].fail(
                     f"Bookmark not found: {stream_name}.{bookmark_key}",
                 )
-            return r[str].ok(value)
+            return r[str].ok(str(value))
         except Exception as e:
             self.logger.exception("Failed to get bookmark", error=str(e))
             return r[str].fail(f"Failed to get bookmark: {e}")
 
     def to_state_message(self) -> m.Meltano.SingerStateMessage:
-        """Build a SingerStateMessage from current internal state."""
-        return m.Meltano.SingerStateMessage(value=self._state)
+        """Return current state as SingerStateMessage."""
+        return self._state_msg
 
     def execute(self, **_kwargs: t.JsonValue) -> r[m.Meltano.SingerStateMessage]:
         """Execute (implements Service pattern)."""
