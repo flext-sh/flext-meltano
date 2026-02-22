@@ -1,47 +1,14 @@
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = [
-  "poetry-core>=2.0",
+  "poetry-core>=2",
 ]
 
 [project]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Intended Audience :: Developers",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.13",
-  "Topic :: Software Development :: Libraries :: Python Modules",
-  "Typing :: Typed",
-  "Development Status :: 5 - Production/Stable",
-]
-dependencies = [
-  "alembic>=1.15.0",
-  "dbt-core>=1.10.5",
-  "duckdb>=1.0.0",
-  "fastapi (>=0.119.0)",
-  "httpx>=0.28.0",
-  "injectable>=4.0.1",
-  "jinja2>=3.1.0",
-  "pandas>=2.0.0",
-  "prometheus-client (>=0.23.0)",
-  "pydantic-settings>=2.10.1",
-  "pydantic (>=2.12.3)",
-  "python-dotenv>=1.0.0",
-  "pyyaml>=6.0.2",
-  "requests>=2.31.0",
-  "singer-sdk (>=0.52.0)",
-  "sqlalchemy>=2.0.0",
-  "structlog>=25.1.0",
-  "uvicorn (>=0.38.0)",
-  "setuptools (>=80.9.0)",
-  "pydantic-core (>=2.41.4)",
-  "meltano (>=4.0.8,<5.0.0)",
-  "wrapt (>=1.17.0,<2.0.0)",
-  "referencing (>=0.28.4,<0.37.0)",
-]
-
+name = "flext-meltano"
+version = "0.12.0-dev"
 description = "FLEXT Meltano - Enterprise Data Integration Platform"
+readme = "README.md"
 keywords = [
   "data-integration",
   "enterprise",
@@ -50,83 +17,157 @@ keywords = [
   "meltano",
   "typed",
 ]
-name = "flext-meltano"
-readme = "README.md"
-requires-python = ">=3.13,<3.14"
-version = "0.12.0-dev"
 license = "MIT"
-
-[[project.authors]]
-email = "team@flext.sh"
-name = "FLEXT Team"
-
-[[project.maintainers]]
-email = "team@flext.sh"
-name = "FLEXT Team"
-[project.urls]
-Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
-Homepage = "https://github.com/flext-sh/flext"
-Repository = "https://github.com/flext-sh/flext"
-
-[project.scripts]
-flext-meltano = "flext_meltano.cli:main"
-
-[tool.bandit]
-exclude_dirs = [
-  "build",
-  "dist",
-  "tests",
+maintainers = [ { email = "team@flext.sh", name = "FLEXT Team" } ]
+authors = [ { email = "team@flext.sh", name = "FLEXT Team" } ]
+requires-python = ">=3.13,<3.14"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
 ]
-skips = [ "B404", "B603", "B607", "B105", "B608", "B101", "B601" ]
+dependencies = [
+  "alembic>=1.15",
+  "dbt-core>=1.10.5",
+  "duckdb>=1",
+  "fastapi>=0.119",
+  "httpx>=0.28",
+  "injectable>=4.0.1",
+  "jinja2>=3.1",
+  "meltano>=4.0.8,<5",
+  "pandas>=2",
+  "prometheus-client>=0.23",
+  "pydantic>=2.12.3",
+  "pydantic-core>=2.41.4",
+  "pydantic-settings>=2.10.1",
+  "python-dotenv>=1",
+  "pyyaml>=6.0.2",
+  "referencing>=0.28.4,<0.37",
+  "requests>=2.31",
+  "setuptools>=80.9",
+  "singer-sdk>=0.52",
+  "sqlalchemy>=2",
+  "structlog>=25.1",
+  "uvicorn>=0.38",
+  "wrapt>=1.17,<2",
+]
+urls.Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
+urls.Homepage = "https://github.com/flext-sh/flext"
+urls.Repository = "https://github.com/flext-sh/flext"
+scripts.flext-meltano = "flext_meltano.cli:main"
 
 [tool.poetry]
+dependencies.python = ">=3.13,<3.14"
+dependencies.alembic = "^1.15.0"
+dependencies.dbt-core = ">=1.10.0"
+dependencies.duckdb = "^1.0.0"
+dependencies.fastapi = ">=0.119.0"
+dependencies.httpx = "^0.28.0"
+dependencies.injectable = "^4.0.1"
+dependencies.jinja2 = "^3.1.0"
+dependencies.pandas = "^2.0.0"
+dependencies.prometheus-client = ">=0.23.0"
+dependencies.pydantic-settings = ">=2.11.0"
+dependencies.pydantic = ">=2.12.3"
+dependencies.python-dotenv = "^1.0.0"
+dependencies.pyyaml = "^6.0.2"
+dependencies.requests = "^2.31.0"
+dependencies.singer-sdk = ">=0.52.0"
+dependencies.sqlalchemy = ">=2.0.44"
+dependencies.structlog = "^25.1.0"
+dependencies.uvicorn = ">=0.38.0"
+dependencies.flext-api.develop = true
+dependencies.flext-api.path = "../flext-api"
+dependencies.flext-cli.develop = true
+dependencies.flext-cli.path = "../flext-cli"
+dependencies.flext-core.develop = true
+dependencies.flext-core.path = "../flext-core"
+dependencies.flext-observability.develop = true
+dependencies.flext-observability.path = "../flext-observability"
+dependencies.flext-plugin.develop = true
+dependencies.flext-plugin.path = "../flext-plugin"
+group.dev.dependencies.autoflake = ">=2.3.1"
+group.dev.dependencies.black = ">=25.1.0"
+group.dev.dependencies.codespell = ">=2.3.0"
+group.dev.dependencies.commitizen = ">=4.8.3,<4.9"
+group.dev.dependencies.detect-secrets = ">=1.5.0"
+group.dev.dependencies.isort = ">=6.0.1"
+group.dev.dependencies.pandas = "^2.3.1"
+group.dev.dependencies.pre-commit = ">=4.0.1"
+group.dev.dependencies.pylint = ">=3.3.0"
+group.dev.dependencies.pyrefly = "^0.46.3"
+group.dev.dependencies.pyupgrade = ">=3.19.0"
+group.dev.dependencies.radon = ">=6.0.1"
+group.dev.dependencies.ruff = ">=0.12.3"
+group.dev.dependencies.schedule = ">=1.2.0"
+group.dev.dependencies.vulture = ">=2.13"
+group.dev.dependencies.beartype = "^0.22.6"
+group.dev.dependencies.pytest-cov = "^7.0.0"
+group.dev.dependencies.prompt-toolkit = ">=3.0.52"
+group.dev.dependencies.sqlparse = ">=0.5.5"
+group.security.dependencies.bandit = ">=1.8.0"
+group.security.dependencies.pip-audit = ">=2.7.3"
+group.test.dependencies.factory-boy = ">=3.3.1"
+group.test.dependencies.faker = ">=37.4.0"
+group.test.dependencies.hypothesis = ">=6.125.0"
+group.test.dependencies.pytest = ">=8.4.0"
+group.test.dependencies.pytest-benchmark = ">=5.1.0"
+group.test.dependencies.pytest-clarity = ">=1.0.1"
+group.test.dependencies.pytest-cov = ">=7.0.0"
+group.test.dependencies.pytest-deadfixtures = ">=2.2.1"
+group.test.dependencies.pytest-env = ">=1.1.5"
+group.test.dependencies.pytest-mock = ">=3.14.0"
+group.test.dependencies.pytest-sugar = ">=1.0.0"
+group.test.dependencies.pytest-timeout = ">=2.4.0"
+group.test.dependencies.pytest-xdist = ">=3.8.0"
+group.test.dependencies.python-ldap = ">=3.4.4"
+group.typings.dependencies.numpy = "^2.4.0"
+group.typings.dependencies.pandas-stubs = ">=2.1.4"
+group.typings.dependencies.types-psutil = ">=7.0.0"
+group.typings.dependencies.types-python-dateutil = ">=2.9.0"
+group.typings.dependencies.types-pyyaml = ">=6.0.12"
+group.typings.dependencies.types-redis = ">=4.6.0"
+group.typings.dependencies.types-requests = ">=2.32.4"
+group.typings.dependencies.types-setuptools = ">=80.9.0"
+group.typings.dependencies.types-toml = ">=0.10.8.20240310"
+group.typings.dependencies.scipy-stubs = "^1.16.2.4"
+group.typings.dependencies.types-jsonschema = "^4.25.1.20251009"
+group.typings.dependencies.types-openpyxl = "^3.1.5.20250919"
+group.typings.dependencies.types-xlrd = "^2.0.0.20251020"
+packages = [ { from = "src", include = "flext_meltano" } ]
 
-[[tool.poetry.packages]]
-from = "src"
-include = "flext_meltano"
+[tool.ruff]
+extend = "../ruff-shared.toml"
+lint.isort.known-first-party = [
+  "flext_meltano",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.13,<3.14"
-alembic = "^1.15.0"
-dbt-core = ">=1.10.0"
-duckdb = "^1.0.0"
-fastapi = ">=0.119.0"
-httpx = "^0.28.0"
-injectable = "^4.0.1"
-jinja2 = "^3.1.0"
-pandas = "^2.0.0"
-prometheus-client = ">=0.23.0"
-pydantic-settings = ">=2.11.0"
-pydantic = ">=2.12.3"
-python-dotenv = "^1.0.0"
-pyyaml = "^6.0.2"
-requests = "^2.31.0"
-singer-sdk = ">=0.52.0"
-sqlalchemy = ">=2.0.44"
-structlog = "^25.1.0"
-uvicorn = ">=0.38.0"
+[tool.codespell]
+ignore-words-list = "dn,cn,ou,uid,sn,aci,acl,ldif,flext,FLEXT,dbt,oic,wms,grpc,meltano,protobuf,creds,assertIn"
+skip = """\
+  .git,*.lock,*.egg-info,dist,build,.venv,__pycache__,.mypy_cache,.pytest_cache,.ruff_cache,node_modules,vendor,*.pb2*.\
+  py\
+  """
 
 [tool.deptry]
 known_first_party = [
-  "flext_meltano",
-  "flext_core",
-  "flext_cli",
-  "flext_api",
-  "flext_observability",
-  "flext_plugin",
+  "flext",
+  "flext_quality",
 ]
 pep621_dev_dependency_groups = [
   "dev",
+  "docs",
+  "security",
   "test",
   "typings",
-  "security",
 ]
-
-[tool.deptry.package_module_name_map]
-pyyaml = "yaml"
-
-[tool.deptry.per_rule_ignores]
-DEP002 = [
+package_module_name_map.pyyaml = "yaml"
+per_rule_ignores.DEP002 = [
   # CLI tools (invoked from command line, not imported)
   "autoflake",
   "bandit",
@@ -173,12 +214,32 @@ DEP002 = [
   "singer-sdk",
   "wrapt",
 ]
+exclude = [
+  ".archive",
+  ".git",
+  ".meltano",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  "__pycache__",
+  "build",
+  "dist",
+  "htmlcov",
+  "node_modules",
+  "reports",
+  "scripts",
+  "tests",
+  "vendor",
+  "venv",
+]
+extend_exclude = [
+  "flexcore/",
+  "flext-.*/",
+]
 
-[tool.ruff]
-extend = "../ruff-shared.toml"
-
-[tool.pytest.ini_options]
-addopts = [
+[tool.pytest]
+ini_options.addopts = [
   "--strict-config",
   "--strict-markers",
   "--tb=short",
@@ -189,120 +250,205 @@ addopts = [
   "--timeout-method=signal",
   "--durations=0",
 ]
-markers = [
-  "concurrency: Concurrency tests",
-  "e2e: End-to-end tests",
-  "integration: Integration tests",
-  "meltano: Meltano-specific tests",
-  "performance: Performance tests",
-  "real: Real functionality tests without mocks",
-  "slow: Slow tests",
-  "smoke: Smoke tests",
-  "unit: Unit tests",
+ini_options.markers = [
+  "docker: marca testes que requerem Docker",
+  "e2e: marca testes como testes de integração end-to-end",
+  "edge_cases: marca testes de casos extremos",
+  "integration: marca testes como testes de integração",
+  "integrity: marca testes de integridade",
+  "oracle: marca testes específicos do Oracle",
+  "performance: marca testes de performance",
+  "resilience: marca testes de resiliência",
+  "slow: marca testes como execução lenta",
+  "stress: marca testes de stress",
+  "unit: marca testes como testes unitários",
 ]
-minversion = "8.0"
-testpaths = [
-  "tests",
+ini_options.minversion = "8.0"
+ini_options.testpaths = [
+  "tests/",
 ]
-
-[tool.poetry.dependencies.flext-core]
-develop = true
-path = "../flext-core"
-
-[tool.poetry.dependencies.flext-cli]
-develop = true
-path = "../flext-cli"
-
-[tool.poetry.dependencies.flext-api]
-develop = true
-path = "../flext-api"
-
-[tool.poetry.dependencies.flext-observability]
-develop = true
-path = "../flext-observability"
-
-[tool.poetry.dependencies.flext-plugin]
-develop = true
-path = "../flext-plugin"
-
-[tool.ruff.lint.isort]
-known-first-party = [
-  "flext_meltano",
+ini_options.filterwarnings = [
+  "ignore::DeprecationWarning:pyasn1(.*|$)",
 ]
-
-[tool.pyrefly]
-search-path = [ "../typings", "../typings/generated", "src", "tests", "examples", "scripts" ]
-project-excludes = [ "**/*_pb2*.py", "**/*_pb2_grpc*.py" ]
-[[tool.pyrefly.sub-config]]
-matches = "**/flext_meltano/protocols.py"
-[tool.pyrefly.sub-config.errors]
-bad-return = false
-[[tool.pyrefly.sub-config]]
-matches = "**/flext_meltano/typings.py"
-[tool.pyrefly.sub-config.errors]
-unknown-name = false
-
-[tool.poetry.group.dev.dependencies]
-autoflake = ">=2.3.1"
-black = ">=25.1.0"
-codespell = ">=2.3.0"
-commitizen = ">=4.8.3,<4.9"
-detect-secrets = ">=1.5.0"
-isort = ">=6.0.1"
-pandas = "^2.3.1"
-pre-commit = ">=4.0.1"
-pylint = ">=3.3.0"
-pyrefly = "^0.46.3"
-pyupgrade = ">=3.19.0"
-radon = ">=6.0.1"
-ruff = ">=0.12.3"
-schedule = ">=1.2.0"
-vulture = ">=2.13"
-beartype = "^0.22.6"
-pytest-cov = "^7.0.0"
-prompt-toolkit = ">=3.0.52"
-sqlparse = ">=0.5.5"
-
-[tool.poetry.group.test.dependencies]
-
-factory-boy = ">=3.3.1"
-faker = ">=37.4.0"
-hypothesis = ">=6.125.0"
-pytest = ">=8.4.0"
-pytest-benchmark = ">=5.1.0"
-pytest-clarity = ">=1.0.1"
-pytest-cov = ">=7.0.0"
-pytest-deadfixtures = ">=2.2.1"
-pytest-env = ">=1.1.5"
-pytest-mock = ">=3.14.0"
-pytest-sugar = ">=1.0.0"
-pytest-timeout = ">=2.4.0"
-pytest-xdist = ">=3.8.0"
-python-ldap = ">=3.4.4"
-
-[tool.poetry.group.typings.dependencies]
-numpy = "^2.4.0"
-pandas-stubs = ">=2.1.4"
-types-psutil = ">=7.0.0"
-types-python-dateutil = ">=2.9.0"
-types-pyyaml = ">=6.0.12"
-types-redis = ">=4.6.0"
-types-requests = ">=2.32.4"
-types-setuptools = ">=80.9.0"
-types-toml = ">=0.10.8.20240310"
-scipy-stubs = "^1.16.2.4"
-types-jsonschema = "^4.25.1.20251009"
-types-openpyxl = "^3.1.5.20250919"
-types-xlrd = "^2.0.0.20251020"
-
-[tool.poetry.group.security.dependencies]
-bandit = ">=1.8.0"
-pip-audit = ">=2.7.3"
+ini_options.python_classes = [
+  "Test*",
+]
+ini_options.python_files = [
+  "*_test.py",
+  "*_tests.py",
+  "test_*.py",
+]
+ini_options.python_functions = [
+  "test_*",
+]
+ini_options.pythonpath = [
+  ".",
+  "src",
+]
 
 [tool.coverage]
-[tool.coverage.run]
-source = [ "src/flext_meltano" ]
+run.branch = true
+run.omit = [
+  "*/__pycache__/*",
+  "*/_pb2*.py",
+  "*/conftest.py",
+  "*/tests/*",
+]
+run.relative_files = true
+run.source = [ "src/flext_meltano" ]
+report.exclude_lines = [
+  "@abstractmethod",
+  "^\\s*\\.\\.\\.\\s*$",
+  "def __repr__",
+  "def __str__",
+  'if __name__ == "__main__":',
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "pragma: no cover",
+  "raise NotImplementedError",
+]
+report.fail_under = 100
+report.partial_branches = [
+  "pragma: no branch",
+]
+report.precision = 2
+report.show_missing = true
+report.skip_empty = true
+html.directory = "htmlcov"
+xml.output = "coverage.xml"
 
-[tool.coverage.report]
-fail_under = 100
-precision = 2
+[tool.pyrefly]
+search-path = ["..", "../typings", "../typings/generated", "src", "tests", "examples", "scripts"]
+project-excludes = [ "**/*_pb2*.py", "**/*_pb2_grpc*.py" ]
+
+[tool.pyright]
+enableTypeIgnoreComments = false
+extraPaths = ["..", "src", "tests", "examples", "scripts", "../typings", "../typings/generated", "../flext-api/src", "../flext-cli/src", "../flext-core/src", "../flext-observability/src", "../flext-plugin/src"]
+include = [ "src", "scripts", "tests", "examples" ]
+exclude = [
+  "**/*.pb2.py",
+  "**/*.pb2_grpc.py",
+  ".git/",
+  ".meltano/",
+  ".mypy_cache/",
+  ".pytest_cache/",
+  ".ruff_cache/",
+  "__pycache__/",
+  "build/",
+  "dist/",
+  "node_modules/",
+  "target/",
+]
+pythonPlatform = "Linux"
+pythonVersion = "3.13"
+reportAssertAlwaysTrue = false
+reportCallInDefaultInitializer = "error"
+reportCallIssue = "error"
+reportConstantRedefinition = "error"
+reportDuplicateImport = "error"
+reportFunctionMemberAccess = "error"
+reportGeneralTypeIssues = "error"
+reportImplicitRelativeImport = false
+reportImplicitStringConcatenation = "warning"
+reportImportCycles = "error"
+reportIncompatibleMethodOverride = "error"
+reportIncompatibleVariableOverride = "error"
+reportIncompleteStub = "warning"
+reportInconsistentConstructor = "error"
+reportInvalidStringEscapeSequence = "error"
+reportInvalidStubStatement = "error"
+reportInvalidTypeForm = false
+reportInvalidTypeVarUse = "error"
+reportMatchNotExhaustive = "warning"
+reportMissingImports = "error"
+reportMissingModuleSource = "error"
+reportMissingParameterType = "error"
+reportMissingSuperCall = "warning"
+reportMissingTypeArgument = "error"
+reportMissingTypeStubs = "warning"
+reportOptionalCall = "error"
+reportOptionalContextManager = "error"
+reportOptionalIterable = "error"
+reportOptionalMemberAccess = "error"
+reportOptionalOperand = "error"
+reportOptionalSubscript = "error"
+reportPrivateUsage = false
+reportPropertyTypeMismatch = "error"
+reportSelfClsParameterName = "error"
+reportTypedDictNotRequiredAccess = "error"
+reportUnboundVariable = "error"
+typeCheckingMode = "strict"
+reportUninitializedInstanceVariable = "warning"
+reportUnknownArgumentType = false
+reportUnknownLambdaType = "error"
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnnecessaryCast = "warning"
+reportUnnecessaryComparison = "warning"
+reportUnnecessaryIsInstance = "warning"
+reportUnnecessaryTypeIgnoreComment = "warning"
+reportUnsupportedDunderAll = "error"
+reportUntypedBaseClass = "error"
+reportUntypedClassDecorator = "error"
+reportUntypedFunctionDecorator = "error"
+reportUntypedNamedTuple = "error"
+reportUnusedCallResult = "warning"
+reportUnusedClass = "warning"
+reportUnusedCoroutine = "error"
+reportUnusedExpression = "warning"
+reportUnusedFunction = "warning"
+reportUnusedImport = "error"
+reportUnusedVariable = "error"
+reportWildcardImportFromLibrary = "error"
+strictDictionaryInference = true
+strictListInference = true
+strictParameterNoneValue = true
+strictSetInference = true
+useLibraryCodeForTypes = true
+
+[tool.bandit]
+exclude_dirs = [
+  ".git",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  "__pycache__",
+  "build",
+  "dist",
+  "node_modules",
+  "tests",
+  "vendor",
+]
+skips = [ "B404", "B603", "B607", "B105", "B608" ]
+
+[tool.complexipy]
+max_complexity = 15
+output_format = "plain"
+
+[tool.vulture]
+exclude = [
+  ".*/examples/",
+  ".*/scripts/",
+  ".*/tests/",
+  ".coverage.*",
+  ".git/",
+  ".mypy_cache/",
+  ".pytest_cache/",
+  ".ruff_cache/",
+  ".venv/",
+  "__pycache__/",
+  "build/",
+  "dist/",
+  "node_modules/",
+  "tests/",
+  "vendor/",
+]
+min_confidence = 80
+paths = [
+  "**/src",
+  "src",
+]
+sort_by_size = true
+verbose = false
