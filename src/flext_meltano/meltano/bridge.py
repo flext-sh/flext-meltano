@@ -10,6 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from flext_core import FlextLogger, FlextResult
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -38,7 +40,7 @@ class FlextMeltanoBridge:
     @staticmethod
     def execute_command(
         command: str,
-        args: dict[str, t.JsonValue] | None = None,
+        args: Mapping[str, t.JsonValue] | None = None,
     ) -> FlextResult[t.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 

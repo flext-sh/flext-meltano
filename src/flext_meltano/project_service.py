@@ -10,11 +10,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import tempfile
 from pathlib import Path
 
 import yaml
-from flext_core import r, s
+from flext_core import r, s, u
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import c
@@ -59,7 +60,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "service_type": "flext_meltano_project_service",
                 "status": "ready",
                 "config": self._meltano_config.model_dump()
-                if hasattr(self._meltano_config, "model_dump")
+                if u.Guards.is_pydantic_model(self._meltano_config)
                 else {},
             }
 
@@ -151,7 +152,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         self,
         project_name: str,
         project_dir: Path,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Create new Meltano project using railway-oriented file operations.
 
         Validates project name, creates directory structure, and initializes
@@ -197,12 +198,12 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _validate_project_parameters(
         project_id: str | None,
         prefix: str,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Validate temporary project creation parameters."""
         if not prefix or not prefix.strip():
-            return r[dict[str, str]].fail("Project prefix cannot be empty")
+            return r[Mapping[str, str]].fail("Project prefix cannot be empty")
 
-        return r[dict[str, str]].ok({
+        return r[Mapping[str, str]].ok({
             "project_id": project_id or "flext-meltano-project",
             "prefix": prefix.strip(),
         })
@@ -220,7 +221,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _generate_minimal_config(
         temp_path: Path,
         project_id: str,
-    ) -> r[dict[str, t.GeneralValueType]]:
+    ) -> r[Mapping[str, t.GeneralValueType]]:
         """Generate minimal meltano.yml configuration."""
         config: t.GeneralValueType = {
             "version": 1,
@@ -239,14 +240,14 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
                 },
             ],
         }
-        return r[dict[str, t.GeneralValueType]].ok({
+        return r[Mapping[str, t.GeneralValueType]].ok({
             "path": temp_path,
             "config": config,
         })
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: dict[str, t.GeneralValueType],
+        config_data: Mapping[str, t.GeneralValueType],
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -275,7 +276,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def _write_meltano_config(
-        project_path: Path, config: dict[str, t.GeneralValueType]
+        project_path: Path, config: Mapping[str, t.GeneralValueType]
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -345,17 +346,17 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _validate_project_creation_params(
         project_name: str,
         project_dir: Path,
-    ) -> r[dict[str, str | Path]]:
+    ) -> r[Mapping[str, str | Path]]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return r[dict[str, str | Path]].fail("Project name cannot be empty")
+            return r[Mapping[str, str | Path]].fail("Project name cannot be empty")
 
         if not project_dir.exists():
-            return r[dict[str, str | Path]].fail(
+            return r[Mapping[str, str | Path]].fail(
                 f"Parent directory not found: {project_dir}",
             )
 
-        return r[dict[str, str | Path]].ok({
+        return r[Mapping[str, str | Path]].ok({
             "name": project_name.strip(),
             "parent_dir": project_dir,
         })
@@ -415,7 +416,7 @@ environments:
         self,
         project_name: str,
         project_path: Path,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Build successful project creation result."""
         try:
             result: dict[str, str] = {
@@ -434,9 +435,9 @@ environments:
                 project_path=str(project_path),
             )
 
-            return r[dict[str, str]].ok(result)
+            return r[Mapping[str, str]].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, str]].fail(f"Failed to build creation result: {e}")
+            return r[Mapping[str, str]].fail(f"Failed to build creation result: {e}")
 
 
 __all__ = ["FlextMeltanoProjectService"]

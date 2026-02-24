@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar, Self
 
@@ -366,7 +367,7 @@ class FlextMeltanoSettings(FlextSettings):
         """
         if v is None:
             return None
-        if hasattr(v, "get_secret_value"):
+        if u.Guards.is_type(v, SecretStr):
             return v
         return SecretStr(str(v))
 
@@ -440,7 +441,7 @@ class FlextMeltanoSettings(FlextSettings):
             self.project_root,
         )
 
-    def get_environment_variables(self) -> dict[str, str]:
+    def get_environment_variables(self) -> Mapping[str, str]:
         """Get environment variables for Meltano operations.
 
         This method uses FlextSettings as the base and adds Meltano-specific variables.
@@ -623,7 +624,7 @@ class FlextMeltanoSettings(FlextSettings):
         if overrides:
             # Apply overrides to the instance
             for key, value in overrides.items():
-                if hasattr(instance, key):
+                if key in cls.model_fields:
                     setattr(instance, key, value)
 
         return instance
@@ -643,7 +644,9 @@ class FlextMeltanoSettings(FlextSettings):
         """
         try:
             instance_payload = (
-                instance.model_dump() if hasattr(instance, "model_dump") else instance
+                instance.model_dump()
+                if u.Guards.is_pydantic_model(instance)
+                else instance
             )
             normalized_instance = cls.model_validate(instance_payload)
         except ValidationError as err:
@@ -755,7 +758,7 @@ class FlextMeltanoSettings(FlextSettings):
             if (
                 "environment" in overrides
                 and overrides["environment"] == "production"
-                and hasattr(self, "debug")
+                and "debug" in self.__class__.model_fields
                 and self.debug
             ):
                 # Force debug=False when switching to production
@@ -763,12 +766,12 @@ class FlextMeltanoSettings(FlextSettings):
 
             applied_count = 0
             for key, value in overrides.items():
-                if hasattr(self, key) and key in self.__class__.model_fields:
+                if key in self.__class__.model_fields:
                     setattr(self, key, value)
                     applied_count += 1
 
             # Track metadata about overrides
-            if not hasattr(self, "_metadata_extra"):
+            if getattr(self, "_metadata_extra", None) is None:
                 self._metadata_extra: dict[str, str] = {}
             self._metadata_extra["overrides_applied"] = (
                 "true" if applied_count > 0 else "false"
@@ -805,7 +808,7 @@ class FlextMeltanoSettings(FlextSettings):
         """
         return getattr(self, "_sealed", False)
 
-    def get_meltano_environment_variables(self) -> dict[str, str]:
+    def get_meltano_environment_variables(self) -> Mapping[str, str]:
         """Get Meltano-specific environment variables.
 
         This method provides Meltano-specific environment variables using FlextSettings

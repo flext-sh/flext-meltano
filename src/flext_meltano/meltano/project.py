@@ -137,7 +137,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
     ) -> list[t.Plugin.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
         plugins: list[t.Plugin.PluginDefinition] = []
-        if not hasattr(self.project, "plugins"):
+        if getattr(self.project, "plugins", None) is None:
             return plugins
 
         try:
@@ -146,7 +146,10 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 return plugins
 
             for plugin in plugins_attr:
-                if not (hasattr(plugin, "name") and hasattr(plugin, "type")):
+                if not (
+                    getattr(plugin, "name", None) is not None
+                    and getattr(plugin, "type", None) is not None
+                ):
                     continue
                 if plugin_type is not None and plugin.type != plugin_type:
                     continue

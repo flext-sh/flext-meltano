@@ -259,7 +259,7 @@ class FlextTestsDocker(ContainerManager):
                 self.project_name,
                 "exec",
             ]
-            cmd.extend(["-T", service_name])  # -T disables pseudo-TTY
+            cmd.extend(["-T", service_name])  # -T disables pseudo-t
             cmd.extend(command)
 
             result = subprocess.run(

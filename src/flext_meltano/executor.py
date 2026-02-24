@@ -76,7 +76,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
                 "status": "ready",
                 "execution_timestamp": str(time.time()),
                 "config": self._meltano_config.model_dump()
-                if hasattr(self._meltano_config, "model_dump")
+                if u.Guards.is_pydantic_model(self._meltano_config)
                 else {},
             }
 

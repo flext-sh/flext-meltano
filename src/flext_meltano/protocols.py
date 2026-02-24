@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
@@ -67,13 +68,16 @@ class FlextMeltanoProtocols(FlextProtocols):
             # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
-            variants: dict[str, FlextTypes.JsonValue] | None
+            variants: Mapping[str, FlextTypes.JsonValue] | None
 
-            def get_config(self) -> dict[str, FlextTypes.JsonValue]:
+            def get_config(self) -> Mapping[str, FlextTypes.JsonValue]:
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(self, config: dict[str, FlextTypes.JsonValue]) -> bool:
+            def validate_config(
+                self,
+                config: Mapping[str, FlextTypes.JsonValue],
+            ) -> bool:
                 """Validate plugin configuration. # INTERFACE."""
                 ...
 
@@ -307,7 +311,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             @property
-            def variants(self) -> dict[str, FlextTypes.JsonValue] | None:
+            def variants(self) -> Mapping[str, FlextTypes.JsonValue] | None:
                 """Available variants."""
                 ...
 

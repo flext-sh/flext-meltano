@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import FlextLogger, r, u
@@ -240,7 +241,7 @@ class FlextMeltanoAbstractions:
         self,
         _project: p.Meltano.MeltanoProjectProtocol,
         plugin_type: str,
-    ) -> r[dict[str, t.Plugin.PluginDefinition]]:
+    ) -> r[Mapping[str, t.Plugin.PluginDefinition]]:
         """Get plugins of specified type."""
         try:
             # Simplified implementation - would need actual plugin discovery
@@ -263,12 +264,12 @@ class FlextMeltanoAbstractions:
                 for k, v in plugins.items()
                 if u.get(v, "type", default="") == plugin_type
             }
-            return r[dict[str, t.Plugin.PluginDefinition]].ok(filtered_plugins)
+            return r[Mapping[str, t.Plugin.PluginDefinition]].ok(filtered_plugins)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
-            return r[dict[str, t.Plugin.PluginDefinition]].fail(error_msg)
+            return r[Mapping[str, t.Plugin.PluginDefinition]].fail(error_msg)
 
     def add_plugin(self, plugin_config: t.Plugin.PluginConfiguration) -> r[bool]:
         """Add a plugin."""

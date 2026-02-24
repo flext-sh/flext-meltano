@@ -49,11 +49,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
 
 
 # Short aliases per FLEXT convention
-tc = TestsFlextMeltanoConstants  # Primary test constants alias
+c = TestsFlextMeltanoConstants  # Primary test constants alias
 c = TestsFlextMeltanoConstants  # Alternative alias for compatibility
 
 __all__ = [
     "TestsFlextMeltanoConstants",
     "c",
-    "tc",
+    "c",
 ]

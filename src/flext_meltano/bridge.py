@@ -10,6 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from flext_core import FlextLogger, r, u
 
 from flext_meltano.models import FlextMeltanoModels
@@ -33,7 +35,7 @@ class FlextMeltanoBridge:
     @staticmethod
     def execute_command(
         command: str,
-        args: dict[str, t.JsonValue] | None = None,
+        args: Mapping[str, t.JsonValue] | None = None,
     ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute a bridge command with JSON arguments.
 
@@ -80,7 +82,7 @@ class FlextMeltanoBridge:
             return r[bool].fail(f"Bridge connection validation failed: {e}")
 
     @staticmethod
-    def discover_plugins() -> r[dict[str, t.JsonValue]]:
+    def discover_plugins() -> r[Mapping[str, t.JsonValue]]:
         """Discover available plugins through the Go bridge."""
         try:
             # Placeholder - real implementation would query Go bridge for plugins
@@ -91,9 +93,9 @@ class FlextMeltanoBridge:
                 "status": "discovered",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return r[dict[str, t.JsonValue]].ok(result_data)
+            return r[Mapping[str, t.JsonValue]].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, t.JsonValue]].fail(f"Plugin discovery failed: {e}")
+            return r[Mapping[str, t.JsonValue]].fail(f"Plugin discovery failed: {e}")
 
 
 __all__ = ["FlextMeltanoBridge"]

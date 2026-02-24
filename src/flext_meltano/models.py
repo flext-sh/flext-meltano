@@ -15,6 +15,7 @@ from typing import Literal, Self
 
 import yaml
 from flext_core import (
+    u,
     FlextModels,
     FlextResult,
     t,
@@ -45,8 +46,8 @@ class FlextMeltanoModels(FlextModels):
 
     @staticmethod
     def _protect_sensitive_config(
-        value: dict[str, t.JsonValue],
-    ) -> dict[str, t.JsonValue]:
+        value: Mapping[str, t.JsonValue],
+    ) -> Mapping[str, t.JsonValue]:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -118,7 +119,7 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_items(cls, value: t.GeneralValueType) -> list[str]:
                 """Convert sequence-like values into string lists."""
-                if isinstance(value, list | tuple | set):
+                if u.Guards.is_type(value, (list, tuple, set)):
                     return [str(item) for item in value if item is not None]
                 return []
 
@@ -134,7 +135,7 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_items(cls, value: t.GeneralValueType) -> list[bool]:
                 """Convert sequence-like values into booleans."""
-                if isinstance(value, list | tuple | set):
+                if u.Guards.is_type(value, (list, tuple, set)):
                     return [bool(item) for item in value]
                 return []
 
@@ -456,7 +457,7 @@ class FlextMeltanoModels(FlextModels):
             )
 
             @computed_field
-            def pipeline_dict(self) -> dict[str, bool]:
+            def pipeline_dict(self) -> Mapping[str, bool]:
                 """Pipeline logging as dictionary."""
                 return {
                     "execution": self.pipeline_execution,
@@ -471,7 +472,7 @@ class FlextMeltanoModels(FlextModels):
                 }
 
             @computed_field
-            def extract_dict(self) -> dict[str, bool]:
+            def extract_dict(self) -> Mapping[str, bool]:
                 """Extract logging as dictionary."""
                 return {
                     "operations": self.extract_operations,
@@ -485,7 +486,7 @@ class FlextMeltanoModels(FlextModels):
                 }
 
             @computed_field
-            def load_dict(self) -> dict[str, bool]:
+            def load_dict(self) -> Mapping[str, bool]:
                 """Load logging as dictionary."""
                 return {
                     "operations": self.load_operations,
@@ -499,7 +500,7 @@ class FlextMeltanoModels(FlextModels):
                 }
 
             @computed_field
-            def transform_dict(self) -> dict[str, bool]:
+            def transform_dict(self) -> Mapping[str, bool]:
                 """Transform logging as dictionary."""
                 return {
                     "operations": self.transform_operations,
@@ -744,8 +745,8 @@ class FlextMeltanoModels(FlextModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: dict[str, t.JsonValue],
-            ) -> dict[str, t.JsonValue]:
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -794,8 +795,8 @@ class FlextMeltanoModels(FlextModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: dict[str, t.JsonValue],
-            ) -> dict[str, t.JsonValue]:
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -845,8 +846,8 @@ class FlextMeltanoModels(FlextModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: dict[str, t.JsonValue],
-            ) -> dict[str, t.JsonValue]:
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -883,7 +884,7 @@ class FlextMeltanoModels(FlextModels):
             def schema_properties_count(self) -> int:
                 """Number of schema properties."""
                 properties = self.stream_schema.get("properties", {})
-                if isinstance(properties, dict):
+                if u.Guards._is_dict(properties):
                     return len(properties)
                 return 0
 
@@ -910,8 +911,8 @@ class FlextMeltanoModels(FlextModels):
             @field_serializer("stream_schema")
             def serialize_stream_schema(
                 self,
-                value: dict[str, t.JsonValue],
-            ) -> dict[str, t.JsonValue]:
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
                 """Normalize stream schema structure."""
                 result = dict(value)
                 if "properties" not in result:
@@ -1036,7 +1037,7 @@ class FlextMeltanoModels(FlextModels):
                     self.streams.values(),
                 )
                 result = u.agg(streams_list, "records_extracted", fn=sum)
-                return result if isinstance(result, int) else 0
+                return result if u.Guards._is_int(result) else 0
 
             @computed_field
             def is_ready_for_extraction(self) -> bool:
@@ -1144,8 +1145,8 @@ class FlextMeltanoModels(FlextModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: dict[str, t.JsonValue],
-            ) -> dict[str, t.JsonValue]:
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1512,7 +1513,7 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_schema(cls, value: object) -> object:
                 """Normalize mapping input before JSON validation."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return {str(key): item for key, item in value.items()}
                 return {}
 
@@ -1528,11 +1529,11 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_records(cls, value: object) -> object:
                 """Normalize mixed record input into dict records."""
-                if isinstance(value, list | tuple):
+                if u.Guards._is_list_or_tuple(value):
                     return [
                         {str(key): item for key, item in record.items()}
                         for record in value
-                        if isinstance(record, Mapping)
+                        if u.Guards._is_mapping(record)
                     ]
                 return []
 
@@ -1549,9 +1550,9 @@ class FlextMeltanoModels(FlextModels):
             def normalize_values(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, t.GeneralValueType]:
+            ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize mapping-like payloads to dict[str, value]."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return {str(key): item for key, item in value.items()}
                 return {}
 
@@ -1568,7 +1569,7 @@ class FlextMeltanoModels(FlextModels):
             def normalize_json_values(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, t.GeneralValueType]:
+            ) -> Mapping[str, t.GeneralValueType]:
                 """Coerce top-level config values to JSON-compatible values."""
                 normalized = (
                     FlextMeltanoModels.Meltano.ConfigMappingPayload.model_validate(
@@ -1577,7 +1578,7 @@ class FlextMeltanoModels(FlextModels):
                 )
                 valid_types = (str, int, float, bool, list, dict, type(None))
                 return {
-                    key: item if isinstance(item, valid_types) else str(item)
+                    key: item if u.Guards.is_type(item, valid_types) else str(item)
                     for key, item in normalized.items()
                 }
 
@@ -1606,7 +1607,7 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_content(cls, value: object) -> str:
                 """Normalize dict content via yaml.dump, pass str through."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return yaml.dump(
                         dict(value),
                         default_flow_style=False,
@@ -1630,20 +1631,20 @@ class FlextMeltanoModels(FlextModels):
             def normalize_variant(
                 cls,
                 value: object,
-            ) -> str | list[str] | dict[str, t.JsonValue] | None:
+            ) -> str | list[str] | Mapping[str, t.JsonValue] | None:
                 """Normalize variant_raw into typed union."""
                 if value is None:
                     return None
-                if isinstance(value, str):
+                if u.Guards._is_str(value):
                     return value
-                if isinstance(value, list | tuple):
+                if u.Guards._is_list_or_tuple(value):
                     return [str(item) for item in value]
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     result: dict[str, t.JsonValue] = {}
                     for k, v in value.items():
-                        if isinstance(v, str | int | float | bool | type(None)):
+                        if u.Guards.is_type(v, (str, int, float, bool, type(None))):
                             result[str(k)] = v
-                        elif isinstance(v, list | dict):
+                        elif u.Guards.is_type(v, (list, dict)):
                             result[str(k)] = str(v)
                     return result
                 return str(value)
@@ -1681,9 +1682,9 @@ class FlextMeltanoModels(FlextModels):
             def normalize_variants(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, t.GeneralValueType]:
+            ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize variant maps from external payloads."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return {str(key): item for key, item in value.items()}
                 return {}
 
@@ -1714,9 +1715,9 @@ class FlextMeltanoModels(FlextModels):
             def normalize_plugins(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, t.GeneralValueType]:
+            ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize plugin catalog mapping."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return {str(key): item for key, item in value.items()}
                 return {}
 
@@ -1758,9 +1759,9 @@ class FlextMeltanoModels(FlextModels):
             def normalize_json_maps(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, t.GeneralValueType]:
+            ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize mapping-like payloads into JSON dictionaries."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return {str(key): item for key, item in value.items()}
                 return {}
 
@@ -1789,9 +1790,9 @@ class FlextMeltanoModels(FlextModels):
             def normalize_execution_result(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, t.GeneralValueType]:
+            ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize execution result map payload."""
-                if isinstance(value, Mapping):
+                if u.Guards._is_mapping(value):
                     return {str(key): item for key, item in value.items()}
                 return {}
 
@@ -1810,15 +1811,15 @@ class FlextMeltanoModels(FlextModels):
             def normalize_values(
                 cls,
                 value: t.GeneralValueType,
-            ) -> dict[str, str]:
+            ) -> Mapping[str, str]:
                 """Keep scalar execution values and stringify them."""
-                if not isinstance(value, Mapping):
+                if not u.Guards._is_mapping(value):
                     return {}
 
                 return {
                     str(key): str(item)
                     for key, item in value.items()
-                    if isinstance(item, str | int | bool | float)
+                    if u.Guards.is_type(item, (str, int, bool, float))
                 }
 
             model_config = ConfigDict(extra="allow")

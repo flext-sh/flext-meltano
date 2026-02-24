@@ -12,6 +12,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from flext_core import FlextResult, FlextService
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
@@ -62,7 +64,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
                 "config": self._meltano_config.model_dump()
-                if hasattr(self._meltano_config, "model_dump")
+                if u.Guards.is_pydantic_model(self._meltano_config)
                 else {},
             }
 
@@ -77,7 +79,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     def discover_plugins(
         self,
         project: p.Meltano.MeltanoProjectProtocol | None = None,
-    ) -> r[list[dict[str, str]]]:
+    ) -> r[list[Mapping[str, str]]]:
         """Discover plugins from Meltano Hub using native API.
 
         Args:
@@ -99,15 +101,18 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     FlextMeltanoProjectService().create_temporary_project()
                 )
                 if temp_project_result.is_failure:
-                    return r[list[dict[str, str]]].fail(
+                    return r[list[Mapping[str, str]]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
 
                 # Type narrowing: ensure result is a protocol-compliant project
                 temp_project = temp_project_result.value
-                if not isinstance(temp_project, p.Meltano.MeltanoProjectProtocol):
-                    return r[list[dict[str, str]]].fail(
+                if (
+                    temp_project is None
+                    or getattr(temp_project, "root_dir", None) is None
+                ):
+                    return r[list[Mapping[str, str]]].fail(
                         "Temporary project does not satisfy MeltanoProjectProtocol",
                     )
                 working_project = temp_project
@@ -119,7 +124,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                 plugin_name: str,
                 indexed_plugin: t.Plugin.PluginDefinition,
                 plugin_type: str,
-            ) -> dict[str, str]:
+            ) -> Mapping[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
                 source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
                 variants_str = (
@@ -175,19 +180,19 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     plugins.append(build_plugin_info(k, v, "loader"))
 
             self.logger.info(f"Discovered {u.count(plugins)} plugins")
-            return r[list[dict[str, str]]].ok(plugins)
+            return r[list[Mapping[str, str]]].ok(plugins)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return r[list[dict[str, str]]].fail(error_msg)
+            return r[list[Mapping[str, str]]].fail(error_msg)
 
     def add_plugin(
         self,
         project: p.Meltano.MeltanoProjectProtocol,
         plugin_type: str,
         plugin_name: str,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
         Uses FlextResult.chain_validations() to compose plugin addition steps
@@ -223,7 +228,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         self,
         plugin_name: str,
         plugin_type: str,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Get detailed information about specific plugin using monadic composition.
 
         Args:
@@ -236,7 +241,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """
 
         # Use monadic composition to reduce returns (DSL pattern)
-        def extract_plugin_info(plugins_data: object) -> r[dict[str, str]]:
+        def extract_plugin_info(plugins_data: object) -> r[Mapping[str, str]]:
             """Extract plugin info from plugins dict."""
             plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate(
                 {"plugins": plugins_data},
@@ -245,7 +250,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             if u.not_(u.in_(plugin_name, plugins_dict)) or u.empty(
                 u.get(plugins_dict, plugin_name),
             ):
-                return r[dict[str, str]].fail(
+                return r[Mapping[str, str]].fail(
                     f"Plugin '{plugin_name}' not found in {plugin_type}",
                 )
 
@@ -266,7 +271,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
                     "logo_url": indexed_plugin.logo_url,
                 },
             ).model_dump()
-            return r[dict[str, str]].ok(plugin_info)
+            return r[Mapping[str, str]].ok(plugin_info)
 
         try:
             # Use monadic composition to chain operations (DSL pattern)
@@ -277,14 +282,14 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if temp_project_result.is_failure:
-                return r[dict[str, str]].fail(
+                return r[Mapping[str, str]].fail(
                     temp_project_result.error or "Failed to create temporary project",
                 )
 
             # Type narrowing: ensure project satisfies protocol
             temp_project = temp_project_result.value
-            if not isinstance(temp_project, p.Meltano.MeltanoProjectProtocol):
-                return r[dict[str, str]].fail(
+            if temp_project is None or getattr(temp_project, "root_dir", None) is None:
+                return r[Mapping[str, str]].fail(
                     "Temporary project does not satisfy MeltanoProjectProtocol",
                 )
 
@@ -295,7 +300,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if plugins_result.is_failure:
-                return r[dict[str, str]].fail(
+                return r[Mapping[str, str]].fail(
                     plugins_result.error or "Failed to get plugins",
                 )
 
@@ -303,7 +308,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
-            return r[dict[str, str]].fail(error_msg)
+            return r[Mapping[str, str]].fail(error_msg)
 
     # Private helper methods
 
@@ -358,7 +363,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         plugin_type: str,
         *,
         addition_success: bool,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Build successful plugin addition result."""
         plugin_result: dict[str, str] = {
             "success": "true" if addition_success else "false",
@@ -373,7 +378,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             plugin_type=plugin_type,
         )
 
-        return r[dict[str, str]].ok(plugin_result)
+        return r[Mapping[str, str]].ok(plugin_result)
 
 
 # Import here to avoid circular import

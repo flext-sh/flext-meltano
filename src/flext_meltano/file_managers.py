@@ -10,12 +10,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import shutil
 import tempfile
 from pathlib import Path
 
 import yaml
 from flext_core import (
+    u,
     FlextLogger,
     r,
     u,
@@ -204,7 +206,7 @@ class FlextMeltanoFileManagers:
         cls,
         base_path: Path,
         directories: list[str],
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Create directory structure using direct pathlib implementation.
 
         Returns:
@@ -218,9 +220,9 @@ class FlextMeltanoFileManagers:
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
 
-            return r[dict[str, str]].ok(created_paths)
+            return r[Mapping[str, str]].ok(created_paths)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, str]].fail(
+            return r[Mapping[str, str]].fail(
                 f"Failed to create directories: {e}",
             )
 

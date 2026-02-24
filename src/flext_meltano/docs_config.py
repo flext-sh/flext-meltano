@@ -11,6 +11,7 @@ ARCHITECTURAL INTEGRATION:
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar
 
@@ -92,7 +93,7 @@ class DocsConfig(FlextSettings):
         if config_result.is_success and config_result.value is not None:
             # Type narrowing: verify instance type before returning
             value = config_result.value
-            if isinstance(value, cls):
+            if u.Guards.is_type(value, cls):
                 return value
 
         # Create and return new instance
@@ -128,7 +129,7 @@ class DocsConfig(FlextSettings):
                 {"values": config_guard},
             ).values
             for key, value in config_values.items():
-                if hasattr(self, key):
+                if key in self.__class__.model_fields:
                     setattr(self, key, value)
 
             return r.ok(self)
@@ -137,7 +138,7 @@ class DocsConfig(FlextSettings):
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return r[DocsConfig].fail(error_msg)
 
-    def get_schedule_config(self) -> dict[str, t.GeneralValueType]:
+    def get_schedule_config(self) -> Mapping[str, t.GeneralValueType]:
         """Get scheduling configuration as dictionary for backward compatibility.
 
         Returns:
@@ -151,7 +152,7 @@ class DocsConfig(FlextSettings):
             "audit_time": self.audit_time,
         }
 
-    def get_quality_thresholds(self) -> dict[str, t.GeneralValueType]:
+    def get_quality_thresholds(self) -> Mapping[str, t.GeneralValueType]:
         """Get quality thresholds as dictionary for backward compatibility.
 
         Returns:
@@ -167,7 +168,7 @@ class DocsConfig(FlextSettings):
             "fail_on_critical_issues": self.fail_on_critical_issues,
         }
 
-    def get_reporting_config(self) -> dict[str, t.GeneralValueType]:
+    def get_reporting_config(self) -> Mapping[str, t.GeneralValueType]:
         """Get reporting configuration as dictionary for backward compatibility.
 
         Returns:
@@ -178,7 +179,7 @@ class DocsConfig(FlextSettings):
             "output_directory": self.reports_output_dir,
         }
 
-    def get_link_validation_config(self) -> dict[str, t.GeneralValueType]:
+    def get_link_validation_config(self) -> Mapping[str, t.GeneralValueType]:
         """Get link validation configuration as dictionary for backward compatibility.
 
         Returns:
@@ -190,7 +191,7 @@ class DocsConfig(FlextSettings):
             "retries": self.link_validation_retries,
         }
 
-    def get_audit_thresholds(self) -> dict[str, t.GeneralValueType]:
+    def get_audit_thresholds(self) -> Mapping[str, t.GeneralValueType]:
         """Get audit thresholds as dictionary for backward compatibility.
 
         Returns:

@@ -141,8 +141,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         # Cleanup function should be Callable[[TResource], None] | None
         def cleanup_file_handle(file_handle: TextIO) -> None:
             try:
-                if hasattr(file_handle, "close"):
-                    file_handle.close()
+                file_handle.close()
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
                 FlextLogger(__name__).warning(f"Error closing file handle: {err}")
 
@@ -190,7 +189,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         config: t.MeltanoCore.MeltanoConfigDict,
     ) -> r[bool]:
         """Write YAML content to file handle."""
-        if not hasattr(file_handle, "write"):
+        if getattr(file_handle, "write", None) is None:
             return r[bool].fail("Invalid file handle: missing write method")
 
         # Safe YAML serialization using r pattern
@@ -223,8 +222,7 @@ class FlextMeltanoUtilities(FlextUtilities):
 
         """
         try:
-            if hasattr(file_handle, "close"):
-                file_handle.close()
+            file_handle.close()
             return r[None].ok(None)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
             # Log but don't fail on close errors

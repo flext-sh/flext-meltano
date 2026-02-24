@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import json
 from pathlib import Path
 
@@ -148,7 +149,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             self.logger.exception("Failed to select streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 
-    def get_stream_schema(self, stream_name: str) -> r[dict[str, t.JsonValue]]:
+    def get_stream_schema(self, stream_name: str) -> r[Mapping[str, t.JsonValue]]:
         """Get schema for a specific stream.
 
         Args:
@@ -165,14 +166,14 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                         "Stream schema retrieved",
                         stream=stream_name,
                     )
-                    return r[dict[str, t.JsonValue]].ok(entry.schema_definition)
+                    return r[Mapping[str, t.JsonValue]].ok(entry.schema_definition)
 
-            return r[dict[str, t.JsonValue]].fail(
+            return r[Mapping[str, t.JsonValue]].fail(
                 f"Stream not found in catalog: {stream_name}",
             )
         except Exception as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
-            return r[dict[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
+            return r[Mapping[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
 
     def execute(self) -> r[m.Meltano.SingerCatalog]:
         """Execute (implements Service pattern)."""

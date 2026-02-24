@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import json
 
 from flext_core import u
@@ -43,11 +44,11 @@ class FlextMeltanoExecutionResult:
 
     def to_dict(
         self,
-    ) -> dict[str, str | int | float | bool | list[str]]:
+    ) -> Mapping[str, str | int | float | bool | list[str]]:
         """Convert to dictionary representation.
 
         Returns:
-        dict[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
+        Mapping[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
 
         """
         return {

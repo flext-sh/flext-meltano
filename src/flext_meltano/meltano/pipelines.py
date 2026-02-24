@@ -57,7 +57,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_path: str,
         source_name: str,
         sink_name: str,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Execute data pipeline using railway-oriented programming.
 
         Consolidates pipeline coordinator functionality into unified service method
@@ -79,11 +79,13 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         # Execute synchronous steps first
         start_result = self._log_pipeline_start(source_name, sink_name)
         if start_result.is_failure:
-            return r[dict[str, str]].fail(start_result.error or "Pipeline start failed")
+            return r[Mapping[str, str]].fail(
+                start_result.error or "Pipeline start failed"
+            )
 
         plugins_result = self._find_required_plugins()
         if plugins_result.is_failure:
-            return r[dict[str, str]].fail(
+            return r[Mapping[str, str]].fail(
                 plugins_result.error or "Failed to find plugins",
             )
 
@@ -95,14 +97,14 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             plugins_result.value,
         )
         if elt_context_result.is_failure:
-            return r[dict[str, str]].fail(
+            return r[Mapping[str, str]].fail(
                 elt_context_result.error or "Failed to create ELT context",
             )
 
         # Execute singer runner
         runner_result = self._execute_singer_runner(elt_context_result.value)
         if runner_result.is_failure:
-            return r[dict[str, str]].fail(
+            return r[Mapping[str, str]].fail(
                 runner_result.error or "Failed to execute singer runner",
             )
 
@@ -113,7 +115,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             runner_result.value,
         )
         if final_result.is_failure:
-            return r[dict[str, str]].fail(
+            return r[Mapping[str, str]].fail(
                 final_result.error
                 or f"Pipeline execution failed for {source_name} -> {sink_name}",
             )
@@ -146,13 +148,13 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             def __init__(self, name: str) -> None:
                 self.name = name
                 self.default_variant: str | None = "default"
-                self.variants: dict[str, t.JsonValue] | None = None
+                self.variants: Mapping[str, t.JsonValue] | None = None
 
-            def get_config(self) -> dict[str, t.JsonValue]:
+            def get_config(self) -> Mapping[str, t.JsonValue]:
                 """Get plugin configuration."""
                 return {}
 
-            def validate_config(self, config: dict[str, t.JsonValue]) -> bool:
+            def validate_config(self, config: Mapping[str, t.JsonValue]) -> bool:
                 """Validate plugin configuration."""
                 _ = config  # Protocol requirement
                 return True
@@ -255,7 +257,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
     def _execute_singer_runner(
         self,
         context_data: t.MeltanoCore.RunContextDict,
-    ) -> r[dict[str, t.JsonValue]]:
+    ) -> r[Mapping[str, t.JsonValue]]:
         """Execute Singer runner with context data."""
         try:
             parsed_context = m.Meltano.PipelineExecutionContext.model_validate(
@@ -270,13 +272,13 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 def __init__(self, name: str) -> None:
                     self.name = name
                     self.default_variant: str | None = "default"
-                    self.variants: dict[str, t.JsonValue] | None = None
+                    self.variants: Mapping[str, t.JsonValue] | None = None
 
-                def get_config(self) -> dict[str, t.JsonValue]:
+                def get_config(self) -> Mapping[str, t.JsonValue]:
                     """Get plugin configuration."""
                     return {}
 
-                def validate_config(self, config: dict[str, t.JsonValue]) -> bool:
+                def validate_config(self, config: Mapping[str, t.JsonValue]) -> bool:
                     """Validate plugin configuration."""
                     _ = config  # Protocol requirement
                     return True
@@ -300,7 +302,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
 
             if execution_result.is_failure:
-                return r[dict[str, t.JsonValue]].fail(
+                return r[Mapping[str, t.JsonValue]].fail(
                     execution_result.error or "Pipeline execution failed",
                 )
 
@@ -312,12 +314,12 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 },
             )
 
-            return r[dict[str, t.JsonValue]].ok(
+            return r[Mapping[str, t.JsonValue]].ok(
                 result_context.model_dump(mode="python"),
             )
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, t.JsonValue]].fail(
+            return r[Mapping[str, t.JsonValue]].fail(
                 f"Unexpected error in ELT pipeline: {e}",
             )
 
@@ -326,7 +328,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         extractor_name: str,
         loader_name: str,
         context_data: Mapping[str, t.JsonValue],
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Build successful pipeline result."""
         try:
             parsed_context = m.Meltano.PipelineResultContext.model_validate(
@@ -355,9 +357,9 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 loader=loader_name,
             )
 
-            return r[dict[str, str]].ok(pipeline_result)
+            return r[Mapping[str, str]].ok(pipeline_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[dict[str, str]].fail(f"Failed to build pipeline result: {e}")
+            return r[Mapping[str, str]].fail(f"Failed to build pipeline result: {e}")
 
 
 __all__ = [

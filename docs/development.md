@@ -183,7 +183,7 @@ make format
 # Quick checks
 make l          # lint
 make t          # test
-make tc         # type-check
+make c         # type-check
 ```
 
 ______________________________________________________________________

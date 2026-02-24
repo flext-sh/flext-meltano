@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from flext_core import FlextContainer, e, r, s, u
 
 from flext_meltano.settings import FlextMeltanoSettings
@@ -338,7 +340,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     def create_from_config(
         self,
-        config: t.MeltanoCore.MeltanoConfigDict | dict[str, t.GeneralValueType],
+        config: t.MeltanoCore.MeltanoConfigDict | Mapping[str, t.GeneralValueType],
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Create a service instance from configuration (config-as-instance placeholder)."""
         cfg: t.MeltanoCore.MeltanoConfigDict = dict(config)

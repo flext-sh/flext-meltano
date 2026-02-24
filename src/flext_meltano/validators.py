@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import contextlib
+from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import FlextLogger, r
@@ -193,8 +194,8 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_connection_config(
         cls,
-        config: dict[str, t.JsonValue],
-    ) -> r[dict[str, t.JsonValue]]:
+        config: Mapping[str, t.JsonValue],
+    ) -> r[Mapping[str, t.JsonValue]]:
         """Validate connection configuration with domain-specific business rules.
 
         Validates connection configuration data for pipeline services,
@@ -223,15 +224,15 @@ class FlextMeltanoValidators:
         try:
             # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
-                return r[dict[str, t.JsonValue]].fail(
+                return r[Mapping[str, t.JsonValue]].fail(
                     "Connection configuration cannot be empty",
                 )
 
-            return r[dict[str, t.JsonValue]].ok(config)
+            return r[Mapping[str, t.JsonValue]].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return r[dict[str, t.JsonValue]].fail(error_msg)
+            return r[Mapping[str, t.JsonValue]].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(

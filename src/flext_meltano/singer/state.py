@@ -114,7 +114,7 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
                 self._state_msg.value[stream_name] = {}
 
             stream_bookmarks = self._state_msg.value[stream_name]
-            if isinstance(stream_bookmarks, dict):
+            if u.Guards._is_dict(stream_bookmarks):
                 stream_bookmarks[bookmark_key] = bookmark_value
             self.logger.debug(
                 "Bookmark updated",
@@ -142,7 +142,7 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
             if stream_state is None:
                 return r[str].fail(f"Stream state not found: {stream_name}")
 
-            if not isinstance(stream_state, dict):
+            if not u.Guards._is_dict(stream_state):
                 return r[str].fail(f"Stream state for {stream_name} is not a dict")
 
             value = stream_state.get(bookmark_key)
