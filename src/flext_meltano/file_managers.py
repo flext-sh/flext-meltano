@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 import shutil
 import tempfile
+from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
 from flext_core import (
-    u,
     FlextLogger,
     r,
     u,

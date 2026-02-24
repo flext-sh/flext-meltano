@@ -13,7 +13,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 from flext_core import (
-    u,
     FlextExceptions,
     FlextService,
     r,
@@ -67,8 +66,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
             config_obj = self._config
             raw_config = (
                 config_obj.model_dump()
-                if config_obj is not None
-                and u.Guards.is_pydantic_model(config_obj)
+                if config_obj is not None and u.Guards.is_pydantic_model(config_obj)
                 else config_obj
             )
             return FlextMeltanoSettings.model_validate(raw_config)

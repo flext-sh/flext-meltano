@@ -15,12 +15,11 @@ from typing import Literal, Self
 
 import yaml
 from flext_core import (
-    u,
     FlextModels,
     FlextResult,
     t,
+    u,
 )
-from flext_core.utilities import u
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -884,9 +883,11 @@ class FlextMeltanoModels(FlextModels):
             def schema_properties_count(self) -> int:
                 """Number of schema properties."""
                 properties = self.stream_schema.get("properties", {})
-                if u.Guards._is_dict(properties):
-                    return len(properties)
-                return 0
+                match properties:
+                    case dict():
+                        return len(properties)
+                    case _:
+                        return 0
 
             @model_validator(mode="after")
             def validate_stream_definition(self) -> Self:
@@ -1037,7 +1038,11 @@ class FlextMeltanoModels(FlextModels):
                     self.streams.values(),
                 )
                 result = u.agg(streams_list, "records_extracted", fn=sum)
-                return result if u.Guards._is_int(result) else 0
+                match result:
+                    case int():
+                        return result
+                    case _:
+                        return 0
 
             @computed_field
             def is_ready_for_extraction(self) -> bool:
@@ -1513,9 +1518,11 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_schema(cls, value: object) -> object:
                 """Normalize mapping input before JSON validation."""
-                if u.Guards._is_mapping(value):
-                    return {str(key): item for key, item in value.items()}
-                return {}
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
             """Typed record batch payload used by API load flow."""
@@ -1529,13 +1536,20 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_records(cls, value: object) -> object:
                 """Normalize mixed record input into dict records."""
-                if u.Guards._is_list_or_tuple(value):
-                    return [
-                        {str(key): item for key, item in record.items()}
-                        for record in value
-                        if u.Guards._is_mapping(record)
-                    ]
-                return []
+                match value:
+                    case list() | tuple():
+                        records: list[dict[str, t.JsonValue]] = []
+                        for record in value:
+                            match record:
+                                case Mapping():
+                                    records.append({
+                                        str(key): item for key, item in record.items()
+                                    })
+                                case _:
+                                    continue
+                        return records
+                    case _:
+                        return []
 
         class ConfigMappingPayload(FlextModels.ArbitraryTypesModel):
             """Normalized mapping payload with string keys."""
@@ -1552,9 +1566,11 @@ class FlextMeltanoModels(FlextModels):
                 value: t.GeneralValueType,
             ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize mapping-like payloads to dict[str, value]."""
-                if u.Guards._is_mapping(value):
-                    return {str(key): item for key, item in value.items()}
-                return {}
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
 
         class JsonCompatibleConfigPayload(FlextModels.ArbitraryTypesModel):
             """Normalize config map values into JSON-compatible payloads."""
@@ -1607,16 +1623,18 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_content(cls, value: object) -> str:
                 """Normalize dict content via yaml.dump, pass str through."""
-                if u.Guards._is_mapping(value):
-                    return yaml.dump(
-                        dict(value),
-                        default_flow_style=False,
-                        indent=2,
-                        allow_unicode=True,
-                    )
-                if value is None:
-                    return ""
-                return str(value)
+                match value:
+                    case Mapping():
+                        return yaml.dump(
+                            dict(value),
+                            default_flow_style=False,
+                            indent=2,
+                            allow_unicode=True,
+                        )
+                    case None:
+                        return ""
+                    case _:
+                        return str(value)
 
         class VariantPayload(FlextModels.ArbitraryTypesModel):
             """Normalize plugin variant from external extraction (str|list|dict)."""
@@ -1633,21 +1651,23 @@ class FlextMeltanoModels(FlextModels):
                 value: object,
             ) -> str | list[str] | Mapping[str, t.JsonValue] | None:
                 """Normalize variant_raw into typed union."""
-                if value is None:
-                    return None
-                if u.Guards._is_str(value):
-                    return value
-                if u.Guards._is_list_or_tuple(value):
-                    return [str(item) for item in value]
-                if u.Guards._is_mapping(value):
-                    result: dict[str, t.JsonValue] = {}
-                    for k, v in value.items():
-                        if u.Guards.is_type(v, (str, int, float, bool, type(None))):
-                            result[str(k)] = v
-                        elif u.Guards.is_type(v, (list, dict)):
-                            result[str(k)] = str(v)
-                    return result
-                return str(value)
+                match value:
+                    case None:
+                        return None
+                    case str():
+                        return value
+                    case list() | tuple():
+                        return [str(item) for item in value]
+                    case Mapping():
+                        result: dict[str, t.JsonValue] = {}
+                        for k, v in value.items():
+                            if u.Guards.is_type(v, (str, int, float, bool, type(None))):
+                                result[str(k)] = v
+                            elif u.Guards.is_type(v, (list, dict)):
+                                result[str(k)] = str(v)
+                        return result
+                    case _:
+                        return str(value)
 
         class PluginDiscoverySource(FlextModels.ArbitraryTypesModel):
             """Normalized raw plugin discovery payload from external sources."""
@@ -1684,9 +1704,11 @@ class FlextMeltanoModels(FlextModels):
                 value: t.GeneralValueType,
             ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize variant maps from external payloads."""
-                if u.Guards._is_mapping(value):
-                    return {str(key): item for key, item in value.items()}
-                return {}
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
 
             model_config = ConfigDict(extra="allow")
 
@@ -1717,9 +1739,11 @@ class FlextMeltanoModels(FlextModels):
                 value: t.GeneralValueType,
             ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize plugin catalog mapping."""
-                if u.Guards._is_mapping(value):
-                    return {str(key): item for key, item in value.items()}
-                return {}
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
 
             model_config = ConfigDict(extra="allow")
 
@@ -1761,9 +1785,11 @@ class FlextMeltanoModels(FlextModels):
                 value: t.GeneralValueType,
             ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize mapping-like payloads into JSON dictionaries."""
-                if u.Guards._is_mapping(value):
-                    return {str(key): item for key, item in value.items()}
-                return {}
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
 
             model_config = ConfigDict(extra="allow")
 
@@ -1792,9 +1818,11 @@ class FlextMeltanoModels(FlextModels):
                 value: t.GeneralValueType,
             ) -> Mapping[str, t.GeneralValueType]:
                 """Normalize execution result map payload."""
-                if u.Guards._is_mapping(value):
-                    return {str(key): item for key, item in value.items()}
-                return {}
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
 
             model_config = ConfigDict(extra="allow")
 
@@ -1813,14 +1841,15 @@ class FlextMeltanoModels(FlextModels):
                 value: t.GeneralValueType,
             ) -> Mapping[str, str]:
                 """Keep scalar execution values and stringify them."""
-                if not u.Guards._is_mapping(value):
-                    return {}
-
-                return {
-                    str(key): str(item)
-                    for key, item in value.items()
-                    if u.Guards.is_type(item, (str, int, bool, float))
-                }
+                match value:
+                    case Mapping():
+                        return {
+                            str(key): str(item)
+                            for key, item in value.items()
+                            if u.Guards.is_type(item, (str, int, bool, float))
+                        }
+                    case _:
+                        return {}
 
             model_config = ConfigDict(extra="allow")
 

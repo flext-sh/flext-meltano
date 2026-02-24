@@ -12,9 +12,8 @@ from flext_core import (
     FlextDecorators as d,
     FlextExceptions as e,
     FlextHandlers as h,
-    FlextMixins as x,
-    FlextService as s,
     r,
+    x,
 )
 
 from flext_meltano.__version__ import __version__, __version_info__
@@ -23,7 +22,7 @@ from flext_meltano.api import FlextMeltano
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.constants import (
     FlextMeltanoConstants,
-    c,
+    FlextMeltanoConstants as c,
 )
 from flext_meltano.dbt import (
     FlextMeltanoDbtProjectManager,

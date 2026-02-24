@@ -17,9 +17,9 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
     """Test protocols combining FlextTestsProtocols and FlextMeltanoProtocols.
 
     Provides access to:
-    - tp.Tests.Docker.* (from FlextTestsProtocols)
-    - tp.Tests.Factory.* (from FlextTestsProtocols)
-    - tp.Meltano.* (from FlextMeltanoProtocols)
+    - p.Tests.Docker.* (from FlextTestsProtocols)
+    - p.Tests.Factory.* (from FlextTestsProtocols)
+    - p.Meltano.* (from FlextMeltanoProtocols)
     """
 
     class Tests:
@@ -34,6 +34,6 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
 
 # Runtime aliases
 p = TestsFlextMeltanoProtocols
-tp = TestsFlextMeltanoProtocols
+p = TestsFlextMeltanoProtocols
 
-__all__ = ["TestsFlextMeltanoProtocols", "p", "tp"]
+__all__ = ["TestsFlextMeltanoProtocols", "p"]

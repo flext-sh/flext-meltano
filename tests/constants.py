@@ -55,5 +55,4 @@ c = TestsFlextMeltanoConstants  # Alternative alias for compatibility
 __all__ = [
     "TestsFlextMeltanoConstants",
     "c",
-    "c",
 ]
