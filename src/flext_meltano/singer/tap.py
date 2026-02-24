@@ -112,7 +112,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             if not stream_def.stream_schema:
                 return r[bool].fail("Stream schema cannot be empty")
 
-            # Schema is already typed as dict[str, t.GeneralValueType] in StreamDefinition
+            # Schema is already a validated typed mapping in StreamDefinition
             if "properties" not in stream_def.stream_schema:
                 return r[bool].fail("Stream schema must contain properties")
 

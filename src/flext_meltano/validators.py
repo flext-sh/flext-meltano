@@ -89,7 +89,7 @@ class FlextMeltanoValidators:
 
         """
         try:
-            m.PipelineProjectModel.model_validate(config)
+            m.Meltano.PipelineProjectModel.model_validate(config)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Project validation failed: {error}")
@@ -125,7 +125,7 @@ class FlextMeltanoValidators:
 
         """
         try:
-            m.TransformationProjectModel.model_validate(config)
+            m.Meltano.TransformationProjectModel.model_validate(config)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Transformation validation failed: {error}")

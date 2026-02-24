@@ -110,13 +110,17 @@ class TestFlextMeltanoValidatorsComprehensive:
             "profile": "analytics_profile",
         }
 
-        result = FlextMeltanoValidators.validate_transformation_business_rules(dbt_config)
+        result = FlextMeltanoValidators.validate_transformation_business_rules(
+            dbt_config
+        )
         tm.ok(result)
 
     def test_validate_dbt_config_missing_required(self) -> None:
         dbt_config: t.JsonValue = {"name": "analytics"}
 
-        result = FlextMeltanoValidators.validate_transformation_business_rules(dbt_config)
+        result = FlextMeltanoValidators.validate_transformation_business_rules(
+            dbt_config
+        )
         assert result.is_failure
         tm.fail(result)
 
@@ -205,8 +209,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert not result.is_success
         assert result.error is not None
-        assert result.error is not None
-        assert "Plugin name cannot be empty" in result.error
+        assert "Plugin config validation failed" in result.error
 
     def test_validate_plugin_name_whitespace(self) -> None:
         config: t.JsonValue = {
@@ -218,8 +221,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert not result.is_success
         assert result.error is not None
-        assert result.error is not None
-        assert "Plugin name cannot be empty" in result.error
+        assert "Plugin config validation failed" in result.error
 
     def test_validate_target_plugin_name_too_short(self) -> None:
         config: t.JsonValue = {

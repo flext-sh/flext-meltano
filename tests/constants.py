@@ -15,9 +15,8 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_tests.constants import FlextTestsConstants
-
 from flext_meltano.constants import FlextMeltanoConstants
+from flext_tests.constants import FlextTestsConstants
 
 
 class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):

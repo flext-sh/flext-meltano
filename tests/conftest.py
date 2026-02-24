@@ -18,9 +18,9 @@ from typing import Protocol
 
 import pytest
 import yaml
-from helpers.docker_test_manager import FlextTestsDocker
-
 from flext_meltano import t
+
+from tests.helpers.docker_test_manager import FlextTestsDocker
 
 
 class CliRunnerProtocol(Protocol):
