@@ -92,7 +92,7 @@ class FlextMeltanoDbtRunner(s[str]):
 
             self.logger.info("DBT run completed", models_run=result.models_run)
             return r[DbtRunResult].ok(result)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("DBT run failed", error=str(e))
             return r[DbtRunResult].fail(f"DBT run failed: {e}")
 
@@ -130,7 +130,7 @@ class FlextMeltanoDbtRunner(s[str]):
 
             self.logger.info("DBT tests completed", tests_run=result.tests_run)
             return r[DbtTestResult].ok(result)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("DBT tests failed", error=str(e))
             return r[DbtTestResult].fail(f"DBT tests failed: {e}")
 
@@ -161,7 +161,7 @@ class FlextMeltanoDbtRunner(s[str]):
 
             self.logger.info("DBT documentation generated")
             return r[mt.MeltanoCore.ExecutionResultDict].ok(result)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return r[mt.MeltanoCore.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",

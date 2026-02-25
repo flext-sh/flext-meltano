@@ -63,7 +63,7 @@ class FlextMeltanoDbtService(s[str]):
                 self.runner.project_root = root
                 self.logger.info("DBT project loaded")
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
@@ -85,7 +85,7 @@ class FlextMeltanoDbtService(s[str]):
                 models = result.value
                 self.logger.info("DBT models retrieved", count=len(models))
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[list[mt.MeltanoCore.DbtModelDict]].fail(
                 f"Failed to get models: {e}",
@@ -116,7 +116,7 @@ class FlextMeltanoDbtService(s[str]):
                     models_run=run_result.models_run,
                 )
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("DBT run failed", error=str(e))
             return r[DbtRunResult].fail(
                 f"DBT run failed: {e}",
@@ -147,7 +147,7 @@ class FlextMeltanoDbtService(s[str]):
                     tests_run=test_result.tests_run,
                 )
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("DBT tests failed", error=str(e))
             return r[DbtTestResult].fail(
                 f"DBT tests failed: {e}",
@@ -169,7 +169,7 @@ class FlextMeltanoDbtService(s[str]):
             if result.is_success:
                 self.logger.info("DBT documentation generated")
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return r[mt.MeltanoCore.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",

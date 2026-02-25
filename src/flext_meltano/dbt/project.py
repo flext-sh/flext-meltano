@@ -86,7 +86,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 root=str(root),
             )
             return r[DbtProjectInfo].ok(info)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
@@ -124,7 +124,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 file=str(manifest_path),
             )
             return r[mt.Dbt.ManifestData].ok(self.manifest)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to load manifest", error=str(e))
             return r[mt.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
 
@@ -167,7 +167,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
 
             self.logger.info("Models retrieved", count=len(models))
             return r[list[mt.Dbt.ModelConfiguration]].ok(models)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[list[mt.Dbt.ModelConfiguration]].fail(f"Failed to get models: {e}")
 

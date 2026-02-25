@@ -139,39 +139,12 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         ]
     ]:
         """Find required plugins in t.Dbt.Project."""
-
-        # Simplified implementation - would need actual plugin discovery
-        # Create simple objects that satisfy the PluginProtocol
-        class MockPlugin:
-            """Simple plugin implementation satisfying PluginProtocol."""
-
-            def __init__(self, name: str) -> None:
-                self.name = name
-                self.default_variant: str | None = "default"
-                self.variants: Mapping[str, t.JsonValue] | None = None
-
-            def get_config(self) -> Mapping[str, t.JsonValue]:
-                """Get plugin configuration."""
-                return {}
-
-            def validate_config(self, config: Mapping[str, t.JsonValue]) -> bool:
-                """Validate plugin configuration."""
-                _ = config  # Protocol requirement
-                return True
-
-            def execute(self, *args: t.JsonValue) -> t.JsonValue:
-                """Execute plugin with given arguments."""
-                _ = args  # Protocol requirement
-                return {}
-
-        extractor = MockPlugin(name="tap-mock")
-        loader = MockPlugin(name="target-mock")
         return r[
             tuple[
                 p.Meltano.PluginProtocol[t.JsonValue],
                 p.Meltano.PluginProtocol[t.JsonValue],
             ]
-        ].ok((extractor, loader))
+        ].fail("Plugin discovery not configured")
 
     def _create_elt_context(
         self,
@@ -184,39 +157,18 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
     ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Create ELT context for pipeline execution."""
         try:
-            # Create a simple project object that satisfies MeltanoProjectProtocol
-            class MockProject:
-                """Simple project implementation satisfying MeltanoProjectProtocol."""
-
-                def __init__(self, root_dir: Path) -> None:
-                    self._root_dir = root_dir
-
-                @property
-                def root_dir(self) -> Path:
-                    """Get project root directory."""
-                    return self._root_dir
-
-                def find_plugins(self, plugin_type: str) -> list[t.JsonValue]:
-                    """Find plugins of specified type."""
-                    _ = plugin_type  # Protocol requirement
-                    return []
-
-            project_obj: p.Meltano.MeltanoProjectProtocol = MockProject(
-                root_dir=Path(project_path)
-            )
-
-            elt_context_result = self._abstractions.create_elt_context(
-                project_obj,
-                extractor_name,
-                loader_name,
-            )
-
-            if elt_context_result.is_failure:
+            project_root = Path(project_path)
+            if not project_root.exists() or not project_root.is_dir():
                 return r[t.MeltanoCore.ExecutionResultDict].fail(
-                    f"Failed to create ELT context: {elt_context_result.error}",
+                    f"Project path is not a valid directory: {project_path}",
                 )
 
-            elt_context_obj = elt_context_result.value
+            elt_context_obj: t.MeltanoCore.MeltanoConfigDict = {
+                "project": str(project_root),
+                "extractor_name": extractor_name,
+                "loader_name": loader_name,
+                "status": "initialized",
+            }
 
             # Extract plugin objects from the plugins tuple
             extractor_plugin_obj = plugins[0]
@@ -237,7 +189,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             # Build context_data with properly typed JsonValue entries
             # Store object references as string representations for JSON compatibility
             context_data: t.MeltanoCore.RunContextDict = {
-                "project_root": str(project_obj.root_dir),
+                "project_root": str(project_root),
                 "elt_context": elt_context_obj,
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
@@ -260,63 +212,8 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
     ) -> r[Mapping[str, t.JsonValue]]:
         """Execute Singer runner with context data."""
         try:
-            parsed_context = m.Meltano.PipelineExecutionContext.model_validate(
-                context_data,
-            )
-
-            # For simplified implementation, create mock plugins
-            # In real implementation, would retrieve actual plugins
-            class MockPlugin:
-                """Simple plugin for execution."""
-
-                def __init__(self, name: str) -> None:
-                    self.name = name
-                    self.default_variant: str | None = "default"
-                    self.variants: Mapping[str, t.JsonValue] | None = None
-
-                def get_config(self) -> Mapping[str, t.JsonValue]:
-                    """Get plugin configuration."""
-                    return {}
-
-                def validate_config(self, config: Mapping[str, t.JsonValue]) -> bool:
-                    """Validate plugin configuration."""
-                    _ = config  # Protocol requirement
-                    return True
-
-                def execute(self, *args: t.JsonValue) -> t.JsonValue:
-                    """Execute plugin with given arguments."""
-                    _ = args  # Protocol requirement
-                    return {}
-
-            extractor_plugin_obj: p.Meltano.PluginProtocol[t.JsonValue] = MockPlugin(
-                name=parsed_context.extractor_name
-            )
-            loader_plugin_obj: p.Meltano.PluginProtocol[t.JsonValue] = MockPlugin(
-                name=parsed_context.loader_name
-            )
-
-            execution_result = self._abstractions.execute_singer_pipeline(
-                parsed_context.elt_context,
-                extractor_plugin_obj,
-                loader_plugin_obj,
-            )
-
-            if execution_result.is_failure:
-                return r[Mapping[str, t.JsonValue]].fail(
-                    execution_result.error or "Pipeline execution failed",
-                )
-
-            result_context = m.Meltano.PipelineExecutionContext.model_validate(
-                {
-                    **parsed_context.model_dump(mode="python"),
-                    "execution_completed": True,
-                    "execution_result": execution_result.value,
-                },
-            )
-
-            return r[Mapping[str, t.JsonValue]].ok(
-                result_context.model_dump(mode="python"),
-            )
+            _ = m.Meltano.PipelineExecutionContext.model_validate(context_data)
+            return r[Mapping[str, t.JsonValue]].fail("Plugin discovery not configured")
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Mapping[str, t.JsonValue]].fail(

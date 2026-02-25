@@ -57,7 +57,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                 stream_count=len(self._catalog.streams),
             )
             return r[m.Meltano.SingerCatalog].ok(self._catalog)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to discover: {e}")
 
@@ -87,7 +87,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                 stream_count=len(self._catalog.streams),
             )
             return r[m.Meltano.SingerCatalog].ok(self._catalog)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
 
@@ -120,7 +120,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                 file=str(catalog_file),
             )
             return r[None].ok(None)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to save catalog", error=str(e))
             return r[None].fail(f"Failed to save catalog: {e}")
 
@@ -145,7 +145,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                 selected=len(selected),
             )
             return r[m.Meltano.SingerCatalog].ok(filtered_catalog)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to select streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 
@@ -171,7 +171,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             return r[Mapping[str, t.JsonValue]].fail(
                 f"Stream not found in catalog: {stream_name}",
             )
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
             return r[Mapping[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
 

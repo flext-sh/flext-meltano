@@ -10,8 +10,10 @@ SPDX-License-Identifier: MIT
 
 import tempfile
 from pathlib import Path
+from typing import cast
 
 from flext_meltano import FlextMeltanoAdapter, r
+from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
 
 
 class TestFlextMeltanoAdapter:
@@ -66,3 +68,28 @@ class TestFlextMeltanoAdapter:
         assert isinstance(result, r), "Should return FlextResult"
         assert hasattr(result, "is_success"), "Should have is_success"
         assert hasattr(result, "error"), "Should have error"
+
+
+class TestFlextMeltanoOrchestrationPipelineFailures:
+    def test_find_required_plugins_returns_configured_failure(self) -> None:
+        result = FlextMeltanoOrchestrationService._find_required_plugins()
+
+        assert result.is_failure
+        assert result.error == "Plugin discovery not configured"
+
+    def test_execute_singer_runner_returns_configured_failure(self) -> None:
+        service = cast(
+            FlextMeltanoOrchestrationService,
+            object.__new__(FlextMeltanoOrchestrationService),
+        )
+        context_data = {
+            "project_root": "/tmp/project",
+            "elt_context": {},
+            "extractor_name": "tap-csv",
+            "loader_name": "target-jsonl",
+        }
+
+        result = service._execute_singer_runner(context_data)
+
+        assert result.is_failure
+        assert result.error == "Plugin discovery not configured"

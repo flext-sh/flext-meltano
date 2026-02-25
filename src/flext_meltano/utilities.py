@@ -155,7 +155,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 return write_operation(None, resource)
             finally:
                 cleanup_file_handle(resource)
-        except Exception as err:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as err:
             filename = c.Meltano.Paths.MELTANO_PROJECT_FILE
             return r[bool].fail(f"Writing {filename}: {err}")
 

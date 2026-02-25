@@ -86,7 +86,7 @@ class FlextMeltanoMeltanoService(s[str]):
             if result.is_success:
                 self.logger.info("Meltano project created")
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to create project", error=str(e))
             return r[MeltanoProjectInfo].fail(
                 f"Failed to create project: {e}",
@@ -108,7 +108,7 @@ class FlextMeltanoMeltanoService(s[str]):
             if result.is_success:
                 self.logger.info("Meltano project loaded")
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to load project", error=str(e))
             return r[MeltanoProjectInfo].fail(
                 f"Failed to load project: {e}",
@@ -134,7 +134,7 @@ class FlextMeltanoMeltanoService(s[str]):
                 plugins = list(result.value) if result.value else []
                 self.logger.info("Plugins discovered", count=u.count(plugins))
             return result
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
             return r[list[t.Plugin.PluginDefinition]].fail(
                 f"Failed to discover plugins: {e}"
@@ -176,7 +176,7 @@ class FlextMeltanoMeltanoService(s[str]):
 
             self.logger.info("Meltano pipeline executed", status=result.status)
             return r[FlextMeltanoMeltanoService.PipelineResult].ok(result)
-        except Exception as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
             self.logger.exception("Failed to execute pipeline", error=str(e))
             return r[FlextMeltanoMeltanoService.PipelineResult].fail(
                 f"Failed to execute pipeline: {e}",
