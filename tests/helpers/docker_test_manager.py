@@ -228,7 +228,7 @@ class FlextTestsDocker(ContainerManager):
             self.logger.warning(
                 "Failed to get service URL for %s: %s",
                 service_name,
-                e,  # type: ignore[arg-type]
+                e,
             )
 
         return None
@@ -322,7 +322,7 @@ class FlextTestsDocker(ContainerManager):
                     return True
 
             except Exception as e:
-                self.logger.warning("Error checking service health: %s", e)  # type: ignore[arg-type]
+                self.logger.warning("Error checking service health: %s", e)
 
             time.sleep(2)
 
@@ -354,7 +354,7 @@ class FlextTestsDocker(ContainerManager):
             return True
 
         except Exception as e:
-            self.logger.warning("Health check failed: %s", e)  # type: ignore[arg-type]
+            self.logger.warning("Health check failed: %s", e)
             return False
 
     def _cleanup_containers(self) -> None:
