@@ -10,7 +10,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Callable
+import json
+import os
+import shutil
+import signal
+import subprocess
+import time
+from collections.abc import Callable, Mapping
+from pathlib import Path
 from typing import Protocol
 
 from flext_core import FlextLogger, FlextResult, r
@@ -19,6 +26,267 @@ from flext_meltano.models import FlextMeltanoModels
 
 # Import aliases for concise usage
 m = FlextMeltanoModels
+
+
+_PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
+_PIPELINE_CONFIG_FILE = "pipeline.json"
+_PIPELINE_PID_FILE = "pipeline.pid"
+
+
+def _pipelines_root_dir() -> Path:
+    configured_root = os.environ.get(_PIPELINES_ROOT_ENV)
+    if configured_root and configured_root.strip():
+        return Path(configured_root).expanduser().resolve()
+    return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
+
+
+def _pipeline_dir(pipeline_name: str) -> Path:
+    return _pipelines_root_dir() / pipeline_name
+
+
+def _pipeline_config_path(pipeline_name: str) -> Path:
+    return _pipeline_dir(pipeline_name) / _PIPELINE_CONFIG_FILE
+
+
+def _pipeline_pid_path(pipeline_name: str) -> Path:
+    return _pipeline_dir(pipeline_name) / _PIPELINE_PID_FILE
+
+
+def _is_process_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return False
+    return True
+
+
+def create_pipeline(
+    pipeline_name: str,
+    config: Mapping[str, object] | None,
+) -> r[str]:
+    if not pipeline_name.strip():
+        return r[str].fail("Pipeline creation requires a non-empty pipeline name")
+    if config is None:
+        return r[str].fail("Pipeline creation not configured")
+
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if pipeline_dir.exists():
+        return r[str].fail(f"Pipeline '{pipeline_name}' already exists")
+
+    try:
+        pipeline_dir.mkdir(parents=True, exist_ok=False)
+        config_path = _pipeline_config_path(pipeline_name)
+        config_path.write_text(json.dumps(dict(config), indent=2), encoding="utf-8")
+    except OSError as exc:
+        return r[str].fail(f"Failed to create pipeline '{pipeline_name}': {exc}")
+
+    return r[str].ok(str(pipeline_dir))
+
+
+def execute_pipeline(
+    pipeline_name: str,
+    command_args: list[str] | None = None,
+) -> r[str]:
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+
+    configured_command: list[str] | None = None
+    config_path = _pipeline_config_path(pipeline_name)
+    if config_path.exists():
+        try:
+            config_payload = json.loads(config_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            return r[str].fail(
+                f"Failed to read pipeline '{pipeline_name}' configuration: {exc}"
+            )
+
+        if isinstance(config_payload, dict):
+            command_value = config_payload.get("command")
+            if isinstance(command_value, list) and all(
+                isinstance(value, str) for value in command_value
+            ):
+                configured_command = command_value
+
+    meltano_args = command_args or configured_command
+    if not meltano_args:
+        return r[str].fail("Pipeline execution not configured")
+
+    command = ["meltano", *meltano_args]
+    pid_path = _pipeline_pid_path(pipeline_name)
+    process: subprocess.Popen[str] | None = None
+    stdout = ""
+    stderr = ""
+
+    try:
+        process = subprocess.Popen(
+            command,
+            cwd=str(pipeline_dir),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        pid_path.write_text(str(process.pid), encoding="utf-8")
+        stdout, stderr = process.communicate()
+    except FileNotFoundError:
+        return r[str].fail("Meltano CLI executable not found")
+    except OSError as exc:
+        return r[str].fail(f"Failed to execute Meltano CLI command: {exc}")
+    finally:
+        if process is None or process.poll() is not None:
+            try:
+                pid_path.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError:
+                pass
+
+    if process is None:
+        return r[str].fail("Meltano pipeline process was not started")
+
+    if process.returncode != 0:
+        command_error = stderr.strip() or stdout.strip()
+        if not command_error:
+            command_error = (
+                f"Meltano command failed with exit code {process.returncode}"
+            )
+        return r[str].fail(command_error)
+
+    logger = FlextLogger(__name__)
+    if stdout.strip():
+        logger.info(stdout.strip())
+
+    return r[str].ok(stdout.strip() or "executed")
+
+
+def list_pipelines() -> r[list[str]]:
+    pipelines_root = _pipelines_root_dir()
+    if not pipelines_root.exists():
+        return r[list[str]].ok([])
+    if not pipelines_root.is_dir():
+        return r[list[str]].fail(
+            f"Pipelines root path is not a directory: {pipelines_root}"
+        )
+
+    try:
+        pipeline_names = sorted(
+            entry.name for entry in pipelines_root.iterdir() if entry.is_dir()
+        )
+    except OSError as exc:
+        return r[list[str]].fail(f"Failed to list pipelines: {exc}")
+
+    return r[list[str]].ok(pipeline_names)
+
+
+def get_pipeline_status(pipeline_name: str) -> r[str]:
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+
+    pid_path = _pipeline_pid_path(pipeline_name)
+    if not pid_path.exists():
+        return r[str].ok("stopped")
+
+    try:
+        pid = int(pid_path.read_text(encoding="utf-8").strip())
+    except (ValueError, OSError) as exc:
+        return r[str].fail(
+            f"Failed to read status for pipeline '{pipeline_name}': {exc}"
+        )
+
+    if _is_process_running(pid):
+        return r[str].ok("running")
+
+    try:
+        pid_path.unlink()
+    except FileNotFoundError:
+        pass
+    except OSError:
+        pass
+    return r[str].ok("stopped")
+
+
+def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+
+    pid_path = _pipeline_pid_path(pipeline_name)
+    if not pid_path.exists():
+        return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+
+    try:
+        pid = int(pid_path.read_text(encoding="utf-8").strip())
+    except (ValueError, OSError) as exc:
+        return r[str].fail(f"Failed to read PID for pipeline '{pipeline_name}': {exc}")
+
+    if not _is_process_running(pid):
+        try:
+            pid_path.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass
+        return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+
+    try:
+        os.kill(pid, signal.SIGTERM)
+    except ProcessLookupError:
+        try:
+            pid_path.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass
+        return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+    except OSError as exc:
+        return r[str].fail(f"Failed to stop pipeline '{pipeline_name}': {exc}")
+
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        if not _is_process_running(pid):
+            try:
+                pid_path.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError:
+                pass
+            return r[str].ok("stopped")
+        time.sleep(0.1)
+
+    return r[str].fail(
+        f"Pipeline '{pipeline_name}' did not stop within {timeout_seconds:.1f} seconds"
+    )
+
+
+def delete_pipeline(pipeline_name: str) -> r[str]:
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+
+    status_result = get_pipeline_status(pipeline_name)
+    if status_result.is_failure:
+        return r[str].fail(status_result.error)
+    if status_result.value == "running":
+        return r[str].fail(
+            f"Pipeline '{pipeline_name}' is running. Stop it before deletion"
+        )
+
+    try:
+        shutil.rmtree(pipeline_dir)
+    except OSError as exc:
+        return r[str].fail(f"Failed to delete pipeline '{pipeline_name}': {exc}")
+
+    if pipeline_dir.exists():
+        return r[str].fail(f"Pipeline '{pipeline_name}' deletion was not confirmed")
+
+    return r[str].ok("deleted")
 
 
 # Local protocols to avoid circular imports
@@ -187,32 +455,110 @@ class FlextMeltanoPipelineManager:
 
     def _create_pipeline(self, _args: list[str]) -> r[None]:
         """Create new pipeline."""
-        self.logger.info("Pipeline creation not implemented in this refactor")
-        return r[None].ok(None)
+        if not _args:
+            return r[None].fail(
+                "Pipeline creation requires pipeline name and JSON configuration",
+            )
+
+        pipeline_name = _args[0]
+        config_payload: dict[str, object] | None = None
+        if len(_args) >= 2:
+            try:
+                parsed = json.loads(_args[1])
+            except json.JSONDecodeError as exc:
+                return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
+            if not isinstance(parsed, dict):
+                return r[None].fail("Pipeline configuration must be a JSON object")
+            config_payload = parsed
+
+        result = create_pipeline(pipeline_name, config_payload)
+        if result.is_failure:
+            return result
+
+        self.logger.info("Pipeline created", pipeline=pipeline_name)
+        return r[str].ok("created")
 
     def _run_pipeline(self, _args: list[str]) -> r[None]:
         """Run pipeline."""
-        self.logger.info("Pipeline execution not implemented in this refactor")
-        return r[None].ok(None)
+        if not _args:
+            return r[None].fail(
+                "Pipeline execution requires pipeline name",
+            )
+
+        pipeline_name = _args[0]
+        command_args = _args[1:] if len(_args) > 1 else None
+        return execute_pipeline(pipeline_name, command_args)
 
     def _list_pipelines(self, _args: list[str]) -> r[None]:
         """List pipelines."""
-        self.logger.info("Pipeline listing not implemented in this refactor")
-        return r[None].ok(None)
+        result = list_pipelines()
+        if result.is_failure:
+            return r[None].fail(result.error)
+
+        self.logger.info(
+            "Configured pipelines",
+            pipelines=", ".join(result.value),
+        )
+        return r[str].ok("listed")
 
     def _get_pipeline_status(self, _args: list[str]) -> r[None]:
         """Get pipeline status."""
-        self.logger.info("Pipeline status not implemented in this refactor")
-        return r[None].ok(None)
+        if not _args:
+            return r[None].fail("Pipeline status requires pipeline name")
+
+        status_result = get_pipeline_status(_args[0])
+        if status_result.is_failure:
+            return r[None].fail(status_result.error)
+
+        self.logger.info(
+            "Pipeline status", pipeline=_args[0], status=status_result.value
+        )
+        return r[str].ok(status_result.value)
 
     def _stop_pipeline(self, _args: list[str]) -> r[None]:
         """Stop pipeline."""
-        self.logger.info("Pipeline stopping not implemented in this refactor")
-        return r[None].ok(None)
+        if not _args:
+            return r[None].fail("Pipeline stop requires pipeline name")
+
+        return stop_pipeline(_args[0])
 
     def _delete_pipeline(self, _args: list[str]) -> r[None]:
         """Delete pipeline."""
-        self.logger.info("Pipeline deletion not implemented in this refactor")
+        if not _args:
+            return r[None].fail("Pipeline delete requires pipeline name")
+
+        return delete_pipeline(_args[0])
+
+    def _run_meltano_command(self, command: list[str]) -> r[None]:
+        try:
+            completed = subprocess.run(
+                command,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+        except FileNotFoundError:
+            return r[None].fail("Meltano CLI executable not found")
+        except OSError as exc:
+            return r[None].fail(f"Failed to execute Meltano CLI command: {exc}")
+
+        if completed.returncode != 0:
+            command_error = completed.stderr.strip() or completed.stdout.strip()
+            if not command_error:
+                command_error = (
+                    f"Meltano command failed with exit code {completed.returncode}"
+                )
+            self.logger.error(
+                "Meltano pipeline command failed",
+                command=" ".join(command),
+                exit_code=completed.returncode,
+                stderr=completed.stderr,
+            )
+            return r[None].fail(command_error)
+
+        if completed.stdout.strip():
+            self.logger.info(completed.stdout.strip())
+
         return r[None].ok(None)
 
 
@@ -389,4 +735,10 @@ __all__ = [
     "FlextMeltanoPluginManager",
     "FlextMeltanoSingerManager",
     "FlextMeltanoStatusManager",
+    "create_pipeline",
+    "delete_pipeline",
+    "execute_pipeline",
+    "get_pipeline_status",
+    "list_pipelines",
+    "stop_pipeline",
 ]

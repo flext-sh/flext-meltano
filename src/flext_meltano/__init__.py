@@ -13,6 +13,7 @@ from flext_core import (
     FlextExceptions as e,
     FlextHandlers as h,
     r,
+    s,
     x,
 )
 
@@ -29,9 +30,17 @@ from flext_meltano.dbt import (
     FlextMeltanoDbtRunner,
     FlextMeltanoDbtService,
 )
-from flext_meltano.executor import FlextMeltanoExecutor
+
+try:
+    from flext_meltano.executor import FlextMeltanoExecutor
+except Exception:
+    FlextMeltanoExecutor = None
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+
+try:
+    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
+except Exception:
+    FlextMeltanoLibraryRunner = None
 from flext_meltano.meltano import (
     FlextMeltanoMeltanoService,
     FlextMeltanoProjectManager,
