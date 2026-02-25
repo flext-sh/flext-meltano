@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_meltano.cli_managers import (  # pyright: ignore[reportMissingImports]
+from flext_meltano.cli_managers import (
     FlextMeltanoPipelineManager,
     create_pipeline,
     delete_pipeline,

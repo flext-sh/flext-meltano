@@ -20,7 +20,7 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import (  # pyright: ignore[reportMissingImports]
+from flext_core import (
     FlextLogger,
     FlextResult,
     r,
