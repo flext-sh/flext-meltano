@@ -20,9 +20,9 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import FlextLogger, FlextResult, r
+from flext_core import FlextLogger, FlextResult, r  # pyright: ignore[reportMissingImports]
 
-from flext_meltano.models import FlextMeltanoModels
+from .models import FlextMeltanoModels
 
 # Import aliases for concise usage
 m = FlextMeltanoModels
@@ -119,50 +119,32 @@ def execute_pipeline(
         return r[str].fail("Pipeline execution not configured")
 
     command = ["meltano", *meltano_args]
-    pid_path = _pipeline_pid_path(pipeline_name)
-    process: subprocess.Popen[str] | None = None
-    stdout = ""
-    stderr = ""
-
     try:
-        process = subprocess.Popen(
+        completed = subprocess.run(
             command,
             cwd=str(pipeline_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            check=False,
+            capture_output=True,
             text=True,
         )
-        pid_path.write_text(str(process.pid), encoding="utf-8")
-        stdout, stderr = process.communicate()
     except FileNotFoundError:
         return r[str].fail("Meltano CLI executable not found")
     except OSError as exc:
         return r[str].fail(f"Failed to execute Meltano CLI command: {exc}")
-    finally:
-        if process is None or process.poll() is not None:
-            try:
-                pid_path.unlink()
-            except FileNotFoundError:
-                pass
-            except OSError:
-                pass
 
-    if process is None:
-        return r[str].fail("Meltano pipeline process was not started")
-
-    if process.returncode != 0:
-        command_error = stderr.strip() or stdout.strip()
+    if completed.returncode != 0:
+        command_error = completed.stderr.strip() or completed.stdout.strip()
         if not command_error:
             command_error = (
-                f"Meltano command failed with exit code {process.returncode}"
+                f"Meltano command failed with exit code {completed.returncode}"
             )
         return r[str].fail(command_error)
 
     logger = FlextLogger(__name__)
-    if stdout.strip():
-        logger.info(stdout.strip())
+    if completed.stdout.strip():
+        logger.info(completed.stdout.strip())
 
-    return r[str].ok(stdout.strip() or "executed")
+    return r[str].ok(completed.stdout.strip() or "executed")
 
 
 def list_pipelines() -> r[list[str]]:

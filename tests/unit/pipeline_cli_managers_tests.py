@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_meltano.cli_managers import (
+from flext_meltano.cli_managers import (  # pyright: ignore[reportMissingImports]
     FlextMeltanoPipelineManager,
     create_pipeline,
     delete_pipeline,
@@ -50,24 +50,25 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
         create_result = create_pipeline("daily-pipeline", config)
         assert create_result.is_success
 
-        process_mock = MagicMock(spec=subprocess.Popen)
-        process_mock.pid = 4242
-        process_mock.communicate.return_value = ("pipeline ok", "")
-        process_mock.returncode = 0
-        process_mock.poll.return_value = 0
+        completed = subprocess.CompletedProcess(
+            args=["meltano", "run", "tap-demo", "target-demo"],
+            returncode=0,
+            stdout="pipeline ok",
+            stderr="",
+        )
 
         with patch(
-            "flext_meltano.cli_managers.subprocess.Popen",
-            return_value=process_mock,
-        ) as popen_mock:
+            "flext_meltano.cli_managers.subprocess.run",
+            return_value=completed,
+        ) as run_mock:
             result = execute_pipeline("daily-pipeline")
 
     assert result.is_success
-    popen_mock.assert_called_once_with(
+    run_mock.assert_called_once_with(
         ["meltano", "run", "tap-demo", "target-demo"],
         cwd=str(tmp_path / "pipelines" / "daily-pipeline"),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        check=False,
+        capture_output=True,
         text=True,
     )
 
@@ -175,15 +176,16 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
         ])
         assert create_result.is_success
 
-        process_mock = MagicMock(spec=subprocess.Popen)
-        process_mock.pid = 9999
-        process_mock.communicate.return_value = ("ok", "")
-        process_mock.returncode = 0
-        process_mock.poll.return_value = 0
+        completed = subprocess.CompletedProcess(
+            args=["meltano", "run", "tap-demo", "target-demo"],
+            returncode=0,
+            stdout="ok",
+            stderr="",
+        )
 
         with patch(
-            "flext_meltano.cli_managers.subprocess.Popen",
-            return_value=process_mock,
+            "flext_meltano.cli_managers.subprocess.run",
+            return_value=completed,
         ):
             run_result = manager.handle_command(["run", "daily-pipeline"])
 
