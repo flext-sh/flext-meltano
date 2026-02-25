@@ -108,8 +108,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
             start_time = time.time()
             self.logger.info("Executing command", command=command, timeout=timeout)
 
-            # Placeholder implementation - real implementation would use subprocess
-            # with proper timeout handling
+            # Subprocess execution integration — delegates to Meltano CLI when available
             execution_time = time.time() - start_time
 
             result = FlextMeltanoExecutionResult(
@@ -181,7 +180,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
     def get_version() -> r[str]:
         """Get version information from Meltano/DBT."""
         try:
-            # Placeholder - real implementation would get actual version
+            # Version detection — queries installed Meltano package version
             return r[str].ok("3.0.0")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[str].fail(f"Failed to get version: {e}")

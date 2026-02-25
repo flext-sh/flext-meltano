@@ -65,7 +65,15 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
                     entries=len(self._state_msg.value),
                 )
             return r[m.Meltano.SingerStateMessage].ok(self._state_msg)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to load state", error=str(e))
             return r[m.Meltano.SingerStateMessage].fail(f"Failed to load state: {e}")
 
@@ -88,7 +96,15 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
                 file=str(state_file),
             )
             return r[None].ok(None)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to save state", error=str(e))
             return r[None].fail(f"Failed to save state: {e}")
 
@@ -125,7 +141,15 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
                 key=bookmark_key,
             )
             return r[None].ok(None)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to update bookmark", error=str(e))
             return r[None].fail(f"Failed to update bookmark: {e}")
 
@@ -157,7 +181,15 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
                     f"Bookmark not found: {stream_name}.{bookmark_key}",
                 )
             return r[str].ok(str(value))
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to get bookmark", error=str(e))
             return r[str].fail(f"Failed to get bookmark: {e}")
 

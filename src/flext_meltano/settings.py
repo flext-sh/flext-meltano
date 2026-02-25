@@ -517,7 +517,7 @@ class FlextMeltanoSettings(FlextSettings):
             KeyError,
             AttributeError,
             OSError,
-        ) as e:  # pragma: no cover
+        ) as e:
             return r[FlextMeltanoSettings].fail(
                 f"Config creation failed: {e}",
             )

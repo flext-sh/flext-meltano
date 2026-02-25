@@ -103,7 +103,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             KeyError,
             AttributeError,
             OSError,
-        ) as err:  # pragma: no cover
+        ) as err:
             return r[t.MeltanoCore.MeltanoConfigDict].fail(
                 f"Failed to create Meltano config dict: {err}",
             )
@@ -155,7 +155,15 @@ class FlextMeltanoUtilities(FlextUtilities):
                 return write_operation(None, resource)
             finally:
                 cleanup_file_handle(resource)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as err:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as err:
             filename = c.Meltano.Paths.MELTANO_PROJECT_FILE
             return r[bool].fail(f"Writing {filename}: {err}")
 

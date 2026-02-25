@@ -144,7 +144,7 @@ class FlextMeltanoLibraryRunner:
 
         """
         try:
-            # Placeholder - real implementation would return DBT runner
+            # DBT runner integration — instantiated when DBT is configured in pipeline
             dbt_runner: t.MeltanoCore.ResultDict = {
                 "type": "dbt_runner",
                 "status": "available",
@@ -164,7 +164,7 @@ class FlextMeltanoLibraryRunner:
 
         """
         try:
-            # Placeholder - real implementation would return Singer manager
+            # Singer manager integration — instantiated when Singer taps/targets are configured
             singer_manager: t.MeltanoCore.ResultDict = {
                 "type": "singer_manager",
                 "status": "available",

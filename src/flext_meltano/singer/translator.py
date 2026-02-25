@@ -316,7 +316,15 @@ class FlextMeltanoSingerCliTranslator:
             return r[t.CLI.ProcessResult].ok(output_dict)
         except subprocess.TimeoutExpired as e:
             return r[t.CLI.ProcessResult].fail(f"Command timeout: {e}")
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             return r[t.CLI.ProcessResult].fail(f"Command execution failed: {e}")
 
 

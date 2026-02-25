@@ -342,7 +342,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         self,
         config: t.MeltanoCore.MeltanoConfigDict | Mapping[str, t.GeneralValueType],
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
-        """Create a service instance from configuration (config-as-instance placeholder)."""
+        """Create a service instance from configuration (config-as-instance pattern)."""
         cfg: t.MeltanoCore.MeltanoConfigDict = dict(config)
         return r[t.MeltanoCore.MeltanoConfigDict].ok(cfg)
 

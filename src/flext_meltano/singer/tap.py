@@ -85,7 +85,15 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
             return r[t.Singer.StreamCatalog].ok(catalog)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Stream discovery failed", error=str(e))
             return r[t.Singer.StreamCatalog].fail(f"Stream discovery failed: {e}")
 
@@ -120,7 +128,15 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             # For now, just return success
             return r[bool].ok(value=True)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Schema validation failed", error=str(e))
             return r[bool].fail(f"Schema validation failed: {e}")
 
@@ -162,7 +178,15 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail(
                 f"Source instance creation failed: {e}",
@@ -192,7 +216,15 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             # For now, just return success
             return r[bool].ok(value=True)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception(
                 "Source configuration processing failed",
                 error=str(e),

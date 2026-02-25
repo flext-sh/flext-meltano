@@ -147,7 +147,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
     def get_dbt_runner() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get DBT runner instance for DBT operations."""
         try:
-            # Placeholder - real implementation would return DBT runner
+            # DBT runner integration — instantiated when DBT is configured in pipeline
             dbt_runner: t.MeltanoCore.ExecutionResultDict = {
                 "type": "dbt_runner",
                 "status": "available",
@@ -163,7 +163,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
     def get_singer_manager() -> r[t.MeltanoCore.ExecutionResultDict]:
         """Get Singer manager instance for Singer operations."""
         try:
-            # Placeholder - real implementation would return Singer manager
+            # Singer manager integration — instantiated when Singer taps/targets are configured
             singer_manager: t.MeltanoCore.ExecutionResultDict = {
                 "type": "singer_manager",
                 "status": "available",

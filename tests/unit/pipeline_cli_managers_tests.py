@@ -142,7 +142,8 @@ def test_stop_pipeline_sends_sigterm_and_confirms_stop(tmp_path: Path) -> None:
             if sig == signal.SIGTERM:
                 terminated["value"] = True
                 return
-            raise AssertionError("Unexpected signal")
+            msg = "Unexpected signal"
+            raise AssertionError(msg)
 
         with patch("flext_meltano.cli_managers.os.kill", side_effect=fake_kill):
             result = stop_pipeline("daily-pipeline")

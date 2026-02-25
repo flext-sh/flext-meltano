@@ -79,7 +79,15 @@ class FlextMeltanoSingerService(FlextService[str]):
             if result.is_success:
                 self.logger.info("Tap catalog discovery completed")
             return result
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Tap discovery failed", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Tap discovery failed: {e}")
 
@@ -131,7 +139,15 @@ class FlextMeltanoSingerService(FlextService[str]):
                 written=records_written,
             )
             return r[m.Meltano.SingerSyncResult].ok(result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Singer sync failed", error=str(e))
             return r[m.Meltano.SingerSyncResult].fail(
                 f"Singer sync failed: {e}",

@@ -81,7 +81,15 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             return r[m.Meltano.DataSinkDefinition].ok(sink_def)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Sink configuration failed", error=str(e))
             return r[m.Meltano.DataSinkDefinition].fail(
                 f"Sink configuration failed: {e}",
@@ -111,7 +119,15 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
             # For now, just return success
             return r[bool].ok(value=True)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception(
                 "Target configuration validation failed",
                 error=str(e),
@@ -152,7 +168,15 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
 
             return r[m.Meltano.DataSinkInstance].ok(sink_instance)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
             return r[m.Meltano.DataSinkInstance].fail(
                 f"Sink instance creation failed: {e}",

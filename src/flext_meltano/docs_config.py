@@ -134,7 +134,15 @@ class DocsConfig(FlextSettings):
 
             return r.ok(self)
 
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return r[DocsConfig].fail(error_msg)
 

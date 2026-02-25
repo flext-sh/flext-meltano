@@ -87,7 +87,15 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 root=str(root),
             )
             return r[MeltanoProjectInfo].ok(info)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to initialize project")
             return r[MeltanoProjectInfo].fail(
                 f"Failed to initialize project: {e}",
@@ -126,7 +134,15 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 root=str(root),
             )
             return r[MeltanoProjectInfo].ok(info)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to load project", error=str(e))
             return r[MeltanoProjectInfo].fail(
                 f"Failed to load project: {e}",
@@ -200,7 +216,15 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 type=plugin_type,
             )
             return r[list[t.Plugin.PluginDefinition]].ok(plugins)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to get plugins", error=str(e))
             return r[list[t.Plugin.PluginDefinition]].fail(
                 f"Failed to get plugins: {e}",
@@ -228,7 +252,15 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
 
             self.logger.info("Plugin installed", name=name)
             return r[t.Plugin.PluginInfo].ok(plugin_info)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Failed to install plugin", error=str(e))
             return r[t.Plugin.PluginInfo].fail(f"Failed to install plugin: {e}")
 
