@@ -13,6 +13,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import TypeGuard
 
 from flext_core import FlextResult, FlextService
 
@@ -32,6 +33,11 @@ p = FlextMeltanoProtocols
 r = FlextResult
 m = FlextMeltanoModels
 s = FlextService
+
+
+def _is_meltano_project(value: object) -> TypeGuard[p.Meltano.MeltanoProjectProtocol]:
+    """Type guard for protocol-compatible Meltano project objects."""
+    return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 
 
 class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
@@ -108,10 +114,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
                 # Type narrowing: ensure result is a protocol-compliant project
                 temp_project = temp_project_result.value
-                if (
-                    temp_project is None
-                    or getattr(temp_project, "root_dir", None) is None
-                ):
+                if not _is_meltano_project(temp_project):
                     return r[list[Mapping[str, str]]].fail(
                         "Temporary project does not satisfy MeltanoProjectProtocol",
                     )
@@ -288,7 +291,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
             # Type narrowing: ensure project satisfies protocol
             temp_project = temp_project_result.value
-            if temp_project is None or getattr(temp_project, "root_dir", None) is None:
+            if not _is_meltano_project(temp_project):
                 return r[Mapping[str, str]].fail(
                     "Temporary project does not satisfy MeltanoProjectProtocol",
                 )

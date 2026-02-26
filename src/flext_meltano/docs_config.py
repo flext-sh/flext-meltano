@@ -93,8 +93,10 @@ class DocsConfig(FlextSettings):
         if config_result.is_success and config_result.value is not None:
             # Type narrowing: verify instance type before returning
             value = config_result.value
-            if u.Guards.is_type(value, cls):
+            if isinstance(value, cls):
                 return value
+            if isinstance(value, Mapping):
+                return cls.model_validate(value)
 
         # Create and return new instance
         return cls()

@@ -118,9 +118,14 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_items(cls, value: t.GeneralValueType) -> list[str]:
                 """Convert sequence-like values into string lists."""
-                if u.Guards.is_type(value, (list, tuple, set)):
-                    return [str(item) for item in value if item is not None]
-                return []
+                values: list[t.GeneralValueType]
+                if isinstance(value, list):
+                    values = value
+                elif isinstance(value, (tuple, set)):
+                    values = list(value)
+                else:
+                    return []
+                return [str(item) for item in values if item is not None]
 
         class BooleanListValue(FlextModels.ArbitraryTypesModel):
             """Validated boolean list wrapper for process output."""
@@ -134,9 +139,14 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_items(cls, value: t.GeneralValueType) -> list[bool]:
                 """Convert sequence-like values into booleans."""
-                if u.Guards.is_type(value, (list, tuple, set)):
-                    return [bool(item) for item in value]
-                return []
+                values: list[t.GeneralValueType]
+                if isinstance(value, list):
+                    values = value
+                elif isinstance(value, (tuple, set)):
+                    values = list(value)
+                else:
+                    return []
+                return [bool(item) for item in values]
 
         class LoggingConfig(BaseModel):
             """Consolidated logging configuration for all pipeline operations.

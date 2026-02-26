@@ -459,10 +459,10 @@ class FlextMeltanoPipelineManager:
 
         result = create_pipeline(pipeline_name, config_payload)
         if result.is_failure:
-            return result
+            return r[None].fail(result.error)
 
         self.logger.info("Pipeline created", pipeline=pipeline_name)
-        return r[str].ok("created")
+        return r[None].ok(None)
 
     def _run_pipeline(self, _args: list[str]) -> r[None]:
         """Run pipeline."""
@@ -473,7 +473,10 @@ class FlextMeltanoPipelineManager:
 
         pipeline_name = _args[0]
         command_args = _args[1:] if len(_args) > 1 else None
-        return execute_pipeline(pipeline_name, command_args)
+        result = execute_pipeline(pipeline_name, command_args)
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None].ok(None)
 
     def _list_pipelines(self, _args: list[str]) -> r[None]:
         """List pipelines."""
@@ -485,7 +488,7 @@ class FlextMeltanoPipelineManager:
             "Configured pipelines",
             pipelines=", ".join(result.value),
         )
-        return r[str].ok("listed")
+        return r[None].ok(None)
 
     def _get_pipeline_status(self, _args: list[str]) -> r[None]:
         """Get pipeline status."""
@@ -499,21 +502,27 @@ class FlextMeltanoPipelineManager:
         self.logger.info(
             "Pipeline status", pipeline=_args[0], status=status_result.value
         )
-        return r[str].ok(status_result.value)
+        return r[None].ok(None)
 
     def _stop_pipeline(self, _args: list[str]) -> r[None]:
         """Stop pipeline."""
         if not _args:
             return r[None].fail("Pipeline stop requires pipeline name")
 
-        return stop_pipeline(_args[0])
+        result = stop_pipeline(_args[0])
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None].ok(None)
 
     def _delete_pipeline(self, _args: list[str]) -> r[None]:
         """Delete pipeline."""
         if not _args:
             return r[None].fail("Pipeline delete requires pipeline name")
 
-        return delete_pipeline(_args[0])
+        result = delete_pipeline(_args[0])
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None].ok(None)
 
     def _run_meltano_command(self, command: list[str]) -> r[None]:
         try:

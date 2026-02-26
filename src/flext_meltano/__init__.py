@@ -30,17 +30,9 @@ from flext_meltano.dbt import (
     FlextMeltanoDbtRunner,
     FlextMeltanoDbtService,
 )
-
-try:
-    from flext_meltano.executor import FlextMeltanoExecutor
-except Exception:
-    FlextMeltanoExecutor = None
+from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-
-try:
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-except Exception:
-    FlextMeltanoLibraryRunner = None
+from flext_meltano.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.meltano import (
     FlextMeltanoMeltanoService,
     FlextMeltanoProjectManager,

@@ -163,3 +163,4 @@ markers = [
 
 [tool.pyrefly]
 search_path = ["."]
+exclude = ["tests", "examples"]

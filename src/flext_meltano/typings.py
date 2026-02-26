@@ -237,7 +237,7 @@ class FlextMeltanoTypes(FlextTypes):
         type JsonObject = FlextTypes.JsonValue
 
         # JSON value type (re-export from FlextTypes for convenience)
-        type JsonValue = FlextTypes.JsonValue
+        type JsonValue = FlextTypes.GeneralValueType
 
         # Run context for pipeline execution
         type RunContextDict = dict[str, FlextTypes.GeneralValueType]
