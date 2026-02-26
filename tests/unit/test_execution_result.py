@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 from unittest.mock import patch
 
+import pytest
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 
 
@@ -82,7 +83,7 @@ class TestFlextMeltanoExecutionResult:
         assert result.exit_code == -1
         assert not result.output
         assert result.error == "No command provided"
-        assert result.execution_time == 0.0
+        assert result.execution_time == pytest.approx(0.0)
 
     def test_to_dict_success(self) -> None:
         """Test to_dict method with successful execution."""

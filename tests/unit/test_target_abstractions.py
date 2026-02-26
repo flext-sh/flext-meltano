@@ -6,9 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import pytest
 from flext_core import FlextLogger
-
-from flext_meltano import FlextMeltanoTargetAbstractions, m, r, t, u
+from flext_meltano import FlextMeltanoTargetAbstractions, r, t, u
 
 logger = FlextLogger(__name__)
 
@@ -29,8 +29,6 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_create_flext_target_config(self) -> None:
         """Test create_flext_target_config method."""
         if not hasattr(self.target_abstractions, "create_flext_target_config"):
-            import pytest
-
             pytest.skip("create_flext_target_config not available (use PYTHONPATH=src)")
         connection_config: dict[str, t.GeneralValueType] = {"output_path": "test.jsonl"}
 
@@ -51,8 +49,6 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_create_flext_target(self) -> None:
         """Test create_flext_target static method."""
         if not hasattr(FlextMeltanoTargetAbstractions, "create_flext_target"):
-            import pytest
-
             pytest.skip("create_flext_target not available (use PYTHONPATH=src)")
         test_config: dict[str, t.GeneralValueType] = {
             "target_type": "jsonl",

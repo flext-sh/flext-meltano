@@ -14,7 +14,7 @@ import json
 import os
 import shutil
 import signal
-import subprocess
+import subprocess  # noqa: S404
 import time
 from collections.abc import Callable, Mapping
 from pathlib import Path
@@ -74,6 +74,7 @@ def create_pipeline(
     pipeline_name: str,
     config: Mapping[str, object] | None,
 ) -> r[str]:
+    """Create a new Meltano pipeline with the given configuration."""
     if not pipeline_name.strip():
         return r[str].fail("Pipeline creation requires a non-empty pipeline name")
     if config is None:
@@ -97,6 +98,7 @@ def execute_pipeline(
     pipeline_name: str,
     command_args: list[str] | None = None,
 ) -> r[str]:
+    """Execute a Meltano pipeline."""
     pipeline_dir = _pipeline_dir(pipeline_name)
     if not pipeline_dir.exists() or not pipeline_dir.is_dir():
         return r[str].fail(f"Pipeline '{pipeline_name}' not found")
@@ -124,7 +126,7 @@ def execute_pipeline(
 
     command = ["meltano", *meltano_args]
     try:
-        completed = subprocess.run(
+        completed = subprocess.run(  # noqa: S603
             command,
             cwd=str(pipeline_dir),
             check=False,
@@ -152,6 +154,7 @@ def execute_pipeline(
 
 
 def list_pipelines() -> r[list[str]]:
+    """List all available Meltano pipelines."""
     pipelines_root = _pipelines_root_dir()
     if not pipelines_root.exists():
         return r[list[str]].ok([])
@@ -171,6 +174,7 @@ def list_pipelines() -> r[list[str]]:
 
 
 def get_pipeline_status(pipeline_name: str) -> r[str]:
+    """Get the status of a specific Meltano pipeline."""
     pipeline_dir = _pipeline_dir(pipeline_name)
     if not pipeline_dir.exists() or not pipeline_dir.is_dir():
         return r[str].fail(f"Pipeline '{pipeline_name}' not found")
@@ -199,6 +203,7 @@ def get_pipeline_status(pipeline_name: str) -> r[str]:
 
 
 def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
+    """Stop a running Meltano pipeline."""
     pipeline_dir = _pipeline_dir(pipeline_name)
     if not pipeline_dir.exists() or not pipeline_dir.is_dir():
         return r[str].fail(f"Pipeline '{pipeline_name}' not found")
@@ -252,6 +257,7 @@ def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
 
 
 def delete_pipeline(pipeline_name: str) -> r[str]:
+    """Delete a Meltano pipeline."""
     pipeline_dir = _pipeline_dir(pipeline_name)
     if not pipeline_dir.exists() or not pipeline_dir.is_dir():
         return r[str].fail(f"Pipeline '{pipeline_name}' not found")
@@ -448,7 +454,7 @@ class FlextMeltanoPipelineManager:
 
         pipeline_name = _args[0]
         config_payload: dict[str, object] | None = None
-        if len(_args) >= 2:
+        if len(_args) >= 2:  # noqa: PLR2004
             try:
                 parsed = json.loads(_args[1])
             except json.JSONDecodeError as exc:
@@ -526,7 +532,7 @@ class FlextMeltanoPipelineManager:
 
     def _run_meltano_command(self, command: list[str]) -> r[None]:
         try:
-            completed = subprocess.run(
+            completed = subprocess.run(  # noqa: S603
                 command,
                 check=False,
                 capture_output=True,

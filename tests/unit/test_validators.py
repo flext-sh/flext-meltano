@@ -12,8 +12,8 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-
 from flext_meltano import FlextMeltanoValidators, t
+
 from tests.flext_tests_compat import tm
 
 

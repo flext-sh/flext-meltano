@@ -71,6 +71,8 @@ class TestFlextMeltanoAdapter:
 
 
 class TestFlextMeltanoOrchestrationPipelineFailures:
+    """Tests for FlextMeltanoOrchestrationService pipeline failure scenarios."""
+
     def test_find_required_plugins_returns_configured_failure(self) -> None:
         result = FlextMeltanoOrchestrationService._find_required_plugins()
 
@@ -79,7 +81,7 @@ class TestFlextMeltanoOrchestrationPipelineFailures:
 
     def test_execute_singer_runner_returns_configured_failure(self) -> None:
         service = cast(
-            FlextMeltanoOrchestrationService,
+            "FlextMeltanoOrchestrationService",
             object.__new__(FlextMeltanoOrchestrationService),
         )
         context_data = {

@@ -17,7 +17,6 @@ from pathlib import Path
 
 import pytest
 from flext_core import FlextConstants, FlextSettings
-
 from flext_meltano import FlextMeltanoSettings
 
 
@@ -49,9 +48,9 @@ class TestFlextMeltanoSettings:
         config.project_root = Path("/test")
 
         # Test defaults (config_dir may be .meltano or config per Platform)
-        assert config.config_dir.name in (".meltano", "config")
+        assert config.config_dir.name in {".meltano", "config"}
         assert config.logs_dir.name == "logs"
-        assert config.environment in ("development", "testing")
+        assert config.environment in {"development", "testing"}
         # FlextSettings converts to uppercase and may be affected by singleton state
         assert config.log_level in {"INFO", "DEBUG", "WARNING"}  # Accept valid defaults
 

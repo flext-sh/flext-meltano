@@ -193,8 +193,8 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
     def project_root(self) -> Path:
         """Get project root directory - delegates to config."""
         project_root = getattr(self._meltano_config, "project_root", None)
-         if project_root is not None:
-             return m.Meltano.PathPayload(value=project_root).value
+        if project_root is not None:
+            return m.Meltano.PathPayload(value=project_root).value
         return Path.cwd()
 
     @property

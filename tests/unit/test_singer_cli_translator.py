@@ -14,7 +14,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import subprocess
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_meltano import m
@@ -220,7 +219,11 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
         assert result.is_success
         source_command, sink_command = result.value
-        assert source_command == ["tap-postgres", "--config", "/path/to/tap-config.json"]
+        assert source_command == [
+            "tap-postgres",
+            "--config",
+            "/path/to/tap-config.json",
+        ]
         assert sink_command == ["target-postgres"]
 
     def test_translate_pipeline_run_with_sink_config(self) -> None:

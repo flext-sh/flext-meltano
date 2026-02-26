@@ -8,9 +8,8 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from pydantic import ValidationError
-
 from flext_meltano import m
+from pydantic import ValidationError
 
 
 class TestTapConfigEnhanced:
@@ -95,12 +94,14 @@ class TestTargetConfigEnhanced:
         assert config.target_type == "target-postgres"
         assert config.connection_config["database"] == "analytics"
         assert config.batch_size == 1000
-        assert config.batch_wait_limit == 30.0
+        assert config.batch_wait_limit == pytest.approx(30.0)
 
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test TargetConfig validation with empty target_type."""
         with pytest.raises(ValidationError, match="target_type cannot be empty"):
-            m.Meltano.TargetConfig(target_type="", connection_config={"host": "localhost"})
+            m.Meltano.TargetConfig(
+                target_type="", connection_config={"host": "localhost"}
+            )
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         """Test TargetConfig validation with invalid batch_size type."""

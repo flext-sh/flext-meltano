@@ -261,12 +261,10 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         path_obj = config_data.get("path")
         config_obj = config_data.get("config")
 
-         normalized_path = m.Meltano.PathPayload(
-             value=path_obj
-         ).value
-         normalized_config = m.Meltano.ConfigMappingPayload(
-             values=config_obj,
-         ).values
+        normalized_path = m.Meltano.PathPayload(value=path_obj).value
+        normalized_config = m.Meltano.ConfigMappingPayload(
+            values=config_obj,
+        ).values
 
         # Now we have proper types, call _write_meltano_config
         return FlextMeltanoProjectService._write_meltano_config(

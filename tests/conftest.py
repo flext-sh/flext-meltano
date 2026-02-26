@@ -344,8 +344,7 @@ def postgres_service(
 ) -> Generator[str | None]:
     """PostgreSQL service fixture."""
     with docker_manager.service_context(["postgres"]):
-        url = docker_manager.get_service_url("postgres", 5432)
-        yield url
+        yield docker_manager.get_service_url("postgres", 5432)
 
 
 @pytest.fixture
@@ -354,8 +353,7 @@ def redis_service(
 ) -> Generator[str | None]:
     """Redis service fixture."""
     with docker_manager.service_context(["redis"]):
-        url = docker_manager.get_service_url("redis", 6379)
-        yield url
+        yield docker_manager.get_service_url("redis", 6379)
 
 
 @pytest.fixture
@@ -364,8 +362,7 @@ def meltano_service(
 ) -> Generator[str | None]:
     """Meltano service fixture."""
     with docker_manager.service_context(["meltano"]):
-        url = docker_manager.get_service_url("meltano", 3000)
-        yield url
+        yield docker_manager.get_service_url("meltano", 3000)
 
 
 # Pytest markers for test categorization

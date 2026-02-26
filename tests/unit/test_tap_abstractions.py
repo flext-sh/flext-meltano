@@ -4,9 +4,8 @@ import tempfile
 import unittest
 
 import pytest
-from pydantic_core import ValidationError
-
 from flext_meltano import FlextMeltanoTapAbstractions, m, r, t
+from pydantic_core import ValidationError
 
 StreamDefinition = m.Meltano.StreamDefinition
 TapConfig = m.Meltano.TapConfig

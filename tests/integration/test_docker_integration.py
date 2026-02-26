@@ -40,7 +40,11 @@ class TestDockerIntegration:
             assert True  # Connection successful
         except Exception as e:
             err_msg = str(e).lower()
-            if "starting up" in err_msg or "connection refused" in err_msg or "timeout" in err_msg:
+            if (
+                "starting up" in err_msg
+                or "connection refused" in err_msg
+                or "timeout" in err_msg
+            ):
                 pytest.skip(f"PostgreSQL not ready: {e}")
             pytest.fail(f"Failed to connect to PostgreSQL: {e}")
 

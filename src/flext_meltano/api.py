@@ -535,12 +535,12 @@ class FlextMeltano(FlextService[t.JsonValue]):
             )
 
             plugins_list = list(filtered_plugins) if filtered_plugins else []
-             plugins_data: list[t.MeltanoCore.MeltanoConfigDict] = [
-                 m.Meltano.ConfigMappingPayload(
-                     values={**plugin_entry, "api_version": self.version},
-                 ).values
-                 for plugin_entry in plugins_list
-             ]
+            plugins_data: list[t.MeltanoCore.MeltanoConfigDict] = [
+                m.Meltano.ConfigMappingPayload(
+                    values={**plugin_entry, "api_version": self.version},
+                ).values
+                for plugin_entry in plugins_list
+            ]
 
             return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

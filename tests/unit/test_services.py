@@ -7,7 +7,6 @@ from __future__ import annotations
 import tempfile
 
 import pytest
-
 from flext_meltano import FlextMeltanoService, r, s, t
 
 
@@ -112,8 +111,6 @@ class TestTapService:
             try:
                 result = tap_service.create_instance(config)
             except TypeError:
-                import pytest
-
                 pytest.skip(
                     "create_instance(config) not available (use PYTHONPATH=src)"
                 )
@@ -209,8 +206,6 @@ class TestTargetService:
             try:
                 result = target_service.create_instance(config)
             except TypeError:
-                import pytest
-
                 pytest.skip(
                     "create_instance(config) not available (use PYTHONPATH=src)"
                 )
