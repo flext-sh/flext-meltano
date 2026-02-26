@@ -119,7 +119,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         # Numeric project_id is converted to string by str() in implementation
         # Type hint says str but we pass int to test coercion behavior
         result = utilities.create_meltano_config_dict(
-            project_id=123,  # type: ignore[arg-type] - testing coercion
+            project_id=123,
             project_name="test-project",
             version="1.0.0",
         )
@@ -244,7 +244,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             invalid_content: object = 123
             result = utilities.create_project_file(
                 project_path / "test.yml",
-                invalid_content,  # type: ignore[arg-type]
+                invalid_content,
             )
 
             assert result.is_failure

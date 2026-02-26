@@ -1,3 +1,5 @@
+"""Unit tests for pipeline CLI managers."""
+
 from __future__ import annotations
 
 import json
