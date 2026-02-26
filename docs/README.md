@@ -28,7 +28,7 @@
 
 **Version**: 0.9.9 RC | **Last Updated**: 2025-09-17
 
----
+______________________________________________________________________
 
 ## 📋 Documentation Index
 
@@ -48,7 +48,7 @@
 
 - **[Examples](examples/)** - Working code examples and patterns
 
----
+______________________________________________________________________
 
 ## 🎯 Purpose and Architecture
 
@@ -101,7 +101,7 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 - **[Integration Patterns](guides/integration.md)** - Ecosystem integration with other FLEXT projects
 - **[Examples](examples/)** - Working code examples and usage patterns
 
----
+______________________________________________________________________
 
 ## 📋 Development Workflow
 
@@ -123,7 +123,7 @@ make test               # Test suite execution
 - **Service Pattern**: Follow flext-core domain service patterns
 - **Architecture**: Single class per module compliance
 
----
+______________________________________________________________________
 
 ## 📞 Support and Resources
 
@@ -139,7 +139,7 @@ make test               # Test suite execution
 - **[FLEXT Standards](../../CLAUDE.md)** - Development standards
 - **[Root TODO.md](../TODO.md)** - Current roadmap and critical issues
 
----
+______________________________________________________________________
 
 **flext-meltano Documentation v0.9.9** - Last updated 2025-09-17
 

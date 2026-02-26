@@ -537,7 +537,7 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 - [architecture-report.md](architecture-report.md) - Automated status reports
 - [../../scripts/architecture_automation.py](../../scripts/architecture_automation.py) - Automation tools
 
----
+______________________________________________________________________
 
 **Architecture Documentation Guide**: FLEXT-Meltano Architecture Framework
 _Comprehensive guide for creating, maintaining, and evolving enterprise architecture documentation_

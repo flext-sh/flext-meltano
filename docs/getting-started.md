@@ -24,13 +24,13 @@
 
 **ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer integration.
 
----
+______________________________________________________________________
 
 ## 🎯 Overview
 
 flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abstracting Meltano project management, Singer protocol operations, and dbt transformations behind flext-core compatible interfaces.
 
----
+______________________________________________________________________
 
 ## 📋 Prerequisites
 
@@ -53,7 +53,7 @@ source .venv/bin/activate
 cd flext-meltano
 ```
 
----
+______________________________________________________________________
 
 ## ⚡ Quick Installation
 
@@ -65,7 +65,7 @@ poetry install --with dev,test
 python -c "from flext_meltano import FlextMeltanoService; print('✅ Installation successful')"
 ```
 
----
+______________________________________________________________________
 
 ## 🚀 First Steps
 
@@ -154,7 +154,7 @@ else:
     print(f"Error: {result.error}")
 ```
 
----
+______________________________________________________________________
 
 ## 🔧 Development Workflow
 
@@ -183,7 +183,7 @@ make format             # Auto-format code
 make check-imports      # Validate import compliance
 ```
 
----
+______________________________________________________________________
 
 ## 📚 Next Steps
 
@@ -192,7 +192,7 @@ make check-imports      # Validate import compliance
 - **[Development](development.md)** - Contributing guidelines
 - **[Integration](guides/integration.md)** - Ecosystem integration patterns
 
----
+______________________________________________________________________
 
 ## ⚠️ Important Notes
 
@@ -208,7 +208,7 @@ make check-imports      # Validate import compliance
 - **Quality Gates**: All checks must pass before commits
 - **Integration**: Use only flext-core compatible patterns
 
----
+______________________________________________________________________
 
 **Next**: Review the [Architecture Guide](architecture.md) to understand flext-meltano's design patterns and FLEXT ecosystem integration.
 

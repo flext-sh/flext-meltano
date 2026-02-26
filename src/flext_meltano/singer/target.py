@@ -190,6 +190,29 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         # For now, return the current configuration
         return r[t.MeltanoCore.MeltanoConfigDict].ok(self._meltano_config.model_dump())
 
+    def create_flext_target(
+        self,
+        sink_config: m.Meltano.DataSinkConfig | dict[str, t.JsonValue],
+    ) -> r[m.Meltano.DataSinkInstance]:
+        """Create a target instance from configuration.
+
+        Args:
+            sink_config: Target configuration
+
+        Returns:
+            FlextResult containing the created DataSinkInstance
+
+        """
+        if isinstance(sink_config, dict):
+            try:
+                config = m.Meltano.DataSinkConfig(**sink_config)
+            except Exception as e:
+                return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
+        else:
+            config = sink_config
+
+        return self.create_sink_instance(config)
+
 
 # Export Singer SDK types with FLEXT naming
 FlextMeltanoTarget = Target

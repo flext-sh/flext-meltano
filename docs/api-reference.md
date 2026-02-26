@@ -43,7 +43,7 @@
 
 Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin development tools, and enterprise data pipeline orchestration.
 
----
+______________________________________________________________________
 
 ## 🎯 Library Overview
 
@@ -74,7 +74,7 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 | `pipeline_service.py` | Pipeline orchestration         | `FlextMeltanoService`, `FlextMeltanoExecutor` |
 | `project_service.py`  | Project management             | `FlextProjectService`, `FlextMeltanoProject`  |
 
----
+______________________________________________________________________
 
 ## 🎯 Core Services
 
@@ -306,7 +306,7 @@ def execute_parallel_pipelines(
     """
 ```
 
----
+______________________________________________________________________
 
 ## 🔌 Singer Protocol Abstractions
 
@@ -452,7 +452,7 @@ def validate_config(self) -> FlextResult[FlextMeltanoModels.ValidationResult]:
     """
 ```
 
----
+______________________________________________________________________
 
 ## 🛠️ Plugin Management Services
 
@@ -614,7 +614,7 @@ def list_plugins_by_type(
     """
 ```
 
----
+______________________________________________________________________
 
 ## 🚀 Pipeline Services
 
@@ -739,7 +739,7 @@ def execute_conditional_pipeline(
     """
 ```
 
----
+______________________________________________________________________
 
 ## 📁 Project Management
 
@@ -852,7 +852,7 @@ def plugins(self) -> list[FlextMeltanoModels.PluginInfo]:
     """Get list of configured plugins."""
 ```
 
----
+______________________________________________________________________
 
 ## 🔧 Configuration Management
 
@@ -897,7 +897,7 @@ def pipeline_configs(self) -> dict[str, FlextMeltanoModels.PipelineConfig]:
     """Get pipeline execution configurations."""
 ```
 
----
+______________________________________________________________________
 
 ## 📊 Models and Types
 
@@ -1000,7 +1000,7 @@ class PipelineResult(FlextBaseModel):
     error: str | None = None
 ```
 
----
+______________________________________________________________________
 
 ## 🛡️ Exception Hierarchy
 
@@ -1042,7 +1042,7 @@ class FlextMeltanoSettingsurationException(FlextMeltanoException):
     """Exception raised for configuration errors."""
 ```
 
----
+______________________________________________________________________
 
 ## 🔄 Integration Examples
 
@@ -1112,7 +1112,7 @@ taps = plugin_service.discover_plugins()
 available_taps = [p for p in taps.unwrap() if p.plugin_type == "tap"]
 ```
 
----
+______________________________________________________________________
 
 **Document Status**: ✅ Complete | **Last Reviewed**: 2025-10-05
 
