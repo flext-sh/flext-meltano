@@ -29,7 +29,7 @@
 
 **Common issues and solutions** for flext-meltano development and usage.
 
-______________________________________________________________________
+---
 
 ## 🚨 Architecture Compliance Issues
 
@@ -52,7 +52,7 @@ from meltano.core.project import Project
 from flext_meltano import FlextMeltanoAdapter
 ```
 
-______________________________________________________________________
+---
 
 ## 🔧 Development Issues
 
@@ -133,7 +133,7 @@ pytest tests/integration/ -v  # Integration tests
 1. **Environment setup**: Activate correct virtual environment
 1. **Dependencies**: Run `poetry install --with dev,test`
 
-______________________________________________________________________
+---
 
 ## 📦 Dependency Issues
 
@@ -164,7 +164,7 @@ source .venv/bin/activate
 cd flext-meltano
 ```
 
-______________________________________________________________________
+---
 
 ## 🧪 Testing Issues
 
@@ -198,7 +198,7 @@ pytest -m "not slow"
 pytest tests/unit/
 ```
 
-______________________________________________________________________
+---
 
 ## 🔍 Quality Gate Failures
 
@@ -238,7 +238,7 @@ bandit -r src/ -f json
 - **SQL injection**: Use parameterized queries
 - **Path traversal**: Validate file paths
 
-______________________________________________________________________
+---
 
 ## 🚫 Common Mistakes
 
@@ -303,7 +303,7 @@ class FlextMeltanoUtilityService(FlextService):
         pass
 ```
 
-______________________________________________________________________
+---
 
 ## 🆘 Getting Help
 
@@ -329,7 +329,7 @@ make validate 2>&1 | head -50
 - **Issues**: [GitHub Issues](https://github.com/flext-sh/flext/issues)
 - **Architecture**: Review [architecture.md](architecture.md)
 
-______________________________________________________________________
+---
 
 ## 📋 Debugging Checklist
 
@@ -342,6 +342,6 @@ Before reporting issues:
 - [ ] Reviewed error messages carefully
 - [ ] Checked documentation for similar issues
 
-______________________________________________________________________
+---
 
 **Need more help?** Check the [Development Guide](development.md) for detailed contributing guidelines.

@@ -47,7 +47,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
     def discover_streams(
         self,
-        source_config: m.Meltano.DataSourceConfig,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
     ) -> r[t.Singer.StreamCatalog]:
         """Discover available streams for a source configuration.
 
@@ -142,7 +144,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
     def create_source_instance(
         self,
-        source_config: m.Meltano.DataSourceConfig,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
     ) -> r[m.Meltano.DataSourceInstance]:
         """Create a source instance from configuration.
 
@@ -154,18 +158,25 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
         """
         try:
+            source_type = getattr(source_config, "source_type", None) or getattr(
+                source_config, "tap_type", "unknown"
+            )
+            source_identifier = getattr(
+                source_config, "source_identifier", None
+            ) or getattr(source_config, "tap_identifier", "unknown")
+
             self.logger.info(
                 "Creating source instance",
-                source_name=source_config.source_type,
-                source_type=source_config.source_type,
+                source_name=source_type,
+                source_type=source_type,
             )
 
             # Create unique source identifier
-            source_id = f"{source_config.source_type}:{source_config.source_identifier}"
+            source_id = f"{source_type}:{source_identifier}"
 
             # Create source instance
             source_instance = m.Meltano.DataSourceInstance(
-                source_type=source_config.source_type,
+                source_type=source_type,
                 config=source_config,
                 status="configured",
                 source_id=source_id,
@@ -173,7 +184,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
             self.logger.info(
                 "Source instance created successfully",
-                source_name=source_instance.config.source_type,
+                source_name=source_type,
             )
 
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
@@ -192,7 +203,12 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
                 f"Source instance creation failed: {e}",
             )
 
-    def process(self, source_config: m.Meltano.DataSourceConfig) -> r[bool]:
+    def process(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+    ) -> r[bool]:
         """Process a source configuration for validation.
 
         Args:
@@ -203,13 +219,17 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
         """
         try:
+            source_type = getattr(source_config, "source_type", None) or getattr(
+                source_config, "tap_type", "unknown"
+            )
+
             self.logger.debug(
                 "Processing source configuration",
-                source_name=source_config.source_type,
+                source_name=source_type,
             )
 
             # Basic validation
-            if not source_config.source_type:
+            if not source_type or source_type == "unknown":
                 return r[bool].fail("Source configuration must have a type")
 
             # Additional validation logic would go here
@@ -240,6 +260,88 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         """
         # Return empty catalog ready for stream discovery
         return r[t.Singer.StreamCatalog].ok({"streams": []})
+
+    def generate_catalog(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+    ) -> r[t.JsonDict]:
+        """Generate a legacy Singer catalog from configuration.
+
+        Args:
+            source_config: Source configuration or instance
+
+        Returns:
+            FlextResult containing the generated catalog dictionary
+
+        """
+        # Placeholder implementation
+        _ = source_config
+        return r[t.JsonDict].ok({"version": 1, "streams": []})
+
+    def sync_stream(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+        stream_name: str,
+        target: t.GeneralValueType | None = None,
+    ) -> r[t.JsonDict]:
+        """Synchronize a single stream from source to target.
+
+        Args:
+            source_config: Source configuration or instance
+            stream_name: Name of the stream to sync
+            target: Optional target configuration or instance
+
+        Returns:
+            FlextResult containing synchronization statistics
+
+        """
+        # Placeholder implementation
+        _ = source_config
+        return r[t.JsonDict].ok({
+            "stream_name": stream_name,
+            "status": "completed",
+            "records_processed": 0,
+            "target_loaded": target is not None,
+        })
+
+    def create_tap_from_config(
+        self,
+        tap_type: str,
+        connection_config: dict[str, t.GeneralValueType],
+        stream_config: dict[str, t.GeneralValueType] | None = None,
+        **kwargs: t.GeneralValueType,
+    ) -> r[m.Meltano.TapInstance]:
+        """Create a tap instance from raw configuration data.
+
+        Args:
+            tap_type: Type of the tap
+            connection_config: Raw connection configuration
+            stream_config: Optional stream configuration
+
+        Returns:
+            FlextResult containing the created TapInstance
+
+        """
+        try:
+            config = m.Meltano.TapConfig(
+                tap_type=tap_type,
+                connection_config=connection_config,
+                stream_config=stream_config or {},
+                **kwargs,
+            )
+            return self.create_source_instance(config).map(
+                lambda inst: m.Meltano.TapInstance(
+                    tap_type=inst.source_type,
+                    config=config,
+                    tap_id=inst.source_id,
+                )
+            )
+        except Exception as e:
+            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
 
 
 # Export Singer SDK types with FLEXT naming

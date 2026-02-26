@@ -505,7 +505,7 @@ auditor.generate_custom_report("api_quality.md")
 - **Configuration**: `docs/.maintenance_config.yaml`
 - **Quality Reports**: `docs/reports/`
 
-______________________________________________________________________
+---
 
 **Documentation Maintenance Framework v1.0.0**
 _Ensuring FLEXT-Meltano documentation excellence through automated quality assurance._

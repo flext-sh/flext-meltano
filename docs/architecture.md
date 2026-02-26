@@ -39,7 +39,7 @@
 
 **Version**: 0.9.9 RC | **Last Updated**: 2025-09-17
 
-______________________________________________________________________
+---
 
 ## 🎯 Architectural Overview
 
@@ -374,7 +374,7 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 1. **Phase 3**: Complete plugin architecture foundation
 1. **Phase 4**: Performance optimization and production hardening
 
-______________________________________________________________________
+---
 
 **Architecture Summary**: flext-meltano provides a robust, type-safe foundation for ELT operations within the FLEXT ecosystem, with clear separation of concerns, comprehensive error handling, and strong integration patterns. The current architecture debt primarily involves abstracting direct library dependencies behind FLEXT-compatible interfaces.
 

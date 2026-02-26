@@ -204,7 +204,7 @@ make docs
 - **Cloud-Native Features** - Kubernetes operators and service mesh integration
 - **AI/ML Integration** - Intelligent pipeline optimization and anomaly detection
 
-______________________________________________________________________
+---
 
 **Architecture Documentation**: FLEXT-Meltano Enterprise Architecture Framework
 _Comprehensive, automated, and maintainable architecture documentation system_
