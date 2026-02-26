@@ -321,7 +321,7 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Resolved absolute path.
 
         """
-        path_value = m.Meltano.PathPayload.model_validate({"value": v}).value
+         path_value = m.Meltano.PathPayload(value=v).value
         return path_value.expanduser().resolve()
 
     @field_validator("config_dir", "logs_dir")
@@ -336,7 +336,7 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Expanded but not resolved path to allow relative paths.
 
         """
-        path_value = m.Meltano.PathPayload.model_validate({"value": v}).value
+         path_value = m.Meltano.PathPayload(value=v).value
         return path_value.expanduser()  # Don't resolve to allow relative paths
 
     @field_validator("meltano_version", "singer_sdk_version", "dbt_version")

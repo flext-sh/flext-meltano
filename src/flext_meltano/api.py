@@ -101,18 +101,18 @@ class FlextMeltano(FlextService[t.JsonValue]):
 
         if config is None:
             if project_root is not None:
-                config = FlextMeltanoSettings.model_validate({
-                    "project_root": project_root,
-                })
+                config = FlextMeltanoSettings(
+                    project_root=project_root,
+                )
             else:
                 config = None
         if config is None:
             if project_root:
-                self._config = FlextMeltanoSettings.model_validate({
-                    "project_root": project_root,
-                })
+                self._config = FlextMeltanoSettings(
+                    project_root=project_root,
+                )
             else:
-                self._config = FlextMeltanoSettings.model_validate({})
+                self._config = FlextMeltanoSettings()
         else:
             self._config = config
 
@@ -535,12 +535,12 @@ class FlextMeltano(FlextService[t.JsonValue]):
             )
 
             plugins_list = list(filtered_plugins) if filtered_plugins else []
-            plugins_data: list[t.MeltanoCore.MeltanoConfigDict] = [
-                m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": {**plugin_entry, "api_version": self.version},
-                }).values
-                for plugin_entry in plugins_list
-            ]
+             plugins_data: list[t.MeltanoCore.MeltanoConfigDict] = [
+                 m.Meltano.ConfigMappingPayload(
+                     values={**plugin_entry, "api_version": self.version},
+                 ).values
+                 for plugin_entry in plugins_list
+             ]
 
             return r[list[t.MeltanoCore.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

@@ -172,9 +172,9 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             .flat_map(
                 lambda params: self._create_project_directory(
                     str(params["name"]),
-                    m.Meltano.PathPayload.model_validate({
-                        "value": params["parent_dir"],
-                    }).value,
+                    m.Meltano.PathPayload(
+                        value=params["parent_dir"],
+                    ).value,
                 ),
             )
             .flat_map(self._create_project_structure)
@@ -261,12 +261,12 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         path_obj = config_data.get("path")
         config_obj = config_data.get("config")
 
-        normalized_path = m.Meltano.PathPayload.model_validate({
-            "value": path_obj
-        }).value
-        normalized_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": config_obj,
-        }).values
+         normalized_path = m.Meltano.PathPayload(
+             value=path_obj
+         ).value
+         normalized_config = m.Meltano.ConfigMappingPayload(
+             values=config_obj,
+         ).values
 
         # Now we have proper types, call _write_meltano_config
         return FlextMeltanoProjectService._write_meltano_config(

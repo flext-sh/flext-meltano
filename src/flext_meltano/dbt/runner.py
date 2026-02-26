@@ -9,32 +9,38 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 
 from flext_core import r, s
+from pydantic import BaseModel, ConfigDict, Field
 
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
-@dataclass
-class DbtRunResult:
+class DbtRunResult(BaseModel):
     """Result of a DBT run operation."""
 
-    success: bool
-    models_run: int = 0
-    models_failed: int = 0
-    status: str = "unknown"
+    model_config = ConfigDict(extra="forbid")
+
+    success: bool = Field(..., description="Whether the DBT run succeeded")
+    models_run: int = Field(default=0, ge=0, description="Number of models run")
+    models_failed: int = Field(
+        default=0, ge=0, description="Number of models that failed"
+    )
+    status: str = Field(default="unknown", description="Status of the DBT run")
 
 
-@dataclass
-class DbtTestResult:
+class DbtTestResult(BaseModel):
     """Result of a DBT test operation."""
 
-    success: bool
-    tests_run: int = 0
-    tests_failed: int = 0
-    status: str = "unknown"
+    model_config = ConfigDict(extra="forbid")
+
+    success: bool = Field(..., description="Whether the DBT test succeeded")
+    tests_run: int = Field(default=0, ge=0, description="Number of tests run")
+    tests_failed: int = Field(
+        default=0, ge=0, description="Number of tests that failed"
+    )
+    status: str = Field(default="unknown", description="Status of the DBT test")
 
 
 class FlextMeltanoDbtRunner(s[str]):
