@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 from pydantic import BaseModel, Field
 
 from flext_meltano.constants import FlextMeltanoConstants
@@ -24,8 +24,6 @@ from flext_meltano.utilities import u
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
-r = FlextResult
-s = FlextService
 
 
 class FlextMeltanoMeltanoService(s[str]):

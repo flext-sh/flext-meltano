@@ -48,8 +48,8 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     """
 
     # Core service attributes
-    service_name: str
-    version: str
+    service_name: str = ""
+    version: str = ""
     source_name: str | None = None
     sink_name: str | None = None
     transformation_name: str | None = None
@@ -100,7 +100,6 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         tap_name: str | None = None,
         target_name: str | None = None,
         project_name: str | None = None,
-        **_data: t.MeltanoCore.JsonValue,
     ) -> None:
         """Initialize generic pipeline service with composition-based architecture.
 
@@ -119,33 +118,30 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
             tap_name: Singer tap name (maps to source_name)
             target_name: Singer target name (maps to sink_name)
             project_name: DBT project name (maps to transformation_name)
-            **data: Additional configuration data
 
         """
         if not service_name:
             msg = "Service name cannot be empty"
             raise e.ValidationError(msg)
 
-        self._meltano_config = config or FlextMeltanoSettings()
-
         # Map domain-specific parameters to generic parameters (SOLID mapping)
         mapped_source_name = source_name or tap_name
         mapped_sink_name = sink_name or target_name
         mapped_transformation_name = transformation_name or project_name
 
-        # Initialize parent with required fields (exclude None values)
-        init_data = {
-            "service_name": service_name,
-            "version": version,
-        }
-        if mapped_source_name is not None:
-            init_data["source_name"] = mapped_source_name
-        if mapped_sink_name is not None:
-            init_data["sink_name"] = mapped_sink_name
-        if mapped_transformation_name is not None:
-            init_data["transformation_name"] = mapped_transformation_name
+        super().__init__()
 
-        super().__init__(**init_data)
+        self._meltano_config = config or FlextMeltanoSettings()
+
+        # Set service fields directly after init
+        self.service_name = service_name
+        self.version = version
+        if mapped_source_name is not None:
+            self.source_name = mapped_source_name
+        if mapped_sink_name is not None:
+            self.sink_name = mapped_sink_name
+        if mapped_transformation_name is not None:
+            self.transformation_name = mapped_transformation_name
 
         # Store service type for domain-specific operations
         self._service_type = service_type

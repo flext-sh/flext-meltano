@@ -12,7 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
@@ -25,11 +25,10 @@ from flext_meltano.typings import FlextMeltanoTypes
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
 singer_p = FlextMeltanoSingerProtocols
-r = FlextResult
 m = FlextMeltanoModels
 
 
-class FlextMeltanoSingerService(FlextService[str]):
+class FlextMeltanoSingerService(s[str]):
     """Orchestrates Singer ELT pipelines (tap -> target) with deep SDK integration.
 
     Provides complete Singer protocol orchestration including:
