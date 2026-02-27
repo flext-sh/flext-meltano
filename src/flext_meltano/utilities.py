@@ -12,16 +12,15 @@ from typing import TextIO
 
 import yaml
 from flext_core import (
-from typing import override
     FlextLogger,
     FlextUtilities,
     r,
 )
 
-from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.constants import c
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 
 m = FlextMeltanoModels
 

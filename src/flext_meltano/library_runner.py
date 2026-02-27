@@ -17,9 +17,8 @@ from flext_core import FlextLogger, FlextResult
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.singer_protocols import SingerTap, SingerTarget
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 
-from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 

@@ -9,12 +9,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import Protocol, override, runtime_checkable
 
 from flext_core.protocols import FlextProtocols
 from flext_core.typings import FlextTypes
 
-from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> u
 # Runtime aliases defined at module level per FLEXT standards
 t = FlextTypes
@@ -116,7 +115,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             @override
-    def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute the tap extraction (implements Service)."""
                 ...
 
@@ -139,7 +138,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             @override
-    def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute the target loading (implements Service)."""
                 ...
 
@@ -160,7 +159,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 ...
 
             @override
-    def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute DBT transformations (implements Service)."""
                 ...
 

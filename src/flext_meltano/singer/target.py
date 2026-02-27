@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
+
 from flext_core import FlextResult, FlextService
 from singer_sdk import Target
 
@@ -17,7 +19,6 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
-from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 s = FlextService

@@ -16,14 +16,12 @@ from pathlib import Path
 from typing import ClassVar
 
 import yaml
-from flext_core import FlextContainer, FlextSettings, r, u
+from flext_core import FlextContainer, FlextSettings, r
 
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.models import m
+from flext_meltano.typings import t
+from flext_meltano.utilities import u
 
-from typing import override
-# Import aliases for simplified usage
-m = FlextMeltanoModels
 
 
 class DocsConfig(FlextSettings):

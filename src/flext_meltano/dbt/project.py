@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, override
 
 from flext_core import r, s
 from pydantic import BaseModel, Field, ValidationError
@@ -19,7 +19,6 @@ from pydantic import BaseModel, Field, ValidationError
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
-from typing import override
 m = FlextMeltanoModels
 
 

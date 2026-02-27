@@ -11,30 +11,21 @@ from __future__ import annotations
 import time
 from collections.abc import Callable
 from pathlib import Path
-
-from flext_core import (
 from typing import override
-    FlextExceptions,
-    FlextService,
-    r,
-    u,
-)
+
+from flext_core import  e, r
 from pydantic import ValidationError
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.services import FlextMeltanoService
+from flext_meltano.models import m
+from flext_meltano.services import s
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes, t
-
-# Import aliases following order: c -> t -> p -> r -> m -> u -> e
-t_m = FlextMeltanoTypes
-m = FlextMeltanoModels
-e = FlextExceptions
+from flext_meltano.typings import t
+from flext_meltano.utilities import u
 
 
-class FlextMeltano(FlextService[t.JsonValue]):
+class FlextMeltano(s[t.JsonValue]):
     """FLEXT Meltano API facade.
 
     Provides a unified interface for Meltano operations with direct flext-core
@@ -51,14 +42,14 @@ class FlextMeltano(FlextService[t.JsonValue]):
         return FlextMeltanoConstants
 
     @property
-    def types(self) -> type[FlextMeltanoTypes]:
-        """Get FlextMeltanoTypes - delegates to foundation layer."""
-        return FlextMeltanoTypes
+    def types(self) -> type[t]:
+        """Get t - delegates to foundation layer."""
+        return t
 
     @property
-    def models(self) -> type[FlextMeltanoModels]:
-        """Get FlextMeltanoModels - delegates to domain layer."""
-        return FlextMeltanoModels
+    def models(self) -> type[m]:
+        """Get m - delegates to domain layer."""
+        return m
 
     @property
     @override
@@ -735,7 +726,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
     ) -> r[t.JsonValue]:
         """Extract data from source - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self.config, source_name=source_name)
+            service = s(config=self.config, source_name=source_name)
             parsed_schema = m.Meltano.JsonSchemaPayload.model_validate(
                 {"schema": config or {}},
             )
@@ -757,7 +748,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
     ) -> r[t.JsonValue]:
         """Load data to sink - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self.config, sink_name=sink_name)
+            service = s(config=self.config, sink_name=sink_name)
             if records is not None and not u.empty(records):
                 records_batch = m.Meltano.JsonRecordBatchPayload.model_validate(
                     {"records": records},
@@ -777,7 +768,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
     def discover_catalog(self, source_name: str) -> r[t.JsonValue]:
         """Discover source schema - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self.config, source_name=source_name)
+            service = s(config=self.config, source_name=source_name)
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.JsonValue].fail(f"Failed to discover catalog: {e}")

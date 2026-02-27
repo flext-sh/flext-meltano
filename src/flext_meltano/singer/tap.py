@@ -9,14 +9,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
+
 from flext_core import FlextResult, FlextRuntime, FlextService
 from singer_sdk import Stream, Tap
 
-from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.models import m
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 
-from typing import override
 # Result alias
 r = FlextResult
 

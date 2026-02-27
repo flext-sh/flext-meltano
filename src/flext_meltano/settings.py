@@ -12,10 +12,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import ClassVar, Self
+from typing import ClassVar, Self, override
 
 from flext_core import (
-from typing import override
     FlextSettings,
     FlextTypes,
     r,
@@ -23,9 +22,9 @@ from typing import override
 from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_meltano.constants import FlextMeltanoConstants, FlextMeltanoConstants as c
+from flext_meltano.constants import c
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 from flext_meltano.utilities import FlextMeltanoUtilities
 from flext_meltano.validators import FlextMeltanoValidators
 

@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import override
 
 from flext_core import FlextContainer, e, r, s, u
 
@@ -17,7 +18,6 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 
 
-from typing import override
 class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Generic data pipeline service with composition-based architecture.
 

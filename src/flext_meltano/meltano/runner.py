@@ -13,7 +13,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_core import (
-from typing import override
     FlextResult,
     FlextService,
 )

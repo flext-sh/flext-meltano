@@ -16,7 +16,6 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import (
-from typing import override
     FlextResult,
     FlextService,
 )

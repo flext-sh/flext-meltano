@@ -23,7 +23,7 @@ from flext_meltano.api import FlextMeltano
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.constants import (
     FlextMeltanoConstants,
-    FlextMeltanoConstants as c,
+    c,
 )
 from flext_meltano.dbt import (
     FlextMeltanoDbtProjectManager,
@@ -39,7 +39,7 @@ from flext_meltano.meltano import (
 )
 from flext_meltano.models import (
     FlextMeltanoModels,
-    FlextMeltanoModels as m,
+    m,
 )
 from flext_meltano.protocols import (
     FlextMeltanoProtocols,

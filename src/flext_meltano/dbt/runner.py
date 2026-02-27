@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
 from flext_core import r, s
 from pydantic import BaseModel, ConfigDict, Field
@@ -17,7 +18,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
-from typing import override
 class DbtRunResult(BaseModel):
     """Result of a DBT run operation."""
 

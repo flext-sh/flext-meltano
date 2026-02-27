@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
 from flext_core import r, s
 from pydantic import BaseModel, Field
@@ -20,7 +21,6 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
-from typing import override
 # Import aliases for concise usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants

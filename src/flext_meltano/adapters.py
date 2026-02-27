@@ -16,18 +16,13 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import override
 
 import meltano
-from flext_core import FlextResult, FlextService, FlextSettings, u
+from flext_core import r, FlextService, FlextSettings, u
 
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
-
-from typing import override
-# Import aliases following order: c -> t -> p -> r -> m -> u
-t = FlextMeltanoTypes
-r = FlextResult
-
+from flext_meltano.typings import t
 
 class ProjectAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Focused adapter for Meltano project management following SOLID principles."""

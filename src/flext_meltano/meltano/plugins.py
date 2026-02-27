@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TypeGuard
+from typing import TypeGuard, override
 
 from flext_core import FlextResult, FlextService
 
@@ -26,7 +26,6 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
-from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes

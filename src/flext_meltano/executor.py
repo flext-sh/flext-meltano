@@ -12,26 +12,22 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import override
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
 from flext_meltano.adapters import FlextMeltanoAdapter
 from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.constants import c
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import m
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 from flext_meltano.utilities import u
 
-from typing import override
-# Import aliases for simplified usage
-r = FlextResult
-m = FlextMeltanoModels
 
-
-class FlextMeltanoExecutor(FlextService[t.JsonValue]):
+class FlextMeltanoExecutor(s[t.JsonValue]):
     """Unified executor architecture following flext-core patterns.
 
     Provides complete Meltano command execution with proper error handling,
@@ -68,7 +64,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
         """Execute the Meltano executor service.
 
         Returns:
-        FlextResult containing executor configuration and status.
+        r containing executor configuration and status.
 
         """
         try:
@@ -103,7 +99,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
             timeout: Timeout in seconds
 
         Returns:
-            FlextResult with execution result
+            r with execution result
 
         """
         try:
@@ -142,7 +138,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
             target_name: Name of the target to use
 
         Returns:
-            FlextResult with pipeline execution result
+            r with pipeline execution result
 
         """
         try:
@@ -166,7 +162,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
         args: Additional arguments
 
         Returns:
-        FlextResult with DBT execution result
+        r with DBT execution result
 
         """
         try:

@@ -14,12 +14,10 @@ import sys
 from typing import Protocol
 
 from flext_cli import FlextCli
-from flext_cli.protocols import FlextCliProtocols
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, r
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.cli_managers import (
-from typing import override
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
@@ -30,10 +28,6 @@ from typing import override
     _SingerManagerProtocol,
     _StatusManagerProtocol,
 )
-
-# Import alias for protocol types
-p_cli = FlextCliProtocols
-r = FlextResult
 
 
 class _OutputProtocol(Protocol):

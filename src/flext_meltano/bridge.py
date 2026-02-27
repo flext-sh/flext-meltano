@@ -12,14 +12,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_core import FlextLogger, r, u
+from flext_core import FlextLogger, r
 
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.models import m
+from flext_meltano.typings import t
+from flext_meltano.utilities import u
 
-from typing import override
-# Import aliases for concise usage
-m = FlextMeltanoModels
 
 
 class FlextMeltanoBridge:

@@ -19,18 +19,10 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import (
-from typing import override
-    FlextLogger,
-    FlextResult,
-    r,
-)
+from flext_core import FlextLogger, r
 from flext_infra import CommandRunner
 
-from .models import FlextMeltanoModels
-
-# Import aliases for concise usage
-m = FlextMeltanoModels
+from flext_meltano.models import m
 
 
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
@@ -285,21 +277,21 @@ def delete_pipeline(pipeline_name: str) -> r[str]:
 class _ManagerProtocol(Protocol):
     """Base manager protocol."""
 
-    def handle_command(self, args: list[str]) -> FlextResult[None]: ...
+    def handle_command(self, args: list[str]) -> r[None]: ...
 
 
 class _SingerManagerProtocol(Protocol):
     """Singer manager protocol."""
 
-    def handle_tap_command(self, args: list[str]) -> FlextResult[None]: ...
-    def handle_target_command(self, args: list[str]) -> FlextResult[None]: ...
+    def handle_tap_command(self, args: list[str]) -> r[None]: ...
+    def handle_target_command(self, args: list[str]) -> r[None]: ...
 
 
 class _StatusManagerProtocol(Protocol):
     """Status manager protocol."""
 
-    def handle_command(self, args: list[str]) -> FlextResult[None]: ...
-    def handle_version_command(self, _args: list[str]) -> FlextResult[None]: ...
+    def handle_command(self, args: list[str]) -> r[None]: ...
+    def handle_version_command(self, _args: list[str]) -> r[None]: ...
 
 
 class _CLIProtocol(Protocol):

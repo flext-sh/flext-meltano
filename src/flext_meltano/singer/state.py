@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, override
 
 from flext_core import FlextResult, FlextService
 
@@ -19,7 +19,6 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
-from typing import override
 # Import aliases for simplified usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants

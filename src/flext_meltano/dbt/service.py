@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
 from flext_core import r, s
 
@@ -18,7 +19,6 @@ from flext_meltano.dbt.runner import DbtRunResult, DbtTestResult, FlextMeltanoDb
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
-from typing import override
 class FlextMeltanoDbtService(s[str]):
     """Orchestrates DBT transformations with deep SDK integration.
 

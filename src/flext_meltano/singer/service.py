@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, override
 
 from flext_core import r, s
 
@@ -21,7 +21,6 @@ from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
 from flext_meltano.typings import FlextMeltanoTypes
 
-from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> s
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes

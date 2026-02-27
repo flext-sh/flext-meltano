@@ -10,17 +10,16 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, override
 
 from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 from flext_meltano.utilities import u
 
-from typing import override
 m = FlextMeltanoModels
 
 

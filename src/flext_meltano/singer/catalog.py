@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextResult, FlextService
 
@@ -20,7 +21,6 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
-from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 t = FlextMeltanoTypes

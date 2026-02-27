@@ -15,7 +15,6 @@ from typing import Literal, Self
 
 import yaml
 from flext_core import (
-from typing import override
     FlextModels,
     FlextResult,
     t,
@@ -31,7 +30,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.constants import c
 
 
 class FlextMeltanoModels(FlextModels):
