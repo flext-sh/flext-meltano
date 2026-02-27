@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field, ValidationError
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
+from typing import override
 m = FlextMeltanoModels
 
 
@@ -238,6 +239,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             self.logger.exception("Failed to get tests", error=str(e))
             return r[list[mt.Dbt.TestConfiguration]].fail(f"Failed to get tests: {e}")
 
+    @override
     def execute(self, **_kwargs: object) -> r[DbtProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:

@@ -17,6 +17,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
+from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 s = FlextService
@@ -182,6 +183,7 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
                 f"Sink instance creation failed: {e}",
             )
 
+    @override
     def execute(
         self,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:

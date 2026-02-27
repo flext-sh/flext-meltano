@@ -15,6 +15,7 @@ from typing import Literal, Self
 
 import yaml
 from flext_core import (
+from typing import override
     FlextModels,
     FlextResult,
     t,

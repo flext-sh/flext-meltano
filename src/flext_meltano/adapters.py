@@ -23,6 +23,7 @@ from flext_core import FlextResult, FlextService, FlextSettings, u
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 
+from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> u
 t = FlextMeltanoTypes
 r = FlextResult
@@ -32,10 +33,12 @@ class ProjectAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Focused adapter for Meltano project management following SOLID principles."""
 
     @classmethod
+    @override
     def _get_service_config_type(cls) -> type[FlextSettings]:
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
+    @override
     def execute(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute default project operation."""
         return self.get_version()
@@ -90,10 +93,12 @@ class PluginAdapter(FlextService[list[t.Plugin.PluginDefinition]]):
     """Focused adapter for Meltano plugin management following SOLID principles."""
 
     @classmethod
+    @override
     def _get_service_config_type(cls) -> type[FlextSettings]:
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
+    @override
     def execute(self) -> r[list[t.Plugin.PluginDefinition]]:
         """Execute default plugin operation."""
         return self.discover_plugins()
@@ -128,10 +133,12 @@ class PipelineAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
     @classmethod
+    @override
     def _get_service_config_type(cls) -> type[FlextSettings]:
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
+    @override
     def execute(self) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Execute default pipeline operation."""
         return r[t.MeltanoCore.ExecutionResultDict].ok({"status": "ready"})
@@ -176,10 +183,12 @@ class SingerAdapter(FlextService[t.MeltanoCore.SingerCatalogDict]):
     """Focused adapter for Singer protocol operations following SOLID principles."""
 
     @classmethod
+    @override
     def _get_service_config_type(cls) -> type[FlextSettings]:
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
+    @override
     def execute(self) -> r[t.MeltanoCore.SingerCatalogDict]:
         """Execute default singer operation."""
         return self.create_tap_stream_catalog()
@@ -224,10 +233,12 @@ class DbtAdapter(FlextService[t.MeltanoCore.DbtResultDict]):
     """Focused adapter for DBT operations following SOLID principles."""
 
     @classmethod
+    @override
     def _get_service_config_type(cls) -> type[FlextSettings]:
         """Return FlextMeltanoSettings for this service."""
         return FlextMeltanoSettings
 
+    @override
     def execute(self) -> r[t.MeltanoCore.DbtResultDict]:
         """Execute default DBT operation."""
         return self.execute_dbt_operation()

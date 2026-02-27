@@ -16,6 +16,7 @@ from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t
 
+from typing import override
 # Result alias
 r = FlextResult
 
@@ -250,6 +251,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
+    @override
     def execute(self) -> r[t.Singer.StreamCatalog]:
         """Execute source abstraction operations (implements Service).
 

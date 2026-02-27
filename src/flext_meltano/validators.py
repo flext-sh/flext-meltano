@@ -17,6 +17,7 @@ from pydantic import ValidationError
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as t
 
+from typing import override
 m = FlextMeltanoModels
 
 logger = FlextLogger(__name__)

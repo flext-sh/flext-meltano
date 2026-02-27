@@ -25,6 +25,7 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import u
 
+from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 m = FlextMeltanoModels
@@ -62,6 +63,7 @@ class FlextMeltanoExecutor(FlextService[t.JsonValue]):
             error_msg = "Logger initialization failed"
             raise RuntimeError(error_msg)
 
+    @override
     def execute(self) -> r[t.JsonValue]:
         """Execute the Meltano executor service.
 

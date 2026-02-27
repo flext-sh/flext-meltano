@@ -15,6 +15,7 @@ from typing import Protocol
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
+from typing import override
 m = FlextMeltanoModels
 t = FlextMeltanoTypes
 

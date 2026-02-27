@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Protocol
 
 from flext_core import (
+from typing import override
     FlextLogger,
     FlextResult,
     r,

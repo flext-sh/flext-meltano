@@ -21,6 +21,7 @@ from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
 from flext_meltano.typings import FlextMeltanoTypes
 
+from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> s
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
@@ -209,6 +210,7 @@ class FlextMeltanoSingerService(s[str]):
         """
         return self.state_manager.save_state(state_path)
 
+    @override
     def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
         msg = "Singer service initialized"

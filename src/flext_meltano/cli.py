@@ -19,6 +19,7 @@ from flext_core import FlextLogger, FlextResult
 
 from flext_meltano.api import FlextMeltano
 from flext_meltano.cli_managers import (
+from typing import override
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,

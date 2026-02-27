@@ -13,6 +13,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from flext_core import (
+from typing import override
     FlextExceptions,
     FlextService,
     r,
@@ -60,6 +61,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
         return FlextMeltanoModels
 
     @property
+    @override
     def config(self) -> FlextMeltanoSettings:
         """Get typed config - type-safe access to FlextMeltanoSettings."""
         try:
@@ -127,6 +129,7 @@ class FlextMeltano(FlextService[t.JsonValue]):
             version,
         )
 
+    @override
     def execute(self, **_kwargs: t.JsonValue) -> r[t.JsonValue]:
         """Execute service lifecycle.
 

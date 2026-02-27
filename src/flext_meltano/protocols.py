@@ -11,10 +11,10 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from flext_core import T_co
 from flext_core.protocols import FlextProtocols
 from flext_core.typings import FlextTypes
 
+from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> u
 # Runtime aliases defined at module level per FLEXT standards
 t = FlextTypes
@@ -62,7 +62,7 @@ class FlextMeltanoProtocols(FlextProtocols):
         """
 
         @runtime_checkable
-        class PluginProtocol(Protocol[T_co]):
+        class PluginProtocol(Protocol):
             """Meltano plugin interface with covariant return type."""
 
             # Plugin attributes (matching actual Meltano plugin objects)
@@ -81,7 +81,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Validate plugin configuration. # INTERFACE."""
                 ...
 
-            def execute(self, *args: FlextTypes.JsonValue) -> T_co:
+            def execute(self, *args: FlextTypes.JsonValue) -> FlextTypes.JsonValue:
                 """Execute plugin with given arguments. # INTERFACE."""
                 ...
 
@@ -115,7 +115,8 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Sync data from source with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            @override
+    def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute the tap extraction (implements Service)."""
                 ...
 
@@ -137,7 +138,8 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Handle a batch of records with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            @override
+    def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute the target loading (implements Service)."""
                 ...
 
@@ -157,7 +159,8 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Test DBT models with r."""
                 ...
 
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            @override
+    def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute DBT transformations (implements Service)."""
                 ...
 
@@ -175,6 +178,7 @@ class FlextMeltanoProtocols(FlextProtocols):
                 """Execute service call with r."""
                 ...
 
+            @override
             def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Execute service operation (implements Service)."""
                 ...

@@ -20,6 +20,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import u
 
+from typing import override
 m = FlextMeltanoModels
 
 
@@ -264,6 +265,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             self.logger.exception("Failed to install plugin", error=str(e))
             return r[t.Plugin.PluginInfo].fail(f"Failed to install plugin: {e}")
 
+    @override
     def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:

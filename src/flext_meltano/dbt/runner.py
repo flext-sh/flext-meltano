@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
+from typing import override
 class DbtRunResult(BaseModel):
     """Result of a DBT run operation."""
 
@@ -197,6 +198,7 @@ class FlextMeltanoDbtRunner(s[str]):
                 f"Documentation generation failed: {e}",
             )
 
+    @override
     def execute(self, **_kwargs: object) -> r[str]:
         """Execute (implements Service pattern)."""
         if self.project_root:

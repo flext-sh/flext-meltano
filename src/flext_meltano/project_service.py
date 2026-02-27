@@ -24,6 +24,7 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 from flext_meltano.validators import FlextMeltanoValidators
 
+from typing import override
 m = FlextMeltanoModels
 
 
@@ -46,6 +47,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         self._abstractions = FlextMeltanoAbstractions()
         # Note: container and logger are provided automatically by FlextService (s[T])
 
+    @override
     def execute(
         self,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:

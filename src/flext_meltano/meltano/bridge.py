@@ -19,6 +19,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
+from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 t = FlextMeltanoTypes

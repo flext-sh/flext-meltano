@@ -20,6 +20,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.protocols import p
 from flext_meltano.typings import FlextMeltanoTypes as t
 
+from typing import override
 # Import aliases for concise usage following order: c -> t -> p -> r -> m -> u
 m = FlextMeltanoModels
 
@@ -218,8 +219,8 @@ class FlextMeltanoAbstractions:
     def execute_singer_pipeline(
         self,
         elt_context: t.MeltanoCore.MeltanoConfigDict,
-        _extractor_plugin: p.Meltano.PluginProtocol[t.JsonValue],
-        _loader_plugin: p.Meltano.PluginProtocol[t.JsonValue],
+        _extractor_plugin: p.Meltano.PluginProtocol,
+        _loader_plugin: p.Meltano.PluginProtocol,
     ) -> r[t.ELT.PipelineResult]:
         """Execute singer pipeline."""
         try:

@@ -20,6 +20,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
+from typing import override
 # Import aliases for concise usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
@@ -212,6 +213,7 @@ class FlextMeltanoMeltanoService(s[str]):
                 f"Failed to execute pipeline: {e}",
             )
 
+    @override
     def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
         msg = "Meltano service initialized"

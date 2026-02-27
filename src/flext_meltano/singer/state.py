@@ -19,6 +19,7 @@ from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.typings import FlextMeltanoTypes
 
+from typing import override
 # Import aliases for simplified usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
@@ -197,6 +198,7 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
         """Return current state as SingerStateMessage."""
         return self._state_msg
 
+    @override
     def execute(self, **_kwargs: t.JsonValue) -> r[m.Meltano.SingerStateMessage]:
         """Execute (implements Service pattern)."""
         return r[m.Meltano.SingerStateMessage].ok(self.to_state_message())

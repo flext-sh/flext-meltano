@@ -17,6 +17,7 @@ from pathlib import Path
 
 import yaml
 from flext_core import (
+from typing import override
     FlextLogger,
     r,
     u,

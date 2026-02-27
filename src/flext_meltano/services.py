@@ -17,6 +17,7 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 
 
+from typing import override
 class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     """Generic data pipeline service with composition-based architecture.
 
@@ -64,6 +65,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         return self._meltano_config
 
     @property
+    @override
     def container(self) -> FlextContainer:
         """Get FlextContainer instance - delegates to global container."""
         return FlextContainer.get_global()
@@ -155,6 +157,7 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     # SERVICE LIFECYCLE - Railway-oriented execution
     # ============================================================================
 
+    @override
     def execute(self) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Execute service with railway pattern - implements FlextService protocol."""
         return r[t.MeltanoCore.MeltanoConfigDict].ok({

@@ -26,6 +26,7 @@ from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes
 from flext_meltano.utilities import u
 
+from typing import override
 # Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
@@ -56,6 +57,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
+    @override
     def execute(
         self,
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:

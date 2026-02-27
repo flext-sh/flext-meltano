@@ -17,6 +17,7 @@ from flext_core import u
 
 from flext_meltano.models import FlextMeltanoModels
 
+from typing import override
 # Import aliases for concise usage
 m = FlextMeltanoModels
 

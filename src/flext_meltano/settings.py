@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_core import (
+from typing import override
     FlextSettings,
     FlextTypes,
     r,
@@ -537,11 +538,11 @@ class FlextMeltanoSettings(FlextSettings):
         environment: Target environment (development, staging, production, test, local).
         **kwargs: Additional configuration parameters.
 
-        Raises:
-        ValueError: If environment is invalid.
-
         Returns:
         FlextMeltanoSettings: The created configuration instance.
+
+        Raises:
+        ValueError: If environment is invalid.
 
         """
         try:
@@ -595,6 +596,7 @@ class FlextMeltanoSettings(FlextSettings):
     # ============================================================================
 
     @classmethod
+    @override
     def get_global_instance(
         cls,
         **overrides: FlextTypes.JsonValue,

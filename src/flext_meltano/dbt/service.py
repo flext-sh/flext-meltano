@@ -18,6 +18,7 @@ from flext_meltano.dbt.runner import DbtRunResult, DbtTestResult, FlextMeltanoDb
 from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
+from typing import override
 class FlextMeltanoDbtService(s[str]):
     """Orchestrates DBT transformations with deep SDK integration.
 
@@ -215,6 +216,7 @@ class FlextMeltanoDbtService(s[str]):
                 f"Documentation generation failed: {e}",
             )
 
+    @override
     def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
         msg = "DBT service initialized"

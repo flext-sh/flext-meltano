@@ -16,6 +16,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import (
+from typing import override
     FlextResult,
     FlextService,
 )
@@ -134,15 +135,13 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def _find_required_plugins() -> r[
-        tuple[
-            p.Meltano.PluginProtocol[t.JsonValue], p.Meltano.PluginProtocol[t.JsonValue]
-        ]
+        tuple[p.Meltano.PluginProtocol, p.Meltano.PluginProtocol]
     ]:
         """Find required plugins in t.Dbt.Project."""
         return r[
             tuple[
-                p.Meltano.PluginProtocol[t.JsonValue],
-                p.Meltano.PluginProtocol[t.JsonValue],
+                p.Meltano.PluginProtocol,
+                p.Meltano.PluginProtocol,
             ]
         ].fail("Plugin discovery not configured")
 
@@ -151,9 +150,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         project_path: str,
         extractor_name: str,
         loader_name: str,
-        plugins: tuple[
-            p.Meltano.PluginProtocol[t.JsonValue], p.Meltano.PluginProtocol[t.JsonValue]
-        ],
+        plugins: tuple[p.Meltano.PluginProtocol, p.Meltano.PluginProtocol],
     ) -> r[t.MeltanoCore.ExecutionResultDict]:
         """Create ELT context for pipeline execution."""
         try:

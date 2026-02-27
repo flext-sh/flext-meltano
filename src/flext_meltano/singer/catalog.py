@@ -20,6 +20,7 @@ from flext_meltano.models import FlextMeltanoModels
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
+from typing import override
 # Import aliases for simplified usage
 r = FlextResult
 t = FlextMeltanoTypes
@@ -215,6 +216,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             self.logger.exception("Failed to get stream schema", error=str(e))
             return r[Mapping[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
 
+    @override
     def execute(self) -> r[m.Meltano.SingerCatalog]:
         """Execute (implements Service pattern)."""
         return r[m.Meltano.SingerCatalog].ok(self._catalog)

@@ -12,6 +12,7 @@ from typing import TextIO
 
 import yaml
 from flext_core import (
+from typing import override
     FlextLogger,
     FlextUtilities,
     r,

@@ -10,6 +10,7 @@ from flext_core import FlextConstants
 from flext_meltano.typings import t
 
 
+from typing import override
 class FlextMeltanoConstants(FlextConstants):
     """Domain constants for the flext-meltano package."""
 
