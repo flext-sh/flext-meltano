@@ -69,6 +69,19 @@ from flext_meltano.utilities import (
 )
 from flext_meltano.validators import FlextMeltanoValidators
 
+# Standard FLEXT aliases (11 total)
+c = FlextMeltanoConstants
+d = FlextDecorators
+e = FlextExceptions
+h = FlextHandlers
+m = FlextMeltanoModels
+p = FlextMeltanoProtocols
+r = FlextResult
+s = FlextService
+t = FlextMeltanoTypes
+u = FlextMeltanoUtilities
+x = FlextMixins
+
 __all__ = [
     "FlextMeltano",
     "FlextMeltanoAdapter",
