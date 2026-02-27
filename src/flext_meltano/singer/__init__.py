@@ -14,7 +14,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-# Only import lightweight modules that don't depend on models.py
 from flext_meltano.singer.protocols import (
     FlextMeltanoPluginProtocols,
     FlextMeltanoSingerProtocols,

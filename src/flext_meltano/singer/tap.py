@@ -12,7 +12,6 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextRuntime, FlextService
 from singer_sdk import Stream, Tap
 
-# Import order: c -> t -> p -> r -> m -> u
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t
