@@ -14,8 +14,7 @@ import json
 import os
 import shutil
 import signal
-import subprocess  # noqa: S404
-import time
+import subprocessimport time
 from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Protocol
@@ -126,8 +125,7 @@ def execute_pipeline(
 
     command = ["meltano", *meltano_args]
     try:
-        completed = subprocess.run(  # noqa: S603
-            command,
+        completed = subprocess.run(            command,
             cwd=str(pipeline_dir),
             check=False,
             capture_output=True,
@@ -454,8 +452,7 @@ class FlextMeltanoPipelineManager:
 
         pipeline_name = _args[0]
         config_payload: dict[str, object] | None = None
-        if len(_args) >= 2:  # noqa: PLR2004
-            try:
+        if len(_args) >= 2:            try:
                 parsed = json.loads(_args[1])
             except json.JSONDecodeError as exc:
                 return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
@@ -532,8 +529,7 @@ class FlextMeltanoPipelineManager:
 
     def _run_meltano_command(self, command: list[str]) -> r[None]:
         try:
-            completed = subprocess.run(  # noqa: S603
-                command,
+            completed = subprocess.run(                command,
                 check=False,
                 capture_output=True,
                 text=True,
