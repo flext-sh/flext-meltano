@@ -294,6 +294,9 @@ class FlextMeltanoTypes(FlextCliTypes):
             type ErrorsDict = dict[str, str]
 
 
+    # Direct access to Singer namespace for convenience
+    Singer = Meltano.Singer
+
 t = FlextMeltanoTypes
 
 __all__ = [
