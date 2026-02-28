@@ -134,7 +134,7 @@ class FlextMeltanoMeltanoService(s[str]):
     def discover_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[t.Plugin.PluginDefinition]]:
+    ) -> r[list[t.Meltano.Plugin.PluginDefinition]]:
         """Discover plugins in the project.
 
         Args:
@@ -161,7 +161,7 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
-            return r[list[t.Plugin.PluginDefinition]].fail(
+            return r[list[t.Meltano.Plugin.PluginDefinition]].fail(
                 f"Failed to discover plugins: {e}",
             )
 

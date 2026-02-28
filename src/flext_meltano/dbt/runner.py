@@ -164,7 +164,7 @@ class FlextMeltanoDbtRunner(s[str]):
     def docs_generate(
         self,
         **_kwargs: t.GeneralValueType,
-    ) -> r[mt.MeltanoCore.ExecutionResultDict]:
+    ) -> r[mt.Meltano.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -176,7 +176,7 @@ class FlextMeltanoDbtRunner(s[str]):
         """
         try:
             if not self.project_root:
-                return r[mt.MeltanoCore.ExecutionResultDict].fail("No project root set")
+                return r[mt.Meltano.ExecutionResultDict].fail("No project root set")
 
             self.logger.info(
                 "Generating DBT documentation",
@@ -184,13 +184,13 @@ class FlextMeltanoDbtRunner(s[str]):
             )
 
             # DBT docs generate would be executed here
-            result: mt.MeltanoCore.ExecutionResultDict = {
+            result: mt.Meltano.ExecutionResultDict = {
                 "status": "completed",
                 "docs_path": str(self.project_root / "target" / "index.html"),
             }
 
             self.logger.info("DBT documentation generated")
-            return r[mt.MeltanoCore.ExecutionResultDict].ok(result)
+            return r[mt.Meltano.ExecutionResultDict].ok(result)
         except (
             ValueError,
             TypeError,
@@ -201,7 +201,7 @@ class FlextMeltanoDbtRunner(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[mt.MeltanoCore.ExecutionResultDict].fail(
+            return r[mt.Meltano.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",
             )
 

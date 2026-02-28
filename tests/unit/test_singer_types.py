@@ -23,7 +23,7 @@ class TestFlextSingerTypes:
         singer_types = t()
 
         assert singer_types is not None
-        assert hasattr(singer_types, "MeltanoCore")
+        assert hasattr(singer_types, "Meltano")
         assert hasattr(singer_types, "Plugin")
 
     def test_singer_types_basic_functionality(self) -> None:
@@ -32,5 +32,5 @@ class TestFlextSingerTypes:
         singer_types = t()
 
         assert singer_types is not None
-        assert hasattr(singer_types, "MeltanoCore")
+        assert hasattr(singer_types, "Meltano")
         assert hasattr(singer_types, "Plugin")

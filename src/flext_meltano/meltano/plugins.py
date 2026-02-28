@@ -44,7 +44,7 @@ def _is_meltano_project(
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 
 
-class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
+class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
@@ -63,7 +63,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
     @override
     def execute(
         self,
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute the pipeline component service.
 
         Returns:
@@ -71,7 +71,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         try:
-            config_data: t.MeltanoCore.MeltanoConfigDict = {
+            config_data: t.Meltano.MeltanoConfigDict = {
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
                 "config": self._meltano_config.model_dump()
@@ -80,12 +80,12 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             }
 
             self.logger.info("FlextMeltanoPluginService executed successfully")
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(config_data)
+            return r[t.Meltano.MeltanoConfigDict].ok(config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Plugin service execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
+            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     def discover_plugins(
         self,
@@ -130,7 +130,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
             # DSL Builder Pattern: Process plugins using u.construct() mnemonic pattern
             def build_plugin_info(
                 plugin_name: str,
-                indexed_plugin: t.Plugin.PluginDefinition,
+                indexed_plugin: t.Meltano.Plugin.PluginDefinition,
                 plugin_type: str,
             ) -> Mapping[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
@@ -352,7 +352,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         try:
             # Use abstraction layer for plugin addition
             # Build properly typed plugin config
-            plugin_config: t.Plugin.PluginConfiguration = {
+            plugin_config: t.Meltano.Plugin.PluginConfiguration = {
                 "project_root": str(project.root_dir),
                 "plugin_type": plugin_type_str,
                 "plugin_name": plugin_name,

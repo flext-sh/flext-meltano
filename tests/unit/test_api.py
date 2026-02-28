@@ -36,9 +36,9 @@ class TestFlextMeltanoInitialization:
             def execute(
                 self,
                 **kwargs: object,
-            ) -> r[r[t.MeltanoCore.MeltanoConfigDict]]:
-                return r[r[t.MeltanoCore.MeltanoConfigDict]].ok(
-                    r[t.MeltanoCore.MeltanoConfigDict].ok({}),
+            ) -> r[r[t.Meltano.MeltanoConfigDict]]:
+                return r[r[t.Meltano.MeltanoConfigDict]].ok(
+                    r[t.Meltano.MeltanoConfigDict].ok({}),
                 )
 
         api = ConcreteAPI(service_name="test-api")

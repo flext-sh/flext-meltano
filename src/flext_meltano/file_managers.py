@@ -74,7 +74,7 @@ class FlextMeltanoFileManagers:
     @classmethod
     def save_yaml_config(
         cls,
-        config: t.MeltanoCore.FileConfigDict,
+        config: t.Meltano.FileConfigDict,
         file_path: Path,
     ) -> r[bool]:
         """Save YAML config using DSL patterns.
@@ -111,7 +111,7 @@ class FlextMeltanoFileManagers:
         return result
 
     @classmethod
-    def load_yaml_config(cls, file_path: Path) -> r[t.MeltanoCore.FileConfigDict]:
+    def load_yaml_config(cls, file_path: Path) -> r[t.Meltano.FileConfigDict]:
         """Load YAML config using DSL patterns + direct YAML.
 
         ZERO DUPLICATION: Uses u.Guards.is_string_non_empty for validation.
@@ -123,15 +123,15 @@ class FlextMeltanoFileManagers:
         """
 
         # DSL: Use u.try_ for unified error handling
-        def _load() -> r[t.MeltanoCore.FileConfigDict]:
+        def _load() -> r[t.Meltano.FileConfigDict]:
             # Basic path validation using flext-core utilities
             if not u.Guards.is_string_non_empty(str(file_path)):
-                return r[t.MeltanoCore.FileConfigDict].fail(
+                return r[t.Meltano.FileConfigDict].fail(
                     f"Invalid YAML file path: {file_path}",
                 )
 
             if not file_path.exists():
-                return r[t.MeltanoCore.FileConfigDict].fail(
+                return r[t.Meltano.FileConfigDict].fail(
                     f"YAML file not found: {file_path}",
                 )
 
@@ -140,12 +140,12 @@ class FlextMeltanoFileManagers:
 
             # DSL: Use u.when for conditional handling
             if config_data is None:
-                return r[t.MeltanoCore.FileConfigDict].ok({})
+                return r[t.Meltano.FileConfigDict].ok({})
 
             validated_config = m.Meltano.ConfigMappingPayload.model_validate(
                 {"values": config_data},
             ).values
-            return r[t.MeltanoCore.FileConfigDict].ok(validated_config)
+            return r[t.Meltano.FileConfigDict].ok(validated_config)
 
         result = u.try_(
             _load,
@@ -161,7 +161,7 @@ class FlextMeltanoFileManagers:
         )
         # Type narrowing: result is object | None
         if result is None:
-            return r[t.MeltanoCore.FileConfigDict].fail("Failed to load YAML config")
+            return r[t.Meltano.FileConfigDict].fail("Failed to load YAML config")
         return result
 
     @classmethod
@@ -228,7 +228,7 @@ class FlextMeltanoFileManagers:
         cls,
         project_root: Path,
         _project_name: str,
-    ) -> r[t.MeltanoCore.PathDict]:
+    ) -> r[t.Meltano.PathDict]:
         """Setup Meltano project structure using direct implementation.
 
         Returns:
@@ -289,9 +289,9 @@ class FlextMeltanoFileManagers:
 
             # Add project root
             created_paths["project_root"] = project_root
-            return r[t.MeltanoCore.PathDict].ok(created_paths)
+            return r[t.Meltano.PathDict].ok(created_paths)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.PathDict].fail(
+            return r[t.Meltano.PathDict].fail(
                 f"Failed to setup project structure: {e}",
             )
 

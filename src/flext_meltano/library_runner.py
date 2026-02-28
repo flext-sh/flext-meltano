@@ -45,7 +45,7 @@ class FlextMeltanoLibraryRunner:
         self,
         tap: singer_p.SingerTap,
         target: singer_p.SingerTarget,
-        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Run a complete ELT pipeline from tap to target.
 
@@ -139,7 +139,7 @@ class FlextMeltanoLibraryRunner:
             return r[t.Processing.DbtTransformationResult].fail(error_msg)
 
     @staticmethod
-    def get_dbt_runner() -> r[t.MeltanoCore.ResultDict]:
+    def get_dbt_runner() -> r[t.Meltano.ResultDict]:
         """Get DBT runner instance for DBT operations.
 
         Returns:
@@ -149,17 +149,17 @@ class FlextMeltanoLibraryRunner:
         """
         try:
             # DBT runner integration — instantiated when DBT is configured in pipeline
-            dbt_runner: t.MeltanoCore.ResultDict = {
+            dbt_runner: t.Meltano.ResultDict = {
                 "type": "dbt_runner",
                 "status": "available",
                 "capabilities": ["run", "test", "docs", "seed"],
             }
-            return r[t.MeltanoCore.ResultDict].ok(dbt_runner)
+            return r[t.Meltano.ResultDict].ok(dbt_runner)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.ResultDict].fail(f"Failed to get DBT runner: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Failed to get DBT runner: {e}")
 
     @staticmethod
-    def get_singer_manager() -> r[t.MeltanoCore.ResultDict]:
+    def get_singer_manager() -> r[t.Meltano.ResultDict]:
         """Get Singer manager instance for Singer operations.
 
         Returns:
@@ -169,14 +169,14 @@ class FlextMeltanoLibraryRunner:
         """
         try:
             # Singer manager integration — instantiated when Singer taps/targets are configured
-            singer_manager: t.MeltanoCore.ResultDict = {
+            singer_manager: t.Meltano.ResultDict = {
                 "type": "singer_manager",
                 "status": "available",
                 "capabilities": ["discover", "sync", "validate"],
             }
-            return r[t.MeltanoCore.ResultDict].ok(singer_manager)
+            return r[t.Meltano.ResultDict].ok(singer_manager)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.ResultDict].fail(
+            return r[t.Meltano.ResultDict].fail(
                 f"Failed to get Singer manager: {e}",
             )
 
@@ -185,7 +185,7 @@ class FlextMeltanoLibraryRunner:
         tap_name: str,
         target_name: str,
         dbt_models: list[str] | None = None,
-        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations.
 

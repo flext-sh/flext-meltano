@@ -151,9 +151,9 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
 
     def _extract_plugins(
         self, plugin_type: str | None
-    ) -> list[t.Plugin.PluginDefinition]:
+    ) -> list[t.Meltano.Plugin.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
-        plugins: list[t.Plugin.PluginDefinition] = []
+        plugins: list[t.Meltano.Plugin.PluginDefinition] = []
         if getattr(self.project, "plugins", None) is None:
             return plugins
 
@@ -174,7 +174,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 # Type narrowing for variant attribute
                 variant_raw = getattr(plugin, "variant", None)
 
-                plugin_def: t.Plugin.PluginDefinition = {
+                plugin_def: t.Meltano.Plugin.PluginDefinition = {
                     "name": plugin.name,
                     "type": plugin.type,
                 }
@@ -195,7 +195,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
     def get_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[t.Plugin.PluginDefinition]]:
+    ) -> r[list[t.Meltano.Plugin.PluginDefinition]]:
         """Get plugins from the project.
 
         Args:
@@ -207,7 +207,9 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         """
         try:
             if not self.project:
-                return r[list[t.Plugin.PluginDefinition]].fail("No project loaded")
+                return r[list[t.Meltano.Plugin.PluginDefinition]].fail(
+                    "No project loaded"
+                )
 
             plugins = self._extract_plugins(plugin_type)
 
@@ -216,7 +218,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 count=u.count(plugins),
                 type=plugin_type,
             )
-            return r[list[t.Plugin.PluginDefinition]].ok(plugins)
+            return r[list[t.Meltano.Plugin.PluginDefinition]].ok(plugins)
         except (
             ValueError,
             TypeError,
@@ -227,11 +229,11 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[list[t.Plugin.PluginDefinition]].fail(
+            return r[list[t.Meltano.Plugin.PluginDefinition]].fail(
                 f"Failed to get plugins: {e}",
             )
 
-    def install_plugin(self, name: str) -> r[t.Plugin.PluginInfo]:
+    def install_plugin(self, name: str) -> r[t.Meltano.Plugin.PluginInfo]:
         """Install a plugin in the project.
 
         Args:
@@ -246,13 +248,13 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
 
             # Plugin installation would typically use meltano CLI or SDK
             # For now, just log the operation
-            plugin_info: t.Plugin.PluginInfo = {
+            plugin_info: t.Meltano.Plugin.PluginInfo = {
                 "name": name,
                 "status": "installing",
             }
 
             self.logger.info("Plugin installed", name=name)
-            return r[t.Plugin.PluginInfo].ok(plugin_info)
+            return r[t.Meltano.Plugin.PluginInfo].ok(plugin_info)
         except (
             ValueError,
             TypeError,
@@ -263,7 +265,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to install plugin", error=str(e))
-            return r[t.Plugin.PluginInfo].fail(f"Failed to install plugin: {e}")
+            return r[t.Meltano.Plugin.PluginInfo].fail(f"Failed to install plugin: {e}")
 
     @override
     def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:

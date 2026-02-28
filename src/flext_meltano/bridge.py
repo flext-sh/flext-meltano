@@ -32,7 +32,7 @@ class FlextMeltanoBridge:
     def execute_command(
         command: str,
         args: Mapping[str, t.JsonValue] | None = None,
-    ) -> r[t.MeltanoCore.ExecutionResultDict]:
+    ) -> r[t.Meltano.ExecutionResultDict]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -46,15 +46,15 @@ class FlextMeltanoBridge:
         try:
             # Go bridge integration point — communicates with FlexCore Go service via JSON API
             # ExecutionResultDict is dict[str, JsonValue]
-            result_data: t.MeltanoCore.ExecutionResultDict = {
+            result_data: t.Meltano.ExecutionResultDict = {
                 "command": command,
                 "args": args or {},
                 "status": "executed",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return r[t.MeltanoCore.ExecutionResultDict].ok(result_data)
+            return r[t.Meltano.ExecutionResultDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.ExecutionResultDict].fail(
+            return r[t.Meltano.ExecutionResultDict].fail(
                 f"Bridge command failed: {e}",
             )
 

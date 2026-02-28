@@ -35,7 +35,7 @@ c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
-class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict]):
+class FlextMeltanoLibraryRunner(FlextService[t.Meltano.ExecutionResultDict]):
     """Unified library runner providing complete Meltano functionality.
 
     This class consolidates all Meltano operations (DBT transformations, Singer
@@ -53,7 +53,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
         self,
         tap: singer_p.SingerTap,
         target: singer_p.SingerTarget,
-        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Run a complete ELT pipeline from tap to target.
 
@@ -147,34 +147,34 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
             return r[t.Processing.DbtTransformationResult].fail(error_msg)
 
     @staticmethod
-    def get_dbt_runner() -> r[t.MeltanoCore.ExecutionResultDict]:
+    def get_dbt_runner() -> r[t.Meltano.ExecutionResultDict]:
         """Get DBT runner instance for DBT operations."""
         try:
             # DBT runner integration — instantiated when DBT is configured in pipeline
-            dbt_runner: t.MeltanoCore.ExecutionResultDict = {
+            dbt_runner: t.Meltano.ExecutionResultDict = {
                 "type": "dbt_runner",
                 "status": "available",
                 "capabilities": ["run", "test", "docs", "seed"],
             }
-            return r[t.MeltanoCore.ExecutionResultDict].ok(dbt_runner)
+            return r[t.Meltano.ExecutionResultDict].ok(dbt_runner)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.ExecutionResultDict].fail(
+            return r[t.Meltano.ExecutionResultDict].fail(
                 f"Failed to get DBT runner: {e}",
             )
 
     @staticmethod
-    def get_singer_manager() -> r[t.MeltanoCore.ExecutionResultDict]:
+    def get_singer_manager() -> r[t.Meltano.ExecutionResultDict]:
         """Get Singer manager instance for Singer operations."""
         try:
             # Singer manager integration — instantiated when Singer taps/targets are configured
-            singer_manager: t.MeltanoCore.ExecutionResultDict = {
+            singer_manager: t.Meltano.ExecutionResultDict = {
                 "type": "singer_manager",
                 "status": "available",
                 "capabilities": ["discover", "sync", "validate"],
             }
-            return r[t.MeltanoCore.ExecutionResultDict].ok(singer_manager)
+            return r[t.Meltano.ExecutionResultDict].ok(singer_manager)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.MeltanoCore.ExecutionResultDict].fail(
+            return r[t.Meltano.ExecutionResultDict].fail(
                 f"Failed to get Singer manager: {e}",
             )
 
@@ -183,7 +183,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
         tap_name: str,
         target_name: str,
         dbt_models: list[str] | None = None,
-        config: t.MeltanoCore.MeltanoConfigDict | None = None,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:

@@ -30,7 +30,7 @@ from flext_meltano import (
 m = FlextMeltanoModels
 
 
-class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
+class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     """Enterprise pipeline project service with railway-oriented programming.
 
     Manages complete pipeline project lifecycle using FLEXT ecosystem patterns:
@@ -52,7 +52,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     @override
     def execute(
         self,
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute the pipeline project service.
 
         Returns:
@@ -60,7 +60,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
         """
         try:
-            config_data: t.MeltanoCore.MeltanoConfigDict = {
+            config_data: t.Meltano.MeltanoConfigDict = {
                 "service_type": "flext_meltano_project_service",
                 "status": "ready",
                 "config": self._meltano_config.model_dump()
@@ -69,18 +69,18 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             }
 
             self.logger.info("FlextMeltanoProjectService executed successfully")
-            return r[t.MeltanoCore.MeltanoConfigDict].ok(config_data)
+            return r[t.Meltano.MeltanoConfigDict].ok(config_data)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Project service execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MeltanoCore.MeltanoConfigDict].fail(error_msg)
+            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     def create_temporary_project(
         self,
         project_id: str | None = None,
         prefix: str = "flext_meltano_",
-    ) -> r[t.Dbt.Project]:
+    ) -> r[t.Meltano.Dbt.Project]:
         """Create temporary Meltano project with railway-oriented validation.
 
         Uses r.flat_map chains for composable project creation
@@ -113,7 +113,7 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
     def initialize_project(
         self,
         project_root: Path,
-    ) -> r[t.Dbt.Project]:
+    ) -> r[t.Meltano.Dbt.Project]:
         """Initialize Meltano project using railway pattern validation chain.
 
         Chains initialization steps with automatic error handling:
@@ -300,7 +300,9 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
         return project_result
 
     @staticmethod
-    def _convert_to_project_dict(project: t.GeneralValueType) -> r[t.Dbt.Project]:
+    def _convert_to_project_dict(
+        project: t.GeneralValueType,
+    ) -> r[t.Meltano.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, t.GeneralValueType] representation."""
         try:
             # Extract attributes using getattr with type narrowing
@@ -309,15 +311,17 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
             settings_attr = getattr(project, "settings", None)
             version_attr = getattr(project, "meltano_version", None)
 
-            project_dict: t.Dbt.Project = {
+            project_dict: t.Meltano.Dbt.Project = {
                 "name": str(name_attr) if name_attr else "meltano_project",
                 "root": str(root_attr) if root_attr else "unknown",
                 "settings": str(settings_attr) if settings_attr else "",
                 "meltano_version": str(version_attr) if version_attr else "",
             }
-            return r[t.Dbt.Project].ok(project_dict)
+            return r[t.Meltano.Dbt.Project].ok(project_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Dbt.Project].fail(f"Failed to convert project object: {e}")
+            return r[t.Meltano.Dbt.Project].fail(
+                f"Failed to convert project object: {e}"
+            )
 
     @staticmethod
     def _validate_project_path(project_root: Path) -> r[Path]:

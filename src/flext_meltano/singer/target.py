@@ -29,7 +29,7 @@ c = FlextMeltanoConstants
 m = FlextMeltanoModels
 
 
-class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
+class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
     """UNIFIED Sink Abstractions class consolidating ALL sink functionality.
 
     This single class provides:
@@ -189,11 +189,11 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
     @override
     def execute(
         self,
-    ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+    ) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute sink abstraction operations (implements Service)."""
         # This would orchestrate the overall sink abstraction workflow
         # For now, return the current configuration
-        return r[t.MeltanoCore.MeltanoConfigDict].ok(self._meltano_config.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(self._meltano_config.model_dump())
 
     def create_flext_target(
         self,

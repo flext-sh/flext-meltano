@@ -22,18 +22,16 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
     - p.Meltano.* (from FlextMeltanoProtocols)
     """
 
-    class Tests:
-        """Project-specific test protocols.
+    class Meltano(FlextMeltanoProtocols.Meltano):
+        """Meltano-specific test protocols."""
 
-        Extends FlextTestsProtocols.Tests with Meltano-specific protocols.
-        """
+        class Tests:
+            """Project-specific test protocols.
 
-        class Meltano:
-            """Meltano-specific test protocols."""
+            Extends FlextTestsProtocols.Tests with Meltano-specific protocols.
+            """
 
 
-# Runtime aliases
-p = TestsFlextMeltanoProtocols
 p = TestsFlextMeltanoProtocols
 
 __all__ = ["TestsFlextMeltanoProtocols", "p"]

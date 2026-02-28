@@ -147,23 +147,23 @@ class Testt:
         )
 
     def test_meltano_core_namespace(self) -> None:
-        """Test MeltanoCore namespace types."""
-        # Test that MeltanoCore namespace exists
-        assert hasattr(t, "MeltanoCore"), "MeltanoCore namespace should exist"
+        """Test Meltano namespace types."""
+        # Test that Meltano namespace exists
+        assert hasattr(t, "Meltano"), "Meltano namespace should exist"
 
-        # Test MeltanoCore types
-        meltano_core_types = t.MeltanoCore
+        # Test Meltano types
+        meltano_core_types = t.Meltano
         assert hasattr(meltano_core_types, "MeltanoConfigDict"), (
-            "MeltanoConfigDict should exist in MeltanoCore namespace"
+            "MeltanoConfigDict should exist in Meltano namespace"
         )
         assert hasattr(meltano_core_types, "PluginConfigDict"), (
-            "PluginConfigDict should exist in MeltanoCore namespace"
+            "PluginConfigDict should exist in Meltano namespace"
         )
 
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
         # Test that types are properly annotated
-        plugin_definition = t.Plugin.PluginDefinition
+        plugin_definition = t.Meltano.Plugin.PluginDefinition
         assert plugin_definition is not None, (
             "PluginDefinition should be properly annotated"
         )
@@ -186,7 +186,7 @@ class Testt:
             "CLI",
             "ELT",
             "Processing",
-            "MeltanoCore",
+            "Meltano",
         ]
 
         for namespace in expected_namespaces:
@@ -194,7 +194,7 @@ class Testt:
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
-        plugin_def: t.Plugin.PluginDefinition = {
+        plugin_def: t.Meltano.Plugin.PluginDefinition = {
             "name": "tap-users",
             "variants": ["default"],
             "config": {"batch_size": 1000},
@@ -235,7 +235,7 @@ class Testt:
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
         # Test that similar types follow consistent patterns
-        plugin_definition = t.Plugin.PluginDefinition
+        plugin_definition = t.Meltano.Plugin.PluginDefinition
         singer_catalog = t.Singer.CatalogEntry
 
         # Both should be type annotations

@@ -700,12 +700,12 @@ class FlextMeltanoSettings(FlextSettings):
         return c.Performance.BatchProcessing.DEFAULT_SIZE
 
     @classmethod
-    def get_supported_plugin_types(cls) -> t.MeltanoCore.PluginTypeList:
+    def get_supported_plugin_types(cls) -> t.Meltano.PluginTypeList:
         """Get list of supported plugin types."""
         return FlextMeltanoUtilities.Meltano.supported_types()
 
     @classmethod
-    def get_supported_environments(cls) -> t.MeltanoCore.PluginNameList:
+    def get_supported_environments(cls) -> t.Meltano.PluginNameList:
         """Get list of supported environments."""
         return [
             c.Meltano.Enums.Environment.DEVELOPMENT.value,
@@ -715,7 +715,7 @@ class FlextMeltanoSettings(FlextSettings):
         ]
 
     @classmethod
-    def get_supported_log_levels(cls) -> t.MeltanoCore.PluginNameList:
+    def get_supported_log_levels(cls) -> t.Meltano.PluginNameList:
         """Get list of supported log levels."""
         return [
             str(c.Settings.LogLevel.DEBUG.value),
@@ -861,7 +861,7 @@ class FlextMeltanoSettings(FlextSettings):
 
     def get_meltano_logging_config(
         self,
-    ) -> t.MeltanoCore.SettingsDict:
+    ) -> t.Meltano.SettingsDict:
         """Get Meltano-specific logging configuration dictionary.
 
         Delegates to consolidated logging model for maintainability.
@@ -912,13 +912,13 @@ class FlextMeltanoSettings(FlextSettings):
             "environment_specific_logging": self.environment_specific_logging,
         }
 
-        merged_config: t.MeltanoCore.SettingsDict = {
+        merged_config: t.Meltano.SettingsDict = {
             **config_dict,
             **additional_config,
         }
         return merged_config
 
-    def get_metadata(self) -> t.MeltanoCore.MetadataDict:
+    def get_metadata(self) -> t.Meltano.MetadataDict:
         """Get configuration metadata including override tracking.
 
         Returns:
@@ -945,7 +945,7 @@ class FlextMeltanoSettings(FlextSettings):
         def create_dbt_config(
             project_name: str,
             profile_name: str = "",
-        ) -> r[t.Dbt.ProjectConfiguration]:
+        ) -> r[t.Meltano.Dbt.ProjectConfiguration]:
             """Create DBT project configuration.
 
             Args:
@@ -958,7 +958,7 @@ class FlextMeltanoSettings(FlextSettings):
             """
             try:
                 profile = profile_name or f"{project_name}_profile"
-                config: t.Dbt.ProjectConfiguration = {
+                config: t.Meltano.Dbt.ProjectConfiguration = {
                     "name": project_name,
                     "version": "1.0.0",
                     "config-version": 2,
@@ -970,9 +970,9 @@ class FlextMeltanoSettings(FlextSettings):
                     "macro-paths": ["macros"],
                     "snapshot-paths": ["snapshots"],
                 }
-                return r[t.Dbt.ProjectConfiguration].ok(config)
+                return r[t.Meltano.Dbt.ProjectConfiguration].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[t.Dbt.ProjectConfiguration].fail(
+                return r[t.Meltano.Dbt.ProjectConfiguration].fail(
                     f"Failed to create DBT config: {e}",
                 )
 
@@ -981,7 +981,7 @@ class FlextMeltanoSettings(FlextSettings):
             profile_name: str,
             target_name: str = "dev",
             db_type: str = "postgres",
-        ) -> r[t.Dbt.ProfileConfiguration]:
+        ) -> r[t.Meltano.Dbt.ProfileConfiguration]:
             """Create DBT profile configuration.
 
             Args:
@@ -994,7 +994,7 @@ class FlextMeltanoSettings(FlextSettings):
 
             """
             try:
-                profile_config: t.Dbt.ProfileConfiguration = {
+                profile_config: t.Meltano.Dbt.ProfileConfiguration = {
                     profile_name: {
                         "target": target_name,
                         "outputs": {
@@ -1010,9 +1010,9 @@ class FlextMeltanoSettings(FlextSettings):
                         },
                     },
                 }
-                return r[t.Dbt.ProfileConfiguration].ok(profile_config)
+                return r[t.Meltano.Dbt.ProfileConfiguration].ok(profile_config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[t.Dbt.ProfileConfiguration].fail(
+                return r[t.Meltano.Dbt.ProfileConfiguration].fail(
                     f"Failed to create DBT profile config: {e}",
                 )
 
@@ -1020,7 +1020,7 @@ class FlextMeltanoSettings(FlextSettings):
         def create_meltano_config(
             project_id: str,
             default_environment: str = "dev",
-        ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+        ) -> r[t.Meltano.MeltanoConfigDict]:
             """Create basic Meltano project configuration.
 
             Args:
@@ -1032,7 +1032,7 @@ class FlextMeltanoSettings(FlextSettings):
 
             """
             try:
-                config: t.MeltanoCore.MeltanoConfigDict = {
+                config: t.Meltano.MeltanoConfigDict = {
                     "version": 1,
                     "default_environment": default_environment,
                     "project_id": project_id,
@@ -1049,9 +1049,9 @@ class FlextMeltanoSettings(FlextSettings):
                         },
                     ],
                 }
-                return r[t.MeltanoCore.MeltanoConfigDict].ok(config)
+                return r[t.Meltano.MeltanoConfigDict].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                return r[t.Meltano.MeltanoConfigDict].fail(
                     f"Failed to create Meltano config: {e}",
                 )
 

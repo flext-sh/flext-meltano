@@ -40,17 +40,17 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     - All production constants come from FlextMeltanoConstants
     """
 
-    class Paths:
-        """Test path constants."""
+    class Meltano(FlextMeltanoConstants.Meltano):
+        class Tests:
+            class Paths:
+                """Test path constants."""
 
-        TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
-        TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
-        TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
+                TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
+                TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
+                TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
 
-# Short aliases per FLEXT convention
-c = TestsFlextMeltanoConstants  # Primary test constants alias
-c = TestsFlextMeltanoConstants  # Alternative alias for compatibility
+c = TestsFlextMeltanoConstants
 
 __all__ = [
     "TestsFlextMeltanoConstants",

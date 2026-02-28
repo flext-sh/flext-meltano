@@ -27,16 +27,15 @@ class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
     - FlextTestsModels.Tests.* - Generic test utilities
     """
 
-    class Tests:
-        """Test fixtures namespace for flext-meltano.
+    class Meltano(FlextMeltanoModels.Meltano):
+        class Tests:
+            """Test fixtures namespace for flext-meltano.
 
-        Contains test-specific models and fixtures that should not
-        be part of production code.
-        """
+            Contains test-specific models and fixtures that should not
+            be part of production code.
+            """
 
 
-# Short aliases for tests
-tm = TestsFlextMeltanoModels
 m = TestsFlextMeltanoModels
 
-__all__ = ["TestsFlextMeltanoModels", "m", "tm"]
+__all__ = ["TestsFlextMeltanoModels", "m"]
