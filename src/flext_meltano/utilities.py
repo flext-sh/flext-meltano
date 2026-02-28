@@ -19,10 +19,8 @@ from flext_core import (
 
 from flext_meltano.constants import c
 from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import m
 from flext_meltano.typings import t
-
-m = FlextMeltanoModels
 
 
 class FlextMeltanoUtilities(FlextUtilities):

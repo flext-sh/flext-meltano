@@ -15,10 +15,6 @@ from flext_cli.protocols import FlextCliProtocols
 from flext_core import FlextTypes
 from flext_core.protocols import FlextProtocols
 
-# Import aliases following order: c -> t -> p -> r -> m -> u
-# Runtime aliases defined at module level per FLEXT standards
-t = FlextTypes
-
 # Lazy import to break circular dependency - imported on-demand when needed
 # from flext_meltano.singer.protocols import (
 #     FlextMeltanoPluginProtocols,
