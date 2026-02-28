@@ -7,8 +7,6 @@ from typing import Final
 
 from flext_core import FlextConstants
 
-from flext_meltano.typings import t
-
 
 class FlextMeltanoConstants(FlextConstants):
     """Domain constants for the flext-meltano package."""
@@ -106,32 +104,6 @@ class FlextMeltanoConstants(FlextConstants):
             INSTALLATION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 10
             MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
             MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
-
-            @classmethod
-            def supported_types(cls) -> t.MeltanoCore.PluginTypeList:
-                """Return the supported plugin type identifiers."""
-                return [
-                    plugin_type.value
-                    for plugin_type in FlextMeltanoConstants.Meltano.Enums.PluginType.__members__.values()
-                ]
-
-            @classmethod
-            def default_catalog(cls) -> list[t.Plugin.PluginDefinition]:
-                """Provide default plugin catalog entries for discovery workflows."""
-                return [
-                    {
-                        "type": plugin_type.value,
-                        "variant": cls.DEFAULT_VARIANT,
-                        "registry": cls.HUB_URL,
-                        "identifiers": [plugin_type.value],
-                    }
-                    for plugin_type in FlextMeltanoConstants.Meltano.Enums.PluginType.__members__.values()
-                ]
-
-            @classmethod
-            def get_all_plugins(cls) -> list[t.Plugin.PluginDefinition]:
-                """Compatibility shim for existing discovery logic."""
-                return cls.default_catalog()
 
         class Singer:
             """Singer protocol message metadata."""
