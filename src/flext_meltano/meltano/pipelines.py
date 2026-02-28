@@ -82,7 +82,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         start_result = self._log_pipeline_start(source_name, sink_name)
         if start_result.is_failure:
             return r[Mapping[str, str]].fail(
-                start_result.error or "Pipeline start failed"
+                start_result.error or "Pipeline start failed",
             )
 
         plugins_result = self._find_required_plugins()
@@ -200,7 +200,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.ExecutionResultDict].fail(
-                f"Failed to create ELT context: {e}"
+                f"Failed to create ELT context: {e}",
             )
 
     def _execute_singer_runner(
@@ -226,7 +226,7 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Build successful pipeline result."""
         try:
             parsed_context = m.Meltano.PipelineResultContext.model_validate(
-                context_data
+                context_data,
             )
             execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate(
                 {"values": parsed_context.execution_result},

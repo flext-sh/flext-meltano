@@ -187,7 +187,8 @@ class FlextMeltanoDbtService(s[str]):
             )
 
     def generate_docs(
-        self, **kwargs: mt.GeneralValueType
+        self,
+        **kwargs: mt.GeneralValueType,
     ) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 

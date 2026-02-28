@@ -27,7 +27,9 @@ class CliRunnerProtocol(Protocol):
     """Protocol for CLI runner interface."""
 
     def invoke(
-        self, *args: t.GeneralValueType, **kwargs: t.GeneralValueType
+        self,
+        *args: t.GeneralValueType,
+        **kwargs: t.GeneralValueType,
     ) -> t.GeneralValueType:
         """Invoke CLI command."""
 
@@ -181,7 +183,8 @@ class MockCliRunner:
 
     @staticmethod
     def invoke(
-        *_args: t.GeneralValueType, **_kwargs: t.GeneralValueType
+        *_args: t.GeneralValueType,
+        **_kwargs: t.GeneralValueType,
     ) -> t.GeneralValueType:
         """Mock invoke method."""
         return type("Result", (), {"exit_code": 0, "output": ""})()
@@ -391,7 +394,8 @@ class MockMeltanoService:
 
     @staticmethod
     def install_plugin(
-        _plugin_type: str, plugin_name: str
+        _plugin_type: str,
+        plugin_name: str,
     ) -> dict[str, t.GeneralValueType]:
         return {"plugin": plugin_name, "status": "installed"}
 

@@ -112,7 +112,7 @@ class TestTapService:
                 result = tap_service.create_instance(config)
             except TypeError:
                 pytest.skip(
-                    "create_instance(config) not available (use PYTHONPATH=src)"
+                    "create_instance(config) not available (use PYTHONPATH=src)",
                 )
             assert isinstance(result, r)
 
@@ -207,7 +207,7 @@ class TestTargetService:
                 result = target_service.create_instance(config)
             except TypeError:
                 pytest.skip(
-                    "create_instance(config) not available (use PYTHONPATH=src)"
+                    "create_instance(config) not available (use PYTHONPATH=src)",
                 )
             assert isinstance(result, r)
 

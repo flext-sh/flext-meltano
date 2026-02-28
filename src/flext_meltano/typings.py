@@ -244,7 +244,8 @@ class FlextMeltanoTypes(FlextTypes):
 
         # Type aliases for file_managers.py
         FileConfigDict = dict[
-            str, FlextTypes.GeneralValueType
+            str,
+            FlextTypes.GeneralValueType,
         ]
         PathDict = dict[str, str | Path]
 

@@ -73,7 +73,7 @@ class FlextMeltanoBridge:
             return FlextResult[t.Bridge.BridgeStatus].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[t.Bridge.BridgeStatus].fail(
-                f"Bridge command failed: {e}"
+                f"Bridge command failed: {e}",
             )
 
     @staticmethod
@@ -140,7 +140,7 @@ class FlextMeltanoBridge:
             return FlextResult[t.Plugin.PluginCatalog].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[t.Plugin.PluginCatalog].fail(
-                f"Plugin discovery failed: {e}"
+                f"Plugin discovery failed: {e}",
             )
 
 

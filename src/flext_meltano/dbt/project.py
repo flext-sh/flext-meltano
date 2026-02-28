@@ -97,7 +97,8 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             )
 
     def load_manifest(
-        self, manifest_path: Path | None = None
+        self,
+        manifest_path: Path | None = None,
     ) -> r[mt.Dbt.ManifestData]:
         """Load DBT manifest.
 
@@ -116,7 +117,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
 
             if not manifest_path.exists():
                 return r[mt.Dbt.ManifestData].fail(
-                    f"Manifest not found: {manifest_path}"
+                    f"Manifest not found: {manifest_path}",
                 )
 
             with manifest_path.open() as f:

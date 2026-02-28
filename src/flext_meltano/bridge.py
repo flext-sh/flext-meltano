@@ -55,7 +55,7 @@ class FlextMeltanoBridge:
             return r[t.MeltanoCore.ExecutionResultDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.ExecutionResultDict].fail(
-                f"Bridge command failed: {e}"
+                f"Bridge command failed: {e}",
             )
 
     @staticmethod

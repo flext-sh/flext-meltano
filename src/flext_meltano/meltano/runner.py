@@ -159,7 +159,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
             return r[t.MeltanoCore.ExecutionResultDict].ok(dbt_runner)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.ExecutionResultDict].fail(
-                f"Failed to get DBT runner: {e}"
+                f"Failed to get DBT runner: {e}",
             )
 
     @staticmethod
@@ -175,7 +175,7 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
             return r[t.MeltanoCore.ExecutionResultDict].ok(singer_manager)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.MeltanoCore.ExecutionResultDict].fail(
-                f"Failed to get Singer manager: {e}"
+                f"Failed to get Singer manager: {e}",
             )
 
     def execute_complete_elt_pipeline(

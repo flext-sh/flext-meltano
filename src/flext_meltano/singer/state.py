@@ -40,7 +40,8 @@ class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
         self._state_msg: m.Meltano.SingerStateMessage = m.Meltano.SingerStateMessage()
 
     def load_state(
-        self, state_file: Path | None = None
+        self,
+        state_file: Path | None = None,
     ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file or memory.
 

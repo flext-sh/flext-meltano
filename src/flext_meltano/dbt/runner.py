@@ -26,7 +26,9 @@ class DbtRunResult(BaseModel):
     success: bool = Field(..., description="Whether the DBT run succeeded")
     models_run: int = Field(default=0, ge=0, description="Number of models run")
     models_failed: int = Field(
-        default=0, ge=0, description="Number of models that failed"
+        default=0,
+        ge=0,
+        description="Number of models that failed",
     )
     status: str = Field(default="unknown", description="Status of the DBT run")
 
@@ -39,7 +41,9 @@ class DbtTestResult(BaseModel):
     success: bool = Field(..., description="Whether the DBT test succeeded")
     tests_run: int = Field(default=0, ge=0, description="Number of tests run")
     tests_failed: int = Field(
-        default=0, ge=0, description="Number of tests that failed"
+        default=0,
+        ge=0,
+        description="Number of tests that failed",
     )
     status: str = Field(default="unknown", description="Status of the DBT test")
 
@@ -158,7 +162,8 @@ class FlextMeltanoDbtRunner(s[str]):
             return r[DbtTestResult].fail(f"DBT tests failed: {e}")
 
     def docs_generate(
-        self, **_kwargs: t.GeneralValueType
+        self,
+        **_kwargs: t.GeneralValueType,
     ) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 

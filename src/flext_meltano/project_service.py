@@ -278,7 +278,8 @@ class FlextMeltanoProjectService(s[t.MeltanoCore.MeltanoConfigDict]):
 
     @staticmethod
     def _write_meltano_config(
-        project_path: Path, config: Mapping[str, t.GeneralValueType]
+        project_path: Path,
+        config: Mapping[str, t.GeneralValueType],
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:

@@ -179,7 +179,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         if not hasattr(self.tap_abstractions, "build"):
             pytest.skip("build not available on this FlextMeltanoTapAbstractions")
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-csv",
@@ -218,7 +219,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test get_stream_config method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_stream_config"):
             pytest.skip(
-                "get_stream_config not available on this FlextMeltanoTapAbstractions"
+                "get_stream_config not available on this FlextMeltanoTapAbstractions",
             )
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
@@ -292,7 +293,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test tap instance validation using process method and flext_tests."""
         # Create valid tap instance
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         valid_instance = m.Meltano.TapInstance(
             tap_type="tap-csv",
@@ -386,7 +388,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_discover_streams_csv(self) -> None:
         """Test discover_streams with CSV strategy using flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-csv",
@@ -467,7 +470,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test get_stream_by_name method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_stream_by_name"):
             pytest.skip(
-                "get_stream_by_name not available on this FlextMeltanoTapAbstractions"
+                "get_stream_by_name not available on this FlextMeltanoTapAbstractions",
             )
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
@@ -802,7 +805,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         if not hasattr(self.tap_abstractions, "sync_stream"):
             pytest.skip("sync_stream not available on this FlextMeltanoTapAbstractions")
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-csv",
@@ -836,7 +840,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test list_streams method using flext_tests."""
         if not hasattr(self.tap_abstractions, "list_streams"):
             pytest.skip(
-                "list_streams not available on this FlextMeltanoTapAbstractions"
+                "list_streams not available on this FlextMeltanoTapAbstractions",
             )
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
@@ -870,10 +874,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test get_tap_type method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_tap_type"):
             pytest.skip(
-                "get_tap_type not available on this FlextMeltanoTapAbstractions"
+                "get_tap_type not available on this FlextMeltanoTapAbstractions",
             )
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-csv",
@@ -1009,7 +1014,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     @unittest.skip(
         "API methods not yet implemented: create_tap_from_config, "
         "generate_catalog, sync_stream. Requires implementation in "
-        "FlextMeltanoTapAbstractions."
+        "FlextMeltanoTapAbstractions.",
     )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
@@ -1091,7 +1096,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 # Handle both dict entry and model object
                 stream_name = (
                     stream_entry.get(
-                        "stream_name", stream_entry.get("tap_stream_id", "unknown")
+                        "stream_name",
+                        stream_entry.get("tap_stream_id", "unknown"),
                     )
                     if isinstance(stream_entry, dict)
                     else getattr(stream_entry, "stream_name", "unknown")

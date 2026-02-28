@@ -81,13 +81,14 @@ def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
     assert result.is_failure
     assert result.error == "Pipeline execution not configured"
 
-
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         assert create_pipeline(
-            "b-pipeline", {"command": ["run", "tap-a", "target-a"]}
+            "b-pipeline",
+            {"command": ["run", "tap-a", "target-a"]},
         ).is_success
         assert create_pipeline(
-            "a-pipeline", {"command": ["run", "tap-b", "target-b"]}
+            "a-pipeline",
+            {"command": ["run", "tap-b", "target-b"]},
         ).is_success
 
     assert result.is_success
@@ -97,7 +98,8 @@ def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
 def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         assert create_pipeline(
-            "daily-pipeline", {"command": ["run", "tap", "target"]}
+            "daily-pipeline",
+            {"command": ["run", "tap", "target"]},
         ).is_success
         pid_file = tmp_path / "pipelines" / "daily-pipeline" / "pipeline.pid"
         pid_file.write_text("1234", encoding="utf-8")
@@ -117,10 +119,10 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
     assert stopped_result.value == "stopped"
     assert not pid_file.exists()
 
-
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         assert create_pipeline(
-            "daily-pipeline", {"command": ["run", "tap", "target"]}
+            "daily-pipeline",
+            {"command": ["run", "tap", "target"]},
         ).is_success
         pid_file = tmp_path / "pipelines" / "daily-pipeline" / "pipeline.pid"
         pid_file.write_text("5678", encoding="utf-8")
@@ -140,6 +142,7 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
             raise AssertionError(msg)
 
         with patch("flext_meltano.cli_managers.os.kill", side_effect=fake_kill):
+            pass
 
     assert result.is_success
     assert not pid_file.exists()
@@ -148,7 +151,8 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
 def test_delete_pipeline_removes_configuration_directory(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         assert create_pipeline(
-            "daily-pipeline", {"command": ["run", "tap", "target"]}
+            "daily-pipeline",
+            {"command": ["run", "tap", "target"]},
         ).is_success
         result = delete_pipeline("daily-pipeline")
 

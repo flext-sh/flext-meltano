@@ -35,7 +35,7 @@ class FlextMeltano(s[t.JsonValue]):
 
     """
 
-    service_name: str
+    service_name: str = "flext_meltano_api"
     version: str = ""  # Will be set in __init__
 
     @property
@@ -111,10 +111,11 @@ class FlextMeltano(s[t.JsonValue]):
         else:
             self._config = config
 
-        super().__init__(
-            service_name=service_name,
-            version=version,
-        )
+        super().__init__()
+
+        # Manually set attributes that used to be passed to constructor
+        self.service_name = service_name
+        self.version = version
 
         self.logger.info(
             "FlextMeltano API '%s' v%s initialized",
@@ -873,7 +874,10 @@ class FlextMeltano(s[t.JsonValue]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.JsonValue].fail(f"Invalid payload: {e}")
         result = self.run_elt_pipeline(
-            p.tap_name, p.target_name, p.dbt_models, p.config
+            p.tap_name,
+            p.target_name,
+            p.dbt_models,
+            p.config,
         )
         return result.map(lambda v: v)
 

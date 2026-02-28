@@ -61,7 +61,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         """
         try:
             source_type_val = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", None
+                source_config,
+                "tap_type",
+                None,
             )
             self.logger.info(
                 "Discovering streams for source",
@@ -158,10 +160,14 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", "unknown"
+                source_config,
+                "tap_type",
+                "unknown",
             )
             source_identifier = getattr(
-                source_config, "source_identifier", None
+                source_config,
+                "source_identifier",
+                None,
             ) or getattr(source_config, "tap_identifier", "unknown")
 
             self.logger.info(
@@ -219,7 +225,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", "unknown"
+                source_config,
+                "tap_type",
+                "unknown",
             )
 
             self.logger.debug(
@@ -338,7 +346,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
                     tap_type=inst.source_type,
                     config=config,
                     tap_id=inst.source_id,
-                )
+                ),
             )
         except Exception as e:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")

@@ -74,7 +74,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
         # Test nested value retrieval
         test_data: dict[str, t.GeneralValueType] = {
-            "level1": {"level2": {"level3": "found_value"}}
+            "level1": {"level2": {"level3": "found_value"}},
         }
         level1 = test_data.get("level1", {})
         if isinstance(level1, dict):

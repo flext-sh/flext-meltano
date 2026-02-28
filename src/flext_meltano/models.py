@@ -206,10 +206,12 @@ class FlextMeltanoModels(FlextModels):
                 description="Log extract operations",
             )
             extract_queries: bool = Field(
-                default=True, description="Log extract queries"
+                default=True,
+                description="Log extract queries",
             )
             extract_results: bool = Field(
-                default=True, description="Log extract results"
+                default=True,
+                description="Log extract results",
             )
             extract_errors: bool = Field(default=True, description="Log extract errors")
             extract_performance: bool = Field(
@@ -231,7 +233,8 @@ class FlextMeltanoModels(FlextModels):
 
             # Load/Sink Operations Logging (8 fields)
             load_operations: bool = Field(
-                default=True, description="Log load operations"
+                default=True,
+                description="Log load operations",
             )
             load_batches: bool = Field(default=True, description="Log load batches")
             load_results: bool = Field(default=True, description="Log load results")
@@ -264,7 +267,8 @@ class FlextMeltanoModels(FlextModels):
                 description="Log transform results",
             )
             transform_errors: bool = Field(
-                default=True, description="Log transform errors"
+                default=True,
+                description="Log transform errors",
             )
             transform_performance: bool = Field(
                 default=True,
@@ -285,7 +289,8 @@ class FlextMeltanoModels(FlextModels):
 
             # DBT Specific Logging (6 fields)
             dbt_parse: bool = Field(
-                default=True, description="Log DBT parsing operations"
+                default=True,
+                description="Log DBT parsing operations",
             )
             dbt_compile: bool = Field(default=True, description="Log DBT compilation")
             dbt_execute: bool = Field(default=True, description="Log DBT execution")
@@ -301,7 +306,8 @@ class FlextMeltanoModels(FlextModels):
 
             # Data Quality Logging (8 fields)
             data_quality: bool = Field(
-                default=True, description="Log data quality checks"
+                default=True,
+                description="Log data quality checks",
             )
             data_quality_checks: bool = Field(
                 default=True,
@@ -347,7 +353,8 @@ class FlextMeltanoModels(FlextModels):
                 description="Log plugin timing information",
             )
             plugin_memory: bool = Field(
-                default=True, description="Log plugin memory usage"
+                default=True,
+                description="Log plugin memory usage",
             )
             plugin_throughput: bool = Field(
                 default=True,
@@ -356,10 +363,12 @@ class FlextMeltanoModels(FlextModels):
 
             # Source and Target Logging (14 fields)
             source_info: bool = Field(
-                default=True, description="Log source information"
+                default=True,
+                description="Log source information",
             )
             target_info: bool = Field(
-                default=True, description="Log target information"
+                default=True,
+                description="Log target information",
             )
             source_errors: bool = Field(default=True, description="Log source errors")
             target_errors: bool = Field(default=True, description="Log target errors")
@@ -380,10 +389,12 @@ class FlextMeltanoModels(FlextModels):
                 description="Log target timing information",
             )
             source_memory: bool = Field(
-                default=True, description="Log source memory usage"
+                default=True,
+                description="Log source memory usage",
             )
             target_memory: bool = Field(
-                default=True, description="Log target memory usage"
+                default=True,
+                description="Log target memory usage",
             )
             source_throughput: bool = Field(
                 default=True,
@@ -432,7 +443,8 @@ class FlextMeltanoModels(FlextModels):
                 description="Log alert generation",
             )
             monitoring_health: bool = Field(
-                default=True, description="Log health checks"
+                default=True,
+                description="Log health checks",
             )
             monitoring_traces: bool = Field(
                 default=True,
@@ -632,7 +644,8 @@ class FlextMeltanoModels(FlextModels):
                 description="Path to catalog file",
             )
             state_file: str | None = Field(
-                default=None, description="Path to state file"
+                default=None,
+                description="Path to state file",
             )
             state_output_file: str | None = Field(
                 default=None,
@@ -647,7 +660,8 @@ class FlextMeltanoModels(FlextModels):
                 description="Path to target configuration file",
             )
             full_refresh: bool = Field(
-                default=False, description="Run with full refresh"
+                default=False,
+                description="Run with full refresh",
             )
 
         # ========================================================================
@@ -672,7 +686,8 @@ class FlextMeltanoModels(FlextModels):
 
             tap_name: str = Field(description="Name of the tap to run")
             discover: bool = Field(
-                default=False, description="Run tap in discover mode"
+                default=False,
+                description="Run tap in discover mode",
             )
             config_file: str | None = Field(
                 default=None,
@@ -868,7 +883,7 @@ class FlextMeltanoModels(FlextModels):
                 description="JSON schema for the stream",
             )
             source_type: str = Field(
-                description="Type of source this stream belongs to"
+                description="Type of source this stream belongs to",
             )
             status: str = Field(
                 default=c.Meltano.Enums.StreamStatus.DISCOVERED,
@@ -973,14 +988,16 @@ class FlextMeltanoModels(FlextModels):
             """Generic tap instance for data extraction."""
 
             tap_id: str | None = Field(
-                default=None, description="Unique tap identifier"
+                default=None,
+                description="Unique tap identifier",
             )
             tap_type: str = Field(description="Type of the tap")
             config: FlextMeltanoModels.Meltano.TapConfig = Field(
-                description="Tap configuration"
+                description="Tap configuration",
             )
             adapter: t.GeneralValueType | None = Field(
-                default=None, description="Tap adapter instance"
+                default=None,
+                description="Tap adapter instance",
             )
             streams: list[FlextMeltanoModels.Meltano.StreamInfo] = Field(
                 default_factory=list,
@@ -1091,7 +1108,8 @@ class FlextMeltanoModels(FlextModels):
             """Generic data sink instance for pipeline operations."""
 
             sink_id: str | None = Field(
-                default=None, description="Unique sink identifier"
+                default=None,
+                description="Unique sink identifier",
             )
             sink_type: str = Field(description="Type of the data sink")
             config: FlextMeltanoModels.Meltano.DataSinkConfig = Field(
@@ -1200,7 +1218,8 @@ class FlextMeltanoModels(FlextModels):
                 description="Stream processing status",
             )
             records_loaded: int = Field(
-                default=0, description="Number of records loaded"
+                default=0,
+                description="Number of records loaded",
             )
             batches_processed: int = Field(
                 default=0,
@@ -1444,7 +1463,8 @@ class FlextMeltanoModels(FlextModels):
             """Result of a Singer sync operation."""
 
             records_processed: int = Field(
-                ge=0, description="Number of records processed"
+                ge=0,
+                description="Number of records processed",
             )
             records_written: int = Field(ge=0, description="Number of records written")
             errors: int = Field(ge=0, description="Number of errors")
@@ -1701,7 +1721,10 @@ class FlextMeltanoModels(FlextModels):
             )
 
             @field_validator(
-                "default_variant", "logo_url", "description", mode="before"
+                "default_variant",
+                "logo_url",
+                "description",
+                mode="before",
             )
             @classmethod
             def normalize_string_fields(
@@ -1781,7 +1804,10 @@ class FlextMeltanoModels(FlextModels):
             )
 
             @field_validator(
-                "project_root", "extractor_name", "loader_name", mode="before"
+                "project_root",
+                "extractor_name",
+                "loader_name",
+                mode="before",
             )
             @classmethod
             def normalize_required_strings(
@@ -1811,7 +1837,8 @@ class FlextMeltanoModels(FlextModels):
             """Typed subset for extracting final pipeline result fields."""
 
             project_root: str = Field(
-                default="unknown", description="Project root path"
+                default="unknown",
+                description="Project root path",
             )
             execution_result: dict[str, t.GeneralValueType] = Field(
                 default_factory=dict,
@@ -1904,7 +1931,8 @@ class FlextMeltanoModels(FlextModels):
             name: str | None = Field(default=None, description="Node name")
             path: str | None = Field(default=None, description="Node path")
             description: str | None = Field(
-                default=None, description="Node description"
+                default=None,
+                description="Node description",
             )
             fqn: list[str] = Field(
                 default_factory=list,
@@ -2067,7 +2095,8 @@ class FlextMeltanoModels(FlextModels):
             namespace: str = Field(description="Plugin namespace")
             pip_url: str | None = Field(default=None, description="Plugin pip URL")
             executable: str | None = Field(
-                default=None, description="Plugin executable"
+                default=None,
+                description="Plugin executable",
             )
             variant: str = Field(
                 default="standard",

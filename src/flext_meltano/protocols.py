@@ -105,7 +105,8 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def sync(
-                self, catalog: FlextTypes.JsonValue
+                self,
+                catalog: FlextTypes.JsonValue,
             ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Sync data from source with r."""
                 ...
@@ -143,13 +144,15 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             """DBT Runner protocol extending Service for ELT operations."""
 
             def run(
-                self, models: list[str]
+                self,
+                models: list[str],
             ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Run DBT models with r."""
                 ...
 
             def test(
-                self, models: list[str]
+                self,
+                models: list[str],
             ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
                 """Test DBT models with r."""
                 ...
@@ -161,7 +164,8 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
         @runtime_checkable
         class ServiceCallProtocol(
-            FlextProtocols.Service[FlextTypes.JsonValue], Protocol
+            FlextProtocols.Service[FlextTypes.JsonValue],
+            Protocol,
         ):
             """Service call protocol extending Service."""
 

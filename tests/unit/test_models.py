@@ -100,7 +100,8 @@ class TestTargetConfigEnhanced:
         """Test TargetConfig validation with empty target_type."""
         with pytest.raises(ValidationError, match="target_type cannot be empty"):
             m.Meltano.TargetConfig(
-                target_type="", connection_config={"host": "localhost"}
+                target_type="",
+                connection_config={"host": "localhost"},
             )
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:

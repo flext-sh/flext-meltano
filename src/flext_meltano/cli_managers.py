@@ -102,7 +102,7 @@ def execute_pipeline(
             config_payload = json.loads(config_path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError) as exc:
             return r[str].fail(
-                f"Failed to read pipeline '{pipeline_name}' configuration: {exc}"
+                f"Failed to read pipeline '{pipeline_name}' configuration: {exc}",
             )
 
         if isinstance(config_payload, dict):
@@ -149,7 +149,7 @@ def list_pipelines() -> r[list[str]]:
         return r[list[str]].ok([])
     if not pipelines_root.is_dir():
         return r[list[str]].fail(
-            f"Pipelines root path is not a directory: {pipelines_root}"
+            f"Pipelines root path is not a directory: {pipelines_root}",
         )
 
     try:
@@ -176,7 +176,7 @@ def get_pipeline_status(pipeline_name: str) -> r[str]:
         pid = int(pid_path.read_text(encoding="utf-8").strip())
     except (ValueError, OSError) as exc:
         return r[str].fail(
-            f"Failed to read status for pipeline '{pipeline_name}': {exc}"
+            f"Failed to read status for pipeline '{pipeline_name}': {exc}",
         )
 
     if _is_process_running(pid):
@@ -241,7 +241,7 @@ def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
         time.sleep(0.1)
 
     return r[str].fail(
-        f"Pipeline '{pipeline_name}' did not stop within {timeout_seconds:.1f} seconds"
+        f"Pipeline '{pipeline_name}' did not stop within {timeout_seconds:.1f} seconds",
     )
 
 
@@ -256,7 +256,7 @@ def delete_pipeline(pipeline_name: str) -> r[str]:
         return r[str].fail(status_result.error)
     if status_result.value == "running":
         return r[str].fail(
-            f"Pipeline '{pipeline_name}' is running. Stop it before deletion"
+            f"Pipeline '{pipeline_name}' is running. Stop it before deletion",
         )
 
     try:
@@ -495,7 +495,9 @@ class FlextMeltanoPipelineManager:
             return r[None].fail(status_result.error)
 
         self.logger.info(
-            "Pipeline status", pipeline=_args[0], status=status_result.value
+            "Pipeline status",
+            pipeline=_args[0],
+            status=status_result.value,
         )
         return r[None](value=None, is_success=True)
 

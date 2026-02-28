@@ -559,7 +559,7 @@ class FlextMeltanoSettings(FlextSettings):
 
         # Create config data with environment
         config_data: dict[str, FlextTypes.GeneralValueType] = {
-            "environment": env_type.value
+            "environment": env_type.value,
         }
 
         # Handle debug/environment conflict: production cannot have debug=True
@@ -973,7 +973,7 @@ class FlextMeltanoSettings(FlextSettings):
                 return r[t.Dbt.ProjectConfiguration].ok(config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[t.Dbt.ProjectConfiguration].fail(
-                    f"Failed to create DBT config: {e}"
+                    f"Failed to create DBT config: {e}",
                 )
 
         @staticmethod

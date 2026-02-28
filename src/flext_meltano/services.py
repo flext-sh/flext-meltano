@@ -69,10 +69,6 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Get FlextContainer instance - delegates to global container."""
         return FlextContainer.get_global()
 
-    
-    
-    
-    
     def __init__(
         self,
         config: FlextMeltanoSettings | None = None,

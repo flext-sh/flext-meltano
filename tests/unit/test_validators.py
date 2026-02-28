@@ -110,7 +110,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
 
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config
+            dbt_config,
         )
         tm.ok(result)
 
@@ -118,7 +118,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         dbt_config: t.JsonValue = {"name": "analytics"}
 
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config
+            dbt_config,
         )
         assert result.is_failure
         tm.fail(result)

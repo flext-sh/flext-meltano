@@ -269,7 +269,7 @@ class FlextMeltanoSingerCliTranslator:
         # Validate command to prevent execution of untrusted input
         if not command:
             return r[t.CLI.ProcessResult].fail(
-                "Invalid command: must be non-empty list"
+                "Invalid command: must be non-empty list",
             )
 
         def is_string_argument(arg: t.GeneralValueType) -> bool:
@@ -281,7 +281,7 @@ class FlextMeltanoSingerCliTranslator:
 
         if not all(is_string_argument(arg) for arg in command):
             return r[t.CLI.ProcessResult].fail(
-                "Invalid command: all arguments must be strings"
+                "Invalid command: all arguments must be strings",
             )
 
         try:

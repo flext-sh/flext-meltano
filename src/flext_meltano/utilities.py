@@ -399,7 +399,9 @@ class FlextMeltanoUtilities(FlextUtilities):
 
     @classmethod
     def save_yaml_file(
-        cls, file_path: Path, content: t.MeltanoCore.MeltanoConfigDict
+        cls,
+        file_path: Path,
+        content: t.MeltanoCore.MeltanoConfigDict,
     ) -> r[Path]:
         """Save content to YAML file."""
         result = cls.write_meltano_yml(content, file_path)

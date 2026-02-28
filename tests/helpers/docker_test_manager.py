@@ -367,7 +367,8 @@ class FlextTestsDocker(ContainerManager):
 
     @contextmanager
     def service_context(
-        self, services: list[str] | None = None
+        self,
+        services: list[str] | None = None,
     ) -> Generator[FlextTestsDocker]:
         """Context manager for service lifecycle.
 

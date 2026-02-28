@@ -162,7 +162,7 @@ class FlextMeltanoMeltanoService(s[str]):
         ) as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
             return r[list[t.Plugin.PluginDefinition]].fail(
-                f"Failed to discover plugins: {e}"
+                f"Failed to discover plugins: {e}",
             )
 
     def execute_pipeline(
