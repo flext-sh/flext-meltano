@@ -41,7 +41,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     """
 
     class Meltano(FlextMeltanoConstants.Meltano):
+        """Meltano domain namespace."""
+
         class Tests:
+            """Meltano tests namespace."""
+
             class Paths:
                 """Test path constants."""
 

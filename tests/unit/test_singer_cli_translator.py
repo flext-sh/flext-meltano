@@ -400,7 +400,6 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             "--full-refresh",
         ]
 
-
     def test_translate_dbt_run_with_all_parameters(self) -> None:
         """Test DBT run translation with all parameters."""
         params = m.Meltano.CliParameters.TransformationParams(
@@ -516,7 +515,9 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         ])
 
         assert result.is_failure
-        assert "tap-nonexistent" in str(result.error) and "not found" in str(result.error)
+        assert "tap-nonexistent" in str(result.error) and "not found" in str(
+            result.error
+        )
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_generic_exception(

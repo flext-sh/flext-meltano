@@ -120,7 +120,7 @@ src/flext_meltano/
 ```python
 ├── config.py                # FlextMeltanoSettings (configuration management)
 ├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic config)
-└── utilities.py            # FlextMeltanoUtilities (helper functions)
+└── utilities.py            # u (helper functions)
 ```
 
 **Purpose**: Manages configuration, environment settings, and utility functions for ELT operations.

@@ -183,9 +183,9 @@ class MockCliRunner:
 
     @staticmethod
     def invoke(
-        *_args: Any,
-        **_kwargs: Any,
-    ) -> Any:
+        *args: object,
+        **kwargs: object,
+    ) -> object:
         """Mock invoke method."""
         return type("Result", (), {"exit_code": 0, "output": ""})()
 

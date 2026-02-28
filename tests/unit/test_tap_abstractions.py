@@ -25,7 +25,7 @@ class _TestAssertions:
 
     @staticmethod
     def assert_in(item: object, container: object, message: str = "") -> None:
-        assert item in container, message or f"{item!r} not in {container!r}"
+        assert item in container, message or f"{item!r} not in {container!r}"  # type: ignore[operator]
 
 
 class TestFlextMeltanoTapAbstractionsComplete:
@@ -52,8 +52,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
-            connection_config=connection_config,
-            stream_config=stream_config,
+            connection_config=connection_config,  # type: ignore[arg-type]
+            stream_config=stream_config,  # type: ignore[arg-type]
             tap_version="v1.2.0",
         )
 
@@ -71,7 +71,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
         stream_def = m.Meltano.StreamDefinition(
             stream_name="users",
-            stream_schema=stream_schema,
+            stream_schema=stream_schema,  # type: ignore[arg-type]
             source_type="tap-postgres",
             status="discovered",
             records_extracted=42,
@@ -145,7 +145,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
         assert tap_abs is not None
         if hasattr(tap_abs, "service_name"):
-            assert tap_abs.service_name == "FlextMeltanoTapAbstractions"
+            assert tap_abs.service_name == "FlextMeltanoTapAbstractions"  # type: ignore[attr-defined]
         assert hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger")
 
     def test_serviceprocessor_process_method(self) -> None:
@@ -183,10 +183,10 @@ class TestFlextMeltanoTapAbstractionsComplete:
             config=config,
             tap_id="test_tap_123",
             status="ready",
-            discovered=True,
+            discovered=True,  # type: ignore[call-arg]
         )
 
-        result = self.tap_abstractions.build(
+        result = self.tap_abstractions.build(  # type: ignore[attr-defined]
             tap_instance,
             correlation_id="test_corr_123",
         )
@@ -226,9 +226,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
             },
         )
 
-        users_config = self.tap_abstractions.get_stream_config(config, "users")
-        orders_config = self.tap_abstractions.get_stream_config(config, "orders")
-        missing_config = self.tap_abstractions.get_stream_config(config, "missing")
+        users_config = self.tap_abstractions.get_stream_config(config, "users")  # type: ignore[attr-defined]
+        orders_config = self.tap_abstractions.get_stream_config(config, "orders")  # type: ignore[attr-defined]
+        missing_config = self.tap_abstractions.get_stream_config(config, "missing")  # type: ignore[attr-defined]
 
         self.test_assertions.assert_true(
             condition=isinstance(users_config, dict),
@@ -270,7 +270,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,
-            stream_config=stream_config,
+            stream_config=stream_config,  # type: ignore[arg-type]
             version="v2.0.0",
         )
 
@@ -486,7 +486,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
 
         # Then get specific stream
-        stream_result = self.tap_abstractions.get_stream_by_name(tap_instance, "users")
+        stream_result = self.tap_abstractions.get_stream_by_name(tap_instance, "users")  # type: ignore[attr-defined]
         self.test_assertions.assert_true(
             condition=isinstance(stream_result, r),
             message="Should return r",
@@ -505,7 +505,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             )
 
         # Test missing stream
-        missing_result = self.tap_abstractions.get_stream_by_name(
+        missing_result = self.tap_abstractions.get_stream_by_name(  # type: ignore[attr-defined]
             tap_instance,
             "missing_stream",
         )
@@ -581,7 +581,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             source_type="tap-postgres",
         )
 
-        result = self.tap_abstractions._create_catalog_entry_from_stream(stream)
+        result = self.tap_abstractions._create_catalog_entry_from_stream(stream)  # type: ignore[attr-defined]
 
         self.test_assertions.assert_true(
             condition=isinstance(result, r),
@@ -631,7 +631,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             source_type="tap-postgres",
         )
 
-        result = self.tap_abstractions.extract_records(stream)
+        result = self.tap_abstractions.extract_records(stream)  # type: ignore[attr-defined]
 
         self.test_assertions.assert_true(
             condition=isinstance(result, r),
@@ -683,7 +683,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             source_type="tap-postgres",
         )
 
-        result = self.tap_abstractions.extract_records(stream, limit=1)
+        result = self.tap_abstractions.extract_records(stream, limit=1)  # type: ignore[attr-defined]
 
         self.test_assertions.assert_true(
             condition=isinstance(result, r),
@@ -714,7 +714,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             source_type="tap-postgres",
         )
 
-        result = self.tap_abstractions.extract_records(stream)
+        result = self.tap_abstractions.extract_records(stream)  # type: ignore[attr-defined]
 
         self.test_assertions.assert_true(
             condition=isinstance(result, r),
@@ -856,7 +856,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
 
         # List streams
-        stream_names = self.tap_abstractions.list_streams(tap_instance)
+        stream_names = self.tap_abstractions.list_streams(tap_instance)  # type: ignore[attr-defined]
         self.test_assertions.assert_true(
             condition=isinstance(stream_names, list),
             message="Should return list",
@@ -882,7 +882,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             tap_id="csv_tap_123",
         )
 
-        tap_type = self.tap_abstractions.get_tap_type(tap_instance)
+        tap_type = self.tap_abstractions.get_tap_type(tap_instance)  # type: ignore[attr-defined]
         self.test_assertions.assert_equal(
             actual=tap_type,
             expected="tap-csv",
@@ -894,7 +894,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         if not hasattr(self.tap_abstractions, "get_registered_streams"):
             pytest.skip("get_registered_streams not available (use PYTHONPATH=src)")
         # Initially should be empty
-        initial_streams = self.tap_abstractions.get_registered_streams()
+        initial_streams = self.tap_abstractions.get_registered_streams()  # type: ignore[attr-defined]
         self.test_assertions.assert_true(
             condition=isinstance(initial_streams, list),
             message="Should return list",
@@ -913,7 +913,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         if discovery_result.is_success:
-            registered_streams = self.tap_abstractions.get_registered_streams()
+            registered_streams = self.tap_abstractions.get_registered_streams()  # type: ignore[attr-defined]
             self.test_assertions.assert_true(
                 condition=len(registered_streams) > 0,
                 message="Should have registered streams",
@@ -935,7 +935,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             )
             if hasattr(instance, "service_name"):
                 self.test_assertions.assert_equal(
-                    actual=instance.service_name,
+                    actual=instance.service_name,  # type: ignore[attr-defined]
                     expected="FlextMeltanoTapAbstractions",
                     message="Service name should match",
                 )
@@ -1023,8 +1023,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
-            connection_config=connection_config,
-            stream_config=stream_config,
+            connection_config=connection_config,  # type: ignore[arg-type]
+            stream_config=stream_config,  # type: ignore[arg-type]
         )
         self.test_assertions.assert_true(
             condition=create_result.is_success,
@@ -1034,8 +1034,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         # Step 2: Create tap instance for further operations
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
-            connection_config=connection_config,
-            stream_config=stream_config,
+            connection_config=connection_config,  # type: ignore[arg-type]
+            stream_config=stream_config,  # type: ignore[arg-type]
         )
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-postgres",
@@ -1112,7 +1112,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 # Test sync operation
                 sync_result = self.tap_abstractions.sync_stream(
                     tap_instance,
-                    stream_name,
+                    stream_name,  # type: ignore[arg-type]
                 )
                 self.test_assertions.assert_true(
                     condition=sync_result.is_success,

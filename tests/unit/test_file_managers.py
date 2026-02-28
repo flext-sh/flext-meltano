@@ -9,9 +9,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from pydantic import ConfigDict
-
 from flext_meltano import FlextMeltanoFileManagers, t
+
 
 class TestFlextMeltanoFileManagersComprehensive:
     """Comprehensive tests for FlextMeltanoFileManagers with 100% coverage."""

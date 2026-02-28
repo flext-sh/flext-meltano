@@ -298,7 +298,6 @@ class FlextMeltanoSettings(FlextSettings):
     )
 
     # Instance attributes (declared at class level for type safety)
-    metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
     sealed: bool = Field(default=False, exclude=True)
 
     # ============================================================================
@@ -363,9 +362,7 @@ class FlextMeltanoSettings(FlextSettings):
         """
         if v is None:
             return None
-        if isinstance(v, SecretStr):
-            return v
-        return SecretStr(str(v))
+        return v
 
     # ============================================================================
     # CONFIGURATION METHODS - Business logic methods

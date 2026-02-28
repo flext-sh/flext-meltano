@@ -100,7 +100,7 @@ import subprocess
 
 from flext_core import r
 
-from flext_meltano import c, m, t
+from flext_meltano import m, t
 
 
 class FlextMeltanoSingerCliTranslator:

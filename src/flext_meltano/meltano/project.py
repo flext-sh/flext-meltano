@@ -207,9 +207,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         """
         try:
             if not self.project:
-                return r[list[t.Meltano.PluginDefinition]].fail(
-                    "No project loaded"
-                )
+                return r[list[t.Meltano.PluginDefinition]].fail("No project loaded")
 
             plugins = self._extract_plugins(plugin_type)
 

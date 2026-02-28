@@ -54,7 +54,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.value
         assert isinstance(tap_service, FlextMeltanoService)
-        assert hasattr(tap_service, "tap_name")
+        assert hasattr(tap_service, "source_name")
 
     def test_tap_service_with_additional_data(self) -> None:
         """Test TapService creation with additional configuration data."""
@@ -158,7 +158,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.value
         assert isinstance(target_service, FlextMeltanoService)
-        assert hasattr(target_service, "target_name")
+        assert hasattr(target_service, "sink_name")
 
     def test_target_service_with_additional_data(self) -> None:
         """Test TargetService creation with additional configuration data."""
@@ -253,7 +253,7 @@ class TestDbtService:
         assert service_result.is_success
         dbt_service = service_result.value
         assert isinstance(dbt_service, FlextMeltanoService)
-        assert hasattr(dbt_service, "project_name")
+        assert hasattr(dbt_service, "transformation_name")
 
     def test_dbt_service_with_additional_data(self) -> None:
         """Test DbtService creation with additional configuration data."""

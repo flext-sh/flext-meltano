@@ -28,6 +28,8 @@ class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
     """
 
     class Meltano(FlextMeltanoModels.Meltano):
+        """Meltano domain models test namespace."""
+
         class Tests:
             """Test fixtures namespace for flext-meltano.
 

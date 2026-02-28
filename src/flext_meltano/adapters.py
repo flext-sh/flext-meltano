@@ -25,6 +25,8 @@ from flext_meltano import FlextMeltanoSettings, t, u
 
 
 class FlextMeltanoAdapter:
+    """Base adapter namespace class for focused integrations."""
+
     class ProjectAdapter(s[t.Meltano.ExecutionResultDict]):
         """Focused adapter for Meltano project management following SOLID principles."""
 
@@ -103,7 +105,7 @@ class FlextMeltanoAdapter:
         ) -> r[list[t.Meltano.PluginDefinition]]:
             """Discover available plugins of specified type.
 
-            Note: Real plugin discovery requires FlextMeltanoUtilities.
+            Note: Real plugin discovery requires u.
             Use FlextMeltano.discover_plugins() for full implementation.
             """
             try:

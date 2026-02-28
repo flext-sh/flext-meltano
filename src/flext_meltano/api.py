@@ -769,7 +769,7 @@ class FlextMeltano(s[t.JsonValue]):
         """Discover source schema - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
-            import typing
+            import typing  # noqa: PLC0415
 
             return service.discover().map(lambda v: typing.cast("t.JsonValue", v))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

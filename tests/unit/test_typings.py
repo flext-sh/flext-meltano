@@ -187,7 +187,7 @@ class TestFlextMeltanoTypes:
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
-        plugin_def: t.Meltano.Plugin.PluginDefinition = {
+        plugin_def: t.Meltano.Plugin.PluginDefinition = {  # type: ignore[type-arg]
             "name": "tap-users",
             "variants": ["default"],
             "config": {"batch_size": 1000},

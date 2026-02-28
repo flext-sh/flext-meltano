@@ -24,7 +24,7 @@ class TestFlextSingerTypes:
 
         assert singer_types is not None
         assert hasattr(singer_types, "Meltano")
-        assert hasattr(singer_types, "Plugin")
+        assert hasattr(singer_types.Meltano, "PluginDefinition")
 
     def test_singer_types_basic_functionality(self) -> None:
         """Test basic singer types functionality."""
@@ -33,4 +33,4 @@ class TestFlextSingerTypes:
 
         assert singer_types is not None
         assert hasattr(singer_types, "Meltano")
-        assert hasattr(singer_types, "Plugin")
+        assert hasattr(singer_types.Meltano, "PluginDefinition")

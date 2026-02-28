@@ -15,7 +15,7 @@ from typing import ClassVar, override
 
 from flext_core import r, s
 
-from flext_meltano import c, m, t
+from flext_meltano import m, t
 
 
 class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):

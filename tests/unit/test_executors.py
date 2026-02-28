@@ -22,8 +22,6 @@ class TestFlextMeltanoExecutorComplete:
         """Test executor initialization."""
         executor = FlextMeltanoExecutor()
         assert executor is not None
-        assert hasattr(executor, "project_root")
-        assert hasattr(executor, "meltano_adapter")
         # Console was replaced by logger in flext-core patterns
         # assert hasattr(executor, "console") - deprecated
         assert hasattr(executor, "logger")

@@ -61,9 +61,8 @@ class FlextMeltanoTypes(FlextCliTypes):
                 try:
                     return getattr(meltano_cls, name)
                 except AttributeError:
-                    raise AttributeError(
-                        f"type object 'Plugin' has no attribute {name!r}"
-                    ) from None
+                    msg = f"type object 'Plugin' has no attribute {name!r}"
+                    raise AttributeError(msg) from None
 
         class Plugin(metaclass=_PluginMeta):
             """Plugin namespace bridging t.Meltano.* to t.Meltano.* types."""

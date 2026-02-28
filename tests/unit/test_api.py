@@ -38,7 +38,7 @@ class TestFlextMeltanoInitialization:
                 self,
                 **kwargs: object,
             ) -> r[t.JsonValue]:
-                val = typing.cast(t.JsonValue, {})
+                val = typing.cast("t.JsonValue", {})
                 return r.ok(val)
 
         api = ConcreteAPI(service_name="test-api")
@@ -261,8 +261,9 @@ class TestFlextMeltanoDataOperations:
         """Test data loading with actual records."""
         api = FlextMeltano()
 
-        import typing
-        records = typing.cast(list[t.JsonValue], [{"id": 1, "name": "test"}])
+        import typing  # noqa: PLC0415
+
+        records = typing.cast("list[t.JsonValue]", [{"id": 1, "name": "test"}])
         result = api.load_data(sink_name="target-jsonl", records=records)
 
         assert result.is_failure or result.is_success
@@ -370,8 +371,8 @@ class TestFlextMeltanoErrorHandling:
 
     def test_api_handles_invalid_project_root(self) -> None:
         """Test API handles invalid project root type."""
-        api = FlextMeltano(project_root=123)  # type: ignore[arg-type]
-        assert api is not None
+        with pytest.raises((TypeError, ValueError)):
+            FlextMeltano(project_root=123)  # type: ignore[arg-type]
 
     def test_create_project_exception_handling(self) -> None:
         """Test project creation handles exceptions gracefully."""
@@ -580,7 +581,7 @@ class TestFlextMeltanoPerformance:
 
     def test_api_initialization_performance(
         self,
-        benchmark: typing.Any,  # pytest-benchmark fixture
+        benchmark: typing.Any,  # noqa: ANN401
     ) -> None:
         """Benchmark API initialization performance."""
 
@@ -592,7 +593,7 @@ class TestFlextMeltanoPerformance:
 
     def test_api_properties_access_performance(
         self,
-        benchmark: typing.Any,  # pytest-benchmark fixture
+        benchmark: typing.Any,  # noqa: ANN401
     ) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()
