@@ -14,10 +14,8 @@ from collections.abc import Mapping
 
 from flext_core import FlextLogger, r
 
-from flext_meltano.models import m
 from flext_meltano.typings import t
 from flext_meltano.utilities import u
-
 
 
 class FlextMeltanoBridge:

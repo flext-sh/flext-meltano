@@ -13,11 +13,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 
-
-from flext_meltano.models import m
-
 from flext_meltano.utilities import u
-
 
 
 class FlextMeltanoExecutionResult:

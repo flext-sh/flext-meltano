@@ -23,7 +23,6 @@ from flext_meltano.typings import t
 from flext_meltano.utilities import u
 
 
-
 class DocsConfig(FlextSettings):
     """Centralized configuration for documentation automation.
 

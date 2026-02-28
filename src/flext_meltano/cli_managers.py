@@ -22,9 +22,6 @@ from typing import Protocol
 from flext_core import FlextLogger, r
 from flext_infra import CommandRunner
 
-from flext_meltano.models import m
-
-
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
 _PIPELINE_CONFIG_FILE = "pipeline.json"
 _PIPELINE_PID_FILE = "pipeline.pid"

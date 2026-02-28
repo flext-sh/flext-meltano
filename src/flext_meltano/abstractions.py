@@ -16,7 +16,6 @@ from pathlib import Path
 
 from flext_core import FlextLogger, r, u
 
-from flext_meltano.models import m
 from flext_meltano.protocols import p
 from flext_meltano.typings import t
 

@@ -13,7 +13,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import override
 
-from flext_core import  e, r
+from flext_core import e, r
 from pydantic import ValidationError
 
 from flext_meltano.adapters import FlextMeltanoAdapter

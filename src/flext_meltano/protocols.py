@@ -11,8 +11,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
-from flext_core.protocols import FlextProtocols
-from flext_core.typings import FlextTypes
+from flext_core import FlextProtocols, FlextTypes
 
 # Import aliases following order: c -> t -> p -> r -> m -> u
 # Runtime aliases defined at module level per FLEXT standards

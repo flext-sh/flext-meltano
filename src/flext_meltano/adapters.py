@@ -19,10 +19,11 @@ from pathlib import Path
 from typing import override
 
 import meltano
-from flext_core import r, FlextService, FlextSettings, u
+from flext_core import FlextService, FlextSettings, r, u
 
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
+
 
 class ProjectAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):
     """Focused adapter for Meltano project management following SOLID principles."""
