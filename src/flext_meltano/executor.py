@@ -68,7 +68,6 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
 
         """
         try:
-            # Type narrowing: dict is already JsonValue compatible
             config_data: t.MeltanoCore.ExecutionResultDict = {
                 "executor_type": "flext_meltano_executor",
                 "status": "ready",
