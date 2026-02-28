@@ -278,14 +278,6 @@ class FlextMeltanoConstants(FlextConstants):
             MAX_NAME_LENGTH: Final[int] = 50
             VALID_NAME_PATTERN: Final[str] = r"^[a-zA-Z0-9_-]+$"
 
-        # Compatibility aliases for enums
-        # Note: StrEnum cannot be inherited (it's final), so we use aliases
-        PluginTypes = Enums.PluginType
-        ReplicationMethods = Enums.ReplicationMethod
-        OperationStatus = Enums.OperationStatus
-        RunMode = Enums.RunMode
-        Environment = Enums.Environment
-
 
 # Short alias for FLEXT namespace pattern
 c = FlextMeltanoConstants

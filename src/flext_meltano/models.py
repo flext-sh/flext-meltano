@@ -122,7 +122,7 @@ class FlextMeltanoModels(FlextModels):
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
-                    values = list(value)
+                    values = [*value]
                 else:
                     return []
                 return [str(item) for item in values if item is not None]
@@ -143,7 +143,7 @@ class FlextMeltanoModels(FlextModels):
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
-                    values = list(value)
+                    values = [*value]
                 else:
                     return []
                 return [bool(item) for item in values]
@@ -924,7 +924,7 @@ class FlextMeltanoModels(FlextModels):
                 """Normalize stream schema structure."""
                 result = dict(value)
                 if "properties" not in result:
-                    result["properties"] = {}
+                    result["properties"] = dict[str, t.JsonValue]()
                 if "type" not in result:
                     result["type"] = "object"
                 return result
@@ -1546,7 +1546,7 @@ class FlextMeltanoModels(FlextModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return {}
+                        return dict[str, t.JsonValue]()
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
             """Typed record batch payload used by API load flow."""
@@ -1588,7 +1588,7 @@ class FlextMeltanoModels(FlextModels):
                                     continue
                         return records
                     case _:
-                        return []
+                        return list[str]()
 
         class ConfigMappingPayload(FlextModels.ArbitraryTypesModel):
             """Normalized mapping payload with string keys."""
@@ -1610,32 +1610,6 @@ class FlextMeltanoModels(FlextModels):
                         return {str(key): item for key, item in value.items()}
                     case _:
                         return {}
-
-        class JsonCompatibleConfigPayload(FlextModels.ArbitraryTypesModel):
-            """Normalize config map values into JSON-compatible payloads."""
-
-            values: dict[str, t.GeneralValueType] = Field(
-                default_factory=dict,
-                description="JSON-compatible config values",
-            )
-
-            @field_validator("values", mode="before")
-            @classmethod
-            def normalize_json_values(
-                cls,
-                value: t.GeneralValueType,
-            ) -> Mapping[str, t.GeneralValueType]:
-                """Coerce top-level config values to JSON-compatible values."""
-                normalized = (
-                    FlextMeltanoModels.Meltano.ConfigMappingPayload.model_validate(
-                        {"values": value},
-                    ).values
-                )
-                valid_types = (str, int, float, bool, list, dict, type(None))
-                return {
-                    key: item if u.Guards.is_type(item, valid_types) else str(item)
-                    for key, item in normalized.items()
-                }
 
         class PathPayload(FlextModels.ArbitraryTypesModel):
             """Path normalization payload for runtime path conversions."""

@@ -310,7 +310,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             config_dict: t.MeltanoCore.FileConfigDict,
         ) -> t.MeltanoCore.MeltanoConfigDict:
             """Type-safe conversion from FileConfigDict to MeltanoConfigDict."""
-            return m.Meltano.JsonCompatibleConfigPayload.model_validate(
+            return m.Meltano.ConfigMappingPayload.model_validate(
                 {"values": config_dict},
             ).values
 

@@ -56,7 +56,7 @@ class FlextMeltanoBridge:
             # Go bridge integration point — communicates with FlexCore Go service via JSON API
             # Build result dict with proper typing via model normalization
             args_dict: t.MeltanoCore.MeltanoConfigDict = (
-                m.Meltano.JsonCompatibleConfigPayload.model_validate(
+                m.Meltano.ConfigMappingPayload.model_validate(
                     {"values": args},
                 ).values
                 if args
