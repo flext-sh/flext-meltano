@@ -61,16 +61,12 @@ class FlextMeltanoSettings(FlextSettings):
     # Singleton instance (class-level, avoids PLW0603 global statement)
     _instance: ClassVar[FlextMeltanoSettings | None] = None
 
-    MELTANO_VERSION: ClassVar[str] = (
-        FlextMeltanoConstants.Meltano.Versions.MELTANO_REQUIRED
-    )
-    SINGER_SDK_VERSION: ClassVar[str] = (
-        FlextMeltanoConstants.Meltano.SDK_VERSION_REQUIRED
-    )
-    DBT_VERSION: ClassVar[str] = FlextMeltanoConstants.Meltano.VERSION_REQUIRED_DBT
+    MELTANO_VERSION: ClassVar[str] = c.Meltano.Versions.MELTANO_REQUIRED
+    SINGER_SDK_VERSION: ClassVar[str] = c.Meltano.SDK_VERSION_REQUIRED
+    DBT_VERSION: ClassVar[str] = c.Meltano.VERSION_REQUIRED_DBT
 
-    PROJECT_FILE: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.PROJECT_FILE
-    STATE_DIR: ClassVar[str] = FlextMeltanoConstants.Meltano.Paths.STATE_DIR
+    PROJECT_FILE: ClassVar[str] = c.Meltano.Paths.PROJECT_FILE
+    STATE_DIR: ClassVar[str] = c.Meltano.Paths.STATE_DIR
     VENV_DIR: ClassVar[str] = ".meltano/python"
 
     # Meltano environment variables (Meltano-specific)
@@ -145,12 +141,12 @@ class FlextMeltanoSettings(FlextSettings):
     )
 
     meltano_performance_threshold_warning: float = Field(
-        default=FlextMeltanoConstants.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_WARNING,
+        default=c.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_WARNING,
         description="Meltano performance warning threshold in milliseconds",
     )
 
     meltano_performance_threshold_critical: float = Field(
-        default=FlextMeltanoConstants.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_CRITICAL,
+        default=c.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_CRITICAL,
         description="Meltano performance critical threshold in milliseconds",
     )
 

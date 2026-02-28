@@ -1570,7 +1570,18 @@ class FlextMeltanoModels(FlextModels):
                                     record_dict: dict[str, t.JsonValue] = {}
                                     for key, item in record.items():
                                         # Only include JSON-serializable values
-                                        if isinstance(item, (str, int, float, bool, type(None), list, dict)):
+                                        if isinstance(
+                                            item,
+                                            (
+                                                str,
+                                                int,
+                                                float,
+                                                bool,
+                                                type(None),
+                                                list,
+                                                dict,
+                                            ),
+                                        ):
                                             record_dict[str(key)] = item  # type: ignore[assignment]
                                     records.append(record_dict)
                                 case _:
