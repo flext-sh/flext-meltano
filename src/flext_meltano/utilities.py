@@ -141,7 +141,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             try:
                 file_handle.close()
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
-                FlextLogger(__name__).warning(f"Error closing file handle: {err}")
+                _ = FlextLogger(__name__).warning(f"Error closing file handle: {err}")
 
         try:
             open_result = cls._open_yaml_file_for_writing(target_path)
@@ -232,7 +232,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             return r[None].ok(None)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
             # Log but don't fail on close errors
-            FlextLogger(__name__).warning(f"Error closing file handle: {err}")
+            _ = FlextLogger(__name__).warning(f"Error closing file handle: {err}")
             return r[None].ok(None)
 
     # Note: create_temp_directory moved to FlextMeltanoFileManagers
