@@ -256,69 +256,8 @@ class DbtAdapter(FlextService[t.MeltanoCore.DbtResultDict]):
             )
 
 
-class FlextMeltanoAdapter:
-    """Legacy adapter class - delegates to focused adapter classes."""
-
-    project_adapter: ProjectAdapter
-    plugin_adapter: PluginAdapter
-    pipeline_adapter: PipelineAdapter
-    singer_adapter: SingerAdapter
-    dbt_adapter: DbtAdapter
-
-    def __init__(self) -> None:
-        """Initialize legacy adapter with focused adapters."""
-        self.project_adapter = ProjectAdapter()
-        self.plugin_adapter = PluginAdapter()
-        self.pipeline_adapter = PipelineAdapter()
-        self.singer_adapter = SingerAdapter()
-        self.dbt_adapter = DbtAdapter()
-
-    def get_version(self) -> r[t.MeltanoCore.ExecutionResultDict]:
-        """Get Meltano version information."""
-        return self.project_adapter.get_version()
-
-    def initialize_project(
-        self,
-        project_root: Path,
-    ) -> r[t.MeltanoCore.ExecutionResultDict]:
-        """Initialize Meltano project."""
-        return self.project_adapter.initialize_project(project_root)
-
-    def create_project(
-        self,
-        project_name: str,
-        project_dir: Path,
-    ) -> r[t.MeltanoCore.ExecutionResultDict]:
-        """Create new Meltano project."""
-        return self.project_adapter.create_project(project_name, project_dir)
-
-    def discover_plugins(
-        self,
-        plugin_type: str | None = None,
-    ) -> r[list[t.Plugin.PluginDefinition]]:
-        """Discover available plugins."""
-        return self.plugin_adapter.discover_plugins(plugin_type)
-
-    def execute_pipeline(
-        self,
-        tap_name: str,
-        target_name: str,
-    ) -> r[t.MeltanoCore.ExecutionResultDict]:
-        """Execute ELT pipeline."""
-        return self.pipeline_adapter.execute_pipeline(tap_name, target_name)
-
-    def create_tap_stream_catalog(self) -> r[t.MeltanoCore.SingerCatalogDict]:
-        """Create Singer tap stream catalog."""
-        return self.singer_adapter.create_tap_stream_catalog()
-
-    def execute_dbt_operation(self) -> r[t.MeltanoCore.DbtResultDict]:
-        """Execute DBT operation."""
-        return self.dbt_adapter.execute_dbt_operation()
-
-
 __all__ = [
     "DbtAdapter",
-    "FlextMeltanoAdapter",
     "PipelineAdapter",
     "PluginAdapter",
     "ProjectAdapter",

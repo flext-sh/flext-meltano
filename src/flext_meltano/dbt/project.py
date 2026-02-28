@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import ClassVar, override
+from typing import override
 
-from flext_core import r, s
+from flext_core import r, s, t
 from pydantic import BaseModel, Field, ValidationError
 
 from flext_meltano.models import FlextMeltanoModels
@@ -43,9 +43,6 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
     manifest: Parsed DBT manifest
 
     """
-
-    # Alias for backward compatibility
-    ProjectInfo: ClassVar[type[DbtProjectInfo]] = DbtProjectInfo
 
     def __init__(self, root: Path | None = None) -> None:
         """Initialize DBT project manager.
@@ -239,7 +236,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             return r[list[mt.Dbt.TestConfiguration]].fail(f"Failed to get tests: {e}")
 
     @override
-    def execute(self, **_kwargs: object) -> r[DbtProjectInfo]:
+    def execute(self, **_kwargs: t.GeneralValueType) -> r[DbtProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             info = DbtProjectInfo(

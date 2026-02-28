@@ -21,12 +21,13 @@ from flext_meltano.bridge import FlextMeltanoBridge
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.singer_protocols import SingerTap, SingerTarget
+from flext_meltano.singer_protocols import FlextMeltanoSingerProtocols
 from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
 r = FlextResult
 s = FlextService
+singer_p = FlextMeltanoSingerProtocols
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -48,8 +49,8 @@ class FlextMeltanoLibraryRunner(FlextService[t.MeltanoCore.ExecutionResultDict])
 
     def run_elt_pipeline(
         self,
-        tap: SingerTap,
-        target: SingerTarget,
+        tap: singer_p.SingerTap,
+        target: singer_p.SingerTarget,
         config: t.MeltanoCore.MeltanoConfigDict | None = None,
     ) -> r[t.Processing.EltPipelineResult]:
         """Run a complete ELT pipeline from tap to target.

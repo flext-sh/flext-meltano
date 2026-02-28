@@ -35,7 +35,7 @@ m = FlextMeltanoModels
 s = FlextService
 
 
-def _is_meltano_project(value: object) -> TypeGuard[p.Meltano.MeltanoProjectProtocol]:
+def _is_meltano_project(value: t.GeneralValueType) -> TypeGuard[p.Meltano.MeltanoProjectProtocol]:
     """Type guard for protocol-compatible Meltano project objects."""
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 
@@ -245,7 +245,7 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """
 
         # Use monadic composition to reduce returns (DSL pattern)
-        def extract_plugin_info(plugins_data: object) -> r[Mapping[str, str]]:
+        def extract_plugin_info(plugins_data: t.GeneralValueType) -> r[Mapping[str, str]]:
             """Extract plugin info from plugins dict."""
             plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate(
                 {"plugins": plugins_data},

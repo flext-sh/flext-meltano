@@ -59,8 +59,4 @@ class FlextMeltanoSingerProtocols:
         name: str
 
 
-# Backward compatibility aliases
-SingerTap = FlextMeltanoSingerProtocols.SingerTap
-SingerTarget = FlextMeltanoSingerProtocols.SingerTarget
-
-__all__ = ["FlextMeltanoSingerProtocols", "SingerTap", "SingerTarget"]
+__all__ = ["FlextMeltanoSingerProtocols"]

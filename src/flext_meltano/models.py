@@ -78,7 +78,7 @@ class FlextMeltanoModels(FlextModels):
 
     @staticmethod
     def _validated_string_list(
-        value: object,
+        value: t.GeneralValueType,
     ) -> list[str]:
         """Normalize arbitrary values into a validated list of strings."""
         return FlextMeltanoModels.Meltano.StringListValue.model_validate(
@@ -1540,7 +1540,7 @@ class FlextMeltanoModels(FlextModels):
 
             @field_validator("schema_definition", mode="before")
             @classmethod
-            def normalize_schema(cls, value: object) -> object:
+            def normalize_schema(cls, value: t.GeneralValueType) -> t.GeneralValueType:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
@@ -1558,7 +1558,7 @@ class FlextMeltanoModels(FlextModels):
 
             @field_validator("records", mode="before")
             @classmethod
-            def normalize_records(cls, value: object) -> object:
+            def normalize_records(cls, value: t.GeneralValueType) -> t.GeneralValueType:
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
@@ -1634,7 +1634,7 @@ class FlextMeltanoModels(FlextModels):
 
             @field_validator("content", mode="before")
             @classmethod
-            def normalize_content(cls, value: object) -> str:
+            def normalize_content(cls, value: t.GeneralValueType) -> str:
                 """Normalize dict content via yaml.dump, pass str through."""
                 match value:
                     case Mapping():
@@ -1661,7 +1661,7 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def normalize_variant(
                 cls,
-                value: object,
+                value: t.GeneralValueType,
             ) -> str | list[str] | Mapping[str, t.JsonValue] | None:
                 """Normalize variant_raw into typed union."""
                 match value:

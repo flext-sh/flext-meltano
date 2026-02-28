@@ -346,10 +346,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
 
 
-# Export Singer SDK types with FLEXT naming
+# Re-export Singer SDK types for public API
 FlextMeltanoStream = Stream
 FlextMeltanoTap = Tap
-
 
 __all__ = [
     "FlextMeltanoStream",

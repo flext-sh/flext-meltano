@@ -111,7 +111,7 @@ class FlextMeltanoDbtService(s[str]):
     def run_models(
         self,
         models: list[str] | None = None,
-        **kwargs: object,
+        **kwargs: mt.GeneralValueType,
     ) -> r[DbtRunResult]:
         """Run DBT models.
 
@@ -150,7 +150,7 @@ class FlextMeltanoDbtService(s[str]):
     def run_tests(
         self,
         models: list[str] | None = None,
-        **kwargs: object,
+        **kwargs: mt.GeneralValueType,
     ) -> r[DbtTestResult]:
         """Run DBT tests.
 
@@ -186,7 +186,7 @@ class FlextMeltanoDbtService(s[str]):
                 f"DBT tests failed: {e}",
             )
 
-    def generate_docs(self, **kwargs: object) -> r[mt.MeltanoCore.ExecutionResultDict]:
+    def generate_docs(self, **kwargs: mt.GeneralValueType) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:

@@ -217,9 +217,8 @@ class FlextMeltanoTargetAbstractions(s[t.MeltanoCore.MeltanoConfigDict]):
         return self.create_sink_instance(config)
 
 
-# Export Singer SDK types with FLEXT naming
+# Re-export Singer SDK types for public API
 FlextMeltanoTarget = Target
-
 
 __all__ = [
     "FlextMeltanoTarget",

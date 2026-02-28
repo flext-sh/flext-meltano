@@ -12,7 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_core import r, s
+from flext_core import r, s, t
 from pydantic import BaseModel, ConfigDict, Field
 
 from flext_meltano.typings import FlextMeltanoTypes as mt
@@ -68,7 +68,7 @@ class FlextMeltanoDbtRunner(s[str]):
     def run_models(
         self,
         models: list[str] | None = None,
-        **_kwargs: object,
+        **_kwargs: t.GeneralValueType,
     ) -> r[DbtRunResult]:
         """Run DBT models.
 
@@ -114,7 +114,7 @@ class FlextMeltanoDbtRunner(s[str]):
     def run_tests(
         self,
         models: list[str] | None = None,
-        **_kwargs: object,
+        **_kwargs: t.GeneralValueType,
     ) -> r[DbtTestResult]:
         """Run DBT tests.
 
@@ -157,7 +157,7 @@ class FlextMeltanoDbtRunner(s[str]):
             self.logger.exception("DBT tests failed", error=str(e))
             return r[DbtTestResult].fail(f"DBT tests failed: {e}")
 
-    def docs_generate(self, **_kwargs: object) -> r[mt.MeltanoCore.ExecutionResultDict]:
+    def docs_generate(self, **_kwargs: t.GeneralValueType) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -199,7 +199,7 @@ class FlextMeltanoDbtRunner(s[str]):
             )
 
     @override
-    def execute(self, **_kwargs: object) -> r[str]:
+    def execute(self, **_kwargs: t.GeneralValueType) -> r[str]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             msg = f"DBT runner: {self.project_root}"
