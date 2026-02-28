@@ -264,6 +264,20 @@ class FlextMeltanoConstants(FlextConstants):
                 SELECTED = "selected"
                 EXTRACTING = "extracting"
 
+            # Frozensets for stream status validation
+            VALID_STATUSES: Final[frozenset[str]] = frozenset({
+                StreamStatus.INITIALIZED,
+                StreamStatus.PROCESSING,
+                StreamStatus.COMPLETED,
+                StreamStatus.ERROR,
+            })
+
+            ACTIVE_STATUSES: Final[frozenset[str]] = frozenset({
+                StreamStatus.DISCOVERED,
+                StreamStatus.SELECTED,
+                StreamStatus.EXTRACTING,
+            })
+
         class Logging:
             """Logging configuration constants."""
 

@@ -871,7 +871,7 @@ class FlextMeltanoModels(FlextModels):
                 description="Type of source this stream belongs to"
             )
             status: str = Field(
-                default="discovered",
+                default=c.Meltano.Enums.StreamStatus.DISCOVERED,
                 description="Current status of the stream",
             )
             records_extracted: int = Field(
@@ -882,7 +882,7 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def is_active(self) -> bool:
                 """Check if stream is active."""
-                return self.status in {"discovered", "selected", "extracting"}
+                return self.status in c.Meltano.Enums.ACTIVE_STATUSES
 
             @computed_field
             def has_data(self) -> bool:
@@ -906,12 +906,9 @@ class FlextMeltanoModels(FlextModels):
                     msg = "Stream schema must contain properties"
                     raise ValueError(msg)
 
-                valid_statuses = {
-                    "discovered",
-                    "selected",
-                    "extracting",
-                    "completed",
-                    "error",
+                valid_statuses = c.Meltano.Enums.ACTIVE_STATUSES | {
+                    c.Meltano.Enums.StreamStatus.COMPLETED,
+                    c.Meltano.Enums.StreamStatus.ERROR,
                 }
                 if self.status not in valid_statuses:
                     msg = f"Status must be one of: {', '.join(valid_statuses)}"
@@ -945,7 +942,10 @@ class FlextMeltanoModels(FlextModels):
                 default_factory=dict,
                 description="Sink schema",
             )
-            status: str = Field(default="initialized", description="Current status")
+            status: str = Field(
+                default=c.Meltano.Enums.StreamStatus.INITIALIZED,
+                description="Current status",
+            )
 
             @computed_field
             def config_keys_count(self) -> int:
@@ -957,11 +957,11 @@ class FlextMeltanoModels(FlextModels):
             def validate_sink_definition(self) -> Self:
                 """Validate sink definition consistency."""
                 valid_statuses = {
-                    "initialized",
+                    c.Meltano.Enums.StreamStatus.INITIALIZED,
                     "configured",
                     "running",
-                    "completed",
-                    "error",
+                    c.Meltano.Enums.StreamStatus.COMPLETED,
+                    c.Meltano.Enums.StreamStatus.ERROR,
                 }
                 if self.status not in valid_statuses:
                     msg = f"Status must be one of: {', '.join(valid_statuses)}"
@@ -986,7 +986,10 @@ class FlextMeltanoModels(FlextModels):
                 default_factory=list,
                 description="Available streams",
             )
-            status: str = Field(default="initialized", description="Tap status")
+            status: str = Field(
+                default=c.Meltano.Enums.StreamStatus.INITIALIZED,
+                description="Tap status",
+            )
 
             @computed_field
             def stream_count(self) -> int:
@@ -997,7 +1000,9 @@ class FlextMeltanoModels(FlextModels):
             def active_streams(self) -> list[FlextMeltanoModels.Meltano.StreamInfo]:
                 """Active streams for extraction."""
                 return [
-                    s for s in self.streams if s.status in {"discovered", "selected"}
+                    s
+                    for s in self.streams
+                    if s.status in c.Meltano.Enums.ACTIVE_STATUSES
                 ]
 
         class DataSourceInstance(FlextModels.Entity):
@@ -1011,7 +1016,10 @@ class FlextMeltanoModels(FlextModels):
                 default=None,
                 description="Adapter instance",
             )
-            status: str = Field(default="initialized", description="Current status")
+            status: str = Field(
+                default=c.Meltano.Enums.StreamStatus.INITIALIZED,
+                description="Current status",
+            )
             streams: dict[str, FlextMeltanoModels.Meltano.StreamDefinition] = Field(
                 default_factory=dict,
                 description="Discovered streams",
@@ -1034,7 +1042,7 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def active_stream_count(self) -> int:
                 """Number of active streams."""
-                active_statuses = {"discovered", "selected", "extracting"}
+                active_statuses = c.Meltano.Enums.ACTIVE_STATUSES
                 return sum(
                     1
                     for stream in self.streams.values()
@@ -1093,7 +1101,10 @@ class FlextMeltanoModels(FlextModels):
                 default=None,
                 description="Adapter instance",
             )
-            status: str = Field(default="initialized", description="Current status")
+            status: str = Field(
+                default=c.Meltano.Enums.StreamStatus.INITIALIZED,
+                description="Current status",
+            )
             batch_size: int = Field(default=1000, description="Batch processing size")
             sink_count: int = Field(default=0, description="Number of configured sinks")
 
@@ -1185,7 +1196,7 @@ class FlextMeltanoModels(FlextModels):
                 description="Field used for incremental replication",
             )
             status: str = Field(
-                default="initialized",
+                default=c.Meltano.Enums.StreamStatus.INITIALIZED,
                 description="Stream processing status",
             )
             records_loaded: int = Field(
@@ -1212,13 +1223,16 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def processing_status(self) -> str:
                 """Processing status assessment."""
-                if self.status == "completed" and self.records_loaded > 0:
-                    return "success"
-                if self.status == "error":
-                    return "failed"
+                if (
+                    self.status == c.Meltano.Enums.StreamStatus.COMPLETED
+                    and self.records_loaded > 0
+                ):
+                    return c.Meltano.Enums.StreamStatus.SUCCESS
+                if self.status == c.Meltano.Enums.StreamStatus.ERROR:
+                    return c.Meltano.Enums.StreamStatus.FAILED
                 if self.records_loaded > 0:
-                    return "in_progress"
-                return "pending"
+                    return c.Meltano.Enums.StreamStatus.IN_PROGRESS
+                return c.Meltano.Enums.StreamStatus.PENDING
 
             @model_validator(mode="after")
             def validate_stream_info(self) -> Self:
@@ -1227,7 +1241,7 @@ class FlextMeltanoModels(FlextModels):
                     msg = "Records loaded but no batches processed"
                     raise ValueError(msg)
 
-                valid_statuses = {"initialized", "processing", "completed", "error"}
+                valid_statuses = c.Meltano.Enums.VALID_STATUSES
                 if self.status not in valid_statuses:
                     msg = f"Status must be one of: {', '.join(valid_statuses)}"
                     raise ValueError(msg)
@@ -1552,9 +1566,13 @@ class FlextMeltanoModels(FlextModels):
                         for record in value:
                             match record:
                                 case Mapping():
-                                    records.append({
-                                        str(key): item for key, item in record.items()
-                                    })
+                                    # Type narrowing: convert mapping items to JsonValue
+                                    record_dict: dict[str, t.JsonValue] = {}
+                                    for key, item in record.items():
+                                        # Only include JSON-serializable values
+                                        if isinstance(item, (str, int, float, bool, type(None), list, dict)):
+                                            record_dict[str(key)] = item  # type: ignore[assignment]
+                                    records.append(record_dict)
                                 case _:
                                     continue
                         return records
@@ -1671,9 +1689,10 @@ class FlextMeltanoModels(FlextModels):
                     case Mapping():
                         result: dict[str, t.JsonValue] = {}
                         for k, v in value.items():
-                            if u.Guards.is_type(v, (str, int, float, bool, type(None))):
+                            # Type narrowing for JSON-serializable primitives
+                            if isinstance(v, (str, int, float, bool, type(None))):
                                 result[str(k)] = v
-                            elif u.Guards.is_type(v, (list, dict)):
+                            elif isinstance(v, (list, dict)):
                                 result[str(k)] = str(v)
                         return result
                     case _:
@@ -2371,7 +2390,10 @@ class FlextMeltanoModels(FlextModels):
             @computed_field
             def is_successful(self) -> bool:
                 """Check if execution was successful."""
-                return self.status == "success" and self.error_message is None
+                return (
+                    self.status == c.Meltano.Enums.OperationStatus.SUCCESS
+                    and self.error_message is None
+                )
 
             @computed_field
             def execution_rate_per_second(self) -> float:
@@ -2409,7 +2431,10 @@ class FlextMeltanoModels(FlextModels):
                         msg = "Duration inconsistent with start/end times"
                         raise ValueError(msg)
 
-                if self.status == "error" and not self.error_message:
+                if (
+                    self.status == c.Meltano.Enums.OperationStatus.ERROR
+                    and not self.error_message
+                ):
                     msg = "Error status requires error message"
                     raise ValueError(msg)
 
@@ -2419,7 +2444,13 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def validate_status(cls, v: str) -> str:
                 """Validate execution status."""
-                valid_statuses = ["pending", "running", "success", "error", "timeout"]
+                valid_statuses = [
+                    c.Meltano.Enums.OperationStatus.PENDING,
+                    c.Meltano.Enums.OperationStatus.RUNNING,
+                    c.Meltano.Enums.OperationStatus.SUCCESS,
+                    c.Meltano.Enums.OperationStatus.ERROR,
+                    c.Meltano.Enums.OperationStatus.TIMEOUT,
+                ]
                 if v not in valid_statuses:
                     msg = f"Status must be one of: {', '.join(valid_statuses)}"
                     raise ValueError(msg)
@@ -2444,7 +2475,7 @@ class FlextMeltanoModels(FlextModels):
                 )
             )
             overall_status: str = Field(
-                default="pending",
+                default=c.Meltano.Enums.OperationStatus.PENDING,
                 description="Overall pipeline status",
             )
             total_records: int = Field(
@@ -2492,13 +2523,16 @@ class FlextMeltanoModels(FlextModels):
                 """Check if all stages completed successfully."""
                 return bool(
                     self.source_result
-                    and self.source_result.status == "success"
+                    and self.source_result.status
+                    == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.source_result.error_message is None
                     and self.sink_result
-                    and self.sink_result.status == "success"
+                    and self.sink_result.status
+                    == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.sink_result.error_message is None
                     and self.transformation_result
-                    and self.transformation_result.status == "success"
+                    and self.transformation_result.status
+                    == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.transformation_result.error_message is None,
                 )
 
@@ -2535,17 +2569,23 @@ class FlextMeltanoModels(FlextModels):
 
                 all_successful = bool(
                     self.source_result
-                    and self.source_result.status == "success"
+                    and self.source_result.status
+                    == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.source_result.error_message is None
                     and self.sink_result
-                    and self.sink_result.status == "success"
+                    and self.sink_result.status
+                    == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.sink_result.error_message is None
                     and self.transformation_result
-                    and self.transformation_result.status == "success"
+                    and self.transformation_result.status
+                    == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.transformation_result.error_message is None,
                 )
-                if all_successful and self.overall_status != "success":
-                    self.overall_status = "success"
+                if (
+                    all_successful
+                    and self.overall_status != c.Meltano.Enums.OperationStatus.SUCCESS
+                ):
+                    self.overall_status = c.Meltano.Enums.OperationStatus.SUCCESS
 
                 return self
 
@@ -2553,7 +2593,13 @@ class FlextMeltanoModels(FlextModels):
             @classmethod
             def validate_overall_status(cls, v: str) -> str:
                 """Validate overall pipeline status."""
-                valid_statuses = ["pending", "running", "success", "partial", "error"]
+                valid_statuses = [
+                    c.Meltano.Enums.OperationStatus.PENDING,
+                    c.Meltano.Enums.OperationStatus.RUNNING,
+                    c.Meltano.Enums.OperationStatus.SUCCESS,
+                    "partial",
+                    c.Meltano.Enums.OperationStatus.ERROR,
+                ]
                 if v not in valid_statuses:
                     msg = f"Overall status must be one of: {', '.join(valid_statuses)}"
                     raise ValueError(msg)
