@@ -44,10 +44,394 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
 
     """
 
-    # Keep ProjectInfo as alias for backward compatibility
     ProjectInfo: ClassVar[type[MeltanoProjectInfo]] = MeltanoProjectInfo
 
     def __init__(self, root: Path | None = None) -> None:
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
+        """Initialize Meltano project manager.
+
+        Args:
+        root: Root directory of Meltano project (optional)
+
+        """
+        super().__init__()
+        self.project_root: Path | None = root
+        self.project: MeltanoProject | None = None
+        self._metadata_extra: dict[str, str] = {}
+        self._sealed: bool = False
         """Initialize Meltano project manager.
 
         Args:

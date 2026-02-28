@@ -301,6 +301,12 @@ class FlextMeltanoSettings(FlextSettings):
         description="Virtual environment directory",
     )
 
+    # Instance attributes (declared at class level for type safety)
+    _metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
+    _sealed: bool = False
+    _metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
+    _sealed: bool = False
+
     # ============================================================================
     # FIELD VALIDATORS - Pydantic validation methods
     # ============================================================================
@@ -363,7 +369,7 @@ class FlextMeltanoSettings(FlextSettings):
         """
         if v is None:
             return None
-        if u.Guards.is_type(v, SecretStr):
+        if isinstance(v, SecretStr):
             return v
         return SecretStr(str(v))
 
@@ -574,7 +580,7 @@ class FlextMeltanoSettings(FlextSettings):
 
         if "run_mode" in filtered_kwargs:
             run_mode_raw = str(filtered_kwargs["run_mode"]).lower()
-            run_mode_enum = c.Meltano.RunMode(run_mode_raw)
+            run_mode_enum = c.Meltano.Enums.RunMode(run_mode_raw)
             config_data["run_mode"] = run_mode_enum.value
 
         # Apply all other valid kwargs with proper type handling
@@ -775,7 +781,7 @@ class FlextMeltanoSettings(FlextSettings):
             )
             self._metadata_extra["override_count"] = str(applied_count)
 
-            return r[None].ok(None)
+            return r[bool].ok(True)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as error:
             return r[None].fail(
@@ -854,6 +860,17 @@ class FlextMeltanoSettings(FlextSettings):
     # ============================================================================
 
     def get_meltano_logging_config(
+        self,
+    ) -> t.MeltanoCore.SettingsDict:
+        """Get Meltano-specific logging configuration dictionary.
+
+        Delegates to consolidated logging model for maintainability.
+
+        Returns:
+        dict[str, t.GeneralValueType]: Dictionary containing Meltano logging configuration.
+
+        """
+        return self.logging.model_dump()
         self,
     ) -> t.MeltanoCore.SettingsDict:
         """Get Meltano-specific logging configuration dictionary.
