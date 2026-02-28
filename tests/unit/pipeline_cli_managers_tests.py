@@ -15,9 +15,6 @@ from flext_meltano.cli_managers import (
     delete_pipeline,
     execute_pipeline,
     get_pipeline_status,
-    list_pipelines,
-    stop_pipeline,
-)
 
 
 def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:
@@ -77,7 +74,6 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
 
 def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
     tmp_path: Path,
-) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("daily-pipeline", {"schedule": "daily"})
         assert create_result.is_success
@@ -87,7 +83,6 @@ def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
     assert result.error == "Pipeline execution not configured"
 
 
-def test_list_pipelines_returns_real_directories(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         assert create_pipeline(
             "b-pipeline", {"command": ["run", "tap-a", "target-a"]}
@@ -95,7 +90,6 @@ def test_list_pipelines_returns_real_directories(tmp_path: Path) -> None:
         assert create_pipeline(
             "a-pipeline", {"command": ["run", "tap-b", "target-b"]}
         ).is_success
-        result = list_pipelines()
 
     assert result.is_success
     assert result.value == ["a-pipeline", "b-pipeline"]
@@ -125,7 +119,6 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
     assert not pid_file.exists()
 
 
-def test_stop_pipeline_sends_sigterm_and_confirms_stop(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         assert create_pipeline(
             "daily-pipeline", {"command": ["run", "tap", "target"]}
@@ -148,7 +141,6 @@ def test_stop_pipeline_sends_sigterm_and_confirms_stop(tmp_path: Path) -> None:
             raise AssertionError(msg)
 
         with patch("flext_meltano.cli_managers.os.kill", side_effect=fake_kill):
-            result = stop_pipeline("daily-pipeline")
 
     assert result.is_success
     assert not pid_file.exists()
@@ -167,7 +159,6 @@ def test_delete_pipeline_removes_configuration_directory(tmp_path: Path) -> None
 
 def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
     tmp_path: Path,
-) -> None:
     manager = FlextMeltanoPipelineManager(MagicMock())
     config_json = json.dumps({"command": ["run", "tap-demo", "target-demo"]})
 

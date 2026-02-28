@@ -140,7 +140,7 @@ pytest tests/extensions/ -m "compliance" -v
 ```python
 # Custom extension component testing
 import pytest
-from flext_meltano.extensions import CustomTapExtension
+from flext_meltano import CustomTapExtension
 
 @pytest.mark.extension
 @pytest.mark.custom_component
@@ -282,7 +282,7 @@ def enterprise_compliance_dataset():
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
-from flext_meltano.base import FlextMeltanoBase
+from flext_meltano import FlextMeltanoBase
 
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""

@@ -22,9 +22,7 @@ from flext_core import (
     u,
 )
 
-from flext_meltano.constants import c
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import t
+from flext_meltano import FlextMeltanoModels, c, t
 
 m = FlextMeltanoModels
 

@@ -16,7 +16,9 @@ from typing import override
 from flext_core import e, r
 from pydantic import ValidationError
 
-from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.adapters import (
+    ProjectAdapter,
+)
 from flext_meltano.constants import FlextMeltanoConstants
 from flext_meltano.models import m
 from flext_meltano.services import s
@@ -701,9 +703,9 @@ class FlextMeltano(s[t.JsonValue]):
                 "Project name cannot be empty",
             )
         try:
-            adapter = FlextMeltanoAdapter()
+            adapter = ProjectAdapter()
             # Type narrowing: create_project returns MeltanoConfigDict
-            return adapter.project_adapter.create_project(
+            return adapter.create_project(
                 project_name=project_name,
                 project_dir=Path(project_dir) if project_dir else Path.cwd(),
             )

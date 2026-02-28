@@ -17,14 +17,16 @@ from typing import TypeGuard, override
 
 from flext_core import FlextResult, FlextService
 
-from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.project_service import FlextMeltanoProjectService
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import u
+from flext_meltano import (
+    FlextMeltanoAbstractions,
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoProjectService,
+    FlextMeltanoProtocols,
+    FlextMeltanoSettings,
+    FlextMeltanoTypes,
+    u,
+)
 
 # Import aliases following order: c -> t -> p -> r -> m -> u
 c = FlextMeltanoConstants
@@ -35,7 +37,9 @@ m = FlextMeltanoModels
 s = FlextService
 
 
-def _is_meltano_project(value: t.GeneralValueType) -> TypeGuard[p.Meltano.MeltanoProjectProtocol]:
+def _is_meltano_project(
+    value: t.GeneralValueType,
+) -> TypeGuard[p.Meltano.MeltanoProjectProtocol]:
     """Type guard for protocol-compatible Meltano project objects."""
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 
@@ -245,7 +249,9 @@ class FlextMeltanoComponentService(s[t.MeltanoCore.MeltanoConfigDict]):
         """
 
         # Use monadic composition to reduce returns (DSL pattern)
-        def extract_plugin_info(plugins_data: t.GeneralValueType) -> r[Mapping[str, str]]:
+        def extract_plugin_info(
+            plugins_data: t.GeneralValueType,
+        ) -> r[Mapping[str, str]]:
             """Extract plugin info from plugins dict."""
             plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate(
                 {"plugins": plugins_data},

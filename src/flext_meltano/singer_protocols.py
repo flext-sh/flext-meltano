@@ -12,8 +12,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes
 
 m = FlextMeltanoModels
 t = FlextMeltanoTypes

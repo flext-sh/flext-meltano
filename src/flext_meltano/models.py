@@ -30,7 +30,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano.constants import c
+from flext_meltano import c
 
 
 class FlextMeltanoModels(FlextModels):

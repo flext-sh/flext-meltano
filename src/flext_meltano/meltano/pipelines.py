@@ -20,12 +20,14 @@ from flext_core import (
     FlextService,
 )
 
-from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import (
+    FlextMeltanoAbstractions,
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoProtocols,
+    FlextMeltanoSettings,
+    FlextMeltanoTypes,
+)
 
 # Import aliases for simplified usage
 r = FlextResult

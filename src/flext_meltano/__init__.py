@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
     from flext_core import (
@@ -22,33 +22,38 @@ if TYPE_CHECKING:
         x,
     )
 
-    from flext_meltano.__version__ import __version__, __version_info__
-    from flext_meltano.adapters import FlextMeltanoAdapter
-    from flext_meltano.api import FlextMeltano
-    from flext_meltano.bridge import FlextMeltanoBridge
-    from flext_meltano.constants import (
+    from flext_meltano import (
+        DbtAdapter,
+        FlextMeltano,
+        FlextMeltanoBridge,
         FlextMeltanoConstants,
         FlextMeltanoConstants as c,
-    )
-    from flext_meltano.dbt import (
         FlextMeltanoDbtProjectManager,
         FlextMeltanoDbtRunner,
         FlextMeltanoDbtService,
-    )
-    from flext_meltano.executor import FlextMeltanoExecutor
-    from flext_meltano.file_managers import FlextMeltanoFileManagers
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-    from flext_meltano.meltano import (
+        FlextMeltanoExecutor,
+        FlextMeltanoFileManagers,
+        FlextMeltanoLibraryRunner,
         FlextMeltanoMeltanoService,
+        FlextMeltanoModels,
+        FlextMeltanoModels as m,
         FlextMeltanoProjectManager,
-    )
-    from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
-    from flext_meltano.protocols import (
         FlextMeltanoProtocols,
         FlextMeltanoProtocols as p,
+        FlextMeltanoService,
+        FlextMeltanoSettings,
+        FlextMeltanoTypes,
+        FlextMeltanoTypes as t,
+        FlextMeltanoUtilities,
+        FlextMeltanoUtilities as u,
+        FlextMeltanoValidators,
+        PipelineAdapter,
+        PluginAdapter,
+        ProjectAdapter,
+        SingerAdapter,
+        __version__,
+        __version_info__,
     )
-    from flext_meltano.services import FlextMeltanoService
-    from flext_meltano.settings import FlextMeltanoSettings
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
@@ -61,12 +66,6 @@ if TYPE_CHECKING:
         FlextMeltanoTarget,
         FlextMeltanoTargetAbstractions,
     )
-    from flext_meltano.typings import FlextMeltanoTypes, FlextMeltanoTypes as t
-    from flext_meltano.utilities import (
-        FlextMeltanoUtilities,
-        FlextMeltanoUtilities as u,
-    )
-    from flext_meltano.validators import FlextMeltanoValidators
 
 # Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
@@ -143,6 +142,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 }
 
 __all__ = [
+    "DbtAdapter",
     "FlextMeltano",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
@@ -170,6 +170,10 @@ __all__ = [
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
+    "PipelineAdapter",
+    "PluginAdapter",
+    "ProjectAdapter",
+    "SingerAdapter",
     "__version__",
     "__version_info__",
     "c",

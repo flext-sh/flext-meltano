@@ -11,9 +11,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
-from flext_cli.protocols import FlextCliProtocols
-from flext_core import FlextTypes
-from flext_core.protocols import FlextProtocols
+from flext_cli import FlextCliProtocols
+from flext_core import FlextProtocols, FlextTypes
 
 # Lazy import to break circular dependency - imported on-demand when needed
 # from flext_meltano.singer.protocols import (
@@ -34,7 +33,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
     - PROVIDES: Root-level alias `p` for convenient access
 
     Usage:
-    from flext_meltano.protocols import p
+    from flext_meltano import p
 
     # Foundation protocols (inherited)
     result: FlextProtocols.Result[str]

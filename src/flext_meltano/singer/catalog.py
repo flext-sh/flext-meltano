@@ -16,10 +16,8 @@ from typing import override
 
 from flext_core import FlextResult, FlextService
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
-from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases for simplified usage
 r = FlextResult

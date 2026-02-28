@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano.utilities import FlextMeltanoUtilities
+from flext_meltano import FlextMeltanoUtilities
 
 
 class TestsUtilities(FlextMeltanoUtilities):

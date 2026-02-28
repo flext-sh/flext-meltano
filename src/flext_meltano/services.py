@@ -14,8 +14,7 @@ from typing import override
 
 from flext_core import FlextContainer, e, r, s, u
 
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import t
+from flext_meltano import FlextMeltanoSettings, t
 
 
 class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):

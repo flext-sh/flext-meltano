@@ -21,8 +21,7 @@ from typing import override
 import meltano
 from flext_core import FlextService, FlextSettings, r, u
 
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import t
+from flext_meltano import FlextMeltanoSettings, t
 
 
 class ProjectAdapter(FlextService[t.MeltanoCore.ExecutionResultDict]):

@@ -15,11 +15,13 @@ from typing import override
 from flext_core import r, s
 from pydantic import BaseModel, Field
 
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano import (
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoTypes,
+    u,
+)
 from flext_meltano.meltano.project import FlextMeltanoProjectManager, MeltanoProjectInfo
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import u
 
 # Import aliases for concise usage
 t = FlextMeltanoTypes

@@ -141,7 +141,7 @@ PYTHONPATH=src poetry run python -c "import sys; print('Basic import works')"
 
 # Step 4: Test model instantiation after fix
 # Verify TapRunParams() can be created without errors
-# Run: PYTHONPATH=src python -c "from flext_meltano.models import FlextMeltanoModels"
+# Run: PYTHONPATH=src python -c "from flext_meltano import FlextMeltanoModels"
 ```
 
 **Estimated Effort**: 8 hours

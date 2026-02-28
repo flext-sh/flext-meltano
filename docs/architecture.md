@@ -206,7 +206,7 @@ from flext_core import (
 **Type System Integration**:
 
 ```python
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import FlextMeltanoTypes
 
 # Comprehensive type system extending flext-core
 pipeline_config: FlextMeltanoTypes.ELT.PipelineConfig

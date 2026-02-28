@@ -14,10 +14,12 @@ from typing import override
 from flext_core import FlextResult, FlextService
 from singer_sdk import Target
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import (
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoSettings,
+    FlextMeltanoTypes,
+)
 
 # Import aliases for simplified usage
 r = FlextResult

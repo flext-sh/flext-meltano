@@ -14,10 +14,12 @@ from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult
 
-from flext_meltano.bridge import FlextMeltanoBridge
-from flext_meltano.executor import FlextMeltanoExecutor
+from flext_meltano import (
+    FlextMeltanoBridge,
+    FlextMeltanoExecutor,
+    t,
+)
 from flext_meltano.singer_protocols import FlextMeltanoSingerProtocols
-from flext_meltano.typings import t
 
 # Import aliases for simplified usage
 # Import aliases for simplified usage

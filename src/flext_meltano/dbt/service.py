@@ -14,9 +14,9 @@ from typing import override
 
 from flext_core import r, s
 
+from flext_meltano import FlextMeltanoTypes as mt
 from flext_meltano.dbt.project import DbtProjectInfo, FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import DbtRunResult, DbtTestResult, FlextMeltanoDbtRunner
-from flext_meltano.typings import FlextMeltanoTypes as mt
 
 
 class FlextMeltanoDbtService(s[str]):
@@ -186,7 +186,9 @@ class FlextMeltanoDbtService(s[str]):
                 f"DBT tests failed: {e}",
             )
 
-    def generate_docs(self, **kwargs: mt.GeneralValueType) -> r[mt.MeltanoCore.ExecutionResultDict]:
+    def generate_docs(
+        self, **kwargs: mt.GeneralValueType
+    ) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:

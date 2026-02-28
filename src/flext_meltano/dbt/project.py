@@ -16,8 +16,7 @@ from typing import override
 from flext_core import r, s, t
 from pydantic import BaseModel, Field, ValidationError
 
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as mt
+from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes as mt
 
 m = FlextMeltanoModels
 

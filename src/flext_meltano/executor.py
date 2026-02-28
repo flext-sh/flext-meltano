@@ -16,15 +16,16 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.bridge import FlextMeltanoBridge
+from flext_meltano import (
+    FlextMeltanoBridge,
+    FlextMeltanoSettings,
+    c,
+    m,
+    t,
+    u,
+)
 from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.constants import c
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
-from flext_meltano.models import m
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import t
-from flext_meltano.utilities import u
 
 
 class FlextMeltanoExecutor(s[t.JsonValue]):
@@ -36,7 +37,6 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
 
     # Instance attributes for type checker
     _bridge: FlextMeltanoBridge
-    _adapter: FlextMeltanoAdapter | None
     _meltano_config: FlextMeltanoSettings
 
     def __init__(self, config: t.MeltanoCore.MeltanoConfigDict | None = None) -> None:
@@ -53,7 +53,7 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
         else:
             self._meltano_config = FlextMeltanoSettings()
         self._bridge = FlextMeltanoBridge()
-        self._adapter = None
+
         # Type guard for mypy - logger is always initialized
         if self.logger is None:
             error_msg = "Logger initialization failed"
@@ -196,12 +196,6 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
         return Path.cwd()
 
     @property
-    def meltano_adapter(self) -> FlextMeltanoAdapter:
-        """Get Meltano adapter with lazy initialization."""
-        if self._adapter is None:
-            self._adapter = FlextMeltanoAdapter()
-        return self._adapter
-
     @property
     def bridge(self) -> FlextMeltanoBridge:
         """Get bridge instance - delegates to instance attribute."""

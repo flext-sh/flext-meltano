@@ -18,9 +18,7 @@ from typing import ClassVar
 import yaml
 from flext_core import FlextContainer, FlextSettings, r
 
-from flext_meltano.models import m
-from flext_meltano.typings import t
-from flext_meltano.utilities import u
+from flext_meltano import m, t, u
 
 
 class DocsConfig(FlextSettings):

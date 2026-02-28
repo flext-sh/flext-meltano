@@ -14,10 +14,12 @@ from collections.abc import Mapping
 
 from flext_core import FlextLogger, FlextResult
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
-from flext_meltano.utilities import u
+from flext_meltano import (
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoTypes,
+    u,
+)
 
 # Import aliases for simplified usage
 r = FlextResult

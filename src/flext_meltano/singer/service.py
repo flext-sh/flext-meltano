@@ -14,12 +14,10 @@ from typing import ClassVar, override
 
 from flext_core import r, s
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
 from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
-from flext_meltano.typings import FlextMeltanoTypes
 
 # Import aliases following order: c -> t -> p -> r -> m -> s
 c = FlextMeltanoConstants

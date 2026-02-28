@@ -16,9 +16,7 @@ from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import BaseModel, Field
 
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import t
-from flext_meltano.utilities import u
+from flext_meltano import FlextMeltanoModels, t, u
 
 m = FlextMeltanoModels
 

@@ -15,7 +15,7 @@ from typing import override
 from flext_core import r, s, t
 from pydantic import BaseModel, ConfigDict, Field
 
-from flext_meltano.typings import FlextMeltanoTypes as mt
+from flext_meltano import FlextMeltanoTypes as mt
 
 
 class DbtRunResult(BaseModel):
@@ -157,7 +157,9 @@ class FlextMeltanoDbtRunner(s[str]):
             self.logger.exception("DBT tests failed", error=str(e))
             return r[DbtTestResult].fail(f"DBT tests failed: {e}")
 
-    def docs_generate(self, **_kwargs: t.GeneralValueType) -> r[mt.MeltanoCore.ExecutionResultDict]:
+    def docs_generate(
+        self, **_kwargs: t.GeneralValueType
+    ) -> r[mt.MeltanoCore.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:

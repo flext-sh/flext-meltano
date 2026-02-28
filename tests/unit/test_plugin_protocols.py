@@ -14,8 +14,7 @@ import unittest
 from unittest import TestCase
 
 import flext_meltano.plugin_protocols as protocols_module
-from flext_meltano import t
-from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
+from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols, t
 
 
 class TestFlextMeltanoPluginProtocolsUnified(TestCase):

@@ -165,7 +165,7 @@ def test_execution_with_mock(mock_subprocess):
 ```python
 # Reusable test fixtures for unit tests
 import pytest
-from flext_meltano.base import FlextMeltanoSettings
+from flext_meltano import FlextMeltanoSettings
 
 @pytest.fixture
 def test_config():

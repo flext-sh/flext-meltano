@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 """
 
 from flext_meltano import FlextMeltanoLibraryRunner, r, t
-from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.adapters import ProjectAdapter
 
 
 class TestFlextDbtProgrammaticRunner:
@@ -129,12 +129,12 @@ class TestFlextMeltanoLibraryRunner:
         assert "execution_time" in pipeline_data
 
 
-class TestFlextMeltanoAdapterIntegration:
+class TestProjectAdapterIntegration:
     """Test integration of adapter with sub-adapters."""
 
     def test_adapter_has_sub_adapters(self) -> None:
         """Test that adapter has all required sub-adapters."""
-        adapter = FlextMeltanoAdapter()
+        adapter = ProjectAdapter()
         assert hasattr(adapter, "project_adapter")
         assert hasattr(adapter, "plugin_adapter")
         assert hasattr(adapter, "pipeline_adapter")
@@ -143,7 +143,7 @@ class TestFlextMeltanoAdapterIntegration:
 
     def test_adapter_dbt_integration(self) -> None:
         """Test adapter dbt integration via delegation."""
-        adapter = FlextMeltanoAdapter()
+        adapter = ProjectAdapter()
 
         # Test dbt operations through adapter (delegates to dbt_adapter)
         result = adapter.execute_dbt_operation()

@@ -17,12 +17,14 @@ from flext_core import (
     FlextService,
 )
 
-from flext_meltano.bridge import FlextMeltanoBridge
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.executor import FlextMeltanoExecutor
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.singer_protocols import FlextMeltanoSingerProtocols
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import (
+    FlextMeltanoBridge,
+    FlextMeltanoConstants,
+    FlextMeltanoExecutor,
+    FlextMeltanoModels,
+    FlextMeltanoSingerProtocols,
+    FlextMeltanoTypes,
+)
 
 # Import aliases for simplified usage
 r = FlextResult

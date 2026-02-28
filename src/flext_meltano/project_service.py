@@ -18,12 +18,14 @@ from typing import override
 import yaml
 from flext_core import r, s, u
 
-from flext_meltano.abstractions import FlextMeltanoAbstractions
-from flext_meltano.constants import c
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import t
-from flext_meltano.validators import FlextMeltanoValidators
+from flext_meltano import (
+    FlextMeltanoAbstractions,
+    FlextMeltanoModels,
+    FlextMeltanoSettings,
+    FlextMeltanoValidators,
+    c,
+    t,
+)
 
 m = FlextMeltanoModels
 

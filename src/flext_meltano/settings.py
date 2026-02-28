@@ -22,11 +22,13 @@ from flext_core import (
 from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_meltano.constants import c
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import t
-from flext_meltano.utilities import FlextMeltanoUtilities
-from flext_meltano.validators import FlextMeltanoValidators
+from flext_meltano import (
+    FlextMeltanoModels,
+    FlextMeltanoUtilities,
+    FlextMeltanoValidators,
+    c,
+    t,
+)
 
 # FLEXT aliases - all AFTER imports per import order rules
 # Order: c → t → r → m → u
@@ -302,10 +304,8 @@ class FlextMeltanoSettings(FlextSettings):
     )
 
     # Instance attributes (declared at class level for type safety)
-    _metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
-    _sealed: bool = False
-    _metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
-    _sealed: bool = False
+    metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
+    sealed: bool = Field(default=False, exclude=True)
 
     # ============================================================================
     # FIELD VALIDATORS - Pydantic validation methods
@@ -774,12 +774,12 @@ class FlextMeltanoSettings(FlextSettings):
                     applied_count += 1
 
             # Track metadata about overrides
-            if getattr(self, "_metadata_extra", None) is None:
-                self._metadata_extra: dict[str, str] = {}
-            self._metadata_extra["overrides_applied"] = (
+            if getattr(self, "metadata_extra", None) is None:
+                self.metadata_extra: dict[str, str] = {}
+            self.metadata_extra["overrides_applied"] = (
                 "true" if applied_count > 0 else "false"
             )
-            self._metadata_extra["override_count"] = str(applied_count)
+            self.metadata_extra["override_count"] = str(applied_count)
 
             return r[bool].ok(True)
 
@@ -799,7 +799,7 @@ class FlextMeltanoSettings(FlextSettings):
         FlextResult indicating success or failure.
 
         """
-        self._sealed = True
+        self.sealed = True
         return r[None].ok(None)
 
     def is_sealed(self) -> bool:
@@ -809,7 +809,7 @@ class FlextMeltanoSettings(FlextSettings):
         bool: True if configuration is sealed, False otherwise.
 
         """
-        return getattr(self, "_sealed", False)
+        return getattr(self, "sealed", False)
 
     def get_meltano_environment_variables(self) -> Mapping[str, str]:
         """Get Meltano-specific environment variables.
@@ -871,8 +871,6 @@ class FlextMeltanoSettings(FlextSettings):
 
         """
         return self.logging.model_dump()
-        self,
-    ) -> t.MeltanoCore.SettingsDict:
         """Get Meltano-specific logging configuration dictionary.
 
         Delegates to consolidated logging model for maintainability.
