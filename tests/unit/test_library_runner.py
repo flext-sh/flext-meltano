@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 """
 
 from flext_meltano import FlextMeltanoLibraryRunner, r, t
-from flext_meltano.adapters import ProjectAdapter
+from flext_meltano.adapters import FlextMeltanoAdapter
 
 
 class TestFlextDbtProgrammaticRunner:
@@ -27,6 +27,7 @@ class TestFlextDbtProgrammaticRunner:
         dbt_runner_result = library_runner.get_dbt_runner()
         assert dbt_runner_result.is_success
         capabilities = dbt_runner_result.value.get("capabilities", [])
+        assert isinstance(capabilities, list)
         assert "run" in capabilities
         assert "test" in capabilities
 
@@ -49,6 +50,7 @@ class TestFlextSingerProtocolManager:
         singer_manager_result = library_runner.get_singer_manager()
         assert singer_manager_result.is_success
         capabilities = singer_manager_result.value.get("capabilities", [])
+        assert isinstance(capabilities, list)
         assert "discover" in capabilities
         assert "sync" in capabilities
 
@@ -94,24 +96,8 @@ class TestFlextMeltanoLibraryRunner:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
 
-        # with tempfile.TemporaryDirectory(prefix="test_project_") as temp_dir:  # Unused in current test structure
-
-        # Type annotations to help type checker
-        # extractor_config: dict[str, str | dict[str, str]] = {  # Unused in current test structure
-        #     "name": "test_extractor",
-        #     "config": {},
-        # }
-        # loader_config: dict[str, str | dict[str, str]] = {  # Unused in current test structure
-        #     "name": "test_loader",
-        #     "config": {},
-        # }
-        # transformer_config: dict[str, str | dict[str, str]] = {  # Unused in current test structure
-        #     "name": "test_transformer",
-        #     "config": {},
-        # }
-
         # Test the complete pipeline
-        result: r[t.Processing.EltPipelineResult] = (
+        result: r[t.Meltano.Processing.EltPipelineResult] = (
             runner.execute_complete_elt_pipeline(
                 tap_name="tap-csv",
                 target_name="target-jsonl",
@@ -120,7 +106,7 @@ class TestFlextMeltanoLibraryRunner:
 
         assert result.is_success
         # Get the pipeline data from the result
-        pipeline_data: t.Processing.EltPipelineResult = result.value
+        pipeline_data: t.Meltano.Processing.EltPipelineResult = result.value
         # Check that the pipeline data has the expected EltPipelineResult structure
         assert isinstance(pipeline_data, dict)
         assert "success" in pipeline_data
@@ -130,24 +116,19 @@ class TestFlextMeltanoLibraryRunner:
 
 
 class TestProjectAdapterIntegration:
-    """Test integration of adapter with sub-adapters."""
+    """Test integration of FlextMeltanoAdapter.FlextMeltanoAdapter.ProjectAdapter."""
 
-    def test_adapter_has_sub_adapters(self) -> None:
-        """Test that adapter has all required sub-adapters."""
-        adapter = ProjectAdapter()
-        assert hasattr(adapter, "project_adapter")
-        assert hasattr(adapter, "plugin_adapter")
-        assert hasattr(adapter, "pipeline_adapter")
-        assert hasattr(adapter, "singer_adapter")
-        assert hasattr(adapter, "dbt_adapter")
+    def test_adapter_version(self) -> None:
+        """Test that FlextMeltanoAdapter.ProjectAdapter can get version."""
+        adapter = FlextMeltanoAdapter.ProjectAdapter()
+        result = adapter.get_version()
+        assert result.is_success
+        assert result.value is not None
+        assert "version" in result.value
 
-    def test_adapter_dbt_integration(self) -> None:
-        """Test adapter dbt integration via delegation."""
-        adapter = ProjectAdapter()
-
-        # Test dbt operations through adapter (delegates to dbt_adapter)
-        result = adapter.execute_dbt_operation()
-
-        # Result should be a FlextResult (success or failure)
+    def test_adapter_execute(self) -> None:
+        """Test that FlextMeltanoAdapter.ProjectAdapter execute returns FlextResult."""
+        adapter = FlextMeltanoAdapter.ProjectAdapter()
+        result = adapter.execute()
         assert hasattr(result, "is_success")
         assert hasattr(result, "is_failure")

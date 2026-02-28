@@ -60,7 +60,7 @@ class TestTapConfigEnhanced:
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.TapConfig(
                 tap_type="tap-postgres",
-                connection_config="invalid",  # Should be dict
+                connection_config="invalid",  # type: ignore[arg-type]  # Should be dict
             )
 
 
@@ -109,7 +109,7 @@ class TestTargetConfigEnhanced:
         with pytest.raises(ValidationError, match="Input should be a valid integer"):
             m.Meltano.TargetConfig(
                 target_type="target-csv",
-                batch_size="invalid",  # Should be int
+                batch_size="invalid",  # type: ignore[arg-type]  # Should be int
             )
 
 
@@ -171,7 +171,7 @@ class TestStreamInfoEnhanced:
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.StreamInfo(
                 stream_name="users",
-                stream_schema="invalid",  # Should be dict
+                stream_schema="invalid",  # type: ignore[arg-type]  # Should be dict
                 stream_created_at="2025-01-01T00:00:00Z",
             )
 
@@ -222,7 +222,7 @@ class TestMeltanoProjectModelEnhanced:
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.MeltanoProjectModel(
                 project_id="test-project",
-                plugins="invalid",  # Should be dict
+                plugins="invalid",  # type: ignore[arg-type]  # Should be dict
             )
 
 
@@ -288,7 +288,7 @@ class TestPluginModelEnhanced:
             m.Meltano.PluginModel(
                 name="tap-postgres",
                 namespace="tap-postgres",
-                capabilities="invalid",  # Should be list
+                capabilities="invalid",  # type: ignore[arg-type]  # Should be list
             )
 
 
@@ -352,7 +352,7 @@ class TestDbtProjectModelEnhanced:
             m.Meltano.DbtProjectModel(
                 name="test-project",
                 profile="default",
-                config="invalid",  # Should be dict
+                config="invalid",  # type: ignore[arg-type]  # Should be dict
             )
 
 

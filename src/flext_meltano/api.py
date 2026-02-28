@@ -16,12 +16,10 @@ from typing import override
 from flext_core import e, r
 from pydantic import ValidationError
 
-from flext_meltano.adapters import (
-    ProjectAdapter,
-)
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano.constants import c
 from flext_meltano.models import m
-from flext_meltano.services import s
+from flext_meltano.services import FlextMeltanoService, s
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
 from flext_meltano.utilities import u
@@ -39,9 +37,9 @@ class FlextMeltano(s[t.JsonValue]):
     version: str = ""  # Will be set in __init__
 
     @property
-    def constants(self) -> type[FlextMeltanoConstants]:
-        """Get FlextMeltanoConstants - delegates to foundation layer."""
-        return FlextMeltanoConstants
+    def constants(self) -> type[c]:
+        """Get c - delegates to foundation layer."""
+        return c
 
     @property
     def types(self) -> type[t]:
@@ -123,7 +121,6 @@ class FlextMeltano(s[t.JsonValue]):
             version,
         )
 
-    @override
     def execute(self, **_kwargs: t.JsonValue) -> r[t.JsonValue]:
         """Execute service lifecycle.
 
@@ -684,9 +681,9 @@ class FlextMeltano(s[t.JsonValue]):
             "service_name": self.service_name,
         })
 
-    def get_info(self) -> r[t.Meltano.Plugin.PluginInfo]:
+    def get_info(self) -> r[t.Meltano.PluginInfo]:
         """Get API information using flext-core patterns."""
-        return r[t.Meltano.Plugin.PluginInfo].ok({
+        return r[t.Meltano.PluginInfo].ok({
             "name": self.service_name,
             "version": self.version,
             "type": "meltano_api_service",
@@ -704,7 +701,7 @@ class FlextMeltano(s[t.JsonValue]):
                 "Project name cannot be empty",
             )
         try:
-            adapter = ProjectAdapter()
+            adapter = FlextMeltanoAdapter.ProjectAdapter()
             # Type narrowing: create_project returns MeltanoConfigDict
             return adapter.create_project(
                 project_name=project_name,
@@ -729,7 +726,7 @@ class FlextMeltano(s[t.JsonValue]):
     ) -> r[t.JsonValue]:
         """Extract data from source - delegates to service."""
         try:
-            service = s(config=self.config, source_name=source_name)
+            service = FlextMeltanoService(config=self.config, source_name=source_name)
             parsed_schema = m.Meltano.JsonSchemaPayload.model_validate(
                 {"schema": config or {}},
             )
@@ -751,7 +748,7 @@ class FlextMeltano(s[t.JsonValue]):
     ) -> r[t.JsonValue]:
         """Load data to sink - delegates to service."""
         try:
-            service = s(config=self.config, sink_name=sink_name)
+            service = FlextMeltanoService(config=self.config, sink_name=sink_name)
             if records is not None and not u.empty(records):
                 records_batch = m.Meltano.JsonRecordBatchPayload.model_validate(
                     {"records": records},
@@ -771,8 +768,10 @@ class FlextMeltano(s[t.JsonValue]):
     def discover_catalog(self, source_name: str) -> r[t.JsonValue]:
         """Discover source schema - delegates to service."""
         try:
-            service = s(config=self.config, source_name=source_name)
-            return service.discover()
+            service = FlextMeltanoService(config=self.config, source_name=source_name)
+            import typing
+
+            return service.discover().map(lambda v: typing.cast("t.JsonValue", v))
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.JsonValue].fail(f"Failed to discover catalog: {e}")
 

@@ -39,7 +39,7 @@ s = FlextService
 
 def _is_meltano_project(
     value: t.GeneralValueType,
-) -> TypeGuard[p.Meltano.MeltanoProjectProtocol]:
+) -> TypeGuard[p.Meltano.Project]:
     """Type guard for protocol-compatible Meltano project objects."""
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 
@@ -89,7 +89,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
     def discover_plugins(
         self,
-        project: p.Meltano.MeltanoProjectProtocol | None = None,
+        project: p.Meltano.Project | None = None,
     ) -> r[list[Mapping[str, str]]]:
         """Discover plugins from Meltano Hub using native API.
 
@@ -104,7 +104,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
             self.logger.info("Discovering Meltano plugins")
 
             # Use provided project or create temporary one
-            working_project: p.Meltano.MeltanoProjectProtocol
+            working_project: p.Meltano.Project
             if project:
                 working_project = project
             else:
@@ -121,7 +121,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 temp_project = temp_project_result.value
                 if not _is_meltano_project(temp_project):
                     return r[list[Mapping[str, str]]].fail(
-                        "Temporary project does not satisfy MeltanoProjectProtocol",
+                        "Temporary project does not satisfy Project",
                     )
                 working_project = temp_project
 
@@ -130,7 +130,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
             # DSL Builder Pattern: Process plugins using u.construct() mnemonic pattern
             def build_plugin_info(
                 plugin_name: str,
-                indexed_plugin: t.Meltano.Plugin.PluginDefinition,
+                indexed_plugin: t.Meltano.PluginDefinition,
                 plugin_type: str,
             ) -> Mapping[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
@@ -197,7 +197,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
     def add_plugin(
         self,
-        project: p.Meltano.MeltanoProjectProtocol,
+        project: p.Meltano.Project,
         plugin_type: str,
         plugin_name: str,
     ) -> r[Mapping[str, str]]:
@@ -300,7 +300,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
             temp_project = temp_project_result.value
             if not _is_meltano_project(temp_project):
                 return r[Mapping[str, str]].fail(
-                    "Temporary project does not satisfy MeltanoProjectProtocol",
+                    "Temporary project does not satisfy Project",
                 )
 
             # Get plugins and extract info
@@ -344,7 +344,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
     def _execute_plugin_addition(
         self,
-        project: p.Meltano.MeltanoProjectProtocol,
+        project: p.Meltano.Project,
         plugin_type_str: str,
         plugin_name: str,
     ) -> r[bool]:
@@ -352,7 +352,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         try:
             # Use abstraction layer for plugin addition
             # Build properly typed plugin config
-            plugin_config: t.Meltano.Plugin.PluginConfiguration = {
+            plugin_config: t.Meltano.PluginConfiguration = {
                 "project_root": str(project.root_dir),
                 "plugin_type": plugin_type_str,
                 "plugin_name": plugin_name,

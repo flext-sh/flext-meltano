@@ -16,24 +16,18 @@ from typing import ClassVar, Self, override
 
 from flext_core import (
     FlextSettings,
-    FlextTypes,
     r,
 )
 from pydantic import Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_meltano import (
-    FlextMeltanoModels,
-    FlextMeltanoUtilities,
     FlextMeltanoValidators,
     c,
+    m,
     t,
+    u,
 )
-
-# FLEXT aliases - all AFTER imports per import order rules
-# Order: c → t → r → m → u
-m = FlextMeltanoModels
-u = FlextMeltanoUtilities
 
 
 @FlextSettings.auto_register("meltano")
@@ -323,7 +317,7 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Resolved absolute path.
 
         """
-        path_value = m.Meltano.PathPayload(value=v).value
+        path_value = m.Meltano.PathPayload(value=Path(v)).value
         return path_value.expanduser().resolve()
 
     @field_validator("config_dir", "logs_dir")
@@ -338,7 +332,7 @@ class FlextMeltanoSettings(FlextSettings):
         Path: Expanded but not resolved path to allow relative paths.
 
         """
-        path_value = m.Meltano.PathPayload(value=v).value
+        path_value = m.Meltano.PathPayload(value=Path(v)).value
         return path_value.expanduser()  # Don't resolve to allow relative paths
 
     @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
@@ -528,7 +522,7 @@ class FlextMeltanoSettings(FlextSettings):
     def create_for_environment(
         cls,
         environment: str,
-        **kwargs: FlextTypes.JsonValue,
+        **kwargs: t.JsonValue,
     ) -> Self:
         """Create configuration for specific environment.
 
@@ -558,7 +552,7 @@ class FlextMeltanoSettings(FlextSettings):
         filtered_kwargs = filtered_kwargs_dict
 
         # Create config data with environment
-        config_data: dict[str, FlextTypes.GeneralValueType] = {
+        config_data: dict[str, t.GeneralValueType] = {
             "environment": env_type.value,
         }
 
@@ -600,7 +594,7 @@ class FlextMeltanoSettings(FlextSettings):
     @override
     def get_global_instance(
         cls,
-        **overrides: FlextTypes.JsonValue,
+        **overrides: t.JsonValue,
     ) -> FlextMeltanoSettings:
         """Get SINGLETON GLOBAL Meltano config instance (enhanced pattern).
 
@@ -702,7 +696,7 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def get_supported_plugin_types(cls) -> t.Meltano.PluginTypeList:
         """Get list of supported plugin types."""
-        return FlextMeltanoUtilities.Meltano.supported_types()
+        return u.Meltano.supported_types()
 
     @classmethod
     def get_supported_environments(cls) -> t.Meltano.PluginNameList:
@@ -736,7 +730,7 @@ class FlextMeltanoSettings(FlextSettings):
         # Clear global instance for this class
         # Parent class doesn't have this method, so we implement it here
 
-    def apply_overrides(self, **overrides: FlextTypes.JsonValue) -> r[None]:
+    def apply_overrides(self, **overrides: t.JsonValue) -> r[None]:
         """Apply configuration overrides to this instance.
 
         This method allows runtime modification of configuration values,
@@ -781,7 +775,7 @@ class FlextMeltanoSettings(FlextSettings):
             )
             self.metadata_extra["override_count"] = str(applied_count)
 
-            return r[bool].ok(True)
+            return r[None].ok(None)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as error:
             return r[None].fail(

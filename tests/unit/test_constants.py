@@ -59,13 +59,13 @@ class Testc:
 
     def test_plugin_namespace(self) -> None:
         """Test Plugin constants."""
-        assert isinstance(c.Meltano.PluginTypes.EXTRACTORS, str), (
+        assert isinstance(c.Meltano.Enums.PluginType.EXTRACTORS, str), (
             "Extractor type should be a string"
         )
-        assert isinstance(c.Meltano.PluginTypes.LOADERS, str), (
+        assert isinstance(c.Meltano.Enums.PluginType.LOADERS, str), (
             "Loader type should be a string"
         )
-        assert isinstance(c.Meltano.PluginTypes.TRANSFORMS, str), (
+        assert isinstance(c.Meltano.Enums.PluginType.TRANSFORMS, str), (
             "Transformer type should be a string"
         )
         assert isinstance(c.Meltano.DEFAULT_VARIANT, str), (
@@ -107,11 +107,11 @@ class Testc:
 
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
-        plugin_types = c.Meltano.PluginTypes
+        plugin_types = c.Meltano.Enums.PluginType
 
-        assert hasattr(plugin_types, "EXTRACTORS"), "PluginTypes should have EXTRACTORS"
-        assert hasattr(plugin_types, "LOADERS"), "PluginTypes should have LOADERS"
-        assert hasattr(plugin_types, "TRANSFORMS"), "PluginTypes should have TRANSFORMS"
+        assert hasattr(plugin_types, "EXTRACTORS"), "PluginType should have EXTRACTORS"
+        assert hasattr(plugin_types, "LOADERS"), "PluginType should have LOADERS"
+        assert hasattr(plugin_types, "TRANSFORMS"), "PluginType should have TRANSFORMS"
 
         assert isinstance(plugin_types.EXTRACTORS, str), "EXTRACTORS should be a string"
         assert isinstance(plugin_types.LOADERS, str), "LOADERS should be a string"
@@ -139,8 +139,8 @@ class Testc:
             "Dbt",
             "Model",
             "Logging",
-            "Service",
-            "PluginTypes",
+            "Plugin",
+            "Enums",
         ]
         for namespace in meltano_namespaces:
             assert hasattr(c.Meltano, namespace), (
@@ -150,11 +150,11 @@ class Testc:
     def test_export_completeness(self) -> None:
         """Test that all necessary constants are exported."""
         assert hasattr(c, "Meltano"), "Meltano should be accessible from c"
-        assert hasattr(c.Meltano, "PluginTypes"), (
-            "PluginTypes should be accessible from c.Meltano"
+        assert hasattr(c.Meltano.Enums, "PluginType"), (
+            "PluginType should be accessible from c.Meltano.Enums"
         )
 
-        plugin_types = c.Meltano.PluginTypes
+        plugin_types = c.Meltano.Enums.PluginType
         assert hasattr(plugin_types, "EXTRACTORS"), (
-            "PluginTypes should have EXTRACTORS member"
+            "PluginType should have EXTRACTORS member"
         )

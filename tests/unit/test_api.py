@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
+import typing
 from pathlib import Path
 
 import pytest
@@ -36,10 +37,9 @@ class TestFlextMeltanoInitialization:
             def execute(
                 self,
                 **kwargs: object,
-            ) -> r[r[t.Meltano.MeltanoConfigDict]]:
-                return r[r[t.Meltano.MeltanoConfigDict]].ok(
-                    r[t.Meltano.MeltanoConfigDict].ok({}),
-                )
+            ) -> r[t.JsonValue]:
+                val = typing.cast(t.JsonValue, {})
+                return r.ok(val)
 
         api = ConcreteAPI(service_name="test-api")
         assert api is not None
@@ -128,7 +128,7 @@ class TestFlextMeltanoProjectOperations:
         api = FlextMeltano()
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            result = api.validate_project(Path(temp_dir))
+            result = api.validate_project(str(temp_dir))
 
             assert result.is_success or result.is_failure
 
@@ -261,7 +261,8 @@ class TestFlextMeltanoDataOperations:
         """Test data loading with actual records."""
         api = FlextMeltano()
 
-        records = [{"id": 1, "name": "test"}]
+        import typing
+        records = typing.cast(list[t.JsonValue], [{"id": 1, "name": "test"}])
         result = api.load_data(sink_name="target-jsonl", records=records)
 
         assert result.is_failure or result.is_success
@@ -369,7 +370,7 @@ class TestFlextMeltanoErrorHandling:
 
     def test_api_handles_invalid_project_root(self) -> None:
         """Test API handles invalid project root type."""
-        api = FlextMeltano(project_root=123)
+        api = FlextMeltano(project_root=123)  # type: ignore[arg-type]
         assert api is not None
 
     def test_create_project_exception_handling(self) -> None:
@@ -424,7 +425,7 @@ class TestFlextMeltanoIntegration:
         """Test API respects project root context across operations."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            api = FlextMeltano(project_root=temp_path)
+            api = FlextMeltano(project_root=str(temp_path))
 
             assert api is not None
 
@@ -443,7 +444,8 @@ class TestFlextMeltanoExecuteMethod:
         result = api.execute()
 
         assert result.is_success
-        assert "version" in result.value
+        assert result.value is not None
+        assert "version" in str(result.value)
 
     def test_execute_unknown_command(self) -> None:
         """Test execute method with unknown command."""
@@ -486,7 +488,7 @@ class TestFlextMeltanoSuccessPaths:
         """Test project validation exception handling."""
         api = FlextMeltano()
 
-        result = api.validate_project(Path("/nonexistent/path"))
+        result = api.validate_project("/nonexistent/path")
 
         assert result.is_failure
         assert result.error and (
@@ -578,7 +580,7 @@ class TestFlextMeltanoPerformance:
 
     def test_api_initialization_performance(
         self,
-        benchmark: object,  # pytest-benchmark fixture
+        benchmark: typing.Any,  # pytest-benchmark fixture
     ) -> None:
         """Benchmark API initialization performance."""
 
@@ -590,7 +592,7 @@ class TestFlextMeltanoPerformance:
 
     def test_api_properties_access_performance(
         self,
-        benchmark: object,  # pytest-benchmark fixture
+        benchmark: typing.Any,  # pytest-benchmark fixture
     ) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()

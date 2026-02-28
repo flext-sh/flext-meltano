@@ -16,15 +16,16 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import override
 
 import meltano
-from flext_core import FlextService, FlextSettings, r, u
+from flext_core import FlextSettings, r, s
 
-from flext_meltano import FlextMeltanoSettings, t
+from flext_meltano import FlextMeltanoSettings, t, u
 
 
 class FlextMeltanoAdapter:
-    class ProjectAdapter(FlextService[t.Meltano.ExecutionResultDict]):
+    class ProjectAdapter(s[t.Meltano.ExecutionResultDict]):
         """Focused adapter for Meltano project management following SOLID principles."""
 
         @classmethod
@@ -82,7 +83,7 @@ class FlextMeltanoAdapter:
                     f"Project creation failed: {ex}",
                 )
 
-    class PluginAdapter(FlextService[list[t.Meltano.Plugin.PluginDefinition]]):
+    class PluginAdapter(s[list[t.Meltano.PluginDefinition]]):
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
         @classmethod
@@ -92,21 +93,21 @@ class FlextMeltanoAdapter:
             return FlextMeltanoSettings
 
         @override
-        def execute(self) -> r[list[t.Meltano.Plugin.PluginDefinition]]:
+        def execute(self) -> r[list[t.Meltano.PluginDefinition]]:
             """Execute default plugin operation."""
             return self.discover_plugins()
 
         def discover_plugins(
             self,
             plugin_type: str | None = None,
-        ) -> r[list[t.Meltano.Plugin.PluginDefinition]]:
+        ) -> r[list[t.Meltano.PluginDefinition]]:
             """Discover available plugins of specified type.
 
             Note: Real plugin discovery requires FlextMeltanoUtilities.
             Use FlextMeltano.discover_plugins() for full implementation.
             """
             try:
-                plugins: list[t.Meltano.Plugin.PluginDefinition] = [
+                plugins: list[t.Meltano.PluginDefinition] = [
                     {"name": "tap-postgres", "type": "tap", "variant": "meltanolabs"},
                     {
                         "name": "target-jsonl",
@@ -121,13 +122,13 @@ class FlextMeltanoAdapter:
                         if u.get(plugin, "type") == plugin_type
                     ]
 
-                return r[list[t.Meltano.Plugin.PluginDefinition]].ok(plugins)
+                return r[list[t.Meltano.PluginDefinition]].ok(plugins)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-                return r[list[t.Meltano.Plugin.PluginDefinition]].fail(
+                return r[list[t.Meltano.PluginDefinition]].fail(
                     f"Plugin discovery failed: {ex}",
                 )
 
-    class PipelineAdapter(FlextService[t.Meltano.ExecutionResultDict]):
+    class PipelineAdapter(s[t.Meltano.ExecutionResultDict]):
         """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
         @classmethod
@@ -175,7 +176,7 @@ class FlextMeltanoAdapter:
                     f"Pipeline execution failed: {ex}",
                 )
 
-    class SingerAdapter(FlextService[t.Meltano.SingerCatalogDict]):
+    class SingerAdapter(s[t.Meltano.SingerCatalogDict]):
         """Focused adapter for Singer protocol operations following SOLID principles."""
 
         @classmethod
@@ -222,7 +223,7 @@ class FlextMeltanoAdapter:
                     f"Catalog creation failed: {ex}",
                 )
 
-    class DbtAdapter(FlextService[t.Meltano.DbtResultDict]):
+    class DbtAdapter(s[t.Meltano.DbtResultDict]):
         """Focused adapter for DBT operations following SOLID principles."""
 
         @classmethod

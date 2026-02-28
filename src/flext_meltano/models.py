@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Literal, Self
 
 import yaml
+from flext_cli import FlextCliModels
 from flext_core import (
     FlextModels,
     FlextResult,
@@ -33,7 +34,7 @@ from pydantic import (
 from flext_meltano import c
 
 
-class FlextMeltanoModels(FlextModels):
+class FlextMeltanoModels(FlextCliModels):
     """Generic pipeline models.
 
     Provides reusable Pydantic models for pipeline operations.
@@ -2618,6 +2619,15 @@ class FlextMeltanoModels(FlextModels):
                     msg = f"Overall status must be one of: {', '.join(valid_statuses)}"
                     raise ValueError(msg)
                 return v
+
+        class DbtProjectInfo(BaseModel):
+            """Information about a DBT project."""
+
+            root: Path = Field(description="Project root directory")
+            name: str = Field(description="Project name")
+            dbt_version: str | None = Field(default=None, description="DBT version")
+            models_count: int = Field(default=0, description="Number of models")
+            tests_count: int = Field(default=0, description="Number of tests")
 
 
 # ==========================================================================

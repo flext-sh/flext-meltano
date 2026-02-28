@@ -5,10 +5,11 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final
 
+from flext_cli import FlextCliConstants
 from flext_core import FlextConstants
 
 
-class FlextMeltanoConstants(FlextConstants):
+class FlextMeltanoConstants(FlextCliConstants):
     """Domain constants for the flext-meltano package."""
 
     class Meltano:

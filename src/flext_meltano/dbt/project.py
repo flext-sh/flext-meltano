@@ -13,25 +13,13 @@ import json
 from pathlib import Path
 from typing import override
 
-from flext_core import r, s, t
-from pydantic import BaseModel, Field, ValidationError
+from flext_core import r, s
+from pydantic import ValidationError
 
-from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes as mt
-
-m = FlextMeltanoModels
+from flext_meltano import m, t
 
 
-class DbtProjectInfo(BaseModel):
-    """Information about a DBT project."""
-
-    root: Path = Field(description="Project root directory")
-    name: str = Field(description="Project name")
-    dbt_version: str | None = Field(default=None, description="DBT version")
-    models_count: int = Field(default=0, description="Number of models")
-    tests_count: int = Field(default=0, description="Number of tests")
-
-
-class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
+class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
     """Manages DBT projects with deep SDK integration.
 
     Provides programmatic access to DBT projects, manifests, and
@@ -52,9 +40,9 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
         """
         super().__init__()
         self.project_root = root
-        self.manifest: mt.Dbt.ManifestData | None = None
+        self.manifest: t.Meltano.Dbt.ManifestData | None = None
 
-    def load_project(self, root: Path) -> r[DbtProjectInfo]:
+    def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
         """Load a DBT project.
 
         Args:
@@ -66,13 +54,13 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
         """
         try:
             if not root.exists():
-                return r[DbtProjectInfo].fail(
+                return r[m.Meltano.DbtProjectInfo].fail(
                     f"DBT project directory not found: {root}",
                 )
 
             self.project_root = root
 
-            info = DbtProjectInfo(
+            info = m.Meltano.DbtProjectInfo(
                 root=root,
                 name=str(root.name),
             )
@@ -81,7 +69,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 "DBT project loaded",
                 root=str(root),
             )
-            return r[DbtProjectInfo].ok(info)
+            return r[m.Meltano.DbtProjectInfo].ok(info)
         except (
             ValueError,
             TypeError,
@@ -92,14 +80,14 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[DbtProjectInfo].fail(
+            return r[m.Meltano.DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
             )
 
     def load_manifest(
         self,
         manifest_path: Path | None = None,
-    ) -> r[mt.Dbt.ManifestData]:
+    ) -> r[t.Meltano.Dbt.ManifestData]:
         """Load DBT manifest.
 
         Args:
@@ -112,23 +100,23 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
         try:
             if manifest_path is None:
                 if self.project_root is None:
-                    return r[mt.Dbt.ManifestData].fail("No project loaded")
+                    return r[t.Meltano.Dbt.ManifestData].fail("No project loaded")
                 manifest_path = self.project_root / "target" / "manifest.json"
 
             if not manifest_path.exists():
-                return r[mt.Dbt.ManifestData].fail(
+                return r[t.Meltano.Dbt.ManifestData].fail(
                     f"Manifest not found: {manifest_path}",
                 )
 
             with manifest_path.open() as f:
-                manifest_data: mt.Dbt.ManifestData = json.load(f)
+                manifest_data: t.Meltano.Dbt.ManifestData = json.load(f)
                 self.manifest = manifest_data
 
             self.logger.info(
                 "DBT manifest loaded",
                 file=str(manifest_path),
             )
-            return r[mt.Dbt.ManifestData].ok(self.manifest)
+            return r[t.Meltano.Dbt.ManifestData].ok(self.manifest)
         except (
             ValueError,
             TypeError,
@@ -139,9 +127,9 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load manifest", error=str(e))
-            return r[mt.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
+            return r[t.Meltano.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
 
-    def get_models(self) -> r[list[mt.Dbt.ModelConfiguration]]:
+    def get_models(self) -> r[list[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from manifest.
 
         Returns:
@@ -152,11 +140,11 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return r[list[mt.Dbt.ModelConfiguration]].fail(
+                    return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
                         manifest_result.error or "Unknown error",
                     )
 
-            models: list[mt.Dbt.ModelConfiguration] = []
+            models: list[t.Meltano.Dbt.ModelConfiguration] = []
             if self.manifest:
                 manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
                 parsed_nodes = [
@@ -179,7 +167,7 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 ]
 
             self.logger.info("Models retrieved", count=len(models))
-            return r[list[mt.Dbt.ModelConfiguration]].ok(models)
+            return r[list[t.Meltano.Dbt.ModelConfiguration]].ok(models)
         except (
             ValueError,
             TypeError,
@@ -190,9 +178,11 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[list[mt.Dbt.ModelConfiguration]].fail(f"Failed to get models: {e}")
+            return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
+                f"Failed to get models: {e}"
+            )
 
-    def get_tests(self) -> r[list[mt.Dbt.TestConfiguration]]:
+    def get_tests(self) -> r[list[t.Meltano.Dbt.TestConfiguration]]:
         """Get all tests from manifest.
 
         Returns:
@@ -203,11 +193,11 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
             if not self.manifest:
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
-                    return r[list[mt.Dbt.TestConfiguration]].fail(
+                    return r[list[t.Meltano.Dbt.TestConfiguration]].fail(
                         manifest_result.error or "Unknown error",
                     )
 
-            tests: list[mt.Dbt.TestConfiguration] = []
+            tests: list[t.Meltano.Dbt.TestConfiguration] = []
             if self.manifest:
                 manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
                 parsed_nodes = [
@@ -230,21 +220,23 @@ class FlextMeltanoDbtProjectManager(s[DbtProjectInfo]):
                 ]
 
             self.logger.info("Tests retrieved", count=len(tests))
-            return r[list[mt.Dbt.TestConfiguration]].ok(tests)
+            return r[list[t.Meltano.Dbt.TestConfiguration]].ok(tests)
         except (ValidationError, OSError, ValueError, TypeError) as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return r[list[mt.Dbt.TestConfiguration]].fail(f"Failed to get tests: {e}")
+            return r[list[t.Meltano.Dbt.TestConfiguration]].fail(
+                f"Failed to get tests: {e}"
+            )
 
     @override
-    def execute(self, **_kwargs: t.GeneralValueType) -> r[DbtProjectInfo]:
+    def execute(self, **_kwargs: t.GeneralValueType) -> r[m.Meltano.DbtProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
-            info = DbtProjectInfo(
+            info = m.Meltano.DbtProjectInfo(
                 root=self.project_root,
                 name=str(self.project_root.name),
             )
-            return r[DbtProjectInfo].ok(info)
-        return r[DbtProjectInfo].fail("No project loaded")
+            return r[m.Meltano.DbtProjectInfo].ok(info)
+        return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
 
 
 __all__ = [

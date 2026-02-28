@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import override
 
 from flext_core import r, s
 
@@ -59,7 +58,6 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
             error_msg = "Logger initialization failed"
             raise RuntimeError(error_msg)
 
-    @override
     def execute(self) -> r[t.JsonValue]:
         """Execute the Meltano executor service.
 
@@ -195,7 +193,6 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
         return Path.cwd()
 
     @property
-    @property
     def bridge(self) -> FlextMeltanoBridge:
         """Get bridge instance - delegates to instance attribute."""
         return self._bridge
@@ -263,13 +260,13 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
         })
 
     @staticmethod
-    def list_plugins() -> r[list[t.Meltano.Plugin.PluginDefinition]]:
+    def list_plugins() -> r[list[t.Meltano.PluginDefinition]]:
         """List available plugins - delegates to adapter."""
         try:
             # Return empty list - full implementation delegates to adapter
-            return r[list[t.Meltano.Plugin.PluginDefinition]].ok([])
+            return r[list[t.Meltano.PluginDefinition]].ok([])
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[t.Meltano.Plugin.PluginDefinition]].fail(
+            return r[list[t.Meltano.PluginDefinition]].fail(
                 f"Failed to list plugins: {e}",
             )
 

@@ -43,7 +43,7 @@ class FlextMeltanoBridge:
     def execute_command(
         command: str,
         args: Mapping[str, t.JsonValue] | None = None,
-    ) -> FlextResult[t.Bridge.BridgeStatus]:
+    ) -> FlextResult[t.Meltano.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -64,15 +64,15 @@ class FlextMeltanoBridge:
                 if args
                 else {}
             )
-            result: t.Bridge.BridgeStatus = {
+            result: t.Meltano.Bridge.BridgeStatus = {
                 "command": command,
                 "args": args_dict,
                 "status": "executed",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[t.Bridge.BridgeStatus].ok(result)
+            return FlextResult[t.Meltano.Bridge.BridgeStatus].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[t.Bridge.BridgeStatus].fail(
+            return FlextResult[t.Meltano.Bridge.BridgeStatus].fail(
                 f"Bridge command failed: {e}",
             )
 
@@ -95,51 +95,51 @@ class FlextMeltanoBridge:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
 
     @staticmethod
-    def discover_plugins() -> FlextResult[t.Meltano.Plugin.PluginCatalog]:
+    def discover_plugins() -> FlextResult[t.Meltano.PluginCatalog]:
         """Discover available plugins through the Go bridge."""
         try:
             # Go bridge plugin discovery — queries FlexCore for registered plugins
-            extractor1: t.Meltano.Plugin.PluginDefinition = {
+            extractor1: t.Meltano.PluginDefinition = {
                 "name": "tap-csv",
                 "type": "extractors",
             }
-            extractor2: t.Meltano.Plugin.PluginDefinition = {
+            extractor2: t.Meltano.PluginDefinition = {
                 "name": "tap-postgres",
                 "type": "extractors",
             }
-            extractor3: t.Meltano.Plugin.PluginDefinition = {
+            extractor3: t.Meltano.PluginDefinition = {
                 "name": "tap-json",
                 "type": "extractors",
             }
-            loader1: t.Meltano.Plugin.PluginDefinition = {
+            loader1: t.Meltano.PluginDefinition = {
                 "name": "target-csv",
                 "type": "loaders",
             }
-            loader2: t.Meltano.Plugin.PluginDefinition = {
+            loader2: t.Meltano.PluginDefinition = {
                 "name": "target-postgres",
                 "type": "loaders",
             }
-            loader3: t.Meltano.Plugin.PluginDefinition = {
+            loader3: t.Meltano.PluginDefinition = {
                 "name": "target-jsonl",
                 "type": "loaders",
             }
-            transformer1: t.Meltano.Plugin.PluginDefinition = {
+            transformer1: t.Meltano.PluginDefinition = {
                 "name": "dbt-postgres",
                 "type": "transformers",
             }
-            transformer2: t.Meltano.Plugin.PluginDefinition = {
+            transformer2: t.Meltano.PluginDefinition = {
                 "name": "dbt-snowflake",
                 "type": "transformers",
             }
 
-            result: t.Meltano.Plugin.PluginCatalog = {
+            result: t.Meltano.PluginCatalog = {
                 "extractors": [extractor1, extractor2, extractor3],
                 "loaders": [loader1, loader2, loader3],
                 "transformers": [transformer1, transformer2],
             }
-            return FlextResult[t.Meltano.Plugin.PluginCatalog].ok(result)
+            return FlextResult[t.Meltano.PluginCatalog].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[t.Meltano.Plugin.PluginCatalog].fail(
+            return FlextResult[t.Meltano.PluginCatalog].fail(
                 f"Plugin discovery failed: {e}",
             )
 

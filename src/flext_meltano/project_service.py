@@ -13,21 +13,18 @@ from __future__ import annotations
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
-from typing import override
 
 import yaml
 from flext_core import r, s, u
 
 from flext_meltano import (
     FlextMeltanoAbstractions,
-    FlextMeltanoModels,
     FlextMeltanoSettings,
     FlextMeltanoValidators,
     c,
+    m,
     t,
 )
-
-m = FlextMeltanoModels
 
 
 class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
@@ -49,7 +46,6 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         self._abstractions = FlextMeltanoAbstractions()
         # Note: container and logger are provided automatically by FlextService (s[T])
 
-    @override
     def execute(
         self,
     ) -> r[t.Meltano.MeltanoConfigDict]:
@@ -177,7 +173,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
                 lambda params: self._create_project_directory(
                     str(params["name"]),
                     m.Meltano.PathPayload(
-                        value=params["parent_dir"],
+                        value=Path(str(params["parent_dir"])),
                     ).value,
                 ),
             )
@@ -265,9 +261,11 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         path_obj = config_data.get("path")
         config_obj = config_data.get("config")
 
-        normalized_path = m.Meltano.PathPayload(value=path_obj).value
+        config_dict = dict(config_obj) if isinstance(config_obj, Mapping) else {}
+
+        normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
         normalized_config = m.Meltano.ConfigMappingPayload(
-            values=config_obj,
+            values=config_dict,
         ).values
 
         # Now we have proper types, call _write_meltano_config

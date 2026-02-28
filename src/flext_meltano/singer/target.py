@@ -11,22 +11,14 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 from singer_sdk import Target
 
 from flext_meltano import (
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
     FlextMeltanoSettings,
-    FlextMeltanoTypes,
+    m,
+    t,
 )
-
-# Import aliases for simplified usage
-r = FlextResult
-s = FlextService
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
 
 
 class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
@@ -43,7 +35,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified sink abstractions with FLEXT configuration."""
-        # Initialize FlextService base - logger comes from FlextMixins
+        # Initialize s base - logger comes from FlextMixins
         super().__init__()
         # Store meltano-specific config (use different name to avoid override)
         self._meltano_config: FlextMeltanoSettings = (
@@ -60,7 +52,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         sink_config: Sink configuration
 
         Returns:
-        FlextResult containing configured sink definition
+        r containing configured sink definition
 
         """
         try:
@@ -106,7 +98,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         sink_config: Sink configuration to validate
 
         Returns:
-        FlextResult containing validation result
+        r containing validation result
 
         """
         try:
@@ -148,7 +140,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         sink_config: Sink configuration
 
         Returns:
-        FlextResult containing configured sink instance
+        r containing configured sink instance
 
         """
         try:
@@ -205,12 +197,12 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
             sink_config: Target configuration
 
         Returns:
-            FlextResult containing the created DataSinkInstance
+            r containing the created DataSinkInstance
 
         """
         if isinstance(sink_config, dict):
             try:
-                config = m.Meltano.DataSinkConfig(**sink_config)
+                config = m.Meltano.DataSinkConfig(**sink_config)  # type: ignore[arg-type]
             except Exception as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
         else:

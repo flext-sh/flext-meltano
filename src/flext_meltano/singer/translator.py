@@ -1,7 +1,7 @@
 """Singer CLI Translator - Pydantic Model to Singer SDK Command Translation.
 
 Converts Pydantic parameter models (TapRunParams, TargetRunParams, etc.) to
-Singer SDK CLI commands with automatic parameter validation through FlextResult.
+Singer SDK CLI commands with automatic parameter validation through r.
 
 ## Three-Layer Architecture
 
@@ -24,7 +24,7 @@ Layer 5: Singer SDK Execution
 ### For flext-tap-* Projects
 
 ```python
-from flext_meltano import FlextMeltanoModels
+from flext_meltano import m
 from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 # Create source parameters
@@ -76,7 +76,7 @@ if commands_result.is_success:
 All methods return `r[T]` for type-safe error handling:
 
 ```python
-# Example: Chain operations with FlextResult
+# Example: Chain operations with r
 result = (
     FlextMeltanoSingerCliTranslator
     .translate_tap_run(tap_params)
@@ -98,15 +98,9 @@ from __future__ import annotations
 import json
 import subprocess
 
-from flext_core import FlextResult
+from flext_core import r
 
-from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
-
-# Import aliases for concise usage
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-r = FlextResult
+from flext_meltano import c, m, t
 
 
 class FlextMeltanoSingerCliTranslator:
@@ -118,7 +112,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_tap_run(
-        params: FlextMeltanoModels.Meltano.CliParameters.DataSourceParams,
+        params: m.Meltano.CliParameters.DataSourceParams,
     ) -> r[list[str]]:
         """Convert DataSourceParams to Singer SDK source CLI command.
 
@@ -151,7 +145,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_target_run(
-        params: FlextMeltanoModels.Meltano.CliParameters.DataSinkParams,
+        params: m.Meltano.CliParameters.DataSinkParams,
     ) -> r[list[str]]:
         """Convert DataSinkParams to Singer SDK sink CLI command.
 
@@ -174,7 +168,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def translate_pipeline_run(
-        params: FlextMeltanoModels.Meltano.CliParameters.PipelineParams,
+        params: m.Meltano.CliParameters.PipelineParams,
     ) -> r[tuple[list[str], list[str]]]:
         """Convert PipelineParams to source and sink CLI commands.
 
@@ -254,7 +248,7 @@ class FlextMeltanoSingerCliTranslator:
         command: list[str],
         input_data: str | None = None,
         timeout: int = 300,
-    ) -> r[t.CLI.ProcessResult]:
+    ) -> r[t.Meltano.CLI.ProcessResult]:
         """Execute Singer SDK command and capture output.
 
         Args:
@@ -268,7 +262,7 @@ class FlextMeltanoSingerCliTranslator:
         """
         # Validate command to prevent execution of untrusted input
         if not command:
-            return r[t.CLI.ProcessResult].fail(
+            return r[t.Meltano.CLI.ProcessResult].fail(
                 "Invalid command: must be non-empty list",
             )
 
@@ -280,7 +274,7 @@ class FlextMeltanoSingerCliTranslator:
                     return False
 
         if not all(is_string_argument(arg) for arg in command):
-            return r[t.CLI.ProcessResult].fail(
+            return r[t.Meltano.CLI.ProcessResult].fail(
                 "Invalid command: all arguments must be strings",
             )
 
@@ -298,7 +292,7 @@ class FlextMeltanoSingerCliTranslator:
             )
 
             # Return execution results
-            output_dict: t.CLI.ProcessResult = {
+            output_dict: t.Meltano.CLI.ProcessResult = {
                 "stdout": proc_result.stdout.decode() if proc_result.stdout else "",
                 "stderr": proc_result.stderr.decode() if proc_result.stderr else "",
                 "returncode": proc_result.returncode,
@@ -309,11 +303,11 @@ class FlextMeltanoSingerCliTranslator:
                 stderr_msg = str(
                     output_dict.get("stderr", "Command execution failed"),
                 )
-                return r[t.CLI.ProcessResult].fail(stderr_msg)
+                return r[t.Meltano.CLI.ProcessResult].fail(stderr_msg)
 
-            return r[t.CLI.ProcessResult].ok(output_dict)
+            return r[t.Meltano.CLI.ProcessResult].ok(output_dict)
         except subprocess.TimeoutExpired as e:
-            return r[t.CLI.ProcessResult].fail(f"Command timeout: {e}")
+            return r[t.Meltano.CLI.ProcessResult].fail(f"Command timeout: {e}")
         except (
             ValueError,
             TypeError,
@@ -323,7 +317,7 @@ class FlextMeltanoSingerCliTranslator:
             RuntimeError,
             ImportError,
         ) as e:
-            return r[t.CLI.ProcessResult].fail(f"Command execution failed: {e}")
+            return r[t.Meltano.CLI.ProcessResult].fail(f"Command execution failed: {e}")
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

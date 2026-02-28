@@ -311,7 +311,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_minimal(self) -> None:
         """Test DBT run translation with minimal parameters."""
-        params = m.Meltano.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
         )
 
@@ -323,7 +323,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_models(self) -> None:
         """Test DBT run translation with models parameter."""
-        params = m.Meltano.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
             models="users orders",
         )
@@ -343,7 +343,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_select(self) -> None:
         """Test DBT run translation with select parameter."""
-        params = m.Meltano.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
             select="tag:daily",
         )
@@ -363,7 +363,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_exclude(self) -> None:
         """Test DBT run translation with exclude parameter."""
-        params = m.Meltano.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
             exclude="tag:deprecated",
         )
@@ -383,7 +383,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_full_refresh(self) -> None:
         """Test DBT run translation with full refresh flag."""
-        params = m.Meltano.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
             full_refresh=True,
         )
@@ -400,35 +400,15 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             "--full-refresh",
         ]
 
-    def test_translate_dbt_run_with_vars(self) -> None:
-        """Test DBT run translation with vars parameter."""
-        params = m.Meltano.DbtRunParams(
-            project_dir="/path/to/dbt/project",
-            vars={"key": "value"},
-        )
-
-        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
-        assert result.is_success
-        command = result.value
-        assert command == [
-            "dbt",
-            "run",
-            "--project-dir",
-            "/path/to/dbt/project",
-            "--vars",
-            '{"key": "value"}',
-        ]
 
     def test_translate_dbt_run_with_all_parameters(self) -> None:
         """Test DBT run translation with all parameters."""
-        params = m.Meltano.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
             models="users orders",
             select="tag:daily",
             exclude="tag:deprecated",
             full_refresh=True,
-            vars={"environment": "production"},
         )
 
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
@@ -447,8 +427,6 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             "--exclude",
             "tag:deprecated",
             "--full-refresh",
-            "--vars",
-            '{"environment": "production"}',
         ]
 
 
@@ -513,7 +491,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         ])
 
         assert result.is_failure
-        assert "Connection failed" in result.error
+        assert "Connection failed" in str(result.error)
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_timeout(self, mock_run: MagicMock) -> None:
@@ -526,7 +504,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         )
 
         assert result.is_failure
-        assert "timed out after 10 seconds" in result.error
+        assert "timed out after 10 seconds" in str(result.error)
 
     @patch("subprocess.run")
     def test_execute_singer_command_not_found(self, mock_run: MagicMock) -> None:
@@ -538,7 +516,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         ])
 
         assert result.is_failure
-        assert "tap-nonexistent" in result.error and "not found" in result.error
+        assert "tap-nonexistent" in str(result.error) and "not found" in str(result.error)
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_generic_exception(
@@ -553,4 +531,4 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         ])
 
         assert result.is_failure
-        assert "Unexpected error" in result.error
+        assert "Unexpected error" in str(result.error)

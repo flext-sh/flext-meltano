@@ -11,16 +11,13 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextResult, FlextRuntime, FlextService
+from flext_core import FlextRuntime, r, s
 from singer_sdk import Stream, Tap
 
 from flext_meltano import FlextMeltanoSettings, m, t
 
-# Result alias
-r = FlextResult
 
-
-class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
+class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
     """UNIFIED Source Abstractions class consolidating ALL source functionality.
 
     This single class provides:
@@ -49,14 +46,14 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         source_config: m.Meltano.DataSourceConfig
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
-    ) -> r[t.Singer.StreamCatalog]:
+    ) -> r[t.Meltano.Singer.StreamCatalog]:
         """Discover available streams for a source configuration.
 
         Args:
         source_config: Source configuration with discovery parameters
 
         Returns:
-        FlextResult containing discovered stream catalog
+        r containing discovered stream catalog
 
         """
         try:
@@ -73,12 +70,12 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
 
             # Validate source configuration
             if not source_type_val:
-                return r[t.Singer.StreamCatalog].fail(
+                return r[t.Meltano.Singer.StreamCatalog].fail(
                     "Source configuration must have name and type for discovery",
                 )
 
             # Return empty catalog - would integrate with actual Singer taps
-            catalog: t.Singer.StreamCatalog = {"streams": []}
+            catalog: t.Meltano.Singer.StreamCatalog = {"streams": []}
 
             streams = catalog.get("streams", [])
             self.logger.info(
@@ -86,7 +83,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
                 stream_count=len(streams),
             )
 
-            return r[t.Singer.StreamCatalog].ok(catalog)
+            return r[t.Meltano.Singer.StreamCatalog].ok(catalog)
 
         except (
             ValueError,
@@ -98,7 +95,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             ImportError,
         ) as e:
             self.logger.exception("Stream discovery failed", error=str(e))
-            return r[t.Singer.StreamCatalog].fail(f"Stream discovery failed: {e}")
+            return r[t.Meltano.Singer.StreamCatalog].fail(
+                f"Stream discovery failed: {e}"
+            )
 
     def validate_stream_schema(
         self,
@@ -110,7 +109,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         stream_def: Stream definition to validate
 
         Returns:
-        FlextResult containing validation result
+        r containing validation result
 
         """
         try:
@@ -155,7 +154,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         source_config: Source configuration
 
         Returns:
-        FlextResult containing configured source instance
+        r containing configured source instance
 
         """
         try:
@@ -179,10 +178,28 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             # Create unique source identifier
             source_id = f"{source_type}:{source_identifier}"
 
+            # Ensure config is exactly DataSourceConfig for the model
+            if isinstance(source_config, m.Meltano.DataSourceConfig):
+                config = source_config
+            elif isinstance(source_config, m.Meltano.TapConfig):
+                config = m.Meltano.DataSourceConfig(
+                    source_type=source_config.tap_type,
+                    connection_config=source_config.connection_config,
+                    stream_config=source_config.stream_config or {},
+                    source_version=source_config.tap_version,
+                )
+            else:
+                config = m.Meltano.DataSourceConfig(
+                    source_type=source_config.tap_type,
+                    connection_config=source_config.config.connection_config,
+                    stream_config=source_config.config.stream_config or {},
+                    source_version=source_config.config.tap_version,
+                )
+
             # Create source instance
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
-                config=source_config,
+                config=config,
                 status="configured",
                 source_id=source_id,
             )
@@ -220,7 +237,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         source_config: Source configuration to process
 
         Returns:
-        FlextResult containing validation result
+        r containing validation result
 
         """
         try:
@@ -259,15 +276,15 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
     @override
-    def execute(self) -> r[t.Singer.StreamCatalog]:
+    def execute(self) -> r[t.Meltano.Singer.StreamCatalog]:
         """Execute source abstraction operations (implements Service).
 
         Returns:
-            FlextResult containing empty stream catalog ready for discovery
+            r containing empty stream catalog ready for discovery
 
         """
         # Return empty catalog ready for stream discovery
-        return r[t.Singer.StreamCatalog].ok({"streams": []})
+        return r[t.Meltano.Singer.StreamCatalog].ok({"streams": []})
 
     def generate_catalog(
         self,
@@ -281,7 +298,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             source_config: Source configuration or instance
 
         Returns:
-            FlextResult containing the generated catalog dictionary
+            r containing the generated catalog dictionary
 
         """
         # Placeholder implementation
@@ -304,7 +321,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             target: Optional target configuration or instance
 
         Returns:
-            FlextResult containing synchronization statistics
+            r containing synchronization statistics
 
         """
         # Placeholder implementation
@@ -319,9 +336,9 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: dict[str, t.GeneralValueType],
-        stream_config: dict[str, t.GeneralValueType] | None = None,
-        **kwargs: t.GeneralValueType,
+        connection_config: dict[str, t.JsonValue],
+        stream_config: dict[str, t.JsonValue] | None = None,
+        **kwargs: t.JsonValue,
     ) -> r[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data.
 
@@ -329,9 +346,10 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
             tap_type: Type of the tap
             connection_config: Raw connection configuration
             stream_config: Optional stream configuration
+            kwargs: Additional configuration (e.g., tap_version)
 
         Returns:
-            FlextResult containing the created TapInstance
+            r containing the created TapInstance
 
         """
         try:
@@ -339,7 +357,7 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
                 tap_type=tap_type,
                 connection_config=connection_config,
                 stream_config=stream_config or {},
-                **kwargs,
+                **kwargs,  # type: ignore[arg-type]
             )
             return self.create_source_instance(config).map(
                 lambda inst: m.Meltano.TapInstance(

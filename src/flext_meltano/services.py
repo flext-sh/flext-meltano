@@ -12,9 +12,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import override
 
-from flext_core import FlextContainer, e, r, s, u
+from flext_core import FlextContainer, e, r, s
 
-from flext_meltano import FlextMeltanoSettings, t
+from flext_meltano import FlextMeltanoSettings, t, u
 
 
 class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
@@ -302,9 +302,9 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
     # UTILITY METHODS - Generic utility operations following SOLID principles
     # ============================================================================
 
-    def get_info(self) -> r[t.Meltano.Plugin.PluginInfo]:
+    def get_info(self) -> r[t.Meltano.PluginInfo]:
         """Get service information."""
-        return r[t.Meltano.Plugin.PluginInfo].ok({
+        return r[t.Meltano.PluginInfo].ok({
             "name": self.service_name,
             "version": self.version,
             "type": "pipeline_service",

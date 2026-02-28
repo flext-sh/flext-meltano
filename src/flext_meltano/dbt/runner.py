@@ -12,10 +12,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_core import r, s, t
+from flext_core import r, s
 from pydantic import BaseModel, ConfigDict, Field
 
-from flext_meltano import FlextMeltanoTypes as mt
+from flext_meltano import t
 
 
 class DbtRunResult(BaseModel):
@@ -164,7 +164,7 @@ class FlextMeltanoDbtRunner(s[str]):
     def docs_generate(
         self,
         **_kwargs: t.GeneralValueType,
-    ) -> r[mt.Meltano.ExecutionResultDict]:
+    ) -> r[t.Meltano.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -176,7 +176,7 @@ class FlextMeltanoDbtRunner(s[str]):
         """
         try:
             if not self.project_root:
-                return r[mt.Meltano.ExecutionResultDict].fail("No project root set")
+                return r[t.Meltano.ExecutionResultDict].fail("No project root set")
 
             self.logger.info(
                 "Generating DBT documentation",
@@ -184,13 +184,13 @@ class FlextMeltanoDbtRunner(s[str]):
             )
 
             # DBT docs generate would be executed here
-            result: mt.Meltano.ExecutionResultDict = {
+            result: t.Meltano.ExecutionResultDict = {
                 "status": "completed",
                 "docs_path": str(self.project_root / "target" / "index.html"),
             }
 
             self.logger.info("DBT documentation generated")
-            return r[mt.Meltano.ExecutionResultDict].ok(result)
+            return r[t.Meltano.ExecutionResultDict].ok(result)
         except (
             ValueError,
             TypeError,
@@ -201,7 +201,7 @@ class FlextMeltanoDbtRunner(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[mt.Meltano.ExecutionResultDict].fail(
+            return r[t.Meltano.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",
             )
 

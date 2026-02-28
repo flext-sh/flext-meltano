@@ -13,6 +13,9 @@ from unittest.mock import patch
 
 from flext_meltano import FlextMeltanoUtilities, t, u
 
+# Alias to the Meltano sub-namespace where utility classmethods reside
+mu = FlextMeltanoUtilities.Meltano
+
 
 class TestFlextMeltanoUtilitiesEnhanced:
     """Enhanced tests for FlextMeltanoUtilities class."""
@@ -24,9 +27,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_success(self) -> None:
         """Test successful Meltano config dictionary creation."""
-        utilities = FlextMeltanoUtilities()
-
-        result = utilities.create_meltano_config_dict(
+        result = mu.create_meltano_config_dict(
             project_id="test-project",
             version="1.0.0",
             default_environment="dev",
@@ -43,14 +44,12 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_plugins(self) -> None:
         """Test Meltano config dictionary creation with plugins."""
-        utilities = FlextMeltanoUtilities()
-
-        plugins: dict[str, t.GeneralValueType] = {
+        plugins: dict[str, t.JsonValue] = {
             "extractors": [{"name": "tap-postgres"}],
             "loaders": [{"name": "target-csv"}],
         }
 
-        result = utilities.create_meltano_config_dict(
+        result = mu.create_meltano_config_dict(
             project_id="etl-project",
             plugins=plugins,
         )
@@ -77,14 +76,12 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
-        utilities = FlextMeltanoUtilities()
-
-        environments: dict[str, t.GeneralValueType] = {
+        environments: dict[str, t.JsonValue] = {
             "dev": {"plugins": {"extractors": []}},
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
 
-        config_result = utilities.create_meltano_config_dict(
+        config_result = mu.create_meltano_config_dict(
             project_id="multi-env-project",
             environments=environments,
         )
@@ -113,11 +110,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
         self,
     ) -> None:
         """Test Meltano config dictionary creation converts numeric project_id to string."""
-        utilities = FlextMeltanoUtilities()
-
         # Numeric project_id is converted to string by str() in implementation
         # Type hint says str but we pass int to test coercion behavior
-        result = utilities.create_meltano_config_dict(
+        result = mu.create_meltano_config_dict(
             project_id=123,
             project_name="test-project",
             version="1.0.0",
@@ -132,8 +127,6 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
@@ -143,22 +136,20 @@ class TestFlextMeltanoUtilitiesEnhanced:
             (project_path / ".meltano" / "config").mkdir()
             (project_path / ".meltano" / "logs").mkdir()
 
-            result = utilities.validate_project_structure(project_path)
+            result = mu.validate_project_structure(project_path)
 
             assert result.is_success
             assert result.value is not None
 
     def test_validate_project_structure_missing_pipeline_yml(self) -> None:
         """Test project structure validation with missing pipeline.yml."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
             # Create .meltano directory but not meltano.yml
             (project_path / ".meltano").mkdir()
 
-            result = utilities.validate_project_structure(project_path)
+            result = mu.validate_project_structure(project_path)
 
             assert result.is_failure
             assert result.error is not None
@@ -166,15 +157,13 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_validate_project_structure_missing_meltano_dir(self) -> None:
         """Test project structure validation with missing .meltano directory."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
             # Create pipeline.yml but not .meltano directory
             (project_path / "pipeline.yml").write_text("project_id: test")
 
-            result = utilities.validate_project_structure(project_path)
+            result = mu.validate_project_structure(project_path)
 
             # Current implementation only checks for pipeline.yml existence
             assert result.is_success
@@ -182,9 +171,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_validate_project_structure_nonexistent_path(self) -> None:
         """Test project structure validation with nonexistent path."""
-        utilities = FlextMeltanoUtilities()
-
-        result = utilities.validate_project_structure(Path("/nonexistent/path"))
+        result = mu.validate_project_structure(Path("/nonexistent/path"))
 
         assert result.is_failure
         assert result.error is not None
@@ -192,17 +179,15 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_project_file_success(self) -> None:
         """Test successful project file creation."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
-            content: dict[str, t.GeneralValueType] = {
+            content: dict[str, t.JsonValue] = {
                 "project_id": "test-project",
                 "version": "1.0.0",
             }
 
-            result = utilities.create_project_file(
+            result = mu.create_project_file(
                 project_path / "pipeline.yml",
                 content,
             )
@@ -216,13 +201,11 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_project_file_directory_not_exists(self) -> None:
         """Test project file creation in non-existent directory."""
-        utilities = FlextMeltanoUtilities()
-
         # Try to create file in non-existent directory
         file_path = Path("/nonexistent/directory/pipeline.yml")
-        content: dict[str, t.GeneralValueType] = {"project_id": "test"}
+        content: dict[str, t.JsonValue] = {"project_id": "test"}
 
-        result = utilities.create_project_file(
+        result = mu.create_project_file(
             file_path,
             content,
         )
@@ -233,15 +216,13 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_project_file_invalid_content_type(self) -> None:
         """Test project file creation with invalid content type."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
-            # Pass invalid content (not dict[str, t.GeneralValueType] or string)
+            # Pass invalid content (not dict[str, t.JsonValue] or string)
             # Using integer directly - runtime will handle the type mismatch
             invalid_content: object = 123
-            result = utilities.create_project_file(
+            result = mu.create_project_file(
                 project_path / "test.yml",
                 invalid_content,
             )
@@ -252,8 +233,6 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_load_yaml_file_success(self) -> None:
         """Test successful YAML file loading."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "config.yml"
 
@@ -261,7 +240,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             with yaml_file.open("w", encoding="utf-8") as f:
                 f.write("project_id: test-project\nversion: 1.0.0\n")
 
-            result = utilities.load_yaml_file(yaml_file)
+            result = mu.load_yaml_config(yaml_file)
 
             assert result.is_success
             assert result.value["project_id"] == "test-project"
@@ -269,8 +248,6 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_load_yaml_file_invalid_format(self) -> None:
         """Test YAML file loading with invalid format."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "invalid.yml"
 
@@ -278,7 +255,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             with yaml_file.open("w", encoding="utf-8") as f:
                 f.write("invalid: yaml: content: [")
 
-            result = utilities.load_yaml_file(yaml_file)
+            result = mu.load_yaml_config(yaml_file)
 
             assert result.is_failure
             assert result.error is not None
@@ -286,9 +263,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_load_yaml_file_nonexistent(self) -> None:
         """Test YAML file loading with nonexistent file."""
-        utilities = FlextMeltanoUtilities()
-
-        result = utilities.load_yaml_file(Path("/nonexistent/file.yml"))
+        result = mu.load_yaml_config(Path("/nonexistent/file.yml"))
 
         assert result.is_failure
         assert result.error is not None
@@ -296,16 +271,14 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_save_yaml_file_success(self) -> None:
         """Test successful YAML file saving."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "output.yml"
-            content: dict[str, t.GeneralValueType] = {
+            content: t.Meltano.MeltanoConfigDict = {
                 "project_id": "save-test",
                 "version": "2.0.0",
             }
 
-            result = utilities.save_yaml_file(yaml_file, content)
+            result = mu.write_meltano_yml(content, yaml_file)
 
             assert result.is_success
             assert yaml_file.exists()
@@ -317,54 +290,46 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_save_yaml_file_invalid_content(self) -> None:
         """Test YAML file saving with invalid content."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "output.yml"
 
             # Try to save content with object (YAML can serialize but not deserialize)
-            content_with_object = {"data": object()}
+            content_with_object: t.Meltano.MeltanoConfigDict = {"data": object()}
 
-            result = utilities.save_yaml_file(yaml_file, content_with_object)
+            result = mu.write_meltano_yml(content_with_object, yaml_file)
 
             # Save should succeed
             assert result.is_success
             assert yaml_file.exists()
 
             # But loading should fail
-            load_result = utilities.load_yaml_file(yaml_file)
+            load_result = mu.load_yaml_config(yaml_file)
             assert load_result.is_failure
             assert load_result.error is not None
             assert "YAML" in str(load_result.error) or "yaml" in str(load_result.error)
 
     def test_directory_exists_success(self) -> None:
         """Test successful directory existence check."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
-            result = utilities.directory_exists(Path(temp_dir))
+            result = mu.directory_exists(Path(temp_dir))
 
             assert result.is_success
             assert result.value is True
 
     def test_directory_exists_failure(self) -> None:
         """Test directory existence check with nonexistent directory."""
-        utilities = FlextMeltanoUtilities()
-
-        result = utilities.directory_exists(Path("/nonexistent/directory"))
+        result = mu.directory_exists(Path("/nonexistent/directory"))
 
         assert result.is_success
         assert result.value is False
 
     def test_directory_exists_file_instead_of_directory(self) -> None:
         """Test directory existence check with file instead of directory."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file.write(b"test content")
             temp_file_path = Path(temp_file.name)
 
-            result = utilities.directory_exists(temp_file_path)
+            result = mu.directory_exists(temp_file_path)
 
             assert result.is_success
             assert result.value is False
@@ -374,13 +339,11 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_utilities_handle_file_operation_errors_gracefully(self) -> None:
         """Test that utilities handle file operation errors gracefully."""
-        utilities = FlextMeltanoUtilities()
-
         # Test with a path that causes permission errors
         with patch("pathlib.Path.exists") as mock_exists:
             mock_exists.side_effect = OSError("Permission denied")
 
-            result = utilities.directory_exists(Path("/restricted/path"))
+            result = mu.directory_exists(Path("/restricted/path"))
 
             assert result.is_failure
             assert result.error is not None
@@ -388,9 +351,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_none_values(self) -> None:
         """Test Meltano config dictionary creation with None values."""
-        utilities = FlextMeltanoUtilities()
-
-        result = utilities.create_meltano_config_dict(
+        result = mu.create_meltano_config_dict(
             project_id="test-project",
             project_name="Test Project",
         )
@@ -406,9 +367,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_empty_strings(self) -> None:
         """Test Meltano config dictionary creation with empty strings."""
-        utilities = FlextMeltanoUtilities()
-
-        result = utilities.create_meltano_config_dict(
+        result = mu.create_meltano_config_dict(
             project_id="test-project",
             project_name="",
         )
@@ -422,8 +381,6 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_validate_project_structure_with_subdirectories(self) -> None:
         """Test project structure validation with additional subdirectories."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
@@ -436,21 +393,19 @@ class TestFlextMeltanoUtilitiesEnhanced:
             (project_path / "transform").mkdir()
             (project_path / "extract").mkdir()
 
-            result = utilities.validate_project_structure(project_path)
+            result = mu.validate_project_structure(project_path)
 
             assert result.is_success
             assert result.value is not None
 
     def test_create_project_file_with_string_content(self) -> None:
         """Test project file creation with string content."""
-        utilities = FlextMeltanoUtilities()
-
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
 
             content = "project_id: test-project\nversion: 1.0.0"
 
-            result = utilities.create_project_file(project_path / "config.yml", content)
+            result = mu.create_project_file(project_path / "config.yml", content)
 
             assert result.is_success
             assert (project_path / "config.yml").exists()

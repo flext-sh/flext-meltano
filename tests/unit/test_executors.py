@@ -32,7 +32,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test executor with custom configuration."""
         with tempfile.TemporaryDirectory() as temp_dir:
             config = {"project_root": temp_dir}
-            executor = FlextMeltanoExecutor(config=config)
+            executor = FlextMeltanoExecutor(config=config)  # type: ignore[arg-type]
             assert executor is not None
 
     def test_bridge_property_lazy_loading(self) -> None:
@@ -504,7 +504,7 @@ class TestFlextMeltanoExecutorComplete:
 
         for command, args in edge_case_commands:
             try:
-                result = self.executor._execute_command(command, args)
+                result = self.executor._route_command(command, args)
                 assert isinstance(result, r)
                 # Should handle all command scenarios
             except Exception as e:
@@ -553,7 +553,7 @@ class TestFlextMeltanoExecutorComplete:
 
         for args in run_command_tests:
             try:
-                result = self.executor._handle_run_command(args)
+                result = self.executor._handle_default_command(["run"] + args)
                 assert isinstance(result, r)
                 # May succeed or fail depending on arguments
             except Exception as e:
@@ -565,7 +565,7 @@ class TestFlextMeltanoExecutorComplete:
 
         # Test _print_help method (should not return anything)
         try:
-            self.executor._print_help()
+            self.executor.help()
             # Method returns None, just ensure it doesn't crash
         except Exception as e:
             # May fail in some environments
@@ -641,7 +641,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict[str, t.GeneralValueType] before dictionary operations
+        # Type guard: verify cli_app is a dict[str, t.JsonValue] before dictionary operations
         if isinstance(cli_app, dict):
             assert "name" in cli_app, "CLI should have name property"
             assert "executor" in cli_app, "CLI should have executor property"
@@ -669,7 +669,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict[str, t.GeneralValueType] before dictionary operations
+        # Type guard: verify cli_app is a dict[str, t.JsonValue] before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
             # The "executor" key is a string "self", use the actual executor instance
@@ -738,7 +738,7 @@ class TestFlextMeltanoExecutorComplete:
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"
         cli_app = cli_result.value
 
-        # Type guard: verify cli_app is a dict[str, t.GeneralValueType] before dictionary operations
+        # Type guard: verify cli_app is a dict[str, t.JsonValue] before dictionary operations
         if isinstance(cli_app, dict):
             assert "executor" in cli_app
             # The "executor" key is a string "self", use the actual executor instance

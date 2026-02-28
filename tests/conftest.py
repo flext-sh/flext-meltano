@@ -14,7 +14,7 @@ import os
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import pytest
 import yaml
@@ -28,9 +28,9 @@ class CliRunnerProtocol(Protocol):
 
     def invoke(
         self,
-        *args: t.GeneralValueType,
-        **kwargs: t.GeneralValueType,
-    ) -> t.GeneralValueType:
+        *args: t.JsonValue,
+        **kwargs: t.JsonValue,
+    ) -> t.JsonValue:
         """Invoke CLI command."""
 
 
@@ -59,7 +59,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> dict[str, t.GeneralValueType]:
+def meltano_yml_config() -> dict[str, t.JsonValue]:
     """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
@@ -122,8 +122,8 @@ def meltano_yml_config() -> dict[str, t.GeneralValueType]:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: dict[str, t.GeneralValueType],
-) -> dict[str, t.GeneralValueType]:
+    meltano_yml_config: dict[str, t.JsonValue],
+) -> dict[str, Any]:
     """Meltano project for testing."""
     # Create pipeline.yml
 
@@ -131,7 +131,7 @@ def meltano_project(
     with meltano_yml.open("w", encoding="utf-8") as f:
         yaml.dump(meltano_yml_config, f)
 
-    # Return simple dict[str, t.GeneralValueType] instead of missing MeltanoProject class
+    # Return simple dict[str, Any] instead of missing MeltanoProject class
     return {
         "name": "test-project",
         "directory": test_meltano_project_dir,
@@ -144,7 +144,7 @@ def meltano_project(
 
 # Plugin fixtures
 @pytest.fixture
-def tap_csv_config() -> dict[str, t.GeneralValueType]:
+def tap_csv_config() -> dict[str, t.JsonValue]:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -159,7 +159,7 @@ def tap_csv_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def target_csv_config() -> dict[str, t.GeneralValueType]:
+def target_csv_config() -> dict[str, t.JsonValue]:
     """Target CSV configuration for testing."""
     return {
         "destination_path": "output",
@@ -183,9 +183,9 @@ class MockCliRunner:
 
     @staticmethod
     def invoke(
-        *_args: t.GeneralValueType,
-        **_kwargs: t.GeneralValueType,
-    ) -> t.GeneralValueType:
+        *_args: Any,
+        **_kwargs: Any,
+    ) -> Any:
         """Mock invoke method."""
         return type("Result", (), {"exit_code": 0, "output": ""})()
 
@@ -204,7 +204,7 @@ def meltano_invoke_args() -> list[str]:
 
 # Singer protocol fixtures
 @pytest.fixture
-def singer_schema() -> dict[str, t.GeneralValueType]:
+def singer_schema() -> dict[str, t.JsonValue]:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -223,7 +223,7 @@ def singer_schema() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def singer_records() -> list[dict[str, t.GeneralValueType]]:
+def singer_records() -> list[dict[str, t.JsonValue]]:
     """Sample Singer records for testing."""
     return [
         {
@@ -250,7 +250,7 @@ def singer_records() -> list[dict[str, t.GeneralValueType]]:
 
 
 @pytest.fixture
-def singer_state() -> dict[str, t.GeneralValueType]:
+def singer_state() -> dict[str, t.JsonValue]:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -267,7 +267,7 @@ def singer_state() -> dict[str, t.GeneralValueType]:
 
 # Pipeline execution fixtures
 @pytest.fixture
-def pipeline_execution_config() -> dict[str, t.GeneralValueType]:
+def pipeline_execution_config() -> dict[str, t.JsonValue]:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -281,7 +281,7 @@ def pipeline_execution_config() -> dict[str, t.GeneralValueType]:
 
 # Environment fixtures
 @pytest.fixture
-def test_environment_config() -> dict[str, t.GeneralValueType]:
+def test_environment_config() -> dict[str, t.JsonValue]:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -297,7 +297,7 @@ def test_environment_config() -> dict[str, t.GeneralValueType]:
 
 # Schedule fixtures
 @pytest.fixture
-def sample_schedule_config() -> dict[str, t.GeneralValueType]:
+def sample_schedule_config() -> dict[str, t.JsonValue]:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -311,7 +311,7 @@ def sample_schedule_config() -> dict[str, t.GeneralValueType]:
 
 # Job fixtures
 @pytest.fixture
-def job_run_config() -> dict[str, t.GeneralValueType]:
+def job_run_config() -> dict[str, t.JsonValue]:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -388,19 +388,19 @@ class MockMeltanoService:
 
     @staticmethod
     def create_project(
-        _config: dict[str, t.GeneralValueType],
-    ) -> dict[str, t.GeneralValueType]:
+        _config: dict[str, t.JsonValue],
+    ) -> dict[str, t.JsonValue]:
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
     def install_plugin(
         _plugin_type: str,
         plugin_name: str,
-    ) -> dict[str, t.GeneralValueType]:
+    ) -> dict[str, t.JsonValue]:
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
-    def run_pipeline(_extractor: str, _loader: str) -> dict[str, t.GeneralValueType]:
+    def run_pipeline(_extractor: str, _loader: str) -> dict[str, t.JsonValue]:
         return {"execution_id": "test-execution", "status": "running"}
 
 
@@ -413,16 +413,16 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, config: dict[str, t.GeneralValueType]) -> None:
+    def __init__(self, config: dict[str, t.JsonValue]) -> None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
-    def discover(self) -> dict[str, t.GeneralValueType]:
+    def discover(self) -> dict[str, t.JsonValue]:
         _ = self.config  # Use self to avoid PLR6301
         return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-    def extract(self) -> list[dict[str, t.GeneralValueType]]:
+    def extract(self) -> list[dict[str, t.JsonValue]]:
         _ = self.config  # Use self to avoid PLR6301
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -436,15 +436,15 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, config: dict[str, t.GeneralValueType]) -> None:
+    def __init__(self, config: dict[str, t.JsonValue]) -> None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
     def load(
         self,
-        records: list[dict[str, t.GeneralValueType]],
-    ) -> dict[str, t.GeneralValueType]:
+        records: list[dict[str, t.JsonValue]],
+    ) -> dict[str, t.JsonValue]:
         _ = self.config  # Use self to avoid PLR6301
         return {"records_loaded": len(records), "status": "success"}
 

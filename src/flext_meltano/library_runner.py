@@ -12,19 +12,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, r
 
-from flext_meltano import (
-    FlextMeltanoBridge,
-    FlextMeltanoExecutor,
-    t,
-)
-from flext_meltano.singer_protocols import FlextMeltanoSingerProtocols
-
-# Import aliases for simplified usage
-# Import aliases for simplified usage
-r = FlextResult
-singer_p = FlextMeltanoSingerProtocols
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
 
 
 class FlextMeltanoLibraryRunner:
@@ -43,10 +33,10 @@ class FlextMeltanoLibraryRunner:
 
     def run_elt_pipeline(
         self,
-        tap: singer_p.SingerTap,
-        target: singer_p.SingerTarget,
+        tap: p.Meltano.SingerTap,
+        target: p.Meltano.SingerTarget,
         config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Processing.EltPipelineResult]:
+    ) -> r[t.Meltano.Processing.EltPipelineResult]:
         """Run a complete ELT pipeline from tap to target.
 
         Args:
@@ -69,13 +59,13 @@ class FlextMeltanoLibraryRunner:
             result = self._executor.execute_pipeline(tap.name, target.name, config)
 
             if result.is_failure:
-                return r[t.Processing.EltPipelineResult].fail(
+                return r[t.Meltano.Processing.EltPipelineResult].fail(
                     result.error or "Pipeline execution failed",
                 )
 
             # Convert execution result to ELT pipeline result
             execution_result = result.value
-            elt_result: t.Processing.EltPipelineResult = {
+            elt_result: t.Meltano.Processing.EltPipelineResult = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
                 "target_name": target.name,
@@ -85,18 +75,18 @@ class FlextMeltanoLibraryRunner:
                 "error": execution_result.error,
             }
 
-            return r[t.Processing.EltPipelineResult].ok(elt_result)
+            return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.Processing.EltPipelineResult].fail(error_msg)
+            return r[t.Meltano.Processing.EltPipelineResult].fail(error_msg)
 
     def run_dbt_transformation(
         self,
         models: list[str] | None = None,
         project_dir: Path | None = None,
-    ) -> r[t.Processing.DbtTransformationResult]:
+    ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT transformations.
 
         Args:
@@ -115,12 +105,12 @@ class FlextMeltanoLibraryRunner:
             result = self._executor.execute_dbt_command("run", args)
 
             if result.is_failure:
-                return r[t.Processing.DbtTransformationResult].fail(
+                return r[t.Meltano.Processing.DbtTransformationResult].fail(
                     result.error or "DBT transformation failed",
                 )
 
             execution_result = result.value
-            dbt_result: t.Processing.DbtTransformationResult = {
+            dbt_result: t.Meltano.Processing.DbtTransformationResult = {
                 "success": execution_result.success,
                 "exit_code": execution_result.exit_code,
                 "models_run": models or ["all"],
@@ -131,12 +121,12 @@ class FlextMeltanoLibraryRunner:
                 "error": execution_result.error,
             }
 
-            return r[t.Processing.DbtTransformationResult].ok(dbt_result)
+            return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"DBT transformation failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.Processing.DbtTransformationResult].fail(error_msg)
+            return r[t.Meltano.Processing.DbtTransformationResult].fail(error_msg)
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ResultDict]:
@@ -186,7 +176,7 @@ class FlextMeltanoLibraryRunner:
         target_name: str,
         dbt_models: list[str] | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Processing.EltPipelineResult]:
+    ) -> r[t.Meltano.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations.
 
         Args:
@@ -210,12 +200,12 @@ class FlextMeltanoLibraryRunner:
             # Execute EL pipeline
             result = self._executor.execute_pipeline(tap_name, target_name, config)
             if result.is_failure:
-                return r[t.Processing.EltPipelineResult].fail(
+                return r[t.Meltano.Processing.EltPipelineResult].fail(
                     result.error or "EL pipeline execution failed",
                 )
 
             execution_result = result.value
-            elt_result: t.Processing.EltPipelineResult = {
+            elt_result: t.Meltano.Processing.EltPipelineResult = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,
@@ -235,12 +225,12 @@ class FlextMeltanoLibraryRunner:
                     elt_result["dbt_success"] = True
                     elt_result["dbt_models_run"] = dbt_models
 
-            return r[t.Processing.EltPipelineResult].ok(elt_result)
+            return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
 
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.Processing.EltPipelineResult].fail(error_msg)
+            return r[t.Meltano.Processing.EltPipelineResult].fail(error_msg)
 
 
 __all__ = ["FlextMeltanoLibraryRunner"]

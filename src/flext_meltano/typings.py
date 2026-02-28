@@ -17,11 +17,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
+from flext_cli import FlextCliTypes
 from flext_core import FlextTypes
 from singer_sdk import typing as singer_sdk_typing
 
 
-class FlextMeltanoTypes(FlextTypes):
+class FlextMeltanoTypes(FlextCliTypes):
     """Meltano-specific type definitions extending t.
 
     Domain-specific type system for Meltano data integration operations.
@@ -51,9 +52,21 @@ class FlextMeltanoTypes(FlextTypes):
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
         PluginVariant = Literal["default", "singer", "custom"]
 
-        # Namespace bridge so t.Meltano.Plugin.PluginDefinition resolves in type checkers.
-        class Plugin(Meltano):
-            """Compatibility namespace for plugin-related aliases."""
+        class _PluginMeta(type):
+            """Metaclass that proxies attribute access to the Meltano class."""
+
+            def __getattr__(cls, name: str) -> object:
+                # Resolve from the enclosing Meltano class
+                meltano_cls = FlextMeltanoTypes.Meltano
+                try:
+                    return getattr(meltano_cls, name)
+                except AttributeError:
+                    raise AttributeError(
+                        f"type object 'Plugin' has no attribute {name!r}"
+                    ) from None
+
+        class Plugin(metaclass=_PluginMeta):
+            """Plugin namespace bridging t.Meltano.* to t.Meltano.* types."""
 
         class Singer:
             """Singer protocol complex types namespace."""

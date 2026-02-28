@@ -135,14 +135,12 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         return r.ok(None)
 
     @staticmethod
-    def _find_required_plugins() -> r[
-        tuple[p.Meltano.PluginProtocol, p.Meltano.PluginProtocol]
-    ]:
+    def _find_required_plugins() -> r[tuple[p.Meltano.Plugin, p.Meltano.Plugin]]:
         """Find required plugins in t.Meltano.Dbt.Project."""
         return r[
             tuple[
-                p.Meltano.PluginProtocol,
-                p.Meltano.PluginProtocol,
+                p.Meltano.Plugin,
+                p.Meltano.Plugin,
             ]
         ].fail("Plugin discovery not configured")
 
@@ -151,7 +149,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         project_path: str,
         extractor_name: str,
         loader_name: str,
-        plugins: tuple[p.Meltano.PluginProtocol, p.Meltano.PluginProtocol],
+        plugins: tuple[p.Meltano.Plugin, p.Meltano.Plugin],
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Create ELT context for pipeline execution."""
         try:

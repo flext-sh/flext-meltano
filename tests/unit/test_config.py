@@ -29,7 +29,7 @@ class TestFlextMeltanoSettings:
         config.project_root = Path("/test/project")
         config.config_dir = Path(".meltano")
         config.logs_dir = Path("logs")
-        config.log_level = "INFO"  # Must be uppercase for enum validation
+        config.log_level = "INFO"  # type: ignore[assignment]
         config.meltano_version = "3.9.1"
         config.singer_sdk_version = "0.48.0"
         config.dbt_version = "1.10.5"

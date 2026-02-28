@@ -11,16 +11,16 @@ from pathlib import Path
 from typing import TextIO
 
 import yaml
+from flext_cli import FlextCliUtilities
 from flext_core import (
     FlextLogger,
-    FlextUtilities,
     r,
 )
 
 from flext_meltano import FlextMeltanoFileManagers, c, m, t
 
 
-class FlextMeltanoUtilities(FlextUtilities):
+class FlextMeltanoUtilities(FlextCliUtilities):
     """DOMAIN-SPECIFIC Meltano utilities.
 
     ONLY what cannot be generalized to flext-core.
@@ -41,13 +41,13 @@ class FlextMeltanoUtilities(FlextUtilities):
             project_name: str = "",
             version: str | None = None,
             default_environment: str | None = None,
-            plugins: t.MeltanoCore.MeltanoConfigDict | None = None,
-            environments: t.MeltanoCore.MeltanoConfigDict | None = None,
-        ) -> r[t.MeltanoCore.MeltanoConfigDict]:
+            plugins: t.Meltano.MeltanoConfigDict | None = None,
+            environments: t.Meltano.MeltanoConfigDict | None = None,
+        ) -> r[t.Meltano.MeltanoConfigDict]:
             """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
             try:
                 # DSL Builder pattern: compose config with defaults
-                raw_config: t.MeltanoCore.MeltanoConfigDict = {
+                raw_config: t.Meltano.MeltanoConfigDict = {
                     "project_id": project_id,
                     "project_name": project_name or project_id,
                     "version": version or 1,
@@ -77,7 +77,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                     {"values": cfg},
                 ).values
                 plugins_val = cfg_dict.get("plugins")
-                result_cfg: t.MeltanoCore.MeltanoConfigDict = {
+                result_cfg: t.Meltano.MeltanoConfigDict = {
                     "version": cfg_dict.get("version", 1),
                     "project_id": u.Text.safe_string(project_id_val),
                     "project_name": u.Text.safe_string(project_name_val),
@@ -100,7 +100,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                     result_cfg["default_environment"] = (
                         c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0]
                     )
-                return r[t.MeltanoCore.MeltanoConfigDict].ok(result_cfg)
+                return r[t.Meltano.MeltanoConfigDict].ok(result_cfg)
             except (
                 ValueError,
                 TypeError,
@@ -108,14 +108,14 @@ class FlextMeltanoUtilities(FlextUtilities):
                 AttributeError,
                 OSError,
             ) as err:
-                return r[t.MeltanoCore.MeltanoConfigDict].fail(
+                return r[t.Meltano.MeltanoConfigDict].fail(
                     f"Failed to create Meltano config dict: {err}",
                 )
 
         @classmethod
         def write_meltano_yml(
             cls,
-            config: t.MeltanoCore.MeltanoConfigDict,
+            config: t.Meltano.MeltanoConfigDict,
             target_path: Path,
         ) -> r[bool]:
             """Write MELTANO-SPECIFIC YAML configuration using monadic resource management.
@@ -206,7 +206,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         def _write_yaml_content(
             cls,
             file_handle: TextIO,
-            config: t.MeltanoCore.MeltanoConfigDict,
+            config: t.Meltano.MeltanoConfigDict,
         ) -> r[bool]:
             """Write YAML content to file handle."""
             if getattr(file_handle, "write", None) is None:
@@ -262,7 +262,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             namespace: str = "",
             pip_url: str = "",
             executable: str = "",
-        ) -> r[t.MeltanoCore.PluginConfigDict]:
+        ) -> r[t.Meltano.PluginConfigDict]:
             """Create MELTANO-SPECIFIC plugin config using DSL builder pattern."""
             # DSL Builder: compose plugin config with safe string processing
             raw: dict[str, t.JsonValue] = {
@@ -279,8 +279,8 @@ class FlextMeltanoUtilities(FlextUtilities):
 
             # Build config using DSL with process for string fields
             def build_plugin(
-                d: t.MeltanoCore.PluginConfigDict,
-            ) -> t.MeltanoCore.PluginConfigDict:
+                d: t.Meltano.PluginConfigDict,
+            ) -> t.Meltano.PluginConfigDict:
                 type_val = d.get("type", "extractor")
                 return {
                     "name": safe_str(d.get("name", "")),
@@ -304,10 +304,10 @@ class FlextMeltanoUtilities(FlextUtilities):
                 {"values": cfg},
             ).values
             result = build_plugin(cfg_dict)
-            return r[t.MeltanoCore.PluginConfigDict].ok(result)
+            return r[t.Meltano.PluginConfigDict].ok(result)
 
         @classmethod
-        def load_yaml_config(cls, path: Path) -> r[t.MeltanoCore.MeltanoConfigDict]:
+        def load_yaml_config(cls, path: Path) -> r[t.Meltano.MeltanoConfigDict]:
             """Load YAML config using monadic composition with resource management.
 
             Uses r monadic patterns to chain file loading, validation,
@@ -325,8 +325,8 @@ class FlextMeltanoUtilities(FlextUtilities):
             # Import here to avoid circular import
             # MONADIC COMPOSITION: Chain file operations with automatic error handling
             def convert_to_dict(
-                config_dict: t.MeltanoCore.FileConfigDict,
-            ) -> t.MeltanoCore.MeltanoConfigDict:
+                config_dict: t.Meltano.FileConfigDict,
+            ) -> t.Meltano.MeltanoConfigDict:
                 """Type-safe conversion from FileConfigDict to MeltanoConfigDict."""
                 return m.Meltano.ConfigMappingPayload.model_validate(
                     {"values": config_dict},
@@ -342,7 +342,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             return (
                 result
                 if result.is_success
-                else r[t.MeltanoCore.MeltanoConfigDict].fail(
+                else r[t.Meltano.MeltanoConfigDict].fail(
                     result.error or f"Loading YAML config from {path} failed",
                 )
             )
@@ -395,7 +395,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         @staticmethod
         def create_project_file(
             file_path: Path,
-            content: str | t.MeltanoCore.MeltanoConfigDict,
+            content: str | t.Meltano.MeltanoConfigDict,
         ) -> r[Path]:
             """Create a project file with content."""
             content_guard = u.guard(content, (str, dict), return_value=True)
@@ -414,7 +414,7 @@ class FlextMeltanoUtilities(FlextUtilities):
                 return r.fail(f"Failed to create project file: {err}")
 
         @classmethod
-        def load_yaml_file(cls, file_path: Path) -> r[t.MeltanoCore.MeltanoConfigDict]:
+        def load_yaml_file(cls, file_path: Path) -> r[t.Meltano.MeltanoConfigDict]:
             """Load YAML file."""
             return cls.load_yaml_config(file_path)
 
@@ -422,7 +422,7 @@ class FlextMeltanoUtilities(FlextUtilities):
         def save_yaml_file(
             cls,
             file_path: Path,
-            content: t.MeltanoCore.MeltanoConfigDict,
+            content: t.Meltano.MeltanoConfigDict,
         ) -> r[Path]:
             """Save content to YAML file."""
             result = cls.write_meltano_yml(content, file_path)
@@ -441,7 +441,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             ]
 
         @classmethod
-        def default_catalog(cls) -> list[t.Meltano.Plugin.PluginDefinition]:
+        def default_catalog(cls) -> list[t.Meltano.PluginDefinition]:
             """Provide default plugin catalog entries for discovery workflows."""
             return [
                 {
@@ -454,7 +454,7 @@ class FlextMeltanoUtilities(FlextUtilities):
             ]
 
         @classmethod
-        def get_all_plugins(cls) -> list[t.Meltano.Plugin.PluginDefinition]:
+        def get_all_plugins(cls) -> list[t.Meltano.PluginDefinition]:
             """Compatibility shim for existing discovery logic."""
             return cls.default_catalog()
 

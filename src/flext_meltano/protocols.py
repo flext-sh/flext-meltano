@@ -12,17 +12,12 @@ from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
-from flext_core import FlextProtocols, FlextTypes
 
-# Lazy import to break circular dependency - imported on-demand when needed
-# from flext_meltano.singer.protocols import (
-#     FlextMeltanoPluginProtocols,
-#     FlextMeltanoSingerProtocols,
-# )
+from flext_meltano import m, t
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):
-    """Unified Meltano protocols extending FlextProtocols.
+    """Unified Meltano protocols extending FlextCliProtocols.
 
     Extends p to inherit all foundation protocols (Result, Service, etc.)
     and adds Meltano/Singer/DBT-specific protocols in the Meltano namespace.
@@ -36,12 +31,12 @@ class FlextMeltanoProtocols(FlextCliProtocols):
     from flext_meltano import p
 
     # Foundation protocols (inherited)
-    result: FlextProtocols.Result[str]
-    service: FlextProtocols.Service[str]
+    result: FlextCliProtocols.Result[str]
+    service: FlextCliProtocols.Service[str]
 
     # Meltano-specific protocols
-    tap: FlextProtocols.Meltano.TapProtocol
-    target: FlextProtocols.Meltano.TargetProtocol
+    tap: FlextCliProtocols.Meltano.Tap
+    target: FlextCliProtocols.Meltano.Target
     """
 
     # =========================================================================
@@ -57,114 +52,114 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         """
 
         @runtime_checkable
-        class PluginProtocol(Protocol):
+        class Plugin(Protocol):
             """Meltano plugin interface with covariant return type."""
 
             # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
-            variants: Mapping[str, FlextTypes.JsonValue] | None
+            variants: Mapping[str, t.JsonValue] | None
 
-            def get_config(self) -> Mapping[str, FlextTypes.JsonValue]:
+            def get_config(self) -> Mapping[str, t.JsonValue]:
                 """Get plugin configuration."""
                 ...
 
             def validate_config(
                 self,
-                config: Mapping[str, FlextTypes.JsonValue],
+                config: Mapping[str, t.JsonValue],
             ) -> bool:
                 """Validate plugin configuration. # INTERFACE."""
                 ...
 
-            def execute(self, *args: FlextTypes.JsonValue) -> FlextTypes.JsonValue:
+            def execute(self, *args: t.JsonValue) -> t.JsonValue:
                 """Execute plugin with given arguments. # INTERFACE."""
                 ...
 
         @runtime_checkable
-        class StreamProtocol(Protocol):
+        class Stream(Protocol):
             """Singer stream interface with type safety."""
 
             name: str
             tap_stream_id: str
-            schema: FlextTypes.JsonValue
+            schema: t.JsonValue
 
-            def sync_records(self) -> FlextTypes.JsonValue:
+            def sync_records(self) -> t.JsonValue:
                 """Sync records from the stream. # INTERFACE."""
                 ...
 
-            def get_records(self) -> FlextTypes.JsonValue:
+            def get_records(self) -> t.JsonValue:
                 """Get records from the stream. # INTERFACE."""
                 ...
 
         @runtime_checkable
-        class TapProtocol(FlextProtocols.Service[FlextTypes.JsonValue], Protocol):
+        class Tap(FlextCliProtocols.Service[t.JsonValue], Protocol):
             """Singer Tap protocol extending Service for ELT operations."""
 
-            def discover(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def discover(self) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Discover catalog with r."""
                 ...
 
             def sync(
                 self,
-                catalog: FlextTypes.JsonValue,
-            ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+                catalog: t.JsonValue,
+            ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Sync data from source with r."""
                 ...
 
             @override
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Execute the tap extraction (implements Service)."""
                 ...
 
         @runtime_checkable
-        class TargetProtocol(FlextProtocols.Service[FlextTypes.JsonValue], Protocol):
+        class Target(FlextCliProtocols.Service[t.JsonValue], Protocol):
             """Singer Target protocol extending Service for ELT operations."""
 
             def handle_record(
                 self,
-                record: FlextTypes.JsonValue,
-            ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+                record: t.JsonValue,
+            ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Handle a single record with r."""
                 ...
 
             def handle_batch(
                 self,
-                records: list[FlextTypes.JsonValue],
-            ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+                records: list[t.JsonValue],
+            ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Handle a batch of records with r."""
                 ...
 
             @override
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Execute the target loading (implements Service)."""
                 ...
 
         @runtime_checkable
-        class DbtRunnerProtocol(FlextProtocols.Service[FlextTypes.JsonValue], Protocol):
+        class DbtRunner(FlextCliProtocols.Service[t.JsonValue], Protocol):
             """DBT Runner protocol extending Service for ELT operations."""
 
             def run(
                 self,
                 models: list[str],
-            ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Run DBT models with r."""
                 ...
 
             def test(
                 self,
                 models: list[str],
-            ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Test DBT models with r."""
                 ...
 
             @override
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Execute DBT transformations (implements Service)."""
                 ...
 
         @runtime_checkable
-        class ServiceCallProtocol(
-            FlextProtocols.Service[FlextTypes.JsonValue],
+        class ServiceCall(
+            FlextCliProtocols.Service[t.JsonValue],
             Protocol,
         ):
             """Service call protocol extending Service."""
@@ -172,18 +167,18 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             def call(
                 self,
                 operation: str,
-                payload: FlextTypes.JsonValue,
-            ) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+                payload: t.JsonValue,
+            ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Execute service call with r."""
                 ...
 
             @override
-            def execute(self) -> FlextProtocols.Result[FlextTypes.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Execute service operation (implements Service)."""
                 ...
 
         @runtime_checkable
-        class CLIManagerProtocol(Protocol):
+        class CLIManager(Protocol):
             """Base protocol for CLI managers."""
 
             def handle_command(self, args: list[str]) -> int:
@@ -191,7 +186,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         @runtime_checkable
-        class SingerManagerProtocol(Protocol):
+        class SingerManager(Protocol):
             """Protocol for Singer CLI manager."""
 
             def handle_command(self, args: list[str]) -> int:
@@ -207,7 +202,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         @runtime_checkable
-        class StatusManagerProtocol(Protocol):
+        class StatusManager(Protocol):
             """Protocol for Status CLI manager."""
 
             def handle_command(self, args: list[str]) -> int:
@@ -219,15 +214,15 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         @runtime_checkable
-        class CLIProtocol(Protocol):
+        class CLI(Protocol):
             """CLI protocol for manager composition - avoids circular imports."""
 
             # Manager attributes with proper protocol types
-            pipeline_manager: FlextMeltanoProtocols.Meltano.CLIManagerProtocol
-            singer_manager: FlextMeltanoProtocols.Meltano.SingerManagerProtocol
-            dbt_manager: FlextMeltanoProtocols.Meltano.CLIManagerProtocol
-            plugin_manager: FlextMeltanoProtocols.Meltano.CLIManagerProtocol
-            status_manager: FlextMeltanoProtocols.Meltano.StatusManagerProtocol
+            pipeline_manager: FlextMeltanoProtocols.Meltano.CLIManager
+            singer_manager: FlextMeltanoProtocols.Meltano.SingerManager
+            dbt_manager: FlextMeltanoProtocols.Meltano.CLIManager
+            plugin_manager: FlextMeltanoProtocols.Meltano.CLIManager
+            status_manager: FlextMeltanoProtocols.Meltano.StatusManager
 
             def show_banner(self) -> None:
                 """Show CLI banner."""
@@ -258,7 +253,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         @runtime_checkable
-        class MeltanoProjectProtocol(Protocol):
+        class Project(Protocol):
             """Meltano Project protocol for type-safe project operations.
 
             Represents the interface for a Meltano project object that can be
@@ -270,23 +265,23 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 """Get project root directory."""
                 ...
 
-            def find_plugins(self, plugin_type: str) -> list[FlextTypes.JsonValue]:
+            def find_plugins(self, plugin_type: str) -> list[t.JsonValue]:
                 """Find plugins of specified type."""
                 ...
 
         @runtime_checkable
-        class AdapterProtocol(Protocol):
+        class Adapter(Protocol):
             """Protocol for data adapters (tap/target/sink adapters).
 
             Represents the interface for adapters used in data extraction,
             loading, and transformation operations.
             """
 
-            def connect(self) -> FlextProtocols.Result[bool]:
+            def connect(self) -> FlextCliProtocols.Result[bool]:
                 """Establish connection to the data source/sink."""
                 ...
 
-            def disconnect(self) -> FlextProtocols.Result[bool]:
+            def disconnect(self) -> FlextCliProtocols.Result[bool]:
                 """Close connection to the data source/sink."""
                 ...
 
@@ -296,7 +291,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         @runtime_checkable
-        class IndexedPluginProtocol(Protocol):
+        class IndexedPlugin(Protocol):
             """Protocol for indexed plugin objects used in plugin discovery.
 
             Represents plugin metadata accessed via u.get() for attributes
@@ -314,7 +309,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             @property
-            def variants(self) -> Mapping[str, FlextTypes.JsonValue] | None:
+            def variants(self) -> Mapping[str, t.JsonValue] | None:
                 """Available variants."""
                 ...
 
@@ -322,6 +317,40 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             def logo_url(self) -> str | None:
                 """Plugin logo URL."""
                 ...
+
+        class SingerTap(Protocol):
+            """Singer Tap protocol definition."""
+
+            streams: list[str]
+            name: str
+            state: m.Meltano.SingerStateMessage
+
+            def discover(self) -> m.Meltano.SingerCatalog:
+                """Discover and return the tap Singer catalog."""
+                ...
+
+            def sync(
+                self,
+                catalog: m.Meltano.SingerCatalog,
+                state: m.Meltano.SingerStateMessage,
+            ) -> None:
+                """Synchronize records using catalog and state."""
+                ...
+
+            def get_records(
+                self, stream_name: str
+            ) -> list[m.Meltano.SingerRecordMessage]:
+                """Get records for a specific stream."""
+                ...
+
+            def get_state(self) -> m.Meltano.SingerStateMessage:
+                """Get current state."""
+                ...
+
+        class SingerTarget(Protocol):
+            """Singer Target protocol definition."""
+
+            name: str
 
 
 # Runtime alias for simplified usage

@@ -30,7 +30,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test create_flext_target_config method."""
         if not hasattr(self.target_abstractions, "create_flext_target_config"):
             pytest.skip("create_flext_target_config not available (use PYTHONPATH=src)")
-        connection_config: dict[str, t.GeneralValueType] = {"output_path": "test.jsonl"}
+        connection_config: dict[str, t.JsonValue] = {"output_path": "test.jsonl"}
 
         result = self.target_abstractions.create_flext_target_config(
             target_type="jsonl",
@@ -50,7 +50,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test create_flext_target static method."""
         if not hasattr(FlextMeltanoTargetAbstractions, "create_flext_target"):
             pytest.skip("create_flext_target not available (use PYTHONPATH=src)")
-        test_config: dict[str, t.GeneralValueType] = {
+        test_config: dict[str, t.JsonValue] = {
             "target_type": "jsonl",
             "connection_config": {"output_path": "test.jsonl"},
             "batch_size": 100,
@@ -73,7 +73,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         assert "T" in timestamp
 
         # Test nested value retrieval
-        test_data: dict[str, t.GeneralValueType] = {
+        test_data: dict[str, t.JsonValue] = {
             "level1": {"level2": {"level3": "found_value"}},
         }
         level1 = test_data.get("level1", {})

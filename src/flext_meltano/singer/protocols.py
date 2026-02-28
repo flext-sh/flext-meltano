@@ -116,14 +116,14 @@ class FlextMeltanoPluginProtocols:
     """
 
     # Core plugin types - use proper type aliases
-    TapPlugin = t.Meltano.Plugin.PluginDefinition
-    TargetPlugin = t.Meltano.Plugin.PluginDefinition
-    DbtPlugin = t.Meltano.Plugin.PluginDefinition
+    TapPlugin = t.Meltano.PluginDefinition
+    TargetPlugin = t.Meltano.PluginDefinition
+    DbtPlugin = t.Meltano.PluginDefinition
 
     # Service protocols - use proper configuration types
-    TapServiceProtocol = t.Meltano.Plugin.PluginConfiguration
-    TargetServiceProtocol = t.Meltano.Plugin.PluginConfiguration
-    DbtServiceProtocol = t.Meltano.Plugin.PluginConfiguration
+    TapServiceProtocol = t.Meltano.PluginConfiguration
+    TargetServiceProtocol = t.Meltano.PluginConfiguration
+    DbtServiceProtocol = t.Meltano.PluginConfiguration
 
 
 __all__ = [

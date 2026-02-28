@@ -13,18 +13,12 @@ import json
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
-from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
-
-# Import aliases for simplified usage
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-r = FlextResult
+from flext_meltano import c, m, t
 
 
-class FlextMeltanoStateManager(FlextService[m.Meltano.SingerStateMessage]):
+class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
     """Manages Singer state (bookmarks, incremental sync state).
 
     Handles loading, updating, and persisting state for incremental

@@ -14,9 +14,12 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import FlextMeltanoTypes as mt
-from flext_meltano.dbt.project import DbtProjectInfo, FlextMeltanoDbtProjectManager
+from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes
+from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import DbtRunResult, DbtTestResult, FlextMeltanoDbtRunner
+
+t = FlextMeltanoTypes
+m = FlextMeltanoModels
 
 
 class FlextMeltanoDbtService(s[str]):
@@ -47,7 +50,7 @@ class FlextMeltanoDbtService(s[str]):
     def load_project(
         self,
         root: Path,
-    ) -> r[DbtProjectInfo]:
+    ) -> r[m.Meltano.DbtProjectInfo]:
         """Load a DBT project.
 
         Args:
@@ -74,13 +77,13 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[DbtProjectInfo].fail(
+            return r[m.Meltano.DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
             )
 
     def get_project_models(
         self,
-    ) -> r[list[mt.Meltano.DbtModelDict]]:
+    ) -> r[list[t.Meltano.DbtModelDict]]:
         """Get all models from the project.
 
         Returns:
@@ -104,14 +107,14 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[list[mt.Meltano.DbtModelDict]].fail(
+            return r[list[t.Meltano.DbtModelDict]].fail(
                 f"Failed to get models: {e}",
             )
 
     def run_models(
         self,
         models: list[str] | None = None,
-        **kwargs: mt.GeneralValueType,
+        **kwargs: t.GeneralValueType,
     ) -> r[DbtRunResult]:
         """Run DBT models.
 
@@ -150,7 +153,7 @@ class FlextMeltanoDbtService(s[str]):
     def run_tests(
         self,
         models: list[str] | None = None,
-        **kwargs: mt.GeneralValueType,
+        **kwargs: t.GeneralValueType,
     ) -> r[DbtTestResult]:
         """Run DBT tests.
 
@@ -188,8 +191,8 @@ class FlextMeltanoDbtService(s[str]):
 
     def generate_docs(
         self,
-        **kwargs: mt.GeneralValueType,
-    ) -> r[mt.Meltano.ExecutionResultDict]:
+        **kwargs: t.GeneralValueType,
+    ) -> r[t.Meltano.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -215,7 +218,7 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[mt.Meltano.ExecutionResultDict].fail(
+            return r[t.Meltano.ExecutionResultDict].fail(
                 f"Documentation generation failed: {e}",
             )
 
