@@ -14,7 +14,7 @@ from typing import ClassVar, override
 
 from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from flext_meltano import FlextMeltanoModels, t, u
 
@@ -43,21 +43,8 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
     """
 
     ProjectInfo: ClassVar[type[MeltanoProjectInfo]] = MeltanoProjectInfo
-    _metadata_extra: dict[str, str] = {}
-    _sealed: bool = False
-
-    def __init__(self, root: Path | None = None) -> None:
-        """Initialize Meltano project manager.
-
-        Args:
-            root: Root directory of Meltano project (optional)
-
-        """
-        super().__init__()
-        self.project_root: Path | None = root
-        self.project: MeltanoProject | None = None
-        self._metadata_extra: dict[str, str] = {}
-        self._sealed: bool = False
+    _metadata_extra: dict[str, str] = PrivateAttr(default_factory=dict)
+    _sealed: bool = PrivateAttr(default=False)
 
     def __init__(self, root: Path | None = None) -> None:
         """Initialize Meltano project manager.

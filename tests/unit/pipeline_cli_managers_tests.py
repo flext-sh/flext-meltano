@@ -12,6 +12,10 @@ from unittest.mock import MagicMock, patch
 from flext_meltano.cli_managers import (
     FlextMeltanoPipelineManager,
     create_pipeline,
+    delete_pipeline,
+    execute_pipeline,
+    get_pipeline_status,
+    list_pipelines,
 )
 
 
@@ -90,9 +94,10 @@ def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
             "a-pipeline",
             {"command": ["run", "tap-b", "target-b"]},
         ).is_success
+        list_result = list_pipelines()
 
-    assert result.is_success
-    assert result.value == ["a-pipeline", "b-pipeline"]
+    assert list_result.is_success
+    assert list_result.value == ["a-pipeline", "b-pipeline"]
 
 
 def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
@@ -144,7 +149,7 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
         with patch("flext_meltano.cli_managers.os.kill", side_effect=fake_kill):
             pass
 
-    assert result.is_success
+    assert running_result.is_success
     assert not pid_file.exists()
 
 
