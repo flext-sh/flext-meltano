@@ -302,10 +302,8 @@ class FlextMeltanoSettings(FlextSettings):
     )
 
     # Instance attributes (declared at class level for type safety)
-    _metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
-    _sealed: bool = False
-    _metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
-    _sealed: bool = False
+    metadata_extra: dict[str, str] = Field(default_factory=dict, exclude=True)
+    sealed: bool = Field(default=False, exclude=True)
 
     # ============================================================================
     # FIELD VALIDATORS - Pydantic validation methods
@@ -774,12 +772,11 @@ class FlextMeltanoSettings(FlextSettings):
                     applied_count += 1
 
             # Track metadata about overrides
-            if getattr(self, "_metadata_extra", None) is None:
-                self._metadata_extra: dict[str, str] = {}
-            self._metadata_extra["overrides_applied"] = (
+            self.metadata_extra["overrides_applied"] = (
                 "true" if applied_count > 0 else "false"
             )
-            self._metadata_extra["override_count"] = str(applied_count)
+            self.metadata_extra["override_count"] = str(applied_count)
+
 
             return r[bool].ok(True)
 
@@ -799,7 +796,7 @@ class FlextMeltanoSettings(FlextSettings):
         FlextResult indicating success or failure.
 
         """
-        self._sealed = True
+        self.sealed = True
         return r[None].ok(None)
 
     def is_sealed(self) -> bool:
@@ -809,7 +806,8 @@ class FlextMeltanoSettings(FlextSettings):
         bool: True if configuration is sealed, False otherwise.
 
         """
-        return getattr(self, "_sealed", False)
+        return self.sealed
+
 
     def get_meltano_environment_variables(self) -> Mapping[str, str]:
         """Get Meltano-specific environment variables.
@@ -870,20 +868,8 @@ class FlextMeltanoSettings(FlextSettings):
         dict[str, t.GeneralValueType]: Dictionary containing Meltano logging configuration.
 
         """
-        return self.logging.model_dump()
-        self,
-    ) -> t.MeltanoCore.SettingsDict:
-        """Get Meltano-specific logging configuration dictionary.
-
-        Delegates to consolidated logging model for maintainability.
-
-        Returns:
-        dict[str, t.GeneralValueType]: Dictionary containing Meltano logging configuration.
-
-        """
         config_dict = self.logging.model_dump()
 
-        # Add additional non-logging config fields for backward compatibility
         additional_config = {
             "meltano_performance_threshold_warning": (
                 self.meltano_performance_threshold_warning

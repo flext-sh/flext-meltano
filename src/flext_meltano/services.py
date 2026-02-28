@@ -70,26 +70,10 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
         """Get FlextContainer instance - delegates to global container."""
         return FlextContainer.get_global()
 
-    @property
-    def tap_name(self) -> str | None:
-        """Get TAP name (alias for source_name in Singer terminology)."""
-        return self.source_name
-
-    @property
-    def target_name(self) -> str | None:
-        """Get TARGET name (alias for sink_name in Singer terminology)."""
-        return self.sink_name
-
-    @property
-    def dbt_name(self) -> str | None:
-        """Get DBT name (alias for transformation_name)."""
-        return self.transformation_name
-
-    @property
-    def project_name(self) -> str | None:
-        """Get project name (alias for transformation_name for DBT projects)."""
-        return self.transformation_name
-
+    
+    
+    
+    
     def __init__(
         self,
         config: FlextMeltanoSettings | None = None,
@@ -460,7 +444,6 @@ class FlextMeltanoService(s[t.MeltanoCore.MeltanoConfigDict]):
     ) -> r[t.MeltanoCore.MeltanoConfigDict]:
         """Test transformation models."""
         models_to_test = models or ["all_models"]
-        # Type narrowing: dict literal is already MeltanoConfigDict compatible
         result_dict: t.MeltanoCore.MeltanoConfigDict = {
             "models": models_to_test,
             "status": "passed",

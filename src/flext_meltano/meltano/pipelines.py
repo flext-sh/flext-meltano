@@ -183,7 +183,6 @@ class FlextMeltanoOrchestrationService(s[t.MeltanoCore.MeltanoConfigDict]):
                 )
 
             # Build context_data with properly typed JsonValue entries
-            # Store object references as string representations for JSON compatibility
             context_data: t.MeltanoCore.RunContextDict = {
                 "project_root": str(project_root),
                 "elt_context": elt_context_obj,
