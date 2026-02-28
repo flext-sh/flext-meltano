@@ -11,7 +11,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
-from flext_core import FlextProtocols, FlextTypes
+from flext_cli.protocols import FlextCliProtocols
+from flext_core.protocols import FlextProtocols
+from flext_core import FlextTypes
 
 # Import aliases following order: c -> t -> p -> r -> m -> u
 # Runtime aliases defined at module level per FLEXT standards
@@ -24,7 +26,7 @@ t = FlextTypes
 # )
 
 
-class FlextMeltanoProtocols(FlextProtocols):
+class FlextMeltanoProtocols(FlextCliProtocols):
     """Unified Meltano protocols extending FlextProtocols.
 
     Extends p to inherit all foundation protocols (Result, Service, etc.)
