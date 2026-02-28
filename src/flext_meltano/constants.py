@@ -249,6 +249,21 @@ class FlextMeltanoConstants(FlextConstants):
                 TESTING = "testing"
                 LOCAL = "local"
 
+            class StreamStatus(StrEnum):
+                """Meltano stream statuses — single source of truth."""
+
+                COMPLETED = "completed"
+                ERROR = "error"
+                SUCCESS = "success"
+                FAILED = "failed"
+                IN_PROGRESS = "in_progress"
+                PENDING = "pending"
+                INITIALIZED = "initialized"
+                PROCESSING = "processing"
+                DISCOVERED = "discovered"
+                SELECTED = "selected"
+                EXTRACTING = "extracting"
+
         class Logging:
             """Logging configuration constants."""
 
