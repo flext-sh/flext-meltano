@@ -21,7 +21,10 @@ if TYPE_CHECKING:
 
 # Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextMeltanoDbtProjectManager": ("flext_meltano.dbt.project", "FlextMeltanoDbtProjectManager"),
+    "FlextMeltanoDbtProjectManager": (
+        "flext_meltano.dbt.project",
+        "FlextMeltanoDbtProjectManager",
+    ),
     "FlextMeltanoDbtRunner": ("flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"),
     "FlextMeltanoDbtService": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
 }
