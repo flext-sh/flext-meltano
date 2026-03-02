@@ -240,12 +240,6 @@ class FlextMeltanoTypes(FlextCliTypes):
         StateDict = dict[str, FlextTypes.JsonValue]
         ResultDict = dict[str, FlextTypes.JsonValue]
 
-        # Type aliases for protocols.py
-        type JsonObject = FlextTypes.JsonValue
-
-        # JSON value type (re-export from FlextTypes for convenience)
-        type JsonValue = FlextTypes.GeneralValueType
-
         # Run context for pipeline execution
         type RunContextDict = dict[str, FlextTypes.GeneralValueType]
 
@@ -298,8 +292,4 @@ class FlextMeltanoTypes(FlextCliTypes):
 
 
 t = FlextMeltanoTypes
-
-__all__ = [
-    "FlextMeltanoTypes",
-    "t",
-]
+__all__ = ["FlextMeltanoTypes", "t"]
