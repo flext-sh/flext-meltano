@@ -212,7 +212,7 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
                     elt_result["dbt_success"] = True
                     elt_result["dbt_models_run"] = list(
                         dbt_models,
-                    )  # Convert to list[t.GeneralValueType]
+                    )  # Convert to list[t.ContainerValue]
 
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
 

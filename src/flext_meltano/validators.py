@@ -36,7 +36,7 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config: dict[str, t.GeneralValueType] = {
+        >>> config: dict[str, t.ContainerValue] = {
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
@@ -77,7 +77,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: dict[str, t.GeneralValueType] = {
+            >>> config: dict[str, t.ContainerValue] = {
             ...     "version": 1,
             ...     "project_id": my - meltano - project,
             ... }
@@ -111,7 +111,7 @@ class FlextMeltanoValidators:
             FlextResult containing boolean validation result or error details.
 
         Example:
-            >>> config: dict[str, t.GeneralValueType] = {
+            >>> config: dict[str, t.ContainerValue] = {
             ...     "name": "my_transformation_project",
             ...     "version": 1.0.0,
             ... }

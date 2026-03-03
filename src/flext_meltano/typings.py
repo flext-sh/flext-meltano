@@ -72,8 +72,8 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type CatalogEntry = dict[str, str | dict[str, FlextTypes.JsonValue]]
             type StreamSchema = dict[str, dict[str, FlextTypes.JsonValue]]
-            type TapConfig = dict[str, FlextTypes.GeneralValueType]
-            type TargetConfig = dict[str, FlextTypes.GeneralValueType]
+            type TapConfig = dict[str, FlextTypes.ContainerValue]
+            type TargetConfig = dict[str, FlextTypes.ContainerValue]
             type MessageBatch = list[dict[str, FlextTypes.JsonValue]]
             type StreamCatalog = dict[str, list[CatalogEntry]]
             type Record = dict[str, FlextTypes.JsonValue]
@@ -173,7 +173,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             """CLI operation complex types namespace."""
 
             type Command = list[str]
-            type ProcessResult = dict[str, str | int | float | bool | list[str]]
+            type ProcessResult = dict[str, t.JsonPrimitive | list[str]]
             type CommandResult = dict[str, str | int | bool]
             type ExecutionResult = dict[str, str | int | bool | FlextTypes.JsonValue]
             type CLIStatus = dict[str, str | bool]
@@ -183,10 +183,7 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type PipelineResult = dict[
                 str,
-                str
-                | int
-                | float
-                | bool
+                t.JsonPrimitive
                 | FlextTypes.JsonValue
                 | list[FlextTypes.JsonValue],
             ]
@@ -224,15 +221,15 @@ class FlextMeltanoTypes(FlextCliTypes):
         type NestedJsonDict = dict[str, NestedJsonValue]
 
         # Meltano configuration and data types
-        type MeltanoConfigDict = dict[str, FlextTypes.GeneralValueType]
-        type PluginConfigDict = dict[str, FlextTypes.GeneralValueType]
+        type MeltanoConfigDict = dict[str, FlextTypes.ContainerValue]
+        type PluginConfigDict = dict[str, FlextTypes.ContainerValue]
         type EnvironmentDict = dict[str, str]
         type VariablesDict = dict[str, str]
-        type SettingsDict = dict[str, FlextTypes.GeneralValueType]
-        type MetadataDict = dict[str, FlextTypes.GeneralValueType]
-        type CommandDict = dict[str, FlextTypes.GeneralValueType]
-        type ScheduleDict = dict[str, FlextTypes.GeneralValueType]
-        type JobDict = dict[str, FlextTypes.GeneralValueType]
+        type SettingsDict = dict[str, FlextTypes.ContainerValue]
+        type MetadataDict = dict[str, FlextTypes.ContainerValue]
+        type CommandDict = dict[str, FlextTypes.ContainerValue]
+        type ScheduleDict = dict[str, FlextTypes.ContainerValue]
+        type JobDict = dict[str, FlextTypes.ContainerValue]
 
         # Type aliases for singer.py
         RecordDict = dict[str, FlextTypes.JsonValue]
@@ -241,12 +238,12 @@ class FlextMeltanoTypes(FlextCliTypes):
         ResultDict = dict[str, FlextTypes.JsonValue]
 
         # Run context for pipeline execution
-        type RunContextDict = dict[str, FlextTypes.GeneralValueType]
+        type RunContextDict = dict[str, FlextTypes.ContainerValue]
 
         # Type aliases for file_managers.py
         FileConfigDict = dict[
             str,
-            FlextTypes.GeneralValueType,
+            FlextTypes.ContainerValue,
         ]
         PathDict = dict[str, str | Path]
 
@@ -254,9 +251,9 @@ class FlextMeltanoTypes(FlextCliTypes):
         type PluginList = list[str]
         type PluginNameList = list[str]
         type PluginTypeList = list[str]
-        type ExecutionResultDict = dict[str, FlextTypes.GeneralValueType]
+        type ExecutionResultDict = dict[str, FlextTypes.ContainerValue]
         type ExecutionStatusDict = dict[str, str]
-        type RuntimeConfigDict = dict[str, FlextTypes.GeneralValueType]
+        type RuntimeConfigDict = dict[str, FlextTypes.ContainerValue]
 
         # Singer protocol types
         type SingerRecordDict = dict[str, FlextTypes.JsonValue]

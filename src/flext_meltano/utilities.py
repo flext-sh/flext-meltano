@@ -274,7 +274,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             }
 
             # Helper: safe string with fallback
-            def safe_str(val: t.GeneralValueType) -> str:
+            def safe_str(val: t.ContainerValue) -> str:
                 return u.Text.safe_string(str(val)) if val else ""
 
             # Build config using DSL with process for string fields

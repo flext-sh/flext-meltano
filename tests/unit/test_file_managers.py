@@ -26,7 +26,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_valid(self) -> None:
         """Test saving valid YAML configuration."""
-        config: dict[str, t.GeneralValueType] = {
+        config: dict[str, t.ContainerValue] = {
             "project_id": "test-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"], "loaders": ["target-csv"]},
@@ -42,7 +42,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, t.GeneralValueType] = {
+        config: dict[str, t.ContainerValue] = {
             "test": "data",
         }
         invalid_path = Path("/nonexistent/directory/config.yml")
@@ -53,7 +53,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
         # First create a valid YAML file
-        config: dict[str, t.GeneralValueType] = {
+        config: dict[str, t.ContainerValue] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -93,7 +93,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
         # Create valid YAML file
-        config: dict[str, t.GeneralValueType] = {
+        config: dict[str, t.ContainerValue] = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -300,7 +300,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             assert setup_result.is_success
 
             # Create and save config
-            config: dict[str, t.GeneralValueType] = {
+            config: dict[str, t.ContainerValue] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
@@ -375,7 +375,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_concurrent_file_operations(self) -> None:
         """Test concurrent file operations don't interfere."""
         # Create multiple configs simultaneously
-        configs: list[dict[str, t.GeneralValueType]] = [
+        configs: list[dict[str, t.ContainerValue]] = [
             {"id": "config1", "data": "value1"},
             {"id": "config2", "data": "value2"},
             {"id": "config3", "data": "value3"},

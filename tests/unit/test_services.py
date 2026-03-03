@@ -108,7 +108,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, t.GeneralValueType] = {"file_path": tmp_file.name}
+            config: dict[str, t.ContainerValue] = {"file_path": tmp_file.name}
             try:
                 result = tap_service.create_instance(config)  # type: ignore[arg-type]
             except TypeError:
@@ -123,7 +123,7 @@ class TestTapService:
         assert service_result.is_success
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, t.GeneralValueType] = {"file_path": tmp_file.name}
+            config: dict[str, t.ContainerValue] = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
             assert isinstance(result, r)
 
@@ -203,7 +203,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, t.GeneralValueType] = {"output_path": tmp_file.name}
+            config: dict[str, t.ContainerValue] = {"output_path": tmp_file.name}
             try:
                 result = target_service.create_instance(config)  # type: ignore[arg-type]
             except TypeError:
@@ -218,7 +218,7 @@ class TestTargetService:
         assert service_result.is_success
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, t.GeneralValueType] = {"output_path": tmp_file.name}
+            config: dict[str, t.ContainerValue] = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
             assert isinstance(result, r)
 

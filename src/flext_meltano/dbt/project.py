@@ -228,7 +228,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             )
 
     @override
-    def execute(self, **_kwargs: t.GeneralValueType) -> r[m.Meltano.DbtProjectInfo]:
+    def execute(self, **_kwargs: t.ContainerValue) -> r[m.Meltano.DbtProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             info = m.Meltano.DbtProjectInfo(

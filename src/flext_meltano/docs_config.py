@@ -144,7 +144,7 @@ class DocsConfig(FlextSettings):
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return r[DocsConfig].fail(error_msg)
 
-    def get_schedule_config(self) -> Mapping[str, t.GeneralValueType]:
+    def get_schedule_config(self) -> Mapping[str, t.ContainerValue]:
         """Get scheduling configuration as dictionary for backward compatibility.
 
         Returns:
@@ -158,7 +158,7 @@ class DocsConfig(FlextSettings):
             "audit_time": self.audit_time,
         }
 
-    def get_quality_thresholds(self) -> Mapping[str, t.GeneralValueType]:
+    def get_quality_thresholds(self) -> Mapping[str, t.ContainerValue]:
         """Get quality thresholds as dictionary for backward compatibility.
 
         Returns:
@@ -174,7 +174,7 @@ class DocsConfig(FlextSettings):
             "fail_on_critical_issues": self.fail_on_critical_issues,
         }
 
-    def get_reporting_config(self) -> Mapping[str, t.GeneralValueType]:
+    def get_reporting_config(self) -> Mapping[str, t.ContainerValue]:
         """Get reporting configuration as dictionary for backward compatibility.
 
         Returns:
@@ -185,7 +185,7 @@ class DocsConfig(FlextSettings):
             "output_directory": self.reports_output_dir,
         }
 
-    def get_link_validation_config(self) -> Mapping[str, t.GeneralValueType]:
+    def get_link_validation_config(self) -> Mapping[str, t.ContainerValue]:
         """Get link validation configuration as dictionary for backward compatibility.
 
         Returns:
@@ -197,7 +197,7 @@ class DocsConfig(FlextSettings):
             "retries": self.link_validation_retries,
         }
 
-    def get_audit_thresholds(self) -> Mapping[str, t.GeneralValueType]:
+    def get_audit_thresholds(self) -> Mapping[str, t.ContainerValue]:
         """Get audit thresholds as dictionary for backward compatibility.
 
         Returns:

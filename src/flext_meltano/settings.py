@@ -549,7 +549,7 @@ class FlextMeltanoSettings(FlextSettings):
         filtered_kwargs = filtered_kwargs_dict
 
         # Create config data with environment
-        config_data: dict[str, t.GeneralValueType] = {
+        config_data: dict[str, t.ContainerValue] = {
             "environment": env_type.value,
         }
 
@@ -858,7 +858,7 @@ class FlextMeltanoSettings(FlextSettings):
         Delegates to consolidated logging model for maintainability.
 
         Returns:
-        dict[str, t.GeneralValueType]: Dictionary containing Meltano logging configuration.
+        dict[str, t.ContainerValue]: Dictionary containing Meltano logging configuration.
 
         """
         return self.logging.model_dump()
@@ -867,7 +867,7 @@ class FlextMeltanoSettings(FlextSettings):
         Delegates to consolidated logging model for maintainability.
 
         Returns:
-        dict[str, t.GeneralValueType]: Dictionary containing Meltano logging configuration.
+        dict[str, t.ContainerValue]: Dictionary containing Meltano logging configuration.
 
         """
         config_dict = self.logging.model_dump()
@@ -913,7 +913,7 @@ class FlextMeltanoSettings(FlextSettings):
         """Get configuration metadata including override tracking.
 
         Returns:
-        dict[str, t.GeneralValueType]: Configuration metadata dictionary.
+        dict[str, t.ContainerValue]: Configuration metadata dictionary.
 
         """
         # Return the metadata with proper typing

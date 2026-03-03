@@ -136,7 +136,7 @@ class FlextMeltanoFileManagers:
                 )
 
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
-                config_data: t.GeneralValueType = yaml.safe_load(f)
+                config_data: t.ContainerValue = yaml.safe_load(f)
 
             # DSL: Use u.when for conditional handling
             if config_data is None:

@@ -266,7 +266,7 @@ class FlextMeltanoSingerCliTranslator:
                 "Invalid command: must be non-empty list",
             )
 
-        def is_string_argument(arg: t.GeneralValueType) -> bool:
+        def is_string_argument(arg: t.ContainerValue) -> bool:
             match arg:
                 case str():
                     return True
