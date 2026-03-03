@@ -183,9 +183,7 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type PipelineResult = dict[
                 str,
-                t.JsonPrimitive
-                | FlextTypes.JsonValue
-                | list[FlextTypes.JsonValue],
+                t.JsonPrimitive | FlextTypes.JsonValue | list[FlextTypes.JsonValue],
             ]
             type ExtractConfig = dict[str, FlextTypes.JsonValue]
             type LoadConfig = dict[str, FlextTypes.JsonValue]
