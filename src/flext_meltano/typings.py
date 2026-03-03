@@ -173,7 +173,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             """CLI operation complex types namespace."""
 
             type Command = list[str]
-            type ProcessResult = dict[str, t.JsonPrimitive | list[str]]
+            type ProcessResult = dict[str, t.Scalar | list[str]]
             type CommandResult = dict[str, str | int | bool]
             type ExecutionResult = dict[str, str | int | bool | FlextTypes.JsonValue]
             type CLIStatus = dict[str, str | bool]
@@ -183,7 +183,7 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type PipelineResult = dict[
                 str,
-                t.JsonPrimitive | FlextTypes.JsonValue | list[FlextTypes.JsonValue],
+                t.Scalar | FlextTypes.JsonValue | list[FlextTypes.JsonValue],
             ]
             type ExtractConfig = dict[str, FlextTypes.JsonValue]
             type LoadConfig = dict[str, FlextTypes.JsonValue]

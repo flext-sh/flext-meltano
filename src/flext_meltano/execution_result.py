@@ -39,7 +39,7 @@ class FlextMeltanoExecutionResult:
 
     def to_dict(
         self,
-    ) -> Mapping[str, t.JsonPrimitive | list[str]]:
+    ) -> Mapping[str, t.Scalar | list[str]]:
         """Convert to dictionary representation.
 
         Returns:
