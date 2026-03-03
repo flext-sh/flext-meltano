@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 from flext_core import FlextLogger
+
 from flext_meltano import r, t, u
 from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
 

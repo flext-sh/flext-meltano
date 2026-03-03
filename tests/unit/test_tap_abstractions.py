@@ -4,8 +4,9 @@ import tempfile
 import unittest
 
 import pytest
-from flext_meltano import FlextMeltanoTapAbstractions, m, r, t
 from pydantic_core import ValidationError
+
+from flext_meltano import FlextMeltanoTapAbstractions, m, r, t
 
 
 class _TestAssertions:

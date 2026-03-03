@@ -11,6 +11,7 @@ import json
 from unittest.mock import patch
 
 import pytest
+
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 
 

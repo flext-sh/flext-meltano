@@ -7,6 +7,7 @@ from __future__ import annotations
 import tempfile
 
 import pytest
+
 from flext_meltano import FlextMeltanoService, r, s, t
 
 

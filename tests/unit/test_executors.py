@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest import mock
 
 from flext_core import FlextLogger
+
 from flext_meltano import FlextMeltanoExecutor, r
 
 logger = FlextLogger(__name__)

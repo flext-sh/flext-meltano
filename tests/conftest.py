@@ -18,8 +18,8 @@ from typing import Any, Protocol
 
 import pytest
 import yaml
-from flext_meltano import t
 
+from flext_meltano import t
 from tests.helpers.docker_test_manager import FlextTestsDocker
 
 

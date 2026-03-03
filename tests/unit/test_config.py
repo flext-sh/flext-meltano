@@ -17,6 +17,7 @@ from pathlib import Path
 
 import pytest
 from flext_core import FlextConstants, FlextSettings
+
 from flext_meltano import FlextMeltanoSettings
 
 
