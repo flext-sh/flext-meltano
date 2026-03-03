@@ -8,6 +8,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_tests import FlextTestsTypes
+
 
 class TestsFlextMeltanoTypes(FlextTestsTypes):
     """Test type aliases for flextmeltano."""
