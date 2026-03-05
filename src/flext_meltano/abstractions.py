@@ -89,72 +89,40 @@ class FlextMeltanoAbstractions:
         self._project_path: Path | None = None
         self._runner_helper = self._RunnerHelper(self.logger)
 
-    # Project operations
-    def find_project(self, project_root: Path) -> r[Path]:
-        """Find and validate pipeline project directory."""
+    def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
+        """Add a plugin."""
         try:
-            if not project_root.exists() or not project_root.is_dir():
-                return r[Path].fail(
-                    f"Project path is not a valid directory: {project_root}",
-                )
-
-            self._project_path = project_root
-
+            # Simplified implementation - would validate and add plugin
             self.logger.info(
-                "Pipeline project loaded successfully",
-                project_root=str(project_root),
+                "Adding plugin",
+                plugin_config=plugin_config,
             )
-
-            return r[Path].ok(project_root)
-
+            return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to load pipeline project: {e}"
+            error_msg = f"Failed to add plugin: {e}"
             self.logger.exception(error_msg)
-            return r[Path].fail(error_msg)
+            return r[bool].fail(error_msg)
 
-    def get_project_root(self) -> r[Path]:
-        """Get the root directory of the current project."""
-        if not self._project_path:
-            return r[Path].fail("No project loaded")
-
-        try:
-            return r[Path].ok(self._project_path)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Path].fail(f"Failed to get project root: {e}")
-
-    # Component operations
-    def get_components_of_type(
+    # ELT operations
+    def create_elt_context(
         self,
-        component_type: str,
-    ) -> r[list[t.Meltano.PluginDefinition]]:
-        """Get components of specified type."""
+        project: p.Meltano.Project,
+        extractor_name: str,
+        loader_name: str,
+    ) -> r[t.Meltano.MeltanoConfigDict]:
+        """Create ELT context for pipeline execution."""
         try:
-            # Generic component listing - would be implemented based on actual needs
-            components: list[t.Meltano.PluginDefinition] = [
-                {"name": "source-csv", "type": "sources", "status": "available"},
-                {"name": "sink-postgres", "type": "sinks", "status": "available"},
-                {
-                    "name": "transform-dbt",
-                    "type": "transformers",
-                    "status": "available",
-                },
-            ]
-
-            # DSL: Use filter for unified filtering
-            filtered_components = u.filter(
-                components,
-                lambda comp: u.get(comp, "type", default="") == component_type,
-            )
-            # Type narrowing: ensure list[t.Meltano.PluginDefinition]
-            result_list: list[t.Meltano.PluginDefinition] = (
-                list(filtered_components) if filtered_components else []
-            )
-            return r[list[t.Meltano.PluginDefinition]].ok(result_list)
-
+            elt_context: t.Meltano.MeltanoConfigDict = {
+                "project": str(project.root_dir),
+                "extractor_name": extractor_name,
+                "loader_name": loader_name,
+                "status": "initialized",
+            }
+            return r[t.Meltano.MeltanoConfigDict].ok(elt_context)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to get components of type {component_type}: {e}"
+            error_msg = f"Failed to create ELT context: {e}"
             self.logger.exception(error_msg)
-            return r[list[t.Meltano.PluginDefinition]].fail(error_msg)
+            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     # Runner operations
     def create_pipeline_context(
@@ -189,27 +157,6 @@ class FlextMeltanoAbstractions:
             sink_config,
         )
 
-    # ELT operations
-    def create_elt_context(
-        self,
-        project: p.Meltano.Project,
-        extractor_name: str,
-        loader_name: str,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Create ELT context for pipeline execution."""
-        try:
-            elt_context: t.Meltano.MeltanoConfigDict = {
-                "project": str(project.root_dir),
-                "extractor_name": extractor_name,
-                "loader_name": loader_name,
-                "status": "initialized",
-            }
-            return r[t.Meltano.MeltanoConfigDict].ok(elt_context)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to create ELT context: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
-
     def execute_singer_pipeline(
         self,
         elt_context: t.Meltano.MeltanoConfigDict,
@@ -230,6 +177,63 @@ class FlextMeltanoAbstractions:
             error_msg = f"Failed to execute singer pipeline: {e}"
             self.logger.exception(error_msg)
             return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
+
+    # Project operations
+    def find_project(self, project_root: Path) -> r[Path]:
+        """Find and validate pipeline project directory."""
+        try:
+            if not project_root.exists() or not project_root.is_dir():
+                return r[Path].fail(
+                    f"Project path is not a valid directory: {project_root}",
+                )
+
+            self._project_path = project_root
+
+            self.logger.info(
+                "Pipeline project loaded successfully",
+                project_root=str(project_root),
+            )
+
+            return r[Path].ok(project_root)
+
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            error_msg = f"Failed to load pipeline project: {e}"
+            self.logger.exception(error_msg)
+            return r[Path].fail(error_msg)
+
+    # Component operations
+    def get_components_of_type(
+        self,
+        component_type: str,
+    ) -> r[list[t.Meltano.PluginDefinition]]:
+        """Get components of specified type."""
+        try:
+            # Generic component listing - would be implemented based on actual needs
+            components: list[t.Meltano.PluginDefinition] = [
+                {"name": "source-csv", "type": "sources", "status": "available"},
+                {"name": "sink-postgres", "type": "sinks", "status": "available"},
+                {
+                    "name": "transform-dbt",
+                    "type": "transformers",
+                    "status": "available",
+                },
+            ]
+
+            # DSL: Use filter for unified filtering
+            filtered_components = u.filter(
+                components,
+                lambda comp: u.get(comp, "type", default="") == component_type,
+            )
+            # Type narrowing: ensure list[t.Meltano.PluginDefinition]
+            result_list: list[t.Meltano.PluginDefinition] = (
+                list(filtered_components) if filtered_components else []
+            )
+            return r[list[t.Meltano.PluginDefinition]].ok(result_list)
+
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            error_msg = f"Failed to get components of type {component_type}: {e}"
+            self.logger.exception(error_msg)
+            return r[list[t.Meltano.PluginDefinition]].fail(error_msg)
 
     # Plugin operations
     def get_plugins_of_type(
@@ -266,19 +270,15 @@ class FlextMeltanoAbstractions:
             self.logger.exception(error_msg)
             return r[Mapping[str, t.Meltano.PluginDefinition]].fail(error_msg)
 
-    def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
-        """Add a plugin."""
+    def get_project_root(self) -> r[Path]:
+        """Get the root directory of the current project."""
+        if not self._project_path:
+            return r[Path].fail("No project loaded")
+
         try:
-            # Simplified implementation - would validate and add plugin
-            self.logger.info(
-                "Adding plugin",
-                plugin_config=plugin_config,
-            )
-            return r[bool].ok(value=True)
+            return r[Path].ok(self._project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to add plugin: {e}"
-            self.logger.exception(error_msg)
-            return r[bool].fail(error_msg)
+            return r[Path].fail(f"Failed to get project root: {e}")
 
 
 __all__ = [

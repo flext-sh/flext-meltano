@@ -85,32 +85,6 @@ class FlextMeltanoCLI:
         self.status_manager = FlextMeltanoStatusManager(temp_self)
         self.command_router = FlextMeltanoCommandRouter(temp_self)
 
-    def show_pipeline_help(self) -> None:
-        """Show pipeline help."""
-        self.output.print_message(
-            "Pipeline commands: create, run, list, status, stop, delete",
-        )
-
-    def show_tap_help(self) -> None:
-        """Show tap help."""
-        self.output.print_message("Tap commands: run, discover, test")
-
-    def show_target_help(self) -> None:
-        """Show target help."""
-        self.output.print_message("Target commands: run, test")
-
-    def show_dbt_help(self) -> None:
-        """Show DBT help."""
-        self.output.print_message("DBT commands: run, test, docs")
-
-    def show_plugin_help(self) -> None:
-        """Show plugin help."""
-        self.output.print_message("Plugin commands: install, list, info")
-
-    def show_status_help(self) -> None:
-        """Show status help."""
-        self.output.print_message("Status commands: show, health")
-
     # =============================================================================
     # MAIN CLI ENTRY POINT
     # =============================================================================
@@ -125,6 +99,32 @@ class FlextMeltanoCLI:
     def show_banner(self) -> None:
         """Show CLI banner."""
         self.output.print_message("FLEXT Meltano CLI - Use flext-cli patterns")
+
+    def show_dbt_help(self) -> None:
+        """Show DBT help."""
+        self.output.print_message("DBT commands: run, test, docs")
+
+    def show_pipeline_help(self) -> None:
+        """Show pipeline help."""
+        self.output.print_message(
+            "Pipeline commands: create, run, list, status, stop, delete",
+        )
+
+    def show_plugin_help(self) -> None:
+        """Show plugin help."""
+        self.output.print_message("Plugin commands: install, list, info")
+
+    def show_status_help(self) -> None:
+        """Show status help."""
+        self.output.print_message("Status commands: show, health")
+
+    def show_tap_help(self) -> None:
+        """Show tap help."""
+        self.output.print_message("Tap commands: run, discover, test")
+
+    def show_target_help(self) -> None:
+        """Show target help."""
+        self.output.print_message("Target commands: run, test")
 
 
 def main() -> int:

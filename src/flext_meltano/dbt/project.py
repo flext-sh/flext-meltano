@@ -42,92 +42,16 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
         self.project_root = root
         self.manifest: t.Meltano.Dbt.ManifestData | None = None
 
-    def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
-        """Load a DBT project.
-
-        Args:
-        root: Root directory of the DBT project
-
-        Returns:
-        r containing project information
-
-        """
-        try:
-            if not root.exists():
-                return r[m.Meltano.DbtProjectInfo].fail(
-                    f"DBT project directory not found: {root}",
-                )
-
-            self.project_root = root
-
+    @override
+    def execute(self, **_kwargs: t.ContainerValue) -> r[m.Meltano.DbtProjectInfo]:
+        """Execute (implements Service pattern)."""
+        if self.project_root:
             info = m.Meltano.DbtProjectInfo(
-                root=root,
-                name=str(root.name),
-            )
-
-            self.logger.info(
-                "DBT project loaded",
-                root=str(root),
+                root=self.project_root,
+                name=str(self.project_root.name),
             )
             return r[m.Meltano.DbtProjectInfo].ok(info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[m.Meltano.DbtProjectInfo].fail(
-                f"Failed to load DBT project: {e}",
-            )
-
-    def load_manifest(
-        self,
-        manifest_path: Path | None = None,
-    ) -> r[t.Meltano.Dbt.ManifestData]:
-        """Load DBT manifest.
-
-        Args:
-        manifest_path: Path to manifest file (optional)
-
-        Returns:
-        r containing manifest dictionary
-
-        """
-        try:
-            if manifest_path is None:
-                if self.project_root is None:
-                    return r[t.Meltano.Dbt.ManifestData].fail("No project loaded")
-                manifest_path = self.project_root / "target" / "manifest.json"
-
-            if not manifest_path.exists():
-                return r[t.Meltano.Dbt.ManifestData].fail(
-                    f"Manifest not found: {manifest_path}",
-                )
-
-            with manifest_path.open() as f:
-                manifest_data: t.Meltano.Dbt.ManifestData = json.load(f)
-                self.manifest = manifest_data
-
-            self.logger.info(
-                "DBT manifest loaded",
-                file=str(manifest_path),
-            )
-            return r[t.Meltano.Dbt.ManifestData].ok(self.manifest)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to load manifest", error=str(e))
-            return r[t.Meltano.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
+        return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
 
     def get_models(self) -> r[list[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from manifest.
@@ -227,16 +151,92 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 f"Failed to get tests: {e}"
             )
 
-    @override
-    def execute(self, **_kwargs: t.ContainerValue) -> r[m.Meltano.DbtProjectInfo]:
-        """Execute (implements Service pattern)."""
-        if self.project_root:
+    def load_manifest(
+        self,
+        manifest_path: Path | None = None,
+    ) -> r[t.Meltano.Dbt.ManifestData]:
+        """Load DBT manifest.
+
+        Args:
+        manifest_path: Path to manifest file (optional)
+
+        Returns:
+        r containing manifest dictionary
+
+        """
+        try:
+            if manifest_path is None:
+                if self.project_root is None:
+                    return r[t.Meltano.Dbt.ManifestData].fail("No project loaded")
+                manifest_path = self.project_root / "target" / "manifest.json"
+
+            if not manifest_path.exists():
+                return r[t.Meltano.Dbt.ManifestData].fail(
+                    f"Manifest not found: {manifest_path}",
+                )
+
+            with manifest_path.open() as f:
+                manifest_data: t.Meltano.Dbt.ManifestData = json.load(f)
+                self.manifest = manifest_data
+
+            self.logger.info(
+                "DBT manifest loaded",
+                file=str(manifest_path),
+            )
+            return r[t.Meltano.Dbt.ManifestData].ok(self.manifest)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to load manifest", error=str(e))
+            return r[t.Meltano.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
+
+    def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
+        """Load a DBT project.
+
+        Args:
+        root: Root directory of the DBT project
+
+        Returns:
+        r containing project information
+
+        """
+        try:
+            if not root.exists():
+                return r[m.Meltano.DbtProjectInfo].fail(
+                    f"DBT project directory not found: {root}",
+                )
+
+            self.project_root = root
+
             info = m.Meltano.DbtProjectInfo(
-                root=self.project_root,
-                name=str(self.project_root.name),
+                root=root,
+                name=str(root.name),
+            )
+
+            self.logger.info(
+                "DBT project loaded",
+                root=str(root),
             )
             return r[m.Meltano.DbtProjectInfo].ok(info)
-        return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to load DBT project", error=str(e))
+            return r[m.Meltano.DbtProjectInfo].fail(
+                f"Failed to load DBT project: {e}",
+            )
 
 
 __all__ = [

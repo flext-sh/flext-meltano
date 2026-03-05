@@ -300,220 +300,16 @@ class FlextMeltanoSettings(FlextSettings):
     # Instance attributes (declared at class level for type safety)
     sealed: bool = Field(default=False, exclude=True)
 
-    # ============================================================================
-    # FIELD VALIDATORS - Pydantic validation methods
-    # ============================================================================
-
-    @field_validator("project_root", "venv_dir", mode="before")
     @classmethod
-    def validate_absolute_paths(cls, v: Path | str) -> Path:
-        """Validate and convert absolute path fields.
+    def clear_global_instance(cls) -> None:
+        """Clear the global instance (useful for testing).
 
-        Args:
-        v: Path or string to validate and convert.
-
-        Returns:
-        Path: Resolved absolute path.
+        Removes the current global configuration instance, allowing for
+        fresh configuration in test scenarios.
 
         """
-        path_value = m.Meltano.PathPayload(value=Path(v)).value
-        return path_value.expanduser().resolve()
-
-    @field_validator("config_dir", "logs_dir")
-    @classmethod
-    def validate_relative_paths(cls, v: Path | str) -> Path:
-        """Validate relative path fields (should not be resolved to absolute).
-
-        Args:
-        v: Path or string to validate and convert.
-
-        Returns:
-        Path: Expanded but not resolved path to allow relative paths.
-
-        """
-        path_value = m.Meltano.PathPayload(value=Path(v)).value
-        return path_value.expanduser()  # Don't resolve to allow relative paths
-
-    @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
-    @classmethod
-    def validate_versions(cls, v: str) -> str:
-        """Validate version strings (strip whitespace).
-
-        Args:
-        v: Version string to validate.
-
-        Returns:
-        str: Validated and stripped version string.
-
-        """
-        return v.strip()
-
-    @field_validator("meltano_database_uri", "meltano_api_key")
-    @classmethod
-    def validate_secret_fields(cls, v: SecretStr | None) -> SecretStr | None:
-        """Validate SecretStr fields for sensitive data.
-
-        Args:
-        v: SecretStr value to validate.
-
-        Returns:
-        SecretStr | None: Validated SecretStr or None.
-
-        """
-        if v is None:
-            return None
-        return v
-
-    # ============================================================================
-    # CONFIGURATION METHODS - Business logic methods
-    # ============================================================================
-
-    def get_project_file(self) -> r[Path]:
-        """Get full path to meltano project file using railway pattern.
-
-        Returns:
-        FlextResult containing the full path to the Meltano project file.
-
-        """
-        try:
-            return r[Path].ok(self.project_root / self.PROJECT_FILE)
-        except (ValueError, TypeError, OSError) as e:
-            return r[Path].fail(f"Failed to get project file path: {e}")
-
-    def get_absolute_config_dir(self) -> r[Path]:
-        """Get absolute path to config directory using railway pattern.
-
-        Returns:
-        FlextResult containing the absolute config directory path.
-
-        """
-        try:
-            if self.config_dir.is_absolute():
-                return r[Path].ok(self.config_dir)
-            return r[Path].ok(self.project_root / self.config_dir)
-        except (ValueError, TypeError, OSError) as e:
-            return r[Path].fail(f"Failed to get config directory path: {e}")
-
-    def get_absolute_logs_dir(self) -> r[Path]:
-        """Get absolute path to logs directory using railway pattern.
-
-        Returns:
-        FlextResult containing the absolute logs directory path.
-
-        """
-        try:
-            if self.logs_dir.is_absolute():
-                return r[Path].ok(self.logs_dir)
-            return r[Path].ok(self.project_root / self.logs_dir)
-        except (ValueError, TypeError, OSError) as e:
-            return r[Path].fail(f"Failed to get logs directory path: {e}")
-
-    def get_absolute_venv_dir(self) -> Path:
-        """Get absolute path to virtual environment directory.
-
-        Returns:
-        Path: Absolute virtual environment directory path.
-
-        """
-        if self.venv_dir.is_absolute():
-            return self.venv_dir
-        return self.project_root / self.venv_dir
-
-    def validate_project_structure(self) -> r[bool]:
-        """Validate Meltano project directory structure.
-
-        Performs complete validation of the Meltano project structure,
-        checking for required directories, files, and configuration.
-
-        Returns:
-        FlextResult containing boolean validation result or error details.
-
-        """
-        # Use centralized validator to eliminate duplication
-        return FlextMeltanoValidators.validate_pipeline_project_structure(
-            self.project_root,
-        )
-
-    def get_environment_variables(self) -> Mapping[str, str]:
-        """Get environment variables for Meltano operations.
-
-        This method uses FlextSettings as the base and adds Meltano-specific variables.
-
-        Returns:
-        dict[str, str]: Environment variables dictionary.
-
-        """
-        return self.get_meltano_environment_variables()
-
-    def get_meltano_database_uri_value(self) -> str:
-        """Get the actual Meltano database URI value (safely extract from SecretStr).
-
-        Returns:
-        str: The database URI value.
-
-        """
-        if self.meltano_database_uri is None:
-            return "sqlite:///meltano.db"
-        return self.meltano_database_uri.get_secret_value()
-
-    def get_meltano_api_key_value(self) -> str | None:
-        """Get the actual Meltano API key value (safely extract from SecretStr).
-
-        Returns:
-        str | None: The API key value or None if not set.
-
-        """
-        if self.meltano_api_key is None:
-            return None
-        return self.meltano_api_key.get_secret_value()
-
-    # ============================================================================
-    # CONSTANTS ACCESS METHODS - Utility methods for constants
-    # ============================================================================
-
-    # ============================================================================
-    # FACTORY METHODS - Instance creation and validation
-    # ============================================================================
-
-    @classmethod
-    def create_from_project_root(
-        cls,
-        project_root: str | Path,
-    ) -> r[FlextMeltanoSettings]:
-        """Create configuration from project root directory.
-
-        Creates a new configuration instance from the specified project root
-        directory and validates the project structure.
-
-        Args:
-        project_root: Path to the Meltano project root directory.
-
-        Returns:
-        FlextResult containing the created configuration or error details.
-
-        """
-        try:
-            config = cls()
-            config.project_root = Path(project_root)
-            validation_result = config.validate_project_structure()
-
-            if validation_result.is_failure:
-                return r[FlextMeltanoSettings].fail(
-                    validation_result.error or "Project validation failed",
-                )
-
-            return r[FlextMeltanoSettings].ok(config)
-
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-        ) as e:
-            return r[FlextMeltanoSettings].fail(
-                f"Config creation failed: {e}",
-            )
+        # Clear global instance for this class
+        # Parent class doesn't have this method, so we implement it here
 
     @classmethod
     def create_for_environment(
@@ -584,6 +380,74 @@ class FlextMeltanoSettings(FlextSettings):
         return cls.model_validate(config_data)
 
     # ============================================================================
+    # CONSTANTS ACCESS METHODS - Utility methods for constants
+    # ============================================================================
+
+    # ============================================================================
+    # FACTORY METHODS - Instance creation and validation
+    # ============================================================================
+
+    @classmethod
+    def create_from_project_root(
+        cls,
+        project_root: str | Path,
+    ) -> r[FlextMeltanoSettings]:
+        """Create configuration from project root directory.
+
+        Creates a new configuration instance from the specified project root
+        directory and validates the project structure.
+
+        Args:
+        project_root: Path to the Meltano project root directory.
+
+        Returns:
+        FlextResult containing the created configuration or error details.
+
+        """
+        try:
+            config = cls()
+            config.project_root = Path(project_root)
+            validation_result = config.validate_project_structure()
+
+            if validation_result.is_failure:
+                return r[FlextMeltanoSettings].fail(
+                    validation_result.error or "Project validation failed",
+                )
+
+            return r[FlextMeltanoSettings].ok(config)
+
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+        ) as e:
+            return r[FlextMeltanoSettings].fail(
+                f"Config creation failed: {e}",
+            )
+
+    @classmethod
+    def get_default_batch_size(cls) -> int:
+        """Get the default batch size value.
+
+        Returns:
+            int: The default batch size for data processing.
+
+        """
+        return c.Performance.BatchProcessing.DEFAULT_SIZE
+
+    @classmethod
+    def get_default_timeout(cls) -> int:
+        """Get the default timeout value.
+
+        Returns:
+            int: The default timeout in seconds.
+
+        """
+        return c.Network.DEFAULT_TIMEOUT
+
+    # ============================================================================
     # SINGLETON METHODS - Global instance management (FlextSettings SOURCE)
     # ============================================================================
 
@@ -624,6 +488,52 @@ class FlextMeltanoSettings(FlextSettings):
         return instance
 
     @classmethod
+    def get_name(cls) -> str:
+        """Get the name of flext-meltano.
+
+        Returns:
+            str: The name string for flext-meltano.
+
+        """
+        return "flext-meltano"
+
+    @classmethod
+    def get_supported_environments(cls) -> t.Meltano.PluginNameList:
+        """Get list of supported environments."""
+        return [
+            c.Meltano.Enums.Environment.DEVELOPMENT.value,
+            c.Meltano.Enums.Environment.STAGING.value,
+            c.Meltano.Enums.Environment.PRODUCTION.value,
+            c.Meltano.Enums.Environment.TESTING.value,
+        ]
+
+    @classmethod
+    def get_supported_log_levels(cls) -> t.Meltano.PluginNameList:
+        """Get list of supported log levels."""
+        return [
+            str(c.Settings.LogLevel.DEBUG.value),
+            str(c.Settings.LogLevel.INFO.value),
+            str(c.Settings.LogLevel.WARNING.value),
+            str(c.Settings.LogLevel.ERROR.value),
+            str(c.Settings.LogLevel.CRITICAL.value),
+        ]
+
+    @classmethod
+    def get_supported_plugin_types(cls) -> t.Meltano.PluginTypeList:
+        """Get list of supported plugin types."""
+        return u.Meltano.supported_types()
+
+    @classmethod
+    def get_version(cls) -> str:
+        """Get the version of flext-meltano.
+
+        Returns:
+            str: The version string for flext-meltano.
+
+        """
+        return "0.9.0"
+
+    @classmethod
     def set_global_instance(cls, instance: FlextSettings) -> None:
         """Set the SINGLETON GLOBAL Meltano configuration instance.
 
@@ -650,82 +560,69 @@ class FlextMeltanoSettings(FlextSettings):
         # Use class-level singleton pattern (avoids PLW0603 global statement)
         cls._instance = normalized_instance
 
+    # ============================================================================
+    # FIELD VALIDATORS - Pydantic validation methods
+    # ============================================================================
+
+    @field_validator("project_root", "venv_dir", mode="before")
     @classmethod
-    def get_version(cls) -> str:
-        """Get the version of flext-meltano.
+    def validate_absolute_paths(cls, v: Path | str) -> Path:
+        """Validate and convert absolute path fields.
+
+        Args:
+        v: Path or string to validate and convert.
 
         Returns:
-            str: The version string for flext-meltano.
+        Path: Resolved absolute path.
 
         """
-        return "0.9.0"
+        path_value = m.Meltano.PathPayload(value=Path(v)).value
+        return path_value.expanduser().resolve()
 
+    @field_validator("config_dir", "logs_dir")
     @classmethod
-    def get_name(cls) -> str:
-        """Get the name of flext-meltano.
+    def validate_relative_paths(cls, v: Path | str) -> Path:
+        """Validate relative path fields (should not be resolved to absolute).
+
+        Args:
+        v: Path or string to validate and convert.
 
         Returns:
-            str: The name string for flext-meltano.
+        Path: Expanded but not resolved path to allow relative paths.
 
         """
-        return "flext-meltano"
+        path_value = m.Meltano.PathPayload(value=Path(v)).value
+        return path_value.expanduser()  # Don't resolve to allow relative paths
 
+    @field_validator("meltano_database_uri", "meltano_api_key")
     @classmethod
-    def get_default_timeout(cls) -> int:
-        """Get the default timeout value.
+    def validate_secret_fields(cls, v: SecretStr | None) -> SecretStr | None:
+        """Validate SecretStr fields for sensitive data.
+
+        Args:
+        v: SecretStr value to validate.
 
         Returns:
-            int: The default timeout in seconds.
+        SecretStr | None: Validated SecretStr or None.
 
         """
-        return c.Network.DEFAULT_TIMEOUT
+        if v is None:
+            return None
+        return v
 
+    @field_validator("meltano_version", "singer_sdk_version", "dbt_version")
     @classmethod
-    def get_default_batch_size(cls) -> int:
-        """Get the default batch size value.
+    def validate_versions(cls, v: str) -> str:
+        """Validate version strings (strip whitespace).
+
+        Args:
+        v: Version string to validate.
 
         Returns:
-            int: The default batch size for data processing.
+        str: Validated and stripped version string.
 
         """
-        return c.Performance.BatchProcessing.DEFAULT_SIZE
-
-    @classmethod
-    def get_supported_plugin_types(cls) -> t.Meltano.PluginTypeList:
-        """Get list of supported plugin types."""
-        return u.Meltano.supported_types()
-
-    @classmethod
-    def get_supported_environments(cls) -> t.Meltano.PluginNameList:
-        """Get list of supported environments."""
-        return [
-            c.Meltano.Enums.Environment.DEVELOPMENT.value,
-            c.Meltano.Enums.Environment.STAGING.value,
-            c.Meltano.Enums.Environment.PRODUCTION.value,
-            c.Meltano.Enums.Environment.TESTING.value,
-        ]
-
-    @classmethod
-    def get_supported_log_levels(cls) -> t.Meltano.PluginNameList:
-        """Get list of supported log levels."""
-        return [
-            str(c.Settings.LogLevel.DEBUG.value),
-            str(c.Settings.LogLevel.INFO.value),
-            str(c.Settings.LogLevel.WARNING.value),
-            str(c.Settings.LogLevel.ERROR.value),
-            str(c.Settings.LogLevel.CRITICAL.value),
-        ]
-
-    @classmethod
-    def clear_global_instance(cls) -> None:
-        """Clear the global instance (useful for testing).
-
-        Removes the current global configuration instance, allowing for
-        fresh configuration in test scenarios.
-
-        """
-        # Clear global instance for this class
-        # Parent class doesn't have this method, so we implement it here
+        return v.strip()
 
     def apply_overrides(self, **overrides: t.JsonValue) -> r[None]:
         """Apply configuration overrides to this instance.
@@ -780,27 +677,77 @@ class FlextMeltanoSettings(FlextSettings):
                 error_code="OVERRIDE_APPLICATION_ERROR",
             )
 
-    def seal(self) -> r[None]:
-        """Seal the configuration to prevent further modifications.
-
-        Once sealed, the configuration cannot be modified, ensuring
-        immutability for production use.
+    def get_absolute_config_dir(self) -> r[Path]:
+        """Get absolute path to config directory using railway pattern.
 
         Returns:
-        FlextResult indicating success or failure.
+        FlextResult containing the absolute config directory path.
 
         """
-        self.sealed = True
-        return r[None].ok(None)
+        try:
+            if self.config_dir.is_absolute():
+                return r[Path].ok(self.config_dir)
+            return r[Path].ok(self.project_root / self.config_dir)
+        except (ValueError, TypeError, OSError) as e:
+            return r[Path].fail(f"Failed to get config directory path: {e}")
 
-    def is_sealed(self) -> bool:
-        """Check if the configuration is sealed.
+    def get_absolute_logs_dir(self) -> r[Path]:
+        """Get absolute path to logs directory using railway pattern.
 
         Returns:
-        bool: True if configuration is sealed, False otherwise.
+        FlextResult containing the absolute logs directory path.
 
         """
-        return getattr(self, "sealed", False)
+        try:
+            if self.logs_dir.is_absolute():
+                return r[Path].ok(self.logs_dir)
+            return r[Path].ok(self.project_root / self.logs_dir)
+        except (ValueError, TypeError, OSError) as e:
+            return r[Path].fail(f"Failed to get logs directory path: {e}")
+
+    def get_absolute_venv_dir(self) -> Path:
+        """Get absolute path to virtual environment directory.
+
+        Returns:
+        Path: Absolute virtual environment directory path.
+
+        """
+        if self.venv_dir.is_absolute():
+            return self.venv_dir
+        return self.project_root / self.venv_dir
+
+    def get_environment_variables(self) -> Mapping[str, str]:
+        """Get environment variables for Meltano operations.
+
+        This method uses FlextSettings as the base and adds Meltano-specific variables.
+
+        Returns:
+        dict[str, str]: Environment variables dictionary.
+
+        """
+        return self.get_meltano_environment_variables()
+
+    def get_meltano_api_key_value(self) -> str | None:
+        """Get the actual Meltano API key value (safely extract from SecretStr).
+
+        Returns:
+        str | None: The API key value or None if not set.
+
+        """
+        if self.meltano_api_key is None:
+            return None
+        return self.meltano_api_key.get_secret_value()
+
+    def get_meltano_database_uri_value(self) -> str:
+        """Get the actual Meltano database URI value (safely extract from SecretStr).
+
+        Returns:
+        str: The database URI value.
+
+        """
+        if self.meltano_database_uri is None:
+            return "sqlite:///meltano.db"
+        return self.meltano_database_uri.get_secret_value()
 
     def get_meltano_environment_variables(self) -> Mapping[str, str]:
         """Get Meltano-specific environment variables.
@@ -926,6 +873,59 @@ class FlextMeltanoSettings(FlextSettings):
         }
 
     # ============================================================================
+    # CONFIGURATION METHODS - Business logic methods
+    # ============================================================================
+
+    def get_project_file(self) -> r[Path]:
+        """Get full path to meltano project file using railway pattern.
+
+        Returns:
+        FlextResult containing the full path to the Meltano project file.
+
+        """
+        try:
+            return r[Path].ok(self.project_root / self.PROJECT_FILE)
+        except (ValueError, TypeError, OSError) as e:
+            return r[Path].fail(f"Failed to get project file path: {e}")
+
+    def is_sealed(self) -> bool:
+        """Check if the configuration is sealed.
+
+        Returns:
+        bool: True if configuration is sealed, False otherwise.
+
+        """
+        return getattr(self, "sealed", False)
+
+    def seal(self) -> r[None]:
+        """Seal the configuration to prevent further modifications.
+
+        Once sealed, the configuration cannot be modified, ensuring
+        immutability for production use.
+
+        Returns:
+        FlextResult indicating success or failure.
+
+        """
+        self.sealed = True
+        return r[None].ok(None)
+
+    def validate_project_structure(self) -> r[bool]:
+        """Validate Meltano project directory structure.
+
+        Performs complete validation of the Meltano project structure,
+        checking for required directories, files, and configuration.
+
+        Returns:
+        FlextResult containing boolean validation result or error details.
+
+        """
+        # Use centralized validator to eliminate duplication
+        return FlextMeltanoValidators.validate_pipeline_project_structure(
+            self.project_root,
+        )
+
+    # ============================================================================
     # NESTED CONFIGURATION BUILDERS - FLEXT Pattern for unified functionality
     # ============================================================================
 
@@ -1008,6 +1008,26 @@ class FlextMeltanoSettings(FlextSettings):
                 )
 
         @staticmethod
+        def create_development_config() -> r[FlextMeltanoSettings]:
+            """Create configuration optimized for development environment.
+
+            Returns:
+            FlextResult with development-optimized FlextMeltanoSettings
+
+            """
+            try:
+                config = FlextMeltanoSettings()
+                # Apply development-specific settings
+                config.environment = c.Meltano.Enums.Environment.DEVELOPMENT.value
+                config.debug = True
+                config.log_level = c.Settings.LogLevel.DEBUG
+                config.network_timeout = 300
+                config.max_concurrent_jobs = 2
+                return r[FlextMeltanoSettings].ok(config)
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+                return r[FlextMeltanoSettings].fail(f"Failed to create dev config: {e}")
+
+        @staticmethod
         def create_meltano_config(
             project_id: str,
             default_environment: str = "dev",
@@ -1045,26 +1065,6 @@ class FlextMeltanoSettings(FlextSettings):
                 return r[t.Meltano.MeltanoConfigDict].fail(
                     f"Failed to create Meltano config: {e}",
                 )
-
-        @staticmethod
-        def create_development_config() -> r[FlextMeltanoSettings]:
-            """Create configuration optimized for development environment.
-
-            Returns:
-            FlextResult with development-optimized FlextMeltanoSettings
-
-            """
-            try:
-                config = FlextMeltanoSettings()
-                # Apply development-specific settings
-                config.environment = c.Meltano.Enums.Environment.DEVELOPMENT.value
-                config.debug = True
-                config.log_level = c.Settings.LogLevel.DEBUG
-                config.network_timeout = 300
-                config.max_concurrent_jobs = 2
-                return r[FlextMeltanoSettings].ok(config)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                return r[FlextMeltanoSettings].fail(f"Failed to create dev config: {e}")
 
         @staticmethod
         def create_production_config(

@@ -88,6 +88,12 @@ class FlextMeltanoSingerService(s[str]):
             self.logger.exception("Tap discovery failed", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Tap discovery failed: {e}")
 
+    @override
+    def execute(self) -> r[str]:
+        """Execute (implements Service pattern)."""
+        msg = "Singer service initialized"
+        return r[str].ok(msg)
+
     def execute_sync(
         self,
         tap: singer_p.SingerTap,
@@ -162,6 +168,21 @@ class FlextMeltanoSingerService(s[str]):
         """
         return self.catalog_manager.load_catalog(catalog_path)
 
+    def load_state_from_file(
+        self,
+        state_path: Path | None = None,
+    ) -> r[m.Meltano.SingerStateMessage]:
+        """Load state from file.
+
+        Args:
+        state_path: Path to state file
+
+        Returns:
+        FlextResult containing loaded state as SingerStateMessage
+
+        """
+        return self.state_manager.load_state(state_path)
+
     def save_catalog_to_file(
         self,
         catalog: m.Meltano.SingerCatalog,
@@ -180,21 +201,6 @@ class FlextMeltanoSingerService(s[str]):
         self.catalog_manager.set_catalog(catalog)
         return self.catalog_manager.save_catalog(catalog_path)
 
-    def load_state_from_file(
-        self,
-        state_path: Path | None = None,
-    ) -> r[m.Meltano.SingerStateMessage]:
-        """Load state from file.
-
-        Args:
-        state_path: Path to state file
-
-        Returns:
-        FlextResult containing loaded state as SingerStateMessage
-
-        """
-        return self.state_manager.load_state(state_path)
-
     def save_state_to_file(self, state_path: Path) -> r[None]:
         """Save state to file.
 
@@ -206,12 +212,6 @@ class FlextMeltanoSingerService(s[str]):
 
         """
         return self.state_manager.save_state(state_path)
-
-    @override
-    def execute(self) -> r[str]:
-        """Execute (implements Service pattern)."""
-        msg = "Singer service initialized"
-        return r[str].ok(msg)
 
 
 __all__ = [

@@ -91,44 +91,28 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
                 f"Sink configuration failed: {e}",
             )
 
-    def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
-        """Validate a sink configuration.
+    def create_flext_target(
+        self,
+        sink_config: m.Meltano.DataSinkConfig | dict[str, t.JsonValue],
+    ) -> r[m.Meltano.DataSinkInstance]:
+        """Create a target instance from configuration.
 
         Args:
-        sink_config: Sink configuration to validate
+            sink_config: Target configuration
 
         Returns:
-        r containing validation result
+            r containing the created DataSinkInstance
 
         """
-        try:
-            self.logger.debug(
-                "Validating target configuration",
-                target_name=sink_config.sink_type,
-            )
+        if isinstance(sink_config, dict):
+            try:
+                config = m.Meltano.DataSinkConfig(**sink_config)  # type: ignore[arg-type]
+            except Exception as e:
+                return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
+        else:
+            config = sink_config
 
-            # Basic validation
-            if not sink_config.sink_type:
-                return r[bool].fail("Target configuration must have name and type")
-
-            # Additional validation logic would go here
-            # For now, just return success
-            return r[bool].ok(value=True)
-
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception(
-                "Target configuration validation failed",
-                error=str(e),
-            )
-            return r[bool].fail(f"Target configuration validation failed: {e}")
+        return self.create_sink_instance(config)
 
     def create_sink_instance(
         self,
@@ -187,28 +171,44 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         # For now, return the current configuration
         return r[t.Meltano.MeltanoConfigDict].ok(self._meltano_config.model_dump())
 
-    def create_flext_target(
-        self,
-        sink_config: m.Meltano.DataSinkConfig | dict[str, t.JsonValue],
-    ) -> r[m.Meltano.DataSinkInstance]:
-        """Create a target instance from configuration.
+    def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
+        """Validate a sink configuration.
 
         Args:
-            sink_config: Target configuration
+        sink_config: Sink configuration to validate
 
         Returns:
-            r containing the created DataSinkInstance
+        r containing validation result
 
         """
-        if isinstance(sink_config, dict):
-            try:
-                config = m.Meltano.DataSinkConfig(**sink_config)  # type: ignore[arg-type]
-            except Exception as e:
-                return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
-        else:
-            config = sink_config
+        try:
+            self.logger.debug(
+                "Validating target configuration",
+                target_name=sink_config.sink_type,
+            )
 
-        return self.create_sink_instance(config)
+            # Basic validation
+            if not sink_config.sink_type:
+                return r[bool].fail("Target configuration must have name and type")
+
+            # Additional validation logic would go here
+            # For now, just return success
+            return r[bool].ok(value=True)
+
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception(
+                "Target configuration validation failed",
+                error=str(e),
+            )
+            return r[bool].fail(f"Target configuration validation failed: {e}")
 
 
 # Re-export Singer SDK types for public API

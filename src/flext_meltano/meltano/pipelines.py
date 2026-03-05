@@ -54,6 +54,16 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         self._config = config or FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
+    @staticmethod
+    def _find_required_plugins() -> r[tuple[p.Meltano.Plugin, p.Meltano.Plugin]]:
+        """Find required plugins in t.Meltano.Dbt.Project."""
+        return r[
+            tuple[
+                p.Meltano.Plugin,
+                p.Meltano.Plugin,
+            ]
+        ].fail("Plugin discovery not configured")
+
     def execute_pipeline(
         self,
         project_path: str,
@@ -123,26 +133,43 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             )
         return final_result
 
-    # Private helper methods (extracted from adapters.py)
+    def _build_pipeline_result(
+        self,
+        extractor_name: str,
+        loader_name: str,
+        context_data: Mapping[str, t.JsonValue],
+    ) -> r[Mapping[str, str]]:
+        """Build successful pipeline result."""
+        try:
+            parsed_context = m.Meltano.PipelineResultContext.model_validate(
+                context_data,
+            )
+            execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate(
+                {"values": parsed_context.execution_result},
+            ).values
 
-    def _log_pipeline_start(self, extractor_name: str, loader_name: str) -> r[None]:
-        """Log pipeline execution start."""
-        self.logger.info(
-            "Executing ELT pipeline",
-            extractor=extractor_name,
-            loader=loader_name,
-        )
-        return r.ok(None)
+            # Build pipeline result using available data
+            pipeline_result: dict[str, str] = {
+                "success": "true",
+                "extractor": extractor_name,
+                "loader": loader_name,
+                "execution_method": "singer_runner_abstracted",
+                "project_root": parsed_context.project_root,
+                "run_id": "unknown",  # Would be extracted from elt_context in real implementation
+            }
 
-    @staticmethod
-    def _find_required_plugins() -> r[tuple[p.Meltano.Plugin, p.Meltano.Plugin]]:
-        """Find required plugins in t.Meltano.Dbt.Project."""
-        return r[
-            tuple[
-                p.Meltano.Plugin,
-                p.Meltano.Plugin,
-            ]
-        ].fail("Plugin discovery not configured")
+            # Add execution result data if available
+            pipeline_result.update(execution_values)
+
+            self.logger.info(
+                "ELT pipeline executed successfully",
+                extractor=extractor_name,
+                loader=loader_name,
+            )
+
+            return r[Mapping[str, str]].ok(pipeline_result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[Mapping[str, str]].fail(f"Failed to build pipeline result: {e}")
 
     def _create_elt_context(
         self,
@@ -215,43 +242,16 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 f"Unexpected error in ELT pipeline: {e}",
             )
 
-    def _build_pipeline_result(
-        self,
-        extractor_name: str,
-        loader_name: str,
-        context_data: Mapping[str, t.JsonValue],
-    ) -> r[Mapping[str, str]]:
-        """Build successful pipeline result."""
-        try:
-            parsed_context = m.Meltano.PipelineResultContext.model_validate(
-                context_data,
-            )
-            execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate(
-                {"values": parsed_context.execution_result},
-            ).values
+    # Private helper methods (extracted from adapters.py)
 
-            # Build pipeline result using available data
-            pipeline_result: dict[str, str] = {
-                "success": "true",
-                "extractor": extractor_name,
-                "loader": loader_name,
-                "execution_method": "singer_runner_abstracted",
-                "project_root": parsed_context.project_root,
-                "run_id": "unknown",  # Would be extracted from elt_context in real implementation
-            }
-
-            # Add execution result data if available
-            pipeline_result.update(execution_values)
-
-            self.logger.info(
-                "ELT pipeline executed successfully",
-                extractor=extractor_name,
-                loader=loader_name,
-            )
-
-            return r[Mapping[str, str]].ok(pipeline_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, str]].fail(f"Failed to build pipeline result: {e}")
+    def _log_pipeline_start(self, extractor_name: str, loader_name: str) -> r[None]:
+        """Log pipeline execution start."""
+        self.logger.info(
+            "Executing ELT pipeline",
+            extractor=extractor_name,
+            loader=loader_name,
+        )
+        return r.ok(None)
 
 
 __all__ = [

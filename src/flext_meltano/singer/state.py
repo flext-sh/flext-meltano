@@ -33,6 +33,51 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         super().__init__()
         self._state_msg: m.Meltano.SingerStateMessage = m.Meltano.SingerStateMessage()
 
+    @override
+    def execute(self, **_kwargs: t.JsonValue) -> r[m.Meltano.SingerStateMessage]:
+        """Execute (implements Service pattern)."""
+        return r[m.Meltano.SingerStateMessage].ok(self.to_state_message())
+
+    def get_bookmark(self, stream_name: str, bookmark_key: str) -> r[str]:
+        """Get current bookmark value.
+
+        Args:
+        stream_name: Name of the stream
+        bookmark_key: Bookmark field name
+
+        Returns:
+        FlextResult containing bookmark value or None
+
+        """
+        try:
+            stream_state = self._state_msg.value.get(stream_name)
+            if stream_state is None:
+                return r[str].fail(f"Stream state not found: {stream_name}")
+
+            match stream_state:
+                case dict():
+                    pass
+                case _:
+                    return r[str].fail(f"Stream state for {stream_name} is not a dict")
+
+            value = stream_state.get(bookmark_key)
+            if value is None:
+                return r[str].fail(
+                    f"Bookmark not found: {stream_name}.{bookmark_key}",
+                )
+            return r[str].ok(str(value))
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to get bookmark", error=str(e))
+            return r[str].fail(f"Failed to get bookmark: {e}")
+
     def load_state(
         self,
         state_file: Path | None = None,
@@ -101,6 +146,10 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             self.logger.exception("Failed to save state", error=str(e))
             return r[None].fail(f"Failed to save state: {e}")
 
+    def to_state_message(self) -> m.Meltano.SingerStateMessage:
+        """Return current state as SingerStateMessage."""
+        return self._state_msg
+
     def update_bookmark(
         self,
         stream_name: str,
@@ -145,55 +194,6 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         ) as e:
             self.logger.exception("Failed to update bookmark", error=str(e))
             return r[None].fail(f"Failed to update bookmark: {e}")
-
-    def get_bookmark(self, stream_name: str, bookmark_key: str) -> r[str]:
-        """Get current bookmark value.
-
-        Args:
-        stream_name: Name of the stream
-        bookmark_key: Bookmark field name
-
-        Returns:
-        FlextResult containing bookmark value or None
-
-        """
-        try:
-            stream_state = self._state_msg.value.get(stream_name)
-            if stream_state is None:
-                return r[str].fail(f"Stream state not found: {stream_name}")
-
-            match stream_state:
-                case dict():
-                    pass
-                case _:
-                    return r[str].fail(f"Stream state for {stream_name} is not a dict")
-
-            value = stream_state.get(bookmark_key)
-            if value is None:
-                return r[str].fail(
-                    f"Bookmark not found: {stream_name}.{bookmark_key}",
-                )
-            return r[str].ok(str(value))
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to get bookmark", error=str(e))
-            return r[str].fail(f"Failed to get bookmark: {e}")
-
-    def to_state_message(self) -> m.Meltano.SingerStateMessage:
-        """Return current state as SingerStateMessage."""
-        return self._state_msg
-
-    @override
-    def execute(self, **_kwargs: t.JsonValue) -> r[m.Meltano.SingerStateMessage]:
-        """Execute (implements Service pattern)."""
-        return r[m.Meltano.SingerStateMessage].ok(self.to_state_message())
 
 
 __all__ = [

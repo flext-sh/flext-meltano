@@ -42,6 +42,46 @@ class FlextMeltanoFileManagers:
     """
 
     @classmethod
+    def cleanup_temp_directory(cls, temp_path: Path) -> r[bool]:
+        """Cleanup temporary directory using direct implementation.
+
+        Returns:
+        r indicating success or failure of the cleanup operation.
+
+        """
+        try:
+            if temp_path.exists() and temp_path.is_dir():
+                shutil.rmtree(temp_path)
+            return r[bool].ok(value=True)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[bool].fail(f"Failed to cleanup temp directory: {e}")
+
+    @classmethod
+    def create_directory_structure(
+        cls,
+        base_path: Path,
+        directories: list[str],
+    ) -> r[Mapping[str, str]]:
+        """Create directory structure using direct pathlib implementation.
+
+        Returns:
+        r containing the created directory structure information.
+
+        """
+        try:
+            created_paths: dict[str, str] = {}
+            for directory in directories:
+                dir_path = base_path / directory
+                dir_path.mkdir(parents=True, exist_ok=True)
+                created_paths[directory] = str(dir_path)
+
+            return r[Mapping[str, str]].ok(created_paths)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[Mapping[str, str]].fail(
+                f"Failed to create directories: {e}",
+            )
+
+    @classmethod
     def create_temp_directory(cls, prefix: str = "flext_meltano_") -> r[Path]:
         """Create temporary directory using DSL patterns.
 
@@ -69,45 +109,6 @@ class FlextMeltanoFileManagers:
             error_msg = "Failed to create temp directory"
             logger.error(error_msg)
             return r[Path].fail(error_msg)
-        return result
-
-    @classmethod
-    def save_yaml_config(
-        cls,
-        config: t.Meltano.FileConfigDict,
-        file_path: Path,
-    ) -> r[bool]:
-        """Save YAML config using DSL patterns.
-
-        DSL: Uses u.try_ for unified error handling.
-
-        Returns:
-        FlextResult indicating success or failure of the save operation.
-
-        """
-
-        # DSL: Use u.try_ for unified error handling
-        def _save() -> r[bool]:
-            # Ensure parent directory exists
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            # Write YAML with proper encoding
-            with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
-                yaml.dump(
-                    config,
-                    f,
-                    indent=2,
-                    default_flow_style=False,
-                    sort_keys=False,
-                )
-            return r[bool].ok(value=True)
-
-        result = u.try_(
-            _save,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        if result is None:
-            return r[bool].fail("Failed to save YAML config")
         return result
 
     @classmethod
@@ -165,63 +166,43 @@ class FlextMeltanoFileManagers:
         return result
 
     @classmethod
-    def validate_yaml_file(cls, file_path: Path) -> r[bool]:
-        """Validate YAML using DSL patterns + direct YAML parsing.
+    def save_yaml_config(
+        cls,
+        config: t.Meltano.FileConfigDict,
+        file_path: Path,
+    ) -> r[bool]:
+        """Save YAML config using DSL patterns.
 
-        ZERO DUPLICATION: Uses u.Guards.is_string_non_empty for validation.
         DSL: Uses u.try_ for unified error handling.
 
         Returns:
-        r indicating whether the YAML file is valid.
+        FlextResult indicating success or failure of the save operation.
 
         """
 
         # DSL: Use u.try_ for unified error handling
-        def _validate() -> r[bool]:
-            # Basic path validation using flext-core utilities
-            if not u.Guards.is_string_non_empty(str(file_path)):
-                return r[bool].fail(f"Invalid YAML file path: {file_path}")
-
-            if not file_path.exists():
-                return r[bool].fail(f"YAML file not found: {file_path}")
-
-            with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
-                yaml.safe_load(f)  # This will raise an exception if invalid YAML
-
+        def _save() -> r[bool]:
+            # Ensure parent directory exists
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            # Write YAML with proper encoding
+            with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
+                yaml.dump(
+                    config,
+                    f,
+                    indent=2,
+                    default_flow_style=False,
+                    sort_keys=False,
+                )
             return r[bool].ok(value=True)
 
-        # DSL: Handle YAML-specific errors separately
-        try:
-            return _validate()
-        except yaml.YAMLError as e:
-            return r[bool].fail(f"Invalid YAML syntax: {e}")
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[bool].fail(f"Failed to validate YAML: {e}")
-
-    @classmethod
-    def create_directory_structure(
-        cls,
-        base_path: Path,
-        directories: list[str],
-    ) -> r[Mapping[str, str]]:
-        """Create directory structure using direct pathlib implementation.
-
-        Returns:
-        r containing the created directory structure information.
-
-        """
-        try:
-            created_paths: dict[str, str] = {}
-            for directory in directories:
-                dir_path = base_path / directory
-                dir_path.mkdir(parents=True, exist_ok=True)
-                created_paths[directory] = str(dir_path)
-
-            return r[Mapping[str, str]].ok(created_paths)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, str]].fail(
-                f"Failed to create directories: {e}",
-            )
+        result = u.try_(
+            _save,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            default=None,
+        )
+        if result is None:
+            return r[bool].fail("Failed to save YAML config")
+        return result
 
     @classmethod
     def setup_project_structure(
@@ -296,21 +277,6 @@ class FlextMeltanoFileManagers:
             )
 
     @classmethod
-    def cleanup_temp_directory(cls, temp_path: Path) -> r[bool]:
-        """Cleanup temporary directory using direct implementation.
-
-        Returns:
-        r indicating success or failure of the cleanup operation.
-
-        """
-        try:
-            if temp_path.exists() and temp_path.is_dir():
-                shutil.rmtree(temp_path)
-            return r[bool].ok(value=True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[bool].fail(f"Failed to cleanup temp directory: {e}")
-
-    @classmethod
     def validate_project_structure(cls, project_root: Path) -> r[bool]:
         """Validate Meltano project structure.
 
@@ -334,6 +300,40 @@ class FlextMeltanoFileManagers:
             return r[bool].ok(value=True)
         except (ValueError, TypeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project structure: {e}")
+
+    @classmethod
+    def validate_yaml_file(cls, file_path: Path) -> r[bool]:
+        """Validate YAML using DSL patterns + direct YAML parsing.
+
+        ZERO DUPLICATION: Uses u.Guards.is_string_non_empty for validation.
+        DSL: Uses u.try_ for unified error handling.
+
+        Returns:
+        r indicating whether the YAML file is valid.
+
+        """
+
+        # DSL: Use u.try_ for unified error handling
+        def _validate() -> r[bool]:
+            # Basic path validation using flext-core utilities
+            if not u.Guards.is_string_non_empty(str(file_path)):
+                return r[bool].fail(f"Invalid YAML file path: {file_path}")
+
+            if not file_path.exists():
+                return r[bool].fail(f"YAML file not found: {file_path}")
+
+            with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
+                yaml.safe_load(f)  # This will raise an exception if invalid YAML
+
+            return r[bool].ok(value=True)
+
+        # DSL: Handle YAML-specific errors separately
+        try:
+            return _validate()
+        except yaml.YAMLError as e:
+            return r[bool].fail(f"Invalid YAML syntax: {e}")
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[bool].fail(f"Failed to validate YAML: {e}")
 
 
 __all__ = ["FlextMeltanoFileManagers"]

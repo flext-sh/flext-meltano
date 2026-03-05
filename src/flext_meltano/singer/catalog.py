@@ -68,6 +68,45 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to discover: {e}")
 
+    @override
+    def execute(self) -> r[m.Meltano.SingerCatalog]:
+        """Execute (implements Service pattern)."""
+        return r[m.Meltano.SingerCatalog].ok(self._catalog)
+
+    def get_stream_schema(self, stream_name: str) -> r[Mapping[str, t.JsonValue]]:
+        """Get schema for a specific stream.
+
+        Args:
+        stream_name: Name of the stream
+
+        Returns:
+        FlextResult containing stream schema or None
+
+        """
+        try:
+            for entry in self._catalog.streams:
+                if entry.stream == stream_name:
+                    self.logger.debug(
+                        "Stream schema retrieved",
+                        stream=stream_name,
+                    )
+                    return r[Mapping[str, t.JsonValue]].ok(entry.schema_definition)
+
+            return r[Mapping[str, t.JsonValue]].fail(
+                f"Stream not found in catalog: {stream_name}",
+            )
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to get stream schema", error=str(e))
+            return r[Mapping[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
+
     def load_catalog(self, catalog_file: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.
 
@@ -105,15 +144,6 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         ) as e:
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
-
-    def set_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:
-        """Set catalog data directly.
-
-        Args:
-        catalog: Catalog model to set
-
-        """
-        self._catalog = catalog
 
     def save_catalog(self, catalog_file: Path) -> r[None]:
         """Save catalog to file.
@@ -180,44 +210,14 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             self.logger.exception("Failed to select streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 
-    def get_stream_schema(self, stream_name: str) -> r[Mapping[str, t.JsonValue]]:
-        """Get schema for a specific stream.
+    def set_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:
+        """Set catalog data directly.
 
         Args:
-        stream_name: Name of the stream
-
-        Returns:
-        FlextResult containing stream schema or None
+        catalog: Catalog model to set
 
         """
-        try:
-            for entry in self._catalog.streams:
-                if entry.stream == stream_name:
-                    self.logger.debug(
-                        "Stream schema retrieved",
-                        stream=stream_name,
-                    )
-                    return r[Mapping[str, t.JsonValue]].ok(entry.schema_definition)
-
-            return r[Mapping[str, t.JsonValue]].fail(
-                f"Stream not found in catalog: {stream_name}",
-            )
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to get stream schema", error=str(e))
-            return r[Mapping[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
-
-    @override
-    def execute(self) -> r[m.Meltano.SingerCatalog]:
-        """Execute (implements Service pattern)."""
-        return r[m.Meltano.SingerCatalog].ok(self._catalog)
+        self._catalog = catalog
 
 
 __all__ = [

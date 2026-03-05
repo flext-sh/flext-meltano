@@ -47,6 +47,75 @@ class FlextMeltanoDbtService(s[str]):
         self.project_manager = FlextMeltanoDbtProjectManager()
         self.runner = FlextMeltanoDbtRunner()
 
+    @override
+    def execute(self) -> r[str]:
+        """Execute (implements Service pattern)."""
+        msg = "DBT service initialized"
+        return r[str].ok(msg)
+
+    def generate_docs(
+        self,
+        **kwargs: t.ContainerValue,
+    ) -> r[t.Meltano.ExecutionResultDict]:
+        """Generate DBT documentation.
+
+        Args:
+        **kwargs: Additional dbt docs arguments
+
+        Returns:
+        FlextResult containing documentation result
+
+        """
+        try:
+            self.logger.info("Generating DBT documentation")
+            result = self.runner.docs_generate(**kwargs)
+            if result.is_success:
+                self.logger.info("DBT documentation generated")
+            return result
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("DBT documentation generation failed", error=str(e))
+            return r[t.Meltano.ExecutionResultDict].fail(
+                f"Documentation generation failed: {e}",
+            )
+
+    def get_project_models(
+        self,
+    ) -> r[list[t.Meltano.DbtModelDict]]:
+        """Get all models from the project.
+
+        Returns:
+        FlextResult containing list of models
+
+        """
+        try:
+            self.logger.info("Retrieving DBT models")
+            result = self.project_manager.get_models()
+            if result.is_success:
+                models = result.value
+                self.logger.info("DBT models retrieved", count=len(models))
+            return result
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to get models", error=str(e))
+            return r[list[t.Meltano.DbtModelDict]].fail(
+                f"Failed to get models: {e}",
+            )
+
     def load_project(
         self,
         root: Path,
@@ -79,36 +148,6 @@ class FlextMeltanoDbtService(s[str]):
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[m.Meltano.DbtProjectInfo].fail(
                 f"Failed to load DBT project: {e}",
-            )
-
-    def get_project_models(
-        self,
-    ) -> r[list[t.Meltano.DbtModelDict]]:
-        """Get all models from the project.
-
-        Returns:
-        FlextResult containing list of models
-
-        """
-        try:
-            self.logger.info("Retrieving DBT models")
-            result = self.project_manager.get_models()
-            if result.is_success:
-                models = result.value
-                self.logger.info("DBT models retrieved", count=len(models))
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to get models", error=str(e))
-            return r[list[t.Meltano.DbtModelDict]].fail(
-                f"Failed to get models: {e}",
             )
 
     def run_models(
@@ -188,45 +227,6 @@ class FlextMeltanoDbtService(s[str]):
             return r[DbtTestResult].fail(
                 f"DBT tests failed: {e}",
             )
-
-    def generate_docs(
-        self,
-        **kwargs: t.ContainerValue,
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Generate DBT documentation.
-
-        Args:
-        **kwargs: Additional dbt docs arguments
-
-        Returns:
-        FlextResult containing documentation result
-
-        """
-        try:
-            self.logger.info("Generating DBT documentation")
-            result = self.runner.docs_generate(**kwargs)
-            if result.is_success:
-                self.logger.info("DBT documentation generated")
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}",
-            )
-
-    @override
-    def execute(self) -> r[str]:
-        """Execute (implements Service pattern)."""
-        msg = "DBT service initialized"
-        return r[str].ok(msg)
 
 
 __all__ = [

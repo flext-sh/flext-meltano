@@ -479,21 +479,6 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
-            def pipeline_dict(self) -> Mapping[str, bool]:
-                """Pipeline logging as dictionary."""
-                return {
-                    "execution": self.pipeline_execution,
-                    "stages": self.pipeline_stages,
-                    "progress": self.pipeline_progress,
-                    "errors": self.pipeline_errors,
-                    "warnings": self.pipeline_warnings,
-                    "performance": self.pipeline_performance,
-                    "timing": self.pipeline_timing,
-                    "memory": self.pipeline_memory,
-                    "throughput": self.pipeline_throughput,
-                }
-
-            @computed_field
             def extract_dict(self) -> Mapping[str, bool]:
                 """Extract logging as dictionary."""
                 return {
@@ -519,6 +504,21 @@ class FlextMeltanoModels(FlextCliModels):
                     "timing": self.load_timing,
                     "memory": self.load_memory,
                     "throughput": self.load_throughput,
+                }
+
+            @computed_field
+            def pipeline_dict(self) -> Mapping[str, bool]:
+                """Pipeline logging as dictionary."""
+                return {
+                    "execution": self.pipeline_execution,
+                    "stages": self.pipeline_stages,
+                    "progress": self.pipeline_progress,
+                    "errors": self.pipeline_errors,
+                    "warnings": self.pipeline_warnings,
+                    "performance": self.pipeline_performance,
+                    "timing": self.pipeline_timing,
+                    "memory": self.pipeline_memory,
+                    "throughput": self.pipeline_throughput,
                 }
 
             @computed_field
@@ -738,9 +738,11 @@ class FlextMeltanoModels(FlextCliModels):
             tap_version: str = Field(default="latest", description="Tap version")
 
             @computed_field
-            def tap_identifier(self) -> str:
-                """Unique tap identifier."""
-                return f"{self.tap_type}:{self.tap_version}"
+            def config_size(self) -> int:
+                """Total number of configuration parameters."""
+                conn_keys = list(self.connection_config.keys())
+                stream_keys = list(self.stream_config.keys())
+                return u.count(conn_keys) + u.count(stream_keys)
 
             @computed_field
             def has_stream_config(self) -> bool:
@@ -748,11 +750,17 @@ class FlextMeltanoModels(FlextCliModels):
                 return bool(self.stream_config)
 
             @computed_field
-            def config_size(self) -> int:
-                """Total number of configuration parameters."""
-                conn_keys = list(self.connection_config.keys())
-                stream_keys = list(self.stream_config.keys())
-                return u.count(conn_keys) + u.count(stream_keys)
+            def tap_identifier(self) -> str:
+                """Unique tap identifier."""
+                return f"{self.tap_type}:{self.tap_version}"
+
+            @field_serializer("connection_config")
+            def serialize_connection_config(
+                self,
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
+                """Serialize connection config with sensitive data protection."""
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_tap_config(self) -> Self:
@@ -766,14 +774,6 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
 
                 return self
-
-            @field_serializer("connection_config")
-            def serialize_connection_config(
-                self,
-                value: Mapping[str, t.JsonValue],
-            ) -> Mapping[str, t.JsonValue]:
-                """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class TargetConfig(FlextModels.Entity):
             """Generic target configuration for data loading."""
@@ -794,9 +794,9 @@ class FlextMeltanoModels(FlextCliModels):
             target_version: str = Field(default="latest", description="Target version")
 
             @computed_field
-            def target_identifier(self) -> str:
-                """Unique target identifier."""
-                return f"{self.target_type}:{self.target_version}"
+            def config_size(self) -> int:
+                """Total number of configuration parameters."""
+                return len(self.connection_config)
 
             @computed_field
             def has_connection_config(self) -> bool:
@@ -804,9 +804,17 @@ class FlextMeltanoModels(FlextCliModels):
                 return bool(self.connection_config)
 
             @computed_field
-            def config_size(self) -> int:
-                """Total number of configuration parameters."""
-                return len(self.connection_config)
+            def target_identifier(self) -> str:
+                """Unique target identifier."""
+                return f"{self.target_type}:{self.target_version}"
+
+            @field_serializer("connection_config")
+            def serialize_connection_config(
+                self,
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
+                """Serialize connection config with sensitive data protection."""
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_target_config(self) -> Self:
@@ -816,14 +824,6 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
 
                 return self
-
-            @field_serializer("connection_config")
-            def serialize_connection_config(
-                self,
-                value: Mapping[str, t.JsonValue],
-            ) -> Mapping[str, t.JsonValue]:
-                """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class DataSourceConfig(FlextModels.Entity):
             """Generic data source configuration with validation."""
@@ -839,9 +839,11 @@ class FlextMeltanoModels(FlextCliModels):
             source_version: str = Field(default="latest", description="Source version")
 
             @computed_field
-            def source_identifier(self) -> str:
-                """Unique source identifier."""
-                return f"{self.source_type}:{self.source_version}"
+            def config_size(self) -> int:
+                """Total number of configuration parameters."""
+                conn_keys = list(self.connection_config.keys())
+                stream_keys = list(self.stream_config.keys())
+                return u.count(conn_keys) + u.count(stream_keys)
 
             @computed_field
             def has_stream_config(self) -> bool:
@@ -849,11 +851,17 @@ class FlextMeltanoModels(FlextCliModels):
                 return bool(self.stream_config)
 
             @computed_field
-            def config_size(self) -> int:
-                """Total number of configuration parameters."""
-                conn_keys = list(self.connection_config.keys())
-                stream_keys = list(self.stream_config.keys())
-                return u.count(conn_keys) + u.count(stream_keys)
+            def source_identifier(self) -> str:
+                """Unique source identifier."""
+                return f"{self.source_type}:{self.source_version}"
+
+            @field_serializer("connection_config")
+            def serialize_connection_config(
+                self,
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
+                """Serialize connection config with sensitive data protection."""
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_source_config(self) -> Self:
@@ -867,14 +875,6 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
 
                 return self
-
-            @field_serializer("connection_config")
-            def serialize_connection_config(
-                self,
-                value: Mapping[str, t.JsonValue],
-            ) -> Mapping[str, t.JsonValue]:
-                """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class StreamDefinition(FlextModels.Entity):
             """Generic stream definition for data pipeline operations."""
@@ -896,14 +896,14 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
-            def is_active(self) -> bool:
-                """Check if stream is active."""
-                return self.status in c.Meltano.Enums.ACTIVE_STATUSES
-
-            @computed_field
             def has_data(self) -> bool:
                 """Check if stream has extracted data."""
                 return self.records_extracted > 0
+
+            @computed_field
+            def is_active(self) -> bool:
+                """Check if stream is active."""
+                return self.status in c.Meltano.Enums.ACTIVE_STATUSES
 
             @computed_field
             def schema_properties_count(self) -> int:
@@ -914,6 +914,19 @@ class FlextMeltanoModels(FlextCliModels):
                         return len(properties)
                     case _:
                         return 0
+
+            @field_serializer("stream_schema")
+            def serialize_stream_schema(
+                self,
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
+                """Normalize stream schema structure."""
+                result = dict(value)
+                if "properties" not in result:
+                    result["properties"] = dict[str, t.JsonValue]()
+                if "type" not in result:
+                    result["type"] = "object"
+                return result
 
             @model_validator(mode="after")
             def validate_stream_definition(self) -> Self:
@@ -931,19 +944,6 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
 
                 return self
-
-            @field_serializer("stream_schema")
-            def serialize_stream_schema(
-                self,
-                value: Mapping[str, t.JsonValue],
-            ) -> Mapping[str, t.JsonValue]:
-                """Normalize stream schema structure."""
-                result = dict(value)
-                if "properties" not in result:
-                    result["properties"] = dict[str, t.JsonValue]()
-                if "type" not in result:
-                    result["type"] = "object"
-                return result
 
         class DataSinkDefinition(FlextModels.Entity):
             """Generic data sink definition for pipeline operations."""
@@ -1010,11 +1010,6 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
-            def stream_count(self) -> int:
-                """Number of available streams."""
-                return len(self.streams)
-
-            @computed_field
             def active_streams(self) -> list[FlextMeltanoModels.Meltano.StreamInfo]:
                 """Active streams for extraction."""
                 return [
@@ -1022,6 +1017,11 @@ class FlextMeltanoModels(FlextCliModels):
                     for s in self.streams
                     if s.status in c.Meltano.Enums.ACTIVE_STATUSES
                 ]
+
+            @computed_field
+            def stream_count(self) -> int:
+                """Number of available streams."""
+                return len(self.streams)
 
         class DataSourceInstance(FlextModels.Entity):
             """Generic data source instance for pipeline operations."""
@@ -1053,11 +1053,6 @@ class FlextMeltanoModels(FlextCliModels):
             source_id: str = Field(description="Unique source identifier")
 
             @computed_field
-            def stream_count(self) -> int:
-                """Number of discovered streams."""
-                return len(self.streams)
-
-            @computed_field
             def active_stream_count(self) -> int:
                 """Number of active streams."""
                 active_statuses = c.Meltano.Enums.ACTIVE_STATUSES
@@ -1066,6 +1061,23 @@ class FlextMeltanoModels(FlextCliModels):
                     for stream in self.streams.values()
                     if stream.status in active_statuses
                 )
+
+            @computed_field
+            def is_ready_for_extraction(self) -> bool:
+                """Check if source is ready for data extraction."""
+                streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
+                    self.streams.values(),
+                )
+                return (
+                    self.discovered
+                    and u.count(streams_list) > 0
+                    and self.status == "configured"
+                )
+
+            @computed_field
+            def stream_count(self) -> int:
+                """Number of discovered streams."""
+                return len(self.streams)
 
             @computed_field
             def total_records_extracted(self) -> int:
@@ -1079,18 +1091,6 @@ class FlextMeltanoModels(FlextCliModels):
                         return result
                     case _:
                         return 0
-
-            @computed_field
-            def is_ready_for_extraction(self) -> bool:
-                """Check if source is ready for data extraction."""
-                streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
-                    self.streams.values(),
-                )
-                return (
-                    self.discovered
-                    and u.count(streams_list) > 0
-                    and self.status == "configured"
-                )
 
             @model_validator(mode="after")
             def validate_source_instance(self) -> Self:
@@ -1153,11 +1153,6 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
-            def sink_identifier(self) -> str:
-                """Unique sink identifier."""
-                return f"{self.sink_type}:batch_{self.batch_size}"
-
-            @computed_field
             def max_records_capacity(self) -> int:
                 """Maximum records capacity."""
                 return self.batch_size * self.max_batches
@@ -1170,6 +1165,19 @@ class FlextMeltanoModels(FlextCliModels):
                 if self.batch_size >= FlextMeltanoModels.PERFORMANCE_GOOD_THRESHOLD:
                     return "medium"
                 return "low"
+
+            @computed_field
+            def sink_identifier(self) -> str:
+                """Unique sink identifier."""
+                return f"{self.sink_type}:batch_{self.batch_size}"
+
+            @field_serializer("connection_config")
+            def serialize_connection_config(
+                self,
+                value: Mapping[str, t.JsonValue],
+            ) -> Mapping[str, t.JsonValue]:
+                """Serialize connection config with sensitive data protection."""
+                return FlextMeltanoModels._protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_sink_config(self) -> Self:
@@ -1186,14 +1194,6 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
 
                 return self
-
-            @field_serializer("connection_config")
-            def serialize_connection_config(
-                self,
-                value: Mapping[str, t.JsonValue],
-            ) -> Mapping[str, t.JsonValue]:
-                """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
 
         class StreamInfo(FlextModels.Entity):
             """Generic stream information for data pipeline operations."""
@@ -1229,16 +1229,16 @@ class FlextMeltanoModels(FlextCliModels):
             stream_created_at: str = Field(description="Creation timestamp")
 
             @computed_field
-            def has_processed_data(self) -> bool:
-                """Check if stream has processed data."""
-                return self.records_loaded > 0 or self.batches_processed > 0
-
-            @computed_field
             def average_records_per_batch(self) -> float:
                 """Average records per batch."""
                 if self.batches_processed == 0:
                     return 0.0
                 return self.records_loaded / self.batches_processed
+
+            @computed_field
+            def has_processed_data(self) -> bool:
+                """Check if stream has processed data."""
+                return self.records_loaded > 0 or self.batches_processed > 0
 
             @computed_field
             def processing_status(self) -> str:
@@ -1804,6 +1804,19 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Execution result payload",
             )
 
+            @field_validator("elt_context", "execution_result", mode="before")
+            @classmethod
+            def normalize_json_maps(
+                cls,
+                value: t.ContainerValue,
+            ) -> Mapping[str, t.ContainerValue]:
+                """Normalize mapping-like payloads into JSON dictionaries."""
+                match value:
+                    case Mapping():
+                        return {str(key): item for key, item in value.items()}
+                    case _:
+                        return {}
+
             @field_validator(
                 "project_root",
                 "extractor_name",
@@ -1819,19 +1832,6 @@ class FlextMeltanoModels(FlextCliModels):
                 normalized = "" if value is None else str(value)
                 return normalized.strip()
 
-            @field_validator("elt_context", "execution_result", mode="before")
-            @classmethod
-            def normalize_json_maps(
-                cls,
-                value: t.ContainerValue,
-            ) -> Mapping[str, t.ContainerValue]:
-                """Normalize mapping-like payloads into JSON dictionaries."""
-                match value:
-                    case Mapping():
-                        return {str(key): item for key, item in value.items()}
-                    case _:
-                        return {}
-
             model_config = ConfigDict(extra="allow")
 
         class PipelineResultContext(FlextModels.ArbitraryTypesModel):
@@ -1846,13 +1846,6 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Execution result payload",
             )
 
-            @field_validator("project_root", mode="before")
-            @classmethod
-            def normalize_project_root(cls, value: t.ContainerValue) -> str:
-                """Normalize project root from mixed payload values."""
-                normalized = "unknown" if value is None else str(value)
-                return normalized.strip() or "unknown"
-
             @field_validator("execution_result", mode="before")
             @classmethod
             def normalize_execution_result(
@@ -1865,6 +1858,13 @@ class FlextMeltanoModels(FlextCliModels):
                         return {str(key): item for key, item in value.items()}
                     case _:
                         return {}
+
+            @field_validator("project_root", mode="before")
+            @classmethod
+            def normalize_project_root(cls, value: t.ContainerValue) -> str:
+                """Normalize project root from mixed payload values."""
+                normalized = "unknown" if value is None else str(value)
+                return normalized.strip() or "unknown"
 
             model_config = ConfigDict(extra="allow")
 
@@ -2127,12 +2127,6 @@ class FlextMeltanoModels(FlextCliModels):
                 return self.executable is not None
 
             @computed_field
-            def settings_count(self) -> int:
-                """Number of plugin settings."""
-                keys: list[str] = list(self.settings.keys())
-                return u.count(keys)
-
-            @computed_field
             def plugin_complexity(self) -> str:
                 """Plugin complexity assessment."""
                 settings_keys = list(self.settings.keys())
@@ -2150,6 +2144,12 @@ class FlextMeltanoModels(FlextCliModels):
                 ):
                     return "moderate"
                 return "complex"
+
+            @computed_field
+            def settings_count(self) -> int:
+                """Number of plugin settings."""
+                keys: list[str] = list(self.settings.keys())
+                return u.count(keys)
 
             @model_validator(mode="after")
             def validate_plugin_consistency(self) -> Self:
@@ -2232,18 +2232,6 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
-            def total_path_count(self) -> int:
-                """Total number of configured paths."""
-                # Use u.count() for unified counting (DSL pattern)
-                return (
-                    u.count(self.model_paths)
-                    + u.count(self.analysis_paths)
-                    + u.count(self.test_paths)
-                    + u.count(self.seed_paths)
-                    + u.count(self.macro_paths)
-                )
-
-            @computed_field
             def has_custom_paths(self) -> bool:
                 """Check if project has custom paths."""
                 default_paths = {"models", "analysis", "tests", "seeds", "macros"}
@@ -2278,6 +2266,18 @@ class FlextMeltanoModels(FlextCliModels):
                 ):
                     return "moderate"
                 return "complex"
+
+            @computed_field
+            def total_path_count(self) -> int:
+                """Total number of configured paths."""
+                # Use u.count() for unified counting (DSL pattern)
+                return (
+                    u.count(self.model_paths)
+                    + u.count(self.analysis_paths)
+                    + u.count(self.test_paths)
+                    + u.count(self.seed_paths)
+                    + u.count(self.macro_paths)
+                )
 
             @model_validator(mode="after")
             def validate_project_consistency(
@@ -2316,11 +2316,6 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
-            def model_count(self) -> int:
-                """Number of models to execute."""
-                return len(self.models)
-
-            @computed_field
             def exclude_count(self) -> int:
                 """Number of models to exclude."""
                 return len(self.exclude)
@@ -2341,6 +2336,11 @@ class FlextMeltanoModels(FlextCliModels):
             def is_parallel_execution(self) -> bool:
                 """Check if execution uses multiple threads."""
                 return self.threads > 1
+
+            @computed_field
+            def model_count(self) -> int:
+                """Number of models to execute."""
+                return len(self.models)
 
             @model_validator(mode="after")
             def validate_execution_consistency(
@@ -2398,6 +2398,13 @@ class FlextMeltanoModels(FlextCliModels):
             )
 
             @computed_field
+            def execution_rate_per_second(self) -> float:
+                """Execution rate (records/second)."""
+                if not self.duration_seconds or self.duration_seconds <= 0:
+                    return 0.0
+                return self.records_processed / self.duration_seconds
+
+            @computed_field
             def is_completed(self) -> bool:
                 """Check if execution is completed."""
                 return self.end_time is not None
@@ -2409,13 +2416,6 @@ class FlextMeltanoModels(FlextCliModels):
                     self.status == c.Meltano.Enums.OperationStatus.SUCCESS
                     and self.error_message is None
                 )
-
-            @computed_field
-            def execution_rate_per_second(self) -> float:
-                """Execution rate (records/second)."""
-                if not self.duration_seconds or self.duration_seconds <= 0:
-                    return 0.0
-                return self.records_processed / self.duration_seconds
 
             @computed_field
             def performance_category(self) -> str:
@@ -2432,6 +2432,22 @@ class FlextMeltanoModels(FlextCliModels):
                 if rate >= FlextMeltanoModels.PERFORMANCE_MODERATE_THRESHOLD:
                     return "moderate_performance"
                 return "low_performance"
+
+            @field_validator("status", mode="before")
+            @classmethod
+            def validate_status(cls, v: str) -> str:
+                """Validate execution status."""
+                valid_statuses = [
+                    c.Meltano.Enums.OperationStatus.PENDING,
+                    c.Meltano.Enums.OperationStatus.RUNNING,
+                    c.Meltano.Enums.OperationStatus.SUCCESS,
+                    c.Meltano.Enums.OperationStatus.ERROR,
+                    c.Meltano.Enums.OperationStatus.TIMEOUT,
+                ]
+                if v not in valid_statuses:
+                    msg = f"Status must be one of: {', '.join(valid_statuses)}"
+                    raise ValueError(msg)
+                return v
 
             @model_validator(mode="after")
             def validate_execution_result(self) -> Self:
@@ -2454,22 +2470,6 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
 
                 return self
-
-            @field_validator("status", mode="before")
-            @classmethod
-            def validate_status(cls, v: str) -> str:
-                """Validate execution status."""
-                valid_statuses = [
-                    c.Meltano.Enums.OperationStatus.PENDING,
-                    c.Meltano.Enums.OperationStatus.RUNNING,
-                    c.Meltano.Enums.OperationStatus.SUCCESS,
-                    c.Meltano.Enums.OperationStatus.ERROR,
-                    c.Meltano.Enums.OperationStatus.TIMEOUT,
-                ]
-                if v not in valid_statuses:
-                    msg = f"Status must be one of: {', '.join(valid_statuses)}"
-                    raise ValueError(msg)
-                return v
 
         class PipelineResult(FlextModels.TimestampedModel):
             """Generic pipeline execution result with complete validation."""
@@ -2566,6 +2566,22 @@ class FlextMeltanoModels(FlextCliModels):
                     total += self.transformation_result.duration_seconds
                 return total
 
+            @field_validator("overall_status", mode="before")
+            @classmethod
+            def validate_overall_status(cls, v: str) -> str:
+                """Validate overall pipeline status."""
+                valid_statuses = [
+                    c.Meltano.Enums.OperationStatus.PENDING,
+                    c.Meltano.Enums.OperationStatus.RUNNING,
+                    c.Meltano.Enums.OperationStatus.SUCCESS,
+                    "partial",
+                    c.Meltano.Enums.OperationStatus.ERROR,
+                ]
+                if v not in valid_statuses:
+                    msg = f"Overall status must be one of: {', '.join(valid_statuses)}"
+                    raise ValueError(msg)
+                return v
+
             @model_validator(mode="after")
             def validate_pipeline_result(self) -> Self:
                 """Validate pipeline result consistency."""
@@ -2603,22 +2619,6 @@ class FlextMeltanoModels(FlextCliModels):
                     self.overall_status = c.Meltano.Enums.OperationStatus.SUCCESS
 
                 return self
-
-            @field_validator("overall_status", mode="before")
-            @classmethod
-            def validate_overall_status(cls, v: str) -> str:
-                """Validate overall pipeline status."""
-                valid_statuses = [
-                    c.Meltano.Enums.OperationStatus.PENDING,
-                    c.Meltano.Enums.OperationStatus.RUNNING,
-                    c.Meltano.Enums.OperationStatus.SUCCESS,
-                    "partial",
-                    c.Meltano.Enums.OperationStatus.ERROR,
-                ]
-                if v not in valid_statuses:
-                    msg = f"Overall status must be one of: {', '.join(valid_statuses)}"
-                    raise ValueError(msg)
-                return v
 
         class DbtProjectInfo(BaseModel):
             """Information about a DBT project."""

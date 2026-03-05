@@ -69,6 +69,58 @@ class FlextMeltanoDbtRunner(s[str]):
         super().__init__()
         self.project_root: Path | None = project_root
 
+    def docs_generate(
+        self,
+        **_kwargs: t.ContainerValue,
+    ) -> r[t.Meltano.ExecutionResultDict]:
+        """Generate DBT documentation.
+
+        Args:
+        **_kwargs: Additional dbt docs arguments
+
+        Returns:
+        FlextResult containing documentation generation result
+
+        """
+        try:
+            if not self.project_root:
+                return r[t.Meltano.ExecutionResultDict].fail("No project root set")
+
+            self.logger.info(
+                "Generating DBT documentation",
+                cwd=str(self.project_root),
+            )
+
+            # DBT docs generate would be executed here
+            result: t.Meltano.ExecutionResultDict = {
+                "status": "completed",
+                "docs_path": str(self.project_root / "target" / "index.html"),
+            }
+
+            self.logger.info("DBT documentation generated")
+            return r[t.Meltano.ExecutionResultDict].ok(result)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("DBT documentation generation failed", error=str(e))
+            return r[t.Meltano.ExecutionResultDict].fail(
+                f"Documentation generation failed: {e}",
+            )
+
+    @override
+    def execute(self, **_kwargs: t.ContainerValue) -> r[str]:
+        """Execute (implements Service pattern)."""
+        if self.project_root:
+            msg = f"DBT runner: {self.project_root}"
+            return r[str].ok(msg)
+        return r[str].fail("No project root set")
+
     def run_models(
         self,
         models: list[str] | None = None,
@@ -160,58 +212,6 @@ class FlextMeltanoDbtRunner(s[str]):
         ) as e:
             self.logger.exception("DBT tests failed", error=str(e))
             return r[DbtTestResult].fail(f"DBT tests failed: {e}")
-
-    def docs_generate(
-        self,
-        **_kwargs: t.ContainerValue,
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Generate DBT documentation.
-
-        Args:
-        **_kwargs: Additional dbt docs arguments
-
-        Returns:
-        FlextResult containing documentation generation result
-
-        """
-        try:
-            if not self.project_root:
-                return r[t.Meltano.ExecutionResultDict].fail("No project root set")
-
-            self.logger.info(
-                "Generating DBT documentation",
-                cwd=str(self.project_root),
-            )
-
-            # DBT docs generate would be executed here
-            result: t.Meltano.ExecutionResultDict = {
-                "status": "completed",
-                "docs_path": str(self.project_root / "target" / "index.html"),
-            }
-
-            self.logger.info("DBT documentation generated")
-            return r[t.Meltano.ExecutionResultDict].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}",
-            )
-
-    @override
-    def execute(self, **_kwargs: t.ContainerValue) -> r[str]:
-        """Execute (implements Service pattern)."""
-        if self.project_root:
-            msg = f"DBT runner: {self.project_root}"
-            return r[str].ok(msg)
-        return r[str].fail("No project root set")
 
 
 __all__ = [

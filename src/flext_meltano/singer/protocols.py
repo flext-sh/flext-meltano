@@ -48,20 +48,6 @@ class FlextMeltanoSingerProtocols:
             """
             ...
 
-        def sync(
-            self,
-            catalog: m.Meltano.SingerCatalog,
-            state: m.Meltano.SingerStateMessage,
-        ) -> None:
-            """Synchronize data from source to stdout.
-
-            Args:
-            catalog: Singer catalog model
-            state: Current state for incremental sync
-
-            """
-            ...
-
         def get_records(self, stream_name: str) -> list[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream.
 
@@ -79,6 +65,20 @@ class FlextMeltanoSingerProtocols:
 
             Returns:
             Singer state message containing sync state
+
+            """
+            ...
+
+        def sync(
+            self,
+            catalog: m.Meltano.SingerCatalog,
+            state: m.Meltano.SingerStateMessage,
+        ) -> None:
+            """Synchronize data from source to stdout.
+
+            Args:
+            catalog: Singer catalog model
+            state: Current state for incremental sync
 
             """
             ...

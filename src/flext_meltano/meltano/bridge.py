@@ -40,6 +40,55 @@ class FlextMeltanoBridge:
         self.logger: FlextLogger = FlextLogger(__name__)
 
     @staticmethod
+    def discover_plugins() -> FlextResult[t.Meltano.PluginCatalog]:
+        """Discover available plugins through the Go bridge."""
+        try:
+            # Go bridge plugin discovery — queries FlexCore for registered plugins
+            extractor1: t.Meltano.PluginDefinition = {
+                "name": "tap-csv",
+                "type": "extractors",
+            }
+            extractor2: t.Meltano.PluginDefinition = {
+                "name": "tap-postgres",
+                "type": "extractors",
+            }
+            extractor3: t.Meltano.PluginDefinition = {
+                "name": "tap-json",
+                "type": "extractors",
+            }
+            loader1: t.Meltano.PluginDefinition = {
+                "name": "target-csv",
+                "type": "loaders",
+            }
+            loader2: t.Meltano.PluginDefinition = {
+                "name": "target-postgres",
+                "type": "loaders",
+            }
+            loader3: t.Meltano.PluginDefinition = {
+                "name": "target-jsonl",
+                "type": "loaders",
+            }
+            transformer1: t.Meltano.PluginDefinition = {
+                "name": "dbt-postgres",
+                "type": "transformers",
+            }
+            transformer2: t.Meltano.PluginDefinition = {
+                "name": "dbt-snowflake",
+                "type": "transformers",
+            }
+
+            result: t.Meltano.PluginCatalog = {
+                "extractors": [extractor1, extractor2, extractor3],
+                "loaders": [loader1, loader2, loader3],
+                "transformers": [transformer1, transformer2],
+            }
+            return FlextResult[t.Meltano.PluginCatalog].ok(result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return FlextResult[t.Meltano.PluginCatalog].fail(
+                f"Plugin discovery failed: {e}",
+            )
+
+    @staticmethod
     def execute_command(
         command: str,
         args: Mapping[str, t.JsonValue] | None = None,
@@ -93,55 +142,6 @@ class FlextMeltanoBridge:
             return FlextResult[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")
-
-    @staticmethod
-    def discover_plugins() -> FlextResult[t.Meltano.PluginCatalog]:
-        """Discover available plugins through the Go bridge."""
-        try:
-            # Go bridge plugin discovery — queries FlexCore for registered plugins
-            extractor1: t.Meltano.PluginDefinition = {
-                "name": "tap-csv",
-                "type": "extractors",
-            }
-            extractor2: t.Meltano.PluginDefinition = {
-                "name": "tap-postgres",
-                "type": "extractors",
-            }
-            extractor3: t.Meltano.PluginDefinition = {
-                "name": "tap-json",
-                "type": "extractors",
-            }
-            loader1: t.Meltano.PluginDefinition = {
-                "name": "target-csv",
-                "type": "loaders",
-            }
-            loader2: t.Meltano.PluginDefinition = {
-                "name": "target-postgres",
-                "type": "loaders",
-            }
-            loader3: t.Meltano.PluginDefinition = {
-                "name": "target-jsonl",
-                "type": "loaders",
-            }
-            transformer1: t.Meltano.PluginDefinition = {
-                "name": "dbt-postgres",
-                "type": "transformers",
-            }
-            transformer2: t.Meltano.PluginDefinition = {
-                "name": "dbt-snowflake",
-                "type": "transformers",
-            }
-
-            result: t.Meltano.PluginCatalog = {
-                "extractors": [extractor1, extractor2, extractor3],
-                "loaders": [loader1, loader2, loader3],
-                "transformers": [transformer1, transformer2],
-            }
-            return FlextResult[t.Meltano.PluginCatalog].ok(result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[t.Meltano.PluginCatalog].fail(
-                f"Plugin discovery failed: {e}",
-            )
 
 
 __all__ = ["FlextMeltanoBridge"]

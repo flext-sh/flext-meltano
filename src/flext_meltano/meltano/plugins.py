@@ -60,32 +60,53 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
-    @override
-    def execute(
+    @staticmethod
+    def _validate_plugin_type(plugin_type: str) -> r[str]:
+        """Validate plugin type."""
+        valid_types = ["extractors", "loaders", "transformers"]
+        # Use u.not_() + u.in_() for membership check (DSL pattern)
+        if u.not_(u.in_(plugin_type, valid_types)):
+            return r[str].fail(
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
+            )
+        return r[str].ok(plugin_type)
+
+    def add_plugin(
         self,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute the pipeline component service.
+        project: p.Meltano.Project,
+        plugin_type: str,
+        plugin_name: str,
+    ) -> r[Mapping[str, str]]:
+        """Add plugin to Meltano project using railway-oriented validation chain.
+
+        Uses FlextResult.chain_validations() to compose plugin addition steps
+        with automatic error accumulation and early termination on failure.
+
+        Args:
+        project: Meltano project instance
+        plugin_type: Type of plugin (extractors, loaders, transformers)
+        plugin_name: Name of the plugin to add
 
         Returns:
-        FlextResult containing plugin service configuration and status.
+        FlextResult containing plugin addition information
 
         """
-        try:
-            config_data: t.Meltano.MeltanoConfigDict = {
-                "service_type": "flext_meltano_plugin_service",
-                "status": "ready",
-                "config": self._meltano_config.model_dump()
-                if u.Guards.is_pydantic_model(self._meltano_config)
-                else {},
-            }
-
-            self.logger.info("FlextMeltanoPluginService executed successfully")
-            return r[t.Meltano.MeltanoConfigDict].ok(config_data)
-
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Plugin service execution failed: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
+        # RAILWAY PATTERN: Chain validations and operations
+        return (
+            self
+            ._log_plugin_addition_start(plugin_name, plugin_type)
+            .flat_map(lambda _: self._validate_plugin_type(plugin_type))
+            .flat_map(
+                lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
+            )
+            .flat_map(
+                lambda result: self._build_plugin_addition_result(
+                    plugin_name,
+                    plugin_type,
+                    addition_success=result,
+                ),
+            )
+        )
 
     def discover_plugins(
         self,
@@ -195,42 +216,32 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
             self.logger.exception(error_msg, error=str(e))
             return r[list[Mapping[str, str]]].fail(error_msg)
 
-    def add_plugin(
+    @override
+    def execute(
         self,
-        project: p.Meltano.Project,
-        plugin_type: str,
-        plugin_name: str,
-    ) -> r[Mapping[str, str]]:
-        """Add plugin to Meltano project using railway-oriented validation chain.
-
-        Uses FlextResult.chain_validations() to compose plugin addition steps
-        with automatic error accumulation and early termination on failure.
-
-        Args:
-        project: Meltano project instance
-        plugin_type: Type of plugin (extractors, loaders, transformers)
-        plugin_name: Name of the plugin to add
+    ) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute the pipeline component service.
 
         Returns:
-        FlextResult containing plugin addition information
+        FlextResult containing plugin service configuration and status.
 
         """
-        # RAILWAY PATTERN: Chain validations and operations
-        return (
-            self
-            ._log_plugin_addition_start(plugin_name, plugin_type)
-            .flat_map(lambda _: self._validate_plugin_type(plugin_type))
-            .flat_map(
-                lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
-            )
-            .flat_map(
-                lambda result: self._build_plugin_addition_result(
-                    plugin_name,
-                    plugin_type,
-                    addition_success=result,
-                ),
-            )
-        )
+        try:
+            config_data: t.Meltano.MeltanoConfigDict = {
+                "service_type": "flext_meltano_plugin_service",
+                "status": "ready",
+                "config": self._meltano_config.model_dump()
+                if u.Guards.is_pydantic_model(self._meltano_config)
+                else {},
+            }
+
+            self.logger.info("FlextMeltanoPluginService executed successfully")
+            return r[t.Meltano.MeltanoConfigDict].ok(config_data)
+
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            error_msg = f"Plugin service execution failed: {e}"
+            self.logger.exception(error_msg)
+            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     def get_plugin_info(
         self,
@@ -320,27 +331,28 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
             self.logger.exception(error_msg)
             return r[Mapping[str, str]].fail(error_msg)
 
-    # Private helper methods
+    def _build_plugin_addition_result(
+        self,
+        plugin_name: str,
+        plugin_type: str,
+        *,
+        addition_success: bool,
+    ) -> r[Mapping[str, str]]:
+        """Build successful plugin addition result."""
+        plugin_result: dict[str, str] = {
+            "success": "true" if addition_success else "false",
+            "plugin_name": plugin_name,
+            "plugin_type": plugin_type,
+            "addition_method": "project_add_service_native",
+        }
 
-    def _log_plugin_addition_start(self, plugin_name: str, plugin_type: str) -> r[None]:
-        """Log plugin addition start."""
         self.logger.info(
-            "Adding plugin using ProjectAddService",
+            "Plugin added successfully",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return r[None].ok(None)
 
-    @staticmethod
-    def _validate_plugin_type(plugin_type: str) -> r[str]:
-        """Validate plugin type."""
-        valid_types = ["extractors", "loaders", "transformers"]
-        # Use u.not_() + u.in_() for membership check (DSL pattern)
-        if u.not_(u.in_(plugin_type, valid_types)):
-            return r[str].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
-            )
-        return r[str].ok(plugin_type)
+        return r[Mapping[str, str]].ok(plugin_result)
 
     def _execute_plugin_addition(
         self,
@@ -367,28 +379,16 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Plugin addition failed: {e}")
 
-    def _build_plugin_addition_result(
-        self,
-        plugin_name: str,
-        plugin_type: str,
-        *,
-        addition_success: bool,
-    ) -> r[Mapping[str, str]]:
-        """Build successful plugin addition result."""
-        plugin_result: dict[str, str] = {
-            "success": "true" if addition_success else "false",
-            "plugin_name": plugin_name,
-            "plugin_type": plugin_type,
-            "addition_method": "project_add_service_native",
-        }
+    # Private helper methods
 
+    def _log_plugin_addition_start(self, plugin_name: str, plugin_type: str) -> r[None]:
+        """Log plugin addition start."""
         self.logger.info(
-            "Plugin added successfully",
+            "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-
-        return r[Mapping[str, str]].ok(plugin_result)
+        return r[None].ok(None)
 
 
 # Import here to avoid circular import

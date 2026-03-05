@@ -59,6 +59,56 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         self._metadata_extra: dict[str, str] = {}
         self._sealed: bool = False
 
+    @override
+    def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:
+        """Execute (implements Service pattern)."""
+        if self.project_root:
+            info = MeltanoProjectInfo(
+                root=self.project_root,
+                name=str(self.project_root.name),
+            )
+            return r[MeltanoProjectInfo].ok(info)
+        return r[MeltanoProjectInfo].fail("No project loaded")
+
+    def get_plugins(
+        self,
+        plugin_type: str | None = None,
+    ) -> r[list[t.Meltano.PluginDefinition]]:
+        """Get plugins from the project.
+
+        Args:
+        plugin_type: Optional plugin type to filter (tap, target, dbt, etc.)
+
+        Returns:
+        r containing list of plugins
+
+        """
+        try:
+            if not self.project:
+                return r[list[t.Meltano.PluginDefinition]].fail("No project loaded")
+
+            plugins = self._extract_plugins(plugin_type)
+
+            self.logger.info(
+                "Plugins retrieved",
+                count=u.count(plugins),
+                type=plugin_type,
+            )
+            return r[list[t.Meltano.PluginDefinition]].ok(plugins)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to get plugins", error=str(e))
+            return r[list[t.Meltano.PluginDefinition]].fail(
+                f"Failed to get plugins: {e}",
+            )
+
     def initialize_project(
         self,
         root: Path,
@@ -101,6 +151,40 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             return r[MeltanoProjectInfo].fail(
                 f"Failed to initialize project: {e}",
             )
+
+    def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
+        """Install a plugin in the project.
+
+        Args:
+        name: Name of the plugin to install
+
+        Returns:
+        r containing plugin information
+
+        """
+        try:
+            self.logger.info("Installing plugin", name=name)
+
+            # Plugin installation would typically use meltano CLI or SDK
+            # For now, just log the operation
+            plugin_info: t.Meltano.PluginInfo = {
+                "name": name,
+                "status": "installing",
+            }
+
+            self.logger.info("Plugin installed", name=name)
+            return r[t.Meltano.PluginInfo].ok(plugin_info)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to install plugin", error=str(e))
+            return r[t.Meltano.PluginInfo].fail(f"Failed to install plugin: {e}")
 
     def load_project(
         self,
@@ -191,90 +275,6 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             pass
 
         return plugins
-
-    def get_plugins(
-        self,
-        plugin_type: str | None = None,
-    ) -> r[list[t.Meltano.PluginDefinition]]:
-        """Get plugins from the project.
-
-        Args:
-        plugin_type: Optional plugin type to filter (tap, target, dbt, etc.)
-
-        Returns:
-        r containing list of plugins
-
-        """
-        try:
-            if not self.project:
-                return r[list[t.Meltano.PluginDefinition]].fail("No project loaded")
-
-            plugins = self._extract_plugins(plugin_type)
-
-            self.logger.info(
-                "Plugins retrieved",
-                count=u.count(plugins),
-                type=plugin_type,
-            )
-            return r[list[t.Meltano.PluginDefinition]].ok(plugins)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to get plugins", error=str(e))
-            return r[list[t.Meltano.PluginDefinition]].fail(
-                f"Failed to get plugins: {e}",
-            )
-
-    def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
-        """Install a plugin in the project.
-
-        Args:
-        name: Name of the plugin to install
-
-        Returns:
-        r containing plugin information
-
-        """
-        try:
-            self.logger.info("Installing plugin", name=name)
-
-            # Plugin installation would typically use meltano CLI or SDK
-            # For now, just log the operation
-            plugin_info: t.Meltano.PluginInfo = {
-                "name": name,
-                "status": "installing",
-            }
-
-            self.logger.info("Plugin installed", name=name)
-            return r[t.Meltano.PluginInfo].ok(plugin_info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to install plugin", error=str(e))
-            return r[t.Meltano.PluginInfo].fail(f"Failed to install plugin: {e}")
-
-    @override
-    def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:
-        """Execute (implements Service pattern)."""
-        if self.project_root:
-            info = MeltanoProjectInfo(
-                root=self.project_root,
-                name=str(self.project_root.name),
-            )
-            return r[MeltanoProjectInfo].ok(info)
-        return r[MeltanoProjectInfo].fail("No project loaded")
 
 
 __all__ = [

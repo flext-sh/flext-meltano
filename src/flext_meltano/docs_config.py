@@ -97,6 +97,74 @@ class DocsConfig(FlextSettings):
         # Create and return new instance
         return cls()
 
+    def get_audit_thresholds(self) -> Mapping[str, t.ContainerValue]:
+        """Get audit thresholds as dictionary for backward compatibility.
+
+        Returns:
+            Dictionary with audit threshold settings
+
+        """
+        return {
+            "max_file_age_days": self.max_file_age_days,
+            "min_words_per_file": self.min_words_per_file,
+            "max_broken_links_ratio": self.max_broken_links_ratio,
+            "required_sections": self.required_sections,
+            "max_line_length": self.max_line_length,
+        }
+
+    def get_link_validation_config(self) -> Mapping[str, t.ContainerValue]:
+        """Get link validation configuration as dictionary for backward compatibility.
+
+        Returns:
+            Dictionary with link validation settings
+
+        """
+        return {
+            "timeout": self.link_validation_timeout,
+            "retries": self.link_validation_retries,
+        }
+
+    def get_quality_thresholds(self) -> Mapping[str, t.ContainerValue]:
+        """Get quality thresholds as dictionary for backward compatibility.
+
+        Returns:
+            Dictionary with quality threshold settings
+
+        """
+        return {
+            "min_quality_score": self.min_quality_score,
+            "max_file_age_days": self.max_file_age_days,
+            "min_words_per_file": self.min_words_per_file,
+            "max_broken_links_ratio": self.max_broken_links_ratio,
+            "max_line_length": self.max_line_length,
+            "fail_on_critical_issues": self.fail_on_critical_issues,
+        }
+
+    def get_reporting_config(self) -> Mapping[str, t.ContainerValue]:
+        """Get reporting configuration as dictionary for backward compatibility.
+
+        Returns:
+            Dictionary with reporting settings
+
+        """
+        return {
+            "output_directory": self.reports_output_dir,
+        }
+
+    def get_schedule_config(self) -> Mapping[str, t.ContainerValue]:
+        """Get scheduling configuration as dictionary for backward compatibility.
+
+        Returns:
+            Dictionary with automation scheduling settings
+
+        """
+        return {
+            "enable_scheduled_audits": self.enable_scheduled_audits,
+            "audit_schedule": self.audit_schedule,
+            "audit_day": self.audit_day,
+            "audit_time": self.audit_time,
+        }
+
     def load_from_file(self, config_path: str | Path | None = None) -> r[DocsConfig]:
         """Load configuration from YAML file using FlextSettings patterns.
 
@@ -143,71 +211,3 @@ class DocsConfig(FlextSettings):
         ) as e:
             error_msg = f"Failed to load configuration from {file_path}: {e}"
             return r[DocsConfig].fail(error_msg)
-
-    def get_schedule_config(self) -> Mapping[str, t.ContainerValue]:
-        """Get scheduling configuration as dictionary for backward compatibility.
-
-        Returns:
-            Dictionary with automation scheduling settings
-
-        """
-        return {
-            "enable_scheduled_audits": self.enable_scheduled_audits,
-            "audit_schedule": self.audit_schedule,
-            "audit_day": self.audit_day,
-            "audit_time": self.audit_time,
-        }
-
-    def get_quality_thresholds(self) -> Mapping[str, t.ContainerValue]:
-        """Get quality thresholds as dictionary for backward compatibility.
-
-        Returns:
-            Dictionary with quality threshold settings
-
-        """
-        return {
-            "min_quality_score": self.min_quality_score,
-            "max_file_age_days": self.max_file_age_days,
-            "min_words_per_file": self.min_words_per_file,
-            "max_broken_links_ratio": self.max_broken_links_ratio,
-            "max_line_length": self.max_line_length,
-            "fail_on_critical_issues": self.fail_on_critical_issues,
-        }
-
-    def get_reporting_config(self) -> Mapping[str, t.ContainerValue]:
-        """Get reporting configuration as dictionary for backward compatibility.
-
-        Returns:
-            Dictionary with reporting settings
-
-        """
-        return {
-            "output_directory": self.reports_output_dir,
-        }
-
-    def get_link_validation_config(self) -> Mapping[str, t.ContainerValue]:
-        """Get link validation configuration as dictionary for backward compatibility.
-
-        Returns:
-            Dictionary with link validation settings
-
-        """
-        return {
-            "timeout": self.link_validation_timeout,
-            "retries": self.link_validation_retries,
-        }
-
-    def get_audit_thresholds(self) -> Mapping[str, t.ContainerValue]:
-        """Get audit thresholds as dictionary for backward compatibility.
-
-        Returns:
-            Dictionary with audit threshold settings
-
-        """
-        return {
-            "max_file_age_days": self.max_file_age_days,
-            "min_words_per_file": self.min_words_per_file,
-            "max_broken_links_ratio": self.max_broken_links_ratio,
-            "required_sections": self.required_sections,
-            "max_line_length": self.max_line_length,
-        }

@@ -58,6 +58,149 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
             error_msg = "Logger initialization failed"
             raise RuntimeError(error_msg)
 
+    @property
+    def bridge(self) -> FlextMeltanoBridge:
+        """Get bridge instance - delegates to instance attribute."""
+        return self._bridge
+
+    # ========================================================================
+    # DELEGATION PROPERTIES - Using SOLID pattern with thin wrappers
+    # ========================================================================
+
+    @property
+    def project_root(self) -> Path:
+        """Get project root directory - delegates to config."""
+        project_root = getattr(self._meltano_config, "project_root", None)
+        if project_root is not None:
+            return m.Meltano.PathPayload(value=project_root).value
+        return Path.cwd()
+
+    @staticmethod
+    def _execute_action_command(
+        action: str,
+        args: list[str],
+    ) -> r[t.Meltano.ExecutionResultDict]:
+        """Execute action command - delegates to appropriate handler."""
+        try:
+            return r[t.Meltano.ExecutionResultDict].ok({
+                "command": action,
+                "action": action,
+                "args": args,
+                "status": "executed",
+            })
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.ExecutionResultDict].fail(f"Action failed: {e}")
+
+    @staticmethod
+    def _execute_health_command() -> r[t.Meltano.ExecutionResultDict]:
+        """Execute health command - delegates to adapter."""
+        return r[t.Meltano.ExecutionResultDict].ok({
+            "command": "health",
+            "command_type": "health",
+            "status": "healthy",
+            "health": "OK",
+            "components": ["bridge", "adapter", "executor"],
+        })
+
+    @staticmethod
+    def _execute_help_command() -> r[t.Meltano.ExecutionResultDict]:
+        """Execute help command - returns help info."""
+        return r[t.Meltano.ExecutionResultDict].ok({
+            "command": "help",
+            "command_type": "help",
+            "status": "success",
+            "help": "FLEXT Meltano CLI - Data integration framework",
+        })
+
+    @staticmethod
+    def _execute_version_command() -> r[t.Meltano.ExecutionResultDict]:
+        """Execute version command - returns version info."""
+        return r[t.Meltano.ExecutionResultDict].ok({
+            "command": "version",
+            "command_type": "version",
+            "status": "success",
+            "version": c.Meltano.FLEXT_MELTANO_VERSION,
+            "success": True,
+            "cli_type": "flext_meltano",
+        })
+
+    @staticmethod
+    def _handle_cli_no_args() -> r[t.Meltano.ExecutionResultDict]:
+        """Handle CLI with no arguments - delegates to ready state."""
+        return r[t.Meltano.ExecutionResultDict].ok({
+            "status": "ready",
+            "command_type": "cli",
+            "message": "No arguments provided - ready for commands",
+        })
+
+    @staticmethod
+    def create_cli_runner(args: list[str]) -> r[t.Meltano.ExecutionResultDict]:
+        """Create CLI runner for command execution - static factory."""
+        try:
+            executor = FlextMeltanoExecutor()
+            return (
+                executor.run(args)
+                if args
+                else r[t.Meltano.ExecutionResultDict].ok({
+                    "status": "ready",
+                    "command_type": "cli_runner",
+                    "args": args,
+                })
+            )
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.ExecutionResultDict].fail(
+                f"Failed to create CLI runner: {e}",
+            )
+
+    @staticmethod
+    def create_flext_cli() -> r[FlextMeltanoCLI]:
+        """Create FLEXT CLI instance - delegates to CLI module."""
+        try:
+            cli = FlextMeltanoCLI()
+            return r[FlextMeltanoCLI].ok(cli)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[FlextMeltanoCLI].fail(f"Failed to create CLI: {e}")
+
+    @staticmethod
+    def get_version() -> r[str]:
+        """Get version information from Meltano/DBT."""
+        try:
+            # Version detection — queries installed Meltano package version
+            return r[str].ok("3.0.0")
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[str].fail(f"Failed to get version: {e}")
+
+    @staticmethod
+    def list_commands() -> r[t.Meltano.ExecutionResultDict]:
+        """List available commands - returns command list."""
+        commands_list = [
+            "version",
+            "help",
+            "health",
+            "pipeline",
+            "run",
+            "install",
+            "list",
+            "invoke",
+            "select",
+        ]
+        available = [c for c in commands_list if c in {"version", "help", "health"}]
+        return r[t.Meltano.ExecutionResultDict].ok({
+            "commands": commands_list,
+            "available_commands": available,
+        })
+
+    @staticmethod
+    def list_plugins() -> r[list[t.Meltano.PluginDefinition]]:
+        """List available plugins - delegates to adapter."""
+        try:
+            # Return empty list - full implementation delegates to adapter
+            return r[list[t.Meltano.PluginDefinition]].ok([])
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[list[t.Meltano.PluginDefinition]].fail(
+                f"Failed to list plugins: {e}",
+            )
+
     def execute(self) -> r[t.JsonValue]:
         """Execute the Meltano executor service.
 
@@ -122,6 +265,30 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
             self.logger.exception(error_msg)
             return r[FlextMeltanoExecutionResult].fail(error_msg)
 
+    def execute_dbt_command(
+        self,
+        dbt_command: str,
+        args: list[str] | None = None,
+    ) -> r[FlextMeltanoExecutionResult]:
+        """Execute a DBT command.
+
+        Args:
+        dbt_command: DBT subcommand (run, test, docs, etc.)
+        args: Additional arguments
+
+        Returns:
+        r with DBT execution result
+
+        """
+        try:
+            command = ["dbt", dbt_command]
+            if args:
+                command.extend(args)
+            return self.execute_command(command)
+
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[FlextMeltanoExecutionResult].fail(f"DBT command failed: {e}")
+
     def execute_pipeline(
         self,
         tap_name: str,
@@ -147,65 +314,13 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
                 f"Pipeline execution failed: {e}",
             )
 
-    def execute_dbt_command(
-        self,
-        dbt_command: str,
-        args: list[str] | None = None,
-    ) -> r[FlextMeltanoExecutionResult]:
-        """Execute a DBT command.
+    def health(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Check system health - delegates to handler."""
+        return self._execute_health_command()
 
-        Args:
-        dbt_command: DBT subcommand (run, test, docs, etc.)
-        args: Additional arguments
-
-        Returns:
-        r with DBT execution result
-
-        """
-        try:
-            command = ["dbt", dbt_command]
-            if args:
-                command.extend(args)
-            return self.execute_command(command)
-
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[FlextMeltanoExecutionResult].fail(f"DBT command failed: {e}")
-
-    @staticmethod
-    def get_version() -> r[str]:
-        """Get version information from Meltano/DBT."""
-        try:
-            # Version detection — queries installed Meltano package version
-            return r[str].ok("3.0.0")
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[str].fail(f"Failed to get version: {e}")
-
-    # ========================================================================
-    # DELEGATION PROPERTIES - Using SOLID pattern with thin wrappers
-    # ========================================================================
-
-    @property
-    def project_root(self) -> Path:
-        """Get project root directory - delegates to config."""
-        project_root = getattr(self._meltano_config, "project_root", None)
-        if project_root is not None:
-            return m.Meltano.PathPayload(value=project_root).value
-        return Path.cwd()
-
-    @property
-    def bridge(self) -> FlextMeltanoBridge:
-        """Get bridge instance - delegates to instance attribute."""
-        return self._bridge
-
-    # ========================================================================
-    # PUBLIC DELEGATION METHODS - Using SOLID pattern with one responsibility
-    # ========================================================================
-
-    def run_command(self, args: list[str]) -> r[int]:
-        """Execute command and return exit code - delegates to routing."""
-        if not args:
-            return r[int].ok(1)
-        return self._route_command(args[0], args[1:]).map(lambda _: 0)
+    def help(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Get help information - delegates to handler."""
+        return self._execute_help_command()
 
     def run(self, args: list[str]) -> r[t.Meltano.ExecutionResultDict]:
         """Run command with arguments - delegates to command router."""
@@ -227,48 +342,15 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
             })
         return self.run(args)
 
-    def version(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Get version information - delegates to handler."""
-        return self._execute_version_command()
+    # ========================================================================
+    # PUBLIC DELEGATION METHODS - Using SOLID pattern with one responsibility
+    # ========================================================================
 
-    def help(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Get help information - delegates to handler."""
-        return self._execute_help_command()
-
-    def health(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Check system health - delegates to handler."""
-        return self._execute_health_command()
-
-    @staticmethod
-    def list_commands() -> r[t.Meltano.ExecutionResultDict]:
-        """List available commands - returns command list."""
-        commands_list = [
-            "version",
-            "help",
-            "health",
-            "pipeline",
-            "run",
-            "install",
-            "list",
-            "invoke",
-            "select",
-        ]
-        available = [c for c in commands_list if c in {"version", "help", "health"}]
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "commands": commands_list,
-            "available_commands": available,
-        })
-
-    @staticmethod
-    def list_plugins() -> r[list[t.Meltano.PluginDefinition]]:
-        """List available plugins - delegates to adapter."""
-        try:
-            # Return empty list - full implementation delegates to adapter
-            return r[list[t.Meltano.PluginDefinition]].ok([])
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[t.Meltano.PluginDefinition]].fail(
-                f"Failed to list plugins: {e}",
-            )
+    def run_command(self, args: list[str]) -> r[int]:
+        """Execute command and return exit code - delegates to routing."""
+        if not args:
+            return r[int].ok(1)
+        return self._route_command(args[0], args[1:]).map(lambda _: 0)
 
     def run_pipeline(
         self,
@@ -286,128 +368,8 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
             },
         )
 
-    @staticmethod
-    def create_flext_cli() -> r[FlextMeltanoCLI]:
-        """Create FLEXT CLI instance - delegates to CLI module."""
-        try:
-            cli = FlextMeltanoCLI()
-            return r[FlextMeltanoCLI].ok(cli)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[FlextMeltanoCLI].fail(f"Failed to create CLI: {e}")
-
-    @staticmethod
-    def create_cli_runner(args: list[str]) -> r[t.Meltano.ExecutionResultDict]:
-        """Create CLI runner for command execution - static factory."""
-        try:
-            executor = FlextMeltanoExecutor()
-            return (
-                executor.run(args)
-                if args
-                else r[t.Meltano.ExecutionResultDict].ok({
-                    "status": "ready",
-                    "command_type": "cli_runner",
-                    "args": args,
-                })
-            )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Failed to create CLI runner: {e}",
-            )
-
-    # ========================================================================
-    # PRIVATE DELEGATION HANDLERS - Using SOLID pattern with single purpose
-    # ========================================================================
-
-    def _handle_version_command(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle version command - delegates to executor."""
-        return self._execute_version_command()
-
-    def _handle_help_command(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle help command - delegates to executor."""
-        return self._execute_help_command()
-
-    def _handle_default_command(
-        self,
-        args: list[str],
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle default command - delegates to action executor."""
-        return self._execute_action_command("default", args)
-
-    @staticmethod
-    def _execute_version_command() -> r[t.Meltano.ExecutionResultDict]:
-        """Execute version command - returns version info."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "command": "version",
-            "command_type": "version",
-            "status": "success",
-            "version": c.Meltano.FLEXT_MELTANO_VERSION,
-            "success": True,
-            "cli_type": "flext_meltano",
-        })
-
-    @staticmethod
-    def _execute_help_command() -> r[t.Meltano.ExecutionResultDict]:
-        """Execute help command - returns help info."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "command": "help",
-            "command_type": "help",
-            "status": "success",
-            "help": "FLEXT Meltano CLI - Data integration framework",
-        })
-
-    @staticmethod
-    def _execute_health_command() -> r[t.Meltano.ExecutionResultDict]:
-        """Execute health command - delegates to adapter."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "command": "health",
-            "command_type": "health",
-            "status": "healthy",
-            "health": "OK",
-            "components": ["bridge", "adapter", "executor"],
-        })
-
-    @staticmethod
-    def _execute_action_command(
-        action: str,
-        args: list[str],
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Execute action command - delegates to appropriate handler."""
-        try:
-            return r[t.Meltano.ExecutionResultDict].ok({
-                "command": action,
-                "action": action,
-                "args": args,
-                "status": "executed",
-            })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(f"Action failed: {e}")
-
-    def _route_command(
-        self,
-        command: str,
-        args: list[str],
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Route command to appropriate handler - delegates to handlers."""
-        # Map commands directly without using u.get to maintain type safety
-        if command == "version":
-            return self._execute_version_command()
-        if command == "help":
-            return self._execute_help_command()
-        if command == "health":
-            return self._execute_health_command()
-        return self._execute_action_command(command, args)
-
-    @staticmethod
-    def _handle_cli_no_args() -> r[t.Meltano.ExecutionResultDict]:
-        """Handle CLI with no arguments - delegates to ready state."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "status": "ready",
-            "command_type": "cli",
-            "message": "No arguments provided - ready for commands",
-        })
-
-    def _handle_cli_version_args(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle CLI version arguments - delegates to version handler."""
+    def version(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Get version information - delegates to handler."""
         return self._execute_version_command()
 
     def _handle_cli_help_args(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -427,6 +389,44 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
             })
         command = args[0]
         return self._route_command(command, args[1:])
+
+    def _handle_cli_version_args(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Handle CLI version arguments - delegates to version handler."""
+        return self._execute_version_command()
+
+    def _handle_default_command(
+        self,
+        args: list[str],
+    ) -> r[t.Meltano.ExecutionResultDict]:
+        """Handle default command - delegates to action executor."""
+        return self._execute_action_command("default", args)
+
+    def _handle_help_command(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Handle help command - delegates to executor."""
+        return self._execute_help_command()
+
+    # ========================================================================
+    # PRIVATE DELEGATION HANDLERS - Using SOLID pattern with single purpose
+    # ========================================================================
+
+    def _handle_version_command(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Handle version command - delegates to executor."""
+        return self._execute_version_command()
+
+    def _route_command(
+        self,
+        command: str,
+        args: list[str],
+    ) -> r[t.Meltano.ExecutionResultDict]:
+        """Route command to appropriate handler - delegates to handlers."""
+        # Map commands directly without using u.get to maintain type safety
+        if command == "version":
+            return self._execute_version_command()
+        if command == "help":
+            return self._execute_help_command()
+        if command == "health":
+            return self._execute_health_command()
+        return self._execute_action_command(command, args)
 
 
 __all__ = ["FlextMeltanoExecutor"]

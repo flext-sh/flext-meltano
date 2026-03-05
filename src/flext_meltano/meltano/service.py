@@ -101,36 +101,6 @@ class FlextMeltanoMeltanoService(s[str]):
                 f"Failed to create project: {e}",
             )
 
-    def load_project(self, root: Path) -> r[MeltanoProjectInfo]:
-        """Load an existing Meltano project.
-
-        Args:
-        root: Root directory of the project
-
-        Returns:
-        FlextResult containing project information
-
-        """
-        try:
-            self.logger.info("Loading Meltano project", root=str(root))
-            result = self.project_manager.load_project(root)
-            if result.is_success:
-                self.logger.info("Meltano project loaded")
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to load project", error=str(e))
-            return r[MeltanoProjectInfo].fail(
-                f"Failed to load project: {e}",
-            )
-
     def discover_plugins(
         self,
         plugin_type: str | None = None,
@@ -164,6 +134,12 @@ class FlextMeltanoMeltanoService(s[str]):
             return r[list[t.Meltano.PluginDefinition]].fail(
                 f"Failed to discover plugins: {e}",
             )
+
+    @override
+    def execute(self) -> r[str]:
+        """Execute (implements Service pattern)."""
+        msg = "Meltano service initialized"
+        return r[str].ok(msg)
 
     def execute_pipeline(
         self,
@@ -215,11 +191,35 @@ class FlextMeltanoMeltanoService(s[str]):
                 f"Failed to execute pipeline: {e}",
             )
 
-    @override
-    def execute(self) -> r[str]:
-        """Execute (implements Service pattern)."""
-        msg = "Meltano service initialized"
-        return r[str].ok(msg)
+    def load_project(self, root: Path) -> r[MeltanoProjectInfo]:
+        """Load an existing Meltano project.
+
+        Args:
+        root: Root directory of the project
+
+        Returns:
+        FlextResult containing project information
+
+        """
+        try:
+            self.logger.info("Loading Meltano project", root=str(root))
+            result = self.project_manager.load_project(root)
+            if result.is_success:
+                self.logger.info("Meltano project loaded")
+            return result
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Failed to load project", error=str(e))
+            return r[MeltanoProjectInfo].fail(
+                f"Failed to load project: {e}",
+            )
 
 
 __all__ = [

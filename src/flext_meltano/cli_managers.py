@@ -301,12 +301,12 @@ class _CLIProtocol(Protocol):
     status_manager: _StatusManagerProtocol
 
     def show_banner(self) -> None: ...
-    def show_pipeline_help(self) -> None: ...
     def show_dbt_help(self) -> None: ...
+    def show_pipeline_help(self) -> None: ...
     def show_plugin_help(self) -> None: ...
+    def show_status_help(self) -> None: ...
     def show_tap_help(self) -> None: ...
     def show_target_help(self) -> None: ...
-    def show_status_help(self) -> None: ...
 
 
 class FlextMeltanoCommandRouter:
@@ -321,6 +321,14 @@ class FlextMeltanoCommandRouter:
         super().__init__()
         self.cli = cli
         self.logger = FlextLogger(__name__)
+
+    @staticmethod
+    def _execute_command(
+        handler: Callable[[list[str]], r[None]],
+        args: list[str],
+    ) -> r[None]:
+        """Execute command handler."""
+        return handler(args)
 
     def route_command(self, args: list[str]) -> int:
         """Route command to appropriate handler using composition."""
@@ -365,14 +373,6 @@ class FlextMeltanoCommandRouter:
 
         return r[Callable[[list[str]], r[None]]].ok(handler)
 
-    @staticmethod
-    def _execute_command(
-        handler: Callable[[list[str]], r[None]],
-        args: list[str],
-    ) -> r[None]:
-        """Execute command handler."""
-        return handler(args)
-
 
 class FlextMeltanoPipelineManager:
     """SOLID-compliant pipeline manager for FLEXT Meltano CLI.
@@ -386,6 +386,14 @@ class FlextMeltanoPipelineManager:
         super().__init__()
         self.cli = cli
         self.logger = FlextLogger(__name__)
+
+    @staticmethod
+    def _execute_pipeline_operation(
+        handler: Callable[[list[str]], r[None]],
+        args: list[str],
+    ) -> r[None]:
+        """Execute pipeline operation."""
+        return handler(args)
 
     def handle_command(self, args: list[str]) -> r[None]:
         """Handle pipeline command using composition."""
@@ -403,36 +411,6 @@ class FlextMeltanoPipelineManager:
 
         handler = handler_result.value
         return self._execute_pipeline_operation(handler, subcommand_args)
-
-    def _get_pipeline_handler(
-        self,
-        subcommand: str,
-    ) -> r[Callable[[list[str]], r[None]]]:
-        """Get pipeline operation handler."""
-        operation_map: dict[str, Callable[[list[str]], r[None]]] = {
-            "create": self._create_pipeline,
-            "run": self._run_pipeline,
-            "list": self._list_pipelines,
-            "status": self._get_pipeline_status,
-            "stop": self._stop_pipeline,
-            "delete": self._delete_pipeline,
-        }
-
-        handler = operation_map.get(subcommand)
-        if handler is None:
-            return r[Callable[[list[str]], r[None]]].fail(
-                f"Unknown pipeline command: {subcommand}",
-            )
-
-        return r[Callable[[list[str]], r[None]]].ok(handler)
-
-    @staticmethod
-    def _execute_pipeline_operation(
-        handler: Callable[[list[str]], r[None]],
-        args: list[str],
-    ) -> r[None]:
-        """Execute pipeline operation."""
-        return handler(args)
 
     def _create_pipeline(self, _args: list[str]) -> r[None]:
         """Create new pipeline."""
@@ -459,31 +437,37 @@ class FlextMeltanoPipelineManager:
         self.logger.info("Pipeline created", pipeline=pipeline_name)
         return r[None](value=None, is_success=True)
 
-    def _run_pipeline(self, _args: list[str]) -> r[None]:
-        """Run pipeline."""
+    def _delete_pipeline(self, _args: list[str]) -> r[None]:
+        """Delete pipeline."""
         if not _args:
-            return r[None].fail(
-                "Pipeline execution requires pipeline name",
+            return r[None].fail("Pipeline delete requires pipeline name")
+
+        result = delete_pipeline(_args[0])
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None](value=None, is_success=True)
+
+    def _get_pipeline_handler(
+        self,
+        subcommand: str,
+    ) -> r[Callable[[list[str]], r[None]]]:
+        """Get pipeline operation handler."""
+        operation_map: dict[str, Callable[[list[str]], r[None]]] = {
+            "create": self._create_pipeline,
+            "run": self._run_pipeline,
+            "list": self._list_pipelines,
+            "status": self._get_pipeline_status,
+            "stop": self._stop_pipeline,
+            "delete": self._delete_pipeline,
+        }
+
+        handler = operation_map.get(subcommand)
+        if handler is None:
+            return r[Callable[[list[str]], r[None]]].fail(
+                f"Unknown pipeline command: {subcommand}",
             )
 
-        pipeline_name = _args[0]
-        command_args = _args[1:] if len(_args) > 1 else None
-        result = execute_pipeline(pipeline_name, command_args)
-        if result.is_failure:
-            return r[None].fail(result.error)
-        return r[None](value=None, is_success=True)
-
-    def _list_pipelines(self, _args: list[str]) -> r[None]:
-        """List pipelines."""
-        result = list_pipelines()
-        if result.is_failure:
-            return r[None].fail(result.error)
-
-        self.logger.info(
-            "Configured pipelines",
-            pipelines=", ".join(result.value),
-        )
-        return r[None](value=None, is_success=True)
+        return r[Callable[[list[str]], r[None]]].ok(handler)
 
     def _get_pipeline_status(self, _args: list[str]) -> r[None]:
         """Get pipeline status."""
@@ -501,24 +485,16 @@ class FlextMeltanoPipelineManager:
         )
         return r[None](value=None, is_success=True)
 
-    def _stop_pipeline(self, _args: list[str]) -> r[None]:
-        """Stop pipeline."""
-        if not _args:
-            return r[None].fail("Pipeline stop requires pipeline name")
-
-        result = stop_pipeline(_args[0])
+    def _list_pipelines(self, _args: list[str]) -> r[None]:
+        """List pipelines."""
+        result = list_pipelines()
         if result.is_failure:
             return r[None].fail(result.error)
-        return r[None](value=None, is_success=True)
 
-    def _delete_pipeline(self, _args: list[str]) -> r[None]:
-        """Delete pipeline."""
-        if not _args:
-            return r[None].fail("Pipeline delete requires pipeline name")
-
-        result = delete_pipeline(_args[0])
-        if result.is_failure:
-            return r[None].fail(result.error)
+        self.logger.info(
+            "Configured pipelines",
+            pipelines=", ".join(result.value),
+        )
         return r[None](value=None, is_success=True)
 
     def _run_meltano_command(self, command: list[str]) -> r[None]:
@@ -549,6 +525,30 @@ class FlextMeltanoPipelineManager:
         if completed.stdout.strip():
             self.logger.info(completed.stdout.strip())
 
+        return r[None](value=None, is_success=True)
+
+    def _run_pipeline(self, _args: list[str]) -> r[None]:
+        """Run pipeline."""
+        if not _args:
+            return r[None].fail(
+                "Pipeline execution requires pipeline name",
+            )
+
+        pipeline_name = _args[0]
+        command_args = _args[1:] if len(_args) > 1 else None
+        result = execute_pipeline(pipeline_name, command_args)
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None](value=None, is_success=True)
+
+    def _stop_pipeline(self, _args: list[str]) -> r[None]:
+        """Stop pipeline."""
+        if not _args:
+            return r[None].fail("Pipeline stop requires pipeline name")
+
+        result = stop_pipeline(_args[0])
+        if result.is_failure:
+            return r[None].fail(result.error)
         return r[None](value=None, is_success=True)
 
 
