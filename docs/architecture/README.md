@@ -185,7 +185,7 @@ make docs
 
 - **[../guides/MAINTENANCE_GUIDE.md](../guides/MAINTENANCE_GUIDE.md)** - Documentation maintenance procedures
 - **[../../README.md](../../README.md)** - Project overview and getting started
-- **[../../CLAUDE.md](../../CLAUDE.md)** - Development guidelines and standards
+- **[../../AGENTS.md](../../AGENTS.md)** - Development guidelines and standards
 - **[../guides/MAINTENANCE_GUIDE.md](../guides/MAINTENANCE_GUIDE.md)** - Quality assurance processes
 
 ## 🎯 Architecture Evolution

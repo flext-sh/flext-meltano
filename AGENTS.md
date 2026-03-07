@@ -2,7 +2,7 @@
 
 Placeholder generated for documentation link consistency.
 
-**See [../CLAUDE.md](../CLAUDE.md) for full workspace standards.**
+**See [../AGENTS.md](../AGENTS.md) for full workspace standards.**
 
 ### Zero Tolerance Rules (Completely Prohibited)
 

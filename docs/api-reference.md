@@ -1128,7 +1128,7 @@ ______________________________________________________________________
 
 - [flext-core Foundation](https://github.com/organization/flext/tree/main/flext-core/docs/api-reference/foundation.md) - Core APIs and patterns
 - [flext-plugin API](https://github.com/organization/flext/tree/main/flext-plugin/docs/api-reference.md) - Plugin API reference
-- [flext-quality Automation](https://github.com/organization/flext/tree/main/flext-quality/CLAUDE.md) - Quality analysis and automation
+- [flext-quality Automation](https://github.com/organization/flext/tree/main/flext-quality/AGENTS.md) - Quality analysis and automation
 
 **External Resources**:
 

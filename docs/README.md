@@ -136,7 +136,7 @@ ______________________________________________________________________
 ### **FLEXT Ecosystem Links**
 
 - **[FLEXT Workspace](../../README.md)** - Complete ecosystem overview
-- **[FLEXT Standards](../../CLAUDE.md)** - Development standards
+- **[FLEXT Standards](../../AGENTS.md)** - Development standards
 - **[Root TODO.md](../TODO.md)** - Current roadmap and critical issues
 
 ______________________________________________________________________
