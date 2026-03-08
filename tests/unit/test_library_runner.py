@@ -61,11 +61,9 @@ class TestFlextMeltanoLibraryRunner:
     def test_initialization(self) -> None:
         """Test library runner initialization."""
         runner = FlextMeltanoLibraryRunner()
-        # Test public methods return FlextResult
         dbt_runner_result = runner.get_dbt_runner()
         assert dbt_runner_result.is_success
         assert dbt_runner_result.value is not None
-
         singer_manager_result = runner.get_singer_manager()
         assert singer_manager_result.is_success
         assert singer_manager_result.value is not None
@@ -95,19 +93,13 @@ class TestFlextMeltanoLibraryRunner:
     def test_execute_complete_elt_pipeline_mock(self) -> None:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
-
-        # Test the complete pipeline
         result: r[t.Meltano.Processing.EltPipelineResult] = (
             runner.execute_complete_elt_pipeline(
-                tap_name="tap-csv",
-                target_name="target-jsonl",
+                tap_name="tap-csv", target_name="target-jsonl"
             )
         )
-
         assert result.is_success
-        # Get the pipeline data from the result
         pipeline_data: t.Meltano.Processing.EltPipelineResult = result.value
-        # Check that the pipeline data has the expected EltPipelineResult structure
         assert isinstance(pipeline_data, dict)
         assert "success" in pipeline_data
         assert "tap_name" in pipeline_data

@@ -33,17 +33,12 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_create_flext_target_config(self) -> None:
         """Test target configuration creation."""
         assert self.target_abstractions is not None
-
-        # Skip test if method not available
         if not hasattr(self.target_abstractions, "configure_sink"):
             pytest.skip("configure_sink not available")
-
-        # Test will be implemented when method signature is finalized
         pass
 
     def test_create_flext_target(self) -> None:
         """Test target creation."""
-        # Test will be implemented when method signature is finalized
         pass
 
     def test_target_error_handling(self) -> None:
@@ -57,10 +52,8 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         timestamp = u.Generators.generate_iso_timestamp()
         assert isinstance(timestamp, str)
         assert "T" in timestamp
-
-        # Test nested value retrieval
         test_data: dict[str, t.JsonValue] = {
-            "level1": {"level2": {"level3": "found_value"}},
+            "level1": {"level2": {"level3": "found_value"}}
         }
         level1 = test_data.get("level1", {})
         if isinstance(level1, dict):

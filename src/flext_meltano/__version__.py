@@ -14,7 +14,6 @@ from importlib.metadata import PackageNotFoundError, metadata
 try:
     _metadata = metadata("flext_meltano")
 except PackageNotFoundError:
-    # Fallback for development when package is not installed
     _metadata = {
         "Version": "0.0.0.dev0",
         "Name": "flext_meltano",
@@ -24,7 +23,6 @@ except PackageNotFoundError:
         "License": "MIT",
         "Home-Page": "https://github.com/flext-sh/flext",
     }
-
 __version__ = _metadata["Version"]
 __version_info__ = tuple(
     int(part) if part.isdigit() else part for part in __version__.split(".")
@@ -35,7 +33,6 @@ __author__ = _metadata["Author"]
 __author_email__ = _metadata["Author-Email"]
 __license__ = _metadata.get("License", "")
 __url__ = _metadata.get("Home-Page", "")
-
 __all__ = [
     "__author__",
     "__author_email__",

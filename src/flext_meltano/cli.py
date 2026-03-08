@@ -46,10 +46,8 @@ class FlextMeltanoCLI:
     Single class per module following SOLID principles strictly.
     """
 
-    # Declare attributes to satisfy _CLIProtocol at class level
-    # Use protocol types to match _CLIProtocol expectations
     logger: FlextLogger
-    output: _OutputProtocol  # FlextCliOutput (actual type from flext_cli)
+    output: _OutputProtocol
     _api: FlextMeltano
     pipeline_manager: _ManagerProtocol
     singer_manager: _SingerManagerProtocol
@@ -66,18 +64,10 @@ class FlextMeltanoCLI:
         """
         super().__init__()
         self.logger = FlextLogger(__name__)
-
-        # Initialize core dependencies
         self._cli = FlextCli()
         self._api = FlextMeltano()
         self.output = self._cli.output
-
-        # Chicken-and-egg: managers need self, but self needs managers for _CLIProtocol
-        # Solution: Create a temporary typed variable that we know will satisfy the protocol
-        # after all managers are assigned
         temp_self = self
-
-        # Initialize specialized components using composition
         self.pipeline_manager = FlextMeltanoPipelineManager(temp_self)
         self.singer_manager = FlextMeltanoSingerManager(temp_self)
         self.dbt_manager = FlextMeltanoDbtManager(temp_self)
@@ -85,15 +75,10 @@ class FlextMeltanoCLI:
         self.status_manager = FlextMeltanoStatusManager(temp_self)
         self.command_router = FlextMeltanoCommandRouter(temp_self)
 
-    # =============================================================================
-    # MAIN CLI ENTRY POINT
-    # =============================================================================
-
     def main(self, args: list[str] | None = None) -> int:
         """Main CLI entry point."""
         if args is None:
             args = sys.argv[1:]
-
         return self.command_router.route_command(args)
 
     def show_banner(self) -> None:
@@ -107,7 +92,7 @@ class FlextMeltanoCLI:
     def show_pipeline_help(self) -> None:
         """Show pipeline help."""
         self.output.print_message(
-            "Pipeline commands: create, run, list, status, stop, delete",
+            "Pipeline commands: create, run, list, status, stop, delete"
         )
 
     def show_plugin_help(self) -> None:

@@ -26,9 +26,6 @@ class FlextMeltanoAbstractions:
     class following FLEXT 'one class per module' pattern with nested helper classes.
     """
 
-    # NESTED RUNNER HELPER CLASS
-    # ========================================================================
-
     class _RunnerHelper:
         """Helper class for data pipeline runner operations."""
 
@@ -38,10 +35,7 @@ class FlextMeltanoAbstractions:
             self.logger = logger
 
         def create_pipeline_context(
-            self,
-            project_path: Path,
-            source_name: str,
-            sink_name: str,
+            self, project_path: Path, source_name: str, sink_name: str
         ) -> r[t.Meltano.NestedJsonDict]:
             """Create pipeline context for data pipeline operations."""
             try:
@@ -65,8 +59,6 @@ class FlextMeltanoAbstractions:
         ) -> r[t.Meltano.ELT.PipelineResult]:
             """Execute data pipeline with given context and configurations."""
             try:
-                # This is a simplified implementation
-                # In production, would orchestrate the actual data pipeline
                 result: t.Meltano.ELT.PipelineResult = {
                     "status": "completed",
                     "source": u.get(source_config, "name", default="unknown"),
@@ -79,9 +71,6 @@ class FlextMeltanoAbstractions:
                 self.logger.exception(error_msg)
                 return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
 
-    # MAIN UNIFIED CLASS INTERFACE
-    # ========================================================================
-
     def __init__(self) -> None:
         """Initialize unified abstractions with FLEXT patterns."""
         super().__init__()
@@ -92,23 +81,15 @@ class FlextMeltanoAbstractions:
     def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
         """Add a plugin."""
         try:
-            # Simplified implementation - would validate and add plugin
-            self.logger.info(
-                "Adding plugin",
-                plugin_config=plugin_config,
-            )
+            self.logger.info("Adding plugin", plugin_config=plugin_config)
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"
             self.logger.exception(error_msg)
             return r[bool].fail(error_msg)
 
-    # ELT operations
     def create_elt_context(
-        self,
-        project: p.Meltano.Project,
-        extractor_name: str,
-        loader_name: str,
+        self, project: p.Meltano.Project, extractor_name: str, loader_name: str
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Create ELT context for pipeline execution."""
         try:
@@ -124,20 +105,14 @@ class FlextMeltanoAbstractions:
             self.logger.exception(error_msg)
             return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
-    # Runner operations
     def create_pipeline_context(
-        self,
-        source_name: str,
-        sink_name: str,
+        self, source_name: str, sink_name: str
     ) -> r[t.Meltano.NestedJsonDict]:
         """Create pipeline context."""
         if not self._project_path:
             return r[t.Meltano.NestedJsonDict].fail("No project loaded")
-
         return self._runner_helper.create_pipeline_context(
-            self._project_path,
-            source_name,
-            sink_name,
+            self._project_path, source_name, sink_name
         )
 
     def execute_data_pipeline(
@@ -150,11 +125,8 @@ class FlextMeltanoAbstractions:
             "project_path": str(self._project_path) if self._project_path else None,
             "status": "initialized",
         }
-
         return self._runner_helper.execute_data_pipeline(
-            pipeline_context,
-            source_config,
-            sink_config,
+            pipeline_context, source_config, sink_config
         )
 
     def execute_singer_pipeline(
@@ -165,8 +137,6 @@ class FlextMeltanoAbstractions:
     ) -> r[t.Meltano.ELT.PipelineResult]:
         """Execute singer pipeline."""
         try:
-            # Simplified implementation - in production would orchestrate actual
-            # singer pipeline
             result: t.Meltano.ELT.PipelineResult = {
                 "status": "completed",
                 "records_processed": 0,
@@ -178,37 +148,28 @@ class FlextMeltanoAbstractions:
             self.logger.exception(error_msg)
             return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
 
-    # Project operations
     def find_project(self, project_root: Path) -> r[Path]:
         """Find and validate pipeline project directory."""
         try:
             if not project_root.exists() or not project_root.is_dir():
                 return r[Path].fail(
-                    f"Project path is not a valid directory: {project_root}",
+                    f"Project path is not a valid directory: {project_root}"
                 )
-
             self._project_path = project_root
-
             self.logger.info(
-                "Pipeline project loaded successfully",
-                project_root=str(project_root),
+                "Pipeline project loaded successfully", project_root=str(project_root)
             )
-
             return r[Path].ok(project_root)
-
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to load pipeline project: {e}"
             self.logger.exception(error_msg)
             return r[Path].fail(error_msg)
 
-    # Component operations
     def get_components_of_type(
-        self,
-        component_type: str,
+        self, component_type: str
     ) -> r[list[t.Meltano.PluginDefinition]]:
         """Get components of specified type."""
         try:
-            # Generic component listing - would be implemented based on actual needs
             components: list[t.Meltano.PluginDefinition] = [
                 {"name": "source-csv", "type": "sources", "status": "available"},
                 {"name": "sink-postgres", "type": "sinks", "status": "available"},
@@ -218,32 +179,24 @@ class FlextMeltanoAbstractions:
                     "status": "available",
                 },
             ]
-
-            # DSL: Use filter for unified filtering
             filtered_components = u.filter(
                 components,
                 lambda comp: u.get(comp, "type", default="") == component_type,
             )
-            # Type narrowing: ensure list[t.Meltano.PluginDefinition]
             result_list: list[t.Meltano.PluginDefinition] = (
                 list(filtered_components) if filtered_components else []
             )
             return r[list[t.Meltano.PluginDefinition]].ok(result_list)
-
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get components of type {component_type}: {e}"
             self.logger.exception(error_msg)
             return r[list[t.Meltano.PluginDefinition]].fail(error_msg)
 
-    # Plugin operations
     def get_plugins_of_type(
-        self,
-        _project: p.Meltano.Project,
-        plugin_type: str,
+        self, _project: p.Meltano.Project, plugin_type: str
     ) -> r[Mapping[str, t.Meltano.PluginDefinition]]:
         """Get plugins of specified type."""
         try:
-            # Simplified implementation - would need actual plugin discovery
             plugins: dict[str, t.Meltano.PluginDefinition] = {
                 "tap-csv": {
                     "name": "tap-csv",
@@ -256,15 +209,12 @@ class FlextMeltanoAbstractions:
                     "status": "available",
                 },
             }
-
-            # DSL: Use dict comprehension for filtering (u.filter expects single-arg predicate)
             filtered_plugins: dict[str, t.Meltano.PluginDefinition] = {
                 k: v
                 for k, v in plugins.items()
                 if u.get(v, "type", default="") == plugin_type
             }
             return r[Mapping[str, t.Meltano.PluginDefinition]].ok(filtered_plugins)
-
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
@@ -274,13 +224,10 @@ class FlextMeltanoAbstractions:
         """Get the root directory of the current project."""
         if not self._project_path:
             return r[Path].fail("No project loaded")
-
         try:
             return r[Path].ok(self._project_path)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Path].fail(f"Failed to get project root: {e}")
 
 
-__all__ = [
-    "FlextMeltanoAbstractions",
-]
+__all__ = ["FlextMeltanoAbstractions"]

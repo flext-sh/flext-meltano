@@ -47,8 +47,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
         """Execute (implements Service pattern)."""
         if self.project_root:
             info = m.Meltano.DbtProjectInfo(
-                root=self.project_root,
-                name=str(self.project_root.name),
+                root=self.project_root, name=str(self.project_root.name)
             )
             return r[m.Meltano.DbtProjectInfo].ok(info)
         return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
@@ -65,9 +64,8 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
                     return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
-                        manifest_result.error or "Unknown error",
+                        manifest_result.error or "Unknown error"
                     )
-
             models: list[t.Meltano.Dbt.ModelConfiguration] = []
             if self.manifest:
                 manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
@@ -89,7 +87,6 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                     }
                     for node in model_nodes
                 ]
-
             self.logger.info("Models retrieved", count=len(models))
             return r[list[t.Meltano.Dbt.ModelConfiguration]].ok(models)
         except (
@@ -118,9 +115,8 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 manifest_result = self.load_manifest()
                 if manifest_result.is_failure:
                     return r[list[t.Meltano.Dbt.TestConfiguration]].fail(
-                        manifest_result.error or "Unknown error",
+                        manifest_result.error or "Unknown error"
                     )
-
             tests: list[t.Meltano.Dbt.TestConfiguration] = []
             if self.manifest:
                 manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
@@ -142,7 +138,6 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                     }
                     for node in test_nodes
                 ]
-
             self.logger.info("Tests retrieved", count=len(tests))
             return r[list[t.Meltano.Dbt.TestConfiguration]].ok(tests)
         except (ValidationError, OSError, ValueError, TypeError) as e:
@@ -152,8 +147,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             )
 
     def load_manifest(
-        self,
-        manifest_path: Path | None = None,
+        self, manifest_path: Path | None = None
     ) -> r[t.Meltano.Dbt.ManifestData]:
         """Load DBT manifest.
 
@@ -169,20 +163,14 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 if self.project_root is None:
                     return r[t.Meltano.Dbt.ManifestData].fail("No project loaded")
                 manifest_path = self.project_root / "target" / "manifest.json"
-
             if not manifest_path.exists():
                 return r[t.Meltano.Dbt.ManifestData].fail(
-                    f"Manifest not found: {manifest_path}",
+                    f"Manifest not found: {manifest_path}"
                 )
-
             with manifest_path.open() as f:
                 manifest_data: t.Meltano.Dbt.ManifestData = json.load(f)
                 self.manifest = manifest_data
-
-            self.logger.info(
-                "DBT manifest loaded",
-                file=str(manifest_path),
-            )
+            self.logger.info("DBT manifest loaded", file=str(manifest_path))
             return r[t.Meltano.Dbt.ManifestData].ok(self.manifest)
         except (
             ValueError,
@@ -209,20 +197,11 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
         try:
             if not root.exists():
                 return r[m.Meltano.DbtProjectInfo].fail(
-                    f"DBT project directory not found: {root}",
+                    f"DBT project directory not found: {root}"
                 )
-
             self.project_root = root
-
-            info = m.Meltano.DbtProjectInfo(
-                root=root,
-                name=str(root.name),
-            )
-
-            self.logger.info(
-                "DBT project loaded",
-                root=str(root),
-            )
+            info = m.Meltano.DbtProjectInfo(root=root, name=str(root.name))
+            self.logger.info("DBT project loaded", root=str(root))
             return r[m.Meltano.DbtProjectInfo].ok(info)
         except (
             ValueError,
@@ -234,11 +213,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[m.Meltano.DbtProjectInfo].fail(
-                f"Failed to load DBT project: {e}",
-            )
+            return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
 
-__all__ = [
-    "FlextMeltanoDbtProjectManager",
-]
+__all__ = ["FlextMeltanoDbtProjectManager"]

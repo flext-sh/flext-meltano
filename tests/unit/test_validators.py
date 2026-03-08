@@ -26,13 +26,11 @@ class TestFlextMeltanoValidatorsComprehensive:
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert result.is_success
 
     def test_validate_plugin_config_missing_fields(self) -> None:
         config: t.JsonValue = {"name": "tap-csv"}
-
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert result.is_failure
         assert result.is_failure
@@ -44,7 +42,6 @@ class TestFlextMeltanoValidatorsComprehensive:
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert result.is_failure
         assert result.is_failure
@@ -56,7 +53,6 @@ class TestFlextMeltanoValidatorsComprehensive:
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-
         result = FlextMeltanoValidators.validate_plugin_config(config)
         assert result.is_failure
         assert result.is_failure
@@ -75,29 +71,22 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_meltano_config_valid(self) -> None:
         config: t.JsonValue = {"version": 1, "project_id": "test-project"}
-
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         assert result.is_success
 
     def test_validate_meltano_config_missing_version(self) -> None:
         config: t.JsonValue = {"project_id": "test-project"}
-
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         assert result.is_failure or result.is_success
 
     def test_validate_meltano_config_invalid_version(self) -> None:
-        config: t.JsonValue = {
-            "version": 2,
-            "project_id": "test-project",
-        }
-
+        config: t.JsonValue = {"version": 2, "project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         assert result.is_failure
         assert result.is_failure
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test basic validator instantiation."""
-        # Test that validator can be instantiated
         validator = FlextMeltanoValidators()
         assert validator is not None
 
@@ -108,71 +97,59 @@ class TestFlextMeltanoValidatorsComprehensive:
             "transformation_version": "1.0.0",
             "profile": "analytics_profile",
         }
-
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config,
+            dbt_config
         )
         assert result.is_success
 
     def test_validate_dbt_config_missing_required(self) -> None:
         dbt_config: t.JsonValue = {"name": "analytics"}
-
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config,
+            dbt_config
         )
         assert result.is_failure
         assert result.is_failure
 
     @pytest.mark.parametrize(
-        "invalid_config",
-        [None, "not a dict", [], 123, {"invalid": "structure"}],
+        "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
     )
     def test_validate_plugin_config_parametrized_invalid(
-        self,
-        invalid_config: t.JsonValue,
+        self, invalid_config: t.JsonValue
     ) -> None:
         result = FlextMeltanoValidators.validate_plugin_config(invalid_config)
         assert result.is_failure
         assert result.is_failure
 
     def test_complex_validation_scenario(self) -> None:
-        meltano_config: t.JsonValue = {
-            "version": 1,
-            "project_id": "integration-test",
-        }
-
+        meltano_config: t.JsonValue = {"version": 1, "project_id": "integration-test"}
         dbt_config: t.JsonValue = {
             "name": "analytics",
             "version": 1,
             "transformation_version": "1.0.0",
             "profile": "analytics_profile",
         }
-
         tap_config: t.JsonValue = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-
         target_config: t.JsonValue = {
             "name": "target-postgres",
             "namespace": "target_postgres",
             "pip_url": "pipelinewise-target-postgres",
             "executable": "target-postgres",
         }
-
         meltano_result = (
             FlextMeltanoValidators.validate_pipeline_project_business_rules(
-                meltano_config,
+                meltano_config
             )
         )
         dbt_result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config,
+            dbt_config
         )
         tap_result = FlextMeltanoValidators.validate_plugin_config(tap_config)
         target_result = FlextMeltanoValidators.validate_plugin_config(target_config)
-
         assert meltano_result.is_success
         assert dbt_result.is_success
         assert tap_result.is_success
@@ -181,14 +158,11 @@ class TestFlextMeltanoValidatorsComprehensive:
     def test_validator_architecture_compliance(self) -> None:
         assert hasattr(FlextMeltanoValidators, "validate_plugin_config")
         assert hasattr(
-            FlextMeltanoValidators,
-            "validate_pipeline_project_business_rules",
+            FlextMeltanoValidators, "validate_pipeline_project_business_rules"
         )
         assert hasattr(FlextMeltanoValidators, "validate_transformation_business_rules")
-
         assert not hasattr(FlextMeltanoValidators, "safe_json_stringify")
         assert not hasattr(FlextMeltanoValidators, "Text")
-
         config: t.JsonValue = {
             "name": "test-plugin",
             "namespace": "test_ns",

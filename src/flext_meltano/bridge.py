@@ -32,7 +32,6 @@ class FlextMeltanoBridge:
     def discover_plugins() -> r[Mapping[str, t.JsonValue]]:
         """Discover available plugins through the Go bridge."""
         try:
-            # Go bridge plugin discovery — queries FlexCore for registered plugins
             result_data: dict[str, t.JsonValue] = {
                 "extractors": ["tap-csv", "tap-postgres", "tap-json"],
                 "loaders": ["target-csv", "target-postgres", "target-jsonl"],
@@ -46,8 +45,7 @@ class FlextMeltanoBridge:
 
     @staticmethod
     def execute_command(
-        command: str,
-        args: Mapping[str, t.JsonValue] | None = None,
+        command: str, args: Mapping[str, t.JsonValue] | None = None
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Execute a bridge command with JSON arguments.
 
@@ -60,8 +58,6 @@ class FlextMeltanoBridge:
 
         """
         try:
-            # Go bridge integration point — communicates with FlexCore Go service via JSON API
-            # ExecutionResultDict is dict[str, JsonValue]
             result_data: t.Meltano.ExecutionResultDict = {
                 "command": command,
                 "args": args or {},
@@ -70,15 +66,12 @@ class FlextMeltanoBridge:
             }
             return r[t.Meltano.ExecutionResultDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Bridge command failed: {e}",
-            )
+            return r[t.Meltano.ExecutionResultDict].fail(f"Bridge command failed: {e}")
 
     @staticmethod
     def get_version() -> r[str]:
         """Get bridge version information."""
         try:
-            # Go bridge version endpoint — returns bridge protocol version
             return r[str].ok("1.0.0")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[str].fail(f"Failed to get version: {e}")
@@ -87,7 +80,6 @@ class FlextMeltanoBridge:
     def validate_connection() -> r[bool]:
         """Validate connection to Go bridge."""
         try:
-            # Go bridge connectivity check — validates FlexCore service availability
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Bridge connection validation failed: {e}")

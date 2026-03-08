@@ -37,15 +37,12 @@ class FlextMeltanoAdapter:
             return FlextMeltanoSettings
 
         def create_project(
-            self,
-            project_name: str,
-            project_dir: Path,
+            self, project_name: str, project_dir: Path
         ) -> r[t.Meltano.ExecutionResultDict]:
             """Create new Meltano project with SOLID delegation."""
             try:
                 project_path = Path(project_dir) / project_name
                 project_path.mkdir(parents=True, exist_ok=True)
-
                 result: t.Meltano.ExecutionResultDict = {
                     "project_name": project_name,
                     "project_path": str(project_path),
@@ -55,7 +52,7 @@ class FlextMeltanoAdapter:
                 return r[t.Meltano.ExecutionResultDict].ok(result)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
                 return r[t.Meltano.ExecutionResultDict].fail(
-                    f"Project creation failed: {ex}",
+                    f"Project creation failed: {ex}"
                 )
 
         def execute(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -65,24 +62,20 @@ class FlextMeltanoAdapter:
         def get_version(self) -> r[t.Meltano.ExecutionResultDict]:
             """Get Meltano version information using native API."""
             meltano_version = getattr(meltano, "__version__", "3.9.1")
-
             version_info: t.Meltano.ExecutionResultDict = {
                 "version": meltano_version,
                 "meltano": meltano_version,
                 "cli_type": "native_meltano_api",
                 "integration": "flext-core",
             }
-
             return r[t.Meltano.ExecutionResultDict].ok(version_info)
 
         def initialize_project(
-            self,
-            project_root: Path,
+            self, project_root: Path
         ) -> r[t.Meltano.ExecutionResultDict]:
             """Initialize Meltano project using railway pattern for composable steps."""
             return self.create_project(
-                project_name=project_root.name,
-                project_dir=project_root,
+                project_name=project_root.name, project_dir=project_root
             )
 
     class PluginAdapter(s[list[t.Meltano.PluginDefinition]]):
@@ -95,8 +88,7 @@ class FlextMeltanoAdapter:
             return FlextMeltanoSettings
 
         def discover_plugins(
-            self,
-            plugin_type: str | None = None,
+            self, plugin_type: str | None = None
         ) -> r[list[t.Meltano.PluginDefinition]]:
             """Discover available plugins of specified type.
 
@@ -118,11 +110,10 @@ class FlextMeltanoAdapter:
                         for plugin in plugins
                         if u.get(plugin, "type") == plugin_type
                     ]
-
                 return r[list[t.Meltano.PluginDefinition]].ok(plugins)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
                 return r[list[t.Meltano.PluginDefinition]].fail(
-                    f"Plugin discovery failed: {ex}",
+                    f"Plugin discovery failed: {ex}"
                 )
 
         @override
@@ -144,38 +135,30 @@ class FlextMeltanoAdapter:
             return r[t.Meltano.ExecutionResultDict].ok({"status": "ready"})
 
         def execute_pipeline(
-            self,
-            tap_name: str,
-            target_name: str,
+            self, tap_name: str, target_name: str
         ) -> r[t.Meltano.ExecutionResultDict]:
             """Execute ELT pipeline using Meltano."""
             try:
                 if not tap_name.startswith("tap-"):
                     return r[t.Meltano.ExecutionResultDict].fail(
-                        f"Invalid tap name format: {tap_name}",
+                        f"Invalid tap name format: {tap_name}"
                     )
-
                 if not target_name.startswith("target-"):
                     return r[t.Meltano.ExecutionResultDict].fail(
-                        f"Invalid target name format: {target_name}",
+                        f"Invalid target name format: {target_name}"
                     )
-
                 execution_result: t.Meltano.ExecutionResultDict = {
                     "pipeline_id": f"{tap_name}_{target_name}_{int(time.time())}",
                     "tap": tap_name,
                     "target": target_name,
                     "status": "completed",
                     "execution_duration": 0.5,
-                    "stages": {
-                        "extract_duration": 0.3,
-                        "load_duration": 0.2,
-                    },
+                    "stages": {"extract_duration": 0.3, "load_duration": 0.2},
                 }
-
                 return r[t.Meltano.ExecutionResultDict].ok(execution_result)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
                 return r[t.Meltano.ExecutionResultDict].fail(
-                    f"Pipeline execution failed: {ex}",
+                    f"Pipeline execution failed: {ex}"
                 )
 
     class SingerAdapter(s[t.Meltano.SingerCatalogDict]):
@@ -209,16 +192,15 @@ class FlextMeltanoAdapter:
                                         "forced-replication-method": "INCREMENTAL",
                                         "valid-replication-keys": ["updated_at"],
                                     },
-                                },
+                                }
                             ],
-                        },
-                    ],
+                        }
+                    ]
                 }
-
                 return r[t.Meltano.SingerCatalogDict].ok(catalog)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
                 return r[t.Meltano.SingerCatalogDict].fail(
-                    f"Catalog creation failed: {ex}",
+                    f"Catalog creation failed: {ex}"
                 )
 
         def execute(self) -> r[t.Meltano.SingerCatalogDict]:
@@ -246,14 +228,9 @@ class FlextMeltanoAdapter:
                     "tests_run": 12,
                     "execution_time": 45.2,
                 }
-
                 return r[t.Meltano.DbtResultDict].ok(dbt_result)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-                return r[t.Meltano.DbtResultDict].fail(
-                    f"DBT operation failed: {ex}",
-                )
+                return r[t.Meltano.DbtResultDict].fail(f"DBT operation failed: {ex}")
 
 
-__all__ = [
-    "FlextMeltanoAdapter",
-]
+__all__ = ["FlextMeltanoAdapter"]

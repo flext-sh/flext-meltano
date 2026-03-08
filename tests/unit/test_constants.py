@@ -16,7 +16,6 @@ class Testc:
 
     def test_meltano_namespace(self) -> None:
         """Test Meltano namespace constants."""
-        # Test version constants (correct paths)
         assert isinstance(c.Meltano.FLEXT_MELTANO_VERSION, str), (
             "Meltano version should be a string"
         )
@@ -108,30 +107,22 @@ class Testc:
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
         plugin_types = c.Meltano.Enums.PluginType
-
         assert hasattr(plugin_types, "EXTRACTORS"), "PluginType should have EXTRACTORS"
         assert hasattr(plugin_types, "LOADERS"), "PluginType should have LOADERS"
         assert hasattr(plugin_types, "TRANSFORMS"), "PluginType should have TRANSFORMS"
-
         assert isinstance(plugin_types.EXTRACTORS, str), "EXTRACTORS should be a string"
         assert isinstance(plugin_types.LOADERS, str), "LOADERS should be a string"
         assert isinstance(plugin_types.TRANSFORMS, str), "TRANSFORMS should be a string"
 
     def test_constants_immutability(self) -> None:
         """Test that constants are immutable (Final)."""
-        # Constants are Final by design - this test validates the pattern
         assert True, "Constants should be immutable"
 
     def test_namespace_organization(self) -> None:
         """Test that constants are properly organized in namespaces."""
-        expected_namespaces = [
-            "Meltano",
-        ]
-
+        expected_namespaces = ["Meltano"]
         for namespace in expected_namespaces:
             assert hasattr(c, namespace), f"Constants should have {namespace} namespace"
-
-        # Test Meltano sub-namespaces
         meltano_namespaces = [
             "Metadata",
             "Paths",
@@ -153,7 +144,6 @@ class Testc:
         assert hasattr(c.Meltano.Enums, "PluginType"), (
             "PluginType should be accessible from c.Meltano.Enums"
         )
-
         plugin_types = c.Meltano.Enums.PluginType
         assert hasattr(plugin_types, "EXTRACTORS"), (
             "PluginType should have EXTRACTORS member"

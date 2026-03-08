@@ -112,9 +112,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def execute_singer_command(
-        command: list[str],
-        input_data: str | None = None,
-        timeout: int = 300,
+        command: list[str], input_data: str | None = None, timeout: int = 300
     ) -> r[t.Meltano.CLI.ProcessResult]:
         """Execute Singer SDK command and capture output.
 
@@ -127,10 +125,9 @@ class FlextMeltanoSingerCliTranslator:
         r containing execution results with stdout/stderr
 
         """
-        # Validate command to prevent execution of untrusted input
         if not command:
             return r[t.Meltano.CLI.ProcessResult].fail(
-                "Invalid command: must be non-empty list",
+                "Invalid command: must be non-empty list"
             )
 
         def is_string_argument(arg: t.ContainerValue) -> bool:
@@ -142,13 +139,10 @@ class FlextMeltanoSingerCliTranslator:
 
         if not all(is_string_argument(arg) for arg in command):
             return r[t.Meltano.CLI.ProcessResult].fail(
-                "Invalid command: all arguments must be strings",
+                "Invalid command: all arguments must be strings"
             )
-
         try:
             process_input = input_data.encode() if input_data else None
-
-            # Execute command with subprocess (shell=False for security)
             proc_result = subprocess.run(
                 command,
                 capture_output=True,
@@ -157,21 +151,14 @@ class FlextMeltanoSingerCliTranslator:
                 check=False,
                 shell=False,
             )
-
-            # Return execution results
             output_dict: t.Meltano.CLI.ProcessResult = {
                 "stdout": proc_result.stdout.decode() if proc_result.stdout else "",
                 "stderr": proc_result.stderr.decode() if proc_result.stderr else "",
                 "returncode": proc_result.returncode,
             }
-
-            # Handle execution failure
             if proc_result.returncode != 0:
-                stderr_msg = str(
-                    output_dict.get("stderr", "Command execution failed"),
-                )
+                stderr_msg = str(output_dict.get("stderr", "Command execution failed"))
                 return r[t.Meltano.CLI.ProcessResult].fail(stderr_msg)
-
             return r[t.Meltano.CLI.ProcessResult].ok(output_dict)
         except subprocess.TimeoutExpired as e:
             return r[t.Meltano.CLI.ProcessResult].fail(f"Command timeout: {e}")
@@ -199,32 +186,21 @@ class FlextMeltanoSingerCliTranslator:
         r containing list of DBT CLI command arguments
 
         """
-        command: list[str] = [
-            "dbt",
-            "run",
-            "--project-dir",
-            params.project_dir,
-        ]
-
+        command: list[str] = ["dbt", "run", "--project-dir", params.project_dir]
         if params.models:
             command.extend(["--models", params.models])
-
         if params.select:
             command.extend(["--select", params.select])
-
         if params.exclude:
             command.extend(["--exclude", params.exclude])
-
         if params.full_refresh:
             command.append("--full-refresh")
-
         vars_val = getattr(params, "vars", None)
         if vars_val:
-            vars_dict = m.Meltano.ConfigMappingPayload.model_validate(
-                {"values": vars_val},
-            ).values
+            vars_dict = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": vars_val
+            }).values
             command.extend(["--vars", json.dumps(vars_dict)])
-
         return r[list[str]].ok(command)
 
     @staticmethod
@@ -240,28 +216,17 @@ class FlextMeltanoSingerCliTranslator:
         r containing tuple of (source_command, sink_command)
 
         """
-        # Build source command
         source_command: list[str] = [params.source_name]
-
         if params.source_config:
             source_command.extend(["--config", params.source_config])
-
         if params.catalog_file:
             source_command.extend(["--catalog", params.catalog_file])
-
         if params.state_file:
             source_command.extend(["--state", params.state_file])
-
-        # Build sink command
         sink_command: list[str] = [params.sink_name]
-
         if params.sink_config:
             sink_command.extend(["--config", params.sink_config])
-
-        return r[tuple[list[str], list[str]]].ok((
-            source_command,
-            sink_command,
-        ))
+        return r[tuple[list[str], list[str]]].ok((source_command, sink_command))
 
     @staticmethod
     def translate_tap_run(
@@ -277,23 +242,17 @@ class FlextMeltanoSingerCliTranslator:
 
         """
         command: list[str] = [params.source_name]
-
         if params.discover:
             command.append("--discover")
             return r[list[str]].ok(command)
-
         if params.config_file:
             command.extend(["--config", params.config_file])
-
         if params.catalog_file:
             command.extend(["--catalog", params.catalog_file])
-
         if params.state_file:
             command.extend(["--state", params.state_file])
-
         if params.catalog_file:
             command.extend(["--properties", params.catalog_file])
-
         return r[list[str]].ok(command)
 
     @staticmethod
@@ -310,13 +269,10 @@ class FlextMeltanoSingerCliTranslator:
 
         """
         command: list[str] = [params.sink_name]
-
         if params.config_file:
             command.extend(["--config", params.config_file])
-
         if params.input_file:
             command.extend(["--input", params.input_file])
-
         return r[list[str]].ok(command)
 
 

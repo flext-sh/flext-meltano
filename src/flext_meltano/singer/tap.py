@@ -58,26 +58,17 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config,
-                "tap_type",
-                "unknown",
+                source_config, "tap_type", "unknown"
             )
             source_identifier = getattr(
-                source_config,
-                "source_identifier",
-                None,
+                source_config, "source_identifier", None
             ) or getattr(source_config, "tap_identifier", "unknown")
-
             self.logger.info(
                 "Creating source instance",
                 source_name=source_type,
                 source_type=source_type,
             )
-
-            # Create unique source identifier
             source_id = f"{source_type}:{source_identifier}"
-
-            # Ensure config is exactly DataSourceConfig for the model
             if isinstance(source_config, m.Meltano.DataSourceConfig):
                 config = source_config
             elif isinstance(source_config, m.Meltano.TapConfig):
@@ -94,22 +85,16 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
                     stream_config=source_config.config.stream_config or {},
                     source_version=source_config.config.tap_version,
                 )
-
-            # Create source instance
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
                 config=config,
                 status="configured",
                 source_id=source_id,
             )
-
             self.logger.info(
-                "Source instance created successfully",
-                source_name=source_type,
+                "Source instance created successfully", source_name=source_type
             )
-
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
-
         except (
             ValueError,
             TypeError,
@@ -121,7 +106,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         ) as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail(
-                f"Source instance creation failed: {e}",
+                f"Source instance creation failed: {e}"
             )
 
     def create_tap_from_config(
@@ -148,14 +133,12 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
                 tap_type=tap_type,
                 connection_config=connection_config,
                 stream_config=stream_config or {},
-                **kwargs,  # type: ignore[arg-type]
+                **kwargs,
             )
             return self.create_source_instance(config).map(
                 lambda inst: m.Meltano.TapInstance(
-                    tap_type=inst.source_type,
-                    config=config,
-                    tap_id=inst.source_id,
-                ),
+                    tap_type=inst.source_type, config=config, tap_id=inst.source_id
+                )
             )
         except Exception as e:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
@@ -177,33 +160,21 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type_val = getattr(source_config, "source_type", None) or getattr(
-                source_config,
-                "tap_type",
-                None,
+                source_config, "tap_type", None
             )
             self.logger.info(
                 "Discovering streams for source",
                 source_type=source_type_val,
                 source_name=source_type_val,
             )
-
-            # Validate source configuration
             if not source_type_val:
                 return r[t.Meltano.Singer.StreamCatalog].fail(
-                    "Source configuration must have name and type for discovery",
+                    "Source configuration must have name and type for discovery"
                 )
-
-            # Return empty catalog - would integrate with actual Singer taps
             catalog: t.Meltano.Singer.StreamCatalog = {"streams": []}
-
             streams = catalog.get("streams", [])
-            self.logger.info(
-                "Stream discovery completed",
-                stream_count=len(streams),
-            )
-
+            self.logger.info("Stream discovery completed", stream_count=len(streams))
             return r[t.Meltano.Singer.StreamCatalog].ok(catalog)
-
         except (
             ValueError,
             TypeError,
@@ -226,7 +197,6 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             r containing empty stream catalog ready for discovery
 
         """
-        # Return empty catalog ready for stream discovery
         return r[t.Meltano.Singer.StreamCatalog].ok({"streams": []})
 
     def generate_catalog(
@@ -244,7 +214,6 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             r containing the generated catalog dictionary
 
         """
-        # Placeholder implementation
         _ = source_config
         return r[t.JsonDict].ok({"version": 1, "streams": []})
 
@@ -265,24 +234,14 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config,
-                "tap_type",
-                "unknown",
+                source_config, "tap_type", "unknown"
             )
-
             self.logger.debug(
-                "Processing source configuration",
-                source_name=source_type,
+                "Processing source configuration", source_name=source_type
             )
-
-            # Basic validation
             if not source_type or source_type == "unknown":
                 return r[bool].fail("Source configuration must have a type")
-
-            # Additional validation logic would go here
-            # For now, just return success
             return r[bool].ok(value=True)
-
         except (
             ValueError,
             TypeError,
@@ -293,8 +252,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             ImportError,
         ) as e:
             self.logger.exception(
-                "Source configuration processing failed",
-                error=str(e),
+                "Source configuration processing failed", error=str(e)
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
@@ -317,7 +275,6 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             r containing synchronization statistics
 
         """
-        # Placeholder implementation
         _ = source_config
         return r[t.JsonDict].ok({
             "stream_name": stream_name,
@@ -326,10 +283,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             "target_loaded": target is not None,
         })
 
-    def validate_stream_schema(
-        self,
-        stream_def: m.Meltano.StreamDefinition,
-    ) -> r[bool]:
+    def validate_stream_schema(self, stream_def: m.Meltano.StreamDefinition) -> r[bool]:
         """Validate a stream definition's schema.
 
         Args:
@@ -341,22 +295,13 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             self.logger.debug(
-                "Validating stream schema",
-                stream_name=stream_def.stream_name,
+                "Validating stream schema", stream_name=stream_def.stream_name
             )
-
-            # Basic schema validation
             if not stream_def.stream_schema:
                 return r[bool].fail("Stream schema cannot be empty")
-
-            # Schema is already a validated typed mapping in StreamDefinition
             if "properties" not in stream_def.stream_schema:
                 return r[bool].fail("Stream schema must contain properties")
-
-            # Additional validation logic would go here
-            # For now, just return success
             return r[bool].ok(value=True)
-
         except (
             ValueError,
             TypeError,
@@ -370,12 +315,6 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             return r[bool].fail(f"Schema validation failed: {e}")
 
 
-# Re-export Singer SDK types for public API
 FlextMeltanoStream = Stream
 FlextMeltanoTap = Tap
-
-__all__ = [
-    "FlextMeltanoStream",
-    "FlextMeltanoTap",
-    "FlextMeltanoTapAbstractions",
-]
+__all__ = ["FlextMeltanoStream", "FlextMeltanoTap", "FlextMeltanoTapAbstractions"]

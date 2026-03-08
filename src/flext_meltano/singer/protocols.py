@@ -13,7 +13,6 @@ from typing import Protocol
 
 from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes
 
-# Import aliases
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
 
@@ -70,9 +69,7 @@ class FlextMeltanoSingerProtocols:
             ...
 
         def sync(
-            self,
-            catalog: m.Meltano.SingerCatalog,
-            state: m.Meltano.SingerStateMessage,
+            self, catalog: m.Meltano.SingerCatalog, state: m.Meltano.SingerStateMessage
         ) -> None:
             """Synchronize data from source to stdout.
 
@@ -115,18 +112,12 @@ class FlextMeltanoPluginProtocols:
     All protocol types are accessed through this single class - NO ALIASES.
     """
 
-    # Core plugin types - use proper type aliases
     TapPlugin = t.Meltano.PluginDefinition
     TargetPlugin = t.Meltano.PluginDefinition
     DbtPlugin = t.Meltano.PluginDefinition
-
-    # Service protocols - use proper configuration types
     TapServiceProtocol = t.Meltano.PluginConfiguration
     TargetServiceProtocol = t.Meltano.PluginConfiguration
     DbtServiceProtocol = t.Meltano.PluginConfiguration
 
 
-__all__ = [
-    "FlextMeltanoPluginProtocols",
-    "FlextMeltanoSingerProtocols",
-]
+__all__ = ["FlextMeltanoPluginProtocols", "FlextMeltanoSingerProtocols"]

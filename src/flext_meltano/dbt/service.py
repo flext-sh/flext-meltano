@@ -54,8 +54,7 @@ class FlextMeltanoDbtService(s[str]):
         return r[str].ok(msg)
 
     def generate_docs(
-        self,
-        **kwargs: t.ContainerValue,
+        self, **kwargs: t.ContainerValue
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Generate DBT documentation.
 
@@ -83,12 +82,10 @@ class FlextMeltanoDbtService(s[str]):
         ) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}",
+                f"Documentation generation failed: {e}"
             )
 
-    def get_project_models(
-        self,
-    ) -> r[list[t.Meltano.DbtModelDict]]:
+    def get_project_models(self) -> r[list[t.Meltano.DbtModelDict]]:
         """Get all models from the project.
 
         Returns:
@@ -112,14 +109,9 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[list[t.Meltano.DbtModelDict]].fail(
-                f"Failed to get models: {e}",
-            )
+            return r[list[t.Meltano.DbtModelDict]].fail(f"Failed to get models: {e}")
 
-    def load_project(
-        self,
-        root: Path,
-    ) -> r[m.Meltano.DbtProjectInfo]:
+    def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
         """Load a DBT project.
 
         Args:
@@ -146,14 +138,10 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[m.Meltano.DbtProjectInfo].fail(
-                f"Failed to load DBT project: {e}",
-            )
+            return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
     def run_models(
-        self,
-        models: list[str] | None = None,
-        **kwargs: t.ContainerValue,
+        self, models: list[str] | None = None, **kwargs: t.ContainerValue
     ) -> r[DbtRunResult]:
         """Run DBT models.
 
@@ -170,10 +158,7 @@ class FlextMeltanoDbtService(s[str]):
             result = self.runner.run_models(models, **kwargs)
             if result.is_success:
                 run_result = result.value
-                self.logger.info(
-                    "DBT run completed",
-                    models_run=run_result.models_run,
-                )
+                self.logger.info("DBT run completed", models_run=run_result.models_run)
             return result
         except (
             ValueError,
@@ -185,14 +170,10 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT run failed", error=str(e))
-            return r[DbtRunResult].fail(
-                f"DBT run failed: {e}",
-            )
+            return r[DbtRunResult].fail(f"DBT run failed: {e}")
 
     def run_tests(
-        self,
-        models: list[str] | None = None,
-        **kwargs: t.ContainerValue,
+        self, models: list[str] | None = None, **kwargs: t.ContainerValue
     ) -> r[DbtTestResult]:
         """Run DBT tests.
 
@@ -209,10 +190,7 @@ class FlextMeltanoDbtService(s[str]):
             result = self.runner.run_tests(models, **kwargs)
             if result.is_success:
                 test_result = result.value
-                self.logger.info(
-                    "DBT tests completed",
-                    tests_run=test_result.tests_run,
-                )
+                self.logger.info("DBT tests completed", tests_run=test_result.tests_run)
             return result
         except (
             ValueError,
@@ -224,11 +202,7 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT tests failed", error=str(e))
-            return r[DbtTestResult].fail(
-                f"DBT tests failed: {e}",
-            )
+            return r[DbtTestResult].fail(f"DBT tests failed: {e}")
 
 
-__all__ = [
-    "FlextMeltanoDbtService",
-]
+__all__ = ["FlextMeltanoDbtService"]

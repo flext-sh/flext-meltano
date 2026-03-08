@@ -30,16 +30,11 @@ class FlextMeltanoTypes(FlextCliTypes):
     Uses Python 3.13+ type syntax and patterns.
     """
 
-    # =========================================================================
-    # MELTANO DOMAIN NAMESPACES - Following FLEXT pattern
-    # =========================================================================
-
     class Meltano:
         """Meltano plugin complex types namespace."""
 
         type PluginDefinition = dict[
-            str,
-            str | list[str] | dict[str, FlextTypes.JsonValue],
+            str, str | list[str] | dict[str, FlextTypes.JsonValue]
         ]
         type PluginConfiguration = dict[str, FlextTypes.JsonValue]
         type PluginCatalog = dict[str, list[PluginDefinition]]
@@ -47,8 +42,6 @@ class FlextMeltanoTypes(FlextCliTypes):
         type PluginInstallation = dict[str, str | bool | list[str]]
         type PluginExecution = dict[str, FlextTypes.JsonValue]
         type PluginInfo = dict[str, str | bool | int | FlextTypes.JsonValue]
-
-        # Plugin type literals
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
         PluginVariant = Literal["default", "singer", "custom"]
 
@@ -56,7 +49,6 @@ class FlextMeltanoTypes(FlextCliTypes):
             """Metaclass that proxies attribute access to the Meltano class."""
 
             def __getattr__(cls, name: str) -> object:
-                # Resolve from the enclosing Meltano class
                 meltano_cls = FlextMeltanoTypes.Meltano
                 try:
                     return getattr(meltano_cls, name)
@@ -79,12 +71,9 @@ class FlextMeltanoTypes(FlextCliTypes):
             type Record = dict[str, FlextTypes.JsonValue]
             type Schema = dict[str, FlextTypes.JsonValue]
             type State = dict[str, FlextTypes.JsonValue]
-
-            # Singer protocol Literal types
             ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
             SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
 
-            # Singer SDK typing utilities (domain separation from singer_sdk.typing)
             class Typing:
                 """Singer SDK typing utilities wrapper (Zero Tolerance for direct imports).
 
@@ -131,14 +120,10 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type ProjectConfig = dict[str, FlextTypes.JsonValue]
             type ProjectMetadata = dict[str, str | int | bool | FlextTypes.JsonValue]
-
-            # Meltano-specific project types extending the generic ones
             type MeltanoProjectType = Literal[
-                # Generic types inherited from t
                 "library",
                 "application",
                 "service",
-                # Meltano-specific types
                 "meltano-project",
                 "elt-pipeline",
                 "data-pipeline",
@@ -152,8 +137,6 @@ class FlextMeltanoTypes(FlextCliTypes):
                 "data-loader",
                 "transformation-service",
             ]
-
-            # Meltano-specific project configurations
             type MeltanoProjectConfig = dict[str, FlextTypes.JsonValue]
             type PipelineConfig = dict[str, str | int | bool | list[str]]
             type SingerConfig = dict[str, bool | str | FlextTypes.JsonValue]
@@ -182,8 +165,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             """ELT pipeline complex types namespace."""
 
             type PipelineResult = dict[
-                str,
-                t.Scalar | FlextTypes.JsonValue | list[FlextTypes.JsonValue],
+                str, t.Scalar | FlextTypes.JsonValue | list[FlextTypes.JsonValue]
             ]
             type ExtractConfig = dict[str, FlextTypes.JsonValue]
             type LoadConfig = dict[str, FlextTypes.JsonValue]
@@ -197,16 +179,12 @@ class FlextMeltanoTypes(FlextCliTypes):
         class Processing:
             """Meltano-specific processing types."""
 
-            # Meltano-specific processing result types
             type DbtTransformationResult = dict[str, FlextTypes.JsonValue]
             type SingerProcessingResult = dict[str, FlextTypes.JsonValue]
             type SingerExecutionResult = dict[str, FlextTypes.JsonValue]
             type EltPipelineResult = dict[str, FlextTypes.JsonValue]
+            type Headers = dict[str, str]
 
-            # HTTP and network types
-            type Headers = dict[str, str]  # HTTP headers mapping
-
-        # Recursive JSON type supporting nested dictionaries
         type NestedJsonValue = (
             bool
             | float
@@ -217,8 +195,6 @@ class FlextMeltanoTypes(FlextCliTypes):
             | None
         )
         type NestedJsonDict = dict[str, NestedJsonValue]
-
-        # Meltano configuration and data types
         type MeltanoConfigDict = dict[str, FlextTypes.ContainerValue]
         type PluginConfigDict = dict[str, FlextTypes.ContainerValue]
         type EnvironmentDict = dict[str, str]
@@ -228,32 +204,19 @@ class FlextMeltanoTypes(FlextCliTypes):
         type CommandDict = dict[str, FlextTypes.ContainerValue]
         type ScheduleDict = dict[str, FlextTypes.ContainerValue]
         type JobDict = dict[str, FlextTypes.ContainerValue]
-
-        # Type aliases for singer.py
         RecordDict = dict[str, FlextTypes.JsonValue]
         SchemaDict = dict[str, FlextTypes.JsonValue]
         StateDict = dict[str, FlextTypes.JsonValue]
         ResultDict = dict[str, FlextTypes.JsonValue]
-
-        # Run context for pipeline execution
         type RunContextDict = dict[str, FlextTypes.ContainerValue]
-
-        # Type aliases for file_managers.py
-        FileConfigDict = dict[
-            str,
-            FlextTypes.ContainerValue,
-        ]
+        FileConfigDict = dict[str, FlextTypes.ContainerValue]
         PathDict = dict[str, str | Path]
-
-        # Plugin and execution types
         type PluginList = list[str]
         type PluginNameList = list[str]
         type PluginTypeList = list[str]
         type ExecutionResultDict = dict[str, FlextTypes.ContainerValue]
         type ExecutionStatusDict = dict[str, str]
         type RuntimeConfigDict = dict[str, FlextTypes.ContainerValue]
-
-        # Singer protocol types
         type SingerRecordDict = dict[str, FlextTypes.JsonValue]
         type SingerStateDict = dict[str, FlextTypes.JsonValue]
         type SingerCatalogDict = dict[str, FlextTypes.JsonValue]
@@ -261,8 +224,6 @@ class FlextMeltanoTypes(FlextCliTypes):
         type SingerSchemaDict = dict[str, FlextTypes.JsonValue]
         type SingerMessageList = list[dict[str, FlextTypes.JsonValue]]
         type StreamNameList = list[str]
-
-        # DBT transformation types
         type DbtModelDict = dict[str, FlextTypes.JsonValue]
         type DbtProfileDict = dict[str, FlextTypes.JsonValue]
         type DbtProjectDict = dict[str, FlextTypes.JsonValue]
@@ -282,7 +243,6 @@ class FlextMeltanoTypes(FlextCliTypes):
             type MetricsDict = dict[str, float]
             type ErrorsDict = dict[str, str]
 
-    # Direct access to Singer namespace for convenience
     Singer = Meltano.Singer
 
 

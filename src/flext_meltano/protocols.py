@@ -39,11 +39,6 @@ class FlextMeltanoProtocols(FlextCliProtocols):
     target: FlextCliProtocols.Meltano.Target
     """
 
-    # =========================================================================
-    # MELTANO ELT-SPECIFIC PROTOCOLS
-    # =========================================================================
-    # Domain-specific protocols for Meltano, Singer, and DBT operations.
-
     class Meltano:
         """Meltano ELT domain-specific protocols.
 
@@ -55,7 +50,6 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class Plugin(Protocol):
             """Meltano plugin interface with covariant return type."""
 
-            # Plugin attributes (matching actual Meltano plugin objects)
             name: str
             default_variant: str | None
             variants: Mapping[str, t.JsonValue] | None
@@ -68,10 +62,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(
-                self,
-                config: Mapping[str, t.JsonValue],
-            ) -> bool:
+            def validate_config(self, config: Mapping[str, t.JsonValue]) -> bool:
                 """Validate plugin configuration. # INTERFACE."""
                 ...
 
@@ -105,8 +96,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def sync(
-                self,
-                catalog: t.JsonValue,
+                self, catalog: t.JsonValue
             ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Sync data from source with r."""
                 ...
@@ -121,15 +111,13 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def handle_batch(
-                self,
-                records: list[t.JsonValue],
+                self, records: list[t.JsonValue]
             ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Handle a batch of records with r."""
                 ...
 
             def handle_record(
-                self,
-                record: t.JsonValue,
+                self, record: t.JsonValue
             ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Handle a single record with r."""
                 ...
@@ -143,31 +131,20 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 """Execute DBT transformations (implements Service)."""
                 ...
 
-            def run(
-                self,
-                models: list[str],
-            ) -> FlextCliProtocols.Result[t.JsonValue]:
+            def run(self, models: list[str]) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Run DBT models with r."""
                 ...
 
-            def test(
-                self,
-                models: list[str],
-            ) -> FlextCliProtocols.Result[t.JsonValue]:
+            def test(self, models: list[str]) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Test DBT models with r."""
                 ...
 
         @runtime_checkable
-        class ServiceCall(
-            FlextCliProtocols.Service[t.JsonValue],
-            Protocol,
-        ):
+        class ServiceCall(FlextCliProtocols.Service[t.JsonValue], Protocol):
             """Service call protocol extending Service."""
 
             def call(
-                self,
-                operation: str,
-                payload: t.JsonValue,
+                self, operation: str, payload: t.JsonValue
             ) -> FlextCliProtocols.Result[t.JsonValue]:
                 """Execute service call with r."""
                 ...
@@ -217,7 +194,6 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class CLI(Protocol):
             """CLI protocol for manager composition - avoids circular imports."""
 
-            # Manager attributes with proper protocol types
             pipeline_manager: FlextMeltanoProtocols.Meltano.CLIManager
             singer_manager: FlextMeltanoProtocols.Meltano.SingerManager
             dbt_manager: FlextMeltanoProtocols.Meltano.CLIManager
@@ -353,10 +329,5 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             name: str
 
 
-# Runtime alias for simplified usage
 p = FlextMeltanoProtocols
-
-__all__ = [
-    "FlextMeltanoProtocols",
-    "p",
-]
+__all__ = ["FlextMeltanoProtocols", "p"]

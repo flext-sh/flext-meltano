@@ -19,7 +19,6 @@ from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
 
-# Import aliases following order: c -> t -> p -> r -> m -> s
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
 singer_p = FlextMeltanoSingerProtocols
@@ -45,7 +44,6 @@ class FlextMeltanoSingerService(s[str]):
 
     """
 
-    # Canonical models from m.Meltano namespace — no inner class duplication
     PipelineConfig: ClassVar[type[m.Meltano.SingerPipelineConfig]] = (
         m.Meltano.SingerPipelineConfig
     )
@@ -58,8 +56,7 @@ class FlextMeltanoSingerService(s[str]):
         self.state_manager = FlextMeltanoStateManager()
 
     def discover_tap_catalog(
-        self,
-        tap: singer_p.SingerTap,
+        self, tap: singer_p.SingerTap
     ) -> r[m.Meltano.SingerCatalog]:
         """Discover catalog from a tap instance.
 
@@ -115,19 +112,12 @@ class FlextMeltanoSingerService(s[str]):
         """
         try:
             self.logger.info("Starting Singer sync")
-
             records_processed = 0
             records_written = 0
             errors = 0
-
-            # Execute tap sync
-            # Get records from tap
             records: list[m.Meltano.SingerRecordMessage] = []
             tap.sync(catalog, state)
-
-            # The target consumes from tap's output
             target.consume(records)
-
             result = m.Meltano.SingerSyncResult(
                 records_processed=records_processed,
                 records_written=records_written,
@@ -135,7 +125,6 @@ class FlextMeltanoSingerService(s[str]):
                 state=state.value,
                 duration_seconds=0.0,
             )
-
             self.logger.info(
                 "Singer sync completed",
                 records=records_processed,
@@ -152,9 +141,7 @@ class FlextMeltanoSingerService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Singer sync failed", error=str(e))
-            return r[m.Meltano.SingerSyncResult].fail(
-                f"Singer sync failed: {e}",
-            )
+            return r[m.Meltano.SingerSyncResult].fail(f"Singer sync failed: {e}")
 
     def load_catalog_from_file(self, catalog_path: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.
@@ -169,8 +156,7 @@ class FlextMeltanoSingerService(s[str]):
         return self.catalog_manager.load_catalog(catalog_path)
 
     def load_state_from_file(
-        self,
-        state_path: Path | None = None,
+        self, state_path: Path | None = None
     ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file.
 
@@ -184,9 +170,7 @@ class FlextMeltanoSingerService(s[str]):
         return self.state_manager.load_state(state_path)
 
     def save_catalog_to_file(
-        self,
-        catalog: m.Meltano.SingerCatalog,
-        catalog_path: Path,
+        self, catalog: m.Meltano.SingerCatalog, catalog_path: Path
     ) -> r[None]:
         """Save catalog to file.
 
@@ -214,6 +198,4 @@ class FlextMeltanoSingerService(s[str]):
         return self.state_manager.save_state(state_path)
 
 
-__all__ = [
-    "FlextMeltanoSingerService",
-]
+__all__ = ["FlextMeltanoSingerService"]

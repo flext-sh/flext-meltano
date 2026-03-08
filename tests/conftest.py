@@ -26,15 +26,10 @@ from tests.helpers.docker_test_manager import FlextTestsDocker
 class CliRunnerProtocol(Protocol):
     """Protocol for CLI runner interface."""
 
-    def invoke(
-        self,
-        *args: t.JsonValue,
-        **kwargs: t.JsonValue,
-    ) -> t.JsonValue:
+    def invoke(self, *args: t.JsonValue, **kwargs: t.JsonValue) -> t.JsonValue:
         """Invoke CLI command."""
 
 
-# Test environment setup
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
     """Set test environment variables."""
@@ -42,13 +37,11 @@ def set_test_environment() -> Generator[None]:
     os.environ["FLEXT_LOG_LEVEL"] = "DEBUG"
     os.environ["MELTANO_ENVIRONMENT"] = "test"
     yield
-    # Cleanup
     os.environ.pop("FLEXT_ENV", None)
     os.environ.pop("FLEXT_LOG_LEVEL", None)
     os.environ.pop("MELTANO_ENVIRONMENT", None)
 
 
-# Meltano project fixtures
 @pytest.fixture
 def test_meltano_project_dir() -> Generator[Path]:
     """Temporary Meltano project directory for testing."""
@@ -75,18 +68,18 @@ def meltano_yml_config() -> dict[str, t.JsonValue]:
                                 "name": "tap-csv",
                                 "variant": "meltanolabs",
                                 "pip_url": "pipelinewise-tap-csv",
-                            },
+                            }
                         ],
                         "loaders": [
                             {
                                 "name": "target-csv",
                                 "variant": "meltanolabs",
                                 "pip_url": "pipelinewise-target-csv",
-                            },
+                            }
                         ],
-                    },
+                    }
                 },
-            },
+            }
         ],
         "plugins": {
             "extractors": [
@@ -100,20 +93,18 @@ def meltano_yml_config() -> dict[str, t.JsonValue]:
                                 "entity": "test_data",
                                 "path": "test_data.csv",
                                 "keys": ["id"],
-                            },
-                        ],
+                            }
+                        ]
                     },
-                },
+                }
             ],
             "loaders": [
                 {
                     "name": "target-csv",
                     "variant": "meltanolabs",
                     "pip_url": "pipelinewise-target-csv",
-                    "config": {
-                        "destination_path": "output",
-                    },
-                },
+                    "config": {"destination_path": "output"},
+                }
             ],
         },
     }
@@ -121,17 +112,12 @@ def meltano_yml_config() -> dict[str, t.JsonValue]:
 
 @pytest.fixture
 def meltano_project(
-    test_meltano_project_dir: Path,
-    meltano_yml_config: dict[str, t.JsonValue],
+    test_meltano_project_dir: Path, meltano_yml_config: dict[str, t.JsonValue]
 ) -> dict[str, Any]:
     """Meltano project for testing."""
-    # Create pipeline.yml
-
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     with meltano_yml.open("w", encoding="utf-8") as f:
         yaml.dump(meltano_yml_config, f)
-
-    # Return simple dict[str, Any] instead of missing MeltanoProject class
     return {
         "name": "test-project",
         "directory": test_meltano_project_dir,
@@ -142,7 +128,6 @@ def meltano_project(
     }
 
 
-# Plugin fixtures
 @pytest.fixture
 def tap_csv_config() -> dict[str, t.JsonValue]:
     """Tap CSV configuration for testing."""
@@ -153,39 +138,28 @@ def tap_csv_config() -> dict[str, t.JsonValue]:
                 "path": "test_data.csv",
                 "keys": ["id"],
                 "encoding": "utf-8",
-            },
-        ],
+            }
+        ]
     }
 
 
 @pytest.fixture
 def target_csv_config() -> dict[str, t.JsonValue]:
     """Target CSV configuration for testing."""
-    return {
-        "destination_path": "output",
-        "file_format": "csv",
-        "delimiter": ",",
-    }
+    return {"destination_path": "output", "file_format": "csv", "delimiter": ","}
 
 
 @pytest.fixture
 def sample_csv_data() -> str:
     """Sample CSV data for testing."""
-    return """id,name,email,created_at
-1,John Doe,john@example.com,2023-01-01
-2,Jane Smith,jane@example.com,2023-01-02
-3,Bob Johnson,bob@example.com,2023-01-03"""
+    return "id,name,email,created_at\n1,John Doe,john@example.com,2023-01-01\n2,Jane Smith,jane@example.com,2023-01-02\n3,Bob Johnson,bob@example.com,2023-01-03"
 
 
-# Meltano CLI fixtures
 class MockCliRunner:
     """Mock CLI runner."""
 
     @staticmethod
-    def invoke(
-        *args: object,
-        **kwargs: object,
-    ) -> object:
+    def invoke(*args: object, **kwargs: object) -> object:
         """Mock invoke method."""
         return type("Result", (), {"exit_code": 0, "output": ""})()
 
@@ -202,7 +176,6 @@ def meltano_invoke_args() -> list[str]:
     return ["--log-level", "debug", "--environment", "test"]
 
 
-# Singer protocol fixtures
 @pytest.fixture
 def singer_schema() -> dict[str, t.JsonValue]:
     """Sample Singer schema for testing."""
@@ -259,13 +232,12 @@ def singer_state() -> dict[str, t.JsonValue]:
                 "test_entity": {
                     "replication_key": "created_at",
                     "replication_key_value": "2023-01-02T00:00:00Z",
-                },
-            },
+                }
+            }
         },
     }
 
 
-# Pipeline execution fixtures
 @pytest.fixture
 def pipeline_execution_config() -> dict[str, t.JsonValue]:
     """Pipeline execution configuration for testing."""
@@ -279,7 +251,6 @@ def pipeline_execution_config() -> dict[str, t.JsonValue]:
     }
 
 
-# Environment fixtures
 @pytest.fixture
 def test_environment_config() -> dict[str, t.JsonValue]:
     """Test environment configuration."""
@@ -287,15 +258,11 @@ def test_environment_config() -> dict[str, t.JsonValue]:
         "name": "test",
         "config": {
             "project_id": "test-meltano-project",
-            "cli": {
-                "log_level": "DEBUG",
-                "log_config": False,
-            },
+            "cli": {"log_level": "DEBUG", "log_config": False},
         },
     }
 
 
-# Schedule fixtures
 @pytest.fixture
 def sample_schedule_config() -> dict[str, t.JsonValue]:
     """Sample schedule configuration."""
@@ -309,7 +276,6 @@ def sample_schedule_config() -> dict[str, t.JsonValue]:
     }
 
 
-# Job fixtures
 @pytest.fixture
 def job_run_config() -> dict[str, t.JsonValue]:
     """Job run configuration for testing."""
@@ -322,53 +288,40 @@ def job_run_config() -> dict[str, t.JsonValue]:
     }
 
 
-# Docker fixtures for containerized testing
-
-
 @pytest.fixture(scope="session")
 def docker_manager() -> FlextTestsDocker:
     """Session-scoped Docker manager fixture."""
     return FlextTestsDocker(keep_running=True)
-    # Cleanup will happen via atexit
 
 
 @pytest.fixture
-def docker_services(
-    docker_manager: FlextTestsDocker,
-) -> Generator[FlextTestsDocker]:
+def docker_services(docker_manager: FlextTestsDocker) -> Generator[FlextTestsDocker]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager
 
 
 @pytest.fixture
-def postgres_service(
-    docker_manager: FlextTestsDocker,
-) -> Generator[str | None]:
+def postgres_service(docker_manager: FlextTestsDocker) -> Generator[str | None]:
     """PostgreSQL service fixture."""
     with docker_manager.service_context(["postgres"]):
         yield docker_manager.get_service_url("postgres", 5432)
 
 
 @pytest.fixture
-def redis_service(
-    docker_manager: FlextTestsDocker,
-) -> Generator[str | None]:
+def redis_service(docker_manager: FlextTestsDocker) -> Generator[str | None]:
     """Redis service fixture."""
     with docker_manager.service_context(["redis"]):
         yield docker_manager.get_service_url("redis", 6379)
 
 
 @pytest.fixture
-def meltano_service(
-    docker_manager: FlextTestsDocker,
-) -> Generator[str | None]:
+def meltano_service(docker_manager: FlextTestsDocker) -> Generator[str | None]:
     """Meltano service fixture."""
     with docker_manager.service_context(["meltano"]):
         yield docker_manager.get_service_url("meltano", 3000)
 
 
-# Pytest markers for test categorization
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest markers."""
     config.addinivalue_line("markers", "unit: Unit tests")
@@ -382,21 +335,15 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "docker: Docker-based tests")
 
 
-# Mock services
 class MockMeltanoService:
     """Mock Meltano service."""
 
     @staticmethod
-    def create_project(
-        _config: dict[str, t.JsonValue],
-    ) -> dict[str, t.JsonValue]:
+    def create_project(_config: dict[str, t.JsonValue]) -> dict[str, t.JsonValue]:
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
-    def install_plugin(
-        _plugin_type: str,
-        plugin_name: str,
-    ) -> dict[str, t.JsonValue]:
+    def install_plugin(_plugin_type: str, plugin_name: str) -> dict[str, t.JsonValue]:
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
@@ -419,11 +366,11 @@ class MockSingerTap:
         self.config = config
 
     def discover(self) -> dict[str, t.JsonValue]:
-        _ = self.config  # Use self to avoid PLR6301
+        _ = self.config
         return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
     def extract(self) -> list[dict[str, t.JsonValue]]:
-        _ = self.config  # Use self to avoid PLR6301
+        _ = self.config
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
 
@@ -441,11 +388,8 @@ class MockSingerTarget:
         super().__init__()
         self.config = config
 
-    def load(
-        self,
-        records: list[dict[str, t.JsonValue]],
-    ) -> dict[str, t.JsonValue]:
-        _ = self.config  # Use self to avoid PLR6301
+    def load(self, records: list[dict[str, t.JsonValue]]) -> dict[str, t.JsonValue]:
+        _ = self.config
         return {"records_loaded": len(records), "status": "success"}
 
 

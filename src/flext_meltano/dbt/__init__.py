@@ -18,8 +18,6 @@ if TYPE_CHECKING:
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoDbtProjectManager": (
         "flext_meltano.dbt.project",
@@ -28,7 +26,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoDbtRunner": ("flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"),
     "FlextMeltanoDbtService": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
 }
-
 __all__ = [
     "FlextMeltanoDbtProjectManager",
     "FlextMeltanoDbtRunner",
@@ -36,7 +33,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str) -> Any:  # noqa: ANN401
+def __getattr__(name: str) -> Any:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

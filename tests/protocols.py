@@ -34,5 +34,4 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
 
 
 p = TestsFlextMeltanoProtocols
-
 __all__ = ["TestsFlextMeltanoProtocols", "p"]

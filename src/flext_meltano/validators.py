@@ -17,7 +17,6 @@ from pydantic import ValidationError
 from flext_meltano import FlextMeltanoModels, t
 
 m = FlextMeltanoModels
-
 logger = FlextLogger(__name__)
 
 
@@ -50,8 +49,7 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_connection_config(
-        cls,
-        config: Mapping[str, t.JsonValue],
+        cls, config: Mapping[str, t.JsonValue]
     ) -> r[Mapping[str, t.JsonValue]]:
         """Validate connection configuration with domain-specific business rules.
 
@@ -79,12 +77,10 @@ class FlextMeltanoValidators:
 
         """
         try:
-            # DOMAIN-SPECIFIC: Connection config business rules
             if not config:
                 return r[Mapping[str, t.JsonValue]].fail(
-                    "Connection configuration cannot be empty",
+                    "Connection configuration cannot be empty"
                 )
-
             return r[Mapping[str, t.JsonValue]].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
@@ -92,10 +88,7 @@ class FlextMeltanoValidators:
             return r[Mapping[str, t.JsonValue]].fail(error_msg)
 
     @classmethod
-    def validate_pipeline_component_business_rules(
-        cls,
-        config: t.JsonValue,
-    ) -> r[bool]:
+    def validate_pipeline_component_business_rules(cls, config: t.JsonValue) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
             m.Meltano.PluginComponentConfig.model_validate(config)
@@ -104,10 +97,7 @@ class FlextMeltanoValidators:
             return r[bool].fail(f"Plugin config validation failed: {error}")
 
     @classmethod
-    def validate_pipeline_project_business_rules(
-        cls,
-        config: t.JsonValue,
-    ) -> r[bool]:
+    def validate_pipeline_project_business_rules(cls, config: t.JsonValue) -> r[bool]:
         """Validate pipeline project business rules.
 
         Validates pipeline project configuration including version requirements
@@ -138,10 +128,7 @@ class FlextMeltanoValidators:
             return r[bool].fail(f"Project validation failed: {error}")
 
     @classmethod
-    def validate_pipeline_project_structure(
-        cls,
-        project_path: Path,
-    ) -> r[bool]:
+    def validate_pipeline_project_structure(cls, project_path: Path) -> r[bool]:
         """Validate pipeline project structure with domain-specific business rules.
 
         Performs complete validation of the pipeline project directory
@@ -164,33 +151,17 @@ class FlextMeltanoValidators:
 
         """
         try:
-            # Check if path exists and is directory
             if not project_path.exists():
-                return r[bool].fail(
-                    f"Project path does not exist: {project_path}",
-                )
-
+                return r[bool].fail(f"Project path does not exist: {project_path}")
             if not project_path.is_dir():
-                return r[bool].fail(
-                    f"Project path is not a directory: {project_path}",
-                )
-
-            # Check for required pipeline files
+                return r[bool].fail(f"Project path is not a directory: {project_path}")
             pipeline_config = project_path / "pipeline.yml"
             if not pipeline_config.exists():
-                return r[
-                    bool
-                ].fail(
-                    f"pipeline.yml not found in {project_path}",  # Test expectation compliance
-                )
-
-            # Check for transform directory (Transformation) - optional for basic projects
+                return r[bool].fail(f"pipeline.yml not found in {project_path}")
             transform_dir = project_path / "transform"
             if not transform_dir.exists():
-                # Create transform directory if it doesn't exist (optional)
                 with contextlib.suppress(OSError):
                     transform_dir.mkdir(parents=True, exist_ok=True)
-
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
@@ -198,10 +169,7 @@ class FlextMeltanoValidators:
             return r[bool].fail(error_msg)
 
     @classmethod
-    def validate_plugin_config(
-        cls,
-        config: t.JsonValue,
-    ) -> r[bool]:
+    def validate_plugin_config(cls, config: t.JsonValue) -> r[bool]:
         """Validate plugin configuration with complete business rules.
 
         Validates plugin configuration data for Meltano plugins,
@@ -217,10 +185,7 @@ class FlextMeltanoValidators:
         return cls.validate_pipeline_component_business_rules(config)
 
     @classmethod
-    def validate_transformation_business_rules(
-        cls,
-        config: t.JsonValue,
-    ) -> r[bool]:
+    def validate_transformation_business_rules(cls, config: t.JsonValue) -> r[bool]:
         """Validate transformation-specific business rules.
 
         Validates transformation project configuration including project name format
@@ -253,6 +218,4 @@ class FlextMeltanoValidators:
             return r[bool].fail(f"Transformation validation failed: {error}")
 
 
-__all__ = [
-    "FlextMeltanoValidators",
-]
+__all__ = ["FlextMeltanoValidators"]

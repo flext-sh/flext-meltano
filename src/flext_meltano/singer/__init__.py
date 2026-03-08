@@ -23,8 +23,6 @@ if TYPE_CHECKING:
         FlextMeltanoPluginProtocols,
         FlextMeltanoSingerProtocols,
     )
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoPluginProtocols": (
         "flext_meltano.singer.protocols",
@@ -35,14 +33,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextMeltanoSingerProtocols",
     ),
 }
-
-__all__ = [
-    "FlextMeltanoPluginProtocols",
-    "FlextMeltanoSingerProtocols",
-]
+__all__ = ["FlextMeltanoPluginProtocols", "FlextMeltanoSingerProtocols"]
 
 
-def __getattr__(name: str) -> Any:  # noqa: ANN401
+def __getattr__(name: str) -> Any:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

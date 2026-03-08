@@ -16,16 +16,11 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
-from flext_core import (
-    FlextLogger,
-    r,
-    u,
-)
+from flext_core import FlextLogger, r, u
 
 from flext_meltano import FlextMeltanoModels, c, t
 
 m = FlextMeltanoModels
-
 logger = FlextLogger(__name__)
 
 
@@ -58,9 +53,7 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def create_directory_structure(
-        cls,
-        base_path: Path,
-        directories: list[str],
+        cls, base_path: Path, directories: list[str]
     ) -> r[Mapping[str, str]]:
         """Create directory structure using direct pathlib implementation.
 
@@ -74,12 +67,9 @@ class FlextMeltanoFileManagers:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
-
             return r[Mapping[str, str]].ok(created_paths)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, str]].fail(
-                f"Failed to create directories: {e}",
-            )
+            return r[Mapping[str, str]].fail(f"Failed to create directories: {e}")
 
     @classmethod
     def create_temp_directory(cls, prefix: str = "flext_meltano_") -> r[Path]:
@@ -93,9 +83,7 @@ class FlextMeltanoFileManagers:
         """
         logger = FlextLogger(__name__)
 
-        # DSL: Use u.try_ for unified error handling
         def _create() -> r[Path]:
-            # Use direct tempfile.mkdtemp for temporary directory creation
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
             logger.info("Created temporary directory: %s", temp_dir)
             return r[Path].ok(temp_dir)
@@ -123,29 +111,22 @@ class FlextMeltanoFileManagers:
 
         """
 
-        # DSL: Use u.try_ for unified error handling
         def _load() -> r[t.Meltano.FileConfigDict]:
-            # Basic path validation using flext-core utilities
             if not u.Guards.is_string_non_empty(str(file_path)):
                 return r[t.Meltano.FileConfigDict].fail(
-                    f"Invalid YAML file path: {file_path}",
+                    f"Invalid YAML file path: {file_path}"
                 )
-
             if not file_path.exists():
                 return r[t.Meltano.FileConfigDict].fail(
-                    f"YAML file not found: {file_path}",
+                    f"YAML file not found: {file_path}"
                 )
-
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 config_data: t.ContainerValue = yaml.safe_load(f)
-
-            # DSL: Use u.when for conditional handling
             if config_data is None:
                 return r[t.Meltano.FileConfigDict].ok({})
-
-            validated_config = m.Meltano.ConfigMappingPayload.model_validate(
-                {"values": config_data},
-            ).values
+            validated_config = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": config_data
+            }).values
             return r[t.Meltano.FileConfigDict].ok(validated_config)
 
         result = u.try_(
@@ -160,16 +141,13 @@ class FlextMeltanoFileManagers:
             ),
             default=None,
         )
-        # Type narrowing: result is object | None
         if result is None:
             return r[t.Meltano.FileConfigDict].fail("Failed to load YAML config")
         return result
 
     @classmethod
     def save_yaml_config(
-        cls,
-        config: t.Meltano.FileConfigDict,
-        file_path: Path,
+        cls, config: t.Meltano.FileConfigDict, file_path: Path
     ) -> r[bool]:
         """Save YAML config using DSL patterns.
 
@@ -180,18 +158,11 @@ class FlextMeltanoFileManagers:
 
         """
 
-        # DSL: Use u.try_ for unified error handling
         def _save() -> r[bool]:
-            # Ensure parent directory exists
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            # Write YAML with proper encoding
             with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.dump(
-                    config,
-                    f,
-                    indent=2,
-                    default_flow_style=False,
-                    sort_keys=False,
+                    config, f, indent=2, default_flow_style=False, sort_keys=False
                 )
             return r[bool].ok(value=True)
 
@@ -206,9 +177,7 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def setup_project_structure(
-        cls,
-        project_root: Path,
-        _project_name: str,
+        cls, project_root: Path, _project_name: str
     ) -> r[t.Meltano.PathDict]:
         """Setup Meltano project structure using direct implementation.
 
@@ -217,7 +186,6 @@ class FlextMeltanoFileManagers:
 
         """
         try:
-            # Define Meltano directory structure
             directories = [
                 "extract",
                 "load",
@@ -227,25 +195,17 @@ class FlextMeltanoFileManagers:
                 "transform/tests",
                 "transform/data",
             ]
-
-            # Create directory structure
             created_paths: dict[str, Path | str] = {}
             for directory in directories:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
-
-            # Create essential config files
             configs = {
                 c.Meltano.Paths.MELTANO_PROJECT_FILE: {
                     "version": 1,
                     "project_id": "project_name",
                     "project_name": "project_name",
-                    "plugins": {
-                        "extractors": [],
-                        "loaders": [],
-                        "transformers": [],
-                    },
+                    "plugins": {"extractors": [], "loaders": [], "transformers": []},
                 },
                 "transform/dbt_project.yml": {
                     "name": "project_name",
@@ -255,26 +215,18 @@ class FlextMeltanoFileManagers:
                     "test-paths": ["tests"],
                 },
             }
-
             for filename, config_data in configs.items():
                 config_path = project_root / filename
-                validated_config = m.Meltano.ConfigMappingPayload.model_validate(
-                    {"values": config_data},
-                ).values
-                save_result = cls.save_yaml_config(
-                    validated_config,
-                    config_path,
-                )
+                validated_config = m.Meltano.ConfigMappingPayload.model_validate({
+                    "values": config_data
+                }).values
+                save_result = cls.save_yaml_config(validated_config, config_path)
                 if save_result.is_success:
                     created_paths[filename.replace("/", "_")] = str(config_path)
-
-            # Add project root
             created_paths["project_root"] = project_root
             return r[t.Meltano.PathDict].ok(created_paths)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.PathDict].fail(
-                f"Failed to setup project structure: {e}",
-            )
+            return r[t.Meltano.PathDict].fail(f"Failed to setup project structure: {e}")
 
     @classmethod
     def validate_project_structure(cls, project_root: Path) -> r[bool]:
@@ -285,18 +237,13 @@ class FlextMeltanoFileManagers:
 
         """
         try:
-            # Check if path exists and is directory
             if not project_root.exists():
                 return r[bool].fail(f"Project path does not exist: {project_root}")
-
             if not project_root.is_dir():
                 return r[bool].fail(f"Project path is not a directory: {project_root}")
-
-            # Check for required pipeline files
             pipeline_config = project_root / "pipeline.yml"
             if not pipeline_config.exists():
                 return r[bool].fail(f"pipeline.yml not found in {project_root}")
-
             return r[bool].ok(value=True)
         except (ValueError, TypeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project structure: {e}")
@@ -313,21 +260,15 @@ class FlextMeltanoFileManagers:
 
         """
 
-        # DSL: Use u.try_ for unified error handling
         def _validate() -> r[bool]:
-            # Basic path validation using flext-core utilities
             if not u.Guards.is_string_non_empty(str(file_path)):
                 return r[bool].fail(f"Invalid YAML file path: {file_path}")
-
             if not file_path.exists():
                 return r[bool].fail(f"YAML file not found: {file_path}")
-
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
-                yaml.safe_load(f)  # This will raise an exception if invalid YAML
-
+                yaml.safe_load(f)
             return r[bool].ok(value=True)
 
-        # DSL: Handle YAML-specific errors separately
         try:
             return _validate()
         except yaml.YAMLError as e:

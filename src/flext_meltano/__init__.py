@@ -75,8 +75,6 @@ if TYPE_CHECKING:
         FlextMeltanoUtilities as u,
     )
     from flext_meltano.validators import FlextMeltanoValidators
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltano": ("flext_meltano.api", "FlextMeltano"),
     "FlextMeltanoAdapter": ("flext_meltano.adapters", "FlextMeltanoAdapter"),
@@ -164,7 +162,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "u": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
     "x": ("flext_core", "x"),
 }
-
 __all__ = [
     "FlextMeltano",
     "FlextMeltanoAdapter",
@@ -215,7 +212,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str) -> Any:  # noqa: ANN401
+def __getattr__(name: str) -> Any:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

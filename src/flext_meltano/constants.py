@@ -85,11 +85,10 @@ class FlextMeltanoConstants(FlextCliConstants):
             POSTGRES: Final[int] = 5432
             MYSQL: Final[int] = 3306
             ORACLE: Final[int] = 1521
-
             PERFORMANCE_LEVEL = FlextConstants.Settings.LogLevel.WARNING
-            MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5_000
-            MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10_000
-            HIGH_MEMORY_THRESHOLD: Final[int] = 1_073_741_824
+            MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
+            MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
+            HIGH_MEMORY_THRESHOLD: Final[int] = 1073741824
 
         class Plugin:
             """Plugin management constants."""
@@ -143,11 +142,11 @@ class FlextMeltanoConstants(FlextCliConstants):
             VERSION_PARTS_COUNT: Final[int] = 3
             TAP_SIMPLE_CONFIG_THRESHOLD: Final[int] = 3
             TAP_MODERATE_CONFIG_THRESHOLD: Final[int] = 8
-            TARGET_HIGH_EFFICIENCY_THRESHOLD: Final[int] = 1_000
+            TARGET_HIGH_EFFICIENCY_THRESHOLD: Final[int] = 1000
             TARGET_MEDIUM_EFFICIENCY_THRESHOLD: Final[int] = 100
             DBT_SIMPLE_EXECUTION_THRESHOLD: Final[int] = 5
             DBT_MODERATE_EXECUTION_THRESHOLD: Final[int] = 20
-            EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1_000
+            EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1000
             EXECUTION_GOOD_PERFORMANCE_THRESHOLD: Final[int] = 100
             EXECUTION_MODERATE_PERFORMANCE_THRESHOLD: Final[int] = 10
             MAX_WORKERS_THRESHOLD: Final[int] = 50
@@ -237,14 +236,12 @@ class FlextMeltanoConstants(FlextCliConstants):
                 SELECTED = "selected"
                 EXTRACTING = "extracting"
 
-            # Frozensets for stream status validation
             VALID_STATUSES: Final[frozenset[str]] = frozenset({
                 StreamStatus.INITIALIZED,
                 StreamStatus.PROCESSING,
                 StreamStatus.COMPLETED,
                 StreamStatus.ERROR,
             })
-
             ACTIVE_STATUSES: Final[frozenset[str]] = frozenset({
                 StreamStatus.DISCOVERED,
                 StreamStatus.SELECTED,
@@ -277,10 +274,8 @@ class FlextMeltanoConstants(FlextCliConstants):
 
             MIN_NAME_LENGTH: Final[int] = 3
             MAX_NAME_LENGTH: Final[int] = 50
-            VALID_NAME_PATTERN: Final[str] = r"^[a-zA-Z0-9_-]+$"
+            VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
 
 
-# Short alias for FLEXT namespace pattern
 c = FlextMeltanoConstants
-
 __all__ = ["FlextMeltanoConstants", "c"]

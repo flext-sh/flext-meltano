@@ -23,7 +23,6 @@ from flext_meltano import (
 )
 from flext_meltano.meltano.project import FlextMeltanoProjectManager, MeltanoProjectInfo
 
-# Import aliases for concise usage
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -54,8 +53,7 @@ class FlextMeltanoMeltanoService(s[str]):
         run_config: str = Field(description="Run configuration name")
         select: str | None = Field(default=None, description="Stream/table selection")
         select_filter: str | None = Field(
-            default=None,
-            description="Additional selection filter",
+            default=None, description="Additional selection filter"
         )
 
     def __init__(self) -> None:
@@ -89,13 +87,10 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to create project", error=str(e))
-            return r[MeltanoProjectInfo].fail(
-                f"Failed to create project: {e}",
-            )
+            return r[MeltanoProjectInfo].fail(f"Failed to create project: {e}")
 
     def discover_plugins(
-        self,
-        plugin_type: str | None = None,
+        self, plugin_type: str | None = None
     ) -> r[list[t.Meltano.PluginDefinition]]:
         """Discover plugins in the project.
 
@@ -124,7 +119,7 @@ class FlextMeltanoMeltanoService(s[str]):
         ) as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
             return r[list[t.Meltano.PluginDefinition]].fail(
-                f"Failed to discover plugins: {e}",
+                f"Failed to discover plugins: {e}"
             )
 
     @override
@@ -134,8 +129,7 @@ class FlextMeltanoMeltanoService(s[str]):
         return r[str].ok(msg)
 
     def execute_pipeline(
-        self,
-        config: FlextMeltanoMeltanoService.PipelineConfig,
+        self, config: FlextMeltanoMeltanoService.PipelineConfig
     ) -> r[FlextMeltanoMeltanoService.PipelineResult]:
         """Execute a Meltano pipeline.
 
@@ -147,26 +141,15 @@ class FlextMeltanoMeltanoService(s[str]):
 
         """
         try:
-            self.logger.info(
-                "Executing Meltano pipeline",
-                run_config=config.run_config,
-            )
-
-            # Load project first
+            self.logger.info("Executing Meltano pipeline", run_config=config.run_config)
             project_result = self.project_manager.load_project(config.project_root)
             if project_result.is_failure:
                 return r[FlextMeltanoMeltanoService.PipelineResult].fail(
-                    project_result.error,
+                    project_result.error
                 )
-
-            # Pipeline execution would use meltano run API
-            # For now, simulate successful execution
             result = FlextMeltanoMeltanoService.PipelineResult(
-                success=True,
-                status="completed",
-                exit_code=0,
+                success=True, status="completed", exit_code=0
             )
-
             self.logger.info("Meltano pipeline executed", status=result.status)
             return r[FlextMeltanoMeltanoService.PipelineResult].ok(result)
         except (
@@ -180,7 +163,7 @@ class FlextMeltanoMeltanoService(s[str]):
         ) as e:
             self.logger.exception("Failed to execute pipeline", error=str(e))
             return r[FlextMeltanoMeltanoService.PipelineResult].fail(
-                f"Failed to execute pipeline: {e}",
+                f"Failed to execute pipeline: {e}"
             )
 
     def load_project(self, root: Path) -> r[MeltanoProjectInfo]:
@@ -209,11 +192,7 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return r[MeltanoProjectInfo].fail(
-                f"Failed to load project: {e}",
-            )
+            return r[MeltanoProjectInfo].fail(f"Failed to load project: {e}")
 
 
-__all__ = [
-    "FlextMeltanoMeltanoService",
-]
+__all__ = ["FlextMeltanoMeltanoService"]

@@ -17,8 +17,6 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoMeltanoService": (
         "flext_meltano.meltano.service",
@@ -29,14 +27,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextMeltanoProjectManager",
     ),
 }
-
-__all__ = [
-    "FlextMeltanoMeltanoService",
-    "FlextMeltanoProjectManager",
-]
+__all__ = ["FlextMeltanoMeltanoService", "FlextMeltanoProjectManager"]
 
 
-def __getattr__(name: str) -> Any:  # noqa: ANN401
+def __getattr__(name: str) -> Any:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

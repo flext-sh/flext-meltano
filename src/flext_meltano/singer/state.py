@@ -25,7 +25,6 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
     syncs with proper error handling and FlextResult patterns.
     """
 
-    # StateEntry is now canonical in m.Meltano.SingerStateEntry
     StateEntry: ClassVar[type[m.Meltano.SingerStateEntry]] = m.Meltano.SingerStateEntry
 
     def __init__(self) -> None:
@@ -53,18 +52,14 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             stream_state = self._state_msg.value.get(stream_name)
             if stream_state is None:
                 return r[str].fail(f"Stream state not found: {stream_name}")
-
             match stream_state:
                 case dict():
                     pass
                 case _:
                     return r[str].fail(f"Stream state for {stream_name} is not a dict")
-
             value = stream_state.get(bookmark_key)
             if value is None:
-                return r[str].fail(
-                    f"Bookmark not found: {stream_name}.{bookmark_key}",
-                )
+                return r[str].fail(f"Bookmark not found: {stream_name}.{bookmark_key}")
             return r[str].ok(str(value))
         except (
             ValueError,
@@ -79,8 +74,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             return r[str].fail(f"Failed to get bookmark: {e}")
 
     def load_state(
-        self,
-        state_file: Path | None = None,
+        self, state_file: Path | None = None
     ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file or memory.
 
@@ -95,7 +89,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             if state_file and state_file.exists():
                 with state_file.open() as f:
                     self._state_msg = m.Meltano.SingerStateMessage.model_validate(
-                        json.load(f),
+                        json.load(f)
                     )
                 self.logger.info(
                     "State loaded from file",
@@ -129,10 +123,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             state_file.parent.mkdir(parents=True, exist_ok=True)
             with state_file.open("w", encoding="utf-8") as f:
                 f.write(self._state_msg.model_dump_json(indent=2))
-            self.logger.info(
-                "State saved to file",
-                file=str(state_file),
-            )
+            self.logger.info("State saved to file", file=str(state_file))
             return r[None].ok(None)
         except (
             ValueError,
@@ -151,10 +142,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         return self._state_msg
 
     def update_bookmark(
-        self,
-        stream_name: str,
-        bookmark_key: str,
-        bookmark_value: str,
+        self, stream_name: str, bookmark_key: str, bookmark_value: str
     ) -> r[None]:
         """Update bookmark for a stream.
 
@@ -170,18 +158,13 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         try:
             if stream_name not in self._state_msg.value:
                 self._state_msg.value[stream_name] = {}
-
             stream_bookmarks = self._state_msg.value[stream_name]
             match stream_bookmarks:
                 case dict():
                     stream_bookmarks[bookmark_key] = bookmark_value
                 case _:
                     pass
-            self.logger.debug(
-                "Bookmark updated",
-                stream=stream_name,
-                key=bookmark_key,
-            )
+            self.logger.debug("Bookmark updated", stream=stream_name, key=bookmark_key)
             return r[None].ok(None)
         except (
             ValueError,
@@ -196,6 +179,4 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             return r[None].fail(f"Failed to update bookmark: {e}")
 
 
-__all__ = [
-    "FlextMeltanoStateManager",
-]
+__all__ = ["FlextMeltanoStateManager"]

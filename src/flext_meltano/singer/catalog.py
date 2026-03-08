@@ -19,7 +19,6 @@ from flext_core import FlextResult, FlextService
 from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 
-# Import aliases for simplified usage
 r = FlextResult
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
@@ -52,8 +51,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         try:
             self._catalog = tap.discover()
             self.logger.info(
-                "Streams discovered",
-                stream_count=len(self._catalog.streams),
+                "Streams discovered", stream_count=len(self._catalog.streams)
             )
             return r[m.Meltano.SingerCatalog].ok(self._catalog)
         except (
@@ -86,14 +84,10 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         try:
             for entry in self._catalog.streams:
                 if entry.stream == stream_name:
-                    self.logger.debug(
-                        "Stream schema retrieved",
-                        stream=stream_name,
-                    )
+                    self.logger.debug("Stream schema retrieved", stream=stream_name)
                     return r[Mapping[str, t.JsonValue]].ok(entry.schema_definition)
-
             return r[Mapping[str, t.JsonValue]].fail(
-                f"Stream not found in catalog: {stream_name}",
+                f"Stream not found in catalog: {stream_name}"
             )
         except (
             ValueError,
@@ -120,12 +114,10 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         try:
             if not catalog_file.exists():
                 return r[m.Meltano.SingerCatalog].fail(
-                    f"Catalog file not found: {catalog_file}",
+                    f"Catalog file not found: {catalog_file}"
                 )
-
             with catalog_file.open(encoding="utf-8") as f:
                 raw_data = json.load(f)
-
             self._catalog = m.Meltano.SingerCatalog.model_validate(raw_data)
             self.logger.info(
                 "Catalog loaded from file",
@@ -159,11 +151,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
             with catalog_file.open("w", encoding="utf-8") as f:
                 f.write(self._catalog.model_dump_json(indent=2, by_alias=True))
-
-            self.logger.info(
-                "Catalog saved to file",
-                file=str(catalog_file),
-            )
+            self.logger.info("Catalog saved to file", file=str(catalog_file))
             return r[None].ok(None)
         except (
             ValueError,
@@ -220,6 +208,4 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         self._catalog = catalog
 
 
-__all__ = [
-    "FlextMeltanoCatalogManager",
-]
+__all__ = ["FlextMeltanoCatalogManager"]

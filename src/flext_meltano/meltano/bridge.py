@@ -21,7 +21,6 @@ from flext_meltano import (
     u,
 )
 
-# Import aliases for simplified usage
 r = FlextResult
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
@@ -43,7 +42,6 @@ class FlextMeltanoBridge:
     def discover_plugins() -> FlextResult[t.Meltano.PluginCatalog]:
         """Discover available plugins through the Go bridge."""
         try:
-            # Go bridge plugin discovery — queries FlexCore for registered plugins
             extractor1: t.Meltano.PluginDefinition = {
                 "name": "tap-csv",
                 "type": "extractors",
@@ -76,7 +74,6 @@ class FlextMeltanoBridge:
                 "name": "dbt-snowflake",
                 "type": "transformers",
             }
-
             result: t.Meltano.PluginCatalog = {
                 "extractors": [extractor1, extractor2, extractor3],
                 "loaders": [loader1, loader2, loader3],
@@ -85,13 +82,12 @@ class FlextMeltanoBridge:
             return FlextResult[t.Meltano.PluginCatalog].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[t.Meltano.PluginCatalog].fail(
-                f"Plugin discovery failed: {e}",
+                f"Plugin discovery failed: {e}"
             )
 
     @staticmethod
     def execute_command(
-        command: str,
-        args: Mapping[str, t.JsonValue] | None = None,
+        command: str, args: Mapping[str, t.JsonValue] | None = None
     ) -> FlextResult[t.Meltano.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 
@@ -104,12 +100,8 @@ class FlextMeltanoBridge:
 
         """
         try:
-            # Go bridge integration point — communicates with FlexCore Go service via JSON API
-            # Build result dict with proper typing via model normalization
             args_dict: t.Meltano.MeltanoConfigDict = (
-                m.Meltano.ConfigMappingPayload.model_validate(
-                    {"values": args},
-                ).values
+                m.Meltano.ConfigMappingPayload.model_validate({"values": args}).values
                 if args
                 else {}
             )
@@ -122,14 +114,13 @@ class FlextMeltanoBridge:
             return FlextResult[t.Meltano.Bridge.BridgeStatus].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[t.Meltano.Bridge.BridgeStatus].fail(
-                f"Bridge command failed: {e}",
+                f"Bridge command failed: {e}"
             )
 
     @staticmethod
     def get_version() -> FlextResult[str]:
         """Get bridge version information."""
         try:
-            # Go bridge version endpoint — returns bridge protocol version
             return FlextResult[str].ok("1.0.0")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[str].fail(f"Failed to get version: {e}")
@@ -138,7 +129,6 @@ class FlextMeltanoBridge:
     def validate_connection() -> FlextResult[bool]:
         """Validate connection to Go bridge."""
         try:
-            # Go bridge connectivity check — validates FlexCore service availability
             return FlextResult[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return FlextResult[bool].fail(f"Bridge connection validation failed: {e}")

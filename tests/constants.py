@@ -56,8 +56,4 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
 
 
 c = TestsFlextMeltanoConstants
-
-__all__ = [
-    "TestsFlextMeltanoConstants",
-    "c",
-]
+__all__ = ["TestsFlextMeltanoConstants", "c"]

@@ -19,10 +19,8 @@ class TestTapConfigEnhanced:
     def test_tap_config_with_minimal_data(self) -> None:
         """Test TapConfig with minimal required data."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
+            tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-
         assert config.tap_type == "tap-postgres"
         assert config.connection_config == {"host": "localhost"}
         assert config.stream_config == {}
@@ -44,7 +42,6 @@ class TestTapConfigEnhanced:
             },
             tap_version="1.0.0",
         )
-
         assert config.tap_type == "tap-mysql"
         assert config.connection_config["host"] == "db.example.com"
         assert config.connection_config["port"] == 3306
@@ -59,10 +56,7 @@ class TestTapConfigEnhanced:
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         """Test TapConfig validation with invalid connection_config type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            m.Meltano.TapConfig(
-                tap_type="tap-postgres",
-                connection_config="invalid",  # type: ignore[arg-type]  # Should be dict
-            )
+            m.Meltano.TapConfig(tap_type="tap-postgres", connection_config="invalid")
 
 
 class TestTargetConfigEnhanced:
@@ -71,7 +65,6 @@ class TestTargetConfigEnhanced:
     def test_target_config_with_minimal_data(self) -> None:
         """Test TargetConfig with minimal required data."""
         config = m.Meltano.TargetConfig(target_type="target-csv")
-
         assert config.target_type == "target-csv"
         assert config.connection_config == {}
         assert config.batch_size is None
@@ -91,7 +84,6 @@ class TestTargetConfigEnhanced:
             batch_size=1000,
             batch_wait_limit=30.0,
         )
-
         assert config.target_type == "target-postgres"
         assert config.connection_config["database"] == "analytics"
         assert config.batch_size == 1000
@@ -101,17 +93,13 @@ class TestTargetConfigEnhanced:
         """Test TargetConfig validation with empty target_type."""
         with pytest.raises(ValidationError, match="target_type cannot be empty"):
             m.Meltano.TargetConfig(
-                target_type="",
-                connection_config={"host": "localhost"},
+                target_type="", connection_config={"host": "localhost"}
             )
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         """Test TargetConfig validation with invalid batch_size type."""
         with pytest.raises(ValidationError, match="Input should be a valid integer"):
-            m.Meltano.TargetConfig(
-                target_type="target-csv",
-                batch_size="invalid",  # type: ignore[arg-type]  # Should be int
-            )
+            m.Meltano.TargetConfig(target_type="target-csv", batch_size="invalid")
 
 
 class TestStreamInfoEnhanced:
@@ -124,7 +112,6 @@ class TestStreamInfoEnhanced:
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             stream_created_at="2025-01-01T00:00:00Z",
         )
-
         assert stream.stream_name == "users"
         assert stream.stream_schema["type"] == "object"
         assert stream.status == "initialized"
@@ -149,7 +136,6 @@ class TestStreamInfoEnhanced:
             replication_key="order_date",
             stream_created_at="2025-01-01T00:00:00Z",
         )
-
         assert stream.stream_name == "orders"
         assert stream.key_properties == ["id"]
         assert stream.replication_method == "FULL_TABLE"
@@ -158,8 +144,7 @@ class TestStreamInfoEnhanced:
     def test_stream_info_validation_empty_stream_name(self) -> None:
         """Test StreamInfo validation with empty stream_name."""
         with pytest.raises(
-            ValidationError,
-            match="String should have at least 1 character",
+            ValidationError, match="String should have at least 1 character"
         ):
             m.Meltano.StreamInfo(
                 stream_name="",
@@ -172,7 +157,7 @@ class TestStreamInfoEnhanced:
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.StreamInfo(
                 stream_name="users",
-                stream_schema="invalid",  # type: ignore[arg-type]  # Should be dict
+                stream_schema="invalid",
                 stream_created_at="2025-01-01T00:00:00Z",
             )
 
@@ -183,7 +168,6 @@ class TestMeltanoProjectModelEnhanced:
     def test_meltano_project_with_minimal_data(self) -> None:
         """Test MeltanoProjectModel with minimal required data."""
         project = m.Meltano.MeltanoProjectModel(project_id="test-project")
-
         assert project.project_id == "test-project"
         assert project.project_version == "1"
         assert project.default_environment == "dev"
@@ -205,7 +189,6 @@ class TestMeltanoProjectModelEnhanced:
                 "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
             },
         )
-
         assert project.project_id == "analytics-project"
         assert project.project_version == "2.0"
         assert project.default_environment == "production"
@@ -221,10 +204,7 @@ class TestMeltanoProjectModelEnhanced:
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
         """Test MeltanoProjectModel validation with invalid plugins type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            m.Meltano.MeltanoProjectModel(
-                project_id="test-project",
-                plugins="invalid",  # type: ignore[arg-type]  # Should be dict
-            )
+            m.Meltano.MeltanoProjectModel(project_id="test-project", plugins="invalid")
 
 
 class TestPluginModelEnhanced:
@@ -233,11 +213,8 @@ class TestPluginModelEnhanced:
     def test_plugin_model_with_minimal_data(self) -> None:
         """Test PluginModel with minimal required data."""
         plugin = m.Meltano.PluginModel(
-            name="tap-postgres",
-            namespace="tap_postgres",
-            pip_url="tap-postgres",
+            name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
         )
-
         assert plugin.name == "tap-postgres"
         assert plugin.namespace == "tap_postgres"
         assert plugin.variant == "standard"
@@ -261,11 +238,10 @@ class TestPluginModelEnhanced:
                     "kind": "string",
                     "label": "Host",
                     "description": "PostgreSQL host",
-                },
+                }
             },
             config_files=["config.json"],
         )
-
         assert plugin.name == "tap-postgres"
         assert plugin.namespace == "meltanolabs"
         assert plugin.variant == "meltanolabs"
@@ -278,8 +254,7 @@ class TestPluginModelEnhanced:
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
         with pytest.raises(
-            ValidationError,
-            match="String should have at least 1 character",
+            ValidationError, match="String should have at least 1 character"
         ):
             m.Meltano.PluginModel(name="", namespace="")
 
@@ -287,9 +262,7 @@ class TestPluginModelEnhanced:
         """Test PluginModel validation with invalid capabilities type."""
         with pytest.raises(ValidationError, match="Input should be a valid list"):
             m.Meltano.PluginModel(
-                name="tap-postgres",
-                namespace="tap-postgres",
-                capabilities="invalid",  # type: ignore[arg-type]  # Should be list
+                name="tap-postgres", namespace="tap-postgres", capabilities="invalid"
             )
 
 
@@ -299,11 +272,8 @@ class TestDbtProjectModelEnhanced:
     def test_dbt_project_with_minimal_data(self) -> None:
         """Test DbtProjectModel with minimal required data."""
         dbt_project = m.Meltano.DbtProjectModel(
-            name="analytics",
-            dbt_version="1.0.0",
-            profile="default",
+            name="analytics", dbt_version="1.0.0", profile="default"
         )
-
         assert dbt_project.name == "analytics"
         assert dbt_project.profile == "default"
         assert dbt_project.dbt_version == "1.0.0"
@@ -323,12 +293,11 @@ class TestDbtProjectModelEnhanced:
                 "staging": {
                     "materialized": "view",
                     "models": ["stg_users", "stg_orders"],
-                },
+                }
             },
             sources={"raw_data": {"tables": ["users", "orders"]}},
             tests={"unit": {"models": ["test_user_validity"]}},
         )
-
         assert dbt_project.name == "data-warehouse"
         assert dbt_project.profile == "postgres"
         assert dbt_project.dbt_version == "2.1.0"
@@ -351,9 +320,7 @@ class TestDbtProjectModelEnhanced:
         """Test DbtProjectModel validation with invalid config type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.DbtProjectModel(
-                name="test-project",
-                profile="default",
-                config="invalid",  # type: ignore[arg-type]  # Should be dict
+                name="test-project", profile="default", config="invalid"
             )
 
 
@@ -366,13 +333,10 @@ class TestModelIntegration:
             tap_type="tap-postgres",
             connection_config={"host": "source.db.com", "port": 5432},
         )
-
         target_config = m.Meltano.TargetConfig(
             target_type="target-postgres",
             connection_config={"host": "target.db.com", "port": 5432},
         )
-
-        # Both configs should be valid
         assert tap_config.tap_type == "tap-postgres"
         assert target_config.target_type == "target-postgres"
         assert tap_config.connection_config["host"] == "source.db.com"
@@ -381,16 +345,11 @@ class TestModelIntegration:
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
         plugin = m.Meltano.PluginModel(
-            name="tap-mysql",
-            namespace="meltanolabs",
-            pip_url="tap-mysql",
+            name="tap-mysql", namespace="meltanolabs", pip_url="tap-mysql"
         )
-
         project = m.Meltano.MeltanoProjectModel(
-            project_id="mysql-etl",
-            plugins={"extractors": [{"name": "tap-mysql"}]},
+            project_id="mysql-etl", plugins={"extractors": [{"name": "tap-mysql"}]}
         )
-
         assert plugin.name in str(project.plugins)
         assert project.project_id == "mysql-etl"
 
@@ -402,12 +361,10 @@ class TestModelIntegration:
             key_properties=["id"],
             stream_created_at="2025-01-01T00:00:00Z",
         )
-
         tap_config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
             stream_config={"users": {"schema": "public"}},
         )
-
         assert stream.stream_name in tap_config.stream_config
         assert stream.key_properties == ["id"]

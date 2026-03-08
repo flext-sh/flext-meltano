@@ -160,7 +160,6 @@ class TestFlextMeltanoTypes:
         assert plugin_definition is not None, (
             "PluginDefinition should be properly annotated"
         )
-
         singer_catalog = t.Meltano.Singer.CatalogEntry
         assert singer_catalog is not None, (
             "Singer CatalogEntry should be properly annotated"
@@ -179,7 +178,6 @@ class TestFlextMeltanoTypes:
             "ELT",
             "Processing",
         ]
-
         for namespace in expected_sub_namespaces:
             assert hasattr(t.Meltano, namespace), (
                 f"Meltano should have {namespace} sub-namespace"
@@ -187,7 +185,7 @@ class TestFlextMeltanoTypes:
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
-        plugin_def: t.Meltano.Plugin.PluginDefinition = {  # type: ignore[type-arg]
+        plugin_def: t.Meltano.Plugin.PluginDefinition = {
             "name": "tap-users",
             "variants": ["default"],
             "config": {"batch_size": 1000},
@@ -196,11 +194,7 @@ class TestFlextMeltanoTypes:
             "tap_stream_id": "users",
             "schema": {"type": "object"},
         }
-        project: dict[str, t.JsonValue] = {
-            "name": "elt-project",
-            "enabled": True,
-        }
-
+        project: dict[str, t.JsonValue] = {"name": "elt-project", "enabled": True}
         assert plugin_def["name"] == "tap-users"
         assert isinstance(plugin_def["variants"], list)
         assert catalog["tap_stream_id"] == "users"
@@ -217,7 +211,6 @@ class TestFlextMeltanoTypes:
         assert hasattr(plugin_namespace, "PluginDefinition"), (
             "Plugin namespace should contain PluginDefinition"
         )
-
         singer_namespace = t.Meltano.Singer
         assert hasattr(singer_namespace, "Record"), (
             "Singer namespace should contain Record"
@@ -227,6 +220,5 @@ class TestFlextMeltanoTypes:
         """Test that types are consistent across the namespace."""
         plugin_definition = t.Meltano.Plugin.PluginDefinition
         singer_catalog = t.Meltano.Singer.CatalogEntry
-
         assert plugin_definition is not None, "PluginDefinition should be a valid type"
         assert singer_catalog is not None, "Singer CatalogEntry should be a valid type"

@@ -14,11 +14,7 @@ from typing import override
 from flext_core import r, s
 from singer_sdk import Target
 
-from flext_meltano import (
-    FlextMeltanoSettings,
-    m,
-    t,
-)
+from flext_meltano import FlextMeltanoSettings, m, t
 
 
 class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
@@ -35,16 +31,13 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified sink abstractions with FLEXT configuration."""
-        # Initialize s base - logger comes from FlextMixins
         super().__init__()
-        # Store meltano-specific config (use different name to avoid override)
         self._meltano_config: FlextMeltanoSettings = (
             config if config is not None else FlextMeltanoSettings()
         )
 
     def configure_sink(
-        self,
-        sink_config: m.Meltano.DataSinkConfig,
+        self, sink_config: m.Meltano.DataSinkConfig
     ) -> r[m.Meltano.DataSinkDefinition]:
         """Configure a sink for a sink configuration.
 
@@ -61,22 +54,16 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
                 target_name=sink_config.sink_type,
                 target_type=sink_config.sink_type,
             )
-
-            # Create sink definition
             sink_def = m.Meltano.DataSinkDefinition(
                 sink_name=f"{sink_config.sink_type}_sink",
                 sink_type=sink_config.sink_type,
                 config=sink_config.model_dump(),
                 status="configured",
             )
-
             self.logger.info(
-                "Sink configured successfully",
-                sink_name=sink_def.sink_name,
+                "Sink configured successfully", sink_name=sink_def.sink_name
             )
-
             return r[m.Meltano.DataSinkDefinition].ok(sink_def)
-
         except (
             ValueError,
             TypeError,
@@ -88,12 +75,11 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         ) as e:
             self.logger.exception("Sink configuration failed", error=str(e))
             return r[m.Meltano.DataSinkDefinition].fail(
-                f"Sink configuration failed: {e}",
+                f"Sink configuration failed: {e}"
             )
 
     def create_flext_target(
-        self,
-        sink_config: m.Meltano.DataSinkConfig | dict[str, t.JsonValue],
+        self, sink_config: m.Meltano.DataSinkConfig | dict[str, t.JsonValue]
     ) -> r[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration.
 
@@ -106,17 +92,15 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         """
         if isinstance(sink_config, dict):
             try:
-                config = m.Meltano.DataSinkConfig(**sink_config)  # type: ignore[arg-type]
+                config = m.Meltano.DataSinkConfig(**sink_config)
             except Exception as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
         else:
             config = sink_config
-
         return self.create_sink_instance(config)
 
     def create_sink_instance(
-        self,
-        sink_config: m.Meltano.DataSinkConfig,
+        self, sink_config: m.Meltano.DataSinkConfig
     ) -> r[m.Meltano.DataSinkInstance]:
         """Create a sink instance from configuration.
 
@@ -133,21 +117,14 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
                 sink_name=sink_config.sink_type,
                 sink_type=sink_config.sink_type,
             )
-
-            # Create sink instance
             sink_instance = m.Meltano.DataSinkInstance(
-                sink_type=sink_config.sink_type,
-                config=sink_config,
-                status="configured",
+                sink_type=sink_config.sink_type, config=sink_config, status="configured"
             )
-
             self.logger.info(
                 "Sink instance created successfully",
                 sink_name=sink_instance.config.sink_type,
             )
-
             return r[m.Meltano.DataSinkInstance].ok(sink_instance)
-
         except (
             ValueError,
             TypeError,
@@ -159,16 +136,12 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         ) as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
             return r[m.Meltano.DataSinkInstance].fail(
-                f"Sink instance creation failed: {e}",
+                f"Sink instance creation failed: {e}"
             )
 
     @override
-    def execute(
-        self,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute sink abstraction operations (implements Service)."""
-        # This would orchestrate the overall sink abstraction workflow
-        # For now, return the current configuration
         return r[t.Meltano.MeltanoConfigDict].ok(self._meltano_config.model_dump())
 
     def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
@@ -183,18 +156,11 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         """
         try:
             self.logger.debug(
-                "Validating target configuration",
-                target_name=sink_config.sink_type,
+                "Validating target configuration", target_name=sink_config.sink_type
             )
-
-            # Basic validation
             if not sink_config.sink_type:
                 return r[bool].fail("Target configuration must have name and type")
-
-            # Additional validation logic would go here
-            # For now, just return success
             return r[bool].ok(value=True)
-
         except (
             ValueError,
             TypeError,
@@ -205,16 +171,10 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
             ImportError,
         ) as e:
             self.logger.exception(
-                "Target configuration validation failed",
-                error=str(e),
+                "Target configuration validation failed", error=str(e)
             )
             return r[bool].fail(f"Target configuration validation failed: {e}")
 
 
-# Re-export Singer SDK types for public API
 FlextMeltanoTarget = Target
-
-__all__ = [
-    "FlextMeltanoTarget",
-    "FlextMeltanoTargetAbstractions",
-]
+__all__ = ["FlextMeltanoTarget", "FlextMeltanoTargetAbstractions"]

@@ -39,9 +39,7 @@ class FlextMeltanoExecutionResult:
         self.error = error
         self.execution_time = execution_time
 
-    def to_dict(
-        self,
-    ) -> Mapping[str, t.Scalar | list[str]]:
+    def to_dict(self) -> Mapping[str, t.Scalar | list[str]]:
         """Convert to dictionary representation.
 
         Returns:
