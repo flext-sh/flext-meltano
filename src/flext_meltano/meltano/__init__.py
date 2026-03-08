@@ -32,7 +32,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 __all__ = ["FlextMeltanoMeltanoService", "FlextMeltanoProjectManager"]
 
 
-def __getattr__(name: str) -> Any:
+def __getattr__(name: str) -> FlextTypes.ModuleExport:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 
