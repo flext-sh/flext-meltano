@@ -14,20 +14,11 @@ from typing import ClassVar, override
 
 from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import PrivateAttr
 
 from flext_meltano import FlextMeltanoModels, t, u
 
 m = FlextMeltanoModels
-
-
-class MeltanoProjectInfo(BaseModel):
-    """Information about a Meltano project."""
-
-    root: Path = Field(description="Project root directory")
-    name: str = Field(description="Project name")
-    state: str = Field(default="initialized", description="Project state")
-    plugins_count: int = Field(default=0, description="Number of plugins")
 
 
 class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):

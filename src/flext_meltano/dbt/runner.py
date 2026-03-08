@@ -13,39 +13,8 @@ from pathlib import Path
 from typing import override
 
 from flext_core import r, s
-from pydantic import BaseModel, ConfigDict, Field
 
 from flext_meltano import t
-
-
-class DbtRunResult(BaseModel):
-    """Result of a DBT run operation."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    success: bool = Field(..., description="Whether the DBT run succeeded")
-    models_run: int = Field(default=0, ge=0, description="Number of models run")
-    models_failed: int = Field(
-        default=0,
-        ge=0,
-        description="Number of models that failed",
-    )
-    status: str = Field(default="unknown", description="Status of the DBT run")
-
-
-class DbtTestResult(BaseModel):
-    """Result of a DBT test operation."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    success: bool = Field(..., description="Whether the DBT test succeeded")
-    tests_run: int = Field(default=0, ge=0, description="Number of tests run")
-    tests_failed: int = Field(
-        default=0,
-        ge=0,
-        description="Number of tests that failed",
-    )
-    status: str = Field(default="unknown", description="Status of the DBT test")
 
 
 class FlextMeltanoDbtRunner(s[str]):

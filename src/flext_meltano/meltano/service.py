@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import override
 
 from flext_core import r, s
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from flext_meltano import (
     FlextMeltanoConstants,
@@ -57,14 +57,6 @@ class FlextMeltanoMeltanoService(s[str]):
             default=None,
             description="Additional selection filter",
         )
-
-    class PipelineResult(BaseModel):
-        """Result of a Meltano pipeline execution."""
-
-        success: bool = Field(description="Whether pipeline succeeded")
-        status: str = Field(description="Pipeline status")
-        message: str | None = Field(default=None, description="Status message")
-        exit_code: int | None = Field(default=None, description="Exit code")
 
     def __init__(self) -> None:
         """Initialize Meltano orchestration service."""
