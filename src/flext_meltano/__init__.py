@@ -13,8 +13,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
-    from flext_core.typings import FlextTypes
-
     from flext_core import (
         FlextDecorators as d,
         FlextExceptions as e,
@@ -23,6 +21,7 @@ if TYPE_CHECKING:
         s,
         x,
     )
+    from flext_core.typings import FlextTypes
 
     from flext_meltano.__version__ import __version__, __version_info__
     from flext_meltano.adapters import FlextMeltanoAdapter
