@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_core import r
-from flext_infra import FlextInfraCommandRunner
+from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano.cli_managers import (
     FlextMeltanoPipelineManager,
@@ -55,7 +55,9 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
         mock_command_result.stdout = "pipeline ok"
         mock_command_result.stderr = ""
         with patch.object(
-            FlextInfraCommandRunner, "run_raw", return_value=r.ok(mock_command_result)
+            FlextInfraUtilitiesSubprocess,
+            "run_raw",
+            return_value=r.ok(mock_command_result),
         ) as run_mock:
             result = execute_pipeline("exec-pipeline")
     assert result.is_success
@@ -157,7 +159,9 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
         mock_command_result.stdout = "ok"
         mock_command_result.stderr = ""
         with patch.object(
-            FlextInfraCommandRunner, "run_raw", return_value=r.ok(mock_command_result)
+            FlextInfraUtilitiesSubprocess,
+            "run_raw",
+            return_value=r.ok(mock_command_result),
         ):
             run_result = manager.handle_command(["run", "lifecycle-pipeline"])
         list_result = manager.handle_command(["list"])

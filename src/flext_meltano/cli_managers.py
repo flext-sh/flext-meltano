@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Protocol
 
 from flext_core import FlextLogger, r
-from flext_infra import FlextInfraCommandRunner
+from flext_infra import FlextInfraUtilitiesSubprocess
 
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
 _PIPELINE_CONFIG_FILE = "pipeline.json"
@@ -105,7 +105,7 @@ def execute_pipeline(
     if not meltano_args:
         return r[str].fail("Pipeline execution not configured")
     command = ["meltano", *meltano_args]
-    runner = FlextInfraCommandRunner()
+    runner = FlextInfraUtilitiesSubprocess()
     run_result = runner.run_raw(command, cwd=pipeline_dir)
     if run_result.is_failure:
         error_msg = run_result.error or "Unknown error"
@@ -444,7 +444,7 @@ class FlextMeltanoPipelineManager:
         return r[None](value=None, is_success=True)
 
     def _run_meltano_command(self, command: list[str]) -> r[None]:
-        runner = FlextInfraCommandRunner()
+        runner = FlextInfraUtilitiesSubprocess()
         run_result = runner.run_raw(command)
         if run_result.is_failure:
             error_msg = run_result.error or "Unknown error"
