@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
@@ -21,7 +21,6 @@ if TYPE_CHECKING:
         s,
         x,
     )
-    from flext_core.typings import FlextTypes
 
     from flext_meltano.__version__ import __version__, __version_info__
     from flext_meltano.adapters import FlextMeltanoAdapter
@@ -76,6 +75,8 @@ if TYPE_CHECKING:
         FlextMeltanoUtilities as u,
     )
     from flext_meltano.validators import FlextMeltanoValidators
+
+# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltano": ("flext_meltano.api", "FlextMeltano"),
     "FlextMeltanoAdapter": ("flext_meltano.adapters", "FlextMeltanoAdapter"),
@@ -163,6 +164,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "u": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
     "x": ("flext_core", "x"),
 }
+
 __all__ = [
     "FlextMeltano",
     "FlextMeltanoAdapter",
@@ -213,7 +215,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str) -> FlextTypes.ModuleExport:
+def __getattr__(name: str) -> Any:  # noqa: ANN401  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 
