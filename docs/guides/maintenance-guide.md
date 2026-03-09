@@ -458,14 +458,15 @@ Extend the system with custom validation rules:
 # scripts/custom_validators.py
 from docs_maintenance import DocumentationAuditor
 
+
 class CustomFlextValidator(DocumentationAuditor):
     def _validate_flext_patterns(self, content: str) -> List[str]:
         """Validate FLEXT-specific patterns."""
         issues = []
 
         # Check for proper import statements
-        if 'from flext_meltano import' in content:
-            if not content.count('from flext_core import'):
+        if "from flext_meltano import" in content:
+            if not content.count("from flext_core import"):
                 issues.append("Missing flext-core import")
 
         return issues

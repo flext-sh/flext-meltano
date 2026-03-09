@@ -142,16 +142,19 @@ pytest tests/extensions/ -m "compliance" -v
 import pytest
 from flext_meltano import CustomTapExtension
 
+
 @pytest.mark.extension
 @pytest.mark.custom_component
 def test_custom_tap_extension():
     """Test custom tap extension compliance and functionality."""
 
     # Initialize custom extension
-    custom_tap = CustomTapExtension(config={
-        "source_system": "enterprise_erp",
-        "api_endpoint": "https://erp.company.com/api"
-    })
+    custom_tap = CustomTapExtension(
+        config={
+            "source_system": "enterprise_erp",
+            "api_endpoint": "https://erp.company.com/api",
+        }
+    )
 
     # Test Singer protocol compliance
     assert custom_tap.implements_singer_protocol()
@@ -241,8 +244,9 @@ def oracle_oic_test_environment():
     return {
         "oic_endpoint": "https://test-oic.oracle.com",
         "test_credentials": load_test_credentials(),
-        "sample_integrations": load_oic_integration_samples()
+        "sample_integrations": load_oic_integration_samples(),
     }
+
 
 @pytest.fixture
 def custom_tap_configuration():
@@ -252,9 +256,9 @@ def custom_tap_configuration():
         "config": {
             "api_url": "https://test-erp.company.com/api",
             "batch_size": 1000,
-            "timeout": 30
+            "timeout": 30,
         },
-        "catalog": load_custom_tap_catalog()
+        "catalog": load_custom_tap_catalog(),
     }
 ```
 
@@ -269,7 +273,7 @@ def enterprise_compliance_dataset():
         "pii_data": load_anonymized_pii_data(),
         "financial_data": load_test_financial_records(),
         "audit_requirements": load_compliance_requirements(),
-        "expected_transformations": load_compliance_transforms()
+        "expected_transformations": load_compliance_transforms(),
     }
 ```
 
@@ -283,6 +287,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
 from flext_meltano import FlextMeltanoBase
+
 
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
@@ -308,7 +313,7 @@ class EnterpriseExtension(FlextMeltanoBase, ABC):
             self.has_audit_trail(),
             self.validates_data_privacy(),
             self.follows_security_protocols(),
-            self.implements_error_handling()
+            self.implements_error_handling(),
         ])
 ```
 

@@ -489,6 +489,7 @@ def test_operation_returns_flext_result():
     assert isinstance(result, FlextResult)
     assert result.is_success or result.is_failure
 
+
 def test_operation_success_path():
     """Test successful operation execution."""
     service = FlextMeltanoService()
@@ -498,6 +499,7 @@ def test_operation_success_path():
     assert result.is_success
     plugins = result.unwrap()
     assert isinstance(plugins, list)
+
 
 def test_operation_failure_path():
     """Test operation failure handling."""
@@ -517,9 +519,10 @@ def test_operation_failure_path():
 @pytest.fixture
 def mock_meltano_adapter():
     """Provide mocked Meltano adapter."""
-    with patch('flext_meltano.adapters.FlextMeltanoAdapter') as mock:
+    with patch("flext_meltano.adapters.FlextMeltanoAdapter") as mock:
         mock.return_value.run_tap.return_value = FlextResult.ok({"status": "success"})
         yield mock
+
 
 def test_service_with_external_dependency(mock_meltano_adapter):
     """Test service operation with mocked external dependency."""

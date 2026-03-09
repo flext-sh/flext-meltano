@@ -109,6 +109,7 @@ from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
+
 def process_data(data: dict) -> FlextResult[Optional[t.Dict]]:
     # Implementation
     pass
@@ -255,6 +256,7 @@ def risky_operation():
     except Exception as e:
         return None  # Lost error information
 
+
 # ✅ Correct
 def safe_operation() -> FlextResult[t.Dict]:
     try:
@@ -274,6 +276,7 @@ class UtilityClass:
     @staticmethod
     def do_something():
         pass
+
 
 # ✅ Correct
 from flext_core import FlextBus
@@ -296,6 +299,7 @@ from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
+
 
 class FlextMeltanoUtilityService(FlextService):
     def do_something(self) -> FlextResult[t.Dict]:

@@ -215,6 +215,7 @@ external --> intermediate: Data extraction
 ```python
 class PipelineState:
     """Pipeline execution state with bookmarks."""
+
     pipeline_id: str
     bookmarks: Dict[str, object]  # Singer bookmark format
     last_updated: datetime
@@ -232,6 +233,7 @@ class PipelineState:
 ```python
 class RecordBuffer:
     """In-memory buffer for batch processing."""
+
     records: List[dict]
     max_size: int
     flush_threshold: float
@@ -247,6 +249,7 @@ class RecordBuffer:
 ```python
 class ErrorStore:
     """Storage for failed records and error context."""
+
     errors: List[ErrorRecord]
 
     @dataclass
@@ -270,6 +273,7 @@ ______________________________________________________________________
 @dataclass
 class PipelineConfig:
     """Pipeline configuration with validation."""
+
     name: str
     tap: TapConfig
     target: TargetConfig
@@ -279,9 +283,14 @@ class PipelineConfig:
     def validate(self) -> FlextResult[ValidatedConfig]:
         """Validate complete pipeline configuration."""
         return (
-            self.tap.validate()
+            self.tap
+            .validate()
             .flat_map(lambda tap: self.target.validate())
-            .map(lambda target: ValidatedConfig(tap=tap, target=target, transforms=self.transforms))
+            .map(
+                lambda target: ValidatedConfig(
+                    tap=tap, target=target, transforms=self.transforms
+                )
+            )
         )
 ```
 
@@ -329,18 +338,22 @@ class PipelineConfig:
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
-    def validate_record(self, record: dict, schema: dict) -> FlextResult[ValidatedRecord]:
+    def validate_record(
+        self, record: dict, schema: dict
+    ) -> FlextResult[ValidatedRecord]:
         """Validate record against Singer schema."""
         try:
             # JSON Schema validation
             validate(instance=record, schema=schema)
             return FlextResult.ok(ValidatedRecord(record=record, schema=schema))
         except ValidationError as e:
-            return FlextResult.fail(ValidationError(f"Schema validation failed: {e.message}"))
+            return FlextResult.fail(
+                ValidationError(f"Schema validation failed: {e.message}")
+            )
 
     def validate_stream_schema(self, schema: dict) -> FlextResult[ValidatedSchema]:
         """Validate Singer stream schema."""
-        required_fields = ['type', 'properties']
+        required_fields = ["type", "properties"]
         if not all(field in schema for field in required_fields):
             return FlextResult.fail(SchemaError("Invalid Singer schema structure"))
 
@@ -539,6 +552,7 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 @dataclass
 class RetentionPolicy:
     """Data retention policy configuration."""
+
     data_type: str
     retention_period_days: int
     archive_strategy: str  # 'delete', 'archive', 'anonymize'
@@ -575,12 +589,16 @@ ______________________________________________________________________
 class PipelineScaler:
     """Dynamic pipeline scaling based on workload."""
 
-    def scale_pipeline(self, pipeline: Pipeline, metrics: SystemMetrics) -> ScalingDecision:
+    def scale_pipeline(
+        self, pipeline: Pipeline, metrics: SystemMetrics
+    ) -> ScalingDecision:
         """Determine scaling requirements."""
         if metrics.queue_depth > self.queue_threshold:
             return ScalingDecision(scale_up=True, instances=2)
         elif metrics.cpu_usage < self.cpu_threshold:
-            return ScalingDecision(scale_down=True, instances=max(1, current_instances - 1))
+            return ScalingDecision(
+                scale_down=True, instances=max(1, current_instances - 1)
+            )
         else:
             return ScalingDecision(scale_up=False, scale_down=False)
 ```
@@ -591,12 +609,14 @@ class PipelineScaler:
 class DataPartitioner:
     """Intelligent data partitioning for parallel processing."""
 
-    def partition_data(self, records: List[dict], partition_key: str) -> Dict[str, List[dict]]:
+    def partition_data(
+        self, records: List[dict], partition_key: str
+    ) -> Dict[str, List[dict]]:
         """Partition data for parallel processing."""
         partitions = defaultdict(list)
 
         for record in records:
-            key = record.get(partition_key, 'default')
+            key = record.get(partition_key, "default")
             partitions[key].append(record)
 
         return dict[str, object](partitions)
@@ -618,7 +638,7 @@ class PipelineCache:
         if stream_name in self.schema_cache:
             cached_item = self.schema_cache[stream_name]
             if not self._is_expired(cached_item):
-                return cached_item['schema']
+                return cached_item["schema"]
         return None
 ```
 
@@ -638,6 +658,7 @@ class PipelineCache:
 @dataclass
 class AlertRule:
     """Monitoring alert configuration."""
+
     metric_name: str
     condition: str  # '>', '<', '==', '!='
     threshold: float

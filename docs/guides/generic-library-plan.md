@@ -190,7 +190,9 @@ result = service.install_plugin("tap-gitlab")
 
 # Pipeline execution (protocol-based)
 tap_result = service.execute_tap("tap-gitlab", config={"api_url": "..."})
-target_result = service.execute_target("target-postgres", records, config={"host": "..."})
+target_result = service.execute_target(
+    "target-postgres", records, config={"host": "..."}
+)
 ```
 
 #### FlextPluginService (Plugin Management)
@@ -228,8 +230,7 @@ sync_result = tap.sync(selected_streams)
 ```python
 # Generic plugin discovery
 def discover_plugins(
-    plugin_type: str | None = None,
-    source: PluginSource = PluginSource.AUTO
+    plugin_type: str | None = None, source: PluginSource = PluginSource.AUTO
 ) -> FlextResult[list[PluginInfo]]:
     """Discover plugins from multiple sources.
 
@@ -246,9 +247,7 @@ def discover_plugins(
 
 ```python
 def install_plugin(
-    plugin_name: str,
-    version: str | None = None,
-    source: str | None = None
+    plugin_name: str, version: str | None = None, source: str | None = None
 ) -> FlextResult[PluginInstallResult]:
     """Install plugin from specified source.
 
@@ -271,7 +270,7 @@ def execute_tap(
     tap_name: str,
     config: t.Dict,
     state: t.Dict | None = None,
-    streams: t.StringList | None = None
+    streams: t.StringList | None = None,
 ) -> FlextResult[TapExecutionResult]:
     """Execute Singer tap with configuration.
 
@@ -290,9 +289,7 @@ def execute_tap(
 
 ```python
 def execute_target(
-    target_name: str,
-    records: list[t.Dict],
-    config: t.Dict
+    target_name: str, records: list[t.Dict], config: t.Dict
 ) -> FlextResult[TargetExecutionResult]:
     """Execute Singer target with records.
 
@@ -311,9 +308,7 @@ def execute_target(
 #### Pipeline Configuration API
 
 ```python
-def create_pipeline(
-    config: PipelineConfig
-) -> FlextResult[Pipeline]:
+def create_pipeline(config: PipelineConfig) -> FlextResult[Pipeline]:
     """Create pipeline configuration.
 
     Args:
@@ -328,8 +323,7 @@ def create_pipeline(
 
 ```python
 def execute_pipeline(
-    pipeline: Pipeline | str,
-    options: PipelineOptions | None = None
+    pipeline: Pipeline | str, options: PipelineOptions | None = None
 ) -> FlextResult[PipelineResult]:
     """Execute configured pipeline.
 

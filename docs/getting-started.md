@@ -137,6 +137,7 @@ from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
+
 # All flext-meltano operations return FlextResult[T]
 def example_operation() -> FlextResult[str]:
     try:
@@ -144,6 +145,7 @@ def example_operation() -> FlextResult[str]:
         return FlextResult.ok("Operation successful")
     except Exception as e:
         return FlextResult.fail(f"Operation failed: {e}")
+
 
 # Usage pattern
 result = example_operation()

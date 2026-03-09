@@ -275,6 +275,7 @@ def test_operation_success():
     plugins = result.unwrap()
     assert isinstance(plugins, list)
 
+
 def test_operation_failure():
     """Test operation failure returns Fail result."""
     service = FlextMeltanoService()
@@ -294,12 +295,14 @@ def test_operation_failure():
 from unittest.mock import Mock, patch
 import pytest
 
+
 @pytest.fixture
 def mock_meltano_adapter():
     """Provide mocked Meltano adapter for testing."""
-    with patch('flext_meltano.adapters.FlextMeltanoAdapter') as mock:
+    with patch("flext_meltano.adapters.FlextMeltanoAdapter") as mock:
         mock.return_value.run_tap.return_value = FlextResult.ok({"status": "success"})
         yield mock
+
 
 def test_service_with_meltano_integration(mock_meltano_adapter):
     """Test service integration with mocked Meltano operations."""
@@ -321,8 +324,9 @@ def sample_config():
     return FlextMeltanoSettings(
         project_root=Path("/tmp/test"),
         environment="test",
-        plugins=[{"name": "tap-csv", "variant": "meltano"}]
+        plugins=[{"name": "tap-csv", "variant": "meltano"}],
     )
+
 
 @pytest.fixture
 def mock_plugin_service():

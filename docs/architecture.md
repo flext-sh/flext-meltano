@@ -195,11 +195,11 @@ graph TD
 
 ```python
 from flext_core import (
-    FlextResult,           # Railway-oriented programming
-    FlextService,    # Service base class
-    FlextLogger,           # Logging infrastructure
-    FlextContainer,        # Dependency injection
-    u         # Common utilities
+    FlextResult,  # Railway-oriented programming
+    FlextService,  # Service base class
+    FlextLogger,  # Logging infrastructure
+    FlextContainer,  # Dependency injection
+    u,  # Common utilities
 )
 ```
 
@@ -220,9 +220,9 @@ result: FlextResult[FlextMeltanoTypes.ELT.PipelineResult]
 
 ```python
 # ⚠️ ARCHITECTURE DEBT - Requires abstraction
-import meltano                                    # Line 14 in adapters.py
-from meltano.core.project import Project         # Line 22 in adapters.py
-from meltano.core.plugin_invoker import PluginInvoker # Line 21 in adapters.py
+import meltano  # Line 14 in adapters.py
+from meltano.core.project import Project  # Line 22 in adapters.py
+from meltano.core.plugin_invoker import PluginInvoker  # Line 21 in adapters.py
 ```
 
 **Target Architecture (Abstracted)**:
@@ -248,12 +248,14 @@ class FlextMeltanoTypes:
 
     class Plugin:
         """Meltano plugin management types."""
+
         type Name = str
         type Config = ConfigDict
         type Command = t.StringList
 
     class Singer:
         """Singer protocol integration types."""
+
         type Tap = object
         type Target = object
         type MessageType = str
@@ -261,6 +263,7 @@ class FlextMeltanoTypes:
 
     class ELT:
         """Extract-Load-Transform pipeline types."""
+
         type Pipeline = ConfigDict
         type PipelineResult = JsonObject
         type ExtractResult = JsonObject
@@ -271,13 +274,16 @@ class FlextMeltanoTypes:
 ```python
 class TapConfig(BaseModel):
     """Type-safe tap configuration model."""
+
     tap_type: str
     connection_config: t.Dict
     stream_config: t.Dict | None = None
     version: str | None = None
 
+
 class StreamDefinition(BaseModel):
     """Type-safe stream definition model."""
+
     stream_name: str
     stream_schema: t.Dict
     tap_type: str
@@ -292,8 +298,7 @@ class StreamDefinition(BaseModel):
 ```python
 # All operations return FlextResult[T] for railway-oriented programming
 def process_elt_pipeline(
-    tap_config: TapConfig,
-    target_config: t.Dict
+    tap_config: TapConfig, target_config: t.Dict
 ) -> FlextResult[t.Dict]:
     """Process ELT pipeline with comprehensive error handling."""
 
@@ -320,11 +325,14 @@ def process_elt_pipeline(
 class FlextMeltanoError(Exception):
     """Base exception for all flext-meltano operations."""
 
+
 class FlextMeltanoSettingsurationError(FlextMeltanoError):
     """Configuration-related errors."""
 
+
 class FlextMeltanoExecutionError(FlextMeltanoError):
     """Pipeline execution errors."""
+
 
 class FlextMeltanoValidationError(FlextMeltanoError):
     """Data validation errors."""

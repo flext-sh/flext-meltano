@@ -65,7 +65,8 @@ Implement railway-oriented programming using `FlextResult[T]` from flext-core, e
 
 ```python
 result = (
-    service.discover_plugins()
+    service
+    .discover_plugins()
     .flat_map(lambda plugins: service.validate_plugins(plugins))
     .map(lambda valid_plugins: service.install_plugins(valid_plugins))
 )
@@ -152,11 +153,14 @@ def process_pipeline(config: dict) -> FlextResult[PipelineResult]:
 class FlextMeltanoError(Exception):
     """Base error for all FLEXT-Meltano operations."""
 
+
 class ConfigurationError(FlextMeltanoError):
     """Configuration-related errors."""
 
+
 class PluginError(FlextMeltanoError):
     """Plugin operation errors."""
+
 
 class PipelineError(FlextMeltanoError):
     """Pipeline execution errors."""

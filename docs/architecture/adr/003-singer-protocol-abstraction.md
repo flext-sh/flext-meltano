@@ -78,7 +78,7 @@ if result.is_failure:
 # Mock Singer SDK for unit testing
 @pytest.fixture
 def mock_singer_sdk():
-    with patch('singer_sdk.Tap'):
+    with patch("singer_sdk.Tap"):
         yield
 ```
 
@@ -148,11 +148,14 @@ def mock_singer_sdk():
 class FlextMeltanoSingerBase:
     """Base class for all Singer operations with FLEXT patterns."""
 
+
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap abstraction with railway-oriented error handling."""
 
+
 class FlextMeltanoTarget(FlextMeltanoSingerBase, SingerTarget):
     """FLEXT target abstraction with railway-oriented error handling."""
+
 
 class FlextMeltanoStream(FlextMeltanoSingerBase):
     """Stream abstraction with FLEXT state management."""
@@ -175,7 +178,8 @@ class FlextMeltanoTap(FlextMeltanoSingerBase):
     def run_tap(self, config: dict, state: dict) -> FlextResult[TapResult]:
         # Railway pattern for tap execution
         return (
-            self.validate_config(config)
+            self
+            .validate_config(config)
             .flat_map(lambda _: self.initialize_state(state))
             .flat_map(lambda _: self.execute_streams())
             .map(lambda result: TapResult.from_execution(result))

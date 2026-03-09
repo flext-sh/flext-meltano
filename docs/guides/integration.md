@@ -77,6 +77,7 @@ from flext_core import t
 from flext_core import u
 from flext_meltano import FlextMeltanoTapAbstractions, StreamDefinition
 
+
 class FlextOracleTapService(FlextService):
     """Oracle tap using flext-meltano Singer abstractions."""
 
@@ -84,7 +85,9 @@ class FlextOracleTapService(FlextService):
         super().__init__()
         self._tap_abstractions = FlextMeltanoTapAbstractions()
 
-    def discover_oracle_streams(self, config: dict) -> FlextResult[list[StreamDefinition]]:
+    def discover_oracle_streams(
+        self, config: dict
+    ) -> FlextResult[list[StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
         return self._tap_abstractions.discover_catalog("tap-oracle")
 
@@ -120,6 +123,7 @@ from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 from flext_meltano import FlextMeltanoTargetAbstractions
+
 
 class FlextOracleTargetService(FlextService):
     """Oracle target using flext-meltano Singer abstractions."""
@@ -164,6 +168,7 @@ from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 from flext_meltano import FlextMeltanoDbtService
+
 
 class FlextOracleDbtService(FlextService):
     """Oracle dbt transformations using flext-meltano."""
@@ -211,6 +216,7 @@ from flext_core import t
 from flext_core import u
 from flext_meltano import FlextMeltanoService, FlextMeltanoAdapter
 
+
 class EnterpriseELTService(FlextService):
     """Complete ELT pipeline for enterprise applications."""
 
@@ -220,10 +226,7 @@ class EnterpriseELTService(FlextService):
         self._adapter = FlextMeltanoAdapter()
 
     def execute_elt_pipeline(
-        self,
-        tap_name: str,
-        target_name: str,
-        dbt_models: t.StringList = None
+        self, tap_name: str, target_name: str, dbt_models: t.StringList = None
     ) -> FlextResult[t.Dict]:
         """Execute complete ELT pipeline."""
 
@@ -241,7 +244,7 @@ class EnterpriseELTService(FlextService):
 
         return FlextResult[t.Dict].ok({
             "pipeline": pipeline_result.unwrap(),
-            "models_executed": dbt_models or []
+            "models_executed": dbt_models or [],
         })
 ```
 
@@ -269,15 +272,11 @@ from flext_meltano import FlextMeltanoBridge
 bridge = FlextMeltanoBridge()
 response = bridge.handle_bridge_request({
     "command": "run_pipeline",
-    "args": ["tap-csv", "target-jsonl"]
+    "args": ["tap-csv", "target-jsonl"],
 })
 
 # Response format follows FlextResult structure
-{
-    "success": True,
-    "data": {"records_processed": 1000},
-    "error": None
-}
+{"success": True, "data": {"records_processed": 1000}, "error": None}
 ```
 
 ______________________________________________________________________

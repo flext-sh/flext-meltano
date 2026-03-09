@@ -213,7 +213,8 @@ class FlextMeltanoService:
     def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
         # Use injected dependencies
         return (
-            self.config_validator.validate(pipeline.config)
+            self.config_validator
+            .validate(pipeline.config)
             .flat_map(lambda _: self.meltano_adapter.run_pipeline(pipeline))
             .flat_map(lambda result: self.dbt_adapter.run_transformations(result))
         )

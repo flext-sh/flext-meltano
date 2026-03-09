@@ -264,12 +264,13 @@ flext_meltano --> redis: Caching & queues
 ```python
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
-    FlextResult,      # Railway-oriented error handling
-    FlextContainer,   # Dependency injection
-    FlextModels,      # Base model classes
-    FlextLogger,      # Structured logging
-    FlextService      # Base service class
+    FlextResult,  # Railway-oriented error handling
+    FlextContainer,  # Dependency injection
+    FlextModels,  # Base model classes
+    FlextLogger,  # Structured logging
+    FlextService,  # Base service class
 )
+
 
 class FlextMeltanoService(FlextService):
     """FLEXT-Meltano service extending FLEXT-Core patterns."""
@@ -278,14 +279,10 @@ class FlextMeltanoService(FlextService):
         """Plugin discovery with FLEXT error handling."""
         try:
             plugins = self.adapter.list_plugins()
-            validated_plugins = [
-                self.validate_plugin(plugin) for plugin in plugins
-            ]
+            validated_plugins = [self.validate_plugin(plugin) for plugin in plugins]
             return FlextResult.ok(validated_plugins)
         except Exception as e:
-            return FlextResult.fail(
-                MeltanoError(f"Plugin discovery failed: {e}")
-            )
+            return FlextResult.fail(MeltanoError(f"Plugin discovery failed: {e}"))
 ```
 
 #### Meltano CLI Integration
@@ -310,27 +307,29 @@ class MeltanoAdapter:
                 capture_output=True,
                 text=True,
                 timeout=self.command_timeout,
-                cwd=self.project_root
+                cwd=self.project_root,
             )
 
             if result.returncode == 0:
-                return FlextResult.ok(MeltanoResult(
-                    success=True,
-                    output=result.stdout,
-                    command=cmd
-                ))
+                return FlextResult.ok(
+                    MeltanoResult(success=True, output=result.stdout, command=cmd)
+                )
             else:
-                return FlextResult.fail(MeltanoExecutionError(
-                    f"Meltano command failed: {result.stderr}",
-                    command=cmd,
-                    return_code=result.returncode
-                ))
+                return FlextResult.fail(
+                    MeltanoExecutionError(
+                        f"Meltano command failed: {result.stderr}",
+                        command=cmd,
+                        return_code=result.returncode,
+                    )
+                )
 
         except subprocess.TimeoutExpired:
-            return FlextResult.fail(MeltanoTimeoutError(
-                f"Meltano command timed out after {self.command_timeout}s",
-                command=cmd
-            ))
+            return FlextResult.fail(
+                MeltanoTimeoutError(
+                    f"Meltano command timed out after {self.command_timeout}s",
+                    command=cmd,
+                )
+            )
 ```
 
 #### Singer SDK Integration
@@ -592,6 +591,7 @@ from flext_core import t
 from flext_core import u
 from flext_meltano import FlextMeltanoTap, FlextMeltanoTarget
 
+
 class MyFLEXTProject(FlextService):
     """FLEXT project extending foundation patterns."""
 
@@ -604,7 +604,8 @@ class MyFLEXTProject(FlextService):
     def execute_pipeline(self) -> FlextResult[PipelineResult]:
         """Execute pipeline using FLEXT foundation."""
         return (
-            self.tap.discover_streams()
+            self.tap
+            .discover_streams()
             .flat_map(lambda streams: self.validate_streams(streams))
             .flat_map(lambda _: self.target.initialize())
             .flat_map(lambda _: self.run_data_flow())
@@ -760,7 +761,9 @@ ______________________________________________________________________
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
-    def execute_sync_operation(self, request: OperationRequest) -> FlextResult[OperationResponse]:
+    def execute_sync_operation(
+        self, request: OperationRequest
+    ) -> FlextResult[OperationResponse]:
         """Execute synchronous operation with timeout and error handling."""
 
         # Validate request
@@ -775,14 +778,16 @@ class SynchronousIntegration:
                 return FlextResult.ok(self.adapt_response(response))
 
         except TimeoutError:
-            return FlextResult.fail(IntegrationTimeoutError(
-                f"Operation timed out after {self.operation_timeout}s"
-            ))
+            return FlextResult.fail(
+                IntegrationTimeoutError(
+                    f"Operation timed out after {self.operation_timeout}s"
+                )
+            )
 
         except ExternalSystemError as e:
-            return FlextResult.fail(IntegrationError(
-                f"External system error: {e.message}"
-            ))
+            return FlextResult.fail(
+                IntegrationError(f"External system error: {e.message}")
+            )
 ```
 
 #### Circuit Breaker Pattern
@@ -832,7 +837,9 @@ class CircuitBreakerIntegration:
         if self.last_failure_time is None:
             return True
 
-        time_since_failure = (datetime.utcnow() - self.last_failure_time).total_seconds()
+        time_since_failure = (
+            datetime.utcnow() - self.last_failure_time
+        ).total_seconds()
         return time_since_failure >= self.recovery_timeout
 ```
 
