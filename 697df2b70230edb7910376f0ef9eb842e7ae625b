@@ -1,0 +1,38 @@
+src/flext_meltano/meltano/plugins.py
+  645942a66b71fbb4 28,147,149,152,154,161,164,166,256-258,297-298
+src/flext_meltano/meltano/pipelines.py
+  c963d31991094136 26,156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "697df2b70230edb7910376f0ef9eb842e7ae625b",
+  "prompts": {
+    "645942a66b71fbb4": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_326e022e2ffeno4xaB0hQrHjV1",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 70,
+      "total_deletions": 66,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    },
+    "c963d31991094136": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32797ed69ffeitiORv0NMoXDt9",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
