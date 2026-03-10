@@ -16,12 +16,9 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
-from flext_core import FlextLogger, r, u
+from flext_core import FlextLogger, r
 
-from flext_meltano import FlextMeltanoModels, c, t
-
-m = FlextMeltanoModels
-logger = FlextLogger(__name__)
+from flext_meltano import c, m, t, u
 
 
 class FlextMeltanoFileManagers:
@@ -35,6 +32,8 @@ class FlextMeltanoFileManagers:
     - Contains ONLY Meltano-specific operations (YAML configs, project structure)
     - Uses tempfile standard library with u (FlextUtilities) validation
     """
+
+    logger = FlextLogger(__name__)
 
     @classmethod
     def cleanup_temp_directory(cls, temp_path: Path) -> r[bool]:
@@ -81,23 +80,18 @@ class FlextMeltanoFileManagers:
         FlextResult containing the created temporary directory path.
 
         """
-        logger = FlextLogger(__name__)
 
         def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-            logger.info("Created temporary directory: %s", temp_dir)
+            FlextMeltanoFileManagers.logger.info(
+                "Created temporary directory: %s", temp_dir
+            )
             return temp_dir
 
-        result = u.try_[Path](
+        return u.try_(
             _create,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        return result.lash(
-            lambda error: r[Path].fail(
-                f"Failed to create temp directory: {error}",
-            )
-        )
+        ).map_error(lambda e: f"Failed to create temp directory: {e}")
 
     @classmethod
     def load_yaml_config(cls, file_path: Path) -> r[t.Meltano.FileConfigDict]:
@@ -126,12 +120,11 @@ class FlextMeltanoFileManagers:
                 config_data: t.ContainerValue = yaml.safe_load(f)
             if config_data is None:
                 return {}
-            validated_config = m.Meltano.ConfigMappingPayload.model_validate({
+            return m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data
             }).values
-            return validated_config
 
-        result = u.try_[t.Meltano.FileConfigDict](
+        return u.try_(
             _load,
             catch=(
                 yaml.YAMLError,
@@ -141,13 +134,7 @@ class FlextMeltanoFileManagers:
                 AttributeError,
                 OSError,
             ),
-            default=None,
-        )
-        return result.lash(
-            lambda error: r[t.Meltano.FileConfigDict].fail(
-                f"Failed to load YAML config: {error}",
-            )
-        )
+        ).map_error(lambda e: f"Failed to load YAML config: {e}")
 
     @classmethod
     def save_yaml_config(
@@ -170,14 +157,10 @@ class FlextMeltanoFileManagers:
                 )
             return True
 
-        result = u.try_[bool](
+        return u.try_(
             _save,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        return result.lash(
-            lambda error: r[bool].fail(f"Failed to save YAML config: {error}")
-        )
+        ).map_error(lambda e: f"Failed to save YAML config: {e}")
 
     @classmethod
     def setup_project_structure(
@@ -204,20 +187,26 @@ class FlextMeltanoFileManagers:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
-            configs = {
-                c.Meltano.Paths.MELTANO_PROJECT_FILE: {
-                    "version": 1,
-                    "project_id": "project_name",
-                    "project_name": "project_name",
-                    "plugins": {"extractors": [], "loaders": [], "transformers": []},
+            meltano_config: t.Meltano.FileConfigDict = {
+                "version": 1,
+                "project_id": "project_name",
+                "project_name": "project_name",
+                "plugins": {
+                    "extractors": list[str](),
+                    "loaders": list[str](),
+                    "transformers": list[str](),
                 },
-                "transform/dbt_project.yml": {
-                    "name": "project_name",
-                    "version": "1.0.0",
-                    "profile": "project_name",
-                    "model-paths": ["models"],
-                    "test-paths": ["tests"],
-                },
+            }
+            dbt_project_config: t.Meltano.FileConfigDict = {
+                "name": "project_name",
+                "version": "1.0.0",
+                "profile": "project_name",
+                "model-paths": ["models"],
+                "test-paths": ["tests"],
+            }
+            configs: dict[str, t.Meltano.FileConfigDict] = {
+                c.Meltano.Paths.MELTANO_PROJECT_FILE: meltano_config,
+                "transform/dbt_project.yml": dbt_project_config,
             }
             for filename, config_data in configs.items():
                 config_path = project_root / filename
