@@ -107,7 +107,6 @@ class FlextMeltanoLibraryRunner:
                 "target_name": target_name,
                 "execution_time": execution_result.execution_time,
                 "exit_code": execution_result.exit_code,
-                "output": execution_result.output,
                 "output": execution_result.output or "",
                 "error": execution_result.error or "",
             }
