@@ -43,7 +43,7 @@ class FlextMeltanoValidators:
         ...     validator.validate_pipeline_component_business_rules(config)
         ... )
         >>> if result.is_success:
-        ...     print("Component configuration is valid")
+        ...     logger.info("Component configuration is valid")
 
     """
 
@@ -73,7 +73,7 @@ class FlextMeltanoValidators:
             ... )
             >>> if result.is_success:
             ...     validated_config: dict[str, t.JsonValue] = result.value
-            ...     print(f"Validated config: {validated_config}")
+            ...     logger.info("Validated config", config=validated_config)
 
         """
         try:
@@ -118,7 +118,7 @@ class FlextMeltanoValidators:
             ...     config
             ... )
             >>> if result.is_success and result.value:
-            ...     print("Project configuration is valid")
+            ...     logger.info("Project configuration is valid")
 
         """
         try:
@@ -147,7 +147,7 @@ class FlextMeltanoValidators:
             ...     project_path
             ... )
             >>> if result.is_success and result.value:
-            ...     print("Project structure is valid")
+            ...     logger.info("Project structure is valid")
 
         """
         try:
@@ -208,7 +208,7 @@ class FlextMeltanoValidators:
             ...     )
             ... )
             >>> if result.is_success and result.value:
-            ...     print("Transformation configuration is valid")
+            ...     logger.info("Transformation configuration is valid")
 
         """
         try:

@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import FlextRuntime, r, s
-from singer_sdk import Stream, Tap
 
 from flext_meltano import FlextMeltanoSettings, m, t
 
@@ -112,9 +111,9 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: dict[str, t.JsonValue],
-        stream_config: dict[str, t.JsonValue] | None = None,
-        **kwargs: t.JsonValue,
+        connection_config: t.Dict,
+        stream_config: t.Dict | None = None,
+        tap_version: str = "1.0.0",
     ) -> r[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data.
 
@@ -122,19 +121,20 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             tap_type: Type of the tap
             connection_config: Raw connection configuration
             stream_config: Optional stream configuration
-            kwargs: Additional configuration (e.g., tap_version)
+            tap_version: Tap plugin semantic version
 
         Returns:
             r containing the created TapInstance
 
         """
         try:
-            config = m.Meltano.TapConfig(
-                tap_type=tap_type,
-                connection_config=connection_config,
-                stream_config=stream_config or {},
-                **kwargs,
-            )
+            config_payload: t.Dict = {
+                "tap_type": tap_type,
+                "connection_config": connection_config,
+                "stream_config": stream_config or {},
+                "tap_version": tap_version,
+            }
+            config = m.Meltano.TapConfig.model_validate(config_payload)
             return self.create_source_instance(config).map(
                 lambda inst: m.Meltano.TapInstance(
                     tap_type=inst.source_type, config=config, tap_id=inst.source_id
@@ -315,6 +315,4 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             return r[bool].fail(f"Schema validation failed: {e}")
 
 
-FlextMeltanoStream = Stream
-FlextMeltanoTap = Tap
-__all__ = ["FlextMeltanoStream", "FlextMeltanoTap", "FlextMeltanoTapAbstractions"]
+__all__ = ["FlextMeltanoTapAbstractions"]

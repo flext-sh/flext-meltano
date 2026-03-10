@@ -47,7 +47,8 @@ if command_result.is_success:
     )
     if execution_result.success:
         output = execution_result.value
-        print(f"Source executed: {output['stdout']}")
+        logger = structlog.get_logger(__name__)
+        logger.info("Source executed", stdout=output["stdout"])
 ```
 
 ### For Complete Pipelines
@@ -85,7 +86,8 @@ result = (
 )
 
 if result.is_failure:
-    print(f"Pipeline failed: {result.error}")
+    logger = structlog.get_logger(__name__)
+    logger.error("Pipeline failed", error=str(result.error))
 ```
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.

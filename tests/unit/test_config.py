@@ -255,7 +255,7 @@ class TestFlextMeltanoSettingsEdgeCases:
 
     def test_invalid_log_level_validation(self) -> None:
         """Test log level validation - uses default when invalid."""
-        global_config = FlextSettings.get_global_instance()
+        global_config = FlextSettings.get_global()
         assert hasattr(global_config, "log_level")
         assert global_config.log_level in {"INFO", "DEBUG"}
 

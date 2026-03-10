@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import r, s
-from singer_sdk import Target
 
 from flext_meltano import FlextMeltanoSettings, m, t
 
@@ -79,7 +78,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
             )
 
     def create_flext_target(
-        self, sink_config: m.Meltano.DataSinkConfig | dict[str, t.JsonValue]
+        self, sink_config: m.Meltano.DataSinkConfig | t.Dict
     ) -> r[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration.
 
@@ -90,9 +89,12 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
             r containing the created DataSinkInstance
 
         """
-        if isinstance(sink_config, dict):
+        if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
-                config = m.Meltano.DataSinkConfig(**sink_config)
+                config_payload: t.Dict = dict(sink_config)
+                config: m.Meltano.DataSinkConfig = (
+                    m.Meltano.DataSinkConfig.model_validate(config_payload)
+                )
             except Exception as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
         else:
@@ -176,5 +178,4 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
             return r[bool].fail(f"Target configuration validation failed: {e}")
 
 
-FlextMeltanoTarget = Target
-__all__ = ["FlextMeltanoTarget", "FlextMeltanoTargetAbstractions"]
+__all__ = ["FlextMeltanoTargetAbstractions"]

@@ -6,7 +6,7 @@ specification with FLEXT ecosystem patterns and railway-oriented programming.
 NOTE: Heavy modules (service, tap, target) are NOT imported at package level
 to avoid circular imports. Import them explicitly when needed:
     from flext_meltano.singer.service import FlextMeltanoSingerService
-    from flext_meltano.singer.tap import FlextMeltanoTap
+    from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

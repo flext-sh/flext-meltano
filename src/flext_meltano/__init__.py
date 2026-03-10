@@ -30,9 +30,6 @@ if TYPE_CHECKING:
         FlextMeltanoPluginManager,
         FlextMeltanoSingerManager,
         FlextMeltanoStatusManager,
-        _ManagerProtocol,
-        _SingerManagerProtocol,
-        _StatusManagerProtocol,
     )
     from flext_meltano.constants import (
         FlextMeltanoConstants,
@@ -61,12 +58,9 @@ if TYPE_CHECKING:
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
     from flext_meltano.singer.tap import (
-        FlextMeltanoStream,
-        FlextMeltanoTap,
         FlextMeltanoTapAbstractions,
     )
     from flext_meltano.singer.target import (
-        FlextMeltanoTarget,
         FlextMeltanoTargetAbstractions,
     )
     from flext_meltano.typings import FlextMeltanoTypes, FlextMeltanoTypes as t
@@ -133,13 +127,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_meltano.cli_managers",
         "FlextMeltanoStatusManager",
     ),
-    "FlextMeltanoStream": ("flext_meltano.singer.tap", "FlextMeltanoStream"),
-    "FlextMeltanoTap": ("flext_meltano.singer.tap", "FlextMeltanoTap"),
     "FlextMeltanoTapAbstractions": (
         "flext_meltano.singer.tap",
         "FlextMeltanoTapAbstractions",
     ),
-    "FlextMeltanoTarget": ("flext_meltano.singer.target", "FlextMeltanoTarget"),
     "FlextMeltanoTargetAbstractions": (
         "flext_meltano.singer.target",
         "FlextMeltanoTargetAbstractions",
@@ -147,9 +138,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoTypes": ("flext_meltano.typings", "FlextMeltanoTypes"),
     "FlextMeltanoUtilities": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
     "FlextMeltanoValidators": ("flext_meltano.validators", "FlextMeltanoValidators"),
-    "_ManagerProtocol": ("flext_meltano.cli_managers", "_ManagerProtocol"),
-    "_SingerManagerProtocol": ("flext_meltano.cli_managers", "_SingerManagerProtocol"),
-    "_StatusManagerProtocol": ("flext_meltano.cli_managers", "_StatusManagerProtocol"),
     "__version__": ("flext_meltano.__version__", "__version__"),
     "__version_info__": ("flext_meltano.__version__", "__version_info__"),
     "c": ("flext_meltano.constants", "FlextMeltanoConstants"),
@@ -188,17 +176,11 @@ __all__ = [
     "FlextMeltanoSingerService",
     "FlextMeltanoStateManager",
     "FlextMeltanoStatusManager",
-    "FlextMeltanoStream",
-    "FlextMeltanoTap",
     "FlextMeltanoTapAbstractions",
-    "FlextMeltanoTarget",
     "FlextMeltanoTargetAbstractions",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
-    "_ManagerProtocol",
-    "_SingerManagerProtocol",
-    "_StatusManagerProtocol",
     "__version__",
     "__version_info__",
     "c",
