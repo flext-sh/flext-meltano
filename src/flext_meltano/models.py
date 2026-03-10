@@ -132,7 +132,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Validated boolean list wrapper for process output."""
 
             items: list[bool] = Field(
-                default_factory=list,
+                default_factory=lambda: list[bool](),
                 description="Normalized list of boolean values",
             )
 
@@ -1001,7 +1001,7 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Tap adapter instance",
             )
             streams: list[FlextMeltanoModels.Meltano.StreamInfo] = Field(
-                default_factory=list,
+                default_factory=lambda: list[FlextMeltanoModels.Meltano.StreamInfo](),
                 description="Available streams",
             )
             status: str = Field(
@@ -1390,7 +1390,9 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Singer stream schema payload",
             )
             metadata: list[FlextMeltanoModels.Meltano.SingerCatalogMetadata] = Field(
-                default_factory=list,
+                default_factory=lambda: list[
+                    FlextMeltanoModels.Meltano.SingerCatalogMetadata
+                ](),
                 description="Singer stream metadata blocks",
             )
             key_properties: list[str] = Field(
@@ -1432,7 +1434,9 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Singer catalog message discriminator",
             )
             streams: list[FlextMeltanoModels.Meltano.SingerCatalogEntry] = Field(
-                default_factory=list,
+                default_factory=lambda: list[
+                    FlextMeltanoModels.Meltano.SingerCatalogEntry
+                ](),
                 description="Singer catalog stream entries",
             )
 
@@ -1573,7 +1577,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Typed record batch payload used by API load flow."""
 
             records: list[dict[str, t.JsonValue]] = Field(
-                default_factory=list,
+                default_factory=lambda: list[dict[str, t.JsonValue]](),
                 description="Normalized record payloads",
             )
 
@@ -1696,8 +1700,10 @@ class FlextMeltanoModels(FlextCliModels):
                         result: dict[str, t.JsonValue] = {}
                         for k, v in value.items():
                             # Type narrowing for JSON-serializable primitives
-                            if isinstance(v, (str, int, float, bool, type(None))):
+                            if isinstance(v, (str, int, float, bool)):
                                 result[str(k)] = v
+                            elif v is None:
+                                result[str(k)] = ""
                             elif isinstance(v, (list, dict)):
                                 result[str(k)] = str(v)
                         return result

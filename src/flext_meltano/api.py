@@ -232,8 +232,7 @@ class FlextMeltano(s[t.JsonValue]):
                 validation_result.error or "Validation failed"
             )
         args = validation_result.value
-        build_result = _build_pipeline_config(*args)
-        return build_result
+        return _build_pipeline_config(*args)
 
     def create_project(
         self, project_name: str, project_dir: str | None = None
@@ -243,10 +242,18 @@ class FlextMeltano(s[t.JsonValue]):
             return r[t.Meltano.MeltanoConfigDict].fail("Project name cannot be empty")
         try:
             adapter = FlextMeltanoAdapter.ProjectAdapter()
-            return adapter.create_project(
+            result = adapter.create_project(
                 project_name=project_name,
                 project_dir=Path(project_dir) if project_dir else Path.cwd(),
             )
+            if result.is_failure:
+                return r[t.Meltano.MeltanoConfigDict].fail(
+                    result.error or "Failed to create project"
+                )
+            normalized = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": result.value
+            }).values
+            return r[t.Meltano.MeltanoConfigDict].ok(normalized)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(f"Failed to create project: {e}")
 
@@ -396,7 +403,7 @@ class FlextMeltano(s[t.JsonValue]):
                 f"Invalid plugin name format: {plugin_name}"
             )
         try:
-            plugin_config: t.JsonValue = {
+            plugin_config: t.Meltano.MeltanoConfigDict = {
                 "name": plugin_name,
                 "namespace": plugin_name.replace("-", "_"),
                 "pip_url": f"pipelinewise-{plugin_name}",

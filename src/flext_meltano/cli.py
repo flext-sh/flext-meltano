@@ -14,7 +14,7 @@ import sys
 from typing import Protocol
 
 from flext_cli import FlextCli
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger
 
 from flext_meltano import (
     FlextMeltano,
@@ -35,7 +35,7 @@ from flext_meltano.cli_managers import (
 class _OutputProtocol(Protocol):
     """Protocol for CLI output with print_message method."""
 
-    def print_message(self, message: str, style: str | None = None) -> r[bool]: ...
+    def print_message(self, message: str, style: str | None = None) -> None: ...
 
 
 class FlextMeltanoCLI:

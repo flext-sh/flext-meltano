@@ -22,6 +22,9 @@ from typing import Protocol
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
+from flext_meltano.models import m
+from flext_meltano.typings import t
+
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
 _PIPELINE_CONFIG_FILE = "pipeline.json"
 _PIPELINE_PID_FILE = "pipeline.pid"
@@ -90,17 +93,22 @@ def execute_pipeline(
     config_path = _pipeline_config_path(pipeline_name)
     if config_path.exists():
         try:
-            config_payload = json.loads(config_path.read_text(encoding="utf-8"))
+            config_payload_raw: t.ContainerValue = json.loads(
+                config_path.read_text(encoding="utf-8")
+            )
         except (json.JSONDecodeError, OSError) as exc:
             return r[str].fail(
                 f"Failed to read pipeline '{pipeline_name}' configuration: {exc}"
             )
-        if isinstance(config_payload, dict):
-            command_value = config_payload.get("command")
-            if isinstance(command_value, list) and all(
-                isinstance(value, str) for value in command_value
-            ):
-                configured_command = command_value
+        if isinstance(config_payload_raw, dict):
+            validated_payload = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": config_payload_raw
+            }).values
+            command_value = validated_payload.get("command")
+            if isinstance(command_value, list):
+                configured_command = m.Meltano.StringListValue.model_validate({
+                    "items": command_value
+                }).items
     meltano_args = command_args or configured_command
     if not meltano_args:
         return r[str].fail("Pipeline execution not configured")
@@ -380,15 +388,17 @@ class FlextMeltanoPipelineManager:
                 "Pipeline creation requires pipeline name and JSON configuration"
             )
         pipeline_name = _args[0]
-        config_payload: dict[str, object] | None = None
+        config_payload: t.Meltano.MeltanoConfigDict | None = None
         if len(_args) >= _MIN_ARGS_WITH_CONFIG:
             try:
-                parsed = json.loads(_args[1])
+                parsed: t.ContainerValue = json.loads(_args[1])
             except json.JSONDecodeError as exc:
                 return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
             if not isinstance(parsed, dict):
                 return r[None].fail("Pipeline configuration must be a JSON object")
-            config_payload = parsed
+            config_payload = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": parsed
+            }).values
         result = create_pipeline(pipeline_name, config_payload)
         if result.is_failure:
             return r[None].fail(result.error)

@@ -2,7 +2,7 @@
 
 This module provides the FlextMeltanoComponentService class following FLEXT patterns:
 - Single Responsibility Principle
-- Railway-oriented programming with FlextResult
+- Railway-oriented programming with r
 - Clean Architecture with domain separation
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -15,25 +15,17 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TypeGuard, override
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
 from flext_meltano import (
-    FlextMeltanoAbstractions,
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
     FlextMeltanoProjectService,
-    FlextMeltanoProtocols,
     FlextMeltanoSettings,
-    FlextMeltanoTypes,
+    m,
+    p,
+    t,
     u,
 )
-
-c = FlextMeltanoConstants
-t = FlextMeltanoTypes
-p = FlextMeltanoProtocols
-r = FlextResult
-m = FlextMeltanoModels
-s = FlextService
+from flext_meltano.abstractions import FlextMeltanoAbstractions
 
 
 def _is_meltano_project(value: t.ContainerValue) -> TypeGuard[p.Meltano.Project]:
@@ -48,13 +40,10 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     FLEXT patterns with railway-oriented programming.
     """
 
-    _abstractions: FlextMeltanoAbstractions
-
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
         super().__init__()
         self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
-        self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> r[str]:
@@ -71,7 +60,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     ) -> r[Mapping[str, str]]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
-        Uses FlextResult.chain_validations() to compose plugin addition steps
+        Uses r.chain_validations() to compose plugin addition steps
         with automatic error accumulation and early termination on failure.
 
         Args:
@@ -80,7 +69,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         plugin_name: Name of the plugin to add
 
         Returns:
-        FlextResult containing plugin addition information
+        r containing plugin addition information
 
         """
         return (
@@ -106,7 +95,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         project: Optional Project instance (creates temporary if None)
 
         Returns:
-        FlextResult containing list of discovered plugins with metadata
+        r containing list of discovered plugins with metadata
 
         """
         try:
@@ -129,7 +118,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                         "Temporary project does not satisfy Project"
                     )
                 working_project = temp_project
-            plugins = []
+            plugins: list[Mapping[str, str]] = []
 
             def build_plugin_info(
                 plugin_name: str,
@@ -155,21 +144,26 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                     constructed
                 ).model_dump()
 
-            extractors_result = self._abstractions.get_plugins_of_type(
-                working_project, "extractors"
+            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+            extractors_result: r[Mapping[str, t.Meltano.PluginDefinition]] = (
+                abstractions.get_plugins_of_type(working_project, "extractors")
             )
             if extractors_result.is_success:
-                extractors_dict = extractors_result.value
+                extractors_dict: Mapping[str, t.Meltano.PluginDefinition] = (
+                    extractors_result.value
+                )
                 max_extractors = 10
                 for idx, (k, v) in enumerate(extractors_dict.items()):
                     if idx >= max_extractors:
                         break
                     plugins.append(build_plugin_info(k, v, "extractor"))
-            loaders_result = self._abstractions.get_plugins_of_type(
-                working_project, "loaders"
+            loaders_result: r[Mapping[str, t.Meltano.PluginDefinition]] = (
+                abstractions.get_plugins_of_type(working_project, "loaders")
             )
             if loaders_result.is_success:
-                loaders_dict = loaders_result.value
+                loaders_dict: Mapping[str, t.Meltano.PluginDefinition] = (
+                    loaders_result.value
+                )
                 max_loaders = 5
                 for idx, (k, v) in enumerate(loaders_dict.items()):
                     if idx >= max_loaders:
@@ -187,7 +181,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         """Execute the pipeline component service.
 
         Returns:
-        FlextResult containing plugin service configuration and status.
+        r containing plugin service configuration and status.
 
         """
         try:
@@ -215,7 +209,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         plugin_type: Type of the plugin
 
         Returns:
-        FlextResult containing plugin information
+        r containing plugin information
 
         """
 
@@ -259,8 +253,9 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 return r[Mapping[str, str]].fail(
                     "Temporary project does not satisfy Project"
                 )
-            plugins_result = self._abstractions.get_plugins_of_type(
-                temp_project, plugin_type
+            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+            plugins_result: r[Mapping[str, t.Meltano.PluginDefinition]] = (
+                abstractions.get_plugins_of_type(temp_project, plugin_type)
             )
             if plugins_result.is_failure:
                 return r[Mapping[str, str]].fail(
@@ -299,7 +294,8 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 "plugin_type": plugin_type_str,
                 "plugin_name": plugin_name,
             }
-            add_result = self._abstractions.add_plugin(plugin_config)
+            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+            add_result: r[bool] = abstractions.add_plugin(plugin_config)
             if add_result.is_failure:
                 error_msg = add_result.error or "Plugin addition failed"
                 return r[bool].fail(error_msg)

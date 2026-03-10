@@ -43,12 +43,16 @@ class FlextMeltanoFileManagers:
         r indicating success or failure of the cleanup operation.
 
         """
-        try:
+
+        def _cleanup() -> bool:
             if temp_path.exists() and temp_path.is_dir():
                 shutil.rmtree(temp_path)
-            return r[bool].ok(value=True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[bool].fail(f"Failed to cleanup temp directory: {e}")
+            return True
+
+        return u.try_(
+            _cleanup,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(lambda e: f"Failed to cleanup temp directory: {e}")
 
     @classmethod
     def create_directory_structure(
@@ -60,15 +64,19 @@ class FlextMeltanoFileManagers:
         r containing the created directory structure information.
 
         """
-        try:
+
+        def _create_dirs() -> Mapping[str, str]:
             created_paths: dict[str, str] = {}
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = str(dir_path)
-            return r[Mapping[str, str]].ok(created_paths)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, str]].fail(f"Failed to create directories: {e}")
+            return created_paths
+
+        return u.try_(
+            _create_dirs,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(lambda e: f"Failed to create directories: {e}")
 
     @classmethod
     def create_temp_directory(cls, prefix: str = "flext_meltano_") -> r[Path]:

@@ -107,7 +107,7 @@ class FlextMeltanoBridge:
             )
             result: t.Meltano.Bridge.BridgeStatus = {
                 "command": command,
-                "args": args_dict,
+                "args": str(args_dict),
                 "status": "executed",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }

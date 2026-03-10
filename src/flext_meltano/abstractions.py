@@ -61,8 +61,8 @@ class FlextMeltanoAbstractions:
             try:
                 result: t.Meltano.ELT.PipelineResult = {
                     "status": "completed",
-                    "source": u.get(source_config, "name", default="unknown"),
-                    "sink": u.get(sink_config, "name", default="unknown"),
+                    "source": str(u.get(source_config, "name", default="unknown")),
+                    "sink": str(u.get(sink_config, "name", default="unknown")),
                     "records_processed": 0,
                 }
                 return r[t.Meltano.ELT.PipelineResult].ok(result)
@@ -140,7 +140,7 @@ class FlextMeltanoAbstractions:
             result: t.Meltano.ELT.PipelineResult = {
                 "status": "completed",
                 "records_processed": 0,
-                "elt_context": elt_context,
+                "elt_context": str(elt_context),
             }
             return r[t.Meltano.ELT.PipelineResult].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

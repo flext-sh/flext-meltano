@@ -34,7 +34,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     """
 
     ProjectInfo: ClassVar[type[dict[str, t.JsonValue]]] = dict
-    _metadata_extra: dict[str, str] = PrivateAttr(default_factory=dict)
+    _metadata_extra: dict[str, str] = PrivateAttr(
+        default_factory=lambda: dict[str, str](),
+    )
     _sealed: bool = PrivateAttr(default=False)
 
     def __init__(self, root: Path | None = None) -> None:
@@ -47,8 +49,6 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         super().__init__()
         self.project_root: Path | None = root
         self.project: MeltanoProject | None = None
-        self._metadata_extra: dict[str, str] = {}
-        self._sealed: bool = False
 
     @override
     def execute(

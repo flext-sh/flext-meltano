@@ -15,23 +15,15 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 
-from flext_core import FlextResult, FlextService
+from flext_core import r, s
 
 from flext_meltano import (
-    FlextMeltanoAbstractions,
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
-    FlextMeltanoProtocols,
     FlextMeltanoSettings,
-    FlextMeltanoTypes,
+    m,
+    p,
+    t,
 )
-
-r = FlextResult
-s = FlextService
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-p = FlextMeltanoProtocols
+from flext_meltano.abstractions import FlextMeltanoAbstractions
 
 
 class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
@@ -161,8 +153,11 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             }
             extractor_plugin_obj = plugins[0]
             loader_plugin_obj = plugins[1]
-            execution_result = self._abstractions.execute_singer_pipeline(
-                elt_context_obj, extractor_plugin_obj, loader_plugin_obj
+            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+            execution_result: r[t.Meltano.ELT.PipelineResult] = (
+                abstractions.execute_singer_pipeline(
+                    elt_context_obj, extractor_plugin_obj, loader_plugin_obj
+                )
             )
             if execution_result.is_failure:
                 return r[t.Meltano.ExecutionResultDict].fail(
@@ -186,7 +181,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             )
 
     def _execute_singer_runner(
-        self, context_data: t.Meltano.RunContextDict
+        self, context_data: t.Meltano.ExecutionResultDict
     ) -> r[Mapping[str, t.JsonValue]]:
         """Execute Singer runner with context data."""
         try:
@@ -202,7 +197,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         self.logger.info(
             "Executing ELT pipeline", extractor=extractor_name, loader=loader_name
         )
-        return r.ok(None)
+        return r[None].ok(None)
 
 
 __all__ = ["FlextMeltanoOrchestrationService"]

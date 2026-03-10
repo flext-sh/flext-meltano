@@ -88,14 +88,14 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
                 "target_name": target_name,
                 "execution_time": execution_result.execution_time,
                 "exit_code": execution_result.exit_code,
-                "output": execution_result.output,
-                "error": execution_result.error,
+                "output": execution_result.output or "",
+                "error": execution_result.error or "",
             }
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
                 if dbt_result.is_failure:
                     elt_result["dbt_success"] = False
-                    elt_result["dbt_error"] = dbt_result.error
+                    elt_result["dbt_error"] = dbt_result.error or ""
                 else:
                     elt_result["dbt_success"] = True
                     elt_result["dbt_models_run"] = list(dbt_models)
@@ -119,7 +119,7 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
 
         """
         try:
-            args = []
+            args: list[str] = []
             if models:
                 args.extend(["--models"] + models)
             result = self._executor.execute_dbt_command("run", args)
@@ -133,10 +133,10 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
                 "exit_code": execution_result.exit_code,
                 "models_run": models or ["all"],
                 "execution_method": "library_runner",
-                "project_dir": str(project_dir) if project_dir else None,
+                "project_dir": str(project_dir) if project_dir else "",
                 "execution_time": execution_result.execution_time,
-                "output": execution_result.output,
-                "error": execution_result.error,
+                "output": execution_result.output or "",
+                "error": execution_result.error or "",
             }
             return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
