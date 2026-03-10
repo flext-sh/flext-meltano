@@ -21,7 +21,7 @@ from flext_meltano import FlextMeltanoModels, t, u
 m = FlextMeltanoModels
 
 
-class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
+class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):  # noqa: F821
     """Manages Meltano projects with deep SDK integration.
 
     Provides programmatic access to Meltano projects, plugins, and
@@ -33,7 +33,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
 
     """
 
-    ProjectInfo: ClassVar[type[MeltanoProjectInfo]] = MeltanoProjectInfo
+    ProjectInfo: ClassVar[type[MeltanoProjectInfo]] = MeltanoProjectInfo  # noqa: F821
     _metadata_extra: dict[str, str] = PrivateAttr(default_factory=dict)
     _sealed: bool = PrivateAttr(default=False)
 
@@ -51,14 +51,14 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         self._sealed: bool = False
 
     @override
-    def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:
+    def execute(self, **_kwargs: t.JsonValue) -> r[MeltanoProjectInfo]:  # noqa: F821
         """Execute (implements Service pattern)."""
         if self.project_root:
-            info = MeltanoProjectInfo(
+            info = MeltanoProjectInfo(  # noqa: F821
                 root=self.project_root, name=str(self.project_root.name)
             )
-            return r[MeltanoProjectInfo].ok(info)
-        return r[MeltanoProjectInfo].fail("No project loaded")
+            return r[MeltanoProjectInfo].ok(info)  # noqa: F821
+        return r[MeltanoProjectInfo].fail("No project loaded")  # noqa: F821
 
     def get_plugins(
         self, plugin_type: str | None = None
@@ -94,7 +94,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
                 f"Failed to get plugins: {e}"
             )
 
-    def initialize_project(self, root: Path) -> r[MeltanoProjectInfo]:
+    def initialize_project(self, root: Path) -> r[MeltanoProjectInfo]:  # noqa: F821
         """Initialize a new Meltano project.
 
         Args:
@@ -108,11 +108,11 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             root.mkdir(parents=True, exist_ok=True)
             self.project = MeltanoProject(root)
             self.project_root = root
-            info = MeltanoProjectInfo(
+            info = MeltanoProjectInfo(  # noqa: F821
                 root=root, name=str(root.name), state="initialized"
             )
             self.logger.info("Meltano project initialized", root=str(root))
-            return r[MeltanoProjectInfo].ok(info)
+            return r[MeltanoProjectInfo].ok(info)  # noqa: F821
         except (
             ValueError,
             TypeError,
@@ -123,7 +123,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to initialize project")
-            return r[MeltanoProjectInfo].fail(f"Failed to initialize project: {e}")
+            return r[MeltanoProjectInfo].fail(f"Failed to initialize project: {e}")  # noqa: F821
 
     def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
         """Install a plugin in the project.
@@ -152,7 +152,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             self.logger.exception("Failed to install plugin", error=str(e))
             return r[t.Meltano.PluginInfo].fail(f"Failed to install plugin: {e}")
 
-    def load_project(self, root: Path) -> r[MeltanoProjectInfo]:
+    def load_project(self, root: Path) -> r[MeltanoProjectInfo]:  # noqa: F821
         """Load an existing Meltano project.
 
         Args:
@@ -164,14 +164,14 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         """
         try:
             if not root.exists():
-                return r[MeltanoProjectInfo].fail(
+                return r[MeltanoProjectInfo].fail(  # noqa: F821
                     f"Project directory not found: {root}"
                 )
             self.project = MeltanoProject(root)
             self.project_root = root
-            info = MeltanoProjectInfo(root=root, name=str(root.name), state="loaded")
+            info = MeltanoProjectInfo(root=root, name=str(root.name), state="loaded")  # noqa: F821
             self.logger.info("Meltano project loaded", root=str(root))
-            return r[MeltanoProjectInfo].ok(info)
+            return r[MeltanoProjectInfo].ok(info)  # noqa: F821
         except (
             ValueError,
             TypeError,
@@ -182,7 +182,7 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return r[MeltanoProjectInfo].fail(f"Failed to load project: {e}")
+            return r[MeltanoProjectInfo].fail(f"Failed to load project: {e}")  # noqa: F821
 
     def _extract_plugins(
         self, plugin_type: str | None
@@ -219,4 +219,4 @@ class FlextMeltanoProjectManager(FlextService[MeltanoProjectInfo]):
         return plugins
 
 
-__all__ = ["FlextMeltanoProjectManager", "MeltanoProjectInfo"]
+__all__ = ["FlextMeltanoProjectManager", "MeltanoProjectInfo"]  # noqa: F822

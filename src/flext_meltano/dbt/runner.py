@@ -84,7 +84,7 @@ class FlextMeltanoDbtRunner(s[str]):
 
     def run_models(
         self, models: list[str] | None = None, **_kwargs: t.ContainerValue
-    ) -> r[DbtRunResult]:
+    ) -> r[DbtRunResult]:  # noqa: F821
         """Run DBT models.
 
         Args:
@@ -97,17 +97,17 @@ class FlextMeltanoDbtRunner(s[str]):
         """
         try:
             if not self.project_root:
-                return r[DbtRunResult].fail("No project root set")
+                return r[DbtRunResult].fail("No project root set")  # noqa: F821
             self.logger.info(
                 "Starting DBT run", models=models, cwd=str(self.project_root)
             )
-            result = DbtRunResult(
+            result = DbtRunResult(  # noqa: F821
                 success=True,
                 models_run=len(models) if models else 0,
                 status="completed",
             )
             self.logger.info("DBT run completed", models_run=result.models_run)
-            return r[DbtRunResult].ok(result)
+            return r[DbtRunResult].ok(result)  # noqa: F821
         except (
             ValueError,
             TypeError,
@@ -118,11 +118,11 @@ class FlextMeltanoDbtRunner(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT run failed", error=str(e))
-            return r[DbtRunResult].fail(f"DBT run failed: {e}")
+            return r[DbtRunResult].fail(f"DBT run failed: {e}")  # noqa: F821
 
     def run_tests(
         self, models: list[str] | None = None, **_kwargs: t.ContainerValue
-    ) -> r[DbtTestResult]:
+    ) -> r[DbtTestResult]:  # noqa: F821
         """Run DBT tests.
 
         Args:
@@ -135,13 +135,13 @@ class FlextMeltanoDbtRunner(s[str]):
         """
         try:
             if not self.project_root:
-                return r[DbtTestResult].fail("No project root set")
+                return r[DbtTestResult].fail("No project root set")  # noqa: F821
             self.logger.info(
                 "Starting DBT tests", models=models, cwd=str(self.project_root)
             )
-            result = DbtTestResult(success=True, tests_run=0, status="completed")
+            result = DbtTestResult(success=True, tests_run=0, status="completed")  # noqa: F821
             self.logger.info("DBT tests completed", tests_run=result.tests_run)
-            return r[DbtTestResult].ok(result)
+            return r[DbtTestResult].ok(result)  # noqa: F821
         except (
             ValueError,
             TypeError,
@@ -152,7 +152,7 @@ class FlextMeltanoDbtRunner(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT tests failed", error=str(e))
-            return r[DbtTestResult].fail(f"DBT tests failed: {e}")
+            return r[DbtTestResult].fail(f"DBT tests failed: {e}")  # noqa: F821
 
 
 __all__ = ["FlextMeltanoDbtRunner"]

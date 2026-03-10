@@ -207,7 +207,7 @@ class TestFlextMeltanoDataOperations:
     def test_load_data_with_records(self) -> None:
         """Test data loading with actual records."""
         api = FlextMeltano()
-        import typing
+        import typing  # noqa: PLC0415
 
         records = typing.cast("list[t.JsonValue]", [{"id": 1, "name": "test"}])
         result = api.load_data(sink_name="target-jsonl", records=records)
