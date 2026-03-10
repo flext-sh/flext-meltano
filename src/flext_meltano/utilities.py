@@ -12,7 +12,7 @@ from typing import TextIO
 
 import yaml
 from flext_cli import FlextCliUtilities
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger, FlextUtilities, r
 
 from flext_meltano import FlextMeltanoFileManagers, c, m, t
 
@@ -60,26 +60,27 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             r containing file handle or error.
 
             """
-            try:
+
+            def open_file() -> TextIO:
                 target_path.parent.mkdir(parents=True, exist_ok=True)
-                file_handle = target_path.open(
-                    "w", encoding=c.Utilities.DEFAULT_ENCODING
-                )
-                return r[TextIO].ok(file_handle)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
-                return r[TextIO].fail(f"Failed to open file for writing: {err}")
+                return target_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING)
+
+            return FlextUtilities.try_(
+                open_file,
+                catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            ).map_error(lambda e: f"Failed to open file for writing: {e}")
 
         @classmethod
         def _validate_yaml_path(cls, path: Path) -> r[Path]:
             """Validate YAML file path before loading."""
             if not path.exists():
-                return r.fail(f"File does not exist: {path}")
+                return r[Path].fail(f"File does not exist: {path}")
             if not path.is_file():
-                return r.fail(f"Path is not a file: {path}")
+                return r[Path].fail(f"Path is not a file: {path}")
             suffix = u.Conversion.normalize(path.suffix, case="lower")
             if suffix not in {".yml", ".yaml"}:
-                return r.fail(f"File is not a YAML file: {path}")
-            return r.ok(path)
+                return r[Path].fail(f"File is not a YAML file: {path}")
+            return r[Path].ok(path)
 
         @classmethod
         def _write_yaml_content(
@@ -280,9 +281,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             """Save content to YAML file."""
             result = cls.write_meltano_yml(content, file_path)
             return (
-                r.ok(file_path)
+                r[Path].ok(file_path)
                 if result.is_success
-                else r.fail(result.error or "Failed to save YAML file")
+                else r[Path].fail(result.error or "Failed to save YAML file")
             )
 
         @classmethod
@@ -305,7 +306,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             """
 
             def write_operation(
-                _unused_value: t.JsonValue, file_handle: TextIO, /
+                _unused_value: t.ContainerValue, file_handle: TextIO, /
             ) -> r[bool]:
                 return cls._write_yaml_content(file_handle, config)
 
@@ -350,26 +351,32 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             file_path: Path, content: str | t.Meltano.MeltanoConfigDict
         ) -> r[Path]:
             """Create a project file with content."""
-            content_guard = u.guard(content, (str, dict), return_value=True)
+            content_guard = FlextUtilities.guard(
+                content, (str, dict), return_value=True
+            )
             if content_guard is None:
-                return r.fail("Invalid content type: must be string or dict")
-            try:
+                return r[Path].fail("Invalid content type: must be string or dict")
+
+            def create_file() -> Path:
                 file_path.parent.mkdir(parents=True, exist_ok=True)
                 content_str = m.Meltano.FileContentPayload.model_validate({
                     "content": content_guard
                 }).content
-                _ = file_path.write_text(content_str, encoding="utf-8")
-                return r.ok(file_path)
-            except (OSError, ValueError, yaml.YAMLError) as err:
-                return r.fail(f"Failed to create project file: {err}")
+                file_path.write_text(content_str, encoding="utf-8")
+                return file_path
+
+            return FlextUtilities.try_(
+                create_file,
+                catch=(OSError, ValueError, yaml.YAMLError),
+            ).map_error(lambda e: f"Failed to create project file: {e}")
 
         @staticmethod
         def directory_exists(path: Path) -> r[bool]:
             """Check if directory exists."""
-            try:
-                return r.ok(path.exists() and path.is_dir())
-            except (OSError, ValueError) as err:
-                return r.fail(f"Failed to check directory existence: {err}")
+            return FlextUtilities.try_(
+                lambda: path.exists() and path.is_dir(),
+                catch=(OSError, ValueError),
+            ).map_error(lambda e: f"Failed to check directory existence: {e}")
 
         @staticmethod
         def supported_types() -> list[str]:
@@ -384,7 +391,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             """Validate Meltano project structure."""
             try:
                 if not project_path.exists():
-                    return r.fail(f"Project path does not exist: {project_path}")
+                    return r[bool].fail(f"Project path does not exist: {project_path}")
                 meltano_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
                 fallback_file = project_path / "meltano.yml"
                 config_file = (
@@ -395,10 +402,10 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     else None
                 )
                 if config_file:
-                    return r.ok(True)
-                return r.fail(f"Meltano config file not found: {meltano_file}")
+                    return r[bool].ok(True)
+                return r[bool].fail(f"Meltano config file not found: {meltano_file}")
             except (OSError, ValueError) as err:
-                return r.fail(f"Failed to validate project structure: {err}")
+                return r[bool].fail(f"Failed to validate project structure: {err}")
 
 
 u = FlextMeltanoUtilities
