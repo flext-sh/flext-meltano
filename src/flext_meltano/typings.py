@@ -214,7 +214,7 @@ class FlextMeltanoTypes(FlextCliTypes):
         type PluginList = list[str]
         type PluginNameList = list[str]
         type PluginTypeList = list[str]
-        type ExecutionResultDict = dict[str, FlextTypes.ContainerValue]
+        type ExecutionResultDict = dict[str, FlextTypes.JsonValue]
         type ExecutionStatusDict = dict[str, str]
         type RuntimeConfigDict = dict[str, FlextTypes.ContainerValue]
         type SingerRecordDict = dict[str, FlextTypes.JsonValue]

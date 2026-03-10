@@ -83,21 +83,21 @@ class FlextMeltanoFileManagers:
         """
         logger = FlextLogger(__name__)
 
-        def _create() -> r[Path]:
+        def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
             logger.info("Created temporary directory: %s", temp_dir)
-            return r[Path].ok(temp_dir)
+            return temp_dir
 
-        result = u.try_(
+        result = u.try_[Path](
             _create,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
             default=None,
         )
-        if result is None:
-            error_msg = "Failed to create temp directory"
-            logger.error(error_msg)
-            return r[Path].fail(error_msg)
-        return result
+        return result.lash(
+            lambda error: r[Path].fail(
+                f"Failed to create temp directory: {error}",
+            )
+        )
 
     @classmethod
     def load_yaml_config(cls, file_path: Path) -> r[t.Meltano.FileConfigDict]:
@@ -111,25 +111,27 @@ class FlextMeltanoFileManagers:
 
         """
 
-        def _load() -> r[t.Meltano.FileConfigDict]:
+        def _load() -> t.Meltano.FileConfigDict:
             if not u.Guards.is_string_non_empty(str(file_path)):
-                return r[t.Meltano.FileConfigDict].fail(
-                    f"Invalid YAML file path: {file_path}"
+                msg = f"Invalid YAML file path: {file_path}"
+                raise ValueError(
+                    msg,
                 )
             if not file_path.exists():
-                return r[t.Meltano.FileConfigDict].fail(
-                    f"YAML file not found: {file_path}"
+                msg = f"YAML file not found: {file_path}"
+                raise FileNotFoundError(
+                    msg,
                 )
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 config_data: t.ContainerValue = yaml.safe_load(f)
             if config_data is None:
-                return r[t.Meltano.FileConfigDict].ok({})
+                return {}
             validated_config = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data
             }).values
-            return r[t.Meltano.FileConfigDict].ok(validated_config)
+            return validated_config
 
-        result = u.try_(
+        result = u.try_[t.Meltano.FileConfigDict](
             _load,
             catch=(
                 yaml.YAMLError,
@@ -141,9 +143,11 @@ class FlextMeltanoFileManagers:
             ),
             default=None,
         )
-        if result is None:
-            return r[t.Meltano.FileConfigDict].fail("Failed to load YAML config")
-        return result
+        return result.lash(
+            lambda error: r[t.Meltano.FileConfigDict].fail(
+                f"Failed to load YAML config: {error}",
+            )
+        )
 
     @classmethod
     def save_yaml_config(
@@ -158,22 +162,22 @@ class FlextMeltanoFileManagers:
 
         """
 
-        def _save() -> r[bool]:
+        def _save() -> bool:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.dump(
                     config, f, indent=2, default_flow_style=False, sort_keys=False
                 )
-            return r[bool].ok(value=True)
+            return True
 
-        result = u.try_(
+        result = u.try_[bool](
             _save,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
             default=None,
         )
-        if result is None:
-            return r[bool].fail("Failed to save YAML config")
-        return result
+        return result.lash(
+            lambda error: r[bool].fail(f"Failed to save YAML config: {error}")
+        )
 
     @classmethod
     def setup_project_structure(

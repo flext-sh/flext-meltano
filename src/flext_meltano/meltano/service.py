@@ -21,7 +21,7 @@ from flext_meltano import (
     FlextMeltanoTypes,
     u,
 )
-from flext_meltano.meltano.project import FlextMeltanoProjectManager, MeltanoProjectInfo
+from flext_meltano.meltano.project import FlextMeltanoProjectManager
 
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
@@ -61,7 +61,7 @@ class FlextMeltanoMeltanoService(s[str]):
         super().__init__()
         self.project_manager = FlextMeltanoProjectManager()
 
-    def create_project(self, root: Path) -> r[MeltanoProjectInfo]:
+    def create_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Create a new Meltano project.
 
         Args:
@@ -87,7 +87,9 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to create project", error=str(e))
-            return r[MeltanoProjectInfo].fail(f"Failed to create project: {e}")
+            return r[t.Meltano.Project.ProjectMetadata].fail(
+                f"Failed to create project: {e}"
+            )
 
     def discover_plugins(
         self, plugin_type: str | None = None
@@ -130,7 +132,7 @@ class FlextMeltanoMeltanoService(s[str]):
 
     def execute_pipeline(
         self, config: FlextMeltanoMeltanoService.PipelineConfig
-    ) -> r[FlextMeltanoMeltanoService.PipelineResult]:
+    ) -> r[t.Meltano.ELT.PipelineResult]:
         """Execute a Meltano pipeline.
 
         Args:
@@ -144,14 +146,14 @@ class FlextMeltanoMeltanoService(s[str]):
             self.logger.info("Executing Meltano pipeline", run_config=config.run_config)
             project_result = self.project_manager.load_project(config.project_root)
             if project_result.is_failure:
-                return r[FlextMeltanoMeltanoService.PipelineResult].fail(
-                    project_result.error
-                )
-            result = FlextMeltanoMeltanoService.PipelineResult(
-                success=True, status="completed", exit_code=0
-            )
-            self.logger.info("Meltano pipeline executed", status=result.status)
-            return r[FlextMeltanoMeltanoService.PipelineResult].ok(result)
+                return r[t.Meltano.ELT.PipelineResult].fail(project_result.error)
+            result: t.Meltano.ELT.PipelineResult = {
+                "success": True,
+                "status": "completed",
+                "exit_code": 0,
+            }
+            self.logger.info("Meltano pipeline executed", status=result["status"])
+            return r[t.Meltano.ELT.PipelineResult].ok(result)
         except (
             ValueError,
             TypeError,
@@ -162,11 +164,11 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to execute pipeline", error=str(e))
-            return r[FlextMeltanoMeltanoService.PipelineResult].fail(
+            return r[t.Meltano.ELT.PipelineResult].fail(
                 f"Failed to execute pipeline: {e}"
             )
 
-    def load_project(self, root: Path) -> r[MeltanoProjectInfo]:
+    def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Load an existing Meltano project.
 
         Args:
@@ -192,7 +194,9 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return r[MeltanoProjectInfo].fail(f"Failed to load project: {e}")
+            return r[t.Meltano.Project.ProjectMetadata].fail(
+                f"Failed to load project: {e}"
+            )
 
 
 __all__ = ["FlextMeltanoMeltanoService"]

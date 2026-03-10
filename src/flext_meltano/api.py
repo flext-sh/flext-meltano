@@ -135,7 +135,7 @@ class FlextMeltano(s[t.JsonValue]):
         """
         return r[list[t.Meltano.MeltanoConfigDict]].ok([])
 
-    def call(self, operation: str, payload: t.JsonValue) -> r[t.JsonValue]:
+    def call(self, operation: str, payload: t.JsonValue) -> r[t.ContainerValue]:
         """Route operations using dispatch table.
 
         Args:
@@ -146,7 +146,7 @@ class FlextMeltano(s[t.JsonValue]):
             Operation result as JSON value.
 
         """
-        operation_dispatch: dict[str, Callable[[t.JsonValue], r[t.JsonValue]]] = {
+        operation_dispatch: dict[str, Callable[[t.JsonValue], r[t.ContainerValue]]] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,
             "install_plugin": self._handle_install_plugin_call,
@@ -159,7 +159,7 @@ class FlextMeltano(s[t.JsonValue]):
         if operation in operation_dispatch:
             handler = operation_dispatch[operation]
             return handler(payload)
-        return r[t.JsonValue].fail(f"Unknown operation: {operation}")
+        return r[t.ContainerValue].fail(f"Unknown operation: {operation}")
 
     def create_pipeline(
         self,
@@ -204,8 +204,7 @@ class FlextMeltano(s[t.JsonValue]):
         def _build_pipeline_config(
             tap_name: str, target_name: str, config: t.Meltano.MeltanoConfigDict
         ) -> r[t.Meltano.MeltanoConfigDict]:
-
-            def _build() -> r[t.Meltano.MeltanoConfigDict]:
+            try:
                 pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
                 pipeline_config: t.Meltano.MeltanoConfigDict = {
                     "pipeline_id": pipeline_id,
@@ -222,15 +221,10 @@ class FlextMeltano(s[t.JsonValue]):
                     "project_root": str(getattr(self._config, "project_root", ".")),
                 }
                 return r[t.Meltano.MeltanoConfigDict].ok(pipeline_config)
-
-            result = u.try_(
-                _build,
-                catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-                default=None,
-            )
-            if result is None:
-                return r[t.Meltano.MeltanoConfigDict].fail("Pipeline creation failed")
-            return result
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+                return r[t.Meltano.MeltanoConfigDict].fail(
+                    f"Pipeline creation failed: {e}"
+                )
 
         validation_result = _validate_inputs()
         if validation_result.is_failure:
@@ -238,7 +232,8 @@ class FlextMeltano(s[t.JsonValue]):
                 validation_result.error or "Validation failed"
             )
         args = validation_result.value
-        return _build_pipeline_config(*args)
+        build_result = _build_pipeline_config(*args)
+        return build_result
 
     def create_project(
         self, project_name: str, project_dir: str | None = None
@@ -295,7 +290,7 @@ class FlextMeltano(s[t.JsonValue]):
                 "Pipeline ID is required for execution"
             )
 
-        def _execute() -> r[t.Meltano.MeltanoConfigDict]:
+        try:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
             execution_result: t.Meltano.MeltanoConfigDict = {
@@ -307,15 +302,10 @@ class FlextMeltano(s[t.JsonValue]):
                 "api_version": self.version,
             }
             return r[t.Meltano.MeltanoConfigDict].ok(execution_result)
-
-        result = u.try_(
-            _execute,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        if result is None:
-            return r[t.Meltano.MeltanoConfigDict].fail("Pipeline execution failed")
-        return result
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(
+                f"Pipeline execution failed: {e}"
+            )
 
     def extract_data(
         self, source_name: str, config: t.Meltano.MeltanoConfigDict | None = None
@@ -531,7 +521,7 @@ class FlextMeltano(s[t.JsonValue]):
         if not (target_name and target_name.strip()):
             return r[t.Meltano.MeltanoConfigDict].fail("target_name is required")
 
-        def _execute_elt() -> r[t.Meltano.MeltanoConfigDict]:
+        try:
             execution_start = time.time()
             extract_duration = 0.5
             load_duration = 0.3
@@ -555,15 +545,10 @@ class FlextMeltano(s[t.JsonValue]):
                 "api_version": self.version,
             }
             return r[t.Meltano.MeltanoConfigDict].ok(elt_result)
-
-        result = u.try_(
-            _execute_elt,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        if result is None:
-            return r[t.Meltano.MeltanoConfigDict].fail("ELT pipeline execution failed")
-        return result
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(
+                f"ELT pipeline execution failed: {e}"
+            )
 
     def run_tap(self, tap_name: str) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute Singer tap.
@@ -584,7 +569,7 @@ class FlextMeltano(s[t.JsonValue]):
                 f"Invalid tap name format: {tap_name}"
             )
 
-        def _execute_tap() -> r[t.Meltano.MeltanoConfigDict]:
+        try:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
             return r[t.Meltano.MeltanoConfigDict].ok({
@@ -594,15 +579,8 @@ class FlextMeltano(s[t.JsonValue]):
                 "executed_at": str(time.time()),
                 "api_version": self.version,
             })
-
-        result = u.try_(
-            _execute_tap,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        if result is None:
-            return r[t.Meltano.MeltanoConfigDict].fail("Tap execution failed")
-        return result
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
 
     def run_target(self, target_name: str) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute Singer target.
@@ -623,7 +601,7 @@ class FlextMeltano(s[t.JsonValue]):
                 f"Invalid target name format: {target_name}"
             )
 
-        def _execute_target() -> r[t.Meltano.MeltanoConfigDict]:
+        try:
             execution_start = time.time()
             execution_duration = time.time() - execution_start
             return r[t.Meltano.MeltanoConfigDict].ok({
@@ -633,15 +611,8 @@ class FlextMeltano(s[t.JsonValue]):
                 "executed_at": str(time.time()),
                 "api_version": self.version,
             })
-
-        result = u.try_(
-            _execute_target,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-            default=None,
-        )
-        if result is None:
-            return r[t.Meltano.MeltanoConfigDict].fail("Target execution failed")
-        return result
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(f"Target execution failed: {e}")
 
     def test_dbt_models(
         self,
@@ -680,77 +651,81 @@ class FlextMeltano(s[t.JsonValue]):
 
     def _handle_configure_environment_call(
         self, payload: t.JsonValue
-    ) -> r[t.JsonValue]:
+    ) -> r[t.ContainerValue]:
         """Handle configure_environment operation call with model validation."""
         try:
             p = m.Meltano.ConfigureEnvironmentPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.configure_environment(p.environment_name, p.config)
         return result.map(lambda v: v)
 
-    def _handle_create_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_create_pipeline_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
         """Handle create_pipeline operation call with model validation."""
         try:
             p = m.Meltano.CreatePipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.create_pipeline(p.tap_name, p.target_name, p.config or None)
         return result.map(lambda v: v)
 
-    def _handle_execute_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_execute_pipeline_call(
+        self, payload: t.JsonValue
+    ) -> r[t.ContainerValue]:
         """Handle execute_pipeline operation call with model validation."""
         try:
             p = m.Meltano.ExecutePipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.execute_pipeline(p.pipeline_id, p.config)
         return result.map(lambda v: v)
 
-    def _handle_install_plugin_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_install_plugin_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
         """Handle install_plugin operation call with model validation."""
         try:
             p = m.Meltano.InstallPluginPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.install_plugin(p.plugin_type, p.plugin_name, p.config)
         return result.map(lambda v: v)
 
-    def _handle_list_plugins_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_list_plugins_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
         """Handle list_plugins operation call with model validation."""
         try:
             p = m.Meltano.ListPluginsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.list_plugins(p.plugin_type)
         return result.map(lambda v: v)
 
-    def _handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
         """Handle run_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.run_dbt_models(p.models, p.config)
         return result.map(lambda v: v)
 
-    def _handle_run_elt_pipeline_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_run_elt_pipeline_call(
+        self, payload: t.JsonValue
+    ) -> r[t.ContainerValue]:
         """Handle run_elt_pipeline operation call with model validation."""
         try:
             p = m.Meltano.RunEltPipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.run_elt_pipeline(
             p.tap_name, p.target_name, p.dbt_models, p.config
         )
         return result.map(lambda v: v)
 
-    def _handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[t.JsonValue]:
+    def _handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
         """Handle test_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.JsonValue].fail(f"Invalid payload: {e}")
+            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
         result = self.test_dbt_models(p.models, p.config)
         return result.map(lambda v: v)
 

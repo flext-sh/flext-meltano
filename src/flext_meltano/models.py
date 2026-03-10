@@ -2629,6 +2629,62 @@ class FlextMeltanoModels(FlextCliModels):
             models_count: int = Field(default=0, description="Number of models")
             tests_count: int = Field(default=0, description="Number of tests")
 
+        class DbtRunResult(FlextModels.ArbitraryTypesModel):
+            """Result of a DBT model run operation."""
+
+            success: bool = Field(
+                default=True,
+                description="Whether the run was successful",
+            )
+            models_run: int = Field(
+                default=0,
+                description="Number of models executed",
+            )
+            status: str = Field(
+                default="completed",
+                description="Run status (completed, failed, etc.)",
+            )
+            error_message: str | None = Field(
+                default=None,
+                description="Error message if run failed",
+            )
+            execution_time_seconds: float | None = Field(
+                default=None,
+                description="Total execution time in seconds",
+            )
+
+        class DbtTestResult(FlextModels.ArbitraryTypesModel):
+            """Result of a DBT test operation."""
+
+            success: bool = Field(
+                default=True,
+                description="Whether tests passed",
+            )
+            tests_run: int = Field(
+                default=0,
+                description="Number of tests executed",
+            )
+            tests_passed: int = Field(
+                default=0,
+                description="Number of tests passed",
+            )
+            tests_failed: int = Field(
+                default=0,
+                description="Number of tests failed",
+            )
+            status: str = Field(
+                default="completed",
+                description="Test status (completed, failed, etc.)",
+            )
+            error_message: str | None = Field(
+                default=None,
+                description="Error message if tests failed",
+            )
+            execution_time_seconds: float | None = Field(
+                default=None,
+                description="Total execution time in seconds",
+            )
+
 
 # ==========================================================================
 # Model rebuild calls removed to avoid forward reference resolution issues

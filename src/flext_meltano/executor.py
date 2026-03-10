@@ -42,9 +42,6 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
         else:
             self._meltano_config = FlextMeltanoSettings()
         self._bridge = FlextMeltanoBridge()
-        if self.logger is None:
-            error_msg = "Logger initialization failed"
-            raise RuntimeError(error_msg)
 
     @property
     def bridge(self) -> FlextMeltanoBridge:
