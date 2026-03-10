@@ -1,0 +1,29 @@
+src/flext_meltano/dbt/service.py
+  cbe628a55c3d500b 145,173,177,205
+src/flext_meltano/models.py
+  cbe628a55c3d500b 2632-2687
+src/flext_meltano/dbt/runner.py
+  cbe628a55c3d500b 17,87,100,104,110,121,125,138,142,144,146,157
+src/flext_meltano/api.py
+  cbe628a55c3d500b 207,224-226,235-236,293,305,307,524,548,550,572,582-583,604,614-615
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "307bd00a00be42c3f9be408fea2589d78b772522",
+  "prompts": {
+    "cbe628a55c3d500b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32745146fffevu2cbbrJOLrndT",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 116,
+      "total_deletions": 87,
+      "accepted_lines": 95,
+      "overriden_lines": 0
+    }
+  }
+}
