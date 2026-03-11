@@ -1,0 +1,43 @@
+src/flext_meltano/utilities.py
+  5b6dd191b6cb846d 357,359
+src/flext_meltano/singer/tap.py
+  5b6dd191b6cb846d 144,146-147
+  c963d31991094136 119
+src/flext_meltano/settings.py
+  c963d31991094136 26,123
+src/flext_meltano/api.py
+  5b6dd191b6cb846d 61-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "70cade177c3b4e88b0f16968118a0a03b61869ea",
+  "prompts": {
+    "5b6dd191b6cb846d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_326facca1ffeHPlA2nSY0yV9AR",
+        "model": "kimi-for-coding/k2p5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 7,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    },
+    "c963d31991094136": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32797ed69ffeitiORv0NMoXDt9",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 13,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
