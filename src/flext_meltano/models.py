@@ -63,7 +63,7 @@ class FlextMeltanoModels(FlextCliModels):
             )
             checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate(
                 {
-                    "items": checks_result.value if checks_result.is_success else [],
+                    "items": checks_result.value_or([]),
                 },
             ).items
             if checks:
