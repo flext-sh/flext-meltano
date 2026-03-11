@@ -66,7 +66,7 @@ class TestFlextMeltanoExecutionResult:
 
     def test_initialization_with_empty_command(self) -> None:
         """Test initialization with empty command."""
-        command = []
+        command: list[str] = []
         result = FlextMeltanoExecutionResult(
             command=command,
             success=False,
