@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextSettings, c, r, t
+from flext_core import FlextSettings, c, r, t, u
 from pydantic import Field, field_validator
 
 
@@ -107,10 +107,10 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def create_from_project_root(cls, project_root: Path) -> r[FlextMeltanoSettings]:
         """Create settings from a project root path."""
-        try:
-            return r[FlextMeltanoSettings].ok(cls(project_root=str(project_root)))
-        except ValueError as error:
-            return r[FlextMeltanoSettings].fail(str(error))
+        return u.try_(
+            lambda: cls(project_root=str(project_root)),
+            catch=ValueError,
+        ).map_error(lambda e: str(e))
 
     @classmethod
     def create_for_environment(cls, env_type: str) -> FlextMeltanoSettings:

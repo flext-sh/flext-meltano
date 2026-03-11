@@ -71,18 +71,18 @@ class FlextMeltanoBridge:
     @staticmethod
     def get_version() -> r[str]:
         """Get bridge version information."""
-        try:
-            return r[str].ok("1.0.0")
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[str].fail(f"Failed to get version: {e}")
+        return u.try_(
+            lambda: "1.0.0",
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(lambda e: f"Failed to get version: {e}")
 
     @staticmethod
     def validate_connection() -> r[bool]:
         """Validate connection to Go bridge."""
-        try:
-            return r[bool].ok(value=True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[bool].fail(f"Bridge connection validation failed: {e}")
+        return u.try_(
+            lambda: True,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(lambda e: f"Bridge connection validation failed: {e}")
 
 
 __all__ = ["FlextMeltanoBridge"]

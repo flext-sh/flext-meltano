@@ -145,10 +145,10 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
     @staticmethod
     def get_version() -> r[str]:
         """Get version information from Meltano/DBT."""
-        try:
-            return r[str].ok("3.0.0")
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[str].fail(f"Failed to get version: {e}")
+        return u.try_(
+            lambda: "3.0.0",
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(lambda e: f"Failed to get version: {e}")
 
     @staticmethod
     def list_commands() -> r[t.Meltano.ExecutionResultDict]:
@@ -173,12 +173,10 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
     @staticmethod
     def list_plugins() -> r[list[t.Meltano.PluginDefinition]]:
         """List available plugins - delegates to adapter."""
-        try:
-            return r[list[t.Meltano.PluginDefinition]].ok([])
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[t.Meltano.PluginDefinition]].fail(
-                f"Failed to list plugins: {e}"
-            )
+        return u.try_(
+            list,
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(lambda e: f"Failed to list plugins: {e}")
 
     @override
     def execute(self) -> r[t.JsonValue]:
