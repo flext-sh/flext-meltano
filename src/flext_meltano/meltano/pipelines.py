@@ -54,7 +54,15 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         """Execute orchestration service logic."""
         try:
             return r[t.Meltano.MeltanoConfigDict].ok({})
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(f"Orchestration failed: {e}")
 
     def execute_pipeline(

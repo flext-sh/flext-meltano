@@ -37,8 +37,18 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
         """Execute library runner logic."""
         try:
             return r[t.Meltano.ExecutionResultDict].ok({"status": "ready"})
-        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(f"Runner execution failed: {e}")
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            return r[t.Meltano.ExecutionResultDict].fail(
+                f"Runner execution failed: {e}"
+            )
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ExecutionResultDict]:

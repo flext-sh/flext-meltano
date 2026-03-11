@@ -43,7 +43,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
-        self._meltano_config: FlextMeltanoSettings = config if config is not None else FlextMeltanoSettings()
+        self._meltano_config: FlextMeltanoSettings = (
+            config if config is not None else FlextMeltanoSettings()
+        )
         self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
