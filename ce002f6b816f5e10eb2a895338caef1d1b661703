@@ -1,0 +1,88 @@
+src/flext_meltano/cli_managers.py
+  ab9b940cee535f87 249,255,263,274-278
+src/flext_meltano/__version__.py
+  88c6430802612c95 12,15
+src/flext_meltano/singer/tap.py
+  88c6430802612c95 62-63
+src/flext_meltano/models.py
+  085bf50f9799f744 1597,1599,1601-1603
+src/flext_meltano/settings.py
+  e93a413913b0ebf6 8
+src/flext_meltano/utilities.py
+  c963d31991094136 142-144
+  e93a413913b0ebf6 150
+src/flext_meltano/cli.py
+  ab9b940cee535f87 29-31,52-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "ce002f6b816f5e10eb2a895338caef1d1b661703",
+  "prompts": {
+    "085bf50f9799f744": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_325ee6400ffemDFWJ1P5XmyiOm",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 45,
+      "total_deletions": 51,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    },
+    "88c6430802612c95": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32648449affe3vN2XvO9GpDIpx",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 12,
+      "total_deletions": 10,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    },
+    "ab9b940cee535f87": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3265bf7ceffeauFnoTdTrVzFYy",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 21,
+      "total_deletions": 21,
+      "accepted_lines": 18,
+      "overriden_lines": 0
+    },
+    "c963d31991094136": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32797ed69ffeitiORv0NMoXDt9",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 5,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "e93a413913b0ebf6": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_326980a86ffekYMW057MlAO3fe",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 10,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
