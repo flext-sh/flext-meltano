@@ -13,6 +13,7 @@ from __future__ import annotations
 import tempfile
 from collections.abc import Mapping
 from pathlib import Path
+from typing import override
 
 import yaml
 from flext_core import r, s, u
@@ -42,7 +43,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
-        self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
+        self._meltano_config: FlextMeltanoSettings = config if config is not None else FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
@@ -300,6 +301,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
             .flat_map(self._convert_to_project_dict)
         )
 
+    @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute the pipeline project service.
 

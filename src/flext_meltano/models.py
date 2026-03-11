@@ -1594,19 +1594,13 @@ class FlextMeltanoModels(FlextCliModels):
                                     # Type narrowing: convert mapping items to JsonValue
                                     record_dict: dict[str, t.JsonValue] = {}
                                     for key, item in record.items():
-                                        # Only include JSON-serializable values
+                                        # Only include JSON-serializable values (exclude None, BaseModel, Path)
                                         if isinstance(
-                                            item,
-                                            (
-                                                str,
-                                                int,
-                                                float,
-                                                bool,
-                                                type(None),
-                                                list,
-                                                dict,
-                                            ),
+                                            item, (str, int, float, bool, list, dict)
                                         ):
+                                            # Pyright cannot prove list[ContainerValue] ⊆ list[JsonValue]
+                                            # because ContainerValue includes None, BaseModel, Path which are not JsonValue.
+                                            # Runtime check above ensures only JSON-serializable types are included.
                                             record_dict[str(key)] = item  # type: ignore[assignment]
                                     records.append(record_dict)
                                 case _:

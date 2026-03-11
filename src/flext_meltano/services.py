@@ -93,7 +93,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         mapped_sink_name = sink_name or target_name
         mapped_transformation_name = transformation_name or project_name
         super().__init__()
-        self._meltano_config = config or FlextMeltanoSettings()
+        self._meltano_config = config if config is not None else FlextMeltanoSettings()
         self.service_name = service_name
         self.version = version
         if mapped_source_name is not None:

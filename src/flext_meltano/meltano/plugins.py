@@ -43,7 +43,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
         super().__init__()
-        self._meltano_config: FlextMeltanoSettings = config or FlextMeltanoSettings()
+        self._meltano_config: FlextMeltanoSettings = config if config is not None else FlextMeltanoSettings()
 
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> r[str]:

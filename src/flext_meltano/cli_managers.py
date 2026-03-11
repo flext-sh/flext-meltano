@@ -246,13 +246,13 @@ def delete_pipeline(pipeline_name: str) -> r[str]:
     return r[str].ok("deleted")
 
 
-class _ManagerProtocol(Protocol):
+class ManagerProtocol(Protocol):
     """Base manager protocol."""
 
     def handle_command(self, args: list[str]) -> r[None]: ...
 
 
-class _SingerManagerProtocol(Protocol):
+class SingerManagerProtocol(Protocol):
     """Singer manager protocol."""
 
     def handle_tap_command(self, args: list[str]) -> r[None]: ...
@@ -260,7 +260,7 @@ class _SingerManagerProtocol(Protocol):
     def handle_target_command(self, args: list[str]) -> r[None]: ...
 
 
-class _StatusManagerProtocol(Protocol):
+class StatusManagerProtocol(Protocol):
     """Status manager protocol."""
 
     def handle_command(self, args: list[str]) -> r[None]: ...
@@ -271,11 +271,11 @@ class _StatusManagerProtocol(Protocol):
 class _CLIProtocol(Protocol):
     """Minimal CLI protocol for manager composition."""
 
-    pipeline_manager: _ManagerProtocol
-    singer_manager: _SingerManagerProtocol
-    dbt_manager: _ManagerProtocol
-    plugin_manager: _ManagerProtocol
-    status_manager: _StatusManagerProtocol
+    pipeline_manager: ManagerProtocol
+    singer_manager: SingerManagerProtocol
+    dbt_manager: ManagerProtocol
+    plugin_manager: ManagerProtocol
+    status_manager: StatusManagerProtocol
 
     def show_banner(self) -> None: ...
 

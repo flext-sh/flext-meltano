@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
 from flext_core import r, s
 
@@ -30,6 +31,14 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
         super().__init__()
         self._executor = FlextMeltanoExecutor()
         self._bridge = FlextMeltanoBridge()
+
+    @override
+    def execute(self) -> r[t.Meltano.ExecutionResultDict]:
+        """Execute library runner logic."""
+        try:
+            return r[t.Meltano.ExecutionResultDict].ok({"status": "ready"})
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+            return r[t.Meltano.ExecutionResultDict].fail(f"Runner execution failed: {e}")
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ExecutionResultDict]:

@@ -139,12 +139,15 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "values": cfg
                 }).values
                 plugins_val = cfg_dict.get("plugins")
+                plugins_dict: dict[str, t.ContainerValue] = {}
+                if isinstance(plugins_val, dict):
+                    plugins_dict = plugins_val
                 result_cfg: t.Meltano.MeltanoConfigDict = {
                     "version": cfg_dict.get("version", 1),
                     "project_id": u.Text.safe_string(project_id_val),
                     "project_name": u.Text.safe_string(project_name_val),
                     "environments": cfg_dict.get("environments") or default_envs,
-                    "plugins": plugins_val if plugins_val is not None else {},
+                    "plugins": plugins_dict,
                     "metadata": {
                         "created_by": c.Meltano.Metadata.CREATED_BY,
                         "created_at": u.Generators.generate_iso_timestamp(),

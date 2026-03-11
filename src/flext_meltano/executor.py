@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import override
 
 from flext_core import r, s
 
@@ -179,6 +180,7 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
                 f"Failed to list plugins: {e}"
             )
 
+    @override
     def execute(self) -> r[t.JsonValue]:
         """Execute the Meltano executor service.
 

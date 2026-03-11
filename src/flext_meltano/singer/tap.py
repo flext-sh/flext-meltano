@@ -59,6 +59,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             source_type = getattr(source_config, "source_type", None) or getattr(
                 source_config, "tap_type", "unknown"
             )
+            if not isinstance(source_type, str):
+                source_type = "unknown"
             source_identifier = getattr(
                 source_config, "source_identifier", None
             ) or getattr(source_config, "tap_identifier", "unknown")

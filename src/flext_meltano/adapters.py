@@ -55,6 +55,7 @@ class FlextMeltanoAdapter:
                     f"Project creation failed: {ex}"
                 )
 
+        @override
         def execute(self) -> r[t.Meltano.ExecutionResultDict]:
             """Execute default project operation."""
             return self.get_version()
@@ -117,6 +118,7 @@ class FlextMeltanoAdapter:
                 )
 
         @override
+        @override
         def execute(self) -> r[list[t.Meltano.PluginDefinition]]:
             """Execute default plugin operation."""
             return self.discover_plugins()
@@ -130,6 +132,7 @@ class FlextMeltanoAdapter:
             """Return FlextMeltanoSettings for this service."""
             return FlextMeltanoSettings
 
+        @override
         def execute(self) -> r[t.Meltano.ExecutionResultDict]:
             """Execute default pipeline operation."""
             return r[t.Meltano.ExecutionResultDict].ok({"status": "ready"})
@@ -164,6 +167,7 @@ class FlextMeltanoAdapter:
     class SingerAdapter(s[t.Meltano.SingerCatalogDict]):
         """Focused adapter for Singer protocol operations following SOLID principles."""
 
+        @override
         @classmethod
         def _get_service_config_type(cls) -> type[FlextSettings]:
             """Return FlextMeltanoSettings for this service."""
@@ -203,6 +207,7 @@ class FlextMeltanoAdapter:
                     f"Catalog creation failed: {ex}"
                 )
 
+        @override
         def execute(self) -> r[t.Meltano.SingerCatalogDict]:
             """Execute default singer operation."""
             return self.create_tap_stream_catalog()
@@ -210,11 +215,13 @@ class FlextMeltanoAdapter:
     class DbtAdapter(s[t.Meltano.DbtResultDict]):
         """Focused adapter for DBT operations following SOLID principles."""
 
+        @override
         @classmethod
         def _get_service_config_type(cls) -> type[FlextSettings]:
             """Return FlextMeltanoSettings for this service."""
             return FlextMeltanoSettings
 
+        @override
         def execute(self) -> r[t.Meltano.DbtResultDict]:
             """Execute default DBT operation."""
             return self.execute_dbt_operation()

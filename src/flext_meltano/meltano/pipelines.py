@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
+from typing import override
 
 from flext_core import r, s
 
@@ -38,7 +39,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize pipeline service with FLEXT configuration."""
         super().__init__()
-        self._config = config or FlextMeltanoSettings()
+        self._config = config if config is not None else FlextMeltanoSettings()
         self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
@@ -47,6 +48,14 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         return r[tuple[p.Meltano.Plugin, p.Meltano.Plugin]].fail(
             "Plugin discovery not configured"
         )
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute orchestration service logic."""
+        try:
+            return r[t.Meltano.MeltanoConfigDict].ok({})
+        except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError, ImportError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(f"Orchestration failed: {e}")
 
     def execute_pipeline(
         self, project_path: str, source_name: str, sink_name: str

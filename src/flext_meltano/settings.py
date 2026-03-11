@@ -5,13 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_core import FlextSettings, c, r, t
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
 
 
 class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration services."""
-
-    model_config = ConfigDict(validate_assignment=True)
 
     project_root: t.Scalar = Field(default=".")
     config_dir: str = Field(default=".meltano")

@@ -21,14 +21,14 @@ from flext_meltano import (
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
-    _ManagerProtocol,
-    _SingerManagerProtocol,
-    _StatusManagerProtocol,
 )
 from flext_meltano.cli_managers import (
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
+    ManagerProtocol,
+    SingerManagerProtocol,
+    StatusManagerProtocol,
 )
 
 
@@ -49,11 +49,11 @@ class FlextMeltanoCLI:
     logger: FlextLogger
     output: _OutputProtocol
     _api: FlextMeltano
-    pipeline_manager: _ManagerProtocol
-    singer_manager: _SingerManagerProtocol
-    dbt_manager: _ManagerProtocol
-    plugin_manager: _ManagerProtocol
-    status_manager: _StatusManagerProtocol
+    pipeline_manager: ManagerProtocol
+    singer_manager: SingerManagerProtocol
+    dbt_manager: ManagerProtocol
+    plugin_manager: ManagerProtocol
+    status_manager: StatusManagerProtocol
     command_router: FlextMeltanoCommandRouter
 
     def __init__(self) -> None:

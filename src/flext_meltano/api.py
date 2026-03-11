@@ -265,6 +265,7 @@ class FlextMeltano(s[t.JsonValue]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.JsonValue].fail(f"Failed to discover catalog: {e}")
 
+    @override
     def execute(self, **_kwargs: t.JsonValue) -> r[t.JsonValue]:
         """Execute service lifecycle.
 

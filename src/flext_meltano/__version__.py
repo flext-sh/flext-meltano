@@ -9,10 +9,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from importlib.metadata import PackageNotFoundError, metadata
+from importlib.metadata import PackageMetadata, PackageNotFoundError, metadata
 
 try:
-    _metadata = metadata("flext_meltano")
+    _metadata: PackageMetadata | dict[str, str] = metadata("flext_meltano")
 except PackageNotFoundError:
     _metadata = {
         "Version": "0.0.0.dev0",
