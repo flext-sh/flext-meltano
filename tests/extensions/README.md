@@ -303,7 +303,7 @@ class EnterpriseExtension(FlextMeltanoBase, ABC):
         pass
 
     @abstractmethod
-    def execute_enterprise_logic(self) -> FlextResult:
+    def execute_enterprise_logic(self) -> r:
         """Execute enterprise-specific business logic."""
         pass
 

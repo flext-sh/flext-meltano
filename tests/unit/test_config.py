@@ -108,7 +108,7 @@ class TestFlextMeltanoSettings:
         assert config_dir.name == ".meltano"
 
     def test_get_absolute_logs_dir(self) -> None:
-        """Test get_absolute_logs_dir method returns FlextResult."""
+        """Test get_absolute_logs_dir method returns r."""
         config = FlextMeltanoSettings(
             project_root=Path("/test/project"), logs_dir=Path("logs")
         )

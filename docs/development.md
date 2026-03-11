@@ -90,7 +90,7 @@ make test               # Test suite execution
 ### **Code Standards**
 
 - **Architecture**: Single class per module with nested helpers
-- **Error Handling**: FlextResult pattern for all operations
+- **Error Handling**: r pattern for all operations
 - **Type Safety**: Comprehensive type annotations with Pydantic
 - **Import Policy**: Root-level imports only from flext_meltano
 
@@ -113,7 +113,7 @@ ______________________________________________________________________
 ### **FLEXT Ecosystem Requirements**
 
 - Use only flext-core foundation patterns
-- Implement FlextResult railway-oriented programming
+- Implement r railway-oriented programming
 - Follow single responsibility principle
 - Maintain comprehensive type safety
 
@@ -194,7 +194,7 @@ ______________________________________________________________________
 
 - [ ] All quality gates pass
 - [ ] Type annotations present
-- [ ] FlextResult pattern used for error handling
+- [ ] r pattern used for error handling
 - [ ] No direct external library imports
 - [ ] Tests updated for new functionality
 
@@ -202,7 +202,7 @@ ______________________________________________________________________
 
 - Use only FLEXT ecosystem imports
 - Follow single class per module pattern
-- Implement proper error handling with FlextResult
+- Implement proper error handling with r
 - Maintain comprehensive documentation
 
 ______________________________________________________________________

@@ -152,14 +152,14 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
 config = FlextMeltanoSettings()
-validation_result: FlextResult[bool] = config.validate_meltano_config()
+validation_result: r[bool] = config.validate_meltano_config()
 
 if validation_result.is_success:
     print("Meltano configuration is valid")
@@ -497,7 +497,7 @@ Due to compliance issues:
 1. **Use Abstractions**: Leverage existing FlextMeltanoSettings where possible
 1. **Monitor Progress**: Track abstraction layer implementation
 1. **Plan Migration**: Prepare for wrapper layer adoption
-1. **Validate Patterns**: Use FlextResult patterns consistently
+1. **Validate Patterns**: Use r patterns consistently
 
 ______________________________________________________________________
 

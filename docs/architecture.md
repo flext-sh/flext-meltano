@@ -23,7 +23,7 @@
   - [**FlextMeltanoTypes Hierarchy**](#flextmeltanotypes-hierarchy)
   - [**Pydantic Model Integration**](#pydantic-model-integration)
 - [🛡️ Error Handling Architecture](#error-handling-architecture)
-  - [**FlextResult Pattern Implementation**](#flextresult-pattern-implementation)
+  - [**r Pattern Implementation**](#flextresult-pattern-implementation)
   - [**Exception Hierarchy**](#exception-hierarchy)
 - [🎯 Current Status and Technical Debt](#current-status-and-technical-debt)
   - [**Architecture Compliance Status**](#architecture-compliance-status)
@@ -48,7 +48,7 @@ flext-meltano serves as the foundational library for ELT operations within the F
 ### **Design Principles**
 
 1. **Type Safety First** - Comprehensive type annotations with Pydantic models
-1. **Railway-Oriented Programming** - FlextResult[T] pattern for error handling
+1. **Railway-Oriented Programming** - r[T] pattern for error handling
 1. **Single Responsibility** - One class per module with nested helpers
 1. **FLEXT Ecosystem Integration** - Built on flext-core foundation patterns
 1. **Abstraction Layers** - Clear separation between external libraries and FLEXT interfaces
@@ -137,7 +137,7 @@ graph TD
     D --> E[Data Extraction]
     E --> F[FlextMeltanoTargetAbstractions]
     F --> G[Data Loading]
-    G --> H[FlextResult Response]
+    G --> H[r Response]
 
     B --> I[FlextMeltanoDbtService]
     I --> J[DBT Operations]
@@ -149,15 +149,15 @@ graph TD
 
 ```mermaid
 graph TD
-    A[Operation Start] --> B{FlextResult Check}
+    A[Operation Start] --> B{r Check}
     B -->|Success| C[Process Data]
     B -->|Failure| D[Error Propagation]
     C --> E{Validation}
     E -->|Valid| F[Continue Pipeline]
-    E -->|Invalid| G[FlextResult.fail()]
+    E -->|Invalid| G[r.fail()]
     D --> H[Error Logging]
     G --> H
-    F --> I[FlextResult.ok()]
+    F --> I[r.ok()]
 ```
 
 ## 🏛️ Clean Architecture Implementation
@@ -195,7 +195,7 @@ graph TD
 
 ```python
 from flext_core import (
-    FlextResult,  # Railway-oriented programming
+    r,  # Railway-oriented programming
     FlextService,  # Service base class
     FlextLogger,  # Logging infrastructure
     FlextContainer,  # Dependency injection
@@ -211,7 +211,7 @@ from flext_meltano import FlextMeltanoTypes
 # Comprehensive type system extending flext-core
 pipeline_config: FlextMeltanoTypes.ELT.PipelineConfig
 tap_config: FlextMeltanoTypes.Singer.TapConfig
-result: FlextResult[FlextMeltanoTypes.ELT.PipelineResult]
+result: r[FlextMeltanoTypes.ELT.PipelineResult]
 ```
 
 ### **External Library Integration**
@@ -233,7 +233,7 @@ class _MeltanoLibraryWrapper:
     """Internal wrapper for meltano library operations."""
 
     @staticmethod
-    def create_project(path: Path) -> FlextResult[object]:
+    def create_project(path: Path) -> r[object]:
         """Create Meltano project through library API."""
         # Implementation with proper error handling
 ```
@@ -293,30 +293,26 @@ class StreamDefinition(BaseModel):
 
 ## 🛡️ Error Handling Architecture
 
-### **FlextResult Pattern Implementation**
+### **r Pattern Implementation**
 
 ```python
-# All operations return FlextResult[T] for railway-oriented programming
-def process_elt_pipeline(
-    tap_config: TapConfig, target_config: t.Dict
-) -> FlextResult[t.Dict]:
+# All operations return r[T] for railway-oriented programming
+def process_elt_pipeline(tap_config: TapConfig, target_config: t.Dict) -> r[t.Dict]:
     """Process ELT pipeline with comprehensive error handling."""
 
     # Validation phase
     validation_result = validate_configuration(tap_config)
     if validation_result.is_failure:
-        return FlextResult[t.Dict].fail(
+        return r[t.Dict].fail(
             f"Configuration validation failed: {validation_result.error}"
         )
 
     # Execution phase
     execution_result = execute_pipeline(tap_config, target_config)
     if execution_result.is_failure:
-        return FlextResult[t.Dict].fail(
-            f"Pipeline execution failed: {execution_result.error}"
-        )
+        return r[t.Dict].fail(f"Pipeline execution failed: {execution_result.error}")
 
-    return FlextResult[t.Dict].ok(execution_result.unwrap())
+    return r[t.Dict].ok(execution_result.unwrap())
 ```
 
 ### **Exception Hierarchy**
@@ -345,7 +341,7 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 | Component                 | Status  | Details                                            |
 | ------------------------- | ------- | -------------------------------------------------- |
 | **Type Safety**           | 🟢 90%  | Comprehensive Pydantic models and type annotations |
-| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with FlextResult patterns  |
+| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with r patterns  |
 | **Single Class Pattern**  | 🟢 100% | All modules follow single class architecture       |
 | **External Abstractions** | 🟡 60%  | Direct imports in adapters.py need wrapping        |
 

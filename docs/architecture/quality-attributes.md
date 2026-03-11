@@ -401,9 +401,7 @@ class AsyncPipelineExecutor:
                 self.metrics.pipeline_failed()
                 return PipelineResult.failure(PipelineExecutionError(str(e)))
 
-    async def validate_pipeline_async(
-        self, pipeline: Pipeline
-    ) -> FlextResult[ValidatedPipeline]:
+    async def validate_pipeline_async(self, pipeline: Pipeline) -> r[ValidatedPipeline]:
         """Async pipeline validation."""
 
         # Run validation checks concurrently
@@ -418,9 +416,9 @@ class AsyncPipelineExecutor:
 
         if any(isinstance(r, Exception) for r in results):
             exceptions = [r for r in results if isinstance(r, Exception)]
-            return FlextResult.fail(ValidationError(f"Validation failed: {exceptions}"))
+            return r.fail(ValidationError(f"Validation failed: {exceptions}"))
 
-        return FlextResult.ok(ValidatedPipeline(pipeline, results))
+        return r.ok(ValidatedPipeline(pipeline, results))
 
     async def execute_extraction_async(self, pipeline: Pipeline) -> ExtractionResult:
         """Execute data extraction asynchronously."""
@@ -1060,7 +1058,7 @@ title FLEXT-Meltano - Reliability Architecture
 
 rectangle "Error Handling" as error_handling {
     component "Railway Pattern" as railway [
-        FlextResult[T] pattern
+        r[T] pattern
         Error propagation
         Recovery strategies
     ]
@@ -1147,9 +1145,7 @@ end note
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
-    def execute_with_railway(
-        self, operation: Operation
-    ) -> FlextResult[OperationResult]:
+    def execute_with_railway(self, operation: Operation) -> r[OperationResult]:
         """Execute operation using railway pattern with full error handling."""
 
         return (
@@ -1163,22 +1159,20 @@ class RailwayExecutor:
             .map(lambda result: OperationResult.from_success(result))
         )
 
-    def validate_operation(
-        self, operation: Operation
-    ) -> FlextResult[ValidatedOperation]:
+    def validate_operation(self, operation: Operation) -> r[ValidatedOperation]:
         """Validate operation parameters and constraints."""
 
         # Schema validation
         schema_result = self.schema_validator.validate(operation.payload)
         if schema_result.is_failure:
-            return FlextResult.fail(
+            return r.fail(
                 ValidationError(f"Schema validation failed: {schema_result.error}")
             )
 
         # Business rule validation
         business_result = self.business_validator.validate(operation)
         if business_result.is_failure:
-            return FlextResult.fail(
+            return r.fail(
                 BusinessRuleViolation(
                     f"Business rule violation: {business_result.error}"
                 )
@@ -1187,17 +1181,15 @@ class RailwayExecutor:
         # Resource availability check
         resource_result = self.resource_checker.check_availability(operation)
         if resource_result.is_failure:
-            return FlextResult.fail(
+            return r.fail(
                 ResourceUnavailableError(
                     f"Resources unavailable: {resource_result.error}"
                 )
             )
 
-        return FlextResult.ok(ValidatedOperation(operation, schema_result.unwrap()))
+        return r.ok(ValidatedOperation(operation, schema_result.unwrap()))
 
-    def execute_operation(
-        self, operation: ValidatedOperation
-    ) -> FlextResult[ExecutionResult]:
+    def execute_operation(self, operation: ValidatedOperation) -> r[ExecutionResult]:
         """Execute operation with comprehensive error handling."""
 
         try:
@@ -1205,7 +1197,7 @@ class RailwayExecutor:
             with self.timeout_context(operation.timeout_seconds):
                 # Execute with circuit breaker
                 if not self.circuit_breaker.allow_request():
-                    return FlextResult.fail(
+                    return r.fail(
                         CircuitBreakerOpenError(
                             "Circuit breaker is open - service temporarily unavailable"
                         )
@@ -1217,11 +1209,11 @@ class RailwayExecutor:
                 # Record success
                 self.circuit_breaker.record_success()
 
-                return FlextResult.ok(result)
+                return r.ok(result)
 
         except TimeoutError:
             self.circuit_breaker.record_failure()
-            return FlextResult.fail(
+            return r.fail(
                 OperationTimeoutError(
                     f"Operation timed out after {operation.timeout_seconds} seconds"
                 )
@@ -1229,9 +1221,7 @@ class RailwayExecutor:
 
         except ExternalServiceError as e:
             self.circuit_breaker.record_failure()
-            return FlextResult.fail(
-                ExternalServiceError(f"External service error: {e.message}")
-            )
+            return r.fail(ExternalServiceError(f"External service error: {e.message}"))
 
         except Exception as e:
             # Record failure for circuit breaker
@@ -1248,7 +1238,7 @@ class RailwayExecutor:
                 },
             )
 
-            return FlextResult.fail(
+            return r.fail(
                 OperationExecutionError(f"Operation execution failed: {str(e)}")
             )
 ```
@@ -1345,7 +1335,7 @@ class RetryExecutor:
         self.max_delay = max_delay
         self.backoff_factor = backoff_factor
 
-    def execute_with_retry(self, operation: Callable[[], T]) -> FlextResult[T]:
+    def execute_with_retry(self, operation: Callable[[], T]) -> r[T]:
         """Execute operation with retry logic."""
 
         last_exception = None
@@ -1353,7 +1343,7 @@ class RetryExecutor:
         for attempt in range(self.max_attempts):
             try:
                 result = operation()
-                return FlextResult.ok(result)
+                return r.ok(result)
 
             except self.retryable_exceptions as e:
                 last_exception = e
@@ -1373,10 +1363,10 @@ class RetryExecutor:
 
             except Exception as e:
                 # Non-retryable exception
-                return FlextResult.fail(OperationError(f"Non-retryable error: {e}"))
+                return r.fail(OperationError(f"Non-retryable error: {e}"))
 
         # All retry attempts exhausted
-        return FlextResult.fail(
+        return r.fail(
             RetryExhaustedError(
                 f"Operation failed after {self.max_attempts} attempts. "
                 f"Last error: {last_exception}"

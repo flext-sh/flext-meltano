@@ -143,7 +143,7 @@ make docs
 ### Core Principles
 
 1. **Clean Architecture** - Domain-driven design with clear layer separation
-1. **Railway-Oriented Programming** - Composable error handling with FlextResult[T]
+1. **Railway-Oriented Programming** - Composable error handling with r[T]
 1. **Type Safety First** - 100% Pyrefly compliance and Pydantic validation
 1. **Ecosystem Foundation** - Foundation library for 32+ FLEXT projects
 

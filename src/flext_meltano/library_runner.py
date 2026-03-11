@@ -36,7 +36,7 @@ class FlextMeltanoLibraryRunner:
         """Get DBT runner instance for DBT operations.
 
         Returns:
-            FlextResult with DBT runner information containing type, status,
+            r with DBT runner information containing type, status,
             and available capabilities.
 
         """
@@ -55,7 +55,7 @@ class FlextMeltanoLibraryRunner:
         """Get Singer manager instance for Singer operations.
 
         Returns:
-            FlextResult with Singer manager information containing type, status,
+            r with Singer manager information containing type, status,
             and available capabilities.
 
         """
@@ -85,7 +85,7 @@ class FlextMeltanoLibraryRunner:
             config: Optional pipeline configuration
 
         Returns:
-            FlextResult with complete ELT pipeline execution results
+            r with complete ELT pipeline execution results
 
         """
         try:
@@ -134,7 +134,7 @@ class FlextMeltanoLibraryRunner:
         project_dir: DBT project directory
 
         Returns:
-        FlextResult with DBT transformation results
+        r with DBT transformation results
 
         """
         try:
@@ -177,7 +177,7 @@ class FlextMeltanoLibraryRunner:
         config: Pipeline configuration
 
         Returns:
-        FlextResult with ELT pipeline execution results
+        r with ELT pipeline execution results
 
         """
         try:

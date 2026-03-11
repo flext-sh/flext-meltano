@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, r
 
 
 class ContainerManager:
@@ -40,7 +40,7 @@ class ContainerManager:
 
     def run_compose_command(
         self, command: list[str], timeout: int = 300
-    ) -> FlextResult[subprocess.CompletedProcess[str]]:
+    ) -> r[subprocess.CompletedProcess[str]]:
         """Run a docker-compose command with error handling.
 
         Args:
@@ -48,7 +48,7 @@ class ContainerManager:
             timeout: Command timeout
 
         Returns:
-            FlextResult with command result
+            r with command result
 
         """
         try:
@@ -67,18 +67,16 @@ class ContainerManager:
                 timeout=timeout,
             )
             if result.returncode != 0:
-                return FlextResult[subprocess.CompletedProcess[str]].fail(
+                return r[subprocess.CompletedProcess[str]].fail(
                     f"Command failed: {' '.join(full_command)}\n{result.stderr}"
                 )
-            return FlextResult[subprocess.CompletedProcess[str]].ok(result)
+            return r[subprocess.CompletedProcess[str]].ok(result)
         except subprocess.TimeoutExpired:
-            return FlextResult[subprocess.CompletedProcess[str]].fail(
+            return r[subprocess.CompletedProcess[str]].fail(
                 f"Command timed out: {' '.join(command)}"
             )
         except Exception as e:
-            return FlextResult[subprocess.CompletedProcess[str]].fail(
-                f"Command error: {e}"
-            )
+            return r[subprocess.CompletedProcess[str]].fail(f"Command error: {e}")
 
 
 class FlextTestsDocker(ContainerManager):
@@ -119,7 +117,7 @@ class FlextTestsDocker(ContainerManager):
 
     def start_services(
         self, services: list[str] | None = None, wait_timeout: int = 60
-    ) -> FlextResult[bool]:
+    ) -> r[bool]:
         """Start Docker services with health checks.
 
         Args:
@@ -127,12 +125,12 @@ class FlextTestsDocker(ContainerManager):
             wait_timeout: Timeout for service health checks
 
         Returns:
-            FlextResult indicating success/failure
+            r indicating success/failure
 
         """
         try:
             if not self.compose_file.exists():
-                return FlextResult[bool].fail(
+                return r[bool].fail(
                     f"Docker compose file not found: {self.compose_file}"
                 )
             cmd = ["up", "-d"]
@@ -140,44 +138,40 @@ class FlextTestsDocker(ContainerManager):
                 cmd.extend(services)
             result = self.run_compose_command(cmd, timeout=300)
             if result.is_failure:
-                return FlextResult[bool].fail(
-                    f"Failed to start Docker services: {result.error}"
-                )
+                return r[bool].fail(f"Failed to start Docker services: {result.error}")
             self.containers_started = True
             if not self._wait_for_services(wait_timeout):
-                return FlextResult[bool].fail("Services failed health checks")
+                return r[bool].fail("Services failed health checks")
             self.logger.info("Docker services started successfully")
-            return FlextResult[bool].ok(value=True)
+            return r[bool].ok(value=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Error starting Docker services: {e}")
+            return r[bool].fail(f"Error starting Docker services: {e}")
 
-    def stop_services(self, *, remove_volumes: bool = False) -> FlextResult[bool]:
+    def stop_services(self, *, remove_volumes: bool = False) -> r[bool]:
         """Stop Docker services.
 
         Args:
             remove_volumes: Whether to remove volumes
 
         Returns:
-            FlextResult indicating success/failure
+            r indicating success/failure
 
         """
         try:
             if not self.containers_started:
-                return FlextResult[bool].ok(value=True)
+                return r[bool].ok(value=True)
             cmd = ["down"]
             if remove_volumes:
                 cmd.append("-v")
             result = self.run_compose_command(cmd, timeout=120)
             if result.is_failure:
                 self.logger.warning(f"Failed to stop Docker services: {result.error}")
-                return FlextResult[bool].fail(
-                    f"Failed to stop Docker services: {result.error}"
-                )
+                return r[bool].fail(f"Failed to stop Docker services: {result.error}")
             self.containers_started = False
             self.logger.info("Docker services stopped successfully")
-            return FlextResult[bool].ok(value=True)
+            return r[bool].ok(value=True)
         except Exception as e:
-            return FlextResult[bool].fail(f"Error stopping Docker services: {e}")
+            return r[bool].fail(f"Error stopping Docker services: {e}")
 
     def get_service_url(self, service_name: str, port: int) -> str | None:
         """Get service URL for a running container.
@@ -204,7 +198,7 @@ class FlextTestsDocker(ContainerManager):
 
     def execute_in_container(
         self, service_name: str, command: list[str], timeout: int = 30
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> r[dict[str, Any]]:
         """Execute command in running container.
 
         Args:
@@ -213,7 +207,7 @@ class FlextTestsDocker(ContainerManager):
             timeout: Command timeout
 
         Returns:
-            FlextResult with execution results
+            r with execution results
 
         """
         try:
@@ -230,16 +224,16 @@ class FlextTestsDocker(ContainerManager):
             result = subprocess.run(
                 cmd, check=False, capture_output=True, text=True, timeout=timeout
             )
-            return FlextResult[dict[str, Any]].ok({
+            return r[dict[str, Any]].ok({
                 "returncode": result.returncode,
                 "stdout": result.stdout,
                 "stderr": result.stderr,
                 "success": result.returncode == 0,
             })
         except subprocess.TimeoutExpired:
-            return FlextResult[dict[str, Any]].fail("Command execution timed out")
+            return r[dict[str, Any]].fail("Command execution timed out")
         except Exception as e:
-            return FlextResult[dict[str, Any]].fail(f"Command execution failed: {e}")
+            return r[dict[str, Any]].fail(f"Command execution failed: {e}")
 
     def _wait_for_services(self, timeout: int) -> bool:
         """Wait for services to be healthy.

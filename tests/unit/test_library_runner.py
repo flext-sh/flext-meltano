@@ -13,7 +13,7 @@ class TestFlextDbtProgrammaticRunner:
     """Test FlextDbtProgrammaticRunner functionality."""
 
     def test_get_dbt_runner(self) -> None:
-        """Test getting dbt runner instance returns FlextResult."""
+        """Test getting dbt runner instance returns r."""
         library_runner = FlextMeltanoLibraryRunner()
         dbt_runner_result = library_runner.get_dbt_runner()
         assert dbt_runner_result.is_success
@@ -36,7 +36,7 @@ class TestFlextSingerProtocolManager:
     """Test FlextSingerProtocolManager functionality."""
 
     def test_get_singer_manager(self) -> None:
-        """Test getting Singer manager instance returns FlextResult."""
+        """Test getting Singer manager instance returns r."""
         library_runner = FlextMeltanoLibraryRunner()
         singer_manager_result = library_runner.get_singer_manager()
         assert singer_manager_result.is_success
@@ -119,7 +119,7 @@ class TestProjectAdapterIntegration:
         assert "version" in result.value
 
     def test_adapter_execute(self) -> None:
-        """Test that FlextMeltanoAdapter.ProjectAdapter execute returns FlextResult."""
+        """Test that FlextMeltanoAdapter.ProjectAdapter execute returns r."""
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.execute()
         assert hasattr(result, "is_success")

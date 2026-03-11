@@ -4,7 +4,7 @@ Tests the CliModelConverter integration with Meltano models:
 - Dict to Pydantic model conversion
 - Validation error propagation
 - Round-trip conversion
-- FlextResult railway pattern throughout
+- r railway pattern throughout
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

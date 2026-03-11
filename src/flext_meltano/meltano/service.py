@@ -68,7 +68,7 @@ class FlextMeltanoMeltanoService(s[str]):
         root: Root directory for the project
 
         Returns:
-        FlextResult containing project information
+        r containing project information
 
         """
         try:
@@ -100,7 +100,7 @@ class FlextMeltanoMeltanoService(s[str]):
         plugin_type: Optional plugin type to filter
 
         Returns:
-        FlextResult containing list of plugins
+        r containing list of plugins
 
         """
         try:
@@ -139,7 +139,7 @@ class FlextMeltanoMeltanoService(s[str]):
         config: Pipeline configuration
 
         Returns:
-        FlextResult containing pipeline result
+        r containing pipeline result
 
         """
         try:
@@ -175,7 +175,7 @@ class FlextMeltanoMeltanoService(s[str]):
         root: Root directory of the project
 
         Returns:
-        FlextResult containing project information
+        r containing project information
 
         """
         try:

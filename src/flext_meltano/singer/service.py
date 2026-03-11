@@ -64,7 +64,7 @@ class FlextMeltanoSingerService(s[str]):
         tap: Singer tap instance
 
         Returns:
-        FlextResult containing discovered catalog
+        r containing discovered catalog
 
         """
         try:
@@ -107,7 +107,7 @@ class FlextMeltanoSingerService(s[str]):
             state: Current state message for incremental sync
 
         Returns:
-        FlextResult containing sync result with metrics
+        r containing sync result with metrics
 
         """
         try:
@@ -150,7 +150,7 @@ class FlextMeltanoSingerService(s[str]):
         catalog_path: Path to catalog file
 
         Returns:
-        FlextResult containing loaded catalog
+        r containing loaded catalog
 
         """
         return self.catalog_manager.load_catalog(catalog_path)
@@ -164,7 +164,7 @@ class FlextMeltanoSingerService(s[str]):
         state_path: Path to state file
 
         Returns:
-        FlextResult containing loaded state as SingerStateMessage
+        r containing loaded state as SingerStateMessage
 
         """
         return self.state_manager.load_state(state_path)
@@ -179,7 +179,7 @@ class FlextMeltanoSingerService(s[str]):
         catalog_path: Path to save
 
         Returns:
-        FlextResult with success status
+        r with success status
 
         """
         self.catalog_manager.set_catalog(catalog)
@@ -192,7 +192,7 @@ class FlextMeltanoSingerService(s[str]):
         state_path: Path to save state
 
         Returns:
-        FlextResult with success status
+        r with success status
 
         """
         return self.state_manager.save_state(state_path)

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, r
 
 from flext_meltano import (
     FlextMeltanoConstants,
@@ -21,7 +21,6 @@ from flext_meltano import (
     u,
 )
 
-r = FlextResult
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
 m = FlextMeltanoModels
@@ -39,7 +38,7 @@ class FlextMeltanoBridge:
         self.logger: FlextLogger = FlextLogger(__name__)
 
     @staticmethod
-    def discover_plugins() -> FlextResult[t.Meltano.PluginCatalog]:
+    def discover_plugins() -> r[t.Meltano.PluginCatalog]:
         """Discover available plugins through the Go bridge."""
         try:
             extractor1: t.Meltano.PluginDefinition = {
@@ -79,16 +78,14 @@ class FlextMeltanoBridge:
                 "loaders": [loader1, loader2, loader3],
                 "transformers": [transformer1, transformer2],
             }
-            return FlextResult[t.Meltano.PluginCatalog].ok(result)
+            return r[t.Meltano.PluginCatalog].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[t.Meltano.PluginCatalog].fail(
-                f"Plugin discovery failed: {e}"
-            )
+            return r[t.Meltano.PluginCatalog].fail(f"Plugin discovery failed: {e}")
 
     @staticmethod
     def execute_command(
         command: str, args: Mapping[str, t.JsonValue] | None = None
-    ) -> FlextResult[t.Meltano.Bridge.BridgeStatus]:
+    ) -> r[t.Meltano.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 
         Args:
@@ -96,7 +93,7 @@ class FlextMeltanoBridge:
         args: JSON-serializable arguments
 
         Returns:
-        FlextResult with command execution results
+        r with command execution results
 
         """
         try:
@@ -111,20 +108,18 @@ class FlextMeltanoBridge:
                 "status": "executed",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return FlextResult[t.Meltano.Bridge.BridgeStatus].ok(result)
+            return r[t.Meltano.Bridge.BridgeStatus].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return FlextResult[t.Meltano.Bridge.BridgeStatus].fail(
-                f"Bridge command failed: {e}"
-            )
+            return r[t.Meltano.Bridge.BridgeStatus].fail(f"Bridge command failed: {e}")
 
     @staticmethod
-    def get_version() -> FlextResult[str]:
+    def get_version() -> r[str]:
         """Get bridge version information."""
         version: str = "1.0.0"
         return r[str].ok(version)
 
     @staticmethod
-    def validate_connection() -> FlextResult[bool]:
+    def validate_connection() -> r[bool]:
         """Validate connection to Go bridge."""
         connected: bool = True
         return r[bool].ok(connected)

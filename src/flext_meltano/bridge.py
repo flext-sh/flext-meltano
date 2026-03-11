@@ -54,7 +54,7 @@ class FlextMeltanoBridge:
         args: JSON-serializable arguments
 
         Returns:
-        FlextResult with command execution results
+        r with command execution results
 
         """
         try:

@@ -17,7 +17,7 @@
   - [Service Layer Code Structure](#service-layer-code-structure)
   - [Key Classes and Interfaces](#key-classes-and-interfaces)
 - [📋 Architecture Decision Records](#architecture-decision-records)
-  - [ADR-001: Railway-Oriented Programming with FlextResult[T]](#adr-001-railway-oriented-programming-with-flextresultt)
+  - [ADR-001: Railway-Oriented Programming with r[T]](#adr-001-railway-oriented-programming-with-flextresultt)
   - [ADR-002: Clean Architecture with Domain-Driven Design](#adr-002-clean-architecture-with-domain-driven-design)
   - [ADR-003: Singer Protocol Abstraction Layer](#adr-003-singer-protocol-abstraction-layer)
 - [🏆 Quality Attributes](#quality-attributes)
@@ -84,7 +84,7 @@ Rel(REDACTED_LDAP_BIND_PASSWORD, flext_meltano, "Manages", "Infrastructure, moni
 Rel(flext_meltano, meltano_core, "Integrates with", "CLI operations, project management")
 Rel(flext_meltano, singer_sdk, "Implements", "Tap/target protocols, state management")
 Rel(flext_meltano, dbt_core, "Orchestrates", "Model execution, testing, documentation")
-Rel(flext_meltano, flext_core, "Built on", "FlextResult[T], dependency injection, logging")
+Rel(flext_meltano, flext_core, "Built on", "r[T], dependency injection, logging")
 
 Rel(flext_tap_star, flext_meltano, "Depends on", "Foundation library")
 Rel(flext_target_star, flext_meltano, "Depends on", "Foundation library")
@@ -197,7 +197,7 @@ Rel(api_facade, config_manager, "Configures", "Configuration access")
 Rel(orchestrator, singer_service, "Coordinates", "Pipeline execution")
 Rel(orchestrator, dbt_service, "Orchestrates", "Model execution")
 Rel(orchestrator, state_manager, "Persists", "State updates")
-Rel(orchestrator, error_handler, "Handles errors", "FlextResult[T]")
+Rel(orchestrator, error_handler, "Handles errors", "r[T]")
 
 Rel(plugin_manager, config_manager, "Validates", "Plugin configuration")
 Rel(singer_service, state_manager, "Updates", "Singer bookmarks")
@@ -328,7 +328,7 @@ FlextMeltanoService --> FlextMeltanoSettings : configures
 
 note right of FlextMeltanoService
     Railway-oriented error handling
-    with FlextResult[T] pattern
+    with r[T] pattern
 end note
 
 @enduml
@@ -349,7 +349,7 @@ ______________________________________________________________________
 
 ## 📋 Architecture Decision Records
 
-### ADR-001: Railway-Oriented Programming with FlextResult[T]
+### ADR-001: Railway-Oriented Programming with r[T]
 
 **Status**: Accepted | **Date**: 2025-01-15
 
@@ -359,7 +359,7 @@ FLEXT-Meltano needs robust error handling for complex ELT operations involving m
 
 #### Decision
 
-Implement railway-oriented programming using FlextResult[T] from flext-core, ensuring composable error handling throughout the entire codebase.
+Implement railway-oriented programming using r[T] from flext-core, ensuring composable error handling throughout the entire codebase.
 
 #### Consequences
 

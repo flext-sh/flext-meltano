@@ -16,9 +16,12 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
+from flext_cli.utilities import FlextCliUtilities
 from flext_core import FlextLogger, r
 
-from flext_meltano import c, m, t, u
+from flext_meltano import c, m, t
+
+u = FlextCliUtilities
 
 
 class FlextMeltanoFileManagers:
@@ -85,7 +88,7 @@ class FlextMeltanoFileManagers:
         DSL: Uses u.try_ for unified error handling.
 
         Returns:
-        FlextResult containing the created temporary directory path.
+        r containing the created temporary directory path.
 
         """
 
@@ -153,7 +156,7 @@ class FlextMeltanoFileManagers:
         DSL: Uses u.try_ for unified error handling.
 
         Returns:
-        FlextResult indicating success or failure of the save operation.
+        r indicating success or failure of the save operation.
 
         """
 
@@ -234,7 +237,7 @@ class FlextMeltanoFileManagers:
         """Validate Meltano project structure.
 
         Returns:
-        FlextResult indicating whether the project structure is valid.
+        r indicating whether the project structure is valid.
 
         """
         try:

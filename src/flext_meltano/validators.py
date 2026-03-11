@@ -39,8 +39,8 @@ class FlextMeltanoValidators:
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
-        >>> result: FlextResult[object] = (
-        ...     validator.validate_pipeline_component_business_rules(config)
+        >>> result: r[object] = validator.validate_pipeline_component_business_rules(
+        ...     config
         ... )
         >>> if result.is_success:
         ...     logger.info("Component configuration is valid")
@@ -60,7 +60,7 @@ class FlextMeltanoValidators:
             config: Connection configuration dictionary to validate.
 
         Returns:
-            FlextResult containing validated configuration or error details.
+            r containing validated configuration or error details.
 
         Example:
             >>> config: dict[str, t.JsonValue] = {
@@ -107,7 +107,7 @@ class FlextMeltanoValidators:
             config: Project configuration dictionary to validate.
 
         Returns:
-            FlextResult containing boolean validation result or error details.
+            r containing boolean validation result or error details.
 
         Example:
             >>> config: dict[str, t.ContainerValue] = {
@@ -138,7 +138,7 @@ class FlextMeltanoValidators:
             project_path: Path to the pipeline project directory.
 
         Returns:
-            FlextResult containing boolean validation result or error details.
+            r containing boolean validation result or error details.
 
         Example:
             >>> from pathlib import Path
@@ -179,7 +179,7 @@ class FlextMeltanoValidators:
         config: Plugin configuration to validate.
 
         Returns:
-        FlextResult containing boolean validation result or error details.
+        r containing boolean validation result or error details.
 
         """
         return cls.validate_pipeline_component_business_rules(config)
@@ -195,14 +195,14 @@ class FlextMeltanoValidators:
             config: Transformation configuration dictionary to validate.
 
         Returns:
-            FlextResult containing boolean validation result or error details.
+            r containing boolean validation result or error details.
 
         Example:
             >>> config: dict[str, t.ContainerValue] = {
             ...     "name": "my_transformation_project",
             ...     "version": 1.0.0,
             ... }
-            >>> result: FlextResult[object] = (
+            >>> result: r[object] = (
             ...     FlextMeltanoValidators.validate_transformation_business_rules(
             ...         config
             ...     )

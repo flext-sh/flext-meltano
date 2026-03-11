@@ -30,7 +30,7 @@ class FlextMeltanoDbtService(s[str]):
     - Manifest and model discovery
     - Model execution and testing
     - Documentation generation
-    - Error handling with FlextResult[T]
+    - Error handling with r[T]
 
     This service integrates directly with dbt-core, providing a
     programmatic API for complete transformation operations.
@@ -62,7 +62,7 @@ class FlextMeltanoDbtService(s[str]):
         **kwargs: Additional dbt docs arguments
 
         Returns:
-        FlextResult containing documentation result
+        r containing documentation result
 
         """
         try:
@@ -89,7 +89,7 @@ class FlextMeltanoDbtService(s[str]):
         """Get all models from the project.
 
         Returns:
-        FlextResult containing list of models
+        r containing list of models
 
         """
         try:
@@ -118,7 +118,7 @@ class FlextMeltanoDbtService(s[str]):
         root: Root directory of DBT project
 
         Returns:
-        FlextResult containing project information
+        r containing project information
 
         """
         try:
@@ -150,7 +150,7 @@ class FlextMeltanoDbtService(s[str]):
         **kwargs: Additional dbt run arguments
 
         Returns:
-        FlextResult containing run result
+        r containing run result
 
         """
         try:
@@ -182,7 +182,7 @@ class FlextMeltanoDbtService(s[str]):
         **kwargs: Additional dbt test arguments
 
         Returns:
-        FlextResult containing test result
+        r containing test result
 
         """
         try:

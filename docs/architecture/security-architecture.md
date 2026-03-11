@@ -820,13 +820,13 @@ class DataPrivacyController:
     def __init__(self, data_store):
         self.data_store = data_store
 
-    def handle_data_subject_request(self, request: DataSubjectRequest) -> FlextResult[ComplianceAction]:
+    def handle_data_subject_request(self, request: DataSubjectRequest) -> r[ComplianceAction]:
         """Handle data subject access/deletion requests."""
 
         if request.request_type == 'access':
             # Provide data inventory
             user_data = self._collect_user_data(request.user_id)
-            return FlextResult.ok(ComplianceAction(
+            return r.ok(ComplianceAction(
                 action_type='data_export',
                 data=user_data,
                 format='json'
@@ -837,14 +837,14 @@ class DataPrivacyController:
             deletion_result = self._delete_user_data(request.user_id)
             if deletion_result.is_success:
                 self._audit_data_deletion(request.user_id, request.reason)
-                return FlextResult.ok(ComplianceAction(
+                return r.ok(ComplianceAction(
                     action_type='data_deleted',
                     confirmation_id=str(uuid.uuid4())
                 ))
             else:
                 return deletion_result
 
-        return FlextResult.fail(ValidationError("Invalid request type"))
+        return r.fail(ValidationError("Invalid request type"))
 
     def _collect_user_data(self, user_id: str) -> Dict[str, object]:
         """Collect all user data for export."""
@@ -855,14 +855,14 @@ class DataPrivacyController:
             'preferences': self.data_store.get_user_preferences(user_id)
         }
 
-    def _delete_user_data(self, user_id: str) -> FlextResult[bool]:
+    def _delete_user_data(self, user_id: str) -> r[bool]:
         """Delete all user data."""
         try:
             # Anonymize instead of delete for audit purposes
             self.data_store.anonymize_user_data(user_id)
-            return FlextResult.| ok(value=True)
+            return r.| ok(value=True)
         except Exception as e:
-            return FlextResult.fail(DataDeletionError(f"Failed to delete user data: {e}"))
+            return r.fail(DataDeletionError(f"Failed to delete user data: {e}"))
 ```
 
 #### Audit and Reporting

@@ -21,7 +21,7 @@ class FlextMeltanoDbtRunner(s[str]):
     """Executes DBT commands programmatically with deep SDK integration.
 
     Provides programmatic DBT execution for run, test, and documentation
-    operations with FlextResult error handling.
+    operations with r error handling.
 
     Attributes:
     project_root: Root directory of DBT project
@@ -47,7 +47,7 @@ class FlextMeltanoDbtRunner(s[str]):
         **_kwargs: Additional dbt docs arguments
 
         Returns:
-        FlextResult containing documentation generation result
+        r containing documentation generation result
 
         """
         try:
@@ -92,7 +92,7 @@ class FlextMeltanoDbtRunner(s[str]):
         **_kwargs: Additional dbt run arguments
 
         Returns:
-        FlextResult containing run result
+        r containing run result
 
         """
         try:
@@ -130,7 +130,7 @@ class FlextMeltanoDbtRunner(s[str]):
         **_kwargs: Additional dbt test arguments
 
         Returns:
-        FlextResult containing test result
+        r containing test result
 
         """
         try:

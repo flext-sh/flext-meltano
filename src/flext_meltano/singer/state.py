@@ -22,7 +22,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
     """Manages Singer state (bookmarks, incremental sync state).
 
     Handles loading, updating, and persisting state for incremental
-    syncs with proper error handling and FlextResult patterns.
+    syncs with proper error handling and r patterns.
     """
 
     StateEntry: ClassVar[type[m.Meltano.SingerStateEntry]] = m.Meltano.SingerStateEntry
@@ -45,7 +45,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         bookmark_key: Bookmark field name
 
         Returns:
-        FlextResult containing bookmark value or None
+        r containing bookmark value or None
 
         """
         try:
@@ -82,7 +82,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         state_file: Path to state file (optional)
 
         Returns:
-        FlextResult containing loaded state as SingerStateMessage
+        r containing loaded state as SingerStateMessage
 
         """
         try:
@@ -116,7 +116,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         state_file: Path to save state file
 
         Returns:
-        FlextResult with success status
+        r with success status
 
         """
         try:
@@ -152,7 +152,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         bookmark_value: New bookmark value
 
         Returns:
-        FlextResult with success status
+        r with success status
 
         """
         try:

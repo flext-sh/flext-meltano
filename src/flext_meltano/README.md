@@ -100,7 +100,7 @@ Each module follows standardized documentation format:
 ### Enterprise Standards Compliance
 
 - **Naming Conventions**: Consistent PascalCase for classes, snake_case for functions
-- **Error Handling**: FlextResult pattern throughout for railway-oriented programming
+- **Error Handling**: r pattern throughout for railway-oriented programming
 - **Dependency Injection**: Centralized container pattern with type safety
 - **Configuration Management**: Environment-aware settings with validation
 - **Logging Integration**: Structured logging with correlation IDs
@@ -118,7 +118,7 @@ Go Services (FlexCore/FLEXT) → Python Bridge → Meltano CLI → Data Operatio
 - **Bridge Script**: `scripts/flext_meltano_bridge.py` for subprocess communication
 - **JSON API**: All bridge operations return JSON-serializable results
 - **Subprocess Orchestration**: Direct Meltano CLI execution with proper error handling
-- **Enterprise Patterns**: FlextResult, dependency injection, structured logging
+- **Enterprise Patterns**: r, dependency injection, structured logging
 
 ## Development Standards
 
@@ -134,7 +134,7 @@ Go Services (FlexCore/FLEXT) → Python Bridge → Meltano CLI → Data Operatio
 
 - **Unit Tests**: Individual component testing with mocking
 - **Integration Tests**: Bridge communication and subprocess execution
-- **Enterprise Tests**: FlextResult patterns and error handling validation
+- **Enterprise Tests**: r patterns and error handling validation
 - **Performance Tests**: Subprocess execution timing and resource usage
 
 ______________________________________________________________________

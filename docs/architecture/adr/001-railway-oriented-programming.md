@@ -1,4 +1,4 @@
-# ADR-001: Railway-Oriented Programming with FlextResult[T]
+# ADR-001: Railway-Oriented Programming with r[T]
 
 <!-- TOC START -->
 
@@ -6,7 +6,7 @@
 - [Decision](#decision)
 - [Rationale](#rationale)
   - [Why Railway-Oriented Programming](#why-railway-oriented-programming)
-  - [Why FlextResult[T] from flext-core](#why-flextresultt-from-flext-core)
+  - [Why r[T] from flext-core](#why-flextresultt-from-flext-core)
 - [Consequences](#consequences)
   - [Positive](#positive)
   - [Negative](#negative)
@@ -47,11 +47,11 @@ The system needs to handle:
 
 ## Decision
 
-Implement railway-oriented programming using `FlextResult[T]` from flext-core, ensuring composable error handling throughout the entire codebase.
+Implement railway-oriented programming using `r[T]` from flext-core, ensuring composable error handling throughout the entire codebase.
 
 **Key Implementation Points:**
 
-1. **All public APIs return `FlextResult[T]`**
+1. **All public APIs return `r[T]`**
 1. **Internal methods may use exceptions for programming errors**
 1. **Error types are specific and actionable**
 1. **Railway pattern used for operation chaining**
@@ -75,14 +75,14 @@ result = (
 **Type Safety**: Error types are preserved through the entire flow
 
 ```python
-def process_pipeline(config: dict) -> FlextResult[PipelineResult]:
+def process_pipeline(config: dict) -> r[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
-    return FlextResult.ok(PipelineResult(...))
+    return r.ok(PipelineResult(...))
 ```
 
 **Clarity**: Error handling is explicit and visible in the code structure
 
-### Why FlextResult[T] from flext-core
+### Why r[T] from flext-core
 
 **Consistency**: Aligns with FLEXT ecosystem patterns
 **Maturity**: Proven implementation with comprehensive features
@@ -169,7 +169,7 @@ class PipelineError(FlextMeltanoError):
 ### Railway Pattern Usage
 
 ```python
-def create_and_run_pipeline(config: PipelineConfig) -> FlextResult[PipelineResult]:
+def create_and_run_pipeline(config: PipelineConfig) -> r[PipelineResult]:
     return (
         validate_config(config)
         .flat_map(lambda cfg: discover_plugins(cfg))

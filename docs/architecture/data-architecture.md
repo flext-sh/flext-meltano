@@ -280,7 +280,7 @@ class PipelineConfig:
     transforms: List[TransformConfig] = field(default_factory=list)
     schedule: Optional[str] = None
 
-    def validate(self) -> FlextResult[ValidatedConfig]:
+    def validate(self) -> r[ValidatedConfig]:
         """Validate complete pipeline configuration."""
         return (
             self.tap
@@ -338,26 +338,22 @@ class PipelineConfig:
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
-    def validate_record(
-        self, record: dict, schema: dict
-    ) -> FlextResult[ValidatedRecord]:
+    def validate_record(self, record: dict, schema: dict) -> r[ValidatedRecord]:
         """Validate record against Singer schema."""
         try:
             # JSON Schema validation
             validate(instance=record, schema=schema)
-            return FlextResult.ok(ValidatedRecord(record=record, schema=schema))
+            return r.ok(ValidatedRecord(record=record, schema=schema))
         except ValidationError as e:
-            return FlextResult.fail(
-                ValidationError(f"Schema validation failed: {e.message}")
-            )
+            return r.fail(ValidationError(f"Schema validation failed: {e.message}"))
 
-    def validate_stream_schema(self, schema: dict) -> FlextResult[ValidatedSchema]:
+    def validate_stream_schema(self, schema: dict) -> r[ValidatedSchema]:
         """Validate Singer stream schema."""
         required_fields = ["type", "properties"]
         if not all(field in schema for field in required_fields):
-            return FlextResult.fail(SchemaError("Invalid Singer schema structure"))
+            return r.fail(SchemaError("Invalid Singer schema structure"))
 
-        return FlextResult.ok(ValidatedSchema(schema=schema))
+        return r.ok(ValidatedSchema(schema=schema))
 ```
 
 ______________________________________________________________________

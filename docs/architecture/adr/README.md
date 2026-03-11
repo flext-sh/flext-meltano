@@ -100,7 +100,7 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 
 | ADR | Title | Status | Date |
 | \---------------------------------------------- | ------------------------------------------------ | -------- | ---------- | --------------------------- |
-| [ADR-001](001-railway-oriented-programming.md) | Railway-Oriented Programming with FlextResult[T] | Accepted | 2025-01-15 |
+| [ADR-001](001-railway-oriented-programming.md) | Railway-Oriented Programming with r[T] | Accepted | 2025-01-15 |
 | [ADR-002](002-clean-architecture-ddd.md) | Clean Architecture with Domain-Driven Design | Accepted | 2025-01-20 |
 | [ADR-003](003-singer-protocol-abstraction.md) | Singer Protocol Abstraction Layer | Accepted | 2025-02-01 |
 | ADR-004 | Type Safety First with Python 3.13+ | Accepted | 2025-02-05 | _Documentation coming soon_ |

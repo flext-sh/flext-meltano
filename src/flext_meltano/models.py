@@ -17,7 +17,7 @@ import yaml
 from flext_cli import FlextCliModels
 from flext_core import (
     FlextModels,
-    FlextResult,
+    r,
     t,
     u,
 )
@@ -57,7 +57,7 @@ class FlextMeltanoModels(FlextCliModels):
             sensitive_keys_list: list[str] = list(sensitive_keys)
             checks_result = u.process(
                 sensitive_keys_list,
-                lambda s: FlextResult[bool].ok(
+                lambda s: r[bool].ok(
                     s in normalized,
                 ),
             )

@@ -14,12 +14,11 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextService, r
 
 from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 
-r = FlextResult
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
 c = FlextMeltanoConstants
@@ -30,7 +29,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
     """Manages Singer catalogs (schemas and stream definitions).
 
     Handles catalog discovery, loading, validation, and manipulation
-    with proper error handling and FlextResult patterns.
+    with proper error handling and r patterns.
     """
 
     def __init__(self) -> None:
@@ -45,7 +44,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         tap: Singer tap instance with discover() method
 
         Returns:
-        FlextResult containing discovered catalog
+        r containing discovered catalog
 
         """
         try:
@@ -78,7 +77,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         stream_name: Name of the stream
 
         Returns:
-        FlextResult containing stream schema or None
+        r containing stream schema or None
 
         """
         try:
@@ -108,7 +107,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         catalog_file: Path to catalog file
 
         Returns:
-        FlextResult containing loaded catalog
+        r containing loaded catalog
 
         """
         try:
@@ -144,7 +143,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         catalog_file: Path to save catalog
 
         Returns:
-        FlextResult with success status
+        r with success status
 
         """
         try:
@@ -172,7 +171,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         stream_names: List of stream names to select
 
         Returns:
-        FlextResult containing filtered catalog
+        r containing filtered catalog
 
         """
         try:
