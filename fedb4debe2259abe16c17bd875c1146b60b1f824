@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "fedb4debe2259abe16c17bd875c1146b60b1f824",
+  "prompts": {
+    "26c42d907a396eb3": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_326b3085effe81VUAq2rTBVhr7",
+        "model": "kimi-for-coding/k2p5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
