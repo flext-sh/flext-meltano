@@ -116,6 +116,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         connection_config: t.Dict,
         stream_config: t.Dict | None = None,
         tap_version: str = "1.0.0",
+        _version: str | None = None,
     ) -> r[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data.
 
@@ -140,10 +141,10 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             return self.create_source_instance(config).map(
                 lambda inst: m.Meltano.TapInstance(
                     tap_type=inst.source_type, config=config, tap_id=inst.source_id
-                )
+                ).model_dump()
             )
-        except Exception as e:
-            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
+        except Exception as exc:
+            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
 
     def discover_streams(
         self,

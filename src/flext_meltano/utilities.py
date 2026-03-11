@@ -354,11 +354,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             file_path: Path, content: str | t.Meltano.MeltanoConfigDict
         ) -> r[Path]:
             """Create a project file with content."""
-            content_guard = FlextUtilities.guard(
-                content, (str, dict), return_value=True
-            )
-            if content_guard is None:
+            if not isinstance(content, str | dict):
                 return r[Path].fail("Invalid content type: must be string or dict")
+            content_guard: str | dict[str, object] = content
 
             def create_file() -> Path:
                 file_path.parent.mkdir(parents=True, exist_ok=True)

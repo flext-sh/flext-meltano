@@ -58,6 +58,9 @@ class FlextMeltano(s[t.JsonValue]):
         if u.empty(service_name):
             msg = "API service name cannot be empty"
             raise e.ValidationError(msg, error_code="INVALID_SERVICE_NAME")
+        if project_root is not None and not isinstance(project_root, str | Path):
+            msg = f"project_root must be str or Path, got {type(project_root).__name__}"
+            raise TypeError(msg)
         version = version if version is not None else "0.9.0"
         if config is None:
             if project_root is not None:
