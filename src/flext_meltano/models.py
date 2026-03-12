@@ -40,7 +40,7 @@ class FlextMeltanoModels(FlextCliModels):
     Provides reusable Pydantic models for pipeline operations.
     """
 
-    def __init_subclass__(cls, **kwargs: object) -> None:
+    def __init_subclass__(cls, **kwargs: t.Scalar) -> None:
         """Allow downstream projects to inherit FlextMeltanoModels for namespace composition."""
         super().__init_subclass__(**kwargs)
 

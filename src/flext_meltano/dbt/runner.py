@@ -38,7 +38,7 @@ class FlextMeltanoDbtRunner(s[str]):
         super().__init__()
         self.project_root: Path | None = project_root
 
-    def docs_generate(self, **_kwargs: object) -> r[t.Meltano.ExecutionResultDict]:
+    def docs_generate(self, **_kwargs: t.Scalar) -> r[t.Meltano.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -73,7 +73,7 @@ class FlextMeltanoDbtRunner(s[str]):
             )
 
     @override
-    def execute(self, **_kwargs: object) -> r[str]:
+    def execute(self, **_kwargs: t.Scalar) -> r[str]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             msg = f"DBT runner: {self.project_root}"
@@ -81,7 +81,7 @@ class FlextMeltanoDbtRunner(s[str]):
         return r[str].fail("No project root set")
 
     def run_models(
-        self, models: list[str] | None = None, **_kwargs: object
+        self, models: list[str] | None = None, **_kwargs: t.Scalar
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
 
@@ -119,7 +119,7 @@ class FlextMeltanoDbtRunner(s[str]):
             return r[m.Meltano.DbtRunResult].fail(f"DBT run failed: {e}")
 
     def run_tests(
-        self, models: list[str] | None = None, **_kwargs: object
+        self, models: list[str] | None = None, **_kwargs: t.Scalar
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.
 

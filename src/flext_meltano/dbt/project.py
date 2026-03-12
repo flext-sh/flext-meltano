@@ -43,7 +43,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
         self.manifest: t.Meltano.Dbt.ManifestData | None = None
 
     @override
-    def execute(self, **_kwargs: object) -> r[m.Meltano.DbtProjectInfo]:
+    def execute(self, **_kwargs: t.Scalar) -> r[m.Meltano.DbtProjectInfo]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             info = m.Meltano.DbtProjectInfo(

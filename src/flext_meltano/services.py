@@ -123,7 +123,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _create_service_generic(
-        service_type: str, name: str, **config: object
+        service_type: str, name: str, **config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Generic service factory - delegates to specific creators."""
         if service_type == "source":
@@ -166,13 +166,13 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         })
 
     @staticmethod
-    def create_dbt_service(dbt_name: str, **config: object) -> r[FlextMeltanoService]:
+    def create_dbt_service(dbt_name: str, **config: t.Scalar) -> r[FlextMeltanoService]:
         """Create DBT transformation service - delegates to generic transformation service."""
         return FlextMeltanoService.create_transformation_service(dbt_name, **config)
 
     @staticmethod
     def create_sink_service(
-        sink_name: str, **_config: object
+        sink_name: str, **_config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create data sink service using railway pattern."""
         try:
@@ -187,7 +187,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def create_source_service(
-        source_name: str, **_config: object
+        source_name: str, **_config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create data source service using railway pattern."""
         try:
@@ -201,20 +201,20 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
             )
 
     @staticmethod
-    def create_tap_service(tap_name: str, **config: object) -> r[FlextMeltanoService]:
+    def create_tap_service(tap_name: str, **config: t.Scalar) -> r[FlextMeltanoService]:
         """Create Singer tap service - delegates to generic source service."""
         return FlextMeltanoService.create_source_service(tap_name, **config)
 
     @staticmethod
     def create_target_service(
-        target_name: str, **config: object
+        target_name: str, **config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create Singer target service - delegates to generic sink service."""
         return FlextMeltanoService.create_sink_service(target_name, **config)
 
     @staticmethod
     def create_transformation_service(
-        transformation_name: str, **_config: object
+        transformation_name: str, **_config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create transformation service using railway pattern."""
         try:
