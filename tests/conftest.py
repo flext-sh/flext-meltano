@@ -14,7 +14,7 @@ import os
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol
 
 import pytest
 import yaml
@@ -23,11 +23,21 @@ from flext_meltano import t
 from tests.helpers.docker_test_manager import FlextTestsDocker
 
 
+class MockCliResult:
+    """Mock CLI invocation result."""
+
+    def __init__(self, exit_code: int = 0, output: str = "") -> None:
+        """Initialize the instance."""
+        self.exit_code = exit_code
+        self.output = output
+
+
 class CliRunnerProtocol(Protocol):
     """Protocol for CLI runner interface."""
 
-    def invoke(self, *args: objectwargs: objecobjectt:object
+    def invoke(self, *args: t.Scalar, **kwargs: t.Scalar) -> MockCliResult:
         """Invoke CLI command."""
+        ...
 
 
 @pytest.fixture(autouse=True)
@@ -52,7 +62,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> dict[str, object
+def meltano_yml_config() -> t.Meltano.MeltanoConfigDict:
     """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
@@ -112,8 +122,9 @@ def meltano_yml_config() -> dict[str, object
 
 @pytest.fixture
 def meltano_project(
-    test_meltano_project_dir: Path, meltano_yml_config: dict[str, object
-) -> dict[str, Any]:
+    test_meltano_project_dir: Path,
+    meltano_yml_config: t.Meltano.MeltanoConfigDict,
+) -> t.Meltano.MeltanoConfigDict:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     with meltano_yml.open("w", encoding="utf-8") as f:
@@ -129,7 +140,7 @@ def meltano_project(
 
 
 @pytest.fixture
-def tap_csv_config() -> dict[str, object
+def tap_csv_config() -> t.Meltano.MeltanoConfigDict:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -144,7 +155,7 @@ def tap_csv_config() -> dict[str, object
 
 
 @pytest.fixture
-def target_csv_config() -> dict[str, object
+def target_csv_config() -> t.Meltano.MeltanoConfigDict:
     """Target CSV configuration for testing."""
     return {"destination_path": "output", "file_format": "csv", "delimiter": ","}
 
@@ -159,9 +170,11 @@ class MockCliRunner:
     """Mock CLI runner."""
 
     @staticmethod
-    def invoke(*args: object, **kwargs: object) -> object:
+    def invoke(*args: t.Scalar, **kwargs: t.Scalar) -> MockCliResult:
         """Mock invoke method."""
-        return type("Result", (), {"exit_code": 0, "output": ""})()
+        _ = args
+        _ = kwargs
+        return MockCliResult()
 
 
 @pytest.fixture
@@ -177,7 +190,7 @@ def meltano_invoke_args() -> list[str]:
 
 
 @pytest.fixture
-def singer_schema() -> dict[str, object
+def singer_schema() -> t.Meltano.MeltanoConfigDict:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -196,7 +209,7 @@ def singer_schema() -> dict[str, object
 
 
 @pytest.fixture
-def singer_records() -> list[dict[str, object
+def singer_records() -> list[t.Meltano.MeltanoConfigDict]:
     """Sample Singer records for testing."""
     return [
         {
@@ -223,7 +236,7 @@ def singer_records() -> list[dict[str, object
 
 
 @pytest.fixture
-def singer_state() -> dict[str, object
+def singer_state() -> t.Meltano.MeltanoConfigDict:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -239,7 +252,7 @@ def singer_state() -> dict[str, object
 
 
 @pytest.fixture
-def pipeline_execution_config() -> dict[str, object
+def pipeline_execution_config() -> t.Meltano.MeltanoConfigDict:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -252,7 +265,7 @@ def pipeline_execution_config() -> dict[str, object
 
 
 @pytest.fixture
-def test_environment_config() -> dict[str, object
+def test_environment_config() -> t.Meltano.MeltanoConfigDict:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -264,7 +277,7 @@ def test_environment_config() -> dict[str, object
 
 
 @pytest.fixture
-def sample_schedule_config() -> dict[str, object
+def sample_schedule_config() -> t.Meltano.MeltanoConfigDict:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -277,7 +290,7 @@ def sample_schedule_config() -> dict[str, object
 
 
 @pytest.fixture
-def job_run_config() -> dict[str, object
+def job_run_config() -> t.Meltano.MeltanoConfigDict:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -339,15 +352,23 @@ class MockMeltanoService:
     """Mock Meltano service."""
 
     @staticmethod
-    def create_project(_config: dict[str, object dict[str, objecobject
+    def create_project(
+        _config: t.Meltano.MeltanoConfigDict,
+    ) -> t.Meltano.MeltanoConfigDict:
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
-    def install_plugin(_plugin_type: str, plugin_name: str) -> dict[str, object
+    def install_plugin(
+        _plugin_type: str,
+        plugin_name: str,
+    ) -> t.Meltano.MeltanoConfigDict:
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
-    def run_pipeline(_extractor: str, _loader: str) -> dict[str, object
+    def run_pipeline(
+        _extractor: str,
+        _loader: str,
+    ) -> t.Meltano.MeltanoConfigDict:
         return {"execution_id": "test-execution", "status": "running"}
 
 
@@ -360,16 +381,16 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, config: dict[str, object None:
+    def __init__(self, config: t.Meltano.MeltanoConfigDict) -> None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
-    def discover(self) -> dict[str, object
+    def discover(self) -> t.Meltano.MeltanoConfigDict:
         _ = self.config
         return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-    def extract(self) -> list[dict[str, object
+    def extract(self) -> list[t.Meltano.MeltanoConfigDict]:
         _ = self.config
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -383,12 +404,15 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, config: dict[str, object None:
+    def __init__(self, config: t.Meltano.MeltanoConfigDict) -> None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
-    def load(self, records: list[dict[str, object> dict[str, objecobject
+    def load(
+        self,
+        records: list[t.Meltano.MeltanoConfigDict],
+    ) -> t.Meltano.MeltanoConfigDict:
         _ = self.config
         return {"records_loaded": len(records), "status": "success"}
 

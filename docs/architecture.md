@@ -233,7 +233,7 @@ class _MeltanoLibraryWrapper:
     """Internal wrapper for meltano library operations."""
 
     @staticmethod
-    def create_project(path: Path) -> r[object]:
+    def create_project(path: Path) -> r[t.Container]:
         """Create Meltano project through library API."""
         # Implementation with proper error handling
 ```
@@ -256,8 +256,8 @@ class FlextMeltanoTypes:
     class Singer:
         """Singer protocol integration types."""
 
-        type Tap = object
-        type Target = object
+        type Tap = SingerTapProtocol
+        type Target = SingerTargetProtocol
         type MessageType = str
         type RecordMessage = JsonObject
 

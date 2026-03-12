@@ -52,7 +52,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         timestamp = u.Generators.generate_iso_timestamp()
         assert isinstance(timestamp, str)
         assert "T" in timestamp
-        test_data: dict[str, object
+        test_data: t.Meltano.MeltanoConfigDict = {
             "level1": {"level2": {"level3": "found_value"}}
         }
         level1 = test_data.get("level1", {})

@@ -49,8 +49,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_connection_config(
-        cls, config: Mapping[str, object
-    ) -> r[Mapping[str, object
+        cls, config: Mapping[str, t.Scalar]
+    ) -> r[Mapping[str, t.Scalar]]:
         """Validate connection configuration with domain-specific business rules.
 
         Validates connection configuration data for pipeline services,
@@ -78,17 +78,19 @@ class FlextMeltanoValidators:
         """
         try:
             if not config:
-                return r[Mapping[str, objectil(
+                return r[Mapping[str, t.Scalar]].fail(
                     "Connection configuration cannot be empty"
                 )
-            return r[Mapping[str, object(config)
+            return r[Mapping[str, t.Scalar]].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return r[Mapping[str, objectil(error_msg)
+            return r[Mapping[str, t.Scalar]].fail(error_msg)
 
     @classmethod
-    def validate_pipeline_component_business_rules(cls, config: objectr[bool]:
+    def validate_pipeline_component_business_rules(
+        cls, config: Mapping[str, t.Scalar]
+    ) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
             m.Meltano.PluginComponentConfig.model_validate(config)
@@ -97,7 +99,9 @@ class FlextMeltanoValidators:
             return r[bool].fail(f"Plugin config validation failed: {error}")
 
     @classmethod
-    def validate_pipeline_project_business_rules(cls, config: objectr[bool]:
+    def validate_pipeline_project_business_rules(
+        cls, config: Mapping[str, t.Scalar]
+    ) -> r[bool]:
         """Validate pipeline project business rules.
 
         Validates pipeline project configuration including version requirements
@@ -169,7 +173,7 @@ class FlextMeltanoValidators:
             return r[bool].fail(error_msg)
 
     @classmethod
-    def validate_plugin_config(cls, config: objectr[bool]:
+    def validate_plugin_config(cls, config: Mapping[str, t.Scalar]) -> r[bool]:
         """Validate plugin configuration with complete business rules.
 
         Validates plugin configuration data for Meltano plugins,
@@ -185,7 +189,9 @@ class FlextMeltanoValidators:
         return cls.validate_pipeline_component_business_rules(config)
 
     @classmethod
-    def validate_transformation_business_rules(cls, config: objectr[bool]:
+    def validate_transformation_business_rules(
+        cls, config: Mapping[str, t.Scalar]
+    ) -> r[bool]:
         """Validate transformation-specific business rules.
 
         Validates transformation project configuration including project name format

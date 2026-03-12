@@ -23,7 +23,6 @@ from flext_meltano import (
 
 t = FlextMeltanoTypes
 c = FlextMeltanoConstants
-m = FlextMeltanoModels
 
 
 class FlextMeltanoBridge:
@@ -84,7 +83,7 @@ class FlextMeltanoBridge:
 
     @staticmethod
     def execute_command(
-        command: str, args: Mapping[str, objectone = None
+        command: str, args: Mapping[str, t.Container] | None = None
     ) -> r[t.Meltano.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 
@@ -98,7 +97,9 @@ class FlextMeltanoBridge:
         """
         try:
             args_dict: t.Meltano.MeltanoConfigDict = (
-                m.Meltano.ConfigMappingPayload.model_validate({"values": args}).values
+                FlextMeltanoModels.Meltano.ConfigMappingPayload.model_validate({
+                    "values": args
+                }).values
                 if args
                 else {}
             )

@@ -139,7 +139,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "values": cfg
                 }).values
                 plugins_val = cfg_dict.get("plugins")
-                plugins_dict: dict[str, object] = {}
+                plugins_dict: dict[str, t.Scalar] = {}
                 if isinstance(plugins_val, dict):
                     plugins_dict = plugins_val
                 result_cfg: t.Meltano.MeltanoConfigDict = {
@@ -177,7 +177,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             executable: str = "",
         ) -> r[t.Meltano.PluginConfigDict]:
             """Create MELTANO-SPECIFIC plugin config using DSL builder pattern."""
-            raw: dict[str, object
+            raw: dict[str, t.Scalar] = {
                 "name": name,
                 "namespace": namespace,
                 "pip_url": pip_url,
@@ -356,7 +356,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             """Create a project file with content."""
             if not isinstance(content, str | dict):
                 return r[Path].fail("Invalid content type: must be string or dict")
-            content_guard: str | dict[str, object] = content
+            content_guard: str | dict[str, t.Scalar] = content
 
             def create_file() -> Path:
                 file_path.parent.mkdir(parents=True, exist_ok=True)

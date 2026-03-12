@@ -153,7 +153,7 @@ git push origin feature/amazing-feature
 
 ```python
 # ✅ CORRECT - Complete type annotations
-def process_data(data: dict[str, object]) -> r[ProcessedData]:
+def process_data(data: ProcessInputModel) -> r[ProcessedData]:
     """Process data with type safety."""
     if not data:
         return r[ProcessedData].fail("Data required")
@@ -170,7 +170,7 @@ def process_data(data):
 
 ```python
 # ✅ CORRECT - Use r for all operations
-def validate_and_process(data: dict) -> r[ProcessedData]:
+def validate_and_process(data: ProcessInputModel) -> r[ProcessedData]:
     return (
         validate_data(data)
         .flat_map(transform_data)
@@ -180,7 +180,7 @@ def validate_and_process(data: dict) -> r[ProcessedData]:
 
 
 # ❌ WRONG - Exception-based error handling
-def validate_and_process(data: dict) -> ProcessedData:
+def validate_and_process(data: ProcessInputModel) -> ProcessedData:
     if not data:
         raise ValueError("Data required")
     return transform_data(data)
@@ -192,20 +192,20 @@ def validate_and_process(data: dict) -> ProcessedData:
 # ✅ CORRECT - Use [Project]Models pattern
 class FlextApiModels:
     class Request(BaseModel):
-        data: dict[str, object]
+        data: ProcessInputModel
 
     class Response(BaseModel):
-        result: r[object]
+        result: r[ProcessedData]
         status: int
 
 
 # ❌ WRONG - Scattered model definitions
 class ApiRequest(BaseModel):
-    data: dict[str, object]
+    data: ProcessInputModel
 
 
 class ApiResponse(BaseModel):
-    result: object
+    result: ProcessedData
 ```
 
 ## Testing
@@ -342,7 +342,7 @@ class FlextNewlib:
     def __init__(self, config: FlextNewlibSettings):
         self.config = config
 
-    def process(self, data: dict) -> r[dict]:
+    def process(self, data: NewlibProcessInputModel) -> r[NewlibProcessResultModel]:
         """Process data using r pattern."""
         # Implementation here
         pass
@@ -354,10 +354,10 @@ class FlextNewlibModels:
         setting: str = "default"
 
     class Request(BaseModel):
-        data: dict[str, object]
+        data: NewlibProcessInputModel
 
     class Response(BaseModel):
-        result: r[object]
+        result: r[NewlibProcessResultModel]
 ```
 
 ### 3. Add to Workspace
@@ -406,12 +406,12 @@ poetry env info
 ### Code Documentation
 
 ```python
-def process_data(data: dict[str, object]) -> r[ProcessedData]:
+def process_data(data: ProcessInputModel) -> r[ProcessedData]:
     """
     Process data using the FLEXT pipeline.
 
     Args:
-        data: Input data dictionary
+        data: Input data mapping with strict contracts
 
     Returns:
         r containing processed data or error

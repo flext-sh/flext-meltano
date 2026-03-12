@@ -37,7 +37,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_plugins(self) -> None:
         """Test Meltano config dictionary creation with plugins."""
-        plugins: dict[str, object
+        plugins: t.Meltano.MeltanoConfigDict = {
             "extractors": [{"name": "tap-postgres"}],
             "loaders": [{"name": "target-csv"}],
         }
@@ -65,7 +65,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
-        environments: dict[str, object
+        environments: t.Meltano.MeltanoConfigDict = {
             "dev": {"plugins": {"extractors": []}},
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
@@ -145,7 +145,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test successful project file creation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            content: dict[str, object
+            content: t.Meltano.MeltanoConfigDict = {
                 "project_id": "test-project",
                 "version": "1.0.0",
             }
@@ -160,7 +160,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_project_file_directory_not_exists(self) -> None:
         """Test project file creation in non-existent directory."""
         file_path = Path("/nonexistent/directory/pipeline.yml")
-        content: dict[str, object"project_id": "test"}
+        content: t.Meltano.MeltanoConfigDict = {"project_id": "test"}
         result = u.Meltano.create_project_file(file_path, content)
         assert result.is_failure
         assert result.error is not None
@@ -170,7 +170,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test project file creation with invalid content type."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            invalid_content: object = 123
+            invalid_content: int = 123
             result = u.Meltano.create_project_file(
                 project_path / "test.yml", invalid_content
             )
@@ -226,8 +226,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test YAML file saving with invalid content."""
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "output.yml"
-            content_with_object: t.Meltano.MeltanoConfigDict = {"data": object()}
-            result = u.Meltano.write_meltano_yml(content_with_object, yaml_file)
+            content_with_set: t.Meltano.MeltanoConfigDict = {"data": {"bad"}}
+            result = u.Meltano.write_meltano_yml(content_with_set, yaml_file)
             assert result.is_success
             assert yaml_file.exists()
             load_result = u.Meltano.load_yaml_config(yaml_file)

@@ -120,7 +120,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         self,
         extractor_name: str,
         loader_name: str,
-        context_data: Mapping[str, object
+        context_data: Mapping[str, t.Scalar],
     ) -> r[Mapping[str, str]]:
         """Build successful pipeline result."""
         try:
@@ -199,13 +199,13 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
 
     def _execute_singer_runner(
         self, context_data: t.Meltano.ExecutionResultDict
-    ) -> r[Mapping[str, object
+    ) -> r[Mapping[str, t.Scalar]]:
         """Execute Singer runner with context data."""
         try:
             _ = m.Meltano.PipelineExecutionContext.model_validate(context_data)
-            return r[Mapping[str, objectil("Plugin discovery not configured")
+            return r[Mapping[str, t.Scalar]].fail("Plugin discovery not configured")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, objectil(
+            return r[Mapping[str, t.Scalar]].fail(
                 f"Unexpected error in ELT pipeline: {e}"
             )
 

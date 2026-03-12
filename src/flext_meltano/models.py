@@ -40,14 +40,14 @@ class FlextMeltanoModels(FlextCliModels):
     Provides reusable Pydantic models for pipeline operations.
     """
 
-    def __init_subclass__(cls, **kwargs: objectNone:
+    def __init_subclass__(cls, **kwargs: object) -> None:
         """Allow downstream projects to inherit FlextMeltanoModels for namespace composition."""
         super().__init_subclass__(**kwargs)
 
     @staticmethod
     def _protect_sensitive_config(
-        value: Mapping[str, object
-    ) -> Mapping[str, object
+        value: Mapping[str, t.Scalar],
+    ) -> Mapping[str, t.Scalar]:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -71,7 +71,7 @@ class FlextMeltanoModels(FlextCliModels):
             return False
 
         # Transform dict values with protection for sensitive fields
-        protected: dict[str, object}
+        protected: dict[str, t.Scalar] = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
 
@@ -677,7 +677,7 @@ class FlextMeltanoModels(FlextCliModels):
             select: str | None = Field(default=None, description="Selection syntax")
             exclude: str | None = Field(default=None, description="Exclusion syntax")
             full_refresh: bool = Field(default=False, description="Full refresh flag")
-            vars: dict[str, objectone = Field(
+            vars: dict[str, t.Scalar] | None = Field(
                 default=None,
                 description="dbt variables",
             )
@@ -728,10 +728,10 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic tap configuration for data extraction."""
 
             tap_type: str = Field(description="Type of the tap")
-            connection_config: dict[str, objectield(
+            connection_config: dict[str, t.Scalar] = Field(
                 description="Connection configuration",
             )
-            stream_config: dict[str, objectield(
+            stream_config: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Stream-specific configuration",
             )
@@ -756,9 +756,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self,
-                value: Mapping[str, object
-            ) -> Mapping[str, object
+                self, value: Mapping[str, t.Scalar]
+            ) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -779,7 +778,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic target configuration for data loading."""
 
             target_type: str = Field(description="Type of the target")
-            connection_config: dict[str, objectield(
+            connection_config: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Connection configuration",
             )
@@ -810,9 +809,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self,
-                value: Mapping[str, object
-            ) -> Mapping[str, object
+                self, value: Mapping[str, t.Scalar]
+            ) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -829,10 +827,10 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic data source configuration with validation."""
 
             source_type: str = Field(description="Type of the data source")
-            connection_config: dict[str, objectield(
+            connection_config: dict[str, t.Scalar] = Field(
                 description="Connection configuration",
             )
-            stream_config: dict[str, objectield(
+            stream_config: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Stream-specific configuration",
             )
@@ -857,9 +855,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self,
-                value: Mapping[str, object
-            ) -> Mapping[str, object
+                self, value: Mapping[str, t.Scalar]
+            ) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -880,7 +877,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic stream definition for data pipeline operations."""
 
             stream_name: str = Field(description="Name of the stream")
-            stream_schema: dict[str, objectield(
+            stream_schema: dict[str, t.Container] = Field(
                 description="JSON schema for the stream",
             )
             source_type: str = Field(
@@ -917,13 +914,12 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("stream_schema")
             def serialize_stream_schema(
-                self,
-                value: Mapping[str, object
-            ) -> Mapping[str, object
+                self, value: Mapping[str, t.Container]
+            ) -> Mapping[str, t.Container]:
                 """Normalize stream schema structure."""
                 result = dict(value)
                 if "properties" not in result:
-                    result["properties"] = dict[str, object
+                    result["properties"] = {}
                 if "type" not in result:
                     result["type"] = "object"
                 return result
@@ -950,11 +946,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             sink_name: str = Field(description="Name of the sink")
             sink_type: str = Field(description="Type of the sink")
-            config: dict[str, objectield(
+            config: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Sink configuration",
             )
-            sink_schema: dict[str, objectield(
+            sink_schema: dict[str, t.Container] = Field(
                 default_factory=dict,
                 description="Sink schema",
             )
@@ -1046,7 +1042,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default=False,
                 description="Whether streams have been discovered",
             )
-            metadata: dict[str, objectield(
+            metadata: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Additional metadata",
             )
@@ -1140,7 +1136,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic data sink configuration with validation."""
 
             sink_type: str = Field(description="Sink type identifier")
-            connection_config: dict[str, objectield(
+            connection_config: dict[str, t.Scalar] = Field(
                 description="Connection configuration dictionary",
             )
             batch_size: int = Field(
@@ -1173,9 +1169,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self,
-                value: Mapping[str, object
-            ) -> Mapping[str, object
+                self, value: Mapping[str, t.Scalar]
+            ) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1199,7 +1194,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic stream information for data pipeline operations."""
 
             stream_name: str = Field(min_length=1, description="Stream name identifier")
-            stream_schema: dict[str, objectield(
+            stream_schema: dict[str, t.Container] = Field(
                 description="Stream schema definition",
             )
             key_properties: list[str] = Field(
@@ -1276,7 +1271,7 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Singer message discriminator",
             )
             stream: str = Field(min_length=1, description="Singer stream name")
-            schema_definition: dict[str, objectield(
+            schema_definition: dict[str, t.Container] = Field(
                 alias="schema",
                 serialization_alias="schema",
                 validation_alias="schema",
@@ -1299,7 +1294,7 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Singer message discriminator",
             )
             stream: str = Field(min_length=1, description="Singer stream name")
-            record: dict[str, objectield(
+            record: dict[str, t.Container] = Field(
                 description="Singer record payload",
             )
             time_extracted: str | None = Field(
@@ -1383,7 +1378,7 @@ class FlextMeltanoModels(FlextCliModels):
                 description="Tap stream identifier",
             )
             stream: str = Field(min_length=1, description="Singer stream name")
-            schema_definition: dict[str, objectield(
+            schema_definition: dict[str, t.Container] = Field(
                 alias="schema",
                 serialization_alias="schema",
                 validation_alias="schema",
@@ -1555,7 +1550,7 @@ class FlextMeltanoModels(FlextCliModels):
         class JsonSchemaPayload(FlextModels.ArbitraryTypesModel):
             """Typed schema payload used by API extract flow."""
 
-            schema_definition: dict[str, objectield(
+            schema_definition: dict[str, t.Container] = Field(
                 default_factory=dict,
                 alias="schema",
                 serialization_alias="schema",
@@ -1571,13 +1566,13 @@ class FlextMeltanoModels(FlextCliModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return dict[str, object
+                        return {}
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
             """Typed record batch payload used by API load flow."""
 
-            records: list[dict[str, objectField(
-                default_factory=lambda: list[dict[str, object
+            records: list[dict[str, t.Container]] = Field(
+                default_factory=list,
                 description="Normalized record payloads",
             )
 
@@ -1587,12 +1582,12 @@ class FlextMeltanoModels(FlextCliModels):
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
-                        records: list[dict[str, object[]
+                        records: list[dict[str, t.Container]] = []
                         for record in value:
                             match record:
                                 case Mapping():
                                     # Type narrowing: convert mapping items to object
-                                    record_dict: dict[str, object}
+                                    record_dict: dict[str, t.Container] = {}
                                     for key, item in record.items():
                                         # Only include JSON-serializable values (exclude None, BaseModel, Path)
                                         if isinstance(item, (str, int, float, bool)):
@@ -1666,7 +1661,7 @@ class FlextMeltanoModels(FlextCliModels):
         class VariantPayload(FlextModels.ArbitraryTypesModel):
             """Normalize plugin variant from external extraction (str|list|dict)."""
 
-            value: str | list[str] | dict[str, objectone = Field(
+            value: str | list[str] | dict[str, t.Scalar] | None = Field(
                 default=None,
                 description="Normalized variant value",
             )
@@ -1676,7 +1671,7 @@ class FlextMeltanoModels(FlextCliModels):
             def normalize_variant(
                 cls,
                 value: object,
-            ) -> str | list[str] | Mapping[str, objectone:
+            ) -> str | list[str] | Mapping[str, t.Scalar] | None:
                 """Normalize variant_raw into typed union."""
                 match value:
                     case None:
@@ -1686,7 +1681,7 @@ class FlextMeltanoModels(FlextCliModels):
                     case list() | tuple():
                         return [str(item) for item in value]
                     case Mapping():
-                        result: dict[str, object}
+                        result: dict[str, t.Scalar] = {}
                         for k, v in value.items():
                             # Type narrowing for JSON-serializable primitives
                             if isinstance(v, (str, int, float, bool)):
@@ -1980,11 +1975,11 @@ class FlextMeltanoModels(FlextCliModels):
                 default="dev",
                 description="Default environment name",
             )
-            plugins: dict[str, objectield(
+            plugins: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Plugin configurations",
             )
-            environments: dict[str, objectield(
+            environments: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Environment configurations",
             )
@@ -2098,7 +2093,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default="standard",
                 description="Plugin variant",
             )
-            settings: dict[str, objectield(
+            settings: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Plugin settings",
             )
@@ -2169,19 +2164,19 @@ class FlextMeltanoModels(FlextCliModels):
             name: str = Field(description="DBT project name")
             profile: str = Field(description="DBT profile name")
             dbt_version: str = Field(default="1.0.0", description="DBT project version")
-            config: dict[str, objectield(
+            config: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="DBT project configuration",
             )
-            models: dict[str, objectield(
+            models: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="DBT models configuration",
             )
-            sources: dict[str, objectield(
+            sources: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="DBT sources configuration",
             )
-            tests: dict[str, objectield(
+            tests: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="DBT tests configuration",
             )
@@ -2387,7 +2382,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default=None,
                 description="Error message if failed",
             )
-            metadata: dict[str, objectield(
+            metadata: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Additional execution metadata",
             )
@@ -2492,7 +2487,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default=0,
                 description="Total records processed",
             )
-            pipeline_metadata: dict[str, objectield(
+            pipeline_metadata: dict[str, t.Scalar] = Field(
                 default_factory=dict,
                 description="Pipeline execution metadata",
             )

@@ -194,7 +194,7 @@ class TestFlextMeltanoTypes:
             "tap_stream_id": "users",
             "schema": {"type": "object"},
         }
-        project: dict[str, object"name": "elt-project", "enabled": True}
+        project: t.Meltano.MeltanoConfigDict = {"name": "elt-project", "enabled": True}
         assert plugin_def["name"] == "tap-users"
         assert isinstance(plugin_def["variants"], list)
         assert catalog["tap_stream_id"] == "users"

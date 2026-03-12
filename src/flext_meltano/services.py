@@ -166,9 +166,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         })
 
     @staticmethod
-    def create_dbt_service(
-        dbt_name: str, **config: object
-    ) -> r[FlextMeltanoService]:
+    def create_dbt_service(dbt_name: str, **config: object) -> r[FlextMeltanoService]:
         """Create DBT transformation service - delegates to generic transformation service."""
         return FlextMeltanoService.create_transformation_service(dbt_name, **config)
 
@@ -203,9 +201,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
             )
 
     @staticmethod
-    def create_tap_service(
-        tap_name: str, **config: object
-    ) -> r[FlextMeltanoService]:
+    def create_tap_service(tap_name: str, **config: object) -> r[FlextMeltanoService]:
         """Create Singer tap service - delegates to generic source service."""
         return FlextMeltanoService.create_source_service(tap_name, **config)
 
@@ -233,9 +229,9 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
             )
 
     @staticmethod
-    def discover() -> r[object
+    def discover() -> r[t.Meltano.ResultDict]:
         """Discover data source schema - railway-oriented operation."""
-        return r[object{"streams": []})
+        return r[t.Meltano.ResultDict].ok({"streams": ""})
 
     @staticmethod
     def execute_pipeline(
@@ -327,9 +323,9 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         return r[t.Meltano.ResultDict].ok({"status": "completed"})
 
     @staticmethod
-    def load_record(_record: objectr[objecobject
+    def load_record(_record: t.Meltano.RecordDict) -> r[t.Meltano.ResultDict]:
         """Load single record to sink - railway-oriented operation."""
-        return r[object{"status": "processed"})
+        return r[t.Meltano.ResultDict].ok({"status": "processed"})
 
     @staticmethod
     def run_pipeline(

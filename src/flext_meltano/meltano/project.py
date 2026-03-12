@@ -18,8 +18,6 @@ from pydantic import PrivateAttr
 
 from flext_meltano import FlextMeltanoModels, t, u
 
-m = FlextMeltanoModels
-
 
 class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]):
     """Manages Meltano projects with deep SDK integration.
@@ -33,7 +31,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     """
 
-    ProjectInfo: ClassVar[type[dict[str, object dict
+    ProjectInfo: ClassVar[type[dict[str, t.Container]]] = dict
     _metadata_extra: dict[str, str] = PrivateAttr(
         default_factory=lambda: dict[str, str](),
     )
@@ -51,10 +49,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         self.project: MeltanoProject | None = None
 
     @override
-    def execute(
-        self,
-        **_kwargs: object
-    ) -> r[t.Meltano.Project.ProjectMetadata]:
+    def execute(self, **_kwargs: t.Container) -> r[t.Meltano.Project.ProjectMetadata]:
         """Execute (implements Service pattern)."""
         if self.project_root:
             info: t.Meltano.Project.ProjectMetadata = {
@@ -222,9 +217,11 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                     "name": plugin.name,
                     "type": plugin.type,
                 }
-                variant_normalized = m.Meltano.VariantPayload.model_validate({
-                    "value": variant_raw
-                }).value
+                variant_normalized = (
+                    FlextMeltanoModels.Meltano.VariantPayload.model_validate({
+                        "value": variant_raw
+                    }).value
+                )
                 if variant_normalized is not None:
                     plugin_def["variant"] = variant_normalized
                 plugins.append(plugin_def)
