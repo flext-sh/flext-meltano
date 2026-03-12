@@ -29,23 +29,23 @@ class FlextMeltanoBridge:
         self.logger: FlextLogger = FlextLogger(__name__)
 
     @staticmethod
-    def discover_plugins() -> r[Mapping[str, t.JsonValue]]:
+    def discover_plugins() -> r[Mapping[str, object
         """Discover available plugins through the Go bridge."""
         try:
-            result_data: dict[str, t.JsonValue] = {
+            result_data: dict[str, object
                 "extractors": ["tap-csv", "tap-postgres", "tap-json"],
                 "loaders": ["target-csv", "target-postgres", "target-jsonl"],
                 "transformers": ["dbt-postgres", "dbt-snowflake"],
                 "status": "discovered",
                 "timestamp": u.Generators.generate_iso_timestamp(),
             }
-            return r[Mapping[str, t.JsonValue]].ok(result_data)
+            return r[Mapping[str, object(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, t.JsonValue]].fail(f"Plugin discovery failed: {e}")
+            return r[Mapping[str, objectil(f"Plugin discovery failed: {e}")
 
     @staticmethod
     def execute_command(
-        command: str, args: Mapping[str, t.JsonValue] | None = None
+        command: str, args: Mapping[str, objectone = None
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Execute a bridge command with JSON arguments.
 

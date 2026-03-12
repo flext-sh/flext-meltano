@@ -26,7 +26,7 @@ from tests.helpers.docker_test_manager import FlextTestsDocker
 class CliRunnerProtocol(Protocol):
     """Protocol for CLI runner interface."""
 
-    def invoke(self, *args: t.JsonValue, **kwargs: t.JsonValue) -> t.JsonValue:
+    def invoke(self, *args: objectwargs: objecobjectt:object
         """Invoke CLI command."""
 
 
@@ -52,7 +52,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> dict[str, t.JsonValue]:
+def meltano_yml_config() -> dict[str, object
     """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
@@ -112,7 +112,7 @@ def meltano_yml_config() -> dict[str, t.JsonValue]:
 
 @pytest.fixture
 def meltano_project(
-    test_meltano_project_dir: Path, meltano_yml_config: dict[str, t.JsonValue]
+    test_meltano_project_dir: Path, meltano_yml_config: dict[str, object
 ) -> dict[str, Any]:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
@@ -129,7 +129,7 @@ def meltano_project(
 
 
 @pytest.fixture
-def tap_csv_config() -> dict[str, t.JsonValue]:
+def tap_csv_config() -> dict[str, object
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -144,7 +144,7 @@ def tap_csv_config() -> dict[str, t.JsonValue]:
 
 
 @pytest.fixture
-def target_csv_config() -> dict[str, t.JsonValue]:
+def target_csv_config() -> dict[str, object
     """Target CSV configuration for testing."""
     return {"destination_path": "output", "file_format": "csv", "delimiter": ","}
 
@@ -177,7 +177,7 @@ def meltano_invoke_args() -> list[str]:
 
 
 @pytest.fixture
-def singer_schema() -> dict[str, t.JsonValue]:
+def singer_schema() -> dict[str, object
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -196,7 +196,7 @@ def singer_schema() -> dict[str, t.JsonValue]:
 
 
 @pytest.fixture
-def singer_records() -> list[dict[str, t.JsonValue]]:
+def singer_records() -> list[dict[str, object
     """Sample Singer records for testing."""
     return [
         {
@@ -223,7 +223,7 @@ def singer_records() -> list[dict[str, t.JsonValue]]:
 
 
 @pytest.fixture
-def singer_state() -> dict[str, t.JsonValue]:
+def singer_state() -> dict[str, object
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -239,7 +239,7 @@ def singer_state() -> dict[str, t.JsonValue]:
 
 
 @pytest.fixture
-def pipeline_execution_config() -> dict[str, t.JsonValue]:
+def pipeline_execution_config() -> dict[str, object
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -252,7 +252,7 @@ def pipeline_execution_config() -> dict[str, t.JsonValue]:
 
 
 @pytest.fixture
-def test_environment_config() -> dict[str, t.JsonValue]:
+def test_environment_config() -> dict[str, object
     """Test environment configuration."""
     return {
         "name": "test",
@@ -264,7 +264,7 @@ def test_environment_config() -> dict[str, t.JsonValue]:
 
 
 @pytest.fixture
-def sample_schedule_config() -> dict[str, t.JsonValue]:
+def sample_schedule_config() -> dict[str, object
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -277,7 +277,7 @@ def sample_schedule_config() -> dict[str, t.JsonValue]:
 
 
 @pytest.fixture
-def job_run_config() -> dict[str, t.JsonValue]:
+def job_run_config() -> dict[str, object
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -339,15 +339,15 @@ class MockMeltanoService:
     """Mock Meltano service."""
 
     @staticmethod
-    def create_project(_config: dict[str, t.JsonValue]) -> dict[str, t.JsonValue]:
+    def create_project(_config: dict[str, object dict[str, objecobject
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
-    def install_plugin(_plugin_type: str, plugin_name: str) -> dict[str, t.JsonValue]:
+    def install_plugin(_plugin_type: str, plugin_name: str) -> dict[str, object
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
-    def run_pipeline(_extractor: str, _loader: str) -> dict[str, t.JsonValue]:
+    def run_pipeline(_extractor: str, _loader: str) -> dict[str, object
         return {"execution_id": "test-execution", "status": "running"}
 
 
@@ -360,16 +360,16 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, config: dict[str, t.JsonValue]) -> None:
+    def __init__(self, config: dict[str, object None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
-    def discover(self) -> dict[str, t.JsonValue]:
+    def discover(self) -> dict[str, object
         _ = self.config
         return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-    def extract(self) -> list[dict[str, t.JsonValue]]:
+    def extract(self) -> list[dict[str, object
         _ = self.config
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -383,12 +383,12 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, config: dict[str, t.JsonValue]) -> None:
+    def __init__(self, config: dict[str, object None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
-    def load(self, records: list[dict[str, t.JsonValue]]) -> dict[str, t.JsonValue]:
+    def load(self, records: list[dict[str, object> dict[str, objecobject
         _ = self.config
         return {"records_loaded": len(records), "status": "success"}
 

@@ -52,17 +52,17 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
             name: str
             default_variant: str | None
-            variants: Mapping[str, t.JsonValue] | None
+            variants: Mapping[str, objectone
 
-            def execute(self, *args: t.JsonValue) -> t.JsonValue:
+            def execute(self, *args: objectobjecobject
                 """Execute plugin with given arguments. # INTERFACE."""
                 ...
 
-            def get_config(self) -> Mapping[str, t.JsonValue]:
+            def get_config(self) -> Mapping[str, object
                 """Get plugin configuration."""
                 ...
 
-            def validate_config(self, config: Mapping[str, t.JsonValue]) -> bool:
+            def validate_config(self, config: Mapping[str, object bool:
                 """Validate plugin configuration. # INTERFACE."""
                 ...
 
@@ -72,85 +72,85 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
             name: str
             tap_stream_id: str
-            schema: t.JsonValue
+            schema: object
 
-            def get_records(self) -> t.JsonValue:
+            def get_records(self) -> object
                 """Get records from the stream. # INTERFACE."""
                 ...
 
-            def sync_records(self) -> t.JsonValue:
+            def sync_records(self) -> object
                 """Sync records from the stream. # INTERFACE."""
                 ...
 
         @runtime_checkable
-        class Tap(FlextCliProtocols.Service[t.JsonValue], Protocol):
+        class Tap(FlextCliProtocols.Service[objectotocol):
             """Singer Tap protocol extending Service for ELT operations."""
 
-            def discover(self) -> FlextCliProtocols.Result[t.JsonValue]:
+            def discover(self) -> FlextCliProtocols.Result[object
                 """Discover catalog with r."""
                 ...
 
             @override
-            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[object
                 """Execute the tap extraction (implements Service)."""
                 ...
 
             def sync(
-                self, catalog: t.JsonValue
-            ) -> FlextCliProtocols.Result[t.JsonValue]:
+                self, catalog: object
+            ) -> FlextCliProtocols.Result[object
                 """Sync data from source with r."""
                 ...
 
         @runtime_checkable
-        class Target(FlextCliProtocols.Service[t.JsonValue], Protocol):
+        class Target(FlextCliProtocols.Service[objectotocol):
             """Singer Target protocol extending Service for ELT operations."""
 
             @override
-            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[object
                 """Execute the target loading (implements Service)."""
                 ...
 
             def handle_batch(
-                self, records: list[t.JsonValue]
-            ) -> FlextCliProtocols.Result[t.JsonValue]:
+                self, records: list[object
+            ) -> FlextCliProtocols.Result[object
                 """Handle a batch of records with r."""
                 ...
 
             def handle_record(
-                self, record: t.JsonValue
-            ) -> FlextCliProtocols.Result[t.JsonValue]:
+                self, record: object
+            ) -> FlextCliProtocols.Result[object
                 """Handle a single record with r."""
                 ...
 
         @runtime_checkable
-        class DbtRunner(FlextCliProtocols.Service[t.JsonValue], Protocol):
+        class DbtRunner(FlextCliProtocols.Service[objectotocol):
             """DBT Runner protocol extending Service for ELT operations."""
 
             @override
-            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[object
                 """Execute DBT transformations (implements Service)."""
                 ...
 
-            def run(self, models: list[str]) -> FlextCliProtocols.Result[t.JsonValue]:
+            def run(self, models: list[str]) -> FlextCliProtocols.Result[object
                 """Run DBT models with r."""
                 ...
 
-            def test(self, models: list[str]) -> FlextCliProtocols.Result[t.JsonValue]:
+            def test(self, models: list[str]) -> FlextCliProtocols.Result[object
                 """Test DBT models with r."""
                 ...
 
         @runtime_checkable
-        class ServiceCall(FlextCliProtocols.Service[t.JsonValue], Protocol):
+        class ServiceCall(FlextCliProtocols.Service[objectotocol):
             """Service call protocol extending Service."""
 
             def call(
-                self, operation: str, payload: t.JsonValue
-            ) -> FlextCliProtocols.Result[t.JsonValue]:
+                self, operation: str, payload: object
+            ) -> FlextCliProtocols.Result[object
                 """Execute service call with r."""
                 ...
 
             @override
-            def execute(self) -> FlextCliProtocols.Result[t.JsonValue]:
+            def execute(self) -> FlextCliProtocols.Result[object
                 """Execute service operation (implements Service)."""
                 ...
 
@@ -241,7 +241,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 """Get project root directory."""
                 ...
 
-            def find_plugins(self, plugin_type: str) -> list[t.JsonValue]:
+            def find_plugins(self, plugin_type: str) -> list[object
                 """Find plugins of specified type."""
                 ...
 
@@ -290,7 +290,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             @property
-            def variants(self) -> Mapping[str, t.JsonValue] | None:
+            def variants(self) -> Mapping[str, objectone:
                 """Available variants."""
                 ...
 

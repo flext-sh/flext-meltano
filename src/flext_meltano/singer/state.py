@@ -33,7 +33,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         self._state_msg: m.Meltano.SingerStateMessage = m.Meltano.SingerStateMessage()
 
     @override
-    def execute(self, **_kwargs: t.JsonValue) -> r[m.Meltano.SingerStateMessage]:
+    def execute(self, **_kwargs: objectr[m.Meltano.SingerStateMessage]:
         """Execute (implements Service pattern)."""
         return r[m.Meltano.SingerStateMessage].ok(self.to_state_message())
 

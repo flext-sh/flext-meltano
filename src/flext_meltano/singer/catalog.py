@@ -70,7 +70,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         """Execute (implements Service pattern)."""
         return r[m.Meltano.SingerCatalog].ok(self._catalog)
 
-    def get_stream_schema(self, stream_name: str) -> r[Mapping[str, t.JsonValue]]:
+    def get_stream_schema(self, stream_name: str) -> r[Mapping[str, object
         """Get schema for a specific stream.
 
         Args:
@@ -84,8 +84,8 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             for entry in self._catalog.streams:
                 if entry.stream == stream_name:
                     self.logger.debug("Stream schema retrieved", stream=stream_name)
-                    return r[Mapping[str, t.JsonValue]].ok(entry.schema_definition)
-            return r[Mapping[str, t.JsonValue]].fail(
+                    return r[Mapping[str, object(entry.schema_definition)
+            return r[Mapping[str, objectil(
                 f"Stream not found in catalog: {stream_name}"
             )
         except (
@@ -98,7 +98,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
-            return r[Mapping[str, t.JsonValue]].fail(f"Failed to get schema: {e}")
+            return r[Mapping[str, objectil(f"Failed to get schema: {e}")
 
     def load_catalog(self, catalog_file: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.

@@ -84,7 +84,7 @@ class FlextMeltanoBridge:
 
     @staticmethod
     def execute_command(
-        command: str, args: Mapping[str, t.JsonValue] | None = None
+        command: str, args: Mapping[str, objectone = None
     ) -> r[t.Meltano.Bridge.BridgeStatus]:
         """Execute a bridge command with JSON arguments.
 

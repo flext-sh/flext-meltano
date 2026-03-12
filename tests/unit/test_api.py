@@ -28,8 +28,8 @@ class TestFlextMeltanoInitialization:
         """Test API initialization with default parameters."""
 
         class ConcreteAPI(FlextMeltano):
-            def execute(self, **kwargs: object) -> r[t.JsonValue]:
-                val = typing.cast("t.JsonValue", {})
+            def execute(self, **kwargs: object) -> r[object
+                val = typing.cast("object)
                 return r.ok(val)
 
         api = ConcreteAPI(service_name="test-api")
@@ -209,7 +209,7 @@ class TestFlextMeltanoDataOperations:
         api = FlextMeltano()
         import typing  # noqa: PLC0415
 
-        records = typing.cast("list[t.JsonValue]", [{"id": 1, "name": "test"}])
+        records = typing.cast("list[object{"id": 1, "name": "test"}])
         result = api.load_data(sink_name="target-jsonl", records=records)
         assert result.is_failure or result.is_success
 

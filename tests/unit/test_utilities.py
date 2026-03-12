@@ -37,7 +37,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_plugins(self) -> None:
         """Test Meltano config dictionary creation with plugins."""
-        plugins: dict[str, t.JsonValue] = {
+        plugins: dict[str, object
             "extractors": [{"name": "tap-postgres"}],
             "loaders": [{"name": "target-csv"}],
         }
@@ -65,7 +65,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
-        environments: dict[str, t.JsonValue] = {
+        environments: dict[str, object
             "dev": {"plugins": {"extractors": []}},
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
@@ -145,7 +145,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test successful project file creation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            content: dict[str, t.JsonValue] = {
+            content: dict[str, object
                 "project_id": "test-project",
                 "version": "1.0.0",
             }
@@ -160,7 +160,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_project_file_directory_not_exists(self) -> None:
         """Test project file creation in non-existent directory."""
         file_path = Path("/nonexistent/directory/pipeline.yml")
-        content: dict[str, t.JsonValue] = {"project_id": "test"}
+        content: dict[str, object"project_id": "test"}
         result = u.Meltano.create_project_file(file_path, content)
         assert result.is_failure
         assert result.error is not None

@@ -25,7 +25,7 @@ from flext_meltano.typings import t
 from flext_meltano.utilities import u
 
 
-class FlextMeltano(s[t.JsonValue]):
+class FlextMeltano(s[object
     """FLEXT Meltano API facade.
 
     Provides a unified interface for Meltano operations with direct flext-core
@@ -138,7 +138,7 @@ class FlextMeltano(s[t.JsonValue]):
         """
         return r[list[t.Meltano.MeltanoConfigDict]].ok([])
 
-    def call(self, operation: str, payload: t.JsonValue) -> r[object]:
+    def call(self, operation: str, payload: objectr[object]:
         """Route operations using dispatch table.
 
         Args:
@@ -149,7 +149,7 @@ class FlextMeltano(s[t.JsonValue]):
             Operation result as JSON value.
 
         """
-        operation_dispatch: dict[str, Callable[[t.JsonValue], r[object]]] = {
+        operation_dispatch: dict[str, Callable[[objectobject]]] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,
             "install_plugin": self._handle_install_plugin_call,
@@ -260,23 +260,23 @@ class FlextMeltano(s[t.JsonValue]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(f"Failed to create project: {e}")
 
-    def discover_catalog(self, source_name: str) -> r[t.JsonValue]:
+    def discover_catalog(self, source_name: str) -> r[object
         """Discover source schema - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.JsonValue].fail(f"Failed to discover catalog: {e}")
+            return r[objectl(f"Failed to discover catalog: {e}")
 
     @override
-    def execute(self, **_kwargs: t.JsonValue) -> r[t.JsonValue]:
+    def execute(self, **_kwargs: objectr[objecobject
         """Execute service lifecycle.
 
         Returns:
             Service status information as JSON.
 
         """
-        return r[t.JsonValue].ok({
+        return r[object{
             "service_name": self.service_name,
             "version": self.version,
             "status": "active",
@@ -320,7 +320,7 @@ class FlextMeltano(s[t.JsonValue]):
 
     def extract_data(
         self, source_name: str, config: t.Meltano.MeltanoConfigDict | None = None
-    ) -> r[t.JsonValue]:
+    ) -> r[object
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
@@ -329,14 +329,14 @@ class FlextMeltano(s[t.JsonValue]):
             })
             extract_result = service.extract(parsed_schema.schema_definition)
             if extract_result.is_failure:
-                return r[t.JsonValue].fail(
+                return r[objectl(
                     extract_result.error or "Failed to extract data"
                 )
-            return r[t.JsonValue].ok({
+            return r[object{
                 str(k): v for k, v in extract_result.value.items()
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.JsonValue].fail(f"Failed to extract data: {e}")
+            return r[objectl(f"Failed to extract data: {e}")
 
     def generate_dbt_docs(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Generate DBT documentation using flext-core patterns."""
@@ -365,7 +365,7 @@ class FlextMeltano(s[t.JsonValue]):
             "description": "FLEXT Meltano API Service",
         })
 
-    def get_service_status(self) -> r[t.JsonValue]:
+    def get_service_status(self) -> r[object
         """Get service status using flext-core patterns."""
         return self.execute()
 
@@ -456,8 +456,8 @@ class FlextMeltano(s[t.JsonValue]):
             )
 
     def load_data(
-        self, sink_name: str, records: list[t.JsonValue] | None = None
-    ) -> r[t.JsonValue]:
+        self, sink_name: str, records: list[objectone = None
+    ) -> r[object
         """Load data to sink - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, sink_name=sink_name)
@@ -467,15 +467,15 @@ class FlextMeltano(s[t.JsonValue]):
                 }).records
                 load_result = service.load_batch(records_batch)
                 if load_result.is_failure:
-                    return r[t.JsonValue].fail(
+                    return r[objectl(
                         load_result.error or "Failed to load data"
                     )
-                return r[t.JsonValue].ok({
+                return r[object{
                     str(k): v for k, v in load_result.value.items()
                 })
-            return r[t.JsonValue].ok({"status": "initialized"})
+            return r[object{"status": "initialized"})
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.JsonValue].fail(f"Failed to load data: {e}")
+            return r[objectl(f"Failed to load data: {e}")
 
     def run_dbt_models(
         self,
@@ -660,7 +660,7 @@ class FlextMeltano(s[t.JsonValue]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project: {e}")
 
-    def _handle_configure_environment_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_configure_environment_call(self, payload: objectr[object]:
         """Handle configure_environment operation call with model validation."""
         try:
             p = m.Meltano.ConfigureEnvironmentPayload.model_validate(payload)
@@ -669,7 +669,7 @@ class FlextMeltano(s[t.JsonValue]):
         result = self.configure_environment(p.environment_name, p.config)
         return result.map(lambda v: v)
 
-    def _handle_create_pipeline_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_create_pipeline_call(self, payload: objectr[object]:
         """Handle create_pipeline operation call with model validation."""
         try:
             p = m.Meltano.CreatePipelinePayload.model_validate(payload)
@@ -678,7 +678,7 @@ class FlextMeltano(s[t.JsonValue]):
         result = self.create_pipeline(p.tap_name, p.target_name, p.config or None)
         return result.map(lambda v: v)
 
-    def _handle_execute_pipeline_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_execute_pipeline_call(self, payload: objectr[object]:
         """Handle execute_pipeline operation call with model validation."""
         try:
             p = m.Meltano.ExecutePipelinePayload.model_validate(payload)
@@ -687,7 +687,7 @@ class FlextMeltano(s[t.JsonValue]):
         result = self.execute_pipeline(p.pipeline_id, p.config)
         return result.map(lambda v: v)
 
-    def _handle_install_plugin_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_install_plugin_call(self, payload: objectr[object]:
         """Handle install_plugin operation call with model validation."""
         try:
             p = m.Meltano.InstallPluginPayload.model_validate(payload)
@@ -696,7 +696,7 @@ class FlextMeltano(s[t.JsonValue]):
         result = self.install_plugin(p.plugin_type, p.plugin_name, p.config)
         return result.map(lambda v: v)
 
-    def _handle_list_plugins_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_list_plugins_call(self, payload: objectr[object]:
         """Handle list_plugins operation call with model validation."""
         try:
             p = m.Meltano.ListPluginsPayload.model_validate(payload)
@@ -705,7 +705,7 @@ class FlextMeltano(s[t.JsonValue]):
         result = self.list_plugins(p.plugin_type)
         return result.map(lambda v: v)
 
-    def _handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_run_dbt_models_call(self, payload: objectr[object]:
         """Handle run_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
@@ -714,7 +714,7 @@ class FlextMeltano(s[t.JsonValue]):
         result = self.run_dbt_models(p.models, p.config)
         return result.map(lambda v: v)
 
-    def _handle_run_elt_pipeline_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_run_elt_pipeline_call(self, payload: objectr[object]:
         """Handle run_elt_pipeline operation call with model validation."""
         try:
             p = m.Meltano.RunEltPipelinePayload.model_validate(payload)
@@ -725,7 +725,7 @@ class FlextMeltano(s[t.JsonValue]):
         )
         return result.map(lambda v: v)
 
-    def _handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[object]:
+    def _handle_test_dbt_models_call(self, payload: objectr[object]:
         """Handle test_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)

@@ -177,7 +177,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             executable: str = "",
         ) -> r[t.Meltano.PluginConfigDict]:
             """Create MELTANO-SPECIFIC plugin config using DSL builder pattern."""
-            raw: dict[str, t.JsonValue] = {
+            raw: dict[str, object
                 "name": name,
                 "namespace": namespace,
                 "pip_url": pip_url,

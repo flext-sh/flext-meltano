@@ -33,7 +33,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     """
 
-    ProjectInfo: ClassVar[type[dict[str, t.JsonValue]]] = dict
+    ProjectInfo: ClassVar[type[dict[str, object dict
     _metadata_extra: dict[str, str] = PrivateAttr(
         default_factory=lambda: dict[str, str](),
     )
@@ -53,7 +53,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     @override
     def execute(
         self,
-        **_kwargs: t.JsonValue,
+        **_kwargs: object
     ) -> r[t.Meltano.Project.ProjectMetadata]:
         """Execute (implements Service pattern)."""
         if self.project_root:

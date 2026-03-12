@@ -21,7 +21,7 @@ from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 
 
-class FlextMeltanoExecutor(s[t.JsonValue]):
+class FlextMeltanoExecutor(s[object
     """Unified executor architecture following flext-core patterns.
 
     Provides complete Meltano command execution with proper error handling,
@@ -175,7 +175,7 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
         return r[list[t.Meltano.PluginDefinition]].ok(plugins)
 
     @override
-    def execute(self) -> r[t.JsonValue]:
+    def execute(self) -> r[object
         """Execute the Meltano executor service.
 
         Returns:
@@ -192,11 +192,11 @@ class FlextMeltanoExecutor(s[t.JsonValue]):
                 else {},
             }
             self.logger.info("FlextMeltanoExecutor executed successfully")
-            return r[t.JsonValue].ok(config_data)
+            return r[objectconfig_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Executor execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.JsonValue].fail(error_msg)
+            return r[objectl(error_msg)
 
     def execute_command(
         self,

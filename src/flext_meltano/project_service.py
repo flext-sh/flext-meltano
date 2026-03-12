@@ -147,7 +147,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
                 }
             ],
         }
-        return r[t.ConfigurationMapping].ok({"path": temp_path, "config": config})
+        return r[object].ok({"path": temp_path, "config": config})
 
     @staticmethod
     def _initialize_project_config(project_path: Path, project_name: str) -> r[Path]:
