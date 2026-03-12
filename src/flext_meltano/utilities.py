@@ -144,8 +144,8 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     plugins_dict = plugins_val
                 result_cfg: t.Meltano.MeltanoConfigDict = {
                     "version": cfg_dict.get("version", 1),
-                    "project_id": u.Text.safe_string(project_id_val),
-                    "project_name": u.Text.safe_string(project_name_val),
+                    "project_id": u.safe_string(project_id_val),
+                    "project_name": u.safe_string(project_name_val),
                     "environments": cfg_dict.get("environments") or default_envs,
                     "plugins": plugins_dict,
                     "metadata": {
@@ -186,7 +186,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             }
 
             def safe_str(val: object) -> str:
-                return u.Text.safe_string(str(val)) if val else ""
+                return u.safe_string(str(val)) if val else ""
 
             def build_plugin(
                 d: t.Meltano.PluginConfigDict,
