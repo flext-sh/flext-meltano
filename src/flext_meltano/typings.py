@@ -32,7 +32,7 @@ class FlextMeltanoTypes(FlextCliTypes):
     class Meltano:
         """Meltano plugin complex types namespace."""
 
-        type PluginDefinition = dict[str, str | list[str] | dict[str, object]]
+        type PluginDefinition = dict[str, str | list[str] | Mapping[str, object]]
         type PluginConfiguration = dict[str, object]
         type PluginCatalog = dict[str, list[PluginDefinition]]
         type PluginRegistry = dict[str, "PluginDefinition" | "PluginConfiguration"]
@@ -59,7 +59,7 @@ class FlextMeltanoTypes(FlextCliTypes):
         class Singer:
             """Singer protocol complex types namespace."""
 
-            type CatalogEntry = dict[str, str | dict[str, object]]
+            type CatalogEntry = dict[str, str | Mapping[str, object]]
             type StreamSchema = dict[str, dict[str, object]]
             type TapConfig = dict[str, object]
             type TargetConfig = dict[str, object]
@@ -179,7 +179,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             type Headers = dict[str, str]
 
         type NestedJsonValue = (
-            bool | float | int | str | list[object] | dict[str, object] | None
+            bool | float | int | str | list[object] | Mapping[str, object] | None
         )
         type NestedJsonDict = dict[str, NestedJsonValue]
         type MeltanoConfigDict = dict[str, object]
@@ -191,13 +191,13 @@ class FlextMeltanoTypes(FlextCliTypes):
         type CommandDict = dict[str, object]
         type ScheduleDict = dict[str, object]
         type JobDict = dict[str, object]
-        RecordDict = dict[str, object]
-        SchemaDict = dict[str, object]
-        StateDict = dict[str, object]
-        ResultDict = dict[str, object]
+        RecordDict = Mapping[str, object]
+        SchemaDict = Mapping[str, object]
+        StateDict = Mapping[str, object]
+        ResultDict = Mapping[str, object]
         type RunContextDict = dict[str, object]
-        FileConfigDict = dict[str, object]
-        PathDict = dict[str, str | Path]
+        FileConfigDict = Mapping[str, object]
+        PathDict = Mapping[str, str | Path]
         type PluginList = list[str]
         type PluginNameList = list[str]
         type PluginTypeList = list[str]
