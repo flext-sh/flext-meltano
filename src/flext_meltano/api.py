@@ -138,7 +138,7 @@ class FlextMeltano(s[t.JsonValue]):
         """
         return r[list[t.Meltano.MeltanoConfigDict]].ok([])
 
-    def call(self, operation: str, payload: t.JsonValue) -> r[t.ContainerValue]:
+    def call(self, operation: str, payload: t.JsonValue) -> r[object]:
         """Route operations using dispatch table.
 
         Args:
@@ -149,7 +149,7 @@ class FlextMeltano(s[t.JsonValue]):
             Operation result as JSON value.
 
         """
-        operation_dispatch: dict[str, Callable[[t.JsonValue], r[t.ContainerValue]]] = {
+        operation_dispatch: dict[str, Callable[[t.JsonValue], r[object]]] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,
             "install_plugin": self._handle_install_plugin_call,
@@ -162,7 +162,7 @@ class FlextMeltano(s[t.JsonValue]):
         if operation in operation_dispatch:
             handler = operation_dispatch[operation]
             return handler(payload)
-        return r[t.ContainerValue].fail(f"Unknown operation: {operation}")
+        return r[object].fail(f"Unknown operation: {operation}")
 
     def create_pipeline(
         self,
@@ -660,83 +660,77 @@ class FlextMeltano(s[t.JsonValue]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to validate project: {e}")
 
-    def _handle_configure_environment_call(
-        self, payload: t.JsonValue
-    ) -> r[t.ContainerValue]:
+    def _handle_configure_environment_call(self, payload: t.JsonValue) -> r[object]:
         """Handle configure_environment operation call with model validation."""
         try:
             p = m.Meltano.ConfigureEnvironmentPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.configure_environment(p.environment_name, p.config)
         return result.map(lambda v: v)
 
-    def _handle_create_pipeline_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
+    def _handle_create_pipeline_call(self, payload: t.JsonValue) -> r[object]:
         """Handle create_pipeline operation call with model validation."""
         try:
             p = m.Meltano.CreatePipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.create_pipeline(p.tap_name, p.target_name, p.config or None)
         return result.map(lambda v: v)
 
-    def _handle_execute_pipeline_call(
-        self, payload: t.JsonValue
-    ) -> r[t.ContainerValue]:
+    def _handle_execute_pipeline_call(self, payload: t.JsonValue) -> r[object]:
         """Handle execute_pipeline operation call with model validation."""
         try:
             p = m.Meltano.ExecutePipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.execute_pipeline(p.pipeline_id, p.config)
         return result.map(lambda v: v)
 
-    def _handle_install_plugin_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
+    def _handle_install_plugin_call(self, payload: t.JsonValue) -> r[object]:
         """Handle install_plugin operation call with model validation."""
         try:
             p = m.Meltano.InstallPluginPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.install_plugin(p.plugin_type, p.plugin_name, p.config)
         return result.map(lambda v: v)
 
-    def _handle_list_plugins_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
+    def _handle_list_plugins_call(self, payload: t.JsonValue) -> r[object]:
         """Handle list_plugins operation call with model validation."""
         try:
             p = m.Meltano.ListPluginsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.list_plugins(p.plugin_type)
         return result.map(lambda v: v)
 
-    def _handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
+    def _handle_run_dbt_models_call(self, payload: t.JsonValue) -> r[object]:
         """Handle run_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.run_dbt_models(p.models, p.config)
         return result.map(lambda v: v)
 
-    def _handle_run_elt_pipeline_call(
-        self, payload: t.JsonValue
-    ) -> r[t.ContainerValue]:
+    def _handle_run_elt_pipeline_call(self, payload: t.JsonValue) -> r[object]:
         """Handle run_elt_pipeline operation call with model validation."""
         try:
             p = m.Meltano.RunEltPipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.run_elt_pipeline(
             p.tap_name, p.target_name, p.dbt_models, p.config
         )
         return result.map(lambda v: v)
 
-    def _handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[t.ContainerValue]:
+    def _handle_test_dbt_models_call(self, payload: t.JsonValue) -> r[object]:
         """Handle test_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.ContainerValue].fail(f"Invalid payload: {e}")
+            return r[object].fail(f"Invalid payload: {e}")
         result = self.test_dbt_models(p.models, p.config)
         return result.map(lambda v: v)
 

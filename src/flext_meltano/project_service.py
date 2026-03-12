@@ -49,8 +49,8 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
-    def _convert_to_project_dict(project: t.ContainerValue) -> r[t.Meltano.Dbt.Project]:
-        """Convert Meltano project object to FLEXT dict[str, t.ContainerValue] representation."""
+    def _convert_to_project_dict(project: object) -> r[t.Meltano.Dbt.Project]:
+        """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
             name_attr = getattr(project, "name", None)
             root_attr = getattr(project, "root", None)
@@ -109,7 +109,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: Mapping[str, t.ContainerValue],
+        config_data: Mapping[str, object],
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -132,9 +132,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     @staticmethod
     def _generate_minimal_config(
         temp_path: Path, project_id: str
-    ) -> r[Mapping[str, t.ContainerValue]]:
+    ) -> r[Mapping[str, object]]:
         """Generate minimal meltano.yml configuration."""
-        config: t.ContainerValue = {
+        config: object = {
             "version": 1,
             "default_environment": "dev",
             "project_id": project_id,
@@ -207,7 +207,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _write_meltano_config(
-        project_path: Path, config: Mapping[str, t.ContainerValue]
+        project_path: Path, config: Mapping[str, object]
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -285,7 +285,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         prefix: Temporary directory prefix for organization
 
         Returns:
-        r containing project dict[str, t.ContainerValue] with standardized structure
+        r containing project dict[str, object] with standardized structure
 
         """
         return (
@@ -338,7 +338,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         project_root: Directory path containing meltano.yml
 
         Returns:
-        r containing initialized project dict[str, t.ContainerValue] or validation error
+        r containing initialized project dict[str, object] or validation error
 
         """
         return (

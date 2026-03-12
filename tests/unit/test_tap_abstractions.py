@@ -6,7 +6,7 @@ import unittest
 import pytest
 from pydantic_core import ValidationError
 
-from flext_meltano import FlextMeltanoTapAbstractions, m, r, t
+from flext_meltano import FlextMeltanoTapAbstractions, m, r
 
 
 class _TestAssertions:
@@ -40,12 +40,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_tap_config_validation(self) -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""
-        connection_config: dict[str, t.ContainerValue] = {
+        connection_config: dict[str, object] = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
         }
-        stream_config: dict[str, t.ContainerValue] = {"users": {"selected": True}}
+        stream_config: dict[str, object] = {"users": {"selected": True}}
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config=connection_config,
@@ -58,7 +58,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
-        stream_schema: dict[str, t.ContainerValue] = {
+        stream_schema: dict[str, object] = {
             "type": "object",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
@@ -225,7 +225,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: dict[str, t.ContainerValue] = {
+        stream_config: dict[str, object] = {
             "users": {"selected": True},
             "orders": {"selected": False},
         }
@@ -407,7 +407,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             stream = stream_result.value
             self.test_assertions.assert_true(
                 condition=isinstance(stream, dict),
-                message="Should return dict[str, t.ContainerValue] stream definition",
+                message="Should return dict[str, object] stream definition",
             )
             self.test_assertions.assert_equal(
                 actual=stream.get("name"),
@@ -798,11 +798,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
     )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-        connection_config: dict[str, t.ContainerValue] = {
+        connection_config: dict[str, object] = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: dict[str, t.ContainerValue] = {"users": {"selected": True}}
+        stream_config: dict[str, object] = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,

@@ -139,7 +139,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "values": cfg
                 }).values
                 plugins_val = cfg_dict.get("plugins")
-                plugins_dict: dict[str, t.ContainerValue] = {}
+                plugins_dict: dict[str, object] = {}
                 if isinstance(plugins_val, dict):
                     plugins_dict = plugins_val
                 result_cfg: t.Meltano.MeltanoConfigDict = {
@@ -185,7 +185,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 "type": plugin_type or "extractor",
             }
 
-            def safe_str(val: t.ContainerValue) -> str:
+            def safe_str(val: object) -> str:
                 return u.Text.safe_string(str(val)) if val else ""
 
             def build_plugin(
@@ -309,7 +309,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             """
 
             def write_operation(
-                _unused_value: t.ContainerValue, file_handle: TextIO, /
+                _unused_value: object, file_handle: TextIO, /
             ) -> r[bool]:
                 return cls._write_yaml_content(file_handle, config)
 

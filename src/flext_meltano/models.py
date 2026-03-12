@@ -79,7 +79,7 @@ class FlextMeltanoModels(FlextCliModels):
 
     @staticmethod
     def _validated_string_list(
-        value: t.ContainerValue,
+        value: object,
     ) -> list[str]:
         """Normalize arbitrary values into a validated list of strings."""
         return FlextMeltanoModels.Meltano.StringListValue.model_validate(
@@ -117,9 +117,9 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("items", mode="before")
             @classmethod
-            def normalize_items(cls, value: t.ContainerValue) -> list[str]:
+            def normalize_items(cls, value: object) -> list[str]:
                 """Convert sequence-like values into string lists."""
-                values: list[t.ContainerValue]
+                values: list[object]
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
@@ -138,9 +138,9 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("items", mode="before")
             @classmethod
-            def normalize_items(cls, value: t.ContainerValue) -> list[bool]:
+            def normalize_items(cls, value: object) -> list[bool]:
                 """Convert sequence-like values into booleans."""
-                values: list[t.ContainerValue]
+                values: list[object]
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
@@ -996,7 +996,7 @@ class FlextMeltanoModels(FlextCliModels):
             config: FlextMeltanoModels.Meltano.TapConfig = Field(
                 description="Tap configuration",
             )
-            adapter: t.ContainerValue | None = Field(
+            adapter: object | None = Field(
                 default=None,
                 description="Tap adapter instance",
             )
@@ -1030,7 +1030,7 @@ class FlextMeltanoModels(FlextCliModels):
             config: FlextMeltanoModels.Meltano.DataSourceConfig = Field(
                 description="Source configuration",
             )
-            adapter: t.ContainerValue | None = Field(
+            adapter: object | None = Field(
                 default=None,
                 description="Adapter instance",
             )
@@ -1116,7 +1116,7 @@ class FlextMeltanoModels(FlextCliModels):
             config: FlextMeltanoModels.Meltano.DataSinkConfig = Field(
                 description="Sink configuration",
             )
-            adapter: t.ContainerValue | None = Field(
+            adapter: object | None = Field(
                 default=None,
                 description="Adapter instance",
             )
@@ -1318,7 +1318,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default="STATE",
                 description="Singer message discriminator",
             )
-            value: dict[str, t.ContainerValue] = Field(
+            value: dict[str, object] = Field(
                 default_factory=dict,
                 description="Singer state bookmark payload",
             )
@@ -1370,7 +1370,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default_factory=list,
                 description="Singer metadata breadcrumb path",
             )
-            metadata: dict[str, t.ContainerValue] = Field(
+            metadata: dict[str, object] = Field(
                 default_factory=dict,
                 description="Singer metadata properties",
             )
@@ -1473,7 +1473,7 @@ class FlextMeltanoModels(FlextCliModels):
             )
             records_written: int = Field(ge=0, description="Number of records written")
             errors: int = Field(ge=0, description="Number of errors")
-            state: dict[str, t.ContainerValue] = Field(
+            state: dict[str, object] = Field(
                 default_factory=dict,
                 description="Final state payload",
             )
@@ -1488,7 +1488,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_name: str = Field(min_length=1, description="Singer tap name")
             target_name: str = Field(min_length=1, description="Singer target name")
-            config: dict[str, t.ContainerValue] = Field(
+            config: dict[str, object] = Field(
                 default_factory=dict,
                 description="Pipeline config",
             )
@@ -1497,7 +1497,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Payload for execute_pipeline operation."""
 
             pipeline_id: str = Field(min_length=1, description="Pipeline identifier")
-            config: dict[str, t.ContainerValue] = Field(
+            config: dict[str, object] = Field(
                 default_factory=dict,
                 description="Execution config",
             )
@@ -1507,7 +1507,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             plugin_type: str = Field(min_length=1, description="Plugin type")
             plugin_name: str = Field(min_length=1, description="Plugin name")
-            config: dict[str, t.ContainerValue] = Field(
+            config: dict[str, object] = Field(
                 default_factory=dict,
                 description="Plugin config",
             )
@@ -1524,7 +1524,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Payload for configure_environment operation."""
 
             environment_name: str = Field(min_length=1, description="Environment name")
-            config: dict[str, t.ContainerValue] = Field(
+            config: dict[str, object] = Field(
                 default_factory=dict,
                 description="Environment config",
             )
@@ -1533,7 +1533,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Payload for run/test dbt models operation."""
 
             models: list[str] | None = Field(default=None, description="Models to run")
-            config: dict[str, t.ContainerValue] | None = Field(
+            config: dict[str, object] | None = Field(
                 default=None,
                 description="Execution config",
             )
@@ -1547,7 +1547,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default=None,
                 description="DBT models to run",
             )
-            config: dict[str, t.ContainerValue] | None = Field(
+            config: dict[str, object] | None = Field(
                 default=None,
                 description="Pipeline config",
             )
@@ -1565,7 +1565,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("schema_definition", mode="before")
             @classmethod
-            def normalize_schema(cls, value: t.ContainerValue) -> t.ContainerValue:
+            def normalize_schema(cls, value: object) -> object:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
@@ -1583,7 +1583,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("records", mode="before")
             @classmethod
-            def normalize_records(cls, value: t.ContainerValue) -> t.ContainerValue:
+            def normalize_records(cls, value: object) -> object:
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
@@ -1607,7 +1607,7 @@ class FlextMeltanoModels(FlextCliModels):
         class ConfigMappingPayload(FlextModels.ArbitraryTypesModel):
             """Normalized mapping payload with string keys."""
 
-            values: dict[str, t.ContainerValue] = Field(
+            values: dict[str, object] = Field(
                 default_factory=dict,
                 description="Normalized mapping values",
             )
@@ -1616,8 +1616,8 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_values(
                 cls,
-                value: t.ContainerValue,
-            ) -> Mapping[str, t.ContainerValue]:
+                value: object,
+            ) -> Mapping[str, object]:
                 """Normalize mapping-like payloads to dict[str, value]."""
                 match value:
                     case Mapping():
@@ -1632,7 +1632,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("value", mode="before")
             @classmethod
-            def normalize_path(cls, value: t.ContainerValue) -> Path:
+            def normalize_path(cls, value: object) -> Path:
                 """Normalize mixed path input into Path objects."""
                 if value is None:
                     return Path()
@@ -1648,7 +1648,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("content", mode="before")
             @classmethod
-            def normalize_content(cls, value: t.ContainerValue) -> str:
+            def normalize_content(cls, value: object) -> str:
                 """Normalize dict content via yaml.dump, pass str through."""
                 match value:
                     case Mapping():
@@ -1675,7 +1675,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_variant(
                 cls,
-                value: t.ContainerValue,
+                value: object,
             ) -> str | list[str] | Mapping[str, t.JsonValue] | None:
                 """Normalize variant_raw into typed union."""
                 match value:
@@ -1706,7 +1706,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default="",
                 description="Plugin default variant",
             )
-            variants: dict[str, t.ContainerValue] = Field(
+            variants: dict[str, object] = Field(
                 default_factory=dict,
                 description="Available plugin variants",
             )
@@ -1725,7 +1725,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_string_fields(
                 cls,
-                value: t.ContainerValue,
+                value: object,
             ) -> str:
                 """Normalize optional string fields from external payloads."""
                 return "" if value is None else str(value)
@@ -1734,8 +1734,8 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_variants(
                 cls,
-                value: t.ContainerValue,
-            ) -> Mapping[str, t.ContainerValue]:
+                value: object,
+            ) -> Mapping[str, object]:
                 """Normalize variant maps from external payloads."""
                 match value:
                     case Mapping():
@@ -1769,8 +1769,8 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_plugins(
                 cls,
-                value: t.ContainerValue,
-            ) -> Mapping[str, t.ContainerValue]:
+                value: object,
+            ) -> Mapping[str, object]:
                 """Normalize plugin catalog mapping."""
                 match value:
                     case Mapping():
@@ -1784,7 +1784,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Typed context envelope for ELT pipeline execution."""
 
             project_root: str = Field(description="Project root path")
-            elt_context: dict[str, t.ContainerValue] = Field(
+            elt_context: dict[str, object] = Field(
                 default_factory=dict,
                 description="ELT execution context",
             )
@@ -1794,7 +1794,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default=False,
                 description="Execution completion flag",
             )
-            execution_result: dict[str, t.ContainerValue] = Field(
+            execution_result: dict[str, object] = Field(
                 default_factory=dict,
                 description="Execution result payload",
             )
@@ -1803,8 +1803,8 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_json_maps(
                 cls,
-                value: t.ContainerValue,
-            ) -> Mapping[str, t.ContainerValue]:
+                value: object,
+            ) -> Mapping[str, object]:
                 """Normalize mapping-like payloads into JSON dictionaries."""
                 match value:
                     case Mapping():
@@ -1821,7 +1821,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_required_strings(
                 cls,
-                value: t.ContainerValue,
+                value: object,
             ) -> str:
                 """Normalize required string fields from context payloads."""
                 normalized = "" if value is None else str(value)
@@ -1836,7 +1836,7 @@ class FlextMeltanoModels(FlextCliModels):
                 default="unknown",
                 description="Project root path",
             )
-            execution_result: dict[str, t.ContainerValue] = Field(
+            execution_result: dict[str, object] = Field(
                 default_factory=dict,
                 description="Execution result payload",
             )
@@ -1845,8 +1845,8 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_execution_result(
                 cls,
-                value: t.ContainerValue,
-            ) -> Mapping[str, t.ContainerValue]:
+                value: object,
+            ) -> Mapping[str, object]:
                 """Normalize execution result map payload."""
                 match value:
                     case Mapping():
@@ -1856,7 +1856,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("project_root", mode="before")
             @classmethod
-            def normalize_project_root(cls, value: t.ContainerValue) -> str:
+            def normalize_project_root(cls, value: object) -> str:
                 """Normalize project root from mixed payload values."""
                 normalized = "unknown" if value is None else str(value)
                 return normalized.strip() or "unknown"
@@ -1875,7 +1875,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_values(
                 cls,
-                value: t.ContainerValue,
+                value: object,
             ) -> Mapping[str, str]:
                 """Keep scalar execution values and stringify them."""
                 match value:

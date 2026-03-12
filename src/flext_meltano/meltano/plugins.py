@@ -28,7 +28,7 @@ from flext_meltano import (
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 
 
-def _is_meltano_project(value: t.ContainerValue) -> TypeGuard[p.Meltano.Project]:
+def _is_meltano_project(value: object) -> TypeGuard[p.Meltano.Project]:
     """Type guard for protocol-compatible Meltano project objects."""
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 
@@ -215,7 +215,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
         """
 
-        def extract_plugin_info(plugins_data: t.ContainerValue) -> r[Mapping[str, str]]:
+        def extract_plugin_info(plugins_data: object) -> r[Mapping[str, str]]:
             """Extract plugin info from plugins dict."""
             plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
                 "plugins": plugins_data

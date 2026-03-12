@@ -53,9 +53,7 @@ class FlextMeltanoDbtService(s[str]):
         msg = "DBT service initialized"
         return r[str].ok(msg)
 
-    def generate_docs(
-        self, **kwargs: t.ContainerValue
-    ) -> r[t.Meltano.ExecutionResultDict]:
+    def generate_docs(self, **kwargs: object) -> r[t.Meltano.ExecutionResultDict]:
         """Generate DBT documentation.
 
         Args:
@@ -141,7 +139,7 @@ class FlextMeltanoDbtService(s[str]):
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
     def run_models(
-        self, models: list[str] | None = None, **kwargs: t.ContainerValue
+        self, models: list[str] | None = None, **kwargs: object
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
 
@@ -173,7 +171,7 @@ class FlextMeltanoDbtService(s[str]):
             return r[m.Meltano.DbtRunResult].fail(f"DBT run failed: {e}")
 
     def run_tests(
-        self, models: list[str] | None = None, **kwargs: t.ContainerValue
+        self, models: list[str] | None = None, **kwargs: object
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.
 

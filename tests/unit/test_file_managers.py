@@ -9,7 +9,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_meltano import FlextMeltanoFileManagers, t
+from flext_meltano import FlextMeltanoFileManagers
 
 
 class TestFlextMeltanoFileManagersComprehensive:
@@ -26,7 +26,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_valid(self) -> None:
         """Test saving valid YAML configuration."""
-        config: dict[str, t.ContainerValue] = {
+        config: dict[str, object] = {
             "project_id": "test-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"], "loaders": ["target-csv"]},
@@ -39,14 +39,14 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, t.ContainerValue] = {"test": "data"}
+        config: dict[str, object] = {"test": "data"}
         invalid_path = Path("/nonexistent/directory/config.yml")
         result = FlextMeltanoFileManagers.save_yaml_config(config, invalid_path)
         assert result.is_failure
 
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
-        config: dict[str, t.ContainerValue] = {
+        config: dict[str, object] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -76,7 +76,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
-        config: dict[str, t.ContainerValue] = {
+        config: dict[str, object] = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -230,7 +230,7 @@ class TestFlextMeltanoFileManagersComprehensive:
                 project_root=project_root, _project_name="integration-workflow-test"
             )
             assert setup_result.is_success
-            config: dict[str, t.ContainerValue] = {
+            config: dict[str, object] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
@@ -285,7 +285,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_concurrent_file_operations(self) -> None:
         """Test concurrent file operations don't interfere."""
-        configs: list[dict[str, t.ContainerValue]] = [
+        configs: list[dict[str, object]] = [
             {"id": "config1", "data": "value1"},
             {"id": "config2", "data": "value2"},
             {"id": "config3", "data": "value3"},

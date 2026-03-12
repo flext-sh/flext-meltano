@@ -93,7 +93,7 @@ def execute_pipeline(
     config_path = _pipeline_config_path(pipeline_name)
     if config_path.exists():
         try:
-            config_payload_raw: t.ContainerValue = json.loads(
+            config_payload_raw: object = json.loads(
                 config_path.read_text(encoding="utf-8")
             )
         except (json.JSONDecodeError, OSError) as exc:
@@ -391,7 +391,7 @@ class FlextMeltanoPipelineManager:
         config_payload: t.Meltano.MeltanoConfigDict | None = None
         if len(_args) >= _MIN_ARGS_WITH_CONFIG:
             try:
-                parsed: t.ContainerValue = json.loads(_args[1])
+                parsed: object = json.loads(_args[1])
             except json.JSONDecodeError as exc:
                 return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
             if not isinstance(parsed, dict):
