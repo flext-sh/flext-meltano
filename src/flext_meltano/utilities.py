@@ -77,7 +77,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 return r[Path].fail(f"File does not exist: {path}")
             if not path.is_file():
                 return r[Path].fail(f"Path is not a file: {path}")
-            suffix = u.Conversion.normalize(path.suffix, case="lower")
+            suffix = u.normalize(path.suffix, case="lower")
             if suffix not in {".yml", ".yaml"}:
                 return r[Path].fail(f"File is not a YAML file: {path}")
             return r[Path].ok(path)
@@ -150,7 +150,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "plugins": plugins_dict,
                     "metadata": {
                         "created_by": c.Meltano.Metadata.CREATED_BY,
-                        "created_at": u.Generators.generate_iso_timestamp(),
+                        "created_at": u.generate_iso_timestamp(),
                         "flext_version": c.Meltano.FLEXT_MELTANO_VERSION,
                     },
                 }
@@ -202,7 +202,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "config": {},
                     "metadata": {
                         "created_by": c.Meltano.Metadata.CREATED_BY,
-                        "created_at": u.Generators.generate_iso_timestamp(),
+                        "created_at": u.generate_iso_timestamp(),
                     },
                 }
 

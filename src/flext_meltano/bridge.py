@@ -37,7 +37,7 @@ class FlextMeltanoBridge:
                 "loaders": "target-csv,target-postgres,target-jsonl",
                 "transformers": "dbt-postgres,dbt-snowflake",
                 "status": "discovered",
-                "timestamp": u.Generators.generate_iso_timestamp(),
+                "timestamp": u.generate_iso_timestamp(),
             }
             return r[Mapping[str, t.Scalar]].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -62,7 +62,7 @@ class FlextMeltanoBridge:
                 "command": command,
                 "args": args or {},
                 "status": "executed",
-                "timestamp": u.Generators.generate_iso_timestamp(),
+                "timestamp": u.generate_iso_timestamp(),
             }
             return r[t.Meltano.ExecutionResultDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

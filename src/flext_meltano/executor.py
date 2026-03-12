@@ -188,7 +188,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 "status": "ready",
                 "execution_timestamp": str(time.time()),
                 "config": self._meltano_config.model_dump()
-                if u.Guards.is_pydantic_model(self._meltano_config)
+                if u.is_pydantic_model(self._meltano_config)
                 else {},
             }
             self.logger.info("FlextMeltanoExecutor executed successfully")

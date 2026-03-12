@@ -108,7 +108,7 @@ class FlextMeltanoFileManagers:
     def load_yaml_config(cls, file_path: Path) -> r[t.Meltano.FileConfigDict]:
         """Load YAML config using DSL patterns + direct YAML.
 
-        ZERO DUPLICATION: Uses u.Guards.is_string_non_empty for validation.
+        ZERO DUPLICATION: Uses u.is_string_non_empty for validation.
         DSL: Uses u.try_ for unified error handling.
 
         Returns:
@@ -117,7 +117,7 @@ class FlextMeltanoFileManagers:
         """
 
         def _load() -> t.Meltano.FileConfigDict:
-            if not u.Guards.is_string_non_empty(str(file_path)):
+            if not u.is_string_non_empty(str(file_path)):
                 msg = f"Invalid YAML file path: {file_path}"
                 raise ValueError(
                     msg,
@@ -256,7 +256,7 @@ class FlextMeltanoFileManagers:
     def validate_yaml_file(cls, file_path: Path) -> r[bool]:
         """Validate YAML using DSL patterns + direct YAML parsing.
 
-        ZERO DUPLICATION: Uses u.Guards.is_string_non_empty for validation.
+        ZERO DUPLICATION: Uses u.is_string_non_empty for validation.
         DSL: Uses u.try_ for unified error handling.
 
         Returns:
@@ -265,7 +265,7 @@ class FlextMeltanoFileManagers:
         """
 
         def _validate() -> r[bool]:
-            if not u.Guards.is_string_non_empty(str(file_path)):
+            if not u.is_string_non_empty(str(file_path)):
                 return r[bool].fail(f"Invalid YAML file path: {file_path}")
             if not file_path.exists():
                 return r[bool].fail(f"YAML file not found: {file_path}")

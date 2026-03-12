@@ -107,7 +107,7 @@ class FlextMeltanoBridge:
                 "command": command,
                 "args": str(args_dict),
                 "status": "executed",
-                "timestamp": u.Generators.generate_iso_timestamp(),
+                "timestamp": u.generate_iso_timestamp(),
             }
             return r[t.Meltano.Bridge.BridgeStatus].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

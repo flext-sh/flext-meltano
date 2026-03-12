@@ -191,7 +191,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 "service_type": "flext_meltano_plugin_service",
                 "status": "ready",
                 "config": self._meltano_config.model_dump()
-                if u.Guards.is_pydantic_model(self._meltano_config)
+                if u.is_pydantic_model(self._meltano_config)
                 else {},
             }
             self.logger.info("FlextMeltanoPluginService executed successfully")

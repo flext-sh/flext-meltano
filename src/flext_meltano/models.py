@@ -52,7 +52,7 @@ class FlextMeltanoModels(FlextCliModels):
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
         def is_sensitive(k: str) -> bool:
-            normalized = u.Conversion.normalize(k, case="lower")
+            normalized = u.normalize(k, case="lower")
             # Convert set to list of str for processing
             sensitive_keys_list: list[str] = list(sensitive_keys)
             checks_result = u.process(
@@ -1878,7 +1878,7 @@ class FlextMeltanoModels(FlextCliModels):
                         return {
                             str(key): str(item)
                             for key, item in value.items()
-                            if u.Guards.is_type(item, (str, int, bool, float))
+                            if u.is_type(item, (str, int, bool, float))
                         }
                     case _:
                         return {}

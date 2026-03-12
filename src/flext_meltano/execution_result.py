@@ -53,7 +53,7 @@ class FlextMeltanoExecutionResult:
             "output": self.output,
             "error": self.error,
             "execution_time": self.execution_time,
-            "timestamp": u.Generators.generate_iso_timestamp(),
+            "timestamp": u.generate_iso_timestamp(),
         }
 
     def to_json(self) -> str:

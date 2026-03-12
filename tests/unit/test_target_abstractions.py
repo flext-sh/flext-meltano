@@ -49,7 +49,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core."""
-        timestamp = u.Generators.generate_iso_timestamp()
+        timestamp = u.generate_iso_timestamp()
         assert isinstance(timestamp, str)
         assert "T" in timestamp
         test_data: t.Meltano.MeltanoConfigDict = {
