@@ -245,13 +245,13 @@ def delete_pipeline(pipeline_name: str) -> r[str]:
     return r[str].ok("deleted")
 
 
-class ManagerProtocol(Protocol):
+class Manager(Protocol):
     """Base manager protocol."""
 
     def handle_command(self, args: list[str]) -> r[None]: ...
 
 
-class SingerManagerProtocol(Protocol):
+class SingerManager(Protocol):
     """Singer manager protocol."""
 
     def handle_tap_command(self, args: list[str]) -> r[None]: ...
@@ -259,7 +259,7 @@ class SingerManagerProtocol(Protocol):
     def handle_target_command(self, args: list[str]) -> r[None]: ...
 
 
-class StatusManagerProtocol(Protocol):
+class StatusManager(Protocol):
     """Status manager protocol."""
 
     def handle_command(self, args: list[str]) -> r[None]: ...
@@ -267,14 +267,14 @@ class StatusManagerProtocol(Protocol):
     def handle_version_command(self, _args: list[str]) -> r[None]: ...
 
 
-class _CLIProtocol(Protocol):
+class _CLI(Protocol):
     """Minimal CLI protocol for manager composition."""
 
-    pipeline_manager: ManagerProtocol
-    singer_manager: SingerManagerProtocol
-    dbt_manager: ManagerProtocol
-    plugin_manager: ManagerProtocol
-    status_manager: StatusManagerProtocol
+    pipeline_manager: Manager
+    singer_manager: SingerManager
+    dbt_manager: Manager
+    plugin_manager: Manager
+    status_manager: StatusManager
 
     def show_banner(self) -> None: ...
 
@@ -298,7 +298,7 @@ class FlextMeltanoCommandRouter:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize command router with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -354,7 +354,7 @@ class FlextMeltanoPipelineManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize pipeline manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -504,7 +504,7 @@ class FlextMeltanoSingerManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize Singer manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -548,7 +548,7 @@ class FlextMeltanoDbtManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -577,7 +577,7 @@ class FlextMeltanoPluginManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -606,7 +606,7 @@ class FlextMeltanoStatusManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()
         self.cli = cli

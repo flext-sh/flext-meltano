@@ -91,7 +91,7 @@ class MeltanoAdapter:
 
 - `Pipeline` as a domain concept
 - `Plugin` as a domain entity
-- `SingerProtocol` as a domain service
+- `Singer` as a domain service
 
 **Ubiquitous Language**: Shared vocabulary between technical and business teams
 

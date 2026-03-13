@@ -142,7 +142,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         self,
         operation: str,
         payload: Mapping[str, t.Scalar],
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Route operations using dispatch table.
 
         Args:
@@ -154,7 +154,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
 
         """
         operation_dispatch: dict[
-            str, Callable[[Mapping[str, t.Scalar]], r[t.Container]]
+            str, Callable[[Mapping[str, t.Scalar]], r[t.Meltano.ResultDict]]
         ] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,
@@ -168,7 +168,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         if operation in operation_dispatch:
             handler = operation_dispatch[operation]
             return handler(payload)
-        return r[t.Container].fail(f"Unknown operation: {operation}")
+        return r[t.Meltano.ResultDict].fail(f"Unknown operation: {operation}")
 
     def create_pipeline(
         self,
@@ -266,13 +266,13 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(f"Failed to create project: {e}")
 
-    def discover_catalog(self, source_name: str) -> r[Mapping[str, t.Container]]:
+    def discover_catalog(self, source_name: str) -> r[t.Meltano.ResultDict]:
         """Discover source schema - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, t.Container]].fail(f"Failed to discover catalog: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Failed to discover catalog: {e}")
 
     @override
     def execute(self, **_kwargs: t.Scalar) -> r[t.Meltano.ExecutionResultDict]:
@@ -470,10 +470,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         try:
             service = FlextMeltanoService(config=self.config, sink_name=sink_name)
             if records is not None and (not u.empty(records)):
-                records_batch = m.Meltano.JsonRecordBatchPayload.model_validate({
-                    "records": records,
-                }).records
-                load_result = service.load_batch(records_batch)
+                load_result = service.load_batch(records)
                 if load_result.is_failure:
                     return r[t.Meltano.ResultDict].fail(
                         load_result.error or "Failed to load data"

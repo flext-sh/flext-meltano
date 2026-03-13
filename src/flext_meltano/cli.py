@@ -26,13 +26,13 @@ from flext_meltano.cli_managers import (
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
-    ManagerProtocol,
-    SingerManagerProtocol,
-    StatusManagerProtocol,
+    Manager,
+    SingerManager,
+    StatusManager,
 )
 
 
-class _OutputProtocol(Protocol):
+class _Output(Protocol):
     """Protocol for CLI output with print_message method."""
 
     def print_message(self, message: str, style: str | None = None) -> None: ...
@@ -47,13 +47,13 @@ class FlextMeltanoCLI:
     """
 
     logger: FlextLogger
-    output: _OutputProtocol
+    output: _Output
     _api: FlextMeltano
-    pipeline_manager: ManagerProtocol
-    singer_manager: SingerManagerProtocol
-    dbt_manager: ManagerProtocol
-    plugin_manager: ManagerProtocol
-    status_manager: StatusManagerProtocol
+    pipeline_manager: Manager
+    singer_manager: SingerManager
+    dbt_manager: Manager
+    plugin_manager: Manager
+    status_manager: StatusManager
     command_router: FlextMeltanoCommandRouter
 
     def __init__(self) -> None:

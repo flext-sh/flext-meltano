@@ -115,9 +115,9 @@ class FlextMeltanoPluginProtocols:
     TapPlugin = t.Meltano.PluginDefinition
     TargetPlugin = t.Meltano.PluginDefinition
     DbtPlugin = t.Meltano.PluginDefinition
-    TapServiceProtocol = t.Meltano.PluginConfiguration
-    TargetServiceProtocol = t.Meltano.PluginConfiguration
-    DbtServiceProtocol = t.Meltano.PluginConfiguration
+    TapService = t.Meltano.PluginConfiguration
+    TargetService = t.Meltano.PluginConfiguration
+    DbtService = t.Meltano.PluginConfiguration
 
 
 __all__ = ["FlextMeltanoPluginProtocols", "FlextMeltanoSingerProtocols"]

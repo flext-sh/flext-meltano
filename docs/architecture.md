@@ -85,7 +85,7 @@ src/flext_meltano/
 
 - **FlextMeltanoService**: Unified service following FlextService pattern
 - **Service Implementations**: FlextMeltanoTapService, FlextTargetService, FlextDbtService
-- **Plugin Protocols**: TapServiceProtocol, TargetServiceProtocol, DbtServiceProtocol
+- **Plugin Protocols**: TapService, TargetService, DbtService
 
 ### **Execution Layer**
 
@@ -256,8 +256,8 @@ class FlextMeltanoTypes:
     class Singer:
         """Singer protocol integration types."""
 
-        type Tap = SingerTapProtocol
-        type Target = SingerTargetProtocol
+        type Tap = SingerTap
+        type Target = SingerTarget
         type MessageType = str
         type RecordMessage = JsonObject
 

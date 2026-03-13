@@ -1255,7 +1255,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             stream_name: Annotated[str, Field(description="Name of the stream")]
             stream_schema: Annotated[
-                dict[str, t.Container],
+                dict[str, t.Scalar | Mapping[str, t.Scalar]],
                 Field(
                     description="JSON schema for the stream",
                 ),
@@ -1303,12 +1303,13 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("stream_schema")
             def serialize_stream_schema(
-                self, value: Mapping[str, t.Container]
-            ) -> Mapping[str, t.Container]:
+                self, value: Mapping[str, t.Scalar | Mapping[str, t.Scalar]]
+            ) -> Mapping[str, t.Scalar | Mapping[str, t.Scalar]]:
                 """Normalize stream schema structure."""
-                result = dict(value)
+                result: dict[str, t.Scalar | Mapping[str, t.Scalar]] = dict(value)
                 if "properties" not in result:
-                    result["properties"] = {}
+                    empty: dict[str, t.Scalar] = {}
+                    result["properties"] = empty
                 if "type" not in result:
                     result["type"] = "object"
                 return result
@@ -1655,7 +1656,7 @@ class FlextMeltanoModels(FlextCliModels):
                 str, Field(min_length=1, description="Stream name identifier")
             ]
             stream_schema: Annotated[
-                dict[str, t.Container],
+                dict[str, t.Scalar | Mapping[str, t.Scalar]],
                 Field(
                     description="Stream schema definition",
                 ),
@@ -2196,7 +2197,8 @@ class FlextMeltanoModels(FlextCliModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return {}
+                        empty_schema: dict[str, object] = {}
+                        return empty_schema
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
             """Typed record batch payload used by API load flow."""

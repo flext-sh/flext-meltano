@@ -131,17 +131,17 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         try:
-            config_payload: t.Dict = {
-                "tap_type": tap_type,
-                "connection_config": connection_config,
-                "stream_config": stream_config or {},
-                "tap_version": tap_version,
-            }
-            config = m.Meltano.TapConfig.model_validate(config_payload)
+            config = m.Meltano.TapConfig(
+                tap_type=tap_type,
+                connection_config=connection_config,
+                stream_config=stream_config or {},
+                tap_version=tap_version,
+                domain_events=[],
+            )
             return self.create_source_instance(config).map(
                 lambda inst: m.Meltano.TapInstance(
                     tap_type=inst.source_type, config=config, tap_id=inst.source_id
-                ).model_dump()
+                )
             )
         except Exception as exc:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
@@ -162,15 +162,18 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         try:
-            source_type_val = getattr(source_config, "source_type", None) or getattr(
+            source_type_raw = getattr(source_config, "source_type", None) or getattr(
                 source_config, "tap_type", None
+            )
+            source_type_str: str = (
+                str(source_type_raw) if source_type_raw is not None else ""
             )
             self.logger.info(
                 "Discovering streams for source",
-                source_type=source_type_val,
-                source_name=source_type_val,
+                source_type=source_type_str,
+                source_name=source_type_str,
             )
-            if not source_type_val:
+            if not source_type_str:
                 return r[t.Meltano.Singer.StreamCatalog].fail(
                     "Source configuration must have name and type for discovery"
                 )

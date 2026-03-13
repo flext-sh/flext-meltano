@@ -36,9 +36,9 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
     def test_unified_class_has_service_protocols(self) -> None:
         """Test FlextMeltanoPluginProtocols has service protocol definitions."""
         expected_service_protocols = [
-            "TapServiceProtocol",
-            "TargetServiceProtocol",
-            "DbtServiceProtocol",
+            "TapService",
+            "TargetService",
+            "DbtService",
         ]
         for service_protocol in expected_service_protocols:
             assert hasattr(FlextMeltanoPluginProtocols, service_protocol), (
@@ -61,18 +61,18 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         assert protocol is not None
 
     def test_tap_service_protocol_definition(self) -> None:
-        """Test TapServiceProtocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TapServiceProtocol
+        """Test TapService definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TapService
         assert protocol is not None
 
     def test_target_service_protocol_definition(self) -> None:
-        """Test TargetServiceProtocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
+        """Test TargetService definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TargetService
         assert protocol is not None
 
     def test_dbt_service_protocol_definition(self) -> None:
-        """Test DbtServiceProtocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
+        """Test DbtService definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.DbtService
         assert protocol is not None
 
     def test_no_aliases_exist(self) -> None:
@@ -117,9 +117,9 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             "FlextDbtPlugin",
             "TapService",
             "TargetService",
-            "TapServiceProtocol",
-            "TargetServiceProtocol",
-            "DbtServiceProtocol",
+            "TapService",
+            "TargetService",
+            "DbtService",
         ]
         for forbidden in forbidden_exports:
             assert forbidden not in all_exports, (

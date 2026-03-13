@@ -32,7 +32,7 @@ class MockCliResult:
         self.output = output
 
 
-class CliRunnerProtocol(Protocol):
+class CliRunner(Protocol):
     """Protocol for CLI runner interface."""
 
     def invoke(self, *args: t.Scalar, **kwargs: t.Scalar) -> MockCliResult:
