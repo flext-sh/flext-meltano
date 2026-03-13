@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import signal
 from pathlib import Path
@@ -19,6 +18,7 @@ from flext_meltano.cli_managers import (
     get_pipeline_status,
     list_pipelines,
 )
+from flext_meltano.models import m
 
 
 def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:
@@ -32,10 +32,10 @@ def test_create_pipeline_creates_directory_and_configuration(tmp_path: Path) -> 
     assert result.is_success
     pipeline_dir = tmp_path / "pipelines" / "daily-pipeline"
     assert pipeline_dir.is_dir()
-    assert (
-        json.loads((pipeline_dir / "pipeline.json").read_text(encoding="utf-8"))
-        == config
+    stored = m.Meltano.ConfigMappingPayload.model_validate_json(
+        (pipeline_dir / "pipeline.json").read_text(encoding="utf-8")
     )
+    assert stored.values == config
 
 
 def test_create_pipeline_fails_without_configuration(tmp_path: Path) -> None:
@@ -146,7 +146,9 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
     tmp_path: Path,
 ) -> None:
     manager = FlextMeltanoPipelineManager(MagicMock())
-    config_json = json.dumps({"command": ["run", "tap-demo", "target-demo"]})
+    config_json = m.Meltano.ConfigMappingPayload(
+        values={"command": ["run", "tap-demo", "target-demo"]}
+    ).model_dump_json()
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = manager.handle_command([
             "create",

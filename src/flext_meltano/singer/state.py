@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import ClassVar, override
 
@@ -87,10 +86,9 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         """
         try:
             if state_file and state_file.exists():
-                with state_file.open() as f:
-                    self._state_msg = m.Meltano.SingerStateMessage.model_validate(
-                        json.load(f)
-                    )
+                self._state_msg = m.Meltano.SingerStateMessage.model_validate_json(
+                    state_file.read_text(encoding="utf-8")
+                )
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),

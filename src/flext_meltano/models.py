@@ -1796,11 +1796,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("elt_context", "execution_result", mode="before")
             @classmethod
-            def normalize_json_maps(
+            def normalize_mapping_payloads(
                 cls,
                 value: object,
             ) -> Mapping[str, object]:
-                """Normalize mapping-like payloads into JSON dictionaries."""
+                """Normalize mapping-like payloads into dictionaries."""
                 match value:
                     case Mapping():
                         return {str(key): item for key, item in value.items()}

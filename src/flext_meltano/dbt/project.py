@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import override
 
@@ -167,9 +166,13 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 return r[t.Meltano.Dbt.ManifestData].fail(
                     f"Manifest not found: {manifest_path}"
                 )
-            with manifest_path.open() as f:
-                manifest_data: t.Meltano.Dbt.ManifestData = json.load(f)
-                self.manifest = manifest_data
+            parsed_manifest = m.Meltano.DbtManifest.model_validate_json(
+                manifest_path.read_text(encoding="utf-8")
+            )
+            manifest_data: t.Meltano.Dbt.ManifestData = {
+                "nodes": {k: v.model_dump() for k, v in parsed_manifest.nodes.items()}
+            }
+            self.manifest = manifest_data
             self.logger.info("DBT manifest loaded", file=str(manifest_path))
             return r[t.Meltano.Dbt.ManifestData].ok(self.manifest)
         except (

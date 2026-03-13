@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 import os
 import shutil
 import signal
@@ -76,7 +75,10 @@ def create_pipeline(pipeline_name: str, config: Mapping[str, object] | None) -> 
     try:
         pipeline_dir.mkdir(parents=True, exist_ok=False)
         config_path = _pipeline_config_path(pipeline_name)
-        config_path.write_text(json.dumps(dict(config), indent=2), encoding="utf-8")
+        validated = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": dict(config)
+        })
+        config_path.write_text(validated.model_dump_json(indent=2), encoding="utf-8")
     except OSError as exc:
         return r[str].fail(f"Failed to create pipeline '{pipeline_name}': {exc}")
     return r[str].ok(str(pipeline_dir))
@@ -93,22 +95,19 @@ def execute_pipeline(
     config_path = _pipeline_config_path(pipeline_name)
     if config_path.exists():
         try:
-            config_payload_raw: object = json.loads(
+            config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
                 config_path.read_text(encoding="utf-8")
             )
-        except (json.JSONDecodeError, OSError) as exc:
+        except (ValueError, OSError) as exc:
             return r[str].fail(
                 f"Failed to read pipeline '{pipeline_name}' configuration: {exc}"
             )
-        if isinstance(config_payload_raw, dict):
-            validated_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": config_payload_raw
-            }).values
-            command_value = validated_payload.get("command")
-            if isinstance(command_value, list):
-                configured_command = m.Meltano.StringListValue.model_validate({
-                    "items": command_value
-                }).items
+        validated_payload = config_mapping.values
+        command_value = validated_payload.get("command")
+        if isinstance(command_value, list):
+            configured_command = m.Meltano.StringListValue.model_validate({
+                "items": command_value
+            }).items
     meltano_args = command_args or configured_command
     if not meltano_args:
         return r[str].fail("Pipeline execution not configured")
@@ -391,14 +390,12 @@ class FlextMeltanoPipelineManager:
         config_payload: t.Meltano.MeltanoConfigDict | None = None
         if len(_args) >= _MIN_ARGS_WITH_CONFIG:
             try:
-                parsed: object = json.loads(_args[1])
-            except json.JSONDecodeError as exc:
+                config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
+                    _args[1]
+                )
+            except ValueError as exc:
                 return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
-            if not isinstance(parsed, dict):
-                return r[None].fail("Pipeline configuration must be a JSON object")
-            config_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": parsed
-            }).values
+            config_payload = config_mapping.values
         result = create_pipeline(pipeline_name, config_payload)
         if result.is_failure:
             return r[None].fail(result.error)

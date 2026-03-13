@@ -97,7 +97,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 import subprocess
 
 from flext_core import r
@@ -202,7 +201,8 @@ class FlextMeltanoSingerCliTranslator:
             vars_dict = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": vars_val
             }).values
-            command.extend(["--vars", json.dumps(vars_dict)])
+            vars_payload = m.Meltano.ConfigMappingPayload(values=vars_dict)
+            command.extend(["--vars", vars_payload.model_dump_json()])
         return r[list[str]].ok(command)
 
     @staticmethod

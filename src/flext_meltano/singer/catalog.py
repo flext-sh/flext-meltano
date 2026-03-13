@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 from collections.abc import Mapping
 from pathlib import Path
 from typing import override
@@ -115,9 +114,9 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                 return r[m.Meltano.SingerCatalog].fail(
                     f"Catalog file not found: {catalog_file}"
                 )
-            with catalog_file.open(encoding="utf-8") as f:
-                raw_data = json.load(f)
-            self._catalog = m.Meltano.SingerCatalog.model_validate(raw_data)
+            self._catalog = m.Meltano.SingerCatalog.model_validate_json(
+                catalog_file.read_text(encoding="utf-8")
+            )
             self.logger.info(
                 "Catalog loaded from file",
                 file=str(catalog_file),

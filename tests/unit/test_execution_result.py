@@ -7,12 +7,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 from unittest.mock import patch
 
 import pytest
+from pydantic import TypeAdapter
 
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
+
+_JSON_ADAPTER: TypeAdapter[dict[str, object]] = TypeAdapter(dict[str, object])
 
 
 class TestFlextMeltanoExecutionResult:
@@ -130,8 +132,8 @@ class TestFlextMeltanoExecutionResult:
             )
             assert result_dict["timestamp"] == "2025-01-01T12:01:00Z"
 
-    def test_to_json_success(self) -> None:
-        """Test to_json method with successful execution."""
+    def test_model_dump_json_success(self) -> None:
+        """Test model_dump_json with successful execution."""
         command = ["meltano", "invoke", "tap-postgres", "discover"]
         result = FlextMeltanoExecutionResult(
             command=command,
@@ -143,20 +145,18 @@ class TestFlextMeltanoExecutionResult:
         )
         with patch("flext_core.u.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
-            json_str = result.to_json()
-            parsed_json = json.loads(json_str)
-            assert parsed_json["command"] == command
-            assert parsed_json["success"] is True
-            assert parsed_json["exit_code"] == 0
-            assert parsed_json["output"] == '{"streams": []}'
-            assert not parsed_json["error"]
-            assert (
-                parsed_json["execution_time"] == self.TEST_EXECUTION_TIME_JSON_SUCCESS
-            )
-            assert parsed_json["timestamp"] == "2025-01-01T12:02:00Z"
+            json_str = result.model_dump_json()
+            parsed = _JSON_ADAPTER.validate_json(json_str)
+            assert parsed["command"] == command
+            assert parsed["success"] is True
+            assert parsed["exit_code"] == 0
+            assert parsed["output"] == '{"streams": []}'
+            assert not parsed["error"]
+            assert parsed["execution_time"] == self.TEST_EXECUTION_TIME_JSON_SUCCESS
+            assert parsed["timestamp"] == "2025-01-01T12:02:00Z"
 
-    def test_to_json_failure(self) -> None:
-        """Test to_json method with failed execution."""
+    def test_model_dump_json_failure(self) -> None:
+        """Test model_dump_json with failed execution."""
         command = ["meltano", "config", "invalid-plugin"]
         result = FlextMeltanoExecutionResult(
             command=command,
@@ -168,20 +168,18 @@ class TestFlextMeltanoExecutionResult:
         )
         with patch("flext_core.u.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
-            json_str = result.to_json()
-            parsed_json = json.loads(json_str)
-            assert parsed_json["command"] == command
-            assert parsed_json["success"] is False
-            assert parsed_json["exit_code"] == 2
-            assert not parsed_json["output"]
-            assert parsed_json["error"] == "Configuration error: invalid settings"
-            assert (
-                parsed_json["execution_time"] == self.TEST_EXECUTION_TIME_JSON_FAILURE
-            )
-            assert parsed_json["timestamp"] == "2025-01-01T12:03:00Z"
+            json_str = result.model_dump_json()
+            parsed = _JSON_ADAPTER.validate_json(json_str)
+            assert parsed["command"] == command
+            assert parsed["success"] is False
+            assert parsed["exit_code"] == 2
+            assert not parsed["output"]
+            assert parsed["error"] == "Configuration error: invalid settings"
+            assert parsed["execution_time"] == self.TEST_EXECUTION_TIME_JSON_FAILURE
+            assert parsed["timestamp"] == "2025-01-01T12:03:00Z"
 
-    def test_to_json_with_complex_command(self) -> None:
-        """Test to_json method with complex command arguments."""
+    def test_model_dump_json_with_complex_command(self) -> None:
+        """Test model_dump_json with complex command arguments."""
         command = ["meltano", "run", "--full-refresh", "tap-postgres", "target-csv"]
         result = FlextMeltanoExecutionResult(
             command=command,
@@ -193,15 +191,15 @@ class TestFlextMeltanoExecutionResult:
         )
         with patch("flext_core.u.generate_iso_timestamp") as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
-            json_str = result.to_json()
-            parsed_json = json.loads(json_str)
-            assert parsed_json["command"] == command
-            assert parsed_json["success"] is True
-            assert parsed_json["exit_code"] == 0
-            assert parsed_json["output"] == "Pipeline completed successfully"
-            assert not parsed_json["error"]
-            assert parsed_json["execution_time"] == self.TEST_EXECUTION_TIME_JSON_ERROR
-            assert parsed_json["timestamp"] == "2025-01-01T12:04:00Z"
+            json_str = result.model_dump_json()
+            parsed = _JSON_ADAPTER.validate_json(json_str)
+            assert parsed["command"] == command
+            assert parsed["success"] is True
+            assert parsed["exit_code"] == 0
+            assert parsed["output"] == "Pipeline completed successfully"
+            assert not parsed["error"]
+            assert parsed["execution_time"] == self.TEST_EXECUTION_TIME_JSON_ERROR
+            assert parsed["timestamp"] == "2025-01-01T12:04:00Z"
 
     def test_execution_result_with_special_characters(self) -> None:
         """Test execution result with special characters in output and error."""
