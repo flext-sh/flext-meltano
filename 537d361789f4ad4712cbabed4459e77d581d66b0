@@ -1,0 +1,41 @@
+src/flext_meltano/meltano/runner.py
+  00fa95b37860ab7c 96
+src/flext_meltano/utilities.py
+  00fa95b37860ab7c 357
+src/flext_meltano/dbt/service.py
+  00fa95b37860ab7c 155,187
+src/flext_meltano/library_runner.py
+  00fa95b37860ab7c 96
+src/flext_meltano/dbt/runner.py
+  00fa95b37860ab7c 100,139-140
+src/flext_meltano/executor.py
+  00fa95b37860ab7c 219
+src/flext_meltano/meltano/service.py
+  00fa95b37860ab7c 109,157
+src/flext_meltano/abstractions.py
+  00fa95b37860ab7c 84
+src/flext_meltano/models.py
+  00fa95b37860ab7c 66
+src/flext_meltano/meltano/project.py
+  00fa95b37860ab7c 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "537d361789f4ad4712cbabed4459e77d581d66b0",
+  "prompts": {
+    "00fa95b37860ab7c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_31b7450d5ffeFd8tYeKPduNQ1d",
+        "model": "anthropic/claude-sonnet-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 13,
+      "accepted_lines": 14,
+      "overriden_lines": 0
+    }
+  }
+}
