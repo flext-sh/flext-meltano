@@ -406,6 +406,10 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         self, config: t.Meltano.MeltanoConfigDict | object
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Create a service instance from configuration (config-as-instance pattern)."""
+        if not isinstance(config, dict):
+            return r[t.Meltano.MeltanoConfigDict].fail(
+                "Configuration must be a dictionary"
+            )
         cfg: t.Meltano.MeltanoConfigDict = dict(config)
         return r[t.Meltano.MeltanoConfigDict].ok(cfg)
 
