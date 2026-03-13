@@ -1,0 +1,25 @@
+src/flext_meltano/services.py
+  00fa95b37860ab7c 409-412
+src/flext_meltano/utilities.py
+  00fa95b37860ab7c 359
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.11",
+  "base_commit_sha": "06ea32a08a6d7071150dfae7ce2026e377ea72d8",
+  "prompts": {
+    "00fa95b37860ab7c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_31b7450d5ffeFd8tYeKPduNQ1d",
+        "model": "anthropic/claude-sonnet-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 1,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
