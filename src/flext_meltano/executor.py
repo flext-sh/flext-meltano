@@ -37,7 +37,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         config_guard = u.guard(config, dict, return_value=True)
         if config_guard:
             try:
-                self._meltano_config = FlextMeltanoSettings.model_validate(config_guard)
+                self._meltano_config = FlextMeltanoSettings(config_guard)
             except (ValueError, TypeError, KeyError, AttributeError, OSError):
                 self._meltano_config = FlextMeltanoSettings()
         else:

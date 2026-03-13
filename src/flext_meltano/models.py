@@ -61,7 +61,7 @@ class FlextMeltanoModels(FlextCliModels):
                     s in normalized,
                 ),
             )
-            checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate(
+            checks = FlextMeltanoModels.Meltano.BooleanListValue(
                 {
                     "items": checks_result.unwrap_or([]),
                 },
@@ -82,7 +82,7 @@ class FlextMeltanoModels(FlextCliModels):
         value: object,
     ) -> list[str]:
         """Normalize arbitrary values into a validated list of strings."""
-        return FlextMeltanoModels.Meltano.StringListValue.model_validate(
+        return FlextMeltanoModels.Meltano.StringListValue(
             {"items": value},
         ).items
 

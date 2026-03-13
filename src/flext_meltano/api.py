@@ -90,7 +90,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
                 if config_obj is not None and u.is_pydantic_model(config_obj)
                 else config_obj
             )
-            return FlextMeltanoSettings.model_validate(raw_config)
+            return FlextMeltanoSettings(raw_config)
         except ValidationError:
             return FlextMeltanoSettings()
 
@@ -259,9 +259,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
                 return r[t.Meltano.MeltanoConfigDict].fail(
                     result.error or "Failed to create project"
                 )
-            normalized = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": result.value
-            }).values
+            normalized = m.Meltano.ConfigMappingPayload({"values": result.value}).values
             return r[t.Meltano.MeltanoConfigDict].ok(normalized)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(f"Failed to create project: {e}")
@@ -330,9 +328,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
-            parsed_schema = m.Meltano.JsonSchemaPayload.model_validate({
-                "schema": config or {}
-            })
+            parsed_schema = m.Meltano.JsonSchemaPayload({"schema": config or {}})
             extract_result = service.extract(parsed_schema.schema_definition)
             if extract_result.is_failure:
                 return r[t.Meltano.ResultDict].fail(
@@ -667,93 +663,109 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
 
     def _handle_configure_environment_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle configure_environment operation call with model validation."""
         try:
             p = m.Meltano.ConfigureEnvironmentPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.configure_environment(p.environment_name, p.config)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_create_pipeline_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle create_pipeline operation call with model validation."""
         try:
             p = m.Meltano.CreatePipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.create_pipeline(p.tap_name, p.target_name, p.config or None)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_execute_pipeline_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle execute_pipeline operation call with model validation."""
         try:
             p = m.Meltano.ExecutePipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.execute_pipeline(p.pipeline_id, p.config)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_install_plugin_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle install_plugin operation call with model validation."""
         try:
             p = m.Meltano.InstallPluginPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.install_plugin(p.plugin_type, p.plugin_name, p.config)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_list_plugins_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle list_plugins operation call with model validation."""
         try:
             p = m.Meltano.ListPluginsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.list_plugins(p.plugin_type)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok({"plugins": result.value})
 
     def _handle_run_dbt_models_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle run_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.run_dbt_models(p.models, p.config)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_run_elt_pipeline_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle run_elt_pipeline operation call with model validation."""
         try:
             p = m.Meltano.RunEltPipelinePayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.run_elt_pipeline(
             p.tap_name, p.target_name, p.dbt_models, p.config
         )
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_test_dbt_models_call(
         self, payload: Mapping[str, t.Scalar]
-    ) -> r[t.Container]:
+    ) -> r[t.Meltano.ResultDict]:
         """Handle test_dbt_models operation call with model validation."""
         try:
             p = m.Meltano.RunDbtModelsPayload.model_validate(payload)
         except (ValidationError, ValueError, TypeError) as e:
-            return r[t.Container].fail(f"Invalid payload: {e}")
+            return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         result = self.test_dbt_models(p.models, p.config)
-        return result.map(lambda v: v)
+        if result.is_failure:
+            return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
+        return r[t.Meltano.ResultDict].ok(result.value)
 
 
 __all__ = ["FlextMeltano"]

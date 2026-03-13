@@ -67,9 +67,9 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                     )
             models: list[t.Meltano.Dbt.ModelConfiguration] = []
             if self.manifest:
-                manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
+                manifest_model = m.Meltano.DbtManifest(self.manifest)
                 parsed_nodes = [
-                    m.Meltano.DbtManifestNode.model_validate(node)
+                    m.Meltano.DbtManifestNode(node)
                     for node in manifest_model.nodes.values()
                 ]
                 model_nodes = [
@@ -118,9 +118,9 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                     )
             tests: list[t.Meltano.Dbt.TestConfiguration] = []
             if self.manifest:
-                manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
+                manifest_model = m.Meltano.DbtManifest(self.manifest)
                 parsed_nodes = [
-                    m.Meltano.DbtManifestNode.model_validate(node)
+                    m.Meltano.DbtManifestNode(node)
                     for node in manifest_model.nodes.values()
                 ]
                 test_nodes = [

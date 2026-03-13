@@ -135,9 +135,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     raw_config,
                     ops={"transform": {"normalize": False, "strip_none": False}},
                 )
-                cfg_dict = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": cfg
-                }).values
+                cfg_dict = m.Meltano.ConfigMappingPayload({"values": cfg}).values
                 plugins_val = cfg_dict.get("plugins")
                 plugins_dict: t.Meltano.MeltanoConfigDict = {}
                 if isinstance(plugins_val, dict):
@@ -209,9 +207,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             cfg = u.build(
                 raw, ops={"transform": {"normalize": False, "strip_none": False}}
             )
-            cfg_dict = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": cfg
-            }).values
+            cfg_dict = m.Meltano.ConfigMappingPayload({"values": cfg}).values
             result = build_plugin(cfg_dict)
             return r[t.Meltano.PluginConfigDict].ok(result)
 
@@ -253,9 +249,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 config_dict: t.Meltano.FileConfigDict,
             ) -> t.Meltano.MeltanoConfigDict:
                 """Type-safe conversion from FileConfigDict to MeltanoConfigDict."""
-                return m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": config_dict
-                }).values
+                return m.Meltano.ConfigMappingPayload({"values": config_dict}).values
 
             result = (
                 r[Path]
@@ -360,7 +354,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
             def create_file() -> Path:
                 file_path.parent.mkdir(parents=True, exist_ok=True)
-                content_str = m.Meltano.FileContentPayload.model_validate({
+                content_str = m.Meltano.FileContentPayload({
                     "content": content_guard
                 }).content
                 file_path.write_text(content_str, encoding="utf-8")
