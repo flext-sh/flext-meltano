@@ -83,7 +83,7 @@ class FlextMeltanoDbtService(s[str]):
                 f"Documentation generation failed: {e}"
             )
 
-    def get_project_models(self) -> r[list[t.Meltano.DbtModelDict]]:
+    def get_project_models(self) -> r[list[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from the project.
 
         Returns:
@@ -107,7 +107,9 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[list[t.Meltano.DbtModelDict]].fail(f"Failed to get models: {e}")
+            return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
+                f"Failed to get models: {e}"
+            )
 
     def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
         """Load a DBT project.

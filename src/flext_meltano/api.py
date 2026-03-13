@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import override
 
@@ -90,7 +91,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
                 if config_obj is not None and u.is_pydantic_model(config_obj)
                 else config_obj
             )
-            return FlextMeltanoSettings(raw_config)
+            return FlextMeltanoSettings.model_validate(raw_config)
         except ValidationError:
             return FlextMeltanoSettings()
 
@@ -259,7 +260,9 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
                 return r[t.Meltano.MeltanoConfigDict].fail(
                     result.error or "Failed to create project"
                 )
-            normalized = m.Meltano.ConfigMappingPayload({"values": result.value}).values
+            normalized = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": result.value
+            }).values
             return r[t.Meltano.MeltanoConfigDict].ok(normalized)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(f"Failed to create project: {e}")
@@ -328,8 +331,18 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
-            parsed_schema = m.Meltano.JsonSchemaPayload({"schema": config or {}})
-            extract_result = service.extract(parsed_schema.schema_definition)
+            parsed_schema = m.Meltano.JsonSchemaPayload.model_validate({
+                "schema": config or {}
+            })
+            schema_payload: t.Meltano.SchemaDict = {
+                str(key): (
+                    value
+                    if isinstance(value, (str, int, float, bool, datetime))
+                    else str(value)
+                )
+                for key, value in parsed_schema.schema_definition.items()
+            }
+            extract_result = service.extract(schema_payload)
             if extract_result.is_failure:
                 return r[t.Meltano.ResultDict].fail(
                     extract_result.error or "Failed to extract data"

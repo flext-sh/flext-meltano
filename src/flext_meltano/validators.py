@@ -93,7 +93,7 @@ class FlextMeltanoValidators:
     ) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
-            m.Meltano.PluginComponentConfig(config)
+            m.Meltano.PluginComponentConfig.model_validate(config)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Plugin config validation failed: {error}")
@@ -126,7 +126,7 @@ class FlextMeltanoValidators:
 
         """
         try:
-            m.Meltano.PipelineProjectModel(config)
+            m.Meltano.PipelineProjectModel.model_validate(config)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Project validation failed: {error}")
@@ -218,7 +218,7 @@ class FlextMeltanoValidators:
 
         """
         try:
-            m.Meltano.TransformationProjectModel(config)
+            m.Meltano.TransformationProjectModel.model_validate(config)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Transformation validation failed: {error}")

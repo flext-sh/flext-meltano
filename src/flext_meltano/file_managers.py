@@ -131,7 +131,7 @@ class FlextMeltanoFileManagers:
                 config_data: object = yaml.safe_load(f)
             if config_data is None:
                 return {}
-            return m.Meltano.ConfigMappingPayload({"values": config_data}).values
+            return m.Meltano.ConfigMappingPayload.model_validate({"values": config_data}).values
 
         return u.try_(
             _load,
@@ -219,7 +219,7 @@ class FlextMeltanoFileManagers:
             }
             for filename, config_data in configs.items():
                 config_path = project_root / filename
-                validated_config = m.Meltano.ConfigMappingPayload({
+                validated_config = m.Meltano.ConfigMappingPayload.model_validate({
                     "values": config_data
                 }).values
                 save_result = cls.save_yaml_config(validated_config, config_path)

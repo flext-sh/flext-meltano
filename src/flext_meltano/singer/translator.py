@@ -198,8 +198,12 @@ class FlextMeltanoSingerCliTranslator:
             command.append("--full-refresh")
         vars_val = getattr(params, "vars", None)
         if vars_val:
-            vars_dict = m.Meltano.ConfigMappingPayload({"values": vars_val}).values
-            vars_payload = m.Meltano.ConfigMappingPayload(values=vars_dict)
+            vars_dict = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": vars_val
+            }).values
+            vars_payload = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": vars_dict
+            })
             command.extend(["--vars", vars_payload.model_dump_json()])
         return r[list[str]].ok(command)
 

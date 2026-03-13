@@ -101,7 +101,7 @@ class FlextMeltanoLibraryRunner:
                     result.error or "EL pipeline execution failed"
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = {
+            elt_result: dict[str, t.ContainerValue | None] = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,
@@ -117,7 +117,7 @@ class FlextMeltanoLibraryRunner:
                     elt_result["dbt_error"] = dbt_result.error or ""
                 else:
                     elt_result["dbt_success"] = True
-                    elt_result["dbt_models_run"] = dbt_models
+                    elt_result["dbt_models_run"] = ",".join(dbt_models)
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
@@ -150,7 +150,7 @@ class FlextMeltanoLibraryRunner:
             dbt_result: t.Meltano.Processing.DbtTransformationResult = {
                 "success": execution_result.success,
                 "exit_code": execution_result.exit_code,
-                "models_run": models or ["all"],
+                "models_run": ",".join(models) if models else "all",
                 "execution_method": "library_runner",
                 "project_dir": str(project_dir) if project_dir else "",
                 "execution_time": execution_result.execution_time,
@@ -190,7 +190,7 @@ class FlextMeltanoLibraryRunner:
                     result.error or "Pipeline execution failed"
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = {
+            elt_result: dict[str, t.ContainerValue | None] = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
                 "target_name": target.name,

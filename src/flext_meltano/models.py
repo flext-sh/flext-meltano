@@ -61,11 +61,9 @@ class FlextMeltanoModels(FlextCliModels):
                     s in normalized,
                 ),
             )
-            checks = FlextMeltanoModels.Meltano.BooleanListValue(
-                {
-                    "items": checks_result.unwrap_or([]),
-                },
-            ).items
+            checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate({
+                "items": checks_result.unwrap_or([]),
+            }).items
             if checks:
                 return u.any_(*checks)
             return False
@@ -82,9 +80,7 @@ class FlextMeltanoModels(FlextCliModels):
         value: object,
     ) -> list[str]:
         """Normalize arbitrary values into a validated list of strings."""
-        return FlextMeltanoModels.Meltano.StringListValue(
-            {"items": value},
-        ).items
+        return FlextMeltanoModels.Meltano.StringListValue.model_validate({"items": value}).items
 
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
     PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
@@ -2238,7 +2234,10 @@ class FlextMeltanoModels(FlextCliModels):
             """Normalized mapping payload with string keys."""
 
             values: Annotated[
-                dict[str, object],
+                dict[
+                    str,
+                    t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+                ],
                 Field(
                     default_factory=dict,
                     description="Normalized mapping values",
@@ -2250,13 +2249,32 @@ class FlextMeltanoModels(FlextCliModels):
             def normalize_values(
                 cls,
                 value: object,
-            ) -> Mapping[str, object]:
+            ) -> dict[
+                str,
+                t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+            ]:
                 """Normalize mapping-like payloads to dict[str, value]."""
-                match value:
-                    case Mapping():
-                        return {str(key): item for key, item in value.items()}
-                    case _:
-                        return {}
+                if not isinstance(value, Mapping):
+                    return {}
+                result: dict[
+                    str,
+                    t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+                ] = {}
+                for key, item in value.items():
+                    if u.is_scalar(item) or item is None:
+                        result[str(key)] = item
+                    elif isinstance(item, list):
+                        result[str(key)] = [
+                            v if u.is_scalar(v) or v is None else str(v) for v in item
+                        ]
+                    elif isinstance(item, Mapping):
+                        result[str(key)] = {
+                            str(k): v if u.is_scalar(v) or v is None else str(v)
+                            for k, v in item.items()
+                        }
+                    else:
+                        result[str(key)] = str(item)
+                return result
 
         class PathPayload(FlextModels.ArbitraryTypesModel):
             """Path normalization payload for runtime path conversions."""

@@ -217,7 +217,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                     "name": plugin.name,
                     "type": plugin.type,
                 }
-                variant_normalized = FlextMeltanoModels.Meltano.VariantPayload({
+                variant_normalized = FlextMeltanoModels.Meltano.VariantPayload.model_validate({
                     "value": variant_raw
                 }).value
                 if variant_normalized is not None:

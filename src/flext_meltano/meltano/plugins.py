@@ -128,7 +128,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 plugin_type: str,
             ) -> Mapping[str, str]:
                 """Builder function using u.construct() mnemonic pattern for object construction."""
-                source = m.Meltano.PluginDiscoverySource(indexed_plugin)
+                source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
                 variants_str = (
                     u.join(list(source.variants.keys()), separator=",")
                     if source.variants
@@ -142,7 +142,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                     "logo_url": {"value": source.logo_url},
                     "description": {"value": source.description},
                 })
-                return m.Meltano.PluginDiscoveryItem(constructed).model_dump()
+                return m.Meltano.PluginDiscoveryItem.model_validate(constructed).model_dump()
 
             abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
             extractors_result: r[Mapping[str, t.Meltano.PluginDefinition]] = (
@@ -215,7 +215,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
         def extract_plugin_info(plugins_data: object) -> r[Mapping[str, str]]:
             """Extract plugin info from plugins dict."""
-            plugins_dict = m.Meltano.PluginDiscoveryCatalog({
+            plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
                 "plugins": plugins_data
             }).plugins
             if u.not_(u.in_(plugin_name, plugins_dict)) or u.empty(
@@ -230,7 +230,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 if indexed_plugin.variants
                 else ""
             )
-            plugin_info = m.Meltano.PluginDiscoveryItem({
+            plugin_info = m.Meltano.PluginDiscoveryItem.model_validate({
                 "name": plugin_name,
                 "type": plugin_type,
                 "default_variant": indexed_plugin.default_variant,

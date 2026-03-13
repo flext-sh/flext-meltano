@@ -109,7 +109,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: Mapping[str, object],
+        config_data: Mapping[str, t.ContainerValue | None],
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -122,9 +122,13 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         """
         path_obj = config_data.get("path")
         config_obj = config_data.get("config")
-        config_dict = dict(config_obj) if isinstance(config_obj, Mapping) else {}
+        config_dict: dict[str, t.ContainerValue | None] = (
+            dict(config_obj) if isinstance(config_obj, Mapping) else {}
+        )
         normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
-        normalized_config = m.Meltano.ConfigMappingPayload(values=config_dict).values
+        normalized_config = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": config_dict
+        }).values
         return FlextMeltanoProjectService._write_meltano_config(
             normalized_path, normalized_config
         )
@@ -207,7 +211,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _write_meltano_config(
-        project_path: Path, config: Mapping[str, object]
+        project_path: Path, config: Mapping[str, t.ContainerValue | None]
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:

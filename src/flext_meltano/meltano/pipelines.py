@@ -124,8 +124,8 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
     ) -> r[Mapping[str, str]]:
         """Build successful pipeline result."""
         try:
-            parsed_context = m.Meltano.PipelineResultContext(context_data)
-            execution_values = m.Meltano.PipelineExecutionScalarMap({
+            parsed_context = m.Meltano.PipelineResultContext.model_validate(context_data)
+            execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate({
                 "values": parsed_context.execution_result
             }).values
             pipeline_result: dict[str, str] = {
@@ -184,7 +184,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
             }
-            typed_context = m.Meltano.PipelineExecutionContext(context_data)
+            typed_context = m.Meltano.PipelineExecutionContext.model_validate(context_data)
             return r[t.Meltano.ExecutionResultDict].ok(
                 typed_context.model_dump(mode="python")
             )
@@ -198,7 +198,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
     ) -> r[Mapping[str, t.Scalar]]:
         """Execute Singer runner with context data."""
         try:
-            _ = m.Meltano.PipelineExecutionContext(context_data)
+            _ = m.Meltano.PipelineExecutionContext.model_validate(context_data)
             return r[Mapping[str, t.Scalar]].fail("Plugin discovery not configured")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Mapping[str, t.Scalar]].fail(

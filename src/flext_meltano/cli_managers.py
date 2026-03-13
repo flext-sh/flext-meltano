@@ -63,7 +63,9 @@ def _is_process_running(pid: int) -> bool:
     return True
 
 
-def create_pipeline(pipeline_name: str, config: Mapping[str, object] | None) -> r[str]:
+def create_pipeline(
+    pipeline_name: str, config: Mapping[str, t.ContainerValue | None] | None
+) -> r[str]:
     """Create a new Meltano pipeline with the given configuration."""
     if not pipeline_name.strip():
         return r[str].fail("Pipeline creation requires a non-empty pipeline name")
@@ -75,7 +77,9 @@ def create_pipeline(pipeline_name: str, config: Mapping[str, object] | None) -> 
     try:
         pipeline_dir.mkdir(parents=True, exist_ok=False)
         config_path = _pipeline_config_path(pipeline_name)
-        validated = m.Meltano.ConfigMappingPayload({"values": dict(config)})
+        validated = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": dict(config)
+        })
         config_path.write_text(validated.model_dump_json(indent=2), encoding="utf-8")
     except OSError as exc:
         return r[str].fail(f"Failed to create pipeline '{pipeline_name}': {exc}")
@@ -103,7 +107,7 @@ def execute_pipeline(
         validated_payload = config_mapping.values
         command_value = validated_payload.get("command")
         if isinstance(command_value, list):
-            configured_command = m.Meltano.StringListValue({
+            configured_command = m.Meltano.StringListValue.model_validate({
                 "items": command_value
             }).items
     meltano_args = command_args or configured_command

@@ -97,7 +97,9 @@ class FlextMeltanoBridge:
         """
         try:
             args_dict: t.Meltano.MeltanoConfigDict = (
-                FlextMeltanoModels.Meltano.ConfigMappingPayload({"values": args}).values
+                FlextMeltanoModels.Meltano.ConfigMappingPayload.model_validate({
+                    "values": args
+                }).values
                 if args
                 else {}
             )
