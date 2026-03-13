@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import override
+from typing import Annotated, override
 
 from flext_core import r, s
 from pydantic import Field
@@ -49,12 +49,14 @@ class FlextMeltanoMeltanoService(s[str]):
     class PipelineConfig(FlextMeltanoModels):
         """Configuration for a Meltano pipeline."""
 
-        project_root: Path = Field(description="Meltano project root")
-        run_config: str = Field(description="Run configuration name")
-        select: str | None = Field(default=None, description="Stream/table selection")
-        select_filter: str | None = Field(
-            default=None, description="Additional selection filter"
-        )
+        project_root: Annotated[Path, Field(description="Meltano project root")]
+        run_config: Annotated[str, Field(description="Run configuration name")]
+        select: Annotated[
+            str | None, Field(default=None, description="Stream/table selection")
+        ]
+        select_filter: Annotated[
+            str | None, Field(default=None, description="Additional selection filter")
+        ]
 
     def __init__(self) -> None:
         """Initialize Meltano orchestration service."""
@@ -104,7 +106,7 @@ class FlextMeltanoMeltanoService(s[str]):
 
         """
         try:
-            self.logger.info("Discovering plugins", type=plugin_type)
+            self.logger.info("Discovering plugins", type=plugin_type or "")
             result = self.project_manager.get_plugins(plugin_type)
             if result.is_success:
                 plugins = list(result.value) if result.value else []
@@ -152,7 +154,7 @@ class FlextMeltanoMeltanoService(s[str]):
                 "status": "completed",
                 "exit_code": 0,
             }
-            self.logger.info("Meltano pipeline executed", status=result["status"])
+            self.logger.info("Meltano pipeline executed", status=str(result["status"]))
             return r[t.Meltano.ELT.PipelineResult].ok(result)
         except (
             ValueError,

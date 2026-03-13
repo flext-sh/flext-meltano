@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import Annotated
 
 from flext_core import FlextModels, t
 from pydantic import Field, computed_field
@@ -21,12 +22,12 @@ from flext_meltano import u
 class FlextMeltanoExecutionResult(FlextModels.ArbitraryTypesModel):
     """Execution result model for Meltano command operations following flext-core patterns."""
 
-    command: list[str] = Field(description="Command that was executed")
-    success: bool = Field(description="Whether the command succeeded")
-    exit_code: int = Field(description="Process exit code")
-    output: str = Field(description="Standard output")
-    error: str = Field(description="Standard error")
-    execution_time: float = Field(description="Execution time in seconds")
+    command: Annotated[list[str], Field(description="Command that was executed")]
+    success: Annotated[bool, Field(description="Whether the command succeeded")]
+    exit_code: Annotated[int, Field(description="Process exit code")]
+    output: Annotated[str, Field(description="Standard output")]
+    error: Annotated[str, Field(description="Standard error")]
+    execution_time: Annotated[float, Field(description="Execution time in seconds")]
 
     @computed_field
     def timestamp(self) -> str:

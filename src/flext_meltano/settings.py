@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar
+from typing import Annotated, ClassVar
 
 from flext_core import FlextSettings, c, r, t
 from pydantic import Field, field_validator
@@ -25,14 +25,14 @@ class FlextMeltanoSettings(FlextSettings):
     class ConfigBuilders:
         """Namespace for configuration builder utilities."""
 
-    project_root: Path = Field(default=Path())
-    config_dir: Path = Field(default=Path(".meltano"))
-    logs_dir: Path = Field(default=Path("logs"))
-    environment: str = Field(default="development")
-    log_level: c.Settings.LogLevel = Field(default=c.Settings.LogLevel.INFO)
-    meltano_version: str = Field(default=MELTANO_VERSION)
-    singer_sdk_version: str = Field(default=SINGER_SDK_VERSION)
-    dbt_version: str = Field(default=DBT_VERSION)
+    project_root: Annotated[Path, Field(default=Path())]
+    config_dir: Annotated[Path, Field(default=Path(".meltano"))]
+    logs_dir: Annotated[Path, Field(default=Path("logs"))]
+    environment: Annotated[str, Field(default="development")]
+    log_level: Annotated[c.Settings.LogLevel, Field(default=c.Settings.LogLevel.INFO)]
+    meltano_version: Annotated[str, Field(default=MELTANO_VERSION)]
+    singer_sdk_version: Annotated[str, Field(default=SINGER_SDK_VERSION)]
+    dbt_version: Annotated[str, Field(default=DBT_VERSION)]
 
     @field_validator("project_root", mode="before")
     @classmethod

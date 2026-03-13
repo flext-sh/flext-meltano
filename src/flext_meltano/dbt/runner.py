@@ -97,7 +97,7 @@ class FlextMeltanoDbtRunner(s[str]):
             if not self.project_root:
                 return r[m.Meltano.DbtRunResult].fail("No project root set")
             self.logger.info(
-                "Starting DBT run", models=models, cwd=str(self.project_root)
+                "Starting DBT run", models=str(models or []), cwd=str(self.project_root)
             )
             result = m.Meltano.DbtRunResult(
                 success=True,
@@ -135,7 +135,9 @@ class FlextMeltanoDbtRunner(s[str]):
             if not self.project_root:
                 return r[m.Meltano.DbtTestResult].fail("No project root set")
             self.logger.info(
-                "Starting DBT tests", models=models, cwd=str(self.project_root)
+                "Starting DBT tests",
+                models=str(models or []),
+                cwd=str(self.project_root),
             )
             result = m.Meltano.DbtTestResult(
                 success=True, tests_run=0, status="completed"

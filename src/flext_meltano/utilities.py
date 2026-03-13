@@ -139,9 +139,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "values": cfg
                 }).values
                 plugins_val = cfg_dict.get("plugins")
-                plugins_dict: dict[str, t.Scalar] = {}
+                plugins_dict: t.Meltano.MeltanoConfigDict = {}
                 if isinstance(plugins_val, dict):
-                    plugins_dict = plugins_val
+                    plugins_dict = {str(k): v for k, v in plugins_val.items()}
                 result_cfg: t.Meltano.MeltanoConfigDict = {
                     "version": cfg_dict.get("version", 1),
                     "project_id": u.safe_string(project_id_val),
@@ -354,7 +354,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             file_path: Path, content: str | t.Meltano.MeltanoConfigDict
         ) -> r[Path]:
             """Create a project file with content."""
-            if not isinstance(content, str | dict):
+            if not isinstance(content, (str, dict)):
                 return r[Path].fail("Invalid content type: must be string or dict")
             content_guard: str | dict[str, t.Scalar] = content
 

@@ -81,7 +81,7 @@ class FlextMeltanoAbstractions:
     def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
         """Add a plugin."""
         try:
-            self.logger.info("Adding plugin", plugin_config=plugin_config)
+            self.logger.info("Adding plugin", plugin_config=str(plugin_config))
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to add plugin: {e}"

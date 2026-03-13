@@ -216,7 +216,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         """
         try:
             start_time = time.time()
-            self.logger.info("Executing command", command=command, timeout=timeout)
+            self.logger.info("Executing command", command=str(command), timeout=timeout)
             execution_time = time.time() - start_time
             result = FlextMeltanoExecutionResult(
                 command=command,

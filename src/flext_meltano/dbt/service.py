@@ -152,7 +152,7 @@ class FlextMeltanoDbtService(s[str]):
 
         """
         try:
-            self.logger.info("Running DBT models", models=models)
+            self.logger.info("Running DBT models", models=str(models or []))
             result = self.runner.run_models(models, **kwargs)
             if result.is_success:
                 run_result = result.value
@@ -184,7 +184,7 @@ class FlextMeltanoDbtService(s[str]):
 
         """
         try:
-            self.logger.info("Running DBT tests", models=models)
+            self.logger.info("Running DBT tests", models=str(models or []))
             result = self.runner.run_tests(models, **kwargs)
             if result.is_success:
                 test_result = result.value

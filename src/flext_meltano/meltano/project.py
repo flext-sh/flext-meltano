@@ -76,7 +76,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 return r[list[t.Meltano.PluginDefinition]].fail("No project loaded")
             plugins = self._extract_plugins(plugin_type)
             self.logger.info(
-                "Plugins retrieved", count=u.count(plugins), type=plugin_type
+                "Plugins retrieved", count=u.count(plugins), type=plugin_type or ""
             )
             return r[list[t.Meltano.PluginDefinition]].ok(plugins)
         except (

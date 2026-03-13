@@ -93,7 +93,7 @@ class FlextMeltanoLibraryRunner:
                 "Starting complete ELT pipeline",
                 tap_name=tap_name,
                 target_name=target_name,
-                dbt_models=dbt_models,
+                dbt_models=str(dbt_models or []),
             )
             result = self._executor.execute_pipeline(tap_name, target_name, config)
             if result.is_failure:
