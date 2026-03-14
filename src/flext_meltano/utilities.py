@@ -308,9 +308,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
             """
 
-            def write_operation(
-                _unused_value, file_handle: TextIO, /
-            ) -> r[bool]:
+            def write_operation(_unused_value, file_handle: TextIO, /) -> r[bool]:
                 return cls._write_yaml_content(file_handle, config)
 
             def cleanup_file_handle(file_handle: TextIO) -> None:

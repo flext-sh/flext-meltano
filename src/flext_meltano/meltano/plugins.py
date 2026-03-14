@@ -13,9 +13,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
 from typing import TypeGuard, override
 
 from flext_core import r, s
+from tomlkit import datetime
+from tomlkit.api import datetime
 
 from flext_meltano import (
     FlextMeltanoProjectService,
@@ -215,7 +218,17 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
         """
 
-        def extract_plugin_info(plugins_data) -> r[Mapping[str, str]]:
+        def extract_plugin_info(
+            plugins_data: Mapping[
+                str,
+                dict[
+                    str,
+                    Mapping[str, bool | datetime | float | int | str | None]
+                    | list[str]
+                    | str,
+                ],
+            ],
+        ) -> r[Mapping[str, str]]:
             """Extract plugin info from plugins dict."""
             plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
                 "plugins": plugins_data

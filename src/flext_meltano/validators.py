@@ -39,9 +39,7 @@ class FlextMeltanoValidators:
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
-        >>> result: r = validator.validate_pipeline_component_business_rules(
-        ...     config
-        ... )
+        >>> result: r = validator.validate_pipeline_component_business_rules(config)
         >>> if result.is_success:
         ...     logger.info("Component configuration is valid")
 

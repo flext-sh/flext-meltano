@@ -2957,7 +2957,7 @@ class APIResponse:
     """Consistent API response format."""
 
     def __init__(
-        self, data = None, error: str = None, metadata: Dict[str, object] = None
+        self, data=None, error: str = None, metadata: Dict[str, object] = None
     ):
         self.success = error is None
         self.data = data
