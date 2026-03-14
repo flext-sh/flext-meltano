@@ -80,7 +80,9 @@ class FlextMeltanoModels(FlextCliModels):
         value: object,
     ) -> list[str]:
         """Normalize arbitrary values into a validated list of strings."""
-        return FlextMeltanoModels.Meltano.StringListValue.model_validate({"items": value}).items
+        return FlextMeltanoModels.Meltano.StringListValue.model_validate({
+            "items": value
+        }).items
 
     PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
     PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
@@ -2236,7 +2238,10 @@ class FlextMeltanoModels(FlextCliModels):
             values: Annotated[
                 dict[
                     str,
-                    t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+                    t.Scalar
+                    | list[t.Scalar | None]
+                    | Mapping[str, t.Scalar | None]
+                    | None,
                 ],
                 Field(
                     default_factory=dict,
@@ -2258,7 +2263,10 @@ class FlextMeltanoModels(FlextCliModels):
                     return {}
                 result: dict[
                     str,
-                    t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+                    t.Scalar
+                    | list[t.Scalar | None]
+                    | Mapping[str, t.Scalar | None]
+                    | None,
                 ] = {}
                 for key, item in value.items():
                     if u.is_scalar(item) or item is None:

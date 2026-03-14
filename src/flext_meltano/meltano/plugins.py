@@ -142,7 +142,9 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                     "logo_url": {"value": source.logo_url},
                     "description": {"value": source.description},
                 })
-                return m.Meltano.PluginDiscoveryItem.model_validate(constructed).model_dump()
+                return m.Meltano.PluginDiscoveryItem.model_validate(
+                    constructed
+                ).model_dump()
 
             abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
             extractors_result: r[Mapping[str, t.Meltano.PluginDefinition]] = (

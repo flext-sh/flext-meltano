@@ -124,7 +124,9 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
     ) -> r[Mapping[str, str]]:
         """Build successful pipeline result."""
         try:
-            parsed_context = m.Meltano.PipelineResultContext.model_validate(context_data)
+            parsed_context = m.Meltano.PipelineResultContext.model_validate(
+                context_data
+            )
             execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate({
                 "values": parsed_context.execution_result
             }).values
@@ -184,7 +186,9 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
             }
-            typed_context = m.Meltano.PipelineExecutionContext.model_validate(context_data)
+            typed_context = m.Meltano.PipelineExecutionContext.model_validate(
+                context_data
+            )
             return r[t.Meltano.ExecutionResultDict].ok(
                 typed_context.model_dump(mode="python")
             )
