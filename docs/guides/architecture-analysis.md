@@ -8,7 +8,7 @@
   - [Design Principles](#design-principles)
 - [Core Architecture](#core-architecture)
   - [Service Layer Architecture](#service-layer-architecture)
-  - [ Implementation Architecture](#protocol-implementation-architecture)
+  - [Implementation Architecture](#protocol-implementation-architecture)
   - [Plugin Architecture](#plugin-architecture)
 - [Component Analysis](#component-analysis)
   - [Service Components](#service-components)
