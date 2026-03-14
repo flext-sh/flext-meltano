@@ -185,7 +185,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 "type": plugin_type or "extractor",
             }
 
-            def safe_str(val: object) -> str:
+            def safe_str(val) -> str:
                 return u.safe_string(str(val)) if val else ""
 
             def build_plugin(
@@ -309,7 +309,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             """
 
             def write_operation(
-                _unused_value: object, file_handle: TextIO, /
+                _unused_value, file_handle: TextIO, /
             ) -> r[bool]:
                 return cls._write_yaml_content(file_handle, config)
 

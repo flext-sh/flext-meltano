@@ -241,7 +241,7 @@ class MultiLevelCache:
         self.cache_metrics.miss()
         return None
 
-    def set(self, key: str, value: object, ttl_seconds: int = 3600) -> None:
+    def set(self, key: str, value, ttl_seconds: int = 3600) -> None:
         """Set value in multi-level cache."""
 
         # Serialize for Redis
@@ -2957,7 +2957,7 @@ class APIResponse:
     """Consistent API response format."""
 
     def __init__(
-        self, data: object = None, error: str = None, metadata: Dict[str, object] = None
+        self, data = None, error: str = None, metadata: Dict[str, object] = None
     ):
         self.success = error is None
         self.data = data

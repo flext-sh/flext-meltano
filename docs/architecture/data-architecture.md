@@ -221,7 +221,7 @@ class PipelineState:
     last_updated: datetime
     version: int
 
-    def update_bookmark(self, stream: str, value: object) -> None:
+    def update_bookmark(self, stream: str, value) -> None:
         """Update bookmark for incremental sync."""
         self.bookmarks[stream] = value
         self.last_updated = datetime.utcnow()

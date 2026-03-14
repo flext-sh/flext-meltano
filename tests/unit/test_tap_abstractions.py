@@ -21,11 +21,11 @@ class _TestAssertions:
         assert not condition, message or "assert_false failed"
 
     @staticmethod
-    def assert_equal(actual: object, expected: object, message: str = "") -> None:
+    def assert_equal(actual, expected, message: str = "") -> None:
         assert actual == expected, message or f"expected {expected!r}, got {actual!r}"
 
     @staticmethod
-    def assert_in(item: object, container: object, message: str = "") -> None:
+    def assert_in(item, container, message: str = "") -> None:
         assert item in container, message or f"{item!r} not in {container!r}"
 
 

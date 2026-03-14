@@ -210,7 +210,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         source_config: m.Meltano.DataSourceConfig
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
-    ) -> r[object]:
+    ) -> r:
         """Generate a legacy Singer catalog from configuration.
 
         Args:
@@ -221,7 +221,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r[object].ok({"version": 1, "streams": []})
+        return r.ok({"version": 1, "streams": []})
 
     def process(
         self,
@@ -268,8 +268,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
         stream_name: str,
-        target: object | None = None,
-    ) -> r[object]:
+        target = None,
+    ) -> r:
         """Synchronize a single stream from source to target.
 
         Args:
@@ -282,7 +282,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r[object].ok({
+        return r.ok({
             "stream_name": stream_name,
             "status": "completed",
             "records_processed": 0,

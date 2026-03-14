@@ -502,7 +502,7 @@ class TestFlextMeltanoExecutorComplete:
             plugins_result = executor.list_plugins()
             assert isinstance(plugins_result, r)
 
-    def test_self(self, meltano_cli_runner: object) -> None:
+    def test_self(self, meltano_cli_runner) -> None:
         """Test flext-cli command error paths using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         assert cli_result.is_success, f"CLI creation failed: {cli_result.error}"

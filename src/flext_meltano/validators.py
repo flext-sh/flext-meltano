@@ -39,7 +39,7 @@ class FlextMeltanoValidators:
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
-        >>> result: r[object] = validator.validate_pipeline_component_business_rules(
+        >>> result: r = validator.validate_pipeline_component_business_rules(
         ...     config
         ... )
         >>> if result.is_success:
@@ -208,7 +208,7 @@ class FlextMeltanoValidators:
             ...     "name": "my_transformation_project",
             ...     "version": 1.0.0,
             ... }
-            >>> result: r[object] = (
+            >>> result: r = (
             ...     FlextMeltanoValidators.validate_transformation_business_rules(
             ...         config
             ...     )

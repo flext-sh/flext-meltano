@@ -128,7 +128,7 @@ class FlextMeltanoFileManagers:
                     msg,
                 )
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
-                config_data: object = yaml.safe_load(f)
+                config_data = yaml.safe_load(f)
             if config_data is None:
                 return {}
             return m.Meltano.ConfigMappingPayload.model_validate({

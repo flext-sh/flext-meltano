@@ -49,7 +49,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
-    def _convert_to_project_dict(project: object) -> r[t.Meltano.Dbt.Project]:
+    def _convert_to_project_dict(project) -> r[t.Meltano.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
             name_attr = getattr(project, "name", None)
@@ -138,7 +138,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         temp_path: Path, project_id: str
     ) -> r[Mapping[str, object]]:
         """Generate minimal meltano.yml configuration."""
-        config: object = {
+        config = {
             "version": 1,
             "default_environment": "dev",
             "project_id": project_id,
@@ -151,7 +151,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
                 }
             ],
         }
-        return r[object].ok({"path": temp_path, "config": config})
+        return r.ok({"path": temp_path, "config": config})
 
     @staticmethod
     def _initialize_project_config(project_path: Path, project_name: str) -> r[Path]:
