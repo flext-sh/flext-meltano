@@ -33,26 +33,11 @@ if TYPE_CHECKING:
 # Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoBridge": ("flext_meltano.meltano.bridge", "FlextMeltanoBridge"),
-    "FlextMeltanoComponentService": (
-        "flext_meltano.meltano.plugins",
-        "FlextMeltanoComponentService",
-    ),
-    "FlextMeltanoLibraryRunner": (
-        "flext_meltano.meltano.runner",
-        "FlextMeltanoLibraryRunner",
-    ),
-    "FlextMeltanoMeltanoService": (
-        "flext_meltano.meltano.service",
-        "FlextMeltanoMeltanoService",
-    ),
-    "FlextMeltanoOrchestrationService": (
-        "flext_meltano.meltano.pipelines",
-        "FlextMeltanoOrchestrationService",
-    ),
-    "FlextMeltanoProjectManager": (
-        "flext_meltano.meltano.project",
-        "FlextMeltanoProjectManager",
-    ),
+    "FlextMeltanoComponentService": ("flext_meltano.meltano.plugins", "FlextMeltanoComponentService"),
+    "FlextMeltanoLibraryRunner": ("flext_meltano.meltano.runner", "FlextMeltanoLibraryRunner"),
+    "FlextMeltanoMeltanoService": ("flext_meltano.meltano.service", "FlextMeltanoMeltanoService"),
+    "FlextMeltanoOrchestrationService": ("flext_meltano.meltano.pipelines", "FlextMeltanoOrchestrationService"),
+    "FlextMeltanoProjectManager": ("flext_meltano.meltano.project", "FlextMeltanoProjectManager"),
     "s": ("flext_meltano.meltano.pipelines", "FlextMeltanoOrchestrationService"),
 }
 
