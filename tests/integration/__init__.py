@@ -19,9 +19,11 @@ if TYPE_CHECKING:
 
     from tests.integration.test_docker_integration import TestDockerIntegration
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "TestDockerIntegration": ("tests.integration.test_docker_integration", "TestDockerIntegration"),
+    "TestDockerIntegration": (
+        "tests.integration.test_docker_integration",
+        "TestDockerIntegration",
+    ),
 }
 
 __all__ = [

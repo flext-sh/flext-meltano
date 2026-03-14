@@ -32,7 +32,6 @@ if TYPE_CHECKING:
         docker_services,
     )
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
     "FlextTestsDocker": ("tests.helpers.docker_test_manager", "FlextTestsDocker"),
