@@ -97,7 +97,7 @@ pytest --lf                # Run only last failed tests
 pytest_plugins = [
     "tests.fixtures.database",
     "tests.fixtures.meltano",
-    "tests.fixtures.singer"
+    "tests.fixtures.singer",
 ]
 
 # Coverage requirements (enforced)
@@ -183,6 +183,7 @@ Brief description of what this module tests and why.
 
 Description of test class organization and test method patterns.
 """
+
 
 class TestModuleFunctionality:
     """Test class for specific functionality area.

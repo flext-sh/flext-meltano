@@ -38,10 +38,10 @@ Comprehensive collection of working examples demonstrating FLEXT Meltano's Go �
 
 #### **[01_flext_result_railway_pattern.py](01_flext_result_railway_pattern.py)** - ✅ Production Ready
 
-**Purpose**: Railway-oriented programming with FlextResult patterns
+**Purpose**: Railway-oriented programming with r patterns
 **Scope**: Error handling, result chaining, enterprise patterns
 **Target Audience**: Developers learning FLEXT foundation patterns
-**Dependencies**: flext-core (FlextResult)
+**Dependencies**: flext-core (r)
 
 #### **[02_flext_container_dependency_injection.py](02_flext_container_dependency_injection.py)** - ⚠️ Needs Fix
 
@@ -186,6 +186,7 @@ Description of what users should see when running the example.
 object
 
 from flext_meltano import FlextMeltanoSettings
+
 
 def demonstrate_pattern() -> t.Dict:
     """Demonstrate specific pattern with clear documentation.

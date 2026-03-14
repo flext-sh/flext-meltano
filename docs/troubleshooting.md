@@ -18,7 +18,7 @@
   - [**Linting Errors**](#linting-errors)
   - [**Security Issues**](#security-issues)
 - [🚫 Common Mistakes](#common-mistakes)
-  - [**FlextResult Pattern Violations**](#flextresult-pattern-violations)
+  - [**r Pattern Violations**](#flextresult-pattern-violations)
   - [**Service Pattern Violations**](#service-pattern-violations)
 - [🆘 Getting Help](#getting-help)
   - [**Debug Information**](#debug-information)
@@ -103,13 +103,14 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
-def process_data(data: dict) -> FlextResult[Optional[t.Dict]]:
+
+def process_data(data: dict) -> r[Optional[t.Dict]]:
     # Implementation
     pass
 ```
@@ -183,7 +184,7 @@ open htmlcov/index.html
 **Solution**: Focus on critical paths
 
 1. **Core Services**: Ensure service classes have test coverage
-1. **Error Handling**: Test FlextResult error paths
+1. **Error Handling**: Test r error paths
 1. **Integration Points**: Test abstractions with real scenarios
 
 ### **Slow Tests**
@@ -242,9 +243,9 @@ ______________________________________________________________________
 
 ## 🚫 Common Mistakes
 
-### **FlextResult Pattern Violations**
+### **r Pattern Violations**
 
-**Problem**: Not using FlextResult for error handling
+**Problem**: Not using r for error handling
 
 ```python
 # ❌ Incorrect
@@ -255,13 +256,14 @@ def risky_operation():
     except Exception as e:
         return None  # Lost error information
 
+
 # ✅ Correct
-def safe_operation() -> FlextResult[t.Dict]:
+def safe_operation() -> r[t.Dict]:
     try:
         # operation
-        return FlextResult.ok(data)
+        return r.ok(data)
     except Exception as e:
-        return FlextResult.fail(f"Operation failed: {e}")
+        return r.fail(f"Operation failed: {e}")
 ```
 
 ### **Service Pattern Violations**
@@ -274,6 +276,7 @@ class UtilityClass:
     @staticmethod
     def do_something():
         pass
+
 
 # ✅ Correct
 from flext_core import FlextBus
@@ -291,14 +294,15 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
+
 class FlextMeltanoUtilityService(FlextService):
-    def do_something(self) -> FlextResult[t.Dict]:
+    def do_something(self) -> r[t.Dict]:
         # Implementation with proper error handling
         pass
 ```

@@ -119,8 +119,9 @@ from tests.fixtures import (
     sample_csv_data,
     meltano_test_project,
     mock_singer_tap,
-    test_database_connection
+    test_database_connection,
 )
+
 
 @pytest.fixture
 def test_environment(meltano_test_project, test_database_connection):
@@ -128,7 +129,7 @@ def test_environment(meltano_test_project, test_database_connection):
     return {
         "meltano_project": meltano_test_project,
         "database": test_database_connection,
-        "cleanup": lambda: cleanup_test_environment()
+        "cleanup": lambda: cleanup_test_environment(),
     }
 ```
 
@@ -148,9 +149,10 @@ def sample_users_csv():
             "id": "integer",
             "name": "string",
             "email": "string",
-            "created_at": "datetime"
-        }
+            "created_at": "datetime",
+        },
     }
+
 
 # JSON data fixtures
 @pytest.fixture
@@ -159,7 +161,7 @@ def sample_api_responses():
     return {
         "success_response": {"status": "success", "data": [...]},
         "error_response": {"status": "error", "message": "Test error"},
-        "pagination_response": {"page": 1, "total": 100, "items": [...]}
+        "pagination_response": {"page": 1, "total": 100, "items": [...]},
     }
 ```
 
@@ -176,9 +178,9 @@ def user_schema_fixture():
             "id": {"type": "integer"},
             "name": {"type": "string"},
             "email": {"type": "string", "format": "email"},
-            "created_at": {"type": "string", "format": "date-time"}
+            "created_at": {"type": "string", "format": "date-time"},
         },
-        "required": ["id", "name", "email"]
+        "required": ["id", "name", "email"],
     }
 ```
 
@@ -202,17 +204,17 @@ def meltano_test_project(tmp_path):
                 {
                     "name": "tap-csv",
                     "variant": "meltanolabs",
-                    "pip_url": "pipelinewise-tap-csv"
+                    "pip_url": "pipelinewise-tap-csv",
                 }
             ],
             "loaders": [
                 {
                     "name": "target-jsonl",
                     "variant": "andyh1203",
-                    "pip_url": "target-jsonl"
+                    "pip_url": "target-jsonl",
                 }
-            ]
-        }
+            ],
+        },
     }
 
     with open(project_dir / "meltano.yml", "w") as f:
@@ -232,7 +234,7 @@ def flext_meltano_config():
         project_root="/tmp/test_project",
         environment="test",
         log_level="debug",
-        enable_metrics=False
+        enable_metrics=False,
     )
 ```
 
@@ -257,14 +259,12 @@ class MockMeltanoCLI:
         """Execute mock command."""
         return self.responses.get(command, {"returncode": 0, "stdout": ""})
 
+
 @pytest.fixture
 def mock_meltano_cli():
     """Mock Meltano CLI fixture."""
     mock = MockMeltanoCLI()
-    mock.add_response("--version", {
-        "returncode": 0,
-        "stdout": "meltano 3.0.0"
-    })
+    mock.add_response("--version", {"returncode": 0, "stdout": "meltano 3.0.0"})
     return mock
 ```
 
@@ -275,6 +275,7 @@ def mock_meltano_cli():
 @pytest.fixture
 def mock_database_connection():
     """Mock database connection for testing."""
+
     class MockConnection:
         def execute(self, query):
             return {"rows": [], "rowcount": 0}
@@ -307,6 +308,7 @@ def expensive_fixture():
     # Cleanup once at session end
     cleanup_expensive_data(data)
 
+
 @pytest.fixture
 def cached_data(expensive_fixture):
     """Fast fixture using cached session data."""
@@ -330,14 +332,12 @@ from typing import Dict, Iterator
 
 import pytest
 
+
 @pytest.fixture
 def typed_fixture() -> t.Dict:
     """Properly typed fixture with clear return type."""
-    return {
-        "key": "value",
-        "count": 42,
-        "items": ["a", "b", "c"]
-    }
+    return {"key": "value", "count": 42, "items": ["a", "b", "c"]}
+
 
 @pytest.fixture
 def documented_fixture() -> Iterator[str]:
@@ -365,6 +365,7 @@ def pytest_configure(config):
     fixture_modules = discover_fixture_modules("tests/fixtures")
     for module in fixture_modules:
         register_fixtures(module)
+
 
 def discover_fixture_modules(directory):
     """Discover fixture modules in directory."""
@@ -394,6 +395,7 @@ def test_csv_processing(sample_users_csv):
     assert len(results) == sample_users_csv["records"]
     assert all("email" in record for record in results)
 
+
 # Using configuration fixtures
 def test_meltano_integration(meltano_test_project, flext_meltano_config):
     """Test Meltano integration with fixtures."""
@@ -415,14 +417,14 @@ def complete_test_environment(
     meltano_test_project,
     sample_users_csv,
     mock_database_connection,
-    flext_meltano_config
+    flext_meltano_config,
 ):
     """Complete test environment with all components."""
     return TestEnvironment(
         meltano_project=meltano_test_project,
         data_source=sample_users_csv,
         database=mock_database_connection,
-        config=flext_meltano_config
+        config=flext_meltano_config,
     )
 ```
 

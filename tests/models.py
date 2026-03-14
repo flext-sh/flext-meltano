@@ -9,9 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests.models import FlextTestsModels
+from flext_tests import FlextTestsModels
 
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano import FlextMeltanoModels
 
 
 class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
@@ -28,16 +28,17 @@ class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
     - FlextTestsModels.Tests.* - Generic test utilities
     """
 
-    class Tests:
-        """Test fixtures namespace for flext-meltano.
+    class Meltano(FlextMeltanoModels.Meltano):
+        """Meltano domain models test namespace."""
 
-        Contains test-specific models and fixtures that should not
-        be part of production code.
-        """
+        class Tests:
+            """Test fixtures namespace for flext-meltano.
+
+            Contains test-specific models and fixtures that should not
+            be part of production code.
+            """
 
 
-# Short aliases for tests
-tm = TestsFlextMeltanoModels
 m = TestsFlextMeltanoModels
 
-__all__ = ["TestsFlextMeltanoModels", "m", "tm"]
+__all__ = ["TestsFlextMeltanoModels", "m"]

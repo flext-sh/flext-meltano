@@ -58,8 +58,8 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 ```python
 # FLEXT pattern - Railway-oriented, type-safe
 class MyCustomTap(FlextMeltanoTap):
-    def discover_streams(self) -> FlextResult[List[FlextMeltanoStream]]:
-        return FlextResult.ok([MyStream(self)])
+    def discover_streams(self) -> r[List[FlextMeltanoStream]]:
+        return r.ok([MyStream(self)])
 ```
 
 **Error Handling**: Consistent error handling across all Singer operations
@@ -78,7 +78,7 @@ if result.is_failure:
 # Mock Singer SDK for unit testing
 @pytest.fixture
 def mock_singer_sdk():
-    with patch('singer_sdk.Tap'):
+    with patch("singer_sdk.Tap"):
         yield
 ```
 
@@ -148,11 +148,14 @@ def mock_singer_sdk():
 class FlextMeltanoSingerBase:
     """Base class for all Singer operations with FLEXT patterns."""
 
+
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap abstraction with railway-oriented error handling."""
 
+
 class FlextMeltanoTarget(FlextMeltanoSingerBase, SingerTarget):
     """FLEXT target abstraction with railway-oriented error handling."""
+
 
 class FlextMeltanoStream(FlextMeltanoSingerBase):
     """Stream abstraction with FLEXT state management."""
@@ -162,20 +165,21 @@ class FlextMeltanoStream(FlextMeltanoSingerBase):
 
 ```python
 class FlextMeltanoTap(FlextMeltanoSingerBase):
-    def discover_streams(self) -> FlextResult[List[FlextMeltanoStream]]:
+    def discover_streams(self) -> r[List[FlextMeltanoStream]]:
         try:
             # Singer SDK operations
             streams = super().discover_streams()
             # Convert to FLEXT streams
             flext_streams = [FlextMeltanoStream.from_sdk(stream) for stream in streams]
-            return FlextResult.ok(flext_streams)
+            return r.ok(flext_streams)
         except Exception as e:
-            return FlextResult.fail(SingerError(f"Stream discovery failed: {e}"))
+            return r.fail(SingerError(f"Stream discovery failed: {e}"))
 
-    def run_tap(self, config: dict, state: dict) -> FlextResult[TapResult]:
+    def run_tap(self, config: dict, state: dict) -> r[TapResult]:
         # Railway pattern for tap execution
         return (
-            self.validate_config(config)
+            self
+            .validate_config(config)
             .flat_map(lambda _: self.initialize_state(state))
             .flat_map(lambda _: self.execute_streams())
             .map(lambda result: TapResult.from_execution(result))

@@ -23,7 +23,7 @@
   - [**FlextMeltanoTypes Hierarchy**](#flextmeltanotypes-hierarchy)
   - [**Pydantic Model Integration**](#pydantic-model-integration)
 - [🛡️ Error Handling Architecture](#error-handling-architecture)
-  - [**FlextResult Pattern Implementation**](#flextresult-pattern-implementation)
+  - [**r Pattern Implementation**](#flextresult-pattern-implementation)
   - [**Exception Hierarchy**](#exception-hierarchy)
 - [🎯 Current Status and Technical Debt](#current-status-and-technical-debt)
   - [**Architecture Compliance Status**](#architecture-compliance-status)
@@ -48,7 +48,7 @@ flext-meltano serves as the foundational library for ELT operations within the F
 ### **Design Principles**
 
 1. **Type Safety First** - Comprehensive type annotations with Pydantic models
-1. **Railway-Oriented Programming** - FlextResult[T] pattern for error handling
+1. **Railway-Oriented Programming** - r[T] pattern for error handling
 1. **Single Responsibility** - One class per module with nested helpers
 1. **FLEXT Ecosystem Integration** - Built on flext-core foundation patterns
 1. **Abstraction Layers** - Clear separation between external libraries and FLEXT interfaces
@@ -85,7 +85,7 @@ src/flext_meltano/
 
 - **FlextMeltanoService**: Unified service following FlextService pattern
 - **Service Implementations**: FlextMeltanoTapService, FlextTargetService, FlextDbtService
-- **Plugin Protocols**: TapServiceProtocol, TargetServiceProtocol, DbtServiceProtocol
+- **Plugin Protocols**: TapService, TargetService, DbtService
 
 ### **Execution Layer**
 
@@ -120,7 +120,7 @@ src/flext_meltano/
 ```python
 ├── config.py                # FlextMeltanoSettings (configuration management)
 ├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic config)
-└── utilities.py            # FlextMeltanoUtilities (helper functions)
+└── utilities.py            # u (helper functions)
 ```
 
 **Purpose**: Manages configuration, environment settings, and utility functions for ELT operations.
@@ -137,7 +137,7 @@ graph TD
     D --> E[Data Extraction]
     E --> F[FlextMeltanoTargetAbstractions]
     F --> G[Data Loading]
-    G --> H[FlextResult Response]
+    G --> H[r Response]
 
     B --> I[FlextMeltanoDbtService]
     I --> J[DBT Operations]
@@ -149,15 +149,15 @@ graph TD
 
 ```mermaid
 graph TD
-    A[Operation Start] --> B{FlextResult Check}
+    A[Operation Start] --> B{r Check}
     B -->|Success| C[Process Data]
     B -->|Failure| D[Error Propagation]
     C --> E{Validation}
     E -->|Valid| F[Continue Pipeline]
-    E -->|Invalid| G[FlextResult.fail()]
+    E -->|Invalid| G[r.fail()]
     D --> H[Error Logging]
     G --> H
-    F --> I[FlextResult.ok()]
+    F --> I[r.ok()]
 ```
 
 ## 🏛️ Clean Architecture Implementation
@@ -195,23 +195,23 @@ graph TD
 
 ```python
 from flext_core import (
-    FlextResult,           # Railway-oriented programming
-    FlextService,    # Service base class
-    FlextLogger,           # Logging infrastructure
-    FlextContainer,        # Dependency injection
-    u         # Common utilities
+    r,  # Railway-oriented programming
+    FlextService,  # Service base class
+    FlextLogger,  # Logging infrastructure
+    FlextContainer,  # Dependency injection
+    u,  # Common utilities
 )
 ```
 
 **Type System Integration**:
 
 ```python
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import FlextMeltanoTypes
 
 # Comprehensive type system extending flext-core
 pipeline_config: FlextMeltanoTypes.ELT.PipelineConfig
 tap_config: FlextMeltanoTypes.Singer.TapConfig
-result: FlextResult[FlextMeltanoTypes.ELT.PipelineResult]
+result: r[FlextMeltanoTypes.ELT.PipelineResult]
 ```
 
 ### **External Library Integration**
@@ -220,9 +220,9 @@ result: FlextResult[FlextMeltanoTypes.ELT.PipelineResult]
 
 ```python
 # ⚠️ ARCHITECTURE DEBT - Requires abstraction
-import meltano                                    # Line 14 in adapters.py
-from meltano.core.project import Project         # Line 22 in adapters.py
-from meltano.core.plugin_invoker import PluginInvoker # Line 21 in adapters.py
+import meltano  # Line 14 in adapters.py
+from meltano.core.project import Project  # Line 22 in adapters.py
+from meltano.core.plugin_invoker import PluginInvoker  # Line 21 in adapters.py
 ```
 
 **Target Architecture (Abstracted)**:
@@ -233,7 +233,7 @@ class _MeltanoLibraryWrapper:
     """Internal wrapper for meltano library operations."""
 
     @staticmethod
-    def create_project(path: Path) -> FlextResult[object]:
+    def create_project(path: Path) -> r[m.Meltano.ProjectModel]:
         """Create Meltano project through library API."""
         # Implementation with proper error handling
 ```
@@ -248,19 +248,22 @@ class FlextMeltanoTypes:
 
     class Plugin:
         """Meltano plugin management types."""
+
         type Name = str
         type Config = ConfigDict
         type Command = t.StringList
 
     class Singer:
         """Singer protocol integration types."""
-        type Tap = object
-        type Target = object
+
+        type Tap = SingerTap
+        type Target = SingerTarget
         type MessageType = str
         type RecordMessage = JsonObject
 
     class ELT:
         """Extract-Load-Transform pipeline types."""
+
         type Pipeline = ConfigDict
         type PipelineResult = JsonObject
         type ExtractResult = JsonObject
@@ -271,13 +274,16 @@ class FlextMeltanoTypes:
 ```python
 class TapConfig(BaseModel):
     """Type-safe tap configuration model."""
+
     tap_type: str
     connection_config: t.Dict
     stream_config: t.Dict | None = None
     version: str | None = None
 
+
 class StreamDefinition(BaseModel):
     """Type-safe stream definition model."""
+
     stream_name: str
     stream_schema: t.Dict
     tap_type: str
@@ -287,31 +293,26 @@ class StreamDefinition(BaseModel):
 
 ## 🛡️ Error Handling Architecture
 
-### **FlextResult Pattern Implementation**
+### **r Pattern Implementation**
 
 ```python
-# All operations return FlextResult[T] for railway-oriented programming
-def process_elt_pipeline(
-    tap_config: TapConfig,
-    target_config: t.Dict
-) -> FlextResult[t.Dict]:
+# All operations return r[T] for railway-oriented programming
+def process_elt_pipeline(tap_config: TapConfig, target_config: t.Dict) -> r[t.Dict]:
     """Process ELT pipeline with comprehensive error handling."""
 
     # Validation phase
     validation_result = validate_configuration(tap_config)
     if validation_result.is_failure:
-        return FlextResult[t.Dict].fail(
+        return r[t.Dict].fail(
             f"Configuration validation failed: {validation_result.error}"
         )
 
     # Execution phase
     execution_result = execute_pipeline(tap_config, target_config)
     if execution_result.is_failure:
-        return FlextResult[t.Dict].fail(
-            f"Pipeline execution failed: {execution_result.error}"
-        )
+        return r[t.Dict].fail(f"Pipeline execution failed: {execution_result.error}")
 
-    return FlextResult[t.Dict].ok(execution_result.unwrap())
+    return r[t.Dict].ok(execution_result.unwrap())
 ```
 
 ### **Exception Hierarchy**
@@ -320,11 +321,14 @@ def process_elt_pipeline(
 class FlextMeltanoError(Exception):
     """Base exception for all flext-meltano operations."""
 
+
 class FlextMeltanoSettingsurationError(FlextMeltanoError):
     """Configuration-related errors."""
 
+
 class FlextMeltanoExecutionError(FlextMeltanoError):
     """Pipeline execution errors."""
+
 
 class FlextMeltanoValidationError(FlextMeltanoError):
     """Data validation errors."""
@@ -337,7 +341,7 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 | Component                 | Status  | Details                                            |
 | ------------------------- | ------- | -------------------------------------------------- |
 | **Type Safety**           | 🟢 90%  | Comprehensive Pydantic models and type annotations |
-| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with FlextResult patterns  |
+| **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with r patterns  |
 | **Single Class Pattern**  | 🟢 100% | All modules follow single class architecture       |
 | **External Abstractions** | 🟡 60%  | Direct imports in adapters.py need wrapping        |
 
@@ -390,7 +394,7 @@ ______________________________________________________________________
 
 - [flext-core Foundation](https://github.com/organization/flext/tree/main/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
 - [flext-plugin Architecture](https://github.com/organization/flext/tree/main/flext-plugin/docs/architecture.md) - Plugin architecture patterns
-- [flext-quality Automation](https://github.com/organization/flext/tree/main/flext-quality/CLAUDE.md) - Quality analysis and automation
+- [flext-quality Automation](https://github.com/organization/flext/tree/main/flext-quality/AGENTS.md) - Quality analysis and automation
 
 **External Resources**:
 

@@ -8,10 +8,4 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from tests.constants import TestsFlextMeltanoConstants, c, tc
-
-__all__ = [
-    "TestsFlextMeltanoConstants",
-    "c",
-    "tc",
-]
+__all__: list[str] = []

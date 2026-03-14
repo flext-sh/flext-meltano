@@ -10,54 +10,287 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Callable
+import os
+import shutil
+import signal
+import time
+from collections.abc import Callable, Mapping
+from pathlib import Path
 from typing import Protocol
 
-from flext_core import FlextLogger, FlextResult, FlextResult as r
+from flext_core import FlextLogger, r
+from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.models import m
+from flext_meltano.typings import t
 
-# Import aliases for concise usage
-m = FlextMeltanoModels
+_PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
+_PIPELINE_CONFIG_FILE = "pipeline.json"
+_PIPELINE_PID_FILE = "pipeline.pid"
+_MIN_ARGS_WITH_CONFIG = 2
 
 
-# Local protocols to avoid circular imports
-class _ManagerProtocol(Protocol):
+def _pipelines_root_dir() -> Path:
+    configured_root = os.environ.get(_PIPELINES_ROOT_ENV)
+    if configured_root and configured_root.strip():
+        return Path(configured_root).expanduser().resolve()
+    return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
+
+
+def _pipeline_dir(pipeline_name: str) -> Path:
+    return _pipelines_root_dir() / pipeline_name
+
+
+def _pipeline_config_path(pipeline_name: str) -> Path:
+    return _pipeline_dir(pipeline_name) / _PIPELINE_CONFIG_FILE
+
+
+def _pipeline_pid_path(pipeline_name: str) -> Path:
+    return _pipeline_dir(pipeline_name) / _PIPELINE_PID_FILE
+
+
+def _is_process_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return False
+    return True
+
+
+def create_pipeline(
+    pipeline_name: str, config: Mapping[str, t.ContainerValue | None] | None
+) -> r[str]:
+    """Create a new Meltano pipeline with the given configuration."""
+    if not pipeline_name.strip():
+        return r[str].fail("Pipeline creation requires a non-empty pipeline name")
+    if config is None:
+        return r[str].fail("Pipeline creation not configured")
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if pipeline_dir.exists():
+        return r[str].fail(f"Pipeline '{pipeline_name}' already exists")
+    try:
+        pipeline_dir.mkdir(parents=True, exist_ok=False)
+        config_path = _pipeline_config_path(pipeline_name)
+        validated = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": dict(config)
+        })
+        config_path.write_text(validated.model_dump_json(indent=2), encoding="utf-8")
+    except OSError as exc:
+        return r[str].fail(f"Failed to create pipeline '{pipeline_name}': {exc}")
+    return r[str].ok(str(pipeline_dir))
+
+
+def execute_pipeline(
+    pipeline_name: str, command_args: list[str] | None = None
+) -> r[str]:
+    """Execute a Meltano pipeline."""
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+    configured_command: list[str] | None = None
+    config_path = _pipeline_config_path(pipeline_name)
+    if config_path.exists():
+        try:
+            config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
+                config_path.read_text(encoding="utf-8")
+            )
+        except (ValueError, OSError) as exc:
+            return r[str].fail(
+                f"Failed to read pipeline '{pipeline_name}' configuration: {exc}"
+            )
+        validated_payload = config_mapping.values
+        command_value = validated_payload.get("command")
+        if isinstance(command_value, list):
+            configured_command = m.Meltano.StringListValue.model_validate({
+                "items": command_value
+            }).items
+    meltano_args = command_args or configured_command
+    if not meltano_args:
+        return r[str].fail("Pipeline execution not configured")
+    command = ["meltano", *meltano_args]
+    runner = FlextInfraUtilitiesSubprocess()
+    run_result = runner.run_raw(command, cwd=pipeline_dir)
+    if run_result.is_failure:
+        error_msg = run_result.error or "Unknown error"
+        if "FileNotFoundError" in error_msg or "not found" in error_msg.lower():
+            return r[str].fail("Meltano CLI executable not found")
+        return r[str].fail(f"Failed to execute Meltano CLI command: {error_msg}")
+    completed = run_result.value
+    if completed.exit_code != 0:
+        command_error = completed.stderr.strip() or completed.stdout.strip()
+        if not command_error:
+            command_error = (
+                f"Meltano command failed with exit code {completed.exit_code}"
+            )
+        return r[str].fail(command_error)
+    logger = FlextLogger(__name__)
+    if completed.stdout.strip():
+        logger.info(completed.stdout.strip())
+    return r[str].ok(completed.stdout.strip() or "executed")
+
+
+def list_pipelines() -> r[list[str]]:
+    """List all available Meltano pipelines."""
+    pipelines_root = _pipelines_root_dir()
+    if not pipelines_root.exists():
+        return r[list[str]].ok([])
+    if not pipelines_root.is_dir():
+        return r[list[str]].fail(
+            f"Pipelines root path is not a directory: {pipelines_root}"
+        )
+    try:
+        pipeline_names = sorted(
+            entry.name for entry in pipelines_root.iterdir() if entry.is_dir()
+        )
+    except OSError as exc:
+        return r[list[str]].fail(f"Failed to list pipelines: {exc}")
+    return r[list[str]].ok(pipeline_names)
+
+
+def get_pipeline_status(pipeline_name: str) -> r[str]:
+    """Get the status of a specific Meltano pipeline."""
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+    pid_path = _pipeline_pid_path(pipeline_name)
+    if not pid_path.exists():
+        return r[str].ok("stopped")
+    try:
+        pid = int(pid_path.read_text(encoding="utf-8").strip())
+    except (ValueError, OSError) as exc:
+        return r[str].fail(
+            f"Failed to read status for pipeline '{pipeline_name}': {exc}"
+        )
+    if _is_process_running(pid):
+        return r[str].ok("running")
+    try:
+        pid_path.unlink()
+    except FileNotFoundError:
+        pass
+    except OSError:
+        pass
+    return r[str].ok("stopped")
+
+
+def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
+    """Stop a running Meltano pipeline."""
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+    pid_path = _pipeline_pid_path(pipeline_name)
+    if not pid_path.exists():
+        return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+    try:
+        pid = int(pid_path.read_text(encoding="utf-8").strip())
+    except (ValueError, OSError) as exc:
+        return r[str].fail(f"Failed to read PID for pipeline '{pipeline_name}': {exc}")
+    if not _is_process_running(pid):
+        try:
+            pid_path.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass
+        return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+    try:
+        os.kill(pid, signal.SIGTERM)
+    except ProcessLookupError:
+        try:
+            pid_path.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError:
+            pass
+        return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+    except OSError as exc:
+        return r[str].fail(f"Failed to stop pipeline '{pipeline_name}': {exc}")
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        if not _is_process_running(pid):
+            try:
+                pid_path.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError:
+                pass
+            return r[str].ok("stopped")
+        time.sleep(0.1)
+    return r[str].fail(
+        f"Pipeline '{pipeline_name}' did not stop within {timeout_seconds:.1f} seconds"
+    )
+
+
+def delete_pipeline(pipeline_name: str) -> r[str]:
+    """Delete a Meltano pipeline."""
+    pipeline_dir = _pipeline_dir(pipeline_name)
+    if not pipeline_dir.exists() or not pipeline_dir.is_dir():
+        return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+    status_result = get_pipeline_status(pipeline_name)
+    if status_result.is_failure:
+        return r[str].fail(status_result.error)
+    if status_result.value == "running":
+        return r[str].fail(
+            f"Pipeline '{pipeline_name}' is running. Stop it before deletion"
+        )
+    try:
+        shutil.rmtree(pipeline_dir)
+    except OSError as exc:
+        return r[str].fail(f"Failed to delete pipeline '{pipeline_name}': {exc}")
+    if pipeline_dir.exists():
+        return r[str].fail(f"Pipeline '{pipeline_name}' deletion was not confirmed")
+    return r[str].ok("deleted")
+
+
+class Manager(Protocol):
     """Base manager protocol."""
 
-    def handle_command(self, args: list[str]) -> FlextResult[None]: ...
+    def handle_command(self, args: list[str]) -> r[None]: ...
 
 
-class _SingerManagerProtocol(Protocol):
+class SingerManager(Protocol):
     """Singer manager protocol."""
 
-    def handle_tap_command(self, args: list[str]) -> FlextResult[None]: ...
-    def handle_target_command(self, args: list[str]) -> FlextResult[None]: ...
+    def handle_tap_command(self, args: list[str]) -> r[None]: ...
+
+    def handle_target_command(self, args: list[str]) -> r[None]: ...
 
 
-class _StatusManagerProtocol(Protocol):
+class StatusManager(Protocol):
     """Status manager protocol."""
 
-    def handle_command(self, args: list[str]) -> FlextResult[None]: ...
-    def handle_version_command(self, _args: list[str]) -> FlextResult[None]: ...
+    def handle_command(self, args: list[str]) -> r[None]: ...
+
+    def handle_version_command(self, _args: list[str]) -> r[None]: ...
 
 
-class _CLIProtocol(Protocol):
+class _CLI(Protocol):
     """Minimal CLI protocol for manager composition."""
 
-    pipeline_manager: _ManagerProtocol
-    singer_manager: _SingerManagerProtocol
-    dbt_manager: _ManagerProtocol
-    plugin_manager: _ManagerProtocol
-    status_manager: _StatusManagerProtocol
+    pipeline_manager: Manager
+    singer_manager: SingerManager
+    dbt_manager: Manager
+    plugin_manager: Manager
+    status_manager: StatusManager
 
     def show_banner(self) -> None: ...
-    def show_pipeline_help(self) -> None: ...
+
     def show_dbt_help(self) -> None: ...
+
+    def show_pipeline_help(self) -> None: ...
+
     def show_plugin_help(self) -> None: ...
-    def show_tap_help(self) -> None: ...
-    def show_target_help(self) -> None: ...
+
     def show_status_help(self) -> None: ...
+
+    def show_tap_help(self) -> None: ...
+
+    def show_target_help(self) -> None: ...
 
 
 class FlextMeltanoCommandRouter:
@@ -67,35 +300,36 @@ class FlextMeltanoCommandRouter:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize command router with CLI reference."""
         super().__init__()
         self.cli = cli
         self.logger = FlextLogger(__name__)
 
+    @staticmethod
+    def _execute_command(
+        handler: Callable[[list[str]], r[None]], args: list[str]
+    ) -> r[None]:
+        """Execute command handler."""
+        return handler(args)
+
     def route_command(self, args: list[str]) -> int:
         """Route command to appropriate handler using composition."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_banner()
-            # Use proper FLEXT logging service instead of non-existent method
             self.logger.info("FLEXT Meltano CLI - Main Help")
             return 0
-
         command = args[0]
         command_args = args[1:]
-
-        # Use railway-oriented command mapping
         handler_result = self._get_command_handler(command)
         if handler_result.is_failure:
             self.logger.error(f"Command error: {handler_result.error}")
             return 1
-
         handler = handler_result.value
         execute_result = self._execute_command(handler, command_args)
         if execute_result.is_failure:
             self.logger.error(f"Execution error: {execute_result.error}")
             return 1
-
         return 0
 
     def _get_command_handler(self, command: str) -> r[Callable[[list[str]], r[None]]]:
@@ -109,20 +343,10 @@ class FlextMeltanoCommandRouter:
             "status": self.cli.status_manager.handle_command,
             "version": self.cli.status_manager.handle_version_command,
         }
-
         handler = command_map.get(command)
         if handler is None:
             return r[Callable[[list[str]], r[None]]].fail(f"Unknown command: {command}")
-
         return r[Callable[[list[str]], r[None]]].ok(handler)
-
-    @staticmethod
-    def _execute_command(
-        handler: Callable[[list[str]], r[None]],
-        args: list[str],
-    ) -> r[None]:
-        """Execute command handler."""
-        return handler(args)
 
 
 class FlextMeltanoPipelineManager:
@@ -132,32 +356,65 @@ class FlextMeltanoPipelineManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize pipeline manager with CLI reference."""
         super().__init__()
         self.cli = cli
         self.logger = FlextLogger(__name__)
 
+    @staticmethod
+    def _execute_pipeline_operation(
+        handler: Callable[[list[str]], r[None]], args: list[str]
+    ) -> r[None]:
+        """Execute pipeline operation."""
+        return handler(args)
+
     def handle_command(self, args: list[str]) -> r[None]:
         """Handle pipeline command using composition."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_pipeline_help()
-            return r[None].ok(None)
-
+            return r[None](value=None, is_success=True)
         subcommand = args[0]
         subcommand_args = args[1:]
-
-        # Route to specific pipeline operations
         handler_result = self._get_pipeline_handler(subcommand)
         if handler_result.is_failure:
             return r[None].fail(handler_result.error)
-
         handler = handler_result.value
         return self._execute_pipeline_operation(handler, subcommand_args)
 
+    def _create_pipeline(self, _args: list[str]) -> r[None]:
+        """Create new pipeline."""
+        if not _args:
+            return r[None].fail(
+                "Pipeline creation requires pipeline name and JSON configuration"
+            )
+        pipeline_name = _args[0]
+        config_payload: t.Meltano.MeltanoConfigDict | None = None
+        if len(_args) >= _MIN_ARGS_WITH_CONFIG:
+            try:
+                config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
+                    _args[1]
+                )
+            except ValueError as exc:
+                return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
+            config_payload = config_mapping.values
+        result = create_pipeline(pipeline_name, config_payload)
+        if result.is_failure:
+            return r[None].fail(result.error)
+        self.logger.info("Pipeline created", pipeline=pipeline_name)
+        return r[None](value=None, is_success=True)
+
+    def _delete_pipeline(self, _args: list[str]) -> r[None]:
+        """Delete pipeline."""
+        if not _args:
+            return r[None].fail("Pipeline delete requires pipeline name")
+        result = delete_pipeline(_args[0])
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None](value=None, is_success=True)
+
     def _get_pipeline_handler(
-        self,
-        subcommand: str,
+        self, subcommand: str
     ) -> r[Callable[[list[str]], r[None]]]:
         """Get pipeline operation handler."""
         operation_map: dict[str, Callable[[list[str]], r[None]]] = {
@@ -168,52 +425,78 @@ class FlextMeltanoPipelineManager:
             "stop": self._stop_pipeline,
             "delete": self._delete_pipeline,
         }
-
         handler = operation_map.get(subcommand)
         if handler is None:
             return r[Callable[[list[str]], r[None]]].fail(
-                f"Unknown pipeline command: {subcommand}",
+                f"Unknown pipeline command: {subcommand}"
             )
-
         return r[Callable[[list[str]], r[None]]].ok(handler)
-
-    @staticmethod
-    def _execute_pipeline_operation(
-        handler: Callable[[list[str]], r[None]],
-        args: list[str],
-    ) -> r[None]:
-        """Execute pipeline operation."""
-        return handler(args)
-
-    def _create_pipeline(self, _args: list[str]) -> r[None]:
-        """Create new pipeline."""
-        self.logger.info("Pipeline creation not implemented in this refactor")
-        return r[None].ok(None)
-
-    def _run_pipeline(self, _args: list[str]) -> r[None]:
-        """Run pipeline."""
-        self.logger.info("Pipeline execution not implemented in this refactor")
-        return r[None].ok(None)
-
-    def _list_pipelines(self, _args: list[str]) -> r[None]:
-        """List pipelines."""
-        self.logger.info("Pipeline listing not implemented in this refactor")
-        return r[None].ok(None)
 
     def _get_pipeline_status(self, _args: list[str]) -> r[None]:
         """Get pipeline status."""
-        self.logger.info("Pipeline status not implemented in this refactor")
-        return r[None].ok(None)
+        if not _args:
+            return r[None].fail("Pipeline status requires pipeline name")
+        status_result = get_pipeline_status(_args[0])
+        if status_result.is_failure:
+            return r[None].fail(status_result.error)
+        self.logger.info(
+            "Pipeline status", pipeline=_args[0], status=status_result.value
+        )
+        return r[None](value=None, is_success=True)
+
+    def _list_pipelines(self, _args: list[str]) -> r[None]:
+        """List pipelines."""
+        result = list_pipelines()
+        if result.is_failure:
+            return r[None].fail(result.error)
+        self.logger.info("Configured pipelines", pipelines=", ".join(result.value))
+        return r[None](value=None, is_success=True)
+
+    def _run_meltano_command(self, command: list[str]) -> r[None]:
+        runner = FlextInfraUtilitiesSubprocess()
+        run_result = runner.run_raw(command)
+        if run_result.is_failure:
+            error_msg = run_result.error or "Unknown error"
+            if "FileNotFoundError" in error_msg or "not found" in error_msg.lower():
+                return r[None].fail("Meltano CLI executable not found")
+            return r[None].fail(f"Failed to execute Meltano CLI command: {error_msg}")
+        completed = run_result.value
+        if completed.exit_code != 0:
+            command_error = completed.stderr.strip() or completed.stdout.strip()
+            if not command_error:
+                command_error = (
+                    f"Meltano command failed with exit code {completed.exit_code}"
+                )
+            self.logger.error(
+                "Meltano pipeline command failed",
+                command=" ".join(command),
+                exit_code=completed.exit_code,
+                stderr=completed.stderr,
+            )
+            return r[None].fail(command_error)
+        if completed.stdout.strip():
+            self.logger.info(completed.stdout.strip())
+        return r[None](value=None, is_success=True)
+
+    def _run_pipeline(self, _args: list[str]) -> r[None]:
+        """Run pipeline."""
+        if not _args:
+            return r[None].fail("Pipeline execution requires pipeline name")
+        pipeline_name = _args[0]
+        command_args = _args[1:] if len(_args) > 1 else None
+        result = execute_pipeline(pipeline_name, command_args)
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None](value=None, is_success=True)
 
     def _stop_pipeline(self, _args: list[str]) -> r[None]:
         """Stop pipeline."""
-        self.logger.info("Pipeline stopping not implemented in this refactor")
-        return r[None].ok(None)
-
-    def _delete_pipeline(self, _args: list[str]) -> r[None]:
-        """Delete pipeline."""
-        self.logger.info("Pipeline deletion not implemented in this refactor")
-        return r[None].ok(None)
+        if not _args:
+            return r[None].fail("Pipeline stop requires pipeline name")
+        result = stop_pipeline(_args[0])
+        if result.is_failure:
+            return r[None].fail(result.error)
+        return r[None](value=None, is_success=True)
 
 
 class FlextMeltanoSingerManager:
@@ -223,7 +506,7 @@ class FlextMeltanoSingerManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize Singer manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -233,8 +516,7 @@ class FlextMeltanoSingerManager:
         """Handle tap command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_tap_help()
-            return r[None].ok(None)
-
+            return r[None](value=None, is_success=True)
         subcommand = args[0]
         return self._execute_tap_operation(subcommand, args[1:])
 
@@ -242,34 +524,23 @@ class FlextMeltanoSingerManager:
         """Handle target command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_target_help()
-            return r[None].ok(None)
-
+            return r[None](value=None, is_success=True)
         subcommand = args[0]
         return self._execute_target_operation(subcommand, args[1:])
 
-    def _execute_tap_operation(
-        self,
-        operation: str,
-        _args: list[str],
-    ) -> r[None]:
+    def _execute_tap_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute tap operation."""
         self.logger.info(
-            "Tap operation '%s' not implemented in this refactor",
-            operation,
+            "Tap operation '%s' not implemented in this refactor", operation
         )
-        return r[None].ok(None)
+        return r[None](value=None, is_success=True)
 
-    def _execute_target_operation(
-        self,
-        operation: str,
-        _args: list[str],
-    ) -> r[None]:
+    def _execute_target_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute target operation."""
         self.logger.info(
-            "Target operation '%s' not implemented in this refactor",
-            operation,
+            "Target operation '%s' not implemented in this refactor", operation
         )
-        return r[None].ok(None)
+        return r[None](value=None, is_success=True)
 
 
 class FlextMeltanoDbtManager:
@@ -279,7 +550,7 @@ class FlextMeltanoDbtManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -289,22 +560,16 @@ class FlextMeltanoDbtManager:
         """Handle DBT command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_dbt_help()
-            return r[None].ok(None)
-
+            return r[None](value=None, is_success=True)
         subcommand = args[0]
         return self._execute_dbt_operation(subcommand, args[1:])
 
-    def _execute_dbt_operation(
-        self,
-        operation: str,
-        _args: list[str],
-    ) -> r[None]:
+    def _execute_dbt_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute DBT operation."""
         self.logger.info(
-            "DBT operation '%s' not implemented in this refactor",
-            operation,
+            "DBT operation '%s' not implemented in this refactor", operation
         )
-        return r[None].ok(None)
+        return r[None](value=None, is_success=True)
 
 
 class FlextMeltanoPluginManager:
@@ -314,7 +579,7 @@ class FlextMeltanoPluginManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -324,22 +589,16 @@ class FlextMeltanoPluginManager:
         """Handle plugin command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_plugin_help()
-            return r[None].ok(None)
-
+            return r[None](value=None, is_success=True)
         subcommand = args[0]
         return self._execute_plugin_operation(subcommand, args[1:])
 
-    def _execute_plugin_operation(
-        self,
-        operation: str,
-        _args: list[str],
-    ) -> r[None]:
+    def _execute_plugin_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute plugin operation."""
         self.logger.info(
-            "Plugin operation '%s' not implemented in this refactor",
-            operation,
+            "Plugin operation '%s' not implemented in this refactor", operation
         )
-        return r[None].ok(None)
+        return r[None](value=None, is_success=True)
 
 
 class FlextMeltanoStatusManager:
@@ -349,7 +608,7 @@ class FlextMeltanoStatusManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLIProtocol) -> None:
+    def __init__(self, cli: _CLI) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -359,27 +618,21 @@ class FlextMeltanoStatusManager:
         """Handle status command."""
         if not args or args[0] in {"--help", "-h"}:
             self.cli.show_status_help()
-            return r[None].ok(None)
-
+            return r[None](value=None, is_success=True)
         subcommand = args[0]
         return self._execute_status_operation(subcommand, args[1:])
 
     def handle_version_command(self, _args: list[str]) -> r[None]:
         """Handle version command."""
         self.logger.info("FLEXT Meltano version not implemented in this refactor")
-        return r[None].ok(None)
+        return r[None](value=None, is_success=True)
 
-    def _execute_status_operation(
-        self,
-        operation: str,
-        _args: list[str],
-    ) -> r[None]:
+    def _execute_status_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute status operation."""
         self.logger.info(
-            "Status operation '%s' not implemented in this refactor",
-            operation,
+            "Status operation '%s' not implemented in this refactor", operation
         )
-        return r[None].ok(None)
+        return r[None](value=None, is_success=True)
 
 
 __all__ = [
@@ -389,4 +642,10 @@ __all__ = [
     "FlextMeltanoPluginManager",
     "FlextMeltanoSingerManager",
     "FlextMeltanoStatusManager",
+    "create_pipeline",
+    "delete_pipeline",
+    "execute_pipeline",
+    "get_pipeline_status",
+    "list_pipelines",
+    "stop_pipeline",
 ]

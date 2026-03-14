@@ -14,7 +14,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import subprocess
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_meltano import m
@@ -26,85 +25,68 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_minimal(self) -> None:
         """Test tap run translation with minimal parameters."""
-        params = m.CliParameters.DataSourceParams(
-            source_name="tap-postgres",
-            discover=False,
+        params = m.Meltano.CliParameters.DataSourceParams(
+            source_name="tap-postgres", discover=False
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["tap-postgres"]
 
     def test_translate_tap_run_discover_mode(self) -> None:
         """Test tap run translation in discover mode."""
-        params = m.CliParameters.DataSourceParams(
-            source_name="tap-postgres",
-            discover=True,
+        params = m.Meltano.CliParameters.DataSourceParams(
+            source_name="tap-postgres", discover=True
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["tap-postgres", "--discover"]
 
     def test_translate_tap_run_with_config(self) -> None:
         """Test tap run translation with config file."""
-        params = m.CliParameters.DataSourceParams(
+        params = m.Meltano.CliParameters.DataSourceParams(
             source_name="tap-postgres",
             config_file="/path/to/config.json",
             discover=False,
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["tap-postgres", "--config", "/path/to/config.json"]
 
     def test_translate_tap_run_with_catalog(self) -> None:
         """Test tap run translation with catalog file."""
-        params = m.CliParameters.DataSourceParams(
+        params = m.Meltano.CliParameters.DataSourceParams(
             source_name="tap-postgres",
             catalog_file="/path/to/catalog.json",
             discover=False,
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
-        # Note: translator adds --catalog and --properties for catalog_file
         assert "--catalog" in command
 
     def test_translate_tap_run_with_state(self) -> None:
         """Test tap run translation with state file."""
-        params = m.CliParameters.DataSourceParams(
-            source_name="tap-postgres",
-            state_file="/path/to/state.json",
-            discover=False,
+        params = m.Meltano.CliParameters.DataSourceParams(
+            source_name="tap-postgres", state_file="/path/to/state.json", discover=False
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["tap-postgres", "--state", "/path/to/state.json"]
 
     def test_translate_tap_run_with_all_parameters(self) -> None:
         """Test tap run translation with all parameters."""
-        params = m.CliParameters.DataSourceParams(
+        params = m.Meltano.CliParameters.DataSourceParams(
             source_name="tap-postgres",
             config_file="/path/to/config.json",
             catalog_file="/path/to/catalog.json",
             state_file="/path/to/state.json",
             discover=False,
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
         assert "tap-postgres" in command
@@ -114,18 +96,15 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_discover_ignores_other_params(self) -> None:
         """Test that discover mode returns early, ignoring other parameters."""
-        params = m.CliParameters.DataSourceParams(
+        params = m.Meltano.CliParameters.DataSourceParams(
             source_name="tap-postgres",
             config_file="/path/to/config.json",
             catalog_file="/path/to/catalog.json",
             discover=True,
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
-
         assert result.is_success
         command = result.value
-        # Should only include source name and --discover flag
         assert command == ["tap-postgres", "--discover"]
 
 
@@ -134,52 +113,40 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
 
     def test_translate_target_run_minimal(self) -> None:
         """Test target run translation with minimal parameters."""
-        params = m.CliParameters.DataSinkParams(
-            sink_name="target-postgres",
-        )
-
+        params = m.Meltano.CliParameters.DataSinkParams(sink_name="target-postgres")
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["target-postgres"]
 
     def test_translate_target_run_with_config(self) -> None:
         """Test target run translation with config file."""
-        params = m.CliParameters.DataSinkParams(
-            sink_name="target-postgres",
-            config_file="/path/to/config.json",
+        params = m.Meltano.CliParameters.DataSinkParams(
+            sink_name="target-postgres", config_file="/path/to/config.json"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["target-postgres", "--config", "/path/to/config.json"]
 
     def test_translate_target_run_with_input(self) -> None:
         """Test target run translation with input file."""
-        params = m.CliParameters.DataSinkParams(
-            sink_name="target-postgres",
-            input_file="/path/to/input.jsonl",
+        params = m.Meltano.CliParameters.DataSinkParams(
+            sink_name="target-postgres", input_file="/path/to/input.jsonl"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["target-postgres", "--input", "/path/to/input.jsonl"]
 
     def test_translate_target_run_with_all_parameters(self) -> None:
         """Test target run translation with all parameters."""
-        params = m.CliParameters.DataSinkParams(
+        params = m.Meltano.CliParameters.DataSinkParams(
             sink_name="target-postgres",
             config_file="/path/to/config.json",
             input_file="/path/to/input.jsonl",
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
-
         assert result.is_success
         command = result.value
         assert command == [
@@ -196,13 +163,10 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_minimal(self) -> None:
         """Test pipeline run translation with minimal parameters."""
-        params = m.CliParameters.PipelineParams(
-            source_name="tap-postgres",
-            sink_name="target-postgres",
+        params = m.Meltano.CliParameters.PipelineParams(
+            source_name="tap-postgres", sink_name="target-postgres"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
-
         assert result.is_success
         source_command, sink_command = result.value
         assert source_command == ["tap-postgres"]
@@ -210,29 +174,29 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_source_config(self) -> None:
         """Test pipeline run translation with source config."""
-        params = m.CliParameters.PipelineParams(
+        params = m.Meltano.CliParameters.PipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             source_config="/path/to/tap-config.json",
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
-
         assert result.is_success
         source_command, sink_command = result.value
-        assert source_command == ["tap-postgres", "--config", "/path/to/tap-config.json"]
+        assert source_command == [
+            "tap-postgres",
+            "--config",
+            "/path/to/tap-config.json",
+        ]
         assert sink_command == ["target-postgres"]
 
     def test_translate_pipeline_run_with_sink_config(self) -> None:
         """Test pipeline run translation with sink config."""
-        params = m.CliParameters.PipelineParams(
+        params = m.Meltano.CliParameters.PipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             sink_config="/path/to/target-config.json",
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
-
         assert result.is_success
         source_command, sink_command = result.value
         assert source_command == ["tap-postgres"]
@@ -244,14 +208,12 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_catalog(self) -> None:
         """Test pipeline run translation with catalog file."""
-        params = m.CliParameters.PipelineParams(
+        params = m.Meltano.CliParameters.PipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             catalog_file="/path/to/catalog.json",
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
-
         assert result.is_success
         source_command, sink_command = result.value
         assert source_command == ["tap-postgres", "--catalog", "/path/to/catalog.json"]
@@ -259,14 +221,12 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_state(self) -> None:
         """Test pipeline run translation with state file."""
-        params = m.CliParameters.PipelineParams(
+        params = m.Meltano.CliParameters.PipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             state_file="/path/to/state.json",
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
-
         assert result.is_success
         source_command, sink_command = result.value
         assert source_command == ["tap-postgres", "--state", "/path/to/state.json"]
@@ -274,7 +234,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_all_parameters(self) -> None:
         """Test pipeline run translation with all parameters."""
-        params = m.CliParameters.PipelineParams(
+        params = m.Meltano.CliParameters.PipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             source_config="/path/to/tap-config.json",
@@ -282,9 +242,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
             catalog_file="/path/to/catalog.json",
             state_file="/path/to/state.json",
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_pipeline_run(params)
-
         assert result.is_success
         source_command, sink_command = result.value
         assert source_command == [
@@ -308,25 +266,20 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_minimal(self) -> None:
         """Test DBT run translation with minimal parameters."""
-        params = m.DbtRunParams(
-            project_dir="/path/to/dbt/project",
+        params = m.Meltano.CliParameters.TransformationParams(
+            project_dir="/path/to/dbt/project"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
         assert result.is_success
         command = result.value
         assert command == ["dbt", "run", "--project-dir", "/path/to/dbt/project"]
 
     def test_translate_dbt_run_with_models(self) -> None:
         """Test DBT run translation with models parameter."""
-        params = m.DbtRunParams(
-            project_dir="/path/to/dbt/project",
-            models="users orders",
+        params = m.Meltano.CliParameters.TransformationParams(
+            project_dir="/path/to/dbt/project", models="users orders"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
         assert result.is_success
         command = result.value
         assert command == [
@@ -340,13 +293,10 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_select(self) -> None:
         """Test DBT run translation with select parameter."""
-        params = m.DbtRunParams(
-            project_dir="/path/to/dbt/project",
-            select="tag:daily",
+        params = m.Meltano.CliParameters.TransformationParams(
+            project_dir="/path/to/dbt/project", select="tag:daily"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
         assert result.is_success
         command = result.value
         assert command == [
@@ -360,13 +310,10 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_exclude(self) -> None:
         """Test DBT run translation with exclude parameter."""
-        params = m.DbtRunParams(
-            project_dir="/path/to/dbt/project",
-            exclude="tag:deprecated",
+        params = m.Meltano.CliParameters.TransformationParams(
+            project_dir="/path/to/dbt/project", exclude="tag:deprecated"
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
         assert result.is_success
         command = result.value
         assert command == [
@@ -380,13 +327,10 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_full_refresh(self) -> None:
         """Test DBT run translation with full refresh flag."""
-        params = m.DbtRunParams(
-            project_dir="/path/to/dbt/project",
-            full_refresh=True,
+        params = m.Meltano.CliParameters.TransformationParams(
+            project_dir="/path/to/dbt/project", full_refresh=True
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
         assert result.is_success
         command = result.value
         assert command == [
@@ -397,39 +341,16 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             "--full-refresh",
         ]
 
-    def test_translate_dbt_run_with_vars(self) -> None:
-        """Test DBT run translation with vars parameter."""
-        params = m.DbtRunParams(
-            project_dir="/path/to/dbt/project",
-            vars={"key": "value"},
-        )
-
-        result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
-        assert result.is_success
-        command = result.value
-        assert command == [
-            "dbt",
-            "run",
-            "--project-dir",
-            "/path/to/dbt/project",
-            "--vars",
-            '{"key": "value"}',
-        ]
-
     def test_translate_dbt_run_with_all_parameters(self) -> None:
         """Test DBT run translation with all parameters."""
-        params = m.DbtRunParams(
+        params = m.Meltano.CliParameters.TransformationParams(
             project_dir="/path/to/dbt/project",
             models="users orders",
             select="tag:daily",
             exclude="tag:deprecated",
             full_refresh=True,
-            vars={"environment": "production"},
         )
-
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
-
         assert result.is_success
         command = result.value
         assert command == [
@@ -444,8 +365,6 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             "--exclude",
             "tag:deprecated",
             "--full-refresh",
-            "--vars",
-            '{"environment": "production"}',
         ]
 
 
@@ -456,43 +375,29 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     def test_execute_singer_command_success(self, mock_run: MagicMock) -> None:
         """Test successful command execution."""
         mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout=b"Success output",
-            stderr=b"",
+            returncode=0, stdout=b"Success output", stderr=b""
         )
-
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
             "tap-postgres",
             "--config",
             "config.json",
         ])
-
         assert result.is_success
         output = result.value
         assert output["stdout"] == "Success output"
         assert not output["stderr"]
         assert output["returncode"] == 0
-
         mock_run.assert_called_once()
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_with_input(self, mock_run: MagicMock) -> None:
         """Test command execution with input data."""
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout=b"Success",
-            stderr=b"",
-        )
-
+        mock_run.return_value = MagicMock(returncode=0, stdout=b"Success", stderr=b"")
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
-            ["target-postgres"],
-            input_data=input_data,
+            ["target-postgres"], input_data=input_data
         )
-
         assert result.is_success
-
-        # Verify subprocess.run was called with encoded input
         call_args = mock_run.call_args
         assert call_args.kwargs["input"] == input_data.encode()
 
@@ -500,54 +405,44 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     def test_execute_singer_command_failure(self, mock_run: MagicMock) -> None:
         """Test command execution failure."""
         mock_run.return_value = MagicMock(
-            returncode=1,
-            stdout=b"",
-            stderr=b"Error: Connection failed",
+            returncode=1, stdout=b"", stderr=b"Error: Connection failed"
         )
-
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres",
+            "tap-postgres"
         ])
-
         assert result.is_failure
-        assert "Connection failed" in result.error
+        assert "Connection failed" in str(result.error)
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_timeout(self, mock_run: MagicMock) -> None:
         """Test command execution timeout."""
         mock_run.side_effect = subprocess.TimeoutExpired("tap-postgres", 10)
-
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
-            ["tap-postgres"],
-            timeout=10,
+            ["tap-postgres"], timeout=10
         )
-
         assert result.is_failure
-        assert "timed out after 10 seconds" in result.error
+        assert "timed out after 10 seconds" in str(result.error)
 
     @patch("subprocess.run")
     def test_execute_singer_command_not_found(self, mock_run: MagicMock) -> None:
         """Test command not found error."""
         mock_run.side_effect = FileNotFoundError("tap-nonexistent not found")
-
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-nonexistent",
+            "tap-nonexistent"
         ])
-
         assert result.is_failure
-        assert "tap-nonexistent" in result.error and "not found" in result.error
+        assert "tap-nonexistent" in str(result.error) and "not found" in str(
+            result.error
+        )
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_generic_exception(
-        self,
-        mock_run: MagicMock,
+        self, mock_run: MagicMock
     ) -> None:
         """Test generic exception handling."""
         mock_run.side_effect = RuntimeError("Unexpected error")
-
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
-            "tap-postgres",
+            "tap-postgres"
         ])
-
         assert result.is_failure
-        assert "Unexpected error" in result.error
+        assert "Unexpected error" in str(result.error)

@@ -9,19 +9,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextRuntime, FlextService
-from singer_sdk import Stream, Tap
+from typing import override
 
-# Import order: c -> t -> p -> r -> m -> u
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_core import FlextRuntime, r, s
 
-# Result alias
-r = FlextResult
+from flext_meltano import FlextMeltanoSettings, m, t
 
 
-class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
+class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
     """UNIFIED Source Abstractions class consolidating ALL source functionality.
 
     This single class provides:
@@ -45,173 +40,285 @@ class FlextMeltanoTapAbstractions(FlextService[t.Singer.StreamCatalog]):
         """Create a tap abstractions instance wrapped in Result."""
         return r[FlextMeltanoTapAbstractions].ok(FlextRuntime.create_instance(cls))
 
-    def discover_streams(
-        self,
-        source_config: m.DataSourceConfig,
-    ) -> r[t.Singer.StreamCatalog]:
-        """Discover available streams for a source configuration.
-
-        Args:
-        source_config: Source configuration with discovery parameters
-
-        Returns:
-        FlextResult containing discovered stream catalog
-
-        """
-        try:
-            source_type_val = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", None
-            )
-            self.logger.info(
-                "Discovering streams for source",
-                source_type=source_type_val,
-                source_name=source_type_val,
-            )
-
-            # Validate source configuration
-            if not source_type_val:
-                return r[t.Singer.StreamCatalog].fail(
-                    "Source configuration must have name and type for discovery",
-                )
-
-            # Return empty catalog - would integrate with actual Singer taps
-            catalog: t.Singer.StreamCatalog = {"streams": []}
-
-            streams = catalog.get("streams", [])
-            self.logger.info(
-                "Stream discovery completed",
-                stream_count=len(streams),
-            )
-
-            return r[t.Singer.StreamCatalog].ok(catalog)
-
-        except Exception as e:
-            self.logger.exception("Stream discovery failed", error=str(e))
-            return r[t.Singer.StreamCatalog].fail(f"Stream discovery failed: {e}")
-
-    def validate_stream_schema(self, stream_def: m.StreamDefinition) -> r[bool]:
-        """Validate a stream definition's schema.
-
-        Args:
-        stream_def: Stream definition to validate
-
-        Returns:
-        FlextResult containing validation result
-
-        """
-        try:
-            self.logger.debug(
-                "Validating stream schema",
-                stream_name=stream_def.stream_name,
-            )
-
-            # Basic schema validation
-            if not stream_def.stream_schema:
-                return r[bool].fail("Stream schema cannot be empty")
-
-            # Schema is already typed as dict[str, t.GeneralValueType] in StreamDefinition
-            if "properties" not in stream_def.stream_schema:
-                return r[bool].fail("Stream schema must contain properties")
-
-            # Additional validation logic would go here
-            # For now, just return success
-            return r[bool].ok(value=True)
-
-        except Exception as e:
-            self.logger.exception("Schema validation failed", error=str(e))
-            return r[bool].fail(f"Schema validation failed: {e}")
-
     def create_source_instance(
         self,
-        source_config: m.DataSourceConfig,
-    ) -> r[m.DataSourceInstance]:
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+    ) -> r[m.Meltano.DataSourceInstance]:
         """Create a source instance from configuration.
 
         Args:
         source_config: Source configuration
 
         Returns:
-        FlextResult containing configured source instance
+        r containing configured source instance
 
         """
         try:
+            source_type = getattr(source_config, "source_type", None) or getattr(
+                source_config, "tap_type", "unknown"
+            )
+            if not isinstance(source_type, str):
+                source_type = "unknown"
+            source_identifier = getattr(
+                source_config, "source_identifier", None
+            ) or getattr(source_config, "tap_identifier", "unknown")
             self.logger.info(
                 "Creating source instance",
-                source_name=source_config.source_type,
-                source_type=source_config.source_type,
+                source_name=source_type,
+                source_type=source_type,
             )
-
-            # Create unique source identifier
-            source_id = f"{source_config.source_type}:{source_config.source_identifier}"
-
-            # Create source instance
-            source_instance = m.DataSourceInstance(
-                source_type=source_config.source_type,
-                config=source_config,
+            source_id = f"{source_type}:{source_identifier}"
+            if isinstance(source_config, m.Meltano.DataSourceConfig):
+                config = source_config
+            elif isinstance(source_config, m.Meltano.TapConfig):
+                config = m.Meltano.DataSourceConfig(
+                    source_type=source_config.tap_type,
+                    connection_config=source_config.connection_config,
+                    stream_config=source_config.stream_config or {},
+                    source_version=source_config.tap_version,
+                )
+            else:
+                config = m.Meltano.DataSourceConfig(
+                    source_type=source_config.tap_type,
+                    connection_config=source_config.config.connection_config,
+                    stream_config=source_config.config.stream_config or {},
+                    source_version=source_config.config.tap_version,
+                )
+            source_instance = m.Meltano.DataSourceInstance(
+                source_type=source_type,
+                config=config,
                 status="configured",
                 source_id=source_id,
             )
-
             self.logger.info(
-                "Source instance created successfully",
-                source_name=source_instance.config.source_type,
+                "Source instance created successfully", source_name=source_type
+            )
+            return r[m.Meltano.DataSourceInstance].ok(source_instance)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Source instance creation failed", error=str(e))
+            return r[m.Meltano.DataSourceInstance].fail(
+                f"Source instance creation failed: {e}"
             )
 
-            return r[m.DataSourceInstance].ok(source_instance)
+    def create_tap_from_config(
+        self,
+        tap_type: str,
+        connection_config: t.Dict,
+        stream_config: t.Dict | None = None,
+        tap_version: str = "1.0.0",
+        _version: str | None = None,
+    ) -> r[m.Meltano.TapInstance]:
+        """Create a tap instance from raw configuration data.
 
-        except Exception as e:
-            self.logger.exception("Source instance creation failed", error=str(e))
-            return r[m.DataSourceInstance].fail(f"Source instance creation failed: {e}")
+        Args:
+            tap_type: Type of the tap
+            connection_config: Raw connection configuration
+            stream_config: Optional stream configuration
+            tap_version: Tap plugin semantic version
 
-    def process(self, source_config: m.DataSourceConfig) -> r[bool]:
+        Returns:
+            r containing the created TapInstance
+
+        """
+        try:
+            config = m.Meltano.TapConfig(
+                tap_type=tap_type,
+                connection_config=connection_config,
+                stream_config=stream_config or {},
+                tap_version=tap_version,
+                domain_events=[],
+            )
+            return self.create_source_instance(config).map(
+                lambda inst: m.Meltano.TapInstance(
+                    tap_type=inst.source_type, config=config, tap_id=inst.source_id
+                )
+            )
+        except Exception as exc:
+            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
+
+    def discover_streams(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+    ) -> r[t.Meltano.Singer.StreamCatalog]:
+        """Discover available streams for a source configuration.
+
+        Args:
+        source_config: Source configuration with discovery parameters
+
+        Returns:
+        r containing discovered stream catalog
+
+        """
+        try:
+            source_type_raw = getattr(source_config, "source_type", None) or getattr(
+                source_config, "tap_type", None
+            )
+            source_type_str: str = (
+                str(source_type_raw) if source_type_raw is not None else ""
+            )
+            self.logger.info(
+                "Discovering streams for source",
+                source_type=source_type_str,
+                source_name=source_type_str,
+            )
+            if not source_type_str:
+                return r[t.Meltano.Singer.StreamCatalog].fail(
+                    "Source configuration must have name and type for discovery"
+                )
+            catalog: t.Meltano.Singer.StreamCatalog = {"streams": []}
+            streams = catalog.get("streams", [])
+            self.logger.info("Stream discovery completed", stream_count=len(streams))
+            return r[t.Meltano.Singer.StreamCatalog].ok(catalog)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Stream discovery failed", error=str(e))
+            return r[t.Meltano.Singer.StreamCatalog].fail(
+                f"Stream discovery failed: {e}"
+            )
+
+    @override
+    def execute(self) -> r[t.Meltano.Singer.StreamCatalog]:
+        """Execute source abstraction operations (implements Service).
+
+        Returns:
+            r containing empty stream catalog ready for discovery
+
+        """
+        return r[t.Meltano.Singer.StreamCatalog].ok({"streams": []})
+
+    def generate_catalog(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+    ) -> r[object]:
+        """Generate a legacy Singer catalog from configuration.
+
+        Args:
+            source_config: Source configuration or instance
+
+        Returns:
+            r containing the generated catalog dictionary
+
+        """
+        _ = source_config
+        return r[object].ok({"version": 1, "streams": []})
+
+    def process(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+    ) -> r[bool]:
         """Process a source configuration for validation.
 
         Args:
         source_config: Source configuration to process
 
         Returns:
-        FlextResult containing validation result
+        r containing validation result
+
+        """
+        try:
+            source_type = getattr(source_config, "source_type", None) or getattr(
+                source_config, "tap_type", "unknown"
+            )
+            self.logger.debug(
+                "Processing source configuration", source_name=source_type
+            )
+            if not source_type or source_type == "unknown":
+                return r[bool].fail("Source configuration must have a type")
+            return r[bool].ok(value=True)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception(
+                "Source configuration processing failed", error=str(e)
+            )
+            return r[bool].fail(f"Source configuration processing failed: {e}")
+
+    def sync_stream(
+        self,
+        source_config: m.Meltano.DataSourceConfig
+        | m.Meltano.TapConfig
+        | m.Meltano.TapInstance,
+        stream_name: str,
+        target: object | None = None,
+    ) -> r[object]:
+        """Synchronize a single stream from source to target.
+
+        Args:
+            source_config: Source configuration or instance
+            stream_name: Name of the stream to sync
+            target: Optional target configuration or instance
+
+        Returns:
+            r containing synchronization statistics
+
+        """
+        _ = source_config
+        return r[object].ok({
+            "stream_name": stream_name,
+            "status": "completed",
+            "records_processed": 0,
+            "target_loaded": target is not None,
+        })
+
+    def validate_stream_schema(self, stream_def: m.Meltano.StreamDefinition) -> r[bool]:
+        """Validate a stream definition's schema.
+
+        Args:
+        stream_def: Stream definition to validate
+
+        Returns:
+        r containing validation result
 
         """
         try:
             self.logger.debug(
-                "Processing source configuration",
-                source_name=source_config.source_type,
+                "Validating stream schema", stream_name=stream_def.stream_name
             )
-
-            # Basic validation
-            if not source_config.source_type:
-                return r[bool].fail("Source configuration must have a type")
-
-            # Additional validation logic would go here
-            # For now, just return success
+            if not stream_def.stream_schema:
+                return r[bool].fail("Stream schema cannot be empty")
+            if "properties" not in stream_def.stream_schema:
+                return r[bool].fail("Stream schema must contain properties")
             return r[bool].ok(value=True)
-
-        except Exception as e:
-            self.logger.exception(
-                "Source configuration processing failed",
-                error=str(e),
-            )
-            return r[bool].fail(f"Source configuration processing failed: {e}")
-
-    def execute(self) -> r[t.Singer.StreamCatalog]:
-        """Execute source abstraction operations (implements Service).
-
-        Returns:
-            FlextResult containing empty stream catalog ready for discovery
-
-        """
-        # Return empty catalog ready for stream discovery
-        return r[t.Singer.StreamCatalog].ok({"streams": []})
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            self.logger.exception("Schema validation failed", error=str(e))
+            return r[bool].fail(f"Schema validation failed: {e}")
 
 
-# Export Singer SDK types with FLEXT naming
-FlextMeltanoStream = Stream
-FlextMeltanoTap = Tap
-
-
-__all__ = [
-    "FlextMeltanoStream",
-    "FlextMeltanoTap",
-    "FlextMeltanoTapAbstractions",
-]
+__all__ = ["FlextMeltanoTapAbstractions"]

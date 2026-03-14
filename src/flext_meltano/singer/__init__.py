@@ -6,7 +6,7 @@ specification with FLEXT ecosystem patterns and railway-oriented programming.
 NOTE: Heavy modules (service, tap, target) are NOT imported at package level
 to avoid circular imports. Import them explicitly when needed:
     from flext_meltano.singer.service import FlextMeltanoSingerService
-    from flext_meltano.singer.tap import FlextMeltanoTap
+    from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -14,14 +14,44 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-# Only import lightweight modules that don't depend on models.py
-from flext_meltano.singer.protocols import (
-    FlextMeltanoPluginProtocols,
-    FlextMeltanoSingerProtocols,
-)
+from typing import TYPE_CHECKING, Any
+
+from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+
+if TYPE_CHECKING:
+    from flext_meltano.singer.protocols import (
+        FlextMeltanoPluginProtocols,
+        FlextMeltanoSingerProtocols,
+    )
+
+# Lazy import mapping: export_name -> (module_path, attr_name)
+_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
+    "FlextMeltanoPluginProtocols": (
+        "flext_meltano.singer.protocols",
+        "FlextMeltanoPluginProtocols",
+    ),
+    "FlextMeltanoSingerProtocols": (
+        "flext_meltano.singer.protocols",
+        "FlextMeltanoSingerProtocols",
+    ),
+}
 
 __all__ = [
-    # Protocols only - other modules must be imported explicitly
     "FlextMeltanoPluginProtocols",
     "FlextMeltanoSingerProtocols",
 ]
+
+
+def __getattr__(
+    name: str,
+) -> Any:  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
+    """Lazy-load module attributes on first access (PEP 562)."""
+    return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
+
+
+def __dir__() -> list[str]:
+    """Return list of available attributes for dir() and autocomplete."""
+    return sorted(__all__)
+
+
+cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)

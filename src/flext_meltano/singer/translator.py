@@ -1,7 +1,7 @@
 """Singer CLI Translator - Pydantic Model to Singer SDK Command Translation.
 
 Converts Pydantic parameter models (TapRunParams, TargetRunParams, etc.) to
-Singer SDK CLI commands with automatic parameter validation through FlextResult.
+Singer SDK CLI commands with automatic parameter validation through r.
 
 ## Three-Layer Architecture
 
@@ -24,11 +24,11 @@ Layer 5: Singer SDK Execution
 ### For flext-tap-* Projects
 
 ```python
-from flext_meltano.models import FlextMeltanoModels
+from flext_meltano import m
 from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 # Create source parameters
-source_params = FlextMeltanoModels.CliParameters.DataSourceParams(
+source_params = m.Meltano.CliParameters.DataSourceParams(
     source_name="source-postgres",
     config_file="config/source-config.json",
     catalog_file="config/catalog.json",
@@ -47,14 +47,15 @@ if command_result.is_success:
     )
     if execution_result.success:
         output = execution_result.value
-        print(f"Source executed: {output['stdout']}")
+        logger = structlog.get_logger(__name__)
+        logger.info("Source executed", stdout=output["stdout"])
 ```
 
 ### For Complete Pipelines
 
 ```python
 # Create pipeline parameters
-pipeline_params = FlextMeltanoModels.PipelineRunParams(
+pipeline_params = m.PipelineRunParams(
     tap_name="tap-postgres",
     target_name="target-jsonl",
     tap_config="config/tap-config.json",
@@ -76,7 +77,7 @@ if commands_result.is_success:
 All methods return `r[T]` for type-safe error handling:
 
 ```python
-# Example: Chain operations with FlextResult
+# Example: Chain operations with r
 result = (
     FlextMeltanoSingerCliTranslator
     .translate_tap_run(tap_params)
@@ -85,7 +86,8 @@ result = (
 )
 
 if result.is_failure:
-    print(f"Pipeline failed: {result.error}")
+    logger = structlog.get_logger(__name__)
+    logger.error("Pipeline failed", error=str(result.error))
 ```
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -95,20 +97,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 import subprocess
 
-from flext_core import FlextResult
+from flext_core import r
 
-from flext_meltano.constants import FlextMeltanoConstants
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
-
-# Import aliases for concise usage
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
-r = FlextResult
+from flext_meltano import m, t
 
 
 class FlextMeltanoSingerCliTranslator:
@@ -119,141 +112,9 @@ class FlextMeltanoSingerCliTranslator:
     """
 
     @staticmethod
-    def translate_tap_run(
-        params: FlextMeltanoModels.CliParameters.DataSourceParams,
-    ) -> r[list[str]]:
-        """Convert DataSourceParams to Singer SDK source CLI command.
-
-        Args:
-            params: Validated DataSourceParams model
-
-        Returns:
-            r containing list of CLI command arguments
-
-        """
-        command: list[str] = [params.source_name]
-
-        if params.discover:
-            command.append("--discover")
-            return r[list[str]].ok(command)
-
-        if params.config_file:
-            command.extend(["--config", params.config_file])
-
-        if params.catalog_file:
-            command.extend(["--catalog", params.catalog_file])
-
-        if params.state_file:
-            command.extend(["--state", params.state_file])
-
-        if params.catalog_file:
-            command.extend(["--properties", params.catalog_file])
-
-        return r[list[str]].ok(command)
-
-    @staticmethod
-    def translate_target_run(
-        params: FlextMeltanoModels.CliParameters.DataSinkParams,
-    ) -> r[list[str]]:
-        """Convert DataSinkParams to Singer SDK sink CLI command.
-
-        Args:
-        params: Validated DataSinkParams model
-
-        Returns:
-        r containing list of CLI command arguments
-
-        """
-        command: list[str] = [params.sink_name]
-
-        if params.config_file:
-            command.extend(["--config", params.config_file])
-
-        if params.input_file:
-            command.extend(["--input", params.input_file])
-
-        return r[list[str]].ok(command)
-
-    @staticmethod
-    def translate_pipeline_run(
-        params: FlextMeltanoModels.CliParameters.PipelineParams,
-    ) -> r[tuple[list[str], list[str]]]:
-        """Convert PipelineParams to source and sink CLI commands.
-
-        Args:
-        params: Validated PipelineParams model
-
-        Returns:
-        r containing tuple of (source_command, sink_command)
-
-        """
-        # Build source command
-        source_command: list[str] = [params.source_name]
-
-        if params.source_config:
-            source_command.extend(["--config", params.source_config])
-
-        if params.catalog_file:
-            source_command.extend(["--catalog", params.catalog_file])
-
-        if params.state_file:
-            source_command.extend(["--state", params.state_file])
-
-        # Build sink command
-        sink_command: list[str] = [params.sink_name]
-
-        if params.sink_config:
-            sink_command.extend(["--config", params.sink_config])
-
-        return r[tuple[list[str], list[str]]].ok((
-            source_command,
-            sink_command,
-        ))
-
-    @staticmethod
-    def translate_dbt_run(
-        params: m.CliParameters.TransformationParams,
-    ) -> r[list[str]]:
-        """Convert TransformationParams to transformation CLI command.
-
-        Args:
-        params: Validated TransformationParams model
-
-        Returns:
-        r containing list of DBT CLI command arguments
-
-        """
-        command: list[str] = [
-            "dbt",
-            "run",
-            "--project-dir",
-            params.project_dir,
-        ]
-
-        if params.models:
-            command.extend(["--models", params.models])
-
-        if params.select:
-            command.extend(["--select", params.select])
-
-        if params.exclude:
-            command.extend(["--exclude", params.exclude])
-
-        if params.full_refresh:
-            command.append("--full-refresh")
-
-        vars_val = getattr(params, "vars", None)
-        if vars_val and isinstance(vars_val, dict):
-            command.extend(["--vars", json.dumps(vars_val)])
-
-        return r[list[str]].ok(command)
-
-    @staticmethod
     def execute_singer_command(
-        command: list[str],
-        input_data: str | None = None,
-        timeout: int = 300,
-    ) -> r[t.CLI.ProcessResult]:
+        command: list[str], input_data: str | None = None, timeout: int = 300
+    ) -> r[t.Meltano.CLI.ProcessResult]:
         """Execute Singer SDK command and capture output.
 
         Args:
@@ -265,21 +126,24 @@ class FlextMeltanoSingerCliTranslator:
         r containing execution results with stdout/stderr
 
         """
-        # Validate command to prevent execution of untrusted input
-        if not command or not isinstance(command, list):
-            return r[t.CLI.ProcessResult].fail(
+        if not command:
+            return r[t.Meltano.CLI.ProcessResult].fail(
                 "Invalid command: must be non-empty list"
             )
 
-        if not all(isinstance(arg, str) for arg in command):
-            return r[t.CLI.ProcessResult].fail(
+        def is_string_argument(arg: object) -> bool:
+            match arg:
+                case str():
+                    return True
+                case _:
+                    return False
+
+        if not all(is_string_argument(arg) for arg in command):
+            return r[t.Meltano.CLI.ProcessResult].fail(
                 "Invalid command: all arguments must be strings"
             )
-
         try:
             process_input = input_data.encode() if input_data else None
-
-            # Execute command with subprocess (shell=False for security)
             proc_result = subprocess.run(
                 command,
                 capture_output=True,
@@ -288,26 +152,132 @@ class FlextMeltanoSingerCliTranslator:
                 check=False,
                 shell=False,
             )
-
-            # Return execution results
-            output_dict: t.CLI.ProcessResult = {
+            output_dict: t.Meltano.CLI.ProcessResult = {
                 "stdout": proc_result.stdout.decode() if proc_result.stdout else "",
                 "stderr": proc_result.stderr.decode() if proc_result.stderr else "",
                 "returncode": proc_result.returncode,
             }
-
-            # Handle execution failure
             if proc_result.returncode != 0:
-                stderr_msg = output_dict.get("stderr", "Command execution failed")
-                if not isinstance(stderr_msg, str):
-                    stderr_msg = "Command execution failed"
-                return r[t.CLI.ProcessResult].fail(stderr_msg)
-
-            return r[t.CLI.ProcessResult].ok(output_dict)
+                stderr_msg = str(output_dict.get("stderr", "Command execution failed"))
+                return r[t.Meltano.CLI.ProcessResult].fail(stderr_msg)
+            return r[t.Meltano.CLI.ProcessResult].ok(output_dict)
         except subprocess.TimeoutExpired as e:
-            return r[t.CLI.ProcessResult].fail(f"Command timeout: {e}")
-        except Exception as e:
-            return r[t.CLI.ProcessResult].fail(f"Command execution failed: {e}")
+            return r[t.Meltano.CLI.ProcessResult].fail(f"Command timeout: {e}")
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            return r[t.Meltano.CLI.ProcessResult].fail(f"Command execution failed: {e}")
+
+    @staticmethod
+    def translate_dbt_run(
+        params: m.Meltano.CliParameters.TransformationParams,
+    ) -> r[list[str]]:
+        """Convert TransformationParams to transformation CLI command.
+
+        Args:
+        params: Validated TransformationParams model
+
+        Returns:
+        r containing list of DBT CLI command arguments
+
+        """
+        command: list[str] = ["dbt", "run", "--project-dir", params.project_dir]
+        if params.models:
+            command.extend(["--models", params.models])
+        if params.select:
+            command.extend(["--select", params.select])
+        if params.exclude:
+            command.extend(["--exclude", params.exclude])
+        if params.full_refresh:
+            command.append("--full-refresh")
+        vars_val = getattr(params, "vars", None)
+        if vars_val:
+            vars_dict = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": vars_val
+            }).values
+            vars_payload = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": vars_dict
+            })
+            command.extend(["--vars", vars_payload.model_dump_json()])
+        return r[list[str]].ok(command)
+
+    @staticmethod
+    def translate_pipeline_run(
+        params: m.Meltano.CliParameters.PipelineParams,
+    ) -> r[tuple[list[str], list[str]]]:
+        """Convert PipelineParams to source and sink CLI commands.
+
+        Args:
+        params: Validated PipelineParams model
+
+        Returns:
+        r containing tuple of (source_command, sink_command)
+
+        """
+        source_command: list[str] = [params.source_name]
+        if params.source_config:
+            source_command.extend(["--config", params.source_config])
+        if params.catalog_file:
+            source_command.extend(["--catalog", params.catalog_file])
+        if params.state_file:
+            source_command.extend(["--state", params.state_file])
+        sink_command: list[str] = [params.sink_name]
+        if params.sink_config:
+            sink_command.extend(["--config", params.sink_config])
+        return r[tuple[list[str], list[str]]].ok((source_command, sink_command))
+
+    @staticmethod
+    def translate_tap_run(
+        params: m.Meltano.CliParameters.DataSourceParams,
+    ) -> r[list[str]]:
+        """Convert DataSourceParams to Singer SDK source CLI command.
+
+        Args:
+            params: Validated DataSourceParams model
+
+        Returns:
+            r containing list of CLI command arguments
+
+        """
+        command: list[str] = [params.source_name]
+        if params.discover:
+            command.append("--discover")
+            return r[list[str]].ok(command)
+        if params.config_file:
+            command.extend(["--config", params.config_file])
+        if params.catalog_file:
+            command.extend(["--catalog", params.catalog_file])
+        if params.state_file:
+            command.extend(["--state", params.state_file])
+        if params.catalog_file:
+            command.extend(["--properties", params.catalog_file])
+        return r[list[str]].ok(command)
+
+    @staticmethod
+    def translate_target_run(
+        params: m.Meltano.CliParameters.DataSinkParams,
+    ) -> r[list[str]]:
+        """Convert DataSinkParams to Singer SDK sink CLI command.
+
+        Args:
+        params: Validated DataSinkParams model
+
+        Returns:
+        r containing list of CLI command arguments
+
+        """
+        command: list[str] = [params.sink_name]
+        if params.config_file:
+            command.extend(["--config", params.config_file])
+        if params.input_file:
+            command.extend(["--input", params.input_file])
+        return r[list[str]].ok(command)
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

@@ -216,6 +216,7 @@ auth --> gateway: refreshed_tokens
 @dataclass
 class UserRole:
     """User role with associated permissions."""
+
     name: str
     permissions: Set[str]
     scope: str  # 'global', 'project', 'pipeline'
@@ -224,26 +225,31 @@ class UserRole:
         """Check if role has specific permission."""
         return permission in self.permissions
 
+
 # Predefined roles
 ADMIN_ROLE = UserRole(
     name="REDACTED_LDAP_BIND_PASSWORD",
     permissions={"*"},  # All permissions
-    scope="global"
+    scope="global",
 )
 
 DATA_ENGINEER_ROLE = UserRole(
     name="data_engineer",
     permissions={
-        "pipelines:create", "pipelines:read", "pipelines:update",
-        "sources:read", "targets:read", "transforms:execute"
+        "pipelines:create",
+        "pipelines:read",
+        "pipelines:update",
+        "sources:read",
+        "targets:read",
+        "transforms:execute",
     },
-    scope="project"
+    scope="project",
 )
 
 VIEWER_ROLE = UserRole(
     name="viewer",
     permissions={"pipelines:read", "sources:read", "targets:read"},
-    scope="project"
+    scope="project",
 )
 ```
 
@@ -253,10 +259,12 @@ VIEWER_ROLE = UserRole(
 @dataclass
 class AccessRequest:
     """Access request with context attributes."""
+
     subject: User
     action: str  # 'read', 'write', 'execute', 'delete'
     resource: str  # 'pipeline:123', 'source:github', etc.
     context: Dict[str, object]  # environment, time, location, etc.
+
 
 class ABACPolicy:
     """Attribute-based access control policy."""
@@ -265,16 +273,16 @@ class ABACPolicy:
         """Evaluate access request against policy rules."""
 
         # Time-based restrictions
-        if request.context.get('time_hour', 0) not in range(9, 18):
+        if request.context.get("time_hour", 0) not in range(9, 18):
             return False  # Business hours only
 
         # Location-based restrictions
-        if request.context.get('country') not in ['US', 'CA', 'GB']:
+        if request.context.get("country") not in ["US", "CA", "GB"]:
             return False  # Allowed countries only
 
         # Resource ownership
-        if request.resource.startswith('pipeline:'):
-            pipeline_id = request.resource.split(':')[1]
+        if request.resource.startswith("pipeline:"):
+            pipeline_id = request.resource.split(":")[1]
             if not self._user_owns_pipeline(request.subject, pipeline_id):
                 return False
 
@@ -295,24 +303,24 @@ class SessionManager:
         """Create new user session."""
         session_id = self._generate_secure_session_id()
         session_data = {
-            'user_id': user_id,
-            'created_at': datetime.utcnow().isoformat(),
-            'last_activity': datetime.utcnow().isoformat(),
-            'metadata': metadata,
-            'ip_address': metadata.get('ip'),
-            'user_agent': metadata.get('user_agent')
+            "user_id": user_id,
+            "created_at": datetime.utcnow().isoformat(),
+            "last_activity": datetime.utcnow().isoformat(),
+            "metadata": metadata,
+            "ip_address": metadata.get("ip"),
+            "user_agent": metadata.get("user_agent"),
         }
 
         # Store in Redis with expiration
         self.redis.setex(
-            f"session:{session_id}",
-            self.session_timeout,
-            json.dumps(session_data)
+            f"session:{session_id}", self.session_timeout, json.dumps(session_data)
         )
 
         return session_id
 
-    def validate_session(self, session_id: str, ip_address: str) -> Optional[Dict[str, object]]:
+    def validate_session(
+        self, session_id: str, ip_address: str
+    ) -> Optional[Dict[str, object]]:
         """Validate session and update activity."""
         session_key = f"session:{session_id}"
         session_data = self.redis.get(session_key)
@@ -323,12 +331,12 @@ class SessionManager:
         session = json.loads(session_data)
 
         # Check IP consistency (optional security feature)
-        if session.get('ip_address') != ip_address:
+        if session.get("ip_address") != ip_address:
             self.invalidate_session(session_id)
             return None
 
         # Update last activity
-        session['last_activity'] = datetime.utcnow().isoformat()
+        session["last_activity"] = datetime.utcnow().isoformat()
         self.redis.setex(session_key, self.session_timeout, json.dumps(session))
 
         return session
@@ -403,8 +411,7 @@ class DataEncryptor:
         """Encrypt data with envelope encryption."""
         # Generate data key
         data_key = self.kms.generate_data_key(
-            key_spec="AES_256",
-            encryption_context=context
+            key_spec="AES_256", encryption_context=context
         )
 
         # Encrypt data with data key
@@ -414,7 +421,7 @@ class DataEncryptor:
         encrypted_key = self.kms.encrypt(
             key_id=self.master_key_id,
             plaintext=data_key.plaintext,
-            encryption_context=context
+            encryption_context=context,
         )
 
         return EncryptedData(
@@ -422,7 +429,7 @@ class DataEncryptor:
             encrypted_key=encrypted_key.ciphertext_blob,
             key_id=self.master_key_id,
             algorithm=self.algorithm,
-            context=context
+            context=context,
         )
 
     def decrypt_data(self, encrypted_data: EncryptedData) -> bytes:
@@ -431,13 +438,12 @@ class DataEncryptor:
         decrypted_key = self.kms.decrypt(
             key_id=encrypted_data.key_id,
             ciphertext_blob=encrypted_data.encrypted_key,
-            encryption_context=encrypted_data.context
+            encryption_context=encrypted_data.context,
         )
 
         # Decrypt data with data key
         return self._decrypt_with_data_key(
-            encrypted_data.encrypted_data,
-            decrypted_key.plaintext
+            encrypted_data.encrypted_data, decrypted_key.plaintext
         )
 ```
 
@@ -452,7 +458,7 @@ class TLSConfig:
         self.cipher_suites = [
             "TLS_AES_256_GCM_SHA384",
             "TLS_CHACHA20_POLY1305_SHA256",
-            "TLS_AES_128_GCM_SHA256"
+            "TLS_AES_128_GCM_SHA256",
         ]
         self.certificate_validation = True
         self.client_certificate_required = False
@@ -461,7 +467,7 @@ class TLSConfig:
         """Create SSL context with security settings."""
         context = ssl.create_default_context()
         context.minimum_version = ssl.TLSVersion.TLSv1_3
-        context.set_ciphers(':'.join(self.cipher_suites))
+        context.set_ciphers(":".join(self.cipher_suites))
 
         # Certificate validation
         context.check_hostname = True
@@ -476,6 +482,7 @@ class TLSConfig:
 @dataclass
 class DataClassification:
     """Data classification with handling requirements."""
+
     level: str  # 'public', 'internal', 'confidential', 'restricted'
     encryption_required: bool = False
     masking_required: bool = False
@@ -485,32 +492,32 @@ class DataClassification:
     def get_handling_requirements(self) -> Dict[str, object]:
         """Get data handling requirements based on classification."""
         requirements = {
-            'public': {
-                'encryption': False,
-                'masking': False,
-                'audit': False,
-                'retention': 365
+            "public": {
+                "encryption": False,
+                "masking": False,
+                "audit": False,
+                "retention": 365,
             },
-            'internal': {
-                'encryption': True,
-                'masking': False,
-                'audit': False,
-                'retention': 2555
+            "internal": {
+                "encryption": True,
+                "masking": False,
+                "audit": False,
+                "retention": 2555,
             },
-            'confidential': {
-                'encryption': True,
-                'masking': True,
-                'audit': True,
-                'retention': 2555
+            "confidential": {
+                "encryption": True,
+                "masking": True,
+                "audit": True,
+                "retention": 2555,
             },
-            'restricted': {
-                'encryption': True,
-                'masking': True,
-                'audit': True,
-                'retention': 2555
-            }
+            "restricted": {
+                "encryption": True,
+                "masking": True,
+                "audit": True,
+                "retention": 2555,
+            },
         }
-        return requirements.get(self.level, requirements['internal'])
+        return requirements.get(self.level, requirements["internal"])
 ```
 
 ______________________________________________________________________
@@ -668,8 +675,7 @@ spec:
   rules:
     - from:
         - source:
-            principals:
-              ["internal.invalid/ns/flext-meltano/sa/api-service-account"]
+            principals: ["internal.invalid/ns/flext-meltano/sa/api-service-account"]
       to:
         - operation:
             methods: ["GET", "POST", "PUT", "DELETE"]
@@ -747,38 +753,39 @@ class SecurityAuditor:
     def __init__(self, log_shipper):
         self.log_shipper = log_shipper
         self.audit_levels = {
-            'authentication': 'INFO',
-            'authorization': 'INFO',
-            'data_access': 'WARN',
-            'configuration_change': 'WARN',
-            'security_incident': 'ERROR'
+            "authentication": "INFO",
+            "authorization": "INFO",
+            "data_access": "WARN",
+            "configuration_change": "WARN",
+            "security_incident": "ERROR",
         }
 
-    def log_security_event(self, event_type: str, details: Dict[str, object],
-                          severity: str = 'INFO') -> None:
+    def log_security_event(
+        self, event_type: str, details: Dict[str, object], severity: str = "INFO"
+    ) -> None:
         """Log security event with structured data."""
 
         audit_entry = {
-            'timestamp': datetime.utcnow().isoformat(),
-            'event_type': event_type,
-            'severity': severity,
-            'details': details,
-            'source': 'flext-meltano',
-            'version': '1.0.0'
+            "timestamp": datetime.utcnow().isoformat(),
+            "event_type": event_type,
+            "severity": severity,
+            "details": details,
+            "source": "flext-meltano",
+            "version": "1.0.0",
         }
 
         # Add user context if available
-        if hasattr(self, '_current_user'):
-            audit_entry['user_id'] = self._current_user.id
-            audit_entry['user_role'] = self._current_user.role
+        if hasattr(self, "_current_user"):
+            audit_entry["user_id"] = self._current_user.id
+            audit_entry["user_role"] = self._current_user.role
 
         # Add request context
-        if hasattr(self, '_current_request'):
+        if hasattr(self, "_current_request"):
             audit_entry.update({
-                'request_id': self._current_request.id,
-                'client_ip': self._current_request.client_ip,
-                'user_agent': self._current_request.user_agent,
-                'endpoint': self._current_request.endpoint
+                "request_id": self._current_request.id,
+                "client_ip": self._current_request.client_ip,
+                "user_agent": self._current_request.user_agent,
+                "endpoint": self._current_request.endpoint,
             })
 
         # Ship to centralized logging
@@ -813,13 +820,13 @@ class DataPrivacyController:
     def __init__(self, data_store):
         self.data_store = data_store
 
-    def handle_data_subject_request(self, request: DataSubjectRequest) -> FlextResult[ComplianceAction]:
+    def handle_data_subject_request(self, request: DataSubjectRequest) -> r[ComplianceAction]:
         """Handle data subject access/deletion requests."""
 
         if request.request_type == 'access':
             # Provide data inventory
             user_data = self._collect_user_data(request.user_id)
-            return FlextResult.ok(ComplianceAction(
+            return r.ok(ComplianceAction(
                 action_type='data_export',
                 data=user_data,
                 format='json'
@@ -830,14 +837,14 @@ class DataPrivacyController:
             deletion_result = self._delete_user_data(request.user_id)
             if deletion_result.is_success:
                 self._audit_data_deletion(request.user_id, request.reason)
-                return FlextResult.ok(ComplianceAction(
+                return r.ok(ComplianceAction(
                     action_type='data_deleted',
                     confirmation_id=str(uuid.uuid4())
                 ))
             else:
                 return deletion_result
 
-        return FlextResult.fail(ValidationError("Invalid request type"))
+        return r.fail(ValidationError("Invalid request type"))
 
     def _collect_user_data(self, user_id: str) -> Dict[str, object]:
         """Collect all user data for export."""
@@ -848,14 +855,14 @@ class DataPrivacyController:
             'preferences': self.data_store.get_user_preferences(user_id)
         }
 
-    def _delete_user_data(self, user_id: str) -> FlextResult[bool]:
+    def _delete_user_data(self, user_id: str) -> r[bool]:
         """Delete all user data."""
         try:
             # Anonymize instead of delete for audit purposes
             self.data_store.anonymize_user_data(user_id)
-            return FlextResult.| ok(value=True)
+            return r.| ok(value=True)
         except Exception as e:
-            return FlextResult.fail(DataDeletionError(f"Failed to delete user data: {e}"))
+            return r.fail(DataDeletionError(f"Failed to delete user data: {e}"))
 ```
 
 #### Audit and Reporting
@@ -864,14 +871,16 @@ class DataPrivacyController:
 class ComplianceReporter:
     """Automated compliance reporting and attestation."""
 
-    def generate_compliance_report(self, standard: str, period: str) -> ComplianceReport:
+    def generate_compliance_report(
+        self, standard: str, period: str
+    ) -> ComplianceReport:
         """Generate compliance report for specified standard."""
 
-        if standard == 'gdpr':
+        if standard == "gdpr":
             return self._generate_gdpr_report(period)
-        elif standard == 'ccpa':
+        elif standard == "ccpa":
             return self._generate_ccpa_report(period)
-        elif standard == 'soc2':
+        elif standard == "soc2":
             return self._generate_soc2_report(period)
 
         raise ValueError(f"Unsupported compliance standard: {standard}")
@@ -897,7 +906,7 @@ class ComplianceReporter:
             dsr_statistics=dsr_stats,
             breach_incidents=breach_incidents,
             dpia_status=dpia_completed,
-            overall_compliance=self._calculate_compliance_score()
+            overall_compliance=self._calculate_compliance_score(),
         )
 ```
 
@@ -1021,7 +1030,7 @@ class IncidentDetector:
             impact=impact,
             response_actions=response_actions,
             detection_time=datetime.utcnow(),
-            assigned_team=self._get_responsible_team(incident_type)
+            assigned_team=self._get_responsible_team(incident_type),
         )
 ```
 
@@ -1037,16 +1046,20 @@ class IncidentContainment:
         containment_actions = []
 
         # Isolate affected systems
-        if incident.incident_type in ['data_breach', 'malware']:
+        if incident.incident_type in ["data_breach", "malware"]:
             containment_actions.extend(self._isolate_systems(incident.affected_systems))
 
         # Block malicious traffic
-        if incident.incident_type == 'attack':
-            containment_actions.extend(self._block_malicious_traffic(incident.attack_vector))
+        if incident.incident_type == "attack":
+            containment_actions.extend(
+                self._block_malicious_traffic(incident.attack_vector)
+            )
 
         # Revoke compromised credentials
-        if incident.incident_type == 'credential_compromise':
-            containment_actions.extend(self._revoke_credentials(incident.compromised_accounts))
+        if incident.incident_type == "credential_compromise":
+            containment_actions.extend(
+                self._revoke_credentials(incident.compromised_accounts)
+            )
 
         # Execute containment actions
         results = []
@@ -1058,7 +1071,7 @@ class IncidentContainment:
             incident_id=incident.incident_id,
             containment_actions=containment_actions,
             execution_results=results,
-            containment_time=datetime.utcnow()
+            containment_time=datetime.utcnow(),
         )
 ```
 
@@ -1077,8 +1090,7 @@ class IncidentRecovery:
         # Restore from clean backups
         if backup_validation.is_clean:
             restoration_result = self._restore_from_backup(
-                incident.affected_systems,
-                backup_validation.latest_clean_backup
+                incident.affected_systems, backup_validation.latest_clean_backup
             )
         else:
             restoration_result = self._perform_manual_recovery(incident)
@@ -1094,7 +1106,7 @@ class IncidentRecovery:
             restoration_result=restoration_result,
             integrity_check=integrity_check,
             security_updates=security_updates,
-            recovery_time=datetime.utcnow()
+            recovery_time=datetime.utcnow(),
         )
 
     def conduct_post_mortem(self, incident: IncidentResponse) -> PostMortemReport:
@@ -1120,7 +1132,7 @@ class IncidentRecovery:
             root_cause=root_cause,
             impact_assessment=impact_assessment,
             recommendations=recommendations,
-            report_date=datetime.utcnow()
+            report_date=datetime.utcnow(),
         )
 ```
 
@@ -1164,8 +1176,11 @@ class SecurityDashboard:
 
         # Calculate overall health score
         health_score = self._calculate_health_score([
-            auth_metrics, authz_metrics, data_metrics,
-            infra_metrics, threat_metrics
+            auth_metrics,
+            authz_metrics,
+            data_metrics,
+            infra_metrics,
+            threat_metrics,
         ])
 
         return SecurityHealthReport(
@@ -1176,7 +1191,7 @@ class SecurityDashboard:
             data_protection=data_metrics,
             infrastructure=infra_metrics,
             threat_detection=threat_metrics,
-            recommendations=self._generate_recommendations(health_score)
+            recommendations=self._generate_recommendations(health_score),
         )
 ```
 

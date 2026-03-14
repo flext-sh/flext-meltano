@@ -187,6 +187,7 @@ export FLEXT_ENABLE_METRICS=true
 import pytest
 from flext_meltano import FlextMeltanoBridge
 
+
 @pytest.mark.e2e
 @pytest.mark.slow
 def test_complete_data_pipeline_e2e():
@@ -230,8 +231,8 @@ def test_production_scale_pipeline():
 
     # Validate performance characteristics
     assert result.execution_time < 300  # 5 minutes max
-    assert result.memory_usage < 2048   # 2GB max
-    assert result.success_rate > 0.99   # 99%+ success
+    assert result.memory_usage < 2048  # 2GB max
+    assert result.success_rate > 0.99  # 99%+ success
 
     # Validate data quality
     validate_data_quality_metrics(result.output)
@@ -332,8 +333,8 @@ def test_production_readiness_validation():
 
     # Performance criteria
     assert metrics.avg_response_time < 30  # seconds
-    assert metrics.memory_usage < 1024     # MB
-    assert metrics.error_rate < 0.01       # 1%
+    assert metrics.memory_usage < 1024  # MB
+    assert metrics.error_rate < 0.01  # 1%
 
     # Quality criteria
     assert metrics.data_integrity_score > 0.99

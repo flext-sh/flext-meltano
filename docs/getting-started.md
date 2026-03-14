@@ -10,7 +10,7 @@
 - [🚀 First Steps](#first-steps)
   - [**Basic Service Usage**](#basic-service-usage)
   - [**Singer Protocol Operations**](#singer-protocol-operations)
-  - [**FlextResult Pattern**](#flextresult-pattern)
+  - [**r Pattern**](#flextresult-pattern)
 - [🔧 Development Workflow](#development-workflow)
   - [**Quality Gates**](#quality-gates)
   - [**Common Commands**](#common-commands)
@@ -88,7 +88,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
@@ -113,7 +113,7 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 # catalog_result = tap_abstractions.discover_catalog("tap-csv")
 ```
 
-### **FlextResult Pattern**
+### **r Pattern**
 
 ```python
 from flext_core import FlextBus
@@ -131,19 +131,21 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
-# All flext-meltano operations return FlextResult[T]
-def example_operation() -> FlextResult[str]:
+
+# All flext-meltano operations return r[T]
+def example_operation() -> r[str]:
     try:
         # Your operation logic
-        return FlextResult.ok("Operation successful")
+        return r.ok("Operation successful")
     except Exception as e:
-        return FlextResult.fail(f"Operation failed: {e}")
+        return r.fail(f"Operation failed: {e}")
+
 
 # Usage pattern
 result = example_operation()
@@ -199,7 +201,7 @@ ______________________________________________________________________
 ### **Architecture Compliance**
 
 - **Import Restrictions**: Only use root-level imports from `flext_meltano`
-- **Error Handling**: Always use `FlextResult[T]` pattern
+- **Error Handling**: Always use `r[T]` pattern
 - **Service Pattern**: Follow flext-core domain service patterns
 
 ### **Current Status**

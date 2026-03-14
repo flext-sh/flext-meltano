@@ -387,16 +387,17 @@ Extend validation with custom rules:
 # scripts/custom_architecture_rules.py
 from architecture_automation import ArchitectureValidator
 
+
 class CustomArchitectureValidator(ArchitectureValidator):
     def validate_flext_patterns(self, content: str) -> List[str]:
         """Validate FLEXT-specific architectural patterns."""
         issues = []
 
         # Check for required FLEXT patterns
-        if 'FlextResult' not in content:
-            issues.append("Missing FlextResult pattern usage")
+        if "r" not in content:
+            issues.append("Missing r pattern usage")
 
-        if 'railway' not in content.lower():
+        if "railway" not in content.lower():
             issues.append("Consider railway-oriented programming")
 
         return issues

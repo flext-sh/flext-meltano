@@ -21,16 +21,13 @@ class TestFlextSingerTypes:
     def test_singer_types_initialization(self) -> None:
         """Test t initialization."""
         singer_types = t()
-
         assert singer_types is not None
-        assert hasattr(singer_types, "MeltanoCore")
-        assert hasattr(singer_types, "Plugin")
+        assert hasattr(singer_types, "Meltano")
+        assert hasattr(singer_types.Meltano, "PluginDefinition")
 
     def test_singer_types_basic_functionality(self) -> None:
         """Test basic singer types functionality."""
-        # Test that t can be instantiated
         singer_types = t()
-
         assert singer_types is not None
-        assert hasattr(singer_types, "MeltanoCore")
-        assert hasattr(singer_types, "Plugin")
+        assert hasattr(singer_types, "Meltano")
+        assert hasattr(singer_types.Meltano, "PluginDefinition")

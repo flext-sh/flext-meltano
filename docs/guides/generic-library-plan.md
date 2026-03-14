@@ -190,7 +190,9 @@ result = service.install_plugin("tap-gitlab")
 
 # Pipeline execution (protocol-based)
 tap_result = service.execute_tap("tap-gitlab", config={"api_url": "..."})
-target_result = service.execute_target("target-postgres", records, config={"host": "..."})
+target_result = service.execute_target(
+    "target-postgres", records, config={"host": "..."}
+)
 ```
 
 #### FlextPluginService (Plugin Management)
@@ -228,9 +230,8 @@ sync_result = tap.sync(selected_streams)
 ```python
 # Generic plugin discovery
 def discover_plugins(
-    plugin_type: str | None = None,
-    source: PluginSource = PluginSource.AUTO
-) -> FlextResult[list[PluginInfo]]:
+    plugin_type: str | None = None, source: PluginSource = PluginSource.AUTO
+) -> r[list[PluginInfo]]:
     """Discover plugins from multiple sources.
 
     Args:
@@ -246,10 +247,8 @@ def discover_plugins(
 
 ```python
 def install_plugin(
-    plugin_name: str,
-    version: str | None = None,
-    source: str | None = None
-) -> FlextResult[PluginInstallResult]:
+    plugin_name: str, version: str | None = None, source: str | None = None
+) -> r[PluginInstallResult]:
     """Install plugin from specified source.
 
     Args:
@@ -271,8 +270,8 @@ def execute_tap(
     tap_name: str,
     config: t.Dict,
     state: t.Dict | None = None,
-    streams: t.StringList | None = None
-) -> FlextResult[TapExecutionResult]:
+    streams: t.StringList | None = None,
+) -> r[TapExecutionResult]:
     """Execute Singer tap with configuration.
 
     Args:
@@ -290,10 +289,8 @@ def execute_tap(
 
 ```python
 def execute_target(
-    target_name: str,
-    records: list[t.Dict],
-    config: t.Dict
-) -> FlextResult[TargetExecutionResult]:
+    target_name: str, records: list[t.Dict], config: t.Dict
+) -> r[TargetExecutionResult]:
     """Execute Singer target with records.
 
     Args:
@@ -311,9 +308,7 @@ def execute_target(
 #### Pipeline Configuration API
 
 ```python
-def create_pipeline(
-    config: PipelineConfig
-) -> FlextResult[Pipeline]:
+def create_pipeline(config: PipelineConfig) -> r[Pipeline]:
     """Create pipeline configuration.
 
     Args:
@@ -328,9 +323,8 @@ def create_pipeline(
 
 ```python
 def execute_pipeline(
-    pipeline: Pipeline | str,
-    options: PipelineOptions | None = None
-) -> FlextResult[PipelineResult]:
+    pipeline: Pipeline | str, options: PipelineOptions | None = None
+) -> r[PipelineResult]:
     """Execute configured pipeline.
 
     Args:

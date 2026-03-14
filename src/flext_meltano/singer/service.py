@@ -10,23 +10,19 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import ClassVar, override
 
-from flext_core import FlextModels, FlextResult, FlextService
-from pydantic import Field
+from flext_core import r, s
 
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
 from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
-from flext_meltano.typings import FlextMeltanoTypes
 
-# Import aliases following order: c -> t -> p -> r -> m -> s
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
 singer_p = FlextMeltanoSingerProtocols
-r = FlextResult
-m = FlextModels
-s = FlextService
+m = FlextMeltanoModels
 
 
 class FlextMeltanoSingerService(s[str]):
@@ -48,37 +44,10 @@ class FlextMeltanoSingerService(s[str]):
 
     """
 
-    class PipelineConfig(m.Entity):
-        """Configuration for a Singer pipeline."""
-
-        tap_config_path: Path | None = Field(
-            default=None,
-            description="Path to tap configuration",
-        )
-        target_config_path: Path | None = Field(
-            default=None,
-            description="Path to target configuration",
-        )
-        catalog_path: Path | None = Field(
-            default=None,
-            description="Path to catalog file",
-        )
-        state_path: Path | None = Field(default=None, description="Path to state file")
-        selected_streams: list[str] | None = Field(
-            default=None,
-            description="Specific streams to sync",
-        )
-
-    class SyncResult(m.Entity):
-        """Result of a Singer sync operation."""
-
-        records_processed: int = Field(description="Number of records processed")
-        records_written: int = Field(description="Number of records written")
-        errors: int = Field(description="Number of errors")
-        state: t.Singer.TapConfig | None = Field(
-            default=None, description="Final state"
-        )
-        duration_seconds: float = Field(description="Execution duration")
+    PipelineConfig: ClassVar[type[m.Meltano.SingerPipelineConfig]] = (
+        m.Meltano.SingerPipelineConfig
+    )
+    SyncResult: ClassVar[type[m.Meltano.SingerSyncResult]] = m.Meltano.SingerSyncResult
 
     def __init__(self) -> None:
         """Initialize Singer orchestration service."""
@@ -87,16 +56,15 @@ class FlextMeltanoSingerService(s[str]):
         self.state_manager = FlextMeltanoStateManager()
 
     def discover_tap_catalog(
-        self,
-        tap: singer_p.SingerTap,
-    ) -> r[t.Singer.StreamCatalog]:
+        self, tap: singer_p.SingerTap
+    ) -> r[m.Meltano.SingerCatalog]:
         """Discover catalog from a tap instance.
 
         Args:
         tap: Singer tap instance
 
         Returns:
-        FlextResult containing discovered catalog
+        r containing discovered catalog
 
         """
         try:
@@ -105,110 +73,117 @@ class FlextMeltanoSingerService(s[str]):
             if result.is_success:
                 self.logger.info("Tap catalog discovery completed")
             return result
-        except Exception as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Tap discovery failed", error=str(e))
-            return r[t.Singer.StreamCatalog].fail(f"Tap discovery failed: {e}")
+            return r[m.Meltano.SingerCatalog].fail(f"Tap discovery failed: {e}")
+
+    @override
+    def execute(self) -> r[str]:
+        """Execute (implements Service pattern)."""
+        msg = "Singer service initialized"
+        return r[str].ok(msg)
 
     def execute_sync(
         self,
         tap: singer_p.SingerTap,
         target: singer_p.SingerTarget,
-        catalog: t.Singer.StreamCatalog,
-        state: t.Singer.TapConfig | None = None,
-    ) -> r[FlextMeltanoSingerService.SyncResult]:
+        catalog: m.Meltano.SingerCatalog,
+        state: m.Meltano.SingerStateMessage,
+    ) -> r[m.Meltano.SingerSyncResult]:
         """Execute a complete Singer sync pipeline.
 
         Args:
         tap: Singer tap instance
         target: Singer target instance
-        catalog: Catalog dictionary
-        state: Optional state dictionary for incremental sync
+        catalog: Catalog model
+            state: Current state message for incremental sync
 
         Returns:
-        FlextResult containing sync result with metrics
+        r containing sync result with metrics
 
         """
         try:
             self.logger.info("Starting Singer sync")
-
             records_processed = 0
             records_written = 0
             errors = 0
-
-            # Execute tap sync
-            state_dict = state or {}
-
-            # Get records from tap
-            records: t.Singer.MessageBatch = []
-            tap.sync(catalog, state_dict)
-
-            # The target consumes from tap's output
+            records: list[m.Meltano.SingerRecordMessage] = []
+            tap.sync(catalog, state)
             target.consume(records)
-
-            result = FlextMeltanoSingerService.SyncResult(
+            result = m.Meltano.SingerSyncResult(
                 records_processed=records_processed,
                 records_written=records_written,
                 errors=errors,
-                state=state_dict,
+                state=state.value,
                 duration_seconds=0.0,
             )
-
             self.logger.info(
                 "Singer sync completed",
                 records=records_processed,
                 written=records_written,
             )
-            return r[FlextMeltanoSingerService.SyncResult].ok(result)
-        except Exception as e:
+            return r[m.Meltano.SingerSyncResult].ok(result)
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             self.logger.exception("Singer sync failed", error=str(e))
-            return r[FlextMeltanoSingerService.SyncResult].fail(
-                f"Singer sync failed: {e}",
-            )
+            return r[m.Meltano.SingerSyncResult].fail(f"Singer sync failed: {e}")
 
-    def load_catalog_from_file(self, catalog_path: Path) -> r[t.Singer.StreamCatalog]:
+    def load_catalog_from_file(self, catalog_path: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.
 
         Args:
         catalog_path: Path to catalog file
 
         Returns:
-        FlextResult containing loaded catalog
+        r containing loaded catalog
 
         """
         return self.catalog_manager.load_catalog(catalog_path)
 
-    def save_catalog_to_file(
-        self,
-        catalog: t.Singer.StreamCatalog,
-        catalog_path: Path,
-    ) -> r[None]:
-        """Save catalog to file.
-
-        Args:
-        catalog: Catalog dictionary
-        catalog_path: Path to save
-
-        Returns:
-        FlextResult with success status
-
-        """
-        self.catalog_manager.set_catalog(catalog)
-        return self.catalog_manager.save_catalog(catalog_path)
-
     def load_state_from_file(
-        self,
-        state_path: Path | None = None,
-    ) -> r[t.Singer.TapConfig]:
+        self, state_path: Path | None = None
+    ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file.
 
         Args:
         state_path: Path to state file
 
         Returns:
-        FlextResult containing loaded state
+        r containing loaded state as SingerStateMessage
 
         """
         return self.state_manager.load_state(state_path)
+
+    def save_catalog_to_file(
+        self, catalog: m.Meltano.SingerCatalog, catalog_path: Path
+    ) -> r[None]:
+        """Save catalog to file.
+
+        Args:
+        catalog: Catalog model
+        catalog_path: Path to save
+
+        Returns:
+        r with success status
+
+        """
+        self.catalog_manager.set_catalog(catalog)
+        return self.catalog_manager.save_catalog(catalog_path)
 
     def save_state_to_file(self, state_path: Path) -> r[None]:
         """Save state to file.
@@ -217,17 +192,10 @@ class FlextMeltanoSingerService(s[str]):
         state_path: Path to save state
 
         Returns:
-        FlextResult with success status
+        r with success status
 
         """
         return self.state_manager.save_state(state_path)
 
-    def execute(self) -> r[str]:
-        """Execute (implements Service pattern)."""
-        msg = "Singer service initialized"
-        return r[str].ok(msg)
 
-
-__all__ = [
-    "FlextMeltanoSingerService",
-]
+__all__ = ["FlextMeltanoSingerService"]

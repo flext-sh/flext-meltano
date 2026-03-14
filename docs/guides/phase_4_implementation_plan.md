@@ -141,7 +141,7 @@ PYTHONPATH=src poetry run python -c "import sys; print('Basic import works')"
 
 # Step 4: Test model instantiation after fix
 # Verify TapRunParams() can be created without errors
-# Run: PYTHONPATH=src python -c "from flext_meltano.models import FlextMeltanoModels"
+# Run: PYTHONPATH=src python -c "from flext_meltano import FlextMeltanoModels"
 ```
 
 **Estimated Effort**: 8 hours
@@ -296,7 +296,7 @@ ______________________________________________________________________
 - ✅ Implement missing unit tests for service methods
 - ✅ Add comprehensive error condition testing
 - ✅ Create edge case tests for configuration validation
-- ✅ Validate FlextResult patterns throughout
+- ✅ Validate r patterns throughout
 
 **Success Criteria:**
 
@@ -477,17 +477,18 @@ ______________________________________________________________________
 
 ### **Test Implementation Patterns**
 
-#### **FlextResult Testing Pattern**
+#### **r Testing Pattern**
 
 ```python
 def test_operation_returns_flext_result():
-    """Test that operations return FlextResult instances."""
+    """Test that operations return r instances."""
     service = FlextMeltanoService()
 
     result = service.discover_plugins()
 
-    assert isinstance(result, FlextResult)
+    assert isinstance(result, r)
     assert result.is_success or result.is_failure
+
 
 def test_operation_success_path():
     """Test successful operation execution."""
@@ -498,6 +499,7 @@ def test_operation_success_path():
     assert result.is_success
     plugins = result.unwrap()
     assert isinstance(plugins, list)
+
 
 def test_operation_failure_path():
     """Test operation failure handling."""
@@ -517,9 +519,10 @@ def test_operation_failure_path():
 @pytest.fixture
 def mock_meltano_adapter():
     """Provide mocked Meltano adapter."""
-    with patch('flext_meltano.adapters.FlextMeltanoAdapter') as mock:
-        mock.return_value.run_tap.return_value = FlextResult.ok({"status": "success"})
+    with patch("flext_meltano.adapters.FlextMeltanoAdapter") as mock:
+        mock.return_value.run_tap.return_value = r.ok({"status": "success"})
         yield mock
+
 
 def test_service_with_external_dependency(mock_meltano_adapter):
     """Test service operation with mocked external dependency."""

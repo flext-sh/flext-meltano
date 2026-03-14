@@ -14,31 +14,28 @@ import sys
 from typing import Protocol
 
 from flext_cli import FlextCli
-from flext_cli.protocols import FlextCliProtocols
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger
 
-from flext_meltano.api import FlextMeltano
+from flext_meltano import (
+    FlextMeltano,
+    FlextMeltanoPluginManager,
+    FlextMeltanoSingerManager,
+    FlextMeltanoStatusManager,
+)
 from flext_meltano.cli_managers import (
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
-    FlextMeltanoPluginManager,
-    FlextMeltanoSingerManager,
-    FlextMeltanoStatusManager,
-    _ManagerProtocol,
-    _SingerManagerProtocol,
-    _StatusManagerProtocol,
+    Manager,
+    SingerManager,
+    StatusManager,
 )
 
-# Import alias for protocol types
-p_cli = FlextCliProtocols
-r = FlextResult
 
-
-class _OutputProtocol(Protocol):
+class _Output(Protocol):
     """Protocol for CLI output with print_message method."""
 
-    def print_message(self, message: str, style: str | None = None) -> r[bool]: ...
+    def print_message(self, message: str, style: str | None = None) -> None: ...
 
 
 class FlextMeltanoCLI:
@@ -49,16 +46,14 @@ class FlextMeltanoCLI:
     Single class per module following SOLID principles strictly.
     """
 
-    # Declare attributes to satisfy _CLIProtocol at class level
-    # Use protocol types to match _CLIProtocol expectations
     logger: FlextLogger
-    output: _OutputProtocol  # FlextCliOutput (actual type from flext_cli)
+    output: _Output
     _api: FlextMeltano
-    pipeline_manager: _ManagerProtocol
-    singer_manager: _SingerManagerProtocol
-    dbt_manager: _ManagerProtocol
-    plugin_manager: _ManagerProtocol
-    status_manager: _StatusManagerProtocol
+    pipeline_manager: Manager
+    singer_manager: SingerManager
+    dbt_manager: Manager
+    plugin_manager: Manager
+    status_manager: StatusManager
     command_router: FlextMeltanoCommandRouter
 
     def __init__(self) -> None:
@@ -69,18 +64,10 @@ class FlextMeltanoCLI:
         """
         super().__init__()
         self.logger = FlextLogger(__name__)
-
-        # Initialize core dependencies
         self._cli = FlextCli()
         self._api = FlextMeltano()
         self.output = self._cli.output
-
-        # Chicken-and-egg: managers need self, but self needs managers for _CLIProtocol
-        # Solution: Create a temporary typed variable that we know will satisfy the protocol
-        # after all managers are assigned
         temp_self = self
-
-        # Initialize specialized components using composition
         self.pipeline_manager = FlextMeltanoPipelineManager(temp_self)
         self.singer_manager = FlextMeltanoSingerManager(temp_self)
         self.dbt_manager = FlextMeltanoDbtManager(temp_self)
@@ -88,23 +75,25 @@ class FlextMeltanoCLI:
         self.status_manager = FlextMeltanoStatusManager(temp_self)
         self.command_router = FlextMeltanoCommandRouter(temp_self)
 
-    def show_pipeline_help(self) -> None:
-        """Show pipeline help."""
-        self.output.print_message(
-            "Pipeline commands: create, run, list, status, stop, delete",
-        )
+    def main(self, args: list[str] | None = None) -> int:
+        """Main CLI entry point."""
+        if args is None:
+            args = sys.argv[1:]
+        return self.command_router.route_command(args)
 
-    def show_tap_help(self) -> None:
-        """Show tap help."""
-        self.output.print_message("Tap commands: run, discover, test")
-
-    def show_target_help(self) -> None:
-        """Show target help."""
-        self.output.print_message("Target commands: run, test")
+    def show_banner(self) -> None:
+        """Show CLI banner."""
+        self.output.print_message("FLEXT Meltano CLI - Use flext-cli patterns")
 
     def show_dbt_help(self) -> None:
         """Show DBT help."""
         self.output.print_message("DBT commands: run, test, docs")
+
+    def show_pipeline_help(self) -> None:
+        """Show pipeline help."""
+        self.output.print_message(
+            "Pipeline commands: create, run, list, status, stop, delete"
+        )
 
     def show_plugin_help(self) -> None:
         """Show plugin help."""
@@ -114,20 +103,13 @@ class FlextMeltanoCLI:
         """Show status help."""
         self.output.print_message("Status commands: show, health")
 
-    # =============================================================================
-    # MAIN CLI ENTRY POINT
-    # =============================================================================
+    def show_tap_help(self) -> None:
+        """Show tap help."""
+        self.output.print_message("Tap commands: run, discover, test")
 
-    def main(self, args: list[str] | None = None) -> int:
-        """Main CLI entry point."""
-        if args is None:
-            args = sys.argv[1:]
-
-        return self.command_router.route_command(args)
-
-    def show_banner(self) -> None:
-        """Show CLI banner."""
-        self.output.print_message("FLEXT Meltano CLI - Use flext-cli patterns")
+    def show_target_help(self) -> None:
+        """Show target help."""
+        self.output.print_message("Target commands: run, test")
 
 
 def main() -> int:

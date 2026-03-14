@@ -75,7 +75,7 @@ def test_pipeline_validation():
 ```python
 # Adapter pattern allows external system changes
 class MeltanoAdapter:
-    def run_tap(self, config) -> FlextResult[TapResult]:
+    def run_tap(self, config) -> r[TapResult]:
         # Implementation can change without affecting callers
 ```
 
@@ -91,7 +91,7 @@ class MeltanoAdapter:
 
 - `Pipeline` as a domain concept
 - `Plugin` as a domain entity
-- `SingerProtocol` as a domain service
+- `Singer` as a domain service
 
 **Ubiquitous Language**: Shared vocabulary between technical and business teams
 
@@ -179,7 +179,7 @@ src/flext_meltano/
 
 ```python
 # api.py
-def create_pipeline(config: dict) -> FlextResult[Pipeline]:
+def create_pipeline(config: dict) -> r[Pipeline]:
     return FlextMeltanoService().create_pipeline(config)
 ```
 
@@ -187,7 +187,7 @@ def create_pipeline(config: dict) -> FlextResult[Pipeline]:
 
 ```python
 # services.py
-def create_pipeline(self, config: dict) -> FlextResult[Pipeline]:
+def create_pipeline(self, config: dict) -> r[Pipeline]:
     validated_config = self.config_validator.validate(config)
     return validated_config.map(lambda cfg: Pipeline.create(cfg))
 ```
@@ -196,7 +196,7 @@ def create_pipeline(self, config: dict) -> FlextResult[Pipeline]:
 
 ```python
 # services.py
-def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
+def execute_pipeline(self, pipeline: Pipeline) -> r[ExecutionResult]:
     return self.meltano_adapter.run_pipeline(pipeline)
 ```
 
@@ -210,10 +210,11 @@ class FlextMeltanoService:
     meltano_adapter: MeltanoAdapter
     dbt_adapter: FlextMeltanoAdapter.Dbt
 
-    def execute_pipeline(self, pipeline: Pipeline) -> FlextResult[ExecutionResult]:
+    def execute_pipeline(self, pipeline: Pipeline) -> r[ExecutionResult]:
         # Use injected dependencies
         return (
-            self.config_validator.validate(pipeline.config)
+            self.config_validator
+            .validate(pipeline.config)
             .flat_map(lambda _: self.meltano_adapter.run_pipeline(pipeline))
             .flat_map(lambda result: self.dbt_adapter.run_transformations(result))
         )

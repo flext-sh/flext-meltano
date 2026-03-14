@@ -325,7 +325,7 @@ class ConnectionPoolManager:
             max_connections=config.max_connections,
             min_connections=config.min_connections,
             max_idle_time=config.max_idle_time,
-            health_check_interval=config.health_check_interval
+            health_check_interval=config.health_check_interval,
         )
 
         self.pools[service_name] = pool
@@ -383,7 +383,7 @@ class AsyncPipelineExecutor:
                     self.execute_extraction_async(pipeline),
                     self.execute_transformation_async(pipeline),
                     self.execute_loading_async(pipeline),
-                    return_exceptions=True
+                    return_exceptions=True,
                 )
 
                 # Process results
@@ -401,7 +401,7 @@ class AsyncPipelineExecutor:
                 self.metrics.pipeline_failed()
                 return PipelineResult.failure(PipelineExecutionError(str(e)))
 
-    async def validate_pipeline_async(self, pipeline: Pipeline) -> FlextResult[ValidatedPipeline]:
+    async def validate_pipeline_async(self, pipeline: Pipeline) -> r[ValidatedPipeline]:
         """Async pipeline validation."""
 
         # Run validation checks concurrently
@@ -409,16 +409,16 @@ class AsyncPipelineExecutor:
             self.validate_sources_async(pipeline.sources),
             self.validate_targets_async(pipeline.targets),
             self.validate_transforms_async(pipeline.transforms),
-            self.check_dependencies_async(pipeline)
+            self.check_dependencies_async(pipeline),
         ]
 
         results = await asyncio.gather(*validation_tasks, return_exceptions=True)
 
         if any(isinstance(r, Exception) for r in results):
             exceptions = [r for r in results if isinstance(r, Exception)]
-            return FlextResult.fail(ValidationError(f"Validation failed: {exceptions}"))
+            return r.fail(ValidationError(f"Validation failed: {exceptions}"))
 
-        return FlextResult.ok(ValidatedPipeline(pipeline, results))
+        return r.ok(ValidatedPipeline(pipeline, results))
 
     async def execute_extraction_async(self, pipeline: Pipeline) -> ExtractionResult:
         """Execute data extraction asynchronously."""
@@ -448,59 +448,59 @@ class PerformanceMonitor:
         self.metrics = metrics_collector
         self.alerts = alert_manager
         self.performance_thresholds = {
-            'api_response_time': 1000,  # ms
-            'pipeline_execution_time': 600000,  # 10 minutes
-            'memory_usage': 0.8,  # 80%
-            'cpu_usage': 0.8,  # 80%
-            'error_rate': 0.05  # 5%
+            "api_response_time": 1000,  # ms
+            "pipeline_execution_time": 600000,  # 10 minutes
+            "memory_usage": 0.8,  # 80%
+            "cpu_usage": 0.8,  # 80%
+            "error_rate": 0.05,  # 5%
         }
 
-    def record_api_call(self, endpoint: str, response_time: float, status_code: int) -> None:
+    def record_api_call(
+        self, endpoint: str, response_time: float, status_code: int
+    ) -> None:
         """Record API call performance metrics."""
 
         # Record response time
         self.metrics.histogram(
-            'api_response_time',
+            "api_response_time",
             response_time,
-            tags={'endpoint': endpoint, 'status': status_code}
+            tags={"endpoint": endpoint, "status": status_code},
         )
 
         # Check thresholds
-        if response_time > self.performance_thresholds['api_response_time']:
+        if response_time > self.performance_thresholds["api_response_time"]:
             self.alerts.send_alert(
-                'SlowAPIResponse',
+                "SlowAPIResponse",
                 f"API {endpoint} response time: {response_time:.2f}ms",
-                severity='warning'
+                severity="warning",
             )
 
         # Record success/failure rates
         if status_code >= 400:
-            self.metrics.increment('api_errors', tags={'endpoint': endpoint})
+            self.metrics.increment("api_errors", tags={"endpoint": endpoint})
 
-    def monitor_pipeline_execution(self, pipeline_id: str, execution_time: float,
-                                 success: bool) -> None:
+    def monitor_pipeline_execution(
+        self, pipeline_id: str, execution_time: float, success: bool
+    ) -> None:
         """Monitor pipeline execution performance."""
 
         # Record execution time
         self.metrics.histogram(
-            'pipeline_execution_time',
+            "pipeline_execution_time",
             execution_time,
-            tags={'pipeline_id': pipeline_id, 'success': success}
+            tags={"pipeline_id": pipeline_id, "success": success},
         )
 
         # Check for slow pipelines
-        if execution_time > self.performance_thresholds['pipeline_execution_time']:
+        if execution_time > self.performance_thresholds["pipeline_execution_time"]:
             self.alerts.send_alert(
-                'SlowPipelineExecution',
-                f"Pipeline {pipeline_id} took {execution_time/1000:.1f}s",
-                severity='warning'
+                "SlowPipelineExecution",
+                f"Pipeline {pipeline_id} took {execution_time / 1000:.1f}s",
+                severity="warning",
             )
 
         # Track success rates
-        self.metrics.increment(
-            'pipeline_executions',
-            tags={'success': success}
-        )
+        self.metrics.increment("pipeline_executions", tags={"success": success})
 
     def monitor_resource_usage(self) -> None:
         """Monitor system resource usage."""
@@ -509,44 +509,44 @@ class PerformanceMonitor:
 
         # CPU usage
         cpu_percent = psutil.cpu_percent(interval=1)
-        self.metrics.gauge('cpu_usage_percent', cpu_percent)
+        self.metrics.gauge("cpu_usage_percent", cpu_percent)
 
-        if cpu_percent > self.performance_thresholds['cpu_usage'] * 100:
+        if cpu_percent > self.performance_thresholds["cpu_usage"] * 100:
             self.alerts.send_alert(
-                'HighCPUUsage',
-                f"CPU usage: {cpu_percent:.1f}%",
-                severity='warning'
+                "HighCPUUsage", f"CPU usage: {cpu_percent:.1f}%", severity="warning"
             )
 
         # Memory usage
         memory = psutil.virtual_memory()
         memory_percent = memory.percent
-        self.metrics.gauge('memory_usage_percent', memory_percent)
+        self.metrics.gauge("memory_usage_percent", memory_percent)
 
-        if memory_percent > self.performance_thresholds['memory_usage'] * 100:
+        if memory_percent > self.performance_thresholds["memory_usage"] * 100:
             self.alerts.send_alert(
-                'HighMemoryUsage',
+                "HighMemoryUsage",
                 f"Memory usage: {memory_percent:.1f}%",
-                severity='warning'
+                severity="warning",
             )
 
     def calculate_error_rate(self, time_window_minutes: int = 5) -> float:
         """Calculate error rate over time window."""
 
         # Get error count and total requests
-        errors = self.metrics.get_counter_value('api_errors', time_window_minutes)
-        total_requests = self.metrics.get_counter_value('api_requests', time_window_minutes)
+        errors = self.metrics.get_counter_value("api_errors", time_window_minutes)
+        total_requests = self.metrics.get_counter_value(
+            "api_requests", time_window_minutes
+        )
 
         if total_requests == 0:
             return 0.0
 
         error_rate = errors / total_requests
 
-        if error_rate > self.performance_thresholds['error_rate']:
+        if error_rate > self.performance_thresholds["error_rate"]:
             self.alerts.send_alert(
-                'HighErrorRate',
+                "HighErrorRate",
                 f"Error rate: {error_rate:.2%} over {time_window_minutes}min",
-                severity='error'
+                severity="error",
             )
 
         return error_rate
@@ -676,37 +676,43 @@ class HorizontalScaler:
 
         # Check each service
         for service_name, service_config in self.config.services.items():
-            current_count = self.current_instances.get(service_name, service_config.min_instances)
+            current_count = self.current_instances.get(
+                service_name, service_config.min_instances
+            )
             service_metrics = metrics.get_service_metrics(service_name)
 
             # CPU-based scaling
             if service_metrics.cpu_percent > service_config.scale_up_cpu_threshold:
                 new_count = min(
                     current_count * 2,  # Double current count
-                    service_config.max_instances
+                    service_config.max_instances,
                 )
                 if new_count > current_count:
-                    actions.append(ScalingAction(
-                        service_name=service_name,
-                        action='scale_up',
-                        current_instances=current_count,
-                        target_instances=new_count,
-                        reason=f"High CPU: {service_metrics.cpu_percent:.1f}%"
-                    ))
+                    actions.append(
+                        ScalingAction(
+                            service_name=service_name,
+                            action="scale_up",
+                            current_instances=current_count,
+                            target_instances=new_count,
+                            reason=f"High CPU: {service_metrics.cpu_percent:.1f}%",
+                        )
+                    )
 
             elif service_metrics.cpu_percent < service_config.scale_down_cpu_threshold:
                 new_count = max(
                     current_count // 2,  # Halve current count
-                    service_config.min_instances
+                    service_config.min_instances,
                 )
                 if new_count < current_count:
-                    actions.append(ScalingAction(
-                        service_name=service_name,
-                        action='scale_down',
-                        current_instances=current_count,
-                        target_instances=new_count,
-                        reason=f"Low CPU: {service_metrics.cpu_percent:.1f}%"
-                    ))
+                    actions.append(
+                        ScalingAction(
+                            service_name=service_name,
+                            action="scale_down",
+                            current_instances=current_count,
+                            target_instances=new_count,
+                            reason=f"Low CPU: {service_metrics.cpu_percent:.1f}%",
+                        )
+                    )
 
             # Queue-based scaling for workers
             if service_name in self.config.worker_services:
@@ -714,35 +720,37 @@ class HorizontalScaler:
                 if queue_depth > service_config.queue_threshold:
                     new_count = min(
                         current_count + 2,  # Add 2 workers
-                        service_config.max_instances
+                        service_config.max_instances,
                     )
                     if new_count > current_count:
-                        actions.append(ScalingAction(
-                            service_name=service_name,
-                            action='scale_up',
-                            current_instances=current_count,
-                            target_instances=new_count,
-                            reason=f"Queue depth: {queue_depth}"
-                        ))
+                        actions.append(
+                            ScalingAction(
+                                service_name=service_name,
+                                action="scale_up",
+                                current_instances=current_count,
+                                target_instances=new_count,
+                                reason=f"Queue depth: {queue_depth}",
+                            )
+                        )
 
         return actions
 
-    def execute_scaling_actions(self, actions: List[ScalingAction]) -> List[ScalingResult]:
+    def execute_scaling_actions(
+        self, actions: List[ScalingAction]
+    ) -> List[ScalingResult]:
         """Execute scaling actions and track results."""
 
         results = []
 
         for action in actions:
             try:
-                if action.action == 'scale_up':
+                if action.action == "scale_up":
                     self.orchestrator.scale_up_service(
-                        action.service_name,
-                        action.target_instances
+                        action.service_name, action.target_instances
                     )
-                elif action.action == 'scale_down':
+                elif action.action == "scale_down":
                     self.orchestrator.scale_down_service(
-                        action.service_name,
-                        action.target_instances
+                        action.service_name, action.target_instances
                     )
 
                 # Update current instance count
@@ -750,30 +758,36 @@ class HorizontalScaler:
 
                 # Record scaling event
                 self.scaling_history.append({
-                    'timestamp': datetime.utcnow(),
-                    'service': action.service_name,
-                    'action': action.action,
-                    'from_instances': action.current_instances,
-                    'to_instances': action.target_instances,
-                    'reason': action.reason
+                    "timestamp": datetime.utcnow(),
+                    "service": action.service_name,
+                    "action": action.action,
+                    "from_instances": action.current_instances,
+                    "to_instances": action.target_instances,
+                    "reason": action.reason,
                 })
 
-                results.append(ScalingResult(
-                    action=action,
-                    success=True,
-                    message=f"Successfully scaled {action.service_name}"
-                ))
+                results.append(
+                    ScalingResult(
+                        action=action,
+                        success=True,
+                        message=f"Successfully scaled {action.service_name}",
+                    )
+                )
 
             except Exception as e:
-                results.append(ScalingResult(
-                    action=action,
-                    success=False,
-                    message=f"Scaling failed: {str(e)}"
-                ))
+                results.append(
+                    ScalingResult(
+                        action=action,
+                        success=False,
+                        message=f"Scaling failed: {str(e)}",
+                    )
+                )
 
         return results
 
-    def get_scaling_recommendations(self, metrics: SystemMetrics) -> List[ScalingRecommendation]:
+    def get_scaling_recommendations(
+        self, metrics: SystemMetrics
+    ) -> List[ScalingRecommendation]:
         """Provide scaling recommendations without executing them."""
 
         recommendations = []
@@ -784,23 +798,27 @@ class HorizontalScaler:
             # Cost optimization recommendations
             if service_metrics.utilization < 30 and service_metrics.cost_per_hour > 0:
                 savings_per_month = service_metrics.cost_per_hour * 24 * 30 * 0.5
-                recommendations.append(ScalingRecommendation(
-                    service_name=service_name,
-                    recommendation='reduce_instances',
-                    reason=f"Low utilization: {service_metrics.utilization:.1f}%",
-                    potential_savings=savings_per_month,
-                    confidence='high'
-                ))
+                recommendations.append(
+                    ScalingRecommendation(
+                        service_name=service_name,
+                        recommendation="reduce_instances",
+                        reason=f"Low utilization: {service_metrics.utilization:.1f}%",
+                        potential_savings=savings_per_month,
+                        confidence="high",
+                    )
+                )
 
             # Performance optimization recommendations
             if service_metrics.latency_p95 > service_config.target_latency:
-                recommendations.append(ScalingRecommendation(
-                    service_name=service_name,
-                    recommendation='increase_instances',
-                    reason=f"High latency: {service_metrics.latency_p95:.0f}ms",
-                    performance_impact=f"Reduce latency by ~{service_metrics.latency_p95 * 0.3:.0f}ms",
-                    confidence='medium'
-                ))
+                recommendations.append(
+                    ScalingRecommendation(
+                        service_name=service_name,
+                        recommendation="increase_instances",
+                        reason=f"High latency: {service_metrics.latency_p95:.0f}ms",
+                        performance_impact=f"Reduce latency by ~{service_metrics.latency_p95 * 0.3:.0f}ms",
+                        confidence="medium",
+                    )
+                )
 
         return recommendations
 ```
@@ -824,64 +842,68 @@ class DataScaler:
         # Check table sizes
         for table_name, table_metrics in metrics.table_sizes.items():
             if table_metrics.size_gb > self.config.max_table_size_gb:
-                actions.append(DataScalingAction(
-                    action_type='shard_table',
-                    table_name=table_name,
-                    reason=f"Table size: {table_metrics.size_gb:.1f}GB exceeds limit",
-                    shard_key=self._select_shard_key(table_name)
-                ))
+                actions.append(
+                    DataScalingAction(
+                        action_type="shard_table",
+                        table_name=table_name,
+                        reason=f"Table size: {table_metrics.size_gb:.1f}GB exceeds limit",
+                        shard_key=self._select_shard_key(table_name),
+                    )
+                )
 
         # Check query performance
         for query_name, query_metrics in metrics.query_performance.items():
             if query_metrics.avg_execution_time > self.config.max_query_time_seconds:
                 if query_metrics.table_size > self.config.partition_threshold_gb:
-                    actions.append(DataScalingAction(
-                        action_type='add_partition',
-                        table_name=query_metrics.table_name,
-                        reason=f"Slow query: {query_metrics.avg_execution_time:.2f}s",
-                        partition_key=self._select_partition_key(query_metrics)
-                    ))
+                    actions.append(
+                        DataScalingAction(
+                            action_type="add_partition",
+                            table_name=query_metrics.table_name,
+                            reason=f"Slow query: {query_metrics.avg_execution_time:.2f}s",
+                            partition_key=self._select_partition_key(query_metrics),
+                        )
+                    )
 
         # Check read/write ratios
         for table_name, rw_metrics in metrics.read_write_ratios.items():
             if rw_metrics.read_ratio > self.config.read_replica_threshold:
-                actions.append(DataScalingAction(
-                    action_type='add_read_replica',
-                    table_name=table_name,
-                    reason=f"High read ratio: {rw_metrics.read_ratio:.2f}",
-                    replica_count=self._calculate_replica_count(rw_metrics)
-                ))
+                actions.append(
+                    DataScalingAction(
+                        action_type="add_read_replica",
+                        table_name=table_name,
+                        reason=f"High read ratio: {rw_metrics.read_ratio:.2f}",
+                        replica_count=self._calculate_replica_count(rw_metrics),
+                    )
+                )
 
         return actions
 
-    def execute_data_scaling(self, actions: List[DataScalingAction]) -> List[DataScalingResult]:
+    def execute_data_scaling(
+        self, actions: List[DataScalingAction]
+    ) -> List[DataScalingResult]:
         """Execute data scaling actions."""
 
         results = []
 
         for action in actions:
             try:
-                if action.action_type == 'shard_table':
+                if action.action_type == "shard_table":
                     result = self._execute_table_sharding(action)
-                elif action.action_type == 'add_partition':
+                elif action.action_type == "add_partition":
                     result = self._execute_partitioning(action)
-                elif action.action_type == 'add_read_replica':
+                elif action.action_type == "add_read_replica":
                     result = self._execute_read_replica(action)
                 else:
                     raise ValueError(f"Unknown action type: {action.action_type}")
 
-                results.append(DataScalingResult(
-                    action=action,
-                    success=True,
-                    result=result
-                ))
+                results.append(
+                    DataScalingResult(action=action, success=True, result=result)
+                )
 
             except Exception as e:
-                results.append(DataScalingResult(
-                    action=action,
-                    success=False,
-                    error=str(e)
-                ))
+                results.append(
+                    DataScalingResult(action=action, success=False, error=str(e))
+                )
 
         return results
 
@@ -902,7 +924,7 @@ class DataScaler:
             table_name=action.table_name,
             shard_count=shard_count,
             shards=shards,
-            redistribution_result=redistribution_result
+            redistribution_result=redistribution_result,
         )
 
     def _calculate_shard_count(self, table_name: str) -> int:
@@ -956,10 +978,12 @@ class FunctionalDecomposer:
             data_sharing=data_sharing,
             team_ownership=team_ownership,
             coupling_metrics=coupling_metrics,
-            decomposition_candidates=candidates
+            decomposition_candidates=candidates,
         )
 
-    def plan_service_decomposition(self, candidate: DecompositionCandidate) -> DecompositionPlan:
+    def plan_service_decomposition(
+        self, candidate: DecompositionCandidate
+    ) -> DecompositionPlan:
         """Create decomposition plan for service candidate."""
 
         # Define service boundaries
@@ -987,7 +1011,7 @@ class FunctionalDecomposer:
             data_migration=data_migration,
             api_contracts=api_contracts,
             team_transitions=team_transitions,
-            effort_estimate=effort_estimate
+            effort_estimate=effort_estimate,
         )
 
     def execute_decomposition(self, plan: DecompositionPlan) -> DecompositionResult:
@@ -1018,7 +1042,7 @@ class FunctionalDecomposer:
             data_migration=data_migration,
             api_updates=api_updates,
             deployment=deployment,
-            validation=validation
+            validation=validation,
         )
 ```
 
@@ -1034,7 +1058,7 @@ title FLEXT-Meltano - Reliability Architecture
 
 rectangle "Error Handling" as error_handling {
     component "Railway Pattern" as railway [
-        FlextResult[T] pattern
+        r[T] pattern
         Error propagation
         Recovery strategies
     ]
@@ -1121,11 +1145,12 @@ end note
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
-    def execute_with_railway(self, operation: Operation) -> FlextResult[OperationResult]:
+    def execute_with_railway(self, operation: Operation) -> r[OperationResult]:
         """Execute operation using railway pattern with full error handling."""
 
         return (
-            self.validate_operation(operation)
+            self
+            .validate_operation(operation)
             .flat_map(lambda op: self.check_permissions(op))
             .flat_map(lambda op: self.reserve_resources(op))
             .flat_map(lambda op: self.execute_operation(op))
@@ -1134,44 +1159,49 @@ class RailwayExecutor:
             .map(lambda result: OperationResult.from_success(result))
         )
 
-    def validate_operation(self, operation: Operation) -> FlextResult[ValidatedOperation]:
+    def validate_operation(self, operation: Operation) -> r[ValidatedOperation]:
         """Validate operation parameters and constraints."""
 
         # Schema validation
         schema_result = self.schema_validator.validate(operation.payload)
         if schema_result.is_failure:
-            return FlextResult.fail(ValidationError(
-                f"Schema validation failed: {schema_result.error}"
-            ))
+            return r.fail(
+                ValidationError(f"Schema validation failed: {schema_result.error}")
+            )
 
         # Business rule validation
         business_result = self.business_validator.validate(operation)
         if business_result.is_failure:
-            return FlextResult.fail(BusinessRuleViolation(
-                f"Business rule violation: {business_result.error}"
-            ))
+            return r.fail(
+                BusinessRuleViolation(
+                    f"Business rule violation: {business_result.error}"
+                )
+            )
 
         # Resource availability check
         resource_result = self.resource_checker.check_availability(operation)
         if resource_result.is_failure:
-            return FlextResult.fail(ResourceUnavailableError(
-                f"Resources unavailable: {resource_result.error}"
-            ))
+            return r.fail(
+                ResourceUnavailableError(
+                    f"Resources unavailable: {resource_result.error}"
+                )
+            )
 
-        return FlextResult.ok(ValidatedOperation(operation, schema_result.unwrap()))
+        return r.ok(ValidatedOperation(operation, schema_result.unwrap()))
 
-    def execute_operation(self, operation: ValidatedOperation) -> FlextResult[ExecutionResult]:
+    def execute_operation(self, operation: ValidatedOperation) -> r[ExecutionResult]:
         """Execute operation with comprehensive error handling."""
 
         try:
             # Set execution timeout
             with self.timeout_context(operation.timeout_seconds):
-
                 # Execute with circuit breaker
                 if not self.circuit_breaker.allow_request():
-                    return FlextResult.fail(CircuitBreakerOpenError(
-                        "Circuit breaker is open - service temporarily unavailable"
-                    ))
+                    return r.fail(
+                        CircuitBreakerOpenError(
+                            "Circuit breaker is open - service temporarily unavailable"
+                        )
+                    )
 
                 # Execute operation
                 result = operation.execute()
@@ -1179,19 +1209,19 @@ class RailwayExecutor:
                 # Record success
                 self.circuit_breaker.record_success()
 
-                return FlextResult.ok(result)
+                return r.ok(result)
 
         except TimeoutError:
             self.circuit_breaker.record_failure()
-            return FlextResult.fail(OperationTimeoutError(
-                f"Operation timed out after {operation.timeout_seconds} seconds"
-            ))
+            return r.fail(
+                OperationTimeoutError(
+                    f"Operation timed out after {operation.timeout_seconds} seconds"
+                )
+            )
 
         except ExternalServiceError as e:
             self.circuit_breaker.record_failure()
-            return FlextResult.fail(ExternalServiceError(
-                f"External service error: {e.message}"
-            ))
+            return r.fail(ExternalServiceError(f"External service error: {e.message}"))
 
         except Exception as e:
             # Record failure for circuit breaker
@@ -1201,16 +1231,16 @@ class RailwayExecutor:
             self.logger.error(
                 f"Operation execution failed: {e}",
                 extra={
-                    'operation_id': operation.id,
-                    'operation_type': operation.type,
-                    'error_type': type(e).__name__,
-                    'stack_trace': traceback.format_exc()
-                }
+                    "operation_id": operation.id,
+                    "operation_type": operation.type,
+                    "error_type": type(e).__name__,
+                    "stack_trace": traceback.format_exc(),
+                },
             )
 
-            return FlextResult.fail(OperationExecutionError(
-                f"Operation execution failed: {str(e)}"
-            ))
+            return r.fail(
+                OperationExecutionError(f"Operation execution failed: {str(e)}")
+            )
 ```
 
 #### 2. Circuit Breaker Pattern
@@ -1219,8 +1249,12 @@ class RailwayExecutor:
 class CircuitBreaker:
     """Circuit breaker implementation for external service protection."""
 
-    def __init__(self, failure_threshold: int = 5, recovery_timeout: int = 60,
-                 expected_exception: Type[Exception] = Exception):
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        recovery_timeout: int = 60,
+        expected_exception: Type[Exception] = Exception,
+    ):
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.expected_exception = expected_exception
@@ -1270,7 +1304,9 @@ class CircuitBreaker:
         if self.last_failure_time is None:
             return True
 
-        time_since_failure = (datetime.utcnow() - self.last_failure_time).total_seconds()
+        time_since_failure = (
+            datetime.utcnow() - self.last_failure_time
+        ).total_seconds()
         return time_since_failure >= self.recovery_timeout
 
     def _reset_circuit(self) -> None:
@@ -1287,14 +1323,19 @@ class CircuitBreaker:
 class RetryExecutor:
     """Retry executor with exponential backoff and jitter."""
 
-    def __init__(self, max_attempts: int = 3, base_delay: float = 1.0,
-                 max_delay: float = 60.0, backoff_factor: float = 2.0):
+    def __init__(
+        self,
+        max_attempts: int = 3,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+        backoff_factor: float = 2.0,
+    ):
         self.max_attempts = max_attempts
         self.base_delay = base_delay
         self.max_delay = max_delay
         self.backoff_factor = backoff_factor
 
-    def execute_with_retry(self, operation: Callable[[], T]) -> FlextResult[T]:
+    def execute_with_retry(self, operation: Callable[[], T]) -> r[T]:
         """Execute operation with retry logic."""
 
         last_exception = None
@@ -1302,7 +1343,7 @@ class RetryExecutor:
         for attempt in range(self.max_attempts):
             try:
                 result = operation()
-                return FlextResult.ok(result)
+                return r.ok(result)
 
             except self.retryable_exceptions as e:
                 last_exception = e
@@ -1322,19 +1363,21 @@ class RetryExecutor:
 
             except Exception as e:
                 # Non-retryable exception
-                return FlextResult.fail(OperationError(f"Non-retryable error: {e}"))
+                return r.fail(OperationError(f"Non-retryable error: {e}"))
 
         # All retry attempts exhausted
-        return FlextResult.fail(RetryExhaustedError(
-            f"Operation failed after {self.max_attempts} attempts. "
-            f"Last error: {last_exception}"
-        ))
+        return r.fail(
+            RetryExhaustedError(
+                f"Operation failed after {self.max_attempts} attempts. "
+                f"Last error: {last_exception}"
+            )
+        )
 
     def _calculate_delay(self, attempt: int) -> float:
         """Calculate delay for retry attempt with jitter."""
 
         # Exponential backoff
-        delay = self.base_delay * (self.backoff_factor ** attempt)
+        delay = self.base_delay * (self.backoff_factor**attempt)
 
         # Add jitter to prevent thundering herd
         jitter = random.uniform(0.5, 1.5)
@@ -1366,9 +1409,9 @@ class ReliabilityMonitor:
         self.metrics = metrics_collector
         self.alerts = alert_manager
         self.reliability_thresholds = {
-            'error_rate_threshold': 0.05,  # 5%
-            'circuit_breaker_threshold': 0.8,  # 80% of services
-            'mean_time_between_failures': 7200,  # 2 hours
+            "error_rate_threshold": 0.05,  # 5%
+            "circuit_breaker_threshold": 0.8,  # 80% of services
+            "mean_time_between_failures": 7200,  # 2 hours
         }
 
     def monitor_error_rates(self) -> None:
@@ -1379,7 +1422,7 @@ class ReliabilityMonitor:
 
         high_error_services = []
         for service, error_rate in service_error_rates.items():
-            if error_rate > self.reliability_thresholds['error_rate_threshold']:
+            if error_rate > self.reliability_thresholds["error_rate_threshold"]:
                 high_error_services.append((service, error_rate))
 
         if high_error_services:
@@ -1391,10 +1434,10 @@ class ReliabilityMonitor:
                 message += f"- {service}: {error_rate:.2%}\\n"
 
             self.alerts.send_alert(
-                'HighErrorRates',
+                "HighErrorRates",
                 message,
-                severity='error',
-                affected_services=[s[0] for s in high_error_services]
+                severity="error",
+                affected_services=[s[0] for s in high_error_services],
             )
 
     def monitor_circuit_breakers(self) -> None:
@@ -1403,16 +1446,21 @@ class ReliabilityMonitor:
         circuit_breaker_states = self.metrics.get_circuit_breaker_states()
 
         open_breakers = [
-            service for service, state in circuit_breaker_states.items()
-            if state == 'open'
+            service
+            for service, state in circuit_breaker_states.items()
+            if state == "open"
         ]
 
-        if len(open_breakers) > len(circuit_breaker_states) * self.reliability_thresholds['circuit_breaker_threshold']:
+        if (
+            len(open_breakers)
+            > len(circuit_breaker_states)
+            * self.reliability_thresholds["circuit_breaker_threshold"]
+        ):
             self.alerts.send_alert(
-                'MultipleCircuitBreakersOpen',
+                "MultipleCircuitBreakersOpen",
                 f"Multiple circuit breakers open: {', '.join(open_breakers)}",
-                severity='critical',
-                affected_services=open_breakers
+                severity="critical",
+                affected_services=open_breakers,
             )
 
     def calculate_mtbf(self) -> float:
@@ -1422,28 +1470,28 @@ class ReliabilityMonitor:
         failure_events = self.metrics.get_failure_events(hours=24)
 
         if len(failure_events) < 2:
-            return float('inf')  # Not enough data
+            return float("inf")  # Not enough data
 
         # Calculate time between failures
         failure_times = [event.timestamp for event in failure_events]
         time_differences = []
 
         for i in range(1, len(failure_times)):
-            time_diff = (failure_times[i] - failure_times[i-1]).total_seconds()
+            time_diff = (failure_times[i] - failure_times[i - 1]).total_seconds()
             time_differences.append(time_diff)
 
         if not time_differences:
-            return float('inf')
+            return float("inf")
 
         mtbf = sum(time_differences) / len(time_differences)
 
         # Alert if MTBF is below threshold
-        if mtbf < self.reliability_thresholds['mean_time_between_failures']:
+        if mtbf < self.reliability_thresholds["mean_time_between_failures"]:
             self.alerts.send_alert(
-                'LowMTBF',
+                "LowMTBF",
                 f"Mean Time Between Failures: {mtbf:.0f} seconds "
                 f"(threshold: {self.reliability_thresholds['mean_time_between_failures']} seconds)",
-                severity='warning'
+                severity="warning",
             )
 
         return mtbf
@@ -1470,30 +1518,43 @@ class ReliabilityMonitor:
             uptime_percentages=uptime_percentages,
             recommendations=self._generate_reliability_recommendations(
                 error_rates, circuit_breaker_states, mtbf
-            )
+            ),
         )
 
-    def _calculate_reliability_score(self, error_rates: Dict[str, float],
-                                   circuit_breaker_states: Dict[str, str],
-                                   uptime_percentages: Dict[str, float]) -> float:
+    def _calculate_reliability_score(
+        self,
+        error_rates: Dict[str, float],
+        circuit_breaker_states: Dict[str, str],
+        uptime_percentages: Dict[str, float],
+    ) -> float:
         """Calculate overall reliability score (0-100)."""
 
         scores = []
 
         # Error rate score (40% weight)
-        avg_error_rate = sum(error_rates.values()) / len(error_rates) if error_rates else 0
+        avg_error_rate = (
+            sum(error_rates.values()) / len(error_rates) if error_rates else 0
+        )
         error_score = max(0, 100 - (avg_error_rate * 2000))  # Penalty for errors
-        scores.append(('error_rate', error_score, 40))
+        scores.append(("error_rate", error_score, 40))
 
         # Circuit breaker score (30% weight)
-        open_breakers = sum(1 for state in circuit_breaker_states.values() if state == 'open')
-        breaker_score = max(0, 100 - (open_breakers / len(circuit_breaker_states) * 100))
-        scores.append(('circuit_breakers', breaker_score, 30))
+        open_breakers = sum(
+            1 for state in circuit_breaker_states.values() if state == "open"
+        )
+        breaker_score = max(
+            0, 100 - (open_breakers / len(circuit_breaker_states) * 100)
+        )
+        scores.append(("circuit_breakers", breaker_score, 30))
 
         # Uptime score (30% weight)
-        avg_uptime = sum(uptime_percentages.values()) / len(uptime_percentages) if uptime_percentages else 100
+        avg_uptime = (
+            sum(uptime_percentages.values()) / len(uptime_percentages)
+            if uptime_percentages
+            else 100
+        )
         uptime_score = avg_uptime
-        scores.append(('uptime', uptime_score, 30))
+        scores.append(("uptime", uptime_score, 30))
 
         # Calculate weighted average
         total_score = sum(score * weight for _, score, weight in scores)
@@ -1501,17 +1562,21 @@ class ReliabilityMonitor:
 
         return round(total_score / total_weight, 1)
 
-    def _generate_reliability_recommendations(self, error_rates: Dict[str, float],
-                                            circuit_breaker_states: Dict[str, str],
-                                            mtbf: float) -> t.StringList:
+    def _generate_reliability_recommendations(
+        self,
+        error_rates: Dict[str, float],
+        circuit_breaker_states: Dict[str, str],
+        mtbf: float,
+    ) -> t.StringList:
         """Generate reliability improvement recommendations."""
 
         recommendations = []
 
         # High error rate recommendations
         high_error_services = [
-            service for service, rate in error_rates.items()
-            if rate > self.reliability_thresholds['error_rate_threshold']
+            service
+            for service, rate in error_rates.items()
+            if rate > self.reliability_thresholds["error_rate_threshold"]
         ]
         if high_error_services:
             recommendations.append(
@@ -1520,8 +1585,9 @@ class ReliabilityMonitor:
 
         # Circuit breaker recommendations
         open_breakers = [
-            service for service, state in circuit_breaker_states.items()
-            if state == 'open'
+            service
+            for service, state in circuit_breaker_states.items()
+            if state == "open"
         ]
         if open_breakers:
             recommendations.append(
@@ -1529,7 +1595,7 @@ class ReliabilityMonitor:
             )
 
         # MTBF recommendations
-        if mtbf < self.reliability_thresholds['mean_time_between_failures']:
+        if mtbf < self.reliability_thresholds["mean_time_between_failures"]:
             recommendations.append(
                 f"Improve system stability - current MTBF: {mtbf:.0f} seconds"
             )
@@ -1537,7 +1603,9 @@ class ReliabilityMonitor:
         # General recommendations
         if not recommendations:
             recommendations.append("System reliability is within acceptable parameters")
-            recommendations.append("Continue monitoring and maintaining current reliability practices")
+            recommendations.append(
+                "Continue monitoring and maintaining current reliability practices"
+            )
 
         return recommendations
 ```
@@ -1718,10 +1786,12 @@ class AvailabilityManager:
             timestamp=datetime.utcnow(),
             overall_healthy=overall_healthy,
             zone_statuses=zone_statuses,
-            current_primary_zone=self.current_primary_zone
+            current_primary_zone=self.current_primary_zone,
         )
 
-    def _initiate_failover(self, service_name: str, available_zones: t.StringList) -> None:
+    def _initiate_failover(
+        self, service_name: str, available_zones: t.StringList
+    ) -> None:
         """Initiate failover to healthy zone."""
 
         # Find healthiest available zone
@@ -1744,19 +1814,21 @@ class AvailabilityManager:
                 self.current_primary_zone = new_primary_zone
                 self._send_failover_notification(service_name, new_primary_zone)
             else:
-                self._send_failover_failure_notification(service_name, failover_result.error)
+                self._send_failover_failure_notification(
+                    service_name, failover_result.error
+                )
 
     def _configure_failover(self, service_name: str, zones: t.StringList) -> None:
         """Configure automatic failover policies."""
 
         failover_policy = {
-            'service': service_name,
-            'zones': zones,
-            'failover_strategy': 'automatic',
-            'health_check_interval': 30,  # seconds
-            'failover_timeout': 300,      # seconds
-            'rollback_on_failure': True,
-            'notification_channels': ['email', 'slack', 'pagerduty']
+            "service": service_name,
+            "zones": zones,
+            "failover_strategy": "automatic",
+            "health_check_interval": 30,  # seconds
+            "failover_timeout": 300,  # seconds
+            "rollback_on_failure": True,
+            "notification_channels": ["email", "slack", "pagerduty"],
         }
 
         self.orchestrator.set_failover_policy(service_name, failover_policy)
@@ -1780,7 +1852,7 @@ class AvailabilityManager:
             sla_compliance=sla_compliance,
             recommendations=self._generate_availability_recommendations(
                 uptime_metrics, mttr_metrics
-            )
+            ),
         )
 
     def _calculate_uptime_percentages(self) -> Dict[str, float]:
@@ -1792,15 +1864,15 @@ class AvailabilityManager:
             service_zones = self._get_service_zones(service_name)
 
             # Get health check data for last 30 days
-            health_data = self.health_monitor.get_health_history(
-                service_name, days=30
-            )
+            health_data = self.health_monitor.get_health_history(service_name, days=30)
 
             # Calculate uptime percentage
             total_checks = len(health_data)
             healthy_checks = sum(1 for check in health_data if check.healthy)
 
-            uptime_percentage = (healthy_checks / total_checks * 100) if total_checks > 0 else 100.0
+            uptime_percentage = (
+                (healthy_checks / total_checks * 100) if total_checks > 0 else 100.0
+            )
             uptime_data[service_name] = uptime_percentage
 
         return uptime_data
@@ -1828,7 +1900,9 @@ class AvailabilityManager:
 
         return mttr_data
 
-    def _calculate_sla_compliance(self, uptime_metrics: Dict[str, float]) -> Dict[str, bool]:
+    def _calculate_sla_compliance(
+        self, uptime_metrics: Dict[str, float]
+    ) -> Dict[str, bool]:
         """Calculate SLA compliance for each service."""
 
         sla_compliance = {}
@@ -1839,15 +1913,19 @@ class AvailabilityManager:
 
         return sla_compliance
 
-    def _generate_availability_recommendations(self, uptime_metrics: Dict[str, float],
-                                             mttr_metrics: Dict[str, float]) -> t.StringList:
+    def _generate_availability_recommendations(
+        self, uptime_metrics: Dict[str, float], mttr_metrics: Dict[str, float]
+    ) -> t.StringList:
         """Generate availability improvement recommendations."""
 
         recommendations = []
 
         # SLA compliance recommendations
         non_compliant_services = [
-            service for service, compliant in self._calculate_sla_compliance(uptime_metrics).items()
+            service
+            for service, compliant in self._calculate_sla_compliance(
+                uptime_metrics
+            ).items()
             if not compliant
         ]
 
@@ -1858,7 +1936,8 @@ class AvailabilityManager:
 
         # MTTR recommendations
         high_mttr_services = [
-            service for service, mttr in mttr_metrics.items()
+            service
+            for service, mttr in mttr_metrics.items()
             if mttr > self.config.target_mttr_seconds
         ]
 
@@ -1869,8 +1948,12 @@ class AvailabilityManager:
 
         # General recommendations
         if not recommendations:
-            recommendations.append("Availability metrics are within acceptable parameters")
-            recommendations.append("Continue monitoring and maintaining high availability practices")
+            recommendations.append(
+                "Availability metrics are within acceptable parameters"
+            )
+            recommendations.append(
+                "Continue monitoring and maintaining high availability practices"
+            )
 
         return recommendations
 ```
@@ -1887,8 +1970,9 @@ class DisasterRecoveryManager:
         self.communication_manager = communication_manager
         self.dr_plans = self._load_dr_plans()
 
-    def execute_disaster_recovery(self, disaster_type: str,
-                                affected_components: t.StringList) -> DRResult:
+    def execute_disaster_recovery(
+        self, disaster_type: str, affected_components: t.StringList
+    ) -> DRResult:
         """Execute disaster recovery plan."""
 
         # Identify applicable DR plan
@@ -1897,7 +1981,7 @@ class DisasterRecoveryManager:
         if not dr_plan:
             return DRResult(
                 success=False,
-                error=f"No DR plan found for disaster type: {disaster_type}"
+                error=f"No DR plan found for disaster type: {disaster_type}",
             )
 
         # Execute DR plan phases
@@ -1934,24 +2018,32 @@ class DisasterRecoveryManager:
 
         return recovery_result
 
-    def _select_dr_plan(self, disaster_type: str, affected_components: t.StringList) -> Optional[DRPlan]:
+    def _select_dr_plan(
+        self, disaster_type: str, affected_components: t.StringList
+    ) -> Optional[DRPlan]:
         """Select appropriate DR plan based on disaster characteristics."""
 
         # Find plans that match the disaster type
         matching_plans = [
-            plan for plan in self.dr_plans
-            if plan.disaster_type == disaster_type or plan.disaster_type == 'general'
+            plan
+            for plan in self.dr_plans
+            if plan.disaster_type == disaster_type or plan.disaster_type == "general"
         ]
 
         if not matching_plans:
             return None
 
         # Select plan with highest component coverage
-        best_plan = max(matching_plans, key=lambda plan: self._calculate_coverage(plan, affected_components))
+        best_plan = max(
+            matching_plans,
+            key=lambda plan: self._calculate_coverage(plan, affected_components),
+        )
 
         return best_plan
 
-    def _execute_assessment_phase(self, dr_plan: DRPlan, affected_components: t.StringList) -> AssessmentResult:
+    def _execute_assessment_phase(
+        self, dr_plan: DRPlan, affected_components: t.StringList
+    ) -> AssessmentResult:
         """Execute disaster assessment phase."""
 
         assessment_start = datetime.utcnow()
@@ -1970,10 +2062,12 @@ class DisasterRecoveryManager:
             end_time=datetime.utcnow(),
             impact_assessment=impact_assessment,
             priority_order=priority_order,
-            forensic_data=forensic_data
+            forensic_data=forensic_data,
         )
 
-    def _execute_recovery_phase(self, dr_plan: DRPlan, containment_result) -> RecoveryResult:
+    def _execute_recovery_phase(
+        self, dr_plan: DRPlan, containment_result
+    ) -> RecoveryResult:
         """Execute recovery phase according to DR plan."""
 
         recovery_start = datetime.utcnow()
@@ -1990,19 +2084,21 @@ class DisasterRecoveryManager:
                     break
 
             except Exception as e:
-                recovery_steps.append(RecoveryStepResult(
-                    step_name=step.name,
-                    success=False,
-                    error=str(e),
-                    execution_time=datetime.utcnow() - recovery_start
-                ))
+                recovery_steps.append(
+                    RecoveryStepResult(
+                        step_name=step.name,
+                        success=False,
+                        error=str(e),
+                        execution_time=datetime.utcnow() - recovery_start,
+                    )
+                )
                 break
 
         return RecoveryResult(
             start_time=recovery_start,
             end_time=datetime.utcnow(),
             steps=recovery_steps,
-            overall_success=all(step.success for step in recovery_steps)
+            overall_success=all(step.success for step in recovery_steps),
         )
 
     def test_disaster_recovery(self) -> DRTestResult:
@@ -2035,7 +2131,7 @@ class DisasterRecoveryManager:
                     validation_result.success,
                     backup_test.success,
                     failover_test.success,
-                    comm_test.success
+                    comm_test.success,
                 ])
 
             except Exception as e:
@@ -2045,7 +2141,9 @@ class DisasterRecoveryManager:
             test_result.plan_tests.append(plan_test)
 
         test_result.test_end_time = datetime.utcnow()
-        test_result.overall_success = all(plan_test.success for plan_test in test_result.plan_tests)
+        test_result.overall_success = all(
+            plan_test.success for plan_test in test_result.plan_tests
+        )
 
         return test_result
 
@@ -2055,7 +2153,13 @@ class DisasterRecoveryManager:
         validation_issues = []
 
         # Check required sections
-        required_sections = ['assessment', 'containment', 'recovery', 'restoration', 'communication']
+        required_sections = [
+            "assessment",
+            "containment",
+            "recovery",
+            "restoration",
+            "communication",
+        ]
         for section in required_sections:
             if not hasattr(dr_plan, section) or not getattr(dr_plan, section):
                 validation_issues.append(f"Missing required section: {section}")
@@ -2072,11 +2176,12 @@ class DisasterRecoveryManager:
         for step in dr_plan.recovery_steps:
             for dependency in step.dependencies:
                 if not any(s.name == dependency for s in dr_plan.recovery_steps):
-                    validation_issues.append(f"Step '{step.name}' has invalid dependency: {dependency}")
+                    validation_issues.append(
+                        f"Step '{step.name}' has invalid dependency: {dependency}"
+                    )
 
         return ValidationResult(
-            success=len(validation_issues) == 0,
-            issues=validation_issues
+            success=len(validation_issues) == 0, issues=validation_issues
         )
 
     def generate_dr_report(self) -> DRReport:
@@ -2101,7 +2206,7 @@ class DisasterRecoveryManager:
             dr_status=dr_status,
             compliance_metrics=compliance_metrics,
             test_results=test_results,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _calculate_dr_compliance(self) -> DRComplianceMetrics:
@@ -2129,25 +2234,32 @@ class DisasterRecoveryManager:
             plan_compliance.overall_compliant = all([
                 plan_compliance.rto_compliant,
                 plan_compliance.rpo_compliant,
-                plan_compliance.backup_compliant
+                plan_compliance.backup_compliant,
             ])
 
             compliance.plan_compliance.append(plan_compliance)
 
         # Calculate overall compliance
-        compliant_plans = sum(1 for pc in compliance.plan_compliance if pc.overall_compliant)
-        compliance.overall_compliance_percentage = (compliant_plans / len(compliance.plan_compliance)) * 100
+        compliant_plans = sum(
+            1 for pc in compliance.plan_compliance if pc.overall_compliant
+        )
+        compliance.overall_compliance_percentage = (
+            compliant_plans / len(compliance.plan_compliance)
+        ) * 100
 
         return compliance
 
-    def _generate_dr_recommendations(self, dr_status, compliance_metrics, test_results) -> t.StringList:
+    def _generate_dr_recommendations(
+        self, dr_status, compliance_metrics, test_results
+    ) -> t.StringList:
         """Generate disaster recovery improvement recommendations."""
 
         recommendations = []
 
         # Compliance recommendations
         non_compliant_plans = [
-            pc.plan_name for pc in compliance_metrics.plan_compliance
+            pc.plan_name
+            for pc in compliance_metrics.plan_compliance
             if not pc.overall_compliant
         ]
 
@@ -2158,8 +2270,7 @@ class DisasterRecoveryManager:
 
         # Test recommendations
         failed_tests = [
-            test.plan_name for test in test_results.plan_tests
-            if not test.success
+            test.plan_name for test in test_results.plan_tests if not test.success
         ]
 
         if failed_tests:
@@ -2169,7 +2280,8 @@ class DisasterRecoveryManager:
 
         # Status recommendations
         outdated_plans = [
-            plan.name for plan in dr_status.dr_plans
+            plan.name
+            for plan in dr_status.dr_plans
             if (datetime.utcnow() - plan.last_updated).days > 90
         ]
 
@@ -2297,11 +2409,11 @@ class QualityGate:
     def __init__(self, config: QualityConfig):
         self.config = config
         self.checks = {
-            'linting': self._check_linting,
-            'type_checking': self._check_type_safety,
-            'testing': self._check_test_coverage,
-            'security': self._check_security,
-            'documentation': self._check_documentation
+            "linting": self._check_linting,
+            "type_checking": self._check_type_safety,
+            "testing": self._check_test_coverage,
+            "security": self._check_security,
+            "documentation": self._check_documentation,
         }
 
     def run_quality_gates(self, staged_files: List[Path]) -> QualityGateResult:
@@ -2327,8 +2439,7 @@ class QualityGate:
 
             except Exception as e:
                 result.check_results[check_name] = CheckResult(
-                    passed=False,
-                    issues=[f"Check execution failed: {e}"]
+                    passed=False, issues=[f"Check execution failed: {e}"]
                 )
                 result.overall_passed = False
 
@@ -2340,12 +2451,12 @@ class QualityGate:
         result = CheckResult()
 
         # Run Ruff linting
-        cmd = ['ruff', 'check'] + [str(f) for f in code_files + test_files]
+        cmd = ["ruff", "check"] + [str(f) for f in code_files + test_files]
         process = subprocess.run(cmd, capture_output=True, text=True)
 
         if process.returncode != 0:
             result.passed = False
-            result.issues = process.stdout.split('\n')
+            result.issues = process.stdout.split("\n")
             result.issues = [issue for issue in result.issues if issue.strip()]
         else:
             result.passed = True
@@ -2358,12 +2469,12 @@ class QualityGate:
         result = CheckResult()
 
         # Run Pyrefly type checking
-        cmd = ['pyrefly', 'check'] + [str(f) for f in code_files]
+        cmd = ["pyrefly", "check"] + [str(f) for f in code_files]
         process = subprocess.run(cmd, capture_output=True, text=True)
 
         if process.returncode != 0:
             result.passed = False
-            result.issues = process.stdout.split('\n')
+            result.issues = process.stdout.split("\n")
             result.issues = [issue for issue in result.issues if issue.strip()]
         else:
             result.passed = True
@@ -2381,7 +2492,7 @@ class QualityGate:
             return result
 
         # Run coverage check (thresholds configured in pyproject.toml)
-        cmd = ['pytest', '--cov', '--cov-report=term-missing', 'tests/']
+        cmd = ["pytest", "--cov", "--cov-report=term-missing", "tests/"]
         process = subprocess.run(cmd, capture_output=True, text=True)
 
         if process.returncode != 0:
@@ -2398,13 +2509,13 @@ class QualityGate:
         result = CheckResult()
 
         # Run Bandit security scanner
-        cmd = ['bandit', '-r'] + [str(f) for f in code_files]
+        cmd = ["bandit", "-r"] + [str(f) for f in code_files]
         process = subprocess.run(cmd, capture_output=True, text=True)
 
         if process.returncode != 0:
             result.passed = False
-            result.issues = process.stdout.split('\n')
-            result.issues = [issue for issue in result.issues if 'SEVERITY:' in issue]
+            result.issues = process.stdout.split("\n")
+            result.issues = [issue for issue in result.issues if "SEVERITY:" in issue]
         else:
             result.passed = True
 
@@ -2418,12 +2529,14 @@ class QualityGate:
         # Check for undocumented public functions
         undocumented = []
         for file_path in code_files:
-            if file_path.suffix == '.py':
+            if file_path.suffix == ".py":
                 undocumented.extend(self._check_file_documentation(file_path))
 
         if undocumented:
             result.passed = False
-            result.issues = [f"Undocumented public function: {func}" for func in undocumented]
+            result.issues = [
+                f"Undocumented public function: {func}" for func in undocumented
+            ]
         else:
             result.passed = True
 
@@ -2435,11 +2548,11 @@ class QualityGate:
         undocumented = []
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 tree = ast.parse(f.read())
 
             for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef) and not node.name.startswith('_'):
+                if isinstance(node, ast.FunctionDef) and not node.name.startswith("_"):
                     # Check for docstring
                     if not ast.get_docstring(node):
                         undocumented.append(f"{file_path}:{node.lineno}:{node.name}")
@@ -2451,15 +2564,15 @@ class QualityGate:
 
     def _is_code_file(self, file_path: Path) -> bool:
         """Check if file is a code file."""
-        return file_path.suffix in ['.py']
+        return file_path.suffix in [".py"]
 
     def _is_test_file(self, file_path: Path) -> bool:
         """Check if file is a test file."""
-        return 'test' in file_path.name and file_path.suffix == '.py'
+        return "test" in file_path.name and file_path.suffix == ".py"
 
     def _is_doc_file(self, file_path: Path) -> bool:
         """Check if file is a documentation file."""
-        return file_path.suffix in ['.md', '.rst', '.txt']
+        return file_path.suffix in [".md", ".rst", ".txt"]
 ```
 
 #### 2. Automated Code Review
@@ -2496,7 +2609,7 @@ class AutomatedCodeReview:
 
         try:
             # Read file content
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Apply review rules
@@ -2506,7 +2619,9 @@ class AutomatedCodeReview:
             result.quality_score = self._calculate_file_score(result.issues)
 
             # Generate suggestions
-            result.suggestions = self._generate_file_suggestions(result.issues, file_path)
+            result.suggestions = self._generate_file_suggestions(
+                result.issues, file_path
+            )
 
         except Exception as e:
             result.issues = [f"File review failed: {e}"]
@@ -2521,18 +2636,24 @@ class AutomatedCodeReview:
 
         # Complexity checks
         complexity = self._calculate_cyclomatic_complexity(content)
-        if complexity > self.rules.get('max_complexity', 10):
-            issues.append(f"High cyclomatic complexity: {complexity} (max: {self.rules['max_complexity']})")
+        if complexity > self.rules.get("max_complexity", 10):
+            issues.append(
+                f"High cyclomatic complexity: {complexity} (max: {self.rules['max_complexity']})"
+            )
 
         # Line length checks
-        lines = content.split('\n')
-        long_lines = [i for i, line in enumerate(lines, 1) if len(line) > self.rules.get('max_line_length', 120)]
+        lines = content.split("\n")
+        long_lines = [
+            i
+            for i, line in enumerate(lines, 1)
+            if len(line) > self.rules.get("max_line_length", 120)
+        ]
         if long_lines:
             issues.append(f"Long lines found at: {', '.join(map(str, long_lines[:5]))}")
 
         # TODO comment checks
-        todo_count = content.upper().count('TODO') + content.upper().count('FIXME')
-        if todo_count > self.rules.get('max_todos', 3):
+        todo_count = content.upper().count("TODO") + content.upper().count("FIXME")
+        if todo_count > self.rules.get("max_todos", 3):
             issues.append(f"Too many TODO comments: {todo_count}")
 
         # Import organization
@@ -2551,8 +2672,8 @@ class AutomatedCodeReview:
         complexity = 1  # Base complexity
 
         # Count decision points
-        decision_keywords = ['if', 'elif', 'for', 'while', 'except', 'with', 'assert']
-        lines = content.split('\n')
+        decision_keywords = ["if", "elif", "for", "while", "except", "with", "assert"]
+        lines = content.split("\n")
 
         for line in lines:
             stripped = line.strip()
@@ -2565,7 +2686,7 @@ class AutomatedCodeReview:
         """Check import organization and style."""
 
         issues = []
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         # Find import sections
         stdlib_imports = []
@@ -2576,11 +2697,13 @@ class AutomatedCodeReview:
         for line in lines:
             stripped = line.strip()
 
-            if stripped.startswith('import ') or stripped.startswith('from '):
+            if stripped.startswith("import ") or stripped.startswith("from "):
                 in_imports = True
-                if '.' not in stripped.split()[1] or stripped.split()[1].startswith('flext'):
+                if "." not in stripped.split()[1] or stripped.split()[1].startswith(
+                    "flext"
+                ):
                     local_imports.append(stripped)
-                elif any(lib in stripped for lib in ['os', 'sys', 'json', 'datetime']):
+                elif any(lib in stripped for lib in ["os", "sys", "json", "datetime"]):
                     stdlib_imports.append(stripped)
                 else:
                     third_party_imports.append(stripped)
@@ -2589,7 +2712,9 @@ class AutomatedCodeReview:
                 if stdlib_imports and third_party_imports and not local_imports:
                     pass  # Proper grouping
                 elif len(stdlib_imports) > 5 and not third_party_imports:
-                    issues.append("Consider grouping imports: stdlib, third-party, local")
+                    issues.append(
+                        "Consider grouping imports: stdlib, third-party, local"
+                    )
                 break
 
         return issues
@@ -2604,7 +2729,7 @@ class AutomatedCodeReview:
             r'password\s*=\s*["\'][^"\']+["\']',
             r'secret\s*=\s*["\'][^"\']+["\']',
             r'api_key\s*=\s*["\'][^"\']+["\']',
-            r'token\s*=\s*["\'][^"\']+["\']'
+            r'token\s*=\s*["\'][^"\']+["\']',
         ]
 
         for pattern in secret_patterns:
@@ -2612,11 +2737,11 @@ class AutomatedCodeReview:
                 issues.append("Potential hardcoded secret detected")
 
         # Check for SQL injection vulnerabilities
-        if 'execute(' in content and ('%' in content or '+' in content):
+        if "execute(" in content and ("%" in content or "+" in content):
             issues.append("Potential SQL injection vulnerability")
 
         # Check for unsafe eval usage
-        if 'eval(' in content or 'exec(' in content:
+        if "eval(" in content or "exec(" in content:
             issues.append("Use of eval/exec detected - security risk")
 
         return issues
@@ -2628,34 +2753,38 @@ class AutomatedCodeReview:
 
         # Deduct points for issues
         for issue in issues:
-            if 'complexity' in issue.lower():
+            if "complexity" in issue.lower():
                 base_score -= 20
-            elif 'security' in issue.lower():
+            elif "security" in issue.lower():
                 base_score -= 30
-            elif 'line' in issue.lower():
+            elif "line" in issue.lower():
                 base_score -= 5
-            elif 'todo' in issue.lower():
+            elif "todo" in issue.lower():
                 base_score -= 10
             else:
                 base_score -= 5
 
         return max(0, base_score)
 
-    def _generate_file_suggestions(self, issues: t.StringList, file_path: str) -> t.StringList:
+    def _generate_file_suggestions(
+        self, issues: t.StringList, file_path: str
+    ) -> t.StringList:
         """Generate improvement suggestions for a file."""
 
         suggestions = []
 
         for issue in issues:
-            if 'complexity' in issue:
-                suggestions.append("Consider breaking down complex functions into smaller ones")
-            elif 'security' in issue:
+            if "complexity" in issue:
+                suggestions.append(
+                    "Consider breaking down complex functions into smaller ones"
+                )
+            elif "security" in issue:
                 suggestions.append("Review and remove hardcoded secrets")
-            elif 'line' in issue:
+            elif "line" in issue:
                 suggestions.append("Break long lines for better readability")
-            elif 'todo' in issue:
+            elif "todo" in issue:
                 suggestions.append("Address outstanding TODO items")
-            elif 'import' in issue:
+            elif "import" in issue:
                 suggestions.append("Organize imports: stdlib, third-party, local")
 
         return suggestions
@@ -2669,7 +2798,9 @@ class AutomatedCodeReview:
         total_score = sum(review.quality_score for review in file_reviews)
         return total_score / len(file_reviews)
 
-    def _generate_recommendations(self, file_reviews: List[FileReviewResult]) -> t.StringList:
+    def _generate_recommendations(
+        self, file_reviews: List[FileReviewResult]
+    ) -> t.StringList:
         """Generate overall recommendations for the PR."""
 
         recommendations = []
@@ -2677,29 +2808,40 @@ class AutomatedCodeReview:
         # Analyze issue patterns
         all_issues = [issue for review in file_reviews for issue in review.issues]
 
-        if any('security' in issue.lower() for issue in all_issues):
+        if any("security" in issue.lower() for issue in all_issues):
             recommendations.append("Address security issues before merging")
 
-        if any('complexity' in issue.lower() for issue in all_issues):
+        if any("complexity" in issue.lower() for issue in all_issues):
             recommendations.append("Consider refactoring complex functions")
 
-        complexity_issues = sum(1 for issue in all_issues if 'complexity' in issue.lower())
+        complexity_issues = sum(
+            1 for issue in all_issues if "complexity" in issue.lower()
+        )
         if complexity_issues > len(file_reviews) / 2:
-            recommendations.append("Overall code complexity is high - consider architectural improvements")
+            recommendations.append(
+                "Overall code complexity is high - consider architectural improvements"
+            )
 
         if not recommendations:
-            recommendations.append("Code quality is acceptable - proceed with manual review")
+            recommendations.append(
+                "Code quality is acceptable - proceed with manual review"
+            )
 
         return recommendations
 
-    def _identify_blocking_issues(self, file_reviews: List[FileReviewResult]) -> t.StringList:
+    def _identify_blocking_issues(
+        self, file_reviews: List[FileReviewResult]
+    ) -> t.StringList:
         """Identify issues that should block the PR."""
 
         blocking = []
 
         for review in file_reviews:
             for issue in review.issues:
-                if any(keyword in issue.lower() for keyword in ['security', 'hardcoded', 'vulnerability']):
+                if any(
+                    keyword in issue.lower()
+                    for keyword in ["security", "hardcoded", "vulnerability"]
+                ):
                     blocking.append(f"{review.file_path}: {issue}")
 
         return blocking
@@ -2814,8 +2956,9 @@ end note
 class APIResponse:
     """Consistent API response format."""
 
-    def __init__(self, data: object = None, error: str = None,
-                 metadata: Dict[str, object] = None):
+    def __init__(
+        self, data: object = None, error: str = None, metadata: Dict[str, object] = None
+    ):
         self.success = error is None
         self.data = data
         self.error = error
@@ -2827,22 +2970,22 @@ class APIResponse:
         """Convert response to dictionary format."""
 
         response = {
-            'success': self.success,
-            'timestamp': self.timestamp,
-            'request_id': self.request_id
+            "success": self.success,
+            "timestamp": self.timestamp,
+            "request_id": self.request_id,
         }
 
         if self.success:
-            response['data'] = self.data
+            response["data"] = self.data
         else:
-            response['error'] = {
-                'message': self.error,
-                'code': self._get_error_code(self.error),
-                'suggestions': self._get_error_suggestions(self.error)
+            response["error"] = {
+                "message": self.error,
+                "code": self._get_error_code(self.error),
+                "suggestions": self._get_error_suggestions(self.error),
             }
 
         if self.metadata:
-            response['metadata'] = self.metadata
+            response["metadata"] = self.metadata
 
         return response
 
@@ -2854,37 +2997,37 @@ class APIResponse:
         """Map error message to error code."""
 
         error_codes = {
-            'not_found': ['not found', 'does not exist'],
-            'unauthorized': ['unauthorized', 'not authorized'],
-            'validation_error': ['invalid', 'validation failed'],
-            'server_error': ['internal', 'unexpected error']
+            "not_found": ["not found", "does not exist"],
+            "unauthorized": ["unauthorized", "not authorized"],
+            "validation_error": ["invalid", "validation failed"],
+            "server_error": ["internal", "unexpected error"],
         }
 
         for code, patterns in error_codes.items():
             if any(pattern in error.lower() for pattern in patterns):
                 return code
 
-        return 'unknown_error'
+        return "unknown_error"
 
     def _get_error_suggestions(self, error: str) -> t.StringList:
         """Provide actionable suggestions for error resolution."""
 
         suggestions_map = {
-            'not_found': [
+            "not_found": [
                 "Check the resource identifier",
                 "Verify the resource exists",
-                "Check your permissions"
+                "Check your permissions",
             ],
-            'unauthorized': [
+            "unauthorized": [
                 "Verify your authentication credentials",
                 "Check your permissions for this resource",
-                "Contact your REDACTED_LDAP_BIND_PASSWORDistrator"
+                "Contact your REDACTED_LDAP_BIND_PASSWORDistrator",
             ],
-            'validation_error': [
+            "validation_error": [
                 "Review the API documentation",
                 "Check parameter formats",
-                "Validate required fields"
-            ]
+                "Validate required fields",
+            ],
         }
 
         error_code = self._get_error_code(error)
@@ -2897,8 +3040,12 @@ class APIResponse:
 class APIResource:
     """API resource with progressive disclosure."""
 
-    def __init__(self, resource_id: str, basic_fields: Dict[str, object],
-                 detailed_fields: Dict[str, object] = None):
+    def __init__(
+        self,
+        resource_id: str,
+        basic_fields: Dict[str, object],
+        detailed_fields: Dict[str, object] = None,
+    ):
         self.id = resource_id
         self.basic_fields = basic_fields
         self.detailed_fields = detailed_fields or {}
@@ -2906,33 +3053,33 @@ class APIResource:
     def to_basic_representation(self) -> Dict[str, object]:
         """Return basic resource representation."""
         return {
-            'id': self.id,
-            'type': self.__class__.__name__.lower(),
-            'links': self._get_basic_links(),
-            **self.basic_fields
+            "id": self.id,
+            "type": self.__class__.__name__.lower(),
+            "links": self._get_basic_links(),
+            **self.basic_fields,
         }
 
     def to_detailed_representation(self) -> Dict[str, object]:
         """Return detailed resource representation."""
         return {
             **self.to_basic_representation(),
-            'links': self._get_detailed_links(),
-            **self.detailed_fields
+            "links": self._get_detailed_links(),
+            **self.detailed_fields,
         }
 
     def to_minimal_representation(self) -> Dict[str, object]:
         """Return minimal resource representation for lists."""
         return {
-            'id': self.id,
-            'type': self.__class__.__name__.lower(),
-            'url': f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
+            "id": self.id,
+            "type": self.__class__.__name__.lower(),
+            "url": f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}",
         }
 
     def _get_basic_links(self) -> Dict[str, str]:
         """Get basic HATEOAS links."""
         return {
-            'self': f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}",
-            'collection': f"/api/v1/{self.__class__.__name__.lower()}s"
+            "self": f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}",
+            "collection": f"/api/v1/{self.__class__.__name__.lower()}s",
         }
 
     def _get_detailed_links(self) -> Dict[str, str]:
@@ -2940,15 +3087,15 @@ class APIResource:
         links = self._get_basic_links()
 
         # Add related resource links
-        if hasattr(self, 'pipeline_id'):
-            links['pipeline'] = f"/api/v1/pipelines/{self.pipeline_id}"
+        if hasattr(self, "pipeline_id"):
+            links["pipeline"] = f"/api/v1/pipelines/{self.pipeline_id}"
 
-        if hasattr(self, 'user_id'):
-            links['user'] = f"/api/v1/users/{self.user_id}"
+        if hasattr(self, "user_id"):
+            links["user"] = f"/api/v1/users/{self.user_id}"
 
         # Add action links
-        links['update'] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
-        links['delete'] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
+        links["update"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
+        links["delete"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
 
         return links
 ```
@@ -2962,21 +3109,22 @@ class APIHelpSystem:
     def __init__(self):
         self.help_content = self._load_help_content()
 
-    def get_contextual_help(self, endpoint: str, method: str,
-                          error_code: str = None) -> Dict[str, object]:
+    def get_contextual_help(
+        self, endpoint: str, method: str, error_code: str = None
+    ) -> Dict[str, object]:
         """Get contextual help for API endpoint."""
 
         help_info = {
-            'endpoint': endpoint,
-            'method': method,
-            'description': self._get_endpoint_description(endpoint, method),
-            'parameters': self._get_parameter_help(endpoint, method),
-            'examples': self._get_usage_examples(endpoint, method),
-            'troubleshooting': self._get_troubleshooting_tips(endpoint, method)
+            "endpoint": endpoint,
+            "method": method,
+            "description": self._get_endpoint_description(endpoint, method),
+            "parameters": self._get_parameter_help(endpoint, method),
+            "examples": self._get_usage_examples(endpoint, method),
+            "troubleshooting": self._get_troubleshooting_tips(endpoint, method),
         }
 
         if error_code:
-            help_info['error_help'] = self._get_error_help(error_code)
+            help_info["error_help"] = self._get_error_help(error_code)
 
         return help_info
 
@@ -2984,11 +3132,11 @@ class APIHelpSystem:
         """Get human-readable endpoint description."""
 
         descriptions = {
-            'GET /api/v1/pipelines': "Retrieve a list of data pipelines",
-            'POST /api/v1/pipelines': "Create a new data pipeline",
-            'GET /api/v1/pipelines/{id}': "Get details of a specific pipeline",
-            'PUT /api/v1/pipelines/{id}': "Update an existing pipeline",
-            'DELETE /api/v1/pipelines/{id}': "Delete a pipeline"
+            "GET /api/v1/pipelines": "Retrieve a list of data pipelines",
+            "POST /api/v1/pipelines": "Create a new data pipeline",
+            "GET /api/v1/pipelines/{id}": "Get details of a specific pipeline",
+            "PUT /api/v1/pipelines/{id}": "Update an existing pipeline",
+            "DELETE /api/v1/pipelines/{id}": "Delete a pipeline",
         }
 
         key = f"{method} {endpoint}"
@@ -2997,67 +3145,69 @@ class APIHelpSystem:
     def _get_parameter_help(self, endpoint: str, method: str) -> Dict[str, object]:
         """Get parameter documentation."""
 
-        if 'pipelines' in endpoint:
+        if "pipelines" in endpoint:
             return {
-                'name': {
-                    'type': 'string',
-                    'required': True,
-                    'description': 'Unique pipeline name',
-                    'example': 'customer-data-sync'
+                "name": {
+                    "type": "string",
+                    "required": True,
+                    "description": "Unique pipeline name",
+                    "example": "customer-data-sync",
                 },
-                'tap': {
-                    'type': 'object',
-                    'required': True,
-                    'description': 'Source connector configuration',
-                    'properties': {
-                        'name': 'tap-postgres',
-                        'config': {'host': 'localhost', 'database': 'mydb'}
-                    }
+                "tap": {
+                    "type": "object",
+                    "required": True,
+                    "description": "Source connector configuration",
+                    "properties": {
+                        "name": "tap-postgres",
+                        "config": {"host": "localhost", "database": "mydb"},
+                    },
                 },
-                'target': {
-                    'type': 'object',
-                    'required': True,
-                    'description': 'Destination connector configuration'
-                }
+                "target": {
+                    "type": "object",
+                    "required": True,
+                    "description": "Destination connector configuration",
+                },
             }
 
         return {}
 
-    def _get_usage_examples(self, endpoint: str, method: str) -> List[Dict[str, object]]:
+    def _get_usage_examples(
+        self, endpoint: str, method: str
+    ) -> List[Dict[str, object]]:
         """Get usage examples for the endpoint."""
 
         examples = []
 
-        if endpoint == '/api/v1/pipelines' and method == 'POST':
+        if endpoint == "/api/v1/pipelines" and method == "POST":
             examples.append({
-                'title': 'Create a PostgreSQL to Snowflake pipeline',
-                'description': 'Basic pipeline creation example',
-                'request': {
-                    'name': 'postgres-to-snowflake',
-                    'tap': {
-                        'name': 'tap-postgres',
-                        'config': {
-                            'host': 'postgres.example.com',
-                            'database': 'analytics',
-                            'user': 'pipeline_user',
-                            'password': 'secure_password'
-                        }
+                "title": "Create a PostgreSQL to Snowflake pipeline",
+                "description": "Basic pipeline creation example",
+                "request": {
+                    "name": "postgres-to-snowflake",
+                    "tap": {
+                        "name": "tap-postgres",
+                        "config": {
+                            "host": "postgres.example.com",
+                            "database": "analytics",
+                            "user": "pipeline_user",
+                            "password": "secure_password",
+                        },
                     },
-                    'target': {
-                        'name': 'target-snowflake',
-                        'config': {
-                            'account': 'company.snowflakecomputing.com',
-                            'warehouse': 'ANALYTICS_WH',
-                            'database': 'ANALYTICS_DB'
-                        }
-                    }
+                    "target": {
+                        "name": "target-snowflake",
+                        "config": {
+                            "account": "company.snowflakecomputing.com",
+                            "warehouse": "ANALYTICS_WH",
+                            "database": "ANALYTICS_DB",
+                        },
+                    },
                 },
-                'response': {
-                    'id': 'pipeline-123',
-                    'name': 'postgres-to-snowflake',
-                    'status': 'created',
-                    'created_at': '2025-10-10T10:00:00Z'
-                }
+                "response": {
+                    "id": "pipeline-123",
+                    "name": "postgres-to-snowflake",
+                    "status": "created",
+                    "created_at": "2025-10-10T10:00:00Z",
+                },
             })
 
         return examples
@@ -3069,15 +3219,15 @@ class APIHelpSystem:
             "Verify your authentication credentials",
             "Check that required parameters are provided",
             "Ensure configuration values are valid",
-            "Review the API documentation for correct usage"
+            "Review the API documentation for correct usage",
         ]
 
-        if 'pipelines' in endpoint:
+        if "pipelines" in endpoint:
             tips.extend([
                 "Verify tap and target configurations are correct",
                 "Ensure database connections are accessible",
                 "Check that required permissions are granted",
-                "Validate JSON schema compliance"
+                "Validate JSON schema compliance",
             ])
 
         return tips
@@ -3086,52 +3236,55 @@ class APIHelpSystem:
         """Get detailed help for specific error codes."""
 
         error_help = {
-            'VALIDATION_ERROR': {
-                'description': 'Request data failed validation',
-                'causes': [
-                    'Missing required fields',
-                    'Invalid data types',
-                    'Value out of acceptable range'
+            "VALIDATION_ERROR": {
+                "description": "Request data failed validation",
+                "causes": [
+                    "Missing required fields",
+                    "Invalid data types",
+                    "Value out of acceptable range",
                 ],
-                'solutions': [
-                    'Review API documentation for required fields',
-                    'Validate data types and formats',
-                    'Check field constraints and limits'
-                ]
+                "solutions": [
+                    "Review API documentation for required fields",
+                    "Validate data types and formats",
+                    "Check field constraints and limits",
+                ],
             },
-            'AUTHENTICATION_FAILED': {
-                'description': 'Authentication credentials are invalid',
-                'causes': [
-                    'Expired or invalid token',
-                    'Incorrect API key',
-                    'Insufficient permissions'
+            "AUTHENTICATION_FAILED": {
+                "description": "Authentication credentials are invalid",
+                "causes": [
+                    "Expired or invalid token",
+                    "Incorrect API key",
+                    "Insufficient permissions",
                 ],
-                'solutions': [
-                    'Refresh authentication tokens',
-                    'Verify API key configuration',
-                    'Contact REDACTED_LDAP_BIND_PASSWORDistrator for permissions'
-                ]
+                "solutions": [
+                    "Refresh authentication tokens",
+                    "Verify API key configuration",
+                    "Contact REDACTED_LDAP_BIND_PASSWORDistrator for permissions",
+                ],
             },
-            'RESOURCE_NOT_FOUND': {
-                'description': 'Requested resource does not exist',
-                'causes': [
-                    'Incorrect resource identifier',
-                    'Resource was deleted',
-                    'Typographical error in URL'
+            "RESOURCE_NOT_FOUND": {
+                "description": "Requested resource does not exist",
+                "causes": [
+                    "Incorrect resource identifier",
+                    "Resource was deleted",
+                    "Typographical error in URL",
                 ],
-                'solutions': [
-                    'Verify resource identifier',
-                    'Check resource list for correct ID',
-                    'Review API documentation for URL format'
-                ]
-            }
+                "solutions": [
+                    "Verify resource identifier",
+                    "Check resource list for correct ID",
+                    "Review API documentation for URL format",
+                ],
+            },
         }
 
-        return error_help.get(error_code, {
-            'description': 'Unknown error occurred',
-            'causes': ['Unexpected system behavior'],
-            'solutions': ['Contact support with error details']
-        })
+        return error_help.get(
+            error_code,
+            {
+                "description": "Unknown error occurred",
+                "causes": ["Unexpected system behavior"],
+                "solutions": ["Contact support with error details"],
+            },
+        )
 ```
 
 ______________________________________________________________________
@@ -3233,9 +3386,12 @@ end note
 class TestableService:
     """Service designed for testability with dependency injection."""
 
-    def __init__(self, repository: Repository = None,
-                 validator: Validator = None,
-                 notifier: Notifier = None):
+    def __init__(
+        self,
+        repository: Repository = None,
+        validator: Validator = None,
+        notifier: Notifier = None,
+    ):
         self.repository = repository or DefaultRepository()
         self.validator = validator or DefaultValidator()
         self.notifier = notifier or DefaultNotifier()
@@ -3277,29 +3433,32 @@ class TestDataBuilder:
     def __init__(self):
         self.data = {}
 
-    def with_name(self, name: str) -> 'TestDataBuilder':
-        self.data['name'] = name
+    def with_name(self, name: str) -> "TestDataBuilder":
+        self.data["name"] = name
         return self
 
-    def with_config(self, config: Dict[str, object]) -> 'TestDataBuilder':
-        self.data['config'] = config
+    def with_config(self, config: Dict[str, object]) -> "TestDataBuilder":
+        self.data["config"] = config
         return self
 
-    def with_tags(self, *tags: str) -> 'TestDataBuilder':
-        self.data['tags'] = list(tags)
+    def with_tags(self, *tags: str) -> "TestDataBuilder":
+        self.data["tags"] = list(tags)
         return self
 
     def build(self) -> TestEntity:
         """Build the test entity."""
         return TestEntity(**self.data)
 
+
 # Usage in tests
 def test_entity_processing():
-    entity = (TestDataBuilder()
-             .with_name("test-entity")
-             .with_config({"key": "value"})
-             .with_tags("important", "test")
-             .build())
+    entity = (
+        TestDataBuilder()
+        .with_name("test-entity")
+        .with_config({"key": "value"})
+        .with_tags("important", "test")
+        .build()
+    )
 
     result = service.process_entity(entity)
 
@@ -3319,12 +3478,14 @@ def test_database():
     # Teardown
     db.cleanup()
 
+
 @pytest.fixture
 def mock_external_service():
     """Mock external service for testing."""
-    with patch('external_service.Client') as mock_client:
-        mock_client.return_value.get_data.return_value = {'status': 'success'}
+    with patch("external_service.Client") as mock_client:
+        mock_client.return_value.get_data.return_value = {"status": "success"}
         yield mock_client
+
 
 @pytest.fixture
 def authenticated_user():
@@ -3333,6 +3494,7 @@ def authenticated_user():
     # Set up authentication context
     with authenticated_context(user):
         yield user
+
 
 class TestContext:
     """Test context manager for complex setup."""
@@ -3350,14 +3512,10 @@ class TestContext:
         self.cleanup_funcs = [
             lambda: self.db.cleanup(),
             lambda: cleanup_test_user(self.user),
-            lambda: cleanup_test_pipeline(self.pipeline)
+            lambda: cleanup_test_pipeline(self.pipeline),
         ]
 
-        return {
-            'db': self.db,
-            'user': self.user,
-            'pipeline': self.pipeline
-        }
+        return {"db": self.db, "user": self.user, "pipeline": self.pipeline}
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Cleanup in reverse order
@@ -3367,12 +3525,13 @@ class TestContext:
             except Exception as e:
                 print(f"Cleanup failed: {e}")
 
+
 # Usage
 def test_complex_pipeline_operation():
     with TestContext() as context:
-        service = PipelineService(context['db'])
+        service = PipelineService(context["db"])
 
-        result = service.execute_pipeline(context['pipeline'])
+        result = service.execute_pipeline(context["pipeline"])
 
         assert result.is_success
         # Context automatically cleaned up
@@ -3383,15 +3542,15 @@ def test_complex_pipeline_operation():
 ```python
 from hypothesis import given, strategies as st
 
+
 class PropertyBasedTests:
     """Property-based tests for robust validation."""
 
     @given(
         name=st.text(min_size=1, max_size=100),
         config=st.dictionaries(
-            keys=st.text(),
-            values=st.one_of(st.text(), st.integers(), st.booleans())
-        )
+            keys=st.text(), values=st.one_of(st.text(), st.integers(), st.booleans())
+        ),
     )
     def test_pipeline_creation_properties(self, name: str, config: Dict[str, object]):
         """Property-based test for pipeline creation."""
@@ -3416,10 +3575,10 @@ class PropertyBasedTests:
             st.builds(
                 DataRecord,
                 id=st.integers(min_value=1),
-                data=st.dictionaries(keys=st.text(), values=st.text())
+                data=st.dictionaries(keys=st.text(), values=st.text()),
             ),
             min_size=0,
-            max_size=1000
+            max_size=1000,
         )
     )
     def test_data_processing_idempotent(self, records: List[DataRecord]):
@@ -3435,10 +3594,7 @@ class PropertyBasedTests:
         # Then results should be identical
         assert result1 == result2
 
-    @given(
-        st.datetimes(),
-        st.datetimes()
-    )
+    @given(st.datetimes(), st.datetimes())
     def test_time_range_validation(self, start_time: datetime, end_time: datetime):
         """Test time range validation properties."""
 
@@ -3456,30 +3612,33 @@ class PropertyBasedTests:
 ```python
 from pact import Consumer, Provider
 
+
 class ContractTests:
     """Contract tests for API compatibility."""
 
     def test_pipeline_api_contract(self):
         # Define consumer expectations
-        consumer = Consumer('FLEXT-Meltano').has_pact_with(Provider('PipelineAPI'))
+        consumer = Consumer("FLEXT-Meltano").has_pact_with(Provider("PipelineAPI"))
 
         # Define expected interactions
-        (consumer
-         .given('pipeline exists')
-         .upon_receiving('a request for pipeline details')
-         .with_request('GET', '/api/v1/pipelines/123')
-         .will_respond_with(200)
-         .with_body({
-             'id': '123',
-             'name': 'test-pipeline',
-             'status': 'active',
-             'created_at': '2025-01-01T00:00:00Z'
-         }))
+        (
+            consumer
+            .given("pipeline exists")
+            .upon_receiving("a request for pipeline details")
+            .with_request("GET", "/api/v1/pipelines/123")
+            .will_respond_with(200)
+            .with_body({
+                "id": "123",
+                "name": "test-pipeline",
+                "status": "active",
+                "created_at": "2025-01-01T00:00:00Z",
+            })
+        )
 
         # Run the test
         with consumer:
             # Make actual API call
-            response = requests.get('http://localhost:8000/api/v1/pipelines/123')
+            response = requests.get("http://localhost:8000/api/v1/pipelines/123")
             assert response.status_code == 200
 
     def test_data_transformation_contract(self):
@@ -3488,43 +3647,43 @@ class ContractTests:
         # Define transformation contract
         contract = DataTransformationContract(
             input_schema={
-                'type': 'object',
-                'properties': {
-                    'id': {'type': 'integer'},
-                    'name': {'type': 'string'},
-                    'email': {'type': 'string', 'format': 'email'}
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "string"},
+                    "email": {"type": "string", "format": "email"},
                 },
-                'required': ['id', 'name']
+                "required": ["id", "name"],
             },
             output_schema={
-                'type': 'object',
-                'properties': {
-                    'user_id': {'type': 'integer'},
-                    'full_name': {'type': 'string'},
-                    'contact_email': {'type': 'string', 'format': 'email'},
-                    'processed_at': {'type': 'string', 'format': 'date-time'}
+                "type": "object",
+                "properties": {
+                    "user_id": {"type": "integer"},
+                    "full_name": {"type": "string"},
+                    "contact_email": {"type": "string", "format": "email"},
+                    "processed_at": {"type": "string", "format": "date-time"},
                 },
-                'required': ['user_id', 'full_name']
+                "required": ["user_id", "full_name"],
             },
             transformation_rules=[
-                'id -> user_id',
-                'name -> full_name',
-                'email -> contact_email',
-                'add processed_at timestamp'
-            ]
+                "id -> user_id",
+                "name -> full_name",
+                "email -> contact_email",
+                "add processed_at timestamp",
+            ],
         )
 
         # Test contract compliance
         transformer = DataTransformer(contract)
 
-        test_input = {'id': 123, 'name': 'John Doe', 'email': 'john@example.com'}
+        test_input = {"id": 123, "name": "John Doe", "email": "john@example.com"}
         result = transformer.transform(test_input)
 
         # Verify output matches contract
-        assert result['user_id'] == 123
-        assert result['full_name'] == 'John Doe'
-        assert result['contact_email'] == 'john@example.com'
-        assert 'processed_at' in result
+        assert result["user_id"] == 123
+        assert result["full_name"] == "John Doe"
+        assert result["contact_email"] == "john@example.com"
+        assert "processed_at" in result
 
         # Verify schema compliance
         validate(result, contract.output_schema)
@@ -3613,44 +3772,54 @@ class TestDataManager:
         self.base_path = base_path
         self.data_cache = {}
 
-    def get_test_data(self, dataset_name: str, scenario: str = 'default') -> Dict[str, object]:
+    def get_test_data(
+        self, dataset_name: str, scenario: str = "default"
+    ) -> Dict[str, object]:
         """Get test data for specific dataset and scenario."""
 
         cache_key = f"{dataset_name}:{scenario}"
 
         if cache_key not in self.data_cache:
-            data_file = self.base_path / 'fixtures' / dataset_name / f"{scenario}.json"
+            data_file = self.base_path / "fixtures" / dataset_name / f"{scenario}.json"
 
             if data_file.exists():
-                with open(data_file, 'r') as f:
+                with open(data_file, "r") as f:
                     self.data_cache[cache_key] = json.load(f)
             else:
                 raise FileNotFoundError(f"Test data not found: {data_file}")
 
         return self.data_cache[cache_key]
 
-    def create_dynamic_test_data(self, template: str, overrides: Dict[str, object] = None) -> Dict[str, object]:
+    def create_dynamic_test_data(
+        self, template: str, overrides: Dict[str, object] = None
+    ) -> Dict[str, object]:
         """Create dynamic test data from templates."""
 
-        template_data = self.get_test_data('templates', template)
+        template_data = self.get_test_data("templates", template)
         overrides = overrides or {}
 
         # Deep merge overrides
         result = self._deep_merge(template_data, overrides)
 
         # Add dynamic values
-        result['id'] = str(uuid.uuid4())
-        result['created_at'] = datetime.utcnow().isoformat()
-        result['test_run_id'] = os.environ.get('PYTEST_CURRENT_TEST')
+        result["id"] = str(uuid.uuid4())
+        result["created_at"] = datetime.utcnow().isoformat()
+        result["test_run_id"] = os.environ.get("PYTEST_CURRENT_TEST")
 
         return result
 
-    def _deep_merge(self, base: Dict[str, object], override: Dict[str, object]) -> Dict[str, object]:
+    def _deep_merge(
+        self, base: Dict[str, object], override: Dict[str, object]
+    ) -> Dict[str, object]:
         """Deep merge dictionaries."""
         result = base.copy()
 
         for key, value in override.items():
-            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            if (
+                key in result
+                and isinstance(result[key], dict)
+                and isinstance(value, dict)
+            ):
                 result[key] = self._deep_merge(result[key], value)
             else:
                 result[key] = value
@@ -3694,22 +3863,25 @@ class TestResultAnalyzer:
         for test_result in results.test_cases:
             module = test_result.module
             if module not in module_coverage:
-                module_coverage[module] = {'covered': 0, 'total': 0}
+                module_coverage[module] = {"covered": 0, "total": 0}
 
             # Aggregate coverage data
-            module_coverage[module]['covered'] += test_result.lines_covered
-            module_coverage[module]['total'] += test_result.lines_total
+            module_coverage[module]["covered"] += test_result.lines_covered
+            module_coverage[module]["total"] += test_result.lines_total
 
         # Calculate coverage percentages
         coverage_percentages = {}
         for module, coverage in module_coverage.items():
-            if coverage['total'] > 0:
-                coverage_percentages[module] = (coverage['covered'] / coverage['total']) * 100
+            if coverage["total"] > 0:
+                coverage_percentages[module] = (
+                    coverage["covered"] / coverage["total"]
+                ) * 100
 
         return CoverageTrends(
-            overall_coverage=sum(coverage_percentages.values()) / len(coverage_percentages),
+            overall_coverage=sum(coverage_percentages.values())
+            / len(coverage_percentages),
             module_coverage=coverage_percentages,
-            uncovered_lines=self._identify_uncovered_lines(results)
+            uncovered_lines=self._identify_uncovered_lines(results),
         )
 
     def _analyze_failure_patterns(self, results: TestResults) -> FailurePatterns:
@@ -3738,7 +3910,8 @@ class TestResultAnalyzer:
 
         # Identify slow tests
         slow_tests = [
-            test.name for test in results.test_cases
+            test.name
+            for test in results.test_cases
             if test.execution_time > results.slow_test_threshold
         ]
         failure_patterns.slow_tests = slow_tests
@@ -3753,7 +3926,8 @@ class TestResultAnalyzer:
         # Coverage recommendations
         if analysis.coverage_trends.overall_coverage < 95:
             low_coverage_modules = [
-                module for module, coverage in analysis.coverage_trends.module_coverage.items()
+                module
+                for module, coverage in analysis.coverage_trends.module_coverage.items()
                 if coverage < 90
             ]
             if low_coverage_modules:
@@ -3769,11 +3943,15 @@ class TestResultAnalyzer:
 
         # Performance recommendations
         if analysis.performance_trends.average_test_time > 1.0:  # seconds
-            recommendations.append("Consider optimizing slow tests or running them separately")
+            recommendations.append(
+                "Consider optimizing slow tests or running them separately"
+            )
 
         # Reliability recommendations
         if analysis.reliability_metrics.test_flakiness_rate > 0.05:
-            recommendations.append("High test flakiness detected - investigate test stability")
+            recommendations.append(
+                "High test flakiness detected - investigate test stability"
+            )
 
         return recommendations
 ```

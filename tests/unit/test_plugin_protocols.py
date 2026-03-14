@@ -13,10 +13,8 @@ from __future__ import annotations
 import unittest
 from unittest import TestCase
 
-from flext_core import t
-
-import flext_meltano.plugin_protocols as protocols_module
-from flext_meltano.plugin_protocols import FlextMeltanoPluginProtocols
+import flext_meltano.singer.protocols as protocols_module
+from flext_meltano.singer.protocols import FlextMeltanoPluginProtocols
 
 
 class TestFlextMeltanoPluginProtocolsUnified(TestCase):
@@ -29,12 +27,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
 
     def test_unified_class_has_core_plugin_types(self) -> None:
         """Test FlextMeltanoPluginProtocols has core plugin type definitions."""
-        expected_core_types = [
-            "TapPlugin",
-            "TargetPlugin",
-            "DbtPlugin",
-        ]
-
+        expected_core_types = ["TapPlugin", "TargetPlugin", "DbtPlugin"]
         for plugin_type in expected_core_types:
             assert hasattr(FlextMeltanoPluginProtocols, plugin_type), (
                 f"FlextMeltanoPluginProtocols missing core type: {plugin_type}"
@@ -43,11 +36,10 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
     def test_unified_class_has_service_protocols(self) -> None:
         """Test FlextMeltanoPluginProtocols has service protocol definitions."""
         expected_service_protocols = [
-            "TapServiceProtocol",
-            "TargetServiceProtocol",
-            "DbtServiceProtocol",
+            "TapService",
+            "TargetService",
+            "DbtService",
         ]
-
         for service_protocol in expected_service_protocols:
             assert hasattr(FlextMeltanoPluginProtocols, service_protocol), (
                 f"FlextMeltanoPluginProtocols missing service protocol: {service_protocol}"
@@ -57,43 +49,34 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         """Test TapPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TapPlugin
         assert protocol is not None
-        assert protocol == t.JsonValue  # Placeholder implementation
 
     def test_target_plugin_protocol_definition(self) -> None:
         """Test TargetPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TargetPlugin
         assert protocol is not None
-        # TargetPlugin is a type alias for JsonObject, not object itself
-        assert protocol == t.JsonValue  # Placeholder implementation
 
     def test_dbt_plugin_protocol_definition(self) -> None:
         """Test DbtPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.DbtPlugin
         assert protocol is not None
-        assert protocol == t.JsonValue  # Placeholder implementation
 
     def test_tap_service_protocol_definition(self) -> None:
-        """Test TapServiceProtocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TapServiceProtocol
+        """Test TapService definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TapService
         assert protocol is not None
-        assert protocol == t.JsonValue  # Placeholder implementation
 
     def test_target_service_protocol_definition(self) -> None:
-        """Test TargetServiceProtocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TargetServiceProtocol
+        """Test TargetService definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.TargetService
         assert protocol is not None
-        # TargetServiceProtocol is a type alias for JsonObject, not object itself
-        assert protocol == t.JsonValue  # Placeholder implementation
 
     def test_dbt_service_protocol_definition(self) -> None:
-        """Test DbtServiceProtocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.DbtServiceProtocol
+        """Test DbtService definition is valid."""
+        protocol = FlextMeltanoPluginProtocols.DbtService
         assert protocol is not None
-        assert protocol == t.JsonValue  # Placeholder implementation
 
     def test_no_aliases_exist(self) -> None:
         """Test that NO aliases exist - direct API access only."""
-        # Verify the class does NOT have backward compatibility aliases
         no_alias_attributes = [
             "FlextMeltanoTapPlugin",
             "FlextTargetPlugin",
@@ -102,7 +85,6 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             "TargetService",
             "DbtService",
         ]
-
         for alias in no_alias_attributes:
             assert not hasattr(FlextMeltanoPluginProtocols, alias), (
                 f"VIOLATION: Found eliminated alias {alias} - should not exist"
@@ -112,43 +94,33 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         """Test unified class has proper structure."""
         assert hasattr(FlextMeltanoPluginProtocols, "__module__")
         assert (
-            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.plugin_protocols"
+            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.singer.protocols"
         )
 
     def test_direct_api_access_only(self) -> None:
         """Test that only direct API access works - NO module-level aliases."""
-        # Should be importable directly
         assert FlextMeltanoPluginProtocols is not None
-
-        # Should have expected unified structure
         assert hasattr(FlextMeltanoPluginProtocols, "__name__")
 
     def test_class_documentation_exists(self) -> None:
         """Test unified class has proper documentation."""
-        # Should have class docstring
         assert FlextMeltanoPluginProtocols.__doc__ is not None
-
-        # Should have module docstring
         assert protocols_module.__doc__ is not None
 
     def test_module_exports_only_unified_class(self) -> None:
         """Test module exports only the unified class - NO ALIASES."""
-        # Check __all__ exports only the unified class
         all_exports = getattr(protocols_module, "__all__", [])
         assert "FlextMeltanoPluginProtocols" in all_exports
-
-        # Should NOT export any aliases
         forbidden_exports = [
             "FlextMeltanoTapPlugin",
             "FlextTargetPlugin",
             "FlextDbtPlugin",
             "TapService",
             "TargetService",
-            "TapServiceProtocol",
-            "TargetServiceProtocol",
-            "DbtServiceProtocol",
+            "TapService",
+            "TargetService",
+            "DbtService",
         ]
-
         for forbidden in forbidden_exports:
             assert forbidden not in all_exports, (
                 f"VIOLATION: Found forbidden alias export: {forbidden}"

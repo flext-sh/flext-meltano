@@ -152,14 +152,14 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
 config = FlextMeltanoSettings()
-validation_result: FlextResult[bool] = config.validate_meltano_config()
+validation_result: r[bool] = config.validate_meltano_config()
 
 if validation_result.is_success:
     print("Meltano configuration is valid")
@@ -180,15 +180,7 @@ from flext_meltano import TapConfig, FlextMeltanoSettingsBuilders
 tap_config = TapConfig(
     name="tap-csv",
     executable="tap-csv",
-    settings={
-        "files": [
-            {
-                "entity": "users",
-                "path": "data/users.csv",
-                "keys": ["id"]
-            }
-        ]
-    }
+    settings={"files": [{"entity": "users", "path": "data/users.csv", "keys": ["id"]}]},
 )
 
 # Build pipeline configuration
@@ -203,7 +195,7 @@ from flext_meltano import FlextMeltanoSettingsBuilders
 
 target_settings = {
     "destination_path": "output/",
-    "file_naming_scheme": "{stream_name}.jsonl"
+    "file_naming_scheme": "{stream_name}.jsonl",
 }
 
 builder = FlextMeltanoSettingsBuilders()
@@ -223,14 +215,14 @@ stream = StreamDefinition(
         "properties": {
             "id": {"type": "integer"},
             "name": {"type": "string"},
-            "email": {"type": "string"}
-        }
+            "email": {"type": "string"},
+        },
     },
     metadata={
         "selected": True,
         "replication-method": "INCREMENTAL",
-        "replication-key": "updated_at"
-    }
+        "replication-key": "updated_at",
+    },
 )
 ```
 
@@ -311,14 +303,11 @@ builder = FlextMeltanoSettingsBuilders()
 # Tap configuration
 tap_config = {
     "name": "tap-csv",
-    "settings": {"files": [{"entity": "users", "path": "data/users.csv"}]}
+    "settings": {"files": [{"entity": "users", "path": "data/users.csv"}]},
 }
 
 # Target configuration
-target_config = {
-    "name": "target-jsonl",
-    "settings": {"destination_path": "output/"}
-}
+target_config = {"name": "target-jsonl", "settings": {"destination_path": "output/"}}
 
 # Build pipeline
 pipeline_config = builder.build_pipeline_config(tap_config, target_config)
@@ -339,7 +328,7 @@ validators = FlextMeltanoValidators()
 validation_result = validators.validate_pipeline_config({
     "tap": tap_config,
     "target": target_config,
-    "transform": dbt_config
+    "transform": dbt_config,
 })
 
 if validation_result.is_failure:
@@ -430,13 +419,7 @@ dbt_profiles = file_manager.read_dbt_profiles()
 ```python
 # Write Singer catalog
 catalog_data = {
-    "streams": [
-        {
-            "tap_stream_id": "users",
-            "schema": {...},
-            "metadata": [...]
-        }
-    ]
+    "streams": [{"tap_stream_id": "users", "schema": {...}, "metadata": [...]}]
 }
 
 write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.json")
@@ -467,16 +450,13 @@ validators = FlextMeltanoValidators()
 # Validate Singer schema
 schema_validation = validators.validate_singer_schema({
     "type": "object",
-    "properties": {
-        "id": {"type": "integer"},
-        "name": {"type": "string"}
-    }
+    "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
 })
 
 # Validate dbt models
 model_validation = validators.validate_dbt_models([
     {"name": "stg_users", "path": "models/staging/stg_users.sql"},
-    {"name": "dim_users", "path": "models/marts/dim_users.sql"}
+    {"name": "dim_users", "path": "models/marts/dim_users.sql"},
 ])
 ```
 
@@ -517,7 +497,7 @@ Due to compliance issues:
 1. **Use Abstractions**: Leverage existing FlextMeltanoSettings where possible
 1. **Monitor Progress**: Track abstraction layer implementation
 1. **Plan Migration**: Prepare for wrapper layer adoption
-1. **Validate Patterns**: Use FlextResult patterns consistently
+1. **Validate Patterns**: Use r patterns consistently
 
 ______________________________________________________________________
 

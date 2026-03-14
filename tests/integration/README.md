@@ -169,6 +169,7 @@ export MELTANO_ENVIRONMENT=test
 import pytest
 from flext_meltano import FlextMeltanoBridge, FlextMeltanoSettings
 
+
 @pytest.mark.integration
 def test_bridge_meltano_integration():
     """Test real bridge to Meltano CLI integration."""
@@ -187,6 +188,7 @@ def test_bridge_meltano_integration():
 # Database integration test pattern
 import pytest
 from sqlalchemy import create_engine
+
 
 @pytest.mark.integration
 @pytest.mark.database

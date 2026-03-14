@@ -15,9 +15,9 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_tests.constants import FlextTestsConstants
+from flext_tests import FlextTestsConstants
 
-from flext_meltano.constants import FlextMeltanoConstants
+from flext_meltano import FlextMeltanoConstants
 
 
 class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
@@ -28,11 +28,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     2. FlextMeltanoConstants - for domain constants (.Meltano.*)
 
     Access patterns:
-    - tc.Tests.Docker.* (container testing)
-    - tc.Tests.Matcher.* (assertion messages)
-    - tc.Tests.Factory.* (test data generation)
-    - tc.Meltano.* (domain constants from production)
-    - tc.Paths.* (project-specific test data)
+    - c.Tests.Docker.* (container testing)
+    - c.Tests.Matcher.* (assertion messages)
+    - c.Tests.Factory.* (test data generation)
+    - c.Meltano.* (domain constants from production)
+    - c.Paths.* (project-specific test data)
 
     Rules:
     - NEVER duplicate constants from FlextTestsConstants or FlextMeltanoConstants
@@ -41,20 +41,19 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     - All production constants come from FlextMeltanoConstants
     """
 
-    class Paths:
-        """Test path constants."""
+    class Meltano(FlextMeltanoConstants.Meltano):
+        """Meltano domain namespace."""
 
-        TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
-        TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
-        TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
+        class Tests:
+            """Meltano tests namespace."""
+
+            class Paths:
+                """Test path constants."""
+
+                TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
+                TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
+                TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
 
-# Short aliases per FLEXT convention
-tc = TestsFlextMeltanoConstants  # Primary test constants alias
-c = TestsFlextMeltanoConstants  # Alternative alias for compatibility
-
-__all__ = [
-    "TestsFlextMeltanoConstants",
-    "c",
-    "tc",
-]
+c = TestsFlextMeltanoConstants
+__all__ = ["TestsFlextMeltanoConstants", "c"]

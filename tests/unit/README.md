@@ -143,14 +143,15 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
 from flext_core import u
 
+
 # Mock external dependencies
-@patch('flext_meltano.execution.u.u.CommandExecution.run_external_command')
+@patch("flext_meltano.execution.u.u.CommandExecution.run_external_command")
 def test_execution_with_mock(mock_subprocess):
     mock_subprocess.return_value.returncode = 0
     mock_subprocess.return_value.stdout = "test output"
@@ -165,15 +166,13 @@ def test_execution_with_mock(mock_subprocess):
 ```python
 # Reusable test fixtures for unit tests
 import pytest
-from flext_meltano.base import FlextMeltanoSettings
+from flext_meltano import FlextMeltanoSettings
+
 
 @pytest.fixture
 def test_config():
     """Provide test configuration for unit tests."""
-    return FlextMeltanoSettings(
-        project_root="/tmp/test",
-        environment="test"
-    )
+    return FlextMeltanoSettings(project_root="/tmp/test", environment="test")
 ```
 
 ## 📊 Unit Test Quality

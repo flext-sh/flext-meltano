@@ -5,14 +5,11 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final
 
+from flext_cli import FlextCliConstants
 from flext_core import FlextConstants
 
-from flext_meltano.typings import t
 
-c_base = FlextConstants
-
-
-class FlextMeltanoConstants(FlextConstants):
+class FlextMeltanoConstants(FlextCliConstants):
     """Domain constants for the flext-meltano package."""
 
     class Meltano:
@@ -73,12 +70,12 @@ class FlextMeltanoConstants(FlextConstants):
             """Network defaults derived from flext-core."""
 
             MELTANO_DEFAULT_TIMEOUT: Final[int] = (
-                c_base.Performance.DEFAULT_TIMEOUT_LIMIT
+                FlextConstants.Performance.DEFAULT_TIMEOUT_LIMIT
             )
-            DEFAULT_TIMEOUT: Final[int] = c_base.Network.DEFAULT_TIMEOUT
-            DISCOVERY_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT * 2
-            REQUEST_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT * 2
-            CONNECTION_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT
+            DEFAULT_TIMEOUT: Final[int] = FlextConstants.Network.DEFAULT_TIMEOUT
+            DISCOVERY_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2
+            REQUEST_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2
+            CONNECTION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT
             BUFFER_SIZE: Final[int] = 8192
             MAX_PARALLEL_STREAMS: Final[int] = 4
 
@@ -88,11 +85,10 @@ class FlextMeltanoConstants(FlextConstants):
             POSTGRES: Final[int] = 5432
             MYSQL: Final[int] = 3306
             ORACLE: Final[int] = 1521
-
-            PERFORMANCE_LEVEL = c_base.Settings.LogLevel.WARNING
-            MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5_000
-            MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10_000
-            HIGH_MEMORY_THRESHOLD: Final[int] = 1_073_741_824
+            PERFORMANCE_LEVEL = FlextConstants.Settings.LogLevel.WARNING
+            MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
+            MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
+            HIGH_MEMORY_THRESHOLD: Final[int] = 1073741824
 
         class Plugin:
             """Plugin management constants."""
@@ -105,35 +101,9 @@ class FlextMeltanoConstants(FlextConstants):
             PREFIX_TAP: Final[str] = "tap"
             PREFIX_TARGET: Final[str] = "target"
             PREFIX_DBT: Final[str] = "dbt"
-            INSTALLATION_TIMEOUT: Final[int] = c_base.Defaults.TIMEOUT * 10
+            INSTALLATION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 10
             MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
             MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
-
-            @classmethod
-            def supported_types(cls) -> t.MeltanoCore.PluginTypeList:
-                """Return the supported plugin type identifiers."""
-                return [
-                    plugin_type.value
-                    for plugin_type in FlextMeltanoConstants.Meltano.Enums.PluginType.__members__.values()
-                ]
-
-            @classmethod
-            def default_catalog(cls) -> list[t.Plugin.PluginDefinition]:
-                """Provide default plugin catalog entries for discovery workflows."""
-                return [
-                    {
-                        "type": plugin_type.value,
-                        "variant": cls.DEFAULT_VARIANT,
-                        "registry": cls.HUB_URL,
-                        "identifiers": [plugin_type.value],
-                    }
-                    for plugin_type in FlextMeltanoConstants.Meltano.Enums.PluginType.__members__.values()
-                ]
-
-            @classmethod
-            def get_all_plugins(cls) -> list[t.Plugin.PluginDefinition]:
-                """Compatibility shim for existing discovery logic."""
-                return cls.default_catalog()
 
         class Singer:
             """Singer protocol message metadata."""
@@ -172,11 +142,11 @@ class FlextMeltanoConstants(FlextConstants):
             VERSION_PARTS_COUNT: Final[int] = 3
             TAP_SIMPLE_CONFIG_THRESHOLD: Final[int] = 3
             TAP_MODERATE_CONFIG_THRESHOLD: Final[int] = 8
-            TARGET_HIGH_EFFICIENCY_THRESHOLD: Final[int] = 1_000
+            TARGET_HIGH_EFFICIENCY_THRESHOLD: Final[int] = 1000
             TARGET_MEDIUM_EFFICIENCY_THRESHOLD: Final[int] = 100
             DBT_SIMPLE_EXECUTION_THRESHOLD: Final[int] = 5
             DBT_MODERATE_EXECUTION_THRESHOLD: Final[int] = 20
-            EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1_000
+            EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1000
             EXECUTION_GOOD_PERFORMANCE_THRESHOLD: Final[int] = 100
             EXECUTION_MODERATE_PERFORMANCE_THRESHOLD: Final[int] = 10
             MAX_WORKERS_THRESHOLD: Final[int] = 50
@@ -251,6 +221,33 @@ class FlextMeltanoConstants(FlextConstants):
                 TESTING = "testing"
                 LOCAL = "local"
 
+            class StreamStatus(StrEnum):
+                """Meltano stream statuses — single source of truth."""
+
+                COMPLETED = "completed"
+                ERROR = "error"
+                SUCCESS = "success"
+                FAILED = "failed"
+                IN_PROGRESS = "in_progress"
+                PENDING = "pending"
+                INITIALIZED = "initialized"
+                PROCESSING = "processing"
+                DISCOVERED = "discovered"
+                SELECTED = "selected"
+                EXTRACTING = "extracting"
+
+            VALID_STATUSES: Final[frozenset[str]] = frozenset({
+                StreamStatus.INITIALIZED,
+                StreamStatus.PROCESSING,
+                StreamStatus.COMPLETED,
+                StreamStatus.ERROR,
+            })
+            ACTIVE_STATUSES: Final[frozenset[str]] = frozenset({
+                StreamStatus.DISCOVERED,
+                StreamStatus.SELECTED,
+                StreamStatus.EXTRACTING,
+            })
+
         class Logging:
             """Logging configuration constants."""
 
@@ -277,18 +274,8 @@ class FlextMeltanoConstants(FlextConstants):
 
             MIN_NAME_LENGTH: Final[int] = 3
             MAX_NAME_LENGTH: Final[int] = 50
-            VALID_NAME_PATTERN: Final[str] = r"^[a-zA-Z0-9_-]+$"
-
-        # Compatibility aliases for enums
-        # Note: StrEnum cannot be inherited (it's final), so we use aliases
-        PluginTypes = Enums.PluginType
-        ReplicationMethods = Enums.ReplicationMethod
-        OperationStatus = Enums.OperationStatus
-        RunMode = Enums.RunMode
-        Environment = Enums.Environment
+            VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
 
 
-# Short alias for FLEXT namespace pattern
 c = FlextMeltanoConstants
-
 __all__ = ["FlextMeltanoConstants", "c"]

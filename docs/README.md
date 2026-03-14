@@ -69,7 +69,7 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 
 - **Total Lines**: 7,266 across 20 Python modules
 - **Architecture**: Single unified class per module (FLEXT compliant)
-- **Error Handling**: FlextResult pattern implementation (95% coverage)
+- **Error Handling**: r pattern implementation (95% coverage)
 - **Service Pattern**: FlextService implementations (90% coverage)
 
 ### **Key Components**
@@ -119,7 +119,7 @@ make test               # Test suite execution
 ### **FLEXT Compliance Requirements**
 
 - **Import Restrictions**: Only root-level imports from `flext_meltano`
-- **Error Handling**: FlextResult pattern for all operations
+- **Error Handling**: r pattern for all operations
 - **Service Pattern**: Follow flext-core domain service patterns
 - **Architecture**: Single class per module compliance
 
@@ -136,7 +136,7 @@ ______________________________________________________________________
 ### **FLEXT Ecosystem Links**
 
 - **[FLEXT Workspace](../../README.md)** - Complete ecosystem overview
-- **[FLEXT Standards](../../CLAUDE.md)** - Development standards
+- **[FLEXT Standards](../../AGENTS.md)** - Development standards
 - **[Root TODO.md](../TODO.md)** - Current roadmap and critical issues
 
 ______________________________________________________________________

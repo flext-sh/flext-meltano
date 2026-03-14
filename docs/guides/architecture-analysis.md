@@ -8,11 +8,11 @@
   - [Design Principles](#design-principles)
 - [Core Architecture](#core-architecture)
   - [Service Layer Architecture](#service-layer-architecture)
-  - [Protocol Implementation Architecture](#protocol-implementation-architecture)
+  - [Implementation Architecture](#protocol-implementation-architecture)
   - [Plugin Architecture](#plugin-architecture)
 - [Component Analysis](#component-analysis)
   - [Service Components](#service-components)
-  - [Protocol Components](#protocol-components)
+  - [nts](#protocol-components)
 - [Integration Patterns](#integration-patterns)
   - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
   - [External System Integration](#external-system-integration)
@@ -84,13 +84,13 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 ```python
 # Plugin operations
-discover_plugins() -> FlextResult[list[PluginInfo]]
-install_plugin(name: str, version: str | None) -> FlextResult[PluginInstallResult]
-execute_tap(name: str, config: dict) -> FlextResult[TapExecutionResult]
+discover_plugins() -> r[list[PluginInfo]]
+install_plugin(name: str, version: str | None) -> r[PluginInstallResult]
+execute_tap(name: str, config: dict) -> r[TapExecutionResult]
 
 # Pipeline operations
-execute_pipeline(tap: str, target: str) -> FlextResult[PipelineResult]
-validate_configuration() -> FlextResult[bool]
+execute_pipeline(tap: str, target: str) -> r[PipelineResult]
+validate_configuration() -> r[bool]
 ```
 
 #### FlextMeltanoAdapter (CLI Integration)
@@ -129,8 +129,8 @@ class FlextSingerTap(FlextService):
     """Singer tap with discovery, sync, and state management."""
 
     def __init__(self, tap_name: str, config: t.Dict, state: t.Dict | None = None)
-    async def discover(self) -> FlextResult[Catalog]
-    async def sync(self, streams: t.StringList | None = None) -> FlextResult[SyncResult]
+    async def discover(self) -> r[Catalog]
+    async def sync(self, streams: t.StringList | None = None) -> r[SyncResult]
 ```
 
 **FlextSingerTarget Architecture:**
@@ -140,8 +140,8 @@ class FlextSingerTarget(FlextService):
     """Singer target with batch processing and error handling."""
 
     def __init__(self, target_name: str, config: t.Dict)
-    async def load_records(self, records: list[t.Dict]) -> FlextResult[LoadResult]
-    async def flush(self) -> FlextResult[FlushResult]
+    async def load_records(self, records: list[t.Dict]) -> r[LoadResult]
+    async def flush(self) -> r[FlushResult]
 ```
 
 ### Plugin Architecture
@@ -241,7 +241,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import FlextRuntime
 from flext_core import FlextService
 from flext_core import t
