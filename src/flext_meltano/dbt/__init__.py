@@ -1,3 +1,6 @@
+# AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
+# Regenerate with: make codegen
+#
 """DBT Transformations for FLEXT Meltano.
 
 This module provides deep integration with dbt-core for project management,
@@ -17,7 +20,10 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
-    from flext_meltano.dbt.service import FlextMeltanoDbtService
+    from flext_meltano.dbt.service import (
+        FlextMeltanoDbtService,
+        FlextMeltanoDbtService as s,
+    )
 
 # Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
@@ -27,18 +33,18 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "FlextMeltanoDbtRunner": ("flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"),
     "FlextMeltanoDbtService": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
+    "s": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
 }
 
 __all__ = [
     "FlextMeltanoDbtProjectManager",
     "FlextMeltanoDbtRunner",
     "FlextMeltanoDbtService",
+    "s",
 ]
 
 
-def __getattr__(
-    name: str,
-):  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
+def __getattr__(name: str) -> t.ModuleExport:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 
