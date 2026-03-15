@@ -1,13 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make codegen
 #
-"""FLEXT Meltano Tests - Test infrastructure and utilities.
-
-Provides TestsFlextMeltano classes extending FlextTests and FlextMeltano for comprehensive testing.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Tests package."""
 
 from __future__ import annotations
 
@@ -18,6 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from tests import helpers, integration, unit
     from tests.conftest import (
         CliRunner,
         MockCliResult,
@@ -360,6 +355,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "c": ("tests.constants", "c"),
     "docker_manager": ("tests.conftest", "docker_manager"),
     "docker_services": ("tests.conftest", "docker_services"),
+    "helpers": ("tests.helpers", ""),
+    "integration": ("tests.integration", ""),
     "job_run_config": ("tests.conftest", "job_run_config"),
     "logger": ("tests.unit.test_target_abstractions", "logger"),
     "m": ("tests.models", "m"),
@@ -419,6 +416,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
     "u": ("tests.utilities", "TestsFlextMeltanoUtilities"),
+    "unit": ("tests.unit", ""),
 }
 
 __all__ = [
@@ -496,6 +494,8 @@ __all__ = [
     "c",
     "docker_manager",
     "docker_services",
+    "helpers",
+    "integration",
     "job_run_config",
     "logger",
     "m",
@@ -534,6 +534,7 @@ __all__ = [
     "test_meltano_project_dir",
     "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     "u",
+    "unit",
 ]
 
 

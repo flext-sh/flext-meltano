@@ -1,13 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make codegen
 #
-"""ELT pipeline integration library for FLEXT.
-
-Provides programmatic APIs for singer-sdk, meltano-sdk, and dbt-core integration.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Flext meltano package."""
 
 from __future__ import annotations
 
@@ -18,6 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from flext_meltano import dbt, meltano, singer
     from flext_meltano.__version__ import (
         __all__,
         __author__,
@@ -205,15 +200,18 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "__version_info__": ("flext_meltano.__version__", "__version_info__"),
     "c": ("flext_meltano.constants", "c"),
     "create_pipeline": ("flext_meltano.cli_managers", "create_pipeline"),
+    "dbt": ("flext_meltano.dbt", ""),
     "delete_pipeline": ("flext_meltano.cli_managers", "delete_pipeline"),
     "execute_pipeline": ("flext_meltano.cli_managers", "execute_pipeline"),
     "get_pipeline_status": ("flext_meltano.cli_managers", "get_pipeline_status"),
     "list_pipelines": ("flext_meltano.cli_managers", "list_pipelines"),
     "m": ("flext_meltano.models", "m"),
     "main": ("flext_meltano.cli", "main"),
+    "meltano": ("flext_meltano.meltano", ""),
     "p": ("flext_meltano.protocols", "p"),
     "r": ("flext_meltano.execution_result", "FlextMeltanoExecutionResult"),
     "s": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
+    "singer": ("flext_meltano.singer", ""),
     "stop_pipeline": ("flext_meltano.cli_managers", "stop_pipeline"),
     "t": ("flext_meltano.typings", "t"),
     "u": ("flext_meltano.utilities", "u"),
@@ -270,15 +268,18 @@ __all__ = [
     "__version_info__",
     "c",
     "create_pipeline",
+    "dbt",
     "delete_pipeline",
     "execute_pipeline",
     "get_pipeline_status",
     "list_pipelines",
     "m",
     "main",
+    "meltano",
     "p",
     "r",
     "s",
+    "singer",
     "stop_pipeline",
     "t",
     "u",
