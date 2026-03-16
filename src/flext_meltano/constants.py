@@ -284,6 +284,8 @@ class FlextMeltanoConstants(FlextCliConstants):
 
     @unique
     class MeltanoProjectType(StrEnum):
+        """Meltano project type enumeration."""
+
         LIBRARY = "library"
         APPLICATION = "application"
         SERVICE = "service"

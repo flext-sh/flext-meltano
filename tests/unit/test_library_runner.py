@@ -5,6 +5,8 @@ SPDX-License-Identifier: MIT
 
 """
 
+from __future__ import annotations
+
 from flext_meltano import FlextMeltanoLibraryRunner, r, t
 from flext_meltano.adapters import FlextMeltanoAdapter
 
