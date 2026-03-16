@@ -91,9 +91,15 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
         """
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
-                config_payload: t.Dict = dict(sink_config)
+                if isinstance(sink_config, dict):
+                    payload_dict = dict(sink_config)
+                else:
+                    payload_dict = sink_config.root
                 config: m.Meltano.DataSinkConfig = (
-                    m.Meltano.DataSinkConfig.model_validate(config_payload)
+                    m.Meltano.DataSinkConfig.model_validate(payload_dict)
+                )
+                config: m.Meltano.DataSinkConfig = (
+                    m.Meltano.DataSinkConfig.model_validate(payload_dict)
                 )
             except Exception as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")

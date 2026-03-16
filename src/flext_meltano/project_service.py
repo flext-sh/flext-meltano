@@ -146,6 +146,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         temp_path: Path, project_id: str
     ) -> r[Mapping[str, object]]:
         """Generate minimal meltano.yml configuration."""
+        extractors: list[t.Dict] = []
+        loaders: list[t.Dict] = []
+        transformers: list[t.Dict] = []
         config = {
             "version": 1,
             "default_environment": "dev",
@@ -154,7 +157,11 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
                 {
                     "name": "dev",
                     "config": {
-                        "plugins": {"extractors": [], "loaders": [], "transformers": []}
+                        "plugins": {
+                            "extractors": extractors,
+                            "loaders": loaders,
+                            "transformers": transformers,
+                        }
                     },
                 }
             ],

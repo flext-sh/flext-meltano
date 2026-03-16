@@ -113,8 +113,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: t.Dict,
-        stream_config: t.Dict | None = None,
+        connection_config: dict[str, t.Scalar],
+        stream_config: dict[str, t.Scalar] | None = None,
         tap_version: str = "1.0.0",
         _version: str | None = None,
     ) -> r[m.Meltano.TapInstance]:
@@ -210,7 +210,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         source_config: m.Meltano.DataSourceConfig
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
-    ) -> r:
+    ) -> r[t.Dict]:
         """Generate a legacy Singer catalog from configuration.
 
         Args:
@@ -221,7 +221,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r.ok({"version": 1, "streams": []})
+        return r.ok(t.Dict({"version": 1, "streams": []}))
 
     def process(
         self,
@@ -269,7 +269,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         | m.Meltano.TapInstance,
         stream_name: str,
         target: m.Meltano.TargetConfig | None = None,
-    ) -> r:
+    ) -> r[t.Dict]:
         """Synchronize a single stream from source to target.
 
         Args:
@@ -282,12 +282,14 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r.ok({
-            "stream_name": stream_name,
-            "status": "completed",
-            "records_processed": 0,
-            "target_loaded": target is not None,
-        })
+        return r.ok(
+            t.Dict({
+                "stream_name": stream_name,
+                "status": "completed",
+                "records_processed": 0,
+                "target_loaded": target is not None,
+            })
+        )
 
     def validate_stream_schema(self, stream_def: m.Meltano.StreamDefinition) -> r[bool]:
         """Validate a stream definition's schema.

@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Container, Mapping
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal, Self
@@ -129,7 +129,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_items(cls, value: _ValidatorInput) -> list[str]:
                 """Convert sequence-like values into string lists."""
-                values: list
+                values: list[t.ContainerValue | None]
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
@@ -153,7 +153,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_items(cls, value: _ValidatorInput) -> list[bool]:
                 """Convert sequence-like values into booleans."""
-                values: list
+                values: list[t.ContainerValue | None]
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
@@ -2224,7 +2224,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_records(
                 cls, value: _ValidatorInput
-            ) -> list[dict[str, Container]] | list[str]:
+            ) -> list[dict[str, t.Container]] | list[str]:
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
