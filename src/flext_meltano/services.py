@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextContainer, e, r, s
+from flext_core import FlextContainer, e, p, r, s
 
 from flext_meltano import FlextMeltanoSettings, t, u
 
@@ -110,7 +110,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @property
     @override
-    def container(self) -> FlextContainer:
+    def container(self) -> p.Container:
         """Get FlextContainer instance - delegates to global container."""
         return FlextContainer.get_global()
 

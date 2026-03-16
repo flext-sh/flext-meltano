@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger, p, r
 
 from flext_meltano import (
     FlextMeltanoConstants,
@@ -34,7 +34,7 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize the bridge."""
-        self.logger: FlextLogger = FlextLogger(__name__)
+        self.logger: p.Logger = FlextLogger(__name__)
 
     @staticmethod
     def discover_plugins() -> r[t.Meltano.PluginCatalog]:

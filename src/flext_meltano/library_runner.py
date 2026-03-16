@@ -27,7 +27,7 @@ class FlextMeltanoLibraryRunner:
 
     def __init__(self) -> None:
         """Initialize the library runner."""
-        self.logger: FlextLogger = FlextLogger(__name__)
+        self.logger: p.Logger = FlextLogger(__name__)
         self._executor = FlextMeltanoExecutor()
         self._bridge = FlextMeltanoBridge()
 

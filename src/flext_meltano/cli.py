@@ -14,7 +14,7 @@ import sys
 from typing import Protocol
 
 from flext_cli import FlextCli
-from flext_core import FlextLogger
+from flext_core import FlextLogger, p
 
 from flext_meltano import (
     FlextMeltano,
@@ -46,7 +46,7 @@ class FlextMeltanoCLI:
     Single class per module following SOLID principles strictly.
     """
 
-    logger: FlextLogger
+    logger: p.Logger
     output: _Output
     _api: FlextMeltano
     pipeline_manager: Manager
