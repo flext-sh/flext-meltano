@@ -24,6 +24,7 @@ from flext_meltano import (
     FlextMeltanoValidators,
     c,
     m,
+    p,
     t,
 )
 
@@ -49,7 +50,14 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         self._abstractions = FlextMeltanoAbstractions()
 
     @staticmethod
-    def _convert_to_project_dict(project) -> r[t.Meltano.Dbt.Project]:
+    def _convert_to_project_dict(
+        project: p.Meltano.Project
+        | t.Meltano.Dbt.Project
+        | Mapping[str, t.ContainerValue | None]
+        | Path
+        | t.ContainerValue
+        | None,
+    ) -> r[t.Meltano.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
         try:
             name_attr = getattr(project, "name", None)

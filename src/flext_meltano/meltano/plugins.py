@@ -31,7 +31,13 @@ from flext_meltano import (
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 
 
-def _is_meltano_project(value) -> TypeGuard[p.Meltano.Project]:
+def _is_meltano_project(
+    value: p.Meltano.Project
+    | t.Meltano.Dbt.Project
+    | Mapping[str, t.ContainerValue | None]
+    | t.ContainerValue
+    | None,
+) -> TypeGuard[p.Meltano.Project]:
     """Type guard for protocol-compatible Meltano project objects."""
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 

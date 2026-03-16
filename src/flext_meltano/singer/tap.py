@@ -268,7 +268,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
         stream_name: str,
-        target=None,
+        target: m.Meltano.TargetConfig | None = None,
     ) -> r:
         """Synchronize a single stream from source to target.
 
