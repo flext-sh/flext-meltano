@@ -17,8 +17,6 @@ from datetime import datetime
 from typing import TypeGuard, override
 
 from flext_core import r, s
-from tomlkit import datetime
-from tomlkit.api import datetime
 
 from flext_meltano import (
     FlextMeltanoProjectService,

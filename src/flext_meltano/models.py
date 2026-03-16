@@ -14,10 +14,6 @@ from pathlib import Path
 from typing import Annotated, Literal, Self
 
 import yaml
-from beartype.typing import Container
-from dependency_injector.containers import Container
-from dependency_injector.providers import Container
-from docker.models.containers import Container
 from flext_cli import FlextCliModels
 from flext_core import (
     FlextModels,
@@ -25,7 +21,6 @@ from flext_core import (
     t,
     u,
 )
-from matplotlib.container import Container
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -35,9 +30,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from python_on_whales import Container
-from python_on_whales.components.container.cli_wrapper import Container
-from tomlkit.container import Container
 
 from flext_meltano import c
 
