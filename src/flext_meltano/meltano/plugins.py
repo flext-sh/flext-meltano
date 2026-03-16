@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime
-from typing import TypeGuard, override
+from typing import TypeIs, override
 
 from flext_core import r, s
 
@@ -35,7 +35,7 @@ def _is_meltano_project(
     | Mapping[str, t.ContainerValue | None]
     | t.ContainerValue
     | None,
-) -> TypeGuard[p.Meltano.Project]:
+) -> TypeIs[p.Meltano.Project]:
     """Type guard for protocol-compatible Meltano project objects."""
     return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import StrEnum
+from enum import StrEnum, unique
 from typing import Final
 
 from flext_cli import FlextCliConstants
@@ -154,6 +154,7 @@ class FlextMeltanoConstants(FlextCliConstants):
         class Enums:
             """Domain specific enumerations."""
 
+            @unique
             class PluginType(StrEnum):
                 """Supported Meltano plugin categories.
 
@@ -167,6 +168,7 @@ class FlextMeltanoConstants(FlextCliConstants):
                 TRANSFORMS = "transforms"
                 ORCHESTRATORS = "orchestrators"
 
+            @unique
             class ReplicationMethod(StrEnum):
                 """Singer replication method identifiers.
 
@@ -179,6 +181,7 @@ class FlextMeltanoConstants(FlextCliConstants):
                 INCREMENTAL = "INCREMENTAL"
                 LOG_BASED = "LOG_BASED"
 
+            @unique
             class OperationStatus(StrEnum):
                 """Operation execution lifecycle status values.
 
@@ -194,6 +197,7 @@ class FlextMeltanoConstants(FlextCliConstants):
                 TIMEOUT = "timeout"
                 CANCELLED = "cancelled"
 
+            @unique
             class RunMode(StrEnum):
                 """Execution modes for Meltano operations.
 
@@ -207,6 +211,7 @@ class FlextMeltanoConstants(FlextCliConstants):
                 DRY_RUN = "dry_run"
                 TEST = "test"
 
+            @unique
             class Environment(StrEnum):
                 """Deployment environments for Meltano pipelines.
 
@@ -221,6 +226,7 @@ class FlextMeltanoConstants(FlextCliConstants):
                 TESTING = "testing"
                 LOCAL = "local"
 
+            @unique
             class StreamStatus(StrEnum):
                 """Meltano stream statuses — single source of truth."""
 
@@ -275,6 +281,24 @@ class FlextMeltanoConstants(FlextCliConstants):
             MIN_NAME_LENGTH: Final[int] = 3
             MAX_NAME_LENGTH: Final[int] = 50
             VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
+
+    @unique
+    class MeltanoProjectType(StrEnum):
+        LIBRARY = "library"
+        APPLICATION = "application"
+        SERVICE = "service"
+        MELTANO_PROJECT = "meltano-project"
+        ELT_PIPELINE = "elt-pipeline"
+        DATA_PIPELINE = "data-pipeline"
+        ETL_SERVICE = "etl-service"
+        SINGER_TAP = "singer-tap"
+        SINGER_TARGET = "singer-target"
+        DBT_PROJECT = "dbt-project"
+        DATA_INTEGRATION = "data-integration"
+        PIPELINE_ORCHESTRATOR = "pipeline-orchestrator"
+        DATA_EXTRACTOR = "data-extractor"
+        DATA_LOADER = "data-loader"
+        TRANSFORMATION_SERVICE = "transformation-service"
 
 
 c = FlextMeltanoConstants

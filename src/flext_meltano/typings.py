@@ -21,6 +21,8 @@ from typing import Literal
 import singer_sdk.typing as singer_sdk_typing
 from flext_cli import FlextCliTypes
 
+from flext_meltano import c
+
 
 class FlextMeltanoTypes(FlextCliTypes):
     """Meltano-specific type definitions extending t.
@@ -124,23 +126,7 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type ProjectConfig = Mapping[str, t.ContainerValue | None]
             type ProjectMetadata = dict[str, t.Scalar | None]
-            type MeltanoProjectType = Literal[
-                "library",
-                "application",
-                "service",
-                "meltano-project",
-                "elt-pipeline",
-                "data-pipeline",
-                "etl-service",
-                "singer-tap",
-                "singer-target",
-                "dbt-project",
-                "data-integration",
-                "pipeline-orchestrator",
-                "data-extractor",
-                "data-loader",
-                "transformation-service",
-            ]
+            type MeltanoProjectType = c.MeltanoProjectType
             type MeltanoProjectConfig = Mapping[str, t.ContainerValue | None]
             type PipelineConfig = dict[str, str | int | bool | list[str]]
             type SingerConfig = dict[str, t.Scalar | None]
