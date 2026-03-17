@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Mapping
-from datetime import datetime
 from pathlib import Path
 from typing import override
 
@@ -335,11 +334,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
                 "schema": config or {}
             })
             schema_payload: t.Meltano.SchemaDict = {
-                str(key): (
-                    value
-                    if isinstance(value, (str, int, float, bool, datetime))
-                    else str(value)
-                )
+                str(key): (value if isinstance(value, t.SCALAR_TYPES) else str(value))
                 for key, value in parsed_schema.schema_definition.items()
             }
             extract_result = service.extract(schema_payload)

@@ -38,7 +38,7 @@ class FlextMeltanoExecutionResult(FlextModels.ArbitraryTypesModel):
         """Convert to dictionary representation.
 
         Returns:
-        Mapping[str, str | int | float | bool | list[str]]: Dictionary representation of execution result.
+        Mapping[str, t.Primitives | list[str]]: Dictionary representation of execution result.
 
         """
         dumped: dict[str, t.Scalar | list[str]] = {}
