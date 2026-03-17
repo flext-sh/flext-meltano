@@ -13,7 +13,7 @@ from typing import override
 
 from flext_core import FlextRuntime, r, s
 
-from flext_meltano import FlextMeltanoSettings, m, t
+from flext_meltano import FlextMeltanoSettings, c, m, t
 
 
 class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
@@ -57,13 +57,17 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", "unknown"
+                source_config, "tap_type", c.Mixins.IDENTIFIER_UNKNOWN
             )
             if not isinstance(source_type, str):
-                source_type = "unknown"
+                source_type = c.Mixins.IDENTIFIER_UNKNOWN
             source_identifier = getattr(
                 source_config, "source_identifier", None
-            ) or getattr(source_config, "tap_identifier", "unknown")
+            ) or getattr(
+                source_config,
+                "tap_identifier",
+                c.Mixins.IDENTIFIER_UNKNOWN,
+            )
             self.logger.info(
                 "Creating source instance",
                 source_name=source_type,
@@ -240,12 +244,12 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", "unknown"
+                source_config, "tap_type", c.Mixins.IDENTIFIER_UNKNOWN
             )
             self.logger.debug(
                 "Processing source configuration", source_name=source_type
             )
-            if not source_type or source_type == "unknown":
+            if not source_type or source_type == c.Mixins.IDENTIFIER_UNKNOWN:
                 return r[bool].fail("Source configuration must have a type")
             return r[bool].ok(value=True)
         except (

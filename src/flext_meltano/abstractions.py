@@ -16,7 +16,7 @@ from pathlib import Path
 
 from flext_core import FlextLogger, r
 
-from flext_meltano import p, t, u
+from flext_meltano import c, p, t, u
 
 
 class FlextMeltanoAbstractions:
@@ -61,8 +61,20 @@ class FlextMeltanoAbstractions:
             try:
                 result: t.Meltano.ELT.PipelineResult = {
                     "status": "completed",
-                    "source": str(u.get(source_config, "name", default="unknown")),
-                    "sink": str(u.get(sink_config, "name", default="unknown")),
+                    "source": str(
+                        u.get(
+                            source_config,
+                            "name",
+                            default=c.Mixins.IDENTIFIER_UNKNOWN,
+                        )
+                    ),
+                    "sink": str(
+                        u.get(
+                            sink_config,
+                            "name",
+                            default=c.Mixins.IDENTIFIER_UNKNOWN,
+                        )
+                    ),
                     "records_processed": 0,
                 }
                 return r[t.Meltano.ELT.PipelineResult].ok(result)

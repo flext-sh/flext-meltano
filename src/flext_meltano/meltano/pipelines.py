@@ -20,6 +20,7 @@ from flext_core import r, s
 
 from flext_meltano import (
     FlextMeltanoSettings,
+    c,
     m,
     p,
     t,
@@ -136,7 +137,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 "loader": loader_name,
                 "execution_method": "singer_runner_abstracted",
                 "project_root": parsed_context.project_root,
-                "run_id": "unknown",
+                "run_id": c.Mixins.IDENTIFIER_UNKNOWN,
             }
             pipeline_result.update(execution_values)
             self.logger.info(
