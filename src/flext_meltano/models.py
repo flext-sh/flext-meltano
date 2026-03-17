@@ -19,7 +19,6 @@ from flext_core import (
     FlextModels,
     r,
     t,
-    u,
 )
 from pydantic import (
     BaseModel,
@@ -31,7 +30,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano import c
+from flext_meltano import c, u
 
 type _ValidatorInput = (
     t.ContainerValue
@@ -2236,7 +2235,7 @@ class FlextMeltanoModels(FlextCliModels):
                                     record_dict: dict[str, t.Container] = {}
                                     for key, item in record.items():
                                         # Only include JSON-serializable values (exclude None, BaseModel, Path)
-                                        if isinstance(item, (str, int, float, bool)):
+                                        if u.is_primitive(item):
                                             record_dict[str(key)] = item
                                     records.append(record_dict)
                                 case _:
@@ -2369,7 +2368,7 @@ class FlextMeltanoModels(FlextCliModels):
                         result: dict[str, t.Scalar] = {}
                         for k, v in value.items():
                             # Type narrowing for JSON-serializable primitives
-                            if isinstance(v, (str, int, float, bool)):
+                            if u.is_primitive(v):
                                 result[str(k)] = v
                             elif v is None:
                                 result[str(k)] = ""
