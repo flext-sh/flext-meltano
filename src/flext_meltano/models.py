@@ -20,6 +20,7 @@ from flext_core import (
     r,
     t,
 )
+from flext_core.utilities import u
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -30,7 +31,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano import c, u
+from flext_meltano.constants import c
 
 type _ValidatorInput = (
     t.ContainerValue
