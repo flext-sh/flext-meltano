@@ -285,7 +285,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         return r[t.Meltano.ExecutionResultDict].ok({
             "service_name": self.service_name,
             "version": self.version,
-            "status": "active",
+            "status": c.Cqrs.CommonStatus.ACTIVE,
             "operations": ["pipeline", "plugin", "dbt", "environment"],
         })
 

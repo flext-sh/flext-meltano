@@ -13,7 +13,7 @@ from typing import override
 
 from flext_core import FlextContainer, e, p, r, s
 
-from flext_meltano import FlextMeltanoSettings, t, u
+from flext_meltano import FlextMeltanoSettings, c, t, u
 
 
 class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
@@ -419,7 +419,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         return r[t.Meltano.MeltanoConfigDict].ok({
             "service_name": self.service_name,
             "version": self.version,
-            "status": "active",
+            "status": c.Cqrs.CommonStatus.ACTIVE,
             "handlers": ["source", "sink", "pipeline"],
         })
 

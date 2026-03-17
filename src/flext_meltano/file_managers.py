@@ -161,19 +161,15 @@ class FlextMeltanoFileManagers:
         r indicating success or failure of the save operation.
 
         """
-
-        def _save() -> bool:
+        try:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.dump(
                     config, f, indent=2, default_flow_style=False, sort_keys=False
                 )
-            return True
-
-        return u.try_(
-            _save,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-        ).map_error(lambda e: f"Failed to save YAML config: {e}")
+            return r[bool].ok(True)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+            return r[bool].fail(f"Failed to save YAML config: {exc}")
 
     @classmethod
     def setup_project_structure(
