@@ -25,7 +25,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from tests.helpers.docker_test_manager import (
+    from .docker_test_manager import (
         ContainerManager,
         FlextTestsDocker,
         docker_manager,

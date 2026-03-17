@@ -16,7 +16,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from tests.unit.pipeline_cli_managers_tests import (
+    from .pipeline_cli_managers_tests import (
         test_create_pipeline_creates_directory_and_configuration,
         test_create_pipeline_fails_without_configuration,
         test_delete_pipeline_removes_configuration_directory,
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
         test_get_pipeline_status_checks_process_state,
         test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
     )
-    from tests.unit.test_api import (
+    from .test_api import (
         TestFlextMeltanoCatalogOperations,
         TestFlextMeltanoDataOperations,
         TestFlextMeltanoDbtOperations,
@@ -40,13 +40,13 @@ if TYPE_CHECKING:
         TestFlextMeltanoSuccessPaths,
         pytestmark,
     )
-    from tests.unit.test_cli_integration import (
+    from .test_cli_integration import (
         TestCliModelConverterWithDbtRunParams,
         TestCliModelConverterWithPipelineRunParams,
         TestCliModelConverterWithTapRunParams,
         TestCliModelConverterWithTargetRunParams,
     )
-    from tests.unit.test_config import (
+    from .test_config import (
         TestFlextMeltanoSettings,
         TestFlextMeltanoSettingsConstants,
         TestFlextMeltanoSettingsConstants as c,
@@ -54,20 +54,20 @@ if TYPE_CHECKING:
         TestFlextMeltanoSettingsEnums,
         TestFlextMeltanoSettingsIntegration,
     )
-    from tests.unit.test_constants import Testc
-    from tests.unit.test_execution_result import (
+    from .test_constants import Testc
+    from .test_execution_result import (
         TestFlextMeltanoExecutionResult,
         TestFlextMeltanoExecutionResult as r,
     )
-    from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
-    from tests.unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
-    from tests.unit.test_library_runner import (
+    from .test_executors import TestFlextMeltanoExecutorComplete
+    from .test_file_managers import TestFlextMeltanoFileManagersComprehensive
+    from .test_library_runner import (
         TestFlextDbtProgrammaticRunner,
         TestFlextMeltanoLibraryRunner,
         TestFlextSingerProtocolManager,
         TestProjectAdapterIntegration,
     )
-    from tests.unit.test_models import (
+    from .test_models import (
         TestDbtProjectModelEnhanced,
         TestMeltanoProjectModelEnhanced,
         TestModelIntegration,
@@ -76,8 +76,8 @@ if TYPE_CHECKING:
         TestTapConfigEnhanced,
         TestTargetConfigEnhanced,
     )
-    from tests.unit.test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
-    from tests.unit.test_services import (
+    from .test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
+    from .test_services import (
         TestDbtService,
         TestFlextMeltanoServiceInitialization,
         TestServiceArchitecture,
@@ -89,25 +89,22 @@ if TYPE_CHECKING:
         TestTapService as s,
         TestTargetService,
     )
-    from tests.unit.test_singer_cli_translator import (
+    from .test_singer_cli_translator import (
         TestFlextMeltanoSingerCliTranslatorDbtRun,
         TestFlextMeltanoSingerCliTranslatorExecuteCommand,
         TestFlextMeltanoSingerCliTranslatorPipelineRun,
         TestFlextMeltanoSingerCliTranslatorTapRun,
         TestFlextMeltanoSingerCliTranslatorTargetRun,
     )
-    from tests.unit.test_singer_types import (
-        TestFlextSingerTypes,
-        TestFlextSingerTypes as t,
-    )
-    from tests.unit.test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
-    from tests.unit.test_target_abstractions import (
+    from .test_singer_types import TestFlextSingerTypes, TestFlextSingerTypes as t
+    from .test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
+    from .test_target_abstractions import (
         TestFlextMeltanoTargetAbstractionsComplete,
         logger,
     )
-    from tests.unit.test_typings import TestFlextMeltanoTypes
-    from tests.unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
-    from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
+    from .test_typings import TestFlextMeltanoTypes
+    from .test_utilities import TestFlextMeltanoUtilitiesEnhanced
+    from .test_validators import TestFlextMeltanoValidatorsComprehensive
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestCliModelConverterWithDbtRunParams": (
