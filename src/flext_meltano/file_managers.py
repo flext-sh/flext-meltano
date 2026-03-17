@@ -117,37 +117,32 @@ class FlextMeltanoFileManagers:
         r containing the loaded YAML configuration.
 
         """
-
-        def _load() -> t.Meltano.FileConfigDict:
+        try:
             if not u.is_string_non_empty(str(file_path)):
-                msg = f"Invalid YAML file path: {file_path}"
-                raise ValueError(
-                    msg,
+                return r[t.Meltano.FileConfigDict].fail(
+                    f"Failed to load YAML config: Invalid YAML file path: {file_path}"
                 )
             if not file_path.exists():
-                msg = f"YAML file not found: {file_path}"
-                raise FileNotFoundError(
-                    msg,
+                return r[t.Meltano.FileConfigDict].fail(
+                    f"Failed to load YAML config: YAML file not found: {file_path}"
                 )
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 config_data = yaml.safe_load(f)
             if config_data is None:
-                return {}
-            return m.Meltano.ConfigMappingPayload.model_validate({
+                return r[t.Meltano.FileConfigDict].ok({})
+            validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data
             }).values
-
-        return u.try_(
-            _load,
-            catch=(
-                yaml.YAMLError,
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-            ),
-        ).map_error(lambda e: f"Failed to load YAML config: {e}")
+            return r[t.Meltano.FileConfigDict].ok(validated)
+        except (
+            yaml.YAMLError,
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+        ) as e:
+            return r[t.Meltano.FileConfigDict].fail(f"Failed to load YAML config: {e}")
 
     @classmethod
     def save_yaml_config(
