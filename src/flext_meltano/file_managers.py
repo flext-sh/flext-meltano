@@ -97,7 +97,7 @@ class FlextMeltanoFileManagers:
         def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
             FlextMeltanoFileManagers.logger.info(
-                "Created temporary directory: %s", temp_dir
+                f"Created temporary directory: {temp_dir}"
             )
             return temp_dir
 
@@ -130,9 +130,10 @@ class FlextMeltanoFileManagers:
                 config_data = yaml.safe_load(f)
             if config_data is None:
                 return r[t.Meltano.FileConfigDict].ok({})
-            validated = m.Meltano.ConfigMappingPayload.model_validate({
+            raw_validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data
             }).values
+            validated = FlextMeltanoFileManagers._normalize_file_config(raw_validated)
             return r[t.Meltano.FileConfigDict].ok(validated)
         except (
             yaml.YAMLError,
@@ -191,22 +192,25 @@ class FlextMeltanoFileManagers:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
+            plugin_items: dict[str, t.ContainerValue] = {
+                "extractors": [],
+                "loaders": [],
+                "transformers": [],
+            }
             meltano_config: t.Meltano.FileConfigDict = {
                 "version": 1,
                 "project_id": "project_name",
                 "project_name": "project_name",
-                "plugins": {
-                    "extractors": list[str](),
-                    "loaders": list[str](),
-                    "transformers": list[str](),
-                },
+                "plugins": plugin_items,
             }
+            model_paths: list[t.ContainerValue] = ["models"]
+            test_paths: list[t.ContainerValue] = ["tests"]
             dbt_project_config: t.Meltano.FileConfigDict = {
                 "name": "project_name",
                 "version": "1.0.0",
                 "profile": "project_name",
-                "model-paths": ["models"],
-                "test-paths": ["tests"],
+                "model-paths": model_paths,
+                "test-paths": test_paths,
             }
             configs: dict[str, t.Meltano.FileConfigDict] = {
                 c.Meltano.Paths.MELTANO_PROJECT_FILE: meltano_config,
@@ -214,10 +218,7 @@ class FlextMeltanoFileManagers:
             }
             for filename, config_data in configs.items():
                 config_path = project_root / filename
-                validated_config = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": config_data
-                }).values
-                save_result = cls.save_yaml_config(validated_config, config_path)
+                save_result = cls.save_yaml_config(config_data, config_path)
                 if save_result.is_success:
                     created_paths[filename.replace("/", "_")] = str(config_path)
             created_paths["project_root"] = project_root
@@ -272,6 +273,28 @@ class FlextMeltanoFileManagers:
             return r[bool].fail(f"Invalid YAML syntax: {e}")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to validate YAML: {e}")
+
+    @staticmethod
+    def _normalize_file_config(
+        raw: dict[
+            str,
+            t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+        ],
+    ) -> t.Meltano.FileConfigDict:
+        normalized: dict[str, t.ContainerValue | None] = {}
+        for key, value in raw.items():
+            if value is None or u.is_scalar(value):
+                normalized[key] = value
+                continue
+            if isinstance(value, list):
+                normalized[key] = [item for item in value if item is not None]
+                continue
+            nested: dict[str, t.ContainerValue] = {}
+            for nested_key, nested_value in value.items():
+                if u.is_scalar(nested_value):
+                    nested[str(nested_key)] = nested_value
+            normalized[key] = nested
+        return normalized
 
 
 __all__ = ["FlextMeltanoFileManagers"]
