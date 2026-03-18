@@ -41,14 +41,14 @@ class FlextMeltanoAbstractions:
             sink_name: str,
         ) -> r[t.Meltano.NestedJsonDict]:
             """Create pipeline context for data pipeline operations."""
-            try:
-                pipeline_context: t.Meltano.NestedJsonDict = {
-                    "project_path": str(project_path),
-                    "source_name": source_name,
-                    "sink_name": sink_name,
-                    "status": "initialized",
-                }
-                return r[t.Meltano.NestedJsonDict].ok(pipeline_context)
+             try:
+                 pipeline_context: dict[str, str] = {
+                     "project_path": str(project_path),
+                     "source_name": source_name,
+                     "sink_name": sink_name,
+                     "status": "initialized",
+                 }
+                 return r[t.Meltano.NestedJsonDict].ok(pipeline_context)  # type: ignore[arg-type]
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 error_msg = f"Failed to create pipeline context: {e}"
                 self.logger.exception(error_msg)
