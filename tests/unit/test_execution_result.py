@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from flext_core import t
 from flext_tests import tm
 from pydantic import BaseModel, TypeAdapter
 

@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_core import FlextLogger
+from flext_core import FlextLogger, r
 from flext_tests import tm
 
-from flext_meltano import r, t, u
+from flext_meltano import t, u
 from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
 
 logger = FlextLogger(__name__)

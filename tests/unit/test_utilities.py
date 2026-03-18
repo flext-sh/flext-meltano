@@ -140,7 +140,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test project structure validation with nonexistent path."""
         result = u.Meltano.validate_project_structure(Path("/nonexistent/path"))
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        assert result.error is not None
         tm.that("Project path does not exist" in result.error, eq=True)
 
     def test_create_project_file_success(self) -> None:
