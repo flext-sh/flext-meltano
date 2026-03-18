@@ -18,7 +18,44 @@ from flext_core import r, s
 from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
 
 
-class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
+class FlextMeltanoDbtTransformationRunner:
+    @staticmethod
+    def execute_dbt_transformation(
+        executor: FlextMeltanoExecutor,
+        logger: p.Logger,
+        models: list[str] | None = None,
+        project_dir: Path | None = None,
+    ) -> r[t.Meltano.Processing.DbtTransformationResult]:
+        try:
+            args: list[str] = []
+            if models:
+                args.extend(["--models"] + models)
+            result = executor.execute_dbt_command("run", args)
+            if result.is_failure:
+                return r[t.Meltano.Processing.DbtTransformationResult].fail(
+                    result.error or "DBT transformation failed"
+                )
+            execution_result = result.value
+            dbt_result: t.Meltano.Processing.DbtTransformationResult = {
+                "success": execution_result.success,
+                "exit_code": execution_result.exit_code,
+                "models_run": ",".join(models) if models else "all",
+                "execution_method": "library_runner",
+                "project_dir": str(project_dir) if project_dir else "",
+                "execution_time": execution_result.execution_time,
+                "output": execution_result.output or "",
+                "error": execution_result.error or "",
+            }
+            return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            error_msg = f"DBT transformation failed: {e}"
+            logger.exception(error_msg)
+            return r[t.Meltano.Processing.DbtTransformationResult].fail(error_msg)
+
+
+class FlextMeltanoLibraryRunner(
+    FlextMeltanoDbtTransformationRunner, s[t.Meltano.ExecutionResultDict]
+):
     """Unified library runner providing complete Meltano functionality.
 
     This class consolidates all Meltano operations (DBT transformations, Singer
@@ -127,41 +164,12 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
     def run_dbt_transformation(
         self, models: list[str] | None = None, project_dir: Path | None = None
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
-        """Run DBT transformations.
-
-        Args:
-        models: List of models to run (None for all)
-        project_dir: DBT project directory
-
-        Returns:
-        r with DBT transformation results
-
-        """
-        try:
-            args: list[str] = []
-            if models:
-                args.extend(["--models"] + models)
-            result = self._executor.execute_dbt_command("run", args)
-            if result.is_failure:
-                return r[t.Meltano.Processing.DbtTransformationResult].fail(
-                    result.error or "DBT transformation failed"
-                )
-            execution_result = result.value
-            dbt_result: t.Meltano.Processing.DbtTransformationResult = {
-                "success": execution_result.success,
-                "exit_code": execution_result.exit_code,
-                "models_run": ",".join(models) if models else "all",
-                "execution_method": "library_runner",
-                "project_dir": str(project_dir) if project_dir else "",
-                "execution_time": execution_result.execution_time,
-                "output": execution_result.output or "",
-                "error": execution_result.error or "",
-            }
-            return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"DBT transformation failed: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.Processing.DbtTransformationResult].fail(error_msg)
+        return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
+            executor=self._executor,
+            logger=self.logger,
+            models=models,
+            project_dir=project_dir,
+        )
 
     def run_elt_pipeline(
         self,
@@ -206,4 +214,7 @@ class FlextMeltanoLibraryRunner(s[t.Meltano.ExecutionResultDict]):
             return r[t.Meltano.Processing.EltPipelineResult].fail(error_msg)
 
 
-__all__ = ["FlextMeltanoLibraryRunner"]
+__all__ = [
+    "FlextMeltanoDbtTransformationRunner",
+    "FlextMeltanoLibraryRunner",
+]

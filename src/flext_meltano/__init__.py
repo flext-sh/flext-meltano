@@ -60,6 +60,7 @@ if TYPE_CHECKING:
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
+    from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
     from flext_meltano.models import FlextMeltanoModels, m
     from flext_meltano.project_service import FlextMeltanoProjectService
@@ -109,6 +110,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "FlextMeltanoDbtRunner": ("flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"),
     "FlextMeltanoDbtService": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
+    "FlextMeltanoDbtTransformationRunner": (
+        "flext_meltano.meltano.runner",
+        "FlextMeltanoDbtTransformationRunner",
+    ),
     "FlextMeltanoExecutionResult": (
         "flext_meltano.execution_result",
         "FlextMeltanoExecutionResult",
@@ -231,6 +236,7 @@ __all__ = [
     "FlextMeltanoDbtProjectManager",
     "FlextMeltanoDbtRunner",
     "FlextMeltanoDbtService",
+    "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",

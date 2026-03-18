@@ -27,7 +27,10 @@ if TYPE_CHECKING:
     )
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
-    from flext_meltano.meltano.runner import FlextMeltanoLibraryRunner
+    from flext_meltano.meltano.runner import (
+        FlextMeltanoDbtTransformationRunner,
+        FlextMeltanoLibraryRunner,
+    )
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
@@ -35,6 +38,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoComponentService": (
         "flext_meltano.meltano.plugins",
         "FlextMeltanoComponentService",
+    ),
+    "FlextMeltanoDbtTransformationRunner": (
+        "flext_meltano.meltano.runner",
+        "FlextMeltanoDbtTransformationRunner",
     ),
     "FlextMeltanoLibraryRunner": (
         "flext_meltano.meltano.runner",
@@ -58,6 +65,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 __all__ = [
     "FlextMeltanoBridge",
     "FlextMeltanoComponentService",
+    "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoMeltanoService",
     "FlextMeltanoOrchestrationService",

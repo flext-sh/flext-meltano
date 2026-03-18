@@ -46,7 +46,11 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
         """Execute (implements Service pattern)."""
         if self.project_root:
             info = m.Meltano.DbtProjectInfo(
-                root=self.project_root, name=str(self.project_root.name)
+                root=self.project_root,
+                name=str(self.project_root.name),
+                dbt_version=None,
+                models_count=0,
+                tests_count=0,
             )
             return r[m.Meltano.DbtProjectInfo].ok(info)
         return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
@@ -59,33 +63,22 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
 
         """
         try:
-            if not self.manifest:
-                manifest_result = self.load_manifest()
-                if manifest_result.is_failure:
-                    return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
-                        manifest_result.error or "Unknown error"
-                    )
-            models: list[t.Meltano.Dbt.ModelConfiguration] = []
-            if self.manifest:
-                manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
-                parsed_nodes = [
-                    m.Meltano.DbtManifestNode.model_validate(node)
-                    for node in manifest_model.nodes.values()
-                ]
-                model_nodes = [
-                    node for node in parsed_nodes if node.resource_type == "model"
-                ]
-                models = [
-                    {
-                        "name": str(node.name),
-                        "path": str(node.path),
-                        "description": str(node.description)
-                        if node.description is not None
-                        else "",
-                        "fqn": str(node.fqn_string),
-                    }
-                    for node in model_nodes
-                ]
+            model_nodes_result = self._get_manifest_nodes("model")
+            if model_nodes_result.is_failure:
+                return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
+                    model_nodes_result.error or "Unknown error"
+                )
+            models: list[t.Meltano.Dbt.ModelConfiguration] = [
+                {
+                    "name": str(node.name),
+                    "path": str(node.path),
+                    "description": str(node.description)
+                    if node.description is not None
+                    else "",
+                    "fqn": str(node.fqn_string),
+                }
+                for node in model_nodes_result.value
+            ]
             self.logger.info("Models retrieved", count=len(models))
             return r[list[t.Meltano.Dbt.ModelConfiguration]].ok(models)
         except (
@@ -110,39 +103,54 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
 
         """
         try:
-            if not self.manifest:
-                manifest_result = self.load_manifest()
-                if manifest_result.is_failure:
-                    return r[list[t.Meltano.Dbt.TestConfiguration]].fail(
-                        manifest_result.error or "Unknown error"
-                    )
-            tests: list[t.Meltano.Dbt.TestConfiguration] = []
-            if self.manifest:
-                manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
-                parsed_nodes = [
-                    m.Meltano.DbtManifestNode.model_validate(node)
-                    for node in manifest_model.nodes.values()
-                ]
-                test_nodes = [
-                    node for node in parsed_nodes if node.resource_type == "test"
-                ]
-                tests = [
-                    {
-                        "name": str(node.name),
-                        "path": str(node.path),
-                        "description": str(node.description)
-                        if node.description is not None
-                        else "",
-                        "fqn": str(node.fqn_string),
-                    }
-                    for node in test_nodes
-                ]
+            test_nodes_result = self._get_manifest_nodes("test")
+            if test_nodes_result.is_failure:
+                return r[list[t.Meltano.Dbt.TestConfiguration]].fail(
+                    test_nodes_result.error or "Unknown error"
+                )
+            tests: list[t.Meltano.Dbt.TestConfiguration] = [
+                {
+                    "name": str(node.name),
+                    "path": str(node.path),
+                    "description": str(node.description)
+                    if node.description is not None
+                    else "",
+                    "fqn": str(node.fqn_string),
+                }
+                for node in test_nodes_result.value
+            ]
             self.logger.info("Tests retrieved", count=len(tests))
             return r[list[t.Meltano.Dbt.TestConfiguration]].ok(tests)
         except (ValidationError, OSError, ValueError, TypeError) as e:
             self.logger.exception("Failed to get tests", error=str(e))
             return r[list[t.Meltano.Dbt.TestConfiguration]].fail(
                 f"Failed to get tests: {e}"
+            )
+
+    def _get_manifest_nodes(
+        self, resource_type: str
+    ) -> r[list[m.Meltano.DbtManifestNode]]:
+        try:
+            if not self.manifest:
+                manifest_result = self.load_manifest()
+                if manifest_result.is_failure:
+                    return r[list[m.Meltano.DbtManifestNode]].fail(
+                        manifest_result.error or "Unknown error"
+                    )
+            if not self.manifest:
+                return r[list[m.Meltano.DbtManifestNode]].ok([])
+            manifest_model = m.Meltano.DbtManifest.model_validate(self.manifest)
+            parsed_nodes = [
+                m.Meltano.DbtManifestNode.model_validate(node)
+                for node in manifest_model.nodes.values()
+            ]
+            filtered_nodes = [
+                node for node in parsed_nodes if node.resource_type == resource_type
+            ]
+            return r[list[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
+        except (ValidationError, OSError, ValueError, TypeError) as e:
+            return r[list[m.Meltano.DbtManifestNode]].fail(
+                f"Failed to read manifest nodes: {e}"
             )
 
     def load_manifest(
@@ -203,7 +211,13 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                     f"DBT project directory not found: {root}"
                 )
             self.project_root = root
-            info = m.Meltano.DbtProjectInfo(root=root, name=str(root.name))
+            info = m.Meltano.DbtProjectInfo(
+                root=root,
+                name=str(root.name),
+                dbt_version=None,
+                models_count=0,
+                tests_count=0,
+            )
             self.logger.info("DBT project loaded", root=str(root))
             return r[m.Meltano.DbtProjectInfo].ok(info)
         except (

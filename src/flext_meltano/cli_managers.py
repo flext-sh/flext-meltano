@@ -64,7 +64,7 @@ def _is_process_running(pid: int) -> bool:
 
 
 def create_pipeline(
-    pipeline_name: str, config: Mapping[str, t.ContainerValue | None] | None
+    pipeline_name: str, config: t.Meltano.MeltanoConfigDict | None
 ) -> r[str]:
     """Create a new Meltano pipeline with the given configuration."""
     if not pipeline_name.strip():
@@ -531,19 +531,43 @@ class FlextMeltanoSingerManager:
     def _execute_tap_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute tap operation."""
         self.logger.info(
-            "Tap operation '%s' not implemented in this refactor", operation
+            f"Tap operation '{operation}' not implemented in this refactor"
         )
         return r[None](value=None, is_success=True)
 
     def _execute_target_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute target operation."""
         self.logger.info(
-            "Target operation '%s' not implemented in this refactor", operation
+            f"Target operation '{operation}' not implemented in this refactor"
         )
         return r[None](value=None, is_success=True)
 
 
-class FlextMeltanoDbtManager:
+class _FlextMeltanoSimpleCommandManager:
+    cli: _CLI
+    logger: FlextLogger
+
+    def _handle_command(
+        self,
+        args: list[str],
+        help_handler: Callable[[], None],
+        operation_handler: Callable[[str, list[str]], r[None]],
+    ) -> r[None]:
+        if not args or args[0] in {"--help", "-h"}:
+            help_handler()
+            return r[None](value=None, is_success=True)
+        return operation_handler(args[0], args[1:])
+
+    def _log_unimplemented_operation(
+        self, operation_label: str, operation: str
+    ) -> r[None]:
+        self.logger.info(
+            f"{operation_label} operation '{operation}' not implemented in this refactor"
+        )
+        return r[None](value=None, is_success=True)
+
+
+class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     """SOLID-compliant DBT manager for FLEXT Meltano CLI.
 
     Single responsibility: handle DBT CLI commands.
@@ -558,21 +582,16 @@ class FlextMeltanoDbtManager:
 
     def handle_command(self, args: list[str]) -> r[None]:
         """Handle DBT command."""
-        if not args or args[0] in {"--help", "-h"}:
-            self.cli.show_dbt_help()
-            return r[None](value=None, is_success=True)
-        subcommand = args[0]
-        return self._execute_dbt_operation(subcommand, args[1:])
+        return self._handle_command(
+            args, self.cli.show_dbt_help, self._execute_dbt_operation
+        )
 
     def _execute_dbt_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute DBT operation."""
-        self.logger.info(
-            "DBT operation '%s' not implemented in this refactor", operation
-        )
-        return r[None](value=None, is_success=True)
+        return self._log_unimplemented_operation("DBT", operation)
 
 
-class FlextMeltanoPluginManager:
+class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     """SOLID-compliant plugin manager for FLEXT Meltano CLI.
 
     Single responsibility: handle plugin CLI commands.
@@ -587,18 +606,15 @@ class FlextMeltanoPluginManager:
 
     def handle_command(self, args: list[str]) -> r[None]:
         """Handle plugin command."""
-        if not args or args[0] in {"--help", "-h"}:
-            self.cli.show_plugin_help()
-            return r[None](value=None, is_success=True)
-        subcommand = args[0]
-        return self._execute_plugin_operation(subcommand, args[1:])
+        return self._handle_command(
+            args,
+            self.cli.show_plugin_help,
+            self._execute_plugin_operation,
+        )
 
     def _execute_plugin_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute plugin operation."""
-        self.logger.info(
-            "Plugin operation '%s' not implemented in this refactor", operation
-        )
-        return r[None](value=None, is_success=True)
+        return self._log_unimplemented_operation("Plugin", operation)
 
 
 class FlextMeltanoStatusManager:

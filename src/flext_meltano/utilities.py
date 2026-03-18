@@ -145,7 +145,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 plugins_dict: t.Meltano.MeltanoConfigDict = {}
                 if isinstance(plugins_val, dict):
                     plugins_dict = {str(k): v for k, v in plugins_val.items()}
-                result_cfg: dict[str, t.ContainerValue | None] = {
+                result_cfg = {
                     "version": cfg_dict.get("version", 1),
                     "project_id": u.safe_string(project_id_val),
                     "project_name": u.safe_string(project_name_val),
@@ -164,7 +164,26 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     result_cfg["default_environment"] = (
                         c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0]
                     )
-                return r[t.Meltano.MeltanoConfigDict].ok(result_cfg)
+                normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
+                    "values": result_cfg
+                }).values
+                normalized_cfg: dict[str, t.NormalizedValue] = {}
+                for key, value in normalized_values.items():
+                    if value is None:
+                        continue
+                    if isinstance(value, Mapping):
+                        normalized_cfg[str(key)] = {
+                            str(map_key): map_value
+                            for map_key, map_value in value.items()
+                            if map_value is not None
+                        }
+                    elif isinstance(value, list):
+                        normalized_cfg[str(key)] = [
+                            item for item in value if item is not None
+                        ]
+                    else:
+                        normalized_cfg[str(key)] = value
+                return r[t.Meltano.MeltanoConfigDict].ok(normalized_cfg)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
                 return r[t.Meltano.MeltanoConfigDict].fail(
                     f"Failed to create Meltano config dict: {err}"
@@ -209,13 +228,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     },
                 }
 
-            cfg = u.build(
-                raw, ops={"transform": {"normalize": False, "strip_none": False}}
-            )
-            cfg_dict = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": cfg
-            }).values
-            result = build_plugin(cfg_dict)
+            result = build_plugin(raw)
             return r[t.Meltano.PluginConfigDict].ok(result)
 
         @classmethod
@@ -255,10 +268,26 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             def convert_to_dict(
                 config_dict: t.Meltano.FileConfigDict,
             ) -> t.Meltano.MeltanoConfigDict:
-                """Type-safe conversion from FileConfigDict to MeltanoConfigDict."""
-                return m.Meltano.ConfigMappingPayload.model_validate({
+                normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
                     "values": config_dict
                 }).values
+                converted: dict[str, t.NormalizedValue] = {}
+                for key, value in normalized_values.items():
+                    if value is None:
+                        continue
+                    if isinstance(value, Mapping):
+                        converted[str(key)] = {
+                            str(map_key): map_value
+                            for map_key, map_value in value.items()
+                            if map_value is not None
+                        }
+                    elif isinstance(value, list):
+                        converted[str(key)] = [
+                            item for item in value if item is not None
+                        ]
+                    else:
+                        converted[str(key)] = value
+                return converted
 
             result = (
                 r[Path]
