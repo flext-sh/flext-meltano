@@ -6,10 +6,11 @@ import tempfile
 import unittest
 
 import pytest
+from flext_core import r
 from flext_tests import tm
 from pydantic_core import ValidationError
 
-from flext_meltano import FlextMeltanoTapAbstractions, m, r
+from flext_meltano import FlextMeltanoTapAbstractions, m
 
 
 class _TestAssertions:
@@ -24,14 +25,14 @@ class _TestAssertions:
         tm.that(not condition, eq=True)
 
     @staticmethod
-    def assert_equal(actual, expected, message: str = "") -> None:
+    def assert_equal(actual: object, expected: object, message: str = "") -> None:
         (
             tm.that(actual, eq=expected),
             message or f"expected {expected!r}, got {actual!r}",
         )
 
     @staticmethod
-    def assert_in(item, container, message: str = "") -> None:
+    def assert_in(item: object, container: object, message: str = "") -> None:
         tm.that(item in container, eq=True)
 
 
@@ -40,9 +41,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.tap_abstractions = FlextMeltanoTapAbstractions()
+        self.tap_abstractions: FlextMeltanoTapAbstractions = FlextMeltanoTapAbstractions()
         if not hasattr(self, "test_assertions"):
-            self.test_assertions = _TestAssertions()
+            self.test_assertions: _TestAssertions = _TestAssertions()
 
     def test_tap_config_validation(self) -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""
