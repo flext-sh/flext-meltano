@@ -1,0 +1,25 @@
+src/flext_meltano/abstractions.py
+  203c12ef8a4bca9f 45,51
+src/flext_meltano/models.py
+  203c12ef8a4bca9f 133,152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "81cc4ca8676c05f78f2f95a9a2a36543e45b4899",
+  "prompts": {
+    "203c12ef8a4bca9f": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2fd5d901bffe2yVWlgNlIbXNuu",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 16,
+      "total_deletions": 20,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
