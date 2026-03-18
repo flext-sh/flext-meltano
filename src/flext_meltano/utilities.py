@@ -220,7 +220,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 return u.safe_string(str(val))
 
             def build_plugin(
-                d: t.Meltano.PluginConfigDict,
+                d: dict[str, t.Scalar],
             ) -> t.Meltano.PluginConfigDict:
                 type_val = d.get("type", "extractor")
                 return {
