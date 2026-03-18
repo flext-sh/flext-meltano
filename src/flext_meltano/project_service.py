@@ -338,6 +338,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         service_type: str,
         meltano_config: FlextMeltanoSettings,
     ) -> r[t.Meltano.MeltanoConfigDict]:
+        """Build normalized execution payload for service health responses."""
         try:
             return r[t.Meltano.MeltanoConfigDict].ok({
                 "service_type": service_type,

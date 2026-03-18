@@ -19,6 +19,8 @@ from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
 
 
 class FlextMeltanoDbtTransformationRunner:
+    """Execute DBT transformations through the Meltano executor."""
+
     @staticmethod
     def execute_dbt_transformation(
         executor: FlextMeltanoExecutor,
@@ -26,6 +28,7 @@ class FlextMeltanoDbtTransformationRunner:
         models: list[str] | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
+        """Run DBT `run` and normalize output into transformation contract."""
         try:
             args: list[str] = []
             if models:
@@ -167,6 +170,7 @@ class FlextMeltanoLibraryRunner(
         models: list[str] | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
+        """Run DBT transformation using the shared executor and logger."""
         return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
             executor=self._executor,
             logger=self.logger,

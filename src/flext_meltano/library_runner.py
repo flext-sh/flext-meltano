@@ -130,6 +130,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
         models: list[str] | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
+        """Run DBT transformation using the configured Meltano executor."""
         return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
             executor=self._executor,
             logger=self.logger,
