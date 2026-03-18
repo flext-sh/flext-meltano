@@ -13,3 +13,7 @@ from flext_tests import FlextTestsUtilities
 
 class TestsFlextMeltanoUtilities(FlextTestsUtilities):
     """Test utilities for flextmeltano."""
+
+
+u = TestsFlextMeltanoUtilities
+__all__ = ["TestsFlextMeltanoUtilities", "u"]
