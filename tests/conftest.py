@@ -20,7 +20,7 @@ import pytest
 import yaml
 
 from flext_meltano import t
-from tests.helpers.docker_test_manager import tk
+from tests.helpers.docker_test_manager import Tk as tk
 
 
 class MockCliResult:

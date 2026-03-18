@@ -47,7 +47,7 @@ if TYPE_CHECKING:
         test_meltano_project_dir,
     )
     from .constants import TestsFlextMeltanoConstants, c
-    from .helpers.docker_test_manager import ContainerManager, tk
+    from .helpers.docker_test_manager import ContainerManager, Tk as tk
     from .integration.test_docker_integration import TestDockerIntegration
     from .models import TestsFlextMeltanoModels, m
     from .protocols import TestsFlextMeltanoProtocols, p

@@ -79,7 +79,7 @@ class ContainerManager:
             return r[subprocess.CompletedProcess[str]].fail(f"Command error: {e}")
 
 
-class tk(ContainerManager):
+class Tk(ContainerManager):
     """Enterprise Docker testing infrastructure for FLEXT Meltano.
 
     Provides comprehensive container lifecycle management with automatic cleanup,
@@ -300,7 +300,7 @@ class tk(ContainerManager):
                 self.logger.exception("Failed to cleanup containers")
 
     @contextmanager
-    def service_context(self, services: list[str] | None = None) -> Generator[tk]:
+    def service_context(self, services: list[str] | None = None) -> Generator[Tk]:
         """Context manager for service lifecycle.
 
         Args:
@@ -316,13 +316,13 @@ class tk(ContainerManager):
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> tk:
+def docker_manager() -> Tk:
     """Session-scoped Docker manager fixture."""
-    return tk(keep_running=True)
+    return Tk(keep_running=True)
 
 
 @pytest.fixture
-def docker_services(docker_manager: tk) -> Generator[tk]:
+def docker_services(docker_manager: Tk) -> Generator[Tk]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager
