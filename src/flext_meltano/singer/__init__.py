@@ -40,38 +40,14 @@ if TYPE_CHECKING:
     from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextMeltanoCatalogManager": (
-        "flext_meltano.singer.catalog",
-        "FlextMeltanoCatalogManager",
-    ),
-    "FlextMeltanoPluginProtocols": (
-        "flext_meltano.singer.protocols",
-        "FlextMeltanoPluginProtocols",
-    ),
-    "FlextMeltanoSingerCliTranslator": (
-        "flext_meltano.singer.translator",
-        "FlextMeltanoSingerCliTranslator",
-    ),
-    "FlextMeltanoSingerProtocols": (
-        "flext_meltano.singer.protocols",
-        "FlextMeltanoSingerProtocols",
-    ),
-    "FlextMeltanoSingerService": (
-        "flext_meltano.singer.service",
-        "FlextMeltanoSingerService",
-    ),
-    "FlextMeltanoStateManager": (
-        "flext_meltano.singer.state",
-        "FlextMeltanoStateManager",
-    ),
-    "FlextMeltanoTapAbstractions": (
-        "flext_meltano.singer.tap",
-        "FlextMeltanoTapAbstractions",
-    ),
-    "FlextMeltanoTargetAbstractions": (
-        "flext_meltano.singer.target",
-        "FlextMeltanoTargetAbstractions",
-    ),
+    "FlextMeltanoCatalogManager": ("flext_meltano.singer.catalog", "FlextMeltanoCatalogManager"),
+    "FlextMeltanoPluginProtocols": ("flext_meltano.singer.protocols", "FlextMeltanoPluginProtocols"),
+    "FlextMeltanoSingerCliTranslator": ("flext_meltano.singer.translator", "FlextMeltanoSingerCliTranslator"),
+    "FlextMeltanoSingerProtocols": ("flext_meltano.singer.protocols", "FlextMeltanoSingerProtocols"),
+    "FlextMeltanoSingerService": ("flext_meltano.singer.service", "FlextMeltanoSingerService"),
+    "FlextMeltanoStateManager": ("flext_meltano.singer.state", "FlextMeltanoStateManager"),
+    "FlextMeltanoTapAbstractions": ("flext_meltano.singer.tap", "FlextMeltanoTapAbstractions"),
+    "FlextMeltanoTargetAbstractions": ("flext_meltano.singer.target", "FlextMeltanoTargetAbstractions"),
     "p": ("flext_meltano.singer.protocols", "FlextMeltanoPluginProtocols"),
     "s": ("flext_meltano.singer.service", "FlextMeltanoSingerService"),
 }

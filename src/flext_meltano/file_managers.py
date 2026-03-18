@@ -202,19 +202,19 @@ class FlextMeltanoFileManagers:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
-            plugin_items: dict[str, dict[str, object]] = {
-                "extractors": [],
-                "loaders": [],
-                "transformers": [],
-            }
-            meltano_config: t.Meltano.FileConfigDict = {
-                "version": 1,
-                "project_id": "project_name",
-                "project_name": "project_name",
-                "plugins": plugin_items,
-            }
-            model_paths: list[dict[str, object]] = ["models"]
-            test_paths: list[dict[str, object]] = ["tests"]
+             plugin_items: dict[str, list] = {
+                 "extractors": [],
+                 "loaders": [],
+                 "transformers": [],
+             }
+             meltano_config: t.Meltano.FileConfigDict = {
+                 "version": 1,
+                 "project_id": "project_name",
+                 "project_name": "project_name",
+                 "plugins": plugin_items,
+             }
+             model_paths: list[str] = ["models"]
+             test_paths: list[str] = ["tests"]
             dbt_project_config: t.Meltano.FileConfigDict = {
                 "name": "project_name",
                 "version": "1.0.0",

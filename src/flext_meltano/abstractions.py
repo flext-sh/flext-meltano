@@ -56,7 +56,7 @@ class FlextMeltanoAbstractions:
 
         def execute_data_pipeline(
             self,
-            _pipeline_context: t.Meltano.NestedJsonDict,
+            _pipeline_context: dict[str, str | None],
             source_config: t.Meltano.MeltanoConfigDict,
             sink_config: t.Meltano.MeltanoConfigDict,
         ) -> r[t.Meltano.ELT.PipelineResult]:
@@ -127,10 +127,10 @@ class FlextMeltanoAbstractions:
         self,
         source_name: str,
         sink_name: str,
-    ) -> r[t.Meltano.NestedJsonDict]:
+    ) -> r[dict[str, str]]:
         """Create pipeline context."""
         if not self._project_path:
-            return r[t.Meltano.NestedJsonDict].fail("No project loaded")
+            return r[dict[str, str]].fail("No project loaded")
         return self._runner_helper.create_pipeline_context(
             self._project_path,
             source_name,
@@ -148,7 +148,7 @@ class FlextMeltanoAbstractions:
             "status": "initialized",
         }
         return self._runner_helper.execute_data_pipeline(
-            pipeline_context,
+            pipeline_context,  # type: ignore[arg-type]
             source_config,
             sink_config,
         )
@@ -207,7 +207,7 @@ class FlextMeltanoAbstractions:
             ]
             filtered_components = u.filter(
                 components,
-                lambda comp: u.get(comp, "type", default="") == component_type,
+                lambda comp: u.get(dict(comp), "type", default="") == component_type,
             )
             result_list: list[t.Meltano.PluginDefinition] = (
                 list(filtered_components) if filtered_components else []

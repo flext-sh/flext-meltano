@@ -41,7 +41,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             str,
             str | list[str] | Mapping[str, t.Scalar | None],
         ]
-        type PluginConfiguration = Mapping[str, dict[str, object] | None]
+        type PluginConfiguration = dict[str, t.NormalizedValue]
         type PluginCatalog = dict[str, list[t.Meltano.PluginDefinition]]
         type PluginRegistry = Mapping[
             str,
@@ -173,8 +173,8 @@ class FlextMeltanoTypes(FlextCliTypes):
             type EltPipelineResult = Mapping[str, dict[str, object] | None]
             type Headers = dict[str, str]
 
-        type NestedJsonValue = dict[str, object] | None
-        type NestedJsonDict = Mapping[str, t.Meltano.NestedJsonValue]
+        type NestedJsonValue = dict[str, object] | str | int | float | bool | None
+        type NestedJsonDict = dict[str, t.Meltano.NestedJsonValue]
         type MeltanoConfigDict = Mapping[str, t.NormalizedValue]
         type PluginConfigDict = Mapping[str, dict[str, object] | None]
         type EnvironmentDict = dict[str, str]
@@ -188,8 +188,8 @@ class FlextMeltanoTypes(FlextCliTypes):
         type SchemaDict = Mapping[str, t.Scalar | None]
         type StateDict = Mapping[str, t.Scalar | None]
         type ResultDict = Mapping[str, t.NormalizedValue]
-        type RunContextDict = Mapping[str, dict[str, object] | None]
-        type FileConfigDict = Mapping[str, dict[str, object] | None]
+        type RunContextDict = dict[str, t.NormalizedValue]
+        type FileConfigDict = dict[str, t.NormalizedValue]
         PathDict = Mapping[str, str | Path]
         type PluginList = list[str]
         type PluginNameList = list[str]
@@ -199,27 +199,27 @@ class FlextMeltanoTypes(FlextCliTypes):
         type RuntimeConfigDict = Mapping[str, dict[str, object] | None]
         type SingerRecordDict = dict[str, t.Scalar | None]
         type SingerStateDict = dict[str, t.Scalar | None]
-        type SingerCatalogDict = Mapping[str, dict[str, object] | None]
-        type SingerConfigDict = Mapping[str, dict[str, object] | None]
+        type SingerCatalogDict = dict[str, t.NormalizedValue]
+        type SingerConfigDict = dict[str, t.NormalizedValue]
         type SingerSchemaDict = dict[str, t.Scalar | None]
         type SingerMessageList = list[dict[str, t.Scalar | None]]
         type StreamNameList = list[str]
-        type DbtModelDict = Mapping[str, dict[str, object] | None]
-        type DbtProfileDict = Mapping[str, dict[str, object] | None]
-        type DbtProjectDict = Mapping[str, dict[str, object] | None]
-        type DbtManifestDict = Mapping[str, dict[str, object] | None]
-        type DbtResultDict = Mapping[str, dict[str, object] | None]
+        type DbtModelDict = dict[str, t.NormalizedValue]
+        type DbtProfileDict = dict[str, t.NormalizedValue]
+        type DbtProjectDict = dict[str, t.NormalizedValue]
+        type DbtManifestDict = dict[str, t.NormalizedValue]
+        type DbtResultDict = dict[str, t.NormalizedValue]
         type DbtModelList = list[str]
         type DbtTestList = list[str]
 
         class Pipeline:
             """Pipeline execution complex types namespace."""
 
-            type PipelineConfig = Mapping[str, dict[str, object] | None]
+            type PipelineConfig = dict[str, t.NormalizedValue]
             type PipelineStatus = dict[str, str | int | bool]
-            type WorkflowDict = Mapping[str, dict[str, object] | None]
-            type RunContextDict = Mapping[str, dict[str, object] | None]
-            type ExecutionLogsDict = Mapping[str, dict[str, object] | None]
+            type WorkflowDict = dict[str, t.NormalizedValue]
+            type RunContextDict = dict[str, t.NormalizedValue]
+            type ExecutionLogsDict = dict[str, t.NormalizedValue]
             type MetricsDict = dict[str, float]
             type ErrorsDict = dict[str, str]
 
