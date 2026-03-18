@@ -97,7 +97,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     @staticmethod
     def _normalize_container_value(
         value: (
-            t.ContainerValue
+            Mapping[str, object]
             | t.NormalizedValue
             | t.Meltano.MeltanoConfigDict
             | list[t.Scalar | None]

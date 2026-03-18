@@ -32,8 +32,8 @@ from flext_meltano.abstractions import FlextMeltanoAbstractions
 def _is_meltano_project(
     value: p.Meltano.Project
     | t.Meltano.Dbt.Project
-    | Mapping[str, t.ContainerValue | None]
-    | t.ContainerValue
+    | Mapping[str, Mapping[str, object] | None]
+    | Mapping[str, object]
     | None,
 ) -> TypeIs[p.Meltano.Project]:
     """Type guard for protocol-compatible Meltano project objects."""

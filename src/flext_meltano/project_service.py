@@ -54,9 +54,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def _convert_to_project_dict(
         project: p.Meltano.Project
         | t.Meltano.Dbt.Project
-        | Mapping[str, t.ContainerValue | None]
+        | Mapping[str, Mapping[str, object] | None]
         | Path
-        | t.ContainerValue
+        | Mapping[str, object]
         | None,
     ) -> r[t.Meltano.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
@@ -134,7 +134,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         config_payload = m.Meltano.ConfigMappingPayload.model_validate({
             "values": config_obj,
         }).values
-        config_dict = TypeAdapter(dict[str, object]).validate_python(config_payload)
+        config_dict = TypeAdapter(Mapping[str, object]).validate_python(config_payload)
         normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
         return FlextMeltanoProjectService._write_meltano_config(
             normalized_path,

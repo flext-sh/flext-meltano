@@ -34,11 +34,11 @@ from pydantic import (
 from flext_meltano.constants import c
 
 type _ValidatorInput = (
-    t.ContainerValue
-    | Mapping[str, t.ContainerValue | None]
-    | list[t.ContainerValue | None]
-    | tuple[t.ContainerValue | None, ...]
-    | set[t.ContainerValue | None]
+    Mapping[str, object]
+    | Mapping[str, Mapping[str, object] | None]
+    | list[Mapping[str, object] | None]
+    | tuple[Mapping[str, object] | None, ...]
+    | set[Mapping[str, object] | None]
     | None
 )
 
@@ -129,7 +129,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_items(cls, value: _ValidatorInput) -> list[str]:
                 """Convert sequence-like values into string lists."""
-                values: list[t.ContainerValue | None]
+                values: list[dict[str, object] | None]
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
@@ -153,7 +153,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_items(cls, value: _ValidatorInput) -> list[bool]:
                 """Convert sequence-like values into booleans."""
-                values: list[t.ContainerValue | None]
+                values: list[dict[str, object] | None]
                 if isinstance(value, list):
                     values = value
                 elif isinstance(value, (tuple, set)):
@@ -1007,7 +1007,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config = ConfigDict(arbitrary_types_allowed=True)
 
-            config: Mapping[str, t.ContainerValue | None] | None = Field(
+            config: Mapping[str, dict[str, object] | None] | None = Field(
                 default=None,
                 description="Optional Meltano settings payload",
             )
@@ -2290,13 +2290,13 @@ class FlextMeltanoModels(FlextCliModels):
             def normalize_schema(
                 cls,
                 value: _ValidatorInput,
-            ) -> Mapping[str, t.ContainerValue | None]:
+            ) -> Mapping[str, dict[str, object] | None]:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        empty_schema: dict[str, t.ContainerValue | None] = {}
+                        empty_schema: dict[str, dict[str, object] | None] = {}
                         return empty_schema
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):

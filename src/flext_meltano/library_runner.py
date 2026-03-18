@@ -102,7 +102,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: dict[str, t.ContainerValue | None] = {
+            elt_result: dict[str, dict[str, object] | None] = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,
@@ -167,7 +167,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: dict[str, t.ContainerValue | None] = {
+            elt_result: dict[str, dict[str, object] | None] = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
                 "target_name": target.name,

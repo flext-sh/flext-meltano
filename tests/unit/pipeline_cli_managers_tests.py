@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import signal
+from collections.abc import Mapping
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -27,8 +28,6 @@ def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:
 
 
 def test_create_pipeline_creates_directory_and_configuration(tmp_path: Path) -> None:
-    from collections.abc import Mapping
-
     command: list[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
     config: dict[
         str,
@@ -56,7 +55,6 @@ def test_create_pipeline_fails_without_configuration(tmp_path: Path) -> None:
 
 
 def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
-    from collections.abc import Mapping
 
     command: list[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
     config: dict[

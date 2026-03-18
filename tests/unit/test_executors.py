@@ -7,10 +7,10 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from flext_core import FlextLogger
+from flext_core import FlextLogger, r
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoExecutor, r
+from flext_meltano import FlextMeltanoExecutor
 
 logger = FlextLogger(__name__)
 
@@ -20,7 +20,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.executor = FlextMeltanoExecutor()
+        self.executor: FlextMeltanoExecutor = FlextMeltanoExecutor()
 
     def test_executor_initialization(self) -> None:
         """Test executor initialization."""
@@ -362,7 +362,8 @@ class TestFlextMeltanoExecutorComplete:
                 tm.that(isinstance(result, r), eq=True)
                 if not result.is_success:
                     tm.that(result.error, eq=True)
-                    tm.that(len(result.error) > 0, eq=True)
+                    if result.error is not None:
+                        tm.that(len(result.error) > 0, eq=True)
             except Exception as e:
                 logger.debug("Expected exception during command execution: %s", e)
                 tm.that(True, eq=True)
@@ -515,30 +516,35 @@ class TestFlextMeltanoExecutorComplete:
             plugins_result = executor.list_plugins()
             tm.that(isinstance(plugins_result, r), eq=True)
 
-    def test_self(self, meltano_cli_runner) -> None:
+    def test_self(self, meltano_cli_runner: object) -> None:
         """Test flext-cli command error paths using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
         with mock.patch.object(
-            FlextMeltanoExecutor, "version", return_value=core_r.fail($$$)
+            FlextMeltanoExecutor,
+            "version",
+            return_value=r.fail("Version command failed"),
         ):
             version_result = FlextMeltanoExecutor().version()
             tm.fail(version_result)
-            tm.that("Version failed" in str(version_result.error), eq=True)
+            if version_result.error is not None:
+                tm.that("Version failed" in str(version_result.error), eq=True)
             with mock.patch.object(
-                FlextMeltanoExecutor, "health", return_value=core_r.fail($$$)
+                FlextMeltanoExecutor,
+                "health",
+                return_value=r.fail("Health check failed"),
             ):
                 pass
             with mock.patch.object(
                 FlextMeltanoExecutor,
                 "list_plugins",
-                return_value=core_r.fail($$$),
+                return_value=r.fail("Plugin listing failed"),
             ):
                 pass
             with mock.patch.object(
                 FlextMeltanoExecutor,
                 "run_pipeline",
-                return_value=core_r.fail($$$),
+                return_value=r.fail("Pipeline execution failed"),
             ):
                 pass
 
@@ -550,13 +556,14 @@ class TestFlextMeltanoExecutorComplete:
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
             tm.that("executor" in cli_app, eq=True)
-            mock_plugins_result = core_r.ok($$$)
+            mock_plugins_result = r.ok(["plugin1", "plugin2"])
             with mock.patch.object(
                 FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result
             ):
                 plugins_result = executor.list_plugins()
                 tm.ok(plugins_result)
-                tm.that(len(plugins_result.value) > 0, eq=True)
+                if plugins_result.value is not None:
+                    tm.that(len(plugins_result.value) > 0, eq=True)
                 version_result = executor.execute()
                 tm.that(isinstance(version_result, r), eq=True)
 
