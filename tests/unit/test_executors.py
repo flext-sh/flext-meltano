@@ -445,14 +445,13 @@ class TestFlextMeltanoExecutorComplete:
                 tm.that(isinstance(result, r), eq=True)
             except Exception as e:
                 logger.debug(
-                    "Expected exception during run command execution: %s",
-                    str(e),  # noqa: RUF065
+                    f"Expected exception during run command execution: {e}",
                 )
                 tm.that(True, eq=True)
         try:
             self.executor.help()
         except Exception as e:
-            logger.debug("Expected exception during help method execution: %s", str(e))  # noqa: RUF065
+            logger.debug(f"Expected exception during help method execution: {e}")
             tm.that(True, eq=True)
 
     def test_cli_execution_exception_handling(self) -> None:

@@ -1143,13 +1143,13 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_type: Annotated[str, Field(description="Type of the tap")]
             connection_config: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     description="Connection configuration",
                 ),
             ]
             stream_config: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Stream-specific configuration",
@@ -1203,7 +1203,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             target_type: Annotated[str, Field(description="Type of the target")]
             connection_config: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Connection configuration",
@@ -1325,7 +1325,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             stream_name: Annotated[str, Field(description="Name of the stream")]
             stream_schema: Annotated[
-                dict[str, t.Scalar | Mapping[str, t.Scalar]],
+                dict[str, t.NormalizedValue],
                 Field(
                     description="JSON schema for the stream",
                 ),
@@ -1374,12 +1374,12 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("stream_schema")
             def serialize_stream_schema(
                 self,
-                value: Mapping[str, t.Scalar | Mapping[str, t.Scalar]],
-            ) -> Mapping[str, t.Scalar | Mapping[str, t.Scalar]]:
+                value: Mapping[str, t.NormalizedValue],
+            ) -> Mapping[str, t.NormalizedValue]:
                 """Normalize stream schema structure."""
-                result: dict[str, t.Scalar | Mapping[str, t.Scalar]] = dict(value)
+                result: dict[str, t.NormalizedValue] = dict(value)
                 if "properties" not in result:
-                    empty: dict[str, t.Scalar] = {}
+                    empty: dict[str, t.NormalizedValue] = {}
                     result["properties"] = empty
                 if "type" not in result:
                     result["type"] = "object"
@@ -2806,14 +2806,14 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             plugins: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Plugin configurations",
                 ),
             ]
             environments: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Environment configurations",
@@ -2954,7 +2954,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             settings: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Plugin settings",
@@ -3037,28 +3037,28 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="1.0.0", description="DBT project version"),
             ]
             config: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="DBT project configuration",
                 ),
             ]
             models: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="DBT models configuration",
                 ),
             ]
             sources: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="DBT sources configuration",
                 ),
             ]
             tests: Annotated[
-                dict[str, t.Scalar],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="DBT tests configuration",

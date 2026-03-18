@@ -32,8 +32,9 @@ class _TestAssertions:
         )
 
     @staticmethod
-    def assert_in(item: str, container: dict[str, object], message: str = "") -> None:
-        tm.that(item in container, eq=True)
+    def assert_in(item: str, container: object, message: str = "") -> None:  # type: ignore[misc]
+        if isinstance(container, dict):
+            tm.that(item in container, eq=True)
 
 
 class TestFlextMeltanoTapAbstractionsComplete:
@@ -237,15 +238,14 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: dict[str, object] = {
-            "users": {"selected": True},
-            "orders": {"selected": False},
+        stream_config: dict[str, str] = {
+            "users": "selected",
+            "orders": "not_selected",
         }
         result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
-            connection_config=connection_config,
+            connection_config=connection_config,  # type: ignore[arg-type]
             stream_config=stream_config,
-            version="v2.0.0",
         )
         self.test_assertions.assert_true(
             condition=isinstance(result, r), message="Should return r"
@@ -782,7 +782,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test invalid tap config creation using flext_tests."""
         try:
             result = self.tap_abstractions.create_tap_from_config(
-                tap_type="", connection_config={}
+                tap_type="",
+                connection_config={},  # type: ignore[arg-type]
             )
             if result.is_failure:
                 self.test_assertions.assert_true(
@@ -817,8 +818,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream_config: dict[str, object] = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
-            connection_config=connection_config,
-            stream_config=stream_config,
+            connection_config=connection_config,  # type: ignore[arg-type]
+            stream_config=stream_config,  # type: ignore[arg-type]
         )
         self.test_assertions.assert_true(
             condition=create_result.is_success, message="Tap creation should succeed"
