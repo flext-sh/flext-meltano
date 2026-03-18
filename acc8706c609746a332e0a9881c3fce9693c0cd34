@@ -1,0 +1,23 @@
+src/flext_meltano/utilities.py
+  0fb2d9539512fe80 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "acc8706c609746a332e0a9881c3fce9693c0cd34",
+  "prompts": {
+    "0fb2d9539512fe80": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2feca499dffeo7Yde2XRqw4tW3",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
