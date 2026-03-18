@@ -25,6 +25,21 @@ if TYPE_CHECKING:
         test_get_pipeline_status_checks_process_state,
         test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
     )
+    from .test_api import (
+        TestFlextMeltanoCatalogOperations,
+        TestFlextMeltanoDataOperations,
+        TestFlextMeltanoDbtOperations,
+        TestFlextMeltanoELTPipeline,
+        TestFlextMeltanoErrorHandling,
+        TestFlextMeltanoExecuteMethod,
+        TestFlextMeltanoInitialization,
+        TestFlextMeltanoIntegration,
+        TestFlextMeltanoPerformance,
+        TestFlextMeltanoPluginOperations,
+        TestFlextMeltanoProjectOperations,
+        TestFlextMeltanoSuccessPaths,
+        pytestmark,
+    )
     from .test_cli_integration import (
         TestCliModelConverterWithDbtRunParams,
         TestCliModelConverterWithPipelineRunParams,
@@ -117,6 +132,30 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.unit.test_library_runner",
         "TestFlextDbtProgrammaticRunner",
     ),
+    "TestFlextMeltanoCatalogOperations": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoCatalogOperations",
+    ),
+    "TestFlextMeltanoDataOperations": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoDataOperations",
+    ),
+    "TestFlextMeltanoDbtOperations": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoDbtOperations",
+    ),
+    "TestFlextMeltanoELTPipeline": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoELTPipeline",
+    ),
+    "TestFlextMeltanoErrorHandling": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoErrorHandling",
+    ),
+    "TestFlextMeltanoExecuteMethod": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoExecuteMethod",
+    ),
     "TestFlextMeltanoExecutionResult": (
         "tests.unit.test_execution_result",
         "TestFlextMeltanoExecutionResult",
@@ -129,13 +168,33 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.unit.test_file_managers",
         "TestFlextMeltanoFileManagersComprehensive",
     ),
+    "TestFlextMeltanoInitialization": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoInitialization",
+    ),
+    "TestFlextMeltanoIntegration": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoIntegration",
+    ),
     "TestFlextMeltanoLibraryRunner": (
         "tests.unit.test_library_runner",
         "TestFlextMeltanoLibraryRunner",
     ),
+    "TestFlextMeltanoPerformance": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoPerformance",
+    ),
+    "TestFlextMeltanoPluginOperations": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoPluginOperations",
+    ),
     "TestFlextMeltanoPluginProtocolsUnified": (
         "tests.unit.test_plugin_protocols",
         "TestFlextMeltanoPluginProtocolsUnified",
+    ),
+    "TestFlextMeltanoProjectOperations": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoProjectOperations",
     ),
     "TestFlextMeltanoServiceInitialization": (
         "tests.unit.test_services",
@@ -177,6 +236,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestFlextMeltanoSingerCliTranslatorTargetRun": (
         "tests.unit.test_singer_cli_translator",
         "TestFlextMeltanoSingerCliTranslatorTargetRun",
+    ),
+    "TestFlextMeltanoSuccessPaths": (
+        "tests.unit.test_api",
+        "TestFlextMeltanoSuccessPaths",
     ),
     "TestFlextMeltanoTapAbstractionsComplete": (
         "tests.unit.test_tap_abstractions",
@@ -232,6 +295,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "Testc": ("tests.unit.test_constants", "Testc"),
     "c": ("tests.unit.test_config", "TestFlextMeltanoSettingsConstants"),
     "logger": ("tests.unit.test_target_abstractions", "logger"),
+    "pytestmark": ("tests.unit.test_api", "pytestmark"),
     "r": ("tests.unit.test_execution_result", "TestFlextMeltanoExecutionResult"),
     "s": ("tests.unit.test_services", "TestTapService"),
     "t": ("tests.unit.test_singer_types", "TestFlextSingerTypes"),
@@ -273,11 +337,22 @@ __all__ = [
     "TestDbtProjectModelEnhanced",
     "TestDbtService",
     "TestFlextDbtProgrammaticRunner",
+    "TestFlextMeltanoCatalogOperations",
+    "TestFlextMeltanoDataOperations",
+    "TestFlextMeltanoDbtOperations",
+    "TestFlextMeltanoELTPipeline",
+    "TestFlextMeltanoErrorHandling",
+    "TestFlextMeltanoExecuteMethod",
     "TestFlextMeltanoExecutionResult",
     "TestFlextMeltanoExecutorComplete",
     "TestFlextMeltanoFileManagersComprehensive",
+    "TestFlextMeltanoInitialization",
+    "TestFlextMeltanoIntegration",
     "TestFlextMeltanoLibraryRunner",
+    "TestFlextMeltanoPerformance",
+    "TestFlextMeltanoPluginOperations",
     "TestFlextMeltanoPluginProtocolsUnified",
+    "TestFlextMeltanoProjectOperations",
     "TestFlextMeltanoServiceInitialization",
     "TestFlextMeltanoSettings",
     "TestFlextMeltanoSettingsConstants",
@@ -289,6 +364,7 @@ __all__ = [
     "TestFlextMeltanoSingerCliTranslatorPipelineRun",
     "TestFlextMeltanoSingerCliTranslatorTapRun",
     "TestFlextMeltanoSingerCliTranslatorTargetRun",
+    "TestFlextMeltanoSuccessPaths",
     "TestFlextMeltanoTapAbstractionsComplete",
     "TestFlextMeltanoTargetAbstractionsComplete",
     "TestFlextMeltanoTypes",
@@ -313,6 +389,7 @@ __all__ = [
     "Testc",
     "c",
     "logger",
+    "pytestmark",
     "r",
     "s",
     "t",
