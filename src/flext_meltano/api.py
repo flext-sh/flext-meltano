@@ -77,7 +77,7 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
         super().__init__()
         self.service_name = service_name
         self.version = version
-        self.logger.info("FlextMeltano API '%s' v%s initialized", service_name, version)
+        self.logger.info(f"FlextMeltano API '{service_name}' v{version} initialized")
 
     @property
     @override
@@ -570,6 +570,38 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
                 f"ELT pipeline execution failed: {e}"
             )
 
+    def _execute_singer_component(
+        self,
+        component_name: str,
+        component_key: str,
+        component_label: str,
+        validation_prefix: str,
+        execution_error_message: str,
+    ) -> r[t.Meltano.MeltanoConfigDict]:
+        if u.none_(component_name):
+            return r[t.Meltano.MeltanoConfigDict].fail(
+                f"{component_label} name is required for execution"
+            )
+        if not u.starts(component_name, validation_prefix):
+            return r[t.Meltano.MeltanoConfigDict].fail(
+                f"Invalid {component_key} name format: {component_name}"
+            )
+
+        try:
+            execution_start = time.time()
+            execution_duration = time.time() - execution_start
+            return r[t.Meltano.MeltanoConfigDict].ok({
+                f"{component_key}_name": component_name,
+                "status": "completed",
+                "execution_duration": execution_duration,
+                "executed_at": str(time.time()),
+                "api_version": self.version,
+            })
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(
+                f"{execution_error_message}: {e}"
+            )
+
     def run_tap(self, tap_name: str) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute Singer tap.
 
@@ -580,27 +612,13 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
             Tap execution result.
 
         """
-        if u.none_(tap_name):
-            return r[t.Meltano.MeltanoConfigDict].fail(
-                "Tap name is required for execution"
-            )
-        if not u.starts(tap_name, "tap-"):
-            return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid tap name format: {tap_name}"
-            )
-
-        try:
-            execution_start = time.time()
-            execution_duration = time.time() - execution_start
-            return r[t.Meltano.MeltanoConfigDict].ok({
-                "tap_name": tap_name,
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.version,
-            })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.MeltanoConfigDict].fail(f"Tap execution failed: {e}")
+        return self._execute_singer_component(
+            component_name=tap_name,
+            component_key="tap",
+            component_label="Tap",
+            validation_prefix="tap-",
+            execution_error_message="Tap execution failed",
+        )
 
     def run_target(self, target_name: str) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute Singer target.
@@ -612,27 +630,13 @@ class FlextMeltano(s[t.Meltano.MeltanoConfigDict]):
             Target execution result.
 
         """
-        if u.none_(target_name):
-            return r[t.Meltano.MeltanoConfigDict].fail(
-                "Target name is required for execution"
-            )
-        if not u.starts(target_name, "target-"):
-            return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid target name format: {target_name}"
-            )
-
-        try:
-            execution_start = time.time()
-            execution_duration = time.time() - execution_start
-            return r[t.Meltano.MeltanoConfigDict].ok({
-                "target_name": target_name,
-                "status": "completed",
-                "execution_duration": execution_duration,
-                "executed_at": str(time.time()),
-                "api_version": self.version,
-            })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.MeltanoConfigDict].fail(f"Target execution failed: {e}")
+        return self._execute_singer_component(
+            component_name=target_name,
+            component_key="target",
+            component_label="Target",
+            validation_prefix="target-",
+            execution_error_message="Target execution failed",
+        )
 
     def test_dbt_models(
         self,
