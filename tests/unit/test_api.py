@@ -11,13 +11,14 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-import typing
 from pathlib import Path
+from typing import override
 
 import pytest
+from flext_core import r
 from flext_tests import tm
 
-from flext_meltano import FlextMeltano, c, m, r, t
+from flext_meltano import FlextMeltano, c, m, t
 
 pytestmark = pytest.mark.unit
 
@@ -29,9 +30,11 @@ class TestFlextMeltanoInitialization:
         """Test API initialization with default parameters."""
 
         class ConcreteAPI(FlextMeltano):
-            def execute(self, **kwargs: t.Scalar) -> r[t.Scalar]:
+            @override
+            def execute(self, **kwargs: t.Scalar) -> r[m.Meltano.ConfigMappingPayload]:
                 _ = kwargs
-                return r[t.Scalar].ok("ok")
+                payload = m.Meltano.ConfigMappingPayload(values={"status": "ok"})
+                return r[m.Meltano.ConfigMappingPayload].ok(payload)
 
         api = ConcreteAPI(service_name="test-api")
         tm.that(api is not None, eq=True)
@@ -208,7 +211,7 @@ class TestFlextMeltanoDataOperations:
     def test_load_data_with_records(self) -> None:
         """Test data loading with actual records."""
         api = FlextMeltano()
-        records: list[dict[str, t.Scalar]] = [{"id": 1, "name": "test"}]
+        records: list[t.Meltano.RecordDict] = [{"id": 1, "name": "test"}]
         result = api.load_data(sink_name="target-jsonl", records=records)
         tm.that(result.is_failure or result.is_success, eq=True)
 
@@ -289,14 +292,18 @@ class TestFlextMeltanoErrorHandling:
     """Test FlextMeltano error handling and edge cases."""
 
     def test_api_handles_none_project_root(self) -> None:
-        """Test API handles None project root gracefully."""
-        api = FlextMeltano(project_root=None)
-        tm.that(api is not None, eq=True)
+         """Test API handles None project root gracefully."""
+         api = FlextMeltano(project_root=None)
+         tm.that(api is not None, eq=True)
 
     def test_api_handles_invalid_project_root(self) -> None:
-        """Test API handles invalid project root type."""
-        with pytest.raises((TypeError, ValueError)):
-            FlextMeltano(project_root=123)
+         """Test API handles invalid project root type."""
+         try:
+             invalid_root: object = 123
+             FlextMeltano(project_root=invalid_root)  # type: ignore[arg-type]
+             assert False, "Should have raised TypeError or ValueError"
+         except (TypeError, ValueError):
+             pass
 
     def test_create_project_exception_handling(self) -> None:
         """Test project creation handles exceptions gracefully."""
@@ -464,7 +471,7 @@ class TestFlextMeltanoSuccessPaths:
 class TestFlextMeltanoPerformance:
     """Performance benchmarks for FlextMeltano operations."""
 
-    def test_api_initialization_performance(self, benchmark: typing.Any) -> None:
+    def test_api_initialization_performance(self, benchmark: object) -> None:
         """Benchmark API initialization performance."""
 
         def create_api() -> FlextMeltano:
@@ -473,7 +480,7 @@ class TestFlextMeltanoPerformance:
         result = benchmark(create_api)
         tm.that(result is not None, eq=True)
 
-    def test_api_properties_access_performance(self, benchmark: typing.Any) -> None:
+    def test_api_properties_access_performance(self, benchmark: object) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()
 
