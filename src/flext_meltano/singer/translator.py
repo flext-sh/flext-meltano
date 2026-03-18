@@ -146,6 +146,7 @@ class FlextMeltanoSingerCliTranslator:
             )
         try:
             process_input = input_data.encode() if input_data else None
+            # Intentional subprocess usage: Singer SDK command execution
             proc_result = subprocess.run(
                 command,
                 capture_output=True,
