@@ -51,7 +51,7 @@ if TYPE_CHECKING:
     from .integration.test_docker_integration import TestDockerIntegration
     from .models import TestsFlextMeltanoModels, m
     from .protocols import TestsFlextMeltanoProtocols, p
-    from .typings import TestsFlextMeltanoTypes
+    from .typings import TestsFlextMeltanoTypes, t
     from .unit.pipeline_cli_managers_tests import (
         test_create_pipeline_creates_directory_and_configuration,
         test_create_pipeline_fails_without_configuration,
@@ -131,7 +131,7 @@ if TYPE_CHECKING:
         TestFlextMeltanoSingerCliTranslatorTapRun,
         TestFlextMeltanoSingerCliTranslatorTargetRun,
     )
-    from .unit.test_singer_types import TestFlextSingerTypes, TestFlextSingerTypes as t
+    from .unit.test_singer_types import TestFlextSingerTypes
     from .unit.test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
     from .unit.test_target_abstractions import (
         TestFlextMeltanoTargetAbstractionsComplete,
@@ -140,7 +140,7 @@ if TYPE_CHECKING:
     from .unit.test_typings import TestFlextMeltanoTypes
     from .unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
     from .unit.test_validators import TestFlextMeltanoValidatorsComprehensive
-    from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
+    from .utilities import TestsFlextMeltanoUtilities, u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "CliRunner": ("tests.conftest", "CliRunner"),
@@ -376,7 +376,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "singer_records": ("tests.conftest", "singer_records"),
     "singer_schema": ("tests.conftest", "singer_schema"),
     "singer_state": ("tests.conftest", "singer_state"),
-    "t": ("tests.unit.test_singer_types", "TestFlextSingerTypes"),
+    "t": ("tests.typings", "t"),
     "tap_csv_config": ("tests.conftest", "tap_csv_config"),
     "target_csv_config": ("tests.conftest", "target_csv_config"),
     "test_create_pipeline_creates_directory_and_configuration": (
@@ -409,7 +409,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.unit.pipeline_cli_managers_tests",
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
-    "u": ("tests.utilities", "TestsFlextMeltanoUtilities"),
+    "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
 }
 
