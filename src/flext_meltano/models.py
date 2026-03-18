@@ -2065,7 +2065,7 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             errors: Annotated[int, Field(ge=0, description="Number of errors")]
             state: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Final state payload",
@@ -2087,7 +2087,7 @@ class FlextMeltanoModels(FlextCliModels):
                 str, Field(min_length=1, description="Singer target name")
             ]
             config: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Pipeline config",
@@ -2101,7 +2101,7 @@ class FlextMeltanoModels(FlextCliModels):
                 str, Field(min_length=1, description="Pipeline identifier")
             ]
             config: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Execution config",
@@ -2114,7 +2114,7 @@ class FlextMeltanoModels(FlextCliModels):
             plugin_type: Annotated[str, Field(min_length=1, description="Plugin type")]
             plugin_name: Annotated[str, Field(min_length=1, description="Plugin name")]
             config: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Plugin config",
@@ -2139,7 +2139,7 @@ class FlextMeltanoModels(FlextCliModels):
                 str, Field(min_length=1, description="Environment name")
             ]
             config: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict,
                     description="Environment config",
@@ -2153,7 +2153,7 @@ class FlextMeltanoModels(FlextCliModels):
                 list[str] | None, Field(default=None, description="Models to run")
             ]
             config: Annotated[
-                dict[str, object] | None,
+                dict[str, t.NormalizedValue] | None,
                 Field(
                     default=None,
                     description="Execution config",
@@ -2175,7 +2175,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             config: Annotated[
-                dict[str, object] | None,
+                dict[str, t.NormalizedValue] | None,
                 Field(
                     default=None,
                     description="Pipeline config",
