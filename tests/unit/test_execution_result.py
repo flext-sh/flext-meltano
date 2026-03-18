@@ -9,12 +9,24 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
+from flext_core import t
 from flext_tests import tm
-from pydantic import TypeAdapter
+from pydantic import BaseModel, TypeAdapter
 
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 
-_JSON_ADAPTER: TypeAdapter[dict[str, object]] = TypeAdapter(dict[str, object])
+
+class _ExecutionResultJson(BaseModel):
+    command: list[str]
+    success: bool
+    exit_code: int
+    output: str
+    error: str
+    execution_time: float
+    timestamp: str
+
+
+_JSON_ADAPTER: TypeAdapter[_ExecutionResultJson] = TypeAdapter(_ExecutionResultJson)
 
 
 class TestFlextMeltanoExecutionResult:
@@ -155,13 +167,13 @@ class TestFlextMeltanoExecutionResult:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
             json_str = result.model_dump_json()
             parsed = _JSON_ADAPTER.validate_json(json_str)
-            tm.that(parsed["command"], eq=command)
-            tm.that(parsed["success"] is True, eq=True)
-            tm.that(parsed["exit_code"], eq=0)
-            tm.that(parsed["output"], eq='{"streams": []}')
-            tm.that(parsed["error"], eq=False)
-            tm.that(parsed["execution_time"], eq=self.TEST_EXECUTION_TIME_JSON_SUCCESS)
-            tm.that(parsed["timestamp"], eq="2025-01-01T12:02:00Z")
+            tm.that(parsed.command, eq=command)
+            tm.that(parsed.success is True, eq=True)
+            tm.that(parsed.exit_code, eq=0)
+            tm.that(parsed.output, eq='{"streams": []}')
+            tm.that(parsed.error, eq=False)
+            tm.that(parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_SUCCESS)
+            tm.that(parsed.timestamp, eq="2025-01-01T12:02:00Z")
 
     def test_model_dump_json_failure(self) -> None:
         """Test model_dump_json with failed execution."""
@@ -178,13 +190,13 @@ class TestFlextMeltanoExecutionResult:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
             json_str = result.model_dump_json()
             parsed = _JSON_ADAPTER.validate_json(json_str)
-            tm.that(parsed["command"], eq=command)
-            tm.that(parsed["success"] is False, eq=True)
-            tm.that(parsed["exit_code"], eq=2)
-            tm.that(parsed["output"], eq=False)
-            tm.that(parsed["error"], eq="Configuration error: invalid settings")
-            tm.that(parsed["execution_time"], eq=self.TEST_EXECUTION_TIME_JSON_FAILURE)
-            tm.that(parsed["timestamp"], eq="2025-01-01T12:03:00Z")
+            tm.that(parsed.command, eq=command)
+            tm.that(parsed.success is False, eq=True)
+            tm.that(parsed.exit_code, eq=2)
+            tm.that(parsed.output, eq=False)
+            tm.that(parsed.error, eq="Configuration error: invalid settings")
+            tm.that(parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_FAILURE)
+            tm.that(parsed.timestamp, eq="2025-01-01T12:03:00Z")
 
     def test_model_dump_json_with_complex_command(self) -> None:
         """Test model_dump_json with complex command arguments."""
@@ -201,13 +213,13 @@ class TestFlextMeltanoExecutionResult:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
             json_str = result.model_dump_json()
             parsed = _JSON_ADAPTER.validate_json(json_str)
-            tm.that(parsed["command"], eq=command)
-            tm.that(parsed["success"] is True, eq=True)
-            tm.that(parsed["exit_code"], eq=0)
-            tm.that(parsed["output"], eq="Pipeline completed successfully")
-            tm.that(parsed["error"], eq=False)
-            tm.that(parsed["execution_time"], eq=self.TEST_EXECUTION_TIME_JSON_ERROR)
-            tm.that(parsed["timestamp"], eq="2025-01-01T12:04:00Z")
+            tm.that(parsed.command, eq=command)
+            tm.that(parsed.success is True, eq=True)
+            tm.that(parsed.exit_code, eq=0)
+            tm.that(parsed.output, eq="Pipeline completed successfully")
+            tm.that(parsed.error, eq=False)
+            tm.that(parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_ERROR)
+            tm.that(parsed.timestamp, eq="2025-01-01T12:04:00Z")
 
     def test_execution_result_with_special_characters(self) -> None:
         """Test execution result with special characters in output and error."""

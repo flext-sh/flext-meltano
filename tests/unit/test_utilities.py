@@ -124,7 +124,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             (project_path / ".meltano").mkdir()
             result = u.Meltano.validate_project_structure(project_path)
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            assert result.error is not None
             tm.that("Meltano config file not found" in result.error, eq=True)
 
     def test_validate_project_structure_missing_meltano_dir(self) -> None:

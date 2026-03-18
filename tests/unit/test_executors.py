@@ -520,25 +520,25 @@ class TestFlextMeltanoExecutorComplete:
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
         with mock.patch.object(
-            FlextMeltanoExecutor, "version", return_value=r.fail("Version failed")
+            FlextMeltanoExecutor, "version", return_value=core_r.fail($$$)
         ):
             version_result = FlextMeltanoExecutor().version()
             tm.fail(version_result)
             tm.that("Version failed" in str(version_result.error), eq=True)
             with mock.patch.object(
-                FlextMeltanoExecutor, "health", return_value=r.fail("Health failed")
+                FlextMeltanoExecutor, "health", return_value=core_r.fail($$$)
             ):
                 pass
             with mock.patch.object(
                 FlextMeltanoExecutor,
                 "list_plugins",
-                return_value=r.fail("Plugins failed"),
+                return_value=core_r.fail($$$),
             ):
                 pass
             with mock.patch.object(
                 FlextMeltanoExecutor,
                 "run_pipeline",
-                return_value=r.fail("Pipeline failed"),
+                return_value=core_r.fail($$$),
             ):
                 pass
 
@@ -550,7 +550,7 @@ class TestFlextMeltanoExecutorComplete:
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
             tm.that("executor" in cli_app, eq=True)
-            mock_plugins_result = r.ok([{"name": "tap-csv", "type": "extractors"}])
+            mock_plugins_result = core_r.ok($$$)
             with mock.patch.object(
                 FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result
             ):

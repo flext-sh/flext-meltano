@@ -191,7 +191,8 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
         tm.that(result.error is not None, eq=True)
-        tm.that("Plugin config validation failed" in result.error, eq=True)
+        if result.error is not None:
+            tm.that("Plugin config validation failed" in result.error, eq=True)
 
     def test_validate_plugin_name_whitespace(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -203,7 +204,8 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
         tm.that(result.error is not None, eq=True)
-        tm.that("Plugin config validation failed" in result.error, eq=True)
+        if result.error is not None:
+            tm.that("Plugin config validation failed" in result.error, eq=True)
 
     def test_validate_target_plugin_name_too_short(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -216,9 +218,11 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.fail(result)
         tm.that(result.error is not None, eq=True)
         tm.that(result.error is not None, eq=True)
-        tm.that(
-            "Target plugin names must be at least 8 characters" in result.error, eq=True
-        )
+        if result.error is not None:
+            tm.that(
+                "Target plugin names must be at least 8 characters" in result.error,
+                eq=True,
+            )
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -231,10 +235,11 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.fail(result)
         tm.that(result.error is not None, eq=True)
         tm.that(result.error is not None, eq=True)
-        tm.that(
-            "Source component names must be at least 5 characters" in result.error,
-            eq=True,
-        )
+        if result.error is not None:
+            tm.that(
+                "Source component names must be at least 5 characters" in result.error,
+                eq=True,
+            )
 
     def test_validate_target_plugin_name_valid(self) -> None:
         config: dict[str, t.Scalar] = {

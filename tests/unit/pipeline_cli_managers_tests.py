@@ -7,7 +7,7 @@ import signal
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_core import r
+from flext_core import r, t
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
@@ -27,7 +27,14 @@ def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:
 
 
 def test_create_pipeline_creates_directory_and_configuration(tmp_path: Path) -> None:
-    config = {"command": ["run", "tap-demo", "target-demo"], "schedule": "daily"}
+    command: list[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
+    config: dict[
+        str,
+        t.Scalar | list[t.Scalar | None] | dict[str, t.Scalar | None] | None,
+    ] = {
+        "command": command,
+        "schedule": "daily",
+    }
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         result = create_pipeline("daily-pipeline", config)
     tm.ok(result)
@@ -47,7 +54,11 @@ def test_create_pipeline_fails_without_configuration(tmp_path: Path) -> None:
 
 
 def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
-    config = {"command": ["run", "tap-demo", "target-demo"]}
+    command: list[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
+    config: dict[
+        str,
+        t.Scalar | list[t.Scalar | None] | dict[str, t.Scalar | None] | None,
+    ] = {"command": command}
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("exec-pipeline", config)
         tm.ok(create_result)
