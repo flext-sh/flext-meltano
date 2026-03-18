@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 from flext_core import FlextLogger
+from flext_tests import tm
 
 from flext_meltano import r, t, u
 from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
@@ -27,12 +28,12 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_abstractions_initialization(self) -> None:
         """Test FlextMeltanoTargetAbstractions initialization."""
         target_abs = FlextMeltanoTargetAbstractions()
-        assert target_abs is not None
-        assert hasattr(target_abs, "logger")
+        tm.that(target_abs is not None, eq=True)
+        tm.that(hasattr(target_abs, "logger"), eq=True)
 
     def test_create_flext_target_config(self) -> None:
         """Test target configuration creation."""
-        assert self.target_abstractions is not None
+        tm.that(self.target_abstractions is not None, eq=True)
         if not hasattr(self.target_abstractions, "configure_sink"):
             pytest.skip("configure_sink not available")
         pass
@@ -44,14 +45,14 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_error_handling(self) -> None:
         """Test target error handling."""
         failure_result: r[str] = r[str].fail("Target error")
-        assert isinstance(failure_result, r)
-        assert failure_result.is_failure
+        tm.that(isinstance(failure_result, r), eq=True)
+        tm.fail(failure_result)
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core."""
         timestamp = u.generate_iso_timestamp()
-        assert isinstance(timestamp, str)
-        assert "T" in timestamp
+        tm.that(isinstance(timestamp, str), eq=True)
+        tm.that("T" in timestamp, eq=True)
         test_data: t.Meltano.MeltanoConfigDict = {
             "level1": {"level2": {"level3": "found_value"}}
         }
@@ -60,4 +61,4 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             level2 = level1.get("level2", {})
             if isinstance(level2, dict):
                 result = level2.get("level3", "default")
-                assert result == "found_value"
+                tm.that(result, eq="found_value")

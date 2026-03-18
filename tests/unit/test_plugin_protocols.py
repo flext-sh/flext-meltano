@@ -13,6 +13,8 @@ from __future__ import annotations
 import unittest
 from unittest import TestCase
 
+from flext_tests import tm
+
 import flext_meltano.singer.protocols as protocols_module
 from flext_meltano.singer.protocols import FlextMeltanoPluginProtocols
 
@@ -22,16 +24,14 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
 
     def test_unified_class_exists(self) -> None:
         """Test FlextMeltanoPluginProtocols unified class exists."""
-        assert hasattr(FlextMeltanoPluginProtocols, "__name__")
-        assert FlextMeltanoPluginProtocols.__name__ == "FlextMeltanoPluginProtocols"
+        tm.that(hasattr(FlextMeltanoPluginProtocols, "__name__"), eq=True)
+        tm.that(FlextMeltanoPluginProtocols.__name__, eq="FlextMeltanoPluginProtocols")
 
     def test_unified_class_has_core_plugin_types(self) -> None:
         """Test FlextMeltanoPluginProtocols has core plugin type definitions."""
         expected_core_types = ["TapPlugin", "TargetPlugin", "DbtPlugin"]
         for plugin_type in expected_core_types:
-            assert hasattr(FlextMeltanoPluginProtocols, plugin_type), (
-                f"FlextMeltanoPluginProtocols missing core type: {plugin_type}"
-            )
+            tm.that(hasattr(FlextMeltanoPluginProtocols, plugin_type), eq=True)
 
     def test_unified_class_has_service_protocols(self) -> None:
         """Test FlextMeltanoPluginProtocols has service protocol definitions."""
@@ -41,39 +41,37 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             "DbtService",
         ]
         for service_protocol in expected_service_protocols:
-            assert hasattr(FlextMeltanoPluginProtocols, service_protocol), (
-                f"FlextMeltanoPluginProtocols missing service protocol: {service_protocol}"
-            )
+            tm.that(hasattr(FlextMeltanoPluginProtocols, service_protocol), eq=True)
 
     def test_tap_plugin_protocol_definition(self) -> None:
         """Test TapPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TapPlugin
-        assert protocol is not None
+        tm.that(protocol is not None, eq=True)
 
     def test_target_plugin_protocol_definition(self) -> None:
         """Test TargetPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TargetPlugin
-        assert protocol is not None
+        tm.that(protocol is not None, eq=True)
 
     def test_dbt_plugin_protocol_definition(self) -> None:
         """Test DbtPlugin protocol definition is valid."""
         protocol = FlextMeltanoPluginProtocols.DbtPlugin
-        assert protocol is not None
+        tm.that(protocol is not None, eq=True)
 
     def test_tap_service_protocol_definition(self) -> None:
         """Test TapService definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TapService
-        assert protocol is not None
+        tm.that(protocol is not None, eq=True)
 
     def test_target_service_protocol_definition(self) -> None:
         """Test TargetService definition is valid."""
         protocol = FlextMeltanoPluginProtocols.TargetService
-        assert protocol is not None
+        tm.that(protocol is not None, eq=True)
 
     def test_dbt_service_protocol_definition(self) -> None:
         """Test DbtService definition is valid."""
         protocol = FlextMeltanoPluginProtocols.DbtService
-        assert protocol is not None
+        tm.that(protocol is not None, eq=True)
 
     def test_no_aliases_exist(self) -> None:
         """Test that NO aliases exist - direct API access only."""
@@ -86,31 +84,33 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             "DbtService",
         ]
         for alias in no_alias_attributes:
-            assert not hasattr(FlextMeltanoPluginProtocols, alias), (
-                f"VIOLATION: Found eliminated alias {alias} - should not exist"
-            )
+            tm.that(not hasattr(FlextMeltanoPluginProtocols, alias), eq=True)
 
     def test_unified_class_structure(self) -> None:
         """Test unified class has proper structure."""
-        assert hasattr(FlextMeltanoPluginProtocols, "__module__")
-        assert (
-            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.singer.protocols"
+        tm.that(hasattr(FlextMeltanoPluginProtocols, "__module__"), eq=True)
+        tm.that(
+            (
+                FlextMeltanoPluginProtocols.__module__
+                == "flext_meltano.singer.protocols"
+            ),
+            eq=True,
         )
 
     def test_direct_api_access_only(self) -> None:
         """Test that only direct API access works - NO module-level aliases."""
-        assert FlextMeltanoPluginProtocols is not None
-        assert hasattr(FlextMeltanoPluginProtocols, "__name__")
+        tm.that(FlextMeltanoPluginProtocols is not None, eq=True)
+        tm.that(hasattr(FlextMeltanoPluginProtocols, "__name__"), eq=True)
 
     def test_class_documentation_exists(self) -> None:
         """Test unified class has proper documentation."""
-        assert FlextMeltanoPluginProtocols.__doc__ is not None
-        assert protocols_module.__doc__ is not None
+        tm.that(FlextMeltanoPluginProtocols.__doc__ is not None, eq=True)
+        tm.that(protocols_module.__doc__ is not None, eq=True)
 
     def test_module_exports_only_unified_class(self) -> None:
         """Test module exports only the unified class - NO ALIASES."""
         all_exports = getattr(protocols_module, "__all__", [])
-        assert "FlextMeltanoPluginProtocols" in all_exports
+        tm.that("FlextMeltanoPluginProtocols" in all_exports, eq=True)
         forbidden_exports = [
             "FlextMeltanoTapPlugin",
             "FlextTargetPlugin",
@@ -122,9 +122,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             "DbtService",
         ]
         for forbidden in forbidden_exports:
-            assert forbidden not in all_exports, (
-                f"VIOLATION: Found forbidden alias export: {forbidden}"
-            )
+            tm.that(forbidden not in all_exports, eq=True)
 
 
 if __name__ == "__main__":

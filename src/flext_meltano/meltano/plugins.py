@@ -51,14 +51,14 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         """Initialize component service with FLEXT configuration."""
         super().__init__()
         self._meltano_config: FlextMeltanoSettings = (
-            config if config is not None else FlextMeltanoSettings()
+            config if config is not None else FlextMeltanoSettings.model_validate({})
         )
 
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> r[str]:
         """Validate plugin type."""
         valid_types = ["extractors", "loaders", "transformers"]
-        if u.not_(u.in_(plugin_type, valid_types)):
+        if plugin_type not in valid_types:
             return r[str].fail(
                 f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
             )
@@ -193,20 +193,16 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         r containing plugin service configuration and status.
 
         """
-        try:
-            config_data: t.Meltano.MeltanoConfigDict = {
-                "service_type": "flext_meltano_plugin_service",
-                "status": "ready",
-                "config": self._meltano_config.model_dump()
-                if u.is_pydantic_model(self._meltano_config)
-                else {},
-            }
+        result = FlextMeltanoProjectService.build_service_execution_payload(
+            "flext_meltano_plugin_service",
+            self._meltano_config,
+        )
+        if result.is_success:
             self.logger.info("FlextMeltanoPluginService executed successfully")
-            return r[t.Meltano.MeltanoConfigDict].ok(config_data)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Plugin service execution failed: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
+            return result
+        error_msg = result.error or "Plugin service execution failed"
+        self.logger.error(error_msg)
+        return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     def get_plugin_info(
         self, plugin_name: str, plugin_type: str
@@ -237,13 +233,12 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
             plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
                 "plugins": plugins_data
             }).plugins
-            if u.not_(u.in_(plugin_name, plugins_dict)) or u.empty(
-                u.get(plugins_dict, plugin_name)
-            ):
+            plugin_value = plugins_dict.get(plugin_name)
+            if plugin_value is None:
                 return r[Mapping[str, str]].fail(
                     f"Plugin '{plugin_name}' not found in {plugin_type}"
                 )
-            indexed_plugin = plugins_dict[plugin_name]
+            indexed_plugin = plugin_value
             variants_str = (
                 u.join(list(indexed_plugin.variants.keys()), separator=",")
                 if indexed_plugin.variants

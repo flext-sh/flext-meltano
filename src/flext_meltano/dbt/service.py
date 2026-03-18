@@ -9,8 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import override
+from typing import TypeVar, override
 
 from flext_core import r, s
 
@@ -20,6 +21,7 @@ from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
 
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
+_ResultT = TypeVar("_ResultT")
 
 
 class FlextMeltanoDbtService(s[str]):
@@ -153,24 +155,20 @@ class FlextMeltanoDbtService(s[str]):
         r containing run result
 
         """
-        try:
-            self.logger.info("Running DBT models", models=str(models or []))
-            result = self.runner.run_models(models, **kwargs)
-            if result.is_success:
-                run_result = result.value
-                self.logger.info("DBT run completed", models_run=run_result.models_run)
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT run failed", error=str(e))
-            return r[m.Meltano.DbtRunResult].fail(f"DBT run failed: {e}")
+
+        def execute_operation() -> r[m.Meltano.DbtRunResult]:
+            return self.runner.run_models(models, **kwargs)
+
+        def log_success(result: m.Meltano.DbtRunResult) -> None:
+            self.logger.info("DBT run completed", models_run=result.models_run)
+
+        return self._run_dbt_operation(
+            operation_name="models",
+            failure_label="run",
+            models=models,
+            operation=execute_operation,
+            success_logger=log_success,
+        )
 
     def run_tests(
         self, models: list[str] | None = None, **kwargs: t.Scalar
@@ -185,12 +183,34 @@ class FlextMeltanoDbtService(s[str]):
         r containing test result
 
         """
+
+        def execute_operation() -> r[m.Meltano.DbtTestResult]:
+            return self.runner.run_tests(models, **kwargs)
+
+        def log_success(result: m.Meltano.DbtTestResult) -> None:
+            self.logger.info("DBT tests completed", tests_run=result.tests_run)
+
+        return self._run_dbt_operation(
+            operation_name="tests",
+            failure_label="tests",
+            models=models,
+            operation=execute_operation,
+            success_logger=log_success,
+        )
+
+    def _run_dbt_operation(
+        self,
+        operation_name: str,
+        failure_label: str,
+        models: list[str] | None,
+        operation: Callable[[], r[_ResultT]],
+        success_logger: Callable[[_ResultT], None],
+    ) -> r[_ResultT]:
         try:
-            self.logger.info("Running DBT tests", models=str(models or []))
-            result = self.runner.run_tests(models, **kwargs)
+            self.logger.info(f"Running DBT {operation_name}", models=str(models or []))
+            result = operation()
             if result.is_success:
-                test_result = result.value
-                self.logger.info("DBT tests completed", tests_run=test_result.tests_run)
+                success_logger(result.value)
             return result
         except (
             ValueError,
@@ -201,8 +221,8 @@ class FlextMeltanoDbtService(s[str]):
             RuntimeError,
             ImportError,
         ) as e:
-            self.logger.exception("DBT tests failed", error=str(e))
-            return r[m.Meltano.DbtTestResult].fail(f"DBT tests failed: {e}")
+            self.logger.exception(f"DBT {failure_label} failed", error=str(e))
+            return r[_ResultT].fail(f"DBT {failure_label} failed: {e}")
 
 
 __all__ = ["FlextMeltanoDbtService"]

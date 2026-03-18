@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
+from flext_tests import tm
 from pydantic import ValidationError
 
 from flext_meltano import m
@@ -21,10 +22,10 @@ class TestTapConfigEnhanced:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        assert config.tap_type == "tap-postgres"
-        assert config.connection_config == {"host": "localhost"}
-        assert config.stream_config == {}
-        assert config.tap_version == "latest"
+        tm.that(config.tap_type, eq="tap-postgres")
+        tm.that(config.connection_config, eq={"host": "localhost"})
+        tm.that(config.stream_config, eq={})
+        tm.that(config.tap_version, eq="latest")
 
     def test_tap_config_with_full_data(self) -> None:
         """Test TapConfig with all fields populated."""
@@ -42,11 +43,11 @@ class TestTapConfigEnhanced:
             },
             tap_version="1.0.0",
         )
-        assert config.tap_type == "tap-mysql"
-        assert config.connection_config["host"] == "db.example.com"
-        assert config.connection_config["port"] == 3306
-        assert "users" in config.stream_config
-        assert config.tap_version == "1.0.0"
+        tm.that(config.tap_type, eq="tap-mysql")
+        tm.that(config.connection_config["host"], eq="db.example.com")
+        tm.that(config.connection_config["port"], eq=3306)
+        tm.that("users" in config.stream_config, eq=True)
+        tm.that(config.tap_version, eq="1.0.0")
 
     def test_tap_config_validation_empty_tap_type(self) -> None:
         """Test TapConfig validation with empty tap_type."""
@@ -65,10 +66,10 @@ class TestTargetConfigEnhanced:
     def test_target_config_with_minimal_data(self) -> None:
         """Test TargetConfig with minimal required data."""
         config = m.Meltano.TargetConfig(target_type="target-csv")
-        assert config.target_type == "target-csv"
-        assert config.connection_config == {}
-        assert config.batch_size is None
-        assert config.batch_wait_limit is None
+        tm.that(config.target_type, eq="target-csv")
+        tm.that(config.connection_config, eq={})
+        tm.that(config.batch_size is None, eq=True)
+        tm.that(config.batch_wait_limit is None, eq=True)
 
     def test_target_config_with_full_data(self) -> None:
         """Test TargetConfig with all fields populated."""
@@ -84,10 +85,10 @@ class TestTargetConfigEnhanced:
             batch_size=1000,
             batch_wait_limit=30.0,
         )
-        assert config.target_type == "target-postgres"
-        assert config.connection_config["database"] == "analytics"
-        assert config.batch_size == 1000
-        assert config.batch_wait_limit == pytest.approx(30.0)
+        tm.that(config.target_type, eq="target-postgres")
+        tm.that(config.connection_config["database"], eq="analytics")
+        tm.that(config.batch_size, eq=1000)
+        tm.that(abs(config.batch_wait_limit - 30.0), lt=1e-9)
 
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test TargetConfig validation with empty target_type."""
@@ -112,12 +113,12 @@ class TestStreamInfoEnhanced:
             stream_schema={"type": "object", "properties": {"id": {"type": "integer"}}},
             stream_created_at="2025-01-01T00:00:00Z",
         )
-        assert stream.stream_name == "users"
-        assert stream.stream_schema["type"] == "object"
-        assert stream.status == "initialized"
-        assert stream.records_loaded == 0
-        assert stream.batches_processed == 0
-        assert stream.stream_created_at == "2025-01-01T00:00:00Z"
+        tm.that(stream.stream_name, eq="users")
+        tm.that(stream.stream_schema["type"], eq="object")
+        tm.that(stream.status, eq="initialized")
+        tm.that(stream.records_loaded, eq=0)
+        tm.that(stream.batches_processed, eq=0)
+        tm.that(stream.stream_created_at, eq="2025-01-01T00:00:00Z")
 
     def test_stream_info_with_full_data(self) -> None:
         """Test StreamInfo with all fields populated."""
@@ -136,10 +137,10 @@ class TestStreamInfoEnhanced:
             replication_key="order_date",
             stream_created_at="2025-01-01T00:00:00Z",
         )
-        assert stream.stream_name == "orders"
-        assert stream.key_properties == ["id"]
-        assert stream.replication_method == "FULL_TABLE"
-        assert stream.replication_key == "order_date"
+        tm.that(stream.stream_name, eq="orders")
+        tm.that(stream.key_properties, eq=["id"])
+        tm.that(stream.replication_method, eq="FULL_TABLE")
+        tm.that(stream.replication_key, eq="order_date")
 
     def test_stream_info_validation_empty_stream_name(self) -> None:
         """Test StreamInfo validation with empty stream_name."""
@@ -168,11 +169,11 @@ class TestMeltanoProjectModelEnhanced:
     def test_meltano_project_with_minimal_data(self) -> None:
         """Test MeltanoProjectModel with minimal required data."""
         project = m.Meltano.MeltanoProjectModel(project_id="test-project")
-        assert project.project_id == "test-project"
-        assert project.project_version == "1"
-        assert project.default_environment == "dev"
-        assert project.plugins == {}
-        assert project.environments == {}
+        tm.that(project.project_id, eq="test-project")
+        tm.that(project.project_version, eq="1")
+        tm.that(project.default_environment, eq="dev")
+        tm.that(project.plugins, eq={})
+        tm.that(project.environments, eq={})
 
     def test_meltano_project_with_full_data(self) -> None:
         """Test MeltanoProjectModel with all fields populated."""
@@ -189,12 +190,12 @@ class TestMeltanoProjectModelEnhanced:
                 "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
             },
         )
-        assert project.project_id == "analytics-project"
-        assert project.project_version == "2.0"
-        assert project.default_environment == "production"
-        assert "extractors" in project.plugins
-        assert "dev" in project.environments
-        assert "prod" in project.environments
+        tm.that(project.project_id, eq="analytics-project")
+        tm.that(project.project_version, eq="2.0")
+        tm.that(project.default_environment, eq="production")
+        tm.that("extractors" in project.plugins, eq=True)
+        tm.that("dev" in project.environments, eq=True)
+        tm.that("prod" in project.environments, eq=True)
 
     def test_meltano_project_validation_empty_project_id(self) -> None:
         """Test MeltanoProjectModel validation with empty project_id."""
@@ -215,14 +216,14 @@ class TestPluginModelEnhanced:
         plugin = m.Meltano.PluginModel(
             name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
         )
-        assert plugin.name == "tap-postgres"
-        assert plugin.namespace == "tap_postgres"
-        assert plugin.variant == "standard"
-        assert plugin.pip_url == "tap-postgres"
-        assert plugin.executable is None
-        assert plugin.capabilities == []
-        assert plugin.settings == {}
-        assert plugin.config_files == []
+        tm.that(plugin.name, eq="tap-postgres")
+        tm.that(plugin.namespace, eq="tap_postgres")
+        tm.that(plugin.variant, eq="standard")
+        tm.that(plugin.pip_url, eq="tap-postgres")
+        tm.that(plugin.executable is None, eq=True)
+        tm.that(plugin.capabilities, eq=[])
+        tm.that(plugin.settings, eq={})
+        tm.that(plugin.config_files, eq=[])
 
     def test_plugin_model_with_full_data(self) -> None:
         """Test PluginModel with all fields populated."""
@@ -242,14 +243,16 @@ class TestPluginModelEnhanced:
             },
             config_files=["config.json"],
         )
-        assert plugin.name == "tap-postgres"
-        assert plugin.namespace == "meltanolabs"
-        assert plugin.variant == "meltanolabs"
-        assert plugin.pip_url == "git+https://github.com/meltanolabs/tap-postgres.git"
-        assert plugin.executable == "tap-postgres"
-        assert "catalog" in plugin.capabilities
-        assert len(plugin.settings) == 1
-        assert "host" in plugin.settings
+        tm.that(plugin.name, eq="tap-postgres")
+        tm.that(plugin.namespace, eq="meltanolabs")
+        tm.that(plugin.variant, eq="meltanolabs")
+        tm.that(
+            plugin.pip_url, eq="git+https://github.com/meltanolabs/tap-postgres.git"
+        )
+        tm.that(plugin.executable, eq="tap-postgres")
+        tm.that("catalog" in plugin.capabilities, eq=True)
+        tm.that(len(plugin.settings), eq=1)
+        tm.that("host" in plugin.settings, eq=True)
 
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
@@ -274,13 +277,13 @@ class TestDbtProjectModelEnhanced:
         dbt_project = m.Meltano.DbtProjectModel(
             name="analytics", dbt_version="1.0.0", profile="default"
         )
-        assert dbt_project.name == "analytics"
-        assert dbt_project.profile == "default"
-        assert dbt_project.dbt_version == "1.0.0"
-        assert dbt_project.config == {}
-        assert dbt_project.models == {}
-        assert dbt_project.sources == {}
-        assert dbt_project.tests == {}
+        tm.that(dbt_project.name, eq="analytics")
+        tm.that(dbt_project.profile, eq="default")
+        tm.that(dbt_project.dbt_version, eq="1.0.0")
+        tm.that(dbt_project.config, eq={})
+        tm.that(dbt_project.models, eq={})
+        tm.that(dbt_project.sources, eq={})
+        tm.that(dbt_project.tests, eq={})
 
     def test_dbt_project_with_full_data(self) -> None:
         """Test DbtProjectModel with all fields populated."""
@@ -298,13 +301,13 @@ class TestDbtProjectModelEnhanced:
             sources={"raw_data": {"tables": ["users", "orders"]}},
             tests={"unit": {"models": ["test_user_validity"]}},
         )
-        assert dbt_project.name == "data-warehouse"
-        assert dbt_project.profile == "postgres"
-        assert dbt_project.dbt_version == "2.1.0"
-        assert dbt_project.config["materialized"] == "table"
-        assert "staging" in dbt_project.models
-        assert "raw_data" in dbt_project.sources
-        assert "unit" in dbt_project.tests
+        tm.that(dbt_project.name, eq="data-warehouse")
+        tm.that(dbt_project.profile, eq="postgres")
+        tm.that(dbt_project.dbt_version, eq="2.1.0")
+        tm.that(dbt_project.config["materialized"], eq="table")
+        tm.that("staging" in dbt_project.models, eq=True)
+        tm.that("raw_data" in dbt_project.sources, eq=True)
+        tm.that("unit" in dbt_project.tests, eq=True)
 
     def test_dbt_project_validation_empty_name(self) -> None:
         """Test DbtProjectModel validation with empty name."""
@@ -337,10 +340,10 @@ class TestModelIntegration:
             target_type="target-postgres",
             connection_config={"host": "target.db.com", "port": 5432},
         )
-        assert tap_config.tap_type == "tap-postgres"
-        assert target_config.target_type == "target-postgres"
-        assert tap_config.connection_config["host"] == "source.db.com"
-        assert target_config.connection_config["host"] == "target.db.com"
+        tm.that(tap_config.tap_type, eq="tap-postgres")
+        tm.that(target_config.target_type, eq="target-postgres")
+        tm.that(tap_config.connection_config["host"], eq="source.db.com")
+        tm.that(target_config.connection_config["host"], eq="target.db.com")
 
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
@@ -350,8 +353,8 @@ class TestModelIntegration:
         project = m.Meltano.MeltanoProjectModel(
             project_id="mysql-etl", plugins={"extractors": [{"name": "tap-mysql"}]}
         )
-        assert plugin.name in str(project.plugins)
-        assert project.project_id == "mysql-etl"
+        tm.that(plugin.name in str(project.plugins), eq=True)
+        tm.that(project.project_id, eq="mysql-etl")
 
     def test_stream_info_with_tap_config_integration(self) -> None:
         """Test StreamInfo integration with TapConfig."""
@@ -366,5 +369,5 @@ class TestModelIntegration:
             connection_config={"host": "localhost"},
             stream_config={"users": {"schema": "public"}},
         )
-        assert stream.stream_name in tap_config.stream_config
-        assert stream.key_properties == ["id"]
+        tm.that(stream.stream_name in tap_config.stream_config, eq=True)
+        tm.that(stream.key_properties, eq=["id"])

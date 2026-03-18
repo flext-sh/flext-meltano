@@ -12,7 +12,7 @@ import psycopg2
 import pytest
 import redis
 
-from tests.helpers.docker_test_manager import FlextTestsDocker
+from tests.helpers.docker_test_manager import tk
 
 
 class TestDockerIntegration:
@@ -77,7 +77,7 @@ class TestDockerIntegration:
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_docker_services_health(self, docker_services: FlextTestsDocker) -> None:
+    def test_docker_services_health(self, docker_services: tk) -> None:
         """Test overall Docker services health."""
         assert docker_services is not None
         postgres_url = docker_services.get_service_url("postgres", 5432)
@@ -88,7 +88,7 @@ class TestDockerIntegration:
     @pytest.mark.docker
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_container_lifecycle(self, docker_manager: FlextTestsDocker) -> None:
+    def test_container_lifecycle(self, docker_manager: tk) -> None:
         """Test complete container lifecycle management."""
         result = docker_manager.start_services(["postgres"])
         assert result.is_success

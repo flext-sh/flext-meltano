@@ -6,6 +6,7 @@ import tempfile
 import unittest
 
 import pytest
+from flext_tests import tm
 from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoTapAbstractions, m, r
@@ -16,19 +17,22 @@ class _TestAssertions:
 
     @staticmethod
     def assert_true(condition: bool, message: str = "") -> None:
-        assert condition, message or "assert_true failed"
+        tm.that(condition, eq=True)
 
     @staticmethod
     def assert_false(condition: bool, message: str = "") -> None:
-        assert not condition, message or "assert_false failed"
+        tm.that(not condition, eq=True)
 
     @staticmethod
     def assert_equal(actual, expected, message: str = "") -> None:
-        assert actual == expected, message or f"expected {expected!r}, got {actual!r}"
+        (
+            tm.that(actual, eq=expected),
+            message or f"expected {expected!r}, got {actual!r}",
+        )
 
     @staticmethod
     def assert_in(item, container, message: str = "") -> None:
-        assert item in container, message or f"{item!r} not in {container!r}"
+        tm.that(item in container, eq=True)
 
 
 class TestFlextMeltanoTapAbstractionsComplete:
@@ -54,9 +58,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
             stream_config=stream_config,
             tap_version="v1.2.0",
         )
-        assert config.tap_type == "tap-postgres"
-        assert config.tap_version == "v1.2.0"
-        assert "users" in config.stream_config
+        tm.that(config.tap_type, eq="tap-postgres")
+        tm.that(config.tap_version, eq="v1.2.0")
+        tm.that("users" in config.stream_config, eq=True)
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
@@ -126,10 +130,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_tap_abstractions_initialization(self) -> None:
         """Test FlextMeltanoTapAbstractions initialization."""
         tap_abs = FlextMeltanoTapAbstractions()
-        assert tap_abs is not None
+        tm.that(tap_abs is not None, eq=True)
         if hasattr(tap_abs, "service_name"):
-            assert tap_abs.service_name == "FlextMeltanoTapAbstractions"
-        assert hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger")
+            tm.that(tap_abs.service_name, eq="FlextMeltanoTapAbstractions")
+        tm.that(
+            hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger"), eq=True
+        )
 
     def test_serviceprocessor_process_method(self) -> None:
         """Test ServiceProcessor process method using flext_tests."""
@@ -780,7 +786,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                     message="Should have error message",
                 )
         except Exception:
-            assert True
+            tm.that(True, eq=True)
 
     def test_missing_stream_handling(self) -> None:
         """Test missing stream handling using flext_tests."""
@@ -790,10 +796,10 @@ class TestFlextMeltanoTapAbstractionsComplete:
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-postgres", config=config, tap_id="postgres_tap_123"
         )
-        assert self.tap_abstractions is not None
-        assert hasattr(self.tap_abstractions, "discover_streams")
+        tm.that(self.tap_abstractions is not None, eq=True)
+        tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         result = self.tap_abstractions.discover_streams(tap_instance)
-        assert isinstance(result, r)
+        tm.that(isinstance(result, r), eq=True)
 
     @unittest.skip(
         "API methods not yet implemented: create_tap_from_config, generate_catalog, sync_stream. Requires implementation in FlextMeltanoTapAbstractions."

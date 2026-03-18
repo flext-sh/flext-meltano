@@ -1,6 +1,6 @@
 """Test protocol definitions for flext-meltano.
 
-Provides TestsFlextMeltanoProtocols, combining FlextTestsProtocols with
+Provides TestsFlextMeltanoProtocols, combining p with
 FlextMeltanoProtocols for test-specific protocol definitions.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -14,12 +14,12 @@ from flext_tests import p
 from flext_meltano import FlextMeltanoProtocols
 
 
-class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
-    """Test protocols combining FlextTestsProtocols and FlextMeltanoProtocols.
+class TestsFlextMeltanoProtocols(p, FlextMeltanoProtocols):
+    """Test protocols combining p and FlextMeltanoProtocols.
 
     Provides access to:
-    - p.Tests.Docker.* (from FlextTestsProtocols)
-    - p.Tests.Factory.* (from FlextTestsProtocols)
+    - p.Tests.Docker.* (from p)
+    - p.Tests.Factory.* (from p)
     - p.Meltano.* (from FlextMeltanoProtocols)
     """
 
@@ -29,7 +29,7 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
         class Tests:
             """Project-specific test protocols.
 
-            Extends FlextTestsProtocols.Tests with Meltano-specific protocols.
+            Extends p.Tests with Meltano-specific protocols.
             """
 
 

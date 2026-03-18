@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 
 from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
+from flext_tests import tm
 
 from flext_meltano.cli_managers import (
     FlextMeltanoPipelineManager,
@@ -29,27 +30,27 @@ def test_create_pipeline_creates_directory_and_configuration(tmp_path: Path) -> 
     config = {"command": ["run", "tap-demo", "target-demo"], "schedule": "daily"}
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         result = create_pipeline("daily-pipeline", config)
-    assert result.is_success
+    tm.ok(result)
     pipeline_dir = tmp_path / "pipelines" / "daily-pipeline"
-    assert pipeline_dir.is_dir()
+    tm.that(pipeline_dir.is_dir(), eq=True)
     stored = m.Meltano.ConfigMappingPayload.model_validate_json(
         (pipeline_dir / "pipeline.json").read_text(encoding="utf-8")
     )
-    assert stored.values == config
+    tm.that(stored.values, eq=config)
 
 
 def test_create_pipeline_fails_without_configuration(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         result = create_pipeline("daily-pipeline", None)
-    assert result.is_failure
-    assert result.error == "Pipeline creation not configured"
+    tm.fail(result)
+    tm.that(result.error, eq="Pipeline creation not configured")
 
 
 def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
     config = {"command": ["run", "tap-demo", "target-demo"]}
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("exec-pipeline", config)
-        assert create_result.is_success
+        tm.ok(create_result)
         mock_command_result = MagicMock()
         mock_command_result.exit_code = 0
         mock_command_result.stdout = "pipeline ok"
@@ -60,11 +61,11 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
             return_value=r.ok(mock_command_result),
         ) as run_mock:
             result = execute_pipeline("exec-pipeline")
-    assert result.is_success
+    tm.ok(result)
     run_mock.assert_called_once()
     call_args = run_mock.call_args
-    assert call_args[0][0] == ["meltano", "run", "tap-demo", "target-demo"]
-    assert call_args[1]["cwd"] == tmp_path / "pipelines" / "exec-pipeline"
+    tm.that(call_args[0][0], eq=["meltano", "run", "tap-demo", "target-demo"])
+    tm.that(call_args[1]["cwd"], eq=tmp_path / "pipelines" / "exec-pipeline")
 
 
 def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
@@ -72,28 +73,22 @@ def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
 ) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("noexec-pipeline", {"schedule": "daily"})
-        assert create_result.is_success
+        tm.ok(create_result)
         result = execute_pipeline("noexec-pipeline")
-    assert result.is_failure
-    assert result.error == "Pipeline execution not configured"
+    tm.fail(result)
+    tm.that(result.error, eq="Pipeline execution not configured")
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
-        assert create_pipeline(
-            "b-pipeline", {"command": ["run", "tap-a", "target-a"]}
-        ).is_success
-        assert create_pipeline(
-            "a-pipeline", {"command": ["run", "tap-b", "target-b"]}
-        ).is_success
+        tm.ok(create_pipeline("b-pipeline", {"command": ["run", "tap-a", "target-a"]}))
+        tm.ok(create_pipeline("a-pipeline", {"command": ["run", "tap-b", "target-b"]}))
         list_result = list_pipelines()
-    assert list_result.is_success
-    assert "a-pipeline" in list_result.value
-    assert "b-pipeline" in list_result.value
+    tm.ok(list_result)
+    tm.that("a-pipeline" in list_result.value, eq=True)
+    tm.that("b-pipeline" in list_result.value, eq=True)
 
 
 def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
-        assert create_pipeline(
-            "status-pipeline", {"command": ["run", "tap", "target"]}
-        ).is_success
+        tm.ok(create_pipeline("status-pipeline", {"command": ["run", "tap", "target"]}))
         pid_file = tmp_path / "pipelines" / "status-pipeline" / "pipeline.pid"
         pid_file.write_text("1234", encoding="utf-8")
         with patch("flext_meltano.cli_managers.os.kill", return_value=None):
@@ -102,21 +97,21 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
             "flext_meltano.cli_managers.os.kill", side_effect=ProcessLookupError
         ):
             stopped_result = get_pipeline_status("status-pipeline")
-    assert running_result.is_success
-    assert running_result.value == "running"
-    assert stopped_result.is_success
-    assert stopped_result.value == "stopped"
-    assert not pid_file.exists()
+    tm.ok(running_result)
+    tm.that(running_result.value, eq="running")
+    tm.ok(stopped_result)
+    tm.that(stopped_result.value, eq="stopped")
+    tm.that(pid_file.exists(), eq=False)
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
-        assert create_pipeline(
-            "status-pipeline-2", {"command": ["run", "tap", "target"]}
-        ).is_success
+        tm.ok(
+            create_pipeline("status-pipeline-2", {"command": ["run", "tap", "target"]})
+        )
         pid_file = tmp_path / "pipelines" / "status-pipeline-2" / "pipeline.pid"
         pid_file.write_text("5678", encoding="utf-8")
         terminated = {"value": False}
 
         def fake_kill(pid: int, sig: int) -> None:
-            assert pid == 5678
+            tm.that(pid, eq=5678)
             if sig == 0:
                 if terminated["value"]:
                     raise ProcessLookupError
@@ -129,17 +124,15 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
 
         with patch("flext_meltano.cli_managers.os.kill", side_effect=fake_kill):
             pass
-    assert running_result.is_success
+    tm.ok(running_result)
 
 
 def test_delete_pipeline_removes_configuration_directory(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
-        assert create_pipeline(
-            "daily-pipeline", {"command": ["run", "tap", "target"]}
-        ).is_success
+        tm.ok(create_pipeline("daily-pipeline", {"command": ["run", "tap", "target"]}))
         result = delete_pipeline("daily-pipeline")
-    assert result.is_success
-    assert not (tmp_path / "pipelines" / "daily-pipeline").exists()
+    tm.ok(result)
+    tm.that((tmp_path / "pipelines" / "daily-pipeline").exists(), eq=False)
 
 
 def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
@@ -155,7 +148,7 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
             "lifecycle-pipeline",
             config_json,
         ])
-        assert create_result.is_success
+        tm.ok(create_result)
         mock_command_result = MagicMock()
         mock_command_result.exit_code = 0
         mock_command_result.stdout = "ok"
@@ -168,6 +161,6 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
             run_result = manager.handle_command(["run", "lifecycle-pipeline"])
         list_result = manager.handle_command(["list"])
         delete_result = manager.handle_command(["delete", "lifecycle-pipeline"])
-    assert run_result.is_success
-    assert list_result.is_success
-    assert delete_result.is_success
+    tm.ok(run_result)
+    tm.ok(list_result)
+    tm.ok(delete_result)

@@ -17,6 +17,7 @@ from typing import override
 
 import yaml
 from flext_core import r, s, u
+from pydantic import TypeAdapter
 
 from flext_meltano import (
     FlextMeltanoAbstractions,
@@ -45,7 +46,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         """Initialize project service with complete FLEXT ecosystem integration."""
         super().__init__()
         self._meltano_config: FlextMeltanoSettings = (
-            config if config is not None else FlextMeltanoSettings()
+            config if config is not None else FlextMeltanoSettings.model_validate({})
         )
         self._abstractions = FlextMeltanoAbstractions()
 
@@ -117,7 +118,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: Mapping[str, t.ContainerValue | None],
+        config_data: Mapping[str, object],
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -130,15 +131,14 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         """
         path_obj = config_data.get("path")
         config_obj = config_data.get("config")
-        config_dict: dict[str, t.ContainerValue | None] = (
-            dict(config_obj) if isinstance(config_obj, Mapping) else {}
-        )
-        normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
-        normalized_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": config_dict
+        config_payload = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": config_obj,
         }).values
+        config_dict = TypeAdapter(dict[str, object]).validate_python(config_payload)
+        normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
         return FlextMeltanoProjectService._write_meltano_config(
-            normalized_path, normalized_config
+            normalized_path,
+            config_dict,
         )
 
     @staticmethod
@@ -226,7 +226,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _write_meltano_config(
-        project_path: Path, config: Mapping[str, t.ContainerValue | None]
+        project_path: Path, config: Mapping[str, object]
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -322,6 +322,22 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
             .flat_map(self._convert_to_project_dict)
         )
 
+    @staticmethod
+    def build_service_execution_payload(
+        service_type: str,
+        meltano_config: FlextMeltanoSettings,
+    ) -> r[t.Meltano.MeltanoConfigDict]:
+        try:
+            return r[t.Meltano.MeltanoConfigDict].ok({
+                "service_type": service_type,
+                "status": "ready",
+                "config": meltano_config.model_dump()
+                if u.is_pydantic_model(meltano_config)
+                else {},
+            })
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.MeltanoConfigDict].fail(f"Service execution failed: {e}")
+
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute the pipeline project service.
@@ -330,20 +346,16 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         r containing project service configuration and status.
 
         """
-        try:
-            config_data: t.Meltano.MeltanoConfigDict = {
-                "service_type": "flext_meltano_project_service",
-                "status": "ready",
-                "config": self._meltano_config.model_dump()
-                if u.is_pydantic_model(self._meltano_config)
-                else {},
-            }
+        result = self.build_service_execution_payload(
+            "flext_meltano_project_service",
+            self._meltano_config,
+        )
+        if result.is_success:
             self.logger.info("FlextMeltanoProjectService executed successfully")
-            return r[t.Meltano.MeltanoConfigDict].ok(config_data)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Project service execution failed: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
+            return result
+        error_msg = result.error or "Project service execution failed"
+        self.logger.error(error_msg)
+        return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     def initialize_project(self, project_root: Path) -> r[t.Meltano.Dbt.Project]:
         """Initialize Meltano project using railway pattern validation chain.

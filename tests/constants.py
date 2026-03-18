@@ -1,10 +1,10 @@
 """Constants for flext-meltano tests.
 
-Provides TestsFlextMeltanoConstants, extending FlextTestsConstants with flext-meltano-specific
+Provides TestsFlextMeltanoConstants, extending c with flext-meltano-specific
 constants using COMPOSITION INHERITANCE.
 
 Inheritance hierarchy:
-- FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
+- c (flext_tests) - Provides .Tests.* namespace
 - FlextMeltanoConstants (production) - Provides .Meltano.* namespace
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -20,11 +20,11 @@ from flext_tests import c
 from flext_meltano import FlextMeltanoConstants
 
 
-class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
+class TestsFlextMeltanoConstants(c, FlextMeltanoConstants):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
     MANDATORY: Inherits from BOTH:
-    1. FlextTestsConstants - for test infrastructure (.Tests.*)
+    1. c - for test infrastructure (.Tests.*)
     2. FlextMeltanoConstants - for domain constants (.Meltano.*)
 
     Access patterns:
@@ -35,9 +35,9 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     - c.Paths.* (project-specific test data)
 
     Rules:
-    - NEVER duplicate constants from FlextTestsConstants or FlextMeltanoConstants
+    - NEVER duplicate constants from c or FlextMeltanoConstants
     - Only flext-meltano-specific test constants allowed (not generic for other projects)
-    - All generic constants come from FlextTestsConstants
+    - All generic constants come from c
     - All production constants come from FlextMeltanoConstants
     """
 

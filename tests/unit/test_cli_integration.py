@@ -16,6 +16,7 @@ from __future__ import annotations
 import typing
 
 from flext_cli import FlextCliModels
+from flext_tests import tm
 
 from flext_meltano import m, t
 
@@ -36,11 +37,11 @@ class TestCliModelConverterWithTapRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
-        assert model.tap_name == "tap-postgres"
-        assert model.config_file is None
-        assert model.discover is False
+        tm.that(model.tap_name, eq="tap-postgres")
+        tm.that(model.config_file is None, eq=True)
+        tm.that(model.discover is False, eq=True)
 
     def test_converter_tap_run_params_with_config(self) -> None:
         """Test converting dict[str, objecth config to TapRunParams model."""
@@ -52,10 +53,10 @@ class TestCliModelConverterWithTapRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
-        assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
+        tm.that(model.tap_name, eq="tap-postgres")
+        tm.that(model.config_file, eq="/path/to/config.json")
 
     def test_converter_tap_run_params_discover_mode(self) -> None:
         """Test converting dict[str, objecth discover flag to TapRunParams model."""
@@ -66,11 +67,11 @@ class TestCliModelConverterWithTapRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
-        assert model.tap_name == "tap-postgres"
-        assert model.config_file is None
-        assert model.discover is True
+        tm.that(model.tap_name, eq="tap-postgres")
+        tm.that(model.config_file is None, eq=True)
+        tm.that(model.discover is True, eq=True)
 
     def test_converter_tap_run_params_all_fields(self) -> None:
         """Test converting dict[str, objecth all fields to TapRunParams model."""
@@ -85,14 +86,14 @@ class TestCliModelConverterWithTapRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
-        assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/config.json"
-        assert model.catalog_file == "/catalog.json"
-        assert model.state_file == "/state.json"
-        assert model.properties_file == "/properties.json"
-        assert model.discover is False
+        tm.that(model.tap_name, eq="tap-postgres")
+        tm.that(model.config_file, eq="/config.json")
+        tm.that(model.catalog_file, eq="/catalog.json")
+        tm.that(model.state_file, eq="/state.json")
+        tm.that(model.properties_file, eq="/properties.json")
+        tm.that(model.discover is False, eq=True)
 
     def test_converter_tap_run_params_missing_required(self) -> None:
         """Test validation error when tap_name is missing."""
@@ -100,9 +101,9 @@ class TestCliModelConverterWithTapRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_failure
-        assert "validation" in str(result.error).lower()
-        assert "tap_name" in str(result.error).lower()
+        tm.fail(result)
+        tm.that("validation" in str(result.error).lower(), eq=True)
+        tm.that("tap_name" in str(result.error).lower(), eq=True)
 
     def test_converter_tap_run_params_invalid_type(self) -> None:
         """Test validation error when field has wrong type."""
@@ -113,8 +114,8 @@ class TestCliModelConverterWithTapRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_failure
-        assert "validation" in str(result.error).lower()
+        tm.fail(result)
+        tm.that("validation" in str(result.error).lower(), eq=True)
 
 
 class TestCliModelConverterWithTargetRunParams:
@@ -130,11 +131,11 @@ class TestCliModelConverterWithTargetRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
-        assert model.target_name == "target-postgres"
-        assert model.config_file is None
-        assert model.input_file is None
+        tm.that(model.target_name, eq="target-postgres")
+        tm.that(model.config_file is None, eq=True)
+        tm.that(model.input_file is None, eq=True)
 
     def test_converter_target_run_params_with_config(self) -> None:
         """Test converting dict[str, objecth config to TargetRunParams model."""
@@ -145,10 +146,10 @@ class TestCliModelConverterWithTargetRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
-        assert model.target_name == "target-postgres"
-        assert model.config_file == "/path/to/config.json"
+        tm.that(model.target_name, eq="target-postgres")
+        tm.that(model.config_file, eq="/path/to/config.json")
 
     def test_converter_target_run_params_with_input(self) -> None:
         """Test converting dict[str, objecth input file to TargetRunParams model."""
@@ -159,10 +160,10 @@ class TestCliModelConverterWithTargetRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
-        assert model.target_name == "target-postgres"
-        assert model.input_file == "/path/to/input.jsonl"
+        tm.that(model.target_name, eq="target-postgres")
+        tm.that(model.input_file, eq="/path/to/input.jsonl")
 
     def test_converter_target_run_params_all_fields(self) -> None:
         """Test converting dict[str, objecth all fields to TargetRunParams model."""
@@ -174,11 +175,11 @@ class TestCliModelConverterWithTargetRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
-        assert model.target_name == "target-postgres"
-        assert model.config_file == "/config.json"
-        assert model.input_file == "/input.jsonl"
+        tm.that(model.target_name, eq="target-postgres")
+        tm.that(model.config_file, eq="/config.json")
+        tm.that(model.input_file, eq="/input.jsonl")
 
     def test_converter_target_run_params_missing_required(self) -> None:
         """Test validation error when target_name is missing."""
@@ -186,9 +187,9 @@ class TestCliModelConverterWithTargetRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams, cli_args
         )
-        assert result.is_failure
-        assert "validation" in str(result.error).lower()
-        assert "target_name" in str(result.error).lower()
+        tm.fail(result)
+        tm.that("validation" in str(result.error).lower(), eq=True)
+        tm.that("target_name" in str(result.error).lower(), eq=True)
 
 
 class TestCliModelConverterWithPipelineRunParams:
@@ -203,10 +204,10 @@ class TestCliModelConverterWithPipelineRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
-        assert model.tap_name == "tap-postgres"
-        assert model.config_file == "/path/to/config.json"
+        tm.that(model.tap_name, eq="tap-postgres")
+        tm.that(model.config_file, eq="/path/to/config.json")
 
     def test_converter_target_run_params_with_config(self) -> None:
         """Test converting dict[str, objecth config_file to TargetRunParams model."""
@@ -217,10 +218,10 @@ class TestCliModelConverterWithPipelineRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
-        assert model.target_name == "target-postgres"
-        assert model.config_file == "/path/to/config.json"
+        tm.that(model.target_name, eq="target-postgres")
+        tm.that(model.config_file, eq="/path/to/config.json")
 
     def test_converter_pipeline_run_params_with_catalog_state(self) -> None:
         """Test converting dict[str, objecth catalog/state to PipelineRunParams model."""
@@ -233,10 +234,10 @@ class TestCliModelConverterWithPipelineRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.PipelineRunParams", result.value)
-        assert model.catalog_file == "/catalog.json"
-        assert model.state_file == "/state.json"
+        tm.that(model.catalog_file, eq="/catalog.json")
+        tm.that(model.state_file, eq="/state.json")
 
     def test_converter_pipeline_run_params_all_fields(self) -> None:
         """Test converting dict[str, objecth all fields to PipelineRunParams model."""
@@ -251,14 +252,14 @@ class TestCliModelConverterWithPipelineRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.PipelineRunParams", result.value)
-        assert model.tap_name == "tap-postgres"
-        assert model.target_name == "target-postgres"
-        assert model.tap_config == "/tap-config.json"
-        assert model.target_config == "/target-config.json"
-        assert model.catalog_file == "/catalog.json"
-        assert model.state_file == "/state.json"
+        tm.that(model.tap_name, eq="tap-postgres")
+        tm.that(model.target_name, eq="target-postgres")
+        tm.that(model.tap_config, eq="/tap-config.json")
+        tm.that(model.target_config, eq="/target-config.json")
+        tm.that(model.catalog_file, eq="/catalog.json")
+        tm.that(model.state_file, eq="/state.json")
 
     def test_converter_pipeline_run_params_missing_tap_name(self) -> None:
         """Test validation error when tap_name is missing."""
@@ -266,8 +267,8 @@ class TestCliModelConverterWithPipelineRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams, cli_args
         )
-        assert result.is_failure
-        assert "validation" in str(result.error).lower()
+        tm.fail(result)
+        tm.that("validation" in str(result.error).lower(), eq=True)
 
     def test_converter_pipeline_run_params_missing_target_name(self) -> None:
         """Test validation error when target_name is missing."""
@@ -275,8 +276,8 @@ class TestCliModelConverterWithPipelineRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams, cli_args
         )
-        assert result.is_failure
-        assert "validation" in str(result.error).lower()
+        tm.fail(result)
+        tm.that("validation" in str(result.error).lower(), eq=True)
 
 
 class TestCliModelConverterWithDbtRunParams:
@@ -288,11 +289,11 @@ class TestCliModelConverterWithDbtRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
-        assert model.project_dir == "/dbt/project"
-        assert model.models is None
-        assert model.full_refresh is False
+        tm.that(model.project_dir, eq="/dbt/project")
+        tm.that(model.models is None, eq=True)
+        tm.that(model.full_refresh is False, eq=True)
 
     def test_converter_dbt_run_params_with_models(self) -> None:
         """Test converting dict[str, objecth models to DbtRunParams model."""
@@ -303,9 +304,9 @@ class TestCliModelConverterWithDbtRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
-        assert model.models == "users orders"
+        tm.that(model.models, eq="users orders")
 
     def test_converter_dbt_run_params_with_select_exclude(self) -> None:
         """Test converting dict[str, objecth select/exclude to DbtRunParams model."""
@@ -317,10 +318,10 @@ class TestCliModelConverterWithDbtRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
-        assert model.select == "tag:daily"
-        assert model.exclude == "tag:deprecated"
+        tm.that(model.select, eq="tag:daily")
+        tm.that(model.exclude, eq="tag:deprecated")
 
     def test_converter_dbt_run_params_with_full_refresh(self) -> None:
         """Test converting dict[str, objecth full_refresh to DbtRunParams model."""
@@ -331,9 +332,9 @@ class TestCliModelConverterWithDbtRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams, cli_args
         )
-        assert result.is_success
+        tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
-        assert model.full_refresh is True
+        tm.that(model.full_refresh is True, eq=True)
 
     def test_converter_dbt_run_params_missing_required(self) -> None:
         """Test validation error when project_dir is missing."""
@@ -341,5 +342,5 @@ class TestCliModelConverterWithDbtRunParams:
         result = FlextCliModels.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams, cli_args
         )
-        assert result.is_failure
-        assert "validation" in str(result.error).lower()
+        tm.fail(result)
+        tm.that("validation" in str(result.error).lower(), eq=True)

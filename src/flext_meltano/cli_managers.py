@@ -64,7 +64,12 @@ def _is_process_running(pid: int) -> bool:
 
 
 def create_pipeline(
-    pipeline_name: str, config: t.Meltano.MeltanoConfigDict | None
+    pipeline_name: str,
+    config: dict[
+        str,
+        t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+    ]
+    | None,
 ) -> r[str]:
     """Create a new Meltano pipeline with the given configuration."""
     if not pipeline_name.strip():
@@ -389,7 +394,13 @@ class FlextMeltanoPipelineManager:
                 "Pipeline creation requires pipeline name and JSON configuration"
             )
         pipeline_name = _args[0]
-        config_payload: t.Meltano.MeltanoConfigDict | None = None
+        config_payload: (
+            dict[
+                str,
+                t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+            ]
+            | None
+        ) = None
         if len(_args) >= _MIN_ARGS_WITH_CONFIG:
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
@@ -646,7 +657,7 @@ class FlextMeltanoStatusManager:
     def _execute_status_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute status operation."""
         self.logger.info(
-            "Status operation '%s' not implemented in this refactor", operation
+            f"Status operation '{operation}' not implemented in this refactor"
         )
         return r[None](value=None, is_success=True)
 

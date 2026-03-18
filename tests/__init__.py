@@ -47,7 +47,7 @@ if TYPE_CHECKING:
         test_meltano_project_dir,
     )
     from .constants import TestsFlextMeltanoConstants, c
-    from .helpers.docker_test_manager import ContainerManager, FlextTestsDocker
+    from .helpers.docker_test_manager import ContainerManager, tk
     from .integration.test_docker_integration import TestDockerIntegration
     from .models import TestsFlextMeltanoModels, m
     from .protocols import TestsFlextMeltanoProtocols, p
@@ -145,7 +145,6 @@ if TYPE_CHECKING:
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "CliRunner": ("tests.conftest", "CliRunner"),
     "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
-    "FlextTestsDocker": ("tests.helpers.docker_test_manager", "FlextTestsDocker"),
     "MockCliResult": ("tests.conftest", "MockCliResult"),
     "MockCliRunner": ("tests.conftest", "MockCliRunner"),
     "MockMeltanoService": ("tests.conftest", "MockMeltanoService"),
@@ -409,6 +408,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.unit.pipeline_cli_managers_tests",
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
+    "tk": ("tests.helpers.docker_test_manager", "tk"),
     "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
 }
@@ -416,7 +416,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 __all__ = [
     "CliRunner",
     "ContainerManager",
-    "FlextTestsDocker",
     "MockCliResult",
     "MockCliRunner",
     "MockMeltanoService",
@@ -527,6 +526,7 @@ __all__ = [
     "test_get_pipeline_status_checks_process_state",
     "test_meltano_project_dir",
     "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
+    "tk",
     "u",
     "unit",
 ]

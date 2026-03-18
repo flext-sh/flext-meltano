@@ -1,6 +1,6 @@
 """FLEXT Test Docker Manager - Enterprise Docker testing infrastructure.
 
-This module provides FlextTestsDocker class for comprehensive containerized testing
+This module provides tk class for comprehensive containerized testing
 of FLEXT Meltano components with automatic lifecycle management, health checks,
 and resource cleanup.
 
@@ -79,7 +79,7 @@ class ContainerManager:
             return r[subprocess.CompletedProcess[str]].fail(f"Command error: {e}")
 
 
-class FlextTestsDocker(ContainerManager):
+class tk(ContainerManager):
     """Enterprise Docker testing infrastructure for FLEXT Meltano.
 
     Provides comprehensive container lifecycle management with automatic cleanup,
@@ -300,9 +300,7 @@ class FlextTestsDocker(ContainerManager):
                 self.logger.exception("Failed to cleanup containers")
 
     @contextmanager
-    def service_context(
-        self, services: list[str] | None = None
-    ) -> Generator[FlextTestsDocker]:
+    def service_context(self, services: list[str] | None = None) -> Generator[tk]:
         """Context manager for service lifecycle.
 
         Args:
@@ -318,13 +316,13 @@ class FlextTestsDocker(ContainerManager):
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> FlextTestsDocker:
+def docker_manager() -> tk:
     """Session-scoped Docker manager fixture."""
-    return FlextTestsDocker(keep_running=True)
+    return tk(keep_running=True)
 
 
 @pytest.fixture
-def docker_services(docker_manager: FlextTestsDocker) -> Generator[FlextTestsDocker]:
+def docker_services(docker_manager: tk) -> Generator[tk]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager

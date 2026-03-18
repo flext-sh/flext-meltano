@@ -11,7 +11,7 @@ from __future__ import annotations
 from flext_tests import t
 
 
-class TestsFlextMeltanoTypes(FlextTestsTypes):
+class TestsFlextMeltanoTypes(t):
     """Test type aliases for flextmeltano."""
 
 
