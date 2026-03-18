@@ -41,7 +41,9 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.tap_abstractions: FlextMeltanoTapAbstractions = FlextMeltanoTapAbstractions()
+        self.tap_abstractions: FlextMeltanoTapAbstractions = (
+            FlextMeltanoTapAbstractions()
+        )
         if not hasattr(self, "test_assertions"):
             self.test_assertions: _TestAssertions = _TestAssertions()
 

@@ -293,18 +293,18 @@ class TestFlextMeltanoErrorHandling:
     """Test FlextMeltano error handling and edge cases."""
 
     def test_api_handles_none_project_root(self) -> None:
-         """Test API handles None project root gracefully."""
-         api = FlextMeltano(project_root=None)
-         tm.that(api is not None, eq=True)
+        """Test API handles None project root gracefully."""
+        api = FlextMeltano(project_root=None)
+        tm.that(api is not None, eq=True)
 
     def test_api_handles_invalid_project_root(self) -> None:
-         """Test API handles invalid project root type."""
-         try:
-             invalid_root: object = 123
-             FlextMeltano(project_root=invalid_root)  # type: ignore[arg-type]
-             assert False, "Should have raised TypeError or ValueError"
-         except (TypeError, ValueError):
-             pass
+        """Test API handles invalid project root type."""
+        try:
+            invalid_root: object = 123
+            FlextMeltano(project_root=invalid_root)  # type: ignore[arg-type]
+            pytest.fail("Should have raised TypeError or ValueError")
+        except (TypeError, ValueError):
+            pass
 
     def test_create_project_exception_handling(self) -> None:
         """Test project creation handles exceptions gracefully."""
@@ -481,7 +481,9 @@ class TestFlextMeltanoPerformance:
         result = benchmark(create_api)
         tm.that(result is not None, eq=True)
 
-    def test_api_properties_access_performance(self, benchmark: BenchmarkFixture) -> None:
+    def test_api_properties_access_performance(
+        self, benchmark: BenchmarkFixture
+    ) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()
 
