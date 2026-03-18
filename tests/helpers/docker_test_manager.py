@@ -13,7 +13,6 @@ from __future__ import annotations
 import atexit
 import subprocess
 import time
-import typing
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
@@ -188,7 +187,7 @@ class Tk(ContainerManager):
             cmd = ["port", service_name, str(port)]
             result = self.run_compose_command(cmd, timeout=30)
             if result.is_success:
-                process = typing.cast("subprocess.CompletedProcess[str]", result.value)
+                process = result.value
                 host_port = process.stdout.strip().split(":")
                 if len(host_port) == 2:
                     return f"localhost:{host_port[1]}"

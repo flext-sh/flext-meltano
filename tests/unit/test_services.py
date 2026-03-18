@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 from flext_tests import tm
@@ -12,6 +14,8 @@ from flext_meltano import FlextMeltanoService, r, s
 
 class TestFlextMeltanoServiceInitialization:
     """Test FlextMeltanoService initialization and basic functionality."""
+
+    service: FlextMeltanoService
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
@@ -34,6 +38,9 @@ class TestFlextMeltanoServiceInitialization:
 
 class TestTapService:
     """Test TapService functionality using unified architecture."""
+
+    service: FlextMeltanoService
+    create_tap_service: Callable[..., Any]
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
@@ -134,6 +141,9 @@ class TestTapService:
 class TestTargetService:
     """Test TargetService functionality using unified architecture."""
 
+    service: FlextMeltanoService
+    create_target_service: Callable[..., Any]
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
@@ -225,6 +235,9 @@ class TestTargetService:
 class TestDbtService:
     """Test DbtService functionality using unified architecture."""
 
+    service: FlextMeltanoService
+    create_dbt_service: Callable[..., Any]
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
@@ -283,6 +296,8 @@ class TestDbtService:
 class TestServiceFactoryMethods:
     """Test service factory methods on main FlextMeltanoService."""
 
+    service: FlextMeltanoService
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
@@ -334,6 +349,8 @@ class TestServiceFactoryMethods:
 class TestServiceGenericMethods:
     """Test generic service creation and validation methods."""
 
+    service: FlextMeltanoService
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
@@ -368,6 +385,8 @@ class TestServiceGenericMethods:
 
 class TestServiceIntegration:
     """Integration tests combining multiple service operations."""
+
+    service: FlextMeltanoService
 
     def setup_method(self) -> None:
         """Set up test fixtures."""

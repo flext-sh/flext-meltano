@@ -27,23 +27,23 @@ if TYPE_CHECKING:
 
     from .docker_test_manager import (
         ContainerManager,
+        Tk,
         docker_manager,
         docker_services,
-        tk,
     )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
+    "Tk": ("tests.helpers.docker_test_manager", "Tk"),
     "docker_manager": ("tests.helpers.docker_test_manager", "docker_manager"),
     "docker_services": ("tests.helpers.docker_test_manager", "docker_services"),
-    "tk": ("tests.helpers.docker_test_manager", "tk"),
 }
 
 __all__ = [
     "ContainerManager",
+    "Tk",
     "docker_manager",
     "docker_services",
-    "tk",
 ]
 
 
