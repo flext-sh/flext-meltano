@@ -1,0 +1,29 @@
+tests/conftest.py
+  0f46f83de0143d24 23
+tests/__init__.py
+  0f46f83de0143d24 50
+tests/helpers/docker_test_manager.py
+  0f46f83de0143d24 82
+tests/integration/test_docker_integration.py
+  0f46f83de0143d24 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "448fafa6fd93d283d14df6b94c830be2a52bb418",
+  "prompts": {
+    "0f46f83de0143d24": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2fe4698a9ffezG8YgHzmRqaPsV",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
