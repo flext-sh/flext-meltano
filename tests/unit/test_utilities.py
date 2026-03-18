@@ -165,7 +165,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         content: t.Meltano.MeltanoConfigDict = {"project_id": "test"}
         result = u.Meltano.create_project_file(file_path, content)
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        assert result.error is not None
         tm.that("Failed to create project file" in result.error, eq=True)
 
     def test_create_project_file_invalid_content_type(self) -> None:

@@ -44,9 +44,11 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling."""
-        failure_result: r[str] = r[str].fail("Target error")
-        tm.that(isinstance(failure_result, r), eq=True)
-        tm.fail(failure_result)
+        tm.that(self.target_abstractions is not None, eq=True)
+        if self.target_abstractions is None:
+            return
+        result = self.target_abstractions.execute()
+        tm.that(isinstance(result, r), eq=True)
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core."""
