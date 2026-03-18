@@ -108,7 +108,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return str(value)
         if isinstance(value, t.SCALAR_TYPES):
             return value
-        if isinstance(value, list | tuple):
+        if isinstance(value, (list, tuple)):
             normalized_items: list[t.NormalizedValue] = []
             for item in value:
                 if item is None:
@@ -157,6 +157,19 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         for key, item in value.items():
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
         return normalized
+
+    def _service_settings_config(self) -> t.Meltano.SettingsDict:
+        settings = self.config
+        return {
+            "project_root": str(settings.project_root),
+            "config_dir": str(settings.config_dir),
+            "logs_dir": str(settings.logs_dir),
+            "environment": settings.environment,
+            "log_level": str(settings.log_level),
+            "meltano_version": settings.meltano_version,
+            "singer_sdk_version": settings.singer_sdk_version,
+            "dbt_version": settings.dbt_version,
+        }
 
     @property
     def constants(self) -> type[c]:
@@ -337,7 +350,20 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     def discover_catalog(self, source_name: str) -> r[t.Meltano.ResultDict]:
         """Discover source schema - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self.config, source_name=source_name)
+            service = FlextMeltanoService(
+                service_config=m.Meltano.ServiceConstructorConfig(
+                    config=None,
+                    service_name="flext_meltano_service",
+                    service_version=self.version,
+                    source_name=source_name,
+                    sink_name=None,
+                    transformation_name=None,
+                    service_type=None,
+                    tap_name=None,
+                    target_name=None,
+                    project_name=None,
+                ),
+            )
             return service.discover()
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.ResultDict].fail(f"Failed to discover catalog: {e}")
@@ -404,7 +430,20 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     ) -> r[t.Meltano.ResultDict]:
         """Extract data from source - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self.config, source_name=source_name)
+            service = FlextMeltanoService(
+                service_config=m.Meltano.ServiceConstructorConfig(
+                    config=None,
+                    service_name="flext_meltano_service",
+                    service_version=self.version,
+                    source_name=source_name,
+                    sink_name=None,
+                    transformation_name=None,
+                    service_type=None,
+                    tap_name=None,
+                    target_name=None,
+                    project_name=None,
+                ),
+            )
             parsed_schema = m.Meltano.JsonSchemaPayload.model_validate({
                 "schema": config or {},
             })
@@ -556,7 +595,20 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     ) -> r[t.Meltano.ResultDict]:
         """Load data to sink - delegates to service."""
         try:
-            service = FlextMeltanoService(config=self.config, sink_name=sink_name)
+            service = FlextMeltanoService(
+                service_config=m.Meltano.ServiceConstructorConfig(
+                    config=None,
+                    service_name="flext_meltano_service",
+                    service_version=self.version,
+                    source_name=None,
+                    sink_name=sink_name,
+                    transformation_name=None,
+                    service_type=None,
+                    tap_name=None,
+                    target_name=None,
+                    project_name=None,
+                ),
+            )
             if records is not None and len(records) > 0:
                 load_result = service.load_batch(records)
                 if load_result.is_failure:
