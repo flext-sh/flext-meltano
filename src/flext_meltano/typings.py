@@ -38,12 +38,14 @@ class FlextMeltanoTypes(FlextCliTypes):
         type MeltanoValue = t.ContainerValue | None
 
         type PluginDefinition = dict[
-            str, str | list[str] | Mapping[str, t.Scalar | None]
+            str,
+            str | list[str] | Mapping[str, t.Scalar | None],
         ]
         type PluginConfiguration = Mapping[str, t.ContainerValue | None]
         type PluginCatalog = dict[str, list[t.Meltano.PluginDefinition]]
         type PluginRegistry = Mapping[
-            str, t.Meltano.PluginDefinition | t.Meltano.PluginConfiguration
+            str,
+            t.Meltano.PluginDefinition | t.Meltano.PluginConfiguration,
         ]
         type PluginInstallation = dict[str, str | bool | list[str]]
         type PluginExecution = Mapping[str, t.ContainerValue | None]

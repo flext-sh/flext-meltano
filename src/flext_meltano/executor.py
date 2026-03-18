@@ -59,7 +59,8 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
 
     @staticmethod
     def _execute_action_command(
-        action: str, args: list[str]
+        action: str,
+        args: list[str],
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Execute action command - delegates to appropriate handler."""
         try:
@@ -130,7 +131,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.ExecutionResultDict].fail(
-                f"Failed to create CLI runner: {e}"
+                f"Failed to create CLI runner: {e}",
             )
 
     @staticmethod
@@ -233,7 +234,9 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
             return r[FlextMeltanoExecutionResult].fail(error_msg)
 
     def execute_dbt_command(
-        self, dbt_command: str, args: list[str] | None = None
+        self,
+        dbt_command: str,
+        args: list[str] | None = None,
     ) -> r[FlextMeltanoExecutionResult]:
         """Execute a DBT command.
 
@@ -274,7 +277,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
             return self.execute_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[FlextMeltanoExecutionResult].fail(
-                f"Pipeline execution failed: {e}"
+                f"Pipeline execution failed: {e}",
             )
 
     def health(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -310,7 +313,9 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         return self._route_command(args[0], args[1:]).map(lambda _: 0)
 
     def run_pipeline(
-        self, tap_name: str, target_name: str
+        self,
+        tap_name: str,
+        target_name: str,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Run complete ELT pipeline - delegates to execute_pipeline."""
         result = self.execute_pipeline(tap_name, target_name)
@@ -320,7 +325,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 "command": f"{tap_name} -> {target_name}",
                 "exit_code": execution_result.exit_code,
                 "output": execution_result.output,
-            }
+            },
         )
 
     def version(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -332,7 +337,8 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         return self._execute_help_command()
 
     def _handle_cli_other_args(
-        self, args: list[str]
+        self,
+        args: list[str],
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Handle CLI other arguments - delegates to action executor."""
         if not args:
@@ -349,7 +355,8 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         return self._execute_version_command()
 
     def _handle_default_command(
-        self, args: list[str]
+        self,
+        args: list[str],
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Handle default command - delegates to action executor."""
         return self._execute_action_command("default", args)
@@ -363,7 +370,9 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         return self._execute_version_command()
 
     def _route_command(
-        self, command: str, args: list[str]
+        self,
+        command: str,
+        args: list[str],
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Route command to appropriate handler - delegates to handlers."""
         if command == "version":

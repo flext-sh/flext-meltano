@@ -35,7 +35,10 @@ class FlextMeltanoAbstractions:
             self.logger = logger
 
         def create_pipeline_context(
-            self, project_path: Path, source_name: str, sink_name: str
+            self,
+            project_path: Path,
+            source_name: str,
+            sink_name: str,
         ) -> r[t.Meltano.NestedJsonDict]:
             """Create pipeline context for data pipeline operations."""
             try:
@@ -66,14 +69,14 @@ class FlextMeltanoAbstractions:
                             source_config,
                             "name",
                             default=c.Mixins.IDENTIFIER_UNKNOWN,
-                        )
+                        ),
                     ),
                     "sink": str(
                         u.get(
                             sink_config,
                             "name",
                             default=c.Mixins.IDENTIFIER_UNKNOWN,
-                        )
+                        ),
                     ),
                     "records_processed": 0,
                 }
@@ -101,7 +104,10 @@ class FlextMeltanoAbstractions:
             return r[bool].fail(error_msg)
 
     def create_elt_context(
-        self, project: p.Meltano.Project, extractor_name: str, loader_name: str
+        self,
+        project: p.Meltano.Project,
+        extractor_name: str,
+        loader_name: str,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Create ELT context for pipeline execution."""
         try:
@@ -118,13 +124,17 @@ class FlextMeltanoAbstractions:
             return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
 
     def create_pipeline_context(
-        self, source_name: str, sink_name: str
+        self,
+        source_name: str,
+        sink_name: str,
     ) -> r[t.Meltano.NestedJsonDict]:
         """Create pipeline context."""
         if not self._project_path:
             return r[t.Meltano.NestedJsonDict].fail("No project loaded")
         return self._runner_helper.create_pipeline_context(
-            self._project_path, source_name, sink_name
+            self._project_path,
+            source_name,
+            sink_name,
         )
 
     def execute_data_pipeline(
@@ -138,7 +148,9 @@ class FlextMeltanoAbstractions:
             "status": "initialized",
         }
         return self._runner_helper.execute_data_pipeline(
-            pipeline_context, source_config, sink_config
+            pipeline_context,
+            source_config,
+            sink_config,
         )
 
     def execute_singer_pipeline(
@@ -165,11 +177,12 @@ class FlextMeltanoAbstractions:
         try:
             if not project_root.exists() or not project_root.is_dir():
                 return r[Path].fail(
-                    f"Project path is not a valid directory: {project_root}"
+                    f"Project path is not a valid directory: {project_root}",
                 )
             self._project_path = project_root
             self.logger.info(
-                "Pipeline project loaded successfully", project_root=str(project_root)
+                "Pipeline project loaded successfully",
+                project_root=str(project_root),
             )
             return r[Path].ok(project_root)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -178,7 +191,8 @@ class FlextMeltanoAbstractions:
             return r[Path].fail(error_msg)
 
     def get_components_of_type(
-        self, component_type: str
+        self,
+        component_type: str,
     ) -> r[list[t.Meltano.PluginDefinition]]:
         """Get components of specified type."""
         try:
@@ -205,7 +219,9 @@ class FlextMeltanoAbstractions:
             return r[list[t.Meltano.PluginDefinition]].fail(error_msg)
 
     def get_plugins_of_type(
-        self, _project: p.Meltano.Project, plugin_type: str
+        self,
+        _project: p.Meltano.Project,
+        plugin_type: str,
     ) -> r[Mapping[str, t.Meltano.PluginDefinition]]:
         """Get plugins of specified type."""
         try:

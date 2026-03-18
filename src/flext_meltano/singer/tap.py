@@ -57,12 +57,16 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", c.Mixins.IDENTIFIER_UNKNOWN
+                source_config,
+                "tap_type",
+                c.Mixins.IDENTIFIER_UNKNOWN,
             )
             if not isinstance(source_type, str):
                 source_type = c.Mixins.IDENTIFIER_UNKNOWN
             source_identifier = getattr(
-                source_config, "source_identifier", None
+                source_config,
+                "source_identifier",
+                None,
             ) or getattr(
                 source_config,
                 "tap_identifier",
@@ -97,7 +101,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
                 source_id=source_id,
             )
             self.logger.info(
-                "Source instance created successfully", source_name=source_type
+                "Source instance created successfully",
+                source_name=source_type,
             )
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
         except (
@@ -111,7 +116,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         ) as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail(
-                f"Source instance creation failed: {e}"
+                f"Source instance creation failed: {e}",
             )
 
     def create_tap_from_config(
@@ -144,8 +149,10 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             )
             return self.create_source_instance(config).map(
                 lambda inst: m.Meltano.TapInstance(
-                    tap_type=inst.source_type, config=config, tap_id=inst.source_id
-                )
+                    tap_type=inst.source_type,
+                    config=config,
+                    tap_id=inst.source_id,
+                ),
             )
         except Exception as exc:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
@@ -167,7 +174,9 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type_raw = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", None
+                source_config,
+                "tap_type",
+                None,
             )
             source_type_str: str = (
                 str(source_type_raw) if source_type_raw is not None else ""
@@ -179,7 +188,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             )
             if not source_type_str:
                 return r[t.Meltano.Singer.StreamCatalog].fail(
-                    "Source configuration must have name and type for discovery"
+                    "Source configuration must have name and type for discovery",
                 )
             catalog: t.Meltano.Singer.StreamCatalog = {"streams": []}
             streams = catalog.get("streams", [])
@@ -196,7 +205,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         ) as e:
             self.logger.exception("Stream discovery failed", error=str(e))
             return r[t.Meltano.Singer.StreamCatalog].fail(
-                f"Stream discovery failed: {e}"
+                f"Stream discovery failed: {e}",
             )
 
     @override
@@ -244,10 +253,13 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config, "tap_type", c.Mixins.IDENTIFIER_UNKNOWN
+                source_config,
+                "tap_type",
+                c.Mixins.IDENTIFIER_UNKNOWN,
             )
             self.logger.debug(
-                "Processing source configuration", source_name=source_type
+                "Processing source configuration",
+                source_name=source_type,
             )
             if not source_type or source_type == c.Mixins.IDENTIFIER_UNKNOWN:
                 return r[bool].fail("Source configuration must have a type")
@@ -262,7 +274,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             ImportError,
         ) as e:
             self.logger.exception(
-                "Source configuration processing failed", error=str(e)
+                "Source configuration processing failed",
+                error=str(e),
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
@@ -292,7 +305,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
                 "status": "completed",
                 "records_processed": 0,
                 "target_loaded": target is not None,
-            })
+            }),
         )
 
     def validate_stream_schema(self, stream_def: m.Meltano.StreamDefinition) -> r[bool]:
@@ -307,7 +320,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         """
         try:
             self.logger.debug(
-                "Validating stream schema", stream_name=stream_def.stream_name
+                "Validating stream schema",
+                stream_name=stream_def.stream_name,
             )
             if not stream_def.stream_schema:
                 return r[bool].fail("Stream schema cannot be empty")

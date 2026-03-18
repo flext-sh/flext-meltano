@@ -47,7 +47,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_connection_config(
-        cls, config: Mapping[str, t.Scalar]
+        cls,
+        config: Mapping[str, t.Scalar],
     ) -> r[Mapping[str, t.Scalar]]:
         """Validate connection configuration with domain-specific business rules.
 
@@ -77,7 +78,7 @@ class FlextMeltanoValidators:
         try:
             if not config:
                 return r[Mapping[str, t.Scalar]].fail(
-                    "Connection configuration cannot be empty"
+                    "Connection configuration cannot be empty",
                 )
             return r[Mapping[str, t.Scalar]].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -87,7 +88,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_pipeline_component_business_rules(
-        cls, config: Mapping[str, t.Scalar]
+        cls,
+        config: Mapping[str, t.Scalar],
     ) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
@@ -98,7 +100,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_pipeline_project_business_rules(
-        cls, config: Mapping[str, t.Scalar]
+        cls,
+        config: Mapping[str, t.Scalar],
     ) -> r[bool]:
         """Validate pipeline project business rules.
 
@@ -188,7 +191,8 @@ class FlextMeltanoValidators:
 
     @classmethod
     def validate_transformation_business_rules(
-        cls, config: Mapping[str, t.Scalar]
+        cls,
+        config: Mapping[str, t.Scalar],
     ) -> r[bool]:
         """Validate transformation-specific business rules.
 

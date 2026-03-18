@@ -49,7 +49,8 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         try:
             self._catalog = tap.discover()
             self.logger.info(
-                "Streams discovered", stream_count=len(self._catalog.streams)
+                "Streams discovered",
+                stream_count=len(self._catalog.streams),
             )
             return r[m.Meltano.SingerCatalog].ok(self._catalog)
         except (
@@ -85,7 +86,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
                     self.logger.debug("Stream schema retrieved", stream=stream_name)
                     return r[Mapping[str, t.Container]].ok(entry.schema_definition)
             return r[Mapping[str, t.Container]].fail(
-                f"Stream not found in catalog: {stream_name}"
+                f"Stream not found in catalog: {stream_name}",
             )
         except (
             ValueError,
@@ -112,10 +113,10 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         try:
             if not catalog_file.exists():
                 return r[m.Meltano.SingerCatalog].fail(
-                    f"Catalog file not found: {catalog_file}"
+                    f"Catalog file not found: {catalog_file}",
                 )
             self._catalog = m.Meltano.SingerCatalog.model_validate_json(
-                catalog_file.read_text(encoding="utf-8")
+                catalog_file.read_text(encoding="utf-8"),
             )
             self.logger.info(
                 "Catalog loaded from file",

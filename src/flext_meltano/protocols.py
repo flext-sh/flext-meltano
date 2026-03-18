@@ -97,7 +97,8 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def sync(
-                self, catalog: Mapping[str, t.Container]
+                self,
+                catalog: Mapping[str, t.Container],
             ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
                 """Sync data from source with r."""
                 ...
@@ -112,20 +113,23 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def handle_batch(
-                self, records: list[t.Meltano.RecordDict]
+                self,
+                records: list[t.Meltano.RecordDict],
             ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
                 """Handle a batch of records with r."""
                 ...
 
             def handle_record(
-                self, record: t.Meltano.RecordDict
+                self,
+                record: t.Meltano.RecordDict,
             ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
                 """Handle a single record with r."""
                 ...
 
         @runtime_checkable
         class DbtRunner(
-            FlextCliProtocols.Service[t.Meltano.MeltanoConfigDict], Protocol
+            FlextCliProtocols.Service[t.Meltano.MeltanoConfigDict],
+            Protocol,
         ):
             """DBT Runner protocol extending Service for ELT operations."""
 
@@ -135,13 +139,15 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def run(
-                self, models: list[str]
+                self,
+                models: list[str],
             ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
                 """Run DBT models with r."""
                 ...
 
             def test(
-                self, models: list[str]
+                self,
+                models: list[str],
             ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
                 """Test DBT models with r."""
                 ...
@@ -251,7 +257,8 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def find_plugins(
-                self, plugin_type: str
+                self,
+                plugin_type: str,
             ) -> list[t.Meltano.PluginDefinition]:
                 """Find plugins of specified type."""
                 ...
@@ -317,7 +324,8 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def get_records(
-                self, stream_name: str
+                self,
+                stream_name: str,
             ) -> list[m.Meltano.SingerRecordMessage]:
                 """Get records for a specific stream."""
                 ...

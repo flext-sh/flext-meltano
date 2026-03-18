@@ -62,7 +62,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         if config is None:
             if project_root is not None:
                 settings_result = FlextMeltanoSettings.create_from_project_root(
-                    Path(project_root)
+                    Path(project_root),
                 )
                 if settings_result.is_failure:
                     msg = (
@@ -77,7 +77,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         super().__init__()
         self.service_name = service_name
         self.version = version
-        self.logger.info(f"FlextMeltano API '{service_name}' v{version} initialized")
+        self.logger.info("FlextMeltano API '%s' v%s initialized", service_name, version)
 
     @property
     @override
@@ -121,7 +121,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 if item is None:
                     continue
                 normalized_mapping[str(key)] = FlextMeltano._normalize_container_value(
-                    item
+                    item,
                 )
             return normalized_mapping
         return str(value)
@@ -175,7 +175,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, config: t.Meltano.MeltanoConfigDict | None = None
+        environment_name: str,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Configure environment using flext-core railway patterns."""
         if u.empty(environment_name):
@@ -183,7 +184,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         valid_environments = {"development", "staging", "production", "testing"}
         if environment_name not in valid_environments:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid environment: {environment_name}. Valid: {valid_environments}"
+                f"Invalid environment: {environment_name}. Valid: {valid_environments}",
             )
         result_data: t.Meltano.MeltanoConfigDict = {
             "environment": environment_name,
@@ -218,7 +219,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
         """
         operation_dispatch: dict[
-            str, Callable[[Mapping[str, t.Scalar]], r[t.Meltano.ResultDict]]
+            str,
+            Callable[[Mapping[str, t.Scalar]], r[t.Meltano.ResultDict]],
         ] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,
@@ -258,15 +260,15 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         def _validate_inputs() -> r[tuple[str, str, t.Meltano.MeltanoConfigDict]]:
             if u.none_(tap_name, target_name):
                 return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].fail(
-                    "Both tap_name and target_name are required for pipeline creation"
+                    "Both tap_name and target_name are required for pipeline creation",
                 )
             if not u.starts(tap_name, "tap-"):
                 return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].fail(
-                    f"Invalid tap name format: {tap_name}. Must start with 'tap-'"
+                    f"Invalid tap name format: {tap_name}. Must start with 'tap-'",
                 )
             if not u.starts(target_name, "target-"):
                 return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].fail(
-                    f"Invalid target name format: {target_name}. Must start with 'target-'"
+                    f"Invalid target name format: {target_name}. Must start with 'target-'",
                 )
             return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].ok((
                 tap_name,
@@ -275,7 +277,9 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             ))
 
         def _build_pipeline_config(
-            tap_name: str, target_name: str, config: t.Meltano.MeltanoConfigDict
+            tap_name: str,
+            target_name: str,
+            config: t.Meltano.MeltanoConfigDict,
         ) -> r[t.Meltano.MeltanoConfigDict]:
             try:
                 pipeline_id = f"{tap_name}_{target_name}_{int(time.time())}"
@@ -296,19 +300,21 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 return r[t.Meltano.MeltanoConfigDict].ok(pipeline_config)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 return r[t.Meltano.MeltanoConfigDict].fail(
-                    f"Pipeline creation failed: {e}"
+                    f"Pipeline creation failed: {e}",
                 )
 
         validation_result = _validate_inputs()
         if validation_result.is_failure:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                validation_result.error or "Validation failed"
+                validation_result.error or "Validation failed",
             )
         args = validation_result.value
         return _build_pipeline_config(*args)
 
     def create_project(
-        self, project_name: str, project_dir: str | None = None
+        self,
+        project_name: str,
+        project_dir: str | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Create Meltano project - delegates to adapter."""
         if not (project_name and project_name.strip()):
@@ -321,7 +327,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             )
             if result.is_failure:
                 return r[t.Meltano.MeltanoConfigDict].fail(
-                    result.error or "Failed to create project"
+                    result.error or "Failed to create project",
                 )
             normalized = self._normalize_config_mapping(result.value)
             return r[t.Meltano.MeltanoConfigDict].ok(normalized)
@@ -350,12 +356,14 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 "version": self.version,
                 "status": c.Cqrs.CommonStatus.ACTIVE,
                 "operations": ["pipeline", "plugin", "dbt", "environment"],
-            }
+            },
         )
         return r[m.Meltano.ConfigMappingPayload].ok(payload)
 
     def execute_pipeline(
-        self, pipeline_id: str, config: t.Meltano.MeltanoConfigDict | None = None
+        self,
+        pipeline_id: str,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute pipeline using railway patterns.
 
@@ -369,7 +377,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         """
         if u.none_(pipeline_id):
             return r[t.Meltano.MeltanoConfigDict].fail(
-                "Pipeline ID is required for execution"
+                "Pipeline ID is required for execution",
             )
 
         try:
@@ -386,17 +394,19 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[t.Meltano.MeltanoConfigDict].ok(execution_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Pipeline execution failed: {e}"
+                f"Pipeline execution failed: {e}",
             )
 
     def extract_data(
-        self, source_name: str, config: t.Meltano.MeltanoConfigDict | None = None
+        self,
+        source_name: str,
+        config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.ResultDict]:
         """Extract data from source - delegates to service."""
         try:
             service = FlextMeltanoService(config=self.config, source_name=source_name)
             parsed_schema = m.Meltano.JsonSchemaPayload.model_validate({
-                "schema": config or {}
+                "schema": config or {},
             })
             schema_payload: t.Meltano.SchemaDict = {
                 str(key): (value if isinstance(value, t.SCALAR_TYPES) else str(value))
@@ -405,7 +415,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             extract_result = service.extract(schema_payload)
             if extract_result.is_failure:
                 return r[t.Meltano.ResultDict].fail(
-                    extract_result.error or "Failed to extract data"
+                    extract_result.error or "Failed to extract data",
                 )
             return r[t.Meltano.ResultDict].ok({
                 str(k): v for k, v in extract_result.value.items()
@@ -428,7 +438,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"DBT documentation generation failed: {e}"
+                f"DBT documentation generation failed: {e}",
             )
 
     def get_info(self) -> r[t.Meltano.PluginInfo]:
@@ -445,10 +455,10 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         status_payload = self.execute()
         if status_payload.is_failure:
             return r[t.Meltano.ExecutionResultDict].fail(
-                status_payload.error or "Failed to get service status"
+                status_payload.error or "Failed to get service status",
             )
         return r[t.Meltano.ExecutionResultDict].ok(
-            self._normalize_config_mapping(status_payload.value.values)
+            self._normalize_config_mapping(status_payload.value.values),
         )
 
     def get_version_info(self) -> r[t.Meltano.MeltanoConfigDict]:
@@ -477,16 +487,16 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         """
         if u.none_(plugin_type, plugin_name):
             return r[t.Meltano.MeltanoConfigDict].fail(
-                "Plugin type and name are required"
+                "Plugin type and name are required",
             )
         valid_types = {"extractors", "loaders", "transformers", "orchestrators"}
         if plugin_type not in valid_types:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
         if not u.starts(plugin_name, "tap-", "target-", "dbt-"):
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid plugin name format: {plugin_name}"
+                f"Invalid plugin name format: {plugin_name}",
             )
         try:
             plugin_config: dict[str, t.NormalizedValue] = {
@@ -506,11 +516,12 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[t.Meltano.MeltanoConfigDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Plugin installation failed: {e}"
+                f"Plugin installation failed: {e}",
             )
 
     def list_plugins(
-        self, plugin_type: str | None = None
+        self,
+        plugin_type: str | None = None,
     ) -> r[list[t.Meltano.MeltanoConfigDict]]:
         """List installed plugins using flext-core patterns."""
         try:
@@ -535,7 +546,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[list[t.Meltano.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[list[t.Meltano.MeltanoConfigDict]].fail(
-                f"Plugin listing failed: {e}"
+                f"Plugin listing failed: {e}",
             )
 
     def load_data(
@@ -550,7 +561,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 load_result = service.load_batch(records)
                 if load_result.is_failure:
                     return r[t.Meltano.ResultDict].fail(
-                        load_result.error or "Failed to load data"
+                        load_result.error or "Failed to load data",
                     )
                 return r[t.Meltano.ResultDict].ok({
                     str(k): v for k, v in load_result.value.items()
@@ -571,7 +582,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             execution_start = time.time()
             execution_duration = time.time() - execution_start
             self.logger.info(
-                f"DBT models executed successfully in {execution_duration:.2f}s"
+                f"DBT models executed successfully in {execution_duration:.2f}s",
             )
             result_data: t.Meltano.MeltanoConfigDict = {
                 "models": [str(model_name) for model_name in models_to_run],
@@ -587,7 +598,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[t.Meltano.MeltanoConfigDict].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"DBT models execution failed: {e}"
+                f"DBT models execution failed: {e}",
             )
 
     def run_elt_pipeline(
@@ -640,7 +651,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[t.Meltano.MeltanoConfigDict].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"ELT pipeline execution failed: {e}"
+                f"ELT pipeline execution failed: {e}",
             )
 
     def _execute_singer_component(
@@ -653,11 +664,11 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     ) -> r[t.Meltano.MeltanoConfigDict]:
         if u.none_(component_name):
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"{component_label} name is required for execution"
+                f"{component_label} name is required for execution",
             )
         if not u.starts(component_name, validation_prefix):
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid {component_key} name format: {component_name}"
+                f"Invalid {component_key} name format: {component_name}",
             )
 
         try:
@@ -672,7 +683,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"{execution_error_message}: {e}"
+                f"{execution_error_message}: {e}",
             )
 
     def run_tap(self, tap_name: str) -> r[t.Meltano.MeltanoConfigDict]:
@@ -724,7 +735,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             execution_duration = time.time() - execution_start
             tests_count = u.mul(u.count(models_to_test), 3)
             self.logger.info(
-                f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s"
+                f"DBT tests completed successfully: {tests_count} tests passed in {execution_duration:.2f}s",
             )
             result_data: t.Meltano.MeltanoConfigDict = {
                 "models": [str(model_name) for model_name in models_to_test],
@@ -747,7 +758,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[bool].fail(f"Failed to validate project: {e}")
 
     def _handle_configure_environment_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle configure_environment operation call with model validation."""
         try:
@@ -755,7 +767,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config
+            "values": p.config,
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.configure_environment(p.environment_name, normalized_config)
@@ -764,7 +776,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_create_pipeline_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle create_pipeline operation call with model validation."""
         try:
@@ -772,7 +785,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config
+            "values": p.config,
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.create_pipeline(p.tap_name, p.target_name, normalized_config)
@@ -781,7 +794,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_execute_pipeline_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle execute_pipeline operation call with model validation."""
         try:
@@ -789,7 +803,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config
+            "values": p.config,
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.execute_pipeline(p.pipeline_id, normalized_config)
@@ -798,7 +812,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_install_plugin_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle install_plugin operation call with model validation."""
         try:
@@ -806,7 +821,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config
+            "values": p.config,
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.install_plugin(p.plugin_type, p.plugin_name, normalized_config)
@@ -815,7 +830,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_list_plugins_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle list_plugins operation call with model validation."""
         try:
@@ -831,7 +847,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.ResultDict].ok({"plugins": plugins})
 
     def _handle_run_dbt_models_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle run_dbt_models operation call with model validation."""
         try:
@@ -839,7 +856,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config or {}
+            "values": p.config or {},
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.run_dbt_models(p.models, normalized_config)
@@ -848,7 +865,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_run_elt_pipeline_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle run_elt_pipeline operation call with model validation."""
         try:
@@ -856,18 +874,22 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config or {}
+            "values": p.config or {},
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.run_elt_pipeline(
-            p.tap_name, p.target_name, p.dbt_models, normalized_config
+            p.tap_name,
+            p.target_name,
+            p.dbt_models,
+            normalized_config,
         )
         if result.is_failure:
             return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
         return r[t.Meltano.ResultDict].ok(result.value)
 
     def _handle_test_dbt_models_call(
-        self, payload: Mapping[str, t.Scalar]
+        self,
+        payload: Mapping[str, t.Scalar],
     ) -> r[t.Meltano.ResultDict]:
         """Handle test_dbt_models operation call with model validation."""
         try:
@@ -875,7 +897,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         except (ValidationError, ValueError, TypeError) as e:
             return r[t.Meltano.ResultDict].fail(f"Invalid payload: {e}")
         payload_config = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": p.config or {}
+            "values": p.config or {},
         }).values
         normalized_config = self._normalize_config_mapping(payload_config)
         result = self.test_dbt_models(p.models, normalized_config)

@@ -83,7 +83,7 @@ def create_pipeline(
         pipeline_dir.mkdir(parents=True, exist_ok=False)
         config_path = _pipeline_config_path(pipeline_name)
         validated = m.Meltano.ConfigMappingPayload.model_validate({
-            "values": dict(config)
+            "values": dict(config),
         })
         config_path.write_text(validated.model_dump_json(indent=2), encoding="utf-8")
     except OSError as exc:
@@ -92,7 +92,8 @@ def create_pipeline(
 
 
 def execute_pipeline(
-    pipeline_name: str, command_args: list[str] | None = None
+    pipeline_name: str,
+    command_args: list[str] | None = None,
 ) -> r[str]:
     """Execute a Meltano pipeline."""
     pipeline_dir = _pipeline_dir(pipeline_name)
@@ -103,17 +104,17 @@ def execute_pipeline(
     if config_path.exists():
         try:
             config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
-                config_path.read_text(encoding="utf-8")
+                config_path.read_text(encoding="utf-8"),
             )
         except (ValueError, OSError) as exc:
             return r[str].fail(
-                f"Failed to read pipeline '{pipeline_name}' configuration: {exc}"
+                f"Failed to read pipeline '{pipeline_name}' configuration: {exc}",
             )
         validated_payload = config_mapping.values
         command_value = validated_payload.get("command")
         if isinstance(command_value, list):
             configured_command = m.Meltano.StringListValue.model_validate({
-                "items": command_value
+                "items": command_value,
             }).items
     meltano_args = command_args or configured_command
     if not meltano_args:
@@ -147,7 +148,7 @@ def list_pipelines() -> r[list[str]]:
         return r[list[str]].ok([])
     if not pipelines_root.is_dir():
         return r[list[str]].fail(
-            f"Pipelines root path is not a directory: {pipelines_root}"
+            f"Pipelines root path is not a directory: {pipelines_root}",
         )
     try:
         pipeline_names = sorted(
@@ -170,7 +171,7 @@ def get_pipeline_status(pipeline_name: str) -> r[str]:
         pid = int(pid_path.read_text(encoding="utf-8").strip())
     except (ValueError, OSError) as exc:
         return r[str].fail(
-            f"Failed to read status for pipeline '{pipeline_name}': {exc}"
+            f"Failed to read status for pipeline '{pipeline_name}': {exc}",
         )
     if _is_process_running(pid):
         return r[str].ok("running")
@@ -227,7 +228,7 @@ def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
             return r[str].ok("stopped")
         time.sleep(0.1)
     return r[str].fail(
-        f"Pipeline '{pipeline_name}' did not stop within {timeout_seconds:.1f} seconds"
+        f"Pipeline '{pipeline_name}' did not stop within {timeout_seconds:.1f} seconds",
     )
 
 
@@ -241,7 +242,7 @@ def delete_pipeline(pipeline_name: str) -> r[str]:
         return r[str].fail(status_result.error)
     if status_result.value == "running":
         return r[str].fail(
-            f"Pipeline '{pipeline_name}' is running. Stop it before deletion"
+            f"Pipeline '{pipeline_name}' is running. Stop it before deletion",
         )
     try:
         shutil.rmtree(pipeline_dir)
@@ -313,7 +314,8 @@ class FlextMeltanoCommandRouter:
 
     @staticmethod
     def _execute_command(
-        handler: Callable[[list[str]], r[None]], args: list[str]
+        handler: Callable[[list[str]], r[None]],
+        args: list[str],
     ) -> r[None]:
         """Execute command handler."""
         return handler(args)
@@ -369,7 +371,8 @@ class FlextMeltanoPipelineManager:
 
     @staticmethod
     def _execute_pipeline_operation(
-        handler: Callable[[list[str]], r[None]], args: list[str]
+        handler: Callable[[list[str]], r[None]],
+        args: list[str],
     ) -> r[None]:
         """Execute pipeline operation."""
         return handler(args)
@@ -391,7 +394,7 @@ class FlextMeltanoPipelineManager:
         """Create new pipeline."""
         if not _args:
             return r[None].fail(
-                "Pipeline creation requires pipeline name and JSON configuration"
+                "Pipeline creation requires pipeline name and JSON configuration",
             )
         pipeline_name = _args[0]
         config_payload: (
@@ -404,7 +407,7 @@ class FlextMeltanoPipelineManager:
         if len(_args) >= _MIN_ARGS_WITH_CONFIG:
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
-                    _args[1]
+                    _args[1],
                 )
             except ValueError as exc:
                 return r[None].fail(f"Invalid pipeline configuration JSON: {exc}")
@@ -425,7 +428,8 @@ class FlextMeltanoPipelineManager:
         return r[None](value=None, is_success=True)
 
     def _get_pipeline_handler(
-        self, subcommand: str
+        self,
+        subcommand: str,
     ) -> r[Callable[[list[str]], r[None]]]:
         """Get pipeline operation handler."""
         operation_map: dict[str, Callable[[list[str]], r[None]]] = {
@@ -439,7 +443,7 @@ class FlextMeltanoPipelineManager:
         handler = operation_map.get(subcommand)
         if handler is None:
             return r[Callable[[list[str]], r[None]]].fail(
-                f"Unknown pipeline command: {subcommand}"
+                f"Unknown pipeline command: {subcommand}",
             )
         return r[Callable[[list[str]], r[None]]].ok(handler)
 
@@ -451,7 +455,9 @@ class FlextMeltanoPipelineManager:
         if status_result.is_failure:
             return r[None].fail(status_result.error)
         self.logger.info(
-            "Pipeline status", pipeline=_args[0], status=status_result.value
+            "Pipeline status",
+            pipeline=_args[0],
+            status=status_result.value,
         )
         return r[None](value=None, is_success=True)
 
@@ -542,14 +548,16 @@ class FlextMeltanoSingerManager:
     def _execute_tap_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute tap operation."""
         self.logger.info(
-            f"Tap operation '{operation}' not implemented in this refactor"
+            "Tap operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None](value=None, is_success=True)
 
     def _execute_target_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute target operation."""
         self.logger.info(
-            f"Target operation '{operation}' not implemented in this refactor"
+            "Target operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None](value=None, is_success=True)
 
@@ -570,10 +578,14 @@ class _FlextMeltanoSimpleCommandManager:
         return operation_handler(args[0], args[1:])
 
     def _log_unimplemented_operation(
-        self, operation_label: str, operation: str
+        self,
+        operation_label: str,
+        operation: str,
     ) -> r[None]:
         self.logger.info(
-            f"{operation_label} operation '{operation}' not implemented in this refactor"
+            "%s operation '%s' not implemented in this refactor",
+            operation_label,
+            operation,
         )
         return r[None](value=None, is_success=True)
 
@@ -594,7 +606,9 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     def handle_command(self, args: list[str]) -> r[None]:
         """Handle DBT command."""
         return self._handle_command(
-            args, self.cli.show_dbt_help, self._execute_dbt_operation
+            args,
+            self.cli.show_dbt_help,
+            self._execute_dbt_operation,
         )
 
     def _execute_dbt_operation(self, operation: str, _args: list[str]) -> r[None]:
@@ -657,7 +671,8 @@ class FlextMeltanoStatusManager:
     def _execute_status_operation(self, operation: str, _args: list[str]) -> r[None]:
         """Execute status operation."""
         self.logger.info(
-            f"Status operation '{operation}' not implemented in this refactor"
+            "Status operation '%s' not implemented in this refactor",
+            operation,
         )
         return r[None](value=None, is_success=True)
 

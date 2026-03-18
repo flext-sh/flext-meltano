@@ -60,7 +60,8 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         return r[t.Meltano.Project.ProjectMetadata].fail("No project loaded")
 
     def get_plugins(
-        self, plugin_type: str | None = None
+        self,
+        plugin_type: str | None = None,
     ) -> r[list[t.Meltano.PluginDefinition]]:
         """Get plugins from the project.
 
@@ -76,7 +77,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 return r[list[t.Meltano.PluginDefinition]].fail("No project loaded")
             plugins = self._extract_plugins(plugin_type)
             self.logger.info(
-                "Plugins retrieved", count=u.count(plugins), type=plugin_type or ""
+                "Plugins retrieved",
+                count=u.count(plugins),
+                type=plugin_type or "",
             )
             return r[list[t.Meltano.PluginDefinition]].ok(plugins)
         except (
@@ -90,7 +93,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         ) as e:
             self.logger.exception("Failed to get plugins", error=str(e))
             return r[list[t.Meltano.PluginDefinition]].fail(
-                f"Failed to get plugins: {e}"
+                f"Failed to get plugins: {e}",
             )
 
     def initialize_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
@@ -125,7 +128,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         ) as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to initialize project: {e}"
+                f"Failed to initialize project: {e}",
             )
 
     def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
@@ -168,7 +171,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         try:
             if not root.exists():
                 return r[t.Meltano.Project.ProjectMetadata].fail(
-                    f"Project directory not found: {root}"
+                    f"Project directory not found: {root}",
                 )
             self.project = MeltanoProject(root)
             self.project_root = root
@@ -190,11 +193,12 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         ) as e:
             self.logger.exception("Failed to load project", error=str(e))
             return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to load project: {e}"
+                f"Failed to load project: {e}",
             )
 
     def _extract_plugins(
-        self, plugin_type: str | None
+        self,
+        plugin_type: str | None,
     ) -> list[t.Meltano.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
         plugins: list[t.Meltano.PluginDefinition] = []
@@ -219,7 +223,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 }
                 variant_normalized = (
                     FlextMeltanoModels.Meltano.VariantPayload.model_validate({
-                        "value": variant_raw
+                        "value": variant_raw,
                     }).value
                 )
                 if variant_normalized is not None:

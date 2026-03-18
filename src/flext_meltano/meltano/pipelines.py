@@ -47,7 +47,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
     def _find_required_plugins() -> r[tuple[p.Meltano.Plugin, p.Meltano.Plugin]]:
         """Find required plugins in t.Meltano.Dbt.Project."""
         return r[tuple[p.Meltano.Plugin, p.Meltano.Plugin]].fail(
-            "Plugin discovery not configured"
+            "Plugin discovery not configured",
         )
 
     @override
@@ -67,7 +67,10 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             return r[t.Meltano.MeltanoConfigDict].fail(f"Orchestration failed: {e}")
 
     def execute_pipeline(
-        self, project_path: str, source_name: str, sink_name: str
+        self,
+        project_path: str,
+        source_name: str,
+        sink_name: str,
     ) -> r[Mapping[str, str]]:
         """Execute data pipeline using railway-oriented programming.
 
@@ -88,32 +91,37 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         start_result = self._log_pipeline_start(source_name, sink_name)
         if start_result.is_failure:
             return r[Mapping[str, str]].fail(
-                start_result.error or "Pipeline start failed"
+                start_result.error or "Pipeline start failed",
             )
         plugins_result = self._find_required_plugins()
         if plugins_result.is_failure:
             return r[Mapping[str, str]].fail(
-                plugins_result.error or "Failed to find plugins"
+                plugins_result.error or "Failed to find plugins",
             )
         elt_context_result = self._create_elt_context(
-            project_obj, source_name, sink_name, plugins_result.value
+            project_obj,
+            source_name,
+            sink_name,
+            plugins_result.value,
         )
         if elt_context_result.is_failure:
             return r[Mapping[str, str]].fail(
-                elt_context_result.error or "Failed to create ELT context"
+                elt_context_result.error or "Failed to create ELT context",
             )
         runner_result = self._execute_singer_runner(elt_context_result.value)
         if runner_result.is_failure:
             return r[Mapping[str, str]].fail(
-                runner_result.error or "Failed to execute singer runner"
+                runner_result.error or "Failed to execute singer runner",
             )
         final_result = self._build_pipeline_result(
-            source_name, sink_name, runner_result.value
+            source_name,
+            sink_name,
+            runner_result.value,
         )
         if final_result.is_failure:
             return r[Mapping[str, str]].fail(
                 final_result.error
-                or f"Pipeline execution failed for {source_name} -> {sink_name}"
+                or f"Pipeline execution failed for {source_name} -> {sink_name}",
             )
         return final_result
 
@@ -126,10 +134,10 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         """Build successful pipeline result."""
         try:
             parsed_context = m.Meltano.PipelineResultContext.model_validate(
-                context_data
+                context_data,
             )
             execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate({
-                "values": parsed_context.execution_result
+                "values": parsed_context.execution_result,
             }).values
             pipeline_result: dict[str, str] = {
                 "success": "true",
@@ -161,7 +169,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             project_root = Path(project_path)
             if not project_root.exists() or not project_root.is_dir():
                 return r[t.Meltano.ExecutionResultDict].fail(
-                    f"Project path is not a valid directory: {project_path}"
+                    f"Project path is not a valid directory: {project_path}",
                 )
             elt_context_obj: t.Meltano.MeltanoConfigDict = {
                 "project": str(project_root),
@@ -174,12 +182,14 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
             execution_result: r[t.Meltano.ELT.PipelineResult] = (
                 abstractions.execute_singer_pipeline(
-                    elt_context_obj, extractor_plugin_obj, loader_plugin_obj
+                    elt_context_obj,
+                    extractor_plugin_obj,
+                    loader_plugin_obj,
                 )
             )
             if execution_result.is_failure:
                 return r[t.Meltano.ExecutionResultDict].fail(
-                    execution_result.error or "Pipeline execution failed"
+                    execution_result.error or "Pipeline execution failed",
                 )
             context_data: t.Meltano.RunContextDict = {
                 "project_root": str(project_root),
@@ -188,18 +198,19 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 "loader_name": loader_name,
             }
             typed_context = m.Meltano.PipelineExecutionContext.model_validate(
-                context_data
+                context_data,
             )
             return r[t.Meltano.ExecutionResultDict].ok(
-                typed_context.model_dump(mode="python")
+                typed_context.model_dump(mode="python"),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.ExecutionResultDict].fail(
-                f"Failed to create ELT context: {e}"
+                f"Failed to create ELT context: {e}",
             )
 
     def _execute_singer_runner(
-        self, context_data: t.Meltano.ExecutionResultDict
+        self,
+        context_data: t.Meltano.ExecutionResultDict,
     ) -> r[Mapping[str, t.Scalar]]:
         """Execute Singer runner with context data."""
         try:
@@ -207,13 +218,15 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             return r[Mapping[str, t.Scalar]].fail("Plugin discovery not configured")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Mapping[str, t.Scalar]].fail(
-                f"Unexpected error in ELT pipeline: {e}"
+                f"Unexpected error in ELT pipeline: {e}",
             )
 
     def _log_pipeline_start(self, extractor_name: str, loader_name: str) -> r[None]:
         """Log pipeline execution start."""
         self.logger.info(
-            "Executing ELT pipeline", extractor=extractor_name, loader=loader_name
+            "Executing ELT pipeline",
+            extractor=extractor_name,
+            loader=loader_name,
         )
         return r[None].ok(None)
 

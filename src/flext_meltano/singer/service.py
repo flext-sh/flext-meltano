@@ -56,7 +56,8 @@ class FlextMeltanoSingerService(s[str]):
         self.state_manager = FlextMeltanoStateManager()
 
     def discover_tap_catalog(
-        self, tap: singer_p.SingerTap
+        self,
+        tap: singer_p.SingerTap,
     ) -> r[m.Meltano.SingerCatalog]:
         """Discover catalog from a tap instance.
 
@@ -156,7 +157,8 @@ class FlextMeltanoSingerService(s[str]):
         return self.catalog_manager.load_catalog(catalog_path)
 
     def load_state_from_file(
-        self, state_path: Path | None = None
+        self,
+        state_path: Path | None = None,
     ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file.
 
@@ -170,7 +172,9 @@ class FlextMeltanoSingerService(s[str]):
         return self.state_manager.load_state(state_path)
 
     def save_catalog_to_file(
-        self, catalog: m.Meltano.SingerCatalog, catalog_path: Path
+        self,
+        catalog: m.Meltano.SingerCatalog,
+        catalog_path: Path,
     ) -> r[None]:
         """Save catalog to file.
 

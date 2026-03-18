@@ -82,7 +82,7 @@ class FlextMeltanoDbtService(s[str]):
         ) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}"
+                f"Documentation generation failed: {e}",
             )
 
     def get_project_models(self) -> r[list[t.Meltano.Dbt.ModelConfiguration]]:
@@ -110,7 +110,7 @@ class FlextMeltanoDbtService(s[str]):
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
-                f"Failed to get models: {e}"
+                f"Failed to get models: {e}",
             )
 
     def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
@@ -143,7 +143,9 @@ class FlextMeltanoDbtService(s[str]):
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
     def run_models(
-        self, models: list[str] | None = None, **kwargs: t.Scalar
+        self,
+        models: list[str] | None = None,
+        **kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
 
@@ -171,7 +173,9 @@ class FlextMeltanoDbtService(s[str]):
         )
 
     def run_tests(
-        self, models: list[str] | None = None, **kwargs: t.Scalar
+        self,
+        models: list[str] | None = None,
+        **kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.
 
@@ -207,7 +211,7 @@ class FlextMeltanoDbtService(s[str]):
         success_logger: Callable[[_ResultT], None],
     ) -> r[_ResultT]:
         try:
-            self.logger.info(f"Running DBT {operation_name}", models=str(models or []))
+            self.logger.info("Running DBT %s", operation_name, models=str(models or []))
             result = operation()
             if result.is_success:
                 success_logger(result.value)
@@ -221,7 +225,7 @@ class FlextMeltanoDbtService(s[str]):
             RuntimeError,
             ImportError,
         ) as e:
-            self.logger.exception(f"DBT {failure_label} failed", error=str(e))
+            self.logger.exception("DBT %s failed", failure_label, error=str(e))
             return r[_ResultT].fail(f"DBT {failure_label} failed: {e}")
 
 

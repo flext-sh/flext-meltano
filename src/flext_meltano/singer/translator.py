@@ -113,7 +113,9 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def execute_singer_command(
-        command: list[str], input_data: str | None = None, timeout: int = 300
+        command: list[str],
+        input_data: str | None = None,
+        timeout: int = 300,
     ) -> r[t.Meltano.CLI.ProcessResult]:
         """Execute Singer SDK command and capture output.
 
@@ -128,7 +130,7 @@ class FlextMeltanoSingerCliTranslator:
         """
         if not command:
             return r[t.Meltano.CLI.ProcessResult].fail(
-                "Invalid command: must be non-empty list"
+                "Invalid command: must be non-empty list",
             )
 
         def is_string_argument(arg: str) -> bool:
@@ -140,7 +142,7 @@ class FlextMeltanoSingerCliTranslator:
 
         if not all(is_string_argument(arg) for arg in command):
             return r[t.Meltano.CLI.ProcessResult].fail(
-                "Invalid command: all arguments must be strings"
+                "Invalid command: all arguments must be strings",
             )
         try:
             process_input = input_data.encode() if input_data else None
@@ -199,10 +201,10 @@ class FlextMeltanoSingerCliTranslator:
         vars_val = getattr(params, "vars", None)
         if vars_val:
             vars_dict = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": vars_val
+                "values": vars_val,
             }).values
             vars_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": vars_dict
+                "values": vars_dict,
             })
             command.extend(["--vars", vars_payload.model_dump_json()])
         return r[list[str]].ok(command)

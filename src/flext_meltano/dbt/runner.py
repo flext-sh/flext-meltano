@@ -69,7 +69,7 @@ class FlextMeltanoDbtRunner(s[str]):
         ) as e:
             self.logger.exception("DBT documentation generation failed", error=str(e))
             return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}"
+                f"Documentation generation failed: {e}",
             )
 
     @override
@@ -81,7 +81,9 @@ class FlextMeltanoDbtRunner(s[str]):
         return r[str].fail("No project root set")
 
     def run_models(
-        self, models: list[str] | None = None, **_kwargs: t.Scalar
+        self,
+        models: list[str] | None = None,
+        **_kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
 
@@ -97,7 +99,9 @@ class FlextMeltanoDbtRunner(s[str]):
             if not self.project_root:
                 return r[m.Meltano.DbtRunResult].fail("No project root set")
             self.logger.info(
-                "Starting DBT run", models=str(models or []), cwd=str(self.project_root)
+                "Starting DBT run",
+                models=str(models or []),
+                cwd=str(self.project_root),
             )
             result = m.Meltano.DbtRunResult(
                 success=True,
@@ -119,7 +123,9 @@ class FlextMeltanoDbtRunner(s[str]):
             return r[m.Meltano.DbtRunResult].fail(f"DBT run failed: {e}")
 
     def run_tests(
-        self, models: list[str] | None = None, **_kwargs: t.Scalar
+        self,
+        models: list[str] | None = None,
+        **_kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.
 
@@ -140,7 +146,9 @@ class FlextMeltanoDbtRunner(s[str]):
                 cwd=str(self.project_root),
             )
             result = m.Meltano.DbtTestResult(
-                success=True, tests_run=0, status="completed"
+                success=True,
+                tests_run=0,
+                status="completed",
             )
             self.logger.info("DBT tests completed", tests_run=result.tests_run)
             return r[m.Meltano.DbtTestResult].ok(result)

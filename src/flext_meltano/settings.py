@@ -133,7 +133,7 @@ class FlextMeltanoSettings(FlextSettings):
         """Create settings from a project root path."""
         try:
             return r[FlextMeltanoSettings].ok(
-                FlextMeltanoSettings(project_root=project_root)
+                FlextMeltanoSettings(project_root=project_root),
             )
         except ValueError as error:
             return r[FlextMeltanoSettings].fail(str(error))

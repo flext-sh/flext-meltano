@@ -69,7 +69,9 @@ class FlextMeltanoSingerProtocols:
             ...
 
         def sync(
-            self, catalog: m.Meltano.SingerCatalog, state: m.Meltano.SingerStateMessage
+            self,
+            catalog: m.Meltano.SingerCatalog,
+            state: m.Meltano.SingerStateMessage,
         ) -> None:
             """Synchronize data from source to stdout.
 

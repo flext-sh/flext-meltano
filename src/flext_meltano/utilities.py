@@ -87,7 +87,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
         @classmethod
         def _write_yaml_content(
-            cls, file_handle: TextIO, config: t.Meltano.MeltanoConfigDict
+            cls,
+            file_handle: TextIO,
+            config: t.Meltano.MeltanoConfigDict,
         ) -> r[bool]:
             """Write YAML content to file handle."""
             if getattr(file_handle, "write", None) is None:
@@ -104,7 +106,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 return r[bool].ok(value=True)
             except (yaml.YAMLError, ValueError, TypeError, AttributeError):
                 return r[bool].fail(
-                    "Failed to write YAML content: non-serializable object"
+                    "Failed to write YAML content: non-serializable object",
                 )
 
         @classmethod
@@ -132,14 +134,16 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 ]
                 project_id_val = str(raw_config.get("project_id", ""))
                 project_name_val = str(
-                    raw_config.get("project_name") or raw_config.get("project_id") or ""
+                    raw_config.get("project_name")
+                    or raw_config.get("project_id")
+                    or "",
                 )
                 cfg = u.build(
                     raw_config,
                     ops={"transform": {"normalize": False, "strip_none": False}},
                 )
                 cfg_dict = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": cfg
+                    "values": cfg,
                 }).values
                 plugins_val = cfg_dict.get("plugins")
                 plugins_dict: t.Meltano.MeltanoConfigDict = {}
@@ -165,7 +169,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                         c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0]
                     )
                 normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": result_cfg
+                    "values": result_cfg,
                 }).values
                 normalized_cfg: dict[str, t.NormalizedValue] = {}
                 for key, value in normalized_values.items():
@@ -186,7 +190,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 return r[t.Meltano.MeltanoConfigDict].ok(normalized_cfg)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
                 return r[t.Meltano.MeltanoConfigDict].fail(
-                    f"Failed to create Meltano config dict: {err}"
+                    f"Failed to create Meltano config dict: {err}",
                 )
 
         @classmethod
@@ -269,7 +273,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 config_dict: t.Meltano.FileConfigDict,
             ) -> t.Meltano.MeltanoConfigDict:
                 normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": config_dict
+                    "values": config_dict,
                 }).values
                 converted: dict[str, t.NormalizedValue] = {}
                 for key, value in normalized_values.items():
@@ -300,7 +304,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 result
                 if result.is_success
                 else r[t.Meltano.MeltanoConfigDict].fail(
-                    result.error or f"Loading YAML config from {path} failed"
+                    result.error or f"Loading YAML config from {path} failed",
                 )
             )
 
@@ -311,7 +315,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
         @classmethod
         def save_yaml_file(
-            cls, file_path: Path, content: t.Meltano.MeltanoConfigDict
+            cls,
+            file_path: Path,
+            content: t.Meltano.MeltanoConfigDict,
         ) -> r[Path]:
             """Save content to YAML file."""
             result = cls.write_meltano_yml(content, file_path)
@@ -323,7 +329,9 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
         @classmethod
         def write_meltano_yml(
-            cls, config: t.Meltano.MeltanoConfigDict, target_path: Path
+            cls,
+            config: t.Meltano.MeltanoConfigDict,
+            target_path: Path,
         ) -> r[bool]:
             """Write MELTANO-SPECIFIC YAML configuration using monadic resource management.
 
@@ -354,7 +362,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     OSError,
                 ) as err:
                     _ = FlextLogger(__name__).warning(
-                        f"Error closing file handle: {err}"
+                        f"Error closing file handle: {err}",
                     )
 
             try:
@@ -381,7 +389,8 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
         @staticmethod
         def create_project_file(
-            file_path: Path, content: str | t.Meltano.MeltanoConfigDict
+            file_path: Path,
+            content: str | t.Meltano.MeltanoConfigDict,
         ) -> r[Path]:
             """Create a project file with content."""
             if not isinstance(content, (str, dict)):
@@ -391,7 +400,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             def create_file() -> Path:
                 file_path.parent.mkdir(parents=True, exist_ok=True)
                 content_str = m.Meltano.FileContentPayload.model_validate({
-                    "content": content_guard
+                    "content": content_guard,
                 }).content
                 file_path.write_text(content_str, encoding="utf-8")
                 return file_path

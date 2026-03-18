@@ -73,7 +73,8 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
             return r[str].fail(f"Failed to get bookmark: {e}")
 
     def load_state(
-        self, state_file: Path | None = None
+        self,
+        state_file: Path | None = None,
     ) -> r[m.Meltano.SingerStateMessage]:
         """Load state from file or memory.
 
@@ -87,7 +88,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         try:
             if state_file and state_file.exists():
                 self._state_msg = m.Meltano.SingerStateMessage.model_validate_json(
-                    state_file.read_text(encoding="utf-8")
+                    state_file.read_text(encoding="utf-8"),
                 )
                 self.logger.info(
                     "State loaded from file",
@@ -140,7 +141,10 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
         return self._state_msg
 
     def update_bookmark(
-        self, stream_name: str, bookmark_key: str, bookmark_value: str
+        self,
+        stream_name: str,
+        bookmark_key: str,
+        bookmark_value: str,
     ) -> r[None]:
         """Update bookmark for a stream.
 

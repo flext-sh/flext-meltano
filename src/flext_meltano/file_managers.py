@@ -61,7 +61,9 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def create_directory_structure(
-        cls, base_path: Path, directories: list[str]
+        cls,
+        base_path: Path,
+        directories: list[str],
     ) -> r[Mapping[str, str]]:
         """Create directory structure using direct pathlib implementation.
 
@@ -97,7 +99,7 @@ class FlextMeltanoFileManagers:
         def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
             FlextMeltanoFileManagers.logger.info(
-                f"Created temporary directory: {temp_dir}"
+                f"Created temporary directory: {temp_dir}",
             )
             return temp_dir
 
@@ -120,18 +122,18 @@ class FlextMeltanoFileManagers:
         try:
             if not u.is_string_non_empty(str(file_path)):
                 return r[t.Meltano.FileConfigDict].fail(
-                    f"Failed to load YAML config: Invalid YAML file path: {file_path}"
+                    f"Failed to load YAML config: Invalid YAML file path: {file_path}",
                 )
             if not file_path.exists():
                 return r[t.Meltano.FileConfigDict].fail(
-                    f"Failed to load YAML config: YAML file not found: {file_path}"
+                    f"Failed to load YAML config: YAML file not found: {file_path}",
                 )
             with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 config_data = yaml.safe_load(f)
             if config_data is None:
                 return r[t.Meltano.FileConfigDict].ok({})
             raw_validated = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": config_data
+                "values": config_data,
             }).values
             validated = FlextMeltanoFileManagers._normalize_file_config(raw_validated)
             return r[t.Meltano.FileConfigDict].ok(validated)
@@ -147,7 +149,9 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def save_yaml_config(
-        cls, config: t.Meltano.FileConfigDict, file_path: Path
+        cls,
+        config: t.Meltano.FileConfigDict,
+        file_path: Path,
     ) -> r[bool]:
         """Save YAML config using DSL patterns.
 
@@ -161,7 +165,11 @@ class FlextMeltanoFileManagers:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
                 yaml.dump(
-                    config, f, indent=2, default_flow_style=False, sort_keys=False
+                    config,
+                    f,
+                    indent=2,
+                    default_flow_style=False,
+                    sort_keys=False,
                 )
             return r[bool].ok(True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
@@ -169,7 +177,9 @@ class FlextMeltanoFileManagers:
 
     @classmethod
     def setup_project_structure(
-        cls, project_root: Path, _project_name: str
+        cls,
+        project_root: Path,
+        _project_name: str,
     ) -> r[t.Meltano.PathDict]:
         """Setup Meltano project structure using direct implementation.
 
