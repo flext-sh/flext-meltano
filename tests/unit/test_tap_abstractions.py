@@ -625,7 +625,10 @@ class TestFlextMeltanoTapAbstractionsComplete:
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-postgres", config=config, tap_id="postgres_tap_123"
         )
-        mock_target = {"type": "target-jsonl", "loaded_records": 0}
+        mock_target = m.Meltano.TargetConfig(
+            target_type="target-jsonl",
+            connection_config={"loaded_records": 0},
+        )
         if not hasattr(self.tap_abstractions, "sync_stream"):
             pytest.skip("sync_stream not available")
         result = self.tap_abstractions.sync_stream(tap_instance, "users", mock_target)
@@ -864,13 +867,14 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 raw_catalog.get("streams", []) if isinstance(raw_catalog, dict) else []
             )
             for stream_entry in streams:
-                stream_name = (
+                stream_name_value = (
                     stream_entry.get(
                         "stream_name", stream_entry.get("tap_stream_id", "unknown")
                     )
                     if isinstance(stream_entry, dict)
                     else getattr(stream_entry, "stream_name", "unknown")
                 )
+                stream_name = str(stream_name_value) if stream_name_value else "unknown"
                 extract_result = self.tap_abstractions.execute()
                 self.test_assertions.assert_true(
                     condition=extract_result.is_success,

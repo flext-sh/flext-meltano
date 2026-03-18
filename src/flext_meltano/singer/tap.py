@@ -122,8 +122,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: dict[str, t.Scalar],
-        stream_config: dict[str, t.Scalar] | None = None,
+        connection_config: dict[str, t.NormalizedValue],
+        stream_config: dict[str, t.NormalizedValue] | None = None,
         tap_version: str = "1.0.0",
         _version: str | None = None,
     ) -> r[m.Meltano.TapInstance]:
