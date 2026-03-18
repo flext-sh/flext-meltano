@@ -17,6 +17,7 @@ from typing import override
 import pytest
 from flext_core import r
 from flext_tests import tm
+from pytest_benchmark.fixture import BenchmarkFixture
 
 from flext_meltano import FlextMeltano, c, m, t
 
@@ -471,7 +472,7 @@ class TestFlextMeltanoSuccessPaths:
 class TestFlextMeltanoPerformance:
     """Performance benchmarks for FlextMeltano operations."""
 
-    def test_api_initialization_performance(self, benchmark: object) -> None:
+    def test_api_initialization_performance(self, benchmark: BenchmarkFixture) -> None:
         """Benchmark API initialization performance."""
 
         def create_api() -> FlextMeltano:
@@ -480,7 +481,7 @@ class TestFlextMeltanoPerformance:
         result = benchmark(create_api)
         tm.that(result is not None, eq=True)
 
-    def test_api_properties_access_performance(self, benchmark: object) -> None:
+    def test_api_properties_access_performance(self, benchmark: BenchmarkFixture) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()
 
