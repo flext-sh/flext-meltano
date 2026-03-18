@@ -1,0 +1,23 @@
+tests/unit/test_services.py
+  f7241c53aa4430ad 360-361,365-366,370-371,375-376,476-477,493,495,524-525,533-538,542-547,556-559,561-562
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "c8f8e5334efbd49b4c6642ec17787b81db4136c4",
+  "prompts": {
+    "f7241c53aa4430ad": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2fdd98e84ffevdJEY2yXDxgPR0",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 32,
+      "total_deletions": 43,
+      "accepted_lines": 32,
+      "overriden_lines": 0
+    }
+  }
+}
