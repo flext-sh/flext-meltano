@@ -32,7 +32,7 @@ class _TestAssertions:
         )
 
     @staticmethod
-    def assert_in(item: object, container: object, message: str = "") -> None:
+    def assert_in(item: str, container: dict[str, object], message: str = "") -> None:
         tm.that(item in container, eq=True)
 
 
@@ -50,15 +50,15 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_tap_config_validation(self) -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""
-        connection_config: dict[str, object] = {
+        connection_config: dict[str, int | str] = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
         }
-        stream_config: dict[str, object] = {"users": {"selected": True}}
+        stream_config: dict[str, str] = {"users": "selected"}
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
-            connection_config=connection_config,
+            connection_config=connection_config,  # type: ignore[arg-type]
             stream_config=stream_config,
             tap_version="v1.2.0",
         )

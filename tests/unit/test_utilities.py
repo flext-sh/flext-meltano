@@ -287,7 +287,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = u.Meltano.directory_exists(Path("/restricted/path"))
             tm.fail(result)
             tm.that(result.error is not None, eq=True)
-            tm.that("Permission denied" in result.error, eq=True)
+            if result.error is not None:
+                tm.that("Permission denied" in result.error, eq=True)
 
     def test_create_meltano_config_dict_with_none_values(self) -> None:
         """Test Meltano config dictionary creation with None values."""

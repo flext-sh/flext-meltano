@@ -18,9 +18,11 @@ logger = FlextLogger(__name__)
 class TestFlextMeltanoExecutorComplete:
     """Complete test suite for FlextMeltanoExecutor."""
 
+    executor: FlextMeltanoExecutor
+
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.executor: FlextMeltanoExecutor = FlextMeltanoExecutor()
+        self.executor = FlextMeltanoExecutor()
 
     def test_executor_initialization(self) -> None:
         """Test executor initialization."""
@@ -365,13 +367,13 @@ class TestFlextMeltanoExecutorComplete:
                     if result.error is not None:
                         tm.that(len(result.error) > 0, eq=True)
             except Exception as e:
-                logger.debug("Expected exception during command execution: %s", e)
+                logger.debug("Expected exception during command execution: %s", str(e))  # noqa: RUF065
                 tm.that(True, eq=True)
 
     def test_click_cli_infrastructure_invocation(self) -> None:
         """Test Click CLI infrastructure to hit uncovered lines 689-837."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         cli_app = cli_result.value
         tm.that(cli_app is not None, eq=True)
         runner_result = FlextMeltanoExecutor.create_cli_runner([])
@@ -406,7 +408,8 @@ class TestFlextMeltanoExecutorComplete:
                 tm.that(isinstance(result, r), eq=True)
             except Exception as e:
                 logger.debug(
-                    "Expected exception during edge case command execution: %s", e
+                    "Expected exception during edge case command execution: %s",
+                    str(e),  # noqa: RUF065
                 )
                 tm.that(True, eq=True)
 
@@ -425,12 +428,12 @@ class TestFlextMeltanoExecutorComplete:
                     tm.that(result.error, eq=True)
                     tm.that(isinstance(result.error, str), eq=True)
             except Exception as e:
-                logger.debug("Expected exception during pipeline execution: %s", e)
+                logger.debug("Expected exception during pipeline execution: %s", str(e))  # noqa: RUF065
                 tm.that(True, eq=True)
 
     def test_internal_method_direct_invocation(self) -> None:
         """Test internal methods directly to increase coverage."""
-        run_command_tests = [
+        run_command_tests: list[list[str]] = [
             [],
             ["tap-csv"],
             ["tap-csv", "target-jsonl"],
@@ -442,13 +445,14 @@ class TestFlextMeltanoExecutorComplete:
                 tm.that(isinstance(result, r), eq=True)
             except Exception as e:
                 logger.debug(
-                    "Expected exception during run command execution: %s", e
+                    "Expected exception during run command execution: %s",
+                    str(e),  # noqa: RUF065
                 )
                 tm.that(True, eq=True)
         try:
             self.executor.help()
         except Exception as e:
-            logger.debug("Expected exception during help method execution: %s", e)
+            logger.debug("Expected exception during help method execution: %s", str(e))  # noqa: RUF065
             tm.that(True, eq=True)
 
     def test_cli_execution_exception_handling(self) -> None:
@@ -478,7 +482,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_click_cli_main_command_infrastructure(self) -> None:
         """Test CLI main command infrastructure - verifies FlextMeltanoCLI creation."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         cli_app = cli_result.value
         tm.that(cli_app is not None, eq=True)
         tm.that(hasattr(cli_app, "logger"), eq=True)
@@ -486,7 +490,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_flext_cli_version_command_infrastructure(self) -> None:
         """Test flext-cli version command infrastructure using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         version_result = FlextMeltanoExecutor().version()
         tm.that(isinstance(version_result, r), eq=True)
         tm.that(version_result.is_success or version_result.is_failure, eq=True)
@@ -495,7 +499,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test health command infrastructure to hit lines 776-787 (updated for unified CLI)."""
         executor = FlextMeltanoExecutor()
         cli_result = executor.create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
             tm.that("name" in cli_app, eq=True)
@@ -506,7 +510,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_flext_cli_plugins_command_infrastructure(self) -> None:
         """Test flext-cli plugins command infrastructure (no direct Click usage)."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         cli_app = cli_result.value
         tm.that(cli_app is not None, eq=True)
 
@@ -514,7 +518,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test run command infrastructure through executor methods."""
         executor = FlextMeltanoExecutor()
         cli_result = executor.create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
             tm.that("executor" in cli_app, eq=True)
@@ -528,7 +532,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_self(self, meltano_cli_runner: object) -> None:
         """Test flext-cli command error paths using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         with mock.patch.object(
             FlextMeltanoExecutor,
             "version",
@@ -561,7 +565,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test CLI format result paths to hit lines 802-806."""
         executor = FlextMeltanoExecutor()
         cli_result = executor.create_flext_cli()
-        tm.ok(cli_result), f"CLI creation failed: {cli_result.error}"
+        tm.ok(cli_result)
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
             tm.that("executor" in cli_app, eq=True)
