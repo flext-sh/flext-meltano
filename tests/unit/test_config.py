@@ -27,14 +27,15 @@ class TestFlextMeltanoSettings:
 
     def test_basic_config_creation(self) -> None:
         """Test basic config creation with all fields."""
-        config = FlextMeltanoSettings()
-        config.project_root = Path("/test/project")
-        config.config_dir = Path(".meltano")
-        config.logs_dir = Path("logs")
-        config.log_level = "INFO"
-        config.meltano_version = "3.9.1"
-        config.singer_sdk_version = "0.48.0"
-        config.dbt_version = "1.10.5"
+        config = FlextMeltanoSettings(
+            project_root=Path("/test/project"),
+            config_dir=Path(".meltano"),
+            logs_dir=Path("logs"),
+            log_level="INFO",
+            meltano_version="3.9.1",
+            singer_sdk_version="0.48.0",
+            dbt_version="1.10.5",
+        )
         tm.that(config.project_root, eq=Path("/test/project").resolve())
         tm.that(config.config_dir.name, eq=".meltano")
         tm.that(config.logs_dir.name, eq="logs")
