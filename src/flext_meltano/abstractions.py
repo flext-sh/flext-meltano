@@ -148,7 +148,7 @@ class FlextMeltanoAbstractions:
             "status": "initialized",
         }
         return self._runner_helper.execute_data_pipeline(
-            pipeline_context,  # type: ignore[arg-type]
+            pipeline_context,
             source_config,
             sink_config,
         )
