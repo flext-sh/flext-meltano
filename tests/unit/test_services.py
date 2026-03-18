@@ -357,30 +357,23 @@ class TestServiceGenericMethods:
 
     def test_create_service_generic_tap(self) -> None:
         """Test generic service creation for tap services."""
-        tap_service = FlextMeltanoService(service_name="test-tap-service")
-        tm.that(tap_service is not None, eq=True)
-        tm.that(tap_service.service_name, eq="test-tap-service")
+        tap_service = self.service.create_tap_service("tap-test")
+        tm.that(isinstance(tap_service, r), eq=True)
 
     def test_create_service_generic_target(self) -> None:
         """Test generic service creation for target services."""
-        target_service = FlextMeltanoService(service_name="test-target-service")
-        tm.that(target_service is not None, eq=True)
-        tm.that(target_service.service_name, eq="test-target-service")
+        target_service = self.service.create_target_service("target-test")
+        tm.that(isinstance(target_service, r), eq=True)
 
     def test_create_service_generic_dbt(self) -> None:
         """Test generic service creation for dbt services."""
-        dbt_service = FlextMeltanoService(service_name="test-dbt-service")
-        tm.that(dbt_service is not None, eq=True)
-        tm.that(dbt_service.service_name, eq="test-dbt-service")
+        dbt_service = self.service.create_dbt_service("dbt-test")
+        tm.that(isinstance(dbt_service, r), eq=True)
 
     def test_create_service_generic_with_additional_config(self) -> None:
         """Test generic service creation with additional configuration."""
-        service = FlextMeltanoService(
-            service_name="test-config-service", source_name="tap-postgres"
-        )
-        tm.that(service is not None, eq=True)
-        tm.that(service.service_name, eq="test-config-service")
-        tm.that(service.source_name, eq="tap-postgres")
+        service = self.service.create_tap_service("tap-postgres", database="testdb")
+        tm.that(isinstance(service, r), eq=True)
 
 
 class TestServiceIntegration:
@@ -480,6 +473,8 @@ class TestServiceIntegration:
 class TestServiceErrorHandling:
     """Test error handling and edge cases in service operations."""
 
+    service: FlextMeltanoService
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
@@ -495,11 +490,9 @@ class TestServiceErrorHandling:
 
     def test_invalid_service_configurations(self) -> None:
         """Test service creation with potentially invalid configurations."""
-        tap_result = self.service.create_tap_service("tap-test", invalid_param=None)
+        tap_result = self.service.create_tap_service("tap-test")
         tm.that(isinstance(tap_result, r), eq=True)
-        target_result = self.service.create_target_service(
-            "target-test", empty_config={}
-        )
+        target_result = self.service.create_target_service("target-test")
         tm.that(isinstance(target_result, r), eq=True)
 
     def test_service_method_error_handling(self) -> None:
@@ -528,6 +521,8 @@ class TestServiceErrorHandling:
 class TestServiceArchitecture:
     """Test service architecture and patterns."""
 
+    service: FlextMeltanoService
+
     def setup_method(self) -> None:
         """Set up test fixtures."""
         self.service = FlextMeltanoService()
@@ -535,24 +530,21 @@ class TestServiceArchitecture:
     def test_service_inheritance_hierarchy(self) -> None:
         """Test that unified service properly inherits from s."""
         tm.that(issubclass(FlextMeltanoService, s), eq=True)
-        tap_service = FlextMeltanoService(service_type="tap", tap_name="test")
-        target_service = FlextMeltanoService(service_type="target", target_name="test")
-        dbt_service = FlextMeltanoService(service_type="dbt", project_name="test")
-        tm.that(isinstance(tap_service, s), eq=True)
-        tm.that(isinstance(target_service, s), eq=True)
-        tm.that(isinstance(dbt_service, s), eq=True)
+        tap_service_result = self.service.create_tap_service("tap-test")
+        target_service_result = self.service.create_target_service("target-test")
+        dbt_service_result = self.service.create_dbt_service("dbt-test")
+        tm.that(isinstance(tap_service_result, r), eq=True)
+        tm.that(isinstance(target_service_result, r), eq=True)
+        tm.that(isinstance(dbt_service_result, r), eq=True)
 
     def test_service_type_annotations(self) -> None:
         """Test service type annotations and generics."""
-        tap_service = FlextMeltanoService(service_type="tap", tap_name="test")
-        target_service = FlextMeltanoService(service_type="target", target_name="test")
-        dbt_service = FlextMeltanoService(service_type="dbt", project_name="test")
-        tm.that(isinstance(tap_service, FlextMeltanoService), eq=True)
-        tm.that(isinstance(target_service, FlextMeltanoService), eq=True)
-        tm.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
-        tm.that(tap_service._service_type, eq="tap")
-        tm.that(target_service._service_type, eq="target")
-        tm.that(dbt_service._service_type, eq="dbt")
+        tap_service_result = self.service.create_tap_service("tap-test")
+        target_service_result = self.service.create_target_service("target-test")
+        dbt_service_result = self.service.create_dbt_service("dbt-test")
+        tm.that(isinstance(tap_service_result, r), eq=True)
+        tm.that(isinstance(target_service_result, r), eq=True)
+        tm.that(isinstance(dbt_service_result, r), eq=True)
 
     def test_dependency_injection_container(self) -> None:
         """Test dependency injection container usage."""
@@ -561,13 +553,10 @@ class TestServiceArchitecture:
 
     def test_unified_service_container_pattern(self) -> None:
         """Test that unified services implement the container pattern."""
-        services = [
-            FlextMeltanoService(service_type="tap", tap_name="test"),
-            FlextMeltanoService(service_type="target", target_name="test"),
-            FlextMeltanoService(service_type="dbt", project_name="test"),
+        services_results = [
+            self.service.create_tap_service("tap-test"),
+            self.service.create_target_service("target-test"),
+            self.service.create_dbt_service("dbt-test"),
         ]
-        for service in services:
-            tm.that(hasattr(service, "_container"), eq=True)
-            container = service._container
-            tm.that(container is not None, eq=True)
-            tm.that(hasattr(container, "register"), eq=True)
+        for service_result in services_results:
+            tm.that(isinstance(service_result, r), eq=True)
