@@ -177,7 +177,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
                 project_path / "test.yml", invalid_content
             )
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            assert result.error is not None
             tm.that("Invalid content type" in result.error, eq=True)
 
     def test_load_yaml_file_success(self) -> None:
@@ -199,7 +199,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
                 f.write("invalid: yaml: content: [")
             result = u.Meltano.load_yaml_config(yaml_file)
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            assert result.error is not None
             tm.that("Failed to load YAML" in result.error, eq=True)
 
     def test_load_yaml_file_nonexistent(self) -> None:

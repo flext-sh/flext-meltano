@@ -125,16 +125,16 @@ class TestFlextMeltanoTypes:
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
-        plugin_def: t.Meltano.Plugin.PluginDefinition = {
+        plugin_def = {
             "name": "tap-users",
             "variants": ["default"],
             "config": {"batch_size": 1000},
         }
-        catalog: t.Meltano.Singer.CatalogEntry = {
+        catalog = {
             "tap_stream_id": "users",
             "schema": {"type": "object"},
         }
-        project: t.Meltano.MeltanoConfigDict = {"name": "elt-project", "enabled": True}
+        project = {"name": "elt-project", "enabled": True}
         tm.that(plugin_def["name"], eq="tap-users")
         tm.that(isinstance(plugin_def["variants"], list), eq=True)
         tm.that(catalog["tap_stream_id"], eq="users")

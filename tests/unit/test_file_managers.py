@@ -19,6 +19,8 @@ from flext_meltano import FlextMeltanoFileManagers
 class TestFlextMeltanoFileManagersComprehensive:
     """Comprehensive tests for FlextMeltanoFileManagers with 100% coverage."""
 
+    temp_dir: Path
+
     def setup_method(self) -> None:
         """Setup for each test."""
         self.temp_dir = Path(tempfile.mkdtemp())
@@ -303,8 +305,12 @@ class TestFlextMeltanoFileManagersComprehensive:
             load_result = FlextMeltanoFileManagers.load_yaml_config(file_path)
             tm.ok(load_result)
             loaded_config = load_result.value
-            tm.that(loaded_config["id"], eq=expected_config["id"])
-            tm.that(loaded_config["data"], eq=expected_config["data"])
+            expected_id = expected_config["id"]
+            expected_data = expected_config["data"]
+            loaded_id = loaded_config.get("id")
+            loaded_data = loaded_config.get("data")
+            tm.that(loaded_id, eq=expected_id)
+            tm.that(loaded_data, eq=expected_data)
 
     def test_file_managers_inheritance_methods(self) -> None:
         """Test that FlextMeltanoFileManagers has all expected methods."""

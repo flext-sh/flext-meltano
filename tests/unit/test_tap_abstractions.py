@@ -39,13 +39,14 @@ class _TestAssertions:
 class TestFlextMeltanoTapAbstractionsComplete:
     """Complete test suite for FlextMeltanoTapAbstractions."""
 
+    tap_abstractions: FlextMeltanoTapAbstractions
+    test_assertions: _TestAssertions
+
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.tap_abstractions: FlextMeltanoTapAbstractions = (
-            FlextMeltanoTapAbstractions()
-        )
+        self.tap_abstractions = FlextMeltanoTapAbstractions()
         if not hasattr(self, "test_assertions"):
-            self.test_assertions: _TestAssertions = _TestAssertions()
+            self.test_assertions = _TestAssertions()
 
     def test_tap_config_validation(self) -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""

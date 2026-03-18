@@ -18,6 +18,8 @@ from flext_meltano import t
 class TestFlextSingerTypes:
     """Test suite for t with real functionality."""
 
+    singer_types: object
+
     def setup_method(self) -> None:
         """Setup for each test."""
         self.singer_types = t()

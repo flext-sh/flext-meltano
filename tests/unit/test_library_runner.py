@@ -7,9 +7,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_core import r
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoLibraryRunner, r, t
+from flext_meltano import FlextMeltanoLibraryRunner
 from flext_meltano.adapters import FlextMeltanoAdapter
 
 
@@ -97,13 +98,11 @@ class TestFlextMeltanoLibraryRunner:
     def test_execute_complete_elt_pipeline_mock(self) -> None:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
-        result: r[t.Meltano.Processing.EltPipelineResult] = (
-            runner.execute_complete_elt_pipeline(
-                tap_name="tap-csv", target_name="target-jsonl"
-            )
+        result = runner.execute_complete_elt_pipeline(
+            tap_name="tap-csv", target_name="target-jsonl"
         )
         tm.ok(result)
-        pipeline_data: t.Meltano.Processing.EltPipelineResult = result.value
+        pipeline_data = result.value
         tm.that(isinstance(pipeline_data, dict), eq=True)
         tm.that("success" in pipeline_data, eq=True)
         tm.that("tap_name" in pipeline_data, eq=True)
