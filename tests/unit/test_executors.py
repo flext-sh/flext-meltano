@@ -365,7 +365,7 @@ class TestFlextMeltanoExecutorComplete:
                     if result.error is not None:
                         tm.that(len(result.error) > 0, eq=True)
             except Exception as e:
-                logger.debug("Expected exception during command execution: %s", e)
+                logger.debug("Expected exception during command execution: %s", str(e))
                 tm.that(True, eq=True)
 
     def test_click_cli_infrastructure_invocation(self) -> None:
@@ -379,7 +379,13 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(runner_result)
         runner_data = runner_result.value
         tm.that(isinstance(runner_data, dict), eq=True)
-        cli_tests = [[], ["--help"], ["version"], ["health"], ["plugins"]]
+        cli_tests: list[list[str]] = [
+            [],
+            ["--help"],
+            ["version"],
+            ["health"],
+            ["plugins"],
+        ]
         for args in cli_tests:
             result = FlextMeltanoExecutor.create_cli_runner(args)
             tm.that(isinstance(result, r), eq=True)
@@ -388,7 +394,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases to increase coverage."""
-        edge_case_commands = [
+        edge_case_commands: list[tuple[str, list[str]]] = [
             ("nonexistent", []),
             ("", ["args"]),
             ("version", ["extra", "args"]),
@@ -419,7 +425,7 @@ class TestFlextMeltanoExecutorComplete:
                     tm.that(result.error, eq=True)
                     tm.that(isinstance(result.error, str), eq=True)
             except Exception as e:
-                logger.debug("Expected exception during pipeline execution: %s", e)
+                logger.debug("Expected exception during pipeline execution: %s", str(e))
                 tm.that(True, eq=True)
 
     def test_internal_method_direct_invocation(self) -> None:
@@ -435,12 +441,14 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor._handle_default_command(["run"] + args)
                 tm.that(isinstance(result, r), eq=True)
             except Exception as e:
-                logger.debug("Expected exception during run command execution: %s", e)
+                logger.debug(
+                    "Expected exception during run command execution: %s", str(e)
+                )
                 tm.that(True, eq=True)
         try:
             self.executor.help()
         except Exception as e:
-            logger.debug("Expected exception during help method execution: %s", e)
+            logger.debug("Expected exception during help method execution: %s", str(e))
             tm.that(True, eq=True)
 
     def test_cli_execution_exception_handling(self) -> None:
@@ -454,7 +462,8 @@ class TestFlextMeltanoExecutorComplete:
                 if not result.is_success:
                     tm.that(result.error, eq=True)
                     tm.that(result.error is not None, eq=True)
-                    tm.that("CLI run failed" in result.error, eq=True)
+                    if result.error is not None:
+                        tm.that("CLI run failed" in result.error, eq=True)
         except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
             pass
         try:

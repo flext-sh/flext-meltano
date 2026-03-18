@@ -2280,13 +2280,13 @@ class FlextMeltanoModels(FlextCliModels):
             def normalize_schema(
                 cls,
                 value: _ValidatorInput,
-            ) -> Mapping[str, dict[str, object] | None]:
+            ) -> Mapping[str, object]:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        empty_schema: dict[str, dict[str, object] | None] = {}
+                        empty_schema: dict[str, object] = {}
                         return empty_schema
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):

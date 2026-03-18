@@ -212,8 +212,12 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 "type": plugin_type or "extractor",
             }
 
-            def safe_str(val: dict[str, object] | None) -> str:
-                return u.safe_string(str(val)) if val else ""
+            def safe_str(val: object) -> str:
+                if val is None:
+                    return ""
+                if isinstance(val, str):
+                    return u.safe_string(val)
+                return u.safe_string(str(val))
 
             def build_plugin(
                 d: t.Meltano.PluginConfigDict,

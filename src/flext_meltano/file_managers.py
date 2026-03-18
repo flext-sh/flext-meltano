@@ -202,19 +202,19 @@ class FlextMeltanoFileManagers:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
-             plugin_items: dict[str, list] = {
-                 "extractors": [],
-                 "loaders": [],
-                 "transformers": [],
-             }
-             meltano_config: t.Meltano.FileConfigDict = {
-                 "version": 1,
-                 "project_id": "project_name",
-                 "project_name": "project_name",
-                 "plugins": plugin_items,
-             }
-             model_paths: list[str] = ["models"]
-             test_paths: list[str] = ["tests"]
+            plugin_items: dict[str, list[t.NormalizedValue]] = {
+                "extractors": [],
+                "loaders": [],
+                "transformers": [],
+            }
+            meltano_config: t.Meltano.FileConfigDict = {
+                "version": 1,
+                "project_id": "project_name",
+                "project_name": "project_name",
+                "plugins": plugin_items,
+            }
+            model_paths: list[str] = ["models"]
+            test_paths: list[str] = ["tests"]
             dbt_project_config: t.Meltano.FileConfigDict = {
                 "name": "project_name",
                 "version": "1.0.0",
@@ -290,8 +290,8 @@ class FlextMeltanoFileManagers:
             str,
             t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
         ],
-    ) -> t.Meltano.FileConfigDict:
-        normalized: dict[str, dict[str, object] | None] = {}
+    ) -> dict[str, t.NormalizedValue]:
+        normalized: dict[str, t.NormalizedValue] = {}
         for key, value in raw.items():
             if value is None or u.is_scalar(value):
                 normalized[key] = value
@@ -299,7 +299,7 @@ class FlextMeltanoFileManagers:
             if isinstance(value, list):
                 normalized[key] = [item for item in value if item is not None]
                 continue
-            nested: dict[str, dict[str, object]] = {}
+            nested: dict[str, t.Scalar] = {}
             for nested_key, nested_value in value.items():
                 if u.is_scalar(nested_value):
                     nested[str(nested_key)] = nested_value
