@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Annotated, Literal, Self
 
 import yaml
-from flext_cli import FlextCliModels
+from flext_cli import FlextCliModels, u
 from flext_core import FlextModels
 from pydantic import (
     BaseModel,
@@ -25,8 +25,8 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+
 from flext_meltano import c, r, t
-from flext_cli import u
 
 type _ValidatorInput = (
     Mapping[str, object]
