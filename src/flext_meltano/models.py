@@ -1469,7 +1469,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             adapter: Annotated[
-                object | None,
+                t.ContainerValue | None,
                 Field(
                     default=None,
                     description="Tap adapter instance",
@@ -1517,7 +1517,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             adapter: Annotated[
-                object | None,
+                t.ContainerValue | None,
                 Field(
                     default=None,
                     description="Adapter instance",
@@ -1624,7 +1624,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             adapter: Annotated[
-                object | None,
+                t.ContainerValue | None,
                 Field(
                     default=None,
                     description="Adapter instance",
