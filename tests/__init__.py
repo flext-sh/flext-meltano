@@ -12,12 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_meltano.decorators import d
-    from flext_meltano.exceptions import e
-    from flext_meltano.handlers import h
-    from flext_meltano.mixins import x
-    from flext_meltano.result import r
-    from flext_meltano.service import s
+    from flext_meltano import d, e, h, r, s, x
 
     from . import helpers as helpers, integration as integration, unit as unit
     from .conftest import (
@@ -350,11 +345,11 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsFlextMeltanoUtilities": ("tests.utilities", "TestsFlextMeltanoUtilities"),
     "Tk": ("tests.helpers.docker_test_manager", "Tk"),
     "c": ("tests.constants", "c"),
-    "d": ("flext_meltano.decorators", "d"),
+    "d": ("flext_meltano", "d"),
     "docker_manager": ("tests.conftest", "docker_manager"),
     "docker_services": ("tests.conftest", "docker_services"),
-    "e": ("flext_meltano.exceptions", "e"),
-    "h": ("flext_meltano.handlers", "h"),
+    "e": ("flext_meltano", "e"),
+    "h": ("flext_meltano", "h"),
     "helpers": ("tests.helpers", ""),
     "integration": ("tests.integration", ""),
     "job_run_config": ("tests.conftest", "job_run_config"),
@@ -373,9 +368,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "postgres_service": ("tests.conftest", "postgres_service"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
-    "r": ("flext_meltano.result", "r"),
+    "r": ("flext_meltano", "r"),
     "redis_service": ("tests.conftest", "redis_service"),
-    "s": ("flext_meltano.service", "s"),
+    "s": ("flext_meltano", "s"),
     "sample_csv_data": ("tests.conftest", "sample_csv_data"),
     "sample_schedule_config": ("tests.conftest", "sample_schedule_config"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
@@ -417,7 +412,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
-    "x": ("flext_meltano.mixins", "x"),
+    "x": ("flext_meltano", "x"),
 }
 
 __all__ = [

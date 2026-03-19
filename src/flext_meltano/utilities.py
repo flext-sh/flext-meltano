@@ -14,8 +14,8 @@ from typing import TextIO
 import yaml
 from flext_cli import FlextCliUtilities
 from flext_core import FlextLogger, FlextUtilities
-
-from flext_meltano import c, m, r, t
+from flext_meltano import c, r, t
+from flext_cli import m
 from flext_meltano.file_managers import FlextMeltanoFileManagers
 
 

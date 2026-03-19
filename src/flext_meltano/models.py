@@ -25,8 +25,8 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
-from flext_meltano import c, r, t, u
+from flext_meltano import c, r, t
+from flext_cli import u
 
 type _ValidatorInput = (
     Mapping[str, object]
