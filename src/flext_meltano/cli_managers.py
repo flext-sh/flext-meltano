@@ -21,8 +21,7 @@ from typing import Protocol
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano.models import m
-from flext_meltano.typings import t
+from flext_meltano import m, t
 
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
 _PIPELINE_CONFIG_FILE = "pipeline.json"

@@ -12,6 +12,7 @@ from flext_core import r, t
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
+from flext_meltano import m
 from flext_meltano.cli_managers import (
     FlextMeltanoPipelineManager,
     create_pipeline,
@@ -20,7 +21,6 @@ from flext_meltano.cli_managers import (
     get_pipeline_status,
     list_pipelines,
 )
-from flext_meltano.models import m
 
 
 def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:

@@ -13,8 +13,7 @@ from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano.models import m
-from flext_meltano.typings import t
+from flext_meltano import m, t
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):

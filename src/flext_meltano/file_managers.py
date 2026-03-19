@@ -19,9 +19,7 @@ import yaml
 from flext_cli.utilities import FlextCliUtilities
 from flext_core import FlextLogger, r
 
-from flext_meltano.constants import c
-from flext_meltano.models import m
-from flext_meltano.typings import t
+from flext_meltano import c, m, t
 
 u = FlextCliUtilities
 

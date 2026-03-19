@@ -35,7 +35,7 @@ class FlextMeltanoTypes(FlextCliTypes):
     class Meltano:
         """Meltano plugin complex types namespace."""
 
-        type MeltanoValue = dict[str, object] | None
+        type MeltanoValue = dict[str, t.ContainerValue] | None
 
         type PluginDefinition = dict[
             str,
@@ -48,7 +48,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             t.Meltano.PluginDefinition | t.Meltano.PluginConfiguration,
         ]
         type PluginInstallation = dict[str, str | bool | list[str]]
-        type PluginExecution = Mapping[str, dict[str, object] | None]
+        type PluginExecution = Mapping[str, dict[str, t.ContainerValue] | None]
         type PluginInfo = dict[str, t.Scalar | None]
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
         PluginVariant = Literal["default", "singer", "custom"]
@@ -72,8 +72,8 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type CatalogEntry = dict[str, str | Mapping[str, t.Scalar | None]]
             type StreamSchema = dict[str, dict[str, t.Scalar | None]]
-            type TapConfig = Mapping[str, dict[str, object] | None]
-            type TargetConfig = Mapping[str, dict[str, object] | None]
+            type TapConfig = Mapping[str, dict[str, t.ContainerValue] | None]
+            type TargetConfig = Mapping[str, dict[str, t.ContainerValue] | None]
             type MessageBatch = list[dict[str, t.Scalar | None]]
             type StreamCatalog = dict[str, list[t.Meltano.Singer.CatalogEntry]]
             type Record = dict[str, t.Scalar | None]
@@ -118,30 +118,36 @@ class FlextMeltanoTypes(FlextCliTypes):
             type ModelConfiguration = dict[str, t.Scalar | None]
             type TestConfiguration = dict[str, str | list[str]]
             type ProfileConfiguration = dict[str, dict[str, t.Scalar | None]]
-            type ProjectConfiguration = Mapping[str, dict[str, object] | None]
+            type ProjectConfiguration = Mapping[
+                str,
+                dict[str, t.ContainerValue] | None,
+            ]
             type RunResults = dict[str, list[dict[str, t.Scalar | None]]]
-            type ManifestData = Mapping[str, dict[str, object] | None]
+            type ManifestData = Mapping[str, dict[str, t.ContainerValue] | None]
             type Project = dict[str, str | bool | list[str]]
 
         class Project:
             """Meltano-specific project types."""
 
-            type ProjectConfig = Mapping[str, dict[str, object] | None]
+            type ProjectConfig = Mapping[str, dict[str, t.ContainerValue] | None]
             type ProjectMetadata = dict[str, t.Scalar | None]
             type MeltanoProjectType = c.MeltanoProjectType
-            type MeltanoProjectConfig = Mapping[str, dict[str, object] | None]
+            type MeltanoProjectConfig = Mapping[
+                str,
+                dict[str, t.ContainerValue] | None,
+            ]
             type PipelineConfig = dict[str, str | int | bool | list[str]]
             type SingerConfig = dict[str, t.Scalar | None]
-            type DbtConfig = Mapping[str, dict[str, object] | None]
+            type DbtConfig = Mapping[str, dict[str, t.ContainerValue] | None]
 
         class Bridge:
             """Bridge operation complex types namespace."""
 
-            type BridgeMessage = Mapping[str, dict[str, object] | None]
-            type BridgeResponse = Mapping[str, dict[str, object] | None]
+            type BridgeMessage = Mapping[str, dict[str, t.ContainerValue] | None]
+            type BridgeResponse = Mapping[str, dict[str, t.ContainerValue] | None]
             type VersionInfo = dict[str, str | int]
             type ConnectionInfo = dict[str, str | int | bool]
-            type BridgeConfig = Mapping[str, dict[str, object] | None]
+            type BridgeConfig = Mapping[str, dict[str, t.ContainerValue] | None]
             type BridgeStatus = dict[str, t.Scalar | None]
 
         class CLI:
@@ -157,9 +163,9 @@ class FlextMeltanoTypes(FlextCliTypes):
             """ELT pipeline complex types namespace."""
 
             type PipelineResult = dict[str, t.Scalar | None | list[t.Scalar]]
-            type ExtractConfig = Mapping[str, dict[str, object] | None]
-            type LoadConfig = Mapping[str, dict[str, object] | None]
-            type TransformConfig = Mapping[str, dict[str, object] | None]
+            type ExtractConfig = Mapping[str, dict[str, t.ContainerValue] | None]
+            type LoadConfig = Mapping[str, dict[str, t.ContainerValue] | None]
+            type TransformConfig = Mapping[str, dict[str, t.ContainerValue] | None]
             type ExtractionResult = dict[str, t.Scalar | None]
             type LoadingResult = dict[str, t.Scalar | None]
             type TransformationResult = dict[str, t.Scalar | None]
@@ -167,23 +173,23 @@ class FlextMeltanoTypes(FlextCliTypes):
         class Processing:
             """Meltano-specific processing types."""
 
-            type DbtTransformationResult = dict[str, object]
-            type SingerProcessingResult = dict[str, object]
-            type SingerExecutionResult = dict[str, object]
-            type EltPipelineResult = dict[str, object]
+            type DbtTransformationResult = dict[str, t.ContainerValue]
+            type SingerProcessingResult = dict[str, t.ContainerValue]
+            type SingerExecutionResult = dict[str, t.ContainerValue]
+            type EltPipelineResult = dict[str, t.ContainerValue]
             type Headers = dict[str, str]
 
-        type NestedJsonValue = dict[str, object] | str | int | float | bool | None
+        type NestedJsonValue = dict[str, t.ContainerValue] | t.Scalar | None
         type NestedJsonDict = dict[str, t.Meltano.NestedJsonValue]
         type MeltanoConfigDict = Mapping[str, t.NormalizedValue]
-        type PluginConfigDict = dict[str, object]
+        type PluginConfigDict = dict[str, t.ContainerValue]
         type EnvironmentDict = dict[str, str]
         type VariablesDict = dict[str, str]
-        type SettingsDict = dict[str, object]
-        type MetadataDict = dict[str, object]
-        type CommandDict = dict[str, object]
-        type ScheduleDict = dict[str, object]
-        type JobDict = dict[str, object]
+        type SettingsDict = dict[str, t.ContainerValue]
+        type MetadataDict = dict[str, t.ContainerValue]
+        type CommandDict = dict[str, t.ContainerValue]
+        type ScheduleDict = dict[str, t.ContainerValue]
+        type JobDict = dict[str, t.ContainerValue]
         type RecordDict = Mapping[str, t.Scalar | None]
         type SchemaDict = Mapping[str, t.Scalar | None]
         type StateDict = Mapping[str, t.Scalar | None]
@@ -196,7 +202,7 @@ class FlextMeltanoTypes(FlextCliTypes):
         type PluginTypeList = list[str]
         type ExecutionResultDict = Mapping[str, t.NormalizedValue]
         type ExecutionStatusDict = Mapping[str, str]
-        type RuntimeConfigDict = Mapping[str, dict[str, object] | None]
+        type RuntimeConfigDict = Mapping[str, dict[str, t.ContainerValue] | None]
         type SingerRecordDict = dict[str, t.Scalar | None]
         type SingerStateDict = dict[str, t.Scalar | None]
         type SingerCatalogDict = dict[str, t.NormalizedValue]

@@ -16,13 +16,11 @@ from typing import override
 from flext_core import e, r
 from pydantic import ValidationError
 
+from flext_meltano import c, m, u
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.constants import c
-from flext_meltano.models import m
 from flext_meltano.services import FlextMeltanoService, s
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import t
-from flext_meltano.utilities import u
 
 
 class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):

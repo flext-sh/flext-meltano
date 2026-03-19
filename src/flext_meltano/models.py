@@ -19,8 +19,8 @@ from flext_core import (
     FlextModels,
     r,
     t,
+    u,
 )
-from flext_core.utilities import u
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -31,7 +31,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano.constants import c
+from flext_meltano import c
 
 type _ValidatorInput = (
     Mapping[str, object]
