@@ -49,16 +49,12 @@ if TYPE_CHECKING:
     from .test_config import (
         TestFlextMeltanoSettings,
         TestFlextMeltanoSettingsConstants,
-        TestFlextMeltanoSettingsConstants as c,
         TestFlextMeltanoSettingsEdgeCases,
         TestFlextMeltanoSettingsEnums,
         TestFlextMeltanoSettingsIntegration,
     )
     from .test_constants import Testc
-    from .test_execution_result import (
-        TestFlextMeltanoExecutionResult,
-        TestFlextMeltanoExecutionResult as r,
-    )
+    from .test_execution_result import TestFlextMeltanoExecutionResult
     from .test_executors import TestFlextMeltanoExecutorComplete
     from .test_file_managers import TestFlextMeltanoFileManagersComprehensive
     from .test_library_runner import (
@@ -86,7 +82,6 @@ if TYPE_CHECKING:
         TestServiceGenericMethods,
         TestServiceIntegration,
         TestTapService,
-        TestTapService as s,
         TestTargetService,
     )
     from .test_singer_cli_translator import (
@@ -96,7 +91,7 @@ if TYPE_CHECKING:
         TestFlextMeltanoSingerCliTranslatorTapRun,
         TestFlextMeltanoSingerCliTranslatorTargetRun,
     )
-    from .test_singer_types import TestFlextSingerTypes, TestFlextSingerTypes as t
+    from .test_singer_types import TestFlextSingerTypes
     from .test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
     from .test_target_abstractions import (
         TestFlextMeltanoTargetAbstractionsComplete,
@@ -293,12 +288,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestTargetConfigEnhanced": ("tests.unit.test_models", "TestTargetConfigEnhanced"),
     "TestTargetService": ("tests.unit.test_services", "TestTargetService"),
     "Testc": ("tests.unit.test_constants", "Testc"),
-    "c": ("tests.unit.test_config", "TestFlextMeltanoSettingsConstants"),
     "logger": ("tests.unit.test_target_abstractions", "logger"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
-    "r": ("tests.unit.test_execution_result", "TestFlextMeltanoExecutionResult"),
-    "s": ("tests.unit.test_services", "TestTapService"),
-    "t": ("tests.unit.test_singer_types", "TestFlextSingerTypes"),
     "test_create_pipeline_creates_directory_and_configuration": (
         "tests.unit.pipeline_cli_managers_tests",
         "test_create_pipeline_creates_directory_and_configuration",
@@ -387,12 +378,8 @@ __all__ = [
     "TestTargetConfigEnhanced",
     "TestTargetService",
     "Testc",
-    "c",
     "logger",
     "pytestmark",
-    "r",
-    "s",
-    "t",
     "test_create_pipeline_creates_directory_and_configuration",
     "test_create_pipeline_fails_without_configuration",
     "test_delete_pipeline_removes_configuration_directory",

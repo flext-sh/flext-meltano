@@ -12,6 +12,13 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from flext_meltano.decorators import d
+    from flext_meltano.exceptions import e
+    from flext_meltano.handlers import h
+    from flext_meltano.mixins import x
+    from flext_meltano.result import r
+    from flext_meltano.service import s
+
     from . import helpers as helpers, integration as integration, unit as unit
     from .conftest import (
         CliRunner,
@@ -90,10 +97,7 @@ if TYPE_CHECKING:
         TestFlextMeltanoSettingsIntegration,
     )
     from .unit.test_constants import Testc
-    from .unit.test_execution_result import (
-        TestFlextMeltanoExecutionResult,
-        TestFlextMeltanoExecutionResult as r,
-    )
+    from .unit.test_execution_result import TestFlextMeltanoExecutionResult
     from .unit.test_executors import TestFlextMeltanoExecutorComplete
     from .unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
     from .unit.test_library_runner import (
@@ -121,7 +125,6 @@ if TYPE_CHECKING:
         TestServiceGenericMethods,
         TestServiceIntegration,
         TestTapService,
-        TestTapService as s,
         TestTargetService,
     )
     from .unit.test_singer_cli_translator import (
@@ -347,8 +350,11 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsFlextMeltanoUtilities": ("tests.utilities", "TestsFlextMeltanoUtilities"),
     "Tk": ("tests.helpers.docker_test_manager", "Tk"),
     "c": ("tests.constants", "c"),
+    "d": ("flext_meltano.decorators", "d"),
     "docker_manager": ("tests.conftest", "docker_manager"),
     "docker_services": ("tests.conftest", "docker_services"),
+    "e": ("flext_meltano.exceptions", "e"),
+    "h": ("flext_meltano.handlers", "h"),
     "helpers": ("tests.helpers", ""),
     "integration": ("tests.integration", ""),
     "job_run_config": ("tests.conftest", "job_run_config"),
@@ -367,9 +373,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "postgres_service": ("tests.conftest", "postgres_service"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
-    "r": ("tests.unit.test_execution_result", "TestFlextMeltanoExecutionResult"),
+    "r": ("flext_meltano.result", "r"),
     "redis_service": ("tests.conftest", "redis_service"),
-    "s": ("tests.unit.test_services", "TestTapService"),
+    "s": ("flext_meltano.service", "s"),
     "sample_csv_data": ("tests.conftest", "sample_csv_data"),
     "sample_schedule_config": ("tests.conftest", "sample_schedule_config"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
@@ -411,6 +417,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
+    "x": ("flext_meltano.mixins", "x"),
 }
 
 __all__ = [
@@ -486,8 +493,11 @@ __all__ = [
     "TestsFlextMeltanoUtilities",
     "Tk",
     "c",
+    "d",
     "docker_manager",
     "docker_services",
+    "e",
+    "h",
     "helpers",
     "integration",
     "job_run_config",
@@ -529,6 +539,7 @@ __all__ = [
     "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     "u",
     "unit",
+    "x",
 ]
 
 

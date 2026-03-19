@@ -21,17 +21,17 @@ if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
     from flext_meltano.meltano.bridge import FlextMeltanoBridge
-    from flext_meltano.meltano.pipelines import (
-        FlextMeltanoOrchestrationService,
-        FlextMeltanoOrchestrationService as s,
-    )
+    from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
     from flext_meltano.meltano.runner import (
         FlextMeltanoDbtTransformationRunner,
         FlextMeltanoLibraryRunner,
     )
-    from flext_meltano.meltano.service import FlextMeltanoMeltanoService
+    from flext_meltano.meltano.service import (
+        FlextMeltanoMeltanoService,
+        FlextMeltanoMeltanoService as s,
+    )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoBridge": ("flext_meltano.meltano.bridge", "FlextMeltanoBridge"),
@@ -59,7 +59,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_meltano.meltano.project",
         "FlextMeltanoProjectManager",
     ),
-    "s": ("flext_meltano.meltano.pipelines", "FlextMeltanoOrchestrationService"),
+    "s": ("flext_meltano.meltano.service", "FlextMeltanoMeltanoService"),
 }
 
 __all__ = [

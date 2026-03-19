@@ -10,6 +10,11 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
+    from flext_cli.decorators import d
+    from flext_cli.exceptions import e
+    from flext_cli.handlers import h
+    from flext_cli.mixins import x
+    from flext_cli.result import r
     from flext_core.typings import FlextTypes
 
     from flext_meltano import dbt, meltano, singer
@@ -50,10 +55,7 @@ if TYPE_CHECKING:
         FlextMeltanoDbtService,
         FlextMeltanoDbtService as s,
     )
-    from flext_meltano.execution_result import (
-        FlextMeltanoExecutionResult,
-        FlextMeltanoExecutionResult as r,
-    )
+    from flext_meltano.execution_result import FlextMeltanoExecutionResult
     from flext_meltano.executor import FlextMeltanoExecutor
     from flext_meltano.file_managers import FlextMeltanoFileManagers
     from flext_meltano.library_runner import FlextMeltanoLibraryRunner
@@ -205,21 +207,25 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "__version_info__": ("flext_meltano.__version__", "__version_info__"),
     "c": ("flext_meltano.constants", "c"),
     "create_pipeline": ("flext_meltano.cli_managers", "create_pipeline"),
+    "d": ("flext_cli.decorators", "d"),
     "dbt": ("flext_meltano.dbt", ""),
     "delete_pipeline": ("flext_meltano.cli_managers", "delete_pipeline"),
+    "e": ("flext_cli.exceptions", "e"),
     "execute_pipeline": ("flext_meltano.cli_managers", "execute_pipeline"),
     "get_pipeline_status": ("flext_meltano.cli_managers", "get_pipeline_status"),
+    "h": ("flext_cli.handlers", "h"),
     "list_pipelines": ("flext_meltano.cli_managers", "list_pipelines"),
     "m": ("flext_meltano.models", "m"),
     "main": ("flext_meltano.cli", "main"),
     "meltano": ("flext_meltano.meltano", ""),
     "p": ("flext_meltano.protocols", "p"),
-    "r": ("flext_meltano.execution_result", "FlextMeltanoExecutionResult"),
+    "r": ("flext_cli.result", "r"),
     "s": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
     "singer": ("flext_meltano.singer", ""),
     "stop_pipeline": ("flext_meltano.cli_managers", "stop_pipeline"),
     "t": ("flext_meltano.typings", "t"),
     "u": ("flext_meltano.utilities", "u"),
+    "x": ("flext_cli.mixins", "x"),
 }
 
 __all__ = [
@@ -274,10 +280,13 @@ __all__ = [
     "__version_info__",
     "c",
     "create_pipeline",
+    "d",
     "dbt",
     "delete_pipeline",
+    "e",
     "execute_pipeline",
     "get_pipeline_status",
+    "h",
     "list_pipelines",
     "m",
     "main",
@@ -289,6 +298,7 @@ __all__ = [
     "stop_pipeline",
     "t",
     "u",
+    "x",
 ]
 
 
