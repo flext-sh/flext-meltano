@@ -5,8 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, ClassVar
 
-from flext_core import FlextSettings, c, r, t
+from flext_core import FlextSettings
 from pydantic import Field, field_validator
+
+from flext_meltano import c, r, t
 
 
 class FlextMeltanoSettings(FlextSettings):

@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextRuntime, r, s
+from flext_core import FlextRuntime
 
-from flext_meltano import FlextMeltanoSettings, c, m, t
+from flext_meltano import FlextMeltanoSettings, c, m, r, s, t
 
 
 class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):

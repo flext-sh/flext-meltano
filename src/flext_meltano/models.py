@@ -15,12 +15,7 @@ from typing import Annotated, Literal, Self
 
 import yaml
 from flext_cli import FlextCliModels
-from flext_core import (
-    FlextModels,
-    r,
-    t,
-    u,
-)
+from flext_core import FlextModels
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -31,7 +26,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano import c
+from flext_meltano import c, r, t, u
 
 type _ValidatorInput = (
     Mapping[str, object]

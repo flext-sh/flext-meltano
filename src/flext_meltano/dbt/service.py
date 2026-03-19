@@ -13,9 +13,9 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TypeVar, override
 
-from flext_core import r, s
+from flext_core import s
 
-from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes
+from flext_meltano import FlextMeltanoModels, FlextMeltanoTypes, r
 from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
 

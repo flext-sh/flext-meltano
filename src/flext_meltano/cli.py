@@ -14,13 +14,14 @@ import sys
 from typing import Protocol
 
 from flext_cli import FlextCli
-from flext_core import FlextLogger, p
+from flext_core import FlextLogger
 
 from flext_meltano import (
     FlextMeltano,
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
+    p,
 )
 from flext_meltano.cli_managers import (
     FlextMeltanoCommandRouter,

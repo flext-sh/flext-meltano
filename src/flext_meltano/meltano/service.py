@@ -12,13 +12,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, override
 
-from flext_core import r, s
+from flext_core import s
 from pydantic import Field
 
 from flext_meltano import (
     FlextMeltanoConstants,
     FlextMeltanoModels,
     FlextMeltanoTypes,
+    r,
     u,
 )
 from flext_meltano.meltano.project import FlextMeltanoProjectManager

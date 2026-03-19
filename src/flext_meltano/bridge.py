@@ -12,9 +12,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_core import FlextLogger, p, r
+from flext_core import FlextLogger
 
-from flext_meltano import t, u
+from flext_meltano import p, r, t, u
 
 
 class FlextMeltanoBridge:

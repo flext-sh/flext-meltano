@@ -12,9 +12,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import r, s
+from flext_core import s
 
-from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
+from flext_meltano import (
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoTypes,
+    r,
+)
 from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager

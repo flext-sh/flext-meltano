@@ -17,9 +17,9 @@ from pathlib import Path
 
 import yaml
 from flext_cli.utilities import FlextCliUtilities
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger
 
-from flext_meltano import c, m, t
+from flext_meltano import c, m, r, t
 
 u = FlextCliUtilities
 

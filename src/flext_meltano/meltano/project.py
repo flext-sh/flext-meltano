@@ -12,11 +12,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import FlextService, r
+from flext_core import FlextService
 from meltano.core.project import Project as MeltanoProject
 from pydantic import PrivateAttr
 
-from flext_meltano import FlextMeltanoModels, t, u
+from flext_meltano import FlextMeltanoModels, r, t, u
 
 
 class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]):

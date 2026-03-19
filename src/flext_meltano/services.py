@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextContainer, e, p, r, s
+from flext_core import FlextContainer, e, s
 
-from flext_meltano import FlextMeltanoSettings, c, m, t, u
+from flext_meltano import FlextMeltanoSettings, c, m, p, r, t, u
 
 
 class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):

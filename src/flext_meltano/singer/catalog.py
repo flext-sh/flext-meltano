@@ -13,9 +13,14 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextService, r
+from flext_core import FlextService
 
-from flext_meltano import FlextMeltanoConstants, FlextMeltanoModels, FlextMeltanoTypes
+from flext_meltano import (
+    FlextMeltanoConstants,
+    FlextMeltanoModels,
+    FlextMeltanoTypes,
+    r,
+)
 from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 
 t = FlextMeltanoTypes

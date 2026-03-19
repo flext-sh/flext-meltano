@@ -12,9 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_core import r, s
-
-from flext_meltano import m, t
+from flext_meltano import m, r, s, t
 
 
 class FlextMeltanoDbtRunner(s[str]):

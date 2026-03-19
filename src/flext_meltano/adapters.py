@@ -19,9 +19,9 @@ from pathlib import Path
 from typing import override
 
 import meltano
-from flext_core import FlextSettings, r, s
+from flext_core import FlextSettings
 
-from flext_meltano import FlextMeltanoSettings, t, u
+from flext_meltano import FlextMeltanoSettings, r, s, t, u
 
 
 class FlextMeltanoAdapter:

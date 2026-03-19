@@ -11,9 +11,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import r, s
-
-from flext_meltano import FlextMeltanoSettings, m, t
+from flext_meltano import FlextMeltanoSettings, m, r, s, t
 
 
 class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):

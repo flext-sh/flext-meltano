@@ -16,13 +16,13 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import TypeIs, override
 
-from flext_core import r, s
-
 from flext_meltano import (
     FlextMeltanoProjectService,
     FlextMeltanoSettings,
     m,
     p,
+    r,
+    s,
     t,
     u,
 )

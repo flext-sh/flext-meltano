@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import override
 
 import yaml
-from flext_core import r, s, u
 from pydantic import TypeAdapter
 
 from flext_meltano import (
@@ -26,7 +25,10 @@ from flext_meltano import (
     c,
     m,
     p,
+    r,
+    s,
     t,
+    u,
 )
 
 

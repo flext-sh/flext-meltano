@@ -16,15 +16,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
-from flext_core import r, s
-
-from flext_meltano import (
-    FlextMeltanoSettings,
-    c,
-    m,
-    p,
-    t,
-)
+from flext_meltano import FlextMeltanoSettings, c, m, p, r, s, t
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 
 

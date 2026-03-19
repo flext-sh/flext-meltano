@@ -12,9 +12,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, r, t
 from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
 
 

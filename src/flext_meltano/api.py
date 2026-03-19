@@ -13,14 +13,13 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import override
 
-from flext_core import e, r
+from flext_core import e
 from pydantic import ValidationError
 
-from flext_meltano import c, m, u
+from flext_meltano import c, m, r, s, t, u
 from flext_meltano.adapters import FlextMeltanoAdapter
-from flext_meltano.services import FlextMeltanoService, s
+from flext_meltano.services import FlextMeltanoService
 from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import t
 
 
 class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):

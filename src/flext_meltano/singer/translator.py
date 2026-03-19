@@ -99,9 +99,7 @@ from __future__ import annotations
 
 import subprocess
 
-from flext_core import r
-
-from flext_meltano import m, t
+from flext_meltano import m, r, t
 
 
 class FlextMeltanoSingerCliTranslator:

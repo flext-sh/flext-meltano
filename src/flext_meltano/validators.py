@@ -11,10 +11,10 @@ import contextlib
 from collections.abc import Mapping
 from pathlib import Path
 
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger
 from pydantic import ValidationError
 
-from flext_meltano import FlextMeltanoModels, t
+from flext_meltano import FlextMeltanoModels, r, t
 
 m = FlextMeltanoModels
 logger = FlextLogger(__name__)
