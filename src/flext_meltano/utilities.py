@@ -212,7 +212,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 "type": plugin_type or "extractor",
             }
 
-            def safe_str(val: object) -> str:
+            def safe_str(val: t.Scalar | None) -> str:
                 if val is None:
                     return ""
                 if isinstance(val, str):
