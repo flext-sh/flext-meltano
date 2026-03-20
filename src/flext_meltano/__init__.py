@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
-    from flext_cli import d, e, h, r, x
+    from flext_cli import d, e, h, x
     from flext_core.typings import FlextTypes
 
     from flext_meltano import dbt, meltano, singer
@@ -44,14 +44,17 @@ if TYPE_CHECKING:
         list_pipelines,
         stop_pipeline,
     )
-    from flext_meltano.constants import FlextMeltanoConstants, c
+    from flext_meltano.constants import (
+        FlextMeltanoConstants,
+        FlextMeltanoConstants as c,
+    )
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
-    from flext_meltano.dbt.service import (
-        FlextMeltanoDbtService,
-        FlextMeltanoDbtService as s,
+    from flext_meltano.dbt.service import FlextMeltanoDbtService
+    from flext_meltano.execution_result import (
+        FlextMeltanoExecutionResult,
+        FlextMeltanoExecutionResult as r,
     )
-    from flext_meltano.execution_result import FlextMeltanoExecutionResult
     from flext_meltano.executor import FlextMeltanoExecutor
     from flext_meltano.file_managers import FlextMeltanoFileManagers
     from flext_meltano.library_runner import FlextMeltanoLibraryRunner
@@ -60,9 +63,15 @@ if TYPE_CHECKING:
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
     from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
-    from flext_meltano.models import FlextMeltanoModels, m
-    from flext_meltano.project_service import FlextMeltanoProjectService
-    from flext_meltano.protocols import FlextMeltanoProtocols, p
+    from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
+    from flext_meltano.project_service import (
+        FlextMeltanoProjectService,
+        FlextMeltanoProjectService as s,
+    )
+    from flext_meltano.protocols import (
+        FlextMeltanoProtocols,
+        FlextMeltanoProtocols as p,
+    )
     from flext_meltano.services import FlextMeltanoService
     from flext_meltano.settings import FlextMeltanoSettings
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
@@ -75,8 +84,11 @@ if TYPE_CHECKING:
     from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
     from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
     from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
-    from flext_meltano.typings import FlextMeltanoTypes, t
-    from flext_meltano.utilities import FlextMeltanoUtilities, u
+    from flext_meltano.typings import FlextMeltanoTypes, FlextMeltanoTypes as t
+    from flext_meltano.utilities import (
+        FlextMeltanoUtilities,
+        FlextMeltanoUtilities as u,
+    )
     from flext_meltano.validators import FlextMeltanoValidators
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
@@ -201,7 +213,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "__url__": ("flext_meltano.__version__", "__url__"),
     "__version__": ("flext_meltano.__version__", "__version__"),
     "__version_info__": ("flext_meltano.__version__", "__version_info__"),
-    "c": ("flext_meltano.constants", "c"),
+    "c": ("flext_meltano.constants", "FlextMeltanoConstants"),
     "create_pipeline": ("flext_meltano.cli_managers", "create_pipeline"),
     "d": ("flext_cli", "d"),
     "dbt": ("flext_meltano.dbt", ""),
@@ -211,16 +223,16 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "get_pipeline_status": ("flext_meltano.cli_managers", "get_pipeline_status"),
     "h": ("flext_cli", "h"),
     "list_pipelines": ("flext_meltano.cli_managers", "list_pipelines"),
-    "m": ("flext_meltano.models", "m"),
+    "m": ("flext_meltano.models", "FlextMeltanoModels"),
     "main": ("flext_meltano.cli", "main"),
     "meltano": ("flext_meltano.meltano", ""),
-    "p": ("flext_meltano.protocols", "p"),
-    "r": ("flext_cli", "r"),
-    "s": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
+    "p": ("flext_meltano.protocols", "FlextMeltanoProtocols"),
+    "r": ("flext_meltano.execution_result", "FlextMeltanoExecutionResult"),
+    "s": ("flext_meltano.project_service", "FlextMeltanoProjectService"),
     "singer": ("flext_meltano.singer", ""),
     "stop_pipeline": ("flext_meltano.cli_managers", "stop_pipeline"),
-    "t": ("flext_meltano.typings", "t"),
-    "u": ("flext_meltano.utilities", "u"),
+    "t": ("flext_meltano.typings", "FlextMeltanoTypes"),
+    "u": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
     "x": ("flext_cli", "x"),
 }
 

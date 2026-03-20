@@ -28,10 +28,7 @@ if TYPE_CHECKING:
         FlextMeltanoDbtTransformationRunner,
         FlextMeltanoLibraryRunner,
     )
-    from flext_meltano.meltano.service import (
-        FlextMeltanoMeltanoService,
-        FlextMeltanoMeltanoService as s,
-    )
+    from flext_meltano.meltano.service import FlextMeltanoMeltanoService
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoBridge": ("flext_meltano.meltano.bridge", "FlextMeltanoBridge"),
@@ -59,7 +56,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_meltano.meltano.project",
         "FlextMeltanoProjectManager",
     ),
-    "s": ("flext_meltano.meltano.service", "FlextMeltanoMeltanoService"),
 }
 
 __all__ = [
@@ -70,7 +66,6 @@ __all__ = [
     "FlextMeltanoMeltanoService",
     "FlextMeltanoOrchestrationService",
     "FlextMeltanoProjectManager",
-    "s",
 ]
 
 

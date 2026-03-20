@@ -27,13 +27,9 @@ if TYPE_CHECKING:
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
     from flext_meltano.singer.protocols import (
         FlextMeltanoPluginProtocols,
-        FlextMeltanoPluginProtocols as p,
         FlextMeltanoSingerProtocols,
     )
-    from flext_meltano.singer.service import (
-        FlextMeltanoSingerService,
-        FlextMeltanoSingerService as s,
-    )
+    from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
     from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
     from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
@@ -72,8 +68,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_meltano.singer.target",
         "FlextMeltanoTargetAbstractions",
     ),
-    "p": ("flext_meltano.singer.protocols", "FlextMeltanoPluginProtocols"),
-    "s": ("flext_meltano.singer.service", "FlextMeltanoSingerService"),
 }
 
 __all__ = [
@@ -85,8 +79,6 @@ __all__ = [
     "FlextMeltanoStateManager",
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTargetAbstractions",
-    "p",
-    "s",
 ]
 
 

@@ -15,8 +15,8 @@ from typing import Annotated
 
 from flext_core import FlextModels
 from pydantic import Field, computed_field
-
-from flext_meltano import t, u
+from flext_meltano import t
+from flext_cli import u
 
 
 class FlextMeltanoExecutionResult(FlextModels.ArbitraryTypesModel):
