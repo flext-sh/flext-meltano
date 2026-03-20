@@ -72,10 +72,10 @@ class FlextMeltanoConstants(FlextCliConstants):
             MELTANO_DEFAULT_TIMEOUT: Final[int] = (
                 FlextConstants.Performance.DEFAULT_TIMEOUT_LIMIT
             )
-            DEFAULT_TIMEOUT: Final[int] = FlextConstants.Network.DEFAULT_TIMEOUT
-            DISCOVERY_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2
-            REQUEST_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 2
-            CONNECTION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT
+            DEFAULT_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS
+            DISCOVERY_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS * 2
+            REQUEST_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS * 2
+            CONNECTION_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS
             BUFFER_SIZE: Final[int] = 8192
             MAX_PARALLEL_STREAMS: Final[int] = 4
 
@@ -101,7 +101,9 @@ class FlextMeltanoConstants(FlextCliConstants):
             PREFIX_TAP: Final[str] = "tap"
             PREFIX_TARGET: Final[str] = "target"
             PREFIX_DBT: Final[str] = "dbt"
-            INSTALLATION_TIMEOUT: Final[int] = FlextConstants.Defaults.TIMEOUT * 10
+            INSTALLATION_TIMEOUT: Final[int] = (
+                FlextConstants.DEFAULT_TIMEOUT_SECONDS * 10
+            )
             MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
             MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
 
