@@ -13,10 +13,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated
 
+from flext_cli import u
 from flext_core import FlextModels
 from pydantic import Field, computed_field
+
 from flext_meltano import t
-from flext_cli import u
 
 
 class FlextMeltanoExecutionResult(FlextModels.ArbitraryTypesModel):
