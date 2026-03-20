@@ -12,16 +12,14 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_meltano import d, e, h, x
+    from flext_meltano import d, e, h, r, s, x
 
     from . import helpers as helpers, integration as integration, unit as unit
     from .conftest import (
         CliRunner,
         MockCliResult,
-        MockCliResult as r,
         MockCliRunner,
         MockMeltanoService,
-        MockMeltanoService as s,
         MockSingerTap,
         MockSingerTarget,
         docker_manager,
@@ -370,9 +368,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "postgres_service": ("tests.conftest", "postgres_service"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
-    "r": ("tests.conftest", "MockCliResult"),
+    "r": ("flext_meltano", "r"),
     "redis_service": ("tests.conftest", "redis_service"),
-    "s": ("tests.conftest", "MockMeltanoService"),
+    "s": ("flext_meltano", "s"),
     "sample_csv_data": ("tests.conftest", "sample_csv_data"),
     "sample_schedule_config": ("tests.conftest", "sample_schedule_config"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),

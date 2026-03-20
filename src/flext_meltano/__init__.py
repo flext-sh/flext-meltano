@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
-    from flext_cli import d, e, h, x
+    from flext_cli import d, e, h, r, s, x
     from flext_core.typings import FlextTypes
 
     from flext_meltano import dbt, meltano, singer
@@ -51,10 +51,7 @@ if TYPE_CHECKING:
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
-    from flext_meltano.execution_result import (
-        FlextMeltanoExecutionResult,
-        FlextMeltanoExecutionResult as r,
-    )
+    from flext_meltano.execution_result import FlextMeltanoExecutionResult
     from flext_meltano.executor import FlextMeltanoExecutor
     from flext_meltano.file_managers import FlextMeltanoFileManagers
     from flext_meltano.library_runner import FlextMeltanoLibraryRunner
@@ -64,10 +61,7 @@ if TYPE_CHECKING:
     from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
     from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
-    from flext_meltano.project_service import (
-        FlextMeltanoProjectService,
-        FlextMeltanoProjectService as s,
-    )
+    from flext_meltano.project_service import FlextMeltanoProjectService
     from flext_meltano.protocols import (
         FlextMeltanoProtocols,
         FlextMeltanoProtocols as p,
@@ -227,8 +221,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "main": ("flext_meltano.cli", "main"),
     "meltano": ("flext_meltano.meltano", ""),
     "p": ("flext_meltano.protocols", "FlextMeltanoProtocols"),
-    "r": ("flext_meltano.execution_result", "FlextMeltanoExecutionResult"),
-    "s": ("flext_meltano.project_service", "FlextMeltanoProjectService"),
+    "r": ("flext_cli", "r"),
+    "s": ("flext_cli", "s"),
     "singer": ("flext_meltano.singer", ""),
     "stop_pipeline": ("flext_meltano.cli_managers", "stop_pipeline"),
     "t": ("flext_meltano.typings", "FlextMeltanoTypes"),
