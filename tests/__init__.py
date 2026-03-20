@@ -12,14 +12,16 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_meltano import c, d, e, h, m, p, r, s, t, u, x
+    from flext_meltano import d, e, h, x
 
     from . import helpers as helpers, integration as integration, unit as unit
     from .conftest import (
         CliRunner,
         MockCliResult,
+        MockCliResult as r,
         MockCliRunner,
         MockMeltanoService,
+        MockMeltanoService as s,
         MockSingerTap,
         MockSingerTarget,
         docker_manager,
@@ -48,12 +50,12 @@ if TYPE_CHECKING:
         test_environment_config,
         test_meltano_project_dir,
     )
-    from .constants import TestsFlextMeltanoConstants
+    from .constants import TestsFlextMeltanoConstants, TestsFlextMeltanoConstants as c
     from .helpers.docker_test_manager import ContainerManager, Tk
     from .integration.test_docker_integration import TestDockerIntegration
-    from .models import TestsFlextMeltanoModels
-    from .protocols import TestsFlextMeltanoProtocols
-    from .typings import TestsFlextMeltanoTypes
+    from .models import TestsFlextMeltanoModels, TestsFlextMeltanoModels as m
+    from .protocols import TestsFlextMeltanoProtocols, TestsFlextMeltanoProtocols as p
+    from .typings import TestsFlextMeltanoTypes, TestsFlextMeltanoTypes as t
     from .unit.pipeline_cli_managers_tests import (
         test_create_pipeline_creates_directory_and_configuration,
         test_create_pipeline_fails_without_configuration,
@@ -138,7 +140,7 @@ if TYPE_CHECKING:
     from .unit.test_typings import TestFlextMeltanoTypes
     from .unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
     from .unit.test_validators import TestFlextMeltanoValidatorsComprehensive
-    from .utilities import TestsFlextMeltanoUtilities
+    from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "CliRunner": ("tests.conftest", "CliRunner"),
@@ -344,7 +346,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsFlextMeltanoTypes": ("tests.typings", "TestsFlextMeltanoTypes"),
     "TestsFlextMeltanoUtilities": ("tests.utilities", "TestsFlextMeltanoUtilities"),
     "Tk": ("tests.helpers.docker_test_manager", "Tk"),
-    "c": ("flext_meltano", "c"),
+    "c": ("tests.constants", "TestsFlextMeltanoConstants"),
     "d": ("flext_meltano", "d"),
     "docker_manager": ("tests.conftest", "docker_manager"),
     "docker_services": ("tests.conftest", "docker_services"),
@@ -354,7 +356,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "integration": ("tests.integration", ""),
     "job_run_config": ("tests.conftest", "job_run_config"),
     "logger": ("tests.unit.test_target_abstractions", "logger"),
-    "m": ("flext_meltano", "m"),
+    "m": ("tests.models", "TestsFlextMeltanoModels"),
     "meltano_cli_runner": ("tests.conftest", "meltano_cli_runner"),
     "meltano_invoke_args": ("tests.conftest", "meltano_invoke_args"),
     "meltano_project": ("tests.conftest", "meltano_project"),
@@ -363,21 +365,21 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "mock_meltano_service": ("tests.conftest", "mock_meltano_service"),
     "mock_singer_tap": ("tests.conftest", "mock_singer_tap"),
     "mock_singer_target": ("tests.conftest", "mock_singer_target"),
-    "p": ("flext_meltano", "p"),
+    "p": ("tests.protocols", "TestsFlextMeltanoProtocols"),
     "pipeline_execution_config": ("tests.conftest", "pipeline_execution_config"),
     "postgres_service": ("tests.conftest", "postgres_service"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
-    "r": ("flext_meltano", "r"),
+    "r": ("tests.conftest", "MockCliResult"),
     "redis_service": ("tests.conftest", "redis_service"),
-    "s": ("flext_meltano", "s"),
+    "s": ("tests.conftest", "MockMeltanoService"),
     "sample_csv_data": ("tests.conftest", "sample_csv_data"),
     "sample_schedule_config": ("tests.conftest", "sample_schedule_config"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
     "singer_records": ("tests.conftest", "singer_records"),
     "singer_schema": ("tests.conftest", "singer_schema"),
     "singer_state": ("tests.conftest", "singer_state"),
-    "t": ("flext_meltano", "t"),
+    "t": ("tests.typings", "TestsFlextMeltanoTypes"),
     "tap_csv_config": ("tests.conftest", "tap_csv_config"),
     "target_csv_config": ("tests.conftest", "target_csv_config"),
     "test_create_pipeline_creates_directory_and_configuration": (
@@ -410,7 +412,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.unit.pipeline_cli_managers_tests",
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
-    "u": ("flext_meltano", "u"),
+    "u": ("tests.utilities", "TestsFlextMeltanoUtilities"),
     "unit": ("tests.unit", ""),
     "x": ("flext_meltano", "x"),
 }
