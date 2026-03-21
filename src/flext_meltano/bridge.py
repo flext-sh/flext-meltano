@@ -13,10 +13,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_core import FlextLogger
-from flext_core.protocols import FlextProtocols as p
 from flext_core.result import r
-from flext_core.typings import t
-from flext_core.utilities import u
+
+from flext_meltano.protocols import FlextMeltanoProtocols as p
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoBridge:

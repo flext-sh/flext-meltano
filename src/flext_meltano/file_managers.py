@@ -18,10 +18,11 @@ from pathlib import Path
 import yaml
 from flext_cli.utilities import FlextCliUtilities
 from flext_core import FlextLogger
-from flext_core.constants import c
-from flext_core.models import m
 from flext_core.result import r
-from flext_core.typings import t
+
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 u = FlextCliUtilities
 

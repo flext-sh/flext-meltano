@@ -12,12 +12,13 @@ from pathlib import Path
 from typing import TextIO
 
 import yaml
-from flext_cli import FlextCliUtilities, m, r
+from flext_cli import FlextCliUtilities, r
 from flext_core import FlextLogger, FlextUtilities
-from flext_core.constants import c
-from flext_core.typings import t
 
+from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.file_managers import FlextMeltanoFileManagers
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoUtilities(FlextCliUtilities):

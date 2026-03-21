@@ -12,8 +12,9 @@ from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
-from flext_core.models import m
-from flext_core.typings import t
+
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):

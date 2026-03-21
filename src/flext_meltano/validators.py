@@ -13,10 +13,10 @@ from pathlib import Path
 
 from flext_core import FlextLogger
 from flext_core.result import r
-from flext_core.typings import t
 from pydantic import ValidationError
 
 from flext_meltano.models import FlextMeltanoModels
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 m = FlextMeltanoModels
 logger = FlextLogger(__name__)

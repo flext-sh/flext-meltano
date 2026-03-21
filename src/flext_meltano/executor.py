@@ -15,16 +15,16 @@ from pathlib import Path
 from typing import override
 
 from flext_core import s
-from flext_core.constants import c
-from flext_core.models import m
 from flext_core.result import r
-from flext_core.typings import t
-from flext_core.utilities import u
 
 from flext_meltano.cli import FlextMeltanoCLI
+from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.meltano.bridge import FlextMeltanoBridge
+from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):

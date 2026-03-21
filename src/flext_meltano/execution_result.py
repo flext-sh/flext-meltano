@@ -15,8 +15,9 @@ from typing import Annotated
 
 from flext_cli import u
 from flext_core import FlextModels
-from flext_core.typings import t
 from pydantic import Field, computed_field
+
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoExecutionResult(FlextModels.ArbitraryTypesModel):

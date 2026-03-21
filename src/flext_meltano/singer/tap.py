@@ -12,12 +12,12 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import FlextRuntime, s
-from flext_core.constants import c
-from flext_core.models import m
 from flext_core.result import r
-from flext_core.typings import t
 
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
@@ -240,24 +240,23 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         _ = source_config
         return r.ok(t.Dict({"version": 1, "streams": []}))
 
+    @override
     def process(
         self,
-        source_config: m.Meltano.DataSourceConfig
-        | m.Meltano.TapConfig
-        | m.Meltano.TapInstance,
+        items: m.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
     ) -> r[bool]:
         """Process a source configuration for validation.
 
         Args:
-        source_config: Source configuration to process
+        items: Source configuration to process
 
         Returns:
         r containing validation result
 
         """
         try:
-            source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config,
+            source_type = getattr(items, "source_type", None) or getattr(
+                items,
                 "tap_type",
                 c.IDENTIFIER_UNKNOWN,
             )

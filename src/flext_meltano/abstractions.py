@@ -15,11 +15,12 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import FlextLogger
-from flext_core.constants import c
-from flext_core.protocols import FlextProtocols as p
 from flext_core.result import r
-from flext_core.typings import t
-from flext_core.utilities import u
+
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.protocols import FlextMeltanoProtocols as p
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoAbstractions:
