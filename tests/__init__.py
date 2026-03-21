@@ -22,8 +22,6 @@ if TYPE_CHECKING:
         MockMeltanoService,
         MockSingerTap,
         MockSingerTarget,
-        docker_manager,
-        docker_services,
         job_run_config,
         meltano_cli_runner,
         meltano_invoke_args,
@@ -49,7 +47,12 @@ if TYPE_CHECKING:
         test_meltano_project_dir,
     )
     from .constants import TestsFlextMeltanoConstants, TestsFlextMeltanoConstants as c
-    from .helpers.docker_test_manager import ContainerManager, Tk
+    from .helpers.docker_test_manager import (
+        ContainerManager,
+        Tk,
+        docker_manager,
+        docker_services,
+    )
     from .integration.test_docker_integration import TestDockerIntegration
     from .models import TestsFlextMeltanoModels, TestsFlextMeltanoModels as m
     from .protocols import TestsFlextMeltanoProtocols, TestsFlextMeltanoProtocols as p
@@ -346,8 +349,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "Tk": ("tests.helpers.docker_test_manager", "Tk"),
     "c": ("tests.constants", "TestsFlextMeltanoConstants"),
     "d": ("flext_meltano", "d"),
-    "docker_manager": ("tests.conftest", "docker_manager"),
-    "docker_services": ("tests.conftest", "docker_services"),
+    "docker_manager": ("tests.helpers.docker_test_manager", "docker_manager"),
+    "docker_services": ("tests.helpers.docker_test_manager", "docker_services"),
     "e": ("flext_meltano", "e"),
     "h": ("flext_meltano", "h"),
     "helpers": ("tests.helpers", ""),
