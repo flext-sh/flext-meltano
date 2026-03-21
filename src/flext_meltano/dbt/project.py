@@ -12,11 +12,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_core import s
-from flext_core.models import m
-from flext_core.result import r
-from flext_core.typings import t
+from flext_core import r, s, t
 from pydantic import ValidationError
+
+from flext_meltano.models import FlextMeltanoModels as m
 
 
 class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
