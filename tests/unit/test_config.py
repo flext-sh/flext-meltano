@@ -225,7 +225,7 @@ class TestFlextMeltanoSettingsEnums:
 
     def test_uses_flext_constants_for_enums(self) -> None:
         """Test that FlextMeltanoSettings uses FlextConstants for enum values."""
-        u.Tests.Matchers.that(hasattr(FlextConstants.Settings, "LogLevel"), eq=True)
+        u.Tests.Matchers.that(hasattr(FlextConstants, "LogLevel"), eq=True)
         u.Tests.Matchers.that(
             isinstance(FlextMeltanoSettings.model_fields["environment"].default, str),
             eq=True,

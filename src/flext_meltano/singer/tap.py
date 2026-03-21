@@ -63,10 +63,10 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             source_type = getattr(source_config, "source_type", None) or getattr(
                 source_config,
                 "tap_type",
-                c.Mixins.IDENTIFIER_UNKNOWN,
+                c.IDENTIFIER_UNKNOWN,
             )
             if not isinstance(source_type, str):
-                source_type = c.Mixins.IDENTIFIER_UNKNOWN
+                source_type = c.IDENTIFIER_UNKNOWN
             source_identifier = getattr(
                 source_config,
                 "source_identifier",
@@ -74,7 +74,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             ) or getattr(
                 source_config,
                 "tap_identifier",
-                c.Mixins.IDENTIFIER_UNKNOWN,
+                c.IDENTIFIER_UNKNOWN,
             )
             self.logger.info(
                 "Creating source instance",
@@ -259,13 +259,13 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             source_type = getattr(source_config, "source_type", None) or getattr(
                 source_config,
                 "tap_type",
-                c.Mixins.IDENTIFIER_UNKNOWN,
+                c.IDENTIFIER_UNKNOWN,
             )
             self.logger.debug(
                 "Processing source configuration",
                 source_name=source_type,
             )
-            if not source_type or source_type == c.Mixins.IDENTIFIER_UNKNOWN:
+            if not source_type or source_type == c.IDENTIFIER_UNKNOWN:
                 return r[bool].fail("Source configuration must have a type")
             return r[bool].ok(value=True)
         except (

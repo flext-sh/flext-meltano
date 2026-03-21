@@ -71,14 +71,14 @@ class FlextMeltanoAbstractions:
                         u.get(
                             source_config,
                             "name",
-                            default=c.Mixins.IDENTIFIER_UNKNOWN,
+                            default=c.IDENTIFIER_UNKNOWN,
                         ),
                     ),
                     "sink": str(
                         u.get(
                             sink_config,
                             "name",
-                            default=c.Mixins.IDENTIFIER_UNKNOWN,
+                            default=c.IDENTIFIER_UNKNOWN,
                         ),
                     ),
                     "records_processed": 0,

@@ -66,7 +66,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
             def open_file() -> TextIO:
                 target_path.parent.mkdir(parents=True, exist_ok=True)
-                return target_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING)
+                return target_path.open("w", encoding=c.DEFAULT_ENCODING)
 
             return FlextUtilities.try_(
                 open_file,

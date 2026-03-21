@@ -1664,14 +1664,14 @@ class FlextMeltanoModels(FlextCliModels):
             batch_size: Annotated[
                 int,
                 Field(
-                    default=c.Performance.BatchProcessing.DEFAULT_SIZE,
+                    default=c.DEFAULT_SIZE,
                     description="Batch size for record processing",
                 ),
             ]
             max_batches: Annotated[
                 int,
                 Field(
-                    default=c.Performance.BatchProcessing.DEFAULT_SIZE,
+                    default=c.DEFAULT_SIZE,
                     description="Maximum number of batches to process",
                 ),
             ]

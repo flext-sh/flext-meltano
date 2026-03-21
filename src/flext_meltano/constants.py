@@ -69,9 +69,7 @@ class FlextMeltanoConstants(FlextCliConstants):
         class Network:
             """Network defaults derived from flext-core."""
 
-            MELTANO_DEFAULT_TIMEOUT: Final[int] = (
-                FlextConstants.Performance.DEFAULT_TIMEOUT_LIMIT
-            )
+            MELTANO_DEFAULT_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_LIMIT
             DEFAULT_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS
             DISCOVERY_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS * 2
             REQUEST_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS * 2
@@ -85,7 +83,7 @@ class FlextMeltanoConstants(FlextCliConstants):
             POSTGRES: Final[int] = 5432
             MYSQL: Final[int] = 3306
             ORACLE: Final[int] = 1521
-            PERFORMANCE_LEVEL = FlextConstants.Settings.LogLevel.WARNING
+            PERFORMANCE_LEVEL = FlextConstants.LogLevel.WARNING
             MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
             MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
             HIGH_MEMORY_THRESHOLD: Final[int] = 1073741824

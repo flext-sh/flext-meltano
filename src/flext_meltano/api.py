@@ -381,7 +381,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             values={
                 "service_name": self.service_name,
                 "version": self.version,
-                "status": c.Cqrs.CommonStatus.ACTIVE,
+                "status": c.CommonStatus.ACTIVE,
                 "operations": ["pipeline", "plugin", "dbt", "environment"],
             },
         )

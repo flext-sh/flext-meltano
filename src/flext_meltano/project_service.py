@@ -69,7 +69,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
             version_attr = getattr(project, "meltano_version", None)
             project_dict: t.Meltano.Dbt.Project = {
                 "name": str(name_attr) if name_attr else "meltano_project",
-                "root": (str(root_attr) if root_attr else c.Mixins.IDENTIFIER_UNKNOWN),
+                "root": (str(root_attr) if root_attr else c.IDENTIFIER_UNKNOWN),
                 "settings": str(settings_attr) if settings_attr else "",
                 "meltano_version": str(version_attr) if version_attr else "",
             }

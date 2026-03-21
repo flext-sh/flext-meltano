@@ -32,7 +32,7 @@ class FlextMeltanoSettings(FlextSettings):
     config_dir: Annotated[Path, Field(default=Path(".meltano"))]
     logs_dir: Annotated[Path, Field(default=Path("logs"))]
     environment: Annotated[str, Field(default="development")]
-    log_level: Annotated[c.Settings.LogLevel, Field(default=c.Settings.LogLevel.INFO)]
+    log_level: Annotated[c.LogLevel, Field(default=c.LogLevel.INFO)]
     meltano_version: Annotated[str, Field(default=MELTANO_VERSION)]
     singer_sdk_version: Annotated[str, Field(default=SINGER_SDK_VERSION)]
     dbt_version: Annotated[str, Field(default=DBT_VERSION)]

@@ -128,7 +128,7 @@ class FlextMeltanoFileManagers:
                 return r[t.Meltano.FileConfigDict].fail(
                     f"Failed to load YAML config: YAML file not found: {file_path}",
                 )
-            with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
+            with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
                 config_data = yaml.safe_load(f)
             if config_data is None:
                 return r[t.Meltano.FileConfigDict].ok({})
@@ -163,7 +163,7 @@ class FlextMeltanoFileManagers:
         """
         try:
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            with file_path.open("w", encoding=c.Utilities.DEFAULT_ENCODING) as f:
+            with file_path.open("w", encoding=c.DEFAULT_ENCODING) as f:
                 yaml.dump(
                     config,
                     f,
@@ -273,7 +273,7 @@ class FlextMeltanoFileManagers:
                 return r[bool].fail(f"Invalid YAML file path: {file_path}")
             if not file_path.exists():
                 return r[bool].fail(f"YAML file not found: {file_path}")
-            with file_path.open("r", encoding=c.Utilities.DEFAULT_ENCODING) as f:
+            with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
                 yaml.safe_load(f)
             return r[bool].ok(value=True)
 
