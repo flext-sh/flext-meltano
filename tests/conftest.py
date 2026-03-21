@@ -21,7 +21,6 @@ import yaml
 
 from flext_meltano import t
 from tests.helpers.docker_test_manager import Tk as tk
-from tests.utilities import u
 
 
 class MockCliResult:
@@ -305,7 +304,7 @@ def job_run_config() -> t.Meltano.MeltanoConfigDict:
 @pytest.fixture(scope="session")
 def docker_manager() -> tk:
     """Session-scoped Docker manager fixture."""
-    return u.Tests.Docker(keep_running=True)
+    return tk(keep_running=True)
 
 
 @pytest.fixture

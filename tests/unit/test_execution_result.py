@@ -56,7 +56,7 @@ class TestFlextMeltanoExecutionResult:
         u.Tests.Matchers.that(result.success is True, eq=True)
         u.Tests.Matchers.that(result.exit_code, eq=0)
         u.Tests.Matchers.that(result.output, eq="Successfully executed")
-        u.Tests.Matchers.that(result.error, eq=False)
+        u.Tests.Matchers.that(result.error, eq="")
         u.Tests.Matchers.that(
             result.execution_time, eq=self.TEST_EXECUTION_TIME_SUCCESS
         )
@@ -75,7 +75,7 @@ class TestFlextMeltanoExecutionResult:
         u.Tests.Matchers.that(result.command, eq=command)
         u.Tests.Matchers.that(result.success is False, eq=True)
         u.Tests.Matchers.that(result.exit_code, eq=1)
-        u.Tests.Matchers.that(result.output, eq=False)
+        u.Tests.Matchers.that(result.output, eq="")
         u.Tests.Matchers.that(result.error, eq="Plugin not found")
         u.Tests.Matchers.that(
             result.execution_time, eq=self.TEST_EXECUTION_TIME_FAILURE
@@ -95,7 +95,7 @@ class TestFlextMeltanoExecutionResult:
         u.Tests.Matchers.that(result.command, eq=[])
         u.Tests.Matchers.that(result.success is False, eq=True)
         u.Tests.Matchers.that(result.exit_code, eq=-1)
-        u.Tests.Matchers.that(result.output, eq=False)
+        u.Tests.Matchers.that(result.output, eq="")
         u.Tests.Matchers.that(result.error, eq="No command provided")
         u.Tests.Matchers.that(abs(result.execution_time - 0.0), lt=1e-9)
 
@@ -117,7 +117,7 @@ class TestFlextMeltanoExecutionResult:
             u.Tests.Matchers.that(result_dict["success"] is True, eq=True)
             u.Tests.Matchers.that(result_dict["exit_code"], eq=0)
             u.Tests.Matchers.that(result_dict["output"], eq="meltano, version 1.0.0")
-            u.Tests.Matchers.that(result_dict["error"], eq=False)
+            u.Tests.Matchers.that(result_dict["error"], eq="")
             u.Tests.Matchers.that(
                 (
                     result_dict["execution_time"]
@@ -144,7 +144,7 @@ class TestFlextMeltanoExecutionResult:
             u.Tests.Matchers.that(result_dict["command"], eq=command)
             u.Tests.Matchers.that(result_dict["success"] is False, eq=True)
             u.Tests.Matchers.that(result_dict["exit_code"], eq=1)
-            u.Tests.Matchers.that(result_dict["output"], eq=False)
+            u.Tests.Matchers.that(result_dict["output"], eq="")
             u.Tests.Matchers.that(result_dict["error"], eq="Plugin 'invalid' not found")
             u.Tests.Matchers.that(
                 (
@@ -174,7 +174,7 @@ class TestFlextMeltanoExecutionResult:
             u.Tests.Matchers.that(parsed.success is True, eq=True)
             u.Tests.Matchers.that(parsed.exit_code, eq=0)
             u.Tests.Matchers.that(parsed.output, eq='{"streams": []}')
-            u.Tests.Matchers.that(parsed.error, eq=False)
+            u.Tests.Matchers.that(parsed.error, eq="")
             u.Tests.Matchers.that(
                 parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_SUCCESS
             )
@@ -198,7 +198,7 @@ class TestFlextMeltanoExecutionResult:
             u.Tests.Matchers.that(parsed.command, eq=command)
             u.Tests.Matchers.that(parsed.success is False, eq=True)
             u.Tests.Matchers.that(parsed.exit_code, eq=2)
-            u.Tests.Matchers.that(parsed.output, eq=False)
+            u.Tests.Matchers.that(parsed.output, eq="")
             u.Tests.Matchers.that(
                 parsed.error, eq="Configuration error: invalid settings"
             )
@@ -226,7 +226,7 @@ class TestFlextMeltanoExecutionResult:
             u.Tests.Matchers.that(parsed.success is True, eq=True)
             u.Tests.Matchers.that(parsed.exit_code, eq=0)
             u.Tests.Matchers.that(parsed.output, eq="Pipeline completed successfully")
-            u.Tests.Matchers.that(parsed.error, eq=False)
+            u.Tests.Matchers.that(parsed.error, eq="")
             u.Tests.Matchers.that(
                 parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_ERROR
             )

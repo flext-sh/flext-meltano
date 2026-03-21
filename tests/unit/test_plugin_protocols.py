@@ -84,9 +84,6 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
             "FlextMeltanoTapPlugin",
             "FlextTargetPlugin",
             "FlextDbtPlugin",
-            "TapService",
-            "TargetService",
-            "DbtService",
         ]
         for alias in no_alias_attributes:
             u.Tests.Matchers.that(

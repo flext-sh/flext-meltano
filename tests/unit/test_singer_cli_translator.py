@@ -430,7 +430,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         u.Tests.Matchers.ok(result)
         output = result.value
         u.Tests.Matchers.that(output["stdout"], eq="Success output")
-        u.Tests.Matchers.that(output["stderr"], eq=False)
+        u.Tests.Matchers.that(output["stderr"], eq="")
         u.Tests.Matchers.that(output["returncode"], eq=0)
         mock_run.assert_called_once()
 

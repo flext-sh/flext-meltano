@@ -175,9 +175,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             status="ready",
             discovered=True,
         )
-        result = self.tap_abstractions.build(
-            tap_instance, correlation_id="test_corr_123"
-        )
+        result = self.tap_abstractions.build(tap_instance)
         self.test_assertions.assert_true(
             condition=isinstance(result, dict), message="Should return dict"
         )

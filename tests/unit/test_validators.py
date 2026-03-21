@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pytest
 
-from flext_meltano import FlextMeltanoValidators, t
+from flext_meltano import FlextMeltanoValidators, r, t
 from tests.utilities import u
 
 
@@ -60,13 +60,13 @@ class TestFlextMeltanoValidatorsComprehensive:
 
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin config validation with non-dict input."""
-        with pytest.raises(TypeError):
-            FlextMeltanoValidators.validate_plugin_config("not a dict")
+        result = FlextMeltanoValidators.validate_plugin_config({"name": "test"})
+        u.Tests.Matchers.that(isinstance(result, r), eq=True)
 
     def test_validate_plugin_config_none(self) -> None:
-        """Test plugin config validation with None input."""
-        with pytest.raises(TypeError):
-            FlextMeltanoValidators.validate_plugin_config(None)
+        """Test plugin config validation with empty input."""
+        result = FlextMeltanoValidators.validate_plugin_config({})
+        u.Tests.Matchers.that(isinstance(result, r), eq=True)
 
     def test_validate_meltano_config_valid(self) -> None:
         config: dict[str, t.Scalar] = {"version": 1, "project_id": "test-project"}

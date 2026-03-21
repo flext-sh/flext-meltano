@@ -547,7 +547,7 @@ class TestFlextMeltanoExecutorComplete:
             u.Tests.Matchers.fail(version_result)
             if version_result.error is not None:
                 u.Tests.Matchers.that(
-                    "Version failed" in str(version_result.error), eq=True
+                    "Version command failed" in str(version_result.error), eq=True
                 )
             with mock.patch.object(
                 FlextMeltanoExecutor,
