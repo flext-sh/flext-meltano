@@ -16,6 +16,9 @@ from typing import Annotated, Literal, Self
 import yaml
 from flext_cli import FlextCliModels, u
 from flext_core import FlextModels
+from flext_core.constants import c
+from flext_core.result import r
+from flext_core.typings import t
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -25,8 +28,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
-from flext_meltano import c, r, t
 
 type _ValidatorInput = (
     Mapping[str, object]

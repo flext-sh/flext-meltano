@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 from flext_core import FlextLogger, r
-from flext_tests import tm
+from flext_tests import t, u
 
 from flext_meltano import t, u
 from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
@@ -28,12 +28,12 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_abstractions_initialization(self) -> None:
         """Test FlextMeltanoTargetAbstractions initialization."""
         target_abs = FlextMeltanoTargetAbstractions()
-        tm.that(target_abs is not None, eq=True)
-        tm.that(hasattr(target_abs, "logger"), eq=True)
+        u.Tests.Matchers.that(target_abs is not None, eq=True)
+        u.Tests.Matchers.that(hasattr(target_abs, "logger"), eq=True)
 
     def test_create_flext_target_config(self) -> None:
         """Test target configuration creation."""
-        tm.that(self.target_abstractions is not None, eq=True)
+        u.Tests.Matchers.that(self.target_abstractions is not None, eq=True)
         if not hasattr(self.target_abstractions, "configure_sink"):
             pytest.skip("configure_sink not available")
         pass
@@ -44,17 +44,17 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling."""
-        tm.that(self.target_abstractions is not None, eq=True)
+        u.Tests.Matchers.that(self.target_abstractions is not None, eq=True)
         if self.target_abstractions is None:
             return
         result = self.target_abstractions.execute()
-        tm.that(isinstance(result, r), eq=True)
+        u.Tests.Matchers.that(isinstance(result, r), eq=True)
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core."""
         timestamp = u.generate_iso_timestamp()
-        tm.that(isinstance(timestamp, str), eq=True)
-        tm.that("T" in timestamp, eq=True)
+        u.Tests.Matchers.that(isinstance(timestamp, str), eq=True)
+        u.Tests.Matchers.that("T" in timestamp, eq=True)
         test_data: t.Meltano.MeltanoConfigDict = {
             "level1": {"level2": {"level3": "found_value"}}
         }
@@ -63,4 +63,4 @@ class TestFlextMeltanoTargetAbstractionsComplete:
             level2 = level1.get("level2", {})
             if isinstance(level2, dict):
                 result = level2.get("level3", "default")
-                tm.that(result, eq="found_value")
+                u.Tests.Matchers.that(result, eq="found_value")

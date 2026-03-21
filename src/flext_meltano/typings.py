@@ -20,8 +20,7 @@ from typing import Literal
 
 import singer_sdk.typing as singer_sdk_typing
 from flext_cli import FlextCliTypes
-
-from flext_meltano import c
+from flext_core.constants import c
 
 
 class FlextMeltanoTypes(FlextCliTypes):
@@ -90,7 +89,7 @@ class FlextMeltanoTypes(FlextCliTypes):
                 importing directly from singer_sdk.typing.
 
                 Usage:
-                    from flext_meltano import FlextMeltanoTypes
+                    from flext_meltano.typings import FlextMeltanoTypes
 
                     schema = FlextMeltanoTypes.Singer.Typing.PropertiesList(
                         FlextMeltanoTypes.Singer.Typing.Property("id", FlextMeltanoTypes.Singer.Typing.StringType),

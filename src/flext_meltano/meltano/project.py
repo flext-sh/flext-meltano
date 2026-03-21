@@ -13,10 +13,13 @@ from pathlib import Path
 from typing import ClassVar, override
 
 from flext_core import FlextService
+from flext_core.result import r
+from flext_core.typings import t
+from flext_core.utilities import u
 from meltano.core.project import Project as MeltanoProject
 from pydantic import PrivateAttr
 
-from flext_meltano import FlextMeltanoModels, r, t, u
+from flext_meltano.models import FlextMeltanoModels
 
 
 class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]):

@@ -304,7 +304,7 @@ def job_run_config() -> t.Meltano.MeltanoConfigDict:
 @pytest.fixture(scope="session")
 def docker_manager() -> tk:
     """Session-scoped Docker manager fixture."""
-    return tk(keep_running=True)
+    return u.Tests.Docker(keep_running=True)
 
 
 @pytest.fixture

@@ -12,8 +12,8 @@ from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
-
-from flext_meltano import m, t
+from flext_core.models import m
+from flext_core.typings import t
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):
@@ -28,7 +28,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
     - PROVIDES: Root-level alias `p` for convenient access
 
     Usage:
-    from flext_meltano import p
+    from flext_core.protocols import FlextProtocols as p
 
     # Foundation protocols (inherited)
     result: FlextCliProtocols.Result[str]

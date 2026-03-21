@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import tm
+from flext_tests import t, u
 
 from flext_meltano import t
 
@@ -27,13 +27,17 @@ class TestFlextSingerTypes:
     def test_singer_types_initialization(self) -> None:
         """Test t initialization."""
         singer_types = t()
-        tm.that(singer_types is not None, eq=True)
-        tm.that(hasattr(singer_types, "Meltano"), eq=True)
-        tm.that(hasattr(singer_types.Meltano, "PluginDefinition"), eq=True)
+        u.Tests.Matchers.that(singer_types is not None, eq=True)
+        u.Tests.Matchers.that(hasattr(singer_types, "Meltano"), eq=True)
+        u.Tests.Matchers.that(
+            hasattr(singer_types.Meltano, "PluginDefinition"), eq=True
+        )
 
     def test_singer_types_basic_functionality(self) -> None:
         """Test basic singer types functionality."""
         singer_types = t()
-        tm.that(singer_types is not None, eq=True)
-        tm.that(hasattr(singer_types, "Meltano"), eq=True)
-        tm.that(hasattr(singer_types.Meltano, "PluginDefinition"), eq=True)
+        u.Tests.Matchers.that(singer_types is not None, eq=True)
+        u.Tests.Matchers.that(hasattr(singer_types, "Meltano"), eq=True)
+        u.Tests.Matchers.that(
+            hasattr(singer_types.Meltano, "PluginDefinition"), eq=True
+        )

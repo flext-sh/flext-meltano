@@ -14,9 +14,17 @@ import time
 from pathlib import Path
 from typing import override
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoSettings, c, m, r, s, t, u
+from algar_oud_mig.base import s
+from flext_core.constants import c
+from flext_core.models import m
+from flext_core.result import r
+from flext_core.typings import t
+from flext_core.utilities import u
+
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
+from flext_meltano.meltano.bridge import FlextMeltanoBridge
+from flext_meltano.settings import FlextMeltanoSettings
 
 
 class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):

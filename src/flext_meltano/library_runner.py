@@ -13,8 +13,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_core import FlextLogger
+from flext_core.protocols import FlextProtocols as p
+from flext_core.result import r
+from flext_core.typings import t
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, r, t
+from flext_meltano.executor import FlextMeltanoExecutor
+from flext_meltano.meltano.bridge import FlextMeltanoBridge
 from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
 
 
