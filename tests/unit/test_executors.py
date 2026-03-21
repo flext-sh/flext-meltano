@@ -8,9 +8,9 @@ from pathlib import Path
 from unittest import mock
 
 from flext_core import FlextLogger, r
-from flext_tests import u
 
 from flext_meltano import FlextMeltanoExecutor
+from tests.utilities import u
 
 logger = FlextLogger(__name__)
 

@@ -11,7 +11,8 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from flext_meltano import t, u
+from flext_meltano import t
+from tests.utilities import u
 
 
 class TestFlextMeltanoUtilitiesEnhanced:

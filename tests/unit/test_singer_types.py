@@ -10,9 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import u
-
 from flext_meltano import t
+from tests.utilities import u
 
 
 class TestFlextSingerTypes:

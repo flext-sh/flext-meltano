@@ -9,8 +9,9 @@ from __future__ import annotations
 import pytest
 from flext_core import FlextLogger, r
 
-from flext_meltano import t, u
+from flext_meltano import t
 from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
+from tests.utilities import u
 
 logger = FlextLogger(__name__)
 

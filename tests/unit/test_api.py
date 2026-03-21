@@ -16,10 +16,10 @@ from typing import override
 
 import pytest
 from flext_core import r
-from flext_tests import u
 from pytest_benchmark.fixture import BenchmarkFixture
 
 from flext_meltano import FlextMeltano, c, m, t
+from tests.utilities import u
 
 pytestmark = pytest.mark.unit
 

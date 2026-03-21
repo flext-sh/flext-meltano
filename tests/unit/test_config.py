@@ -17,9 +17,9 @@ from pathlib import Path
 
 import pytest
 from flext_core import FlextConstants, FlextSettings
-from flext_tests import u
 
 from flext_meltano import FlextMeltanoSettings
+from tests.utilities import u
 
 
 class TestFlextMeltanoSettings:

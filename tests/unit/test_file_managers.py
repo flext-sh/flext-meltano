@@ -11,9 +11,8 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_tests import u
-
 from flext_meltano import FlextMeltanoFileManagers
+from tests.utilities import u
 
 
 class TestFlextMeltanoFileManagersComprehensive:

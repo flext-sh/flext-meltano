@@ -9,10 +9,10 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from flext_tests import u
 from pydantic import BaseModel, TypeAdapter
 
 from flext_meltano.execution_result import FlextMeltanoExecutionResult
+from tests.utilities import u
 
 
 class _ExecutionResultJson(BaseModel):

@@ -13,10 +13,9 @@ from __future__ import annotations
 import unittest
 from unittest import TestCase
 
-from flext_tests import u
-
 import flext_meltano.singer.protocols as protocols_module
 from flext_meltano.singer.protocols import FlextMeltanoPluginProtocols
+from tests.utilities import u
 
 
 class TestFlextMeltanoPluginProtocolsUnified(TestCase):

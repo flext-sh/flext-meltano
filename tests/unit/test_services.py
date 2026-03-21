@@ -7,9 +7,9 @@ from collections.abc import Callable
 from typing import Any
 
 import pytest
-from flext_tests import u
 
 from flext_meltano import FlextMeltanoService, r, s
+from tests.utilities import u
 
 
 class TestFlextMeltanoServiceInitialization:

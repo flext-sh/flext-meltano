@@ -7,10 +7,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import u
-
 from flext_meltano import FlextMeltanoLibraryRunner
 from flext_meltano.adapters import FlextMeltanoAdapter
+from tests.utilities import u
 
 
 class TestFlextDbtProgrammaticRunner:
