@@ -61,12 +61,12 @@ class TestFlextMeltanoValidatorsComprehensive:
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin config validation with non-dict input."""
         with pytest.raises(TypeError):
-            FlextMeltanoValidators.validate_plugin_config("not a dict")  # type: ignore[arg-type]
+            FlextMeltanoValidators.validate_plugin_config("not a dict")
 
     def test_validate_plugin_config_none(self) -> None:
         """Test plugin config validation with None input."""
         with pytest.raises(TypeError):
-            FlextMeltanoValidators.validate_plugin_config(None)  # type: ignore[arg-type]
+            FlextMeltanoValidators.validate_plugin_config(None)
 
     def test_validate_meltano_config_valid(self) -> None:
         config: dict[str, t.Scalar] = {"version": 1, "project_id": "test-project"}
@@ -116,7 +116,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         self,
         invalid_config: t.Scalar | dict[str, t.Scalar] | list[t.Scalar] | None,
     ) -> None:
-        result = FlextMeltanoValidators.validate_plugin_config(invalid_config)  # type: ignore[arg-type]
+        result = FlextMeltanoValidators.validate_plugin_config(invalid_config)
         u.Tests.Matchers.fail(result)
         u.Tests.Matchers.fail(result)
 

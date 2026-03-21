@@ -57,7 +57,7 @@ class TestTapConfigEnhanced:
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         """Test TapConfig validation with invalid connection_config type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            m.Meltano.TapConfig(tap_type="tap-postgres", connection_config="invalid")  # type: ignore[arg-type]
+            m.Meltano.TapConfig(tap_type="tap-postgres", connection_config="invalid")
 
 
 class TestTargetConfigEnhanced:
@@ -99,7 +99,7 @@ class TestTargetConfigEnhanced:
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         """Test TargetConfig validation with invalid batch_size type."""
         with pytest.raises(ValidationError, match="Input should be a valid integer"):
-            m.Meltano.TargetConfig(target_type="target-csv", batch_size="invalid")  # type: ignore[arg-type]
+            m.Meltano.TargetConfig(target_type="target-csv", batch_size="invalid")
 
 
 class TestStreamInfoEnhanced:
@@ -153,7 +153,7 @@ class TestStreamInfoEnhanced:
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.StreamInfo(
                 stream_name="users",
-                stream_schema="invalid",  # type: ignore[arg-type]
+                stream_schema="invalid",
                 stream_created_at="2025-01-01T00:00:00Z",
             )
 
@@ -200,7 +200,7 @@ class TestMeltanoProjectModelEnhanced:
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
         """Test MeltanoProjectModel validation with invalid plugins type."""
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            m.Meltano.MeltanoProjectModel(project_id="test-project", plugins="invalid")  # type: ignore[arg-type]
+            m.Meltano.MeltanoProjectModel(project_id="test-project", plugins="invalid")
 
 
 class TestPluginModelEnhanced:
@@ -259,7 +259,7 @@ class TestPluginModelEnhanced:
             m.Meltano.PluginModel(
                 name="tap-postgres",
                 namespace="tap-postgres",
-                capabilities="invalid",  # type: ignore[arg-type]
+                capabilities="invalid",
             )
 
 
@@ -316,7 +316,7 @@ class TestDbtProjectModelEnhanced:
             m.Meltano.DbtProjectModel(
                 name="test-project",
                 profile="default",
-                config="invalid",  # type: ignore[arg-type]
+                config="invalid",
             )
 
 

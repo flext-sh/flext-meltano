@@ -301,7 +301,7 @@ class TestFlextMeltanoErrorHandling:
         """Test API handles invalid project root type."""
         try:
             invalid_root: object = 123
-            FlextMeltano(project_root=invalid_root)  # type: ignore[arg-type]
+            FlextMeltano(project_root=invalid_root)
             pytest.fail("Should have raised TypeError or ValueError")
         except (TypeError, ValueError):
             pass

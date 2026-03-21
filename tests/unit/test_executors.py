@@ -371,7 +371,7 @@ class TestFlextMeltanoExecutorComplete:
                     if result.error is not None:
                         u.Tests.Matchers.that(len(result.error) > 0, eq=True)
             except Exception as e:
-                logger.debug("Expected exception during command execution: %s", str(e))  # noqa: RUF065
+                logger.debug("Expected exception during command execution: %s", str(e))
                 u.Tests.Matchers.that(True, eq=True)
 
     def test_click_cli_infrastructure_invocation(self) -> None:
@@ -413,7 +413,7 @@ class TestFlextMeltanoExecutorComplete:
             except Exception as e:
                 logger.debug(
                     "Expected exception during edge case command execution: %s",
-                    str(e),  # noqa: RUF065
+                    str(e),
                 )
                 u.Tests.Matchers.that(True, eq=True)
 
@@ -432,7 +432,7 @@ class TestFlextMeltanoExecutorComplete:
                     u.Tests.Matchers.that(result.error, eq=True)
                     u.Tests.Matchers.that(isinstance(result.error, str), eq=True)
             except Exception as e:
-                logger.debug("Expected exception during pipeline execution: %s", str(e))  # noqa: RUF065
+                logger.debug("Expected exception during pipeline execution: %s", str(e))
                 u.Tests.Matchers.that(True, eq=True)
 
     def test_internal_method_direct_invocation(self) -> None:

@@ -32,7 +32,7 @@ class _TestAssertions:
         )
 
     @staticmethod
-    def assert_in(item: str, container: object, message: str = "") -> None:  # type: ignore[misc]
+    def assert_in(item: str, container: object, message: str = "") -> None:
         if isinstance(container, dict):
             u.Tests.Matchers.that(item in container, eq=True)
 
@@ -59,7 +59,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream_config: dict[str, str] = {"users": "selected"}
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
-            connection_config=connection_config,  # type: ignore[arg-type]
+            connection_config=connection_config,
             stream_config=stream_config,
             tap_version="v1.2.0",
         )
@@ -246,7 +246,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         }
         result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
-            connection_config=connection_config,  # type: ignore[arg-type]
+            connection_config=connection_config,
             stream_config=stream_config,
         )
         self.test_assertions.assert_true(
@@ -788,7 +788,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         try:
             result = self.tap_abstractions.create_tap_from_config(
                 tap_type="",
-                connection_config={},  # type: ignore[arg-type]
+                connection_config={},
             )
             if result.is_failure:
                 self.test_assertions.assert_true(
@@ -825,8 +825,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream_config: dict[str, object] = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
-            connection_config=connection_config,  # type: ignore[arg-type]
-            stream_config=stream_config,  # type: ignore[arg-type]
+            connection_config=connection_config,
+            stream_config=stream_config,
         )
         self.test_assertions.assert_true(
             condition=create_result.is_success, message="Tap creation should succeed"
