@@ -26,8 +26,7 @@ from pydantic import (
     computed_field,
     field_serializer,
     field_validator,
-    model_validator,
-)
+    model_validator)
 
 type _ValidatorInput = (
     Mapping[str, object]
@@ -51,8 +50,7 @@ class FlextMeltanoModels(FlextCliModels):
 
     @staticmethod
     def _protect_sensitive_config(
-        value: Mapping[str, t.Scalar],
-    ) -> Mapping[str, t.Scalar]:
+        value: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -63,9 +61,7 @@ class FlextMeltanoModels(FlextCliModels):
             checks_result = u.process(
                 sensitive_keys_list,
                 lambda s: r[bool].ok(
-                    s in normalized,
-                ),
-            )
+                    s in normalized))
             checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate({
                 "items": checks_result.unwrap_or([]),
             }).items
@@ -82,8 +78,7 @@ class FlextMeltanoModels(FlextCliModels):
 
     @staticmethod
     def _validated_string_list(
-        value: _ValidatorInput,
-    ) -> list[str]:
+        value: _ValidatorInput) -> list[str]:
         """Normalize arbitrary values into a validated list of strings."""
         return FlextMeltanoModels.Meltano.StringListValue.model_validate({
             "items": value,
@@ -115,10 +110,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             items: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Normalized list of string values",
-                ),
+                Field(default_factory=list, description="Normalized list of string values"),
             ]
 
             @field_validator("items", mode="before")
@@ -134,10 +126,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             items: Annotated[
                 list[bool],
-                Field(
-                    default_factory=lambda: list[bool](),
-                    description="Normalized list of boolean values",
-                ),
+                Field(default_factory=lambda: list[bool](), description="Normalized list of boolean values"),
             ]
 
             @field_validator("items", mode="before")
@@ -165,89 +154,53 @@ class FlextMeltanoModels(FlextCliModels):
             # Pipeline Operations Logging (9 fields)
             pipeline_execution: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline execution details",
-                ),
+                Field(default=True, description="Log pipeline execution details"),
             ]
             pipeline_stages: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline stage transitions",
-                ),
+                Field(default=True, description="Log pipeline stage transitions"),
             ]
             pipeline_progress: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline progress updates",
-                ),
+                Field(default=True, description="Log pipeline progress updates"),
             ]
             pipeline_errors: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline errors and failures",
-                ),
+                Field(default=True, description="Log pipeline errors and failures"),
             ]
             pipeline_warnings: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline warnings",
-                ),
+                Field(default=True, description="Log pipeline warnings"),
             ]
             pipeline_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline performance metrics",
-                ),
+                Field(default=True, description="Log pipeline performance metrics"),
             ]
             pipeline_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline timing information",
-                ),
+                Field(default=True, description="Log pipeline timing information"),
             ]
             pipeline_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline memory usage",
-                ),
+                Field(default=True, description="Log pipeline memory usage"),
             ]
             pipeline_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log pipeline throughput metrics",
-                ),
+                Field(default=True, description="Log pipeline throughput metrics"),
             ]
 
             # Extract/Source Operations Logging (8 fields)
             extract_operations: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract operations",
-                ),
+                Field(default=True, description="Log extract operations"),
             ]
             extract_queries: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract queries",
-                ),
+                Field(default=True, description="Log extract queries"),
             ]
             extract_results: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract results",
-                ),
+                Field(default=True, description="Log extract results"),
             ]
             extract_errors: Annotated[
                 bool,
@@ -255,40 +208,25 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             extract_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract performance metrics",
-                ),
+                Field(default=True, description="Log extract performance metrics"),
             ]
             extract_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract timing information",
-                ),
+                Field(default=True, description="Log extract timing information"),
             ]
             extract_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract memory usage",
-                ),
+                Field(default=True, description="Log extract memory usage"),
             ]
             extract_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log extract throughput metrics",
-                ),
+                Field(default=True, description="Log extract throughput metrics"),
             ]
 
             # Load/Sink Operations Logging (8 fields)
             load_operations: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log load operations",
-                ),
+                Field(default=True, description="Log load operations"),
             ]
             load_batches: Annotated[
                 bool,
@@ -304,17 +242,11 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             load_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log load performance metrics",
-                ),
+                Field(default=True, description="Log load performance metrics"),
             ]
             load_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log load timing information",
-                ),
+                Field(default=True, description="Log load timing information"),
             ]
             load_memory: Annotated[
                 bool,
@@ -322,77 +254,47 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             load_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log load throughput metrics",
-                ),
+                Field(default=True, description="Log load throughput metrics"),
             ]
 
             # Transform/DBT Operations Logging (8 fields)
             transform_operations: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform operations",
-                ),
+                Field(default=True, description="Log transform operations"),
             ]
             transform_sql: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform SQL queries",
-                ),
+                Field(default=True, description="Log transform SQL queries"),
             ]
             transform_results: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform results",
-                ),
+                Field(default=True, description="Log transform results"),
             ]
             transform_errors: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform errors",
-                ),
+                Field(default=True, description="Log transform errors"),
             ]
             transform_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform performance metrics",
-                ),
+                Field(default=True, description="Log transform performance metrics"),
             ]
             transform_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform timing information",
-                ),
+                Field(default=True, description="Log transform timing information"),
             ]
             transform_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform memory usage",
-                ),
+                Field(default=True, description="Log transform memory usage"),
             ]
             transform_lineage: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log transform lineage tracking",
-                ),
+                Field(default=True, description="Log transform lineage tracking"),
             ]
 
             # DBT Specific Logging (6 fields)
             dbt_parse: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log DBT parsing operations",
-                ),
+                Field(default=True, description="Log DBT parsing operations"),
             ]
             dbt_compile: Annotated[
                 bool,
@@ -408,84 +310,51 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             dbt_snapshot: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log DBT snapshot operations",
-                ),
+                Field(default=True, description="Log DBT snapshot operations"),
             ]
             dbt_docs: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log DBT documentation generation",
-                ),
+                Field(default=True, description="Log DBT documentation generation"),
             ]
 
             # Data Quality Logging (8 fields)
             data_quality: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality checks",
-                ),
+                Field(default=True, description="Log data quality checks"),
             ]
             data_quality_checks: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality check results",
-                ),
+                Field(default=True, description="Log data quality check results"),
             ]
             data_quality_errors: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality errors",
-                ),
+                Field(default=True, description="Log data quality errors"),
             ]
             data_quality_warnings: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality warnings",
-                ),
+                Field(default=True, description="Log data quality warnings"),
             ]
             data_quality_metrics: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality metrics",
-                ),
+                Field(default=True, description="Log data quality metrics"),
             ]
             data_quality_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality timing information",
-                ),
+                Field(default=True, description="Log data quality timing information"),
             ]
             data_quality_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality memory usage",
-                ),
+                Field(default=True, description="Log data quality memory usage"),
             ]
             data_quality_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log data quality throughput metrics",
-                ),
+                Field(default=True, description="Log data quality throughput metrics"),
             ]
 
             # Plugin Logging (6 fields)
             plugin_operations: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log plugin operations",
-                ),
+                Field(default=True, description="Log plugin operations"),
             ]
             plugin_errors: Annotated[
                 bool,
@@ -493,47 +362,29 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             plugin_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log plugin performance metrics",
-                ),
+                Field(default=True, description="Log plugin performance metrics"),
             ]
             plugin_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log plugin timing information",
-                ),
+                Field(default=True, description="Log plugin timing information"),
             ]
             plugin_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log plugin memory usage",
-                ),
+                Field(default=True, description="Log plugin memory usage"),
             ]
             plugin_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log plugin throughput metrics",
-                ),
+                Field(default=True, description="Log plugin throughput metrics"),
             ]
 
             # Source and Target Logging (14 fields)
             source_info: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log source information",
-                ),
+                Field(default=True, description="Log source information"),
             ]
             target_info: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log target information",
-                ),
+                Field(default=True, description="Log target information"),
             ]
             source_errors: Annotated[
                 bool,
@@ -545,179 +396,107 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             source_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log source performance metrics",
-                ),
+                Field(default=True, description="Log source performance metrics"),
             ]
             target_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log target performance metrics",
-                ),
+                Field(default=True, description="Log target performance metrics"),
             ]
             source_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log source timing information",
-                ),
+                Field(default=True, description="Log source timing information"),
             ]
             target_timing: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log target timing information",
-                ),
+                Field(default=True, description="Log target timing information"),
             ]
             source_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log source memory usage",
-                ),
+                Field(default=True, description="Log source memory usage"),
             ]
             target_memory: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log target memory usage",
-                ),
+                Field(default=True, description="Log target memory usage"),
             ]
             source_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log source throughput metrics",
-                ),
+                Field(default=True, description="Log source throughput metrics"),
             ]
             target_throughput: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log target throughput metrics",
-                ),
+                Field(default=True, description="Log target throughput metrics"),
             ]
 
             # Meltano Performance Tracking (1 field)
             track_meltano_performance: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Track Meltano performance metrics",
-                ),
+                Field(default=True, description="Track Meltano performance metrics"),
             ]
 
             # Orchestration Logging (5 fields)
             orchestration_scheduling: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log orchestration scheduling events",
-                ),
+                Field(default=True, description="Log orchestration scheduling events"),
             ]
             orchestration_execution: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log orchestration execution",
-                ),
+                Field(default=True, description="Log orchestration execution"),
             ]
             orchestration_state: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log orchestration state changes",
-                ),
+                Field(default=True, description="Log orchestration state changes"),
             ]
             orchestration_hooks: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log orchestration hook execution",
-                ),
+                Field(default=True, description="Log orchestration hook execution"),
             ]
             orchestration_dependencies: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log dependency resolution",
-                ),
+                Field(default=True, description="Log dependency resolution"),
             ]
 
             # Monitoring and Observability Logging (5 fields)
             monitoring_metrics: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log collected metrics",
-                ),
+                Field(default=True, description="Log collected metrics"),
             ]
             monitoring_alerts: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log alert generation",
-                ),
+                Field(default=True, description="Log alert generation"),
             ]
             monitoring_health: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log health checks",
-                ),
+                Field(default=True, description="Log health checks"),
             ]
             monitoring_traces: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log distributed traces",
-                ),
+                Field(default=True, description="Log distributed traces"),
             ]
             monitoring_events: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Log observability events",
-                ),
+                Field(default=True, description="Log observability events"),
             ]
 
             # Debugging and Diagnostics Logging (5 fields)
             debug_verbose: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Enable verbose debug logging",
-                ),
+                Field(default=False, description="Enable verbose debug logging"),
             ]
             debug_trace_calls: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Log function call traces",
-                ),
+                Field(default=False, description="Log function call traces"),
             ]
             debug_variable_state: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Log variable state changes",
-                ),
+                Field(default=False, description="Log variable state changes"),
             ]
             debug_configuration: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Log configuration details",
-                ),
+                Field(default=False, description="Log configuration details"),
             ]
             debug_performance_profile: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Log performance profiling data",
-                ),
+                Field(default=False, description="Log performance profiling data"),
             ]
 
             @computed_field
@@ -793,31 +572,19 @@ class FlextMeltanoModels(FlextCliModels):
                 ]
                 config_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to source configuration file",
-                    ),
+                    Field(default=None, description="Path to source configuration file"),
                 ]
                 catalog_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to catalog file for schema discovery",
-                    ),
+                    Field(default=None, description="Path to catalog file for schema discovery"),
                 ]
                 state_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to state file for incremental sync",
-                    ),
+                    Field(default=None, description="Path to state file for incremental sync"),
                 ]
                 discover: Annotated[
                     bool,
-                    Field(
-                        default=False,
-                        description="Run in discovery mode to output schema",
-                    ),
+                    Field(default=False, description="Run in discovery mode to output schema"),
                 ]
 
             class DataSinkParams(FlextModels.Entity):
@@ -826,17 +593,11 @@ class FlextMeltanoModels(FlextCliModels):
                 sink_name: Annotated[str, Field(description="Name of the data sink")]
                 config_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to sink configuration file",
-                    ),
+                    Field(default=None, description="Path to sink configuration file"),
                 ]
                 input_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to input data file (default: stdin)",
-                    ),
+                    Field(default=None, description="Path to input data file (default: stdin)"),
                 ]
 
             class PipelineParams(FlextModels.Entity):
@@ -849,38 +610,23 @@ class FlextMeltanoModels(FlextCliModels):
                 sink_name: Annotated[str, Field(description="Name of the data sink")]
                 source_config: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to source configuration file",
-                    ),
+                    Field(default=None, description="Path to source configuration file"),
                 ]
                 sink_config: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to sink configuration file",
-                    ),
+                    Field(default=None, description="Path to sink configuration file"),
                 ]
                 catalog_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to catalog file",
-                    ),
+                    Field(default=None, description="Path to catalog file"),
                 ]
                 state_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to state file",
-                    ),
+                    Field(default=None, description="Path to state file"),
                 ]
                 state_output_file: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Path to write final state",
-                    ),
+                    Field(default=None, description="Path to write final state"),
                 ]
 
             class TransformationParams(FlextModels.Entity):
@@ -892,31 +638,19 @@ class FlextMeltanoModels(FlextCliModels):
                 ]
                 models: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Specific models to run (space-separated)",
-                    ),
+                    Field(default=None, description="Specific models to run (space-separated)"),
                 ]
                 select: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Selection syntax for models",
-                    ),
+                    Field(default=None, description="Selection syntax for models"),
                 ]
                 exclude: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Exclusion syntax for models",
-                    ),
+                    Field(default=None, description="Exclusion syntax for models"),
                 ]
                 full_refresh: Annotated[
                     bool,
-                    Field(
-                        default=False,
-                        description="Run with full refresh",
-                    ),
+                    Field(default=False, description="Run with full refresh"),
                 ]
 
             class PluginInstallParams(FlextModels.Entity):
@@ -924,9 +658,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 plugin_type: Annotated[
                     str,
-                    Field(
-                        description="Type of plugin (source, sink, transformer)",
-                    ),
+                    Field(description="Type of plugin (source, sink, transformer)"),
                 ]
                 plugin_name: Annotated[
                     str,
@@ -934,10 +666,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ]
                 variant: Annotated[
                     str | None,
-                    Field(
-                        default=None,
-                        description="Specific plugin variant",
-                    ),
+                    Field(default=None, description="Specific plugin variant"),
                 ]
 
         class PipelineRunParams(FlextModels.Entity):
@@ -947,45 +676,27 @@ class FlextMeltanoModels(FlextCliModels):
             target_name: Annotated[str, Field(description="Name of the target to run")]
             catalog_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to catalog file",
-                ),
+                Field(default=None, description="Path to catalog file"),
             ]
             state_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to state file",
-                ),
+                Field(default=None, description="Path to state file"),
             ]
             state_output_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to write final state",
-                ),
+                Field(default=None, description="Path to write final state"),
             ]
             tap_config: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to tap configuration file",
-                ),
+                Field(default=None, description="Path to tap configuration file"),
             ]
             target_config: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to target configuration file",
-                ),
+                Field(default=None, description="Path to target configuration file"),
             ]
             full_refresh: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Run with full refresh",
-                ),
+                Field(default=False, description="Run with full refresh"),
             ]
 
         class ServiceConstructorConfig(BaseModel):
@@ -993,48 +704,16 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config = ConfigDict(arbitrary_types_allowed=True)
 
-            config: Mapping[str, dict[str, object] | None] | None = Field(
-                default=None,
-                description="Optional Meltano settings payload",
-            )
-            service_name: str = Field(
-                default="flext_meltano_service",
-                description="Name of the Meltano service instance",
-                min_length=1,
-            )
-            service_version: str = Field(
-                default="0.9.9",
-                description="Version identifier for the service",
-                min_length=1,
-            )
-            source_name: str | None = Field(
-                default=None,
-                description="Optional source name for specialization",
-            )
-            sink_name: str | None = Field(
-                default=None,
-                description="Optional sink name for specialization",
-            )
-            transformation_name: str | None = Field(
-                default=None,
-                description="Optional transformation name for specialization",
-            )
-            service_type: str | None = Field(
-                default=None,
-                description="Optional service type (tap, target, dbt)",
-            )
-            tap_name: str | None = Field(
-                default=None,
-                description="Optional Singer tap name alias for source_name",
-            )
-            target_name: str | None = Field(
-                default=None,
-                description="Optional Singer target name alias for sink_name",
-            )
-            project_name: str | None = Field(
-                default=None,
-                description="Optional DBT project alias for transformation_name",
-            )
+            config: Mapping[str, dict[str, object] | None] | None = Field(default=None, description="Optional Meltano settings payload")
+            service_name: t.NonEmptyStr = Field(default="flext_meltano_service", description="Name of the Meltano service instance")
+            service_version: t.NonEmptyStr = Field(default="0.9.9", description="Version identifier for the service")
+            source_name: str | None = Field(default=None, description="Optional source name for specialization")
+            sink_name: str | None = Field(default=None, description="Optional sink name for specialization")
+            transformation_name: str | None = Field(default=None, description="Optional transformation name for specialization")
+            service_type: str | None = Field(default=None, description="Optional service type (tap, target, dbt)")
+            tap_name: str | None = Field(default=None, description="Optional Singer tap name alias for source_name")
+            target_name: str | None = Field(default=None, description="Optional Singer target name alias for sink_name")
+            project_name: str | None = Field(default=None, description="Optional DBT project alias for transformation_name")
 
         # ========================================================================
         # DATA SOURCE MODELS - Generic data source configurations and instances
@@ -1062,10 +741,7 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             vars: Annotated[
                 dict[str, t.Scalar] | None,
-                Field(
-                    default=None,
-                    description="dbt variables",
-                ),
+                Field(default=None, description="dbt variables"),
             ]
 
         class TapRunParams(FlextModels.Entity):
@@ -1074,38 +750,23 @@ class FlextMeltanoModels(FlextCliModels):
             tap_name: Annotated[str, Field(description="Name of the tap to run")]
             discover: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Run tap in discover mode",
-                ),
+                Field(default=False, description="Run tap in discover mode"),
             ]
             config_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to tap configuration file",
-                ),
+                Field(default=None, description="Path to tap configuration file"),
             ]
             catalog_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to Singer catalog file",
-                ),
+                Field(default=None, description="Path to Singer catalog file"),
             ]
             state_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to Singer state file",
-                ),
+                Field(default=None, description="Path to Singer state file"),
             ]
             properties_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to Singer properties file",
-                ),
+                Field(default=None, description="Path to Singer properties file"),
             ]
 
         class TargetRunParams(FlextModels.Entity):
@@ -1114,24 +775,15 @@ class FlextMeltanoModels(FlextCliModels):
             target_name: Annotated[str, Field(description="Name of the target to run")]
             config_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Path to target configuration file",
-                ),
+                Field(default=None, description="Path to target configuration file"),
             ]
             input_file: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Input file path for target loading",
-                ),
+                Field(default=None, description="Input file path for target loading"),
             ]
             batch_size: Annotated[
                 int | None,
-                Field(
-                    default=None,
-                    description="Batch size for target operations",
-                ),
+                Field(default=None, description="Batch size for target operations"),
             ]
 
         class TapConfig(FlextModels.Entity):
@@ -1140,16 +792,11 @@ class FlextMeltanoModels(FlextCliModels):
             tap_type: Annotated[str, Field(description="Type of the tap")]
             connection_config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    description="Connection configuration",
-                ),
+                Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Stream-specific configuration",
-                ),
+                Field(default_factory=dict, description="Stream-specific configuration"),
             ]
             tap_version: Annotated[
                 str,
@@ -1176,8 +823,7 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: Mapping[str, t.Scalar],
-            ) -> Mapping[str, t.Scalar]:
+                value: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1200,24 +846,15 @@ class FlextMeltanoModels(FlextCliModels):
             target_type: Annotated[str, Field(description="Type of the target")]
             connection_config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Connection configuration",
-                ),
+                Field(default_factory=dict, description="Connection configuration"),
             ]
             batch_size: Annotated[
                 int | None,
-                Field(
-                    default=None,
-                    description="Batch size for data loading",
-                ),
+                Field(default=None, description="Batch size for data loading"),
             ]
             batch_wait_limit: Annotated[
                 float | None,
-                Field(
-                    default=None,
-                    description="Batch wait limit in seconds",
-                ),
+                Field(default=None, description="Batch wait limit in seconds"),
             ]
             target_version: Annotated[
                 str,
@@ -1242,8 +879,7 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: Mapping[str, t.Scalar],
-            ) -> Mapping[str, t.Scalar]:
+                value: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1262,16 +898,11 @@ class FlextMeltanoModels(FlextCliModels):
             source_type: Annotated[str, Field(description="Type of the data source")]
             connection_config: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    description="Connection configuration",
-                ),
+                Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    default_factory=dict,
-                    description="Stream-specific configuration",
-                ),
+                Field(default_factory=dict, description="Stream-specific configuration"),
             ]
             source_version: Annotated[
                 str,
@@ -1298,8 +929,7 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: Mapping[str, t.Scalar],
-            ) -> Mapping[str, t.Scalar]:
+                value: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1322,29 +952,19 @@ class FlextMeltanoModels(FlextCliModels):
             stream_name: Annotated[str, Field(description="Name of the stream")]
             stream_schema: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    description="JSON schema for the stream",
-                ),
+                Field(description="JSON schema for the stream"),
             ]
             source_type: Annotated[
                 str,
-                Field(
-                    description="Type of source this stream belongs to",
-                ),
+                Field(description="Type of source this stream belongs to"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.StreamStatus.DISCOVERED,
-                    description="Current status of the stream",
-                ),
+                Field(default=c.Meltano.Enums.StreamStatus.DISCOVERED, description="Current status of the stream"),
             ]
             records_extracted: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of records extracted",
-                ),
+                Field(default=0, description="Number of records extracted"),
             ]
 
             @computed_field
@@ -1370,8 +990,7 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("stream_schema")
             def serialize_stream_schema(
                 self,
-                value: Mapping[str, t.NormalizedValue],
-            ) -> Mapping[str, t.NormalizedValue]:
+                value: Mapping[str, t.NormalizedValue]) -> Mapping[str, t.NormalizedValue]:
                 """Normalize stream schema structure."""
                 result: dict[str, t.NormalizedValue] = dict(value)
                 if "properties" not in result:
@@ -1405,24 +1024,15 @@ class FlextMeltanoModels(FlextCliModels):
             sink_type: Annotated[str, Field(description="Type of the sink")]
             config: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    default_factory=dict,
-                    description="Sink configuration",
-                ),
+                Field(default_factory=dict, description="Sink configuration"),
             ]
             sink_schema: Annotated[
                 dict[str, t.Container],
-                Field(
-                    default_factory=dict,
-                    description="Sink schema",
-                ),
+                Field(default_factory=dict, description="Sink schema"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.StreamStatus.INITIALIZED,
-                    description="Current status",
-                ),
+                Field(default=c.Meltano.Enums.StreamStatus.INITIALIZED, description="Current status"),
             ]
 
             @computed_field
@@ -1452,40 +1062,26 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_id: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Unique tap identifier",
-                ),
+                Field(default=None, description="Unique tap identifier"),
             ]
             tap_type: Annotated[str, Field(description="Type of the tap")]
             config: Annotated[
                 FlextMeltanoModels.Meltano.TapConfig,
-                Field(
-                    description="Tap configuration",
-                ),
+                Field(description="Tap configuration"),
             ]
             adapter: Annotated[
                 t.ContainerValue | None,
-                Field(
-                    default=None,
-                    description="Tap adapter instance",
-                ),
+                Field(default=None, description="Tap adapter instance"),
             ]
             streams: Annotated[
                 list[FlextMeltanoModels.Meltano.StreamInfo],
-                Field(
-                    default_factory=lambda: list[
+                Field(default_factory=lambda: list[
                         FlextMeltanoModels.Meltano.StreamInfo
-                    ](),
-                    description="Available streams",
-                ),
+                    ](), description="Available streams"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.StreamStatus.INITIALIZED,
-                    description="Tap status",
-                ),
+                Field(default=c.Meltano.Enums.StreamStatus.INITIALIZED, description="Tap status"),
             ]
 
             @computed_field
@@ -1508,44 +1104,27 @@ class FlextMeltanoModels(FlextCliModels):
             source_type: Annotated[str, Field(description="Type of the data source")]
             config: Annotated[
                 FlextMeltanoModels.Meltano.DataSourceConfig,
-                Field(
-                    description="Source configuration",
-                ),
+                Field(description="Source configuration"),
             ]
             adapter: Annotated[
                 t.ContainerValue | None,
-                Field(
-                    default=None,
-                    description="Adapter instance",
-                ),
+                Field(default=None, description="Adapter instance"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.StreamStatus.INITIALIZED,
-                    description="Current status",
-                ),
+                Field(default=c.Meltano.Enums.StreamStatus.INITIALIZED, description="Current status"),
             ]
             streams: Annotated[
                 dict[str, FlextMeltanoModels.Meltano.StreamDefinition],
-                Field(
-                    default_factory=dict,
-                    description="Discovered streams",
-                ),
+                Field(default_factory=dict, description="Discovered streams"),
             ]
             discovered: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Whether streams have been discovered",
-                ),
+                Field(default=False, description="Whether streams have been discovered"),
             ]
             metadata: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    default_factory=dict,
-                    description="Additional metadata",
-                ),
+                Field(default_factory=dict, description="Additional metadata"),
             ]
             source_id: Annotated[str, Field(description="Unique source identifier")]
 
@@ -1563,8 +1142,7 @@ class FlextMeltanoModels(FlextCliModels):
             def is_ready_for_extraction(self) -> bool:
                 """Check if source is ready for data extraction."""
                 streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
-                    self.streams.values(),
-                )
+                    self.streams.values())
                 return (
                     self.discovered
                     and u.count(streams_list) > 0
@@ -1580,8 +1158,7 @@ class FlextMeltanoModels(FlextCliModels):
             def total_records_extracted(self) -> int:
                 """Total records extracted across all streams."""
                 streams_list: list[FlextMeltanoModels.Meltano.StreamDefinition] = list(
-                    self.streams.values(),
-                )
+                    self.streams.values())
                 result = u.agg(streams_list, "records_extracted", fn=sum)
                 match result:
                     case int():
@@ -1607,31 +1184,20 @@ class FlextMeltanoModels(FlextCliModels):
 
             sink_id: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Unique sink identifier",
-                ),
+                Field(default=None, description="Unique sink identifier"),
             ]
             sink_type: Annotated[str, Field(description="Type of the data sink")]
             config: Annotated[
                 FlextMeltanoModels.Meltano.DataSinkConfig,
-                Field(
-                    description="Sink configuration",
-                ),
+                Field(description="Sink configuration"),
             ]
             adapter: Annotated[
                 t.ContainerValue | None,
-                Field(
-                    default=None,
-                    description="Adapter instance",
-                ),
+                Field(default=None, description="Adapter instance"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.StreamStatus.INITIALIZED,
-                    description="Current status",
-                ),
+                Field(default=c.Meltano.Enums.StreamStatus.INITIALIZED, description="Current status"),
             ]
             batch_size: Annotated[
                 int,
@@ -1657,23 +1223,15 @@ class FlextMeltanoModels(FlextCliModels):
             sink_type: Annotated[str, Field(description="Sink type identifier")]
             connection_config: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    description="Connection configuration dictionary",
-                ),
+                Field(description="Connection configuration dictionary"),
             ]
             batch_size: Annotated[
                 int,
-                Field(
-                    default=c.DEFAULT_SIZE,
-                    description="Batch size for record processing",
-                ),
+                Field(default=c.DEFAULT_SIZE, description="Batch size for record processing"),
             ]
             max_batches: Annotated[
                 int,
-                Field(
-                    default=c.DEFAULT_SIZE,
-                    description="Maximum number of batches to process",
-                ),
+                Field(default=c.DEFAULT_SIZE, description="Maximum number of batches to process"),
             ]
 
             @computed_field
@@ -1698,8 +1256,7 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: Mapping[str, t.Scalar],
-            ) -> Mapping[str, t.Scalar]:
+                value: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1723,56 +1280,36 @@ class FlextMeltanoModels(FlextCliModels):
             """Generic stream information for data pipeline operations."""
 
             stream_name: Annotated[
-                str,
-                Field(min_length=1, description="Stream name identifier"),
+                t.NonEmptyStr,
+                Field(description="Stream name identifier"),
             ]
             stream_schema: Annotated[
                 dict[str, t.Scalar | Mapping[str, t.Scalar]],
-                Field(
-                    description="Stream schema definition",
-                ),
+                Field(description="Stream schema definition"),
             ]
             key_properties: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Primary key properties for the stream",
-                ),
+                Field(default_factory=list, description="Primary key properties for the stream"),
             ]
             replication_method: Annotated[
                 str,
-                Field(
-                    default="FULL_TABLE",
-                    description="Replication method (FULL_TABLE, INCREMENTAL, LOG_BASED)",
-                ),
+                Field(default="FULL_TABLE", description="Replication method (FULL_TABLE, INCREMENTAL, LOG_BASED)"),
             ]
             replication_key: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Field used for incremental replication",
-                ),
+                Field(default=None, description="Field used for incremental replication"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.StreamStatus.INITIALIZED,
-                    description="Stream processing status",
-                ),
+                Field(default=c.Meltano.Enums.StreamStatus.INITIALIZED, description="Stream processing status"),
             ]
             records_loaded: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of records loaded",
-                ),
+                Field(default=0, description="Number of records loaded"),
             ]
             batches_processed: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of batches processed",
-                ),
+                Field(default=0, description="Number of batches processed"),
             ]
             stream_created_at: Annotated[str, Field(description="Creation timestamp")]
 
@@ -1821,37 +1358,25 @@ class FlextMeltanoModels(FlextCliModels):
 
             type: Annotated[
                 Literal["SCHEMA"],
-                Field(
-                    default="SCHEMA",
-                    description="Singer message discriminator",
-                ),
+                Field(default="SCHEMA", description="Singer message discriminator"),
             ]
             stream: Annotated[
-                str,
-                Field(min_length=1, description="Singer stream name"),
+                t.NonEmptyStr,
+                Field(description="Singer stream name"),
             ]
             schema_definition: Annotated[
                 dict[str, t.Container],
-                Field(
-                    alias="schema",
+                Field(alias="schema",
                     serialization_alias="schema",
-                    validation_alias="schema",
-                    description="Singer JSON schema payload",
-                ),
+                    validation_alias="schema", description="Singer JSON schema payload"),
             ]
             key_properties: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Singer stream key properties",
-                ),
+                Field(default_factory=list, description="Singer stream key properties"),
             ]
             bookmark_properties: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Singer bookmark columns for incremental replication",
-                ),
+                Field(default_factory=list, description="Singer bookmark columns for incremental replication"),
             ]
 
         class SingerRecordMessage(FlextModels.ArbitraryTypesModel):
@@ -1859,34 +1384,23 @@ class FlextMeltanoModels(FlextCliModels):
 
             type: Annotated[
                 Literal["RECORD"],
-                Field(
-                    default="RECORD",
-                    description="Singer message discriminator",
-                ),
+                Field(default="RECORD", description="Singer message discriminator"),
             ]
             stream: Annotated[
                 str,
-                Field(min_length=1, description="Singer stream name"),
+                Field(description="Singer stream name"),
             ]
             record: Annotated[
                 dict[str, t.Container],
-                Field(
-                    description="Singer record payload",
-                ),
+                Field(description="Singer record payload"),
             ]
             time_extracted: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="ISO 8601 timestamp when the record was extracted",
-                ),
+                Field(default=None, description="ISO 8601 timestamp when the record was extracted"),
             ]
             version: Annotated[
                 int | None,
-                Field(
-                    default=None,
-                    description="Stream version number for activate_version protocol",
-                ),
+                Field(default=None, description="Stream version number for activate_version protocol"),
             ]
 
         class SingerStateMessage(FlextModels.ArbitraryTypesModel):
@@ -1894,17 +1408,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             type: Annotated[
                 Literal["STATE"],
-                Field(
-                    default="STATE",
-                    description="Singer message discriminator",
-                ),
+                Field(default="STATE", description="Singer message discriminator"),
             ]
             value: Annotated[
                 dict[str, object],
-                Field(
-                    default_factory=dict,
-                    description="Singer state bookmark payload",
-                ),
+                Field(default_factory=dict, description="Singer state bookmark payload"),
             ]
 
         class SingerActivateVersionMessage(FlextModels.ArbitraryTypesModel):
@@ -1917,14 +1425,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             type: Annotated[
                 Literal["ACTIVATE_VERSION"],
-                Field(
-                    default="ACTIVATE_VERSION",
-                    description="Singer message discriminator",
-                ),
+                Field(default="ACTIVATE_VERSION", description="Singer message discriminator"),
             ]
             stream: Annotated[
                 str,
-                Field(min_length=1, description="Singer stream name"),
+                Field(description="Singer stream name"),
             ]
             version: Annotated[int, Field(description="Stream version to activate")]
 
@@ -1938,17 +1443,11 @@ class FlextMeltanoModels(FlextCliModels):
             stream_name: Annotated[str, Field(description="Name of the stream")]
             bookmark_key: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Bookmark field for incremental",
-                ),
+                Field(default=None, description="Bookmark field for incremental"),
             ]
             bookmark_value: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Current bookmark value",
-                ),
+                Field(default=None, description="Current bookmark value"),
             ]
 
             @model_validator(mode="after")
@@ -1964,17 +1463,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             breadcrumb: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Singer metadata breadcrumb path",
-                ),
+                Field(default_factory=list, description="Singer metadata breadcrumb path"),
             ]
             metadata: Annotated[
                 dict[str, object],
-                Field(
-                    default_factory=dict,
-                    description="Singer metadata properties",
-                ),
+                Field(default_factory=dict, description="Singer metadata properties"),
             ]
 
         class SingerCatalogEntry(FlextModels.ArbitraryTypesModel):
@@ -1982,81 +1475,51 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_stream_id: Annotated[
                 str,
-                Field(
-                    min_length=1,
-                    description="Tap stream identifier",
-                ),
+                Field(description="Tap stream identifier"),
             ]
             stream: Annotated[
                 str,
-                Field(min_length=1, description="Singer stream name"),
+                Field(description="Singer stream name"),
             ]
             schema_definition: Annotated[
                 dict[str, t.Container],
-                Field(
-                    alias="schema",
+                Field(alias="schema",
                     serialization_alias="schema",
-                    validation_alias="schema",
-                    description="Singer stream schema payload",
-                ),
+                    validation_alias="schema", description="Singer stream schema payload"),
             ]
             metadata: Annotated[
                 list[FlextMeltanoModels.Meltano.SingerCatalogMetadata],
-                Field(
-                    default_factory=lambda: list[
+                Field(default_factory=lambda: list[
                         FlextMeltanoModels.Meltano.SingerCatalogMetadata
-                    ](),
-                    description="Singer stream metadata blocks",
-                ),
+                    ](), description="Singer stream metadata blocks"),
             ]
             key_properties: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Primary key columns for this stream",
-                ),
+                Field(default_factory=list, description="Primary key columns for this stream"),
             ]
             replication_key: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Column used for incremental replication",
-                ),
+                Field(default=None, description="Column used for incremental replication"),
             ]
             replication_method: Annotated[
                 (Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None),
-                Field(
-                    default=None,
-                    description="Replication method for this stream",
-                ),
+                Field(default=None, description="Replication method for this stream"),
             ]
             is_view: Annotated[
                 bool | None,
-                Field(
-                    default=None,
-                    description="Whether this stream is a database view",
-                ),
+                Field(default=None, description="Whether this stream is a database view"),
             ]
             table_name: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Source table name",
-                ),
+                Field(default=None, description="Source table name"),
             ]
             database_name: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Source database name",
-                ),
+                Field(default=None, description="Source database name"),
             ]
             row_count: Annotated[
                 int | None,
-                Field(
-                    default=None,
-                    description="Estimated row count from source",
-                ),
+                Field(default=None, description="Estimated row count from source"),
             ]
 
         class SingerCatalog(FlextModels.ArbitraryTypesModel):
@@ -2064,19 +1527,13 @@ class FlextMeltanoModels(FlextCliModels):
 
             type: Annotated[
                 Literal["CATALOG"],
-                Field(
-                    default="CATALOG",
-                    description="Singer catalog message discriminator",
-                ),
+                Field(default="CATALOG", description="Singer catalog message discriminator"),
             ]
             streams: Annotated[
                 list[FlextMeltanoModels.Meltano.SingerCatalogEntry],
-                Field(
-                    default_factory=lambda: list[
+                Field(default_factory=lambda: list[
                         FlextMeltanoModels.Meltano.SingerCatalogEntry
-                    ](),
-                    description="Singer catalog stream entries",
-                ),
+                    ](), description="Singer catalog stream entries"),
             ]
 
         class SingerPipelineConfig(FlextModels.Entity):
@@ -2084,65 +1541,41 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_config_path: Annotated[
                 Path | None,
-                Field(
-                    default=None,
-                    description="Path to tap configuration",
-                ),
+                Field(default=None, description="Path to tap configuration"),
             ]
             target_config_path: Annotated[
                 Path | None,
-                Field(
-                    default=None,
-                    description="Path to target configuration",
-                ),
+                Field(default=None, description="Path to target configuration"),
             ]
             catalog_path: Annotated[
                 Path | None,
-                Field(
-                    default=None,
-                    description="Path to catalog file",
-                ),
+                Field(default=None, description="Path to catalog file"),
             ]
             state_path: Annotated[
                 Path | None,
-                Field(
-                    default=None,
-                    description="Path to state file",
-                ),
+                Field(default=None, description="Path to state file"),
             ]
             selected_streams: Annotated[
                 list[str] | None,
-                Field(
-                    default=None,
-                    description="Specific streams to sync",
-                ),
+                Field(default=None, description="Specific streams to sync"),
             ]
 
         class SingerSyncResult(FlextModels.Entity):
             """Result of a Singer sync operation."""
 
             records_processed: Annotated[
-                int,
-                Field(
-                    ge=0,
-                    description="Number of records processed",
-                ),
+                t.NonNegativeInt, Field(description="Number of records processed"),
             ]
             records_written: Annotated[
-                int,
-                Field(ge=0, description="Number of records written"),
+                t.NonNegativeInt, Field(description="Number of records written"),
             ]
-            errors: Annotated[int, Field(ge=0, description="Number of errors")]
+            errors: Annotated[t.NonNegativeInt, Field(description="Number of errors")]
             state: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Final state payload",
-                ),
+                Field(default_factory=dict, description="Final state payload"),
             ]
             duration_seconds: Annotated[
-                float,
-                Field(ge=0.0, description="Execution duration"),
+                t.NonNegativeFloat, Field(description="Execution duration"),
             ]
 
         # ========================================================================
@@ -2152,17 +1585,14 @@ class FlextMeltanoModels(FlextCliModels):
         class CreatePipelinePayload(FlextModels.ArbitraryTypesModel):
             """Payload for create_pipeline operation."""
 
-            tap_name: Annotated[str, Field(min_length=1, description="Singer tap name")]
+            tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
             target_name: Annotated[
                 str,
-                Field(min_length=1, description="Singer target name"),
+                Field(description="Singer target name"),
             ]
             config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Pipeline config",
-                ),
+                Field(default_factory=dict, description="Pipeline config"),
             ]
 
         class ExecutePipelinePayload(FlextModels.ArbitraryTypesModel):
@@ -2170,27 +1600,21 @@ class FlextMeltanoModels(FlextCliModels):
 
             pipeline_id: Annotated[
                 str,
-                Field(min_length=1, description="Pipeline identifier"),
+                Field(description="Pipeline identifier"),
             ]
             config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Execution config",
-                ),
+                Field(default_factory=dict, description="Execution config"),
             ]
 
         class InstallPluginPayload(FlextModels.ArbitraryTypesModel):
             """Payload for install_plugin operation."""
 
-            plugin_type: Annotated[str, Field(min_length=1, description="Plugin type")]
-            plugin_name: Annotated[str, Field(min_length=1, description="Plugin name")]
+            plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
+            plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
             config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Plugin config",
-                ),
+                Field(default_factory=dict, description="Plugin config"),
             ]
 
         class ListPluginsPayload(FlextModels.ArbitraryTypesModel):
@@ -2198,10 +1622,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             plugin_type: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Filter by plugin type",
-                ),
+                Field(default=None, description="Filter by plugin type"),
             ]
 
         class ConfigureEnvironmentPayload(FlextModels.ArbitraryTypesModel):
@@ -2209,14 +1630,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             environment_name: Annotated[
                 str,
-                Field(min_length=1, description="Environment name"),
+                Field(description="Environment name"),
             ]
             config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Environment config",
-                ),
+                Field(default_factory=dict, description="Environment config"),
             ]
 
         class RunDbtModelsPayload(FlextModels.ArbitraryTypesModel):
@@ -2228,33 +1646,24 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             config: Annotated[
                 dict[str, t.NormalizedValue] | None,
-                Field(
-                    default=None,
-                    description="Execution config",
-                ),
+                Field(default=None, description="Execution config"),
             ]
 
         class RunEltPipelinePayload(FlextModels.ArbitraryTypesModel):
             """Payload for run_elt_pipeline operation."""
 
-            tap_name: Annotated[str, Field(min_length=1, description="Singer tap name")]
+            tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
             target_name: Annotated[
                 str,
-                Field(min_length=1, description="Singer target name"),
+                Field(description="Singer target name"),
             ]
             dbt_models: Annotated[
                 list[str] | None,
-                Field(
-                    default=None,
-                    description="DBT models to run",
-                ),
+                Field(default=None, description="DBT models to run"),
             ]
             config: Annotated[
                 dict[str, t.NormalizedValue] | None,
-                Field(
-                    default=None,
-                    description="Pipeline config",
-                ),
+                Field(default=None, description="Pipeline config"),
             ]
 
         class JsonSchemaPayload(FlextModels.ArbitraryTypesModel):
@@ -2262,21 +1671,17 @@ class FlextMeltanoModels(FlextCliModels):
 
             schema_definition: Annotated[
                 dict[str, t.Container],
-                Field(
-                    default_factory=dict,
+                Field(default_factory=dict,
                     alias="schema",
                     serialization_alias="schema",
-                    validation_alias="schema",
-                    description="Schema-like JSON payload",
-                ),
+                    validation_alias="schema", description="Schema-like JSON payload"),
             ]
 
             @field_validator("schema_definition", mode="before")
             @classmethod
             def normalize_schema(
                 cls,
-                value: _ValidatorInput,
-            ) -> Mapping[str, object]:
+                value: _ValidatorInput) -> Mapping[str, object]:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
@@ -2290,18 +1695,14 @@ class FlextMeltanoModels(FlextCliModels):
 
             records: Annotated[
                 list[dict[str, t.Container]],
-                Field(
-                    default_factory=list,
-                    description="Normalized record payloads",
-                ),
+                Field(default_factory=list, description="Normalized record payloads"),
             ]
 
             @field_validator("records", mode="before")
             @classmethod
             def normalize_records(
                 cls,
-                value: _ValidatorInput,
-            ) -> list[dict[str, t.Container]] | list[str]:
+                value: _ValidatorInput) -> list[dict[str, t.Container]] | list[str]:
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
@@ -2333,18 +1734,14 @@ class FlextMeltanoModels(FlextCliModels):
                     | Mapping[str, t.Scalar | None]
                     | None,
                 ],
-                Field(
-                    default_factory=dict,
-                    description="Normalized mapping values",
-                ),
+                Field(default_factory=dict, description="Normalized mapping values"),
             ]
 
             @field_validator("values", mode="before")
             @classmethod
             def normalize_values(
                 cls,
-                value: _ValidatorInput,
-            ) -> dict[
+                value: _ValidatorInput) -> dict[
                 str,
                 t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
             ]:
@@ -2395,10 +1792,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             content: Annotated[
                 str,
-                Field(
-                    default="",
-                    description="Normalized writable string content",
-                ),
+                Field(default="", description="Normalized writable string content"),
             ]
 
             @field_validator("content", mode="before")
@@ -2411,8 +1805,7 @@ class FlextMeltanoModels(FlextCliModels):
                             dict(value),
                             default_flow_style=False,
                             indent=2,
-                            allow_unicode=True,
-                        )
+                            allow_unicode=True)
                     case None:
                         return ""
                     case _:
@@ -2423,18 +1816,14 @@ class FlextMeltanoModels(FlextCliModels):
 
             value: Annotated[
                 str | list[str] | dict[str, t.Scalar] | None,
-                Field(
-                    default=None,
-                    description="Normalized variant value",
-                ),
+                Field(default=None, description="Normalized variant value"),
             ]
 
             @field_validator("value", mode="before")
             @classmethod
             def normalize_variant(
                 cls,
-                value: _ValidatorInput,
-            ) -> str | list[str] | Mapping[str, t.Scalar] | None:
+                value: _ValidatorInput) -> str | list[str] | Mapping[str, t.Scalar] | None:
                 """Normalize variant_raw into typed union."""
                 match value:
                     case None:
@@ -2462,38 +1851,27 @@ class FlextMeltanoModels(FlextCliModels):
 
             default_variant: Annotated[
                 str,
-                Field(
-                    default="",
-                    description="Plugin default variant",
-                ),
+                Field(default="", description="Plugin default variant"),
             ]
             variants: Annotated[
                 dict[str, object],
-                Field(
-                    default_factory=dict,
-                    description="Available plugin variants",
-                ),
+                Field(default_factory=dict, description="Available plugin variants"),
             ]
             logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
             description: Annotated[
                 str,
-                Field(
-                    default="",
-                    description="Plugin description",
-                ),
+                Field(default="", description="Plugin description"),
             ]
 
             @field_validator(
                 "default_variant",
                 "logo_url",
                 "description",
-                mode="before",
-            )
+                mode="before")
             @classmethod
             def normalize_string_fields(
                 cls,
-                value: _ValidatorInput,
-            ) -> str:
+                value: _ValidatorInput) -> str:
                 """Normalize optional string fields from external payloads."""
                 return "" if value is None else str(value)
 
@@ -2501,8 +1879,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_variants(
                 cls,
-                value: _ValidatorInput,
-            ) -> Mapping[str, object]:
+                value: _ValidatorInput) -> Mapping[str, object]:
                 """Normalize variant maps from external payloads."""
                 match value:
                     case Mapping():
@@ -2515,14 +1892,11 @@ class FlextMeltanoModels(FlextCliModels):
         class PluginDiscoveryItem(FlextModels.ArbitraryTypesModel):
             """Typed plugin discovery response item."""
 
-            name: Annotated[str, Field(min_length=1, description="Plugin name")]
-            type: Annotated[str, Field(min_length=1, description="Plugin type")]
+            name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
+            type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
             default_variant: Annotated[
                 str,
-                Field(
-                    default="",
-                    description="Default plugin variant",
-                ),
+                Field(default="", description="Default plugin variant"),
             ]
             variants: Annotated[
                 str,
@@ -2545,8 +1919,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_plugins(
                 cls,
-                value: _ValidatorInput,
-            ) -> Mapping[str, object]:
+                value: _ValidatorInput) -> Mapping[str, object]:
                 """Normalize plugin catalog mapping."""
                 match value:
                     case Mapping():
@@ -2562,37 +1935,27 @@ class FlextMeltanoModels(FlextCliModels):
             project_root: Annotated[str, Field(description="Project root path")]
             elt_context: Annotated[
                 dict[str, object],
-                Field(
-                    default_factory=dict,
-                    description="ELT execution context",
-                ),
+                Field(default_factory=dict, description="ELT execution context"),
             ]
             extractor_name: Annotated[
                 str,
-                Field(min_length=1, description="Extractor name"),
+                Field(description="Extractor name"),
             ]
-            loader_name: Annotated[str, Field(min_length=1, description="Loader name")]
+            loader_name: Annotated[t.NonEmptyStr, Field(description="Loader name")]
             execution_completed: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Execution completion flag",
-                ),
+                Field(default=False, description="Execution completion flag"),
             ]
             execution_result: Annotated[
                 dict[str, object],
-                Field(
-                    default_factory=dict,
-                    description="Execution result payload",
-                ),
+                Field(default_factory=dict, description="Execution result payload"),
             ]
 
             @field_validator("elt_context", "execution_result", mode="before")
             @classmethod
             def normalize_mapping_payloads(
                 cls,
-                value: _ValidatorInput,
-            ) -> Mapping[str, object]:
+                value: _ValidatorInput) -> Mapping[str, object]:
                 """Normalize mapping-like payloads into dictionaries."""
                 match value:
                     case Mapping():
@@ -2604,13 +1967,11 @@ class FlextMeltanoModels(FlextCliModels):
                 "project_root",
                 "extractor_name",
                 "loader_name",
-                mode="before",
-            )
+                mode="before")
             @classmethod
             def normalize_required_strings(
                 cls,
-                value: _ValidatorInput,
-            ) -> str:
+                value: _ValidatorInput) -> str:
                 """Normalize required string fields from context payloads."""
                 normalized = "" if value is None else str(value)
                 return normalized.strip()
@@ -2622,25 +1983,18 @@ class FlextMeltanoModels(FlextCliModels):
 
             project_root: Annotated[
                 str,
-                Field(
-                    default="unknown",
-                    description="Project root path",
-                ),
+                Field(default="unknown", description="Project root path"),
             ]
             execution_result: Annotated[
                 dict[str, object],
-                Field(
-                    default_factory=dict,
-                    description="Execution result payload",
-                ),
+                Field(default_factory=dict, description="Execution result payload"),
             ]
 
             @field_validator("execution_result", mode="before")
             @classmethod
             def normalize_execution_result(
                 cls,
-                value: _ValidatorInput,
-            ) -> Mapping[str, object]:
+                value: _ValidatorInput) -> Mapping[str, object]:
                 """Normalize execution result map payload."""
                 match value:
                     case Mapping():
@@ -2662,18 +2016,14 @@ class FlextMeltanoModels(FlextCliModels):
 
             values: Annotated[
                 dict[str, str],
-                Field(
-                    default_factory=dict,
-                    description="Execution values filtered to scalar strings",
-                ),
+                Field(default_factory=dict, description="Execution values filtered to scalar strings"),
             ]
 
             @field_validator("values", mode="before")
             @classmethod
             def normalize_values(
                 cls,
-                value: _ValidatorInput,
-            ) -> Mapping[str, str]:
+                value: _ValidatorInput) -> Mapping[str, str]:
                 """Keep scalar execution values and stringify them."""
                 match value:
                     case Mapping():
@@ -2690,15 +2040,15 @@ class FlextMeltanoModels(FlextCliModels):
         class PluginComponentConfig(FlextModels.Entity):
             """Validated plugin component configuration for pipeline validators."""
 
-            name: Annotated[str, Field(min_length=1, description="Plugin name")]
+            name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
             namespace: Annotated[
                 str,
-                Field(min_length=1, description="Plugin namespace"),
+                Field(description="Plugin namespace"),
             ]
-            pip_url: Annotated[str, Field(min_length=1, description="Plugin pip URL")]
+            pip_url: Annotated[t.NonEmptyStr, Field(description="Plugin pip URL")]
             executable: Annotated[
                 str,
-                Field(min_length=1, description="Plugin executable"),
+                Field(description="Plugin executable"),
             ]
             type: Annotated[str, Field(default="extractor", description="Plugin type")]
 
@@ -2731,24 +2081,15 @@ class FlextMeltanoModels(FlextCliModels):
             path: Annotated[str | None, Field(default=None, description="Node path")]
             description: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Node description",
-                ),
+                Field(default=None, description="Node description"),
             ]
             fqn: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Fully qualified name parts",
-                ),
+                Field(default_factory=list, description="Fully qualified name parts"),
             ]
             resource_type: Annotated[
                 str,
-                Field(
-                    default="",
-                    description="Node resource type (model, test, etc.)",
-                ),
+                Field(default="", description="Node resource type (model, test, etc.)"),
             ]
 
             @computed_field
@@ -2763,16 +2104,12 @@ class FlextMeltanoModels(FlextCliModels):
 
             nodes: Annotated[
                 dict[str, FlextMeltanoModels.Meltano.DbtManifestNode],
-                Field(
-                    default_factory=dict,
-                    description="Manifest nodes keyed by node_id",
-                ),
+                Field(default_factory=dict, description="Manifest nodes keyed by node_id"),
             ]
 
             def get_nodes_by_type(
                 self,
-                resource_type: str,
-            ) -> list[FlextMeltanoModels.Meltano.DbtManifestNode]:
+                resource_type: str) -> list[FlextMeltanoModels.Meltano.DbtManifestNode]:
                 """Get all nodes of a specific resource type."""
                 return [
                     node
@@ -2796,30 +2133,20 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             default_environment: Annotated[
                 str,
-                Field(
-                    default="dev",
-                    description="Default environment name",
-                ),
+                Field(default="dev", description="Default environment name"),
             ]
             plugins: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Plugin configurations",
-                ),
+                Field(default_factory=dict, description="Plugin configurations"),
             ]
             environments: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Environment configurations",
-                ),
+                Field(default_factory=dict, description="Environment configurations"),
             ]
 
             @model_validator(mode="after")
             def validate_meltano_project(
-                self,
-            ) -> Self:
+                self) -> Self:
                 """Validate Meltano project configuration consistency."""
                 if not self.project_id or not self.project_id.strip():
                     msg = "project_id cannot be empty"
@@ -2832,37 +2159,25 @@ class FlextMeltanoModels(FlextCliModels):
 
             version: Annotated[
                 int,
-                Field(
-                    default=1,
+                Field(default=1,
                     ge=1,
-                    le=1,
-                    description="Project version (only version 1 supported)",
-                ),
+                    le=1, description="Project version (only version 1 supported)"),
             ]
             project_id: Annotated[
                 str,
-                Field(min_length=1, description="Project ID required"),
+                Field(description="Project ID required"),
             ]
             default_environment: Annotated[
                 str,
-                Field(
-                    default="dev",
-                    description="Default environment",
-                ),
+                Field(default="dev", description="Default environment"),
             ]
             project_root: Annotated[
                 Path,
-                Field(
-                    default_factory=Path.cwd,
-                    description="Project root directory",
-                ),
+                Field(default_factory=Path.cwd, description="Project root directory"),
             ]
             environments: Annotated[
                 list[str],
-                Field(
-                    default_factory=lambda: ["dev", "staging", "prod"],
-                    description="Available environments",
-                ),
+                Field(default_factory=lambda: ["dev", "staging", "prod"], description="Available environments"),
             ]
 
             @computed_field
@@ -2910,8 +2225,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @model_validator(mode="after")
             def validate_project_consistency(
-                self,
-            ) -> Self:
+                self) -> Self:
                 """Validate project consistency."""
                 if self.default_environment not in self.environments:
                     msg = (
@@ -2929,7 +2243,7 @@ class FlextMeltanoModels(FlextCliModels):
         class PluginModel(FlextModels.TimestampedModel):
             """Generic plugin configuration for pipeline operations."""
 
-            name: Annotated[str, Field(min_length=1, description="Plugin name")]
+            name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
             namespace: Annotated[str, Field(description="Plugin namespace")]
             pip_url: Annotated[
                 str | None,
@@ -2937,38 +2251,23 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             executable: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Plugin executable",
-                ),
+                Field(default=None, description="Plugin executable"),
             ]
             variant: Annotated[
                 str,
-                Field(
-                    default="standard",
-                    description="Plugin variant",
-                ),
+                Field(default="standard", description="Plugin variant"),
             ]
             settings: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="Plugin settings",
-                ),
+                Field(default_factory=dict, description="Plugin settings"),
             ]
             capabilities: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Plugin capabilities",
-                ),
+                Field(default_factory=list, description="Plugin capabilities"),
             ]
             config_files: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Plugin configuration files",
-                ),
+                Field(default_factory=list, description="Plugin configuration files"),
             ]
 
             @computed_field
@@ -3034,31 +2333,19 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             config: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="DBT project configuration",
-                ),
+                Field(default_factory=dict, description="DBT project configuration"),
             ]
             models: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="DBT models configuration",
-                ),
+                Field(default_factory=dict, description="DBT models configuration"),
             ]
             sources: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="DBT sources configuration",
-                ),
+                Field(default_factory=dict, description="DBT sources configuration"),
             ]
             tests: Annotated[
                 dict[str, t.NormalizedValue],
-                Field(
-                    default_factory=dict,
-                    description="DBT tests configuration",
-                ),
+                Field(default_factory=dict, description="DBT tests configuration"),
             ]
 
             @model_validator(mode="after")
@@ -3077,43 +2364,28 @@ class FlextMeltanoModels(FlextCliModels):
         class TransformationProjectModel(FlextModels.Entity):
             """Generic transformation project configuration with validation."""
 
-            name: Annotated[str, Field(min_length=1, description="Project name")]
+            name: Annotated[t.NonEmptyStr, Field(description="Project name")]
             transformation_version: Annotated[str, Field(description="Project version")]
             profile: Annotated[str, Field(description="Profile name")]
             model_paths: Annotated[
                 list[str],
-                Field(
-                    default=["models"],
-                    description="Model paths",
-                ),
+                Field(default=["models"], description="Model paths"),
             ]
             analysis_paths: Annotated[
                 list[str],
-                Field(
-                    default=["analysis"],
-                    description="Analysis paths",
-                ),
+                Field(default=["analysis"], description="Analysis paths"),
             ]
             test_paths: Annotated[
                 list[str],
-                Field(
-                    default=["tests"],
-                    description="Test paths",
-                ),
+                Field(default=["tests"], description="Test paths"),
             ]
             seed_paths: Annotated[
                 list[str],
-                Field(
-                    default=["seeds"],
-                    description="Seed paths",
-                ),
+                Field(default=["seeds"], description="Seed paths"),
             ]
             macro_paths: Annotated[
                 list[str],
-                Field(
-                    default=["macros"],
-                    description="Macro paths",
-                ),
+                Field(default=["macros"], description="Macro paths"),
             ]
 
             @computed_field
@@ -3125,8 +2397,7 @@ class FlextMeltanoModels(FlextCliModels):
                     + self.analysis_paths
                     + self.test_paths
                     + self.seed_paths
-                    + self.macro_paths,
-                )
+                    + self.macro_paths)
                 return bool(all_paths - default_paths)
 
             @computed_field
@@ -3166,8 +2437,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @model_validator(mode="after")
             def validate_project_consistency(
-                self,
-            ) -> Self:
+                self) -> Self:
                 """Validate project consistency."""
                 if not self.model_paths:
                     msg = "Project must have at least one model path"
@@ -3181,38 +2451,23 @@ class FlextMeltanoModels(FlextCliModels):
             command: Annotated[str, Field(description="Command to execute")]
             models: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Models to execute",
-                ),
+                Field(default_factory=list, description="Models to execute"),
             ]
             exclude: Annotated[
                 list[str],
-                Field(
-                    default_factory=list,
-                    description="Models to exclude",
-                ),
+                Field(default_factory=list, description="Models to exclude"),
             ]
             full_refresh: Annotated[
                 bool,
-                Field(
-                    default=False,
-                    description="Full refresh execution",
-                ),
+                Field(default=False, description="Full refresh execution"),
             ]
             fail_fast: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Fail fast on first error",
-                ),
+                Field(default=True, description="Fail fast on first error"),
             ]
             threads: Annotated[
                 int,
-                Field(
-                    default=1,
-                    description="Number of threads to use",
-                ),
+                Field(default=1, description="Number of threads to use"),
             ]
 
             @computed_field
@@ -3244,8 +2499,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @model_validator(mode="after")
             def validate_execution_consistency(
-                self,
-            ) -> Self:
+                self) -> Self:
                 """Validate execution consistency."""
                 max_threads = (
                     c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD // 3
@@ -3274,45 +2528,27 @@ class FlextMeltanoModels(FlextCliModels):
             status: Annotated[str, Field(description="Execution status")]
             start_time: Annotated[
                 datetime,
-                Field(
-                    default_factory=lambda: datetime.now(tz=UTC),
-                    description="Execution start time",
-                ),
+                Field(default_factory=lambda: datetime.now(tz=UTC), description="Execution start time"),
             ]
             end_time: Annotated[
                 datetime | None,
-                Field(
-                    default=None,
-                    description="Execution end time",
-                ),
+                Field(default=None, description="Execution end time"),
             ]
             duration_seconds: Annotated[
                 float | None,
-                Field(
-                    default=None,
-                    description="Execution duration in seconds",
-                ),
+                Field(default=None, description="Execution duration in seconds"),
             ]
             records_processed: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of records processed",
-                ),
+                Field(default=0, description="Number of records processed"),
             ]
             error_message: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Error message if failed",
-                ),
+                Field(default=None, description="Error message if failed"),
             ]
             metadata: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    default_factory=dict,
-                    description="Additional execution metadata",
-                ),
+                Field(default_factory=dict, description="Additional execution metadata"),
             ]
 
             @computed_field
@@ -3395,44 +2631,26 @@ class FlextMeltanoModels(FlextCliModels):
             pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
             source_result: Annotated[
                 FlextMeltanoModels.Meltano.ExecutionResult | None,
-                Field(
-                    default=None,
-                    description="Source execution result",
-                ),
+                Field(default=None, description="Source execution result"),
             ]
             sink_result: Annotated[
                 FlextMeltanoModels.Meltano.ExecutionResult | None,
-                Field(
-                    default=None,
-                    description="Sink execution result",
-                ),
+                Field(default=None, description="Sink execution result"),
             ]
             transformation_result: FlextMeltanoModels.Meltano.ExecutionResult | None = (
-                Field(
-                    default=None,
-                    description="Transformation execution result",
-                )
+                Field(default=None, description="Transformation execution result")
             )
             overall_status: Annotated[
                 str,
-                Field(
-                    default=c.Meltano.Enums.OperationStatus.PENDING,
-                    description="Overall pipeline status",
-                ),
+                Field(default=c.Meltano.Enums.OperationStatus.PENDING, description="Overall pipeline status"),
             ]
             total_records: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Total records processed",
-                ),
+                Field(default=0, description="Total records processed"),
             ]
             pipeline_metadata: Annotated[
                 dict[str, t.Scalar],
-                Field(
-                    default_factory=dict,
-                    description="Pipeline execution metadata",
-                ),
+                Field(default_factory=dict, description="Pipeline execution metadata"),
             ]
 
             @computed_field
@@ -3481,8 +2699,7 @@ class FlextMeltanoModels(FlextCliModels):
                     and self.transformation_result
                     and self.transformation_result.status
                     == c.Meltano.Enums.OperationStatus.SUCCESS
-                    and self.transformation_result.error_message is None,
-                )
+                    and self.transformation_result.error_message is None)
 
             @computed_field
             def total_duration_seconds(self) -> float:
@@ -3543,8 +2760,7 @@ class FlextMeltanoModels(FlextCliModels):
                     and self.transformation_result
                     and self.transformation_result.status
                     == c.Meltano.Enums.OperationStatus.SUCCESS
-                    and self.transformation_result.error_message is None,
-                )
+                    and self.transformation_result.error_message is None)
                 if (
                     all_successful
                     and self.overall_status != c.Meltano.Enums.OperationStatus.SUCCESS
@@ -3573,38 +2789,23 @@ class FlextMeltanoModels(FlextCliModels):
 
             success: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Whether the run was successful",
-                ),
+                Field(default=True, description="Whether the run was successful"),
             ]
             models_run: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of models executed",
-                ),
+                Field(default=0, description="Number of models executed"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default="completed",
-                    description="Run status (completed, failed, etc.)",
-                ),
+                Field(default="completed", description="Run status (completed, failed, etc.)"),
             ]
             error_message: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Error message if run failed",
-                ),
+                Field(default=None, description="Error message if run failed"),
             ]
             execution_time_seconds: Annotated[
                 float | None,
-                Field(
-                    default=None,
-                    description="Total execution time in seconds",
-                ),
+                Field(default=None, description="Total execution time in seconds"),
             ]
 
         class DbtTestResult(FlextModels.ArbitraryTypesModel):
@@ -3612,52 +2813,31 @@ class FlextMeltanoModels(FlextCliModels):
 
             success: Annotated[
                 bool,
-                Field(
-                    default=True,
-                    description="Whether tests passed",
-                ),
+                Field(default=True, description="Whether tests passed"),
             ]
             tests_run: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of tests executed",
-                ),
+                Field(default=0, description="Number of tests executed"),
             ]
             tests_passed: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of tests passed",
-                ),
+                Field(default=0, description="Number of tests passed"),
             ]
             tests_failed: Annotated[
                 int,
-                Field(
-                    default=0,
-                    description="Number of tests failed",
-                ),
+                Field(default=0, description="Number of tests failed"),
             ]
             status: Annotated[
                 str,
-                Field(
-                    default="completed",
-                    description="Test status (completed, failed, etc.)",
-                ),
+                Field(default="completed", description="Test status (completed, failed, etc.)"),
             ]
             error_message: Annotated[
                 str | None,
-                Field(
-                    default=None,
-                    description="Error message if tests failed",
-                ),
+                Field(default=None, description="Error message if tests failed"),
             ]
             execution_time_seconds: Annotated[
                 float | None,
-                Field(
-                    default=None,
-                    description="Total execution time in seconds",
-                ),
+                Field(default=None, description="Total execution time in seconds"),
             ]
 
 
