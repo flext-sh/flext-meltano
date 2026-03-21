@@ -48,18 +48,22 @@ if TYPE_CHECKING:
         FlextMeltanoConstants,
         FlextMeltanoConstants as c,
     )
-    from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
-    from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
-    from flext_meltano.dbt.service import FlextMeltanoDbtService
+    from flext_meltano.dbt import (
+        FlextMeltanoDbtProjectManager,
+        FlextMeltanoDbtRunner,
+        FlextMeltanoDbtService,
+    )
     from flext_meltano.execution_result import FlextMeltanoExecutionResult
     from flext_meltano.executor import FlextMeltanoExecutor
     from flext_meltano.file_managers import FlextMeltanoFileManagers
     from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-    from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
-    from flext_meltano.meltano.plugins import FlextMeltanoComponentService
-    from flext_meltano.meltano.project import FlextMeltanoProjectManager
-    from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
-    from flext_meltano.meltano.service import FlextMeltanoMeltanoService
+    from flext_meltano.meltano import (
+        FlextMeltanoComponentService,
+        FlextMeltanoDbtTransformationRunner,
+        FlextMeltanoMeltanoService,
+        FlextMeltanoOrchestrationService,
+        FlextMeltanoProjectManager,
+    )
     from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
     from flext_meltano.project_service import FlextMeltanoProjectService
     from flext_meltano.protocols import (
@@ -68,16 +72,16 @@ if TYPE_CHECKING:
     )
     from flext_meltano.services import FlextMeltanoService
     from flext_meltano.settings import FlextMeltanoSettings
-    from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
-    from flext_meltano.singer.protocols import (
+    from flext_meltano.singer import (
+        FlextMeltanoCatalogManager,
         FlextMeltanoPluginProtocols,
+        FlextMeltanoSingerCliTranslator,
         FlextMeltanoSingerProtocols,
+        FlextMeltanoSingerService,
+        FlextMeltanoStateManager,
+        FlextMeltanoTapAbstractions,
+        FlextMeltanoTargetAbstractions,
     )
-    from flext_meltano.singer.service import FlextMeltanoSingerService
-    from flext_meltano.singer.state import FlextMeltanoStateManager
-    from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
-    from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
-    from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
     from flext_meltano.typings import FlextMeltanoTypes, FlextMeltanoTypes as t
     from flext_meltano.utilities import (
         FlextMeltanoUtilities,
@@ -95,7 +99,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoBridge": ("flext_meltano.bridge", "FlextMeltanoBridge"),
     "FlextMeltanoCLI": ("flext_meltano.cli", "FlextMeltanoCLI"),
     "FlextMeltanoCatalogManager": (
-        "flext_meltano.singer.catalog",
+        "flext_meltano.singer",
         "FlextMeltanoCatalogManager",
     ),
     "FlextMeltanoCommandRouter": (
@@ -103,19 +107,19 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextMeltanoCommandRouter",
     ),
     "FlextMeltanoComponentService": (
-        "flext_meltano.meltano.plugins",
+        "flext_meltano.meltano",
         "FlextMeltanoComponentService",
     ),
     "FlextMeltanoConstants": ("flext_meltano.constants", "FlextMeltanoConstants"),
     "FlextMeltanoDbtManager": ("flext_meltano.cli_managers", "FlextMeltanoDbtManager"),
     "FlextMeltanoDbtProjectManager": (
-        "flext_meltano.dbt.project",
+        "flext_meltano.dbt",
         "FlextMeltanoDbtProjectManager",
     ),
-    "FlextMeltanoDbtRunner": ("flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"),
-    "FlextMeltanoDbtService": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
+    "FlextMeltanoDbtRunner": ("flext_meltano.dbt", "FlextMeltanoDbtRunner"),
+    "FlextMeltanoDbtService": ("flext_meltano.dbt", "FlextMeltanoDbtService"),
     "FlextMeltanoDbtTransformationRunner": (
-        "flext_meltano.meltano.runner",
+        "flext_meltano.meltano",
         "FlextMeltanoDbtTransformationRunner",
     ),
     "FlextMeltanoExecutionResult": (
@@ -132,12 +136,12 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextMeltanoLibraryRunner",
     ),
     "FlextMeltanoMeltanoService": (
-        "flext_meltano.meltano.service",
+        "flext_meltano.meltano",
         "FlextMeltanoMeltanoService",
     ),
     "FlextMeltanoModels": ("flext_meltano.models", "FlextMeltanoModels"),
     "FlextMeltanoOrchestrationService": (
-        "flext_meltano.meltano.pipelines",
+        "flext_meltano.meltano",
         "FlextMeltanoOrchestrationService",
     ),
     "FlextMeltanoPipelineManager": (
@@ -149,11 +153,11 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextMeltanoPluginManager",
     ),
     "FlextMeltanoPluginProtocols": (
-        "flext_meltano.singer.protocols",
+        "flext_meltano.singer",
         "FlextMeltanoPluginProtocols",
     ),
     "FlextMeltanoProjectManager": (
-        "flext_meltano.meltano.project",
+        "flext_meltano.meltano",
         "FlextMeltanoProjectManager",
     ),
     "FlextMeltanoProjectService": (
@@ -164,7 +168,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoService": ("flext_meltano.services", "FlextMeltanoService"),
     "FlextMeltanoSettings": ("flext_meltano.settings", "FlextMeltanoSettings"),
     "FlextMeltanoSingerCliTranslator": (
-        "flext_meltano.singer.translator",
+        "flext_meltano.singer",
         "FlextMeltanoSingerCliTranslator",
     ),
     "FlextMeltanoSingerManager": (
@@ -172,27 +176,21 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextMeltanoSingerManager",
     ),
     "FlextMeltanoSingerProtocols": (
-        "flext_meltano.singer.protocols",
+        "flext_meltano.singer",
         "FlextMeltanoSingerProtocols",
     ),
-    "FlextMeltanoSingerService": (
-        "flext_meltano.singer.service",
-        "FlextMeltanoSingerService",
-    ),
-    "FlextMeltanoStateManager": (
-        "flext_meltano.singer.state",
-        "FlextMeltanoStateManager",
-    ),
+    "FlextMeltanoSingerService": ("flext_meltano.singer", "FlextMeltanoSingerService"),
+    "FlextMeltanoStateManager": ("flext_meltano.singer", "FlextMeltanoStateManager"),
     "FlextMeltanoStatusManager": (
         "flext_meltano.cli_managers",
         "FlextMeltanoStatusManager",
     ),
     "FlextMeltanoTapAbstractions": (
-        "flext_meltano.singer.tap",
+        "flext_meltano.singer",
         "FlextMeltanoTapAbstractions",
     ),
     "FlextMeltanoTargetAbstractions": (
-        "flext_meltano.singer.target",
+        "flext_meltano.singer",
         "FlextMeltanoTargetAbstractions",
     ),
     "FlextMeltanoTypes": ("flext_meltano.typings", "FlextMeltanoTypes"),

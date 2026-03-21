@@ -49,12 +49,71 @@ if TYPE_CHECKING:
         test_meltano_project_dir,
     )
     from .constants import TestsFlextMeltanoConstants, TestsFlextMeltanoConstants as c
-    from .helpers.docker_test_manager import ContainerManager, Tk
-    from .integration.test_docker_integration import TestDockerIntegration
+    from .helpers import ContainerManager, Tk
+    from .integration import TestDockerIntegration
     from .models import TestsFlextMeltanoModels, TestsFlextMeltanoModels as m
     from .protocols import TestsFlextMeltanoProtocols, TestsFlextMeltanoProtocols as p
     from .typings import TestsFlextMeltanoTypes, TestsFlextMeltanoTypes as t
-    from .unit.pipeline_cli_managers_tests import (
+    from .unit import (
+        Testc,
+        TestCliModelConverterWithDbtRunParams,
+        TestCliModelConverterWithPipelineRunParams,
+        TestCliModelConverterWithTapRunParams,
+        TestCliModelConverterWithTargetRunParams,
+        TestDbtProjectModelEnhanced,
+        TestDbtService,
+        TestFlextDbtProgrammaticRunner,
+        TestFlextMeltanoCatalogOperations,
+        TestFlextMeltanoDataOperations,
+        TestFlextMeltanoDbtOperations,
+        TestFlextMeltanoELTPipeline,
+        TestFlextMeltanoErrorHandling,
+        TestFlextMeltanoExecuteMethod,
+        TestFlextMeltanoExecutionResult,
+        TestFlextMeltanoExecutorComplete,
+        TestFlextMeltanoFileManagersComprehensive,
+        TestFlextMeltanoInitialization,
+        TestFlextMeltanoIntegration,
+        TestFlextMeltanoLibraryRunner,
+        TestFlextMeltanoPerformance,
+        TestFlextMeltanoPluginOperations,
+        TestFlextMeltanoPluginProtocolsUnified,
+        TestFlextMeltanoProjectOperations,
+        TestFlextMeltanoServiceInitialization,
+        TestFlextMeltanoSettings,
+        TestFlextMeltanoSettingsConstants,
+        TestFlextMeltanoSettingsEdgeCases,
+        TestFlextMeltanoSettingsEnums,
+        TestFlextMeltanoSettingsIntegration,
+        TestFlextMeltanoSingerCliTranslatorDbtRun,
+        TestFlextMeltanoSingerCliTranslatorExecuteCommand,
+        TestFlextMeltanoSingerCliTranslatorPipelineRun,
+        TestFlextMeltanoSingerCliTranslatorTapRun,
+        TestFlextMeltanoSingerCliTranslatorTargetRun,
+        TestFlextMeltanoSuccessPaths,
+        TestFlextMeltanoTapAbstractionsComplete,
+        TestFlextMeltanoTargetAbstractionsComplete,
+        TestFlextMeltanoTypes,
+        TestFlextMeltanoUtilitiesEnhanced,
+        TestFlextMeltanoValidatorsComprehensive,
+        TestFlextSingerProtocolManager,
+        TestFlextSingerTypes,
+        TestMeltanoProjectModelEnhanced,
+        TestModelIntegration,
+        TestPluginModelEnhanced,
+        TestProjectAdapterIntegration,
+        TestServiceArchitecture,
+        TestServiceErrorHandling,
+        TestServiceFactoryMethods,
+        TestServiceGenericMethods,
+        TestServiceIntegration,
+        TestStreamInfoEnhanced,
+        TestTapConfigEnhanced,
+        TestTapService,
+        TestTargetConfigEnhanced,
+        TestTargetService,
+        logger,
+        pytestmark,
         test_create_pipeline_creates_directory_and_configuration,
         test_create_pipeline_fails_without_configuration,
         test_delete_pipeline_removes_configuration_directory,
@@ -63,287 +122,155 @@ if TYPE_CHECKING:
         test_get_pipeline_status_checks_process_state,
         test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
     )
-    from .unit.test_api import (
-        TestFlextMeltanoCatalogOperations,
-        TestFlextMeltanoDataOperations,
-        TestFlextMeltanoDbtOperations,
-        TestFlextMeltanoELTPipeline,
-        TestFlextMeltanoErrorHandling,
-        TestFlextMeltanoExecuteMethod,
-        TestFlextMeltanoInitialization,
-        TestFlextMeltanoIntegration,
-        TestFlextMeltanoPerformance,
-        TestFlextMeltanoPluginOperations,
-        TestFlextMeltanoProjectOperations,
-        TestFlextMeltanoSuccessPaths,
-        pytestmark,
-    )
-    from .unit.test_cli_integration import (
-        TestCliModelConverterWithDbtRunParams,
-        TestCliModelConverterWithPipelineRunParams,
-        TestCliModelConverterWithTapRunParams,
-        TestCliModelConverterWithTargetRunParams,
-    )
-    from .unit.test_config import (
-        TestFlextMeltanoSettings,
-        TestFlextMeltanoSettingsConstants,
-        TestFlextMeltanoSettingsEdgeCases,
-        TestFlextMeltanoSettingsEnums,
-        TestFlextMeltanoSettingsIntegration,
-    )
-    from .unit.test_constants import Testc
-    from .unit.test_execution_result import TestFlextMeltanoExecutionResult
-    from .unit.test_executors import TestFlextMeltanoExecutorComplete
-    from .unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
-    from .unit.test_library_runner import (
-        TestFlextDbtProgrammaticRunner,
-        TestFlextMeltanoLibraryRunner,
-        TestFlextSingerProtocolManager,
-        TestProjectAdapterIntegration,
-    )
-    from .unit.test_models import (
-        TestDbtProjectModelEnhanced,
-        TestMeltanoProjectModelEnhanced,
-        TestModelIntegration,
-        TestPluginModelEnhanced,
-        TestStreamInfoEnhanced,
-        TestTapConfigEnhanced,
-        TestTargetConfigEnhanced,
-    )
-    from .unit.test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
-    from .unit.test_services import (
-        TestDbtService,
-        TestFlextMeltanoServiceInitialization,
-        TestServiceArchitecture,
-        TestServiceErrorHandling,
-        TestServiceFactoryMethods,
-        TestServiceGenericMethods,
-        TestServiceIntegration,
-        TestTapService,
-        TestTargetService,
-    )
-    from .unit.test_singer_cli_translator import (
-        TestFlextMeltanoSingerCliTranslatorDbtRun,
-        TestFlextMeltanoSingerCliTranslatorExecuteCommand,
-        TestFlextMeltanoSingerCliTranslatorPipelineRun,
-        TestFlextMeltanoSingerCliTranslatorTapRun,
-        TestFlextMeltanoSingerCliTranslatorTargetRun,
-    )
-    from .unit.test_singer_types import TestFlextSingerTypes
-    from .unit.test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
-    from .unit.test_target_abstractions import (
-        TestFlextMeltanoTargetAbstractionsComplete,
-        logger,
-    )
-    from .unit.test_typings import TestFlextMeltanoTypes
-    from .unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
-    from .unit.test_validators import TestFlextMeltanoValidatorsComprehensive
     from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "CliRunner": ("tests.conftest", "CliRunner"),
-    "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
+    "ContainerManager": ("tests.helpers", "ContainerManager"),
     "MockCliResult": ("tests.conftest", "MockCliResult"),
     "MockCliRunner": ("tests.conftest", "MockCliRunner"),
     "MockMeltanoService": ("tests.conftest", "MockMeltanoService"),
     "MockSingerTap": ("tests.conftest", "MockSingerTap"),
     "MockSingerTarget": ("tests.conftest", "MockSingerTarget"),
     "TestCliModelConverterWithDbtRunParams": (
-        "tests.unit.test_cli_integration",
+        "tests.unit",
         "TestCliModelConverterWithDbtRunParams",
     ),
     "TestCliModelConverterWithPipelineRunParams": (
-        "tests.unit.test_cli_integration",
+        "tests.unit",
         "TestCliModelConverterWithPipelineRunParams",
     ),
     "TestCliModelConverterWithTapRunParams": (
-        "tests.unit.test_cli_integration",
+        "tests.unit",
         "TestCliModelConverterWithTapRunParams",
     ),
     "TestCliModelConverterWithTargetRunParams": (
-        "tests.unit.test_cli_integration",
+        "tests.unit",
         "TestCliModelConverterWithTargetRunParams",
     ),
-    "TestDbtProjectModelEnhanced": (
-        "tests.unit.test_models",
-        "TestDbtProjectModelEnhanced",
-    ),
-    "TestDbtService": ("tests.unit.test_services", "TestDbtService"),
-    "TestDockerIntegration": (
-        "tests.integration.test_docker_integration",
-        "TestDockerIntegration",
-    ),
-    "TestFlextDbtProgrammaticRunner": (
-        "tests.unit.test_library_runner",
-        "TestFlextDbtProgrammaticRunner",
-    ),
+    "TestDbtProjectModelEnhanced": ("tests.unit", "TestDbtProjectModelEnhanced"),
+    "TestDbtService": ("tests.unit", "TestDbtService"),
+    "TestDockerIntegration": ("tests.integration", "TestDockerIntegration"),
+    "TestFlextDbtProgrammaticRunner": ("tests.unit", "TestFlextDbtProgrammaticRunner"),
     "TestFlextMeltanoCatalogOperations": (
-        "tests.unit.test_api",
+        "tests.unit",
         "TestFlextMeltanoCatalogOperations",
     ),
-    "TestFlextMeltanoDataOperations": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoDataOperations",
-    ),
-    "TestFlextMeltanoDbtOperations": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoDbtOperations",
-    ),
-    "TestFlextMeltanoELTPipeline": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoELTPipeline",
-    ),
-    "TestFlextMeltanoErrorHandling": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoErrorHandling",
-    ),
-    "TestFlextMeltanoExecuteMethod": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoExecuteMethod",
-    ),
+    "TestFlextMeltanoDataOperations": ("tests.unit", "TestFlextMeltanoDataOperations"),
+    "TestFlextMeltanoDbtOperations": ("tests.unit", "TestFlextMeltanoDbtOperations"),
+    "TestFlextMeltanoELTPipeline": ("tests.unit", "TestFlextMeltanoELTPipeline"),
+    "TestFlextMeltanoErrorHandling": ("tests.unit", "TestFlextMeltanoErrorHandling"),
+    "TestFlextMeltanoExecuteMethod": ("tests.unit", "TestFlextMeltanoExecuteMethod"),
     "TestFlextMeltanoExecutionResult": (
-        "tests.unit.test_execution_result",
+        "tests.unit",
         "TestFlextMeltanoExecutionResult",
     ),
     "TestFlextMeltanoExecutorComplete": (
-        "tests.unit.test_executors",
+        "tests.unit",
         "TestFlextMeltanoExecutorComplete",
     ),
     "TestFlextMeltanoFileManagersComprehensive": (
-        "tests.unit.test_file_managers",
+        "tests.unit",
         "TestFlextMeltanoFileManagersComprehensive",
     ),
-    "TestFlextMeltanoInitialization": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoInitialization",
-    ),
-    "TestFlextMeltanoIntegration": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoIntegration",
-    ),
-    "TestFlextMeltanoLibraryRunner": (
-        "tests.unit.test_library_runner",
-        "TestFlextMeltanoLibraryRunner",
-    ),
-    "TestFlextMeltanoPerformance": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoPerformance",
-    ),
+    "TestFlextMeltanoInitialization": ("tests.unit", "TestFlextMeltanoInitialization"),
+    "TestFlextMeltanoIntegration": ("tests.unit", "TestFlextMeltanoIntegration"),
+    "TestFlextMeltanoLibraryRunner": ("tests.unit", "TestFlextMeltanoLibraryRunner"),
+    "TestFlextMeltanoPerformance": ("tests.unit", "TestFlextMeltanoPerformance"),
     "TestFlextMeltanoPluginOperations": (
-        "tests.unit.test_api",
+        "tests.unit",
         "TestFlextMeltanoPluginOperations",
     ),
     "TestFlextMeltanoPluginProtocolsUnified": (
-        "tests.unit.test_plugin_protocols",
+        "tests.unit",
         "TestFlextMeltanoPluginProtocolsUnified",
     ),
     "TestFlextMeltanoProjectOperations": (
-        "tests.unit.test_api",
+        "tests.unit",
         "TestFlextMeltanoProjectOperations",
     ),
     "TestFlextMeltanoServiceInitialization": (
-        "tests.unit.test_services",
+        "tests.unit",
         "TestFlextMeltanoServiceInitialization",
     ),
-    "TestFlextMeltanoSettings": ("tests.unit.test_config", "TestFlextMeltanoSettings"),
+    "TestFlextMeltanoSettings": ("tests.unit", "TestFlextMeltanoSettings"),
     "TestFlextMeltanoSettingsConstants": (
-        "tests.unit.test_config",
+        "tests.unit",
         "TestFlextMeltanoSettingsConstants",
     ),
     "TestFlextMeltanoSettingsEdgeCases": (
-        "tests.unit.test_config",
+        "tests.unit",
         "TestFlextMeltanoSettingsEdgeCases",
     ),
-    "TestFlextMeltanoSettingsEnums": (
-        "tests.unit.test_config",
-        "TestFlextMeltanoSettingsEnums",
-    ),
+    "TestFlextMeltanoSettingsEnums": ("tests.unit", "TestFlextMeltanoSettingsEnums"),
     "TestFlextMeltanoSettingsIntegration": (
-        "tests.unit.test_config",
+        "tests.unit",
         "TestFlextMeltanoSettingsIntegration",
     ),
     "TestFlextMeltanoSingerCliTranslatorDbtRun": (
-        "tests.unit.test_singer_cli_translator",
+        "tests.unit",
         "TestFlextMeltanoSingerCliTranslatorDbtRun",
     ),
     "TestFlextMeltanoSingerCliTranslatorExecuteCommand": (
-        "tests.unit.test_singer_cli_translator",
+        "tests.unit",
         "TestFlextMeltanoSingerCliTranslatorExecuteCommand",
     ),
     "TestFlextMeltanoSingerCliTranslatorPipelineRun": (
-        "tests.unit.test_singer_cli_translator",
+        "tests.unit",
         "TestFlextMeltanoSingerCliTranslatorPipelineRun",
     ),
     "TestFlextMeltanoSingerCliTranslatorTapRun": (
-        "tests.unit.test_singer_cli_translator",
+        "tests.unit",
         "TestFlextMeltanoSingerCliTranslatorTapRun",
     ),
     "TestFlextMeltanoSingerCliTranslatorTargetRun": (
-        "tests.unit.test_singer_cli_translator",
+        "tests.unit",
         "TestFlextMeltanoSingerCliTranslatorTargetRun",
     ),
-    "TestFlextMeltanoSuccessPaths": (
-        "tests.unit.test_api",
-        "TestFlextMeltanoSuccessPaths",
-    ),
+    "TestFlextMeltanoSuccessPaths": ("tests.unit", "TestFlextMeltanoSuccessPaths"),
     "TestFlextMeltanoTapAbstractionsComplete": (
-        "tests.unit.test_tap_abstractions",
+        "tests.unit",
         "TestFlextMeltanoTapAbstractionsComplete",
     ),
     "TestFlextMeltanoTargetAbstractionsComplete": (
-        "tests.unit.test_target_abstractions",
+        "tests.unit",
         "TestFlextMeltanoTargetAbstractionsComplete",
     ),
-    "TestFlextMeltanoTypes": ("tests.unit.test_typings", "TestFlextMeltanoTypes"),
+    "TestFlextMeltanoTypes": ("tests.unit", "TestFlextMeltanoTypes"),
     "TestFlextMeltanoUtilitiesEnhanced": (
-        "tests.unit.test_utilities",
+        "tests.unit",
         "TestFlextMeltanoUtilitiesEnhanced",
     ),
     "TestFlextMeltanoValidatorsComprehensive": (
-        "tests.unit.test_validators",
+        "tests.unit",
         "TestFlextMeltanoValidatorsComprehensive",
     ),
-    "TestFlextSingerProtocolManager": (
-        "tests.unit.test_library_runner",
-        "TestFlextSingerProtocolManager",
-    ),
-    "TestFlextSingerTypes": ("tests.unit.test_singer_types", "TestFlextSingerTypes"),
+    "TestFlextSingerProtocolManager": ("tests.unit", "TestFlextSingerProtocolManager"),
+    "TestFlextSingerTypes": ("tests.unit", "TestFlextSingerTypes"),
     "TestMeltanoProjectModelEnhanced": (
-        "tests.unit.test_models",
+        "tests.unit",
         "TestMeltanoProjectModelEnhanced",
     ),
-    "TestModelIntegration": ("tests.unit.test_models", "TestModelIntegration"),
-    "TestPluginModelEnhanced": ("tests.unit.test_models", "TestPluginModelEnhanced"),
-    "TestProjectAdapterIntegration": (
-        "tests.unit.test_library_runner",
-        "TestProjectAdapterIntegration",
-    ),
-    "TestServiceArchitecture": ("tests.unit.test_services", "TestServiceArchitecture"),
-    "TestServiceErrorHandling": (
-        "tests.unit.test_services",
-        "TestServiceErrorHandling",
-    ),
-    "TestServiceFactoryMethods": (
-        "tests.unit.test_services",
-        "TestServiceFactoryMethods",
-    ),
-    "TestServiceGenericMethods": (
-        "tests.unit.test_services",
-        "TestServiceGenericMethods",
-    ),
-    "TestServiceIntegration": ("tests.unit.test_services", "TestServiceIntegration"),
-    "TestStreamInfoEnhanced": ("tests.unit.test_models", "TestStreamInfoEnhanced"),
-    "TestTapConfigEnhanced": ("tests.unit.test_models", "TestTapConfigEnhanced"),
-    "TestTapService": ("tests.unit.test_services", "TestTapService"),
-    "TestTargetConfigEnhanced": ("tests.unit.test_models", "TestTargetConfigEnhanced"),
-    "TestTargetService": ("tests.unit.test_services", "TestTargetService"),
-    "Testc": ("tests.unit.test_constants", "Testc"),
+    "TestModelIntegration": ("tests.unit", "TestModelIntegration"),
+    "TestPluginModelEnhanced": ("tests.unit", "TestPluginModelEnhanced"),
+    "TestProjectAdapterIntegration": ("tests.unit", "TestProjectAdapterIntegration"),
+    "TestServiceArchitecture": ("tests.unit", "TestServiceArchitecture"),
+    "TestServiceErrorHandling": ("tests.unit", "TestServiceErrorHandling"),
+    "TestServiceFactoryMethods": ("tests.unit", "TestServiceFactoryMethods"),
+    "TestServiceGenericMethods": ("tests.unit", "TestServiceGenericMethods"),
+    "TestServiceIntegration": ("tests.unit", "TestServiceIntegration"),
+    "TestStreamInfoEnhanced": ("tests.unit", "TestStreamInfoEnhanced"),
+    "TestTapConfigEnhanced": ("tests.unit", "TestTapConfigEnhanced"),
+    "TestTapService": ("tests.unit", "TestTapService"),
+    "TestTargetConfigEnhanced": ("tests.unit", "TestTargetConfigEnhanced"),
+    "TestTargetService": ("tests.unit", "TestTargetService"),
+    "Testc": ("tests.unit", "Testc"),
     "TestsFlextMeltanoConstants": ("tests.constants", "TestsFlextMeltanoConstants"),
     "TestsFlextMeltanoModels": ("tests.models", "TestsFlextMeltanoModels"),
     "TestsFlextMeltanoProtocols": ("tests.protocols", "TestsFlextMeltanoProtocols"),
     "TestsFlextMeltanoTypes": ("tests.typings", "TestsFlextMeltanoTypes"),
     "TestsFlextMeltanoUtilities": ("tests.utilities", "TestsFlextMeltanoUtilities"),
-    "Tk": ("tests.helpers.docker_test_manager", "Tk"),
+    "Tk": ("tests.helpers", "Tk"),
     "c": ("tests.constants", "TestsFlextMeltanoConstants"),
     "d": ("flext_meltano", "d"),
     "docker_manager": ("tests.conftest", "docker_manager"),
@@ -353,7 +280,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "helpers": ("tests.helpers", ""),
     "integration": ("tests.integration", ""),
     "job_run_config": ("tests.conftest", "job_run_config"),
-    "logger": ("tests.unit.test_target_abstractions", "logger"),
+    "logger": ("tests.unit", "logger"),
     "m": ("tests.models", "TestsFlextMeltanoModels"),
     "meltano_cli_runner": ("tests.conftest", "meltano_cli_runner"),
     "meltano_invoke_args": ("tests.conftest", "meltano_invoke_args"),
@@ -367,7 +294,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "pipeline_execution_config": ("tests.conftest", "pipeline_execution_config"),
     "postgres_service": ("tests.conftest", "postgres_service"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
-    "pytestmark": ("tests.unit.test_api", "pytestmark"),
+    "pytestmark": ("tests.unit", "pytestmark"),
     "r": ("flext_meltano", "r"),
     "redis_service": ("tests.conftest", "redis_service"),
     "s": ("flext_meltano", "s"),
@@ -381,33 +308,33 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "tap_csv_config": ("tests.conftest", "tap_csv_config"),
     "target_csv_config": ("tests.conftest", "target_csv_config"),
     "test_create_pipeline_creates_directory_and_configuration": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_create_pipeline_creates_directory_and_configuration",
     ),
     "test_create_pipeline_fails_without_configuration": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_create_pipeline_fails_without_configuration",
     ),
     "test_delete_pipeline_removes_configuration_directory": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_delete_pipeline_removes_configuration_directory",
     ),
     "test_environment_config": ("tests.conftest", "test_environment_config"),
     "test_execute_pipeline_fails_when_pipeline_execution_is_not_configured": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_execute_pipeline_fails_when_pipeline_execution_is_not_configured",
     ),
     "test_execute_pipeline_runs_real_subprocess_contract": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_execute_pipeline_runs_real_subprocess_contract",
     ),
     "test_get_pipeline_status_checks_process_state": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_get_pipeline_status_checks_process_state",
     ),
     "test_meltano_project_dir": ("tests.conftest", "test_meltano_project_dir"),
     "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations": (
-        "tests.unit.pipeline_cli_managers_tests",
+        "tests.unit",
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
     "u": ("tests.utilities", "TestsFlextMeltanoUtilities"),
