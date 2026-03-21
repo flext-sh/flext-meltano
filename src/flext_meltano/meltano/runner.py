@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from algar_oud_mig.base import s
+from flext_core import s
 from flext_core.protocols import FlextProtocols as p
 from flext_core.result import r
 from flext_core.typings import t

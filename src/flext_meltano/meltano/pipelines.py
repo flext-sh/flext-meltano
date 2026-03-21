@@ -16,7 +16,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
-from algar_oud_mig.base import s
+from flext_core import s
 from flext_core.constants import c
 from flext_core.models import m
 from flext_core.protocols import FlextProtocols as p

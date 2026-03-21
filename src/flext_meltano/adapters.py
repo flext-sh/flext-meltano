@@ -19,8 +19,7 @@ from pathlib import Path
 from typing import override
 
 import meltano
-from algar_oud_mig.base import s
-from flext_core import FlextSettings
+from flext_core import FlextSettings, s
 from flext_core.result import r
 from flext_core.typings import t
 from flext_core.utilities import u
