@@ -83,9 +83,6 @@ class FlextMeltanoConstants(FlextCliConstants):
             POSTGRES: Final[int] = 5432
             MYSQL: Final[int] = 3306
             ORACLE: Final[int] = 1521
-            PERFORMANCE_LEVEL = FlextConstants.LogLevel.WARNING
-            MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
-            MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
             HIGH_MEMORY_THRESHOLD: Final[int] = 1073741824
 
         class Plugin:
@@ -265,15 +262,6 @@ class FlextMeltanoConstants(FlextCliConstants):
             )
             MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
             MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
-
-        class Model:
-            """Model maturity and validation constants."""
-
-            MATURITY_MATURE_ENV_COUNT: Final[int] = 3
-            MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 1
-            MATURITY_PROTOTYPE_ENV_COUNT: Final[int] = 0
-            COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 5
-            COMPLEXITY_SIMPLE_MAX_SETTINGS: Final[int] = 20
 
         class Service:
             """Service validation constants."""

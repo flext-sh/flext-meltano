@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from typing import Protocol
 
 from flext_cli import FlextCli
 from flext_core import FlextLogger
@@ -27,16 +26,7 @@ from flext_meltano.cli_managers import (
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
-    Manager,
-    SingerManager,
-    StatusManager,
 )
-
-
-class _Output(Protocol):
-    """Protocol for CLI output with print_message method."""
-
-    def print_message(self, message: str, style: str | None = None) -> None: ...
 
 
 class FlextMeltanoCLI:
@@ -48,13 +38,13 @@ class FlextMeltanoCLI:
     """
 
     logger: p.Logger
-    output: _Output
+    output: p.Meltano.Output
     _api: FlextMeltano
-    pipeline_manager: Manager
-    singer_manager: SingerManager
-    dbt_manager: Manager
-    plugin_manager: Manager
-    status_manager: StatusManager
+    pipeline_manager: p.Meltano.CLIManager
+    singer_manager: p.Meltano.SingerManager
+    dbt_manager: p.Meltano.CLIManager
+    plugin_manager: p.Meltano.CLIManager
+    status_manager: p.Meltano.StatusManager
     command_router: FlextMeltanoCommandRouter
 
     def __init__(self) -> None:

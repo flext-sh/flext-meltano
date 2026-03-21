@@ -170,10 +170,18 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         @runtime_checkable
+        class Output(Protocol):
+            """Protocol for CLI output with print_message method."""
+
+            def print_message(self, message: str, style: str | None = None) -> None:
+                """Print a message to output."""
+                ...
+
+        @runtime_checkable
         class CLIManager(Protocol):
             """Base protocol for CLI managers."""
 
-            def handle_command(self, args: list[str]) -> int:
+            def handle_command(self, args: list[str]) -> FlextCliProtocols.Result[None]:
                 """Handle CLI command."""
                 ...
 
@@ -181,15 +189,19 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class SingerManager(Protocol):
             """Protocol for Singer CLI manager."""
 
-            def handle_command(self, args: list[str]) -> int:
+            def handle_command(self, args: list[str]) -> FlextCliProtocols.Result[None]:
                 """Handle CLI command."""
                 ...
 
-            def handle_tap_command(self, args: list[str]) -> int:
+            def handle_tap_command(
+                self, args: list[str]
+            ) -> FlextCliProtocols.Result[None]:
                 """Handle tap command."""
                 ...
 
-            def handle_target_command(self, args: list[str]) -> int:
+            def handle_target_command(
+                self, args: list[str]
+            ) -> FlextCliProtocols.Result[None]:
                 """Handle target command."""
                 ...
 
@@ -197,11 +209,11 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class StatusManager(Protocol):
             """Protocol for Status CLI manager."""
 
-            def handle_command(self, args: list[str]) -> int:
+            def handle_command(self, args: list[str]) -> FlextCliProtocols.Result[None]:
                 """Handle CLI command."""
                 ...
 
-            def handle_version_command(self) -> int:
+            def handle_version_command(self) -> FlextCliProtocols.Result[None]:
                 """Handle version command."""
                 ...
 
@@ -313,14 +325,18 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
         class SingerTap(Protocol):
-            """Singer Tap protocol definition."""
+            """Singer Tap protocol definition for data extraction.
+
+            Defines the interface for Singer data extraction (tap) components
+            that implement the Singer protocol for data source integration.
+            """
 
             streams: list[str]
             name: str
             state: m.Meltano.SingerStateMessage
 
             def discover(self) -> m.Meltano.SingerCatalog:
-                """Discover and return the tap Singer catalog."""
+                """Discover available streams and schemas."""
                 ...
 
             def get_records(
@@ -339,13 +355,30 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 catalog: m.Meltano.SingerCatalog,
                 state: m.Meltano.SingerStateMessage,
             ) -> None:
-                """Synchronize records using catalog and state."""
+                """Synchronize data from source to stdout."""
                 ...
 
         class SingerTarget(Protocol):
-            """Singer Target protocol definition."""
+            """Singer Target protocol definition for data loading.
+
+            Defines the interface for Singer data loading (target) components
+            that implement the Singer protocol for data sink integration.
+            """
 
             name: str
+            config: m.Meltano.TargetConfig
+
+            def consume(self, records: list[m.Meltano.SingerRecordMessage]) -> int:
+                """Consume records batch.
+
+                Args:
+                records: Batch of records to consume
+
+                Returns:
+                Number of records consumed
+
+                """
+                ...
 
 
 p = FlextMeltanoProtocols

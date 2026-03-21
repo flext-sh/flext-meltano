@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from pydantic import BaseModel, TypeAdapter
 
-from flext_meltano.execution_result import FlextMeltanoExecutionResult
+from flext_meltano.models import FlextMeltanoModels as m
 from tests.utilities import u
 
 
@@ -44,7 +44,7 @@ class TestFlextMeltanoExecutionResult:
     def test_initialization_with_all_parameters(self) -> None:
         """Test initialization with all parameters."""
         command = ["meltano", "run", "tap-postgres", "target-csv"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=True,
             exit_code=0,
@@ -64,7 +64,7 @@ class TestFlextMeltanoExecutionResult:
     def test_initialization_with_failure(self) -> None:
         """Test initialization with failure scenario."""
         command = ["meltano", "run", "invalid-plugin"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=False,
             exit_code=1,
@@ -84,7 +84,7 @@ class TestFlextMeltanoExecutionResult:
     def test_initialization_with_empty_command(self) -> None:
         """Test initialization with empty command."""
         command: list[str] = []
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=False,
             exit_code=-1,
@@ -102,7 +102,7 @@ class TestFlextMeltanoExecutionResult:
     def test_to_dict_success(self) -> None:
         """Test to_dict method with successful execution."""
         command = ["meltano", "version"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=True,
             exit_code=0,
@@ -130,7 +130,7 @@ class TestFlextMeltanoExecutionResult:
     def test_to_dict_failure(self) -> None:
         """Test to_dict method with failed execution."""
         command = ["meltano", "run", "invalid"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=False,
             exit_code=1,
@@ -158,7 +158,7 @@ class TestFlextMeltanoExecutionResult:
     def test_model_dump_json_success(self) -> None:
         """Test model_dump_json with successful execution."""
         command = ["meltano", "invoke", "tap-postgres", "discover"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=True,
             exit_code=0,
@@ -183,7 +183,7 @@ class TestFlextMeltanoExecutionResult:
     def test_model_dump_json_failure(self) -> None:
         """Test model_dump_json with failed execution."""
         command = ["meltano", "config", "invalid-plugin"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=False,
             exit_code=2,
@@ -210,7 +210,7 @@ class TestFlextMeltanoExecutionResult:
     def test_model_dump_json_with_complex_command(self) -> None:
         """Test model_dump_json with complex command arguments."""
         command = ["meltano", "run", "--full-refresh", "tap-postgres", "target-csv"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=True,
             exit_code=0,
@@ -235,7 +235,7 @@ class TestFlextMeltanoExecutionResult:
     def test_execution_result_with_special_characters(self) -> None:
         """Test execution result with special characters in output and error."""
         command = ["meltano", "run", "tap-postgres"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=False,
             exit_code=1,
@@ -257,7 +257,7 @@ class TestFlextMeltanoExecutionResult:
     def test_execution_result_with_long_execution_time(self) -> None:
         """Test execution result with long execution time."""
         command = ["meltano", "run", "tap-large-database", "target-warehouse"]
-        result = FlextMeltanoExecutionResult(
+        result = m.Meltano.ExecutionResult(
             command=command,
             success=True,
             exit_code=0,

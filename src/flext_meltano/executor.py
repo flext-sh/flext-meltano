@@ -19,7 +19,6 @@ from flext_core.result import r
 
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.execution_result import FlextMeltanoExecutionResult
 from flext_meltano.meltano.bridge import FlextMeltanoBridge
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
@@ -210,7 +209,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         command: list[str],
         timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
-    ) -> r[FlextMeltanoExecutionResult]:
+    ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a Meltano command with timeout and error handling.
 
         Args:
@@ -225,7 +224,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
             start_time = time.time()
             self.logger.info("Executing command", command=str(command), timeout=timeout)
             execution_time = time.time() - start_time
-            result = FlextMeltanoExecutionResult(
+            result = m.Meltano.CommandExecutionResult(
                 command=command,
                 success=True,
                 exit_code=0,
@@ -233,17 +232,17 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 error="",
                 execution_time=execution_time,
             )
-            return r[FlextMeltanoExecutionResult].ok(result)
+            return r[m.Meltano.CommandExecutionResult].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Command execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[FlextMeltanoExecutionResult].fail(error_msg)
+            return r[m.Meltano.CommandExecutionResult].fail(error_msg)
 
     def execute_dbt_command(
         self,
         dbt_command: str,
         args: list[str] | None = None,
-    ) -> r[FlextMeltanoExecutionResult]:
+    ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a DBT command.
 
         Args:
@@ -260,14 +259,14 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 command.extend(args)
             return self.execute_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[FlextMeltanoExecutionResult].fail(f"DBT command failed: {e}")
+            return r[m.Meltano.CommandExecutionResult].fail(f"DBT command failed: {e}")
 
     def execute_pipeline(
         self,
         tap_name: str,
         target_name: str,
         _config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[FlextMeltanoExecutionResult]:
+    ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline.
 
         Args:
@@ -282,7 +281,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
             command = ["meltano", "run", tap_name, target_name]
             return self.execute_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[FlextMeltanoExecutionResult].fail(
+            return r[m.Meltano.CommandExecutionResult].fail(
                 f"Pipeline execution failed: {e}",
             )
 

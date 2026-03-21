@@ -53,20 +53,6 @@ class FlextMeltanoTypes(FlextCliTypes):
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
         PluginVariant = Literal["default", "singer", "custom"]
 
-        class _PluginMeta(type):
-            """Metaclass that proxies attribute access to the Meltano class."""
-
-            def __getattr__(cls, name: str) -> type | str:
-                meltano_cls = FlextMeltanoTypes.Meltano
-                try:
-                    return getattr(meltano_cls, name)
-                except AttributeError:
-                    msg = f"type object 'Plugin' has no attribute {name!r}"
-                    raise AttributeError(msg) from None
-
-        class Plugin(metaclass=_PluginMeta):
-            """Plugin namespace bridging t.Meltano.* to t.Meltano.* types."""
-
         class Singer:
             """Singer protocol complex types namespace."""
 

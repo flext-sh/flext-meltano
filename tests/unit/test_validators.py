@@ -11,6 +11,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from typing import cast
+
 import pytest
 
 from flext_meltano import FlextMeltanoValidators, r, t
@@ -116,7 +119,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         self,
         invalid_config: t.Scalar | dict[str, t.Scalar] | list[t.Scalar] | None,
     ) -> None:
-        result = FlextMeltanoValidators.validate_plugin_config(invalid_config)
+        result = FlextMeltanoValidators.validate_plugin_config(
+            cast("Mapping[str, t.Scalar]", invalid_config)
+        )
         u.Tests.Matchers.fail(result)
         u.Tests.Matchers.fail(result)
 

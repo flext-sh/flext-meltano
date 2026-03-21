@@ -51,7 +51,6 @@ if TYPE_CHECKING:
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
-    from flext_meltano.execution_result import FlextMeltanoExecutionResult
     from flext_meltano.executor import FlextMeltanoExecutor
     from flext_meltano.file_managers import FlextMeltanoFileManagers
     from flext_meltano.library_runner import FlextMeltanoLibraryRunner
@@ -117,10 +116,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoDbtTransformationRunner": (
         "flext_meltano.meltano.runner",
         "FlextMeltanoDbtTransformationRunner",
-    ),
-    "FlextMeltanoExecutionResult": (
-        "flext_meltano.execution_result",
-        "FlextMeltanoExecutionResult",
     ),
     "FlextMeltanoExecutor": ("flext_meltano.executor", "FlextMeltanoExecutor"),
     "FlextMeltanoFileManagers": (
@@ -245,7 +240,6 @@ __all__ = [
     "FlextMeltanoDbtRunner",
     "FlextMeltanoDbtService",
     "FlextMeltanoDbtTransformationRunner",
-    "FlextMeltanoExecutionResult",
     "FlextMeltanoExecutor",
     "FlextMeltanoFileManagers",
     "FlextMeltanoLibraryRunner",

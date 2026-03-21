@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import override
+from typing import cast, override
 
 import pytest
 from flext_core import r
@@ -300,7 +300,7 @@ class TestFlextMeltanoErrorHandling:
     def test_api_handles_invalid_project_root(self) -> None:
         """Test API handles invalid project root type."""
         try:
-            invalid_root: object = 123
+            invalid_root = cast("Path | str | None", 123)
             FlextMeltano(project_root=invalid_root)
             pytest.fail("Should have raised TypeError or ValueError")
         except (TypeError, ValueError):

@@ -85,24 +85,6 @@ class FlextMeltanoModels(FlextCliModels):
             "items": value,
         }).items
 
-    PROJECT_MATURITY_MATURE_ENV_COUNT: int = 3
-    PROJECT_MATURITY_DEVELOPING_ENV_COUNT: int = 2
-    PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS: int = 5
-    PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS: int = (
-        c.Meltano.ModelValidation.COMPLEXITY_MODERATE_MAX_SETTINGS
-    )
-    TRANSFORMATION_SIMPLE_MAX_PATHS: int = 5
-    TRANSFORMATION_MODERATE_MAX_PATHS: int = 10
-    EXECUTION_SIMPLE_THRESHOLD: int = 10
-    EXECUTION_MODERATE_THRESHOLD: int = c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD
-    PERFORMANCE_HIGH_THRESHOLD: int = 1000
-    PERFORMANCE_GOOD_THRESHOLD: int = (
-        c.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_WARNING
-    )
-    PERFORMANCE_MODERATE_THRESHOLD: int = (
-        c.Meltano.ModelValidation.EXECUTION_GOOD_PERFORMANCE_THRESHOLD
-    )
-
     class Meltano:
         """Meltano domain namespace."""
 
@@ -1324,9 +1306,15 @@ class FlextMeltanoModels(FlextCliModels):
             @computed_field
             def processing_efficiency(self) -> str:
                 """Processing efficiency assessment."""
-                if self.batch_size >= FlextMeltanoModels.PERFORMANCE_HIGH_THRESHOLD:
+                if (
+                    self.batch_size
+                    >= c.Meltano.ModelValidation.EXECUTION_HIGH_PERFORMANCE_THRESHOLD
+                ):
                     return "high"
-                if self.batch_size >= FlextMeltanoModels.PERFORMANCE_GOOD_THRESHOLD:
+                if (
+                    self.batch_size
+                    >= c.Meltano.ModelValidation.EXECUTION_GOOD_PERFORMANCE_THRESHOLD
+                ):
                     return "medium"
                 return "low"
 
@@ -2344,14 +2332,10 @@ class FlextMeltanoModels(FlextCliModels):
 
                 if (
                     has_prod
-                    and env_count
-                    >= FlextMeltanoModels.PROJECT_MATURITY_MATURE_ENV_COUNT
+                    and env_count >= c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT
                 ):
                     return "mature"
-                if (
-                    env_count
-                    >= FlextMeltanoModels.PROJECT_MATURITY_DEVELOPING_ENV_COUNT
-                ):
+                if env_count >= c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT:
                     return "developing"
                 return "basic"
 
@@ -2420,12 +2404,12 @@ class FlextMeltanoModels(FlextCliModels):
                     return "minimal"
                 if (
                     settings_count
-                    <= FlextMeltanoModels.PLUGIN_COMPLEXITY_SIMPLE_MAX_SETTINGS
+                    <= c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS
                 ):
                     return "simple"
                 if (
                     settings_count
-                    <= FlextMeltanoModels.PLUGIN_COMPLEXITY_MODERATE_MAX_SETTINGS
+                    <= c.Meltano.ModelValidation.COMPLEXITY_MODERATE_MAX_SETTINGS
                 ):
                     return "moderate"
                 return "complex"
@@ -2545,12 +2529,12 @@ class FlextMeltanoModels(FlextCliModels):
                 )
                 if (
                     total_path_count
-                    <= FlextMeltanoModels.TRANSFORMATION_SIMPLE_MAX_PATHS
+                    <= c.Meltano.ModelValidation.STRUCTURE_SIMPLE_MAX_PATHS
                 ):
                     return "simple"
                 if (
                     total_path_count
-                    <= FlextMeltanoModels.TRANSFORMATION_MODERATE_MAX_PATHS
+                    <= c.Meltano.ModelValidation.STRUCTURE_MODERATE_MAX_PATHS
                 ):
                     return "moderate"
                 return "complex"
@@ -2612,9 +2596,12 @@ class FlextMeltanoModels(FlextCliModels):
                 total_scope = len(self.models) + len(self.exclude)
                 if total_scope == 0:
                     return "full_project"
-                if total_scope <= FlextMeltanoModels.EXECUTION_SIMPLE_THRESHOLD:
+                if (
+                    total_scope
+                    <= c.Meltano.ModelValidation.DBT_SIMPLE_EXECUTION_THRESHOLD
+                ):
                     return "simple"
-                if total_scope <= FlextMeltanoModels.EXECUTION_MODERATE_THRESHOLD:
+                if total_scope <= c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD:
                     return "moderate"
                 return "complex"
 
@@ -2714,11 +2701,20 @@ class FlextMeltanoModels(FlextCliModels):
                 else:
                     rate = self.records_processed / self.duration_seconds
 
-                if rate >= FlextMeltanoModels.PERFORMANCE_HIGH_THRESHOLD:
+                if (
+                    rate
+                    >= c.Meltano.ModelValidation.EXECUTION_HIGH_PERFORMANCE_THRESHOLD
+                ):
                     return "high_performance"
-                if rate >= FlextMeltanoModels.PERFORMANCE_GOOD_THRESHOLD:
+                if (
+                    rate
+                    >= c.Meltano.ModelValidation.EXECUTION_GOOD_PERFORMANCE_THRESHOLD
+                ):
                     return "good_performance"
-                if rate >= FlextMeltanoModels.PERFORMANCE_MODERATE_THRESHOLD:
+                if (
+                    rate
+                    >= c.Meltano.ModelValidation.EXECUTION_MODERATE_PERFORMANCE_THRESHOLD
+                ):
                     return "moderate_performance"
                 return "low_performance"
 
@@ -2985,6 +2981,42 @@ class FlextMeltanoModels(FlextCliModels):
                 float | None,
                 Field(default=None, description="Total execution time in seconds"),
             ]
+
+        class CommandExecutionResult(FlextModels.ArbitraryTypesModel):
+            """Execution result model for Meltano command operations following flext-core patterns."""
+
+            command: Annotated[
+                list[str], Field(description="Command that was executed")
+            ]
+            success: Annotated[bool, Field(description="Whether the command succeeded")]
+            exit_code: Annotated[int, Field(description="Process exit code")]
+            output: Annotated[str, Field(description="Standard output")]
+            error: Annotated[str, Field(description="Standard error")]
+            execution_time: Annotated[
+                float, Field(description="Execution time in seconds")
+            ]
+
+            @computed_field
+            def timestamp(self) -> str:
+                """ISO timestamp of when the result was generated."""
+                return u.generate_iso_timestamp()
+
+            def to_dict(self) -> Mapping[str, t.Scalar | list[str]]:
+                """Convert to dictionary representation.
+
+                Returns:
+                Mapping[str, t.Primitives | list[str]]: Dictionary representation of execution result.
+
+                """
+                dumped: dict[str, t.Scalar | list[str]] = {}
+                dumped["command"] = self.command
+                dumped["success"] = self.success
+                dumped["exit_code"] = self.exit_code
+                dumped["output"] = self.output
+                dumped["error"] = self.error
+                dumped["execution_time"] = self.execution_time
+                dumped["timestamp"] = u.generate_iso_timestamp()
+                return dumped
 
 
 # ==========================================================================

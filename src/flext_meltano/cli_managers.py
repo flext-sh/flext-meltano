@@ -16,13 +16,13 @@ import signal
 import time
 from collections.abc import Callable, Mapping
 from pathlib import Path
-from typing import Protocol
 
 from flext_core import FlextLogger
 from flext_core.result import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.typings import FlextMeltanoTypes as t
 
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
@@ -254,52 +254,6 @@ def delete_pipeline(pipeline_name: str) -> r[str]:
     return r[str].ok("deleted")
 
 
-class Manager(Protocol):
-    """Base manager protocol."""
-
-    def handle_command(self, args: list[str]) -> r[None]: ...
-
-
-class SingerManager(Protocol):
-    """Singer manager protocol."""
-
-    def handle_tap_command(self, args: list[str]) -> r[None]: ...
-
-    def handle_target_command(self, args: list[str]) -> r[None]: ...
-
-
-class StatusManager(Protocol):
-    """Status manager protocol."""
-
-    def handle_command(self, args: list[str]) -> r[None]: ...
-
-    def handle_version_command(self, _args: list[str]) -> r[None]: ...
-
-
-class _CLI(Protocol):
-    """Minimal CLI protocol for manager composition."""
-
-    pipeline_manager: Manager
-    singer_manager: SingerManager
-    dbt_manager: Manager
-    plugin_manager: Manager
-    status_manager: StatusManager
-
-    def show_banner(self) -> None: ...
-
-    def show_dbt_help(self) -> None: ...
-
-    def show_pipeline_help(self) -> None: ...
-
-    def show_plugin_help(self) -> None: ...
-
-    def show_status_help(self) -> None: ...
-
-    def show_tap_help(self) -> None: ...
-
-    def show_target_help(self) -> None: ...
-
-
 class FlextMeltanoCommandRouter:
     """SOLID-compliant command router for FLEXT Meltano CLI.
 
@@ -307,7 +261,7 @@ class FlextMeltanoCommandRouter:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLI) -> None:
+    def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize command router with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -364,7 +318,7 @@ class FlextMeltanoPipelineManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLI) -> None:
+    def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize pipeline manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -524,7 +478,7 @@ class FlextMeltanoSingerManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLI) -> None:
+    def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize Singer manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -564,7 +518,7 @@ class FlextMeltanoSingerManager:
 
 
 class _FlextMeltanoSimpleCommandManager:
-    cli: _CLI
+    cli: p.Meltano.CLI
     logger: FlextLogger
 
     def _handle_command(
@@ -598,7 +552,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLI) -> None:
+    def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -624,7 +578,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLI) -> None:
+    def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -650,7 +604,7 @@ class FlextMeltanoStatusManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: _CLI) -> None:
+    def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()
         self.cli = cli
