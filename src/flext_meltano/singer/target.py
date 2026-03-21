@@ -12,11 +12,11 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import s
-from flext_core.models import m
 from flext_core.result import r
-from flext_core.typings import t
 
+from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
