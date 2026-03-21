@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import m, u
+from flext_tests import u
 from pydantic import ValidationError
 
 from flext_meltano import m

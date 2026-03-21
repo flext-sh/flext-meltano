@@ -16,7 +16,7 @@ from __future__ import annotations
 import typing
 
 from flext_cli import FlextCliModels
-from flext_tests import m, t, u
+from flext_tests import u
 
 from flext_meltano import m, t
 

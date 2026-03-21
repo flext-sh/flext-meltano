@@ -16,7 +16,7 @@ from typing import override
 
 import pytest
 from flext_core import r
-from flext_tests import c, m, t, u
+from flext_tests import u
 from pytest_benchmark.fixture import BenchmarkFixture
 
 from flext_meltano import FlextMeltano, c, m, t

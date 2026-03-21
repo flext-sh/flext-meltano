@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 from flext_core import r, t
 from flext_infra import FlextInfraUtilitiesSubprocess
-from flext_tests import m, t, u
+from flext_tests import u
 
 from flext_meltano import m
 from flext_meltano.cli_managers import (

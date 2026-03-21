@@ -7,7 +7,7 @@ import unittest
 
 import pytest
 from flext_core import r
-from flext_tests import m, u
+from flext_tests import u
 from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoTapAbstractions, m

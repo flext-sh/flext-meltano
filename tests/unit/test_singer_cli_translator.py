@@ -16,7 +16,7 @@ from __future__ import annotations
 import subprocess
 from unittest.mock import MagicMock, patch
 
-from flext_tests import m, u
+from flext_tests import u
 
 from flext_meltano import m
 from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
