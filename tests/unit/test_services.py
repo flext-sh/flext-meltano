@@ -10,6 +10,7 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoService, r, s
+from tests import t
 
 
 class TestFlextMeltanoServiceInitialization:
@@ -102,7 +103,7 @@ class TestTapService:
         tm.ok(service_result)
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"file_path": tmp_file.name}
+            config: dict[str, t.NormalizedValue] = {"file_path": tmp_file.name}
             try:
                 result = tap_service.create_instance(config)
             except TypeError:
@@ -117,7 +118,7 @@ class TestTapService:
         tm.ok(service_result)
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"file_path": tmp_file.name}
+            config: dict[str, t.NormalizedValue] = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
             tm.that(isinstance(result, r), eq=True)
 
@@ -196,7 +197,7 @@ class TestTargetService:
         tm.ok(service_result)
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"output_path": tmp_file.name}
+            config: dict[str, t.NormalizedValue] = {"output_path": tmp_file.name}
             try:
                 result = target_service.create_instance(config)
             except TypeError:
@@ -211,7 +212,7 @@ class TestTargetService:
         tm.ok(service_result)
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: dict[str, object] = {"output_path": tmp_file.name}
+            config: dict[str, t.NormalizedValue] = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
             tm.that(isinstance(result, r), eq=True)
 

@@ -107,7 +107,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 return r[bool].ok(value=True)
             except (yaml.YAMLError, ValueError, TypeError, AttributeError):
                 return r[bool].fail(
-                    "Failed to write YAML content: non-serializable object",
+                    "Failed to write YAML content: non-serializable t.NormalizedValue",
                 )
 
         @classmethod

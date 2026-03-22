@@ -140,7 +140,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                 indexed_plugin: t.Meltano.PluginDefinition,
                 plugin_type: str,
             ) -> Mapping[str, str]:
-                """Builder function using u.construct() mnemonic pattern for object construction."""
+                """Builder function using u.construct() mnemonic pattern for t.NormalizedValue construction."""
                 source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
                 variants_str = (
                     u.join(list(source.variants.keys()), separator=",")

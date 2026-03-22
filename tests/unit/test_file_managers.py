@@ -14,6 +14,7 @@ from pathlib import Path
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoFileManagers
+from tests import t
 
 
 class TestFlextMeltanoFileManagersComprehensive:
@@ -32,7 +33,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_valid(self) -> None:
         """Test saving valid YAML configuration."""
-        config: dict[str, object] = {
+        config: dict[str, t.NormalizedValue] = {
             "project_id": "test-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"], "loaders": ["target-csv"]},
@@ -45,14 +46,14 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: dict[str, object] = {"test": "data"}
+        config: dict[str, t.NormalizedValue] = {"test": "data"}
         invalid_path = Path("/nonexistent/directory/config.yml")
         result = FlextMeltanoFileManagers.save_yaml_config(config, invalid_path)
         tm.fail(result)
 
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
-        config: dict[str, object] = {
+        config: dict[str, t.NormalizedValue] = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -82,7 +83,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
-        config: dict[str, object] = {
+        config: dict[str, t.NormalizedValue] = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -236,7 +237,7 @@ class TestFlextMeltanoFileManagersComprehensive:
                 project_root=project_root, _project_name="integration-workflow-test"
             )
             tm.ok(setup_result)
-            config: dict[str, object] = {
+            config: dict[str, t.NormalizedValue] = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
@@ -291,7 +292,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_concurrent_file_operations(self) -> None:
         """Test concurrent file operations don't interfere."""
-        configs: list[dict[str, object]] = [
+        configs: list[dict[str, t.NormalizedValue]] = [
             {"id": "config1", "data": "value1"},
             {"id": "config2", "data": "value2"},
             {"id": "config3", "data": "value3"},

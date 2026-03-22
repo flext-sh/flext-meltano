@@ -61,7 +61,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         | Mapping[str, t.NormalizedValue]
         | None,
     ) -> r[t.Meltano.Dbt.Project]:
-        """Convert Meltano project object to FLEXT dict[str, object] representation."""
+        """Convert Meltano project t.NormalizedValue to FLEXT dict[str, t.NormalizedValue] representation."""
         try:
             name_attr = getattr(project, "name", None)
             root_attr = getattr(project, "root", None)
@@ -76,7 +76,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
             return r[t.Meltano.Dbt.Project].ok(project_dict)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.Dbt.Project].fail(
-                f"Failed to convert project object: {e}",
+                f"Failed to convert project t.NormalizedValue: {e}",
             )
 
     @staticmethod
@@ -318,7 +318,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         prefix: Temporary directory prefix for organization
 
         Returns:
-        r containing project dict[str, object] with standardized structure
+        r containing project dict[str, t.NormalizedValue] with standardized structure
 
         """
         return (
@@ -385,7 +385,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         project_root: Directory path containing meltano.yml
 
         Returns:
-        r containing initialized project dict[str, object] or validation error
+        r containing initialized project dict[str, t.NormalizedValue] or validation error
 
         """
         return (

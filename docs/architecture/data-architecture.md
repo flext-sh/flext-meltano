@@ -217,7 +217,7 @@ class PipelineState:
     """Pipeline execution state with bookmarks."""
 
     pipeline_id: str
-    bookmarks: Dict[str, object]  # Singer bookmark format
+    bookmarks: Dict[str, t.NormalizedValue]  # Singer bookmark format
     last_updated: datetime
     version: int
 
@@ -299,13 +299,13 @@ class PipelineConfig:
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
+  "type": "t.NormalizedValue",
   "oneOf": [
     {
       "properties": {
         "type": { "const": "RECORD" },
         "stream": { "type": "string" },
-        "record": { "type": "object" },
+        "record": { "type": "t.NormalizedValue" },
         "time_extracted": { "type": "string", "format": "date-time" }
       },
       "required": ["type", "stream", "record"]
@@ -313,7 +313,7 @@ class PipelineConfig:
     {
       "properties": {
         "type": { "const": "STATE" },
-        "value": { "type": "object" }
+        "value": { "type": "t.NormalizedValue" }
       },
       "required": ["type", "value"]
     },
@@ -615,7 +615,7 @@ class DataPartitioner:
             key = record.get(partition_key, "default")
             partitions[key].append(record)
 
-        return dict[str, object](partitions)
+        return dict[str, t.NormalizedValue](partitions)
 ```
 
 #### 3. **Caching Strategy**

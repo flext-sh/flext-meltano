@@ -457,7 +457,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     def create_from_config(
         self,
-        config: t.Meltano.MeltanoConfigDict | object,
+        config: t.Meltano.MeltanoConfigDict | t.NormalizedValue,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Create a service instance from configuration (config-as-instance pattern)."""
         if not isinstance(config, dict):

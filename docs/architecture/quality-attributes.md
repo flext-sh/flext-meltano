@@ -221,7 +221,7 @@ class MultiLevelCache:
         self.local_cache = LRUCache(local_cache_size)
         self.cache_metrics = CacheMetrics()
 
-    def get(self, key: str) -> Optional[object]:
+    def get(self, key: str) -> Optional[t.NormalizedValue]:
         """Get value with multi-level cache lookup."""
 
         # Check local cache first (fastest)
@@ -2581,7 +2581,7 @@ class QualityGate:
 class AutomatedCodeReview:
     """Automated code review system."""
 
-    def __init__(self, rules_config: Dict[str, object]):
+    def __init__(self, rules_config: Dict[str, t.NormalizedValue]):
         self.rules = rules_config
         self.review_results = []
 
@@ -2957,7 +2957,10 @@ class APIResponse:
     """Consistent API response format."""
 
     def __init__(
-        self, data=None, error: str = None, metadata: Dict[str, object] = None
+        self,
+        data=None,
+        error: str = None,
+        metadata: Dict[str, t.NormalizedValue] = None,
     ):
         self.success = error is None
         self.data = data
@@ -2966,7 +2969,7 @@ class APIResponse:
         self.timestamp = datetime.utcnow().isoformat()
         self.request_id = self._generate_request_id()
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> Dict[str, t.NormalizedValue]:
         """Convert response to dictionary format."""
 
         response = {
@@ -3043,14 +3046,14 @@ class APIResource:
     def __init__(
         self,
         resource_id: str,
-        basic_fields: Dict[str, object],
-        detailed_fields: Dict[str, object] = None,
+        basic_fields: Dict[str, t.NormalizedValue],
+        detailed_fields: Dict[str, t.NormalizedValue] = None,
     ):
         self.id = resource_id
         self.basic_fields = basic_fields
         self.detailed_fields = detailed_fields or {}
 
-    def to_basic_representation(self) -> Dict[str, object]:
+    def to_basic_representation(self) -> Dict[str, t.NormalizedValue]:
         """Return basic resource representation."""
         return {
             "id": self.id,
@@ -3059,7 +3062,7 @@ class APIResource:
             **self.basic_fields,
         }
 
-    def to_detailed_representation(self) -> Dict[str, object]:
+    def to_detailed_representation(self) -> Dict[str, t.NormalizedValue]:
         """Return detailed resource representation."""
         return {
             **self.to_basic_representation(),
@@ -3067,7 +3070,7 @@ class APIResource:
             **self.detailed_fields,
         }
 
-    def to_minimal_representation(self) -> Dict[str, object]:
+    def to_minimal_representation(self) -> Dict[str, t.NormalizedValue]:
         """Return minimal resource representation for lists."""
         return {
             "id": self.id,
@@ -3111,7 +3114,7 @@ class APIHelpSystem:
 
     def get_contextual_help(
         self, endpoint: str, method: str, error_code: str = None
-    ) -> Dict[str, object]:
+    ) -> Dict[str, t.NormalizedValue]:
         """Get contextual help for API endpoint."""
 
         help_info = {
@@ -3142,7 +3145,9 @@ class APIHelpSystem:
         key = f"{method} {endpoint}"
         return descriptions.get(key, f"API endpoint for {endpoint}")
 
-    def _get_parameter_help(self, endpoint: str, method: str) -> Dict[str, object]:
+    def _get_parameter_help(
+        self, endpoint: str, method: str
+    ) -> Dict[str, t.NormalizedValue]:
         """Get parameter documentation."""
 
         if "pipelines" in endpoint:
@@ -3154,7 +3159,7 @@ class APIHelpSystem:
                     "example": "customer-data-sync",
                 },
                 "tap": {
-                    "type": "object",
+                    "type": "t.NormalizedValue",
                     "required": True,
                     "description": "Source connector configuration",
                     "properties": {
@@ -3163,7 +3168,7 @@ class APIHelpSystem:
                     },
                 },
                 "target": {
-                    "type": "object",
+                    "type": "t.NormalizedValue",
                     "required": True,
                     "description": "Destination connector configuration",
                 },
@@ -3173,7 +3178,7 @@ class APIHelpSystem:
 
     def _get_usage_examples(
         self, endpoint: str, method: str
-    ) -> List[Dict[str, object]]:
+    ) -> List[Dict[str, t.NormalizedValue]]:
         """Get usage examples for the endpoint."""
 
         examples = []
@@ -3232,7 +3237,7 @@ class APIHelpSystem:
 
         return tips
 
-    def _get_error_help(self, error_code: str) -> Dict[str, object]:
+    def _get_error_help(self, error_code: str) -> Dict[str, t.NormalizedValue]:
         """Get detailed help for specific error codes."""
 
         error_help = {
@@ -3437,7 +3442,7 @@ class TestDataBuilder:
         self.data["name"] = name
         return self
 
-    def with_config(self, config: Dict[str, object]) -> "TestDataBuilder":
+    def with_config(self, config: Dict[str, t.NormalizedValue]) -> "TestDataBuilder":
         self.data["config"] = config
         return self
 
@@ -3499,7 +3504,7 @@ def authenticated_user():
 class TestContext:
     """Test context manager for complex setup."""
 
-    def __init__(self, setup_data: Dict[str, object] = None):
+    def __init__(self, setup_data: Dict[str, t.NormalizedValue] = None):
         self.setup_data = setup_data or {}
 
     def __enter__(self):
@@ -3552,7 +3557,9 @@ class PropertyBasedTests:
             keys=st.text(), values=st.one_of(st.text(), st.integers(), st.booleans())
         ),
     )
-    def test_pipeline_creation_properties(self, name: str, config: Dict[str, object]):
+    def test_pipeline_creation_properties(
+        self, name: str, config: Dict[str, t.NormalizedValue]
+    ):
         """Property-based test for pipeline creation."""
 
         # Given any valid name and config
@@ -3647,7 +3654,7 @@ class ContractTests:
         # Define transformation contract
         contract = DataTransformationContract(
             input_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": {
                     "id": {"type": "integer"},
                     "name": {"type": "string"},
@@ -3656,7 +3663,7 @@ class ContractTests:
                 "required": ["id", "name"],
             },
             output_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": {
                     "user_id": {"type": "integer"},
                     "full_name": {"type": "string"},
@@ -3774,7 +3781,7 @@ class TestDataManager:
 
     def get_test_data(
         self, dataset_name: str, scenario: str = "default"
-    ) -> Dict[str, object]:
+    ) -> Dict[str, t.NormalizedValue]:
         """Get test data for specific dataset and scenario."""
 
         cache_key = f"{dataset_name}:{scenario}"
@@ -3791,8 +3798,8 @@ class TestDataManager:
         return self.data_cache[cache_key]
 
     def create_dynamic_test_data(
-        self, template: str, overrides: Dict[str, object] = None
-    ) -> Dict[str, object]:
+        self, template: str, overrides: Dict[str, t.NormalizedValue] = None
+    ) -> Dict[str, t.NormalizedValue]:
         """Create dynamic test data from templates."""
 
         template_data = self.get_test_data("templates", template)
@@ -3809,8 +3816,8 @@ class TestDataManager:
         return result
 
     def _deep_merge(
-        self, base: Dict[str, object], override: Dict[str, object]
-    ) -> Dict[str, object]:
+        self, base: Dict[str, t.NormalizedValue], override: Dict[str, t.NormalizedValue]
+    ) -> Dict[str, t.NormalizedValue]:
         """Deep merge dictionaries."""
         result = base.copy()
 

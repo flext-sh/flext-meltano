@@ -211,7 +211,7 @@ from flext_meltano import StreamDefinition
 stream = StreamDefinition(
     name="users",
     schema={
-        "type": "object",
+        "type": "t.NormalizedValue",
         "properties": {
             "id": {"type": "integer"},
             "name": {"type": "string"},
@@ -449,7 +449,7 @@ validators = FlextMeltanoValidators()
 
 # Validate Singer schema
 schema_validation = validators.validate_singer_schema({
-    "type": "object",
+    "type": "t.NormalizedValue",
     "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
 })
 

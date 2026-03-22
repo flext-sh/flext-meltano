@@ -191,7 +191,7 @@ class FlextMeltanoAdapter:
                             "tap_stream_id": "users",
                             "stream": "users",
                             "schema": {
-                                "type": "object",
+                                "type": "t.NormalizedValue",
                                 "properties": {
                                     "id": {"type": "integer"},
                                     "name": {"type": "string"},

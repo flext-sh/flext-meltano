@@ -131,7 +131,7 @@ class TestFlextMeltanoTypes:
         }
         catalog = {
             "tap_stream_id": "users",
-            "schema": {"type": "object"},
+            "schema": {"type": "t.NormalizedValue"},
         }
         project = {"name": "elt-project", "enabled": True}
         tm.that(plugin_def["name"], eq="tap-users")

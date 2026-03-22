@@ -25,14 +25,16 @@ class _TestAssertions:
         tm.that(not condition, eq=True)
 
     @staticmethod
-    def assert_equal(actual: object, expected: object, message: str = "") -> None:
+    def assert_equal(
+        actual: t.NormalizedValue, expected: t.NormalizedValue, message: str = ""
+    ) -> None:
         (
             tm.that(actual, eq=expected),
             message or f"expected {expected!r}, got {actual!r}",
         )
 
     @staticmethod
-    def assert_in(item: str, container: object, message: str = "") -> None:
+    def assert_in(item: str, container: t.NormalizedValue, message: str = "") -> None:
         if isinstance(container, dict):
             tm.that(item in container, eq=True)
 
@@ -69,8 +71,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
-        stream_schema: dict[str, object] = {
-            "type": "object",
+        stream_schema: dict[str, t.NormalizedValue] = {
+            "type": "t.NormalizedValue",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         stream_def = m.Meltano.StreamDefinition(
@@ -412,7 +414,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             stream = stream_result.value
             self.test_assertions.assert_true(
                 condition=isinstance(stream, dict),
-                message="Should return dict[str, object] stream definition",
+                message="Should return dict[str, t.NormalizedValue] stream definition",
             )
             self.test_assertions.assert_equal(
                 actual=stream.get("name"),
@@ -471,7 +473,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream = m.Meltano.StreamDefinition(
             stream_name="users",
             stream_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
             },
             source_type="tap-postgres",
@@ -506,7 +508,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream = m.Meltano.StreamDefinition(
             stream_name="users",
             stream_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": {
                     "id": {"type": "integer"},
                     "name": {"type": "string"},
@@ -551,7 +553,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream = m.Meltano.StreamDefinition(
             stream_name="orders",
             stream_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": {
                     "order_id": {"type": "string"},
                     "amount": {"type": "number"},
@@ -576,7 +578,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         stream = m.Meltano.StreamDefinition(
             stream_name="products",
             stream_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": {
                     "product_id": {"type": "string"},
                     "name": {"type": "string"},
@@ -807,11 +809,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
     )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-        connection_config: dict[str, object] = {
+        connection_config: dict[str, t.NormalizedValue] = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: dict[str, object] = {"users": {"selected": True}}
+        stream_config: dict[str, t.NormalizedValue] = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,

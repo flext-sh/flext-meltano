@@ -95,7 +95,7 @@ class FlextMeltanoService(FlextService):
 
         Args:
             project_root: Path to Meltano project root directory
-            config: Service configuration object
+            config: Service configuration t.NormalizedValue
         """
 ```
 

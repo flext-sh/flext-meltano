@@ -115,11 +115,11 @@ class TestStreamInfoEnhanced:
         """Test StreamInfo with minimal required data."""
         stream = m.Meltano.StreamInfo(
             stream_name="users",
-            stream_schema={"type": "object", "properties": "id"},
+            stream_schema={"type": "t.NormalizedValue", "properties": "id"},
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tm.that(stream.stream_name, eq="users")
-        tm.that(stream.stream_schema["type"], eq="object")
+        tm.that(stream.stream_schema["type"], eq="t.NormalizedValue")
         tm.that(stream.status, eq="initialized")
         tm.that(stream.records_loaded, eq=0)
         tm.that(stream.batches_processed, eq=0)
@@ -130,7 +130,7 @@ class TestStreamInfoEnhanced:
         stream = m.Meltano.StreamInfo(
             stream_name="orders",
             stream_schema={
-                "type": "object",
+                "type": "t.NormalizedValue",
                 "properties": "id,order_date,amount",
             },
             key_properties=["id"],
@@ -150,7 +150,7 @@ class TestStreamInfoEnhanced:
         ):
             m.Meltano.StreamInfo(
                 stream_name="",
-                stream_schema={"type": "object"},
+                stream_schema={"type": "t.NormalizedValue"},
                 stream_created_at="2025-01-01T00:00:00Z",
             )
 
@@ -364,7 +364,7 @@ class TestModelIntegration:
         """Test StreamInfo integration with TapConfig."""
         stream = m.Meltano.StreamInfo(
             stream_name="users",
-            stream_schema={"type": "object", "properties": "id"},
+            stream_schema={"type": "t.NormalizedValue", "properties": "id"},
             key_properties=["id"],
             stream_created_at="2025-01-01T00:00:00Z",
         )

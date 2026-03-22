@@ -183,7 +183,7 @@ python example_module.py
 Description of what users should see when running the example.
 """
 
-object
+t.NormalizedValue
 
 from flext_meltano import FlextMeltanoSettings
 

@@ -72,7 +72,7 @@ if TYPE_CHECKING:
         TestTapConfigEnhanced,
         TestTargetConfigEnhanced,
     )
-    from .test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
+    from .test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified, t
     from .test_services import (
         TestDbtService,
         TestFlextMeltanoServiceInitialization,
@@ -290,6 +290,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "Testc": ("tests.unit.test_constants", "Testc"),
     "logger": ("tests.unit.test_target_abstractions", "logger"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
+    "t": ("tests.unit.test_plugin_protocols", "t"),
     "test_create_pipeline_creates_directory_and_configuration": (
         "tests.unit.pipeline_cli_managers_tests",
         "test_create_pipeline_creates_directory_and_configuration",
@@ -381,6 +382,7 @@ __all__ = [
     "Testc",
     "logger",
     "pytestmark",
+    "t",
     "test_create_pipeline_creates_directory_and_configuration",
     "test_create_pipeline_fails_without_configuration",
     "test_delete_pipeline_removes_configuration_directory",

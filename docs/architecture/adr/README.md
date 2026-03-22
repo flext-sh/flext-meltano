@@ -93,7 +93,7 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 
 ## Notes
 
-{object additional notes or implementation details}
+{t.NormalizedValue additional notes or implementation details}
 ```
 
 ## Current ADRs

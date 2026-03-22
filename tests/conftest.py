@@ -196,7 +196,7 @@ def singer_schema() -> t.Meltano.MeltanoConfigDict:
         "type": "SCHEMA",
         "stream": "test_entity",
         "schema": {
-            "type": "object",
+            "type": "t.NormalizedValue",
             "properties": {
                 "id": {"type": "integer"},
                 "name": {"type": "string"},
