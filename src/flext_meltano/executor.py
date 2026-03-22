@@ -14,8 +14,7 @@ import time
 from pathlib import Path
 from typing import override
 
-from flext_core import s
-from flext_core.result import r
+from flext_core import r, s
 
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants as c

@@ -215,8 +215,6 @@ class FlextMeltanoTypes(FlextCliTypes):
             type MetricsDict = dict[str, float]
             type ErrorsDict = dict[str, str]
 
-    Singer = Meltano.Singer
-
 
 t = FlextMeltanoTypes
 __all__ = ["FlextMeltanoTypes", "t"]

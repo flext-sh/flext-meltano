@@ -12,8 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import FlextService
-from flext_core.result import r
+from flext_core import FlextService, r
 from meltano.core.project import Project as MeltanoProject
 from pydantic import PrivateAttr
 

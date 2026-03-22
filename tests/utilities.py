@@ -1,6 +1,7 @@
-"""Module skeleton for TestsFlextMeltanoUtilities.
+"""Test utilities for flext-meltano.
 
-Test utilities for flextmeltano.
+Provides FlextMeltanoTestUtilities, combining FlextTestsUtilities with
+FlextMeltanoUtilities for test-specific utilities.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -8,18 +9,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import u as _base_u
-from flext_tests._utilities.matchers import FlextTestsMatchersUtilities
+from flext_tests import FlextTestsUtilities
 
-from flext_meltano.utilities import FlextMeltanoUtilities
-
-
-class TestsFlextMeltanoUtilities(FlextMeltanoUtilities):
-    """Test utilities for flextmeltano."""
-
-    class Tests(FlextTestsMatchersUtilities.Tests, _base_u.Tests):
-        """Merged Tests namespace with Matchers from FlextTestsMatchersUtilities."""
+from flext_meltano import FlextMeltanoUtilities
 
 
-u = TestsFlextMeltanoUtilities
-__all__ = ["TestsFlextMeltanoUtilities", "u"]
+class FlextMeltanoTestUtilities(FlextTestsUtilities, FlextMeltanoUtilities):
+    """Test utilities for flext-meltano."""
+
+    class Meltano(FlextMeltanoUtilities.Meltano):
+        """Meltano-specific utilities."""
+
+        class Tests:
+            """Meltano test utilities."""
+
+
+u = FlextMeltanoTestUtilities
+__all__ = ["FlextMeltanoTestUtilities", "u"]

@@ -11,6 +11,7 @@ from collections.abc import Mapping
 from typing import cast
 
 import pytest
+from flext_tests import tm
 from pydantic import ValidationError
 
 from flext_meltano import m, t

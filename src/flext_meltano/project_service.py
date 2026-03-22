@@ -56,9 +56,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def _convert_to_project_dict(
         project: p.Meltano.Project
         | t.Meltano.Dbt.Project
-        | Mapping[str, Mapping[str, object] | None]
+        | Mapping[str, Mapping[str, t.NormalizedValue] | None]
         | Path
-        | Mapping[str, object]
+        | Mapping[str, t.NormalizedValue]
         | None,
     ) -> r[t.Meltano.Dbt.Project]:
         """Convert Meltano project object to FLEXT dict[str, object] representation."""
@@ -120,7 +120,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: Mapping[str, object],
+        config_data: Mapping[str, t.NormalizedValue],
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -136,7 +136,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         config_payload = m.Meltano.ConfigMappingPayload.model_validate({
             "values": config_obj,
         }).values
-        config_dict = TypeAdapter(Mapping[str, object]).validate_python(config_payload)
+        config_dict = TypeAdapter(Mapping[str, t.NormalizedValue]).validate_python(
+            config_payload
+        )
         normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
         return FlextMeltanoProjectService._write_meltano_config(
             normalized_path,
@@ -147,7 +149,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def _generate_minimal_config(
         temp_path: Path,
         project_id: str,
-    ) -> r[Mapping[str, object]]:
+    ) -> r[Mapping[str, t.NormalizedValue]]:
         """Generate minimal meltano.yml configuration."""
         extractors: list[t.Dict] = []
         loaders: list[t.Dict] = []
@@ -232,7 +234,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     @staticmethod
     def _write_meltano_config(
         project_path: Path,
-        config: Mapping[str, object],
+        config: Mapping[str, t.NormalizedValue],
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:

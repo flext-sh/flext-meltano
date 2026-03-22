@@ -19,8 +19,7 @@ from pathlib import Path
 from typing import override
 
 import meltano
-from flext_core import FlextSettings, s
-from flext_core.result import r
+from flext_core import FlextSettings, r, s
 
 from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t

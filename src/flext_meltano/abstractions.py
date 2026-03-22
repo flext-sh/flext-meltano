@@ -14,8 +14,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 
-from flext_core import FlextLogger
-from flext_core.result import r
+from flext_core import FlextLogger, r
 
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.protocols import FlextMeltanoProtocols as p

@@ -11,8 +11,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextContainer, e, s
-from flext_core.result import r
+from flext_core import FlextContainer, e, r, s
 
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m

@@ -12,8 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_core import FlextLogger
-from flext_core.result import r
+from flext_core import FlextLogger, r
 
 from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.typings import FlextMeltanoTypes as t

@@ -15,8 +15,7 @@ from typing import Annotated, Literal, Self
 
 import yaml
 from flext_cli import FlextCliModels, u
-from flext_core import FlextModels
-from flext_core.result import r
+from flext_core import FlextModels, r
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -31,11 +30,11 @@ from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.typings import FlextMeltanoTypes as t
 
 type _ValidatorInput = (
-    Mapping[str, object]
-    | Mapping[str, Mapping[str, object] | None]
-    | list[Mapping[str, object] | None]
-    | tuple[Mapping[str, object] | None, ...]
-    | set[Mapping[str, object] | None]
+    Mapping[str, t.NormalizedValue]
+    | Mapping[str, Mapping[str, t.NormalizedValue] | None]
+    | list[Mapping[str, t.NormalizedValue] | None]
+    | tuple[Mapping[str, t.NormalizedValue] | None, ...]
+    | set[Mapping[str, t.NormalizedValue] | None]
     | None
 )
 
@@ -711,7 +710,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config = ConfigDict(arbitrary_types_allowed=True)
 
-            config: Mapping[str, dict[str, object] | None] | None = Field(
+            config: Mapping[str, dict[str, t.NormalizedValue] | None] | None = Field(
                 default=None, description="Optional Meltano settings payload"
             )
             service_name: t.NonEmptyStr = Field(
@@ -1504,7 +1503,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="STATE", description="Singer message discriminator"),
             ]
             value: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(
                     default_factory=dict, description="Singer state bookmark payload"
                 ),
@@ -1566,7 +1565,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             metadata: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(default_factory=dict, description="Singer metadata properties"),
             ]
 
@@ -1804,13 +1803,15 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("schema_definition", mode="before")
             @classmethod
-            def normalize_schema(cls, value: _ValidatorInput) -> Mapping[str, object]:
+            def normalize_schema(
+                cls, value: _ValidatorInput
+            ) -> Mapping[str, t.NormalizedValue]:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        empty_schema: dict[str, object] = {}
+                        empty_schema: dict[str, t.NormalizedValue] = {}
                         return empty_schema
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
@@ -1978,7 +1979,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="", description="Plugin default variant"),
             ]
             variants: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(default_factory=dict, description="Available plugin variants"),
             ]
             logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
@@ -1997,7 +1998,9 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("variants", mode="before")
             @classmethod
-            def normalize_variants(cls, value: _ValidatorInput) -> Mapping[str, object]:
+            def normalize_variants(
+                cls, value: _ValidatorInput
+            ) -> Mapping[str, t.NormalizedValue]:
                 """Normalize variant maps from external payloads."""
                 match value:
                     case Mapping():
@@ -2035,7 +2038,9 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("plugins", mode="before")
             @classmethod
-            def normalize_plugins(cls, value: _ValidatorInput) -> Mapping[str, object]:
+            def normalize_plugins(
+                cls, value: _ValidatorInput
+            ) -> Mapping[str, t.NormalizedValue]:
                 """Normalize plugin catalog mapping."""
                 match value:
                     case Mapping():
@@ -2050,7 +2055,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             project_root: Annotated[str, Field(description="Project root path")]
             elt_context: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(default_factory=dict, description="ELT execution context"),
             ]
             extractor_name: Annotated[
@@ -2063,7 +2068,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=False, description="Execution completion flag"),
             ]
             execution_result: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(default_factory=dict, description="Execution result payload"),
             ]
 
@@ -2071,7 +2076,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_mapping_payloads(
                 cls, value: _ValidatorInput
-            ) -> Mapping[str, object]:
+            ) -> Mapping[str, t.NormalizedValue]:
                 """Normalize mapping-like payloads into dictionaries."""
                 match value:
                     case Mapping():
@@ -2098,7 +2103,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="unknown", description="Project root path"),
             ]
             execution_result: Annotated[
-                dict[str, object],
+                dict[str, t.NormalizedValue],
                 Field(default_factory=dict, description="Execution result payload"),
             ]
 
@@ -2106,7 +2111,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_execution_result(
                 cls, value: _ValidatorInput
-            ) -> Mapping[str, object]:
+            ) -> Mapping[str, t.NormalizedValue]:
                 """Normalize execution result map payload."""
                 match value:
                     case Mapping():

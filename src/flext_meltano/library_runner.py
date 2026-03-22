@@ -12,8 +12,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextLogger
-from flext_core.result import r
+from flext_core import FlextLogger, r
 
 from flext_meltano.executor import FlextMeltanoExecutor
 from flext_meltano.meltano.bridge import FlextMeltanoBridge
@@ -106,7 +105,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: dict[str, object] = {
+            elt_result: dict[str, t.NormalizedValue] = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,

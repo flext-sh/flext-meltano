@@ -1,10 +1,10 @@
 """Constants for flext-meltano tests.
 
-Provides TestsFlextMeltanoConstants, extending c with flext-meltano-specific
+Provides FlextMeltanoTestConstants, extending FlextTestsConstants with flext-meltano-specific
 constants using COMPOSITION INHERITANCE.
 
 Inheritance hierarchy:
-- c (flext_tests) - Provides .Tests.* namespace
+- FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
 - FlextMeltanoConstants (production) - Provides .Meltano.* namespace
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -15,17 +15,16 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_tests import c
+from flext_tests import FlextTestsConstants
 
 from flext_meltano import FlextMeltanoConstants
 
 
-class TestsFlextMeltanoConstants(c, FlextMeltanoConstants):
+class FlextMeltanoTestConstants(FlextTestsConstants):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
-    MANDATORY: Inherits from BOTH:
-    1. c - for test infrastructure (.Tests.*)
-    2. FlextMeltanoConstants - for domain constants (.Meltano.*)
+    MANDATORY: Inherits from FlextTestsConstants for test infrastructure (.Tests.*).
+    Access project constants via inner class inheriting from FlextMeltanoConstants.Meltano.
 
     Access patterns:
     - c.Tests.Docker.* (container testing)
@@ -35,9 +34,9 @@ class TestsFlextMeltanoConstants(c, FlextMeltanoConstants):
     - c.Paths.* (project-specific test data)
 
     Rules:
-    - NEVER duplicate constants from c or FlextMeltanoConstants
+    - NEVER duplicate constants from FlextTestsConstants or FlextMeltanoConstants
     - Only flext-meltano-specific test constants allowed (not generic for other projects)
-    - All generic constants come from c
+    - All generic constants come from FlextTestsConstants
     - All production constants come from FlextMeltanoConstants
     """
 
@@ -55,5 +54,5 @@ class TestsFlextMeltanoConstants(c, FlextMeltanoConstants):
                 TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
 
-c = TestsFlextMeltanoConstants
-__all__ = ["TestsFlextMeltanoConstants", "c"]
+c = FlextMeltanoTestConstants
+__all__ = ["FlextMeltanoTestConstants", "c"]

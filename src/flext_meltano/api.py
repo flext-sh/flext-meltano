@@ -13,8 +13,7 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import override
 
-from flext_core import e, s
-from flext_core.result import r
+from flext_core import e, r, s
 from pydantic import ValidationError
 
 from flext_meltano.adapters import FlextMeltanoAdapter
@@ -98,7 +97,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     @staticmethod
     def _normalize_container_value(
         value: (
-            Mapping[str, object]
+            Mapping[str, t.NormalizedValue]
             | t.NormalizedValue
             | t.Meltano.MeltanoConfigDict
             | list[t.Scalar | None]

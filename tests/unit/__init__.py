@@ -54,7 +54,7 @@ if TYPE_CHECKING:
         TestFlextMeltanoSettingsIntegration,
     )
     from .test_constants import Testc
-    from .test_execution_result import TestFlextMeltanoExecutionResult
+    from .test_execution_result import TestFlextMeltanoExecutionResult, tm
     from .test_executors import TestFlextMeltanoExecutorComplete
     from .test_file_managers import TestFlextMeltanoFileManagersComprehensive
     from .test_library_runner import (
@@ -318,6 +318,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.unit.pipeline_cli_managers_tests",
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
+    "tm": ("tests.unit.test_execution_result", "tm"),
 }
 
 __all__ = [
@@ -387,6 +388,7 @@ __all__ = [
     "test_execute_pipeline_runs_real_subprocess_contract",
     "test_get_pipeline_status_checks_process_state",
     "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
+    "tm",
 ]
 
 

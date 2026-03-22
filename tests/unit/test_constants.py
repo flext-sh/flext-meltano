@@ -50,12 +50,22 @@ class Testc:
         tm.that(isinstance(c.Meltano.Service.MIN_NAME_LENGTH, int), eq=True)
 
     def test_model_namespace(self) -> None:
-        """Test Model namespace constants."""
-        tm.that(isinstance(c.Meltano.Model.MATURITY_MATURE_ENV_COUNT, int), eq=True)
-        tm.that(isinstance(c.Meltano.Model.MATURITY_DEVELOPING_ENV_COUNT, int), eq=True)
-        tm.that(isinstance(c.Meltano.Model.COMPLEXITY_MINIMAL_SETTINGS, int), eq=True)
+        """Test ModelValidation namespace constants."""
         tm.that(
-            isinstance(c.Meltano.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS, int), eq=True
+            isinstance(c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT, int),
+            eq=True,
+        )
+        tm.that(
+            isinstance(c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT, int),
+            eq=True,
+        )
+        tm.that(
+            isinstance(c.Meltano.ModelValidation.COMPLEXITY_MINIMAL_SETTINGS, int),
+            eq=True,
+        )
+        tm.that(
+            isinstance(c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS, int),
+            eq=True,
         )
 
     def test_logging_namespace(self) -> None:
@@ -88,7 +98,7 @@ class Testc:
             "Paths",
             "Singer",
             "Dbt",
-            "Model",
+            "ModelValidation",
             "Logging",
             "Plugin",
             "Enums",

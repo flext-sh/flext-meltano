@@ -5,8 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, ClassVar
 
-from flext_core import FlextSettings
-from flext_core.result import r
+from flext_core import FlextSettings, r
 from pydantic import Field, field_validator
 
 from flext_meltano.constants import FlextMeltanoConstants as c

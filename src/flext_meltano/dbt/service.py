@@ -13,8 +13,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TypeVar, override
 
-from flext_core import s
-from flext_core.result import r
+from flext_core import r, s
 
 from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
 from flext_meltano.dbt.runner import FlextMeltanoDbtRunner

@@ -12,8 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import s
-from flext_core.result import r
+from flext_core import r, s
 
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.typings import FlextMeltanoTypes as t

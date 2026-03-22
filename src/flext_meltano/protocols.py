@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
-from flext_core.result import r
+from flext_core import r
 
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.typings import FlextMeltanoTypes as t
@@ -182,7 +182,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class CLIManager(Protocol):
             """Base protocol for CLI managers."""
 
-            def handle_command(self, args: list[str]) -> r[None]:
+            def handle_command(self, args: list[str]) -> r[str]:
                 """Handle CLI command."""
                 ...
 
@@ -190,15 +190,15 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class SingerManager(Protocol):
             """Protocol for Singer CLI manager."""
 
-            def handle_command(self, args: list[str]) -> r[None]:
+            def handle_command(self, args: list[str]) -> r[str]:
                 """Handle CLI command."""
                 ...
 
-            def handle_tap_command(self, args: list[str]) -> r[None]:
+            def handle_tap_command(self, args: list[str]) -> r[str]:
                 """Handle tap command."""
                 ...
 
-            def handle_target_command(self, args: list[str]) -> r[None]:
+            def handle_target_command(self, args: list[str]) -> r[str]:
                 """Handle target command."""
                 ...
 
@@ -206,11 +206,11 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class StatusManager(Protocol):
             """Protocol for Status CLI manager."""
 
-            def handle_command(self, args: list[str]) -> r[None]:
+            def handle_command(self, args: list[str]) -> r[str]:
                 """Handle CLI command."""
                 ...
 
-            def handle_version_command(self, args: list[str]) -> r[None]:
+            def handle_version_command(self, args: list[str]) -> r[str]:
                 """Handle version command."""
                 ...
 

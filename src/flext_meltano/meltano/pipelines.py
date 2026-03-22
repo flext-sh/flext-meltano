@@ -16,8 +16,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
-from flext_core import s
-from flext_core.result import r
+from flext_core import r, s
 
 from flext_meltano.abstractions import FlextMeltanoAbstractions
 from flext_meltano.constants import FlextMeltanoConstants as c

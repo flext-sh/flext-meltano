@@ -1,6 +1,7 @@
-"""Module skeleton for TestsFlextMeltanoTypes.
+"""Test type aliases for flext-meltano.
 
-Test type aliases for flextmeltano.
+Provides FlextMeltanoTestTypes, combining FlextTestsTypes with
+FlextMeltanoTypes for test-specific type aliases.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -8,12 +9,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import t
+from flext_tests import FlextTestsTypes
+
+from flext_meltano import FlextMeltanoTypes
 
 
-class TestsFlextMeltanoTypes(t):
-    """Test type aliases for flextmeltano."""
+class FlextMeltanoTestTypes(FlextTestsTypes, FlextMeltanoTypes):
+    """Test type aliases for flext-meltano."""
+
+    class Meltano(FlextMeltanoTypes.Meltano):
+        """Meltano-specific type aliases."""
+
+        class Tests:
+            """Meltano test type aliases."""
 
 
-t = TestsFlextMeltanoTypes
-__all__ = ["TestsFlextMeltanoTypes", "t"]
+t = FlextMeltanoTestTypes
+__all__ = ["FlextMeltanoTestTypes", "t"]
