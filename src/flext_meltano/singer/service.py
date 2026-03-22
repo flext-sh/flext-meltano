@@ -20,13 +20,13 @@ from flext_meltano import (
     FlextMeltanoTypes,
     r,
 )
+from flext_meltano.protocols import FlextMeltanoProtocols
 from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
-from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
 from flext_meltano.singer.state import FlextMeltanoStateManager
 
 c = FlextMeltanoConstants
 t = FlextMeltanoTypes
-singer_p = FlextMeltanoSingerProtocols
+singer_p = FlextMeltanoProtocols.Meltano
 m = FlextMeltanoModels
 
 

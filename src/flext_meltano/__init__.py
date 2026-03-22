@@ -68,10 +68,6 @@ if TYPE_CHECKING:
     from flext_meltano.services import FlextMeltanoService
     from flext_meltano.settings import FlextMeltanoSettings
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
-    from flext_meltano.singer.protocols import (
-        FlextMeltanoPluginProtocols,
-        FlextMeltanoSingerProtocols,
-    )
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
     from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
@@ -143,10 +139,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_meltano.cli_managers",
         "FlextMeltanoPluginManager",
     ),
-    "FlextMeltanoPluginProtocols": (
-        "flext_meltano.singer.protocols",
-        "FlextMeltanoPluginProtocols",
-    ),
     "FlextMeltanoProjectManager": (
         "flext_meltano.meltano.project",
         "FlextMeltanoProjectManager",
@@ -165,10 +157,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextMeltanoSingerManager": (
         "flext_meltano.cli_managers",
         "FlextMeltanoSingerManager",
-    ),
-    "FlextMeltanoSingerProtocols": (
-        "flext_meltano.singer.protocols",
-        "FlextMeltanoSingerProtocols",
     ),
     "FlextMeltanoSingerService": (
         "flext_meltano.singer.service",
@@ -248,7 +236,6 @@ __all__ = [
     "FlextMeltanoOrchestrationService",
     "FlextMeltanoPipelineManager",
     "FlextMeltanoPluginManager",
-    "FlextMeltanoPluginProtocols",
     "FlextMeltanoProjectManager",
     "FlextMeltanoProjectService",
     "FlextMeltanoProtocols",
@@ -256,7 +243,6 @@ __all__ = [
     "FlextMeltanoSettings",
     "FlextMeltanoSingerCliTranslator",
     "FlextMeltanoSingerManager",
-    "FlextMeltanoSingerProtocols",
     "FlextMeltanoSingerService",
     "FlextMeltanoStateManager",
     "FlextMeltanoStatusManager",

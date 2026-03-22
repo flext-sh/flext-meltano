@@ -21,12 +21,12 @@ from flext_meltano import (
     FlextMeltanoTypes,
     r,
 )
-from flext_meltano.singer.protocols import FlextMeltanoSingerProtocols
+from flext_meltano.protocols import FlextMeltanoProtocols
 
 t = FlextMeltanoTypes
 m = FlextMeltanoModels
 c = FlextMeltanoConstants
-singer_p = FlextMeltanoSingerProtocols
+singer_p = FlextMeltanoProtocols.Meltano
 
 
 class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
