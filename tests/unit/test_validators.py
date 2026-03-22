@@ -15,9 +15,9 @@ from collections.abc import Mapping
 from typing import cast
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import FlextMeltanoValidators, r, t
-from tests.utilities import u
 
 
 class TestFlextMeltanoValidatorsComprehensive:
@@ -31,13 +31,13 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "tap-csv",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.ok(result)
+        tm.ok(result)
 
     def test_validate_plugin_config_missing_fields(self) -> None:
         config: dict[str, t.Scalar] = {"name": "tap-csv"}
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.fail(result)
+        tm.fail(result)
+        tm.fail(result)
 
     def test_validate_plugin_config_empty_fields(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -47,8 +47,8 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "tap-csv",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.fail(result)
+        tm.fail(result)
+        tm.fail(result)
 
     def test_validate_plugin_config_invalid_types(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -58,39 +58,39 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "tap-csv",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.fail(result)
+        tm.fail(result)
+        tm.fail(result)
 
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin config validation with non-dict input."""
         result = FlextMeltanoValidators.validate_plugin_config({"name": "test"})
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_validate_plugin_config_none(self) -> None:
         """Test plugin config validation with empty input."""
         result = FlextMeltanoValidators.validate_plugin_config({})
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_validate_meltano_config_valid(self) -> None:
         config: dict[str, t.Scalar] = {"version": 1, "project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
-        u.Tests.Matchers.ok(result)
+        tm.ok(result)
 
     def test_validate_meltano_config_missing_version(self) -> None:
         config: dict[str, t.Scalar] = {"project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
-        u.Tests.Matchers.that(result.is_failure or result.is_success, eq=True)
+        tm.that(result.is_failure or result.is_success, eq=True)
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         config: dict[str, t.Scalar] = {"version": 2, "project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.fail(result)
+        tm.fail(result)
+        tm.fail(result)
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test basic validator instantiation."""
         validator = FlextMeltanoValidators()
-        u.Tests.Matchers.that(validator is not None, eq=True)
+        tm.that(validator is not None, eq=True)
 
     def test_validate_dbt_config_valid(self) -> None:
         dbt_config: dict[str, t.Scalar] = {
@@ -102,15 +102,15 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_transformation_business_rules(
             dbt_config
         )
-        u.Tests.Matchers.ok(result)
+        tm.ok(result)
 
     def test_validate_dbt_config_missing_required(self) -> None:
         dbt_config: dict[str, t.Scalar] = {"name": "analytics"}
         result = FlextMeltanoValidators.validate_transformation_business_rules(
             dbt_config
         )
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.fail(result)
+        tm.fail(result)
+        tm.fail(result)
 
     @pytest.mark.parametrize(
         "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
@@ -122,8 +122,8 @@ class TestFlextMeltanoValidatorsComprehensive:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("Mapping[str, t.Scalar]", invalid_config)
         )
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.fail(result)
+        tm.fail(result)
+        tm.fail(result)
 
     def test_complex_validation_scenario(self) -> None:
         meltano_config: dict[str, t.Scalar] = {
@@ -158,27 +158,23 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
         tap_result = FlextMeltanoValidators.validate_plugin_config(tap_config)
         target_result = FlextMeltanoValidators.validate_plugin_config(target_config)
-        u.Tests.Matchers.ok(meltano_result)
-        u.Tests.Matchers.ok(dbt_result)
-        u.Tests.Matchers.ok(tap_result)
-        u.Tests.Matchers.ok(target_result)
+        tm.ok(meltano_result)
+        tm.ok(dbt_result)
+        tm.ok(tap_result)
+        tm.ok(target_result)
 
     def test_validator_architecture_compliance(self) -> None:
-        u.Tests.Matchers.that(
-            hasattr(FlextMeltanoValidators, "validate_plugin_config"), eq=True
-        )
-        u.Tests.Matchers.that(
+        tm.that(hasattr(FlextMeltanoValidators, "validate_plugin_config"), eq=True)
+        tm.that(
             hasattr(FlextMeltanoValidators, "validate_pipeline_project_business_rules"),
             eq=True,
         )
-        u.Tests.Matchers.that(
+        tm.that(
             hasattr(FlextMeltanoValidators, "validate_transformation_business_rules"),
             eq=True,
         )
-        u.Tests.Matchers.that(
-            hasattr(FlextMeltanoValidators, "safe_json_stringify"), eq=False
-        )
-        u.Tests.Matchers.that(hasattr(FlextMeltanoValidators, "Text"), eq=False)
+        tm.that(hasattr(FlextMeltanoValidators, "safe_json_stringify"), eq=False)
+        tm.that(hasattr(FlextMeltanoValidators, "Text"), eq=False)
         config: dict[str, t.Scalar] = {
             "name": "test-plugin",
             "namespace": "test_ns",
@@ -186,7 +182,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.ok(result)
+        tm.ok(result)
 
     def test_validate_plugin_name_empty(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -196,12 +192,10 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.that(result.error is not None, eq=True)
+        tm.fail(result)
+        tm.that(result.error is not None, eq=True)
         if result.error is not None:
-            u.Tests.Matchers.that(
-                "Plugin config validation failed" in result.error, eq=True
-            )
+            tm.that("Plugin config validation failed" in result.error, eq=True)
 
     def test_validate_plugin_name_whitespace(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -211,12 +205,10 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.that(result.error is not None, eq=True)
+        tm.fail(result)
+        tm.that(result.error is not None, eq=True)
         if result.error is not None:
-            u.Tests.Matchers.that(
-                "Plugin config validation failed" in result.error, eq=True
-            )
+            tm.that("Plugin config validation failed" in result.error, eq=True)
 
     def test_validate_target_plugin_name_too_short(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -226,11 +218,11 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.that(result.error is not None, eq=True)
-        u.Tests.Matchers.that(result.error is not None, eq=True)
+        tm.fail(result)
+        tm.that(result.error is not None, eq=True)
+        tm.that(result.error is not None, eq=True)
         if result.error is not None:
-            u.Tests.Matchers.that(
+            tm.that(
                 "Target plugin names must be at least 8 characters" in result.error,
                 eq=True,
             )
@@ -243,11 +235,11 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.fail(result)
-        u.Tests.Matchers.that(result.error is not None, eq=True)
-        u.Tests.Matchers.that(result.error is not None, eq=True)
+        tm.fail(result)
+        tm.that(result.error is not None, eq=True)
+        tm.that(result.error is not None, eq=True)
         if result.error is not None:
-            u.Tests.Matchers.that(
+            tm.that(
                 "Source component names must be at least 5 characters" in result.error,
                 eq=True,
             )
@@ -260,7 +252,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.ok(result)
+        tm.ok(result)
 
     def test_validate_tap_plugin_name_valid(self) -> None:
         config: dict[str, t.Scalar] = {
@@ -270,4 +262,4 @@ class TestFlextMeltanoValidatorsComprehensive:
             "executable": "test",
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
-        u.Tests.Matchers.ok(result)
+        tm.ok(result)

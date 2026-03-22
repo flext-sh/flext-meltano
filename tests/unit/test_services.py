@@ -7,9 +7,9 @@ from collections.abc import Callable
 from typing import Any
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import FlextMeltanoService, r, s
-from tests.utilities import u
 
 
 class TestFlextMeltanoServiceInitialization:
@@ -23,17 +23,17 @@ class TestFlextMeltanoServiceInitialization:
 
     def test_service_initialization(self) -> None:
         """Test proper service initialization."""
-        u.Tests.Matchers.that(isinstance(self.service, FlextMeltanoService), eq=True)
-        u.Tests.Matchers.that(self.service.service_name, eq="flext_meltano_service")
-        u.Tests.Matchers.that(self.service.version, eq="0.9.9")
-        u.Tests.Matchers.that(hasattr(self.service, "create_tap_service"), eq=True)
-        u.Tests.Matchers.that(hasattr(self.service, "create_target_service"), eq=True)
-        u.Tests.Matchers.that(hasattr(self.service, "create_dbt_service"), eq=True)
-        u.Tests.Matchers.that(callable(FlextMeltanoService), eq=True)
+        tm.that(isinstance(self.service, FlextMeltanoService), eq=True)
+        tm.that(self.service.service_name, eq="flext_meltano_service")
+        tm.that(self.service.version, eq="0.9.9")
+        tm.that(hasattr(self.service, "create_tap_service"), eq=True)
+        tm.that(hasattr(self.service, "create_target_service"), eq=True)
+        tm.that(hasattr(self.service, "create_dbt_service"), eq=True)
+        tm.that(callable(FlextMeltanoService), eq=True)
 
     def test_container_registration(self) -> None:
         """Test that services are registered in the container."""
-        u.Tests.Matchers.that(hasattr(self.service, "_container"), eq=True)
+        tm.that(hasattr(self.service, "_container"), eq=True)
 
 
 class TestTapService:
@@ -50,56 +50,56 @@ class TestTapService:
     def test_tap_service_creation(self) -> None:
         """Test TapService creation and initialization."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
-        u.Tests.Matchers.that(isinstance(tap_service, FlextMeltanoService), eq=True)
-        u.Tests.Matchers.that(hasattr(tap_service, "source_name"), eq=True)
+        tm.that(isinstance(tap_service, FlextMeltanoService), eq=True)
+        tm.that(hasattr(tap_service, "source_name"), eq=True)
 
     def test_tap_service_with_additional_data(self) -> None:
         """Test TapService creation with additional configuration data."""
         service_result = self.create_tap_service(
             "tap-postgres", database="testdb", host="localhost"
         )
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
-        u.Tests.Matchers.that(isinstance(tap_service, FlextMeltanoService), eq=True)
+        tm.that(isinstance(tap_service, FlextMeltanoService), eq=True)
 
     def test_tap_service_adapter_property(self) -> None:
         """Test TapService has container for dependency injection."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
-        u.Tests.Matchers.that(hasattr(tap_service, "_container"), eq=True)
-        u.Tests.Matchers.that(tap_service._container is not None, eq=True)
+        tm.that(hasattr(tap_service, "_container"), eq=True)
+        tm.that(tap_service._container is not None, eq=True)
 
     def test_tap_service_execute_method(self) -> None:
         """Test TapService execute method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         result = tap_service.execute()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_tap_service_validate_config(self) -> None:
         """Test TapService validate_config method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         result = tap_service.validate_config()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_tap_service_get_info(self) -> None:
         """Test TapService get_info method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         result = tap_service.get_info()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_tap_service_create_tap_instance(self) -> None:
         """Test TapService create_tap_instance method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"file_path": tmp_file.name}
@@ -109,33 +109,33 @@ class TestTapService:
                 pytest.skip(
                     "create_instance(config) not available (use PYTHONPATH=src)"
                 )
-            u.Tests.Matchers.that(isinstance(result, r), eq=True)
+            tm.that(isinstance(result, r), eq=True)
 
     def test_tap_service_validate_tap_config(self) -> None:
         """Test TapService validate_tap_config method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
-            u.Tests.Matchers.that(isinstance(result, r), eq=True)
+            tm.that(isinstance(result, r), eq=True)
 
     def test_tap_service_get_default_config(self) -> None:
         """Test TapService get_default_config method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         result = tap_service.get_default_config()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_tap_service_validate_service(self) -> None:
         """Test TapService validate_service method."""
         service_result = self.create_tap_service("tap-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         tap_service = service_result.value
         result = tap_service.validate_service()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
 
 class TestTargetService:
@@ -152,48 +152,48 @@ class TestTargetService:
     def test_target_service_creation(self) -> None:
         """Test TargetService creation and initialization."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
-        u.Tests.Matchers.that(isinstance(target_service, FlextMeltanoService), eq=True)
-        u.Tests.Matchers.that(hasattr(target_service, "sink_name"), eq=True)
+        tm.that(isinstance(target_service, FlextMeltanoService), eq=True)
+        tm.that(hasattr(target_service, "sink_name"), eq=True)
 
     def test_target_service_with_additional_data(self) -> None:
         """Test TargetService creation with additional configuration data."""
         service_result = self.create_target_service(
             "target-postgres", database="outputdb", host="localhost"
         )
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
-        u.Tests.Matchers.that(isinstance(target_service, FlextMeltanoService), eq=True)
+        tm.that(isinstance(target_service, FlextMeltanoService), eq=True)
 
     def test_target_service_has_container(self) -> None:
         """Test TargetService has container for dependency injection."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
-        u.Tests.Matchers.that(hasattr(target_service, "_container"), eq=True)
-        u.Tests.Matchers.that(target_service._container is not None, eq=True)
+        tm.that(hasattr(target_service, "_container"), eq=True)
+        tm.that(target_service._container is not None, eq=True)
 
     def test_target_service_execute_method(self) -> None:
         """Test TargetService execute method."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
         result = target_service.execute()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_target_service_get_info(self) -> None:
         """Test TargetService get_info method."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
         result = target_service.get_info()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_target_service_create_target_instance(self) -> None:
         """Test TargetService create_target_instance method."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"output_path": tmp_file.name}
@@ -203,33 +203,33 @@ class TestTargetService:
                 pytest.skip(
                     "create_instance(config) not available (use PYTHONPATH=src)"
                 )
-            u.Tests.Matchers.that(isinstance(result, r), eq=True)
+            tm.that(isinstance(result, r), eq=True)
 
     def test_target_service_validate_target_config(self) -> None:
         """Test TargetService validate_target_config method."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             config: dict[str, object] = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
-            u.Tests.Matchers.that(isinstance(result, r), eq=True)
+            tm.that(isinstance(result, r), eq=True)
 
     def test_target_service_get_default_config(self) -> None:
         """Test TargetService get_default_config method."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
         result = target_service.get_default_config()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_target_service_validate_service(self) -> None:
         """Test TargetService validate_service method."""
         service_result = self.create_target_service("target-csv")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         target_service = service_result.value
         result = target_service.validate_service()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
 
 class TestDbtService:
@@ -246,51 +246,51 @@ class TestDbtService:
     def test_dbt_service_creation(self) -> None:
         """Test DbtService creation and initialization."""
         service_result = self.create_dbt_service("my_dbt_project")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         dbt_service = service_result.value
-        u.Tests.Matchers.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
-        u.Tests.Matchers.that(hasattr(dbt_service, "transformation_name"), eq=True)
+        tm.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
+        tm.that(hasattr(dbt_service, "transformation_name"), eq=True)
 
     def test_dbt_service_with_additional_data(self) -> None:
         """Test DbtService creation with additional configuration data."""
         service_result = self.create_dbt_service(
             "analytics_project", profile_name="dev", target="dev"
         )
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         dbt_service = service_result.value
-        u.Tests.Matchers.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
+        tm.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
 
     def test_dbt_service_has_container(self) -> None:
         """Test DbtService has container for dependency injection."""
         service_result = self.create_dbt_service("my_dbt_project")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         dbt_service = service_result.value
-        u.Tests.Matchers.that(hasattr(dbt_service, "_container"), eq=True)
-        u.Tests.Matchers.that(dbt_service._container is not None, eq=True)
+        tm.that(hasattr(dbt_service, "_container"), eq=True)
+        tm.that(dbt_service._container is not None, eq=True)
 
     def test_dbt_service_execute_method(self) -> None:
         """Test DbtService execute method."""
         service_result = self.create_dbt_service("my_dbt_project")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         dbt_service = service_result.value
         result = dbt_service.execute()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_dbt_service_get_info(self) -> None:
         """Test DbtService get_info method."""
         service_result = self.create_dbt_service("my_dbt_project")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         dbt_service = service_result.value
         result = dbt_service.get_info()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_dbt_service_get_profiles_config(self) -> None:
         """Test DbtService get_profiles_config method."""
         service_result = self.create_dbt_service("my_dbt_project")
-        u.Tests.Matchers.ok(service_result)
+        tm.ok(service_result)
         dbt_service = service_result.value
         result = dbt_service.get_profiles_config()
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
 
 class TestServiceFactoryMethods:
@@ -305,47 +305,45 @@ class TestServiceFactoryMethods:
     def test_create_tap_service(self) -> None:
         """Test create_tap_service factory method."""
         result = self.service.create_tap_service("tap-csv")
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
         if result.is_success:
             tap_service = result.value
-            u.Tests.Matchers.that(isinstance(tap_service, FlextMeltanoService), eq=True)
+            tm.that(isinstance(tap_service, FlextMeltanoService), eq=True)
 
     def test_create_tap_service_with_config(self) -> None:
         """Test create_tap_service with additional configuration."""
         result = self.service.create_tap_service(
             "tap-postgres", database="testdb", host="localhost"
         )
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_create_target_service(self) -> None:
         """Test create_target_service factory method."""
         result = self.service.create_target_service("target-csv")
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
         if result.is_success:
             target_service = result.value
-            u.Tests.Matchers.that(
-                isinstance(target_service, FlextMeltanoService), eq=True
-            )
+            tm.that(isinstance(target_service, FlextMeltanoService), eq=True)
 
     def test_create_target_service_with_config(self) -> None:
         """Test create_target_service with additional configuration."""
         result = self.service.create_target_service(
             "target-postgres", database="outputdb", host="localhost"
         )
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
     def test_create_dbt_service(self) -> None:
         """Test create_dbt_service factory method."""
         result = self.service.create_dbt_service("my_dbt_project")
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
         if result.is_success:
             dbt_service = result.value
-            u.Tests.Matchers.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
+            tm.that(isinstance(dbt_service, FlextMeltanoService), eq=True)
 
     def test_create_dbt_service_with_config(self) -> None:
         """Test create_dbt_service with project name."""
         result = self.service.create_dbt_service("analytics_project")
-        u.Tests.Matchers.that(isinstance(result, r), eq=True)
+        tm.that(isinstance(result, r), eq=True)
 
 
 class TestServiceGenericMethods:
@@ -360,22 +358,22 @@ class TestServiceGenericMethods:
     def test_create_service_generic_tap(self) -> None:
         """Test generic service creation for tap services."""
         tap_service = self.service.create_tap_service("tap-test")
-        u.Tests.Matchers.that(isinstance(tap_service, r), eq=True)
+        tm.that(isinstance(tap_service, r), eq=True)
 
     def test_create_service_generic_target(self) -> None:
         """Test generic service creation for target services."""
         target_service = self.service.create_target_service("target-test")
-        u.Tests.Matchers.that(isinstance(target_service, r), eq=True)
+        tm.that(isinstance(target_service, r), eq=True)
 
     def test_create_service_generic_dbt(self) -> None:
         """Test generic service creation for dbt services."""
         dbt_service = self.service.create_dbt_service("dbt-test")
-        u.Tests.Matchers.that(isinstance(dbt_service, r), eq=True)
+        tm.that(isinstance(dbt_service, r), eq=True)
 
     def test_create_service_generic_with_additional_config(self) -> None:
         """Test generic service creation with additional configuration."""
         service = self.service.create_tap_service("tap-postgres", database="testdb")
-        u.Tests.Matchers.that(isinstance(service, r), eq=True)
+        tm.that(isinstance(service, r), eq=True)
 
 
 class TestServiceIntegration:
@@ -390,59 +388,59 @@ class TestServiceIntegration:
     def test_full_tap_workflow(self) -> None:
         """Test complete tap service workflow."""
         tap_result = self.service.create_tap_service("tap-csv")
-        u.Tests.Matchers.that(isinstance(tap_result, r), eq=True)
+        tm.that(isinstance(tap_result, r), eq=True)
         if tap_result.is_success:
             tap_service = tap_result.value
-            u.Tests.Matchers.that(tap_service is not None, eq=True)
+            tm.that(tap_service is not None, eq=True)
             validate_result = tap_service.validate_service()
-            u.Tests.Matchers.that(isinstance(validate_result, r), eq=True)
+            tm.that(isinstance(validate_result, r), eq=True)
             config_validate_result = tap_service.validate_config()
-            u.Tests.Matchers.that(isinstance(config_validate_result, r), eq=True)
+            tm.that(isinstance(config_validate_result, r), eq=True)
             info_result = tap_service.get_info()
-            u.Tests.Matchers.that(isinstance(info_result, r), eq=True)
+            tm.that(isinstance(info_result, r), eq=True)
 
     def test_full_target_workflow(self) -> None:
         """Test complete target service workflow."""
         target_result = self.service.create_target_service("target-csv")
-        u.Tests.Matchers.that(isinstance(target_result, r), eq=True)
+        tm.that(isinstance(target_result, r), eq=True)
         if target_result.is_success:
             target_service = target_result.value
-            u.Tests.Matchers.that(target_service is not None, eq=True)
+            tm.that(target_service is not None, eq=True)
             validate_result = target_service.validate_service()
-            u.Tests.Matchers.that(isinstance(validate_result, r), eq=True)
+            tm.that(isinstance(validate_result, r), eq=True)
             info_result = target_service.get_info()
-            u.Tests.Matchers.that(isinstance(info_result, r), eq=True)
+            tm.that(isinstance(info_result, r), eq=True)
 
     def test_full_dbt_workflow(self) -> None:
         """Test complete DBT service workflow."""
         dbt_result = self.service.create_dbt_service("analytics_project")
-        u.Tests.Matchers.that(isinstance(dbt_result, r), eq=True)
+        tm.that(isinstance(dbt_result, r), eq=True)
         if dbt_result.is_success:
             dbt_service = dbt_result.value
-            u.Tests.Matchers.that(dbt_service is not None, eq=True)
+            tm.that(dbt_service is not None, eq=True)
             profiles_result = dbt_service.get_profiles_config()
-            u.Tests.Matchers.that(isinstance(profiles_result, r), eq=True)
+            tm.that(isinstance(profiles_result, r), eq=True)
             info_result = dbt_service.get_info()
-            u.Tests.Matchers.that(isinstance(info_result, r), eq=True)
+            tm.that(isinstance(info_result, r), eq=True)
 
     def test_multiple_service_creation(self) -> None:
         """Test creating multiple services simultaneously."""
         tap_result = self.service.create_tap_service("tap-csv")
         target_result = self.service.create_target_service("target-csv")
         dbt_result = self.service.create_dbt_service("my_project")
-        u.Tests.Matchers.that(isinstance(tap_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(target_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(dbt_result, r), eq=True)
+        tm.that(isinstance(tap_result, r), eq=True)
+        tm.that(isinstance(target_result, r), eq=True)
+        tm.that(isinstance(dbt_result, r), eq=True)
         if all(r.is_success for r in [tap_result, target_result, dbt_result]):
             tap_service = tap_result.value
             target_service = target_result.value
             dbt_service = dbt_result.value
-            u.Tests.Matchers.that(tap_service is not None, eq=True)
-            u.Tests.Matchers.that(target_service is not None, eq=True)
-            u.Tests.Matchers.that(dbt_service is not None, eq=True)
-            u.Tests.Matchers.that(tap_service is not target_service, eq=True)
-            u.Tests.Matchers.that(target_service is not dbt_service, eq=True)
-            u.Tests.Matchers.that(dbt_service is not tap_service, eq=True)
+            tm.that(tap_service is not None, eq=True)
+            tm.that(target_service is not None, eq=True)
+            tm.that(dbt_service is not None, eq=True)
+            tm.that(tap_service is not target_service, eq=True)
+            tm.that(target_service is not dbt_service, eq=True)
+            tm.that(dbt_service is not tap_service, eq=True)
 
     def test_service_configuration_validation(self) -> None:
         """Test service configuration validation across different service types."""
@@ -469,7 +467,7 @@ class TestServiceIntegration:
             ]
         for service_name, creator_method, test_config in services_to_test:
             result = creator_method(service_name, **test_config)
-            u.Tests.Matchers.that(isinstance(result, r), eq=True)
+            tm.that(isinstance(result, r), eq=True)
 
 
 class TestServiceErrorHandling:
@@ -486,23 +484,23 @@ class TestServiceErrorHandling:
         tap_result = self.service.create_tap_service("")
         target_result = self.service.create_target_service("")
         dbt_result = self.service.create_dbt_service("")
-        u.Tests.Matchers.that(isinstance(tap_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(target_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(dbt_result, r), eq=True)
+        tm.that(isinstance(tap_result, r), eq=True)
+        tm.that(isinstance(target_result, r), eq=True)
+        tm.that(isinstance(dbt_result, r), eq=True)
 
     def test_invalid_service_configurations(self) -> None:
         """Test service creation with potentially invalid configurations."""
         tap_result = self.service.create_tap_service("tap-test")
-        u.Tests.Matchers.that(isinstance(tap_result, r), eq=True)
+        tm.that(isinstance(tap_result, r), eq=True)
         target_result = self.service.create_target_service("target-test")
-        u.Tests.Matchers.that(isinstance(target_result, r), eq=True)
+        tm.that(isinstance(target_result, r), eq=True)
 
     def test_service_method_error_handling(self) -> None:
         """Test error handling in service methods."""
         tap_result = self.service.create_tap_service("tap-test")
         if tap_result.is_success:
             tap_service = tap_result.value
-            u.Tests.Matchers.that(tap_service is not None, eq=True)
+            tm.that(tap_service is not None, eq=True)
             methods_to_test = [
                 tap_service.validate_config,
                 tap_service.validate_service,
@@ -513,7 +511,7 @@ class TestServiceErrorHandling:
             for method in methods_to_test:
                 try:
                     result = method()
-                    u.Tests.Matchers.that(isinstance(result, r), eq=True)
+                    tm.that(isinstance(result, r), eq=True)
                 except Exception:
                     pytest.fail(
                         f"Method {method.__name__} raised exception instead of returning r"
@@ -531,27 +529,27 @@ class TestServiceArchitecture:
 
     def test_service_inheritance_hierarchy(self) -> None:
         """Test that unified service properly inherits from s."""
-        u.Tests.Matchers.that(issubclass(FlextMeltanoService, s), eq=True)
+        tm.that(issubclass(FlextMeltanoService, s), eq=True)
         tap_service_result = self.service.create_tap_service("tap-test")
         target_service_result = self.service.create_target_service("target-test")
         dbt_service_result = self.service.create_dbt_service("dbt-test")
-        u.Tests.Matchers.that(isinstance(tap_service_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(target_service_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(dbt_service_result, r), eq=True)
+        tm.that(isinstance(tap_service_result, r), eq=True)
+        tm.that(isinstance(target_service_result, r), eq=True)
+        tm.that(isinstance(dbt_service_result, r), eq=True)
 
     def test_service_type_annotations(self) -> None:
         """Test service type annotations and generics."""
         tap_service_result = self.service.create_tap_service("tap-test")
         target_service_result = self.service.create_target_service("target-test")
         dbt_service_result = self.service.create_dbt_service("dbt-test")
-        u.Tests.Matchers.that(isinstance(tap_service_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(target_service_result, r), eq=True)
-        u.Tests.Matchers.that(isinstance(dbt_service_result, r), eq=True)
+        tm.that(isinstance(tap_service_result, r), eq=True)
+        tm.that(isinstance(target_service_result, r), eq=True)
+        tm.that(isinstance(dbt_service_result, r), eq=True)
 
     def test_dependency_injection_container(self) -> None:
         """Test dependency injection container usage."""
-        u.Tests.Matchers.that(hasattr(self.service, "_container"), eq=True)
-        u.Tests.Matchers.that(self.service._container is not None, eq=True)
+        tm.that(hasattr(self.service, "_container"), eq=True)
+        tm.that(self.service._container is not None, eq=True)
 
     def test_unified_service_container_pattern(self) -> None:
         """Test that unified services implement the container pattern."""
@@ -561,4 +559,4 @@ class TestServiceArchitecture:
             self.service.create_dbt_service("dbt-test"),
         ]
         for service_result in services_results:
-            u.Tests.Matchers.that(isinstance(service_result, r), eq=True)
+            tm.that(isinstance(service_result, r), eq=True)

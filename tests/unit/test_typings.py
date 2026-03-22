@@ -10,8 +10,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_tests import tm
+
 from flext_meltano import t
-from tests.utilities import u
 
 
 class TestFlextMeltanoTypes:
@@ -19,101 +20,96 @@ class TestFlextMeltanoTypes:
 
     def test_meltano_namespace_exists(self) -> None:
         """Test that Meltano namespace exists as top-level namespace."""
-        u.Tests.Matchers.that(hasattr(t, "Meltano"), eq=True)
+        tm.that(hasattr(t, "Meltano"), eq=True)
 
     def test_plugin_namespace(self) -> None:
-        """Test Plugin sub-namespace within Meltano."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Plugin"), eq=True)
-        plugin_types = t.Meltano.Plugin
-        u.Tests.Matchers.that(hasattr(plugin_types, "PluginDefinition"), eq=True)
+        """Test Plugin types exist directly on Meltano namespace."""
+        tm.that(hasattr(t.Meltano, "PluginDefinition"), eq=True)
+        tm.that(hasattr(t.Meltano, "PluginConfiguration"), eq=True)
+        tm.that(hasattr(t.Meltano, "PluginCatalog"), eq=True)
 
     def test_plugin_types_direct(self) -> None:
         """Test Plugin types are also directly on Meltano namespace."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "PluginDefinition"), eq=True)
-        u.Tests.Matchers.that(hasattr(t.Meltano, "PluginType"), eq=True)
-        u.Tests.Matchers.that(hasattr(t.Meltano, "PluginVariant"), eq=True)
+        tm.that(hasattr(t.Meltano, "PluginDefinition"), eq=True)
+        tm.that(hasattr(t.Meltano, "PluginType"), eq=True)
+        tm.that(hasattr(t.Meltano, "PluginVariant"), eq=True)
 
     def test_singer_namespace(self) -> None:
         """Test Singer namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Singer"), eq=True)
+        tm.that(hasattr(t.Meltano, "Singer"), eq=True)
         singer_types = t.Meltano.Singer
-        u.Tests.Matchers.that(hasattr(singer_types, "Record"), eq=True)
-        u.Tests.Matchers.that(hasattr(singer_types, "Schema"), eq=True)
-        u.Tests.Matchers.that(hasattr(singer_types, "State"), eq=True)
+        tm.that(hasattr(singer_types, "Record"), eq=True)
+        tm.that(hasattr(singer_types, "Schema"), eq=True)
+        tm.that(hasattr(singer_types, "State"), eq=True)
 
     def test_dbt_namespace(self) -> None:
         """Test DBT namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Dbt"), eq=True)
+        tm.that(hasattr(t.Meltano, "Dbt"), eq=True)
         dbt_types = t.Meltano.Dbt
-        u.Tests.Matchers.that(hasattr(dbt_types, "ModelConfiguration"), eq=True)
-        u.Tests.Matchers.that(hasattr(dbt_types, "TestConfiguration"), eq=True)
-        u.Tests.Matchers.that(hasattr(dbt_types, "Project"), eq=True)
+        tm.that(hasattr(dbt_types, "ModelConfiguration"), eq=True)
+        tm.that(hasattr(dbt_types, "TestConfiguration"), eq=True)
+        tm.that(hasattr(dbt_types, "Project"), eq=True)
 
     def test_project_namespace(self) -> None:
         """Test Project namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Project"), eq=True)
+        tm.that(hasattr(t.Meltano, "Project"), eq=True)
         project_types = t.Meltano.Project
-        u.Tests.Matchers.that(hasattr(project_types, "ProjectConfig"), eq=True)
-        u.Tests.Matchers.that(hasattr(project_types, "ProjectMetadata"), eq=True)
+        tm.that(hasattr(project_types, "ProjectConfig"), eq=True)
+        tm.that(hasattr(project_types, "ProjectMetadata"), eq=True)
 
     def test_pipeline_namespace(self) -> None:
         """Test Pipeline namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Pipeline"), eq=True)
+        tm.that(hasattr(t.Meltano, "Pipeline"), eq=True)
         pipeline_types = t.Meltano.Pipeline
-        u.Tests.Matchers.that(hasattr(pipeline_types, "PipelineConfig"), eq=True)
-        u.Tests.Matchers.that(hasattr(pipeline_types, "PipelineStatus"), eq=True)
+        tm.that(hasattr(pipeline_types, "PipelineConfig"), eq=True)
+        tm.that(hasattr(pipeline_types, "PipelineStatus"), eq=True)
 
     def test_bridge_namespace(self) -> None:
         """Test Bridge namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Bridge"), eq=True)
+        tm.that(hasattr(t.Meltano, "Bridge"), eq=True)
         bridge_types = t.Meltano.Bridge
-        u.Tests.Matchers.that(hasattr(bridge_types, "BridgeMessage"), eq=True)
-        u.Tests.Matchers.that(hasattr(bridge_types, "BridgeResponse"), eq=True)
+        tm.that(hasattr(bridge_types, "BridgeMessage"), eq=True)
+        tm.that(hasattr(bridge_types, "BridgeResponse"), eq=True)
 
     def test_cli_namespace(self) -> None:
         """Test CLI namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "CLI"), eq=True)
+        tm.that(hasattr(t.Meltano, "CLI"), eq=True)
         cli_types = t.Meltano.CLI
-        u.Tests.Matchers.that(hasattr(cli_types, "Command"), eq=True)
-        u.Tests.Matchers.that(hasattr(cli_types, "CommandResult"), eq=True)
+        tm.that(hasattr(cli_types, "Command"), eq=True)
+        tm.that(hasattr(cli_types, "CommandResult"), eq=True)
 
     def test_elt_namespace(self) -> None:
         """Test ELT namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "ELT"), eq=True)
+        tm.that(hasattr(t.Meltano, "ELT"), eq=True)
         elt_types = t.Meltano.ELT
-        u.Tests.Matchers.that(hasattr(elt_types, "ExtractConfig"), eq=True)
-        u.Tests.Matchers.that(hasattr(elt_types, "LoadConfig"), eq=True)
-        u.Tests.Matchers.that(hasattr(elt_types, "TransformConfig"), eq=True)
+        tm.that(hasattr(elt_types, "ExtractConfig"), eq=True)
+        tm.that(hasattr(elt_types, "LoadConfig"), eq=True)
+        tm.that(hasattr(elt_types, "TransformConfig"), eq=True)
 
     def test_processing_namespace(self) -> None:
         """Test Processing namespace types."""
-        u.Tests.Matchers.that(hasattr(t.Meltano, "Processing"), eq=True)
+        tm.that(hasattr(t.Meltano, "Processing"), eq=True)
         processing_types = t.Meltano.Processing
-        u.Tests.Matchers.that(
-            hasattr(processing_types, "SingerExecutionResult"), eq=True
-        )
-        u.Tests.Matchers.that(
-            hasattr(processing_types, "DbtTransformationResult"), eq=True
-        )
-        u.Tests.Matchers.that(hasattr(processing_types, "EltPipelineResult"), eq=True)
+        tm.that(hasattr(processing_types, "SingerExecutionResult"), eq=True)
+        tm.that(hasattr(processing_types, "DbtTransformationResult"), eq=True)
+        tm.that(hasattr(processing_types, "EltPipelineResult"), eq=True)
 
     def test_meltano_core_types(self) -> None:
         """Test Meltano core types (previously MeltanoCore)."""
         meltano_types = t.Meltano
-        u.Tests.Matchers.that(hasattr(meltano_types, "MeltanoConfigDict"), eq=True)
-        u.Tests.Matchers.that(hasattr(meltano_types, "PluginConfigDict"), eq=True)
+        tm.that(hasattr(meltano_types, "MeltanoConfigDict"), eq=True)
+        tm.that(hasattr(meltano_types, "PluginConfigDict"), eq=True)
 
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
-        plugin_definition = t.Meltano.Plugin.PluginDefinition
-        u.Tests.Matchers.that(plugin_definition is not None, eq=True)
+        plugin_definition = t.Meltano.PluginDefinition
+        tm.that(plugin_definition is not None, eq=True)
         singer_catalog = t.Meltano.Singer.CatalogEntry
-        u.Tests.Matchers.that(singer_catalog is not None, eq=True)
+        tm.that(singer_catalog is not None, eq=True)
 
     def test_namespace_organization(self) -> None:
         """Test that all expected sub-namespaces exist under Meltano."""
         expected_sub_namespaces = [
-            "Plugin",
             "Singer",
             "Dbt",
             "Project",
@@ -124,7 +120,7 @@ class TestFlextMeltanoTypes:
             "Processing",
         ]
         for namespace in expected_sub_namespaces:
-            u.Tests.Matchers.that(hasattr(t.Meltano, namespace), eq=True)
+            tm.that(hasattr(t.Meltano, namespace), eq=True)
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
@@ -138,26 +134,25 @@ class TestFlextMeltanoTypes:
             "schema": {"type": "object"},
         }
         project = {"name": "elt-project", "enabled": True}
-        u.Tests.Matchers.that(plugin_def["name"], eq="tap-users")
-        u.Tests.Matchers.that(isinstance(plugin_def["variants"], list), eq=True)
-        u.Tests.Matchers.that(catalog["tap_stream_id"], eq="users")
-        u.Tests.Matchers.that(isinstance(catalog["schema"], dict), eq=True)
-        u.Tests.Matchers.that(project["enabled"] is True, eq=True)
+        tm.that(plugin_def["name"], eq="tap-users")
+        tm.that(isinstance(plugin_def["variants"], list), eq=True)
+        tm.that(catalog["tap_stream_id"], eq="users")
+        tm.that(isinstance(catalog["schema"], dict), eq=True)
+        tm.that(project["enabled"] is True, eq=True)
 
     def test_export_completeness(self) -> None:
         """Test that all necessary types are exported."""
-        u.Tests.Matchers.that(t is not None, eq=True)
+        tm.that(t is not None, eq=True)
 
     def test_type_hierarchy(self) -> None:
         """Test that type hierarchy is properly structured."""
-        plugin_namespace = t.Meltano.Plugin
-        u.Tests.Matchers.that(hasattr(plugin_namespace, "PluginDefinition"), eq=True)
+        tm.that(hasattr(t.Meltano, "PluginDefinition"), eq=True)
         singer_namespace = t.Meltano.Singer
-        u.Tests.Matchers.that(hasattr(singer_namespace, "Record"), eq=True)
+        tm.that(hasattr(singer_namespace, "Record"), eq=True)
 
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
-        plugin_definition = t.Meltano.Plugin.PluginDefinition
+        plugin_definition = t.Meltano.PluginDefinition
         singer_catalog = t.Meltano.Singer.CatalogEntry
-        u.Tests.Matchers.that(plugin_definition is not None, eq=True)
-        u.Tests.Matchers.that(singer_catalog is not None, eq=True)
+        tm.that(plugin_definition is not None, eq=True)
+        tm.that(singer_catalog is not None, eq=True)

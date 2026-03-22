@@ -14,7 +14,6 @@ import pytest
 from pydantic import ValidationError
 
 from flext_meltano import m, t
-from tests.utilities import u
 
 
 class TestTapConfigEnhanced:
@@ -25,10 +24,10 @@ class TestTapConfigEnhanced:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        u.Tests.Matchers.that(config.tap_type, eq="tap-postgres")
-        u.Tests.Matchers.that(config.connection_config, eq={"host": "localhost"})
-        u.Tests.Matchers.that(config.stream_config, eq={})
-        u.Tests.Matchers.that(config.tap_version, eq="latest")
+        tm.that(config.tap_type, eq="tap-postgres")
+        tm.that(config.connection_config, eq={"host": "localhost"})
+        tm.that(config.stream_config, eq={})
+        tm.that(config.tap_version, eq="latest")
 
     def test_tap_config_with_full_data(self) -> None:
         """Test TapConfig with all fields populated."""
@@ -46,11 +45,11 @@ class TestTapConfigEnhanced:
             },
             tap_version="1.0.0",
         )
-        u.Tests.Matchers.that(config.tap_type, eq="tap-mysql")
-        u.Tests.Matchers.that(config.connection_config["host"], eq="db.example.com")
-        u.Tests.Matchers.that(config.connection_config["port"], eq=3306)
-        u.Tests.Matchers.that("users" in config.stream_config, eq=True)
-        u.Tests.Matchers.that(config.tap_version, eq="1.0.0")
+        tm.that(config.tap_type, eq="tap-mysql")
+        tm.that(config.connection_config["host"], eq="db.example.com")
+        tm.that(config.connection_config["port"], eq=3306)
+        tm.that("users" in config.stream_config, eq=True)
+        tm.that(config.tap_version, eq="1.0.0")
 
     def test_tap_config_validation_empty_tap_type(self) -> None:
         """Test TapConfig validation with empty tap_type."""
@@ -72,10 +71,10 @@ class TestTargetConfigEnhanced:
     def test_target_config_with_minimal_data(self) -> None:
         """Test TargetConfig with minimal required data."""
         config = m.Meltano.TargetConfig(target_type="target-csv")
-        u.Tests.Matchers.that(config.target_type, eq="target-csv")
-        u.Tests.Matchers.that(config.connection_config, eq={})
-        u.Tests.Matchers.that(config.batch_size is None, eq=True)
-        u.Tests.Matchers.that(config.batch_wait_limit is None, eq=True)
+        tm.that(config.target_type, eq="target-csv")
+        tm.that(config.connection_config, eq={})
+        tm.that(config.batch_size is None, eq=True)
+        tm.that(config.batch_wait_limit is None, eq=True)
 
     def test_target_config_with_full_data(self) -> None:
         """Test TargetConfig with all fields populated."""
@@ -91,11 +90,11 @@ class TestTargetConfigEnhanced:
             batch_size=1000,
             batch_wait_limit=30.0,
         )
-        u.Tests.Matchers.that(config.target_type, eq="target-postgres")
-        u.Tests.Matchers.that(config.connection_config["database"], eq="analytics")
-        u.Tests.Matchers.that(config.batch_size, eq=1000)
+        tm.that(config.target_type, eq="target-postgres")
+        tm.that(config.connection_config["database"], eq="analytics")
+        tm.that(config.batch_size, eq=1000)
         if config.batch_wait_limit is not None:
-            u.Tests.Matchers.that(abs(config.batch_wait_limit - 30.0), lt=1e-9)
+            tm.that(abs(config.batch_wait_limit - 30.0), lt=1e-9)
 
     def test_target_config_validation_empty_target_type(self) -> None:
         """Test TargetConfig validation with empty target_type."""
@@ -118,12 +117,12 @@ class TestStreamInfoEnhanced:
             stream_schema={"type": "object", "properties": "id"},
             stream_created_at="2025-01-01T00:00:00Z",
         )
-        u.Tests.Matchers.that(stream.stream_name, eq="users")
-        u.Tests.Matchers.that(stream.stream_schema["type"], eq="object")
-        u.Tests.Matchers.that(stream.status, eq="initialized")
-        u.Tests.Matchers.that(stream.records_loaded, eq=0)
-        u.Tests.Matchers.that(stream.batches_processed, eq=0)
-        u.Tests.Matchers.that(stream.stream_created_at, eq="2025-01-01T00:00:00Z")
+        tm.that(stream.stream_name, eq="users")
+        tm.that(stream.stream_schema["type"], eq="object")
+        tm.that(stream.status, eq="initialized")
+        tm.that(stream.records_loaded, eq=0)
+        tm.that(stream.batches_processed, eq=0)
+        tm.that(stream.stream_created_at, eq="2025-01-01T00:00:00Z")
 
     def test_stream_info_with_full_data(self) -> None:
         """Test StreamInfo with all fields populated."""
@@ -138,10 +137,10 @@ class TestStreamInfoEnhanced:
             replication_key="order_date",
             stream_created_at="2025-01-01T00:00:00Z",
         )
-        u.Tests.Matchers.that(stream.stream_name, eq="orders")
-        u.Tests.Matchers.that(stream.key_properties, eq=["id"])
-        u.Tests.Matchers.that(stream.replication_method, eq="FULL_TABLE")
-        u.Tests.Matchers.that(stream.replication_key, eq="order_date")
+        tm.that(stream.stream_name, eq="orders")
+        tm.that(stream.key_properties, eq=["id"])
+        tm.that(stream.replication_method, eq="FULL_TABLE")
+        tm.that(stream.replication_key, eq="order_date")
 
     def test_stream_info_validation_empty_stream_name(self) -> None:
         """Test StreamInfo validation with empty stream_name."""
@@ -171,11 +170,11 @@ class TestMeltanoProjectModelEnhanced:
     def test_meltano_project_with_minimal_data(self) -> None:
         """Test MeltanoProjectModel with minimal required data."""
         project = m.Meltano.MeltanoProjectModel(project_id="test-project")
-        u.Tests.Matchers.that(project.project_id, eq="test-project")
-        u.Tests.Matchers.that(project.project_version, eq="1")
-        u.Tests.Matchers.that(project.default_environment, eq="dev")
-        u.Tests.Matchers.that(project.plugins, eq={})
-        u.Tests.Matchers.that(project.environments, eq={})
+        tm.that(project.project_id, eq="test-project")
+        tm.that(project.project_version, eq="1")
+        tm.that(project.default_environment, eq="dev")
+        tm.that(project.plugins, eq={})
+        tm.that(project.environments, eq={})
 
     def test_meltano_project_with_full_data(self) -> None:
         """Test MeltanoProjectModel with all fields populated."""
@@ -192,12 +191,12 @@ class TestMeltanoProjectModelEnhanced:
                 "prod": "production",
             },
         )
-        u.Tests.Matchers.that(project.project_id, eq="analytics-project")
-        u.Tests.Matchers.that(project.project_version, eq="2.0")
-        u.Tests.Matchers.that(project.default_environment, eq="production")
-        u.Tests.Matchers.that("extractors" in project.plugins, eq=True)
-        u.Tests.Matchers.that("dev" in project.environments, eq=True)
-        u.Tests.Matchers.that("prod" in project.environments, eq=True)
+        tm.that(project.project_id, eq="analytics-project")
+        tm.that(project.project_version, eq="2.0")
+        tm.that(project.default_environment, eq="production")
+        tm.that("extractors" in project.plugins, eq=True)
+        tm.that("dev" in project.environments, eq=True)
+        tm.that("prod" in project.environments, eq=True)
 
     def test_meltano_project_validation_empty_project_id(self) -> None:
         """Test MeltanoProjectModel validation with empty project_id."""
@@ -221,14 +220,14 @@ class TestPluginModelEnhanced:
         plugin = m.Meltano.PluginModel(
             name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
         )
-        u.Tests.Matchers.that(plugin.name, eq="tap-postgres")
-        u.Tests.Matchers.that(plugin.namespace, eq="tap_postgres")
-        u.Tests.Matchers.that(plugin.variant, eq="standard")
-        u.Tests.Matchers.that(plugin.pip_url, eq="tap-postgres")
-        u.Tests.Matchers.that(plugin.executable is None, eq=True)
-        u.Tests.Matchers.that(plugin.capabilities, eq=[])
-        u.Tests.Matchers.that(plugin.settings, eq={})
-        u.Tests.Matchers.that(plugin.config_files, eq=[])
+        tm.that(plugin.name, eq="tap-postgres")
+        tm.that(plugin.namespace, eq="tap_postgres")
+        tm.that(plugin.variant, eq="standard")
+        tm.that(plugin.pip_url, eq="tap-postgres")
+        tm.that(plugin.executable is None, eq=True)
+        tm.that(plugin.capabilities, eq=[])
+        tm.that(plugin.settings, eq={})
+        tm.that(plugin.config_files, eq=[])
 
     def test_plugin_model_with_full_data(self) -> None:
         """Test PluginModel with all fields populated."""
@@ -245,16 +244,16 @@ class TestPluginModelEnhanced:
             },
             config_files=["config.json"],
         )
-        u.Tests.Matchers.that(plugin.name, eq="tap-postgres")
-        u.Tests.Matchers.that(plugin.namespace, eq="meltanolabs")
-        u.Tests.Matchers.that(plugin.variant, eq="meltanolabs")
-        u.Tests.Matchers.that(
+        tm.that(plugin.name, eq="tap-postgres")
+        tm.that(plugin.namespace, eq="meltanolabs")
+        tm.that(plugin.variant, eq="meltanolabs")
+        tm.that(
             plugin.pip_url, eq="git+https://github.com/meltanolabs/tap-postgres.git"
         )
-        u.Tests.Matchers.that(plugin.executable, eq="tap-postgres")
-        u.Tests.Matchers.that("catalog" in plugin.capabilities, eq=True)
-        u.Tests.Matchers.that(len(plugin.settings), eq=2)
-        u.Tests.Matchers.that("host" in plugin.settings, eq=True)
+        tm.that(plugin.executable, eq="tap-postgres")
+        tm.that("catalog" in plugin.capabilities, eq=True)
+        tm.that(len(plugin.settings), eq=2)
+        tm.that("host" in plugin.settings, eq=True)
 
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
@@ -281,13 +280,13 @@ class TestDbtProjectModelEnhanced:
         dbt_project = m.Meltano.DbtProjectModel(
             name="analytics", dbt_version="1.0.0", profile="default"
         )
-        u.Tests.Matchers.that(dbt_project.name, eq="analytics")
-        u.Tests.Matchers.that(dbt_project.profile, eq="default")
-        u.Tests.Matchers.that(dbt_project.dbt_version, eq="1.0.0")
-        u.Tests.Matchers.that(dbt_project.config, eq={})
-        u.Tests.Matchers.that(dbt_project.models, eq={})
-        u.Tests.Matchers.that(dbt_project.sources, eq={})
-        u.Tests.Matchers.that(dbt_project.tests, eq={})
+        tm.that(dbt_project.name, eq="analytics")
+        tm.that(dbt_project.profile, eq="default")
+        tm.that(dbt_project.dbt_version, eq="1.0.0")
+        tm.that(dbt_project.config, eq={})
+        tm.that(dbt_project.models, eq={})
+        tm.that(dbt_project.sources, eq={})
+        tm.that(dbt_project.tests, eq={})
 
     def test_dbt_project_with_full_data(self) -> None:
         """Test DbtProjectModel with all fields populated."""
@@ -302,13 +301,13 @@ class TestDbtProjectModelEnhanced:
             sources={"raw_data": "users"},
             tests={"unit": "test_user_validity"},
         )
-        u.Tests.Matchers.that(dbt_project.name, eq="data-warehouse")
-        u.Tests.Matchers.that(dbt_project.profile, eq="postgres")
-        u.Tests.Matchers.that(dbt_project.dbt_version, eq="2.1.0")
-        u.Tests.Matchers.that(dbt_project.config["materialized"], eq="table")
-        u.Tests.Matchers.that("staging" in dbt_project.models, eq=True)
-        u.Tests.Matchers.that("raw_data" in dbt_project.sources, eq=True)
-        u.Tests.Matchers.that("unit" in dbt_project.tests, eq=True)
+        tm.that(dbt_project.name, eq="data-warehouse")
+        tm.that(dbt_project.profile, eq="postgres")
+        tm.that(dbt_project.dbt_version, eq="2.1.0")
+        tm.that(dbt_project.config["materialized"], eq="table")
+        tm.that("staging" in dbt_project.models, eq=True)
+        tm.that("raw_data" in dbt_project.sources, eq=True)
+        tm.that("unit" in dbt_project.tests, eq=True)
 
     def test_dbt_project_validation_empty_name(self) -> None:
         """Test DbtProjectModel validation with empty name."""
@@ -344,12 +343,10 @@ class TestModelIntegration:
             target_type="target-postgres",
             connection_config={"host": "target.db.com", "port": 5432},
         )
-        u.Tests.Matchers.that(tap_config.tap_type, eq="tap-postgres")
-        u.Tests.Matchers.that(target_config.target_type, eq="target-postgres")
-        u.Tests.Matchers.that(tap_config.connection_config["host"], eq="source.db.com")
-        u.Tests.Matchers.that(
-            target_config.connection_config["host"], eq="target.db.com"
-        )
+        tm.that(tap_config.tap_type, eq="tap-postgres")
+        tm.that(target_config.target_type, eq="target-postgres")
+        tm.that(tap_config.connection_config["host"], eq="source.db.com")
+        tm.that(target_config.connection_config["host"], eq="target.db.com")
 
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
@@ -359,8 +356,8 @@ class TestModelIntegration:
         project = m.Meltano.MeltanoProjectModel(
             project_id="mysql-etl", plugins={"extractors": "tap-mysql"}
         )
-        u.Tests.Matchers.that(plugin.name in str(project.plugins), eq=True)
-        u.Tests.Matchers.that(project.project_id, eq="mysql-etl")
+        tm.that(plugin.name in str(project.plugins), eq=True)
+        tm.that(project.project_id, eq="mysql-etl")
 
     def test_stream_info_with_tap_config_integration(self) -> None:
         """Test StreamInfo integration with TapConfig."""
@@ -375,5 +372,5 @@ class TestModelIntegration:
             connection_config={"host": "localhost"},
             stream_config={"users": "public"},
         )
-        u.Tests.Matchers.that(stream.stream_name in tap_config.stream_config, eq=True)
-        u.Tests.Matchers.that(stream.key_properties, eq=["id"])
+        tm.that(stream.stream_name in tap_config.stream_config, eq=True)
+        tm.that(stream.key_properties, eq=["id"])
