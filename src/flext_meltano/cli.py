@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from typing import cast
 
 from flext_cli import FlextCli
 from flext_core import FlextLogger
@@ -59,23 +58,12 @@ class FlextMeltanoCLI:
         self._cli = FlextCli()
         self._api = FlextMeltano()
         self.output = self._cli.output
-        temp_self = self
-        self.pipeline_manager = cast(
-            "p.Meltano.CLIManager", FlextMeltanoPipelineManager(temp_self)
-        )
-        self.singer_manager = cast(
-            "p.Meltano.SingerManager", FlextMeltanoSingerManager(temp_self)
-        )
-        self.dbt_manager = cast(
-            "p.Meltano.CLIManager", FlextMeltanoDbtManager(temp_self)
-        )
-        self.plugin_manager = cast(
-            "p.Meltano.CLIManager", FlextMeltanoPluginManager(temp_self)
-        )
-        self.status_manager = cast(
-            "p.Meltano.StatusManager", FlextMeltanoStatusManager(temp_self)
-        )
-        self.command_router = FlextMeltanoCommandRouter(temp_self)
+        self.pipeline_manager = FlextMeltanoPipelineManager(self)
+        self.singer_manager = FlextMeltanoSingerManager(self)
+        self.dbt_manager = FlextMeltanoDbtManager(self)
+        self.plugin_manager = FlextMeltanoPluginManager(self)
+        self.status_manager = FlextMeltanoStatusManager(self)
+        self.command_router = FlextMeltanoCommandRouter(self)
 
     def main(self, args: list[str] | None = None) -> int:
         """Main CLI entry point."""

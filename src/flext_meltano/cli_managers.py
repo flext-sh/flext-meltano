@@ -296,35 +296,14 @@ class FlextMeltanoCommandRouter:
 
     def _get_command_handler(self, command: str) -> r[Callable[[list[str]], r[None]]]:
         """Get command handler for given command."""
-        # Use cast to handle protocol to implementation type compatibility
-        from typing import cast as typing_cast
-
         command_map: dict[str, Callable[[list[str]], r[None]]] = {
-            "pipeline": typing_cast(
-                "Callable[[list[str]], r[None]]",
-                self.cli.pipeline_manager.handle_command,
-            ),
-            "tap": typing_cast(
-                "Callable[[list[str]], r[None]]",
-                self.cli.singer_manager.handle_tap_command,
-            ),
-            "target": typing_cast(
-                "Callable[[list[str]], r[None]]",
-                self.cli.singer_manager.handle_target_command,
-            ),
-            "dbt": typing_cast(
-                "Callable[[list[str]], r[None]]", self.cli.dbt_manager.handle_command
-            ),
-            "plugin": typing_cast(
-                "Callable[[list[str]], r[None]]", self.cli.plugin_manager.handle_command
-            ),
-            "status": typing_cast(
-                "Callable[[list[str]], r[None]]", self.cli.status_manager.handle_command
-            ),
-            "version": typing_cast(
-                "Callable[[list[str]], r[None]]",
-                self.cli.status_manager.handle_version_command,
-            ),
+            "pipeline": self.cli.pipeline_manager.handle_command,
+            "tap": self.cli.singer_manager.handle_tap_command,
+            "target": self.cli.singer_manager.handle_target_command,
+            "dbt": self.cli.dbt_manager.handle_command,
+            "plugin": self.cli.plugin_manager.handle_command,
+            "status": self.cli.status_manager.handle_command,
+            "version": self.cli.status_manager.handle_version_command,
         }
         handler = command_map.get(command)
         if handler is None:
@@ -505,6 +484,19 @@ class FlextMeltanoSingerManager:
         self.cli = cli
         self.logger = FlextLogger(__name__)
 
+    def handle_command(self, args: list[str]) -> r[None]:
+        """Handle Singer command by routing to tap or target subcommands."""
+        if not args or args[0] in {"--help", "-h"}:
+            self.cli.show_tap_help()
+            return r[None](value=None, is_success=True)
+        subcommand = args[0]
+        subcommand_args = args[1:]
+        if subcommand == "tap":
+            return self.handle_tap_command(subcommand_args)
+        if subcommand == "target":
+            return self.handle_target_command(subcommand_args)
+        return r[None].fail(f"Unknown Singer command: {subcommand}")
+
     def handle_tap_command(self, args: list[str]) -> r[None]:
         """Handle tap command."""
         if not args or args[0] in {"--help", "-h"}:
@@ -639,8 +631,9 @@ class FlextMeltanoStatusManager:
         subcommand = args[0]
         return self._execute_status_operation(subcommand, args[1:])
 
-    def handle_version_command(self, _args: list[str]) -> r[None]:
+    def handle_version_command(self, args: list[str]) -> r[None]:
         """Handle version command."""
+        _ = args
         self.logger.info("FLEXT Meltano version not implemented in this refactor")
         return r[None](value=None, is_success=True)
 
