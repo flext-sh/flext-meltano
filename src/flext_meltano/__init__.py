@@ -11,7 +11,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
-    from flext_core.typings import FlextTypes
+    from flext_core import FlextTypes
 
     from flext_meltano import dbt, meltano, singer
     from flext_meltano.__version__ import (
