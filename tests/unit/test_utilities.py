@@ -188,10 +188,10 @@ class TestFlextMeltanoUtilitiesEnhanced:
             u.Tests.Matchers.that("Failed to create project file" in error, eq=True)
 
     def test_create_project_file_invalid_content_type(self) -> None:
-        """Test project file creation with invalid content type."""
+        """Test project file creation with invalid content type (non-str, non-dict)."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            invalid_content = {"invalid": {"nested": ["data"]}}
+            invalid_content = 12345  # type: ignore[arg-type]
             result = u.Meltano.create_project_file(
                 project_path / "test.yml", invalid_content
             )

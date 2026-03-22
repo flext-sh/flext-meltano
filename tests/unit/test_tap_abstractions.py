@@ -6,7 +6,7 @@ import tempfile
 import unittest
 
 import pytest
-from flext_core import r
+from flext_core import r, t
 from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoTapAbstractions, m
@@ -173,7 +173,6 @@ class TestFlextMeltanoTapAbstractionsComplete:
             config=config,
             tap_id="test_tap_123",
             status="ready",
-            discovered=True,
         )
         result = self.tap_abstractions.build(tap_instance)
         self.test_assertions.assert_true(
@@ -185,15 +184,10 @@ class TestFlextMeltanoTapAbstractionsComplete:
             message="Tap ID should match",
         )
         self.test_assertions.assert_equal(
-            actual=result["correlation_id"],
-            expected="test_corr_123",
-            message="Correlation ID should match",
+            actual=result["tap_type"],
+            expected="tap-csv",
+            message="Tap type should match",
         )
-        if "discovered" in result:
-            self.test_assertions.assert_true(
-                condition=bool(result["discovered"]),
-                message="Should reflect discovered status",
-            )
 
     def test_get_stream_config(self) -> None:
         """Test get_stream_config method using flext_tests."""
@@ -251,9 +245,10 @@ class TestFlextMeltanoTapAbstractionsComplete:
             condition=isinstance(result, r), message="Should return r"
         )
         if result.is_success:
-            tap_dict = result.value
+            tap_instance = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(tap_dict, dict), message="Should return dict"
+                condition=isinstance(tap_instance, m.Meltano.TapInstance),
+                message="Should return TapInstance",
             )
 
     def test_validate_tap_instance(self) -> None:
@@ -452,8 +447,8 @@ class TestFlextMeltanoTapAbstractionsComplete:
         if result.is_success:
             catalog = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(catalog, dict),
-                message="Should return catalog dict",
+                condition=isinstance(catalog, t.Dict),
+                message="Should return catalog t.Dict",
             )
             self.test_assertions.assert_equal(
                 actual=catalog["version"], expected=1, message="Should have version 1"
