@@ -296,14 +296,35 @@ class FlextMeltanoCommandRouter:
 
     def _get_command_handler(self, command: str) -> r[Callable[[list[str]], r[None]]]:
         """Get command handler for given command."""
+        # Use cast to handle protocol to implementation type compatibility
+        from typing import cast as typing_cast
+
         command_map: dict[str, Callable[[list[str]], r[None]]] = {
-            "pipeline": self.cli.pipeline_manager.handle_command,
-            "tap": self.cli.singer_manager.handle_tap_command,
-            "target": self.cli.singer_manager.handle_target_command,
-            "dbt": self.cli.dbt_manager.handle_command,
-            "plugin": self.cli.plugin_manager.handle_command,
-            "status": self.cli.status_manager.handle_command,
-            "version": self.cli.status_manager.handle_version_command,
+            "pipeline": typing_cast(
+                "Callable[[list[str]], r[None]]",
+                self.cli.pipeline_manager.handle_command,
+            ),
+            "tap": typing_cast(
+                "Callable[[list[str]], r[None]]",
+                self.cli.singer_manager.handle_tap_command,
+            ),
+            "target": typing_cast(
+                "Callable[[list[str]], r[None]]",
+                self.cli.singer_manager.handle_target_command,
+            ),
+            "dbt": typing_cast(
+                "Callable[[list[str]], r[None]]", self.cli.dbt_manager.handle_command
+            ),
+            "plugin": typing_cast(
+                "Callable[[list[str]], r[None]]", self.cli.plugin_manager.handle_command
+            ),
+            "status": typing_cast(
+                "Callable[[list[str]], r[None]]", self.cli.status_manager.handle_command
+            ),
+            "version": typing_cast(
+                "Callable[[list[str]], r[None]]",
+                self.cli.status_manager.handle_version_command,
+            ),
         }
         handler = command_map.get(command)
         if handler is None:
