@@ -345,7 +345,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_error_scenarios_to_hit_uncovered_lines(self) -> None:
         """Test error scenarios to hit uncovered exception handling lines."""
-        with mock.patch.t.NormalizedValue(sys, "exit", side_effect=SystemExit(1)):
+        with mock.patch.object(sys, "exit", side_effect=SystemExit(1)):
             try:
                 result = self.executor.run_command(["force_error"])
                 tm.that(isinstance(result, r), eq=True)
@@ -458,7 +458,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_cli_execution_exception_handling(self) -> None:
         """Test CLI execution exception handling to hit lines 209-224."""
         try:
-            with mock.patch.t.NormalizedValue(
+            with mock.patch.object(
                 sys, "exit", side_effect=RuntimeError("CLI execution failed")
             ):
                 result = self.executor.run_cli(["force_exception"])
@@ -533,7 +533,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test flext-cli command error paths using FLEXT patterns."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result)
-        with mock.patch.t.NormalizedValue(
+        with mock.patch.object(
             FlextMeltanoExecutor,
             "version",
             return_value=r.fail("Version command failed"),
@@ -542,19 +542,19 @@ class TestFlextMeltanoExecutorComplete:
             tm.fail(version_result)
             if version_result.error is not None:
                 tm.that("Version command failed" in str(version_result.error), eq=True)
-            with mock.patch.t.NormalizedValue(
+            with mock.patch.object(
                 FlextMeltanoExecutor,
                 "health",
                 return_value=r.fail("Health check failed"),
             ):
                 pass
-            with mock.patch.t.NormalizedValue(
+            with mock.patch.object(
                 FlextMeltanoExecutor,
                 "list_plugins",
                 return_value=r.fail("Plugin listing failed"),
             ):
                 pass
-            with mock.patch.t.NormalizedValue(
+            with mock.patch.object(
                 FlextMeltanoExecutor,
                 "run_pipeline",
                 return_value=r.fail("Pipeline execution failed"),
@@ -570,7 +570,7 @@ class TestFlextMeltanoExecutorComplete:
         if isinstance(cli_app, dict):
             tm.that("executor" in cli_app, eq=True)
             mock_plugins_result = r.ok(["plugin1", "plugin2"])
-            with mock.patch.t.NormalizedValue(
+            with mock.patch.object(
                 FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result
             ):
                 plugins_result = executor.list_plugins()

@@ -68,7 +68,7 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
         mock_command_result.exit_code = 0
         mock_command_result.stdout = "pipeline ok"
         mock_command_result.stderr = ""
-        with patch.t.NormalizedValue(
+        with patch.object(
             FlextInfraUtilitiesSubprocess,
             "run_raw",
             return_value=r.ok(mock_command_result),
@@ -166,7 +166,7 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
         mock_command_result.exit_code = 0
         mock_command_result.stdout = "ok"
         mock_command_result.stderr = ""
-        with patch.t.NormalizedValue(
+        with patch.object(
             FlextInfraUtilitiesSubprocess,
             "run_raw",
             return_value=r.ok(mock_command_result),
