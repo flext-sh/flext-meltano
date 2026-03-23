@@ -16,17 +16,11 @@ from typing import override
 from flext_core import FlextService
 
 from flext_meltano import (
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
-    FlextMeltanoTypes,
+    m,
+    p,
     r,
+    t,
 )
-from flext_meltano.protocols import FlextMeltanoProtocols
-
-t = FlextMeltanoTypes
-m = FlextMeltanoModels
-c = FlextMeltanoConstants
-singer_p = FlextMeltanoProtocols.Meltano
 
 
 class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
@@ -41,7 +35,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         super().__init__()
         self._catalog = m.Meltano.SingerCatalog()
 
-    def discover_streams(self, tap: singer_p.SingerTap) -> r[m.Meltano.SingerCatalog]:
+    def discover_streams(self, tap: p.Meltano.SingerTap) -> r[m.Meltano.SingerCatalog]:
         """Discover streams from a tap.
 
         Args:

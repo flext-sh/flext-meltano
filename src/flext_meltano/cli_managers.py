@@ -20,9 +20,7 @@ from pathlib import Path
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.protocols import FlextMeltanoProtocols as p
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import m, p, t
 
 _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
 _PIPELINE_CONFIG_FILE = "pipeline.json"

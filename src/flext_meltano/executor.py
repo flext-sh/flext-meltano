@@ -16,13 +16,15 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.meltano.bridge import FlextMeltanoBridge
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_meltano import (
+    FlextMeltanoBridge,
+    FlextMeltanoCLI,
+    FlextMeltanoSettings,
+    c,
+    m,
+    t,
+    u,
+)
 
 
 class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):

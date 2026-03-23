@@ -14,8 +14,7 @@ from typing import Protocol, override, runtime_checkable
 from flext_cli import FlextCliProtocols
 from flext_core import r
 
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import m, t
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):
@@ -30,7 +29,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
     - PROVIDES: Root-level alias `p` for convenient access
 
     Usage:
-    from flext_core.protocols import FlextProtocols as p
+    from flext_core import p
 
     # Foundation protocols (inherited)
     result: FlextCliProtocols.Result[str]

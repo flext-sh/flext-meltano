@@ -15,10 +15,7 @@ import yaml
 from flext_cli import FlextCliUtilities, r
 from flext_core import FlextLogger, FlextUtilities
 
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.file_managers import FlextMeltanoFileManagers
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import FlextMeltanoFileManagers, c, m, t
 
 
 class FlextMeltanoUtilities(FlextCliUtilities):

@@ -16,7 +16,7 @@ from unittest import TestCase
 
 from flext_tests import tm
 
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import FlextMeltanoTypes
 
 t = FlextMeltanoTypes
 

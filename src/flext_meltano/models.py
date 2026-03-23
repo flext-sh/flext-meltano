@@ -26,8 +26,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import c, t
 
 type _ValidatorInput = (
     Mapping[str, t.NormalizedValue]

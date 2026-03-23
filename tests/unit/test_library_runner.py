@@ -9,8 +9,7 @@ from __future__ import annotations
 
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoLibraryRunner
-from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano import FlextMeltanoAdapter, FlextMeltanoLibraryRunner
 
 
 class TestFlextDbtProgrammaticRunner:

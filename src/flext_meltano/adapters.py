@@ -21,9 +21,7 @@ from typing import override
 import meltano
 from flext_core import FlextSettings, r, s
 
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_meltano import FlextMeltanoSettings, t, u
 
 
 class FlextMeltanoAdapter:

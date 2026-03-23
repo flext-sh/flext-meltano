@@ -13,12 +13,7 @@ from typing import override
 
 from flext_core import FlextContainer, e, r, s
 
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.protocols import FlextMeltanoProtocols as p
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_meltano import FlextMeltanoSettings, c, m, p, t, u
 
 
 class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):

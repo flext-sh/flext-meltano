@@ -24,8 +24,8 @@ Layer 5: Singer SDK Execution
 ### For flext-tap-* Projects
 
 ```python
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
+from flext_meltano import m
+from flext_meltano import FlextMeltanoSingerCliTranslator
 
 # Create source parameters
 source_params = m.Meltano.CliParameters.DataSourceParams(
@@ -101,8 +101,7 @@ import subprocess
 
 from flext_core import r
 
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import m, t
 
 
 class FlextMeltanoSingerCliTranslator:

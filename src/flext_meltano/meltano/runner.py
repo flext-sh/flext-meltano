@@ -15,10 +15,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano.executor import FlextMeltanoExecutor
-from flext_meltano.meltano.bridge import FlextMeltanoBridge
-from flext_meltano.protocols import FlextMeltanoProtocols as p
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
 
 
 class FlextMeltanoDbtTransformationRunner:

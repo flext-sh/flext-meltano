@@ -12,14 +12,14 @@ from flext_core import r, t
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
-from flext_meltano import m
-from flext_meltano.cli_managers import (
+from flext_meltano import (
     FlextMeltanoPipelineManager,
     create_pipeline,
     delete_pipeline,
     execute_pipeline,
     get_pipeline_status,
     list_pipelines,
+    m,
 )
 
 

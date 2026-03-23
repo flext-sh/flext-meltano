@@ -14,8 +14,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import m, t
 
 
 class FlextMeltanoDbtRunner(s[str]):

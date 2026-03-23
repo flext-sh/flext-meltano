@@ -15,19 +15,12 @@ from typing import ClassVar, override
 from flext_core import s
 
 from flext_meltano import (
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
-    FlextMeltanoTypes,
+    FlextMeltanoCatalogManager,
+    FlextMeltanoStateManager,
+    m,
+    p,
     r,
 )
-from flext_meltano.protocols import FlextMeltanoProtocols
-from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
-from flext_meltano.singer.state import FlextMeltanoStateManager
-
-c = FlextMeltanoConstants
-t = FlextMeltanoTypes
-singer_p = FlextMeltanoProtocols.Meltano
-m = FlextMeltanoModels
 
 
 class FlextMeltanoSingerService(s[str]):
@@ -62,7 +55,7 @@ class FlextMeltanoSingerService(s[str]):
 
     def discover_tap_catalog(
         self,
-        tap: singer_p.SingerTap,
+        tap: p.Meltano.SingerTap,
     ) -> r[m.Meltano.SingerCatalog]:
         """Discover catalog from a tap instance.
 
@@ -99,8 +92,8 @@ class FlextMeltanoSingerService(s[str]):
 
     def execute_sync(
         self,
-        tap: singer_p.SingerTap,
-        target: singer_p.SingerTarget,
+        tap: p.Meltano.SingerTap,
+        target: p.Meltano.SingerTarget,
         catalog: m.Meltano.SingerCatalog,
         state: m.Meltano.SingerStateMessage,
     ) -> r[m.Meltano.SingerSyncResult]:

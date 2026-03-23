@@ -15,13 +15,13 @@ from typing import TypeVar, override
 
 from flext_core import r, s
 
-from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
-from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes
+from flext_meltano import (
+    FlextMeltanoDbtProjectManager,
+    FlextMeltanoDbtRunner,
+    m,
+    t,
+)
 
-t = FlextMeltanoTypes
-m = FlextMeltanoModels
 _ResultT = TypeVar("_ResultT")
 
 

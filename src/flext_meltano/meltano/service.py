@@ -16,17 +16,12 @@ from flext_core import s
 from pydantic import Field
 
 from flext_meltano import (
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
-    FlextMeltanoTypes,
+    FlextMeltanoProjectManager,
+    m,
     r,
+    t,
     u,
 )
-from flext_meltano.meltano.project import FlextMeltanoProjectManager
-
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
-m = FlextMeltanoModels
 
 
 class FlextMeltanoMeltanoService(s[str]):
@@ -47,7 +42,7 @@ class FlextMeltanoMeltanoService(s[str]):
 
     """
 
-    class PipelineConfig(FlextMeltanoModels):
+    class PipelineConfig(m):
         """Configuration for a Meltano pipeline."""
 
         project_root: Annotated[Path, Field(description="Meltano project root")]

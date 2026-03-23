@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from pydantic import BaseModel, TypeAdapter
 
-from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano import m
 from tests.utilities import u
 
 tm = u.Tests.Matchers

@@ -18,8 +18,7 @@ from unittest.mock import MagicMock, patch
 
 from flext_tests import tm
 
-from flext_meltano import m
-from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
+from flext_meltano import FlextMeltanoSingerCliTranslator, m
 
 
 class TestFlextMeltanoSingerCliTranslatorTapRun:

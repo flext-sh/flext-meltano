@@ -14,11 +14,13 @@ from pathlib import Path
 
 from flext_core import FlextLogger, r
 
-from flext_meltano.executor import FlextMeltanoExecutor
-from flext_meltano.meltano.bridge import FlextMeltanoBridge
-from flext_meltano.meltano.runner import FlextMeltanoDbtTransformationRunner
-from flext_meltano.protocols import FlextMeltanoProtocols as p
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import (
+    FlextMeltanoBridge,
+    FlextMeltanoDbtTransformationRunner,
+    FlextMeltanoExecutor,
+    p,
+    t,
+)
 
 
 class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):

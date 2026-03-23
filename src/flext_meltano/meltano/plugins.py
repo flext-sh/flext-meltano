@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import TypeIs, override
 
 from flext_meltano import (
+    FlextMeltanoAbstractions,
     FlextMeltanoProjectService,
     FlextMeltanoSettings,
     m,
@@ -26,7 +27,6 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.abstractions import FlextMeltanoAbstractions
 
 
 def _is_meltano_project(

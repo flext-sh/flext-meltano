@@ -13,9 +13,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import FlextMeltanoSettings, m, t
 
 
 class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):

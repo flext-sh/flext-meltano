@@ -17,15 +17,13 @@ from flext_core import FlextLogger
 
 from flext_meltano import (
     FlextMeltano,
+    FlextMeltanoCommandRouter,
+    FlextMeltanoDbtManager,
+    FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
     p,
-)
-from flext_meltano.cli_managers import (
-    FlextMeltanoCommandRouter,
-    FlextMeltanoDbtManager,
-    FlextMeltanoPipelineManager,
 )
 
 

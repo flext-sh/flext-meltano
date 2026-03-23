@@ -13,12 +13,10 @@ from pathlib import Path
 from typing import ClassVar, override
 
 from flext_core import FlextService, r
-from meltano.core.project import Project as MeltanoProject
+from meltano import Project
 from pydantic import PrivateAttr
 
-from flext_meltano.models import FlextMeltanoModels
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_meltano import m, t, u
 
 
 class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]):
@@ -48,7 +46,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         """
         super().__init__()
         self.project_root: Path | None = root
-        self.project: MeltanoProject | None = None
+        self.project: Project | None = None
 
     @override
     def execute(self, **_kwargs: t.Container) -> r[t.Meltano.Project.ProjectMetadata]:
@@ -110,7 +108,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         """
         try:
             root.mkdir(parents=True, exist_ok=True)
-            self.project = MeltanoProject(root)
+            self.project = Project(root)
             self.project_root = root
             info: t.Meltano.Project.ProjectMetadata = {
                 "root": str(root),
@@ -175,7 +173,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 return r[t.Meltano.Project.ProjectMetadata].fail(
                     f"Project directory not found: {root}",
                 )
-            self.project = MeltanoProject(root)
+            self.project = Project(root)
             self.project_root = root
             info: t.Meltano.Project.ProjectMetadata = {
                 "root": str(root),
@@ -223,11 +221,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                     "name": plugin.name,
                     "type": plugin.type,
                 }
-                variant_normalized = (
-                    FlextMeltanoModels.Meltano.VariantPayload.model_validate({
-                        "value": variant_raw,
-                    }).value
-                )
+                variant_normalized = m.Meltano.VariantPayload.model_validate({
+                    "value": variant_raw,
+                }).value
                 if variant_normalized is not None:
                     plugin_def["variant"] = variant_normalized
                 plugins.append(plugin_def)

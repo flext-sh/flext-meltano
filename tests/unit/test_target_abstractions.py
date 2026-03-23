@@ -10,8 +10,7 @@ import pytest
 from flext_core import FlextLogger, r
 from flext_tests import tm
 
-from flext_meltano import t
-from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
+from flext_meltano import FlextMeltanoTargetAbstractions, t
 from tests.utilities import u
 
 logger = FlextLogger(__name__)
