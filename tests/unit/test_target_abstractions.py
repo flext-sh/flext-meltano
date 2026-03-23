@@ -11,7 +11,7 @@ from flext_core import FlextLogger, r
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoTargetAbstractions, t
-from tests.utilities import u
+from tests import u
 
 logger = FlextLogger(__name__)
 

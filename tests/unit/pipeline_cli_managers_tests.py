@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_core import r, t
+from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
@@ -19,8 +19,8 @@ from flext_meltano import (
     execute_pipeline,
     get_pipeline_status,
     list_pipelines,
-    m,
 )
+from tests import m, t
 
 
 def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:

@@ -16,10 +16,11 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextConstants, FlextSettings
+from flext_core import FlextSettings
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoSettings
+from tests import c
 
 
 class TestFlextMeltanoSettings:
@@ -217,11 +218,11 @@ class TestFlextMeltanoSettings:
 
 
 class TestFlextMeltanoSettingsEnums:
-    """Test FlextMeltanoSettings uses FlextConstants for enums."""
+    """Test FlextMeltanoSettings uses c for enums."""
 
     def test_uses_flext_constants_for_enums(self) -> None:
-        """Test that FlextMeltanoSettings uses FlextConstants for enum values."""
-        tm.that(hasattr(FlextConstants, "LogLevel"), eq=True)
+        """Test that FlextMeltanoSettings uses c for enum values."""
+        tm.that(hasattr(c, "LogLevel"), eq=True)
         tm.that(
             isinstance(FlextMeltanoSettings.model_fields["environment"].default, str),
             eq=True,

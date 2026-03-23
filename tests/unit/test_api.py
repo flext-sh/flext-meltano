@@ -19,7 +19,8 @@ from flext_core import r
 from flext_tests import tm
 from pytest_benchmark.fixture import BenchmarkFixture
 
-from flext_meltano import FlextMeltano, c, m, t
+from flext_meltano import FlextMeltano
+from tests import c, m, t
 
 pytestmark = pytest.mark.unit
 

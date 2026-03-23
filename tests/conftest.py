@@ -20,7 +20,7 @@ import pytest
 import yaml
 
 from flext_meltano import t
-from tests.helpers.docker_test_manager import Tk as tk
+from tests import Tk
 
 
 class MockCliResult:
@@ -302,34 +302,34 @@ def job_run_config() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture(scope="session")
-def docker_manager() -> tk:
+def docker_manager() -> Tk:
     """Session-scoped Docker manager fixture."""
-    return tk(keep_running=True)
+    return Tk(keep_running=True)
 
 
 @pytest.fixture
-def docker_services(docker_manager: tk) -> Generator[tk]:
+def docker_services(docker_manager: Tk) -> Generator[Tk]:
     """Function-scoped Docker services fixture."""
     with docker_manager.service_context():
         yield docker_manager
 
 
 @pytest.fixture
-def postgres_service(docker_manager: tk) -> Generator[str | None]:
+def postgres_service(docker_manager: Tk) -> Generator[str | None]:
     """PostgreSQL service fixture."""
     with docker_manager.service_context(["postgres"]):
         yield docker_manager.get_service_url("postgres", 5432)
 
 
 @pytest.fixture
-def redis_service(docker_manager: tk) -> Generator[str | None]:
+def redis_service(docker_manager: Tk) -> Generator[str | None]:
     """Redis service fixture."""
     with docker_manager.service_context(["redis"]):
         yield docker_manager.get_service_url("redis", 6379)
 
 
 @pytest.fixture
-def meltano_service(docker_manager: tk) -> Generator[str | None]:
+def meltano_service(docker_manager: Tk) -> Generator[str | None]:
     """Meltano service fixture."""
     with docker_manager.service_context(["meltano"]):
         yield docker_manager.get_service_url("meltano", 3000)

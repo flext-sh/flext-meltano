@@ -1,7 +1,7 @@
 """Test module for flext-meltano plugin type definitions.
 
 Tests the canonical t.Meltano.PluginDefinition and t.Meltano.PluginConfiguration
-types from FlextMeltanoTypes following FLEXT standards.
+types from t following FLEXT standards.
 NO ALIASES, NO BACKWARD COMPATIBILITY - Direct canonical API testing only.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -16,9 +16,7 @@ from unittest import TestCase
 
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoTypes
-
-t = FlextMeltanoTypes
+from flext_meltano import t
 
 
 class TestFlextMeltanoPluginProtocolsUnified(TestCase):
@@ -47,12 +45,12 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
         tm.that(plugin_cfg is not None, eq=True)
 
     def test_meltano_namespace_exists(self) -> None:
-        """Test FlextMeltanoTypes.Meltano namespace exists."""
-        tm.that(hasattr(FlextMeltanoTypes, "Meltano"), eq=True)
+        """Test t.Meltano namespace exists."""
+        tm.that(hasattr(t, "Meltano"), eq=True)
 
     def test_typings_module_has_documentation(self) -> None:
-        """Test FlextMeltanoTypes class has documentation."""
-        tm.that(FlextMeltanoTypes.__doc__ is not None, eq=True)
+        """Test t class has documentation."""
+        tm.that(t.__doc__ is not None, eq=True)
 
 
 if __name__ == "__main__":
