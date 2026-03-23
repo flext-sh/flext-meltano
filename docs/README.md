@@ -1,7 +1,6 @@
 # flext-meltano Documentation
 
 <!-- TOC START -->
-
 - [📋 Documentation Index](#documentation-index)
   - [**Getting Started**](#getting-started)
   - [**Development**](#development)
@@ -21,7 +20,6 @@
 - [📞 Support and Resources](#support-and-resources)
   - [**Development Support**](#development-support)
   - [**FLEXT Ecosystem Links**](#flext-ecosystem-links)
-
 <!-- TOC END -->
 
 **Documentation for the FLEXT ecosystem ELT foundation library** providing Meltano, dbt, and Singer integration.

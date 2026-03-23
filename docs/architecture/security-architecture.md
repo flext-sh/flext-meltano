@@ -1,7 +1,6 @@
 # Security Architecture Documentation
 
 <!-- TOC START -->
-
 - [📋 Table of Contents](#table-of-contents)
 - [🛡️ Security Architecture Overview](#security-architecture-overview)
   - [Security Principles](#security-principles)
@@ -36,7 +35,6 @@
 - [📈 Security Metrics and KPIs](#security-metrics-and-kpis)
   - [Key Security Metrics](#key-security-metrics)
   - [Security Health Dashboard](#security-health-dashboard)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Security Architecture and Compliance Framework**

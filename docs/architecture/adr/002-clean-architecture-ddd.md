@@ -1,7 +1,6 @@
 # ADR-002: Clean Architecture with Domain-Driven Design
 
 <!-- TOC START -->
-
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -23,7 +22,6 @@
   - [Dependency Injection](#dependency-injection)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
-
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-01-20 | **Category**: 🏗️ Architecture

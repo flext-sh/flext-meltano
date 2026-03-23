@@ -1,7 +1,6 @@
 # flext-meltano Configuration
 
 <!-- TOC START -->
-
 - [🎯 Configuration Overview](#configuration-overview)
 - [📋 Environment Setup](#environment-setup)
   - [Required Environment Variables](#required-environment-variables)
@@ -38,7 +37,6 @@
 - [🔄 Configuration Migration](#configuration-migration)
   - [Resolution Timeline](#resolution-timeline)
   - [Migration Planning](#migration-planning)
-
 <!-- TOC END -->
 
 **Configuration management for FLEXT ecosystem ELT foundation library**

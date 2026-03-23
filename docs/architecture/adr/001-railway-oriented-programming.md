@@ -1,12 +1,11 @@
 # ADR-001: Railway-Oriented Programming with r[T]
 
 <!-- TOC START -->
-
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
   - [Why Railway-Oriented Programming](#why-railway-oriented-programming)
-  - [Why r[T] from flext-core](#why-flextresultt-from-flext-core)
+  - [Why r[T] from flext-core](#why-rt-from-flext-core)
 - [Consequences](#consequences)
   - [Positive](#positive)
   - [Negative](#negative)
@@ -23,7 +22,6 @@
   - [Testing Error Scenarios](#testing-error-scenarios)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
-
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-01-15 | **Category**: 🏗️ Architecture

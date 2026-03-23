@@ -1,7 +1,6 @@
 # Architecture Documentation
 
 <!-- TOC START -->
-
 - [📋 Documentation Overview](#documentation-overview)
 - [🏗️ Documentation Framework](#documentation-framework)
   - [C4 Model Architecture](#c4-model-architecture)
@@ -30,7 +29,6 @@
 - [🎯 Architecture Evolution](#architecture-evolution)
   - [Current State](#current-state)
   - [Future Directions](#future-directions)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Enterprise Data Integration Platform - Architecture Documentation**

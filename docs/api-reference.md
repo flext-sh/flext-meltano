@@ -1,7 +1,6 @@
 # FLEXT-Meltano API Reference
 
 <!-- TOC START -->
-
 - [🎯 Library Overview](#library-overview)
   - [**Architecture Principles**](#architecture-principles)
   - [**Core Modules**](#core-modules)
@@ -34,7 +33,6 @@
   - [Advanced Pipeline Orchestration](#advanced-pipeline-orchestration)
   - [Plugin Management](#plugin-management)
 - [Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 **Complete API documentation for FLEXT-Meltano v0.9.9 - Enterprise Data Pipeline Integration**

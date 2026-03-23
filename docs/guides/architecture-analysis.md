@@ -1,18 +1,17 @@
 # FLEXT-Meltano Architecture Analysis
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [System Overview](#system-overview)
   - [Architecture Philosophy](#architecture-philosophy)
   - [Design Principles](#design-principles)
 - [Core Architecture](#core-architecture)
   - [Service Layer Architecture](#service-layer-architecture)
-  - [Implementation Architecture](#protocol-implementation-architecture)
+  - [Protocol Implementation Architecture](#protocol-implementation-architecture)
   - [Plugin Architecture](#plugin-architecture)
 - [Component Analysis](#component-analysis)
   - [Service Components](#service-components)
-  - [nts](#protocol-components)
+  - [Protocol Components](#protocol-components)
 - [Integration Patterns](#integration-patterns)
   - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
   - [External System Integration](#external-system-integration)
@@ -22,7 +21,6 @@
 - [Scalability Design](#scalability-design)
   - [Horizontal Scalability](#horizontal-scalability)
   - [Data Scalability](#data-scalability)
-
 <!-- TOC END -->
 
 **Category**: Architecture | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2025-10-05

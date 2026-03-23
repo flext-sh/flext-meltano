@@ -1,7 +1,6 @@
 # flext-meltano Integration Patterns
 
 <!-- TOC START -->
-
 - [🎯 ELT Foundation Role](#elt-foundation-role)
 - [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
   - [Tap Implementation Pattern](#tap-implementation-pattern)
@@ -25,7 +24,6 @@
 - [🔧 Integration Best Practices](#integration-best-practices)
   - [Design Patterns](#design-patterns)
   - [Quality Standards](#quality-standards)
-
 <!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**

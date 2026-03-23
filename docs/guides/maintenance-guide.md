@@ -1,7 +1,6 @@
 # Documentation Maintenance Guide
 
 <!-- TOC START -->
-
 - [🎯 Overview](#overview)
 - [🏗️ Architecture](#architecture)
   - [Core Components](#core-components)
@@ -49,7 +48,6 @@
 - [📞 Support & Resources](#support-resources)
   - [Getting Help](#getting-help)
   - [Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Documentation Quality Assurance & Maintenance Framework**

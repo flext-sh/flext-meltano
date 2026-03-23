@@ -1,7 +1,6 @@
 # Documentation Maintenance Quick Start
 
 <!-- TOC START -->
-
 - [🚀 Quick Setup](#quick-setup)
   - [1. Install Maintenance System](#1-install-maintenance-system)
   - [2. Run Your First Audit](#2-run-your-first-audit)
@@ -31,7 +30,6 @@
   - [Custom Validators](#custom-validators)
 - [🎉 Success Metrics](#success-metrics)
 - [📞 Next Steps](#next-steps)
-
 <!-- TOC END -->
 
 **Get started with automated documentation quality assurance in 5 minutes**

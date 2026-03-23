@@ -1,7 +1,6 @@
 # Getting Started with flext-meltano
 
 <!-- TOC START -->
-
 - [🎯 Overview](#overview)
 - [📋 Prerequisites](#prerequisites)
   - [**Environment Requirements**](#environment-requirements)
@@ -10,7 +9,7 @@
 - [🚀 First Steps](#first-steps)
   - [**Basic Service Usage**](#basic-service-usage)
   - [**Singer Protocol Operations**](#singer-protocol-operations)
-  - [**r Pattern**](#flextresult-pattern)
+  - [**r Pattern**](#r-pattern)
 - [🔧 Development Workflow](#development-workflow)
   - [**Quality Gates**](#quality-gates)
   - [**Common Commands**](#common-commands)
@@ -19,7 +18,6 @@
   - [**Architecture Compliance**](#architecture-compliance)
   - [**Current Status**](#current-status)
 - [Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 **ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer integration.

@@ -1,7 +1,6 @@
 # Troubleshooting flext-meltano
 
 <!-- TOC START -->
-
 - [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
   - [**Direct Import Violations**](#direct-import-violations)
 - [🔧 Development Issues](#development-issues)
@@ -18,13 +17,12 @@
   - [**Linting Errors**](#linting-errors)
   - [**Security Issues**](#security-issues)
 - [🚫 Common Mistakes](#common-mistakes)
-  - [**r Pattern Violations**](#flextresult-pattern-violations)
+  - [**r Pattern Violations**](#r-pattern-violations)
   - [**Service Pattern Violations**](#service-pattern-violations)
 - [🆘 Getting Help](#getting-help)
   - [**Debug Information**](#debug-information)
   - [**Support Channels**](#support-channels)
 - [📋 Debugging Checklist](#debugging-checklist)
-
 <!-- TOC END -->
 
 **Common issues and solutions** for flext-meltano development and usage.

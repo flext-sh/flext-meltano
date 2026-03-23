@@ -1,7 +1,6 @@
 # Quality Attributes Documentation
 
 <!-- TOC START -->
-
 - [📋 Table of Contents](#table-of-contents)
 - [🎯 Quality Attributes Overview](#quality-attributes-overview)
   - [Architectural Quality Goals](#architectural-quality-goals)
@@ -46,7 +45,6 @@
   - [Architecture Roadmap](#architecture-roadmap)
   - [Technical Debt Management](#technical-debt-management)
   - [Risk Mitigation](#risk-mitigation)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Quality Attributes and Cross-Cutting Concerns**

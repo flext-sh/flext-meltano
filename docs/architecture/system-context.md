@@ -1,7 +1,6 @@
 # System Context Documentation
 
 <!-- TOC START -->
-
 - [📋 Table of Contents](#table-of-contents)
 - [🎯 System Purpose and Scope](#system-purpose-and-scope)
   - [Primary Purpose](#primary-purpose)
@@ -35,7 +34,6 @@
   - [Key Architectural Characteristics](#key-architectural-characteristics)
   - [System Qualities](#system-qualities)
   - [Integration Philosophy](#integration-philosophy)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Ecosystem Integration and System Context**

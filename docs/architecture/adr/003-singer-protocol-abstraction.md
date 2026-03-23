@@ -1,7 +1,6 @@
 # ADR-003: Singer Protocol Abstraction Layer
 
 <!-- TOC START -->
-
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -22,7 +21,6 @@
   - [State Management](#state-management)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
-
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-02-01 | **Category**: 🏗️ Architecture

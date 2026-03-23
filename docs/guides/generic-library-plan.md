@@ -1,7 +1,6 @@
 # FLEXT-Meltano Generic Library Implementation Plan
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [Current State Analysis](#current-state-analysis)
   - [Current Architecture Issues](#current-architecture-issues)
@@ -26,7 +25,6 @@
   - [For Library Users](#for-library-users)
   - [For Plugin Developers](#for-plugin-developers)
   - [For Enterprise Integration](#for-enterprise-integration)
-
 <!-- TOC END -->
 
 **Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2025-10-05

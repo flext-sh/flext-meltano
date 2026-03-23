@@ -1,7 +1,6 @@
 # Architecture Documentation Guide
 
 <!-- TOC START -->
-
 - [🎯 Overview](#overview)
 - [🏗️ Documentation Framework](#documentation-framework)
   - [C4 Model Structure](#c4-model-structure)
@@ -49,7 +48,6 @@
 - [📚 Resources](#resources)
   - [External References](#external-references)
   - [Internal Documentation](#internal-documentation)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Architecture Documentation Framework and Best Practices**

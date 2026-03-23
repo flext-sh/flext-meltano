@@ -1,7 +1,6 @@
 # flext-meltano Architecture
 
 <!-- TOC START -->
-
 - [🎯 Architectural Overview](#architectural-overview)
   - [**Design Principles**](#design-principles)
 - [🏗️ Module Architecture](#module-architecture)
@@ -23,7 +22,7 @@
   - [**FlextMeltanoTypes Hierarchy**](#flextmeltanotypes-hierarchy)
   - [**Pydantic Model Integration**](#pydantic-model-integration)
 - [🛡️ Error Handling Architecture](#error-handling-architecture)
-  - [**r Pattern Implementation**](#flextresult-pattern-implementation)
+  - [**r Pattern Implementation**](#r-pattern-implementation)
   - [**Exception Hierarchy**](#exception-hierarchy)
 - [🎯 Current Status and Technical Debt](#current-status-and-technical-debt)
   - [**Architecture Compliance Status**](#architecture-compliance-status)
@@ -32,7 +31,6 @@
   - [**Target State**](#target-state)
   - [**Migration Path**](#migration-path)
 - [Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 **Enterprise Meltano integration library architecture for the FLEXT ecosystem**

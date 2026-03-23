@@ -1,7 +1,6 @@
 # Data Architecture Documentation
 
 <!-- TOC START -->
-
 - [📋 Table of Contents](#table-of-contents)
 - [🏗️ Data Flow Architecture](#data-flow-architecture)
   - [High-Level Data Flow](#high-level-data-flow)
@@ -32,7 +31,6 @@
 - [📈 Architecture Evolution](#architecture-evolution)
   - [Current Limitations](#current-limitations)
   - [Future Enhancements](#future-enhancements)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**

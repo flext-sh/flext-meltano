@@ -1,7 +1,6 @@
 # Architecture Decision Records (ADRs)
 
 <!-- TOC START -->
-
 - [Overview](#overview)
 - [ADR Process](#adr-process)
   - [Creating an ADR](#creating-an-adr)
@@ -29,7 +28,6 @@
   - [Writing Effective ADRs](#writing-effective-adrs)
   - [Review Process](#review-process)
 - [Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 **FLEXT-Meltano Architectural Decisions and Rationale**
