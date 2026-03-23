@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
     from flext_tests import d, e, h, r, s, x
 
-    from . import helpers as helpers, integration as integration, unit as unit
-    from .conftest import (
+    from tests import helpers, integration, unit
+    from tests.conftest import (
         CliRunner,
         MockCliResult,
         MockCliRunner,
@@ -45,18 +45,24 @@ if TYPE_CHECKING:
         test_environment_config,
         test_meltano_project_dir,
     )
-    from .constants import FlextMeltanoTestConstants, FlextMeltanoTestConstants as c
-    from .helpers.docker_test_manager import (
+    from tests.constants import (
+        FlextMeltanoTestConstants,
+        FlextMeltanoTestConstants as c,
+    )
+    from tests.helpers.docker_test_manager import (
         ContainerManager,
         Tk,
         docker_manager,
         docker_services,
     )
-    from .integration.test_docker_integration import TestDockerIntegration
-    from .models import FlextMeltanoTestModels, FlextMeltanoTestModels as m
-    from .protocols import FlextMeltanoTestProtocols, FlextMeltanoTestProtocols as p
-    from .typings import FlextMeltanoTestTypes, FlextMeltanoTestTypes as t
-    from .unit.pipeline_cli_managers_tests import (
+    from tests.integration.test_docker_integration import TestDockerIntegration
+    from tests.models import FlextMeltanoTestModels, FlextMeltanoTestModels as m
+    from tests.protocols import (
+        FlextMeltanoTestProtocols,
+        FlextMeltanoTestProtocols as p,
+    )
+    from tests.typings import FlextMeltanoTestTypes, FlextMeltanoTestTypes as t
+    from tests.unit.pipeline_cli_managers_tests import (
         test_create_pipeline_creates_directory_and_configuration,
         test_create_pipeline_fails_without_configuration,
         test_delete_pipeline_removes_configuration_directory,
@@ -65,7 +71,7 @@ if TYPE_CHECKING:
         test_get_pipeline_status_checks_process_state,
         test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
     )
-    from .unit.test_api import (
+    from tests.unit.test_api import (
         TestFlextMeltanoCatalogOperations,
         TestFlextMeltanoDataOperations,
         TestFlextMeltanoDbtOperations,
@@ -80,30 +86,30 @@ if TYPE_CHECKING:
         TestFlextMeltanoSuccessPaths,
         pytestmark,
     )
-    from .unit.test_cli_integration import (
+    from tests.unit.test_cli_integration import (
         TestCliModelConverterWithDbtRunParams,
         TestCliModelConverterWithPipelineRunParams,
         TestCliModelConverterWithTapRunParams,
         TestCliModelConverterWithTargetRunParams,
     )
-    from .unit.test_config import (
+    from tests.unit.test_config import (
         TestFlextMeltanoSettings,
         TestFlextMeltanoSettingsConstants,
         TestFlextMeltanoSettingsEdgeCases,
         TestFlextMeltanoSettingsEnums,
         TestFlextMeltanoSettingsIntegration,
     )
-    from .unit.test_constants import Testc
-    from .unit.test_execution_result import TestFlextMeltanoExecutionResult, tm
-    from .unit.test_executors import TestFlextMeltanoExecutorComplete
-    from .unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
-    from .unit.test_library_runner import (
+    from tests.unit.test_constants import Testc
+    from tests.unit.test_execution_result import TestFlextMeltanoExecutionResult, tm
+    from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
+    from tests.unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
+    from tests.unit.test_library_runner import (
         TestFlextDbtProgrammaticRunner,
         TestFlextMeltanoLibraryRunner,
         TestFlextSingerProtocolManager,
         TestProjectAdapterIntegration,
     )
-    from .unit.test_models import (
+    from tests.unit.test_models import (
         TestDbtProjectModelEnhanced,
         TestMeltanoProjectModelEnhanced,
         TestModelIntegration,
@@ -112,8 +118,8 @@ if TYPE_CHECKING:
         TestTapConfigEnhanced,
         TestTargetConfigEnhanced,
     )
-    from .unit.test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
-    from .unit.test_services import (
+    from tests.unit.test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
+    from tests.unit.test_services import (
         TestDbtService,
         TestFlextMeltanoServiceInitialization,
         TestServiceArchitecture,
@@ -124,23 +130,26 @@ if TYPE_CHECKING:
         TestTapService,
         TestTargetService,
     )
-    from .unit.test_singer_cli_translator import (
+    from tests.unit.test_singer_cli_translator import (
         TestFlextMeltanoSingerCliTranslatorDbtRun,
         TestFlextMeltanoSingerCliTranslatorExecuteCommand,
         TestFlextMeltanoSingerCliTranslatorPipelineRun,
         TestFlextMeltanoSingerCliTranslatorTapRun,
         TestFlextMeltanoSingerCliTranslatorTargetRun,
     )
-    from .unit.test_singer_types import TestFlextSingerTypes
-    from .unit.test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
-    from .unit.test_target_abstractions import (
+    from tests.unit.test_singer_types import TestFlextSingerTypes
+    from tests.unit.test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
+    from tests.unit.test_target_abstractions import (
         TestFlextMeltanoTargetAbstractionsComplete,
         logger,
     )
-    from .unit.test_typings import TestFlextMeltanoTypes
-    from .unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
-    from .unit.test_validators import TestFlextMeltanoValidatorsComprehensive
-    from .utilities import FlextMeltanoTestUtilities, FlextMeltanoTestUtilities as u
+    from tests.unit.test_typings import TestFlextMeltanoTypes
+    from tests.unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
+    from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
+    from tests.utilities import (
+        FlextMeltanoTestUtilities,
+        FlextMeltanoTestUtilities as u,
+    )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "CliRunner": ("tests.conftest", "CliRunner"),
