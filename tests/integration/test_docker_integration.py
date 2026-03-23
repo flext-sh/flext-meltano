@@ -12,7 +12,7 @@ import psycopg2
 import pytest
 import redis
 
-from tests.helpers.docker_test_manager import Tk as tk
+from tests import Tk as tk
 
 
 class TestDockerIntegration:

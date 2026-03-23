@@ -115,7 +115,7 @@ fixtures/
 ```python
 # Standard pytest fixture usage
 import pytest
-from tests.fixtures import (
+from tests import (
     sample_csv_data,
     meltano_test_project,
     mock_singer_tap,

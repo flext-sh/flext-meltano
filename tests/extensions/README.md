@@ -174,7 +174,7 @@ def test_custom_tap_extension():
 def test_oracle_oic_extension():
     """Test Oracle Integration Cloud specialized extension."""
 
-from tests.extensions.oracle_oic import OracleOicExtension
+from tests import OracleOicExtension
 
     # Test OIC-specific functionality
     oic_extension = OracleOicExtension()
@@ -196,7 +196,7 @@ from tests.extensions.oracle_oic import OracleOicExtension
 def test_compliance_extension():
     """Test regulatory compliance extension functionality."""
 
-from tests.extensions.compliance import ComplianceExtension
+from tests import ComplianceExtension
 
     compliance = ComplianceExtension()
 
