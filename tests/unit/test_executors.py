@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
 from unittest import mock
 
@@ -382,7 +383,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(runner_result)
         runner_data = runner_result.value
         tm.that(isinstance(runner_data, dict), eq=True)
-        cli_tests: list[list[str]] = [
+        cli_tests: Sequence[Sequence[str]] = [
             [],
             ["--help"],
             ["version"],
@@ -397,7 +398,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases to increase coverage."""
-        edge_case_commands: list[tuple[str, list[str]]] = [
+        edge_case_commands: Sequence[tuple[str, Sequence[str]]] = [
             ("nonexistent", []),
             ("", ["args"]),
             ("version", ["extra", "args"]),
@@ -434,7 +435,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_internal_method_direct_invocation(self) -> None:
         """Test internal methods directly to increase coverage."""
-        run_command_tests: list[list[str]] = [
+        run_command_tests: Sequence[Sequence[str]] = [
             [],
             ["tap-csv"],
             ["tap-csv", "target-jsonl"],

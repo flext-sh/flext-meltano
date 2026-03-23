@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import shutil
 import tempfile
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import yaml
@@ -61,7 +61,7 @@ class FlextMeltanoFileManagers:
     def create_directory_structure(
         cls,
         base_path: Path,
-        directories: list[str],
+        directories: Sequence[str],
     ) -> r[Mapping[str, str]]:
         """Create directory structure using direct pathlib implementation.
 
@@ -71,7 +71,7 @@ class FlextMeltanoFileManagers:
         """
 
         def _create_dirs() -> Mapping[str, str]:
-            created_paths: dict[str, str] = {}
+            created_paths: Mapping[str, str] = {}
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
@@ -195,12 +195,12 @@ class FlextMeltanoFileManagers:
                 "transform/tests",
                 "transform/data",
             ]
-            created_paths: dict[str, Path | str] = {}
+            created_paths: Mapping[str, Path | str] = {}
             for directory in directories:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
-            plugin_items: dict[str, list[t.NormalizedValue]] = {
+            plugin_items: Mapping[str, Sequence[t.NormalizedValue]] = {
                 "extractors": [],
                 "loaders": [],
                 "transformers": [],
@@ -211,8 +211,8 @@ class FlextMeltanoFileManagers:
                 "project_name": "project_name",
                 "plugins": plugin_items,
             }
-            model_paths: list[str] = ["models"]
-            test_paths: list[str] = ["tests"]
+            model_paths: Sequence[str] = ["models"]
+            test_paths: Sequence[str] = ["tests"]
             dbt_project_config: t.Meltano.FileConfigDict = {
                 "name": "project_name",
                 "version": "1.0.0",
@@ -220,7 +220,7 @@ class FlextMeltanoFileManagers:
                 "model-paths": model_paths,
                 "test-paths": test_paths,
             }
-            configs: dict[str, t.Meltano.FileConfigDict] = {
+            configs: Mapping[str, t.Meltano.FileConfigDict] = {
                 c.Meltano.Paths.MELTANO_PROJECT_FILE: meltano_config,
                 "transform/dbt_project.yml": dbt_project_config,
             }
@@ -284,12 +284,12 @@ class FlextMeltanoFileManagers:
 
     @staticmethod
     def _normalize_file_config(
-        raw: dict[
+        raw: Mapping[
             str,
-            t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+            t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
         ],
-    ) -> dict[str, t.NormalizedValue]:
-        normalized: dict[str, t.NormalizedValue] = {}
+    ) -> Mapping[str, t.NormalizedValue]:
+        normalized: Mapping[str, t.NormalizedValue] = {}
         for key, value in raw.items():
             if value is None or u.is_scalar(value):
                 normalized[key] = value
@@ -297,7 +297,7 @@ class FlextMeltanoFileManagers:
             if isinstance(value, list):
                 normalized[key] = [item for item in value if item is not None]
                 continue
-            nested: dict[str, t.Scalar] = {}
+            nested: Mapping[str, t.Scalar] = {}
             for nested_key, nested_value in value.items():
                 if u.is_scalar(nested_value):
                     nested[str(nested_key)] = nested_value

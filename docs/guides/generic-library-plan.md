@@ -231,7 +231,7 @@ sync_result = tap.sync(selected_streams)
 # Generic plugin discovery
 def discover_plugins(
     plugin_type: str | None = None, source: PluginSource = PluginSource.AUTO
-) -> r[list[PluginInfo]]:
+) -> r[Sequence[PluginInfo]]:
     """Discover plugins from multiple sources.
 
     Args:
@@ -289,7 +289,7 @@ def execute_tap(
 
 ```python
 def execute_target(
-    target_name: str, records: list[t.Dict], config: t.Dict
+    target_name: str, records: Sequence[t.Dict], config: t.Dict
 ) -> r[TargetExecutionResult]:
     """Execute Singer target with records.
 

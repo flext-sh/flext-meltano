@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -102,7 +102,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             Mapping[str, t.NormalizedValue]
             | t.NormalizedValue
             | t.Meltano.MeltanoConfigDict
-            | list[t.Scalar | None]
+            | Sequence[t.Scalar | None]
             | Mapping[str, t.Scalar | None]
         ),
     ) -> t.NormalizedValue:
@@ -111,14 +111,14 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         if isinstance(value, t.SCALAR_TYPES):
             return value
         if isinstance(value, (list, tuple)):
-            normalized_items: list[t.NormalizedValue] = []
+            normalized_items: Sequence[t.NormalizedValue] = []
             for item in value:
                 if item is None:
                     continue
                 normalized_items.append(FlextMeltano._normalize_container_value(item))
             return normalized_items
         if isinstance(value, Mapping):
-            normalized_mapping: dict[str, t.NormalizedValue] = {}
+            normalized_mapping: Mapping[str, t.NormalizedValue] = {}
             for key, item in value.items():
                 if item is None:
                     continue
@@ -131,10 +131,10 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     @staticmethod
     def _normalize_nested_config(
         value: t.Meltano.MeltanoConfigDict | Mapping[str, t.NormalizedValue] | None,
-    ) -> dict[str, t.NormalizedValue]:
+    ) -> Mapping[str, t.NormalizedValue]:
         if value is None:
             return {}
-        normalized: dict[str, t.NormalizedValue] = {}
+        normalized: Mapping[str, t.NormalizedValue] = {}
         for key, item in value.items():
             if item is None:
                 continue
@@ -148,19 +148,22 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             | Mapping[str, t.NormalizedValue]
             | Mapping[
                 str,
-                t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+                t.Scalar
+                | Sequence[t.Scalar | None]
+                | Mapping[str, t.Scalar | None]
+                | None,
             ]
             | None
         ),
     ) -> t.Meltano.MeltanoConfigDict:
         if value is None:
             return {}
-        normalized: dict[str, t.NormalizedValue] = {}
+        normalized: Mapping[str, t.NormalizedValue] = {}
         for key, item in value.items():
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
         return normalized
 
-    def _service_settings_config(self) -> dict[str, str]:
+    def _service_settings_config(self) -> Mapping[str, str]:
         settings = self.config
         return {
             "project_root": str(settings.project_root),
@@ -209,14 +212,14 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         return r[t.Meltano.MeltanoConfigDict].ok(result_data)
 
     @staticmethod
-    def list_pipelines() -> r[list[t.Meltano.MeltanoConfigDict]]:
+    def list_pipelines() -> r[Sequence[t.Meltano.MeltanoConfigDict]]:
         """List configured pipelines.
 
         Returns:
             List of pipeline configurations.
 
         """
-        return r[list[t.Meltano.MeltanoConfigDict]].ok([])
+        return r[Sequence[t.Meltano.MeltanoConfigDict]].ok([])
 
     def call(
         self,
@@ -233,7 +236,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             Operation result as JSON value.
 
         """
-        operation_dispatch: dict[
+        operation_dispatch: Mapping[
             str,
             Callable[[Mapping[str, t.Scalar]], r[t.Meltano.ResultDict]],
         ] = {
@@ -540,7 +543,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 f"Invalid plugin name format: {plugin_name}",
             )
         try:
-            plugin_config: dict[str, t.NormalizedValue] = {
+            plugin_config: Mapping[str, t.NormalizedValue] = {
                 "name": plugin_name,
                 "namespace": plugin_name.replace("-", "_"),
                 "pip_url": f"pipelinewise-{plugin_name}",
@@ -563,7 +566,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     def list_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[t.Meltano.MeltanoConfigDict]]:
+    ) -> r[Sequence[t.Meltano.MeltanoConfigDict]]:
         """List installed plugins using flext-core patterns."""
         try:
             all_plugins = [
@@ -577,23 +580,23 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 else all_plugins
             )
             plugins_list = list(filtered_plugins) if filtered_plugins else []
-            plugins_data: list[t.Meltano.MeltanoConfigDict] = []
+            plugins_data: Sequence[t.Meltano.MeltanoConfigDict] = []
             for plugin_entry in plugins_list:
                 plugin_payload = self._normalize_config_mapping({
                     **plugin_entry,
                     "api_version": self.version,
                 })
                 plugins_data.append(plugin_payload)
-            return r[list[t.Meltano.MeltanoConfigDict]].ok(plugins_data)
+            return r[Sequence[t.Meltano.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[list[t.Meltano.MeltanoConfigDict]].fail(
+            return r[Sequence[t.Meltano.MeltanoConfigDict]].fail(
                 f"Plugin listing failed: {e}",
             )
 
     def load_data(
         self,
         sink_name: str,
-        records: list[t.Meltano.RecordDict] | None = None,
+        records: Sequence[t.Meltano.RecordDict] | None = None,
     ) -> r[t.Meltano.ResultDict]:
         """Load data to sink - delegates to service."""
         try:
@@ -895,7 +898,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         result = self.list_plugins(p.plugin_type)
         if result.is_failure:
             return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
-        plugins: list[t.NormalizedValue] = [
+        plugins: Sequence[t.NormalizedValue] = [
             self._normalize_container_value(plugin) for plugin in result.value
         ]
         return r[t.Meltano.ResultDict].ok({"plugins": plugins})

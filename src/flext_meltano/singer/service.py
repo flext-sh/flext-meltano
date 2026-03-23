@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar, override
 
@@ -114,7 +115,7 @@ class FlextMeltanoSingerService(s[str]):
             records_processed = 0
             records_written = 0
             errors = 0
-            records: list[m.Meltano.SingerRecordMessage] = []
+            records: Sequence[m.Meltano.SingerRecordMessage] = []
             tap.sync(catalog, state)
             target.consume(records)
             result = m.Meltano.SingerSyncResult(

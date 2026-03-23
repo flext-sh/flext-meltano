@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -163,7 +163,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             self.logger.exception("Failed to save catalog", error=str(e))
             return r[None].fail(f"Failed to save catalog: {e}")
 
-    def select_streams(self, stream_names: list[str]) -> r[m.Meltano.SingerCatalog]:
+    def select_streams(self, stream_names: Sequence[str]) -> r[m.Meltano.SingerCatalog]:
         """Select specific streams from catalog.
 
         Args:

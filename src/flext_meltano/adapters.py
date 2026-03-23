@@ -15,6 +15,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
+from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -83,7 +84,7 @@ class FlextMeltanoAdapter:
                 project_dir=project_root,
             )
 
-    class PluginAdapter(s[list[t.Meltano.PluginDefinition]]):
+    class PluginAdapter(s[Sequence[t.Meltano.PluginDefinition]]):
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
         @classmethod
@@ -95,14 +96,14 @@ class FlextMeltanoAdapter:
         def discover_plugins(
             self,
             plugin_type: str | None = None,
-        ) -> r[list[t.Meltano.PluginDefinition]]:
+        ) -> r[Sequence[t.Meltano.PluginDefinition]]:
             """Discover available plugins of specified type.
 
             Note: Real plugin discovery requires u.
             Use FlextMeltano.discover_plugins() for full implementation.
             """
             try:
-                plugins: list[t.Meltano.PluginDefinition] = [
+                plugins: Sequence[t.Meltano.PluginDefinition] = [
                     {"name": "tap-postgres", "type": "tap", "variant": "meltanolabs"},
                     {
                         "name": "target-jsonl",
@@ -116,15 +117,15 @@ class FlextMeltanoAdapter:
                         for plugin in plugins
                         if u.get(plugin, "type") == plugin_type
                     ]
-                return r[list[t.Meltano.PluginDefinition]].ok(plugins)
+                return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-                return r[list[t.Meltano.PluginDefinition]].fail(
+                return r[Sequence[t.Meltano.PluginDefinition]].fail(
                     f"Plugin discovery failed: {ex}",
                 )
 
         @override
         @override
-        def execute(self) -> r[list[t.Meltano.PluginDefinition]]:
+        def execute(self) -> r[Sequence[t.Meltano.PluginDefinition]]:
             """Execute default plugin operation."""
             return self.discover_plugins()
 

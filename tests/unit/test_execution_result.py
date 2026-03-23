@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from unittest.mock import patch
 
 from flext_tests import tm
@@ -16,7 +17,7 @@ from tests import m
 
 
 class _ExecutionResultJson(BaseModel):
-    command: list[str]
+    command: Sequence[str]
     success: bool
     exit_code: int
     output: str
@@ -79,7 +80,7 @@ class TestFlextMeltanoExecutionResult:
 
     def test_initialization_with_empty_command(self) -> None:
         """Test initialization with empty command."""
-        command: list[str] = []
+        command: Sequence[str] = []
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=False,

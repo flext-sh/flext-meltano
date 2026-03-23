@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Annotated, override
 
@@ -94,7 +95,7 @@ class FlextMeltanoMeltanoService(s[str]):
     def discover_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[t.Meltano.PluginDefinition]]:
+    ) -> r[Sequence[t.Meltano.PluginDefinition]]:
         """Discover plugins in the project.
 
         Args:
@@ -121,7 +122,7 @@ class FlextMeltanoMeltanoService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to discover plugins", error=str(e))
-            return r[list[t.Meltano.PluginDefinition]].fail(
+            return r[Sequence[t.Meltano.PluginDefinition]].fail(
                 f"Failed to discover plugins: {e}",
             )
 

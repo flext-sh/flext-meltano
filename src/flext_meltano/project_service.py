@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -61,7 +61,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         | Mapping[str, t.NormalizedValue]
         | None,
     ) -> r[t.Meltano.Dbt.Project]:
-        """Convert Meltano project t.NormalizedValue to FLEXT dict[str, t.NormalizedValue] representation."""
+        """Convert Meltano project t.NormalizedValue to FLEXT Mapping[str, t.NormalizedValue] representation."""
         try:
             name_attr = getattr(project, "name", None)
             root_attr = getattr(project, "root", None)
@@ -151,9 +151,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         project_id: str,
     ) -> r[Mapping[str, t.NormalizedValue]]:
         """Generate minimal meltano.yml configuration."""
-        extractors: list[t.Dict] = []
-        loaders: list[t.Dict] = []
-        transformers: list[t.Dict] = []
+        extractors: Sequence[t.Dict] = []
+        loaders: Sequence[t.Dict] = []
+        transformers: Sequence[t.Dict] = []
         config = {
             "version": 1,
             "default_environment": "dev",
@@ -318,7 +318,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         prefix: Temporary directory prefix for organization
 
         Returns:
-        r containing project dict[str, t.NormalizedValue] with standardized structure
+        r containing project Mapping[str, t.NormalizedValue] with standardized structure
 
         """
         return (
@@ -385,7 +385,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         project_root: Directory path containing meltano.yml
 
         Returns:
-        r containing initialized project dict[str, t.NormalizedValue] or validation error
+        r containing initialized project Mapping[str, t.NormalizedValue] or validation error
 
         """
         return (
@@ -403,7 +403,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     ) -> r[Mapping[str, str]]:
         """Build successful project creation result."""
         try:
-            result: dict[str, str] = {
+            result: Mapping[str, str] = {
                 "success": "true",
                 "project_name": project_name,
                 "project_path": str(project_path),

@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
@@ -75,11 +75,11 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             tap_stream_id: str
             schema: Mapping[str, t.Container]
 
-            def get_records(self) -> list[Mapping[str, t.Container]]:
+            def get_records(self) -> Sequence[Mapping[str, t.Container]]:
                 """Get records from the stream. # INTERFACE."""
                 ...
 
-            def sync_records(self) -> list[Mapping[str, t.Container]]:
+            def sync_records(self) -> Sequence[Mapping[str, t.Container]]:
                 """Sync records from the stream. # INTERFACE."""
                 ...
 
@@ -114,7 +114,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
             def handle_batch(
                 self,
-                records: list[t.Meltano.RecordDict],
+                records: Sequence[t.Meltano.RecordDict],
             ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
                 """Handle a batch of records with r."""
                 ...
@@ -140,14 +140,14 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
             def run(
                 self,
-                models: list[str],
+                models: Sequence[str],
             ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
                 """Run DBT models with r."""
                 ...
 
             def test(
                 self,
-                models: list[str],
+                models: Sequence[str],
             ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
                 """Test DBT models with r."""
                 ...
@@ -181,7 +181,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class CLIManager(Protocol):
             """Base protocol for CLI managers."""
 
-            def handle_command(self, args: list[str]) -> r[str]:
+            def handle_command(self, args: Sequence[str]) -> r[str]:
                 """Handle CLI command."""
                 ...
 
@@ -189,15 +189,15 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class SingerManager(Protocol):
             """Protocol for Singer CLI manager."""
 
-            def handle_command(self, args: list[str]) -> r[str]:
+            def handle_command(self, args: Sequence[str]) -> r[str]:
                 """Handle CLI command."""
                 ...
 
-            def handle_tap_command(self, args: list[str]) -> r[str]:
+            def handle_tap_command(self, args: Sequence[str]) -> r[str]:
                 """Handle tap command."""
                 ...
 
-            def handle_target_command(self, args: list[str]) -> r[str]:
+            def handle_target_command(self, args: Sequence[str]) -> r[str]:
                 """Handle target command."""
                 ...
 
@@ -205,11 +205,11 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class StatusManager(Protocol):
             """Protocol for Status CLI manager."""
 
-            def handle_command(self, args: list[str]) -> r[str]:
+            def handle_command(self, args: Sequence[str]) -> r[str]:
                 """Handle CLI command."""
                 ...
 
-            def handle_version_command(self, args: list[str]) -> r[str]:
+            def handle_version_command(self, args: Sequence[str]) -> r[str]:
                 """Handle version command."""
                 ...
 
@@ -267,7 +267,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             def find_plugins(
                 self,
                 plugin_type: str,
-            ) -> list[t.Meltano.PluginDefinition]:
+            ) -> Sequence[t.Meltano.PluginDefinition]:
                 """Find plugins of specified type."""
                 ...
 
@@ -327,7 +327,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             that implement the Singer protocol for data source integration.
             """
 
-            streams: list[str]
+            streams: Sequence[str]
             name: str
             state: m.Meltano.SingerStateMessage
 
@@ -338,7 +338,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             def get_records(
                 self,
                 stream_name: str,
-            ) -> list[m.Meltano.SingerRecordMessage]:
+            ) -> Sequence[m.Meltano.SingerRecordMessage]:
                 """Get records for a specific stream."""
                 ...
 
@@ -364,7 +364,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             name: str
             config: m.Meltano.TargetConfig
 
-            def consume(self, records: list[m.Meltano.SingerRecordMessage]) -> int:
+            def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
                 """Consume records batch.
 
                 Args:

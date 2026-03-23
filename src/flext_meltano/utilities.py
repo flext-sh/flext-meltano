@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TextIO
 
@@ -127,7 +127,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "environments": environments,
                     "plugins": plugins,
                 }
-                default_envs: list[dict[str, str]] = [
+                default_envs: Sequence[Mapping[str, str]] = [
                     {"name": env} for env in c.Meltano.Metadata.DEFAULT_ENVIRONMENTS
                 ]
                 project_id_val = str(raw_config.get("project_id", ""))
@@ -169,7 +169,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
                     "values": result_cfg,
                 }).values
-                normalized_cfg: dict[str, t.NormalizedValue] = {}
+                normalized_cfg: Mapping[str, t.NormalizedValue] = {}
                 for key, value in normalized_values.items():
                     if value is None:
                         continue
@@ -201,7 +201,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             executable: str = "",
         ) -> r[t.Meltano.PluginConfigDict]:
             """Create MELTANO-SPECIFIC plugin config using DSL builder pattern."""
-            raw: dict[str, t.Scalar] = {
+            raw: Mapping[str, t.Scalar] = {
                 "name": name,
                 "namespace": namespace,
                 "pip_url": pip_url,
@@ -217,7 +217,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 return u.safe_string(str(val))
 
             def build_plugin(
-                d: dict[str, t.Scalar],
+                d: Mapping[str, t.Scalar],
             ) -> t.Meltano.PluginConfigDict:
                 type_val = d.get("type", "extractor")
                 return {
@@ -238,7 +238,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             return r[t.Meltano.PluginConfigDict].ok(result)
 
         @classmethod
-        def default_catalog(cls) -> list[t.Meltano.PluginDefinition]:
+        def default_catalog(cls) -> Sequence[t.Meltano.PluginDefinition]:
             """Provide default plugin catalog entries for discovery workflows."""
             return [
                 {
@@ -251,7 +251,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             ]
 
         @classmethod
-        def get_all_plugins(cls) -> list[t.Meltano.PluginDefinition]:
+        def get_all_plugins(cls) -> Sequence[t.Meltano.PluginDefinition]:
             """Compatibility shim for existing discovery logic."""
             return cls.default_catalog()
 
@@ -277,7 +277,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
                     "values": config_dict,
                 }).values
-                converted: dict[str, t.NormalizedValue] = {}
+                converted: Mapping[str, t.NormalizedValue] = {}
                 for key, value in normalized_values.items():
                     if value is None:
                         continue
@@ -421,7 +421,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             ).map_error(lambda e: f"Failed to check directory existence: {e}")
 
         @staticmethod
-        def supported_types() -> list[str]:
+        def supported_types() -> Sequence[str]:
             """Return the supported plugin type identifiers."""
             return [
                 plugin_type.value

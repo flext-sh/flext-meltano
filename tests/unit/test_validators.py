@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import cast
 
 import pytest
@@ -24,7 +24,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     """Comprehensive tests for FlextMeltanoValidators with 100% coverage."""
 
     def test_validate_plugin_config_valid(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -34,13 +34,13 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.ok(result)
 
     def test_validate_plugin_config_missing_fields(self) -> None:
-        config: dict[str, t.Scalar] = {"name": "tap-csv"}
+        config: Mapping[str, t.Scalar] = {"name": "tap-csv"}
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
         tm.fail(result)
 
     def test_validate_plugin_config_empty_fields(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -51,7 +51,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.fail(result)
 
     def test_validate_plugin_config_invalid_types(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": 123,
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
@@ -72,17 +72,17 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.that(isinstance(result, r), eq=True)
 
     def test_validate_meltano_config_valid(self) -> None:
-        config: dict[str, t.Scalar] = {"version": 1, "project_id": "test-project"}
+        config: Mapping[str, t.Scalar] = {"version": 1, "project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         tm.ok(result)
 
     def test_validate_meltano_config_missing_version(self) -> None:
-        config: dict[str, t.Scalar] = {"project_id": "test-project"}
+        config: Mapping[str, t.Scalar] = {"project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         tm.that(result.is_failure or result.is_success, eq=True)
 
     def test_validate_meltano_config_invalid_version(self) -> None:
-        config: dict[str, t.Scalar] = {"version": 2, "project_id": "test-project"}
+        config: Mapping[str, t.Scalar] = {"version": 2, "project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         tm.fail(result)
         tm.fail(result)
@@ -93,7 +93,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.that(validator is not None, eq=True)
 
     def test_validate_dbt_config_valid(self) -> None:
-        dbt_config: dict[str, t.Scalar] = {
+        dbt_config: Mapping[str, t.Scalar] = {
             "name": "analytics",
             "version": 1,
             "transformation_version": "1.0.0",
@@ -105,7 +105,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.ok(result)
 
     def test_validate_dbt_config_missing_required(self) -> None:
-        dbt_config: dict[str, t.Scalar] = {"name": "analytics"}
+        dbt_config: Mapping[str, t.Scalar] = {"name": "analytics"}
         result = FlextMeltanoValidators.validate_transformation_business_rules(
             dbt_config
         )
@@ -117,7 +117,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     )
     def test_validate_plugin_config_parametrized_invalid(
         self,
-        invalid_config: t.Scalar | dict[str, t.Scalar] | list[t.Scalar] | None,
+        invalid_config: t.Scalar | Mapping[str, t.Scalar] | Sequence[t.Scalar] | None,
     ) -> None:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("Mapping[str, t.Scalar]", invalid_config)
@@ -126,23 +126,23 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.fail(result)
 
     def test_complex_validation_scenario(self) -> None:
-        meltano_config: dict[str, t.Scalar] = {
+        meltano_config: Mapping[str, t.Scalar] = {
             "version": 1,
             "project_id": "integration-test",
         }
-        dbt_config: dict[str, t.Scalar] = {
+        dbt_config: Mapping[str, t.Scalar] = {
             "name": "analytics",
             "version": 1,
             "transformation_version": "1.0.0",
             "profile": "analytics_profile",
         }
-        tap_config: dict[str, t.Scalar] = {
+        tap_config: Mapping[str, t.Scalar] = {
             "name": "tap-csv",
             "namespace": "tap_csv",
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-        target_config: dict[str, t.Scalar] = {
+        target_config: Mapping[str, t.Scalar] = {
             "name": "target-postgres",
             "namespace": "target_postgres",
             "pip_url": "pipelinewise-target-postgres",
@@ -175,7 +175,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         )
         tm.that(hasattr(FlextMeltanoValidators, "safe_json_stringify"), eq=False)
         tm.that(hasattr(FlextMeltanoValidators, "Text"), eq=False)
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "test-plugin",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -185,7 +185,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.ok(result)
 
     def test_validate_plugin_name_empty(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -198,7 +198,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             tm.that("Plugin config validation failed" in result.error, eq=True)
 
     def test_validate_plugin_name_whitespace(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "   ",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -211,7 +211,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             tm.that("Plugin config validation failed" in result.error, eq=True)
 
     def test_validate_target_plugin_name_too_short(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "target-",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -228,7 +228,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             )
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "tap-",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -245,7 +245,7 @@ class TestFlextMeltanoValidatorsComprehensive:
             )
 
     def test_validate_target_plugin_name_valid(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "target-postgres",
             "namespace": "test_ns",
             "pip_url": "test",
@@ -255,7 +255,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.ok(result)
 
     def test_validate_tap_plugin_name_valid(self) -> None:
-        config: dict[str, t.Scalar] = {
+        config: Mapping[str, t.Scalar] = {
             "name": "tap-csv",
             "namespace": "test_ns",
             "pip_url": "test",

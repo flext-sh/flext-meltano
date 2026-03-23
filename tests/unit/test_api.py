@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
 from typing import cast, override
 
@@ -213,7 +214,7 @@ class TestFlextMeltanoDataOperations:
     def test_load_data_with_records(self) -> None:
         """Test data loading with actual records."""
         api = FlextMeltano()
-        records: list[t.Meltano.RecordDict] = [{"id": 1, "name": "test"}]
+        records: Sequence[t.Meltano.RecordDict] = [{"id": 1, "name": "test"}]
         result = api.load_data(sink_name="target-jsonl", records=records)
         tm.that(result.is_failure or result.is_success, eq=True)
 

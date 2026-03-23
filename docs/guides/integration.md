@@ -85,7 +85,7 @@ class FlextOracleTapService(FlextService):
         super().__init__()
         self._tap_abstractions = FlextMeltanoTapAbstractions()
 
-    def discover_oracle_streams(self, config: dict) -> r[list[StreamDefinition]]:
+    def discover_oracle_streams(self, config: dict) -> r[Sequence[StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
         return self._tap_abstractions.discover_catalog("tap-oracle")
 

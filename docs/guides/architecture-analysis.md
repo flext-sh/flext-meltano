@@ -84,7 +84,7 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 ```python
 # Plugin operations
-discover_plugins() -> r[list[PluginInfo]]
+discover_plugins() -> r[Sequence[PluginInfo]]
 install_plugin(name: str, version: str | None) -> r[PluginInstallResult]
 execute_tap(name: str, config: dict) -> r[TapExecutionResult]
 
@@ -140,7 +140,7 @@ class FlextSingerTarget(FlextService):
     """Singer target with batch processing and error handling."""
 
     def __init__(self, target_name: str, config: t.Dict)
-    async def load_records(self, records: list[t.Dict]) -> r[LoadResult]
+    async def load_records(self, records: Sequence[t.Dict]) -> r[LoadResult]
     async def flush(self) -> r[FlushResult]
 ```
 
@@ -345,7 +345,7 @@ class FlextMeltanoWorkerPool:
         self.max_workers = max_workers
         self.worker_pool = []
 
-    async def execute_pipeline_parallel(self, pipelines: list[PipelineConfig]):
+    async def execute_pipeline_parallel(self, pipelines: Sequence[PipelineConfig]):
         # Distribute pipelines across workers
         # Monitor worker health and redistribute load
         # Handle worker failures and recovery

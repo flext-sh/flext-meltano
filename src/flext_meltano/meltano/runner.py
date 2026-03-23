@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -25,12 +26,12 @@ class FlextMeltanoDbtTransformationRunner:
     def execute_dbt_transformation(
         executor: FlextMeltanoExecutor,
         logger: p.Logger,
-        models: list[str] | None = None,
+        models: Sequence[str] | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT `run` and normalize output into transformation contract."""
         try:
-            args: list[str] = []
+            args: Sequence[str] = []
             if models:
                 args.extend(["--models"] + models)
             result = executor.execute_dbt_command("run", args)
@@ -125,7 +126,7 @@ class FlextMeltanoLibraryRunner(
         self,
         tap_name: str,
         target_name: str,
-        dbt_models: list[str] | None = None,
+        dbt_models: Sequence[str] | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations."""
@@ -142,7 +143,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: dict[str, t.NormalizedValue] = {
+            elt_result: Mapping[str, t.NormalizedValue] = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,
@@ -167,7 +168,7 @@ class FlextMeltanoLibraryRunner(
 
     def run_dbt_transformation(
         self,
-        models: list[str] | None = None,
+        models: Sequence[str] | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT transformation using the shared executor and logger."""
@@ -207,7 +208,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: dict[str, t.NormalizedValue] = {
+            elt_result: Mapping[str, t.NormalizedValue] = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
                 "target_name": target.name,

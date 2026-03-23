@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_core import FlextLogger, r
@@ -39,24 +39,24 @@ class FlextMeltanoAbstractions:
             project_path: Path,
             source_name: str,
             sink_name: str,
-        ) -> r[dict[str, str]]:
+        ) -> r[Mapping[str, str]]:
             """Create pipeline context for data pipeline operations."""
             try:
-                pipeline_context: dict[str, str] = {
+                pipeline_context: Mapping[str, str] = {
                     "project_path": str(project_path),
                     "source_name": source_name,
                     "sink_name": sink_name,
                     "status": "initialized",
                 }
-                return r[dict[str, str]].ok(pipeline_context)
+                return r[Mapping[str, str]].ok(pipeline_context)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 error_msg = f"Failed to create pipeline context: {e}"
                 self.logger.exception(error_msg)
-                return r[dict[str, str]].fail(error_msg)
+                return r[Mapping[str, str]].fail(error_msg)
 
         def execute_data_pipeline(
             self,
-            _pipeline_context: dict[str, str | None],
+            _pipeline_context: Mapping[str, str | None],
             source_config: t.Meltano.MeltanoConfigDict,
             sink_config: t.Meltano.MeltanoConfigDict,
         ) -> r[t.Meltano.ELT.PipelineResult]:
@@ -127,10 +127,10 @@ class FlextMeltanoAbstractions:
         self,
         source_name: str,
         sink_name: str,
-    ) -> r[dict[str, str]]:
+    ) -> r[Mapping[str, str]]:
         """Create pipeline context."""
         if not self._project_path:
-            return r[dict[str, str]].fail("No project loaded")
+            return r[Mapping[str, str]].fail("No project loaded")
         return self._runner_helper.create_pipeline_context(
             self._project_path,
             source_name,
@@ -143,7 +143,7 @@ class FlextMeltanoAbstractions:
         sink_config: t.Meltano.MeltanoConfigDict,
     ) -> r[t.Meltano.ELT.PipelineResult]:
         """Execute data pipeline."""
-        pipeline_context: dict[str, str | None] = {
+        pipeline_context: Mapping[str, str | None] = {
             "project_path": str(self._project_path) if self._project_path else None,
             "status": "initialized",
         }
@@ -193,10 +193,10 @@ class FlextMeltanoAbstractions:
     def get_components_of_type(
         self,
         component_type: str,
-    ) -> r[list[t.Meltano.PluginDefinition]]:
+    ) -> r[Sequence[t.Meltano.PluginDefinition]]:
         """Get components of specified type."""
         try:
-            components: list[t.Meltano.PluginDefinition] = [
+            components: Sequence[t.Meltano.PluginDefinition] = [
                 {"name": "source-csv", "type": "sources", "status": "available"},
                 {"name": "sink-postgres", "type": "sinks", "status": "available"},
                 {
@@ -209,14 +209,14 @@ class FlextMeltanoAbstractions:
                 components,
                 lambda comp: u.get(dict(comp), "type", default="") == component_type,
             )
-            result_list: list[t.Meltano.PluginDefinition] = (
+            result_list: Sequence[t.Meltano.PluginDefinition] = (
                 list(filtered_components) if filtered_components else []
             )
-            return r[list[t.Meltano.PluginDefinition]].ok(result_list)
+            return r[Sequence[t.Meltano.PluginDefinition]].ok(result_list)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get components of type {component_type}: {e}"
             self.logger.exception(error_msg)
-            return r[list[t.Meltano.PluginDefinition]].fail(error_msg)
+            return r[Sequence[t.Meltano.PluginDefinition]].fail(error_msg)
 
     def get_plugins_of_type(
         self,
@@ -225,7 +225,7 @@ class FlextMeltanoAbstractions:
     ) -> r[Mapping[str, t.Meltano.PluginDefinition]]:
         """Get plugins of specified type."""
         try:
-            plugins: dict[str, t.Meltano.PluginDefinition] = {
+            plugins: Mapping[str, t.Meltano.PluginDefinition] = {
                 "tap-csv": {
                     "name": "tap-csv",
                     "type": "extractors",
@@ -237,7 +237,7 @@ class FlextMeltanoAbstractions:
                     "status": "available",
                 },
             }
-            filtered_plugins: dict[str, t.Meltano.PluginDefinition] = {
+            filtered_plugins: Mapping[str, t.Meltano.PluginDefinition] = {
                 k: v
                 for k, v in plugins.items()
                 if u.get(v, "type", default="") == plugin_type

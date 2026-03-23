@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Generator
+from collections.abc import Generator, Sequence
 from pathlib import Path
 from typing import Protocol
 
@@ -184,7 +184,7 @@ def meltano_cli_runner() -> MockCliRunner:
 
 
 @pytest.fixture
-def meltano_invoke_args() -> list[str]:
+def meltano_invoke_args() -> Sequence[str]:
     """Common Meltano invoke arguments."""
     return ["--log-level", "debug", "--environment", "test"]
 
@@ -209,7 +209,7 @@ def singer_schema() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def singer_records() -> list[t.Meltano.MeltanoConfigDict]:
+def singer_records() -> Sequence[t.Meltano.MeltanoConfigDict]:
     """Sample Singer records for testing."""
     return [
         {
@@ -390,7 +390,7 @@ class MockSingerTap:
         _ = self.config
         return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-    def extract(self) -> list[t.Meltano.MeltanoConfigDict]:
+    def extract(self) -> Sequence[t.Meltano.MeltanoConfigDict]:
         _ = self.config
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -411,7 +411,7 @@ class MockSingerTarget:
 
     def load(
         self,
-        records: list[t.Meltano.MeltanoConfigDict],
+        records: Sequence[t.Meltano.MeltanoConfigDict],
     ) -> t.Meltano.MeltanoConfigDict:
         _ = self.config
         return {"records_loaded": len(records), "status": "success"}

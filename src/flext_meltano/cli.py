@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 
 from flext_cli import FlextCli
 from flext_core import FlextLogger
@@ -63,7 +64,7 @@ class FlextMeltanoCLI:
         self.status_manager = FlextMeltanoStatusManager(self)
         self.command_router = FlextMeltanoCommandRouter(self)
 
-    def main(self, args: list[str] | None = None) -> int:
+    def main(self, args: Sequence[str] | None = None) -> int:
         """Main CLI entry point."""
         if args is None:
             args = sys.argv[1:]

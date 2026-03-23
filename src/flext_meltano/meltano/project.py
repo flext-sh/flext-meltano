@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import ClassVar, override
 
@@ -31,9 +32,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     """
 
-    ProjectInfo: ClassVar[type[dict[str, t.Container]]] = dict
-    _metadata_extra: dict[str, str] = PrivateAttr(
-        default_factory=lambda: dict[str, str](),
+    ProjectInfo: ClassVar[type[Mapping[str, t.Container]]] = dict
+    _metadata_extra: Mapping[str, str] = PrivateAttr(
+        default_factory=lambda: Mapping[str, str](),
     )
     _sealed: bool = PrivateAttr(default=False)
 
@@ -62,7 +63,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     def get_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[list[t.Meltano.PluginDefinition]]:
+    ) -> r[Sequence[t.Meltano.PluginDefinition]]:
         """Get plugins from the project.
 
         Args:
@@ -74,14 +75,14 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         """
         try:
             if not self.project:
-                return r[list[t.Meltano.PluginDefinition]].fail("No project loaded")
+                return r[Sequence[t.Meltano.PluginDefinition]].fail("No project loaded")
             plugins = self._extract_plugins(plugin_type)
             self.logger.info(
                 "Plugins retrieved",
                 count=u.count(plugins),
                 type=plugin_type or "",
             )
-            return r[list[t.Meltano.PluginDefinition]].ok(plugins)
+            return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
         except (
             ValueError,
             TypeError,
@@ -92,7 +93,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
             ImportError,
         ) as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[list[t.Meltano.PluginDefinition]].fail(
+            return r[Sequence[t.Meltano.PluginDefinition]].fail(
                 f"Failed to get plugins: {e}",
             )
 
@@ -199,9 +200,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     def _extract_plugins(
         self,
         plugin_type: str | None,
-    ) -> list[t.Meltano.PluginDefinition]:
+    ) -> Sequence[t.Meltano.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
-        plugins: list[t.Meltano.PluginDefinition] = []
+        plugins: Sequence[t.Meltano.PluginDefinition] = []
         if getattr(self.project, "plugins", None) is None:
             return plugins
         try:

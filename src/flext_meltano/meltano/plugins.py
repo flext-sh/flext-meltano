@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from typing import TypeIs, override
 
@@ -103,7 +103,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     def discover_plugins(
         self,
         project: p.Meltano.Project | None = None,
-    ) -> r[list[Mapping[str, str]]]:
+    ) -> r[Sequence[Mapping[str, str]]]:
         """Discover plugins from Meltano Hub using native API.
 
         Args:
@@ -123,17 +123,17 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                     FlextMeltanoProjectService().create_temporary_project()
                 )
                 if temp_project_result.is_failure:
-                    return r[list[Mapping[str, str]]].fail(
+                    return r[Sequence[Mapping[str, str]]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
                 temp_project = temp_project_result.value
                 if not _is_meltano_project(temp_project):
-                    return r[list[Mapping[str, str]]].fail(
+                    return r[Sequence[Mapping[str, str]]].fail(
                         "Temporary project does not satisfy Project",
                     )
                 working_project = temp_project
-            plugins: list[Mapping[str, str]] = []
+            plugins: Sequence[Mapping[str, str]] = []
 
             def build_plugin_info(
                 plugin_name: str,
@@ -185,11 +185,11 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                         break
                     plugins.append(build_plugin_info(k, v, "loader"))
             self.logger.info(f"Discovered {u.count(plugins)} plugins")
-            return r[list[Mapping[str, str]]].ok(plugins)
+            return r[Sequence[Mapping[str, str]]].ok(plugins)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return r[list[Mapping[str, str]]].fail(error_msg)
+            return r[Sequence[Mapping[str, str]]].fail(error_msg)
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
@@ -229,10 +229,10 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         def extract_plugin_info(
             plugins_data: Mapping[
                 str,
-                dict[
+                Mapping[
                     str,
                     Mapping[str, bool | datetime | float | int | str | None]
-                    | list[str]
+                    | Sequence[str]
                     | str,
                 ],
             ],
@@ -298,7 +298,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         addition_success: bool,
     ) -> r[Mapping[str, str]]:
         """Build successful plugin addition result."""
-        plugin_result: dict[str, str] = {
+        plugin_result: Mapping[str, str] = {
             "success": "true" if addition_success else "false",
             "plugin_name": plugin_name,
             "plugin_type": plugin_type,

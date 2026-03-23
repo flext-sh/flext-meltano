@@ -106,7 +106,7 @@ class FlextMeltanoService(FlextService):
 **Discover available Meltano plugins in the project**
 
 ```python
-def discover_plugins(self) -> r[list[FlextMeltanoModels.PluginInfo]]:
+def discover_plugins(self) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
     """Discover all available plugins in the project.
 
     Returns:
@@ -166,7 +166,7 @@ def execute_tap(
 
 ```python
 def execute_target(
-    self, target_name: str, records: list[t.Dict], config: t.Dict | None = None
+    self, target_name: str, records: Sequence[t.Dict], config: t.Dict | None = None
 ) -> r[FlextMeltanoModels.TargetExecutionResult]:
     """Execute a Singer target with records.
 
@@ -234,7 +234,7 @@ def validate_project(self) -> r[FlextMeltanoModels.ProjectValidation]:
 ```python
 def list_plugins(
     self, plugin_type: str | None = None
-) -> r[list[FlextMeltanoModels.PluginInfo]]:
+) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
     """List available Meltano plugins.
 
     Args:
@@ -280,8 +280,8 @@ def execute_pipeline_advanced(
 
 ```python
 def execute_parallel_pipelines(
-    self, pipelines: list[FlextMeltanoModels.PipelineConfig]
-) -> r[list[FlextMeltanoModels.PipelineResult]]:
+    self, pipelines: Sequence[FlextMeltanoModels.PipelineConfig]
+) -> r[Sequence[FlextMeltanoModels.PipelineResult]]:
     """Execute multiple pipelines in parallel.
 
     Args:
@@ -389,7 +389,7 @@ class FlextSingerTarget(FlextService):
 **Load records into the target**
 
 ```python
-def load_records(self, records: list[t.Dict]) -> r[FlextMeltanoModels.LoadResult]:
+def load_records(self, records: Sequence[t.Dict]) -> r[FlextMeltanoModels.LoadResult]:
     """Load records into the target.
 
     Args:
@@ -449,7 +449,7 @@ class FlextPluginService(FlextService):
 **Discover all plugins in the project**
 
 ```python
-def discover_plugins(self) -> r[list[FlextMeltanoModels.PluginInfo]]:
+def discover_plugins(self) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
     """Discover all plugins in the project.
 
     Returns:
@@ -566,7 +566,7 @@ def find_plugin(
 ```python
 def list_plugins_by_type(
     self, plugin_type: str
-) -> r[list[FlextMeltanoModels.PluginInfo]]:
+) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
     """List plugins by type.
 
     Args:
@@ -662,8 +662,8 @@ class FlextMeltanoExecutor(FlextService):
 
 ```python
 def execute_parallel_pipelines(
-    self, pipelines: list[FlextMeltanoModels.PipelineConfig]
-) -> r[list[FlextMeltanoModels.PipelineResult]]:
+    self, pipelines: Sequence[FlextMeltanoModels.PipelineConfig]
+) -> r[Sequence[FlextMeltanoModels.PipelineResult]]:
     """Execute multiple pipelines in parallel.
 
     Args:
@@ -801,7 +801,7 @@ def meltano_yml_path(self) -> Path:
 
 ```python
 @property
-def plugins(self) -> list[FlextMeltanoModels.PluginInfo]:
+def plugins(self) -> Sequence[FlextMeltanoModels.PluginInfo]:
     """Get list of configured plugins."""
 ```
 
@@ -836,7 +836,7 @@ def project_config(self) -> FlextMeltanoModels.ProjectConfig:
 
 ```python
 @property
-def plugin_configs(self) -> dict[str, t.Dict]:
+def plugin_configs(self) -> Mapping[str, t.Dict]:
     """Get plugin-specific configurations."""
 ```
 
@@ -846,7 +846,7 @@ def plugin_configs(self) -> dict[str, t.Dict]:
 
 ```python
 @property
-def pipeline_configs(self) -> dict[str, FlextMeltanoModels.PipelineConfig]:
+def pipeline_configs(self) -> Mapping[str, FlextMeltanoModels.PipelineConfig]:
     """Get pipeline execution configurations."""
 ```
 

@@ -32,7 +32,7 @@ class FlextMeltanoBridge:
     def discover_plugins() -> r[Mapping[str, t.Scalar]]:
         """Discover available plugins through the Go bridge."""
         try:
-            result_data: dict[str, t.Scalar] = {
+            result_data: Mapping[str, t.Scalar] = {
                 "extractors": "tap-csv,tap-postgres,tap-json",
                 "loaders": "target-csv,target-postgres,target-jsonl",
                 "transformers": "dbt-postgres,dbt-snowflake",

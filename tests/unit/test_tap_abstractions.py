@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from collections.abc import Mapping
 
 import pytest
 from flext_core import r, t
@@ -53,12 +54,12 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_tap_config_validation(self) -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""
-        connection_config: dict[str, int | str] = {
+        connection_config: Mapping[str, int | str] = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
         }
-        stream_config: dict[str, str] = {"users": "selected"}
+        stream_config: Mapping[str, str] = {"users": "selected"}
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config=connection_config,
@@ -71,7 +72,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
-        stream_schema: dict[str, t.NormalizedValue] = {
+        stream_schema: Mapping[str, t.NormalizedValue] = {
             "type": "t.NormalizedValue",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
@@ -232,7 +233,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: dict[str, str] = {
+        stream_config: Mapping[str, str] = {
             "users": "selected",
             "orders": "not_selected",
         }
@@ -414,7 +415,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             stream = stream_result.value
             self.test_assertions.assert_true(
                 condition=isinstance(stream, dict),
-                message="Should return dict[str, t.NormalizedValue] stream definition",
+                message="Should return Mapping[str, t.NormalizedValue] stream definition",
             )
             self.test_assertions.assert_equal(
                 actual=stream.get("name"),
@@ -809,11 +810,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
     )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-        connection_config: dict[str, t.NormalizedValue] = {
+        connection_config: Mapping[str, t.NormalizedValue] = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: dict[str, t.NormalizedValue] = {"users": {"selected": True}}
+        stream_config: Mapping[str, t.NormalizedValue] = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,

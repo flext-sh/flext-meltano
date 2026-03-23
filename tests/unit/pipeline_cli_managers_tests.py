@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import signal
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -23,15 +23,15 @@ from flext_meltano import (
 from tests import m, t
 
 
-def _set_pipelines_root(tmp_path: Path) -> dict[str, str]:
+def _set_pipelines_root(tmp_path: Path) -> Mapping[str, str]:
     return {"FLEXT_MELTANO_PIPELINES_DIR": str(tmp_path / "pipelines")}
 
 
 def test_create_pipeline_creates_directory_and_configuration(tmp_path: Path) -> None:
-    command: list[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
-    config: dict[
+    command: Sequence[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
+    config: Mapping[
         str,
-        t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+        t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
     ] = {
         "command": command,
         "schedule": "daily",
@@ -56,10 +56,10 @@ def test_create_pipeline_fails_without_configuration(tmp_path: Path) -> None:
 
 def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
 
-    command: list[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
-    config: dict[
+    command: Sequence[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
+    config: Mapping[
         str,
-        t.Scalar | list[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+        t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
     ] = {"command": command}
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("exec-pipeline", config)

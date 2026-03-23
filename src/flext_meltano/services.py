@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import override
 
 from flext_core import FlextContainer, e, r, s
@@ -341,9 +342,9 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
     @staticmethod
     def list_components(
         component_type: str | None = None,
-    ) -> r[list[t.Meltano.MeltanoConfigDict]]:
+    ) -> r[Sequence[t.Meltano.MeltanoConfigDict]]:
         """List available pipeline components."""
-        components: list[t.Meltano.MeltanoConfigDict] = [
+        components: Sequence[t.Meltano.MeltanoConfigDict] = [
             {"name": "source-csv", "type": "sources", "status": "installed"},
             {"name": "sink-postgres", "type": "sinks", "status": "installed"},
             {
@@ -358,15 +359,15 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
                 lambda c: u.get(c, "type") == component_type,
             )
             components = list(filtered) if filtered else []
-        return r[list[t.Meltano.MeltanoConfigDict]].ok(components)
+        return r[Sequence[t.Meltano.MeltanoConfigDict]].ok(components)
 
     @staticmethod
-    def list_pipelines() -> r[list[t.Meltano.MeltanoConfigDict]]:
+    def list_pipelines() -> r[Sequence[t.Meltano.MeltanoConfigDict]]:
         """List configured pipelines."""
-        return r[list[t.Meltano.MeltanoConfigDict]].ok([])
+        return r[Sequence[t.Meltano.MeltanoConfigDict]].ok([])
 
     @staticmethod
-    def load_batch(_records: list[t.Meltano.RecordDict]) -> r[t.Meltano.ResultDict]:
+    def load_batch(_records: Sequence[t.Meltano.RecordDict]) -> r[t.Meltano.ResultDict]:
         """Load batch of records to sink - railway-oriented operation."""
         return r[t.Meltano.ResultDict].ok({"status": "completed"})
 
@@ -379,7 +380,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
     def run_pipeline(
         source_name: str,
         sink_name: str,
-        _transformation_models: list[str] | None = None,
+        _transformation_models: Sequence[str] | None = None,
         _config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Run complete data pipeline - railway-oriented operation."""
@@ -411,7 +412,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def run_transformation_models(
-        models: list[str] | None = None,
+        models: Sequence[str] | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Run transformation models."""
@@ -424,7 +425,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def test_transformation_models(
-        models: list[str] | None = None,
+        models: Sequence[str] | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Test transformation models."""

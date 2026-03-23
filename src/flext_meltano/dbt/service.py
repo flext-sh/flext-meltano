@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import TypeVar, override
 
@@ -86,7 +86,7 @@ class FlextMeltanoDbtService(s[str]):
                 f"Documentation generation failed: {e}",
             )
 
-    def get_project_models(self) -> r[list[t.Meltano.Dbt.ModelConfiguration]]:
+    def get_project_models(self) -> r[Sequence[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from the project.
 
         Returns:
@@ -110,7 +110,7 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[list[t.Meltano.Dbt.ModelConfiguration]].fail(
+            return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].fail(
                 f"Failed to get models: {e}",
             )
 
@@ -145,7 +145,7 @@ class FlextMeltanoDbtService(s[str]):
 
     def run_models(
         self,
-        models: list[str] | None = None,
+        models: Sequence[str] | None = None,
         **kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
@@ -175,7 +175,7 @@ class FlextMeltanoDbtService(s[str]):
 
     def run_tests(
         self,
-        models: list[str] | None = None,
+        models: Sequence[str] | None = None,
         **kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.
@@ -207,7 +207,7 @@ class FlextMeltanoDbtService(s[str]):
         self,
         operation_name: str,
         failure_label: str,
-        models: list[str] | None,
+        models: Sequence[str] | None,
         operation: Callable[[], r[_ResultT]],
         success_logger: Callable[[_ResultT], None],
     ) -> r[_ResultT]:
