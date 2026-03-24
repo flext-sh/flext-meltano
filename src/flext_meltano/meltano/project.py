@@ -9,12 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import ClassVar, override
 
 from flext_core import FlextService, r
-from meltano import Project
+from meltano.core.project import Project
 from pydantic import PrivateAttr
 
 from flext_meltano import m, t, u
@@ -34,7 +34,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     ProjectInfo: ClassVar[type[t.FlatContainerMapping]] = dict
     _metadata_extra: t.StrMapping = PrivateAttr(
-        default_factory=lambda: t.StrMapping(),
+        default_factory=dict,
     )
     _sealed: bool = PrivateAttr(default=False)
 
@@ -202,7 +202,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         plugin_type: str | None,
     ) -> Sequence[t.Meltano.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
-        plugins: Sequence[t.Meltano.PluginDefinition] = []
+        plugins: MutableSequence[t.Meltano.PluginDefinition] = []
         if getattr(self.project, "plugins", None) is None:
             return plugins
         try:
@@ -218,7 +218,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 if plugin_type is not None and plugin.type != plugin_type:
                     continue
                 variant_raw = getattr(plugin, "variant", None)
-                plugin_def: t.Meltano.PluginDefinition = {
+                plugin_def: MutableMapping[
+                    str, str | Sequence[str] | Mapping[str, t.Scalar | None]
+                ] = {
                     "name": plugin.name,
                     "type": plugin.type,
                 }

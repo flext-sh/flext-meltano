@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import datetime
 from typing import TypeIs, override
 
@@ -133,7 +133,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                         "Temporary project does not satisfy Project",
                     )
                 working_project = temp_project
-            plugins: Sequence[t.StrMapping] = []
+            plugins: MutableSequence[t.StrMapping] = []
 
             def build_plugin_info(
                 plugin_name: str,
@@ -147,14 +147,14 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                     if source.variants
                     else ""
                 )
-                constructed = u.construct({
-                    "name": {"value": plugin_name},
-                    "type": {"value": plugin_type},
-                    "default_variant": {"value": source.default_variant},
-                    "variants": {"value": variants_str},
-                    "logo_url": {"value": source.logo_url},
-                    "description": {"value": source.description},
-                })
+                constructed: t.MutableContainerMapping = {
+                    "name": plugin_name,
+                    "type": plugin_type,
+                    "default_variant": source.default_variant,
+                    "variants": variants_str,
+                    "logo_url": source.logo_url,
+                    "description": source.description,
+                }
                 return m.Meltano.PluginDiscoveryItem.model_validate(
                     constructed,
                 ).model_dump()

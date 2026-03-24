@@ -191,7 +191,12 @@ class FlextMeltanoSingerCliTranslator:
         r containing list of DBT CLI command arguments
 
         """
-        command: MutableSequence[str] = ["dbt", "run", "--project-dir", params.project_dir]
+        command: MutableSequence[str] = [
+            "dbt",
+            "run",
+            "--project-dir",
+            params.project_dir,
+        ]
         if params.models:
             command.extend(["--models", params.models])
         if params.select:

@@ -118,13 +118,13 @@ class FlextMeltanoSingerService(s[str]):
             records: Sequence[m.Meltano.SingerRecordMessage] = []
             tap.sync(catalog, state)
             target.consume(records)
-            result = m.Meltano.SingerSyncResult(
-                records_processed=records_processed,
-                records_written=records_written,
-                errors=errors,
-                state=state.value,
-                duration_seconds=0.0,
-            )
+            result = m.Meltano.SingerSyncResult.model_validate({
+                "records_processed": records_processed,
+                "records_written": records_written,
+                "errors": errors,
+                "state": state.value,
+                "duration_seconds": 0.0,
+            })
             self.logger.info(
                 "Singer sync completed",
                 records=records_processed,

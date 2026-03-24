@@ -54,12 +54,12 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
                 target_name=sink_config.sink_type,
                 target_type=sink_config.sink_type,
             )
-            sink_def = m.Meltano.DataSinkDefinition(
-                sink_name=f"{sink_config.sink_type}_sink",
-                sink_type=sink_config.sink_type,
-                config=sink_config.model_dump(),
-                status="configured",
-            )
+            sink_def = m.Meltano.DataSinkDefinition.model_validate({
+                "sink_name": f"{sink_config.sink_type}_sink",
+                "sink_type": sink_config.sink_type,
+                "config": sink_config.connection_config,
+                "status": "configured",
+            })
             self.logger.info(
                 "Sink configured successfully",
                 sink_name=sink_def.sink_name,

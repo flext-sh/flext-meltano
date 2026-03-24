@@ -230,9 +230,7 @@ class FlextMeltanoAbstractions:
                 },
             }
             filtered_plugins: Mapping[str, t.Meltano.PluginDefinition] = {
-                k: v
-                for k, v in plugins.items()
-                if v.get("type", "") == plugin_type
+                k: v for k, v in plugins.items() if v.get("type", "") == plugin_type
             }
             return r[Mapping[str, t.Meltano.PluginDefinition]].ok(filtered_plugins)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

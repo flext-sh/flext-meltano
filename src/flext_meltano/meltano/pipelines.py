@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import override
 
@@ -132,7 +132,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate({
                 "values": parsed_context.execution_result,
             }).values
-            pipeline_result: Mapping[str, str] = {
+            pipeline_result: MutableMapping[str, str] = {
                 "success": "true",
                 "extractor": extractor_name,
                 "loader": loader_name,

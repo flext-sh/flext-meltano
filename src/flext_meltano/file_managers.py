@@ -71,7 +71,7 @@ class FlextMeltanoFileManagers:
         """
 
         def _create_dirs() -> t.StrMapping:
-            created_paths: t.StrMapping = {}
+            created_paths: MutableMapping[str, str] = {}
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
@@ -195,7 +195,7 @@ class FlextMeltanoFileManagers:
                 "transform/tests",
                 "transform/data",
             ]
-            created_paths: Mapping[str, Path | str] = {}
+            created_paths: MutableMapping[str, Path | str] = {}
             for directory in directories:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
@@ -289,7 +289,7 @@ class FlextMeltanoFileManagers:
             t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
         ],
     ) -> t.ContainerMapping:
-        normalized: t.ContainerMapping = {}
+        normalized: t.MutableContainerMapping = {}
         for key, value in raw.items():
             if value is None or u.is_scalar(value):
                 normalized[key] = value
@@ -297,11 +297,12 @@ class FlextMeltanoFileManagers:
             if isinstance(value, list):
                 normalized[key] = [item for item in value if item is not None]
                 continue
-            nested: t.ConfigurationMapping = {}
-            for nested_key, nested_value in value.items():
-                if u.is_scalar(nested_value):
-                    nested[str(nested_key)] = nested_value
-            normalized[key] = nested
+            if isinstance(value, Mapping):
+                nested: t.MutableConfigurationMapping = {}
+                for nested_key, nested_value in value.items():
+                    if u.is_scalar(nested_value):
+                        nested[str(nested_key)] = nested_value
+                normalized[key] = nested
         return normalized
 
 

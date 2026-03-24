@@ -659,15 +659,6 @@ class FlextMeltanoStatusManager:
         return r[str].ok("not implemented")
 
 
-# Module-level aliases — delegate to FlextMeltanoPipelineManager staticmethods for
-# backward compatibility with existing call sites.
-create_pipeline = FlextMeltanoPipelineManager.create_pipeline
-execute_pipeline = FlextMeltanoPipelineManager.execute_pipeline
-list_pipelines = FlextMeltanoPipelineManager.list_pipelines
-get_pipeline_status = FlextMeltanoPipelineManager.get_pipeline_status
-stop_pipeline = FlextMeltanoPipelineManager.stop_pipeline
-delete_pipeline = FlextMeltanoPipelineManager.delete_pipeline
-
 __all__ = [
     "FlextMeltanoCommandRouter",
     "FlextMeltanoDbtManager",
@@ -675,10 +666,4 @@ __all__ = [
     "FlextMeltanoPluginManager",
     "FlextMeltanoSingerManager",
     "FlextMeltanoStatusManager",
-    "create_pipeline",
-    "delete_pipeline",
-    "execute_pipeline",
-    "get_pipeline_status",
-    "list_pipelines",
-    "stop_pipeline",
 ]

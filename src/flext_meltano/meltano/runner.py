@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import MutableSequence
 from pathlib import Path
 from typing import override
 
@@ -30,9 +31,9 @@ class FlextMeltanoDbtTransformationRunner:
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT `run` and normalize output into transformation contract."""
         try:
-            args: t.StrSequence = []
+            args: MutableSequence[str] = []
             if models:
-                args.extend(["--models"] + models)
+                args.extend(["--models", *models])
             result = executor.execute_dbt_command("run", args)
             if result.is_failure:
                 return r[t.Meltano.Processing.DbtTransformationResult].fail(
@@ -142,7 +143,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.ContainerMapping = {
+            elt_result: t.MutableContainerMapping = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,
@@ -207,7 +208,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.ContainerMapping = {
+            elt_result: t.MutableContainerMapping = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
                 "target_name": target.name,

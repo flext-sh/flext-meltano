@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, ClassVar, Literal, Self
@@ -70,7 +70,7 @@ class FlextMeltanoModels(FlextCliModels):
             return False
 
         # Transform dict values with protection for sensitive fields
-        protected: t.ConfigurationMapping = {}
+        protected: t.MutableConfigurationMapping = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
 
@@ -819,11 +819,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_type: Annotated[str, Field(description="Type of the tap")]
             connection_config: Annotated[
-                t.ContainerMapping,
+                t.ConfigurationMapping,
                 Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
-                t.ContainerMapping,
+                t.ConfigurationMapping,
                 Field(
                     default_factory=dict, description="Stream-specific configuration"
                 ),
@@ -1027,9 +1027,9 @@ class FlextMeltanoModels(FlextCliModels):
                 self, value: t.ContainerMapping
             ) -> t.ContainerMapping:
                 """Normalize stream schema structure."""
-                result: t.ContainerMapping = dict(value)
+                result: t.MutableContainerMapping = dict(value)
                 if "properties" not in result:
-                    empty: t.ContainerMapping = {}
+                    empty: t.MutableContainerMapping = {}
                     result["properties"] = empty
                 if "type" not in result:
                     result["type"] = "t.NormalizedValue"
@@ -1504,7 +1504,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="STATE", description="Singer message discriminator"),
             ] = "STATE"
             value: Annotated[
-                t.ContainerMapping,
+                t.MutableContainerMapping,
                 Field(
                     default_factory=dict, description="Singer state bookmark payload"
                 ),
@@ -1833,12 +1833,12 @@ class FlextMeltanoModels(FlextCliModels):
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
-                        records: Sequence[t.FlatContainerMapping] = []
+                        records: MutableSequence[t.FlatContainerMapping] = []
                         for record in value:
                             match record:
                                 case Mapping():
                                     # Type narrowing: convert mapping items to t.NormalizedValue
-                                    record_dict: t.FlatContainerMapping = {}
+                                    record_dict: t.MutableFlatContainerMapping = {}
                                     for key, item in record.items():
                                         # Only include JSON-serializable values (exclude None, BaseModel, Path)
                                         if u.is_primitive(item):
@@ -1848,7 +1848,7 @@ class FlextMeltanoModels(FlextCliModels):
                                     continue
                         return records
                     case _:
-                        return t.StrSequence()
+                        return []
 
         class ConfigMappingPayload(FlextCliModels.ArbitraryTypesModel):
             """Normalized mapping payload with string keys."""
@@ -1878,7 +1878,7 @@ class FlextMeltanoModels(FlextCliModels):
                 """Normalize mapping-like payloads to Mapping[str, value]."""
                 if not isinstance(value, Mapping):
                     return {}
-                result: Mapping[
+                result: MutableMapping[
                     str,
                     t.Scalar
                     | Sequence[t.Scalar | None]
@@ -1964,7 +1964,7 @@ class FlextMeltanoModels(FlextCliModels):
                     case list() | tuple():
                         return [str(item) for item in value]
                     case Mapping():
-                        result: t.ConfigurationMapping = {}
+                        result: t.MutableConfigurationMapping = {}
                         for k, v in value.items():
                             # Type narrowing for JSON-serializable primitives
                             if u.is_primitive(v):
@@ -2514,13 +2514,13 @@ class FlextMeltanoModels(FlextCliModels):
             def has_custom_paths(self) -> bool:
                 """Check if project has custom paths."""
                 default_paths = {"models", "analysis", "tests", "seeds", "macros"}
-                all_paths = set(
-                    self.model_paths
-                    + self.analysis_paths
-                    + self.test_paths
-                    + self.seed_paths
-                    + self.macro_paths
-                )
+                all_paths = {
+                    *self.model_paths,
+                    *self.analysis_paths,
+                    *self.test_paths,
+                    *self.seed_paths,
+                    *self.macro_paths,
+                }
                 return bool(all_paths - default_paths)
 
             @computed_field
@@ -2797,7 +2797,7 @@ class FlextMeltanoModels(FlextCliModels):
             @computed_field
             def completed_stages(self) -> t.StrSequence:
                 """Completed pipeline stages."""
-                stages: t.StrSequence = []
+                stages: MutableSequence[str] = []
                 src = self.source_result
                 if src is not None and src.end_time is not None:
                     stages.append("extraction")
@@ -3017,7 +3017,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Mapping[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
 
                 """
-                dumped: Mapping[str, t.Scalar | t.StrSequence] = {}
+                dumped: MutableMapping[str, t.Scalar | t.StrSequence] = {}
                 dumped["command"] = self.command
                 dumped["success"] = self.success
                 dumped["exit_code"] = self.exit_code
