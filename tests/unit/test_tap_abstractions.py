@@ -803,7 +803,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         tm.that(self.tap_abstractions, none=False)
         tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         result = self.tap_abstractions.discover_streams(tap_instance)
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
 
     @unittest.skip(
         "API methods not yet implemented: create_tap_from_config, generate_catalog, sync_stream. Requires implementation in FlextMeltanoTapAbstractions."

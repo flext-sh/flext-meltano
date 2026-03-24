@@ -686,9 +686,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             execution_start = time.time()
             extract_duration = 0.5
             load_duration = 0.3
-            transform_duration = (
-                0.7 if dbt_models is not None and dbt_models else 0.0
-            )
+            transform_duration = 0.7 if dbt_models is not None and dbt_models else 0.0
             total_duration = time.time() - execution_start
             elt_result: t.Meltano.MeltanoConfigDict = {
                 "tap": tap_name,

@@ -135,9 +135,9 @@ class TestFlextMeltanoTypes:
         }
         project = {"name": "elt-project", "enabled": True}
         tm.that(plugin_def["name"], eq="tap-users")
-        tm.that(isinstance(plugin_def["variants"], list), eq=True)
+        tm.that(plugin_def["variants"], is_=list)
         tm.that(catalog["tap_stream_id"], eq="users")
-        tm.that(isinstance(catalog["schema"], dict), eq=True)
+        tm.that(catalog["schema"], is_=dict)
         tm.that(project["enabled"] is True, eq=True)
 
     def test_export_completeness(self) -> None:

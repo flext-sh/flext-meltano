@@ -23,7 +23,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_inheritance_from_flext_utilities(self) -> None:
         """Test that u inherits from u.Meltano."""
         utilities = u()
-        tm.that(isinstance(utilities, u), eq=True)
+        tm.that(utilities, is_=u)
 
     def test_create_meltano_config_dict_success(self) -> None:
         """Test successful Meltano config dictionary creation."""
@@ -53,10 +53,10 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
         tm.ok(result)
         config_dict = result.value
-        tm.that(isinstance(config_dict, dict), eq=True)
+        tm.that(config_dict, is_=dict)
         tm.that(config_dict["project_id"], eq="etl-project")
         plugins_val = config_dict["plugins"]
-        tm.that(isinstance(plugins_val, dict), eq=True)
+        tm.that(plugins_val, is_=dict)
         if isinstance(plugins_val, dict):
             extractors = plugins_val.get("extractors")
             loaders = plugins_val.get("loaders")
@@ -76,25 +76,25 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
         tm.ok(config_result)
         config_dict = config_result.value
-        tm.that(isinstance(config_dict, dict), eq=True)
+        tm.that(config_dict, is_=dict)
         tm.that(config_dict["project_id"], eq="multi-env-project")
         env_dict = config_dict["environments"]
-        tm.that(isinstance(env_dict, dict), eq=True)
+        tm.that(env_dict, is_=dict)
         if isinstance(env_dict, dict):
             tm.that(env_dict, has="dev")
             tm.that(env_dict, has="prod")
             prod_env = env_dict["prod"]
-            tm.that(isinstance(prod_env, dict), eq=True)
+            tm.that(prod_env, is_=dict)
             if isinstance(prod_env, dict):
                 prod_plugins = prod_env.get("plugins")
-                tm.that(isinstance(prod_plugins, dict), eq=True)
+                tm.that(prod_plugins, is_=dict)
                 if isinstance(prod_plugins, dict):
                     prod_extractors = prod_plugins.get("extractors")
-                    tm.that(isinstance(prod_extractors, list), eq=True)
+                    tm.that(prod_extractors, is_=list)
                     if isinstance(prod_extractors, list):
                         tm.that(prod_extractors, eq=True)
                         first_prod_extractor = prod_extractors[0]
-                        tm.that(isinstance(first_prod_extractor, dict), eq=True)
+                        tm.that(first_prod_extractor, is_=dict)
                         if isinstance(first_prod_extractor, dict):
                             tm.that(first_prod_extractor["name"], eq="tap-postgres")
 
@@ -107,7 +107,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         )
         tm.ok(result)
         config_dict = result.value
-        tm.that(isinstance(config_dict, dict), eq=True)
+        tm.that(config_dict, is_=dict)
         tm.that(config_dict["project_id"], eq="123")
 
     def test_validate_project_structure_success(self) -> None:

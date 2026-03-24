@@ -30,7 +30,7 @@ class TestFlextDbtProgrammaticRunner:
         dbt_runner_result = library_runner.get_dbt_runner()
         tm.ok(dbt_runner_result)
         capabilities = dbt_runner_result.value.get("capabilities", [])
-        tm.that(isinstance(capabilities, list), eq=True)
+        tm.that(capabilities, is_=list)
         tm.that(capabilities, has="run")
         tm.that(capabilities, has="test")
 
@@ -53,7 +53,7 @@ class TestFlextSingerProtocolManager:
         singer_manager_result = library_runner.get_singer_manager()
         tm.ok(singer_manager_result)
         capabilities = singer_manager_result.value.get("capabilities", [])
-        tm.that(isinstance(capabilities, list), eq=True)
+        tm.that(capabilities, is_=list)
         tm.that(capabilities, has="discover")
         tm.that(capabilities, has="sync")
 
@@ -101,7 +101,7 @@ class TestFlextMeltanoLibraryRunner:
         )
         tm.ok(result)
         pipeline_data = result.value
-        tm.that(isinstance(pipeline_data, dict), eq=True)
+        tm.that(pipeline_data, is_=dict)
         tm.that(pipeline_data, has="success")
         tm.that(pipeline_data, has="tap_name")
         tm.that(pipeline_data, has="target_name")

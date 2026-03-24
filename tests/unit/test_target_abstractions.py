@@ -48,12 +48,12 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         if self.target_abstractions is None:
             return
         result = self.target_abstractions.execute()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
 
     def test_utility_helper_methods(self) -> None:
         """Test utility helper methods using flext-core."""
         timestamp = u.generate_iso_timestamp()
-        tm.that(isinstance(timestamp, str), eq=True)
+        tm.that(timestamp, is_=str)
         tm.that(timestamp, has="T")
         test_data: t.Meltano.MeltanoConfigDict = {
             "level1": {"level2": {"level3": "found_value"}}

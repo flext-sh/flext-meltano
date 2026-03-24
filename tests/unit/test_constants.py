@@ -20,47 +20,47 @@ class Testc:
 
     def test_meltano_namespace(self) -> None:
         """Test Meltano namespace constants."""
-        tm.that(isinstance(c.Meltano.FLEXT_MELTANO_VERSION, str), eq=True)
-        tm.that(isinstance(c.Meltano.Metadata.APPLICATION_NAME, str), eq=True)
-        tm.that(isinstance(c.Meltano.Metadata.APPLICATION_DESCRIPTION, str), eq=True)
-        tm.that(isinstance(c.Meltano.Paths.PROJECT_FILE, str), eq=True)
-        tm.that(isinstance(c.Meltano.Paths.STATE_DIR, str), eq=True)
+        tm.that(c.Meltano.FLEXT_MELTANO_VERSION, is_=str)
+        tm.that(c.Meltano.Metadata.APPLICATION_NAME, is_=str)
+        tm.that(c.Meltano.Metadata.APPLICATION_DESCRIPTION, is_=str)
+        tm.that(c.Meltano.Paths.PROJECT_FILE, is_=str)
+        tm.that(c.Meltano.Paths.STATE_DIR, is_=str)
 
     def test_singer_namespace(self) -> None:
         """Test Singer protocol constants."""
-        tm.that(isinstance(c.Meltano.SDK_VERSION_REQUIRED, str), eq=True)
-        tm.that(isinstance(c.Meltano.Singer.MESSAGE_TYPE_SCHEMA, str), eq=True)
-        tm.that(isinstance(c.Meltano.Singer.MESSAGE_TYPE_RECORD, str), eq=True)
+        tm.that(c.Meltano.SDK_VERSION_REQUIRED, is_=str)
+        tm.that(c.Meltano.Singer.MESSAGE_TYPE_SCHEMA, is_=str)
+        tm.that(c.Meltano.Singer.MESSAGE_TYPE_RECORD, is_=str)
 
     def test_dbt_namespace(self) -> None:
         """Test DBT constants."""
-        tm.that(isinstance(c.Meltano.Dbt.PROJECT_FILE, str), eq=True)
-        tm.that(isinstance(c.Meltano.Dbt.COMMAND_RUN, str), eq=True)
-        tm.that(isinstance(c.Meltano.Dbt.COMMAND_TEST, str), eq=True)
+        tm.that(c.Meltano.Dbt.PROJECT_FILE, is_=str)
+        tm.that(c.Meltano.Dbt.COMMAND_RUN, is_=str)
+        tm.that(c.Meltano.Dbt.COMMAND_TEST, is_=str)
 
     def test_plugin_namespace(self) -> None:
         """Test Plugin constants."""
-        tm.that(isinstance(c.Meltano.Enums.PluginType.EXTRACTORS, str), eq=True)
-        tm.that(isinstance(c.Meltano.Enums.PluginType.LOADERS, str), eq=True)
-        tm.that(isinstance(c.Meltano.Enums.PluginType.TRANSFORMS, str), eq=True)
-        tm.that(isinstance(c.Meltano.DEFAULT_VARIANT, str), eq=True)
+        tm.that(c.Meltano.Enums.PluginType.EXTRACTORS, is_=str)
+        tm.that(c.Meltano.Enums.PluginType.LOADERS, is_=str)
+        tm.that(c.Meltano.Enums.PluginType.TRANSFORMS, is_=str)
+        tm.that(c.Meltano.DEFAULT_VARIANT, is_=str)
 
     def test_service_namespace(self) -> None:
         """Test Service namespace constants."""
-        tm.that(isinstance(c.Meltano.Service.MIN_NAME_LENGTH, int), eq=True)
+        tm.that(c.Meltano.Service.MIN_NAME_LENGTH, is_=int)
 
     def test_model_namespace(self) -> None:
         """Test ModelValidation namespace constants."""
-        tm.that(isinstance(c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT, int), eq=True)
-        tm.that(isinstance(c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT, int), eq=True)
-        tm.that(isinstance(c.Meltano.ModelValidation.COMPLEXITY_MINIMAL_SETTINGS, int), eq=True)
-        tm.that(isinstance(c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS, int), eq=True)
+        tm.that(c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT, is_=int)
+        tm.that(c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT, is_=int)
+        tm.that(c.Meltano.ModelValidation.COMPLEXITY_MINIMAL_SETTINGS, is_=int)
+        tm.that(c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS, is_=int)
 
     def test_logging_namespace(self) -> None:
         """Test Logging namespace constants."""
-        tm.that(isinstance(c.Meltano.Logging.DEFAULT_LEVEL, str), eq=True)
-        tm.that(isinstance(c.Meltano.Logging.INCLUDE_TRANSFORM_NAME, bool), eq=True)
-        tm.that(isinstance(c.Meltano.Logging.INCLUDE_RECORD_COUNT, bool), eq=True)
+        tm.that(c.Meltano.Logging.DEFAULT_LEVEL, is_=str)
+        tm.that(c.Meltano.Logging.INCLUDE_TRANSFORM_NAME, is_=bool)
+        tm.that(c.Meltano.Logging.INCLUDE_RECORD_COUNT, is_=bool)
 
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
@@ -68,9 +68,9 @@ class Testc:
         tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)
         tm.that(hasattr(plugin_types, "LOADERS"), eq=True)
         tm.that(hasattr(plugin_types, "TRANSFORMS"), eq=True)
-        tm.that(isinstance(plugin_types.EXTRACTORS, str), eq=True)
-        tm.that(isinstance(plugin_types.LOADERS, str), eq=True)
-        tm.that(isinstance(plugin_types.TRANSFORMS, str), eq=True)
+        tm.that(plugin_types.EXTRACTORS, is_=str)
+        tm.that(plugin_types.LOADERS, is_=str)
+        tm.that(plugin_types.TRANSFORMS, is_=str)
 
     def test_constants_immutability(self) -> None:
         """Test that constants are immutable (Final)."""

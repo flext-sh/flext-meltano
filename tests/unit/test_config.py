@@ -61,13 +61,13 @@ class TestFlextMeltanoSettings:
             config_dir=Path("config"),
             logs_dir=Path("logs"),
         )
-        tm.that(isinstance(config.project_root, Path), eq=True)
+        tm.that(config.project_root, is_=Path)
         tm.that(config.project_root.name, eq="path")
 
     def test_path_validation_conversion(self) -> None:
         """Test path validation converts string to Path."""
         config = FlextMeltanoSettings(project_root=Path("string/path"))
-        tm.that(isinstance(config.project_root, Path), eq=True)
+        tm.that(config.project_root, is_=Path)
         tm.that(config.project_root.name, eq="path")
 
     def test_version_validation_success(self) -> None:
@@ -95,7 +95,7 @@ class TestFlextMeltanoSettings:
         project_file_result = config.get_project_file()
         tm.ok(project_file_result)
         project_file = project_file_result.value
-        tm.that(isinstance(project_file, Path), eq=True)
+        tm.that(project_file, is_=Path)
         tm.that(project_file, eq=Path("/test/project/pipeline.yml"))
 
     def test_get_absolute_config_dir(self) -> None:
@@ -106,7 +106,7 @@ class TestFlextMeltanoSettings:
         result = config.get_absolute_config_dir()
         tm.ok(result)
         config_dir = result.value
-        tm.that(isinstance(config_dir, Path), eq=True)
+        tm.that(config_dir, is_=Path)
         tm.that(config_dir.is_absolute(), eq=True)
         tm.that(config_dir.name, eq=".meltano")
 
@@ -118,7 +118,7 @@ class TestFlextMeltanoSettings:
         result = config.get_absolute_logs_dir()
         tm.ok(result)
         logs_dir = result.value
-        tm.that(isinstance(logs_dir, Path), eq=True)
+        tm.that(logs_dir, is_=Path)
         tm.that(logs_dir.is_absolute(), eq=True)
         tm.that(logs_dir.name, eq="logs")
 
@@ -126,7 +126,7 @@ class TestFlextMeltanoSettings:
         """Test get_absolute_venv_dir method."""
         config = FlextMeltanoSettings(project_root=Path("/test/project"))
         venv_dir = config.get_absolute_venv_dir()
-        tm.that(isinstance(venv_dir, Path), eq=True)
+        tm.that(venv_dir, is_=Path)
         tm.that(venv_dir.name, eq="python")
         tm.that(str(venv_dir.parent), has=".meltano")
 
@@ -154,7 +154,7 @@ class TestFlextMeltanoSettings:
             project_root=Path("/test/project"), log_level="DEBUG"
         )
         env_vars = config.get_environment_variables()
-        tm.that(isinstance(env_vars, dict), eq=True)
+        tm.that(env_vars, is_=dict)
         tm.that(env_vars["MELTANO_PROJECT_ROOT"], eq=str(config.project_root))
         tm.that(env_vars["MELTANO_LOG_LEVEL"], eq="DEBUG")
 
@@ -169,11 +169,11 @@ class TestFlextMeltanoSettings:
         """Test methods that return lists of supported values."""
         plugin_types = FlextMeltanoSettings.get_supported_plugin_types()
         log_levels = FlextMeltanoSettings.get_supported_log_levels()
-        tm.that(isinstance(plugin_types, list), eq=True)
+        tm.that(plugin_types, is_=list)
         tm.that(plugin_types, has="extractors")
         tm.that(plugin_types, has="loaders")
         tm.that(plugin_types, has="transforms")
-        tm.that(isinstance(log_levels, list), eq=True)
+        tm.that(log_levels, is_=list)
         tm.that(log_levels, has="INFO")
         tm.that(log_levels, has="DEBUG")
 
@@ -223,7 +223,7 @@ class TestFlextMeltanoSettingsEnums:
     def test_uses_flext_constants_for_enums(self) -> None:
         """Test that FlextMeltanoSettings uses c for enum values."""
         tm.that(hasattr(c, "LogLevel"), eq=True)
-        tm.that(isinstance(FlextMeltanoSettings.model_fields["environment"].default, str), eq=True)
+        tm.that(FlextMeltanoSettings.model_fields["environment"].default, is_=str)
 
     def test_config_builders_nested_class(self) -> None:
         """Test ConfigBuilders nested class exists."""

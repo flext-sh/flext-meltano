@@ -116,7 +116,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         )
         tm.ok(result)
         created_paths = result.value
-        tm.that(isinstance(created_paths, dict), eq=True)
+        tm.that(created_paths, is_=dict)
         for directory in directories:
             dir_path = base_path / directory
             tm.that(dir_path.exists(), eq=True)
@@ -131,7 +131,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         )
         tm.ok(result)
         created_paths = result.value
-        tm.that(isinstance(created_paths, dict), eq=True)
+        tm.that(created_paths, is_=dict)
         tm.that(len(created_paths), eq=0)
 
     def test_setup_project_structure_valid(self) -> None:
@@ -142,7 +142,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         )
         tm.ok(result)
         structure = result.value
-        tm.that(isinstance(structure, dict), eq=True)
+        tm.that(structure, is_=dict)
         tm.that(structure, eq=True)
         tm.that(project_root.exists(), eq=True)
         tm.that(project_root.is_dir(), eq=True)
@@ -162,7 +162,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         result = FlextMeltanoFileManagers.create_temp_directory()
         tm.ok(result)
         temp_path = result.value
-        tm.that(isinstance(temp_path, Path), eq=True)
+        tm.that(temp_path, is_=Path)
         tm.that(temp_path.exists(), eq=True)
         tm.that(temp_path.is_dir(), eq=True)
         tm.that(temp_path.name, has="flext_meltano")
@@ -175,7 +175,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         result = FlextMeltanoFileManagers.create_temp_directory(prefix=custom_prefix)
         tm.ok(result)
         temp_path = result.value
-        tm.that(isinstance(temp_path, Path), eq=True)
+        tm.that(temp_path, is_=Path)
         tm.that(temp_path.exists(), eq=True)
         tm.that(temp_path.is_dir(), eq=True)
         tm.that(temp_path.name, has=custom_prefix)

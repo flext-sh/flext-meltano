@@ -50,25 +50,25 @@ class TestFlextMeltanoExecutorComplete:
     def test_run_command_no_args(self) -> None:
         """Test run_command with no arguments."""
         result = self.executor.run_command([])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         tm.that(result.value, eq=1)
 
     def test_run_command_invalid(self) -> None:
         """Test run_command with invalid command."""
         result = self.executor.run_command(["invalid_command_that_does_not_exist"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if not result.is_success:
             tm.that(result.error, eq=True)
-            tm.that(isinstance(result.error, str), eq=True)
+            tm.that(result.error, is_=str)
 
     def test_handle_version_command(self) -> None:
         """Test version command handling."""
         result = self.executor._handle_version_command()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         version_data = result.value
-        tm.that(isinstance(version_data, dict), eq=True)
+        tm.that(version_data, is_=dict)
         tm.that(version_data, has="command")
         tm.that(version_data, has="version")
         tm.that(version_data, has="success")
@@ -79,33 +79,33 @@ class TestFlextMeltanoExecutorComplete:
     def test_handle_help_command(self) -> None:
         """Test help command handling."""
         result = self.executor._handle_help_command()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         help_data = result.value
-        tm.that(isinstance(help_data, dict), eq=True)
+        tm.that(help_data, is_=dict)
         tm.that(help_data, has="command")
         tm.that(help_data["command"], eq="help")
 
     def test_handle_default_command(self) -> None:
         """Test default command handling."""
         result = self.executor._handle_default_command(["test", "args"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         default_data = result.value
-        tm.that(isinstance(default_data, dict), eq=True)
+        tm.that(default_data, is_=dict)
         tm.that(default_data, has="command")
         tm.that(default_data["command"], eq="default")
 
     def test_run_method(self) -> None:
         """Test run method with different arguments."""
         result = self.executor.run(["version"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor.run(["help"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor.run([])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.fail(result)
         tm.that(result.error, none=False)
         tm.that((result.error or "").lower(), has="cannot be empty")
@@ -113,19 +113,19 @@ class TestFlextMeltanoExecutorComplete:
     def test_health_method(self) -> None:
         """Test health check method."""
         result = self.executor.health()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         health_data = result.value
-        tm.that(isinstance(health_data, dict), eq=True)
+        tm.that(health_data, is_=dict)
         tm.that("status" in health_data or "health" in health_data, eq=True)
 
     def test_version_method(self) -> None:
         """Test version method."""
         result = self.executor.version()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         version_data = result.value
-        tm.that(isinstance(version_data, dict), eq=True)
+        tm.that(version_data, is_=dict)
         tm.that(
             any(
                 key in version_data
@@ -137,7 +137,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_help_method(self) -> None:
         """Test help method."""
         result = self.executor.help()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         help_result = result.value
         tm.that(help_result, none=False)
@@ -145,10 +145,10 @@ class TestFlextMeltanoExecutorComplete:
     def test_list_commands_method(self) -> None:
         """Test list_commands method."""
         result = self.executor.list_commands()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         commands_data = result.value
-        tm.that(isinstance(commands_data, dict), eq=True)
+        tm.that(commands_data, is_=dict)
         tm.that(
             "commands" in commands_data or "available_commands" in commands_data,
             eq=True,
@@ -157,13 +157,13 @@ class TestFlextMeltanoExecutorComplete:
     def test_list_plugins_method(self) -> None:
         """Test list_plugins method."""
         result = self.executor.list_plugins()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if result.is_success:
             plugins_list = result.value
-            tm.that(isinstance(plugins_list, list), eq=True)
+            tm.that(plugins_list, is_=list)
             if plugins_list:
                 plugin = plugins_list[0]
-                tm.that(isinstance(plugin, dict), eq=True)
+                tm.that(plugin, is_=dict)
                 tm.that(
                     any(key in plugin for key in ["plugin_name", "args", "status"]),
                     eq=True,
@@ -174,79 +174,79 @@ class TestFlextMeltanoExecutorComplete:
     def test_run_pipeline_method(self) -> None:
         """Test run_pipeline method."""
         result = self.executor.run_pipeline("tap-csv", "target-jsonl")
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if not result.is_success:
             tm.that(result.error, eq=True)
-            tm.that(isinstance(result.error, str), eq=True)
+            tm.that(result.error, is_=str)
 
     def test_execute_version_command(self) -> None:
         """Test _execute_version_command method."""
         result = self.executor._execute_version_command()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         version_data = result.value
-        tm.that(isinstance(version_data, dict), eq=True)
+        tm.that(version_data, is_=dict)
 
     def test_execute_help_command(self) -> None:
         """Test _execute_help_command method."""
         result = self.executor._execute_help_command()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         help_data = result.value
-        tm.that(isinstance(help_data, dict), eq=True)
+        tm.that(help_data, is_=dict)
 
     def test_execute_health_command(self) -> None:
         """Test _execute_health_command method."""
         result = self.executor._execute_health_command()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         health_data = result.value
-        tm.that(isinstance(health_data, dict), eq=True)
+        tm.that(health_data, is_=dict)
 
     def test_execute_action_command(self) -> None:
         """Test _execute_action_command method."""
         result = self.executor._execute_action_command("test_action", ["arg1", "arg2"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if not result.is_success:
             tm.that(result.error, eq=True)
 
     def test_route_command_method(self) -> None:
         """Test _route_command method."""
         result = self.executor._route_command("version", [])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor._route_command("help", [])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor._route_command("health", [])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor._route_command("unknown", ["args"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
 
     def test_execute_method(self) -> None:
         """Test execute method."""
         result = self.executor.execute()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         version_data = result.value
-        tm.that(isinstance(version_data, dict), eq=True)
+        tm.that(version_data, is_=dict)
 
     def test_flext_meltano_version(self) -> None:
         """Test version method."""
         result = self.executor.version()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         version_data = result.value
-        tm.that(isinstance(version_data, dict), eq=True)
+        tm.that(version_data, is_=dict)
 
     def test_flext_meltano_install(self) -> None:
         """Test install functionality through run_command method."""
         result = self.executor.run_command(["install"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if result.is_success:
             install_result = result.value
-            tm.that(isinstance(install_result, int), eq=True)
+            tm.that(install_result, is_=int)
             tm.that(install_result, gte=0)
         else:
             tm.that(result.error, eq=True)
@@ -254,7 +254,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_flext_meltano_invoke(self) -> None:
         """Test invoke functionality through run_command method."""
         result = self.executor.run_command(["version"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if result.is_success:
             invoke_result = result.value
             tm.that(invoke_result, none=False)
@@ -264,51 +264,51 @@ class TestFlextMeltanoExecutorComplete:
     def test_handle_cli_no_args(self) -> None:
         """Test _handle_cli_no_args method."""
         result = self.executor._handle_cli_no_args()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         cli_data = result.value
-        tm.that(isinstance(cli_data, dict), eq=True)
+        tm.that(cli_data, is_=dict)
 
     def test_handle_cli_version_args(self) -> None:
         """Test _handle_cli_version_args method."""
         result = self.executor._handle_cli_version_args()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         version_data = result.value
-        tm.that(isinstance(version_data, dict), eq=True)
+        tm.that(version_data, is_=dict)
 
     def test_handle_cli_help_args(self) -> None:
         """Test _handle_cli_help_args method."""
         result = self.executor._handle_cli_help_args()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         help_data = result.value
-        tm.that(isinstance(help_data, dict), eq=True)
+        tm.that(help_data, is_=dict)
 
     def test_handle_cli_other_args(self) -> None:
         """Test _handle_cli_other_args method."""
         result = self.executor._handle_cli_other_args(["test", "command"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         cli_data = result.value
-        tm.that(isinstance(cli_data, dict), eq=True)
+        tm.that(cli_data, is_=dict)
 
     def test_run_cli_method(self) -> None:
         """Test run_cli method with various arguments."""
         result = self.executor.run_cli(None)
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor.run_cli([])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor.run_cli(["version"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor.run_cli(["help"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
         result = self.executor.run_cli(["test", "command"])
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         tm.ok(result)
 
     def test_error_handling_with_invalid_project_root(self) -> None:
@@ -316,7 +316,7 @@ class TestFlextMeltanoExecutorComplete:
         invalid_path = Path("/nonexistent/invalid/path")
         executor = FlextMeltanoExecutor(config={"project_root": str(invalid_path)})
         result = executor.version()
-        tm.that(isinstance(result, r), eq=True)
+        tm.that(result, is_=r)
         if not result.is_success:
             tm.that(result.error, eq=True)
 
@@ -325,10 +325,10 @@ class TestFlextMeltanoExecutorComplete:
         commands = ["version", "help", "health"]
         for command in commands:
             result = self.executor.run([command])
-            tm.that(isinstance(result, r), eq=True)
+            tm.that(result, is_=r)
             tm.ok(result)
             data = result.value
-            tm.that(isinstance(data, dict), eq=True)
+            tm.that(data, is_=dict)
             tm.that("command_type" in data or "status" in data, eq=True)
 
     def test_concurrent_executor_instances(self) -> None:
@@ -337,19 +337,19 @@ class TestFlextMeltanoExecutorComplete:
         executor2 = FlextMeltanoExecutor()
         result1 = executor1.version()
         result2 = executor2.version()
-        tm.that(isinstance(result1, r), eq=True)
-        tm.that(isinstance(result2, r), eq=True)
+        tm.that(result1, is_=r)
+        tm.that(result2, is_=r)
         tm.ok(result1)
         tm.ok(result2)
-        tm.that(isinstance(result1.value, dict), eq=True)
-        tm.that(isinstance(result2.value, dict), eq=True)
+        tm.that(result1.value, is_=dict)
+        tm.that(result2.value, is_=dict)
 
     def test_error_scenarios_to_hit_uncovered_lines(self) -> None:
         """Test error scenarios to hit uncovered exception handling lines."""
         with mock.patch.object(sys, "exit", side_effect=SystemExit(1)):
             try:
                 result = self.executor.run_command(["force_error"])
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
             except SystemExit:
                 pass
 
@@ -363,7 +363,7 @@ class TestFlextMeltanoExecutorComplete:
         for args in problematic_args:
             try:
                 result = self.executor.run(args)
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
                 if not result.is_success:
                     tm.that(result.error, eq=True)
                     if result.error is not None:
@@ -379,10 +379,10 @@ class TestFlextMeltanoExecutorComplete:
         cli_app = cli_result.value
         tm.that(cli_app, none=False)
         runner_result = FlextMeltanoExecutor.create_cli_runner([])
-        tm.that(isinstance(runner_result, r), eq=True)
+        tm.that(runner_result, is_=r)
         tm.ok(runner_result)
         runner_data = runner_result.value
-        tm.that(isinstance(runner_data, dict), eq=True)
+        tm.that(runner_data, is_=dict)
         cli_tests: Sequence[Sequence[str]] = [
             [],
             ["--help"],
@@ -392,7 +392,7 @@ class TestFlextMeltanoExecutorComplete:
         ]
         for args in cli_tests:
             result = FlextMeltanoExecutor.create_cli_runner(args)
-            tm.that(isinstance(result, r), eq=True)
+            tm.that(result, is_=r)
             if not result.is_success:
                 tm.that(result.error, eq=True)
 
@@ -407,7 +407,7 @@ class TestFlextMeltanoExecutorComplete:
         for command, args in edge_case_commands:
             try:
                 result = self.executor._route_command(command, args)
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
             except Exception as e:
                 logger.debug(
                     "Expected exception during edge case command execution: %s",
@@ -425,10 +425,10 @@ class TestFlextMeltanoExecutorComplete:
         for tap, target in problematic_pipelines:
             try:
                 result = self.executor.run_pipeline(tap, target)
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
                 if not result.is_success:
                     tm.that(result.error, eq=True)
-                    tm.that(isinstance(result.error, str), eq=True)
+                    tm.that(result.error, is_=str)
             except Exception as e:
                 logger.debug("Expected exception during pipeline execution: %s", e)
                 tm.that(True, eq=True)
@@ -444,7 +444,7 @@ class TestFlextMeltanoExecutorComplete:
         for args in run_command_tests:
             try:
                 result = self.executor._handle_default_command(["run"] + args)
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
             except Exception as e:
                 logger.debug(
                     f"Expected exception during run command execution: {e}",
@@ -463,7 +463,7 @@ class TestFlextMeltanoExecutorComplete:
                 sys, "exit", side_effect=RuntimeError("CLI execution failed")
             ):
                 result = self.executor.run_cli(["force_exception"])
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
                 if not result.is_success:
                     tm.that(result.error, eq=True)
                     tm.that(result.error, none=False)
@@ -474,7 +474,7 @@ class TestFlextMeltanoExecutorComplete:
         try:
             problematic_args = ["--invalid-global-flag", "nonexistent_command"]
             result = self.executor.run_cli(problematic_args)
-            tm.that(isinstance(result, r), eq=True)
+            tm.that(result, is_=r)
             if not result.is_success and result.error:
                 tm.that(result.error, eq=True)
         except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
@@ -493,7 +493,7 @@ class TestFlextMeltanoExecutorComplete:
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result)
         version_result = FlextMeltanoExecutor().version()
-        tm.that(isinstance(version_result, r), eq=True)
+        tm.that(version_result, is_=r)
         tm.that(version_result.is_success or version_result.is_failure, eq=True)
 
     def test_click_health_command_infrastructure(self) -> None:
@@ -524,11 +524,11 @@ class TestFlextMeltanoExecutorComplete:
         if isinstance(cli_app, dict):
             tm.that(cli_app, has="executor")
             run_result = executor.execute()
-            tm.that(isinstance(run_result, r), eq=True)
+            tm.that(run_result, is_=r)
             version_result = executor.execute()
-            tm.that(isinstance(version_result, r), eq=True)
+            tm.that(version_result, is_=r)
             plugins_result = executor.list_plugins()
-            tm.that(isinstance(plugins_result, r), eq=True)
+            tm.that(plugins_result, is_=r)
 
     def test_self(self, meltano_cli_runner: t.NormalizedValue) -> None:
         """Test flext-cli command error paths using FLEXT patterns."""
@@ -579,7 +579,7 @@ class TestFlextMeltanoExecutorComplete:
                 if plugins_result.value is not None:
                     tm.that(plugins_result.value, eq=True)
                 version_result = executor.execute()
-                tm.that(isinstance(version_result, r), eq=True)
+                tm.that(version_result, is_=r)
 
     def test_force_cli_execution_exceptions(self) -> None:
         """Test forced CLI execution exceptions to hit lines 209-224."""
@@ -590,9 +590,9 @@ class TestFlextMeltanoExecutorComplete:
         for cmd in problematic_commands:
             try:
                 result = self.executor.run_cli(cmd)
-                tm.that(isinstance(result, r), eq=True)
+                tm.that(result, is_=r)
                 if result.is_success:
-                    tm.that(isinstance(result.value, dict), eq=True)
+                    tm.that(result.value, is_=dict)
                 else:
                     tm.that(result.error, eq=True)
             except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
