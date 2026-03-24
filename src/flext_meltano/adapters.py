@@ -1,12 +1,5 @@
 """FLEXT Meltano Adapters - SOLID-compliant adapter classes following FLEXT patterns.
 
-This module provides focused adapter classes that follow SOLID principles:
-- Single Responsibility: Each adapter handles one specific domain
-- Open/Closed: Extensible through composition
-- Liskov Substitution: Proper type hierarchies
-- Interface Segregation: Clean separation of concerns
-- Dependency Inversion: Depend on abstractions
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 

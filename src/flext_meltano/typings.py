@@ -1,12 +1,5 @@
 """FLEXT Meltano Types - Domain-specific Meltano type definitions.
 
-This module provides Meltano-specific type definitions extending t.
-Follows FLEXT standards:
-- Domain-specific complex types only
-- No simple aliases to primitive types
-- Python 3.13+ syntax
-- Extends t properly
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 

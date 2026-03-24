@@ -29,23 +29,25 @@ from flext_meltano import (
 )
 
 
-def _is_meltano_project(
-    value: p.Meltano.Project
-    | t.Meltano.Dbt.Project
-    | Mapping[str, t.ContainerMapping | None]
-    | t.ContainerMapping
-    | None,
-) -> TypeIs[p.Meltano.Project]:
-    """Type guard for protocol-compatible Meltano project objects."""
-    return hasattr(value, "root_dir") and callable(getattr(value, "find_plugins", None))
-
-
 class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
     FLEXT patterns with railway-oriented programming.
     """
+
+    @staticmethod
+    def _is_meltano_project(
+        value: p.Meltano.Project
+        | t.Meltano.Dbt.Project
+        | Mapping[str, t.ContainerMapping | None]
+        | t.ContainerMapping
+        | None,
+    ) -> TypeIs[p.Meltano.Project]:
+        """Type guard for protocol-compatible Meltano project objects."""
+        return hasattr(value, "root_dir") and callable(
+            getattr(value, "find_plugins", None)
+        )
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize component service with FLEXT configuration."""
@@ -128,7 +130,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                         or "Failed to create temporary project",
                     )
                 temp_project = temp_project_result.value
-                if not _is_meltano_project(temp_project):
+                if not FlextMeltanoComponentService._is_meltano_project(temp_project):
                     return r[Sequence[t.StrMapping]].fail(
                         "Temporary project does not satisfy Project",
                     )
@@ -272,7 +274,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
                     temp_project_result.error or "Failed to create temporary project",
                 )
             temp_project = temp_project_result.value
-            if not _is_meltano_project(temp_project):
+            if not FlextMeltanoComponentService._is_meltano_project(temp_project):
                 return r[t.StrMapping].fail(
                     "Temporary project does not satisfy Project",
                 )

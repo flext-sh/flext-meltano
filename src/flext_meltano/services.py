@@ -23,28 +23,6 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
     Provides complete pipeline orchestration using flext-core patterns
     with composition over inheritance, railway-oriented programming, and SOLID principles.
 
-    **SOLID Principles Applied:**
-    - Single Responsibility: Each operation class handles one concern
-    - Open/Closed: Extensible through composition, not modification
-    - Liskov Substitution: All operations follow consistent interfaces
-    - Interface Segregation: Focused operation interfaces
-    - Dependency Inversion: Depends on abstractions, not concretions
-
-    **Composition Architecture:**
-    - `source_ops`: Data source protocol operations (discover, extract)
-    - `sink_ops`: Data sink protocol operations (load, transform)
-    - `pipeline_ops`: Pipeline orchestration (configure, execute, monitor)
-
-    Attributes:
-        service_name: Name of the pipeline service instance
-        version: Service version information
-        config: Service configuration
-
-    Example:
-        >>> service = FlextMeltanoService()
-        >>> result = service.discover()
-        >>> pipeline = service.configure_pipeline("source-csv", "sink-postgres")
-
     """
 
     service_name: str = ""
@@ -60,11 +38,6 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         service_config: m.Meltano.ServiceConstructorConfig | None = None,
     ) -> None:
         """Initialize generic pipeline service with composition-based architecture.
-
-        Supports unified service architecture with domain-specific naming:
-        - Singer taps: service_type="tap", tap_name="tap_name"
-        - Singer targets: service_type="target", target_name="target_name"
-        - DBT projects: service_type="dbt", project_name="project_name"
 
         Args:
             service_config: Optional constructor configuration model

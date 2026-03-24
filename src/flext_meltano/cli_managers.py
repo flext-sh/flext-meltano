@@ -22,43 +22,7 @@ from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano import m, p, t
 
-_PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
-_PIPELINE_CONFIG_FILE = "pipeline.json"
-_PIPELINE_PID_FILE = "pipeline.pid"
 _MIN_ARGS_WITH_CONFIG = 2
-
-
-def _pipelines_root_dir() -> Path:
-    configured_root = os.environ.get(_PIPELINES_ROOT_ENV)
-    if configured_root and configured_root.strip():
-        return Path(configured_root).expanduser().resolve()
-    return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
-
-
-def _pipeline_dir(pipeline_name: str) -> Path:
-    return _pipelines_root_dir() / pipeline_name
-
-
-def _pipeline_config_path(pipeline_name: str) -> Path:
-    return _pipeline_dir(pipeline_name) / _PIPELINE_CONFIG_FILE
-
-
-def _pipeline_pid_path(pipeline_name: str) -> Path:
-    return _pipeline_dir(pipeline_name) / _PIPELINE_PID_FILE
-
-
-def _is_process_running(pid: int) -> bool:
-    if pid <= 0:
-        return False
-    try:
-        os.kill(pid, 0)
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
-    except OSError:
-        return False
-    return True
 
 
 class FlextMeltanoCommandRouter:
@@ -130,11 +94,56 @@ class FlextMeltanoPipelineManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
+    _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
+    _PIPELINE_CONFIG_FILE = "pipeline.json"
+    _PIPELINE_PID_FILE = "pipeline.pid"
+
     def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize pipeline manager with CLI reference."""
         super().__init__()
         self.cli = cli
         self.logger = FlextLogger(__name__)
+
+    @staticmethod
+    def _pipelines_root_dir() -> Path:
+        configured_root = os.environ.get(
+            FlextMeltanoPipelineManager._PIPELINES_ROOT_ENV
+        )
+        if configured_root and configured_root.strip():
+            return Path(configured_root).expanduser().resolve()
+        return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
+
+    @staticmethod
+    def _pipeline_dir(pipeline_name: str) -> Path:
+        return FlextMeltanoPipelineManager._pipelines_root_dir() / pipeline_name
+
+    @staticmethod
+    def _pipeline_config_path(pipeline_name: str) -> Path:
+        return (
+            FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+            / FlextMeltanoPipelineManager._PIPELINE_CONFIG_FILE
+        )
+
+    @staticmethod
+    def _pipeline_pid_path(pipeline_name: str) -> Path:
+        return (
+            FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+            / FlextMeltanoPipelineManager._PIPELINE_PID_FILE
+        )
+
+    @staticmethod
+    def _is_process_running(pid: int) -> bool:
+        if pid <= 0:
+            return False
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+        except OSError:
+            return False
+        return True
 
     @staticmethod
     def _execute_pipeline_operation(
@@ -158,12 +167,14 @@ class FlextMeltanoPipelineManager:
             return r[str].fail("Pipeline creation requires a non-empty pipeline name")
         if config is None:
             return r[str].fail("Pipeline creation not configured")
-        pipeline_dir = _pipeline_dir(pipeline_name)
+        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
         if pipeline_dir.exists():
             return r[str].fail(f"Pipeline '{pipeline_name}' already exists")
         try:
             pipeline_dir.mkdir(parents=True, exist_ok=False)
-            config_path = _pipeline_config_path(pipeline_name)
+            config_path = FlextMeltanoPipelineManager._pipeline_config_path(
+                pipeline_name
+            )
             validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": dict(config),
             })
@@ -181,11 +192,11 @@ class FlextMeltanoPipelineManager:
         command_args: t.StrSequence | None = None,
     ) -> r[str]:
         """Execute a Meltano pipeline."""
-        pipeline_dir = _pipeline_dir(pipeline_name)
+        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
         configured_command: t.StrSequence | None = None
-        config_path = _pipeline_config_path(pipeline_name)
+        config_path = FlextMeltanoPipelineManager._pipeline_config_path(pipeline_name)
         if config_path.exists():
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
@@ -228,7 +239,7 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def list_pipelines() -> r[t.StrSequence]:
         """List all available Meltano pipelines."""
-        pipelines_root = _pipelines_root_dir()
+        pipelines_root = FlextMeltanoPipelineManager._pipelines_root_dir()
         if not pipelines_root.exists():
             return r[t.StrSequence].ok([])
         if not pipelines_root.is_dir():
@@ -246,10 +257,10 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def get_pipeline_status(pipeline_name: str) -> r[str]:
         """Get the status of a specific Meltano pipeline."""
-        pipeline_dir = _pipeline_dir(pipeline_name)
+        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
-        pid_path = _pipeline_pid_path(pipeline_name)
+        pid_path = FlextMeltanoPipelineManager._pipeline_pid_path(pipeline_name)
         if not pid_path.exists():
             return r[str].ok("stopped")
         try:
@@ -258,7 +269,7 @@ class FlextMeltanoPipelineManager:
             return r[str].fail(
                 f"Failed to read status for pipeline '{pipeline_name}': {exc}",
             )
-        if _is_process_running(pid):
+        if FlextMeltanoPipelineManager._is_process_running(pid):
             return r[str].ok("running")
         try:
             pid_path.unlink()
@@ -271,10 +282,10 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
         """Stop a running Meltano pipeline."""
-        pipeline_dir = _pipeline_dir(pipeline_name)
+        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
-        pid_path = _pipeline_pid_path(pipeline_name)
+        pid_path = FlextMeltanoPipelineManager._pipeline_pid_path(pipeline_name)
         if not pid_path.exists():
             return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
         try:
@@ -283,7 +294,7 @@ class FlextMeltanoPipelineManager:
             return r[str].fail(
                 f"Failed to read PID for pipeline '{pipeline_name}': {exc}",
             )
-        if not _is_process_running(pid):
+        if not FlextMeltanoPipelineManager._is_process_running(pid):
             try:
                 pid_path.unlink()
             except FileNotFoundError:
@@ -305,7 +316,7 @@ class FlextMeltanoPipelineManager:
             return r[str].fail(f"Failed to stop pipeline '{pipeline_name}': {exc}")
         deadline = time.monotonic() + timeout_seconds
         while time.monotonic() < deadline:
-            if not _is_process_running(pid):
+            if not FlextMeltanoPipelineManager._is_process_running(pid):
                 try:
                     pid_path.unlink()
                 except FileNotFoundError:
@@ -322,7 +333,7 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def delete_pipeline(pipeline_name: str) -> r[str]:
         """Delete a Meltano pipeline."""
-        pipeline_dir = _pipeline_dir(pipeline_name)
+        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
         status_result = FlextMeltanoPipelineManager.get_pipeline_status(pipeline_name)

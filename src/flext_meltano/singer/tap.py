@@ -17,16 +17,7 @@ from flext_meltano import FlextMeltanoSettings, c, m, t
 
 
 class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
-    """UNIFIED Source Abstractions class consolidating ALL source functionality.
-
-    This single class provides:
-    - Complete Singer source protocol implementation
-    - Stream discovery and management
-    - Configuration validation and processing
-    - Railway-oriented error handling throughout
-
-    Following FLEXT 'one class per module' pattern.
-    """
+    """UNIFIED Source Abstractions class consolidating ALL source functionality."""
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
         """Initialize unified source abstractions with FLEXT configuration."""
