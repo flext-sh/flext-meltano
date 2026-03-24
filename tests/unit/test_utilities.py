@@ -247,7 +247,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "output.yml"
             content_with_set: t.Meltano.MeltanoConfigDict = {
-                "data": "invalid-yaml-content"
+                "data": "invalid-yaml-content",
             }
             result = u.Meltano.write_meltano_yml(content_with_set, yaml_file)
             tm.ok(result)

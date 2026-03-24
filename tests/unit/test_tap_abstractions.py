@@ -300,7 +300,7 @@ class TestFlextMeltanoAbstractionsComplete:
             invalid_result = self.tap_abstractions.process(invalid_instance.config)
         except (ValidationError, ValueError):
             invalid_result: r[m.Meltano.TapConfig] = r[m.Meltano.TapConfig].fail(
-                "Validation failed at creation"
+                "Validation failed at creation",
             )
         valid_result = self.tap_abstractions.process(valid_instance.config)
         self.test_assertions.assert_true(

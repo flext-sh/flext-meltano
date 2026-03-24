@@ -46,7 +46,7 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
     ) -> TypeIs[p.Meltano.Project]:
         """Type guard for protocol-compatible Meltano project objects."""
         return hasattr(value, "root_dir") and callable(
-            getattr(value, "find_plugins", None)
+            getattr(value, "find_plugins", None),
         )
 
     def __init__(self, config: FlextMeltanoSettings | None = None) -> None:

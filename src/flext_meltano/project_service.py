@@ -141,7 +141,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
             "values": config_obj,
         }).values
         config_dict: t.ContainerMapping = _CONTAINER_MAP_ADAPTER.validate_python(
-            config_payload
+            config_payload,
         )
         normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
         return FlextMeltanoProjectService._write_meltano_config(

@@ -107,7 +107,7 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def _pipelines_root_dir() -> Path:
         configured_root = os.environ.get(
-            FlextMeltanoPipelineManager._PIPELINES_ROOT_ENV
+            FlextMeltanoPipelineManager._PIPELINES_ROOT_ENV,
         )
         if configured_root and configured_root.strip():
             return Path(configured_root).expanduser().resolve()
@@ -173,7 +173,7 @@ class FlextMeltanoPipelineManager:
         try:
             pipeline_dir.mkdir(parents=True, exist_ok=False)
             config_path = FlextMeltanoPipelineManager._pipeline_config_path(
-                pipeline_name
+                pipeline_name,
             )
             validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": dict(config),
