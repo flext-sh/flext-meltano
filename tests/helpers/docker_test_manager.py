@@ -199,7 +199,9 @@ class Tk(ContainerManager):
                     return f"localhost:{host_port[1]}"
         except Exception as e:
             self.logger.warning(
-                "Failed to get service URL for %s: %s", service_name, str(e),
+                "Failed to get service URL for %s: %s",
+                service_name,
+                str(e),
             )
         return None
 
