@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Mapping, MutableSequence, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -582,13 +582,13 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 else all_plugins
             )
             plugins_list = list(filtered_plugins) if filtered_plugins else []
-            plugins_data: MutableSequence[t.Meltano.MeltanoConfigDict] = []
-            for plugin_entry in plugins_list:
-                plugin_payload = self._normalize_config_mapping({
+            plugins_data: Sequence[t.Meltano.MeltanoConfigDict] = [
+                self._normalize_config_mapping({
                     **plugin_entry,
                     "api_version": self.version,
                 })
-                plugins_data.append(plugin_payload)
+                for plugin_entry in plugins_list
+            ]
             return r[Sequence[t.Meltano.MeltanoConfigDict]].ok(plugins_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Sequence[t.Meltano.MeltanoConfigDict]].fail(

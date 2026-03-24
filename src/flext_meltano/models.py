@@ -2856,17 +2856,15 @@ class FlextMeltanoModels(FlextCliModels):
             @computed_field
             def completed_stages(self) -> t.StrSequence:
                 """Completed pipeline stages."""
-                stages: MutableSequence[str] = []
-                src = self.source_result
-                if src is not None and src.end_time is not None:
-                    stages.append("extraction")
-                snk = self.sink_result
-                if snk is not None and snk.end_time is not None:
-                    stages.append("loading")
-                trn = self.transformation_result
-                if trn is not None and trn.end_time is not None:
-                    stages.append("transformation")
-                return stages
+                return [
+                    stage
+                    for stage, result in (
+                        ("extraction", self.source_result),
+                        ("loading", self.sink_result),
+                        ("transformation", self.transformation_result),
+                    )
+                    if result is not None and result.end_time is not None
+                ]
 
             @computed_field
             def completion_percentage(self) -> float:
