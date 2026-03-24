@@ -37,12 +37,12 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
     def test_plugin_definition_is_type_alias(self) -> None:
         """Test PluginDefinition is accessible as type alias."""
         plugin_def = t.Meltano.PluginDefinition
-        tm.that(plugin_def is not None, eq=True)
+        tm.that(plugin_def, none=False)
 
     def test_plugin_configuration_is_type_alias(self) -> None:
         """Test PluginConfiguration is accessible as type alias."""
         plugin_cfg = t.Meltano.PluginConfiguration
-        tm.that(plugin_cfg is not None, eq=True)
+        tm.that(plugin_cfg, none=False)
 
     def test_meltano_namespace_exists(self) -> None:
         """Test t.Meltano namespace exists."""
@@ -50,7 +50,7 @@ class TestFlextMeltanoPluginProtocolsUnified(TestCase):
 
     def test_typings_module_has_documentation(self) -> None:
         """Test t class has documentation."""
-        tm.that(t.__doc__ is not None, eq=True)
+        tm.that(t.__doc__, none=False)
 
 
 if __name__ == "__main__":

@@ -66,7 +66,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
         tm.ok(result)
         command = result.value
-        tm.that("--catalog" in command, eq=True)
+        tm.that(command, has="--catalog")
 
     def test_translate_tap_run_with_state(self) -> None:
         """Test tap run translation with state file."""
@@ -90,10 +90,10 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(params)
         tm.ok(result)
         command = result.value
-        tm.that("tap-postgres" in command, eq=True)
-        tm.that("--config" in command, eq=True)
-        tm.that("--catalog" in command, eq=True)
-        tm.that("--state" in command, eq=True)
+        tm.that(command, has="tap-postgres")
+        tm.that(command, has="--config")
+        tm.that(command, has="--catalog")
+        tm.that(command, has="--state")
 
     def test_translate_tap_run_discover_ignores_other_params(self) -> None:
         """Test that discover mode returns early, ignoring other parameters."""
@@ -444,7 +444,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
             "tap-postgres"
         ])
         tm.fail(result)
-        tm.that("Connection failed" in str(result.error), eq=True)
+        tm.that(str(result.error), has="Connection failed")
 
     @patch("flext_meltano.singer.translator.subprocess.run")
     def test_execute_singer_command_timeout(self, mock_run: MagicMock) -> None:
@@ -454,7 +454,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
             ["tap-postgres"], timeout=10
         )
         tm.fail(result)
-        tm.that("timed out after 10 seconds" in str(result.error), eq=True)
+        tm.that(str(result.error), has="timed out after 10 seconds")
 
     @patch("subprocess.run")
     def test_execute_singer_command_not_found(self, mock_run: MagicMock) -> None:
@@ -479,4 +479,4 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
             "tap-postgres"
         ])
         tm.fail(result)
-        tm.that("Unexpected error" in str(result.error), eq=True)
+        tm.that(str(result.error), has="Unexpected error")

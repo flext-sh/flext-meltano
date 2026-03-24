@@ -71,7 +71,7 @@ class TestTapService:
         tm.ok(service_result)
         tap_service = service_result.value
         tm.that(hasattr(tap_service, "_container"), eq=True)
-        tm.that(tap_service._container is not None, eq=True)
+        tm.that(tap_service._container, none=False)
 
     def test_tap_service_execute_method(self) -> None:
         """Test TapService execute method."""
@@ -173,7 +173,7 @@ class TestTargetService:
         tm.ok(service_result)
         target_service = service_result.value
         tm.that(hasattr(target_service, "_container"), eq=True)
-        tm.that(target_service._container is not None, eq=True)
+        tm.that(target_service._container, none=False)
 
     def test_target_service_execute_method(self) -> None:
         """Test TargetService execute method."""
@@ -267,7 +267,7 @@ class TestDbtService:
         tm.ok(service_result)
         dbt_service = service_result.value
         tm.that(hasattr(dbt_service, "_container"), eq=True)
-        tm.that(dbt_service._container is not None, eq=True)
+        tm.that(dbt_service._container, none=False)
 
     def test_dbt_service_execute_method(self) -> None:
         """Test DbtService execute method."""
@@ -392,7 +392,7 @@ class TestServiceIntegration:
         tm.that(isinstance(tap_result, r), eq=True)
         if tap_result.is_success:
             tap_service = tap_result.value
-            tm.that(tap_service is not None, eq=True)
+            tm.that(tap_service, none=False)
             validate_result = tap_service.validate_service()
             tm.that(isinstance(validate_result, r), eq=True)
             config_validate_result = tap_service.validate_config()
@@ -406,7 +406,7 @@ class TestServiceIntegration:
         tm.that(isinstance(target_result, r), eq=True)
         if target_result.is_success:
             target_service = target_result.value
-            tm.that(target_service is not None, eq=True)
+            tm.that(target_service, none=False)
             validate_result = target_service.validate_service()
             tm.that(isinstance(validate_result, r), eq=True)
             info_result = target_service.get_info()
@@ -418,7 +418,7 @@ class TestServiceIntegration:
         tm.that(isinstance(dbt_result, r), eq=True)
         if dbt_result.is_success:
             dbt_service = dbt_result.value
-            tm.that(dbt_service is not None, eq=True)
+            tm.that(dbt_service, none=False)
             profiles_result = dbt_service.get_profiles_config()
             tm.that(isinstance(profiles_result, r), eq=True)
             info_result = dbt_service.get_info()
@@ -436,9 +436,9 @@ class TestServiceIntegration:
             tap_service = tap_result.value
             target_service = target_result.value
             dbt_service = dbt_result.value
-            tm.that(tap_service is not None, eq=True)
-            tm.that(target_service is not None, eq=True)
-            tm.that(dbt_service is not None, eq=True)
+            tm.that(tap_service, none=False)
+            tm.that(target_service, none=False)
+            tm.that(dbt_service, none=False)
             tm.that(tap_service is not target_service, eq=True)
             tm.that(target_service is not dbt_service, eq=True)
             tm.that(dbt_service is not tap_service, eq=True)
@@ -501,7 +501,7 @@ class TestServiceErrorHandling:
         tap_result = self.service.create_tap_service("tap-test")
         if tap_result.is_success:
             tap_service = tap_result.value
-            tm.that(tap_service is not None, eq=True)
+            tm.that(tap_service, none=False)
             methods_to_test = [
                 tap_service.validate_config,
                 tap_service.validate_service,
@@ -550,7 +550,7 @@ class TestServiceArchitecture:
     def test_dependency_injection_container(self) -> None:
         """Test dependency injection container usage."""
         tm.that(hasattr(self.service, "_container"), eq=True)
-        tm.that(self.service._container is not None, eq=True)
+        tm.that(self.service._container, none=False)
 
     def test_unified_service_container_pattern(self) -> None:
         """Test that unified services implement the container pattern."""

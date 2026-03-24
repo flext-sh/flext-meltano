@@ -49,7 +49,7 @@ class TestTapConfigEnhanced:
         tm.that(config.tap_type, eq="tap-mysql")
         tm.that(config.connection_config["host"], eq="db.example.com")
         tm.that(config.connection_config["port"], eq=3306)
-        tm.that("users" in config.stream_config, eq=True)
+        tm.that(config.stream_config, has="users")
         tm.that(config.tap_version, eq="1.0.0")
 
     def test_tap_config_validation_empty_tap_type(self) -> None:
@@ -74,8 +74,8 @@ class TestTargetConfigEnhanced:
         config = m.Meltano.TargetConfig(target_type="target-csv")
         tm.that(config.target_type, eq="target-csv")
         tm.that(config.connection_config, eq={})
-        tm.that(config.batch_size is None, eq=True)
-        tm.that(config.batch_wait_limit is None, eq=True)
+        tm.that(config.batch_size, none=True)
+        tm.that(config.batch_wait_limit, none=True)
 
     def test_target_config_with_full_data(self) -> None:
         """Test TargetConfig with all fields populated."""
@@ -195,9 +195,9 @@ class TestMeltanoProjectModelEnhanced:
         tm.that(project.project_id, eq="analytics-project")
         tm.that(project.project_version, eq="2.0")
         tm.that(project.default_environment, eq="production")
-        tm.that("extractors" in project.plugins, eq=True)
-        tm.that("dev" in project.environments, eq=True)
-        tm.that("prod" in project.environments, eq=True)
+        tm.that(project.plugins, has="extractors")
+        tm.that(project.environments, has="dev")
+        tm.that(project.environments, has="prod")
 
     def test_meltano_project_validation_empty_project_id(self) -> None:
         """Test MeltanoProjectModel validation with empty project_id."""
@@ -225,7 +225,7 @@ class TestPluginModelEnhanced:
         tm.that(plugin.namespace, eq="tap_postgres")
         tm.that(plugin.variant, eq="standard")
         tm.that(plugin.pip_url, eq="tap-postgres")
-        tm.that(plugin.executable is None, eq=True)
+        tm.that(plugin.executable, none=True)
         tm.that(plugin.capabilities, eq=[])
         tm.that(plugin.settings, eq={})
         tm.that(plugin.config_files, eq=[])
@@ -252,9 +252,9 @@ class TestPluginModelEnhanced:
             plugin.pip_url, eq="git+https://github.com/meltanolabs/tap-postgres.git"
         )
         tm.that(plugin.executable, eq="tap-postgres")
-        tm.that("catalog" in plugin.capabilities, eq=True)
+        tm.that(plugin.capabilities, has="catalog")
         tm.that(len(plugin.settings), eq=2)
-        tm.that("host" in plugin.settings, eq=True)
+        tm.that(plugin.settings, has="host")
 
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
@@ -306,9 +306,9 @@ class TestDbtProjectModelEnhanced:
         tm.that(dbt_project.profile, eq="postgres")
         tm.that(dbt_project.dbt_version, eq="2.1.0")
         tm.that(dbt_project.config["materialized"], eq="table")
-        tm.that("staging" in dbt_project.models, eq=True)
-        tm.that("raw_data" in dbt_project.sources, eq=True)
-        tm.that("unit" in dbt_project.tests, eq=True)
+        tm.that(dbt_project.models, has="staging")
+        tm.that(dbt_project.sources, has="raw_data")
+        tm.that(dbt_project.tests, has="unit")
 
     def test_dbt_project_validation_empty_name(self) -> None:
         """Test DbtProjectModel validation with empty name."""
@@ -357,7 +357,7 @@ class TestModelIntegration:
         project = m.Meltano.MeltanoProjectModel(
             project_id="mysql-etl", plugins={"extractors": "tap-mysql"}
         )
-        tm.that(plugin.name in str(project.plugins), eq=True)
+        tm.that(str(project.plugins), has=plugin.name)
         tm.that(project.project_id, eq="mysql-etl")
 
     def test_stream_info_with_tap_config_integration(self) -> None:
@@ -373,5 +373,5 @@ class TestModelIntegration:
             connection_config={"host": "localhost"},
             stream_config={"users": "public"},
         )
-        tm.that(stream.stream_name in tap_config.stream_config, eq=True)
+        tm.that(tap_config.stream_config, has=stream.stream_name)
         tm.that(stream.key_properties, eq=["id"])

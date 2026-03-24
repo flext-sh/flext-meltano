@@ -28,12 +28,12 @@ class TestFlextMeltanoTargetAbstractionsComplete:
     def test_target_abstractions_initialization(self) -> None:
         """Test FlextMeltanoTargetAbstractions initialization."""
         target_abs = FlextMeltanoTargetAbstractions()
-        tm.that(target_abs is not None, eq=True)
+        tm.that(target_abs, none=False)
         tm.that(hasattr(target_abs, "logger"), eq=True)
 
     def test_create_flext_target_config(self) -> None:
         """Test target configuration creation."""
-        tm.that(self.target_abstractions is not None, eq=True)
+        tm.that(self.target_abstractions, none=False)
         if not hasattr(self.target_abstractions, "configure_sink"):
             pytest.skip("configure_sink not available")
         pass
@@ -44,7 +44,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
 
     def test_target_error_handling(self) -> None:
         """Test target error handling."""
-        tm.that(self.target_abstractions is not None, eq=True)
+        tm.that(self.target_abstractions, none=False)
         if self.target_abstractions is None:
             return
         result = self.target_abstractions.execute()
@@ -54,7 +54,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test utility helper methods using flext-core."""
         timestamp = u.generate_iso_timestamp()
         tm.that(isinstance(timestamp, str), eq=True)
-        tm.that("T" in timestamp, eq=True)
+        tm.that(timestamp, has="T")
         test_data: t.Meltano.MeltanoConfigDict = {
             "level1": {"level2": {"level3": "found_value"}}
         }

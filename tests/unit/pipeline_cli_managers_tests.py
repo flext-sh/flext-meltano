@@ -95,8 +95,8 @@ def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
         tm.ok(create_pipeline("a-pipeline", {"command": ["run", "tap-b", "target-b"]}))
         list_result = list_pipelines()
     tm.ok(list_result)
-    tm.that("a-pipeline" in list_result.value, eq=True)
-    tm.that("b-pipeline" in list_result.value, eq=True)
+    tm.that(list_result.value, has="a-pipeline")
+    tm.that(list_result.value, has="b-pipeline")
 
 
 def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:

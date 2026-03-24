@@ -35,8 +35,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         tm.that(config_dict["project_id"], eq="test-project")
         tm.that(config_dict["version"], eq="1.0.0")
         tm.that(config_dict["default_environment"], eq="dev")
-        tm.that("plugins" in config_dict, eq=True)
-        tm.that("environments" in config_dict, eq=True)
+        tm.that(config_dict, has="plugins")
+        tm.that(config_dict, has="environments")
 
     def test_create_meltano_config_dict_with_plugins(self) -> None:
         """Test Meltano config dictionary creation with plugins.
@@ -60,10 +60,10 @@ class TestFlextMeltanoUtilitiesEnhanced:
         if isinstance(plugins_val, dict):
             extractors = plugins_val.get("extractors")
             loaders = plugins_val.get("loaders")
-            tm.that(extractors is not None, eq=True)
-            tm.that(loaders is not None, eq=True)
-            tm.that("tap-postgres" in str(extractors), eq=True)
-            tm.that("target-csv" in str(loaders), eq=True)
+            tm.that(extractors, none=False)
+            tm.that(loaders, none=False)
+            tm.that(str(extractors), has="tap-postgres")
+            tm.that(str(loaders), has="target-csv")
 
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
@@ -81,8 +81,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
         env_dict = config_dict["environments"]
         tm.that(isinstance(env_dict, dict), eq=True)
         if isinstance(env_dict, dict):
-            tm.that("dev" in env_dict, eq=True)
-            tm.that("prod" in env_dict, eq=True)
+            tm.that(env_dict, has="dev")
+            tm.that(env_dict, has="prod")
             prod_env = env_dict["prod"]
             tm.that(isinstance(prod_env, dict), eq=True)
             if isinstance(prod_env, dict):
@@ -120,7 +120,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             (project_path / ".meltano" / "logs").mkdir()
             result = u.Meltano.validate_project_structure(project_path)
             tm.ok(result)
-            tm.that(result.value is not None, eq=True)
+            tm.that(result.value, none=False)
 
     def test_validate_project_structure_missing_pipeline_yml(self) -> None:
         """Test project structure validation with missing pipeline.yml."""
@@ -130,9 +130,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = u.Meltano.validate_project_structure(project_path)
             tm.fail(result)
             error = result.error
-            tm.that(error is not None, eq=True)
+            tm.that(error, none=False)
             if error is not None:
-                tm.that("Meltano config file not found" in error, eq=True)
+                tm.that(error, has="Meltano config file not found")
 
     def test_validate_project_structure_missing_meltano_dir(self) -> None:
         """Test project structure validation with missing .meltano directory."""
@@ -148,9 +148,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
         result = u.Meltano.validate_project_structure(Path("/nonexistent/path"))
         tm.fail(result)
         error = result.error
-        tm.that(error is not None, eq=True)
+        tm.that(error, none=False)
         if error is not None:
-            tm.that("Project path does not exist" in error, eq=True)
+            tm.that(error, has="Project path does not exist")
 
     def test_create_project_file_success(self) -> None:
         """Test successful project file creation."""
@@ -166,7 +166,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             tm.ok(result)
             tm.that((project_path / "pipeline.yml").exists(), eq=True)
             written_content = (project_path / "pipeline.yml").read_text()
-            tm.that("project_id: test-project" in written_content, eq=True)
+            tm.that(written_content, has="project_id: test-project")
 
     def test_create_project_file_directory_not_exists(self) -> None:
         """Test project file creation in non-existent directory raises PermissionError."""
@@ -184,7 +184,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
                 project_path / "test.yml", invalid_content
             )
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            tm.that(result.error, none=False)
 
     def test_load_yaml_file_success(self) -> None:
         """Test successful YAML file loading."""
@@ -206,18 +206,18 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = u.Meltano.load_yaml_config(yaml_file)
             tm.fail(result)
             error = result.error
-            tm.that(error is not None, eq=True)
+            tm.that(error, none=False)
             if error is not None:
-                tm.that("Failed to load YAML" in error, eq=True)
+                tm.that(error, has="Failed to load YAML")
 
     def test_load_yaml_file_nonexistent(self) -> None:
         """Test YAML file loading with nonexistent file."""
         result = u.Meltano.load_yaml_config(Path("/nonexistent/file.yml"))
         tm.fail(result)
         error = result.error
-        tm.that(error is not None, eq=True)
+        tm.that(error, none=False)
         if error is not None:
-            tm.that("File does not exist" in error, eq=True)
+            tm.that(error, has="File does not exist")
 
     def test_save_yaml_file_success(self) -> None:
         """Test successful YAML file saving."""
@@ -231,8 +231,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             tm.ok(result)
             tm.that(yaml_file.exists(), eq=True)
             saved_content = yaml_file.read_text()
-            tm.that("project_id: save-test" in saved_content, eq=True)
-            tm.that("version: 2.0.0" in saved_content, eq=True)
+            tm.that(saved_content, has="project_id: save-test")
+            tm.that(saved_content, has="version: 2.0.0")
 
     def test_save_yaml_file_invalid_content(self) -> None:
         """Test YAML file saving with invalid content."""
@@ -244,7 +244,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             tm.that(yaml_file.exists(), eq=True)
             load_result = u.Meltano.load_yaml_config(yaml_file)
             tm.fail(load_result)
-            tm.that(load_result.error is not None, eq=True)
+            tm.that(load_result.error, none=False)
             tm.that(
                 "YAML" in str(load_result.error) or "yaml" in str(load_result.error),
                 eq=True,
@@ -279,9 +279,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
             mock_exists.side_effect = OSError("Permission denied")
             result = u.Meltano.directory_exists(Path("/restricted/path"))
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            tm.that(result.error, none=False)
             error_msg = result.error or ""
-            tm.that("Permission denied" in error_msg, eq=True)
+            tm.that(error_msg, has="Permission denied")
 
     def test_create_meltano_config_dict_with_none_values(self) -> None:
         """Test Meltano config dictionary creation with None values."""
@@ -294,7 +294,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         tm.that(config_dict["version"], eq=1)
         tm.that("default_environment" not in config_dict, eq=True)
         tm.that(config_dict["plugins"], eq={})
-        tm.that("environments" in config_dict, eq=True)
+        tm.that(config_dict, has="environments")
 
     def test_create_meltano_config_dict_with_empty_strings(self) -> None:
         """Test Meltano config dictionary creation with empty strings."""
@@ -320,7 +320,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
             (project_path / "extract").mkdir()
             result = u.Meltano.validate_project_structure(project_path)
             tm.ok(result)
-            tm.that(result.value is not None, eq=True)
+            tm.that(result.value, none=False)
 
     def test_create_project_file_with_string_content(self) -> None:
         """Test project file creation with string content."""

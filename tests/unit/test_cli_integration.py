@@ -40,7 +40,7 @@ class TestCliModelConverterWithTapRunParams:
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
         tm.that(model.tap_name, eq="tap-postgres")
-        tm.that(model.config_file is None, eq=True)
+        tm.that(model.config_file, none=True)
         tm.that(model.discover is False, eq=True)
 
     def test_converter_tap_run_params_with_config(self) -> None:
@@ -70,7 +70,7 @@ class TestCliModelConverterWithTapRunParams:
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
         tm.that(model.tap_name, eq="tap-postgres")
-        tm.that(model.config_file is None, eq=True)
+        tm.that(model.config_file, none=True)
         tm.that(model.discover is True, eq=True)
 
     def test_converter_tap_run_params_all_fields(self) -> None:
@@ -102,8 +102,8 @@ class TestCliModelConverterWithTapRunParams:
             m.Meltano.TapRunParams, cli_args
         )
         tm.fail(result)
-        tm.that("validation" in str(result.error).lower(), eq=True)
-        tm.that("tap_name" in str(result.error).lower(), eq=True)
+        tm.that(str(result.error).lower(), has="validation")
+        tm.that(str(result.error).lower(), has="tap_name")
 
     def test_converter_tap_run_params_invalid_type(self) -> None:
         """Test validation error when field has wrong type."""
@@ -115,7 +115,7 @@ class TestCliModelConverterWithTapRunParams:
             m.Meltano.TapRunParams, cli_args
         )
         tm.fail(result)
-        tm.that("validation" in str(result.error).lower(), eq=True)
+        tm.that(str(result.error).lower(), has="validation")
 
 
 class TestCliModelConverterWithTargetRunParams:
@@ -134,8 +134,8 @@ class TestCliModelConverterWithTargetRunParams:
         tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
         tm.that(model.target_name, eq="target-postgres")
-        tm.that(model.config_file is None, eq=True)
-        tm.that(model.input_file is None, eq=True)
+        tm.that(model.config_file, none=True)
+        tm.that(model.input_file, none=True)
 
     def test_converter_target_run_params_with_config(self) -> None:
         """Test converting Mapping[str, objecth config to TargetRunParams model."""
@@ -188,8 +188,8 @@ class TestCliModelConverterWithTargetRunParams:
             m.Meltano.TargetRunParams, cli_args
         )
         tm.fail(result)
-        tm.that("validation" in str(result.error).lower(), eq=True)
-        tm.that("target_name" in str(result.error).lower(), eq=True)
+        tm.that(str(result.error).lower(), has="validation")
+        tm.that(str(result.error).lower(), has="target_name")
 
 
 class TestCliModelConverterWithPipelineRunParams:
@@ -268,7 +268,7 @@ class TestCliModelConverterWithPipelineRunParams:
             m.Meltano.PipelineRunParams, cli_args
         )
         tm.fail(result)
-        tm.that("validation" in str(result.error).lower(), eq=True)
+        tm.that(str(result.error).lower(), has="validation")
 
     def test_converter_pipeline_run_params_missing_target_name(self) -> None:
         """Test validation error when target_name is missing."""
@@ -277,7 +277,7 @@ class TestCliModelConverterWithPipelineRunParams:
             m.Meltano.PipelineRunParams, cli_args
         )
         tm.fail(result)
-        tm.that("validation" in str(result.error).lower(), eq=True)
+        tm.that(str(result.error).lower(), has="validation")
 
 
 class TestCliModelConverterWithDbtRunParams:
@@ -292,7 +292,7 @@ class TestCliModelConverterWithDbtRunParams:
         tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
         tm.that(model.project_dir, eq="/dbt/project")
-        tm.that(model.models is None, eq=True)
+        tm.that(model.models, none=True)
         tm.that(model.full_refresh is False, eq=True)
 
     def test_converter_dbt_run_params_with_models(self) -> None:
@@ -343,4 +343,4 @@ class TestCliModelConverterWithDbtRunParams:
             m.Meltano.DbtRunParams, cli_args
         )
         tm.fail(result)
-        tm.that("validation" in str(result.error).lower(), eq=True)
+        tm.that(str(result.error).lower(), has="validation")

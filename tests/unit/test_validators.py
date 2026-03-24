@@ -90,7 +90,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test basic validator instantiation."""
         validator = FlextMeltanoValidators()
-        tm.that(validator is not None, eq=True)
+        tm.that(validator, none=False)
 
     def test_validate_dbt_config_valid(self) -> None:
         dbt_config: Mapping[str, t.Scalar] = {
@@ -193,9 +193,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
         if result.error is not None:
-            tm.that("Plugin config validation failed" in result.error, eq=True)
+            tm.that(result.error, has="Plugin config validation failed")
 
     def test_validate_plugin_name_whitespace(self) -> None:
         config: Mapping[str, t.Scalar] = {
@@ -206,9 +206,9 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
         if result.error is not None:
-            tm.that("Plugin config validation failed" in result.error, eq=True)
+            tm.that(result.error, has="Plugin config validation failed")
 
     def test_validate_target_plugin_name_too_short(self) -> None:
         config: Mapping[str, t.Scalar] = {
@@ -219,13 +219,10 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
+        tm.that(result.error, none=False)
         if result.error is not None:
-            tm.that(
-                "Target plugin names must be at least 8 characters" in result.error,
-                eq=True,
-            )
+            tm.that(result.error, has="Target plugin names must be at least 8 characters")
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
         config: Mapping[str, t.Scalar] = {
@@ -236,13 +233,10 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         result = FlextMeltanoValidators.validate_plugin_config(config)
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
+        tm.that(result.error, none=False)
         if result.error is not None:
-            tm.that(
-                "Source component names must be at least 5 characters" in result.error,
-                eq=True,
-            )
+            tm.that(result.error, has="Source component names must be at least 5 characters")
 
     def test_validate_target_plugin_name_valid(self) -> None:
         config: Mapping[str, t.Scalar] = {

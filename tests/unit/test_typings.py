@@ -103,9 +103,9 @@ class TestFlextMeltanoTypes:
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
         plugin_definition = t.Meltano.PluginDefinition
-        tm.that(plugin_definition is not None, eq=True)
+        tm.that(plugin_definition, none=False)
         singer_catalog = t.Meltano.Singer.CatalogEntry
-        tm.that(singer_catalog is not None, eq=True)
+        tm.that(singer_catalog, none=False)
 
     def test_namespace_organization(self) -> None:
         """Test that all expected sub-namespaces exist under Meltano."""
@@ -142,7 +142,7 @@ class TestFlextMeltanoTypes:
 
     def test_export_completeness(self) -> None:
         """Test that all necessary types are exported."""
-        tm.that(t is not None, eq=True)
+        tm.that(t, none=False)
 
     def test_type_hierarchy(self) -> None:
         """Test that type hierarchy is properly structured."""
@@ -154,5 +154,5 @@ class TestFlextMeltanoTypes:
         """Test that types are consistent across the namespace."""
         plugin_definition = t.Meltano.PluginDefinition
         singer_catalog = t.Meltano.Singer.CatalogEntry
-        tm.that(plugin_definition is not None, eq=True)
-        tm.that(singer_catalog is not None, eq=True)
+        tm.that(plugin_definition, none=False)
+        tm.that(singer_catalog, none=False)

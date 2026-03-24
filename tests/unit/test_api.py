@@ -40,14 +40,14 @@ class TestFlextMeltanoInitialization:
                 return r[m.Meltano.ConfigMappingPayload].ok(payload)
 
         api = ConcreteAPI(service_name="test-api")
-        tm.that(api is not None, eq=True)
+        tm.that(api, none=False)
 
     def test_api_initialization_with_project_root(self) -> None:
         """Test API initialization with specific project root."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             api = FlextMeltano(project_root=str(temp_path))
-            tm.that(api is not None, eq=True)
+            tm.that(api, none=False)
 
     def test_api_version_property(self) -> None:
         """Test API version property."""
@@ -88,7 +88,7 @@ class TestFlextMeltanoProjectOperations:
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.create_project(project_name="", project_dir=temp_dir)
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            tm.that(result.error, none=False)
 
     def test_create_project_with_config(self) -> None:
         """Test project creation with project_dir."""
@@ -106,7 +106,7 @@ class TestFlextMeltanoProjectOperations:
             nonexistent = Path(temp_dir) / "nonexistent"
             result = api.validate_project(str(nonexistent))
             tm.fail(result)
-            tm.that(result.error is not None, eq=True)
+            tm.that(result.error, none=False)
 
     def test_validate_project_with_path(self) -> None:
         """Test project validation with specific path."""
@@ -130,7 +130,7 @@ class TestFlextMeltanoPluginOperations:
         api = FlextMeltano()
         result = api.install_plugin(plugin_type="invalid_type", plugin_name="tap-csv")
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
 
     def test_install_plugin_with_config(self) -> None:
         """Test plugin installation with configuration."""
@@ -227,7 +227,7 @@ class TestFlextMeltanoDbtOperations:
         api = FlextMeltano()
         result = api.run_dbt_models(models=[])
         tm.ok(result)
-        tm.that(result.value is not None, eq=True)
+        tm.that(result.value, none=False)
         tm.that(result.value.get("models"), eq=["all_models"])
 
     def test_run_dbt_models_without_project(self) -> None:
@@ -241,7 +241,7 @@ class TestFlextMeltanoDbtOperations:
         api = FlextMeltano()
         result = api.test_dbt_models(models=[])
         tm.ok(result)
-        tm.that(result.value is not None, eq=True)
+        tm.that(result.value, none=False)
         tm.that(result.value.get("models"), eq=["all_models"])
 
     def test_run_dbt_models_with_project(self) -> None:
@@ -265,14 +265,14 @@ class TestFlextMeltanoELTPipeline:
         api = FlextMeltano()
         result = api.run_elt_pipeline(tap_name="", target_name="target-jsonl")
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
 
     def test_run_elt_pipeline_without_target(self) -> None:
         """Test ELT pipeline without target name."""
         api = FlextMeltano()
         result = api.run_elt_pipeline(tap_name="tap-csv", target_name="")
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
 
     def test_run_elt_pipeline_without_stream(self) -> None:
         """Test ELT pipeline without stream name (API may or may not require stream)."""
@@ -297,7 +297,7 @@ class TestFlextMeltanoErrorHandling:
     def test_api_handles_none_project_root(self) -> None:
         """Test API handles None project root gracefully."""
         api = FlextMeltano(project_root=None)
-        tm.that(api is not None, eq=True)
+        tm.that(api, none=False)
 
     def test_api_handles_invalid_project_root(self) -> None:
         """Test API handles invalid project root type."""
@@ -321,7 +321,7 @@ class TestFlextMeltanoErrorHandling:
         api = FlextMeltano()
         result = api.validate_project("/invalid/path")
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
+        tm.that(result.error, none=False)
 
 
 class TestFlextMeltanoIntegration:
@@ -350,7 +350,7 @@ class TestFlextMeltanoIntegration:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             api = FlextMeltano(project_root=str(temp_path))
-            tm.that(api is not None, eq=True)
+            tm.that(api, none=False)
             result = api.create_project(project_name="context_test")
             tm.that(result.is_success or result.is_failure, eq=True)
 
@@ -363,8 +363,8 @@ class TestFlextMeltanoExecuteMethod:
         api = FlextMeltano()
         result = api.execute()
         tm.ok(result)
-        tm.that(result.value is not None, eq=True)
-        tm.that("version" in str(result.value), eq=True)
+        tm.that(result.value, none=False)
+        tm.that(str(result.value), has="version")
 
     def test_execute_unknown_command(self) -> None:
         """Test execute method with unknown command."""
@@ -481,7 +481,7 @@ class TestFlextMeltanoPerformance:
             return FlextMeltano()
 
         result = benchmark(create_api)
-        tm.that(result is not None, eq=True)
+        tm.that(result, none=False)
 
     def test_api_properties_access_performance(
         self, benchmark: BenchmarkFixture
@@ -493,4 +493,4 @@ class TestFlextMeltanoPerformance:
             return (api.version, api.constants)
 
         result = benchmark(access_properties)
-        tm.that(result is not None, eq=True)
+        tm.that(result, none=False)

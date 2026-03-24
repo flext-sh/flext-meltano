@@ -49,10 +49,10 @@ class TestFlextMeltanoSettings:
         """Test config creation with default values."""
         config = FlextMeltanoSettings()
         config.project_root = Path("/test")
-        tm.that(config.config_dir.name in {".meltano", "config"}, eq=True)
+        tm.that({".meltano", "config"}, has=config.config_dir.name)
         tm.that(config.logs_dir.name, eq="logs")
-        tm.that(config.environment in {"development", "testing"}, eq=True)
-        tm.that(config.log_level in {"INFO", "DEBUG", "WARNING"}, eq=True)
+        tm.that({"development", "testing"}, has=config.environment)
+        tm.that({"INFO", "DEBUG", "WARNING"}, has=config.log_level)
 
     def test_path_validation_success(self) -> None:
         """Test successful path validation."""
@@ -128,7 +128,7 @@ class TestFlextMeltanoSettings:
         venv_dir = config.get_absolute_venv_dir()
         tm.that(isinstance(venv_dir, Path), eq=True)
         tm.that(venv_dir.name, eq="python")
-        tm.that(".meltano" in str(venv_dir.parent), eq=True)
+        tm.that(str(venv_dir.parent), has=".meltano")
 
     def test_validate_project_structure_missing_project_file(self) -> None:
         """Test project structure validation with missing pipeline.yml."""
@@ -136,7 +136,7 @@ class TestFlextMeltanoSettings:
             config = FlextMeltanoSettings(project_root=Path(tmp_dir))
             result = config.validate_project_structure()
             tm.fail(result)
-            tm.that("pipeline.yml not found" in (result.error or ""), eq=True)
+            tm.that((result.error or ""), has="pipeline.yml not found")
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""
@@ -170,12 +170,12 @@ class TestFlextMeltanoSettings:
         plugin_types = FlextMeltanoSettings.get_supported_plugin_types()
         log_levels = FlextMeltanoSettings.get_supported_log_levels()
         tm.that(isinstance(plugin_types, list), eq=True)
-        tm.that("extractors" in plugin_types, eq=True)
-        tm.that("loaders" in plugin_types, eq=True)
-        tm.that("transforms" in plugin_types, eq=True)
+        tm.that(plugin_types, has="extractors")
+        tm.that(plugin_types, has="loaders")
+        tm.that(plugin_types, has="transforms")
         tm.that(isinstance(log_levels, list), eq=True)
-        tm.that("INFO" in log_levels, eq=True)
-        tm.that("DEBUG" in log_levels, eq=True)
+        tm.that(log_levels, has="INFO")
+        tm.that(log_levels, has="DEBUG")
 
     def test_create_from_project_root_factory(self) -> None:
         """Test create_from_project_root factory method."""
@@ -223,10 +223,7 @@ class TestFlextMeltanoSettingsEnums:
     def test_uses_flext_constants_for_enums(self) -> None:
         """Test that FlextMeltanoSettings uses c for enum values."""
         tm.that(hasattr(c, "LogLevel"), eq=True)
-        tm.that(
-            isinstance(FlextMeltanoSettings.model_fields["environment"].default, str),
-            eq=True,
-        )
+        tm.that(isinstance(FlextMeltanoSettings.model_fields["environment"].default, str), eq=True)
 
     def test_config_builders_nested_class(self) -> None:
         """Test ConfigBuilders nested class exists."""
@@ -265,7 +262,7 @@ class TestFlextMeltanoSettingsEdgeCases:
         """Test log level validation - uses default when invalid."""
         global_config = FlextSettings.get_global()
         tm.that(hasattr(global_config, "log_level"), eq=True)
-        tm.that(global_config.log_level in {"INFO", "DEBUG"}, eq=True)
+        tm.that({"INFO", "DEBUG"}, has=global_config.log_level)
 
     def test_empty_project_root_validation(self) -> None:
         """Test empty project root resolves to current directory."""
@@ -321,7 +318,7 @@ class TestFlextMeltanoSettingsIntegration:
             logs_dir_result.value.mkdir(parents=True, exist_ok=True)
             tm.that(logs_dir_result.value.exists(), eq=True)
             env_vars = config.get_environment_variables()
-            tm.that(len(env_vars) >= 3, eq=True)
+            tm.that(len(env_vars), gte=3)
             tm.that(all(isinstance(k, str) for k in env_vars), eq=True)
             tm.that(all(isinstance(v, str) for v in env_vars.values()), eq=True)
 
@@ -339,9 +336,7 @@ class TestFlextMeltanoSettingsIntegration:
             tm.that(config.environment, eq=env_type)
             expected_log_level = "INFO"
             test_env_log_level = "DEBUG"
-            tm.that(
-                config.log_level in {expected_log_level, test_env_log_level}, eq=True
-            )
+            tm.that({expected_log_level, test_env_log_level}, has=config.log_level)
 
     def test_config_constants_integration(self) -> None:
         """Test that config constants integrate properly with functionality."""
@@ -352,6 +347,6 @@ class TestFlextMeltanoSettingsIntegration:
         venv_dir = config.get_absolute_venv_dir()
         tm.that(str(venv_dir).endswith(FlextMeltanoSettings.VENV_DIR), eq=True)
         env_vars = config.get_environment_variables()
-        tm.that(FlextMeltanoSettings.MELTANO_PROJECT_ROOT_ENV in env_vars, eq=True)
-        tm.that(FlextMeltanoSettings.MELTANO_ENVIRONMENT_ENV in env_vars, eq=True)
-        tm.that(FlextMeltanoSettings.MELTANO_LOG_LEVEL_ENV in env_vars, eq=True)
+        tm.that(env_vars, has=FlextMeltanoSettings.MELTANO_PROJECT_ROOT_ENV)
+        tm.that(env_vars, has=FlextMeltanoSettings.MELTANO_ENVIRONMENT_ENV)
+        tm.that(env_vars, has=FlextMeltanoSettings.MELTANO_LOG_LEVEL_ENV)

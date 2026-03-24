@@ -67,7 +67,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         loaded_config = load_result.value
         tm.that(loaded_config["project_id"], eq="test-load-project")
         tm.that(loaded_config["version"], eq=1)
-        tm.that("plugins" in loaded_config, eq=True)
+        tm.that(loaded_config, has="plugins")
 
     def test_load_yaml_config_nonexistent_file(self) -> None:
         """Test loading YAML config from nonexistent file."""
@@ -165,7 +165,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         tm.that(isinstance(temp_path, Path), eq=True)
         tm.that(temp_path.exists(), eq=True)
         tm.that(temp_path.is_dir(), eq=True)
-        tm.that("flext_meltano" in temp_path.name, eq=True)
+        tm.that(temp_path.name, has="flext_meltano")
         cleanup_result = FlextMeltanoFileManagers.cleanup_temp_directory(temp_path)
         tm.ok(cleanup_result)
 
@@ -178,7 +178,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         tm.that(isinstance(temp_path, Path), eq=True)
         tm.that(temp_path.exists(), eq=True)
         tm.that(temp_path.is_dir(), eq=True)
-        tm.that(custom_prefix in temp_path.name, eq=True)
+        tm.that(temp_path.name, has=custom_prefix)
         cleanup_result = FlextMeltanoFileManagers.cleanup_temp_directory(temp_path)
         tm.ok(cleanup_result)
 

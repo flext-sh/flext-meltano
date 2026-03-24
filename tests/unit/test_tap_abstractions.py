@@ -23,7 +23,7 @@ class _TestAssertions:
 
     @staticmethod
     def assert_false(condition: bool, message: str = "") -> None:
-        tm.that(not condition, eq=True)
+        tm.that(condition, eq=False)
 
     @staticmethod
     def assert_equal(
@@ -37,7 +37,7 @@ class _TestAssertions:
     @staticmethod
     def assert_in(item: str, container: t.NormalizedValue, message: str = "") -> None:
         if isinstance(container, dict):
-            tm.that(item in container, eq=True)
+            tm.that(container, has=item)
 
 
 class TestFlextMeltanoTapAbstractionsComplete:
@@ -68,7 +68,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         )
         tm.that(config.tap_type, eq="tap-postgres")
         tm.that(config.tap_version, eq="v1.2.0")
-        tm.that("users" in config.stream_config, eq=True)
+        tm.that(config.stream_config, has="users")
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
@@ -138,7 +138,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_tap_abstractions_initialization(self) -> None:
         """Test FlextMeltanoTapAbstractions initialization."""
         tap_abs = FlextMeltanoTapAbstractions()
-        tm.that(tap_abs is not None, eq=True)
+        tm.that(tap_abs, none=False)
         if hasattr(tap_abs, "service_name"):
             tm.that(tap_abs.service_name, eq="FlextMeltanoTapAbstractions")
         tm.that(
@@ -800,7 +800,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-postgres", config=config, tap_id="postgres_tap_123"
         )
-        tm.that(self.tap_abstractions is not None, eq=True)
+        tm.that(self.tap_abstractions, none=False)
         tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(isinstance(result, r), eq=True)

@@ -20,7 +20,7 @@ class TestFlextDbtProgrammaticRunner:
         library_runner = FlextMeltanoLibraryRunner()
         dbt_runner_result = library_runner.get_dbt_runner()
         tm.ok(dbt_runner_result)
-        tm.that(dbt_runner_result.value is not None, eq=True)
+        tm.that(dbt_runner_result.value, none=False)
         tm.that(dbt_runner_result.value.get("type"), eq="dbt_runner")
         tm.that(dbt_runner_result.value.get("status"), eq="available")
 
@@ -31,8 +31,8 @@ class TestFlextDbtProgrammaticRunner:
         tm.ok(dbt_runner_result)
         capabilities = dbt_runner_result.value.get("capabilities", [])
         tm.that(isinstance(capabilities, list), eq=True)
-        tm.that("run" in capabilities, eq=True)
-        tm.that("test" in capabilities, eq=True)
+        tm.that(capabilities, has="run")
+        tm.that(capabilities, has="test")
 
 
 class TestFlextSingerProtocolManager:
@@ -43,7 +43,7 @@ class TestFlextSingerProtocolManager:
         library_runner = FlextMeltanoLibraryRunner()
         singer_manager_result = library_runner.get_singer_manager()
         tm.ok(singer_manager_result)
-        tm.that(singer_manager_result.value is not None, eq=True)
+        tm.that(singer_manager_result.value, none=False)
         tm.that(singer_manager_result.value.get("type"), eq="singer_manager")
         tm.that(singer_manager_result.value.get("status"), eq="available")
 
@@ -54,8 +54,8 @@ class TestFlextSingerProtocolManager:
         tm.ok(singer_manager_result)
         capabilities = singer_manager_result.value.get("capabilities", [])
         tm.that(isinstance(capabilities, list), eq=True)
-        tm.that("discover" in capabilities, eq=True)
-        tm.that("sync" in capabilities, eq=True)
+        tm.that(capabilities, has="discover")
+        tm.that(capabilities, has="sync")
 
 
 class TestFlextMeltanoLibraryRunner:
@@ -66,17 +66,17 @@ class TestFlextMeltanoLibraryRunner:
         runner = FlextMeltanoLibraryRunner()
         dbt_runner_result = runner.get_dbt_runner()
         tm.ok(dbt_runner_result)
-        tm.that(dbt_runner_result.value is not None, eq=True)
+        tm.that(dbt_runner_result.value, none=False)
         singer_manager_result = runner.get_singer_manager()
         tm.ok(singer_manager_result)
-        tm.that(singer_manager_result.value is not None, eq=True)
+        tm.that(singer_manager_result.value, none=False)
 
     def test_get_dbt_runner(self) -> None:
         """Test getting dbt runner instance."""
         runner = FlextMeltanoLibraryRunner()
         dbt_runner_result = runner.get_dbt_runner()
         tm.ok(dbt_runner_result)
-        tm.that(dbt_runner_result.value is not None, eq=True)
+        tm.that(dbt_runner_result.value, none=False)
         tm.that(dbt_runner_result.value.get("type"), eq="dbt_runner")
 
     def test_get_singer_manager(self) -> None:
@@ -84,7 +84,7 @@ class TestFlextMeltanoLibraryRunner:
         runner = FlextMeltanoLibraryRunner()
         singer_manager_result = runner.get_singer_manager()
         tm.ok(singer_manager_result)
-        tm.that(singer_manager_result.value is not None, eq=True)
+        tm.that(singer_manager_result.value, none=False)
         tm.that(singer_manager_result.value.get("type"), eq="singer_manager")
 
     def test_get_abstractions(self) -> None:
@@ -102,10 +102,10 @@ class TestFlextMeltanoLibraryRunner:
         tm.ok(result)
         pipeline_data = result.value
         tm.that(isinstance(pipeline_data, dict), eq=True)
-        tm.that("success" in pipeline_data, eq=True)
-        tm.that("tap_name" in pipeline_data, eq=True)
-        tm.that("target_name" in pipeline_data, eq=True)
-        tm.that("execution_time" in pipeline_data, eq=True)
+        tm.that(pipeline_data, has="success")
+        tm.that(pipeline_data, has="tap_name")
+        tm.that(pipeline_data, has="target_name")
+        tm.that(pipeline_data, has="execution_time")
 
 
 class TestProjectAdapterIntegration:
@@ -116,8 +116,8 @@ class TestProjectAdapterIntegration:
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.get_version()
         tm.ok(result)
-        tm.that(result.value is not None, eq=True)
-        tm.that("version" in result.value, eq=True)
+        tm.that(result.value, none=False)
+        tm.that(result.value, has="version")
 
     def test_adapter_execute(self) -> None:
         """Test that FlextMeltanoAdapter.ProjectAdapter execute returns r."""

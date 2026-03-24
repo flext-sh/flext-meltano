@@ -29,7 +29,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_executor_initialization(self) -> None:
         """Test executor initialization."""
         executor = FlextMeltanoExecutor()
-        tm.that(executor is not None, eq=True)
+        tm.that(executor, none=False)
         tm.that(hasattr(executor, "logger"), eq=True)
 
     def test_executor_with_custom_project_root(self) -> None:
@@ -37,13 +37,13 @@ class TestFlextMeltanoExecutorComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             config = {"project_root": temp_dir}
             executor = FlextMeltanoExecutor(config=config)
-            tm.that(executor is not None, eq=True)
+            tm.that(executor, none=False)
 
     def test_bridge_property_lazy_loading(self) -> None:
         """Test bridge property lazy loading."""
         executor = FlextMeltanoExecutor()
         bridge = executor.bridge
-        tm.that(bridge is not None, eq=True)
+        tm.that(bridge, none=False)
         bridge2 = executor.bridge
         tm.that(bridge is bridge2, eq=True)
 
@@ -69,10 +69,10 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(result)
         version_data = result.value
         tm.that(isinstance(version_data, dict), eq=True)
-        tm.that("command" in version_data, eq=True)
-        tm.that("version" in version_data, eq=True)
-        tm.that("success" in version_data, eq=True)
-        tm.that("cli_type" in version_data, eq=True)
+        tm.that(version_data, has="command")
+        tm.that(version_data, has="version")
+        tm.that(version_data, has="success")
+        tm.that(version_data, has="cli_type")
         tm.that(version_data["command"], eq="version")
         tm.that(version_data["cli_type"], eq="flext_meltano")
 
@@ -83,7 +83,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(result)
         help_data = result.value
         tm.that(isinstance(help_data, dict), eq=True)
-        tm.that("command" in help_data, eq=True)
+        tm.that(help_data, has="command")
         tm.that(help_data["command"], eq="help")
 
     def test_handle_default_command(self) -> None:
@@ -93,7 +93,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(result)
         default_data = result.value
         tm.that(isinstance(default_data, dict), eq=True)
-        tm.that("command" in default_data, eq=True)
+        tm.that(default_data, has="command")
         tm.that(default_data["command"], eq="default")
 
     def test_run_method(self) -> None:
@@ -107,8 +107,8 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor.run([])
         tm.that(isinstance(result, r), eq=True)
         tm.fail(result)
-        tm.that(result.error is not None, eq=True)
-        tm.that("cannot be empty" in (result.error or "").lower(), eq=True)
+        tm.that(result.error, none=False)
+        tm.that((result.error or "").lower(), has="cannot be empty")
 
     def test_health_method(self) -> None:
         """Test health check method."""
@@ -140,7 +140,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.that(isinstance(result, r), eq=True)
         tm.ok(result)
         help_result = result.value
-        tm.that(help_result is not None, eq=True)
+        tm.that(help_result, none=False)
 
     def test_list_commands_method(self) -> None:
         """Test list_commands method."""
@@ -247,7 +247,7 @@ class TestFlextMeltanoExecutorComplete:
         if result.is_success:
             install_result = result.value
             tm.that(isinstance(install_result, int), eq=True)
-            tm.that(install_result >= 0, eq=True)
+            tm.that(install_result, gte=0)
         else:
             tm.that(result.error, eq=True)
 
@@ -257,7 +257,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.that(isinstance(result, r), eq=True)
         if result.is_success:
             invoke_result = result.value
-            tm.that(invoke_result is not None, eq=True)
+            tm.that(invoke_result, none=False)
         else:
             tm.that(result.error, eq=True)
 
@@ -377,7 +377,7 @@ class TestFlextMeltanoExecutorComplete:
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result)
         cli_app = cli_result.value
-        tm.that(cli_app is not None, eq=True)
+        tm.that(cli_app, none=False)
         runner_result = FlextMeltanoExecutor.create_cli_runner([])
         tm.that(isinstance(runner_result, r), eq=True)
         tm.ok(runner_result)
@@ -466,9 +466,9 @@ class TestFlextMeltanoExecutorComplete:
                 tm.that(isinstance(result, r), eq=True)
                 if not result.is_success:
                     tm.that(result.error, eq=True)
-                    tm.that(result.error is not None, eq=True)
+                    tm.that(result.error, none=False)
                     if result.error is not None:
-                        tm.that("CLI run failed" in result.error, eq=True)
+                        tm.that(result.error, has="CLI run failed")
         except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
             pass
         try:
@@ -485,7 +485,7 @@ class TestFlextMeltanoExecutorComplete:
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result)
         cli_app = cli_result.value
-        tm.that(cli_app is not None, eq=True)
+        tm.that(cli_app, none=False)
         tm.that(hasattr(cli_app, "logger"), eq=True)
 
     def test_flext_cli_version_command_infrastructure(self) -> None:
@@ -503,17 +503,17 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(cli_result)
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
-            tm.that("name" in cli_app, eq=True)
-            tm.that("executor" in cli_app, eq=True)
+            tm.that(cli_app, has="name")
+            tm.that(cli_app, has="executor")
             health_result = executor.execute()
-            tm.that(health_result is not None, eq=True)
+            tm.that(health_result, none=False)
 
     def test_flext_cli_plugins_command_infrastructure(self) -> None:
         """Test flext-cli plugins command infrastructure (no direct Click usage)."""
         cli_result = FlextMeltanoExecutor().create_flext_cli()
         tm.ok(cli_result)
         cli_app = cli_result.value
-        tm.that(cli_app is not None, eq=True)
+        tm.that(cli_app, none=False)
 
     def test_click_run_command_infrastructure(self) -> None:
         """Test run command infrastructure through executor methods."""
@@ -522,7 +522,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(cli_result)
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
-            tm.that("executor" in cli_app, eq=True)
+            tm.that(cli_app, has="executor")
             run_result = executor.execute()
             tm.that(isinstance(run_result, r), eq=True)
             version_result = executor.execute()
@@ -542,7 +542,7 @@ class TestFlextMeltanoExecutorComplete:
             version_result = FlextMeltanoExecutor().version()
             tm.fail(version_result)
             if version_result.error is not None:
-                tm.that("Version command failed" in str(version_result.error), eq=True)
+                tm.that(str(version_result.error), has="Version command failed")
             with mock.patch.object(
                 FlextMeltanoExecutor,
                 "health",
@@ -569,7 +569,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(cli_result)
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
-            tm.that("executor" in cli_app, eq=True)
+            tm.that(cli_app, has="executor")
             mock_plugins_result = r.ok(["plugin1", "plugin2"])
             with mock.patch.object(
                 FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result

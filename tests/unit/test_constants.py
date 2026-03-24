@@ -51,22 +51,10 @@ class Testc:
 
     def test_model_namespace(self) -> None:
         """Test ModelValidation namespace constants."""
-        tm.that(
-            isinstance(c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT, int),
-            eq=True,
-        )
-        tm.that(
-            isinstance(c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT, int),
-            eq=True,
-        )
-        tm.that(
-            isinstance(c.Meltano.ModelValidation.COMPLEXITY_MINIMAL_SETTINGS, int),
-            eq=True,
-        )
-        tm.that(
-            isinstance(c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS, int),
-            eq=True,
-        )
+        tm.that(isinstance(c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT, int), eq=True)
+        tm.that(isinstance(c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT, int), eq=True)
+        tm.that(isinstance(c.Meltano.ModelValidation.COMPLEXITY_MINIMAL_SETTINGS, int), eq=True)
+        tm.that(isinstance(c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS, int), eq=True)
 
     def test_logging_namespace(self) -> None:
         """Test Logging namespace constants."""
