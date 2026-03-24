@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 
 import pytest
 from flext_core import r
@@ -20,7 +20,7 @@ def _extract_stream_names(raw: t.ContainerMapping) -> Sequence[str]:
     raw_streams_val = raw.get("streams")
     if not isinstance(raw_streams_val, list):
         return []
-    result: list[str] = []
+    result: MutableSequence[str] = []
     for s in raw_streams_val:
         if isinstance(s, dict):
             name = s.get("stream_name") or s.get("tap_stream_id") or ""

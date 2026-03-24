@@ -13,7 +13,7 @@ from __future__ import annotations
 import atexit
 import subprocess
 import time
-from collections.abc import Generator, Mapping
+from collections.abc import Generator, Mapping, MutableSequence
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -55,7 +55,7 @@ class ContainerManager:
 
         """
         try:
-            full_command: list[str] = [
+            full_command: MutableSequence[str] = [
                 "docker-compose",
                 "-f",
                 str(self.compose_file),
