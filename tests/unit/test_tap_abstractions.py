@@ -7,7 +7,8 @@ import unittest
 from collections.abc import Mapping
 
 import pytest
-from flext_core import r, t
+from flext_core import r
+from tests import t
 from flext_tests import tm
 from pydantic_core import ValidationError
 
