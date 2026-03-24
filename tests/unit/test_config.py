@@ -335,8 +335,7 @@ class TestFlextMeltanoSettingsIntegration:
             )
             tm.that(config.environment, eq=env_type)
             expected_log_level = "INFO"
-            test_env_log_level = "DEBUG"
-            tm.that({expected_log_level, test_env_log_level}, has=config.log_level)
+            tm.that(config.log_level, eq=expected_log_level)
 
     def test_config_constants_integration(self) -> None:
         """Test that config constants integrate properly with functionality."""

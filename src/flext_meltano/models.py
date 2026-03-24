@@ -1597,9 +1597,7 @@ class FlextMeltanoModels(FlextCliModels):
             metadata: Annotated[
                 Sequence[FlextMeltanoModels.Meltano.SingerCatalogMetadata],
                 Field(
-                    default_factory=lambda: Sequence[
-                        FlextMeltanoModels.Meltano.SingerCatalogMetadata
-                    ](),
+                    default_factory=list,
                     description="Singer stream metadata blocks",
                 ),
             ]
