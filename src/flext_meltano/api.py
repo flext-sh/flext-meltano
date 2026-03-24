@@ -99,7 +99,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     @staticmethod
     def _normalize_container_value(
         value: (
-            Mapping[str, t.NormalizedValue]
+            t.ContainerMapping
             | t.NormalizedValue
             | t.Meltano.MeltanoConfigDict
             | Sequence[t.Scalar | None]
@@ -111,14 +111,14 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         if isinstance(value, t.SCALAR_TYPES):
             return value
         if isinstance(value, (list, tuple)):
-            normalized_items: Sequence[t.NormalizedValue] = []
+            normalized_items: t.ContainerList = []
             for item in value:
                 if item is None:
                     continue
                 normalized_items.append(FlextMeltano._normalize_container_value(item))
             return normalized_items
         if isinstance(value, Mapping):
-            normalized_mapping: Mapping[str, t.NormalizedValue] = {}
+            normalized_mapping: t.ContainerMapping = {}
             for key, item in value.items():
                 if item is None:
                     continue
@@ -130,11 +130,11 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     @staticmethod
     def _normalize_nested_config(
-        value: t.Meltano.MeltanoConfigDict | Mapping[str, t.NormalizedValue] | None,
-    ) -> Mapping[str, t.NormalizedValue]:
+        value: t.Meltano.MeltanoConfigDict | t.ContainerMapping | None,
+    ) -> t.ContainerMapping:
         if value is None:
             return {}
-        normalized: Mapping[str, t.NormalizedValue] = {}
+        normalized: t.ContainerMapping = {}
         for key, item in value.items():
             if item is None:
                 continue
@@ -145,7 +145,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     def _normalize_config_mapping(
         value: (
             t.Meltano.MeltanoConfigDict
-            | Mapping[str, t.NormalizedValue]
+            | t.ContainerMapping
             | Mapping[
                 str,
                 t.Scalar
@@ -158,7 +158,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     ) -> t.Meltano.MeltanoConfigDict:
         if value is None:
             return {}
-        normalized: Mapping[str, t.NormalizedValue] = {}
+        normalized: t.ContainerMapping = {}
         for key, item in value.items():
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
         return normalized
@@ -543,7 +543,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 f"Invalid plugin name format: {plugin_name}",
             )
         try:
-            plugin_config: Mapping[str, t.NormalizedValue] = {
+            plugin_config: t.ContainerMapping = {
                 "name": plugin_name,
                 "namespace": plugin_name.replace("-", "_"),
                 "pip_url": f"pipelinewise-{plugin_name}",
@@ -896,7 +896,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         result = self.list_plugins(p.plugin_type)
         if result.is_failure:
             return r[t.Meltano.ResultDict].fail(result.error or "Operation failed")
-        plugins: Sequence[t.NormalizedValue] = [
+        plugins: t.ContainerList = [
             self._normalize_container_value(plugin) for plugin in result.value
         ]
         return r[t.Meltano.ResultDict].ok({"plugins": plugins})

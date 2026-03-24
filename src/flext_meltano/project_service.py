@@ -56,12 +56,12 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def _convert_to_project_dict(
         project: p.Meltano.Project
         | t.Meltano.Dbt.Project
-        | Mapping[str, Mapping[str, t.NormalizedValue] | None]
+        | Mapping[str, t.ContainerMapping | None]
         | Path
-        | Mapping[str, t.NormalizedValue]
+        | t.ContainerMapping
         | None,
     ) -> r[t.Meltano.Dbt.Project]:
-        """Convert Meltano project t.NormalizedValue to FLEXT Mapping[str, t.NormalizedValue] representation."""
+        """Convert Meltano project t.NormalizedValue to FLEXT t.ContainerMapping representation."""
         try:
             name_attr = getattr(project, "name", None)
             root_attr = getattr(project, "root", None)
@@ -120,7 +120,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def _extract_and_write_config(
-        config_data: Mapping[str, t.NormalizedValue],
+        config_data: t.ContainerMapping,
     ) -> r[Path]:
         """Extract and validate path and config from generated config data.
 
@@ -136,9 +136,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         config_payload = m.Meltano.ConfigMappingPayload.model_validate({
             "values": config_obj,
         }).values
-        config_dict = TypeAdapter(Mapping[str, t.NormalizedValue]).validate_python(
-            config_payload
-        )
+        config_dict = TypeAdapter(t.ContainerMapping).validate_python(config_payload)
         normalized_path = m.Meltano.PathPayload(value=Path(str(path_obj))).value
         return FlextMeltanoProjectService._write_meltano_config(
             normalized_path,
@@ -149,7 +147,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def _generate_minimal_config(
         temp_path: Path,
         project_id: str,
-    ) -> r[Mapping[str, t.NormalizedValue]]:
+    ) -> r[t.ContainerMapping]:
         """Generate minimal meltano.yml configuration."""
         extractors: Sequence[t.Dict] = []
         loaders: Sequence[t.Dict] = []
@@ -234,7 +232,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     @staticmethod
     def _write_meltano_config(
         project_path: Path,
-        config: Mapping[str, t.NormalizedValue],
+        config: t.ContainerMapping,
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
         try:
@@ -318,7 +316,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         prefix: Temporary directory prefix for organization
 
         Returns:
-        r containing project Mapping[str, t.NormalizedValue] with standardized structure
+        r containing project t.ContainerMapping with standardized structure
 
         """
         return (
@@ -385,7 +383,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         project_root: Directory path containing meltano.yml
 
         Returns:
-        r containing initialized project Mapping[str, t.NormalizedValue] or validation error
+        r containing initialized project t.ContainerMapping or validation error
 
         """
         return (

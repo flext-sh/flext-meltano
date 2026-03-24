@@ -34,7 +34,7 @@ class FlextMeltanoValidators:
 
     Example:
         >>> validator = FlextMeltanoValidators()
-        >>> config: Mapping[str, t.NormalizedValue] = {
+        >>> config: t.ContainerMapping = {
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
@@ -114,7 +114,7 @@ class FlextMeltanoValidators:
             r containing boolean validation result or error details.
 
         Example:
-            >>> config: Mapping[str, t.NormalizedValue] = {
+            >>> config: t.ContainerMapping = {
             ...     "version": 1,
             ...     "project_id": my - meltano - project,
             ... }
@@ -205,7 +205,7 @@ class FlextMeltanoValidators:
             r containing boolean validation result or error details.
 
         Example:
-            >>> config: Mapping[str, t.NormalizedValue] = {
+            >>> config: t.ContainerMapping = {
             ...     "name": "my_transformation_project",
             ...     "version": 1.0.0,
             ... }

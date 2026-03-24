@@ -200,7 +200,7 @@ class FlextMeltanoFileManagers:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
-            plugin_items: Mapping[str, Sequence[t.NormalizedValue]] = {
+            plugin_items: Mapping[str, t.ContainerList] = {
                 "extractors": [],
                 "loaders": [],
                 "transformers": [],
@@ -288,8 +288,8 @@ class FlextMeltanoFileManagers:
             str,
             t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
         ],
-    ) -> Mapping[str, t.NormalizedValue]:
-        normalized: Mapping[str, t.NormalizedValue] = {}
+    ) -> t.ContainerMapping:
+        normalized: t.ContainerMapping = {}
         for key, value in raw.items():
             if value is None or u.is_scalar(value):
                 normalized[key] = value

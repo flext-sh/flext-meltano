@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import shutil
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 
 from flext_tests import tm
@@ -34,7 +34,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_valid(self) -> None:
         """Test saving valid YAML configuration."""
-        config: Mapping[str, t.NormalizedValue] = {
+        config: t.ContainerMapping = {
             "project_id": "test-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"], "loaders": ["target-csv"]},
@@ -47,14 +47,14 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_save_yaml_config_invalid_path(self) -> None:
         """Test saving YAML config to invalid path."""
-        config: Mapping[str, t.NormalizedValue] = {"test": "data"}
+        config: t.ContainerMapping = {"test": "data"}
         invalid_path = Path("/nonexistent/directory/config.yml")
         result = FlextMeltanoFileManagers.save_yaml_config(config, invalid_path)
         tm.fail(result)
 
     def test_load_yaml_config_valid(self) -> None:
         """Test loading valid YAML configuration."""
-        config: Mapping[str, t.NormalizedValue] = {
+        config: t.ContainerMapping = {
             "project_id": "test-load-project",
             "version": 1,
             "plugins": {"extractors": ["tap-csv"]},
@@ -84,7 +84,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_validate_yaml_file_valid(self) -> None:
         """Test validating valid YAML file."""
-        config: Mapping[str, t.NormalizedValue] = {
+        config: t.ContainerMapping = {
             "valid": "yaml",
             "content": {"nested": "value"},
         }
@@ -192,7 +192,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         tm.that(temp_path.exists(), eq=True)
         cleanup_result = FlextMeltanoFileManagers.cleanup_temp_directory(temp_path)
         tm.ok(cleanup_result)
-        tm.that(temp_path.exists(), eq=False)
+        tm.that(not temp_path.exists(), eq=True)
 
     def test_cleanup_temp_directory_nonexistent(self) -> None:
         """Test cleaning up nonexistent directory."""
@@ -238,7 +238,7 @@ class TestFlextMeltanoFileManagersComprehensive:
                 project_root=project_root, _project_name="integration-workflow-test"
             )
             tm.ok(setup_result)
-            config: Mapping[str, t.NormalizedValue] = {
+            config: t.ContainerMapping = {
                 "project_id": "integration-workflow-test",
                 "version": 1,
                 "plugins": {
@@ -293,7 +293,7 @@ class TestFlextMeltanoFileManagersComprehensive:
 
     def test_concurrent_file_operations(self) -> None:
         """Test concurrent file operations don't interfere."""
-        configs: Sequence[Mapping[str, t.NormalizedValue]] = [
+        configs: Sequence[t.ContainerMapping] = [
             {"id": "config1", "data": "value1"},
             {"id": "config2", "data": "value2"},
             {"id": "config3", "data": "value3"},

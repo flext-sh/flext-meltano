@@ -613,7 +613,7 @@ class DataPartitioner:
             key = record.get(partition_key, "default")
             partitions[key].append(record)
 
-        return Mapping[str, t.NormalizedValue](partitions)
+        return t.ContainerMapping(partitions)
 ```
 
 #### 3. **Caching Strategy**

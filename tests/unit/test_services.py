@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from typing import Any
 
 import pytest
@@ -103,7 +103,7 @@ class TestTapService:
         tm.ok(service_result)
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: Mapping[str, t.NormalizedValue] = {"file_path": tmp_file.name}
+            config: t.ContainerMapping = {"file_path": tmp_file.name}
             try:
                 result = tap_service.create_instance(config)
             except TypeError:
@@ -118,7 +118,7 @@ class TestTapService:
         tm.ok(service_result)
         tap_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: Mapping[str, t.NormalizedValue] = {"file_path": tmp_file.name}
+            config: t.ContainerMapping = {"file_path": tmp_file.name}
             result = tap_service.validate_service_config(config)
             tm.that(result, is_=r)
 
@@ -197,7 +197,7 @@ class TestTargetService:
         tm.ok(service_result)
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: Mapping[str, t.NormalizedValue] = {"output_path": tmp_file.name}
+            config: t.ContainerMapping = {"output_path": tmp_file.name}
             try:
                 result = target_service.create_instance(config)
             except TypeError:
@@ -212,7 +212,7 @@ class TestTargetService:
         tm.ok(service_result)
         target_service = service_result.value
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: Mapping[str, t.NormalizedValue] = {"output_path": tmp_file.name}
+            config: t.ContainerMapping = {"output_path": tmp_file.name}
             result = target_service.validate_service_config(config)
             tm.that(result, is_=r)
 

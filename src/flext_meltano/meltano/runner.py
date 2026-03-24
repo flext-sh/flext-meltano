@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -143,7 +143,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: Mapping[str, t.NormalizedValue] = {
+            elt_result: t.ContainerMapping = {
                 "success": execution_result.success,
                 "tap_name": tap_name,
                 "target_name": target_name,
@@ -208,7 +208,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: Mapping[str, t.NormalizedValue] = {
+            elt_result: t.ContainerMapping = {
                 "success": execution_result.success,
                 "tap_name": tap.name,
                 "target_name": target.name,

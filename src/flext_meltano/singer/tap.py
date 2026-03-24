@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import override
 
 from flext_core import FlextRuntime, r, s
@@ -123,8 +122,8 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: Mapping[str, t.NormalizedValue],
-        stream_config: Mapping[str, t.NormalizedValue] | None = None,
+        connection_config: t.ContainerMapping,
+        stream_config: t.ContainerMapping | None = None,
         tap_version: str = "1.0.0",
         _version: str | None = None,
     ) -> r[m.Meltano.TapInstance]:

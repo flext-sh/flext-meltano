@@ -23,7 +23,7 @@ class _TestAssertions:
 
     @staticmethod
     def assert_false(condition: bool, message: str = "") -> None:
-        tm.that(condition, eq=False)
+        tm.that(not condition, eq=True)
 
     @staticmethod
     def assert_equal(
@@ -72,7 +72,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
-        stream_schema: Mapping[str, t.NormalizedValue] = {
+        stream_schema: t.ContainerMapping = {
             "type": "t.NormalizedValue",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
@@ -415,7 +415,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             stream = stream_result.value
             self.test_assertions.assert_true(
                 condition=isinstance(stream, dict),
-                message="Should return Mapping[str, t.NormalizedValue] stream definition",
+                message="Should return t.ContainerMapping stream definition",
             )
             self.test_assertions.assert_equal(
                 actual=stream.get("name"),
@@ -810,11 +810,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
     )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-        connection_config: Mapping[str, t.NormalizedValue] = {
+        connection_config: t.ContainerMapping = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: Mapping[str, t.NormalizedValue] = {"users": {"selected": True}}
+        stream_config: t.ContainerMapping = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,

@@ -29,11 +29,11 @@ from pydantic import (
 from flext_meltano import c, t
 
 type _ValidatorInput = (
-    Mapping[str, t.NormalizedValue]
-    | Mapping[str, Mapping[str, t.NormalizedValue] | None]
-    | Sequence[Mapping[str, t.NormalizedValue] | None]
-    | tuple[Mapping[str, t.NormalizedValue] | None, ...]
-    | set[Mapping[str, t.NormalizedValue] | None]
+    t.ContainerMapping
+    | Mapping[str, t.ContainerMapping | None]
+    | Sequence[t.ContainerMapping | None]
+    | tuple[t.ContainerMapping | None, ...]
+    | set[t.ContainerMapping | None]
     | None
 )
 
@@ -711,7 +711,7 @@ class FlextMeltanoModels(FlextCliModels):
                 arbitrary_types_allowed=True
             )
 
-            config: Mapping[str, Mapping[str, t.NormalizedValue] | None] | None = Field(
+            config: Mapping[str, t.ContainerMapping | None] | None = Field(
                 default=None, description="Optional Meltano settings payload"
             )
             service_name: t.NonEmptyStr = Field(
@@ -823,11 +823,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_type: Annotated[str, Field(description="Type of the tap")]
             connection_config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(
                     default_factory=dict, description="Stream-specific configuration"
                 ),
@@ -879,7 +879,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             target_type: Annotated[str, Field(description="Type of the target")]
             connection_config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Connection configuration"),
             ]
             batch_size: Annotated[
@@ -987,7 +987,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             stream_name: Annotated[str, Field(description="Name of the stream")]
             stream_schema: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(description="JSON schema for the stream"),
             ]
             source_type: Annotated[
@@ -1028,12 +1028,12 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("stream_schema")
             def serialize_stream_schema(
-                self, value: Mapping[str, t.NormalizedValue]
-            ) -> Mapping[str, t.NormalizedValue]:
+                self, value: t.ContainerMapping
+            ) -> t.ContainerMapping:
                 """Normalize stream schema structure."""
-                result: Mapping[str, t.NormalizedValue] = dict(value)
+                result: t.ContainerMapping = dict(value)
                 if "properties" not in result:
-                    empty: Mapping[str, t.NormalizedValue] = {}
+                    empty: t.ContainerMapping = {}
                     result["properties"] = empty
                 if "type" not in result:
                     result["type"] = "t.NormalizedValue"
@@ -1508,7 +1508,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="STATE", description="Singer message discriminator"),
             ] = "STATE"
             value: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(
                     default_factory=dict, description="Singer state bookmark payload"
                 ),
@@ -1570,7 +1570,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             metadata: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Singer metadata properties"),
             ]
 
@@ -1700,7 +1700,7 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             errors: Annotated[t.NonNegativeInt, Field(description="Number of errors")]
             state: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Final state payload"),
             ]
             duration_seconds: Annotated[
@@ -1721,7 +1721,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Singer target name"),
             ]
             config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Pipeline config"),
             ]
 
@@ -1733,7 +1733,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Pipeline identifier"),
             ]
             config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Execution config"),
             ]
 
@@ -1743,7 +1743,7 @@ class FlextMeltanoModels(FlextCliModels):
             plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
             plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
             config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Plugin config"),
             ]
 
@@ -1763,7 +1763,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Environment name"),
             ]
             config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Environment config"),
             ]
 
@@ -1775,7 +1775,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Models to run"),
             ]
             config: Annotated[
-                Mapping[str, t.NormalizedValue] | None,
+                t.ContainerMapping | None,
                 Field(default=None, description="Execution config"),
             ]
 
@@ -1792,7 +1792,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="DBT models to run"),
             ]
             config: Annotated[
-                Mapping[str, t.NormalizedValue] | None,
+                t.ContainerMapping | None,
                 Field(default=None, description="Pipeline config"),
             ]
 
@@ -1812,15 +1812,13 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("schema_definition", mode="before")
             @classmethod
-            def normalize_schema(
-                cls, value: _ValidatorInput
-            ) -> Mapping[str, t.NormalizedValue]:
+            def normalize_schema(cls, value: _ValidatorInput) -> t.ContainerMapping:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        empty_schema: Mapping[str, t.NormalizedValue] = {}
+                        empty_schema: t.ContainerMapping = {}
                         return empty_schema
 
         class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
@@ -1991,7 +1989,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="", description="Plugin default variant"),
             ]
             variants: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Available plugin variants"),
             ]
             logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
@@ -2010,9 +2008,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("variants", mode="before")
             @classmethod
-            def normalize_variants(
-                cls, value: _ValidatorInput
-            ) -> Mapping[str, t.NormalizedValue]:
+            def normalize_variants(cls, value: _ValidatorInput) -> t.ContainerMapping:
                 """Normalize variant maps from external payloads."""
                 match value:
                     case Mapping():
@@ -2050,9 +2046,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("plugins", mode="before")
             @classmethod
-            def normalize_plugins(
-                cls, value: _ValidatorInput
-            ) -> Mapping[str, t.NormalizedValue]:
+            def normalize_plugins(cls, value: _ValidatorInput) -> t.ContainerMapping:
                 """Normalize plugin catalog mapping."""
                 match value:
                     case Mapping():
@@ -2067,7 +2061,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             project_root: Annotated[str, Field(description="Project root path")]
             elt_context: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="ELT execution context"),
             ]
             extractor_name: Annotated[
@@ -2080,7 +2074,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=False, description="Execution completion flag"),
             ]
             execution_result: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Execution result payload"),
             ]
 
@@ -2088,7 +2082,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_mapping_payloads(
                 cls, value: _ValidatorInput
-            ) -> Mapping[str, t.NormalizedValue]:
+            ) -> t.ContainerMapping:
                 """Normalize mapping-like payloads into dictionaries."""
                 match value:
                     case Mapping():
@@ -2115,7 +2109,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="unknown", description="Project root path"),
             ]
             execution_result: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Execution result payload"),
             ]
 
@@ -2123,7 +2117,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_execution_result(
                 cls, value: _ValidatorInput
-            ) -> Mapping[str, t.NormalizedValue]:
+            ) -> t.ContainerMapping:
                 """Normalize execution result map payload."""
                 match value:
                     case Mapping():
@@ -2268,11 +2262,11 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="dev", description="Default environment name"),
             ]
             plugins: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Plugin configurations"),
             ]
             environments: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Environment configurations"),
             ]
 
@@ -2390,7 +2384,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="standard", description="Plugin variant"),
             ]
             settings: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="Plugin settings"),
             ]
             capabilities: Annotated[
@@ -2464,19 +2458,19 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="1.0.0", description="DBT project version"),
             ]
             config: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="DBT project configuration"),
             ]
             models: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="DBT models configuration"),
             ]
             sources: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="DBT sources configuration"),
             ]
             tests: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=dict, description="DBT tests configuration"),
             ]
 

@@ -114,7 +114,7 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
     tm.that(running_result.value, eq="running")
     tm.ok(stopped_result)
     tm.that(stopped_result.value, eq="stopped")
-    tm.that(pid_file.exists(), eq=False)
+    tm.that(not pid_file.exists(), eq=True)
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         tm.ok(
             create_pipeline("status-pipeline-2", {"command": ["run", "tap", "target"]})
@@ -145,7 +145,7 @@ def test_delete_pipeline_removes_configuration_directory(tmp_path: Path) -> None
         tm.ok(create_pipeline("daily-pipeline", {"command": ["run", "tap", "target"]}))
         result = delete_pipeline("daily-pipeline")
     tm.ok(result)
-    tm.that((tmp_path / "pipelines" / "daily-pipeline").exists(), eq=False)
+    tm.that(not (tmp_path / "pipelines" / "daily-pipeline").exists(), eq=True)
 
 
 def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(

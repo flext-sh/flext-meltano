@@ -173,8 +173,8 @@ class TestFlextMeltanoValidatorsComprehensive:
             hasattr(FlextMeltanoValidators, "validate_transformation_business_rules"),
             eq=True,
         )
-        tm.that(hasattr(FlextMeltanoValidators, "safe_json_stringify"), eq=False)
-        tm.that(hasattr(FlextMeltanoValidators, "Text"), eq=False)
+        tm.that(not hasattr(FlextMeltanoValidators, "safe_json_stringify"), eq=True)
+        tm.that(not hasattr(FlextMeltanoValidators, "Text"), eq=True)
         config: Mapping[str, t.Scalar] = {
             "name": "test-plugin",
             "namespace": "test_ns",

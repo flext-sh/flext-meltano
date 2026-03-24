@@ -169,7 +169,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
                     "values": result_cfg,
                 }).values
-                normalized_cfg: Mapping[str, t.NormalizedValue] = {}
+                normalized_cfg: t.ContainerMapping = {}
                 for key, value in normalized_values.items():
                     if value is None:
                         continue
@@ -277,7 +277,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
                     "values": config_dict,
                 }).values
-                converted: Mapping[str, t.NormalizedValue] = {}
+                converted: t.ContainerMapping = {}
                 for key, value in normalized_values.items():
                     if value is None:
                         continue
