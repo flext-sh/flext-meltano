@@ -10,8 +10,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import sys
 from collections.abc import Sequence
+
+import sys
 
 from flext_cli import FlextCli
 from flext_core import FlextLogger

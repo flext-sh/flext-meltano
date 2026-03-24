@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import cast
 
 import pytest
@@ -59,7 +58,7 @@ class TestTapConfigEnhanced:
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         """Test TapConfig validation with invalid connection_config type."""
-        invalid_config = cast("Mapping[str, t.Scalar]", "invalid")
+        invalid_config = cast("t.ScalarMapping", "invalid")
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.TapConfig(
                 tap_type="tap-postgres", connection_config=invalid_config
@@ -156,7 +155,7 @@ class TestStreamInfoEnhanced:
 
     def test_stream_info_validation_invalid_schema_type(self) -> None:
         """Test StreamInfo validation with invalid schema type."""
-        invalid_schema = cast("Mapping[str, t.Scalar]", "invalid")
+        invalid_schema = cast("t.ScalarMapping", "invalid")
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.StreamInfo(
                 stream_name="users",
@@ -206,7 +205,7 @@ class TestMeltanoProjectModelEnhanced:
 
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
         """Test MeltanoProjectModel validation with invalid plugins type."""
-        invalid_plugins = cast("Mapping[str, t.Scalar]", "invalid")
+        invalid_plugins = cast("t.ScalarMapping", "invalid")
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.MeltanoProjectModel(
                 project_id="test-project", plugins=invalid_plugins
@@ -322,7 +321,7 @@ class TestDbtProjectModelEnhanced:
 
     def test_dbt_project_validation_invalid_config_type(self) -> None:
         """Test DbtProjectModel validation with invalid config type."""
-        invalid_config = cast("Mapping[str, t.Scalar]", "invalid")
+        invalid_config = cast("t.ScalarMapping", "invalid")
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.DbtProjectModel(
                 name="test-project",

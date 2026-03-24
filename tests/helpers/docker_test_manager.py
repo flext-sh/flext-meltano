@@ -13,7 +13,7 @@ from __future__ import annotations
 import atexit
 import subprocess
 import time
-from collections.abc import Generator, Mapping, Sequence
+from collections.abc import Sequence, Generator, Mapping
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
