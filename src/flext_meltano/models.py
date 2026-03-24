@@ -2010,7 +2010,8 @@ class FlextMeltanoModels(FlextCliModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return {}
+                        empty: t.ContainerMapping = {}
+                        return empty
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
@@ -2048,7 +2049,8 @@ class FlextMeltanoModels(FlextCliModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return {}
+                        empty: t.ContainerMapping = {}
+                        return empty
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
@@ -2084,7 +2086,8 @@ class FlextMeltanoModels(FlextCliModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return {}
+                        empty: t.ContainerMapping = {}
+                        return empty
 
             @field_validator(
                 "project_root", "extractor_name", "loader_name", mode="before"
@@ -2119,7 +2122,8 @@ class FlextMeltanoModels(FlextCliModels):
                     case Mapping():
                         return {str(key): item for key, item in value.items()}
                     case _:
-                        return {}
+                        empty: t.ContainerMapping = {}
+                        return empty
 
             @field_validator("project_root", mode="before")
             @classmethod

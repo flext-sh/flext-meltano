@@ -133,7 +133,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         value: t.Meltano.MeltanoConfigDict | t.ContainerMapping | None,
     ) -> t.ContainerMapping:
         if value is None:
-            return {}
+            empty: t.ContainerMapping = {}
+            return empty
         normalized: t.MutableContainerMapping = {}
         for key, item in value.items():
             if item is None:
@@ -157,7 +158,8 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         ),
     ) -> t.Meltano.MeltanoConfigDict:
         if value is None:
-            return {}
+            empty: t.Meltano.MeltanoConfigDict = {}
+            return empty
         normalized: t.MutableContainerMapping = {}
         for key, item in value.items():
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
