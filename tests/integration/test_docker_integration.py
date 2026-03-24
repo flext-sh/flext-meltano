@@ -116,13 +116,15 @@ class TestDockerIntegration:
             )
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "\n                    CREATE TABLE IF NOT EXISTS test_table (\n                        id SERIAL PRIMARY KEY,\n                        name VARCHAR(100),\n                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n                    )\n                "
+                    "\n                    CREATE TABLE IF NOT EXISTS test_table (\n                        id SERIAL PRIMARY KEY,\n                        name VARCHAR(100),\n                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n                    )\n                ",
                 )
                 cursor.execute(
-                    "INSERT INTO test_table (name) VALUES (%s)", ("test_record",)
+                    "INSERT INTO test_table (name) VALUES (%s)",
+                    ("test_record",),
                 )
                 cursor.execute(
-                    "SELECT id, name FROM test_table WHERE name = %s", ("test_record",)
+                    "SELECT id, name FROM test_table WHERE name = %s",
+                    ("test_record",),
                 )
                 result = cursor.fetchone()
                 assert result is not None

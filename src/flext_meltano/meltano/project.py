@@ -219,7 +219,8 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                     continue
                 variant_raw = getattr(plugin, "variant", None)
                 plugin_def: MutableMapping[
-                    str, str | Sequence[str] | Mapping[str, t.Scalar | None]
+                    str,
+                    str | Sequence[str] | Mapping[str, t.Scalar | None],
                 ] = {
                     "name": plugin.name,
                     "type": plugin.type,

@@ -112,7 +112,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         base_path = self.temp_dir / "test_project"
         directories = ["config", "data", "logs", "extract", "load"]
         result = FlextMeltanoFileManagers.create_directory_structure(
-            base_path, directories
+            base_path,
+            directories,
         )
         tm.ok(result)
         created_paths = result.value
@@ -127,7 +128,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         base_path = self.temp_dir / "empty_project"
         empty_directories: t.StrSequence = []
         result = FlextMeltanoFileManagers.create_directory_structure(
-            base_path, empty_directories
+            base_path,
+            empty_directories,
         )
         tm.ok(result)
         created_paths = result.value
@@ -138,7 +140,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         """Test setting up complete project structure."""
         project_root = self.temp_dir / "complete_project"
         result = FlextMeltanoFileManagers.setup_project_structure(
-            project_root=project_root, _project_name="test-complete-project"
+            project_root=project_root,
+            _project_name="test-complete-project",
         )
         tm.ok(result)
         structure = result.value
@@ -151,7 +154,8 @@ class TestFlextMeltanoFileManagersComprehensive:
         """Test setting up project structure without default files."""
         project_root = self.temp_dir / "minimal_project"
         result = FlextMeltanoFileManagers.setup_project_structure(
-            project_root=project_root, _project_name="test-minimal-project"
+            project_root=project_root,
+            _project_name="test-minimal-project",
         )
         tm.ok(result)
         tm.that(project_root.exists(), eq=True)
@@ -185,7 +189,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_cleanup_temp_directory_valid(self) -> None:
         """Test cleaning up valid temporary directory."""
         create_result = FlextMeltanoFileManagers.create_temp_directory(
-            prefix="cleanup_test"
+            prefix="cleanup_test",
         )
         tm.ok(create_result)
         temp_path = create_result.value
@@ -204,11 +208,12 @@ class TestFlextMeltanoFileManagersComprehensive:
         """Test validating valid project structure."""
         project_root = self.temp_dir / "validation_project"
         setup_result = FlextMeltanoFileManagers.setup_project_structure(
-            project_root=project_root, _project_name="validation-test"
+            project_root=project_root,
+            _project_name="validation-test",
         )
         tm.ok(setup_result)
         validate_result = FlextMeltanoFileManagers.validate_project_structure(
-            project_root
+            project_root,
         )
         tm.ok(validate_result)
 
@@ -228,14 +233,15 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_complex_workflow_integration(self) -> None:
         """Test complex workflow integrating multiple file manager operations."""
         temp_result = FlextMeltanoFileManagers.create_temp_directory(
-            prefix="integration_test"
+            prefix="integration_test",
         )
         tm.ok(temp_result)
         temp_path = temp_result.value
         try:
             project_root = temp_path / "integration_project"
             setup_result = FlextMeltanoFileManagers.setup_project_structure(
-                project_root=project_root, _project_name="integration-workflow-test"
+                project_root=project_root,
+                _project_name="integration-workflow-test",
             )
             tm.ok(setup_result)
             config: t.ContainerMapping = {
@@ -251,7 +257,7 @@ class TestFlextMeltanoFileManagersComprehensive:
             save_result = FlextMeltanoFileManagers.save_yaml_config(config, config_path)
             tm.ok(save_result)
             validate_yaml_result = FlextMeltanoFileManagers.validate_yaml_file(
-                config_path
+                config_path,
             )
             tm.ok(validate_yaml_result)
             load_result = FlextMeltanoFileManagers.load_yaml_config(config_path)
@@ -282,11 +288,12 @@ class TestFlextMeltanoFileManagersComprehensive:
         except (TypeError, AttributeError):
             pass
         empty_config_result = FlextMeltanoFileManagers.save_yaml_config(
-            {}, self.temp_dir / "empty.yml"
+            {},
+            self.temp_dir / "empty.yml",
         )
         tm.ok(empty_config_result)
         load_empty_result = FlextMeltanoFileManagers.load_yaml_config(
-            self.temp_dir / "empty.yml"
+            self.temp_dir / "empty.yml",
         )
         tm.ok(load_empty_result)
         tm.that(load_empty_result.value, eq={})

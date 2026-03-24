@@ -42,7 +42,7 @@ def test_create_pipeline_creates_directory_and_configuration(tmp_path: Path) -> 
     pipeline_dir = tmp_path / "pipelines" / "daily-pipeline"
     tm.that(pipeline_dir.is_dir(), eq=True)
     stored = m.Meltano.ConfigMappingPayload.model_validate_json(
-        (pipeline_dir / "pipeline.json").read_text(encoding="utf-8")
+        (pipeline_dir / "pipeline.json").read_text(encoding="utf-8"),
     )
     tm.that(stored.values, eq=config)
 
@@ -107,7 +107,8 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
         with patch("flext_meltano.cli_managers.os.kill", return_value=None):
             running_result = get_pipeline_status("status-pipeline")
         with patch(
-            "flext_meltano.cli_managers.os.kill", side_effect=ProcessLookupError
+            "flext_meltano.cli_managers.os.kill",
+            side_effect=ProcessLookupError,
         ):
             stopped_result = get_pipeline_status("status-pipeline")
     tm.ok(running_result)
@@ -117,7 +118,7 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
     tm.that(not pid_file.exists(), eq=True)
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         tm.ok(
-            create_pipeline("status-pipeline-2", {"command": ["run", "tap", "target"]})
+            create_pipeline("status-pipeline-2", {"command": ["run", "tap", "target"]}),
         )
         pid_file = tmp_path / "pipelines" / "status-pipeline-2" / "pipeline.pid"
         pid_file.write_text("5678", encoding="utf-8")
@@ -153,7 +154,7 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
 ) -> None:
     manager = FlextMeltanoPipelineManager(MagicMock())
     config_json = m.Meltano.ConfigMappingPayload(
-        values={"command": ["run", "tap-demo", "target-demo"]}
+        values={"command": ["run", "tap-demo", "target-demo"]},
     ).model_dump_json()
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = manager.handle_command([

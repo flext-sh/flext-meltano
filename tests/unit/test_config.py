@@ -101,7 +101,8 @@ class TestFlextMeltanoSettings:
     def test_get_absolute_config_dir(self) -> None:
         """Test get_absolute_config_dir method."""
         config = FlextMeltanoSettings(
-            project_root=Path("/test/project"), config_dir=Path(".meltano")
+            project_root=Path("/test/project"),
+            config_dir=Path(".meltano"),
         )
         result = config.get_absolute_config_dir()
         tm.ok(result)
@@ -113,7 +114,8 @@ class TestFlextMeltanoSettings:
     def test_get_absolute_logs_dir(self) -> None:
         """Test get_absolute_logs_dir method returns r."""
         config = FlextMeltanoSettings(
-            project_root=Path("/test/project"), logs_dir=Path("logs")
+            project_root=Path("/test/project"),
+            logs_dir=Path("logs"),
         )
         result = config.get_absolute_logs_dir()
         tm.ok(result)
@@ -151,7 +153,8 @@ class TestFlextMeltanoSettings:
     def test_get_environment_variables(self) -> None:
         """Test environment variables extraction."""
         config = FlextMeltanoSettings(
-            project_root=Path("/test/project"), log_level="DEBUG"
+            project_root=Path("/test/project"),
+            log_level="DEBUG",
         )
         env_vars = config.get_environment_variables()
         tm.that(env_vars, is_=dict)
@@ -183,7 +186,7 @@ class TestFlextMeltanoSettings:
             project_file = Path(tmp_dir) / "pipeline.yml"
             project_file.write_text("version: 1\n")
             result = FlextMeltanoSettings.create_from_project_root(
-                project_root=Path(tmp_dir)
+                project_root=Path(tmp_dir),
             )
             tm.ok(result)
             config = result.value
@@ -195,7 +198,7 @@ class TestFlextMeltanoSettings:
             project_file = Path(tmp_dir) / "pipeline.yml"
             project_file.write_text("version: 1\n")
             result = FlextMeltanoSettings.create_from_project_root(
-                project_root=Path(tmp_dir)
+                project_root=Path(tmp_dir),
             )
             tm.ok(result)
             config = result.value
@@ -205,7 +208,8 @@ class TestFlextMeltanoSettings:
         """Test create_for_environment factory method."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             result = FlextMeltanoSettings(
-                project_root=Path(tmp_dir), log_level="WARNING"
+                project_root=Path(tmp_dir),
+                log_level="WARNING",
             )
             config = result
             tm.that(config.log_level, eq="WARNING")
@@ -249,7 +253,8 @@ class TestFlextMeltanoSettingsConstants:
     def test_environment_variable_constants(self) -> None:
         """Test environment variable name constants."""
         tm.that(
-            FlextMeltanoSettings.MELTANO_PROJECT_ROOT_ENV, eq="MELTANO_PROJECT_ROOT"
+            FlextMeltanoSettings.MELTANO_PROJECT_ROOT_ENV,
+            eq="MELTANO_PROJECT_ROOT",
         )
         tm.that(FlextMeltanoSettings.MELTANO_ENVIRONMENT_ENV, eq="MELTANO_ENVIRONMENT")
         tm.that(FlextMeltanoSettings.MELTANO_LOG_LEVEL_ENV, eq="MELTANO_LOG_LEVEL")
@@ -300,7 +305,7 @@ class TestFlextMeltanoSettingsIntegration:
             config_dir.mkdir()
             logs_dir.mkdir()
             result = FlextMeltanoSettings.create_from_project_root(
-                project_root=Path(tmp_dir)
+                project_root=Path(tmp_dir),
             )
             tm.ok(result)
             config = result.value

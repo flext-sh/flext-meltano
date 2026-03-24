@@ -35,7 +35,8 @@ class TestCliModelConverterWithTapRunParams:
             "properties_file": None,
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
@@ -51,7 +52,8 @@ class TestCliModelConverterWithTapRunParams:
             "discover": False,
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
@@ -65,7 +67,8 @@ class TestCliModelConverterWithTapRunParams:
             "discover": True,
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
@@ -84,7 +87,8 @@ class TestCliModelConverterWithTapRunParams:
             "discover": False,
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
@@ -99,7 +103,8 @@ class TestCliModelConverterWithTapRunParams:
         """Test validation error when tap_name is missing."""
         cli_args: t.ContainerMapping = {"discover": False}
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
@@ -112,7 +117,8 @@ class TestCliModelConverterWithTapRunParams:
             "discover": "not-a-boolean",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
@@ -129,7 +135,8 @@ class TestCliModelConverterWithTargetRunParams:
             "input_file": None,
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TargetRunParams, cli_args
+            m.Meltano.TargetRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
@@ -144,7 +151,8 @@ class TestCliModelConverterWithTargetRunParams:
             "config_file": "/path/to/config.json",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TargetRunParams, cli_args
+            m.Meltano.TargetRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
@@ -158,7 +166,8 @@ class TestCliModelConverterWithTargetRunParams:
             "input_file": "/path/to/input.jsonl",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TargetRunParams, cli_args
+            m.Meltano.TargetRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
@@ -173,7 +182,8 @@ class TestCliModelConverterWithTargetRunParams:
             "input_file": "/input.jsonl",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TargetRunParams, cli_args
+            m.Meltano.TargetRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
@@ -185,7 +195,8 @@ class TestCliModelConverterWithTargetRunParams:
         """Test validation error when target_name is missing."""
         cli_args: t.ContainerMapping = {"config_file": "/config.json"}
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TargetRunParams, cli_args
+            m.Meltano.TargetRunParams,
+            cli_args,
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
@@ -202,7 +213,8 @@ class TestCliModelConverterWithPipelineRunParams:
             "config_file": "/path/to/config.json",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TapRunParams, cli_args
+            m.Meltano.TapRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TapRunParams", result.value)
@@ -216,7 +228,8 @@ class TestCliModelConverterWithPipelineRunParams:
             "config_file": "/path/to/config.json",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.TargetRunParams, cli_args
+            m.Meltano.TargetRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.TargetRunParams", result.value)
@@ -232,7 +245,8 @@ class TestCliModelConverterWithPipelineRunParams:
             "state_file": "/state.json",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.PipelineRunParams, cli_args
+            m.Meltano.PipelineRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.PipelineRunParams", result.value)
@@ -250,7 +264,8 @@ class TestCliModelConverterWithPipelineRunParams:
             "state_file": "/state.json",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.PipelineRunParams, cli_args
+            m.Meltano.PipelineRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.PipelineRunParams", result.value)
@@ -265,7 +280,8 @@ class TestCliModelConverterWithPipelineRunParams:
         """Test validation error when tap_name is missing."""
         cli_args: t.ContainerMapping = {"target_name": "target-postgres"}
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.PipelineRunParams, cli_args
+            m.Meltano.PipelineRunParams,
+            cli_args,
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
@@ -274,7 +290,8 @@ class TestCliModelConverterWithPipelineRunParams:
         """Test validation error when target_name is missing."""
         cli_args: t.ContainerMapping = {"tap_name": "tap-postgres"}
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.PipelineRunParams, cli_args
+            m.Meltano.PipelineRunParams,
+            cli_args,
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
@@ -287,7 +304,8 @@ class TestCliModelConverterWithDbtRunParams:
         """Test converting minimal Mapping[str, objectDbtRunParams model."""
         cli_args: t.ContainerMapping = {"project_dir": "/dbt/project"}
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.DbtRunParams, cli_args
+            m.Meltano.DbtRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
@@ -302,7 +320,8 @@ class TestCliModelConverterWithDbtRunParams:
             "models": "users orders",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.DbtRunParams, cli_args
+            m.Meltano.DbtRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
@@ -316,7 +335,8 @@ class TestCliModelConverterWithDbtRunParams:
             "exclude": "tag:deprecated",
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.DbtRunParams, cli_args
+            m.Meltano.DbtRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
@@ -330,7 +350,8 @@ class TestCliModelConverterWithDbtRunParams:
             "full_refresh": True,
         }
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.DbtRunParams, cli_args
+            m.Meltano.DbtRunParams,
+            cli_args,
         )
         tm.ok(result)
         model = typing.cast("m.Meltano.DbtRunParams", result.value)
@@ -340,7 +361,8 @@ class TestCliModelConverterWithDbtRunParams:
         """Test validation error when project_dir is missing."""
         cli_args: t.ContainerMapping = {"models": "users"}
         result = m.Cli.CliModelConverter.cli_args_to_model(
-            m.Meltano.DbtRunParams, cli_args
+            m.Meltano.DbtRunParams,
+            cli_args,
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")

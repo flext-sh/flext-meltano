@@ -36,11 +36,9 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         tm.that(self.target_abstractions, none=False)
         if not hasattr(self.target_abstractions, "configure_sink"):
             pytest.skip("configure_sink not available")
-        pass
 
     def test_create_flext_target(self) -> None:
         """Test target creation."""
-        pass
 
     def test_target_error_handling(self) -> None:
         """Test target error handling."""
@@ -56,7 +54,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         tm.that(timestamp, is_=str)
         tm.that(timestamp, has="T")
         test_data: t.Meltano.MeltanoConfigDict = {
-            "level1": {"level2": {"level3": "found_value"}}
+            "level1": {"level2": {"level3": "found_value"}},
         }
         level1 = test_data.get("level1", {})
         if isinstance(level1, dict):

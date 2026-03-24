@@ -99,27 +99,28 @@ class TestFlextMeltanoValidatorsComprehensive:
             "profile": "analytics_profile",
         }
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config
+            dbt_config,
         )
         tm.ok(result)
 
     def test_validate_dbt_config_missing_required(self) -> None:
         dbt_config: t.ScalarMapping = {"name": "analytics"}
         result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config
+            dbt_config,
         )
         tm.fail(result)
         tm.fail(result)
 
     @pytest.mark.parametrize(
-        "invalid_config", [None, "not a dict", [], 123, {"invalid": "structure"}]
+        "invalid_config",
+        [None, "not a dict", [], 123, {"invalid": "structure"}],
     )
     def test_validate_plugin_config_parametrized_invalid(
         self,
         invalid_config: t.Scalar | t.ScalarMapping | t.ScalarList | None,
     ) -> None:
         result = FlextMeltanoValidators.validate_plugin_config(
-            cast("t.ScalarMapping", invalid_config)
+            cast("t.ScalarMapping", invalid_config),
         )
         tm.fail(result)
         tm.fail(result)
@@ -149,11 +150,11 @@ class TestFlextMeltanoValidatorsComprehensive:
         }
         meltano_result = (
             FlextMeltanoValidators.validate_pipeline_project_business_rules(
-                meltano_config
+                meltano_config,
             )
         )
         dbt_result = FlextMeltanoValidators.validate_transformation_business_rules(
-            dbt_config
+            dbt_config,
         )
         tap_result = FlextMeltanoValidators.validate_plugin_config(tap_config)
         target_result = FlextMeltanoValidators.validate_plugin_config(target_config)
@@ -222,7 +223,8 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.that(result.error, none=False)
         if result.error is not None:
             tm.that(
-                result.error, has="Target plugin names must be at least 8 characters"
+                result.error,
+                has="Target plugin names must be at least 8 characters",
             )
 
     def test_validate_tap_plugin_name_too_short(self) -> None:
@@ -238,7 +240,8 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.that(result.error, none=False)
         if result.error is not None:
             tm.that(
-                result.error, has="Source component names must be at least 5 characters"
+                result.error,
+                has="Source component names must be at least 5 characters",
             )
 
     def test_validate_target_plugin_name_valid(self) -> None:

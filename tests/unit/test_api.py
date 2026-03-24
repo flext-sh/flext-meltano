@@ -95,7 +95,8 @@ class TestFlextMeltanoProjectOperations:
         api = FlextMeltano()
         with tempfile.TemporaryDirectory() as temp_dir:
             result = api.create_project(
-                project_name="config_test", project_dir=temp_dir
+                project_name="config_test",
+                project_dir=temp_dir,
             )
             tm.that(result.is_success or result.is_failure, eq=True)
 
@@ -138,7 +139,9 @@ class TestFlextMeltanoPluginOperations:
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
             tmp_path = tmp_file.name
         result = api.install_plugin(
-            plugin_type="extractors", plugin_name="tap-csv", config={"path": tmp_path}
+            plugin_type="extractors",
+            plugin_name="tap-csv",
+            config={"path": tmp_path},
         )
         tm.that(result.is_failure or result.is_success, eq=True)
 
@@ -312,7 +315,8 @@ class TestFlextMeltanoErrorHandling:
         """Test project creation handles exceptions gracefully."""
         api = FlextMeltano()
         result = api.create_project(
-            project_name="test", project_dir="/invalid/path/that/does/not/exist"
+            project_name="test",
+            project_dir="/invalid/path/that/does/not/exist",
         )
         tm.that(result.is_failure or result.is_success, eq=True)
 
@@ -333,7 +337,8 @@ class TestFlextMeltanoIntegration:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir) / "integration_test"
             create_result = api.create_project(
-                project_name="integration_test", project_dir=str(project_path.parent)
+                project_name="integration_test",
+                project_dir=str(project_path.parent),
             )
             tm.that(
                 create_result.is_success
@@ -421,7 +426,8 @@ class TestFlextMeltanoSuccessPaths:
         """Test plugin installation exception handling."""
         api = FlextMeltano()
         result = api.install_plugin(
-            plugin_type="invalid", plugin_name="nonexistent-plugin"
+            plugin_type="invalid",
+            plugin_name="nonexistent-plugin",
         )
         tm.fail(result)
 
@@ -441,7 +447,8 @@ class TestFlextMeltanoSuccessPaths:
         """Test data extraction exception handling."""
         api = FlextMeltano()
         result = api.extract_data(
-            source_name="nonexistent-source", config={"stream": "nonexistent-stream"}
+            source_name="nonexistent-source",
+            config={"stream": "nonexistent-stream"},
         )
         tm.that(result.is_failure or result.is_success, eq=True)
 
@@ -484,7 +491,8 @@ class TestFlextMeltanoPerformance:
         tm.that(result, none=False)
 
     def test_api_properties_access_performance(
-        self, benchmark: BenchmarkFixture
+        self,
+        benchmark: BenchmarkFixture,
     ) -> None:
         """Benchmark API properties access performance."""
         api = FlextMeltano()

@@ -97,7 +97,8 @@ class TestFlextMeltanoLibraryRunner:
         """Test complete E-L-T pipeline execution with mocked dependencies."""
         runner = FlextMeltanoLibraryRunner()
         result = runner.execute_complete_elt_pipeline(
-            tap_name="tap-csv", target_name="target-jsonl"
+            tap_name="tap-csv",
+            target_name="target-jsonl",
         )
         tm.ok(result)
         pipeline_data = result.value

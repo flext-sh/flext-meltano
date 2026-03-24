@@ -43,7 +43,8 @@ class FlextMeltanoTypes(FlextCliTypes):
         ]
         type PluginConfiguration = FlextCliTypes.ContainerMapping
         type PluginCatalog = Mapping[
-            str, Sequence[FlextMeltanoTypes.Meltano.PluginDefinition]
+            str,
+            Sequence[FlextMeltanoTypes.Meltano.PluginDefinition],
         ]
         type PluginRegistry = Mapping[
             str,
@@ -52,7 +53,8 @@ class FlextMeltanoTypes(FlextCliTypes):
         ]
         type PluginInstallation = Mapping[str, str | bool | Sequence[str]]
         type PluginExecution = Mapping[
-            str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            str,
+            Mapping[str, FlextCliTypes.ContainerValue] | None,
         ]
         type PluginInfo = Mapping[str, FlextCliTypes.Scalar | None]
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
@@ -62,18 +64,22 @@ class FlextMeltanoTypes(FlextCliTypes):
             """Singer protocol complex types namespace."""
 
             type CatalogEntry = Mapping[
-                str, str | Mapping[str, FlextCliTypes.Scalar | None]
+                str,
+                str | Mapping[str, FlextCliTypes.Scalar | None],
             ]
             type StreamSchema = Mapping[str, Mapping[str, FlextCliTypes.Scalar | None]]
             type TapConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type TargetConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type MessageBatch = Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
             type StreamCatalog = Mapping[
-                str, Sequence[FlextMeltanoTypes.Meltano.Singer.CatalogEntry]
+                str,
+                Sequence[FlextMeltanoTypes.Meltano.Singer.CatalogEntry],
             ]
             type Record = Mapping[str, FlextCliTypes.Scalar | None]
             type Schema = Mapping[str, FlextCliTypes.Scalar | None]
@@ -117,17 +123,20 @@ class FlextMeltanoTypes(FlextCliTypes):
             type ModelConfiguration = Mapping[str, FlextCliTypes.Scalar | None]
             type TestConfiguration = Mapping[str, str | Sequence[str]]
             type ProfileConfiguration = Mapping[
-                str, Mapping[str, FlextCliTypes.Scalar | None]
+                str,
+                Mapping[str, FlextCliTypes.Scalar | None],
             ]
             type ProjectConfiguration = Mapping[
                 str,
                 Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type RunResults = Mapping[
-                str, Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
+                str,
+                Sequence[Mapping[str, FlextCliTypes.Scalar | None]],
             ]
             type ManifestData = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type Project = Mapping[str, str | bool | Sequence[str]]
 
@@ -135,7 +144,8 @@ class FlextMeltanoTypes(FlextCliTypes):
             """Meltano-specific project types."""
 
             type ProjectConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type ProjectMetadata = Mapping[str, FlextCliTypes.Scalar | None]
             type MeltanoProjectType = c.MeltanoProjectType
@@ -146,22 +156,26 @@ class FlextMeltanoTypes(FlextCliTypes):
             type PipelineConfig = Mapping[str, FlextCliTypes.Scalar | Sequence[str]]
             type SingerConfig = Mapping[str, FlextCliTypes.Scalar | None]
             type DbtConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
 
         class Bridge:
             """Bridge operation complex types namespace."""
 
             type BridgeMessage = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type BridgeResponse = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type VersionInfo = Mapping[str, str | int]
             type ConnectionInfo = FlextCliTypes.ConfigurationMapping
             type BridgeConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type BridgeStatus = Mapping[str, FlextCliTypes.Scalar | None]
 
@@ -178,16 +192,20 @@ class FlextMeltanoTypes(FlextCliTypes):
             """ELT pipeline complex types namespace."""
 
             type PipelineResult = Mapping[
-                str, FlextCliTypes.Scalar | None | FlextCliTypes.ScalarList
+                str,
+                FlextCliTypes.Scalar | None | FlextCliTypes.ScalarList,
             ]
             type ExtractConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type LoadConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type TransformConfig = Mapping[
-                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+                str,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type ExtractionResult = Mapping[str, FlextCliTypes.Scalar | None]
             type LoadingResult = Mapping[str, FlextCliTypes.Scalar | None]
@@ -221,7 +239,8 @@ class FlextMeltanoTypes(FlextCliTypes):
         type ResultDict = FlextCliTypes.ContainerMapping
         type RunContextDict = FlextCliTypes.ContainerMapping
         type FileConfigDict = Mapping[
-            str, FlextCliTypes.NormalizedValue | Sequence[str]
+            str,
+            FlextCliTypes.NormalizedValue | Sequence[str],
         ]
         PathDict = Mapping[str, str | Path]
         type PluginList = Sequence[str]
@@ -230,7 +249,8 @@ class FlextMeltanoTypes(FlextCliTypes):
         type ExecutionResultDict = FlextCliTypes.ContainerMapping
         type ExecutionStatusDict = FlextCliTypes.StrMapping
         type RuntimeConfigDict = Mapping[
-            str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            str,
+            Mapping[str, FlextCliTypes.ContainerValue] | None,
         ]
         type SingerRecordDict = Mapping[str, FlextCliTypes.Scalar | None]
         type SingerStateDict = Mapping[str, FlextCliTypes.Scalar | None]

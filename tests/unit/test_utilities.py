@@ -28,7 +28,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_meltano_config_dict_success(self) -> None:
         """Test successful Meltano config dictionary creation."""
         result = u.Meltano.create_meltano_config_dict(
-            project_id="test-project", version="1.0.0", default_environment="dev"
+            project_id="test-project",
+            version="1.0.0",
+            default_environment="dev",
         )
         tm.ok(result)
         config_dict = result.value
@@ -49,7 +51,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             "loaders": [{"name": "target-csv"}],
         }
         result = u.Meltano.create_meltano_config_dict(
-            project_id="etl-project", plugins=plugins
+            project_id="etl-project",
+            plugins=plugins,
         )
         tm.ok(result)
         config_dict = result.value
@@ -72,7 +75,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
         config_result = u.Meltano.create_meltano_config_dict(
-            project_id="multi-env-project", environments=environments
+            project_id="multi-env-project",
+            environments=environments,
         )
         tm.ok(config_result)
         config_dict = config_result.value
@@ -103,7 +107,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
     ) -> None:
         """Test Meltano config dictionary creation converts numeric project_id to string."""
         result = u.Meltano.create_meltano_config_dict(
-            project_id="123", project_name="test-project", version="1.0.0"
+            project_id="123",
+            project_name="test-project",
+            version="1.0.0",
         )
         tm.ok(result)
         config_dict = result.value
@@ -161,7 +167,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
                 "version": "1.0.0",
             }
             result = u.Meltano.create_project_file(
-                project_path / "pipeline.yml", content
+                project_path / "pipeline.yml",
+                content,
             )
             tm.ok(result)
             tm.that((project_path / "pipeline.yml").exists(), eq=True)
@@ -181,7 +188,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
             project_path = Path(temp_dir)
             invalid_content = "12345"
             result = u.Meltano.create_project_file(
-                project_path / "test.yml", invalid_content
+                project_path / "test.yml",
+                invalid_content,
             )
             tm.fail(result)
             tm.that(result.error, none=False)
@@ -286,7 +294,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_meltano_config_dict_with_none_values(self) -> None:
         """Test Meltano config dictionary creation with None values."""
         result = u.Meltano.create_meltano_config_dict(
-            project_id="test-project", project_name="Test Project"
+            project_id="test-project",
+            project_name="Test Project",
         )
         tm.ok(result)
         config_dict = result.value
@@ -299,7 +308,8 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_meltano_config_dict_with_empty_strings(self) -> None:
         """Test Meltano config dictionary creation with empty strings."""
         result = u.Meltano.create_meltano_config_dict(
-            project_id="test-project", project_name=""
+            project_id="test-project",
+            project_name="",
         )
         tm.ok(result)
         config_dict = result.value

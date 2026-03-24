@@ -59,7 +59,9 @@ class TestTapService:
     def test_tap_service_with_additional_data(self) -> None:
         """Test TapService creation with additional configuration data."""
         service_result = self.create_tap_service(
-            "tap-postgres", database="testdb", host="localhost"
+            "tap-postgres",
+            database="testdb",
+            host="localhost",
         )
         tm.ok(service_result)
         tap_service = service_result.value
@@ -108,7 +110,7 @@ class TestTapService:
                 result = tap_service.create_instance(config)
             except TypeError:
                 pytest.skip(
-                    "create_instance(config) not available (use PYTHONPATH=src)"
+                    "create_instance(config) not available (use PYTHONPATH=src)",
                 )
             tm.that(result, is_=r)
 
@@ -161,7 +163,9 @@ class TestTargetService:
     def test_target_service_with_additional_data(self) -> None:
         """Test TargetService creation with additional configuration data."""
         service_result = self.create_target_service(
-            "target-postgres", database="outputdb", host="localhost"
+            "target-postgres",
+            database="outputdb",
+            host="localhost",
         )
         tm.ok(service_result)
         target_service = service_result.value
@@ -202,7 +206,7 @@ class TestTargetService:
                 result = target_service.create_instance(config)
             except TypeError:
                 pytest.skip(
-                    "create_instance(config) not available (use PYTHONPATH=src)"
+                    "create_instance(config) not available (use PYTHONPATH=src)",
                 )
             tm.that(result, is_=r)
 
@@ -255,7 +259,9 @@ class TestDbtService:
     def test_dbt_service_with_additional_data(self) -> None:
         """Test DbtService creation with additional configuration data."""
         service_result = self.create_dbt_service(
-            "analytics_project", profile_name="dev", target="dev"
+            "analytics_project",
+            profile_name="dev",
+            target="dev",
         )
         tm.ok(service_result)
         dbt_service = service_result.value
@@ -314,7 +320,9 @@ class TestServiceFactoryMethods:
     def test_create_tap_service_with_config(self) -> None:
         """Test create_tap_service with additional configuration."""
         result = self.service.create_tap_service(
-            "tap-postgres", database="testdb", host="localhost"
+            "tap-postgres",
+            database="testdb",
+            host="localhost",
         )
         tm.that(result, is_=r)
 
@@ -329,7 +337,9 @@ class TestServiceFactoryMethods:
     def test_create_target_service_with_config(self) -> None:
         """Test create_target_service with additional configuration."""
         result = self.service.create_target_service(
-            "target-postgres", database="outputdb", host="localhost"
+            "target-postgres",
+            database="outputdb",
+            host="localhost",
         )
         tm.that(result, is_=r)
 
@@ -515,7 +525,7 @@ class TestServiceErrorHandling:
                     tm.that(result, is_=r)
                 except Exception:
                     pytest.fail(
-                        f"Method {method.__name__} raised exception instead of returning r"
+                        f"Method {method.__name__} raised exception instead of returning r",
                     )
 
 

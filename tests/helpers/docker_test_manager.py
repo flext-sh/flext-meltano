@@ -40,7 +40,9 @@ class ContainerManager:
         self.logger = FlextLogger(__name__)
 
     def run_compose_command(
-        self, command: t.StrSequence, timeout: int = 300
+        self,
+        command: t.StrSequence,
+        timeout: int = 300,
     ) -> r[subprocess.CompletedProcess[str]]:
         """Run a docker-compose command with error handling.
 
@@ -69,12 +71,12 @@ class ContainerManager:
             )
             if result.returncode != 0:
                 return r[subprocess.CompletedProcess[str]].fail(
-                    f"Command failed: {' '.join(full_command)}\n{result.stderr}"
+                    f"Command failed: {' '.join(full_command)}\n{result.stderr}",
                 )
             return r[subprocess.CompletedProcess[str]].ok(result)
         except subprocess.TimeoutExpired:
             return r[subprocess.CompletedProcess[str]].fail(
-                f"Command timed out: {' '.join(command)}"
+                f"Command timed out: {' '.join(command)}",
             )
         except Exception as e:
             return r[subprocess.CompletedProcess[str]].fail(f"Command error: {e}")
@@ -117,7 +119,9 @@ class Tk(ContainerManager):
         atexit.register(self._cleanup_containers)
 
     def start_services(
-        self, services: t.StrSequence | None = None, wait_timeout: int = 60
+        self,
+        services: t.StrSequence | None = None,
+        wait_timeout: int = 60,
     ) -> r[bool]:
         """Start Docker services with health checks.
 
@@ -132,7 +136,7 @@ class Tk(ContainerManager):
         try:
             if not self.compose_file.exists():
                 return r[bool].fail(
-                    f"Docker compose file not found: {self.compose_file}"
+                    f"Docker compose file not found: {self.compose_file}",
                 )
             cmd = ["up", "-d"]
             if services:
@@ -198,7 +202,10 @@ class Tk(ContainerManager):
         return None
 
     def execute_in_container(
-        self, service_name: str, command: t.StrSequence, timeout: int = 30
+        self,
+        service_name: str,
+        command: t.StrSequence,
+        timeout: int = 30,
     ) -> r[Mapping[str, Any]]:
         """Execute command in running container.
 
@@ -223,7 +230,11 @@ class Tk(ContainerManager):
             cmd.extend(["-T", service_name])
             cmd.extend(command)
             result = subprocess.run(
-                cmd, check=False, capture_output=True, text=True, timeout=timeout
+                cmd,
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
             )
             return r[Mapping[str, Any]].ok({
                 "returncode": result.returncode,
@@ -259,7 +270,11 @@ class Tk(ContainerManager):
                     "-q",
                 ]
                 result = subprocess.run(
-                    cmd, check=False, capture_output=True, text=True, timeout=30
+                    cmd,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
                 )
                 if (
                     result.returncode == 0

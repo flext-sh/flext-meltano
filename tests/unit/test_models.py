@@ -22,7 +22,8 @@ class TestTapConfigEnhanced:
     def test_tap_config_with_minimal_data(self) -> None:
         """Test TapConfig with minimal required data."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"}
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tm.that(config.tap_type, eq="tap-postgres")
         tm.that(config.connection_config, eq={"host": "localhost"})
@@ -61,7 +62,8 @@ class TestTapConfigEnhanced:
         invalid_config = cast("t.ScalarMapping", "invalid")
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.TapConfig(
-                tap_type="tap-postgres", connection_config=invalid_config
+                tap_type="tap-postgres",
+                connection_config=invalid_config,
             )
 
 
@@ -145,7 +147,8 @@ class TestStreamInfoEnhanced:
     def test_stream_info_validation_empty_stream_name(self) -> None:
         """Test StreamInfo validation with empty stream_name."""
         with pytest.raises(
-            ValidationError, match="String should have at least 1 character"
+            ValidationError,
+            match="String should have at least 1 character",
         ):
             m.Meltano.StreamInfo(
                 stream_name="",
@@ -208,7 +211,8 @@ class TestMeltanoProjectModelEnhanced:
         invalid_plugins = cast("t.ScalarMapping", "invalid")
         with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
             m.Meltano.MeltanoProjectModel(
-                project_id="test-project", plugins=invalid_plugins
+                project_id="test-project",
+                plugins=invalid_plugins,
             )
 
 
@@ -218,7 +222,9 @@ class TestPluginModelEnhanced:
     def test_plugin_model_with_minimal_data(self) -> None:
         """Test PluginModel with minimal required data."""
         plugin = m.Meltano.PluginModel(
-            name="tap-postgres", namespace="tap_postgres", pip_url="tap-postgres"
+            name="tap-postgres",
+            namespace="tap_postgres",
+            pip_url="tap-postgres",
         )
         tm.that(plugin.name, eq="tap-postgres")
         tm.that(plugin.namespace, eq="tap_postgres")
@@ -248,7 +254,8 @@ class TestPluginModelEnhanced:
         tm.that(plugin.namespace, eq="meltanolabs")
         tm.that(plugin.variant, eq="meltanolabs")
         tm.that(
-            plugin.pip_url, eq="git+https://github.com/meltanolabs/tap-postgres.git"
+            plugin.pip_url,
+            eq="git+https://github.com/meltanolabs/tap-postgres.git",
         )
         tm.that(plugin.executable, eq="tap-postgres")
         tm.that(plugin.capabilities, has="catalog")
@@ -258,7 +265,8 @@ class TestPluginModelEnhanced:
     def test_plugin_model_validation_empty_name(self) -> None:
         """Test PluginModel validation with empty name."""
         with pytest.raises(
-            ValidationError, match="String should have at least 1 character"
+            ValidationError,
+            match="String should have at least 1 character",
         ):
             m.Meltano.PluginModel(name="", namespace="")
 
@@ -278,7 +286,9 @@ class TestDbtProjectModelEnhanced:
     def test_dbt_project_with_minimal_data(self) -> None:
         """Test DbtProjectModel with minimal required data."""
         dbt_project = m.Meltano.DbtProjectModel(
-            name="analytics", dbt_version="1.0.0", profile="default"
+            name="analytics",
+            dbt_version="1.0.0",
+            profile="default",
         )
         tm.that(dbt_project.name, eq="analytics")
         tm.that(dbt_project.profile, eq="default")
@@ -351,10 +361,13 @@ class TestModelIntegration:
     def test_plugin_model_with_project_integration(self) -> None:
         """Test PluginModel integration with MeltanoProjectModel."""
         plugin = m.Meltano.PluginModel(
-            name="tap-mysql", namespace="meltanolabs", pip_url="tap-mysql"
+            name="tap-mysql",
+            namespace="meltanolabs",
+            pip_url="tap-mysql",
         )
         project = m.Meltano.MeltanoProjectModel(
-            project_id="mysql-etl", plugins={"extractors": "tap-mysql"}
+            project_id="mysql-etl",
+            plugins={"extractors": "tap-mysql"},
         )
         tm.that(str(project.plugins), has=plugin.name)
         tm.that(project.project_id, eq="mysql-etl")

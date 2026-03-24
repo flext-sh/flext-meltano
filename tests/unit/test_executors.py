@@ -447,20 +447,23 @@ class TestFlextMeltanoExecutorComplete:
                 tm.that(result, is_=r)
             except Exception as e:
                 logger.debug(
-                    f"Expected exception during run command execution: {e}",
+                    "Expected exception during run command execution: %s",
+                    e,
                 )
                 tm.that(True, eq=True)
         try:
             self.executor.help()
         except Exception as e:
-            logger.debug(f"Expected exception during help method execution: {e}")
+            logger.debug("Expected exception during help method execution: %s", e)
             tm.that(True, eq=True)
 
     def test_cli_execution_exception_handling(self) -> None:
         """Test CLI execution exception handling to hit lines 209-224."""
         try:
             with mock.patch.object(
-                sys, "exit", side_effect=RuntimeError("CLI execution failed")
+                sys,
+                "exit",
+                side_effect=RuntimeError("CLI execution failed"),
             ):
                 result = self.executor.run_cli(["force_exception"])
                 tm.that(result, is_=r)
@@ -572,7 +575,9 @@ class TestFlextMeltanoExecutorComplete:
             tm.that(cli_app, has="executor")
             mock_plugins_result = r.ok(["plugin1", "plugin2"])
             with mock.patch.object(
-                FlextMeltanoExecutor, "list_plugins", return_value=mock_plugins_result
+                FlextMeltanoExecutor,
+                "list_plugins",
+                return_value=mock_plugins_result,
             ):
                 plugins_result = executor.list_plugins()
                 tm.ok(plugins_result)

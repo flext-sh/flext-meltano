@@ -112,7 +112,8 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
             self.transformation_name = mapped_transformation_name
         self._service_type = service_type
         self.logger.info(
-            f"FlextMeltanoService '{service_name}' initialized with generic operation handlers",
+            "FlextMeltanoService '%s' initialized with generic operation handlers",
+            service_name,
         )
 
     @property

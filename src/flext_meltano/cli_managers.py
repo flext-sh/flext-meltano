@@ -102,7 +102,8 @@ class FlextMeltanoCommandRouter:
         return 0
 
     def _get_command_handler(
-        self, command: str
+        self,
+        command: str,
     ) -> r[Callable[[t.StrSequence], r[str]]]:
         """Get command handler for given command."""
         command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
@@ -117,7 +118,7 @@ class FlextMeltanoCommandRouter:
         handler = command_map.get(command)
         if handler is None:
             return r[Callable[[t.StrSequence], r[str]]].fail(
-                f"Unknown command: {command}"
+                f"Unknown command: {command}",
             )
         return r[Callable[[t.StrSequence], r[str]]].ok(handler)
 
@@ -167,7 +168,8 @@ class FlextMeltanoPipelineManager:
                 "values": dict(config),
             })
             config_path.write_text(
-                validated.model_dump_json(indent=2), encoding="utf-8"
+                validated.model_dump_json(indent=2),
+                encoding="utf-8",
             )
         except OSError as exc:
             return r[str].fail(f"Failed to create pipeline '{pipeline_name}': {exc}")
@@ -279,7 +281,7 @@ class FlextMeltanoPipelineManager:
             pid = int(pid_path.read_text(encoding="utf-8").strip())
         except (ValueError, OSError) as exc:
             return r[str].fail(
-                f"Failed to read PID for pipeline '{pipeline_name}': {exc}"
+                f"Failed to read PID for pipeline '{pipeline_name}': {exc}",
             )
         if not _is_process_running(pid):
             try:
@@ -377,7 +379,8 @@ class FlextMeltanoPipelineManager:
                 return r[str].fail(f"Invalid pipeline configuration JSON: {exc}")
             config_payload = config_mapping.values
         result = FlextMeltanoPipelineManager.create_pipeline(
-            pipeline_name, config_payload
+            pipeline_name,
+            config_payload,
         )
         if result.is_failure:
             return r[str].fail(result.error)
@@ -468,7 +471,8 @@ class FlextMeltanoPipelineManager:
         pipeline_name = _args[0]
         command_args = _args[1:] if len(_args) > 1 else None
         result = FlextMeltanoPipelineManager.execute_pipeline(
-            pipeline_name, command_args
+            pipeline_name,
+            command_args,
         )
         if result.is_failure:
             return r[str].fail(result.error)

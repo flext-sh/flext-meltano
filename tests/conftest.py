@@ -78,18 +78,18 @@ def meltano_yml_config() -> t.Meltano.MeltanoConfigDict:
                                 "name": "tap-csv",
                                 "variant": "meltanolabs",
                                 "pip_url": "pipelinewise-tap-csv",
-                            }
+                            },
                         ],
                         "loaders": [
                             {
                                 "name": "target-csv",
                                 "variant": "meltanolabs",
                                 "pip_url": "pipelinewise-target-csv",
-                            }
+                            },
                         ],
-                    }
+                    },
                 },
-            }
+            },
         ],
         "plugins": {
             "extractors": [
@@ -103,10 +103,10 @@ def meltano_yml_config() -> t.Meltano.MeltanoConfigDict:
                                 "entity": "test_data",
                                 "path": "test_data.csv",
                                 "keys": ["id"],
-                            }
-                        ]
+                            },
+                        ],
                     },
-                }
+                },
             ],
             "loaders": [
                 {
@@ -114,7 +114,7 @@ def meltano_yml_config() -> t.Meltano.MeltanoConfigDict:
                     "variant": "meltanolabs",
                     "pip_url": "pipelinewise-target-csv",
                     "config": {"destination_path": "output"},
-                }
+                },
             ],
         },
     }
@@ -149,8 +149,8 @@ def tap_csv_config() -> t.Meltano.MeltanoConfigDict:
                 "path": "test_data.csv",
                 "keys": ["id"],
                 "encoding": "utf-8",
-            }
-        ]
+            },
+        ],
     }
 
 
@@ -245,8 +245,8 @@ def singer_state() -> t.Meltano.MeltanoConfigDict:
                 "test_entity": {
                     "replication_key": "created_at",
                     "replication_key_value": "2023-01-02T00:00:00Z",
-                }
-            }
+                },
+            },
         },
     }
 
