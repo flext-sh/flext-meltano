@@ -356,7 +356,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         if component_type:
             filtered = u.filter(
                 components,
-                lambda c: u.get(c, "type") == component_type,
+                lambda c: c.get("type") == component_type,
             )
             components = list(filtered) if filtered else []
         return r[Sequence[t.Meltano.MeltanoConfigDict]].ok(components)

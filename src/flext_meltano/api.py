@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import override
 
@@ -111,14 +111,14 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         if isinstance(value, t.SCALAR_TYPES):
             return value
         if isinstance(value, (list, tuple)):
-            normalized_items: t.ContainerList = []
+            normalized_items: t.MutableContainerList = []
             for item in value:
                 if item is None:
                     continue
                 normalized_items.append(FlextMeltano._normalize_container_value(item))
             return normalized_items
         if isinstance(value, Mapping):
-            normalized_mapping: t.ContainerMapping = {}
+            normalized_mapping: t.MutableContainerMapping = {}
             for key, item in value.items():
                 if item is None:
                     continue
@@ -134,7 +134,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     ) -> t.ContainerMapping:
         if value is None:
             return {}
-        normalized: t.ContainerMapping = {}
+        normalized: t.MutableContainerMapping = {}
         for key, item in value.items():
             if item is None:
                 continue
@@ -158,7 +158,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     ) -> t.Meltano.MeltanoConfigDict:
         if value is None:
             return {}
-        normalized: t.ContainerMapping = {}
+        normalized: t.MutableContainerMapping = {}
         for key, item in value.items():
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
         return normalized
@@ -575,12 +575,12 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 {"name": "dbt-postgres", "type": "transformers", "status": "installed"},
             ]
             filtered_plugins = (
-                u.filter(all_plugins, lambda p: u.get(p, "type") == plugin_type)
+                u.filter(all_plugins, lambda p: p.get("type") == plugin_type)
                 if plugin_type
                 else all_plugins
             )
             plugins_list = list(filtered_plugins) if filtered_plugins else []
-            plugins_data: Sequence[t.Meltano.MeltanoConfigDict] = []
+            plugins_data: MutableSequence[t.Meltano.MeltanoConfigDict] = []
             for plugin_entry in plugins_list:
                 plugin_payload = self._normalize_config_mapping({
                     **plugin_entry,

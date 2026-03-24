@@ -65,18 +65,10 @@ class FlextMeltanoAbstractions:
                 result: t.Meltano.ELT.PipelineResult = {
                     "status": "completed",
                     "source": str(
-                        u.get(
-                            source_config,
-                            "name",
-                            default=c.IDENTIFIER_UNKNOWN,
-                        ),
+                        source_config.get("name", c.IDENTIFIER_UNKNOWN),
                     ),
                     "sink": str(
-                        u.get(
-                            sink_config,
-                            "name",
-                            default=c.IDENTIFIER_UNKNOWN,
-                        ),
+                        sink_config.get("name", c.IDENTIFIER_UNKNOWN),
                     ),
                     "records_processed": 0,
                 }
@@ -207,7 +199,7 @@ class FlextMeltanoAbstractions:
             ]
             filtered_components = u.filter(
                 components,
-                lambda comp: u.get(dict(comp), "type", default="") == component_type,
+                lambda comp: dict(comp).get("type", "") == component_type,
             )
             result_list: Sequence[t.Meltano.PluginDefinition] = (
                 list(filtered_components) if filtered_components else []
@@ -240,7 +232,7 @@ class FlextMeltanoAbstractions:
             filtered_plugins: Mapping[str, t.Meltano.PluginDefinition] = {
                 k: v
                 for k, v in plugins.items()
-                if u.get(v, "type", default="") == plugin_type
+                if v.get("type", "") == plugin_type
             }
             return r[Mapping[str, t.Meltano.PluginDefinition]].ok(filtered_plugins)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

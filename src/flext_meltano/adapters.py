@@ -115,7 +115,7 @@ class FlextMeltanoAdapter:
                     plugins = [
                         plugin
                         for plugin in plugins
-                        if u.get(plugin, "type") == plugin_type
+                        if plugin.get("type") == plugin_type
                     ]
                 return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:

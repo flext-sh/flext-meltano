@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import shutil
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 
 import yaml

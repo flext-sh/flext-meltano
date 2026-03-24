@@ -43,12 +43,12 @@ class FlextMeltanoTypes(FlextCliTypes):
         ]
         type PluginConfiguration = FlextCliTypes.ContainerMapping
         type PluginCatalog = Mapping[
-            str, Sequence[FlextCliTypes.Meltano.PluginDefinition]
+            str, Sequence[FlextMeltanoTypes.Meltano.PluginDefinition]
         ]
         type PluginRegistry = Mapping[
             str,
-            FlextCliTypes.Meltano.PluginDefinition
-            | FlextCliTypes.Meltano.PluginConfiguration,
+            FlextMeltanoTypes.Meltano.PluginDefinition
+            | FlextMeltanoTypes.Meltano.PluginConfiguration,
         ]
         type PluginInstallation = Mapping[str, str | bool | Sequence[str]]
         type PluginExecution = Mapping[
@@ -73,7 +73,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             ]
             type MessageBatch = Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
             type StreamCatalog = Mapping[
-                str, Sequence[FlextCliTypes.Meltano.Singer.CatalogEntry]
+                str, Sequence[FlextMeltanoTypes.Meltano.Singer.CatalogEntry]
             ]
             type Record = Mapping[str, FlextCliTypes.Scalar | None]
             type Schema = Mapping[str, FlextCliTypes.Scalar | None]
@@ -205,7 +205,7 @@ class FlextMeltanoTypes(FlextCliTypes):
         type NestedJsonValue = (
             Mapping[str, FlextCliTypes.ContainerValue] | FlextCliTypes.Scalar | None
         )
-        type NestedJsonDict = Mapping[str, FlextCliTypes.Meltano.NestedJsonValue]
+        type NestedJsonDict = Mapping[str, FlextMeltanoTypes.Meltano.NestedJsonValue]
         type MeltanoConfigDict = FlextCliTypes.ContainerMapping
         type PluginConfigDict = Mapping[str, FlextCliTypes.ContainerValue]
         type EnvironmentDict = FlextCliTypes.StrMapping

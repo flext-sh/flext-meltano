@@ -98,6 +98,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import subprocess
+from collections.abc import MutableSequence
 
 from flext_core import r
 
@@ -190,7 +191,7 @@ class FlextMeltanoSingerCliTranslator:
         r containing list of DBT CLI command arguments
 
         """
-        command: t.StrSequence = ["dbt", "run", "--project-dir", params.project_dir]
+        command: MutableSequence[str] = ["dbt", "run", "--project-dir", params.project_dir]
         if params.models:
             command.extend(["--models", params.models])
         if params.select:
@@ -223,14 +224,14 @@ class FlextMeltanoSingerCliTranslator:
         r containing tuple of (source_command, sink_command)
 
         """
-        source_command: t.StrSequence = [params.source_name]
+        source_command: MutableSequence[str] = [params.source_name]
         if params.source_config:
             source_command.extend(["--config", params.source_config])
         if params.catalog_file:
             source_command.extend(["--catalog", params.catalog_file])
         if params.state_file:
             source_command.extend(["--state", params.state_file])
-        sink_command: t.StrSequence = [params.sink_name]
+        sink_command: MutableSequence[str] = [params.sink_name]
         if params.sink_config:
             sink_command.extend(["--config", params.sink_config])
         return r[tuple[t.StrSequence, t.StrSequence]].ok((source_command, sink_command))
@@ -248,7 +249,7 @@ class FlextMeltanoSingerCliTranslator:
             r containing list of CLI command arguments
 
         """
-        command: t.StrSequence = [params.source_name]
+        command: MutableSequence[str] = [params.source_name]
         if params.discover:
             command.append("--discover")
             return r[t.StrSequence].ok(command)
@@ -275,7 +276,7 @@ class FlextMeltanoSingerCliTranslator:
         r containing list of CLI command arguments
 
         """
-        command: t.StrSequence = [params.sink_name]
+        command: MutableSequence[str] = [params.sink_name]
         if params.config_file:
             command.extend(["--config", params.config_file])
         if params.input_file:
