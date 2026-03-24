@@ -458,7 +458,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 str(key): (value if isinstance(value, t.SCALAR_TYPES) else str(value))
                 for key, value in parsed_schema.schema_definition.items()
             }
-            extract_result = service.extract(schema_payload)
+            extract_result = service.extract_source(schema_payload)
             if extract_result.is_failure:
                 return r[t.Meltano.ResultDict].fail(
                     extract_result.error or "Failed to extract data",

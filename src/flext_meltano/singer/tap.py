@@ -236,8 +236,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         _ = source_config
         return r.ok(t.Dict({"version": 1, "streams": []}))
 
-    @override
-    def process(
+    def process_source(
         self,
         items: m.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
     ) -> r[bool]:

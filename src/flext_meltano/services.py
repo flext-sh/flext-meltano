@@ -292,8 +292,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         })
 
     @staticmethod
-    @override
-    def extract(_schema: t.Meltano.SchemaDict) -> r[t.Meltano.ResultDict]:
+    def extract_source(_schema: t.Meltano.SchemaDict) -> r[t.Meltano.ResultDict]:
         """Extract data from source - railway-oriented operation."""
         return r[t.Meltano.ResultDict].ok({"status": "completed"})
 

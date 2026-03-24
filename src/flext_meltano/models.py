@@ -1129,15 +1129,11 @@ class FlextMeltanoModels(FlextCliModels):
             streams: Annotated[
                 Sequence[FlextMeltanoModels.Meltano.StreamInfo],
                 Field(
-                    default_factory=lambda: Sequence[
-                        FlextMeltanoModels.Meltano.StreamInfo
-                    ](),
+                    default_factory=list,
                     description="Available streams",
                 ),
             ] = Field(
-                default_factory=lambda: Sequence[
-                    FlextMeltanoModels.Meltano.StreamInfo
-                ](),
+                default_factory=list,
             )
             status: Annotated[
                 str,
@@ -1671,15 +1667,11 @@ class FlextMeltanoModels(FlextCliModels):
             streams: Annotated[
                 Sequence[FlextMeltanoModels.Meltano.SingerCatalogEntry],
                 Field(
-                    default_factory=lambda: Sequence[
-                        FlextMeltanoModels.Meltano.SingerCatalogEntry
-                    ](),
+                    default_factory=list,
                     description="Singer catalog stream entries",
                 ),
             ] = Field(
-                default_factory=lambda: Sequence[
-                    FlextMeltanoModels.Meltano.SingerCatalogEntry
-                ](),
+                default_factory=list,
             )
 
         class SingerPipelineConfig(FlextCliModels.Entity):
@@ -2326,7 +2318,7 @@ class FlextMeltanoModels(FlextCliModels):
                     le=1,
                     description="Project version (only version 1 supported)",
                 ),
-            ]
+            ] = 1
             project_id: Annotated[
                 str,
                 Field(description="Project ID required"),
