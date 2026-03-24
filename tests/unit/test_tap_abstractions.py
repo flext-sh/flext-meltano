@@ -8,11 +8,11 @@ from collections.abc import Mapping
 
 import pytest
 from flext_core import r
-from tests import t
 from flext_tests import tm
 from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoAbstractions, m
+from tests import t
 
 
 class _TestAssertions:
