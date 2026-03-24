@@ -39,9 +39,9 @@ class FlextMeltanoBridge:
                 "status": "discovered",
                 "timestamp": u.generate_iso_timestamp(),
             }
-            return r[Mapping[str, t.Scalar]].ok(result_data)
+            return r[t.ScalarMapping].ok(result_data)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, t.Scalar]].fail(f"Plugin discovery failed: {e}")
+            return r[t.ScalarMapping].fail(f"Plugin discovery failed: {e}")
 
     @staticmethod
     def execute_command(

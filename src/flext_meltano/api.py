@@ -238,7 +238,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         """
         operation_dispatch: Mapping[
             str,
-            Callable[[Mapping[str, t.Scalar]], r[t.Meltano.ResultDict]],
+            Callable[[t.ScalarMapping], r[t.Meltano.ResultDict]],
         ] = {
             "create_pipeline": self._handle_create_pipeline_call,
             "execute_pipeline": self._handle_execute_pipeline_call,

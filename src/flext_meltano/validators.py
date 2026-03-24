@@ -76,14 +76,14 @@ class FlextMeltanoValidators:
         """
         try:
             if not config:
-                return r[Mapping[str, t.Scalar]].fail(
+                return r[t.ScalarMapping].fail(
                     "Connection configuration cannot be empty",
                 )
-            return r[Mapping[str, t.Scalar]].ok(config)
+            return r[t.ScalarMapping].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
             logger.exception(error_msg)
-            return r[Mapping[str, t.Scalar]].fail(error_msg)
+            return r[t.ScalarMapping].fail(error_msg)
 
     @classmethod
     def validate_pipeline_component_business_rules(

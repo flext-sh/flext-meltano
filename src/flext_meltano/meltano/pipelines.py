@@ -208,9 +208,9 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         """Execute Singer runner with context data."""
         try:
             _ = m.Meltano.PipelineExecutionContext.model_validate(context_data)
-            return r[Mapping[str, t.Scalar]].fail("Plugin discovery not configured")
+            return r[t.ScalarMapping].fail("Plugin discovery not configured")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, t.Scalar]].fail(
+            return r[t.ScalarMapping].fail(
                 f"Unexpected error in ELT pipeline: {e}",
             )
 

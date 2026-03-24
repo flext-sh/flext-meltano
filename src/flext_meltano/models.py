@@ -1358,7 +1358,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Stream name identifier"),
             ]
             stream_schema: Annotated[
-                Mapping[str, t.Scalar | Mapping[str, t.Scalar]],
+                Mapping[str, t.Scalar | t.ScalarMapping],
                 Field(description="Stream schema definition"),
             ]
             key_properties: Annotated[
@@ -1948,7 +1948,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Normalize plugin variant from external extraction (str|list|dict)."""
 
             value: Annotated[
-                str | Sequence[str] | Mapping[str, t.Scalar] | None,
+                str | Sequence[str] | t.ScalarMapping | None,
                 Field(default=None, description="Normalized variant value"),
             ]
 
@@ -1956,7 +1956,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_variant(
                 cls, value: _ValidatorInput
-            ) -> str | Sequence[str] | Mapping[str, t.Scalar] | None:
+            ) -> str | Sequence[str] | t.ScalarMapping | None:
                 """Normalize variant_raw into typed union."""
                 match value:
                     case None:
