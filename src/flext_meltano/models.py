@@ -50,15 +50,15 @@ class FlextMeltanoModels(FlextCliModels):
 
     @staticmethod
     def _protect_sensitive_config(
-        value: Mapping[str, t.Scalar],
-    ) -> Mapping[str, t.Scalar]:
+        value: t.ConfigurationMapping,
+    ) -> t.ConfigurationMapping:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
         def is_sensitive(k: str) -> bool:
             normalized = u.normalize(k, case="lower")
             # Convert set to list of str for processing
-            sensitive_keys_list: Sequence[str] = list(sensitive_keys)
+            sensitive_keys_list: t.StrSequence = list(sensitive_keys)
             checks_result = u.process(
                 sensitive_keys_list, lambda s: r[bool].ok(s in normalized)
             )
@@ -70,14 +70,14 @@ class FlextMeltanoModels(FlextCliModels):
             return False
 
         # Transform dict values with protection for sensitive fields
-        protected: Mapping[str, t.Scalar] = {}
+        protected: t.ConfigurationMapping = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
 
         return protected
 
     @staticmethod
-    def _validated_string_list(value: _ValidatorInput) -> Sequence[str]:
+    def _validated_string_list(value: _ValidatorInput) -> t.StrSequence:
         """Normalize arbitrary values into a validated list of strings."""
         return FlextMeltanoModels.Meltano.StringListValue.model_validate({
             "items": value,
@@ -90,7 +90,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Validated string list wrapper for result normalization."""
 
             items: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(
                     default_factory=list, description="Normalized list of string values"
                 ),
@@ -98,7 +98,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("items", mode="before")
             @classmethod
-            def normalize_items(cls, value: _ValidatorInput) -> Sequence[str]:
+            def normalize_items(cls, value: _ValidatorInput) -> t.StrSequence:
                 """Convert sequence-like values into string lists."""
                 if isinstance(value, (list, tuple, set)):
                     return [str(item) for item in value if item is not None]
@@ -704,12 +704,8 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=False, description="Run with full refresh"),
             ]
 
-        class ServiceConstructorConfig(BaseModel):
+        class ServiceConstructorConfig(FlextModels.ArbitraryTypesModel):
             """Configuration model for FlextMeltanoService constructor."""
-
-            model_config: ClassVar[ConfigDict] = ConfigDict(
-                arbitrary_types_allowed=True
-            )
 
             config: Mapping[str, t.ContainerMapping | None] | None = Field(
                 default=None, description="Optional Meltano settings payload"
@@ -772,7 +768,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=False, description="Full refresh flag"),
             ]
             vars: Annotated[
-                Mapping[str, t.Scalar] | None,
+                t.ConfigurationMapping | None,
                 Field(default=None, description="dbt variables"),
             ]
 
@@ -814,7 +810,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Input file path for target loading"),
             ]
             batch_size: Annotated[
-                int | None,
+                t.BatchSize | None,
                 Field(default=None, description="Batch size for target operations"),
             ]
 
@@ -856,8 +852,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self, value: Mapping[str, t.Scalar]
-            ) -> Mapping[str, t.Scalar]:
+                self, value: t.ConfigurationMapping
+            ) -> t.ConfigurationMapping:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -912,8 +908,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self, value: Mapping[str, t.Scalar]
-            ) -> Mapping[str, t.Scalar]:
+                self, value: t.ConfigurationMapping
+            ) -> t.ConfigurationMapping:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -931,11 +927,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             source_type: Annotated[str, Field(description="Type of the data source")]
             connection_config: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(
                     default_factory=dict, description="Stream-specific configuration"
                 ),
@@ -964,8 +960,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self, value: Mapping[str, t.Scalar]
-            ) -> Mapping[str, t.Scalar]:
+                self, value: t.ConfigurationMapping
+            ) -> t.ConfigurationMapping:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1002,7 +998,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             records_extracted: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of records extracted"),
             ]
 
@@ -1062,11 +1058,11 @@ class FlextMeltanoModels(FlextCliModels):
             sink_name: Annotated[str, Field(description="Name of the sink")]
             sink_type: Annotated[str, Field(description="Type of the sink")]
             config: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(default_factory=dict, description="Sink configuration"),
             ] = Field(default_factory=dict)
             sink_schema: Annotated[
-                Mapping[str, t.Container],
+                t.FlatContainerMapping,
                 Field(default_factory=dict, description="Sink schema"),
             ] = Field(default_factory=dict)
             status: Annotated[
@@ -1180,7 +1176,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ] = False
             metadata: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(default_factory=dict, description="Additional metadata"),
             ] = Field(default_factory=dict)
             source_id: Annotated[str, Field(description="Unique source identifier")]
@@ -1262,11 +1258,11 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ] = c.Meltano.Enums.StreamStatus.INITIALIZED
             batch_size: Annotated[
-                int,
+                t.BatchSize,
                 Field(default=1000, description="Batch processing size"),
             ] = 1000
             sink_count: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of configured sinks"),
             ] = 0
 
@@ -1284,18 +1280,18 @@ class FlextMeltanoModels(FlextCliModels):
 
             sink_type: Annotated[str, Field(description="Sink type identifier")]
             connection_config: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(description="Connection configuration dictionary"),
             ]
             batch_size: Annotated[
-                int,
+                t.BatchSize,
                 Field(
                     default=c.DEFAULT_SIZE,
                     description="Batch size for record processing",
                 ),
             ]
             max_batches: Annotated[
-                int,
+                t.PositiveInt,
                 Field(
                     default=c.DEFAULT_SIZE,
                     description="Maximum number of batches to process",
@@ -1329,8 +1325,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_serializer("connection_config")
             def serialize_connection_config(
-                self, value: Mapping[str, t.Scalar]
-            ) -> Mapping[str, t.Scalar]:
+                self, value: t.ConfigurationMapping
+            ) -> t.ConfigurationMapping:
                 """Serialize connection config with sensitive data protection."""
                 return FlextMeltanoModels._protect_sensitive_config(value)
 
@@ -1362,7 +1358,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Stream schema definition"),
             ]
             key_properties: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(
                     default_factory=list,
                     description="Primary key properties for the stream",
@@ -1389,11 +1385,11 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             records_loaded: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of records loaded"),
             ]
             batches_processed: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of batches processed"),
             ]
             stream_created_at: Annotated[str, Field(description="Creation timestamp")]
@@ -1450,7 +1446,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Singer stream name"),
             ]
             schema_definition: Annotated[
-                Mapping[str, t.Container],
+                t.FlatContainerMapping,
                 Field(
                     alias="schema",
                     serialization_alias="schema",
@@ -1459,11 +1455,11 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             key_properties: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default_factory=list, description="Singer stream key properties"),
             ]
             bookmark_properties: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(
                     default_factory=list,
                     description="Singer bookmark columns for incremental replication",
@@ -1482,7 +1478,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Singer stream name"),
             ]
             record: Annotated[
-                Mapping[str, t.Container],
+                t.FlatContainerMapping,
                 Field(description="Singer record payload"),
             ]
             time_extracted: Annotated[
@@ -1533,7 +1529,9 @@ class FlextMeltanoModels(FlextCliModels):
                 str,
                 Field(description="Singer stream name"),
             ]
-            version: Annotated[int, Field(description="Stream version to activate")]
+            version: Annotated[
+                t.PositiveInt, Field(description="Stream version to activate")
+            ]
 
         class SingerStateEntry(FlextModels.Entity):
             """Singer state entry for a stream bookmark.
@@ -1564,7 +1562,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Singer catalog metadata block model."""
 
             breadcrumb: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(
                     default_factory=list, description="Singer metadata breadcrumb path"
                 ),
@@ -1586,7 +1584,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Singer stream name"),
             ]
             schema_definition: Annotated[
-                Mapping[str, t.Container],
+                t.FlatContainerMapping,
                 Field(
                     alias="schema",
                     serialization_alias="schema",
@@ -1602,7 +1600,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             key_properties: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(
                     default_factory=list,
                     description="Primary key columns for this stream",
@@ -1681,7 +1679,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Path to state file"),
             ]
             selected_streams: Annotated[
-                Sequence[str] | None,
+                t.StrSequence | None,
                 Field(default=None, description="Specific streams to sync"),
             ]
 
@@ -1769,7 +1767,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Payload for run/test dbt models operation."""
 
             models: Annotated[
-                Sequence[str] | None,
+                t.StrSequence | None,
                 Field(default=None, description="Models to run"),
             ]
             config: Annotated[
@@ -1786,7 +1784,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(description="Singer target name"),
             ]
             dbt_models: Annotated[
-                Sequence[str] | None,
+                t.StrSequence | None,
                 Field(default=None, description="DBT models to run"),
             ]
             config: Annotated[
@@ -1798,7 +1796,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Typed schema payload used by API extract flow."""
 
             schema_definition: Annotated[
-                Mapping[str, t.Container],
+                t.FlatContainerMapping,
                 Field(
                     default_factory=dict,
                     alias="schema",
@@ -1823,7 +1821,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Typed record batch payload used by API load flow."""
 
             records: Annotated[
-                Sequence[Mapping[str, t.Container]],
+                Sequence[t.FlatContainerMapping],
                 Field(default_factory=list, description="Normalized record payloads"),
             ]
 
@@ -1831,16 +1829,16 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_records(
                 cls, value: _ValidatorInput
-            ) -> Sequence[Mapping[str, t.Container]] | Sequence[str]:
+            ) -> Sequence[t.FlatContainerMapping] | t.StrSequence:
                 """Normalize mixed record input into dict records."""
                 match value:
                     case list() | tuple():
-                        records: Sequence[Mapping[str, t.Container]] = []
+                        records: Sequence[t.FlatContainerMapping] = []
                         for record in value:
                             match record:
                                 case Mapping():
                                     # Type narrowing: convert mapping items to t.NormalizedValue
-                                    record_dict: Mapping[str, t.Container] = {}
+                                    record_dict: t.FlatContainerMapping = {}
                                     for key, item in record.items():
                                         # Only include JSON-serializable values (exclude None, BaseModel, Path)
                                         if u.is_primitive(item):
@@ -1850,7 +1848,7 @@ class FlextMeltanoModels(FlextCliModels):
                                     continue
                         return records
                     case _:
-                        return Sequence[str]()
+                        return t.StrSequence()
 
         class ConfigMappingPayload(FlextModels.ArbitraryTypesModel):
             """Normalized mapping payload with string keys."""
@@ -1948,7 +1946,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Normalize plugin variant from external extraction (str|list|dict)."""
 
             value: Annotated[
-                str | Sequence[str] | t.ScalarMapping | None,
+                str | t.StrSequence | t.ScalarMapping | None,
                 Field(default=None, description="Normalized variant value"),
             ]
 
@@ -1956,7 +1954,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_variant(
                 cls, value: _ValidatorInput
-            ) -> str | Sequence[str] | t.ScalarMapping | None:
+            ) -> str | t.StrSequence | t.ScalarMapping | None:
                 """Normalize variant_raw into typed union."""
                 match value:
                     case None:
@@ -1966,7 +1964,7 @@ class FlextMeltanoModels(FlextCliModels):
                     case list() | tuple():
                         return [str(item) for item in value]
                     case Mapping():
-                        result: Mapping[str, t.Scalar] = {}
+                        result: t.ConfigurationMapping = {}
                         for k, v in value.items():
                             # Type narrowing for JSON-serializable primitives
                             if u.is_primitive(v):
@@ -2136,7 +2134,7 @@ class FlextMeltanoModels(FlextCliModels):
             """Scalar-only pipeline execution values normalized to strings."""
 
             values: Annotated[
-                Mapping[str, str],
+                t.StrMapping,
                 Field(
                     default_factory=dict,
                     description="Execution values filtered to scalar strings",
@@ -2145,7 +2143,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("values", mode="before")
             @classmethod
-            def normalize_values(cls, value: _ValidatorInput) -> Mapping[str, str]:
+            def normalize_values(cls, value: _ValidatorInput) -> t.StrMapping:
                 """Keep scalar execution values and stringify them."""
                 match value:
                     case Mapping():
@@ -2206,7 +2204,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Node description"),
             ]
             fqn: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default_factory=list, description="Fully qualified name parts"),
             ]
             resource_type: Annotated[
@@ -2302,7 +2300,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=Path.cwd, description="Project root directory"),
             ]
             environments: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(
                     default_factory=lambda: ["dev", "staging", "prod"],
                     description="Available environments",
@@ -2322,7 +2320,7 @@ class FlextMeltanoModels(FlextCliModels):
                     u.normalize(env, case="lower") for env in self.environments
                 ]
                 # Convert prod_environments set to list for u.in_
-                prod_envs_list: Sequence[str] = list(prod_environments)
+                prod_envs_list: t.StrSequence = list(prod_environments)
                 return u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
 
             @computed_field
@@ -2333,7 +2331,7 @@ class FlextMeltanoModels(FlextCliModels):
                     u.normalize(env, case="lower") for env in self.environments
                 ]
                 # Convert prod_envs set to list for u.in_
-                prod_envs_list: Sequence[str] = list(prod_envs)
+                prod_envs_list: t.StrSequence = list(prod_envs)
                 has_prod = u.any_(*[
                     u.in_(env, prod_envs_list) for env in normalized_envs
                 ])
@@ -2386,11 +2384,11 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=dict, description="Plugin settings"),
             ]
             capabilities: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default_factory=list, description="Plugin capabilities"),
             ]
             config_files: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default_factory=list, description="Plugin configuration files"),
             ]
 
@@ -2426,7 +2424,7 @@ class FlextMeltanoModels(FlextCliModels):
             @computed_field
             def settings_count(self) -> int:
                 """Number of plugin settings."""
-                keys: Sequence[str] = list(self.settings.keys())
+                keys: t.StrSequence = list(self.settings.keys())
                 return u.count(keys)
 
             @model_validator(mode="after")
@@ -2492,23 +2490,23 @@ class FlextMeltanoModels(FlextCliModels):
             transformation_version: Annotated[str, Field(description="Project version")]
             profile: Annotated[str, Field(description="Profile name")]
             model_paths: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default=["models"], description="Model paths"),
             ]
             analysis_paths: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default=["analysis"], description="Analysis paths"),
             ]
             test_paths: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default=["tests"], description="Test paths"),
             ]
             seed_paths: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default=["seeds"], description="Seed paths"),
             ]
             macro_paths: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default=["macros"], description="Macro paths"),
             ]
 
@@ -2574,11 +2572,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             command: Annotated[str, Field(description="Command to execute")]
             models: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default_factory=list, description="Models to execute"),
             ]
             exclude: Annotated[
-                Sequence[str],
+                t.StrSequence,
                 Field(default_factory=list, description="Models to exclude"),
             ]
             full_refresh: Annotated[
@@ -2590,7 +2588,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=True, description="Fail fast on first error"),
             ]
             threads: Annotated[
-                int,
+                t.WorkerCount,
                 Field(default=1, description="Number of threads to use"),
             ]
 
@@ -2668,7 +2666,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Execution duration in seconds"),
             ]
             records_processed: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of records processed"),
             ]
             error_message: Annotated[
@@ -2676,7 +2674,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Error message if failed"),
             ]
             metadata: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(
                     default_factory=dict, description="Additional execution metadata"
                 ),
@@ -2788,18 +2786,18 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
             total_records: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Total records processed"),
             ]
             pipeline_metadata: Annotated[
-                Mapping[str, t.Scalar],
+                t.ConfigurationMapping,
                 Field(default_factory=dict, description="Pipeline execution metadata"),
             ]
 
             @computed_field
-            def completed_stages(self) -> Sequence[str]:
+            def completed_stages(self) -> t.StrSequence:
                 """Completed pipeline stages."""
-                stages: Sequence[str] = []
+                stages: t.StrSequence = []
                 src = self.source_result
                 if src is not None and src.end_time is not None:
                     stages.append("extraction")
@@ -2914,7 +2912,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class DbtProjectInfo(BaseModel):
+        class DbtProjectInfo(FlextModels.ArbitraryTypesModel):
             """Information about a DBT project."""
 
             root: Annotated[Path, Field(description="Project root directory")]
@@ -2924,10 +2922,12 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="DBT version"),
             ]
             models_count: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of models"),
             ]
-            tests_count: Annotated[int, Field(default=0, description="Number of tests")]
+            tests_count: Annotated[
+                t.NonNegativeInt, Field(default=0, description="Number of tests")
+            ]
 
         class DbtRunResult(FlextModels.ArbitraryTypesModel):
             """Result of a DBT model run operation."""
@@ -2937,7 +2937,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=True, description="Whether the run was successful"),
             ] = True
             models_run: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of models executed"),
             ] = 0
             status: Annotated[
@@ -2964,15 +2964,15 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=True, description="Whether tests passed"),
             ] = True
             tests_run: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of tests executed"),
             ] = 0
             tests_passed: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of tests passed"),
             ] = 0
             tests_failed: Annotated[
-                int,
+                t.NonNegativeInt,
                 Field(default=0, description="Number of tests failed"),
             ] = 0
             status: Annotated[
@@ -2995,14 +2995,14 @@ class FlextMeltanoModels(FlextCliModels):
             """Execution result model for Meltano command operations following flext-core patterns."""
 
             command: Annotated[
-                Sequence[str], Field(description="Command that was executed")
+                t.StrSequence, Field(description="Command that was executed")
             ]
             success: Annotated[bool, Field(description="Whether the command succeeded")]
             exit_code: Annotated[int, Field(description="Process exit code")]
             output: Annotated[str, Field(description="Standard output")]
             error: Annotated[str, Field(description="Standard error")]
             execution_time: Annotated[
-                float, Field(description="Execution time in seconds")
+                t.NonNegativeFloat, Field(description="Execution time in seconds")
             ]
 
             @computed_field
@@ -3010,14 +3010,14 @@ class FlextMeltanoModels(FlextCliModels):
                 """ISO timestamp of when the result was generated."""
                 return u.generate_iso_timestamp()
 
-            def to_dict(self) -> Mapping[str, t.Scalar | Sequence[str]]:
+            def to_dict(self) -> Mapping[str, t.Scalar | t.StrSequence]:
                 """Convert to dictionary representation.
 
                 Returns:
-                Mapping[str, t.Primitives | Sequence[str]]: Dictionary representation of execution result.
+                Mapping[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
 
                 """
-                dumped: Mapping[str, t.Scalar | Sequence[str]] = {}
+                dumped: Mapping[str, t.Scalar | t.StrSequence] = {}
                 dumped["command"] = self.command
                 dumped["success"] = self.success
                 dumped["exit_code"] = self.exit_code

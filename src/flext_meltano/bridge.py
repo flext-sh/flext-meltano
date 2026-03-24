@@ -10,8 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-
 from flext_core import FlextLogger, r
 
 from flext_meltano import p, t, u
@@ -29,10 +27,10 @@ class FlextMeltanoBridge:
         self.logger: p.Logger = FlextLogger(__name__)
 
     @staticmethod
-    def discover_plugins() -> r[Mapping[str, t.Scalar]]:
+    def discover_plugins() -> r[t.ConfigurationMapping]:
         """Discover available plugins through the Go bridge."""
         try:
-            result_data: Mapping[str, t.Scalar] = {
+            result_data: t.ConfigurationMapping = {
                 "extractors": "tap-csv,tap-postgres,tap-json",
                 "loaders": "target-csv,target-postgres,target-jsonl",
                 "transformers": "dbt-postgres,dbt-snowflake",
@@ -46,7 +44,7 @@ class FlextMeltanoBridge:
     @staticmethod
     def execute_command(
         command: str,
-        args: Mapping[str, t.Scalar] | None = None,
+        args: t.ConfigurationMapping | None = None,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Execute a bridge command with JSON arguments.
 

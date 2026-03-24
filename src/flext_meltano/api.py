@@ -163,7 +163,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
         return normalized
 
-    def _service_settings_config(self) -> Mapping[str, str]:
+    def _service_settings_config(self) -> t.StrMapping:
         settings = self.config
         return {
             "project_root": str(settings.project_root),
@@ -224,7 +224,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
     def call(
         self,
         operation: str,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Route operations using dispatch table.
 
@@ -814,7 +814,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_configure_environment_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle configure_environment operation call with model validation."""
         try:
@@ -832,7 +832,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_create_pipeline_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle create_pipeline operation call with model validation."""
         try:
@@ -850,7 +850,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_execute_pipeline_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle execute_pipeline operation call with model validation."""
         try:
@@ -868,7 +868,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_install_plugin_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle install_plugin operation call with model validation."""
         try:
@@ -886,7 +886,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_list_plugins_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle list_plugins operation call with model validation."""
         try:
@@ -903,7 +903,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_run_dbt_models_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle run_dbt_models operation call with model validation."""
         try:
@@ -921,7 +921,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_run_elt_pipeline_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle run_elt_pipeline operation call with model validation."""
         try:
@@ -944,7 +944,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
 
     def _handle_test_dbt_models_call(
         self,
-        payload: Mapping[str, t.Scalar],
+        payload: t.ConfigurationMapping,
     ) -> r[t.Meltano.ResultDict]:
         """Handle test_dbt_models operation call with model validation."""
         try:

@@ -61,8 +61,8 @@ class FlextMeltanoFileManagers:
     def create_directory_structure(
         cls,
         base_path: Path,
-        directories: Sequence[str],
-    ) -> r[Mapping[str, str]]:
+        directories: t.StrSequence,
+    ) -> r[t.StrMapping]:
         """Create directory structure using direct pathlib implementation.
 
         Returns:
@@ -70,8 +70,8 @@ class FlextMeltanoFileManagers:
 
         """
 
-        def _create_dirs() -> Mapping[str, str]:
-            created_paths: Mapping[str, str] = {}
+        def _create_dirs() -> t.StrMapping:
+            created_paths: t.StrMapping = {}
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
@@ -211,8 +211,8 @@ class FlextMeltanoFileManagers:
                 "project_name": "project_name",
                 "plugins": plugin_items,
             }
-            model_paths: Sequence[str] = ["models"]
-            test_paths: Sequence[str] = ["tests"]
+            model_paths: t.StrSequence = ["models"]
+            test_paths: t.StrSequence = ["tests"]
             dbt_project_config: t.Meltano.FileConfigDict = {
                 "name": "project_name",
                 "version": "1.0.0",
@@ -297,7 +297,7 @@ class FlextMeltanoFileManagers:
             if isinstance(value, list):
                 normalized[key] = [item for item in value if item is not None]
                 continue
-            nested: Mapping[str, t.Scalar] = {}
+            nested: t.ConfigurationMapping = {}
             for nested_key, nested_value in value.items():
                 if u.is_scalar(nested_value):
                     nested[str(nested_key)] = nested_value

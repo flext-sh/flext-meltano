@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar, override
 
@@ -32,9 +32,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     """
 
-    ProjectInfo: ClassVar[type[Mapping[str, t.Container]]] = dict
-    _metadata_extra: Mapping[str, str] = PrivateAttr(
-        default_factory=lambda: Mapping[str, str](),
+    ProjectInfo: ClassVar[type[t.FlatContainerMapping]] = dict
+    _metadata_extra: t.StrMapping = PrivateAttr(
+        default_factory=lambda: t.StrMapping(),
     )
     _sealed: bool = PrivateAttr(default=False)
 

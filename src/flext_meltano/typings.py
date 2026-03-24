@@ -132,7 +132,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             type BridgeMessage = Mapping[str, Mapping[str, t.ContainerValue] | None]
             type BridgeResponse = Mapping[str, Mapping[str, t.ContainerValue] | None]
             type VersionInfo = Mapping[str, str | int]
-            type ConnectionInfo = Mapping[str, t.Scalar]
+            type ConnectionInfo = t.ConfigurationMapping
             type BridgeConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
             type BridgeStatus = Mapping[str, t.Scalar | None]
 
@@ -141,14 +141,14 @@ class FlextMeltanoTypes(FlextCliTypes):
 
             type Command = Sequence[str]
             type ProcessResult = Mapping[str, t.Scalar | Sequence[str]]
-            type CommandResult = Mapping[str, t.Scalar]
+            type CommandResult = t.ConfigurationMapping
             type ExecutionResult = Mapping[str, t.Scalar | None]
             type CLIStatus = Mapping[str, str | bool]
 
         class ELT:
             """ELT pipeline complex types namespace."""
 
-            type PipelineResult = Mapping[str, t.Scalar | None | Sequence[t.Scalar]]
+            type PipelineResult = Mapping[str, t.Scalar | None | t.ScalarList]
             type ExtractConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
             type LoadConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
             type TransformConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
@@ -163,14 +163,14 @@ class FlextMeltanoTypes(FlextCliTypes):
             type SingerProcessingResult = Mapping[str, t.ContainerValue]
             type SingerExecutionResult = Mapping[str, t.ContainerValue]
             type EltPipelineResult = Mapping[str, t.ContainerValue]
-            type Headers = Mapping[str, str]
+            type Headers = t.StrMapping
 
         type NestedJsonValue = Mapping[str, t.ContainerValue] | t.Scalar | None
         type NestedJsonDict = Mapping[str, t.Meltano.NestedJsonValue]
         type MeltanoConfigDict = t.ContainerMapping
         type PluginConfigDict = Mapping[str, t.ContainerValue]
-        type EnvironmentDict = Mapping[str, str]
-        type VariablesDict = Mapping[str, str]
+        type EnvironmentDict = t.StrMapping
+        type VariablesDict = t.StrMapping
         type SettingsDict = Mapping[str, t.ContainerValue]
         type MetadataDict = Mapping[str, t.ContainerValue]
         type CommandDict = Mapping[str, t.ContainerValue]
@@ -187,7 +187,7 @@ class FlextMeltanoTypes(FlextCliTypes):
         type PluginNameList = Sequence[str]
         type PluginTypeList = Sequence[str]
         type ExecutionResultDict = t.ContainerMapping
-        type ExecutionStatusDict = Mapping[str, str]
+        type ExecutionStatusDict = t.StrMapping
         type RuntimeConfigDict = Mapping[str, Mapping[str, t.ContainerValue] | None]
         type SingerRecordDict = Mapping[str, t.Scalar | None]
         type SingerStateDict = Mapping[str, t.Scalar | None]
@@ -208,7 +208,7 @@ class FlextMeltanoTypes(FlextCliTypes):
             """Pipeline execution complex types namespace."""
 
             type PipelineConfig = t.ContainerMapping
-            type PipelineStatus = Mapping[str, t.Scalar]
+            type PipelineStatus = t.ConfigurationMapping
             type WorkflowDict = t.ContainerMapping
             type RunContextDict = t.ContainerMapping
             type ExecutionLogsDict = t.ContainerMapping

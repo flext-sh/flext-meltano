@@ -13,7 +13,7 @@ from __future__ import annotations
 import atexit
 import subprocess
 import time
-from collections.abc import Generator, Mapping, Sequence
+from collections.abc import Generator, Mapping
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -38,7 +38,7 @@ class ContainerManager:
         self.logger = FlextLogger(__name__)
 
     def run_compose_command(
-        self, command: Sequence[str], timeout: int = 300
+        self, command: t.StrSequence, timeout: int = 300
     ) -> r[subprocess.CompletedProcess[str]]:
         """Run a docker-compose command with error handling.
 
@@ -115,7 +115,7 @@ class Tk(ContainerManager):
         atexit.register(self._cleanup_containers)
 
     def start_services(
-        self, services: Sequence[str] | None = None, wait_timeout: int = 60
+        self, services: t.StrSequence | None = None, wait_timeout: int = 60
     ) -> r[bool]:
         """Start Docker services with health checks.
 
@@ -196,7 +196,7 @@ class Tk(ContainerManager):
         return None
 
     def execute_in_container(
-        self, service_name: str, command: Sequence[str], timeout: int = 30
+        self, service_name: str, command: t.StrSequence, timeout: int = 30
     ) -> r[Mapping[str, Any]]:
         """Execute command in running container.
 
@@ -299,7 +299,7 @@ class Tk(ContainerManager):
                 self.logger.exception("Failed to cleanup containers")
 
     @contextmanager
-    def service_context(self, services: Sequence[str] | None = None) -> Generator[Tk]:
+    def service_context(self, services: t.StrSequence | None = None) -> Generator[Tk]:
         """Context manager for service lifecycle.
 
         Args:

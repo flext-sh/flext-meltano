@@ -8,7 +8,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import contextlib
-from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import FlextLogger, r
@@ -47,8 +46,8 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_connection_config(
         cls,
-        config: Mapping[str, t.Scalar],
-    ) -> r[Mapping[str, t.Scalar]]:
+        config: t.ConfigurationMapping,
+    ) -> r[t.ConfigurationMapping]:
         """Validate connection configuration with domain-specific business rules.
 
         Validates connection configuration data for pipeline services,
@@ -88,7 +87,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_pipeline_component_business_rules(
         cls,
-        config: Mapping[str, t.Scalar],
+        config: t.ConfigurationMapping,
     ) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
@@ -100,7 +99,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_pipeline_project_business_rules(
         cls,
-        config: Mapping[str, t.Scalar],
+        config: t.ConfigurationMapping,
     ) -> r[bool]:
         """Validate pipeline project business rules.
 
@@ -173,7 +172,7 @@ class FlextMeltanoValidators:
             return r[bool].fail(error_msg)
 
     @classmethod
-    def validate_plugin_config(cls, config: Mapping[str, t.Scalar]) -> r[bool]:
+    def validate_plugin_config(cls, config: t.ConfigurationMapping) -> r[bool]:
         """Validate plugin configuration with complete business rules.
 
         Validates plugin configuration data for Meltano plugins,
@@ -191,7 +190,7 @@ class FlextMeltanoValidators:
     @classmethod
     def validate_transformation_business_rules(
         cls,
-        config: Mapping[str, t.Scalar],
+        config: t.ConfigurationMapping,
     ) -> r[bool]:
         """Validate transformation-specific business rules.
 

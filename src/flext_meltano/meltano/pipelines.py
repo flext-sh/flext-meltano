@@ -12,7 +12,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
@@ -64,7 +63,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         project_path: str,
         source_name: str,
         sink_name: str,
-    ) -> r[Mapping[str, str]]:
+    ) -> r[t.StrMapping]:
         """Execute data pipeline using railway-oriented programming.
 
         Consolidates pipeline coordinator functionality into unified service method
@@ -83,12 +82,12 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         project_obj = project_path
         start_result = self._log_pipeline_start(source_name, sink_name)
         if start_result.is_failure:
-            return r[Mapping[str, str]].fail(
+            return r[t.StrMapping].fail(
                 start_result.error or "Pipeline start failed",
             )
         plugins_result = self._find_required_plugins()
         if plugins_result.is_failure:
-            return r[Mapping[str, str]].fail(
+            return r[t.StrMapping].fail(
                 plugins_result.error or "Failed to find plugins",
             )
         elt_context_result = self._create_elt_context(
@@ -98,12 +97,12 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             plugins_result.value,
         )
         if elt_context_result.is_failure:
-            return r[Mapping[str, str]].fail(
+            return r[t.StrMapping].fail(
                 elt_context_result.error or "Failed to create ELT context",
             )
         runner_result = self._execute_singer_runner(elt_context_result.value)
         if runner_result.is_failure:
-            return r[Mapping[str, str]].fail(
+            return r[t.StrMapping].fail(
                 runner_result.error or "Failed to execute singer runner",
             )
         final_result = self._build_pipeline_result(
@@ -112,7 +111,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             runner_result.value,
         )
         if final_result.is_failure:
-            return r[Mapping[str, str]].fail(
+            return r[t.StrMapping].fail(
                 final_result.error
                 or f"Pipeline execution failed for {source_name} -> {sink_name}",
             )
@@ -122,8 +121,8 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
         self,
         extractor_name: str,
         loader_name: str,
-        context_data: Mapping[str, t.Scalar],
-    ) -> r[Mapping[str, str]]:
+        context_data: t.ConfigurationMapping,
+    ) -> r[t.StrMapping]:
         """Build successful pipeline result."""
         try:
             parsed_context = m.Meltano.PipelineResultContext.model_validate(
@@ -132,7 +131,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
             execution_values = m.Meltano.PipelineExecutionScalarMap.model_validate({
                 "values": parsed_context.execution_result,
             }).values
-            pipeline_result: Mapping[str, str] = {
+            pipeline_result: t.StrMapping = {
                 "success": "true",
                 "extractor": extractor_name,
                 "loader": loader_name,
@@ -146,9 +145,9 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 extractor=extractor_name,
                 loader=loader_name,
             )
-            return r[Mapping[str, str]].ok(pipeline_result)
+            return r[t.StrMapping].ok(pipeline_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[Mapping[str, str]].fail(f"Failed to build pipeline result: {e}")
+            return r[t.StrMapping].fail(f"Failed to build pipeline result: {e}")
 
     def _create_elt_context(
         self,
@@ -204,7 +203,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
     def _execute_singer_runner(
         self,
         context_data: t.Meltano.ExecutionResultDict,
-    ) -> r[Mapping[str, t.Scalar]]:
+    ) -> r[t.ConfigurationMapping]:
         """Execute Singer runner with context data."""
         try:
             _ = m.Meltano.PipelineExecutionContext.model_validate(context_data)

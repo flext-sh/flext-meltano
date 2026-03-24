@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar
 
@@ -88,7 +87,7 @@ class FlextMeltanoSettings(FlextSettings):
             return r[bool].fail(f"{self.PROJECT_FILE} not found in {self.project_root}")
         return r[bool].ok(True)
 
-    def get_environment_variables(self) -> Mapping[str, str]:
+    def get_environment_variables(self) -> t.StrMapping:
         """Build runtime environment variables for Meltano commands."""
         return {
             self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
@@ -117,17 +116,17 @@ class FlextMeltanoSettings(FlextSettings):
         return 1000
 
     @classmethod
-    def get_supported_plugin_types(cls) -> Sequence[str]:
+    def get_supported_plugin_types(cls) -> t.StrSequence:
         """Return supported Meltano plugin categories."""
         return ["extractors", "loaders", "transforms"]
 
     @classmethod
-    def get_supported_environments(cls) -> Sequence[str]:
+    def get_supported_environments(cls) -> t.StrSequence:
         """Return list of valid deployment environment names."""
         return ["development", "testing", "production"]
 
     @classmethod
-    def get_supported_log_levels(cls) -> Sequence[str]:
+    def get_supported_log_levels(cls) -> t.StrSequence:
         """Return supported logging levels."""
         return ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 

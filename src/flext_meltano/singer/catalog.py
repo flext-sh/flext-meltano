@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -69,7 +69,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         """Execute (implements Service pattern)."""
         return r[m.Meltano.SingerCatalog].ok(self._catalog)
 
-    def get_stream_schema(self, stream_name: str) -> r[Mapping[str, t.Container]]:
+    def get_stream_schema(self, stream_name: str) -> r[t.FlatContainerMapping]:
         """Get schema for a specific stream.
 
         Args:
@@ -83,8 +83,8 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             for entry in self._catalog.streams:
                 if entry.stream == stream_name:
                     self.logger.debug("Stream schema retrieved", stream=stream_name)
-                    return r[Mapping[str, t.Container]].ok(entry.schema_definition)
-            return r[Mapping[str, t.Container]].fail(
+                    return r[t.FlatContainerMapping].ok(entry.schema_definition)
+            return r[t.FlatContainerMapping].fail(
                 f"Stream not found in catalog: {stream_name}",
             )
         except (
@@ -97,7 +97,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
-            return r[Mapping[str, t.Container]].fail(f"Failed to get schema: {e}")
+            return r[t.FlatContainerMapping].fail(f"Failed to get schema: {e}")
 
     def load_catalog(self, catalog_file: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.

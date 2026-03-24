@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -26,12 +25,12 @@ class FlextMeltanoDbtTransformationRunner:
     def execute_dbt_transformation(
         executor: FlextMeltanoExecutor,
         logger: p.Logger,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT `run` and normalize output into transformation contract."""
         try:
-            args: Sequence[str] = []
+            args: t.StrSequence = []
             if models:
                 args.extend(["--models"] + models)
             result = executor.execute_dbt_command("run", args)
@@ -126,7 +125,7 @@ class FlextMeltanoLibraryRunner(
         self,
         tap_name: str,
         target_name: str,
-        dbt_models: Sequence[str] | None = None,
+        dbt_models: t.StrSequence | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations."""
@@ -168,7 +167,7 @@ class FlextMeltanoLibraryRunner(
 
     def run_dbt_transformation(
         self,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT transformation using the shared executor and logger."""
