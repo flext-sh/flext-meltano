@@ -33,12 +33,30 @@ if TYPE_CHECKING:
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextMeltanoBridge": ["flext_meltano.meltano.bridge", "FlextMeltanoBridge"],
-    "FlextMeltanoComponentService": ["flext_meltano.meltano.plugins", "FlextMeltanoComponentService"],
-    "FlextMeltanoDbtTransformationRunner": ["flext_meltano.meltano.runner", "FlextMeltanoDbtTransformationRunner"],
-    "FlextMeltanoLibraryRunner": ["flext_meltano.meltano.runner", "FlextMeltanoLibraryRunner"],
-    "FlextMeltanoMeltanoService": ["flext_meltano.meltano.service", "FlextMeltanoMeltanoService"],
-    "FlextMeltanoOrchestrationService": ["flext_meltano.meltano.pipelines", "FlextMeltanoOrchestrationService"],
-    "FlextMeltanoProjectManager": ["flext_meltano.meltano.project", "FlextMeltanoProjectManager"],
+    "FlextMeltanoComponentService": [
+        "flext_meltano.meltano.plugins",
+        "FlextMeltanoComponentService",
+    ],
+    "FlextMeltanoDbtTransformationRunner": [
+        "flext_meltano.meltano.runner",
+        "FlextMeltanoDbtTransformationRunner",
+    ],
+    "FlextMeltanoLibraryRunner": [
+        "flext_meltano.meltano.runner",
+        "FlextMeltanoLibraryRunner",
+    ],
+    "FlextMeltanoMeltanoService": [
+        "flext_meltano.meltano.service",
+        "FlextMeltanoMeltanoService",
+    ],
+    "FlextMeltanoOrchestrationService": [
+        "flext_meltano.meltano.pipelines",
+        "FlextMeltanoOrchestrationService",
+    ],
+    "FlextMeltanoProjectManager": [
+        "flext_meltano.meltano.project",
+        "FlextMeltanoProjectManager",
+    ],
 }
 
 __all__ = [
