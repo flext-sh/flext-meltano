@@ -302,7 +302,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(streams, list),
                 message="Should return list of streams",
             )
-            if len(streams) > 0:
+            if streams:
                 stream_names = [
                     s.get("stream_name", s.get("tap_stream_id", ""))
                     if isinstance(s, dict)
@@ -339,7 +339,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(streams, list),
                 message="Should return list of streams",
             )
-            if len(streams) > 0:
+            if streams:
                 stream_names = [
                     s.get("stream_name", s.get("tap_stream_id", ""))
                     if isinstance(s, dict)
@@ -372,7 +372,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 condition=isinstance(streams, list),
                 message="Should return list of streams",
             )
-            if len(streams) > 0:
+            if streams:
                 stream_names = [
                     s.get("stream_name", s.get("tap_stream_id", ""))
                     if isinstance(s, dict)
@@ -529,7 +529,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
                 message="Should return list of records",
             )
             self.test_assertions.assert_true(
-                condition=len(records) > 0, message="Should extract records"
+                condition=records, message="Should extract records"
             )
             if records:
                 first_record = records[0]
@@ -595,7 +595,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         if result.is_success:
             records = result.value
             self.test_assertions.assert_true(
-                condition=len(records) > 0, message="Should extract product records"
+                condition=records, message="Should extract product records"
             )
             if records:
                 product_record = records[0]
@@ -701,7 +701,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             condition=isinstance(stream_names, list), message="Should return list"
         )
         self.test_assertions.assert_true(
-            condition=len(stream_names) > 0, message="Should have stream names"
+            condition=stream_names, message="Should have stream names"
         )
 
     def test_get_tap_type(self) -> None:
@@ -739,7 +739,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         if discovery_result.is_success:
             registered_streams = self.tap_abstractions.get_registered_streams()
             self.test_assertions.assert_true(
-                condition=len(registered_streams) > 0,
+                condition=registered_streams,
                 message="Should have registered streams",
             )
 

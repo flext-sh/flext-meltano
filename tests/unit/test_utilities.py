@@ -92,7 +92,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
                     prod_extractors = prod_plugins.get("extractors")
                     tm.that(isinstance(prod_extractors, list), eq=True)
                     if isinstance(prod_extractors, list):
-                        tm.that(len(prod_extractors) > 0, eq=True)
+                        tm.that(prod_extractors, eq=True)
                         first_prod_extractor = prod_extractors[0]
                         tm.that(isinstance(first_prod_extractor, dict), eq=True)
                         if isinstance(first_prod_extractor, dict):

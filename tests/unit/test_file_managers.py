@@ -143,7 +143,7 @@ class TestFlextMeltanoFileManagersComprehensive:
         tm.ok(result)
         structure = result.value
         tm.that(isinstance(structure, dict), eq=True)
-        tm.that(len(structure) > 0, eq=True)
+        tm.that(structure, eq=True)
         tm.that(project_root.exists(), eq=True)
         tm.that(project_root.is_dir(), eq=True)
 

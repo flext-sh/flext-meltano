@@ -614,7 +614,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                     project_name=None,
                 ),
             )
-            if records is not None and len(records) > 0:
+            if records is not None and records:
                 load_result = service.load_batch(records)
                 if load_result.is_failure:
                     return r[t.Meltano.ResultDict].fail(
@@ -687,7 +687,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             extract_duration = 0.5
             load_duration = 0.3
             transform_duration = (
-                0.7 if dbt_models is not None and len(dbt_models) > 0 else 0.0
+                0.7 if dbt_models is not None and dbt_models else 0.0
             )
             total_duration = time.time() - execution_start
             elt_result: t.Meltano.MeltanoConfigDict = {

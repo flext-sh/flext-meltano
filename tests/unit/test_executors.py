@@ -367,7 +367,7 @@ class TestFlextMeltanoExecutorComplete:
                 if not result.is_success:
                     tm.that(result.error, eq=True)
                     if result.error is not None:
-                        tm.that(len(result.error) > 0, eq=True)
+                        tm.that(result.error, eq=True)
             except Exception as e:
                 logger.debug("Expected exception during command execution: %s", e)
                 tm.that(True, eq=True)
@@ -476,7 +476,7 @@ class TestFlextMeltanoExecutorComplete:
             result = self.executor.run_cli(problematic_args)
             tm.that(isinstance(result, r), eq=True)
             if not result.is_success and result.error:
-                tm.that(len(result.error) > 0, eq=True)
+                tm.that(result.error, eq=True)
         except (ValueError, TypeError, RuntimeError, AttributeError, SystemExit):
             pass
 
@@ -577,7 +577,7 @@ class TestFlextMeltanoExecutorComplete:
                 plugins_result = executor.list_plugins()
                 tm.ok(plugins_result)
                 if plugins_result.value is not None:
-                    tm.that(len(plugins_result.value) > 0, eq=True)
+                    tm.that(plugins_result.value, eq=True)
                 version_result = executor.execute()
                 tm.that(isinstance(version_result, r), eq=True)
 
