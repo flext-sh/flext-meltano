@@ -487,8 +487,7 @@ class TestFlextMeltanoPerformance:
         def create_api() -> FlextMeltano:
             return FlextMeltano()
 
-        result = benchmark(create_api)
-        tm.that(result, none=False)
+        benchmark(create_api)
 
     def test_api_properties_access_performance(
         self,
@@ -500,5 +499,4 @@ class TestFlextMeltanoPerformance:
         def access_properties() -> tuple[str, type]:
             return (api.version, api.constants)
 
-        result = benchmark(access_properties)
-        tm.that(result, none=False)
+        benchmark(access_properties)

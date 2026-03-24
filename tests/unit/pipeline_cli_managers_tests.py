@@ -12,14 +12,13 @@ from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
-from flext_meltano import (
-    FlextMeltanoPipelineManager,
-    create_pipeline,
-    delete_pipeline,
-    execute_pipeline,
-    get_pipeline_status,
-    list_pipelines,
-)
+from flext_meltano import FlextMeltanoPipelineManager
+
+create_pipeline = FlextMeltanoPipelineManager.create_pipeline
+delete_pipeline = FlextMeltanoPipelineManager.delete_pipeline
+execute_pipeline = FlextMeltanoPipelineManager.execute_pipeline
+get_pipeline_status = FlextMeltanoPipelineManager.get_pipeline_status
+list_pipelines = FlextMeltanoPipelineManager.list_pipelines
 from tests import m, t
 
 

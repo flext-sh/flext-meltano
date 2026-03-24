@@ -15,6 +15,24 @@ from flext_meltano import FlextMeltanoAbstractions, m
 from tests import t
 
 
+def _extract_stream_names(raw: t.ContainerMapping) -> list[str]:
+    """Extract stream names from a discover_streams result."""
+    raw_streams_val = raw.get("streams")
+    if not isinstance(raw_streams_val, list):
+        return []
+    result: list[str] = []
+    for s in raw_streams_val:
+        if isinstance(s, dict):
+            name = s.get("stream_name") or s.get("tap_stream_id") or ""
+            result.append(str(name))
+        else:
+            name = (
+                getattr(s, "stream_name", None) or getattr(s, "tap_stream_id", "") or ""
+            )
+            result.append(str(name))
+    return result
+
+
 class _TestAssertions:
     """Minimal assertion helper when flext_tests is not available."""
 
@@ -32,10 +50,8 @@ class _TestAssertions:
         expected: t.NormalizedValue,
         message: str = "",
     ) -> None:
-        (
-            tm.that(actual, eq=expected),
-            message or f"expected {expected!r}, got {actual!r}",
-        )
+        tm.that(actual, eq=expected)
+        _ = message or f"expected {expected!r}, got {actual!r}"
 
     @staticmethod
     def assert_in(item: str, container: t.NormalizedValue, message: str = "") -> None:
@@ -141,9 +157,10 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_tap_abstractions_initialization(self) -> None:
         """Test FlextMeltanoAbstractions initialization."""
         tap_abs = FlextMeltanoAbstractions()
-        tm.that(tap_abs, none=False)
+        assert tap_abs is not None
         if hasattr(tap_abs, "service_name"):
-            tm.that(tap_abs.service_name, eq="FlextMeltanoAbstractions")
+            service_name = getattr(tap_abs, "service_name")
+            tm.that(service_name, eq="FlextMeltanoAbstractions")
         tm.that(
             hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger"),
             eq=True,
@@ -282,7 +299,9 @@ class TestFlextMeltanoAbstractionsComplete:
             )
             invalid_result = self.tap_abstractions.process(invalid_instance.config)
         except (ValidationError, ValueError):
-            invalid_result = r.fail("Validation failed at creation")
+            invalid_result: r[m.Meltano.TapConfig] = r[m.Meltano.TapConfig].fail(
+                "Validation failed at creation"
+            )
         valid_result = self.tap_abstractions.process(valid_instance.config)
         self.test_assertions.assert_true(
             condition=isinstance(valid_result, r),
@@ -317,18 +336,12 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         if result.is_success:
             raw = result.value
-            streams = raw.get("streams", raw) if isinstance(raw, dict) else raw
+            stream_names = _extract_stream_names(raw) if isinstance(raw, dict) else []
             self.test_assertions.assert_true(
-                condition=isinstance(streams, list),
+                condition=isinstance(stream_names, list),
                 message="Should return list of streams",
             )
-            if streams:
-                stream_names = [
-                    s.get("stream_name", s.get("tap_stream_id", ""))
-                    if isinstance(s, dict)
-                    else getattr(s, "stream_name", getattr(s, "tap_stream_id", ""))
-                    for s in streams
-                ]
+            if stream_names:
                 self.test_assertions.assert_in(
                     item="users",
                     container=stream_names,
@@ -358,18 +371,12 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         if result.is_success:
             raw = result.value
-            streams = raw.get("streams", raw) if isinstance(raw, dict) else raw
+            stream_names = _extract_stream_names(raw) if isinstance(raw, dict) else []
             self.test_assertions.assert_true(
-                condition=isinstance(streams, list),
+                condition=isinstance(stream_names, list),
                 message="Should return list of streams",
             )
-            if streams:
-                stream_names = [
-                    s.get("stream_name", s.get("tap_stream_id", ""))
-                    if isinstance(s, dict)
-                    else getattr(s, "stream_name", getattr(s, "tap_stream_id", ""))
-                    for s in streams
-                ]
+            if stream_names:
                 self.test_assertions.assert_in(
                     item="data",
                     container=stream_names,
@@ -394,18 +401,12 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         if result.is_success:
             raw = result.value
-            streams = raw.get("streams", raw) if isinstance(raw, dict) else raw
+            stream_names = _extract_stream_names(raw) if isinstance(raw, dict) else []
             self.test_assertions.assert_true(
-                condition=isinstance(streams, list),
+                condition=isinstance(stream_names, list),
                 message="Should return list of streams",
             )
-            if streams:
-                stream_names = [
-                    s.get("stream_name", s.get("tap_stream_id", ""))
-                    if isinstance(s, dict)
-                    else getattr(s, "stream_name", getattr(s, "tap_stream_id", ""))
-                    for s in streams
-                ]
+            if stream_names:
                 self.test_assertions.assert_in(
                     item="users",
                     container=stream_names,
@@ -576,7 +577,7 @@ class TestFlextMeltanoAbstractionsComplete:
                 message="Should return list of records",
             )
             self.test_assertions.assert_true(
-                condition=records,
+                condition=bool(records),
                 message="Should extract records",
             )
             if records:
@@ -649,7 +650,7 @@ class TestFlextMeltanoAbstractionsComplete:
         if result.is_success:
             records = result.value
             self.test_assertions.assert_true(
-                condition=records,
+                condition=bool(records),
                 message="Should extract product records",
             )
             if records:
@@ -769,7 +770,7 @@ class TestFlextMeltanoAbstractionsComplete:
             message="Should return list",
         )
         self.test_assertions.assert_true(
-            condition=stream_names,
+            condition=bool(stream_names),
             message="Should have stream names",
         )
 
@@ -815,7 +816,7 @@ class TestFlextMeltanoAbstractionsComplete:
         if discovery_result.is_success:
             registered_streams = self.tap_abstractions.get_registered_streams()
             self.test_assertions.assert_true(
-                condition=registered_streams,
+                condition=bool(registered_streams),
                 message="Should have registered streams",
             )
 
@@ -833,8 +834,9 @@ class TestFlextMeltanoAbstractionsComplete:
                 message="Should return FlextMeltanoAbstractions instance",
             )
             if hasattr(instance, "service_name"):
+                service_name_val = getattr(instance, "service_name")
                 self.test_assertions.assert_equal(
-                    actual=instance.service_name,
+                    actual=service_name_val,
                     expected="FlextMeltanoAbstractions",
                     message="Service name should match",
                 )
@@ -881,7 +883,7 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        tm.that(self.tap_abstractions, none=False)
+        assert self.tap_abstractions is not None
         tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
@@ -947,19 +949,12 @@ class TestFlextMeltanoAbstractionsComplete:
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         if discovery_result.is_success:
             raw_catalog = discovery_result.value
-            streams = (
-                raw_catalog.get("streams", []) if isinstance(raw_catalog, dict) else []
+            stream_name_list = (
+                _extract_stream_names(raw_catalog)
+                if isinstance(raw_catalog, dict)
+                else []
             )
-            for stream_entry in streams:
-                stream_name_value = (
-                    stream_entry.get(
-                        "stream_name",
-                        stream_entry.get("tap_stream_id", "unknown"),
-                    )
-                    if isinstance(stream_entry, dict)
-                    else getattr(stream_entry, "stream_name", "unknown")
-                )
-                stream_name = str(stream_name_value) if stream_name_value else "unknown"
+            for stream_name in stream_name_list:
                 extract_result = self.tap_abstractions.execute()
                 self.test_assertions.assert_true(
                     condition=extract_result.is_success,

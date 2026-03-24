@@ -89,7 +89,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test basic validator instantiation."""
         validator = FlextMeltanoValidators()
-        tm.that(validator, none=False)
+        assert validator is not None
 
     def test_validate_dbt_config_valid(self) -> None:
         dbt_config: t.ScalarMapping = {

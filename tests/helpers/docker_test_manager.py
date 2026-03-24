@@ -55,13 +55,13 @@ class ContainerManager:
 
         """
         try:
-            full_command = [
+            full_command: list[str] = [
                 "docker-compose",
                 "-f",
                 str(self.compose_file),
                 "-p",
                 self.project_name,
-            ] + command
+            ] + list(command)
             result = subprocess.run(
                 full_command,
                 check=False,
@@ -198,7 +198,9 @@ class Tk(ContainerManager):
                 if len(host_port) == 2:
                     return f"localhost:{host_port[1]}"
         except Exception as e:
-            self.logger.warning("Failed to get service URL for %s: %s", service_name, e)
+            self.logger.warning(
+                "Failed to get service URL for %s: %s", service_name, str(e)
+            )
         return None
 
     def execute_in_container(
@@ -283,7 +285,7 @@ class Tk(ContainerManager):
                 ):
                     return True
             except Exception as e:
-                self.logger.warning("Error checking service health: %s", e)
+                self.logger.warning("Error checking service health: %s", str(e))
             time.sleep(2)
         return False
 
@@ -304,7 +306,7 @@ class Tk(ContainerManager):
                     self.logger.warning("Service %s not accessible", service)
             return True
         except Exception as e:
-            self.logger.warning("Health check failed: %s", e)
+            self.logger.warning("Health check failed: %s", str(e))
             return False
 
     def _cleanup_containers(self) -> None:

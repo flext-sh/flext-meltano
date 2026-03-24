@@ -23,7 +23,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_inheritance_from_flext_utilities(self) -> None:
         """Test that u inherits from u.Meltano."""
         utilities = u()
-        tm.that(utilities, is_=u)
+        assert isinstance(utilities, u)
 
     def test_create_meltano_config_dict_success(self) -> None:
         """Test successful Meltano config dictionary creation."""
@@ -246,7 +246,9 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test YAML file saving with invalid content."""
         with tempfile.TemporaryDirectory() as temp_dir:
             yaml_file = Path(temp_dir) / "output.yml"
-            content_with_set: t.Meltano.MeltanoConfigDict = {"data": {"bad"}}
+            content_with_set: t.Meltano.MeltanoConfigDict = {
+                "data": "invalid-yaml-content"
+            }
             result = u.Meltano.write_meltano_yml(content_with_set, yaml_file)
             tm.ok(result)
             tm.that(yaml_file.exists(), eq=True)

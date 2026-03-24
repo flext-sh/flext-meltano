@@ -18,6 +18,11 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from tests.unit.pipeline_cli_managers_tests import (
+        create_pipeline,
+        delete_pipeline,
+        execute_pipeline,
+        get_pipeline_status,
+        list_pipelines,
         test_create_pipeline_creates_directory_and_configuration,
         test_create_pipeline_fails_without_configuration,
         test_delete_pipeline_removes_configuration_directory,
@@ -289,6 +294,14 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "TestTargetConfigEnhanced": ("tests.unit.test_models", "TestTargetConfigEnhanced"),
     "TestTargetService": ("tests.unit.test_services", "TestTargetService"),
     "Testc": ("tests.unit.test_constants", "Testc"),
+    "create_pipeline": ("tests.unit.pipeline_cli_managers_tests", "create_pipeline"),
+    "delete_pipeline": ("tests.unit.pipeline_cli_managers_tests", "delete_pipeline"),
+    "execute_pipeline": ("tests.unit.pipeline_cli_managers_tests", "execute_pipeline"),
+    "get_pipeline_status": (
+        "tests.unit.pipeline_cli_managers_tests",
+        "get_pipeline_status",
+    ),
+    "list_pipelines": ("tests.unit.pipeline_cli_managers_tests", "list_pipelines"),
     "logger": ("tests.unit.test_target_abstractions", "logger"),
     "pytestmark": ("tests.unit.test_api", "pytestmark"),
     "test_create_pipeline_creates_directory_and_configuration": (
@@ -379,6 +392,11 @@ __all__ = [
     "TestTargetConfigEnhanced",
     "TestTargetService",
     "Testc",
+    "create_pipeline",
+    "delete_pipeline",
+    "execute_pipeline",
+    "get_pipeline_status",
+    "list_pipelines",
     "logger",
     "pytestmark",
     "test_create_pipeline_creates_directory_and_configuration",

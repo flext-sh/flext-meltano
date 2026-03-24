@@ -419,8 +419,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
     @staticmethod
     def validate_service_config(config: t.Meltano.MeltanoConfigDict) -> r[bool]:
         """Validate service configuration dictionary."""
-        config_guard = u.guard(config, dict, return_value=True)
-        if config_guard is None:
+        if not u.guard(config, dict):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(value=True)
 
