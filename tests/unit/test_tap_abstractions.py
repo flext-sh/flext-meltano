@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 import pytest
 from flext_core import r
@@ -15,7 +15,7 @@ from flext_meltano import FlextMeltanoAbstractions, m
 from tests import t
 
 
-def _extract_stream_names(raw: t.ContainerMapping) -> list[str]:
+def _extract_stream_names(raw: t.ContainerMapping) -> Sequence[str]:
     """Extract stream names from a discover_streams result."""
     raw_streams_val = raw.get("streams")
     if not isinstance(raw_streams_val, list):
