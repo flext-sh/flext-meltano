@@ -32,31 +32,31 @@ if TYPE_CHECKING:
     from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
     from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextMeltanoCatalogManager": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextMeltanoCatalogManager": [
         "flext_meltano.singer.catalog",
         "FlextMeltanoCatalogManager",
-    ),
-    "FlextMeltanoSingerCliTranslator": (
+    ],
+    "FlextMeltanoSingerCliTranslator": [
         "flext_meltano.singer.translator",
         "FlextMeltanoSingerCliTranslator",
-    ),
-    "FlextMeltanoSingerService": (
+    ],
+    "FlextMeltanoSingerService": [
         "flext_meltano.singer.service",
         "FlextMeltanoSingerService",
-    ),
-    "FlextMeltanoStateManager": (
+    ],
+    "FlextMeltanoStateManager": [
         "flext_meltano.singer.state",
         "FlextMeltanoStateManager",
-    ),
-    "FlextMeltanoTapAbstractions": (
+    ],
+    "FlextMeltanoTapAbstractions": [
         "flext_meltano.singer.tap",
         "FlextMeltanoTapAbstractions",
-    ),
-    "FlextMeltanoTargetAbstractions": (
+    ],
+    "FlextMeltanoTargetAbstractions": [
         "flext_meltano.singer.target",
         "FlextMeltanoTargetAbstractions",
-    ),
+    ],
 }
 
 __all__ = [

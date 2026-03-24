@@ -25,13 +25,13 @@ if TYPE_CHECKING:
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextMeltanoDbtProjectManager": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextMeltanoDbtProjectManager": [
         "flext_meltano.dbt.project",
         "FlextMeltanoDbtProjectManager",
-    ),
-    "FlextMeltanoDbtRunner": ("flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"),
-    "FlextMeltanoDbtService": ("flext_meltano.dbt.service", "FlextMeltanoDbtService"),
+    ],
+    "FlextMeltanoDbtRunner": ["flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"],
+    "FlextMeltanoDbtService": ["flext_meltano.dbt.service", "FlextMeltanoDbtService"],
 }
 
 __all__ = [

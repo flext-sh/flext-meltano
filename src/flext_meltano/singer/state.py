@@ -158,8 +158,7 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
 
         """
         try:
-            if stream_name not in self._state_msg.value:
-                self._state_msg.value[stream_name] = {}
+            self._state_msg.value.setdefault(stream_name, {})
             stream_bookmarks = self._state_msg.value[stream_name]
             match stream_bookmarks:
                 case dict():

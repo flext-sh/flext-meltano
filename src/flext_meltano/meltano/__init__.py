@@ -31,32 +31,32 @@ if TYPE_CHECKING:
     )
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextMeltanoBridge": ("flext_meltano.meltano.bridge", "FlextMeltanoBridge"),
-    "FlextMeltanoComponentService": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextMeltanoBridge": ["flext_meltano.meltano.bridge", "FlextMeltanoBridge"],
+    "FlextMeltanoComponentService": [
         "flext_meltano.meltano.plugins",
         "FlextMeltanoComponentService",
-    ),
-    "FlextMeltanoDbtTransformationRunner": (
+    ],
+    "FlextMeltanoDbtTransformationRunner": [
         "flext_meltano.meltano.runner",
         "FlextMeltanoDbtTransformationRunner",
-    ),
-    "FlextMeltanoLibraryRunner": (
+    ],
+    "FlextMeltanoLibraryRunner": [
         "flext_meltano.meltano.runner",
         "FlextMeltanoLibraryRunner",
-    ),
-    "FlextMeltanoMeltanoService": (
+    ],
+    "FlextMeltanoMeltanoService": [
         "flext_meltano.meltano.service",
         "FlextMeltanoMeltanoService",
-    ),
-    "FlextMeltanoOrchestrationService": (
+    ],
+    "FlextMeltanoOrchestrationService": [
         "flext_meltano.meltano.pipelines",
         "FlextMeltanoOrchestrationService",
-    ),
-    "FlextMeltanoProjectManager": (
+    ],
+    "FlextMeltanoProjectManager": [
         "flext_meltano.meltano.project",
         "FlextMeltanoProjectManager",
-    ),
+    ],
 }
 
 __all__ = [

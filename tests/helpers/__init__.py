@@ -33,11 +33,11 @@ if TYPE_CHECKING:
         docker_services,
     )
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
-    "Tk": ("tests.helpers.docker_test_manager", "Tk"),
-    "docker_manager": ("tests.helpers.docker_test_manager", "docker_manager"),
-    "docker_services": ("tests.helpers.docker_test_manager", "docker_services"),
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "ContainerManager": ["tests.helpers.docker_test_manager", "ContainerManager"],
+    "Tk": ["tests.helpers.docker_test_manager", "Tk"],
+    "docker_manager": ["tests.helpers.docker_test_manager", "docker_manager"],
+    "docker_services": ["tests.helpers.docker_test_manager", "docker_services"],
 }
 
 __all__ = [

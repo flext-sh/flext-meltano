@@ -31,7 +31,7 @@ dependencies = [
   "dbt-core @ git+https://github.com/flext-sh/dbt-core.git@flext/relax-deps#subdirectory=core",
   "duckdb>=1",
   "fastapi>=0.119",
-  "flext-core",
+  "flext-core @ file:../flext-core",
   "httpx>=0.28",
   "injectable>=4.0.1",
   "jinja2>=3.1",
