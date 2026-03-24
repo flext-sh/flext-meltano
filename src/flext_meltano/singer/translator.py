@@ -10,10 +10,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
 from collections.abc import MutableSequence
 
 from flext_core import r
+from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano import m, t
 
@@ -58,38 +58,24 @@ class FlextMeltanoSingerCliTranslator:
             return r[t.Meltano.CLI.ProcessResult].fail(
                 "Invalid command: all arguments must be strings",
             )
-        try:
-            process_input = input_data.encode() if input_data else None
-            # Intentional subprocess usage: Singer SDK command execution
-            proc_result = subprocess.run(
-                command,
-                capture_output=True,
-                input=process_input,
-                timeout=timeout,
-                check=False,
-                shell=False,
-            )
-            output_dict: t.Meltano.CLI.ProcessResult = {
-                "stdout": proc_result.stdout.decode() if proc_result.stdout else "",
-                "stderr": proc_result.stderr.decode() if proc_result.stderr else "",
-                "returncode": proc_result.returncode,
-            }
-            if proc_result.returncode != 0:
-                stderr_msg = str(output_dict.get("stderr", "Command execution failed"))
-                return r[t.Meltano.CLI.ProcessResult].fail(stderr_msg)
-            return r[t.Meltano.CLI.ProcessResult].ok(output_dict)
-        except subprocess.TimeoutExpired as e:
-            return r[t.Meltano.CLI.ProcessResult].fail(f"Command timeout: {e}")
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            return r[t.Meltano.CLI.ProcessResult].fail(f"Command execution failed: {e}")
+        process_input = input_data.encode() if input_data else None
+        cmd_result = FlextInfraUtilitiesSubprocess.run_raw(
+            list(command),
+            timeout=timeout,
+            input_data=process_input,
+        )
+        if cmd_result.is_failure:
+            return r[t.Meltano.CLI.ProcessResult].fail(str(cmd_result.failure()))
+        out = cmd_result.value
+        output_dict: t.Meltano.CLI.ProcessResult = {
+            "stdout": out.stdout,
+            "stderr": out.stderr,
+            "returncode": out.exit_code,
+        }
+        if out.exit_code != 0:
+            stderr_msg = out.stderr or "Command execution failed"
+            return r[t.Meltano.CLI.ProcessResult].fail(stderr_msg)
+        return r[t.Meltano.CLI.ProcessResult].ok(output_dict)
 
     @staticmethod
     def translate_dbt_run(
