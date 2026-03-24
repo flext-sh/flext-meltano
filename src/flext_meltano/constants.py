@@ -6,7 +6,6 @@ from enum import StrEnum, unique
 from typing import Final
 
 from flext_cli import FlextCliConstants
-from flext_core import FlextConstants
 
 
 class FlextMeltanoConstants(FlextCliConstants):
@@ -69,11 +68,15 @@ class FlextMeltanoConstants(FlextCliConstants):
         class Network:
             """Network defaults derived from flext-core."""
 
-            MELTANO_DEFAULT_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_LIMIT
-            DEFAULT_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS
-            DISCOVERY_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS * 2
-            REQUEST_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS * 2
-            CONNECTION_TIMEOUT: Final[int] = FlextConstants.DEFAULT_TIMEOUT_SECONDS
+            MELTANO_DEFAULT_TIMEOUT: Final[int] = (
+                FlextCliConstants.DEFAULT_TIMEOUT_LIMIT
+            )
+            DEFAULT_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS
+            DISCOVERY_TIMEOUT: Final[int] = (
+                FlextCliConstants.DEFAULT_TIMEOUT_SECONDS * 2
+            )
+            REQUEST_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS * 2
+            CONNECTION_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS
             BUFFER_SIZE: Final[int] = 8192
             MAX_PARALLEL_STREAMS: Final[int] = 4
 
@@ -97,7 +100,7 @@ class FlextMeltanoConstants(FlextCliConstants):
             PREFIX_TARGET: Final[str] = "target"
             PREFIX_DBT: Final[str] = "dbt"
             INSTALLATION_TIMEOUT: Final[int] = (
-                FlextConstants.DEFAULT_TIMEOUT_SECONDS * 10
+                FlextCliConstants.DEFAULT_TIMEOUT_SECONDS * 10
             )
             MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
             MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5

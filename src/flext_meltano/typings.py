@@ -35,36 +35,49 @@ class FlextMeltanoTypes(FlextCliTypes):
     class Meltano:
         """Meltano plugin complex types namespace."""
 
-        type MeltanoValue = Mapping[str, t.ContainerValue] | None
+        type MeltanoValue = Mapping[str, FlextCliTypes.ContainerValue] | None
 
         type PluginDefinition = Mapping[
             str,
-            str | Sequence[str] | Mapping[str, t.Scalar | None],
+            str | Sequence[str] | Mapping[str, FlextCliTypes.Scalar | None],
         ]
-        type PluginConfiguration = t.ContainerMapping
-        type PluginCatalog = Mapping[str, Sequence[t.Meltano.PluginDefinition]]
+        type PluginConfiguration = FlextCliTypes.ContainerMapping
+        type PluginCatalog = Mapping[
+            str, Sequence[FlextCliTypes.Meltano.PluginDefinition]
+        ]
         type PluginRegistry = Mapping[
             str,
-            t.Meltano.PluginDefinition | t.Meltano.PluginConfiguration,
+            FlextCliTypes.Meltano.PluginDefinition
+            | FlextCliTypes.Meltano.PluginConfiguration,
         ]
         type PluginInstallation = Mapping[str, str | bool | Sequence[str]]
-        type PluginExecution = Mapping[str, Mapping[str, t.ContainerValue] | None]
-        type PluginInfo = Mapping[str, t.Scalar | None]
+        type PluginExecution = Mapping[
+            str, Mapping[str, FlextCliTypes.ContainerValue] | None
+        ]
+        type PluginInfo = Mapping[str, FlextCliTypes.Scalar | None]
         PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
         PluginVariant = Literal["default", "singer", "custom"]
 
         class Singer:
             """Singer protocol complex types namespace."""
 
-            type CatalogEntry = Mapping[str, str | Mapping[str, t.Scalar | None]]
-            type StreamSchema = Mapping[str, Mapping[str, t.Scalar | None]]
-            type TapConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type TargetConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type MessageBatch = Sequence[Mapping[str, t.Scalar | None]]
-            type StreamCatalog = Mapping[str, Sequence[t.Meltano.Singer.CatalogEntry]]
-            type Record = Mapping[str, t.Scalar | None]
-            type Schema = Mapping[str, t.Scalar | None]
-            type State = Mapping[str, t.Scalar | None]
+            type CatalogEntry = Mapping[
+                str, str | Mapping[str, FlextCliTypes.Scalar | None]
+            ]
+            type StreamSchema = Mapping[str, Mapping[str, FlextCliTypes.Scalar | None]]
+            type TapConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type TargetConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type MessageBatch = Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
+            type StreamCatalog = Mapping[
+                str, Sequence[FlextCliTypes.Meltano.Singer.CatalogEntry]
+            ]
+            type Record = Mapping[str, FlextCliTypes.Scalar | None]
+            type Schema = Mapping[str, FlextCliTypes.Scalar | None]
+            type State = Mapping[str, FlextCliTypes.Scalar | None]
             ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
             SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
 
@@ -101,117 +114,147 @@ class FlextMeltanoTypes(FlextCliTypes):
         class Dbt:
             """DBT transformation complex types namespace."""
 
-            type ModelConfiguration = Mapping[str, t.Scalar | None]
+            type ModelConfiguration = Mapping[str, FlextCliTypes.Scalar | None]
             type TestConfiguration = Mapping[str, str | Sequence[str]]
-            type ProfileConfiguration = Mapping[str, Mapping[str, t.Scalar | None]]
+            type ProfileConfiguration = Mapping[
+                str, Mapping[str, FlextCliTypes.Scalar | None]
+            ]
             type ProjectConfiguration = Mapping[
                 str,
-                Mapping[str, t.ContainerValue] | None,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
-            type RunResults = Mapping[str, Sequence[Mapping[str, t.Scalar | None]]]
-            type ManifestData = Mapping[str, Mapping[str, t.ContainerValue] | None]
+            type RunResults = Mapping[
+                str, Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
+            ]
+            type ManifestData = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
             type Project = Mapping[str, str | bool | Sequence[str]]
 
         class Project:
             """Meltano-specific project types."""
 
-            type ProjectConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type ProjectMetadata = Mapping[str, t.Scalar | None]
+            type ProjectConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type ProjectMetadata = Mapping[str, FlextCliTypes.Scalar | None]
             type MeltanoProjectType = c.MeltanoProjectType
             type MeltanoProjectConfig = Mapping[
                 str,
-                Mapping[str, t.ContainerValue] | None,
+                Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
-            type PipelineConfig = Mapping[str, t.Scalar | Sequence[str]]
-            type SingerConfig = Mapping[str, t.Scalar | None]
-            type DbtConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
+            type PipelineConfig = Mapping[str, FlextCliTypes.Scalar | Sequence[str]]
+            type SingerConfig = Mapping[str, FlextCliTypes.Scalar | None]
+            type DbtConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
 
         class Bridge:
             """Bridge operation complex types namespace."""
 
-            type BridgeMessage = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type BridgeResponse = Mapping[str, Mapping[str, t.ContainerValue] | None]
+            type BridgeMessage = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type BridgeResponse = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
             type VersionInfo = Mapping[str, str | int]
-            type ConnectionInfo = t.ConfigurationMapping
-            type BridgeConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type BridgeStatus = Mapping[str, t.Scalar | None]
+            type ConnectionInfo = FlextCliTypes.ConfigurationMapping
+            type BridgeConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type BridgeStatus = Mapping[str, FlextCliTypes.Scalar | None]
 
         class CLI:
             """CLI operation complex types namespace."""
 
             type Command = Sequence[str]
-            type ProcessResult = Mapping[str, t.Scalar | Sequence[str]]
-            type CommandResult = t.ConfigurationMapping
-            type ExecutionResult = Mapping[str, t.Scalar | None]
+            type ProcessResult = Mapping[str, FlextCliTypes.Scalar | Sequence[str]]
+            type CommandResult = FlextCliTypes.ConfigurationMapping
+            type ExecutionResult = Mapping[str, FlextCliTypes.Scalar | None]
             type CLIStatus = Mapping[str, str | bool]
 
         class ELT:
             """ELT pipeline complex types namespace."""
 
-            type PipelineResult = Mapping[str, t.Scalar | None | t.ScalarList]
-            type ExtractConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type LoadConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type TransformConfig = Mapping[str, Mapping[str, t.ContainerValue] | None]
-            type ExtractionResult = Mapping[str, t.Scalar | None]
-            type LoadingResult = Mapping[str, t.Scalar | None]
-            type TransformationResult = Mapping[str, t.Scalar | None]
+            type PipelineResult = Mapping[
+                str, FlextCliTypes.Scalar | None | FlextCliTypes.ScalarList
+            ]
+            type ExtractConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type LoadConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type TransformConfig = Mapping[
+                str, Mapping[str, FlextCliTypes.ContainerValue] | None
+            ]
+            type ExtractionResult = Mapping[str, FlextCliTypes.Scalar | None]
+            type LoadingResult = Mapping[str, FlextCliTypes.Scalar | None]
+            type TransformationResult = Mapping[str, FlextCliTypes.Scalar | None]
 
         class Processing:
             """Meltano-specific processing types."""
 
-            type DbtTransformationResult = Mapping[str, t.ContainerValue]
-            type SingerProcessingResult = Mapping[str, t.ContainerValue]
-            type SingerExecutionResult = Mapping[str, t.ContainerValue]
-            type EltPipelineResult = Mapping[str, t.ContainerValue]
-            type Headers = t.StrMapping
+            type DbtTransformationResult = Mapping[str, FlextCliTypes.ContainerValue]
+            type SingerProcessingResult = Mapping[str, FlextCliTypes.ContainerValue]
+            type SingerExecutionResult = Mapping[str, FlextCliTypes.ContainerValue]
+            type EltPipelineResult = Mapping[str, FlextCliTypes.ContainerValue]
+            type Headers = FlextCliTypes.StrMapping
 
-        type NestedJsonValue = Mapping[str, t.ContainerValue] | t.Scalar | None
-        type NestedJsonDict = Mapping[str, t.Meltano.NestedJsonValue]
-        type MeltanoConfigDict = t.ContainerMapping
-        type PluginConfigDict = Mapping[str, t.ContainerValue]
-        type EnvironmentDict = t.StrMapping
-        type VariablesDict = t.StrMapping
-        type SettingsDict = Mapping[str, t.ContainerValue]
-        type MetadataDict = Mapping[str, t.ContainerValue]
-        type CommandDict = Mapping[str, t.ContainerValue]
-        type ScheduleDict = Mapping[str, t.ContainerValue]
-        type JobDict = Mapping[str, t.ContainerValue]
-        type RecordDict = Mapping[str, t.Scalar | None]
-        type SchemaDict = Mapping[str, t.Scalar | None]
-        type StateDict = Mapping[str, t.Scalar | None]
-        type ResultDict = t.ContainerMapping
-        type RunContextDict = t.ContainerMapping
-        type FileConfigDict = Mapping[str, t.NormalizedValue | Sequence[str]]
+        type NestedJsonValue = (
+            Mapping[str, FlextCliTypes.ContainerValue] | FlextCliTypes.Scalar | None
+        )
+        type NestedJsonDict = Mapping[str, FlextCliTypes.Meltano.NestedJsonValue]
+        type MeltanoConfigDict = FlextCliTypes.ContainerMapping
+        type PluginConfigDict = Mapping[str, FlextCliTypes.ContainerValue]
+        type EnvironmentDict = FlextCliTypes.StrMapping
+        type VariablesDict = FlextCliTypes.StrMapping
+        type SettingsDict = Mapping[str, FlextCliTypes.ContainerValue]
+        type MetadataDict = Mapping[str, FlextCliTypes.ContainerValue]
+        type CommandDict = Mapping[str, FlextCliTypes.ContainerValue]
+        type ScheduleDict = Mapping[str, FlextCliTypes.ContainerValue]
+        type JobDict = Mapping[str, FlextCliTypes.ContainerValue]
+        type RecordDict = Mapping[str, FlextCliTypes.Scalar | None]
+        type SchemaDict = Mapping[str, FlextCliTypes.Scalar | None]
+        type StateDict = Mapping[str, FlextCliTypes.Scalar | None]
+        type ResultDict = FlextCliTypes.ContainerMapping
+        type RunContextDict = FlextCliTypes.ContainerMapping
+        type FileConfigDict = Mapping[
+            str, FlextCliTypes.NormalizedValue | Sequence[str]
+        ]
         PathDict = Mapping[str, str | Path]
         type PluginList = Sequence[str]
         type PluginNameList = Sequence[str]
         type PluginTypeList = Sequence[str]
-        type ExecutionResultDict = t.ContainerMapping
-        type ExecutionStatusDict = t.StrMapping
-        type RuntimeConfigDict = Mapping[str, Mapping[str, t.ContainerValue] | None]
-        type SingerRecordDict = Mapping[str, t.Scalar | None]
-        type SingerStateDict = Mapping[str, t.Scalar | None]
-        type SingerCatalogDict = t.ContainerMapping
-        type SingerConfigDict = t.ContainerMapping
-        type SingerSchemaDict = Mapping[str, t.Scalar | None]
-        type SingerMessageList = Sequence[Mapping[str, t.Scalar | None]]
+        type ExecutionResultDict = FlextCliTypes.ContainerMapping
+        type ExecutionStatusDict = FlextCliTypes.StrMapping
+        type RuntimeConfigDict = Mapping[
+            str, Mapping[str, FlextCliTypes.ContainerValue] | None
+        ]
+        type SingerRecordDict = Mapping[str, FlextCliTypes.Scalar | None]
+        type SingerStateDict = Mapping[str, FlextCliTypes.Scalar | None]
+        type SingerCatalogDict = FlextCliTypes.ContainerMapping
+        type SingerConfigDict = FlextCliTypes.ContainerMapping
+        type SingerSchemaDict = Mapping[str, FlextCliTypes.Scalar | None]
+        type SingerMessageList = Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
         type StreamNameList = Sequence[str]
-        type DbtModelDict = t.ContainerMapping
-        type DbtProfileDict = t.ContainerMapping
-        type DbtProjectDict = t.ContainerMapping
-        type DbtManifestDict = t.ContainerMapping
-        type DbtResultDict = t.ContainerMapping
+        type DbtModelDict = FlextCliTypes.ContainerMapping
+        type DbtProfileDict = FlextCliTypes.ContainerMapping
+        type DbtProjectDict = FlextCliTypes.ContainerMapping
+        type DbtManifestDict = FlextCliTypes.ContainerMapping
+        type DbtResultDict = FlextCliTypes.ContainerMapping
         type DbtModelList = Sequence[str]
         type DbtTestList = Sequence[str]
 
         class Pipeline:
             """Pipeline execution complex types namespace."""
 
-            type PipelineConfig = t.ContainerMapping
-            type PipelineStatus = t.ConfigurationMapping
-            type WorkflowDict = t.ContainerMapping
-            type RunContextDict = t.ContainerMapping
-            type ExecutionLogsDict = t.ContainerMapping
+            type PipelineConfig = FlextCliTypes.ContainerMapping
+            type PipelineStatus = FlextCliTypes.ConfigurationMapping
+            type WorkflowDict = FlextCliTypes.ContainerMapping
+            type RunContextDict = FlextCliTypes.ContainerMapping
+            type ExecutionLogsDict = FlextCliTypes.ContainerMapping
             type MetricsDict = Mapping[str, float]
             type ErrorsDict = Mapping[str, str]
 

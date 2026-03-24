@@ -139,7 +139,7 @@ if TYPE_CHECKING:
         TestFlextMeltanoSingerCliTranslatorTargetRun,
     )
     from tests.unit.test_singer_types import TestFlextSingerTypes
-    from tests.unit.test_tap_abstractions import TestFlextMeltanoTapAbstractionsComplete
+    from tests.unit.test_tap_abstractions import TestFlextMeltanoAbstractionsComplete
     from tests.unit.test_target_abstractions import (
         TestFlextMeltanoTargetAbstractionsComplete,
         logger,
@@ -193,6 +193,10 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "TestFlextDbtProgrammaticRunner": (
         "tests.unit.test_library_runner",
         "TestFlextDbtProgrammaticRunner",
+    ),
+    "TestFlextMeltanoAbstractionsComplete": (
+        "tests.unit.test_tap_abstractions",
+        "TestFlextMeltanoAbstractionsComplete",
     ),
     "TestFlextMeltanoCatalogOperations": (
         "tests.unit.test_api",
@@ -302,10 +306,6 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "TestFlextMeltanoSuccessPaths": (
         "tests.unit.test_api",
         "TestFlextMeltanoSuccessPaths",
-    ),
-    "TestFlextMeltanoTapAbstractionsComplete": (
-        "tests.unit.test_tap_abstractions",
-        "TestFlextMeltanoTapAbstractionsComplete",
     ),
     "TestFlextMeltanoTargetAbstractionsComplete": (
         "tests.unit.test_target_abstractions",
@@ -448,6 +448,7 @@ __all__ = [
     "TestDbtService",
     "TestDockerIntegration",
     "TestFlextDbtProgrammaticRunner",
+    "TestFlextMeltanoAbstractionsComplete",
     "TestFlextMeltanoCatalogOperations",
     "TestFlextMeltanoDataOperations",
     "TestFlextMeltanoDbtOperations",
@@ -476,7 +477,6 @@ __all__ = [
     "TestFlextMeltanoSingerCliTranslatorTapRun",
     "TestFlextMeltanoSingerCliTranslatorTargetRun",
     "TestFlextMeltanoSuccessPaths",
-    "TestFlextMeltanoTapAbstractionsComplete",
     "TestFlextMeltanoTargetAbstractionsComplete",
     "TestFlextMeltanoTypes",
     "TestFlextMeltanoUtilitiesEnhanced",

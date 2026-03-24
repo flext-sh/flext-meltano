@@ -11,7 +11,7 @@ from flext_core import r, t
 from flext_tests import tm
 from pydantic_core import ValidationError
 
-from flext_meltano import FlextMeltanoTapAbstractions, m
+from flext_meltano import FlextMeltanoAbstractions, m
 
 
 class _TestAssertions:
@@ -40,15 +40,15 @@ class _TestAssertions:
             tm.that(container, has=item)
 
 
-class TestFlextMeltanoTapAbstractionsComplete:
-    """Complete test suite for FlextMeltanoTapAbstractions."""
+class TestFlextMeltanoAbstractionsComplete:
+    """Complete test suite for FlextMeltanoAbstractions."""
 
-    tap_abstractions: FlextMeltanoTapAbstractions
+    tap_abstractions: FlextMeltanoAbstractions
     test_assertions: _TestAssertions
 
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.tap_abstractions = FlextMeltanoTapAbstractions()
+        self.tap_abstractions = FlextMeltanoAbstractions()
         if not hasattr(self, "test_assertions"):
             self.test_assertions = _TestAssertions()
 
@@ -136,11 +136,11 @@ class TestFlextMeltanoTapAbstractionsComplete:
             )
 
     def test_tap_abstractions_initialization(self) -> None:
-        """Test FlextMeltanoTapAbstractions initialization."""
-        tap_abs = FlextMeltanoTapAbstractions()
+        """Test FlextMeltanoAbstractions initialization."""
+        tap_abs = FlextMeltanoAbstractions()
         tm.that(tap_abs, none=False)
         if hasattr(tap_abs, "service_name"):
-            tm.that(tap_abs.service_name, eq="FlextMeltanoTapAbstractions")
+            tm.that(tap_abs.service_name, eq="FlextMeltanoAbstractions")
         tm.that(
             hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger"), eq=True
         )
@@ -165,7 +165,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
         if not hasattr(self.tap_abstractions, "build"):
-            pytest.skip("build not available on this FlextMeltanoTapAbstractions")
+            pytest.skip("build not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
@@ -194,7 +194,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test get_stream_config method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_stream_config"):
             pytest.skip(
-                "get_stream_config not available on this FlextMeltanoTapAbstractions"
+                "get_stream_config not available on this FlextMeltanoAbstractions"
             )
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
@@ -394,7 +394,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         """Test get_stream_by_name method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_stream_by_name"):
             pytest.skip(
-                "get_stream_by_name not available on this FlextMeltanoTapAbstractions"
+                "get_stream_by_name not available on this FlextMeltanoAbstractions"
             )
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
@@ -657,7 +657,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_sync_stream_without_target(self) -> None:
         """Test sync_stream without target using flext_tests."""
         if not hasattr(self.tap_abstractions, "sync_stream"):
-            pytest.skip("sync_stream not available on this FlextMeltanoTapAbstractions")
+            pytest.skip("sync_stream not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
@@ -683,9 +683,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_list_streams(self) -> None:
         """Test list_streams method using flext_tests."""
         if not hasattr(self.tap_abstractions, "list_streams"):
-            pytest.skip(
-                "list_streams not available on this FlextMeltanoTapAbstractions"
-            )
+            pytest.skip("list_streams not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
@@ -707,9 +705,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
     def test_get_tap_type(self) -> None:
         """Test get_tap_type method using flext_tests."""
         if not hasattr(self.tap_abstractions, "get_tap_type"):
-            pytest.skip(
-                "get_tap_type not available on this FlextMeltanoTapAbstractions"
-            )
+            pytest.skip("get_tap_type not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
@@ -745,20 +741,20 @@ class TestFlextMeltanoTapAbstractionsComplete:
 
     def test_create_instance_factory(self) -> None:
         """Test create_instance factory method using flext_tests."""
-        result = FlextMeltanoTapAbstractions.create_result_instance()
+        result = FlextMeltanoAbstractions.create_result_instance()
         self.test_assertions.assert_true(
             condition=isinstance(result, r), message="Should return r"
         )
         if result.is_success:
             instance = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(instance, FlextMeltanoTapAbstractions),
-                message="Should return FlextMeltanoTapAbstractions instance",
+                condition=isinstance(instance, FlextMeltanoAbstractions),
+                message="Should return FlextMeltanoAbstractions instance",
             )
             if hasattr(instance, "service_name"):
                 self.test_assertions.assert_equal(
                     actual=instance.service_name,
-                    expected="FlextMeltanoTapAbstractions",
+                    expected="FlextMeltanoAbstractions",
                     message="Service name should match",
                 )
 
@@ -806,7 +802,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
         tm.that(result, is_=r)
 
     @unittest.skip(
-        "API methods not yet implemented: create_tap_from_config, generate_catalog, sync_stream. Requires implementation in FlextMeltanoTapAbstractions."
+        "API methods not yet implemented: create_tap_from_config, generate_catalog, sync_stream. Requires implementation in FlextMeltanoAbstractions."
     )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""

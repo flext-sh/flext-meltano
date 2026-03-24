@@ -86,7 +86,7 @@ class FlextMeltanoModels(FlextCliModels):
     class Meltano:
         """Meltano domain namespace."""
 
-        class StringListValue(FlextModels.ArbitraryTypesModel):
+        class StringListValue(FlextCliModels.ArbitraryTypesModel):
             """Validated string list wrapper for result normalization."""
 
             items: Annotated[
@@ -104,7 +104,7 @@ class FlextMeltanoModels(FlextCliModels):
                     return [str(item) for item in value if item is not None]
                 return []
 
-        class BooleanListValue(FlextModels.ArbitraryTypesModel):
+        class BooleanListValue(FlextCliModels.ArbitraryTypesModel):
             """Validated boolean list wrapper for process output."""
 
             items: Annotated[
@@ -549,7 +549,7 @@ class FlextMeltanoModels(FlextCliModels):
         class CliParameters(FlextModels):
             """Base class for all CLI parameter models."""
 
-            class DataSourceParams(FlextModels.Entity):
+            class DataSourceParams(FlextCliModels.Entity):
                 """Generic parameters for data source operations."""
 
                 source_name: Annotated[
@@ -584,7 +584,7 @@ class FlextMeltanoModels(FlextCliModels):
                     ),
                 ]
 
-            class DataSinkParams(FlextModels.Entity):
+            class DataSinkParams(FlextCliModels.Entity):
                 """Generic parameters for data sink operations."""
 
                 sink_name: Annotated[str, Field(description="Name of the data sink")]
@@ -600,7 +600,7 @@ class FlextMeltanoModels(FlextCliModels):
                     ),
                 ]
 
-            class PipelineParams(FlextModels.Entity):
+            class PipelineParams(FlextCliModels.Entity):
                 """Generic parameters for pipeline operations."""
 
                 source_name: Annotated[
@@ -631,7 +631,7 @@ class FlextMeltanoModels(FlextCliModels):
                     Field(default=None, description="Path to write final state"),
                 ]
 
-            class TransformationParams(FlextModels.Entity):
+            class TransformationParams(FlextCliModels.Entity):
                 """Generic parameters for transformation operations."""
 
                 project_dir: Annotated[
@@ -658,7 +658,7 @@ class FlextMeltanoModels(FlextCliModels):
                     Field(default=False, description="Run with full refresh"),
                 ]
 
-            class PluginInstallParams(FlextModels.Entity):
+            class PluginInstallParams(FlextCliModels.Entity):
                 """Generic parameters for plugin installation."""
 
                 plugin_type: Annotated[
@@ -674,7 +674,7 @@ class FlextMeltanoModels(FlextCliModels):
                     Field(default=None, description="Specific plugin variant"),
                 ]
 
-        class PipelineRunParams(FlextModels.Entity):
+        class PipelineRunParams(FlextCliModels.Entity):
             """Parameters for pipeline run operations."""
 
             tap_name: Annotated[str, Field(description="Name of the tap to run")]
@@ -704,7 +704,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=False, description="Run with full refresh"),
             ]
 
-        class ServiceConstructorConfig(FlextModels.ArbitraryTypesModel):
+        class ServiceConstructorConfig(FlextCliModels.ArbitraryTypesModel):
             """Configuration model for FlextMeltanoService constructor."""
 
             config: Mapping[str, t.ContainerMapping | None] | None = Field(
@@ -747,7 +747,7 @@ class FlextMeltanoModels(FlextCliModels):
         # DATA SOURCE MODELS - Generic data source configurations and instances
         # ========================================================================
 
-        class DbtRunParams(FlextModels.Entity):
+        class DbtRunParams(FlextCliModels.Entity):
             """Generic parameters for dbt run operations."""
 
             project_dir: Annotated[str, Field(description="dbt project directory")]
@@ -772,7 +772,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="dbt variables"),
             ]
 
-        class TapRunParams(FlextModels.Entity):
+        class TapRunParams(FlextCliModels.Entity):
             """Generic parameters for tap run operations."""
 
             tap_name: Annotated[str, Field(description="Name of the tap to run")]
@@ -797,7 +797,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Path to Singer properties file"),
             ]
 
-        class TargetRunParams(FlextModels.Entity):
+        class TargetRunParams(FlextCliModels.Entity):
             """Generic parameters for target run operations."""
 
             target_name: Annotated[str, Field(description="Name of the target to run")]
@@ -814,7 +814,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Batch size for target operations"),
             ]
 
-        class TapConfig(FlextModels.Entity):
+        class TapConfig(FlextCliModels.Entity):
             """Generic tap configuration for data extraction."""
 
             tap_type: Annotated[str, Field(description="Type of the tap")]
@@ -870,7 +870,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class TargetConfig(FlextModels.Entity):
+        class TargetConfig(FlextCliModels.Entity):
             """Generic target configuration for data loading."""
 
             target_type: Annotated[str, Field(description="Type of the target")]
@@ -922,7 +922,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class DataSourceConfig(FlextModels.Entity):
+        class DataSourceConfig(FlextCliModels.Entity):
             """Generic data source configuration with validation."""
 
             source_type: Annotated[str, Field(description="Type of the data source")]
@@ -978,7 +978,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class StreamDefinition(FlextModels.Entity):
+        class StreamDefinition(FlextCliModels.Entity):
             """Generic stream definition for data pipeline operations."""
 
             stream_name: Annotated[str, Field(description="Name of the stream")]
@@ -1052,7 +1052,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class DataSinkDefinition(FlextModels.Entity):
+        class DataSinkDefinition(FlextCliModels.Entity):
             """Generic data sink definition for pipeline operations."""
 
             sink_name: Annotated[str, Field(description="Name of the sink")]
@@ -1095,7 +1095,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class TapInstance(FlextModels.Entity):
+        class TapInstance(FlextCliModels.Entity):
             """Generic tap instance for data extraction."""
 
             tap_id: Annotated[
@@ -1146,7 +1146,7 @@ class FlextMeltanoModels(FlextCliModels):
                 """Number of available streams."""
                 return len(self.streams)
 
-        class DataSourceInstance(FlextModels.Entity):
+        class DataSourceInstance(FlextCliModels.Entity):
             """Generic data source instance for pipeline operations."""
 
             source_type: Annotated[str, Field(description="Type of the data source")]
@@ -1234,7 +1234,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class DataSinkInstance(FlextModels.Entity):
+        class DataSinkInstance(FlextCliModels.Entity):
             """Generic data sink instance for pipeline operations."""
 
             sink_id: Annotated[
@@ -1275,7 +1275,7 @@ class FlextMeltanoModels(FlextCliModels):
         # DATA SINK CONFIGURATION - Generic sink configuration models
         # ========================================================================
 
-        class DataSinkConfig(FlextModels.Entity):
+        class DataSinkConfig(FlextCliModels.Entity):
             """Generic data sink configuration with validation."""
 
             sink_type: Annotated[str, Field(description="Sink type identifier")]
@@ -1346,7 +1346,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class StreamInfo(FlextModels.Entity):
+        class StreamInfo(FlextCliModels.Entity):
             """Generic stream information for data pipeline operations."""
 
             stream_name: Annotated[
@@ -1434,7 +1434,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class SingerSchemaMessage(FlextModels.ArbitraryTypesModel):
+        class SingerSchemaMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer SCHEMA message model."""
 
             type: Annotated[
@@ -1466,7 +1466,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
 
-        class SingerRecordMessage(FlextModels.ArbitraryTypesModel):
+        class SingerRecordMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer RECORD message model."""
 
             type: Annotated[
@@ -1496,7 +1496,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ]
 
-        class SingerStateMessage(FlextModels.ArbitraryTypesModel):
+        class SingerStateMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer STATE message model."""
 
             type: Annotated[
@@ -1510,7 +1510,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ),
             ] = Field(default_factory=dict)
 
-        class SingerActivateVersionMessage(FlextModels.ArbitraryTypesModel):
+        class SingerActivateVersionMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer ACTIVATE_VERSION message model.
 
             Sent by a tap to signal that all records for a stream version
@@ -1533,7 +1533,7 @@ class FlextMeltanoModels(FlextCliModels):
                 t.PositiveInt, Field(description="Stream version to activate")
             ]
 
-        class SingerStateEntry(FlextModels.Entity):
+        class SingerStateEntry(FlextCliModels.Entity):
             """Singer state entry for a stream bookmark.
 
             Tracks per-stream incremental sync bookmarks with validation
@@ -1558,7 +1558,7 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
                 return self
 
-        class SingerCatalogMetadata(FlextModels.ArbitraryTypesModel):
+        class SingerCatalogMetadata(FlextCliModels.ArbitraryTypesModel):
             """Singer catalog metadata block model."""
 
             breadcrumb: Annotated[
@@ -1572,7 +1572,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=dict, description="Singer metadata properties"),
             ]
 
-        class SingerCatalogEntry(FlextModels.ArbitraryTypesModel):
+        class SingerCatalogEntry(FlextCliModels.ArbitraryTypesModel):
             """Singer catalog stream entry model."""
 
             tap_stream_id: Annotated[
@@ -1635,7 +1635,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Estimated row count from source"),
             ]
 
-        class SingerCatalog(FlextModels.ArbitraryTypesModel):
+        class SingerCatalog(FlextCliModels.ArbitraryTypesModel):
             """Singer catalog response model."""
 
             type: Annotated[
@@ -1659,7 +1659,7 @@ class FlextMeltanoModels(FlextCliModels):
                 ]()
             )
 
-        class SingerPipelineConfig(FlextModels.Entity):
+        class SingerPipelineConfig(FlextCliModels.Entity):
             """Configuration for a Singer ELT pipeline."""
 
             tap_config_path: Annotated[
@@ -1683,7 +1683,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Specific streams to sync"),
             ]
 
-        class SingerSyncResult(FlextModels.Entity):
+        class SingerSyncResult(FlextCliModels.Entity):
             """Result of a Singer sync operation."""
 
             records_processed: Annotated[
@@ -1708,7 +1708,7 @@ class FlextMeltanoModels(FlextCliModels):
         # API PAYLOAD MODELS - Typed payloads for API operations
         # ========================================================================
 
-        class CreatePipelinePayload(FlextModels.ArbitraryTypesModel):
+        class CreatePipelinePayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for create_pipeline operation."""
 
             tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
@@ -1721,7 +1721,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=dict, description="Pipeline config"),
             ]
 
-        class ExecutePipelinePayload(FlextModels.ArbitraryTypesModel):
+        class ExecutePipelinePayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for execute_pipeline operation."""
 
             pipeline_id: Annotated[
@@ -1733,7 +1733,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=dict, description="Execution config"),
             ]
 
-        class InstallPluginPayload(FlextModels.ArbitraryTypesModel):
+        class InstallPluginPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for install_plugin operation."""
 
             plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
@@ -1743,7 +1743,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=dict, description="Plugin config"),
             ]
 
-        class ListPluginsPayload(FlextModels.ArbitraryTypesModel):
+        class ListPluginsPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for list_plugins operation."""
 
             plugin_type: Annotated[
@@ -1751,7 +1751,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Filter by plugin type"),
             ]
 
-        class ConfigureEnvironmentPayload(FlextModels.ArbitraryTypesModel):
+        class ConfigureEnvironmentPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for configure_environment operation."""
 
             environment_name: Annotated[
@@ -1763,7 +1763,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default_factory=dict, description="Environment config"),
             ]
 
-        class RunDbtModelsPayload(FlextModels.ArbitraryTypesModel):
+        class RunDbtModelsPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for run/test dbt models operation."""
 
             models: Annotated[
@@ -1775,7 +1775,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Execution config"),
             ]
 
-        class RunEltPipelinePayload(FlextModels.ArbitraryTypesModel):
+        class RunEltPipelinePayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for run_elt_pipeline operation."""
 
             tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
@@ -1792,7 +1792,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Pipeline config"),
             ]
 
-        class JsonSchemaPayload(FlextModels.ArbitraryTypesModel):
+        class JsonSchemaPayload(FlextCliModels.ArbitraryTypesModel):
             """Typed schema payload used by API extract flow."""
 
             schema_definition: Annotated[
@@ -1817,7 +1817,7 @@ class FlextMeltanoModels(FlextCliModels):
                         empty_schema: t.ContainerMapping = {}
                         return empty_schema
 
-        class JsonRecordBatchPayload(FlextModels.ArbitraryTypesModel):
+        class JsonRecordBatchPayload(FlextCliModels.ArbitraryTypesModel):
             """Typed record batch payload used by API load flow."""
 
             records: Annotated[
@@ -1850,7 +1850,7 @@ class FlextMeltanoModels(FlextCliModels):
                     case _:
                         return t.StrSequence()
 
-        class ConfigMappingPayload(FlextModels.ArbitraryTypesModel):
+        class ConfigMappingPayload(FlextCliModels.ArbitraryTypesModel):
             """Normalized mapping payload with string keys."""
 
             values: Annotated[
@@ -1901,7 +1901,7 @@ class FlextMeltanoModels(FlextCliModels):
                         result[str(key)] = str(item)
                 return result
 
-        class PathPayload(FlextModels.ArbitraryTypesModel):
+        class PathPayload(FlextCliModels.ArbitraryTypesModel):
             """Path normalization payload for runtime path conversions."""
 
             value: Annotated[
@@ -1917,7 +1917,7 @@ class FlextMeltanoModels(FlextCliModels):
                     return Path()
                 return Path(str(value))
 
-        class FileContentPayload(FlextModels.ArbitraryTypesModel):
+        class FileContentPayload(FlextCliModels.ArbitraryTypesModel):
             """Normalize str|dict content to writable string for file operations."""
 
             content: Annotated[
@@ -1942,7 +1942,7 @@ class FlextMeltanoModels(FlextCliModels):
                     case _:
                         return str(value)
 
-        class VariantPayload(FlextModels.ArbitraryTypesModel):
+        class VariantPayload(FlextCliModels.ArbitraryTypesModel):
             """Normalize plugin variant from external extraction (str|list|dict)."""
 
             value: Annotated[
@@ -1977,7 +1977,7 @@ class FlextMeltanoModels(FlextCliModels):
                     case _:
                         return str(value)
 
-        class PluginDiscoverySource(FlextModels.ArbitraryTypesModel):
+        class PluginDiscoverySource(FlextCliModels.ArbitraryTypesModel):
             """Normalized raw plugin discovery payload from external sources."""
 
             default_variant: Annotated[
@@ -2014,7 +2014,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
-        class PluginDiscoveryItem(FlextModels.ArbitraryTypesModel):
+        class PluginDiscoveryItem(FlextCliModels.ArbitraryTypesModel):
             """Typed plugin discovery response item."""
 
             name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
@@ -2033,7 +2033,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default="", description="Plugin description"),
             ]
 
-        class PluginDiscoveryCatalog(FlextModels.ArbitraryTypesModel):
+        class PluginDiscoveryCatalog(FlextCliModels.ArbitraryTypesModel):
             """Typed plugin discovery catalog keyed by plugin name."""
 
             plugins: Mapping[str, FlextMeltanoModels.Meltano.PluginDiscoverySource] = (
@@ -2052,7 +2052,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
-        class PipelineExecutionContext(FlextModels.ArbitraryTypesModel):
+        class PipelineExecutionContext(FlextCliModels.ArbitraryTypesModel):
             """Typed context envelope for ELT pipeline execution."""
 
             project_root: Annotated[str, Field(description="Project root path")]
@@ -2097,7 +2097,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
-        class PipelineResultContext(FlextModels.ArbitraryTypesModel):
+        class PipelineResultContext(FlextCliModels.ArbitraryTypesModel):
             """Typed subset for extracting final pipeline result fields."""
 
             project_root: Annotated[
@@ -2130,7 +2130,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
-        class PipelineExecutionScalarMap(FlextModels.ArbitraryTypesModel):
+        class PipelineExecutionScalarMap(FlextCliModels.ArbitraryTypesModel):
             """Scalar-only pipeline execution values normalized to strings."""
 
             values: Annotated[
@@ -2157,7 +2157,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
-        class PluginComponentConfig(FlextModels.Entity):
+        class PluginComponentConfig(FlextCliModels.Entity):
             """Validated plugin component configuration for pipeline validators."""
 
             name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
@@ -2194,7 +2194,7 @@ class FlextMeltanoModels(FlextCliModels):
                     raise ValueError(msg)
                 return v
 
-        class DbtManifestNode(FlextModels.ArbitraryTypesModel):
+        class DbtManifestNode(FlextCliModels.ArbitraryTypesModel):
             """Parsed dbt manifest node with typed fields."""
 
             name: Annotated[str | None, Field(default=None, description="Node name")]
@@ -2219,7 +2219,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
-        class DbtManifest(FlextModels.ArbitraryTypesModel):
+        class DbtManifest(FlextCliModels.ArbitraryTypesModel):
             """Parsed dbt manifest with typed nodes."""
 
             nodes: Annotated[
@@ -2245,7 +2245,7 @@ class FlextMeltanoModels(FlextCliModels):
         # PROJECT MODELS - Generic project configuration and validation
         # ========================================================================
 
-        class MeltanoProjectModel(FlextModels.Entity):
+        class MeltanoProjectModel(FlextCliModels.Entity):
             """Generic Meltano project configuration with validation."""
 
             project_id: Annotated[str, Field(description="Unique project identifier")]
@@ -2275,7 +2275,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class PipelineProjectModel(FlextModels.Entity):
+        class PipelineProjectModel(FlextCliModels.Entity):
             """Generic pipeline project configuration with validation."""
 
             version: Annotated[
@@ -2362,7 +2362,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class PluginModel(FlextModels.TimestampedModel):
+        class PluginModel(FlextCliModels.TimestampedModel):
             """Generic plugin configuration for pipeline operations."""
 
             name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
@@ -2444,7 +2444,7 @@ class FlextMeltanoModels(FlextCliModels):
         # TRANSFORMATION MODELS - Generic transformation project and execution models
         # ========================================================================
 
-        class DbtProjectModel(FlextModels.Entity):
+        class DbtProjectModel(FlextCliModels.Entity):
             """Generic DBT project configuration with validation."""
 
             name: Annotated[str, Field(description="DBT project name")]
@@ -2483,7 +2483,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class TransformationProjectModel(FlextModels.Entity):
+        class TransformationProjectModel(FlextCliModels.Entity):
             """Generic transformation project configuration with validation."""
 
             name: Annotated[t.NonEmptyStr, Field(description="Project name")]
@@ -2567,7 +2567,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class TransformationExecutionModel(FlextModels.Entity):
+        class TransformationExecutionModel(FlextCliModels.Entity):
             """Generic transformation execution configuration with validation."""
 
             command: Annotated[str, Field(description="Command to execute")]
@@ -2645,7 +2645,7 @@ class FlextMeltanoModels(FlextCliModels):
         # EXECUTION RESULT MODELS - Pipeline execution and monitoring
         # ========================================================================
 
-        class ExecutionResult(FlextModels.TimestampedModel):
+        class ExecutionResult(FlextCliModels.TimestampedModel):
             """Generic execution result tracking with validation."""
 
             operation: Annotated[str, Field(description="Operation performed")]
@@ -2763,7 +2763,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class PipelineResult(FlextModels.TimestampedModel):
+        class PipelineResult(FlextCliModels.TimestampedModel):
             """Generic pipeline execution result with complete validation."""
 
             pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
@@ -2912,7 +2912,7 @@ class FlextMeltanoModels(FlextCliModels):
 
                 return self
 
-        class DbtProjectInfo(FlextModels.ArbitraryTypesModel):
+        class DbtProjectInfo(FlextCliModels.ArbitraryTypesModel):
             """Information about a DBT project."""
 
             root: Annotated[Path, Field(description="Project root directory")]
@@ -2929,7 +2929,7 @@ class FlextMeltanoModels(FlextCliModels):
                 t.NonNegativeInt, Field(default=0, description="Number of tests")
             ]
 
-        class DbtRunResult(FlextModels.ArbitraryTypesModel):
+        class DbtRunResult(FlextCliModels.ArbitraryTypesModel):
             """Result of a DBT model run operation."""
 
             success: Annotated[
@@ -2956,7 +2956,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Total execution time in seconds"),
             ] = None
 
-        class DbtTestResult(FlextModels.ArbitraryTypesModel):
+        class DbtTestResult(FlextCliModels.ArbitraryTypesModel):
             """Result of a DBT test operation."""
 
             success: Annotated[
@@ -2991,7 +2991,7 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(default=None, description="Total execution time in seconds"),
             ] = None
 
-        class CommandExecutionResult(FlextModels.ArbitraryTypesModel):
+        class CommandExecutionResult(FlextCliModels.ArbitraryTypesModel):
             """Execution result model for Meltano command operations following flext-core patterns."""
 
             command: Annotated[

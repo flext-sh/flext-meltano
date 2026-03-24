@@ -13,7 +13,7 @@ from typing import TextIO
 
 import yaml
 from flext_cli import FlextCliUtilities, r
-from flext_core import FlextLogger, FlextUtilities
+from flext_core import FlextLogger
 
 from flext_meltano import FlextMeltanoFileManagers, c, m, t
 
@@ -66,7 +66,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 target_path.parent.mkdir(parents=True, exist_ok=True)
                 return target_path.open("w", encoding=c.DEFAULT_ENCODING)
 
-            return FlextUtilities.try_(
+            return FlextCliUtilities.try_(
                 open_file,
                 catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
             ).map_error(lambda e: f"Failed to open file for writing: {e}")
@@ -407,7 +407,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 file_path.write_text(content_str, encoding="utf-8")
                 return file_path
 
-            return FlextUtilities.try_(
+            return FlextCliUtilities.try_(
                 create_file,
                 catch=(OSError, ValueError, yaml.YAMLError),
             ).map_error(lambda e: f"Failed to create project file: {e}")
@@ -415,7 +415,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
         @staticmethod
         def directory_exists(path: Path) -> r[bool]:
             """Check if directory exists."""
-            return FlextUtilities.try_(
+            return FlextCliUtilities.try_(
                 lambda: path.exists() and path.is_dir(),
                 catch=(OSError, ValueError),
             ).map_error(lambda e: f"Failed to check directory existence: {e}")
