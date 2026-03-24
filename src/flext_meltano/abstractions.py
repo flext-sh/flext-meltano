@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 
 from flext_core import FlextLogger, r
@@ -83,7 +83,7 @@ class FlextMeltanoAbstractions:
         super().__init__()
         self.logger = FlextLogger(__name__)
         self._project_path: Path | None = None
-        self._stream_registry: dict[str, m.Meltano.StreamDefinition] = {}
+        self._stream_registry: MutableMapping[str, m.Meltano.StreamDefinition] = {}
         self._runner_helper = self._RunnerHelper(self.logger)
 
     def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
@@ -270,7 +270,7 @@ class FlextMeltanoAbstractions:
         tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
         """Discover available streams for tap instance."""
-        streams: list[t.ContainerMapping] = [
+        streams: Sequence[t.ContainerMapping] = [
             {"stream_name": "users", "tap_stream_id": "users"},
             {"stream_name": "orders", "tap_stream_id": "orders"},
         ]
@@ -343,7 +343,7 @@ class FlextMeltanoAbstractions:
         if discovery.is_failure:
             return r[t.ContainerMapping].fail(discovery.error or "Discovery failed")
         raw = discovery.value
-        raw_streams: list[t.ContainerMapping] = []
+        raw_streams: MutableSequence[t.ContainerMapping] = []
         if isinstance(raw, dict):
             raw_val = raw.get("streams")
             if isinstance(raw_val, list):
@@ -362,7 +362,7 @@ class FlextMeltanoAbstractions:
         if discovery.is_failure:
             return []
         raw = discovery.value
-        raw_streams: list[t.ContainerMapping] = []
+        raw_streams: MutableSequence[t.ContainerMapping] = []
         if isinstance(raw, dict):
             raw_val = raw.get("streams")
             if isinstance(raw_val, list):
@@ -381,10 +381,10 @@ class FlextMeltanoAbstractions:
         self,
         stream: m.Meltano.StreamDefinition,
         limit: int | None = None,
-    ) -> r[list[t.ContainerMapping]]:
+    ) -> r[Sequence[t.ContainerMapping]]:
         """Extract records from a stream."""
-        records: list[t.ContainerMapping] = []
-        return r[list[t.ContainerMapping]].ok(records)
+        records: Sequence[t.ContainerMapping] = []
+        return r[Sequence[t.ContainerMapping]].ok(records)
 
     def execute(self) -> r[t.ContainerMapping]:
         """Execute abstractions service."""
