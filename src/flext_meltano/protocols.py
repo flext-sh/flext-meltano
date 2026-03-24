@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
@@ -140,14 +140,14 @@ class FlextMeltanoProtocols(FlextCliProtocols):
 
             def run(
                 self,
-                models: Sequence[str],
+                models: t.StrSequence,
             ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
                 """Run DBT models with r."""
                 ...
 
             def test(
                 self,
-                models: Sequence[str],
+                models: t.StrSequence,
             ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
                 """Test DBT models with r."""
                 ...
@@ -181,7 +181,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class CLIManager(Protocol):
             """Base protocol for CLI managers."""
 
-            def handle_command(self, args: Sequence[str]) -> r[str]:
+            def handle_command(self, args: t.StrSequence) -> r[str]:
                 """Handle CLI command."""
                 ...
 
@@ -189,15 +189,15 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class SingerManager(Protocol):
             """Protocol for Singer CLI manager."""
 
-            def handle_command(self, args: Sequence[str]) -> r[str]:
+            def handle_command(self, args: t.StrSequence) -> r[str]:
                 """Handle CLI command."""
                 ...
 
-            def handle_tap_command(self, args: Sequence[str]) -> r[str]:
+            def handle_tap_command(self, args: t.StrSequence) -> r[str]:
                 """Handle tap command."""
                 ...
 
-            def handle_target_command(self, args: Sequence[str]) -> r[str]:
+            def handle_target_command(self, args: t.StrSequence) -> r[str]:
                 """Handle target command."""
                 ...
 
@@ -205,11 +205,11 @@ class FlextMeltanoProtocols(FlextCliProtocols):
         class StatusManager(Protocol):
             """Protocol for Status CLI manager."""
 
-            def handle_command(self, args: Sequence[str]) -> r[str]:
+            def handle_command(self, args: t.StrSequence) -> r[str]:
                 """Handle CLI command."""
                 ...
 
-            def handle_version_command(self, args: Sequence[str]) -> r[str]:
+            def handle_version_command(self, args: t.StrSequence) -> r[str]:
                 """Handle version command."""
                 ...
 
@@ -327,7 +327,7 @@ class FlextMeltanoProtocols(FlextCliProtocols):
             that implement the Singer protocol for data source integration.
             """
 
-            streams: Sequence[str]
+            streams: t.StrSequence
             name: str
             state: m.Meltano.SingerStateMessage
 

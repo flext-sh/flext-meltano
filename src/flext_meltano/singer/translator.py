@@ -97,8 +97,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 import subprocess
 
 from flext_core import r
@@ -115,7 +113,7 @@ class FlextMeltanoSingerCliTranslator:
 
     @staticmethod
     def execute_singer_command(
-        command: Sequence[str],
+        command: t.StrSequence,
         input_data: str | None = None,
         timeout: int = 300,
     ) -> r[t.Meltano.CLI.ProcessResult]:
@@ -182,7 +180,7 @@ class FlextMeltanoSingerCliTranslator:
     @staticmethod
     def translate_dbt_run(
         params: m.Meltano.CliParameters.TransformationParams,
-    ) -> r[Sequence[str]]:
+    ) -> r[t.StrSequence]:
         """Convert TransformationParams to transformation CLI command.
 
         Args:
@@ -192,7 +190,7 @@ class FlextMeltanoSingerCliTranslator:
         r containing list of DBT CLI command arguments
 
         """
-        command: Sequence[str] = ["dbt", "run", "--project-dir", params.project_dir]
+        command: t.StrSequence = ["dbt", "run", "--project-dir", params.project_dir]
         if params.models:
             command.extend(["--models", params.models])
         if params.select:
@@ -210,12 +208,12 @@ class FlextMeltanoSingerCliTranslator:
                 "values": vars_dict,
             })
             command.extend(["--vars", vars_payload.model_dump_json()])
-        return r[Sequence[str]].ok(command)
+        return r[t.StrSequence].ok(command)
 
     @staticmethod
     def translate_pipeline_run(
         params: m.Meltano.CliParameters.PipelineParams,
-    ) -> r[tuple[Sequence[str], Sequence[str]]]:
+    ) -> r[tuple[t.StrSequence, t.StrSequence]]:
         """Convert PipelineParams to source and sink CLI commands.
 
         Args:
@@ -225,22 +223,22 @@ class FlextMeltanoSingerCliTranslator:
         r containing tuple of (source_command, sink_command)
 
         """
-        source_command: Sequence[str] = [params.source_name]
+        source_command: t.StrSequence = [params.source_name]
         if params.source_config:
             source_command.extend(["--config", params.source_config])
         if params.catalog_file:
             source_command.extend(["--catalog", params.catalog_file])
         if params.state_file:
             source_command.extend(["--state", params.state_file])
-        sink_command: Sequence[str] = [params.sink_name]
+        sink_command: t.StrSequence = [params.sink_name]
         if params.sink_config:
             sink_command.extend(["--config", params.sink_config])
-        return r[tuple[Sequence[str], Sequence[str]]].ok((source_command, sink_command))
+        return r[tuple[t.StrSequence, t.StrSequence]].ok((source_command, sink_command))
 
     @staticmethod
     def translate_tap_run(
         params: m.Meltano.CliParameters.DataSourceParams,
-    ) -> r[Sequence[str]]:
+    ) -> r[t.StrSequence]:
         """Convert DataSourceParams to Singer SDK source CLI command.
 
         Args:
@@ -250,10 +248,10 @@ class FlextMeltanoSingerCliTranslator:
             r containing list of CLI command arguments
 
         """
-        command: Sequence[str] = [params.source_name]
+        command: t.StrSequence = [params.source_name]
         if params.discover:
             command.append("--discover")
-            return r[Sequence[str]].ok(command)
+            return r[t.StrSequence].ok(command)
         if params.config_file:
             command.extend(["--config", params.config_file])
         if params.catalog_file:
@@ -262,12 +260,12 @@ class FlextMeltanoSingerCliTranslator:
             command.extend(["--state", params.state_file])
         if params.catalog_file:
             command.extend(["--properties", params.catalog_file])
-        return r[Sequence[str]].ok(command)
+        return r[t.StrSequence].ok(command)
 
     @staticmethod
     def translate_target_run(
         params: m.Meltano.CliParameters.DataSinkParams,
-    ) -> r[Sequence[str]]:
+    ) -> r[t.StrSequence]:
         """Convert DataSinkParams to Singer SDK sink CLI command.
 
         Args:
@@ -277,12 +275,12 @@ class FlextMeltanoSingerCliTranslator:
         r containing list of CLI command arguments
 
         """
-        command: Sequence[str] = [params.sink_name]
+        command: t.StrSequence = [params.sink_name]
         if params.config_file:
             command.extend(["--config", params.config_file])
         if params.input_file:
             command.extend(["--input", params.input_file])
-        return r[Sequence[str]].ok(command)
+        return r[t.StrSequence].ok(command)
 
 
 __all__ = ["FlextMeltanoSingerCliTranslator"]

@@ -67,7 +67,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
     @staticmethod
     def _execute_action_command(
         action: str,
-        args: Sequence[str],
+        args: t.StrSequence,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Execute action command - delegates to appropriate handler."""
         try:
@@ -123,7 +123,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         })
 
     @staticmethod
-    def create_cli_runner(args: Sequence[str]) -> r[t.Meltano.ExecutionResultDict]:
+    def create_cli_runner(args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
@@ -208,7 +208,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
 
     def execute_command(
         self,
-        command: Sequence[str],
+        command: t.StrSequence,
         timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
@@ -243,7 +243,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
     def execute_dbt_command(
         self,
         dbt_command: str,
-        args: Sequence[str] | None = None,
+        args: t.StrSequence | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a DBT command.
 
@@ -295,7 +295,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         """Get help information - delegates to handler."""
         return self._execute_help_command()
 
-    def run(self, args: Sequence[str]) -> r[t.Meltano.ExecutionResultDict]:
+    def run(self, args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
         """Run command with arguments - delegates to command router."""
         if not args:
             return r[t.Meltano.ExecutionResultDict].fail("Arguments cannot be empty")
@@ -303,7 +303,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         command_args = args[1:]
         return self._route_command(command, command_args)
 
-    def run_cli(self, args: Sequence[str] | None) -> r[t.Meltano.ExecutionResultDict]:
+    def run_cli(self, args: t.StrSequence | None) -> r[t.Meltano.ExecutionResultDict]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
             return r[t.Meltano.ExecutionResultDict].ok({
@@ -313,7 +313,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
             })
         return self.run(args)
 
-    def run_command(self, args: Sequence[str]) -> r[int]:
+    def run_command(self, args: t.StrSequence) -> r[int]:
         """Execute command and return exit code - delegates to routing."""
         if not args:
             return r[int].ok(1)
@@ -345,7 +345,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
 
     def _handle_cli_other_args(
         self,
-        args: Sequence[str],
+        args: t.StrSequence,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Handle CLI other arguments - delegates to action executor."""
         if not args:
@@ -363,7 +363,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
 
     def _handle_default_command(
         self,
-        args: Sequence[str],
+        args: t.StrSequence,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Handle default command - delegates to action executor."""
         return self._execute_action_command("default", args)
@@ -379,7 +379,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
     def _route_command(
         self,
         command: str,
-        args: Sequence[str],
+        args: t.StrSequence,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Route command to appropriate handler - delegates to handlers."""
         if command == "version":

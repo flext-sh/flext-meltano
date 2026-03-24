@@ -184,7 +184,7 @@ def meltano_cli_runner() -> MockCliRunner:
 
 
 @pytest.fixture
-def meltano_invoke_args() -> Sequence[str]:
+def meltano_invoke_args() -> t.StrSequence:
     """Common Meltano invoke arguments."""
     return ["--log-level", "debug", "--environment", "test"]
 

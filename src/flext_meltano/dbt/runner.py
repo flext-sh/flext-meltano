@@ -9,8 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 from pathlib import Path
 from typing import override
 
@@ -84,7 +82,7 @@ class FlextMeltanoDbtRunner(s[str]):
 
     def run_models(
         self,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         **_kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
@@ -126,7 +124,7 @@ class FlextMeltanoDbtRunner(s[str]):
 
     def run_tests(
         self,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         **_kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.

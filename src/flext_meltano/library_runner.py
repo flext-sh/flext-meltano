@@ -10,8 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 from pathlib import Path
 
 from flext_core import FlextLogger, r
@@ -81,7 +79,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
         self,
         tap_name: str,
         target_name: str,
-        dbt_models: Sequence[str] | None = None,
+        dbt_models: t.StrSequence | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.Processing.EltPipelineResult]:
         """Execute complete ELT pipeline with optional DBT transformations.
@@ -134,7 +132,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
 
     def run_dbt_transformation(
         self,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         project_dir: Path | None = None,
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT transformation using the configured Meltano executor."""

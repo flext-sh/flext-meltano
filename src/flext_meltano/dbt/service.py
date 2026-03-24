@@ -145,7 +145,7 @@ class FlextMeltanoDbtService(s[str]):
 
     def run_models(
         self,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         **kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtRunResult]:
         """Run DBT models.
@@ -175,7 +175,7 @@ class FlextMeltanoDbtService(s[str]):
 
     def run_tests(
         self,
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         **kwargs: t.Scalar,
     ) -> r[m.Meltano.DbtTestResult]:
         """Run DBT tests.
@@ -207,7 +207,7 @@ class FlextMeltanoDbtService(s[str]):
         self,
         operation_name: str,
         failure_label: str,
-        models: Sequence[str] | None,
+        models: t.StrSequence | None,
         operation: Callable[[], r[_ResultT]],
         success_logger: Callable[[_ResultT], None],
     ) -> r[_ResultT]:

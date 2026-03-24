@@ -23,7 +23,7 @@ from flext_meltano import (
 from tests import m, t
 
 
-def _set_pipelines_root(tmp_path: Path) -> Mapping[str, str]:
+def _set_pipelines_root(tmp_path: Path) -> t.StrMapping:
     return {"FLEXT_MELTANO_PIPELINES_DIR": str(tmp_path / "pipelines")}
 
 

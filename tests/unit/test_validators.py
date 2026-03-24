@@ -117,7 +117,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     )
     def test_validate_plugin_config_parametrized_invalid(
         self,
-        invalid_config: t.Scalar | t.ScalarMapping | Sequence[t.Scalar] | None,
+        invalid_config: t.Scalar | t.ScalarMapping | t.ScalarList | None,
     ) -> None:
         result = FlextMeltanoValidators.validate_plugin_config(
             cast("t.ScalarMapping", invalid_config)

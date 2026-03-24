@@ -9,6 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from flext_meltano import t
 
-__all__: Sequence[str] = []
+__all__: t.StrSequence = []

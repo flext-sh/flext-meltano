@@ -380,7 +380,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
     def run_pipeline(
         source_name: str,
         sink_name: str,
-        _transformation_models: Sequence[str] | None = None,
+        _transformation_models: t.StrSequence | None = None,
         _config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Run complete data pipeline - railway-oriented operation."""
@@ -412,7 +412,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def run_transformation_models(
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Run transformation models."""
@@ -425,7 +425,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
 
     @staticmethod
     def test_transformation_models(
-        models: Sequence[str] | None = None,
+        models: t.StrSequence | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Test transformation models."""

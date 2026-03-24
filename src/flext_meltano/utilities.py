@@ -127,7 +127,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                     "environments": environments,
                     "plugins": plugins,
                 }
-                default_envs: Sequence[Mapping[str, str]] = [
+                default_envs: Sequence[t.StrMapping] = [
                     {"name": env} for env in c.Meltano.Metadata.DEFAULT_ENVIRONMENTS
                 ]
                 project_id_val = str(raw_config.get("project_id", ""))
@@ -421,7 +421,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
             ).map_error(lambda e: f"Failed to check directory existence: {e}")
 
         @staticmethod
-        def supported_types() -> Sequence[str]:
+        def supported_types() -> t.StrSequence:
             """Return the supported plugin type identifiers."""
             return [
                 plugin_type.value

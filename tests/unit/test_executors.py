@@ -383,7 +383,7 @@ class TestFlextMeltanoExecutorComplete:
         tm.ok(runner_result)
         runner_data = runner_result.value
         tm.that(runner_data, is_=dict)
-        cli_tests: Sequence[Sequence[str]] = [
+        cli_tests: Sequence[t.StrSequence] = [
             [],
             ["--help"],
             ["version"],
@@ -398,7 +398,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases to increase coverage."""
-        edge_case_commands: Sequence[tuple[str, Sequence[str]]] = [
+        edge_case_commands: Sequence[tuple[str, t.StrSequence]] = [
             ("nonexistent", []),
             ("", ["args"]),
             ("version", ["extra", "args"]),
@@ -435,7 +435,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_internal_method_direct_invocation(self) -> None:
         """Test internal methods directly to increase coverage."""
-        run_command_tests: Sequence[Sequence[str]] = [
+        run_command_tests: Sequence[t.StrSequence] = [
             [],
             ["tap-csv"],
             ["tap-csv", "target-jsonl"],
