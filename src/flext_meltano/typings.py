@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Literal
 
 import singer_sdk.typing as singer_sdk_typing
 from flext_cli import FlextCliTypes
@@ -50,8 +49,8 @@ class FlextMeltanoTypes(FlextCliTypes):
             Mapping[str, FlextCliTypes.ContainerValue] | None,
         ]
         type PluginInfo = Mapping[str, FlextCliTypes.Scalar | None]
-        PluginType = Literal["extractors", "loaders", "transforms", "orchestrators"]
-        PluginVariant = Literal["default", "singer", "custom"]
+        PluginType = c.Meltano.Enums.PluginType
+        PluginVariant = str  # "default" | "singer" | "custom"
 
         class Singer:
             """Singer protocol complex types namespace."""
@@ -77,8 +76,8 @@ class FlextMeltanoTypes(FlextCliTypes):
             type Record = Mapping[str, FlextCliTypes.Scalar | None]
             type Schema = Mapping[str, FlextCliTypes.Scalar | None]
             type State = Mapping[str, FlextCliTypes.Scalar | None]
-            ReplicationMethod = Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"]
-            SingerVersion = Literal["0.44.0", "0.45.0", "0.46.0", "0.47.0", "0.48.0"]
+            ReplicationMethod = c.Meltano.Enums.ReplicationMethod
+            SingerVersion = str  # "0.44.0" | "0.45.0" | ...
 
             class Typing:
                 """Singer SDK typing utilities wrapper (Zero Tolerance for direct imports).
