@@ -112,7 +112,7 @@ class FlextMeltanoModels(FlextCliModels):
             items: Annotated[
                 Sequence[bool],
                 Field(
-                    default_factory=lambda: Sequence[bool](),
+                    default_factory=list,
                     description="Normalized list of boolean values",
                 ),
             ]
@@ -711,46 +711,76 @@ class FlextMeltanoModels(FlextCliModels):
         class ServiceConstructorConfig(FlextCliModels.ArbitraryTypesModel):
             """Configuration model for FlextMeltanoService constructor."""
 
-            config: Mapping[str, t.ContainerMapping | None] | None = Field(
-                default=None,
-                description="Optional Meltano settings payload",
-            )
-            service_name: t.NonEmptyStr = Field(
-                default="flext_meltano_service",
-                description="Name of the Meltano service instance",
-            )
-            service_version: t.NonEmptyStr = Field(
-                default="0.9.9",
-                description="Version identifier for the service",
-            )
-            source_name: str | None = Field(
-                default=None,
-                description="Optional source name for specialization",
-            )
-            sink_name: str | None = Field(
-                default=None,
-                description="Optional sink name for specialization",
-            )
-            transformation_name: str | None = Field(
-                default=None,
-                description="Optional transformation name for specialization",
-            )
-            service_type: str | None = Field(
-                default=None,
-                description="Optional service type (tap, target, dbt)",
-            )
-            tap_name: str | None = Field(
-                default=None,
-                description="Optional Singer tap name alias for source_name",
-            )
-            target_name: str | None = Field(
-                default=None,
-                description="Optional Singer target name alias for sink_name",
-            )
-            project_name: str | None = Field(
-                default=None,
-                description="Optional DBT project alias for transformation_name",
-            )
+            config: Annotated[
+                Mapping[str, t.ContainerMapping | None] | None,
+                Field(
+                    default=None,
+                    description="Optional Meltano settings payload",
+                ),
+            ]
+            service_name: Annotated[
+                t.NonEmptyStr,
+                Field(
+                    default="flext_meltano_service",
+                    description="Name of the Meltano service instance",
+                ),
+            ]
+            service_version: Annotated[
+                t.NonEmptyStr,
+                Field(
+                    default="0.9.9",
+                    description="Version identifier for the service",
+                ),
+            ]
+            source_name: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional source name for specialization",
+                ),
+            ]
+            sink_name: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional sink name for specialization",
+                ),
+            ]
+            transformation_name: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional transformation name for specialization",
+                ),
+            ]
+            service_type: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional service type (tap, target, dbt)",
+                ),
+            ]
+            tap_name: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional Singer tap name alias for source_name",
+                ),
+            ]
+            target_name: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional Singer target name alias for sink_name",
+                ),
+            ]
+            project_name: Annotated[
+                str | None,
+                Field(
+                    default=None,
+                    description="Optional DBT project alias for transformation_name",
+                ),
+            ]
 
         # ========================================================================
         # DATA SOURCE MODELS - Generic data source configurations and instances
@@ -1075,11 +1105,11 @@ class FlextMeltanoModels(FlextCliModels):
             config: Annotated[
                 t.ConfigurationMapping,
                 Field(default_factory=dict, description="Sink configuration"),
-            ] = Field(default_factory=dict)
+            ]
             sink_schema: Annotated[
                 t.FlatContainerMapping,
                 Field(default_factory=dict, description="Sink schema"),
-            ] = Field(default_factory=dict)
+            ]
             status: Annotated[
                 str,
                 Field(
@@ -1132,9 +1162,7 @@ class FlextMeltanoModels(FlextCliModels):
                     default_factory=list,
                     description="Available streams",
                 ),
-            ] = Field(
-                default_factory=list,
-            )
+            ]
             status: Annotated[
                 str,
                 Field(
@@ -1179,7 +1207,7 @@ class FlextMeltanoModels(FlextCliModels):
             streams: Annotated[
                 Mapping[str, FlextMeltanoModels.Meltano.StreamDefinition],
                 Field(default_factory=dict, description="Discovered streams"),
-            ] = Field(default_factory=dict)
+            ]
             discovered: Annotated[
                 bool,
                 Field(
@@ -1190,7 +1218,7 @@ class FlextMeltanoModels(FlextCliModels):
             metadata: Annotated[
                 t.ConfigurationMapping,
                 Field(default_factory=dict, description="Additional metadata"),
-            ] = Field(default_factory=dict)
+            ]
             source_id: Annotated[str, Field(description="Unique source identifier")]
 
             @computed_field
@@ -1523,7 +1551,7 @@ class FlextMeltanoModels(FlextCliModels):
                     default_factory=dict,
                     description="Singer state bookmark payload",
                 ),
-            ] = Field(default_factory=dict)
+            ]
 
         class SingerActivateVersionMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer ACTIVATE_VERSION message model.
@@ -1670,9 +1698,7 @@ class FlextMeltanoModels(FlextCliModels):
                     default_factory=list,
                     description="Singer catalog stream entries",
                 ),
-            ] = Field(
-                default_factory=list,
-            )
+            ]
 
         class SingerPipelineConfig(FlextCliModels.Entity):
             """Configuration for a Singer ELT pipeline."""

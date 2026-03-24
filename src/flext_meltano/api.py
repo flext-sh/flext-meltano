@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import override
 
 from flext_core import e, r, s
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from flext_meltano import (
     FlextMeltanoAdapter,
@@ -89,7 +89,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             config_obj = self._config
             raw_config = (
                 config_obj.model_dump()
-                if config_obj is not None and u.is_pydantic_model(config_obj)
+                if config_obj is not None and isinstance(config_obj, BaseModel)
                 else config_obj
             )
             return FlextMeltanoSettings.model_validate(raw_config)

@@ -214,10 +214,10 @@ class FlextMeltanoTypes(FlextCliTypes):
         class Processing:
             """Meltano-specific processing types."""
 
-            type DbtTransformationResult = Mapping[str, FlextCliTypes.ContainerValue]
-            type SingerProcessingResult = Mapping[str, FlextCliTypes.ContainerValue]
-            type SingerExecutionResult = Mapping[str, FlextCliTypes.ContainerValue]
-            type EltPipelineResult = Mapping[str, FlextCliTypes.ContainerValue]
+            type DbtTransformationResult = dict[str, FlextCliTypes.ContainerValue]
+            type SingerProcessingResult = dict[str, FlextCliTypes.ContainerValue]
+            type SingerExecutionResult = dict[str, FlextCliTypes.ContainerValue]
+            type EltPipelineResult = dict[str, FlextCliTypes.ContainerValue]
             type Headers = FlextCliTypes.StrMapping
 
         type NestedJsonValue = (

@@ -32,9 +32,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     """
 
-    ProjectInfo: ClassVar[type[t.FlatContainerMapping]] = dict
-    _metadata_extra: t.StrMapping = PrivateAttr(
-        default_factory=dict,
+    ProjectInfo: ClassVar[type[dict[str, t.Container]]] = dict
+    _metadata_extra: dict[str, str] = PrivateAttr(
+        default_factory=lambda: dict[str, str](),
     )
     _sealed: bool = PrivateAttr(default=False)
 
