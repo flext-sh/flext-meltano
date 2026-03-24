@@ -213,11 +213,11 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
     def _validate_project_parameters(
         project_id: str | None,
         prefix: str,
-    ) -> r[t.StrMapping]:
+    ) -> r[Mapping[str, str]]:
         """Validate temporary project creation parameters."""
         if not prefix or not prefix.strip():
-            return r[t.StrMapping].fail("Project prefix cannot be empty")
-        return r[t.StrMapping].ok({
+            return r[Mapping[str, str]].fail("Project prefix cannot be empty")
+        return r[Mapping[str, str]].ok({
             "project_id": project_id or "flext-meltano-project",
             "prefix": prefix.strip(),
         })
@@ -263,7 +263,7 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         self,
         project_name: str,
         project_dir: Path,
-    ) -> r[t.StrMapping]:
+    ) -> r[Mapping[str, str]]:
         """Create new Meltano project using railway-oriented file operations.
 
         Validates project name, creates directory structure, and initializes
@@ -398,10 +398,10 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         self,
         project_name: str,
         project_path: Path,
-    ) -> r[t.StrMapping]:
+    ) -> r[Mapping[str, str]]:
         """Build successful project creation result."""
         try:
-            result: t.StrMapping = {
+            result: Mapping[str, str] = {
                 "success": "true",
                 "project_name": project_name,
                 "project_path": str(project_path),
@@ -415,9 +415,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
                 project_name=project_name,
                 project_path=str(project_path),
             )
-            return r[t.StrMapping].ok(result)
+            return r[Mapping[str, str]].ok(result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.StrMapping].fail(f"Failed to build creation result: {e}")
+            return r[Mapping[str, str]].fail(f"Failed to build creation result: {e}")
 
     def _initialize_project_instance(self, project_path: Path) -> r[Path]:
         """Initialize Meltano project instance using abstractions."""

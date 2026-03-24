@@ -39,20 +39,20 @@ class FlextMeltanoAbstractions:
             project_path: Path,
             source_name: str,
             sink_name: str,
-        ) -> r[t.StrMapping]:
+        ) -> r[Mapping[str, str]]:
             """Create pipeline context for data pipeline operations."""
             try:
-                pipeline_context: t.StrMapping = {
+                pipeline_context: Mapping[str, str] = {
                     "project_path": str(project_path),
                     "source_name": source_name,
                     "sink_name": sink_name,
                     "status": "initialized",
                 }
-                return r[t.StrMapping].ok(pipeline_context)
+                return r[Mapping[str, str]].ok(pipeline_context)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
                 error_msg = f"Failed to create pipeline context: {e}"
                 self.logger.exception(error_msg)
-                return r[t.StrMapping].fail(error_msg)
+                return r[Mapping[str, str]].fail(error_msg)
 
         def execute_data_pipeline(
             self,
@@ -127,10 +127,10 @@ class FlextMeltanoAbstractions:
         self,
         source_name: str,
         sink_name: str,
-    ) -> r[t.StrMapping]:
+    ) -> r[Mapping[str, str]]:
         """Create pipeline context."""
         if not self._project_path:
-            return r[t.StrMapping].fail("No project loaded")
+            return r[Mapping[str, str]].fail("No project loaded")
         return self._runner_helper.create_pipeline_context(
             self._project_path,
             source_name,

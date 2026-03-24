@@ -163,7 +163,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             normalized[str(key)] = FlextMeltano._normalize_container_value(item)
         return normalized
 
-    def _service_settings_config(self) -> t.StrMapping:
+    def _service_settings_config(self) -> Mapping[str, str]:
         settings = self.config
         return {
             "project_root": str(settings.project_root),

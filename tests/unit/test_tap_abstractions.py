@@ -59,7 +59,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "port": 5432,
             "database": "test_db",
         }
-        stream_config: t.StrMapping = {"users": "selected"}
+        stream_config: Mapping[str, str] = {"users": "selected"}
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config=connection_config,
@@ -233,7 +233,7 @@ class TestFlextMeltanoTapAbstractionsComplete:
             "database": "test_db",
             "username": "test_user",
         }
-        stream_config: t.StrMapping = {
+        stream_config: Mapping[str, str] = {
             "users": "selected",
             "orders": "not_selected",
         }

@@ -125,7 +125,7 @@ class TestFlextMeltanoFileManagersComprehensive:
     def test_create_directory_structure_empty(self) -> None:
         """Test creating empty directory structure."""
         base_path = self.temp_dir / "empty_project"
-        empty_directories: t.StrSequence = []
+        empty_directories: Sequence[str] = []
         result = FlextMeltanoFileManagers.create_directory_structure(
             base_path, empty_directories
         )
