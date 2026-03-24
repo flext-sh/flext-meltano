@@ -59,7 +59,7 @@ class TestFlextMeltanoInitialization:
         """Test API constants property."""
         api = FlextMeltano()
         constants = api.constants
-        tm.that(constants, eq=c)
+        tm.that(constants is c, eq=True)
 
     def test_api_types_property(self) -> None:
         """Test API types property."""
@@ -71,7 +71,7 @@ class TestFlextMeltanoInitialization:
         """Test API models property."""
         api = FlextMeltano()
         models = api.models
-        tm.that(models, eq=m)
+        tm.that(models is m, eq=True)
 
 
 class TestFlextMeltanoProjectOperations:

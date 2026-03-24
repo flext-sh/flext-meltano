@@ -8,7 +8,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Sequence
-
 from unittest.mock import patch
 
 from flext_tests import tm

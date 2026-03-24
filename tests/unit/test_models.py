@@ -264,7 +264,7 @@ class TestPluginModelEnhanced:
 
     def test_plugin_model_validation_invalid_capabilities_type(self) -> None:
         """Test PluginModel validation with invalid capabilities type."""
-        with pytest.raises(ValidationError, match="Input should be a valid list"):
+        with pytest.raises(ValidationError, match="not allowed as a Sequence value"):
             m.Meltano.PluginModel(
                 name="tap-postgres",
                 namespace="tap-postgres",

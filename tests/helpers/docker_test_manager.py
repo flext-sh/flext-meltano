@@ -13,13 +13,15 @@ from __future__ import annotations
 import atexit
 import subprocess
 import time
-from collections.abc import Sequence, Generator, Mapping
+from collections.abc import Generator, Mapping
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
 import pytest
 from flext_core import FlextLogger, r
+
+from flext_meltano import t
 
 
 class ContainerManager:
