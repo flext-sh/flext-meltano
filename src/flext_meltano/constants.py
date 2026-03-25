@@ -273,26 +273,28 @@ class FlextMeltanoConstants(FlextCliConstants):
             MAX_NAME_LENGTH: Final[int] = 50
             VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
 
-    @unique
-    class MeltanoProjectType(StrEnum):
-        """Meltano project type enumeration."""
+        @unique
+        class MeltanoProjectType(StrEnum):
+            """Meltano project type enumeration."""
 
-        LIBRARY = "library"
-        APPLICATION = "application"
-        SERVICE = "service"
-        MELTANO_PROJECT = "meltano-project"
-        ELT_PIPELINE = "elt-pipeline"
-        DATA_PIPELINE = "data-pipeline"
-        ETL_SERVICE = "etl-service"
-        SINGER_TAP = "singer-tap"
-        SINGER_TARGET = "singer-target"
-        DBT_PROJECT = "dbt-project"
-        DATA_INTEGRATION = "data-integration"
-        PIPELINE_ORCHESTRATOR = "pipeline-orchestrator"
-        DATA_EXTRACTOR = "data-extractor"
-        DATA_LOADER = "data-loader"
-        TRANSFORMATION_SERVICE = "transformation-service"
+            LIBRARY = "library"
+            APPLICATION = "application"
+            SERVICE = "service"
+            MELTANO_PROJECT = "meltano-project"
+            ELT_PIPELINE = "elt-pipeline"
+            DATA_PIPELINE = "data-pipeline"
+            ETL_SERVICE = "etl-service"
+            SINGER_TAP = "singer-tap"
+            SINGER_TARGET = "singer-target"
+            DBT_PROJECT = "dbt-project"
+            DATA_INTEGRATION = "data-integration"
+            PIPELINE_ORCHESTRATOR = "pipeline-orchestrator"
+            DATA_EXTRACTOR = "data-extractor"
+            DATA_LOADER = "data-loader"
+            TRANSFORMATION_SERVICE = "transformation-service"
 
+
+MeltanoProjectType = FlextMeltanoConstants.Meltano.MeltanoProjectType
 
 c = FlextMeltanoConstants
 __all__ = ["FlextMeltanoConstants", "c"]

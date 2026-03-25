@@ -20,7 +20,7 @@ from flext_tests import FlextTestsConstants
 from flext_meltano import FlextMeltanoConstants
 
 
-class FlextMeltanoTestConstants(FlextTestsConstants):
+class FlextMeltanoTestConstants(FlextTestsConstants, FlextMeltanoConstants):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
     MANDATORY: Inherits from FlextTestsConstants for test infrastructure (.Tests.*).
