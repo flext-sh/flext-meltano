@@ -103,9 +103,9 @@ class TestFlextMeltanoTypes:
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
         plugin_definition = t.Meltano.PluginDefinition
-        tm.that(plugin_definition, none=False)
+        tm.that(str(plugin_definition), none=False)
         singer_catalog = t.Meltano.Singer.CatalogEntry
-        tm.that(singer_catalog, none=False)
+        tm.that(str(singer_catalog), none=False)
 
     def test_namespace_organization(self) -> None:
         """Test that all expected sub-namespaces exist under Meltano."""
@@ -134,10 +134,10 @@ class TestFlextMeltanoTypes:
             "schema": {"type": "t.NormalizedValue"},
         }
         project = {"name": "elt-project", "enabled": True}
-        tm.that(plugin_def["name"], eq="tap-users")
-        tm.that(plugin_def["variants"], is_=list)
-        tm.that(catalog["tap_stream_id"], eq="users")
-        tm.that(catalog["schema"], is_=dict)
+        tm.that(str(plugin_def["name"]), eq="tap-users")
+        tm.that(list(plugin_def["variants"]), is_=list)
+        tm.that(str(catalog["tap_stream_id"]), eq="users")
+        tm.that(dict(catalog["schema"]), is_=dict)
         tm.that(project["enabled"] is True, eq=True)
 
     def test_export_completeness(self) -> None:
@@ -154,5 +154,5 @@ class TestFlextMeltanoTypes:
         """Test that types are consistent across the namespace."""
         plugin_definition = t.Meltano.PluginDefinition
         singer_catalog = t.Meltano.Singer.CatalogEntry
-        tm.that(plugin_definition, none=False)
-        tm.that(singer_catalog, none=False)
+        tm.that(str(plugin_definition), none=False)
+        tm.that(str(singer_catalog), none=False)
