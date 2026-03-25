@@ -93,10 +93,9 @@ class FlextMeltanoModels(FlextCliModels):
             items: Annotated[
                 t.StrSequence,
                 Field(
-                    default_factory=list,
                     description="Normalized list of string values",
                 ),
-            ]
+            ] = Field(default_factory=list)
 
             @field_validator("items", mode="before")
             @classmethod
@@ -112,10 +111,9 @@ class FlextMeltanoModels(FlextCliModels):
             items: Annotated[
                 Sequence[bool],
                 Field(
-                    default_factory=list,
                     description="Normalized list of boolean values",
                 ),
-            ]
+            ] = Field(default_factory=list)
 
             @field_validator("items", mode="before")
             @classmethod
@@ -864,10 +862,9 @@ class FlextMeltanoModels(FlextCliModels):
             stream_config: Annotated[
                 t.ConfigurationMapping,
                 Field(
-                    default_factory=dict,
                     description="Stream-specific configuration",
                 ),
-            ]
+            ] = Field(default_factory=dict)
             tap_version: Annotated[
                 str,
                 Field(default="latest", description="Tap version"),
@@ -917,8 +914,8 @@ class FlextMeltanoModels(FlextCliModels):
             target_type: Annotated[str, Field(description="Type of the target")]
             connection_config: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Connection configuration"),
-            ]
+                Field(description="Connection configuration"),
+            ] = Field(default_factory=dict)
             batch_size: Annotated[
                 int | None,
                 Field(default=None, description="Batch size for data loading"),
@@ -975,10 +972,9 @@ class FlextMeltanoModels(FlextCliModels):
             stream_config: Annotated[
                 t.ConfigurationMapping,
                 Field(
-                    default_factory=dict,
                     description="Stream-specific configuration",
                 ),
-            ]
+            ] = Field(default_factory=dict)
             source_version: Annotated[
                 str,
                 Field(default="latest", description="Source version"),
@@ -1104,12 +1100,12 @@ class FlextMeltanoModels(FlextCliModels):
             sink_type: Annotated[str, Field(description="Type of the sink")]
             config: Annotated[
                 t.ConfigurationMapping,
-                Field(default_factory=dict, description="Sink configuration"),
-            ]
+                Field(description="Sink configuration"),
+            ] = Field(default_factory=dict)
             sink_schema: Annotated[
                 t.FlatContainerMapping,
-                Field(default_factory=dict, description="Sink schema"),
-            ]
+                Field(description="Sink schema"),
+            ] = Field(default_factory=dict)
             status: Annotated[
                 str,
                 Field(
@@ -1159,10 +1155,9 @@ class FlextMeltanoModels(FlextCliModels):
             streams: Annotated[
                 Sequence[FlextMeltanoModels.Meltano.StreamInfo],
                 Field(
-                    default_factory=list,
                     description="Available streams",
                 ),
-            ]
+            ] = Field(default_factory=list)
             status: Annotated[
                 str,
                 Field(
@@ -1206,8 +1201,8 @@ class FlextMeltanoModels(FlextCliModels):
             ] = c.Meltano.Enums.StreamStatus.INITIALIZED
             streams: Annotated[
                 Mapping[str, FlextMeltanoModels.Meltano.StreamDefinition],
-                Field(default_factory=dict, description="Discovered streams"),
-            ]
+                Field(description="Discovered streams"),
+            ] = Field(default_factory=dict)
             discovered: Annotated[
                 bool,
                 Field(
@@ -1217,8 +1212,8 @@ class FlextMeltanoModels(FlextCliModels):
             ] = False
             metadata: Annotated[
                 t.ConfigurationMapping,
-                Field(default_factory=dict, description="Additional metadata"),
-            ]
+                Field(description="Additional metadata"),
+            ] = Field(default_factory=dict)
             source_id: Annotated[str, Field(description="Unique source identifier")]
 
             @computed_field
@@ -1401,10 +1396,9 @@ class FlextMeltanoModels(FlextCliModels):
             key_properties: Annotated[
                 t.StrSequence,
                 Field(
-                    default_factory=list,
                     description="Primary key properties for the stream",
                 ),
-            ]
+            ] = Field(default_factory=list)
             replication_method: Annotated[
                 str,
                 Field(
@@ -1498,15 +1492,14 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             key_properties: Annotated[
                 t.StrSequence,
-                Field(default_factory=list, description="Singer stream key properties"),
-            ]
+                Field(description="Singer stream key properties"),
+            ] = Field(default_factory=list)
             bookmark_properties: Annotated[
                 t.StrSequence,
                 Field(
-                    default_factory=list,
                     description="Singer bookmark columns for incremental replication",
                 ),
-            ]
+            ] = Field(default_factory=list)
 
         class SingerRecordMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer RECORD message model."""
@@ -1548,10 +1541,9 @@ class FlextMeltanoModels(FlextCliModels):
             value: Annotated[
                 t.MutableContainerMapping,
                 Field(
-                    default_factory=dict,
                     description="Singer state bookmark payload",
                 ),
-            ]
+            ] = Field(default_factory=dict)
 
         class SingerActivateVersionMessage(FlextCliModels.ArbitraryTypesModel):
             """Canonical Singer ACTIVATE_VERSION message model.
@@ -1608,14 +1600,13 @@ class FlextMeltanoModels(FlextCliModels):
             breadcrumb: Annotated[
                 t.StrSequence,
                 Field(
-                    default_factory=list,
                     description="Singer metadata breadcrumb path",
                 ),
-            ]
+            ] = Field(default_factory=list)
             metadata: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Singer metadata properties"),
-            ]
+                Field(description="Singer metadata properties"),
+            ] = Field(default_factory=dict)
 
         class SingerCatalogEntry(FlextCliModels.ArbitraryTypesModel):
             """Singer catalog stream entry model."""
@@ -1640,17 +1631,15 @@ class FlextMeltanoModels(FlextCliModels):
             metadata: Annotated[
                 Sequence[FlextMeltanoModels.Meltano.SingerCatalogMetadata],
                 Field(
-                    default_factory=list,
                     description="Singer stream metadata blocks",
                 ),
-            ]
+            ] = Field(default_factory=list)
             key_properties: Annotated[
                 t.StrSequence,
                 Field(
-                    default_factory=list,
                     description="Primary key columns for this stream",
                 ),
-            ]
+            ] = Field(default_factory=list)
             replication_key: Annotated[
                 str | None,
                 Field(
@@ -1695,10 +1684,9 @@ class FlextMeltanoModels(FlextCliModels):
             streams: Annotated[
                 Sequence[FlextMeltanoModels.Meltano.SingerCatalogEntry],
                 Field(
-                    default_factory=list,
                     description="Singer catalog stream entries",
                 ),
-            ]
+            ] = Field(default_factory=list)
 
         class SingerPipelineConfig(FlextCliModels.Entity):
             """Configuration for a Singer ELT pipeline."""
@@ -1738,8 +1726,8 @@ class FlextMeltanoModels(FlextCliModels):
             errors: Annotated[t.NonNegativeInt, Field(description="Number of errors")]
             state: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Final state payload"),
-            ]
+                Field(description="Final state payload"),
+            ] = Field(default_factory=dict)
             duration_seconds: Annotated[
                 t.NonNegativeFloat,
                 Field(description="Execution duration"),
@@ -1759,8 +1747,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             config: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Pipeline config"),
-            ]
+                Field(description="Pipeline config"),
+            ] = Field(default_factory=dict)
 
         class ExecutePipelinePayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for execute_pipeline operation."""
@@ -1771,8 +1759,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             config: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Execution config"),
-            ]
+                Field(description="Execution config"),
+            ] = Field(default_factory=dict)
 
         class InstallPluginPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for install_plugin operation."""
@@ -1781,8 +1769,8 @@ class FlextMeltanoModels(FlextCliModels):
             plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
             config: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Plugin config"),
-            ]
+                Field(description="Plugin config"),
+            ] = Field(default_factory=dict)
 
         class ListPluginsPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for list_plugins operation."""
@@ -1801,8 +1789,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             config: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Environment config"),
-            ]
+                Field(description="Environment config"),
+            ] = Field(default_factory=dict)
 
         class RunDbtModelsPayload(FlextCliModels.ArbitraryTypesModel):
             """Payload for run/test dbt models operation."""
@@ -1839,13 +1827,12 @@ class FlextMeltanoModels(FlextCliModels):
             schema_definition: Annotated[
                 t.FlatContainerMapping,
                 Field(
-                    default_factory=dict,
                     alias="schema",
                     serialization_alias="schema",
                     validation_alias="schema",
                     description="Schema-like JSON payload",
                 ),
-            ]
+            ] = Field(default_factory=dict)
 
             @field_validator("schema_definition", mode="before")
             @classmethod
@@ -1863,8 +1850,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             records: Annotated[
                 Sequence[t.FlatContainerMapping],
-                Field(default_factory=list, description="Normalized record payloads"),
-            ]
+                Field(description="Normalized record payloads"),
+            ] = Field(default_factory=list)
 
             @field_validator("records", mode="before")
             @classmethod
@@ -1903,8 +1890,8 @@ class FlextMeltanoModels(FlextCliModels):
                     | Mapping[str, t.Scalar | None]
                     | None,
                 ],
-                Field(default_factory=dict, description="Normalized mapping values"),
-            ]
+                Field(description="Normalized mapping values"),
+            ] = Field(default_factory=dict)
 
             @field_validator("values", mode="before")
             @classmethod
@@ -1949,8 +1936,8 @@ class FlextMeltanoModels(FlextCliModels):
 
             value: Annotated[
                 Path,
-                Field(default_factory=Path, description="Normalized path"),
-            ]
+                Field(description="Normalized path"),
+            ] = Field(default_factory=Path)
 
             @field_validator("value", mode="before")
             @classmethod
@@ -2030,8 +2017,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             variants: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Available plugin variants"),
-            ]
+                Field(description="Available plugin variants"),
+            ] = Field(default_factory=dict)
             logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
             description: Annotated[
                 str,
@@ -2107,8 +2094,8 @@ class FlextMeltanoModels(FlextCliModels):
             project_root: Annotated[str, Field(description="Project root path")]
             elt_context: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="ELT execution context"),
-            ]
+                Field(description="ELT execution context"),
+            ] = Field(default_factory=dict)
             extractor_name: Annotated[
                 str,
                 Field(description="Extractor name"),
@@ -2120,8 +2107,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             execution_result: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Execution result payload"),
-            ]
+                Field(description="Execution result payload"),
+            ] = Field(default_factory=dict)
 
             @field_validator("elt_context", "execution_result", mode="before")
             @classmethod
@@ -2160,8 +2147,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             execution_result: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Execution result payload"),
-            ]
+                Field(description="Execution result payload"),
+            ] = Field(default_factory=dict)
 
             @field_validator("execution_result", mode="before")
             @classmethod
@@ -2192,10 +2179,9 @@ class FlextMeltanoModels(FlextCliModels):
             values: Annotated[
                 t.StrMapping,
                 Field(
-                    default_factory=dict,
                     description="Execution values filtered to scalar strings",
                 ),
-            ]
+            ] = Field(default_factory=dict)
 
             @field_validator("values", mode="before")
             @classmethod
@@ -2261,8 +2247,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             fqn: Annotated[
                 t.StrSequence,
-                Field(default_factory=list, description="Fully qualified name parts"),
-            ]
+                Field(description="Fully qualified name parts"),
+            ] = Field(default_factory=list)
             resource_type: Annotated[
                 str,
                 Field(default="", description="Node resource type (model, test, etc.)"),
@@ -2281,10 +2267,9 @@ class FlextMeltanoModels(FlextCliModels):
             nodes: Annotated[
                 Mapping[str, FlextMeltanoModels.Meltano.DbtManifestNode],
                 Field(
-                    default_factory=dict,
                     description="Manifest nodes keyed by node_id",
                 ),
-            ]
+            ] = Field(default_factory=dict)
 
             def get_nodes_by_type(
                 self,
@@ -2317,12 +2302,12 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             plugins: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Plugin configurations"),
-            ]
+                Field(description="Plugin configurations"),
+            ] = Field(default_factory=dict)
             environments: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Environment configurations"),
-            ]
+                Field(description="Environment configurations"),
+            ] = Field(default_factory=dict)
 
             @model_validator(mode="after")
             def validate_meltano_project(self) -> Self:
@@ -2355,15 +2340,14 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             project_root: Annotated[
                 Path,
-                Field(default_factory=Path.cwd, description="Project root directory"),
-            ]
+                Field(description="Project root directory"),
+            ] = Field(default_factory=Path.cwd)
             environments: Annotated[
                 t.StrSequence,
                 Field(
-                    default_factory=lambda: ["dev", "staging", "prod"],
                     description="Available environments",
                 ),
-            ]
+            ] = Field(default_factory=lambda: ["dev", "staging", "prod"])
 
             @computed_field
             def environment_count(self) -> int:
@@ -2439,16 +2423,16 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             settings: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="Plugin settings"),
-            ]
+                Field(description="Plugin settings"),
+            ] = Field(default_factory=dict)
             capabilities: Annotated[
                 t.StrSequence,
-                Field(default_factory=list, description="Plugin capabilities"),
-            ]
+                Field(description="Plugin capabilities"),
+            ] = Field(default_factory=list)
             config_files: Annotated[
                 t.StrSequence,
-                Field(default_factory=list, description="Plugin configuration files"),
-            ]
+                Field(description="Plugin configuration files"),
+            ] = Field(default_factory=list)
 
             @computed_field
             def full_plugin_name(self) -> str:
@@ -2513,20 +2497,20 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             config: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="DBT project configuration"),
-            ]
+                Field(description="DBT project configuration"),
+            ] = Field(default_factory=dict)
             models: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="DBT models configuration"),
-            ]
+                Field(description="DBT models configuration"),
+            ] = Field(default_factory=dict)
             sources: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="DBT sources configuration"),
-            ]
+                Field(description="DBT sources configuration"),
+            ] = Field(default_factory=dict)
             tests: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=dict, description="DBT tests configuration"),
-            ]
+                Field(description="DBT tests configuration"),
+            ] = Field(default_factory=dict)
 
             @model_validator(mode="after")
             def validate_dbt_project(self) -> Self:
@@ -2631,12 +2615,12 @@ class FlextMeltanoModels(FlextCliModels):
             command: Annotated[str, Field(description="Command to execute")]
             models: Annotated[
                 t.StrSequence,
-                Field(default_factory=list, description="Models to execute"),
-            ]
+                Field(description="Models to execute"),
+            ] = Field(default_factory=list)
             exclude: Annotated[
                 t.StrSequence,
-                Field(default_factory=list, description="Models to exclude"),
-            ]
+                Field(description="Models to exclude"),
+            ] = Field(default_factory=list)
             full_refresh: Annotated[
                 bool,
                 Field(default=False, description="Full refresh execution"),
@@ -2711,10 +2695,9 @@ class FlextMeltanoModels(FlextCliModels):
             start_time: Annotated[
                 datetime,
                 Field(
-                    default_factory=lambda: datetime.now(tz=UTC),
                     description="Execution start time",
                 ),
-            ]
+            ] = Field(default_factory=lambda: datetime.now(tz=UTC))
             end_time: Annotated[
                 datetime | None,
                 Field(default=None, description="Execution end time"),
@@ -2734,10 +2717,9 @@ class FlextMeltanoModels(FlextCliModels):
             metadata: Annotated[
                 t.ConfigurationMapping,
                 Field(
-                    default_factory=dict,
                     description="Additional execution metadata",
                 ),
-            ]
+            ] = Field(default_factory=dict)
 
             @computed_field
             def execution_rate_per_second(self) -> float:
@@ -2850,8 +2832,8 @@ class FlextMeltanoModels(FlextCliModels):
             ]
             pipeline_metadata: Annotated[
                 t.ConfigurationMapping,
-                Field(default_factory=dict, description="Pipeline execution metadata"),
-            ]
+                Field(description="Pipeline execution metadata"),
+            ] = Field(default_factory=dict)
 
             @computed_field
             def completed_stages(self) -> t.StrSequence:

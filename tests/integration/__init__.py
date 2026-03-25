@@ -21,7 +21,10 @@ if TYPE_CHECKING:
     from tests.integration.test_docker_integration import TestDockerIntegration
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "TestDockerIntegration": ["tests.integration.test_docker_integration", "TestDockerIntegration"],
+    "TestDockerIntegration": [
+        "tests.integration.test_docker_integration",
+        "TestDockerIntegration",
+    ],
 }
 
 __all__ = [
