@@ -198,11 +198,7 @@ class Tk(ContainerManager):
                 if len(host_port) == 2:
                     return f"localhost:{host_port[1]}"
         except Exception as e:
-            self.logger.warning(
-                "Failed to get service URL for %s: %s",
-                service_name,
-                str(e),
-            )
+            self.logger.warning(f"Failed to get service URL for {service_name}: {e}")
         return None
 
     def execute_in_container(
@@ -287,7 +283,7 @@ class Tk(ContainerManager):
                 ):
                     return True
             except Exception as e:
-                self.logger.warning("Error checking service health: %s", str(e))
+                self.logger.warning(f"Error checking service health: {e}")
             time.sleep(2)
         return False
 
@@ -308,7 +304,7 @@ class Tk(ContainerManager):
                     self.logger.warning("Service %s not accessible", service)
             return True
         except Exception as e:
-            self.logger.warning("Health check failed: %s", e)
+            self.logger.warning(f"Health check failed: {e}")
             return False
 
     def _cleanup_containers(self) -> None:

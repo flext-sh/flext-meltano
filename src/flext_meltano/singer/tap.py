@@ -225,7 +225,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r.ok(t.Dict({"version": 1, "streams": []}))
+        return r[t.Dict].ok(t.Dict({"version": 1, "streams": []}))
 
     def process_source(
         self,
@@ -288,7 +288,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r.ok(
+        return r[t.Dict].ok(
             t.Dict({
                 "stream_name": stream_name,
                 "status": "completed",

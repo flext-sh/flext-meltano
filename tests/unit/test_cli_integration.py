@@ -46,7 +46,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_with_config(self) -> None:
         """Test converting Mapping[str, objecth config to TapRunParams model."""
-        cli_args = {
+        cli_args: Mapping[str, str | bool] = {
             "tap_name": "tap-postgres",
             "config_file": "/path/to/config.json",
             "discover": False,
@@ -62,7 +62,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_discover_mode(self) -> None:
         """Test converting Mapping[str, objecth discover flag to TapRunParams model."""
-        cli_args = {
+        cli_args: Mapping[str, str | bool] = {
             "tap_name": "tap-postgres",
             "discover": True,
         }
@@ -78,7 +78,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_all_fields(self) -> None:
         """Test converting Mapping[str, objecth all fields to TapRunParams model."""
-        cli_args = {
+        cli_args: Mapping[str, str | bool] = {
             "tap_name": "tap-postgres",
             "config_file": "/config.json",
             "catalog_file": "/catalog.json",

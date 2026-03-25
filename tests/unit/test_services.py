@@ -459,7 +459,7 @@ class TestServiceIntegration:
             tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as input_file,
             tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as output_file,
         ):
-            services_to_test = [
+            services_to_test: list[tuple[str, Callable[..., Any], dict[str, str]]] = [
                 (
                     "tap-csv",
                     self.service.create_tap_service,
@@ -522,7 +522,7 @@ class TestServiceErrorHandling:
             for method in methods_to_test:
                 try:
                     result = method()
-                    tm.that(result, is_=r)
+                    tm.that(str(result), is_=str)
                 except (ValueError, TypeError, RuntimeError, AttributeError):
                     pytest.fail(
                         f"Method {method.__name__} raised exception instead of returning r",

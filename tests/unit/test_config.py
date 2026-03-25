@@ -17,10 +17,13 @@ from pathlib import Path
 
 import pytest
 from flext_core import FlextSettings
+from flext_core._constants.settings import FlextConstantsSettings
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoSettings
 from tests import c
+
+LogLevel = FlextConstantsSettings.LogLevel
 
 
 class TestFlextMeltanoSettings:
@@ -32,7 +35,7 @@ class TestFlextMeltanoSettings:
             project_root=Path("/test/project"),
             config_dir=Path(".meltano"),
             logs_dir=Path("logs"),
-            log_level="INFO",
+            log_level=LogLevel.INFO,
             meltano_version="3.9.1",
             singer_sdk_version="0.48.0",
             dbt_version="1.10.5",
@@ -154,7 +157,7 @@ class TestFlextMeltanoSettings:
         """Test environment variables extraction."""
         config = FlextMeltanoSettings(
             project_root=Path("/test/project"),
-            log_level="DEBUG",
+            log_level=LogLevel.DEBUG,
         )
         env_vars = config.get_environment_variables()
         tm.that(env_vars, is_=dict)
@@ -209,7 +212,7 @@ class TestFlextMeltanoSettings:
         with tempfile.TemporaryDirectory() as tmp_dir:
             result = FlextMeltanoSettings(
                 project_root=Path(tmp_dir),
-                log_level="WARNING",
+                log_level=LogLevel.WARNING,
             )
             config = result
             tm.that(config.log_level, eq="WARNING")
@@ -335,7 +338,7 @@ class TestFlextMeltanoSettingsIntegration:
             config = FlextMeltanoSettings(
                 project_root=Path("/test"),
                 environment=env_type,
-                log_level="INFO",
+                log_level=LogLevel.INFO,
                 debug=env_type != "production",
             )
             tm.that(config.environment, eq=env_type)

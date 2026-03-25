@@ -253,7 +253,7 @@ class TestFlextMeltanoAbstractionsComplete:
         """Test create_tap_from_config success using flext_tests."""
         if not hasattr(self.tap_abstractions, "create_tap_from_config"):
             pytest.skip("create_tap_from_config not available (use PYTHONPATH=src)")
-        connection_config = {
+        connection_config: t.ContainerMapping = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
@@ -299,7 +299,7 @@ class TestFlextMeltanoAbstractionsComplete:
             )
             invalid_result = self.tap_abstractions.process(invalid_instance.config)
         except (ValidationError, ValueError):
-            invalid_result: r[m.Meltano.TapConfig] = r[m.Meltano.TapConfig].fail(
+            invalid_result = r[m.Meltano.TapConfig].fail(
                 "Validation failed at creation",
             )
         valid_result = self.tap_abstractions.process(valid_instance.config)
@@ -613,7 +613,7 @@ class TestFlextMeltanoAbstractionsComplete:
             },
             source_type="tap-postgres",
         )
-        result = self.tap_abstractions.extract_records(stream, limit=1)
+        result = self.tap_abstractions.extract_records(stream, _limit=1)
         self.test_assertions.assert_true(
             condition=isinstance(result, r),
             message="Should return r",

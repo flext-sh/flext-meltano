@@ -369,7 +369,7 @@ class TestFlextMeltanoExecutorComplete:
                     if result.error is not None:
                         tm.that(result.error, eq=True)
             except Exception as e:
-                logger.debug("Expected exception during command execution: %s", e)
+                logger.debug(f"Expected exception during command execution: {e}")
                 tm.that(True, eq=True)
 
     def test_click_cli_infrastructure_invocation(self) -> None:
@@ -409,10 +409,7 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor._route_command(command, args)
                 tm.that(result, is_=r)
             except Exception as e:
-                logger.debug(
-                    "Expected exception during edge case command execution: %s",
-                    e,
-                )
+                logger.debug(f"Expected exception during edge case command execution: {e}")
                 tm.that(True, eq=True)
 
     def test_pipeline_execution_error_scenarios(self) -> None:
@@ -430,7 +427,7 @@ class TestFlextMeltanoExecutorComplete:
                     tm.that(result.error, eq=True)
                     tm.that(result.error, is_=str)
             except Exception as e:
-                logger.debug("Expected exception during pipeline execution: %s", e)
+                logger.debug(f"Expected exception during pipeline execution: {e}")
                 tm.that(True, eq=True)
 
     def test_internal_method_direct_invocation(self) -> None:
@@ -443,18 +440,15 @@ class TestFlextMeltanoExecutorComplete:
         ]
         for args in run_command_tests:
             try:
-                result = self.executor._handle_default_command(["run"] + args)
+                result = self.executor._handle_default_command(["run"] + list(args))
                 tm.that(result, is_=r)
             except Exception as e:
-                logger.debug(
-                    "Expected exception during run command execution: %s",
-                    e,
-                )
+                logger.debug(f"Expected exception during run command execution: {e}")
                 tm.that(True, eq=True)
         try:
             self.executor.help()
         except Exception as e:
-            logger.debug("Expected exception during help method execution: %s", e)
+            logger.debug(f"Expected exception during help method execution: {e}")
             tm.that(True, eq=True)
 
     def test_cli_execution_exception_handling(self) -> None:
