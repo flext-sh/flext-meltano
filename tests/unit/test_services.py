@@ -523,7 +523,7 @@ class TestServiceErrorHandling:
                 try:
                     result = method()
                     tm.that(result, is_=r)
-                except Exception:
+                except (ValueError, TypeError, RuntimeError, AttributeError):
                     pytest.fail(
                         f"Method {method.__name__} raised exception instead of returning r",
                     )

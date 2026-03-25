@@ -869,7 +869,7 @@ class TestFlextMeltanoAbstractionsComplete:
                     condition=result.error is not None,
                     message="Should have error message",
                 )
-        except Exception:
+        except (ValueError, TypeError, RuntimeError):
             tm.that(True, eq=True)
 
     def test_missing_stream_handling(self) -> None:

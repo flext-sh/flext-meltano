@@ -55,5 +55,5 @@ if __name__ == "__main__":
         simple_executor_example()
         logger.info("")
         simple_config_example()
-    except Exception:
+    except (ValueError, RuntimeError, OSError):
         logger.exception("Error executing examples")

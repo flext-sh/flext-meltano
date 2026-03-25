@@ -13,7 +13,7 @@ from pathlib import Path
 import singer_sdk.typing as singer_sdk_typing
 from flext_cli import FlextCliTypes
 
-from flext_meltano import c
+from flext_meltano.constants import FlextMeltanoConstants as c
 
 
 class FlextMeltanoTypes(FlextCliTypes):
