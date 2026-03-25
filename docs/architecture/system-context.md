@@ -262,11 +262,7 @@ flext_meltano --> redis: Caching & queues
 ```python
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
-<<<<<<< Updated upstream
     r,  # Railway-oriented error handling
-=======
-    FlextResult,  # Railway-oriented error handling
->>>>>>> Stashed changes
     FlextContainer,  # Dependency injection
     FlextModels,  # Base model classes
     FlextLogger,  # Structured logging
@@ -282,15 +278,9 @@ class FlextMeltanoService(FlextService):
         try:
             plugins = self.adapter.list_plugins()
             validated_plugins = [self.validate_plugin(plugin) for plugin in plugins]
-<<<<<<< Updated upstream
             return r.ok(validated_plugins)
         except Exception as e:
             return r.fail(MeltanoError(f"Plugin discovery failed: {e}"))
-=======
-            return FlextResult.ok(validated_plugins)
-        except Exception as e:
-            return FlextResult.fail(MeltanoError(f"Plugin discovery failed: {e}"))
->>>>>>> Stashed changes
 ```
 
 #### Meltano CLI Integration
@@ -319,19 +309,11 @@ class MeltanoAdapter:
             )
 
             if result.returncode == 0:
-<<<<<<< Updated upstream
                 return r.ok(
                     MeltanoResult(success=True, output=result.stdout, command=cmd)
                 )
             else:
                 return r.fail(
-=======
-                return FlextResult.ok(
-                    MeltanoResult(success=True, output=result.stdout, command=cmd)
-                )
-            else:
-                return FlextResult.fail(
->>>>>>> Stashed changes
                     MeltanoExecutionError(
                         f"Meltano command failed: {result.stderr}",
                         command=cmd,
@@ -340,11 +322,7 @@ class MeltanoAdapter:
                 )
 
         except subprocess.TimeoutExpired:
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 MeltanoTimeoutError(
                     f"Meltano command timed out after {self.command_timeout}s",
                     command=cmd,
@@ -781,13 +759,7 @@ ______________________________________________________________________
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
-<<<<<<< Updated upstream
     def execute_sync_operation(self, request: OperationRequest) -> r[OperationResponse]:
-=======
-    def execute_sync_operation(
-        self, request: OperationRequest
-    ) -> FlextResult[OperationResponse]:
->>>>>>> Stashed changes
         """Execute synchronous operation with timeout and error handling."""
 
         # Validate request
@@ -802,24 +774,14 @@ class SynchronousIntegration:
                 return r.ok(self.adapt_response(response))
 
         except TimeoutError:
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 IntegrationTimeoutError(
                     f"Operation timed out after {self.operation_timeout}s"
                 )
             )
 
         except ExternalSystemError as e:
-<<<<<<< Updated upstream
             return r.fail(IntegrationError(f"External system error: {e.message}"))
-=======
-            return FlextResult.fail(
-                IntegrationError(f"External system error: {e.message}")
-            )
->>>>>>> Stashed changes
 ```
 
 #### Circuit Breaker Pattern

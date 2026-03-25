@@ -108,11 +108,7 @@ from flext_core import t
 from flext_core import u
 
 
-<<<<<<< Updated upstream
 def process_data(data: dict) -> r[Optional[t.Dict]]:
-=======
-def process_data(data: dict) -> FlextResult[Optional[t.Dict]]:
->>>>>>> Stashed changes
     # Implementation
     pass
 ```

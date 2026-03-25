@@ -18,15 +18,18 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
-
 if TYPE_CHECKING:
     from flext_core import FlextTypes
+
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoDbtProjectManager": ["flext_meltano.dbt.project", "FlextMeltanoDbtProjectManager"],
+    "FlextMeltanoDbtProjectManager": [
+        "flext_meltano.dbt.project",
+        "FlextMeltanoDbtProjectManager",
+    ],
     "FlextMeltanoDbtRunner": ["flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"],
     "FlextMeltanoDbtService": ["flext_meltano.dbt.service", "FlextMeltanoDbtService"],
 }
@@ -55,6 +58,7 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
+
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -69,6 +73,7 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
+
     """
     return sorted(__all__)
 

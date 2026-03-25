@@ -126,11 +126,7 @@ def discover_plugins(self) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
 ```python
 def install_plugin(
     self, plugin_name: str, version: str | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PluginInstallResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PluginInstallResult]:
->>>>>>> Stashed changes
     """Install a Meltano plugin.
 
     Args:
@@ -149,11 +145,7 @@ def install_plugin(
 ```python
 def execute_tap(
     self, tap_name: str, config: t.Dict | None = None, state: t.Dict | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.TapExecutionResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.TapExecutionResult]:
->>>>>>> Stashed changes
     """Execute a Singer tap with configuration and state.
 
     Args:
@@ -172,13 +164,8 @@ def execute_tap(
 
 ```python
 def execute_target(
-<<<<<<< Updated upstream
     self, target_name: str, records: Sequence[t.Dict], config: t.Dict | None = None
 ) -> r[FlextMeltanoModels.TargetExecutionResult]:
-=======
-    self, target_name: str, records: list[t.Dict], config: t.Dict | None = None
-) -> FlextResult[FlextMeltanoModels.TargetExecutionResult]:
->>>>>>> Stashed changes
     """Execute a Singer target with records.
 
     Args:
@@ -212,11 +199,7 @@ class FlextMeltanoAdapter(FlextService):
 ```python
 def run_pipeline(
     self, tap_name: str, target_name: str, config: t.Dict | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PipelineResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PipelineResult]:
->>>>>>> Stashed changes
     """Execute complete ELT pipeline from tap to target.
 
     Args:
@@ -249,11 +232,7 @@ def validate_project(self) -> r[FlextMeltanoModels.ProjectValidation]:
 ```python
 def list_plugins(
     self, plugin_type: str | None = None
-<<<<<<< Updated upstream
 ) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
-=======
-) -> FlextResult[list[FlextMeltanoModels.PluginInfo]]:
->>>>>>> Stashed changes
     """List available Meltano plugins.
 
     Args:
@@ -282,11 +261,7 @@ class FlextMeltanoExecutor(FlextService):
 ```python
 def execute_pipeline_advanced(
     self, options: FlextMeltanoModels.PipelineOptions
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PipelineResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PipelineResult]:
->>>>>>> Stashed changes
     """Execute pipeline with advanced configuration options.
 
     Args:
@@ -303,13 +278,8 @@ def execute_pipeline_advanced(
 
 ```python
 def execute_parallel_pipelines(
-<<<<<<< Updated upstream
     self, pipelines: Sequence[FlextMeltanoModels.PipelineConfig]
 ) -> r[Sequence[FlextMeltanoModels.PipelineResult]]:
-=======
-    self, pipelines: list[FlextMeltanoModels.PipelineConfig]
-) -> FlextResult[list[FlextMeltanoModels.PipelineResult]]:
->>>>>>> Stashed changes
     """Execute multiple pipelines in parallel.
 
     Args:
@@ -373,11 +343,7 @@ def discover(self) -> r[FlextMeltanoModels.Catalog]:
 ```python
 def sync(
     self, streams: t.StringList | None = None, state: t.Dict | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.SyncResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.SyncResult]:
->>>>>>> Stashed changes
     """Execute tap synchronization.
 
     Args:
@@ -421,13 +387,7 @@ class FlextSingerTarget(FlextService):
 **Load records into the target**
 
 ```python
-<<<<<<< Updated upstream
 def load_records(self, records: Sequence[t.Dict]) -> r[FlextMeltanoModels.LoadResult]:
-=======
-def load_records(
-    self, records: list[t.Dict]
-) -> FlextResult[FlextMeltanoModels.LoadResult]:
->>>>>>> Stashed changes
     """Load records into the target.
 
     Args:
@@ -502,11 +462,7 @@ def discover_plugins(self) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
 ```python
 def install_plugin(
     self, plugin_name: str, version: str | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PluginInstallResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PluginInstallResult]:
->>>>>>> Stashed changes
     """Install a plugin.
 
     Args:
@@ -525,11 +481,7 @@ def install_plugin(
 ```python
 def uninstall_plugin(
     self, plugin_name: str
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PluginUninstallResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PluginUninstallResult]:
->>>>>>> Stashed changes
     """Uninstall a plugin.
 
     Args:
@@ -547,11 +499,7 @@ def uninstall_plugin(
 ```python
 def update_plugin(
     self, plugin_name: str, version: str | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PluginUpdateResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PluginUpdateResult]:
->>>>>>> Stashed changes
     """Update a plugin.
 
     Args:
@@ -579,13 +527,7 @@ class FlextPluginRegistry(FlextService):
 **Register a plugin in the registry**
 
 ```python
-<<<<<<< Updated upstream
 def register_plugin(self, plugin_info: FlextMeltanoModels.PluginInfo) -> r[bool]:
-=======
-def register_plugin(
-    self, plugin_info: FlextMeltanoModels.PluginInfo
-) -> FlextResult[bool]:
->>>>>>> Stashed changes
     """Register a plugin in the registry.
 
     Args:
@@ -603,11 +545,7 @@ def register_plugin(
 ```python
 def find_plugin(
     self, plugin_name: str, plugin_type: str | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PluginInfo | None]:
-=======
-) -> FlextResult[FlextMeltanoModels.PluginInfo | None]:
->>>>>>> Stashed changes
     """Find a plugin by name and optional type.
 
     Args:
@@ -626,11 +564,7 @@ def find_plugin(
 ```python
 def list_plugins_by_type(
     self, plugin_type: str
-<<<<<<< Updated upstream
 ) -> r[Sequence[FlextMeltanoModels.PluginInfo]]:
-=======
-) -> FlextResult[list[FlextMeltanoModels.PluginInfo]]:
->>>>>>> Stashed changes
     """List plugins by type.
 
     Args:
@@ -663,11 +597,7 @@ class FlextMeltanoService(FlextService):
 ```python
 def create_pipeline(
     self, config: FlextMeltanoModels.PipelineConfig
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.Pipeline]:
-=======
-) -> FlextResult[FlextMeltanoModels.Pipeline]:
->>>>>>> Stashed changes
     """Create a new pipeline configuration.
 
     Args:
@@ -685,11 +615,7 @@ def create_pipeline(
 ```python
 def execute_pipeline(
     self, pipeline_name: str, options: FlextMeltanoModels.PipelineOptions | None = None
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PipelineResult]:
-=======
-) -> FlextResult[FlextMeltanoModels.PipelineResult]:
->>>>>>> Stashed changes
     """Execute a configured pipeline.
 
     Args:
@@ -706,13 +632,7 @@ def execute_pipeline(
 **Monitor pipeline execution**
 
 ```python
-<<<<<<< Updated upstream
 def monitor_pipeline(self, pipeline_id: str) -> r[FlextMeltanoModels.PipelineStatus]:
-=======
-def monitor_pipeline(
-    self, pipeline_id: str
-) -> FlextResult[FlextMeltanoModels.PipelineStatus]:
->>>>>>> Stashed changes
     """Monitor pipeline execution status.
 
     Args:
@@ -740,13 +660,8 @@ class FlextMeltanoExecutor(FlextService):
 
 ```python
 def execute_parallel_pipelines(
-<<<<<<< Updated upstream
     self, pipelines: Sequence[FlextMeltanoModels.PipelineConfig]
 ) -> r[Sequence[FlextMeltanoModels.PipelineResult]]:
-=======
-    self, pipelines: list[FlextMeltanoModels.PipelineConfig]
-) -> FlextResult[list[FlextMeltanoModels.PipelineResult]]:
->>>>>>> Stashed changes
     """Execute multiple pipelines in parallel.
 
     Args:
@@ -766,11 +681,7 @@ def execute_conditional_pipeline(
     self,
     condition: FlextMeltanoModels.Condition,
     pipeline: FlextMeltanoModels.PipelineConfig,
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.PipelineResult | None]:
-=======
-) -> FlextResult[FlextMeltanoModels.PipelineResult | None]:
->>>>>>> Stashed changes
     """Execute pipeline based on condition evaluation.
 
     Args:
@@ -804,11 +715,7 @@ class FlextProjectService(FlextService):
 ```python
 def create_project(
     self, project_config: FlextMeltanoModels.ProjectConfig
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.Project]:
-=======
-) -> FlextResult[FlextMeltanoModels.Project]:
->>>>>>> Stashed changes
     """Create a new Meltano project.
 
     Args:
@@ -826,11 +733,7 @@ def create_project(
 ```python
 def validate_project(
     self, project_root: Path | str
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.ProjectValidation]:
-=======
-) -> FlextResult[FlextMeltanoModels.ProjectValidation]:
->>>>>>> Stashed changes
     """Validate Meltano project structure and configuration.
 
     Args:
@@ -848,11 +751,7 @@ def validate_project(
 ```python
 def get_project_info(
     self, project_root: Path | str
-<<<<<<< Updated upstream
 ) -> r[FlextMeltanoModels.ProjectInfo]:
-=======
-) -> FlextResult[FlextMeltanoModels.ProjectInfo]:
->>>>>>> Stashed changes
     """Get project information and metadata.
 
     Args:

@@ -392,13 +392,8 @@ class CustomArchitectureValidator(ArchitectureValidator):
         issues = []
 
         # Check for required FLEXT patterns
-<<<<<<< Updated upstream
         if "r" not in content:
             issues.append("Missing r pattern usage")
-=======
-        if "FlextResult" not in content:
-            issues.append("Missing FlextResult pattern usage")
->>>>>>> Stashed changes
 
         if "railway" not in content.lower():
             issues.append("Consider railway-oriented programming")

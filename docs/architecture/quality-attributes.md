@@ -399,13 +399,7 @@ class AsyncPipelineExecutor:
                 self.metrics.pipeline_failed()
                 return PipelineResult.failure(PipelineExecutionError(str(e)))
 
-<<<<<<< Updated upstream
     async def validate_pipeline_async(self, pipeline: Pipeline) -> r[ValidatedPipeline]:
-=======
-    async def validate_pipeline_async(
-        self, pipeline: Pipeline
-    ) -> FlextResult[ValidatedPipeline]:
->>>>>>> Stashed changes
         """Async pipeline validation."""
 
         # Run validation checks concurrently
@@ -1149,13 +1143,7 @@ end note
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
-<<<<<<< Updated upstream
     def execute_with_railway(self, operation: Operation) -> r[OperationResult]:
-=======
-    def execute_with_railway(
-        self, operation: Operation
-    ) -> FlextResult[OperationResult]:
->>>>>>> Stashed changes
         """Execute operation using railway pattern with full error handling."""
 
         return (
@@ -1169,34 +1157,20 @@ class RailwayExecutor:
             .map(lambda result: OperationResult.from_success(result))
         )
 
-<<<<<<< Updated upstream
     def validate_operation(self, operation: Operation) -> r[ValidatedOperation]:
-=======
-    def validate_operation(
-        self, operation: Operation
-    ) -> FlextResult[ValidatedOperation]:
->>>>>>> Stashed changes
         """Validate operation parameters and constraints."""
 
         # Schema validation
         schema_result = self.schema_validator.validate(operation.payload)
         if schema_result.is_failure:
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 ValidationError(f"Schema validation failed: {schema_result.error}")
             )
 
         # Business rule validation
         business_result = self.business_validator.validate(operation)
         if business_result.is_failure:
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 BusinessRuleViolation(
                     f"Business rule violation: {business_result.error}"
                 )
@@ -1205,11 +1179,7 @@ class RailwayExecutor:
         # Resource availability check
         resource_result = self.resource_checker.check_availability(operation)
         if resource_result.is_failure:
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 ResourceUnavailableError(
                     f"Resources unavailable: {resource_result.error}"
                 )
@@ -1217,13 +1187,7 @@ class RailwayExecutor:
 
         return r.ok(ValidatedOperation(operation, schema_result.unwrap()))
 
-<<<<<<< Updated upstream
     def execute_operation(self, operation: ValidatedOperation) -> r[ExecutionResult]:
-=======
-    def execute_operation(
-        self, operation: ValidatedOperation
-    ) -> FlextResult[ExecutionResult]:
->>>>>>> Stashed changes
         """Execute operation with comprehensive error handling."""
 
         try:
@@ -1231,11 +1195,7 @@ class RailwayExecutor:
             with self.timeout_context(operation.timeout_seconds):
                 # Execute with circuit breaker
                 if not self.circuit_breaker.allow_request():
-<<<<<<< Updated upstream
                     return r.fail(
-=======
-                    return FlextResult.fail(
->>>>>>> Stashed changes
                         CircuitBreakerOpenError(
                             "Circuit breaker is open - service temporarily unavailable"
                         )
@@ -1251,11 +1211,7 @@ class RailwayExecutor:
 
         except TimeoutError:
             self.circuit_breaker.record_failure()
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 OperationTimeoutError(
                     f"Operation timed out after {operation.timeout_seconds} seconds"
                 )
@@ -1263,13 +1219,7 @@ class RailwayExecutor:
 
         except ExternalServiceError as e:
             self.circuit_breaker.record_failure()
-<<<<<<< Updated upstream
             return r.fail(ExternalServiceError(f"External service error: {e.message}"))
-=======
-            return FlextResult.fail(
-                ExternalServiceError(f"External service error: {e.message}")
-            )
->>>>>>> Stashed changes
 
         except Exception as e:
             # Record failure for circuit breaker
@@ -1286,11 +1236,7 @@ class RailwayExecutor:
                 },
             )
 
-<<<<<<< Updated upstream
             return r.fail(
-=======
-            return FlextResult.fail(
->>>>>>> Stashed changes
                 OperationExecutionError(f"Operation execution failed: {str(e)}")
             )
 ```
@@ -1418,11 +1364,7 @@ class RetryExecutor:
                 return r.fail(OperationError(f"Non-retryable error: {e}"))
 
         # All retry attempts exhausted
-<<<<<<< Updated upstream
         return r.fail(
-=======
-        return FlextResult.fail(
->>>>>>> Stashed changes
             RetryExhaustedError(
                 f"Operation failed after {self.max_attempts} attempts. "
                 f"Last error: {last_exception}"
@@ -3013,14 +2955,10 @@ class APIResponse:
     """Consistent API response format."""
 
     def __init__(
-<<<<<<< Updated upstream
         self,
         data=None,
         error: str = None,
         metadata: Dict[str, t.NormalizedValue] = None,
-=======
-        self, data: object = None, error: str = None, metadata: Dict[str, object] = None
->>>>>>> Stashed changes
     ):
         self.success = error is None
         self.data = data
@@ -3106,13 +3044,8 @@ class APIResource:
     def __init__(
         self,
         resource_id: str,
-<<<<<<< Updated upstream
         basic_fields: Dict[str, t.NormalizedValue],
         detailed_fields: Dict[str, t.NormalizedValue] = None,
-=======
-        basic_fields: Dict[str, object],
-        detailed_fields: Dict[str, object] = None,
->>>>>>> Stashed changes
     ):
         self.id = resource_id
         self.basic_fields = basic_fields
@@ -3179,11 +3112,7 @@ class APIHelpSystem:
 
     def get_contextual_help(
         self, endpoint: str, method: str, error_code: str = None
-<<<<<<< Updated upstream
     ) -> Dict[str, t.NormalizedValue]:
-=======
-    ) -> Dict[str, object]:
->>>>>>> Stashed changes
         """Get contextual help for API endpoint."""
 
         help_info = {
@@ -3228,11 +3157,7 @@ class APIHelpSystem:
                     "example": "customer-data-sync",
                 },
                 "tap": {
-<<<<<<< Updated upstream
                     "type": "t.NormalizedValue",
-=======
-                    "type": "object",
->>>>>>> Stashed changes
                     "required": True,
                     "description": "Source connector configuration",
                     "properties": {
@@ -3241,11 +3166,7 @@ class APIHelpSystem:
                     },
                 },
                 "target": {
-<<<<<<< Updated upstream
                     "type": "t.NormalizedValue",
-=======
-                    "type": "object",
->>>>>>> Stashed changes
                     "required": True,
                     "description": "Destination connector configuration",
                 },
@@ -3255,11 +3176,7 @@ class APIHelpSystem:
 
     def _get_usage_examples(
         self, endpoint: str, method: str
-<<<<<<< Updated upstream
     ) -> List[Dict[str, t.NormalizedValue]]:
-=======
-    ) -> List[Dict[str, object]]:
->>>>>>> Stashed changes
         """Get usage examples for the endpoint."""
 
         examples = []
@@ -3523,11 +3440,7 @@ class TestDataBuilder:
         self.data["name"] = name
         return self
 
-<<<<<<< Updated upstream
     def with_config(self, config: Dict[str, t.NormalizedValue]) -> "TestDataBuilder":
-=======
-    def with_config(self, config: Dict[str, object]) -> "TestDataBuilder":
->>>>>>> Stashed changes
         self.data["config"] = config
         return self
 
@@ -3739,11 +3652,7 @@ class ContractTests:
         # Define transformation contract
         contract = DataTransformationContract(
             input_schema={
-<<<<<<< Updated upstream
                 "type": "t.NormalizedValue",
-=======
-                "type": "object",
->>>>>>> Stashed changes
                 "properties": {
                     "id": {"type": "integer"},
                     "name": {"type": "string"},
@@ -3752,11 +3661,7 @@ class ContractTests:
                 "required": ["id", "name"],
             },
             output_schema={
-<<<<<<< Updated upstream
                 "type": "t.NormalizedValue",
-=======
-                "type": "object",
->>>>>>> Stashed changes
                 "properties": {
                     "user_id": {"type": "integer"},
                     "full_name": {"type": "string"},
@@ -3874,11 +3779,7 @@ class TestDataManager:
 
     def get_test_data(
         self, dataset_name: str, scenario: str = "default"
-<<<<<<< Updated upstream
     ) -> Dict[str, t.NormalizedValue]:
-=======
-    ) -> Dict[str, object]:
->>>>>>> Stashed changes
         """Get test data for specific dataset and scenario."""
 
         cache_key = f"{dataset_name}:{scenario}"
@@ -3895,13 +3796,8 @@ class TestDataManager:
         return self.data_cache[cache_key]
 
     def create_dynamic_test_data(
-<<<<<<< Updated upstream
         self, template: str, overrides: Dict[str, t.NormalizedValue] = None
     ) -> Dict[str, t.NormalizedValue]:
-=======
-        self, template: str, overrides: Dict[str, object] = None
-    ) -> Dict[str, object]:
->>>>>>> Stashed changes
         """Create dynamic test data from templates."""
 
         template_data = self.get_test_data("templates", template)
@@ -3918,13 +3814,8 @@ class TestDataManager:
         return result
 
     def _deep_merge(
-<<<<<<< Updated upstream
         self, base: Dict[str, t.NormalizedValue], override: Dict[str, t.NormalizedValue]
     ) -> Dict[str, t.NormalizedValue]:
-=======
-        self, base: Dict[str, object], override: Dict[str, object]
-    ) -> Dict[str, object]:
->>>>>>> Stashed changes
         """Deep merge dictionaries."""
         result = base.copy()
 

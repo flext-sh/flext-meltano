@@ -143,7 +143,6 @@ import pytest
 from flext_meltano import CustomTapExtension
 
 
-
 @pytest.mark.extension
 @pytest.mark.custom_component
 def test_custom_tap_extension():
@@ -288,7 +287,6 @@ from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
 from flext_meltano import FlextMeltanoBase
-
 
 
 class EnterpriseExtension(FlextMeltanoBase, ABC):
