@@ -53,6 +53,7 @@ if TYPE_CHECKING:
         TestCliModelConverterWithTargetRunParams,
     )
     from tests.unit.test_config import (
+        LogLevel,
         TestFlextMeltanoSettings,
         TestFlextMeltanoSettingsConstants,
         TestFlextMeltanoSettingsEdgeCases,
@@ -108,6 +109,7 @@ if TYPE_CHECKING:
     from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "LogLevel": ["tests.unit.test_config", "LogLevel"],
     "TestCliModelConverterWithDbtRunParams": [
         "tests.unit.test_cli_integration",
         "TestCliModelConverterWithDbtRunParams",
@@ -335,6 +337,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
 }
 
 __all__ = [
+    "LogLevel",
     "TestCliModelConverterWithDbtRunParams",
     "TestCliModelConverterWithPipelineRunParams",
     "TestCliModelConverterWithTapRunParams",

@@ -409,7 +409,9 @@ class TestFlextMeltanoExecutorComplete:
                 result = self.executor._route_command(command, args)
                 tm.that(result, is_=r)
             except Exception as e:
-                logger.debug(f"Expected exception during edge case command execution: {e}")
+                logger.debug(
+                    f"Expected exception during edge case command execution: {e}"
+                )
                 tm.that(True, eq=True)
 
     def test_pipeline_execution_error_scenarios(self) -> None:

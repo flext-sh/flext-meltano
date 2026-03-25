@@ -99,6 +99,7 @@ if TYPE_CHECKING:
         TestCliModelConverterWithTargetRunParams,
     )
     from tests.unit.test_config import (
+        LogLevel,
         TestFlextMeltanoSettings,
         TestFlextMeltanoSettingsConstants,
         TestFlextMeltanoSettingsEdgeCases,
@@ -165,6 +166,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextMeltanoTestProtocols": ["tests.protocols", "FlextMeltanoTestProtocols"],
     "FlextMeltanoTestTypes": ["tests.typings", "FlextMeltanoTestTypes"],
     "FlextMeltanoTestUtilities": ["tests.utilities", "FlextMeltanoTestUtilities"],
+    "LogLevel": ["tests.unit.test_config", "LogLevel"],
     "MockCliResult": ["tests.conftest", "MockCliResult"],
     "MockCliRunner": ["tests.conftest", "MockCliRunner"],
     "MockMeltanoService": ["tests.conftest", "MockMeltanoService"],
@@ -448,6 +450,7 @@ __all__ = [
     "FlextMeltanoTestProtocols",
     "FlextMeltanoTestTypes",
     "FlextMeltanoTestUtilities",
+    "LogLevel",
     "MockCliResult",
     "MockCliRunner",
     "MockMeltanoService",

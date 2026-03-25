@@ -1153,7 +1153,9 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(
                     description="Available streams",
                 ),
-            ] = Field(default_factory=lambda: list[FlextMeltanoModels.Meltano.StreamInfo]())
+            ] = Field(
+                default_factory=lambda: list[FlextMeltanoModels.Meltano.StreamInfo]()
+            )
             status: Annotated[
                 str,
                 Field(
@@ -1629,7 +1631,11 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(
                     description="Singer stream metadata blocks",
                 ),
-            ] = Field(default_factory=lambda: list[FlextMeltanoModels.Meltano.SingerCatalogMetadata]())
+            ] = Field(
+                default_factory=lambda: list[
+                    FlextMeltanoModels.Meltano.SingerCatalogMetadata
+                ]()
+            )
             key_properties: Annotated[
                 t.StrSequence,
                 Field(
@@ -1682,7 +1688,11 @@ class FlextMeltanoModels(FlextCliModels):
                 Field(
                     description="Singer catalog stream entries",
                 ),
-            ] = Field(default_factory=lambda: list[FlextMeltanoModels.Meltano.SingerCatalogEntry]())
+            ] = Field(
+                default_factory=lambda: list[
+                    FlextMeltanoModels.Meltano.SingerCatalogEntry
+                ]()
+            )
 
         class SingerPipelineConfig(FlextCliModels.Entity):
             """Configuration for a Singer ELT pipeline."""
