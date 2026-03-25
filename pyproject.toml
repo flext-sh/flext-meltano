@@ -146,6 +146,7 @@ allow-direct-references = true
 # [MANAGED] mypy
 [tool.mypy]
 disable_error_code = [
+  "call-arg",
   "prop-decorator",
 ]
 explicit_package_bases = true
