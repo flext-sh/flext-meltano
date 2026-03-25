@@ -284,7 +284,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         r containing project creation metadata or validation error
 
         """
-        params_r: r[Mapping[str, str | Path]] = self._validate_project_creation_params(project_name, project_dir)
+        params_r: r[Mapping[str, str | Path]] = self._validate_project_creation_params(
+            project_name, project_dir
+        )
         dir_r: r[Path] = params_r.flat_map(
             lambda params: self._create_project_directory(
                 str(params["name"]),
@@ -293,7 +295,9 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         )
         struct_r: r[Path] = dir_r.flat_map(self._create_project_structure)
         init_r: r[Path] = struct_r.flat_map(
-            lambda project_path: self._initialize_project_config(project_path, project_name)
+            lambda project_path: self._initialize_project_config(
+                project_path, project_name
+            )
         )
         return init_r.flat_map(
             lambda project_path: self._build_creation_result(project_name, project_path)
@@ -317,10 +321,14 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         r containing project t.ContainerMapping with standardized structure
 
         """
-        params_r2: r[t.StrMapping] = self._validate_project_parameters(project_id, prefix)
+        params_r2: r[t.StrMapping] = self._validate_project_parameters(
+            project_id, prefix
+        )
         config_r: r[t.ContainerMapping] = params_r2.flat_map(
             lambda params: self._create_temp_directory(params["prefix"]).flat_map(
-                lambda temp_path: self._generate_minimal_config(temp_path, params["project_id"])
+                lambda temp_path: self._generate_minimal_config(
+                    temp_path, params["project_id"]
+                )
             )
         )
         path_r: r[Path] = config_r.flat_map(self._extract_and_write_config)
