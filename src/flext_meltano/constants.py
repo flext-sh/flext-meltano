@@ -294,7 +294,5 @@ class FlextMeltanoConstants(FlextCliConstants):
             TRANSFORMATION_SERVICE = "transformation-service"
 
 
-MeltanoProjectType = FlextMeltanoConstants.Meltano.MeltanoProjectType
-
 c = FlextMeltanoConstants
 __all__ = ["FlextMeltanoConstants", "c"]

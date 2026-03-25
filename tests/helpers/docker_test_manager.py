@@ -201,7 +201,7 @@ class Tk(ContainerManager):
             self.logger.warning(
                 "Failed to get service URL for %s: %s",
                 service_name,
-                str(e),
+                e,
             )
         return None
 
@@ -287,7 +287,7 @@ class Tk(ContainerManager):
                 ):
                     return True
             except Exception as e:
-                self.logger.warning("Error checking service health: %s", str(e))
+                self.logger.warning("Error checking service health: %s", e)
             time.sleep(2)
         return False
 
@@ -308,7 +308,7 @@ class Tk(ContainerManager):
                     self.logger.warning("Service %s not accessible", service)
             return True
         except Exception as e:
-            self.logger.warning("Health check failed: %s", str(e))
+            self.logger.warning("Health check failed: %s", e)
             return False
 
     def _cleanup_containers(self) -> None:

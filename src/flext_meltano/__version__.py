@@ -10,20 +10,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
-from importlib.metadata import PackageMetadata, PackageNotFoundError, metadata
+from importlib.metadata import PackageMetadata, metadata
 
-try:
-    _metadata: PackageMetadata | Mapping[str, str] = metadata("flext_meltano")
-except PackageNotFoundError:
-    _metadata = {
-        "Version": "0.0.0.dev0",
-        "Name": "flext_meltano",
-        "Summary": "FLEXT Meltano - Enterprise Data Integration Platform",
-        "Author": "FLEXT Team",
-        "Author-Email": "team@flext.sh",
-        "License": "MIT",
-        "Home-Page": "https://github.com/flext-sh/flext",
-    }
+_metadata: PackageMetadata | Mapping[str, str] = metadata("flext_meltano")
 __version__ = _metadata["Version"]
 __version_info__ = tuple(
     int(part) if part.isdigit() else part for part in __version__.split(".")

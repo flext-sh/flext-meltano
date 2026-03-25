@@ -267,7 +267,7 @@ class FlextMeltanoAbstractions:
 
     def discover_streams(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        _tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
         """Discover available streams for tap instance."""
         streams: Sequence[t.ContainerMapping] = [
@@ -278,7 +278,7 @@ class FlextMeltanoAbstractions:
 
     def sync_stream(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        _tap_instance: m.Meltano.TapInstance,
         stream_name: str,
         target_config: m.Meltano.TargetConfig | None = None,
     ) -> r[t.ContainerMapping]:
@@ -327,7 +327,7 @@ class FlextMeltanoAbstractions:
 
     def generate_catalog(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        _tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
         """Generate Singer catalog from tap instance streams."""
         catalog: t.ContainerMapping = {"version": 1, "streams": []}
@@ -379,8 +379,8 @@ class FlextMeltanoAbstractions:
 
     def extract_records(
         self,
-        stream: m.Meltano.StreamDefinition,
-        limit: int | None = None,
+        _stream: m.Meltano.StreamDefinition,
+        _limit: int | None = None,
     ) -> r[Sequence[t.ContainerMapping]]:
         """Extract records from a stream."""
         records: Sequence[t.ContainerMapping] = []

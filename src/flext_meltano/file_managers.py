@@ -16,12 +16,9 @@ from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 
 import yaml
-from flext_cli import FlextCliUtilities
 from flext_core import FlextLogger, r
 
-from flext_meltano import c, m, t
-
-u = FlextCliUtilities
+from flext_meltano import c, m, t, u
 
 
 class FlextMeltanoFileManagers:

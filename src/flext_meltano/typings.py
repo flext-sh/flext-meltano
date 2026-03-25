@@ -13,7 +13,7 @@ from pathlib import Path
 import singer_sdk.typing as singer_sdk_typing
 from flext_cli import FlextCliTypes
 
-from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano import c
 
 
 class FlextMeltanoTypes(FlextCliTypes):
@@ -140,7 +140,7 @@ class FlextMeltanoTypes(FlextCliTypes):
                 Mapping[str, FlextCliTypes.ContainerValue] | None,
             ]
             type ProjectMetadata = Mapping[str, FlextCliTypes.Scalar | None]
-            type MeltanoProjectType = c.MeltanoProjectType
+            type MeltanoProjectType = c.Meltano.MeltanoProjectType
             type MeltanoProjectConfig = Mapping[
                 str,
                 Mapping[str, FlextCliTypes.ContainerValue] | None,

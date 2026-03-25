@@ -44,48 +44,44 @@ class FlextMeltanoModels(FlextCliModels):
     Provides reusable Pydantic models for pipeline operations.
     """
 
-    def __init_subclass__(cls, **kwargs: t.Scalar) -> None:
-        """Allow downstream projects to inherit FlextMeltanoModels for namespace composition."""
-        super().__init_subclass__(**kwargs)
-
-    @staticmethod
-    def _protect_sensitive_config(
-        value: t.ConfigurationMapping,
-    ) -> t.ConfigurationMapping:
-        """Protect sensitive keys in configuration dict."""
-        sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
-
-        def is_sensitive(k: str) -> bool:
-            normalized = u.normalize(k, case="lower")
-            # Convert set to list of str for processing
-            sensitive_keys_list: t.StrSequence = list(sensitive_keys)
-            checks_result = u.process(
-                sensitive_keys_list,
-                lambda s: r[bool].ok(s in normalized),
-            )
-            checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate({
-                "items": checks_result.unwrap_or([]),
-            }).items
-            if checks:
-                return u.any_(*checks)
-            return False
-
-        # Transform dict values with protection for sensitive fields
-        protected: t.MutableConfigurationMapping = {}
-        for key, item in value.items():
-            protected[key] = "[PROTECTED]" if is_sensitive(key) else item
-
-        return protected
-
-    @staticmethod
-    def _validated_string_list(value: _ValidatorInput) -> t.StrSequence:
-        """Normalize arbitrary values into a validated list of strings."""
-        return FlextMeltanoModels.Meltano.StringListValue.model_validate({
-            "items": value,
-        }).items
-
     class Meltano:
         """Meltano domain namespace."""
+
+        @staticmethod
+        def _protect_sensitive_config(
+            value: t.ConfigurationMapping,
+        ) -> t.ConfigurationMapping:
+            """Protect sensitive keys in configuration dict."""
+            sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
+
+            def is_sensitive(k: str) -> bool:
+                normalized = u.normalize(k, case="lower")
+                # Convert set to list of str for processing
+                sensitive_keys_list: t.StrSequence = list(sensitive_keys)
+                checks_result = u.process(
+                    sensitive_keys_list,
+                    lambda s: r[bool].ok(s in normalized),
+                )
+                checks = FlextMeltanoModels.Meltano.BooleanListValue.model_validate({
+                    "items": checks_result.unwrap_or([]),
+                }).items
+                if checks:
+                    return u.any_(*checks)
+                return False
+
+            # Transform dict values with protection for sensitive fields
+            protected: t.MutableConfigurationMapping = {}
+            for key, item in value.items():
+                protected[key] = "[PROTECTED]" if is_sensitive(key) else item
+
+            return protected
+
+        @staticmethod
+        def _validated_string_list(value: _ValidatorInput) -> t.StrSequence:
+            """Normalize arbitrary values into a validated list of strings."""
+            return FlextMeltanoModels.Meltano.StringListValue.model_validate({
+                "items": value,
+            }).items
 
         class StringListValue(FlextCliModels.ArbitraryTypesModel):
             """Validated string list wrapper for result normalization."""
