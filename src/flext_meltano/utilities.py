@@ -15,7 +15,9 @@ import yaml
 from flext_cli import FlextCliUtilities, r
 from flext_core import FlextLogger
 
-from flext_meltano import FlextMeltanoFileManagers, c, m, t
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoUtilities(FlextCliUtilities):
@@ -295,13 +297,11 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                         converted[str(key)] = value
                 return converted
 
-            result = (
-                r[Path]
-                .ok(path)
-                .flat_map(cls._validate_yaml_path)
-                .flat_map(FlextMeltanoFileManagers.load_yaml_config)
-                .map(convert_to_dict)
-            )
+            from flext_meltano.file_managers import FlextMeltanoFileManagers
+
+            validated_path: r[Path] = r[Path].ok(path).flat_map(cls._validate_yaml_path)
+            loaded: r[t.Meltano.MeltanoConfigDict] = validated_path.flat_map(FlextMeltanoFileManagers.load_yaml_config)
+            result = loaded.map(convert_to_dict)
             return (
                 result
                 if result.is_success

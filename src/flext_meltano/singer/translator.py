@@ -65,7 +65,7 @@ class FlextMeltanoSingerCliTranslator:
             input_data=process_input,
         )
         if cmd_result.is_failure:
-            return r[t.Meltano.CLI.ProcessResult].fail(str(cmd_result.failure()))
+            return r[t.Meltano.CLI.ProcessResult].fail(cmd_result.error or "Command failed")
         out = cmd_result.value
         output_dict: t.Meltano.CLI.ProcessResult = {
             "stdout": out.stdout,

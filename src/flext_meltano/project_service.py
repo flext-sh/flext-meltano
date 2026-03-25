@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
@@ -155,27 +155,28 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         project_id: str,
     ) -> r[t.ContainerMapping]:
         """Generate minimal meltano.yml configuration."""
-        extractors: Sequence[t.Dict] = []
-        loaders: Sequence[t.Dict] = []
-        transformers: Sequence[t.Dict] = []
-        config = {
+        extractors: t.ContainerList = []
+        loaders: t.ContainerList = []
+        transformers: t.ContainerList = []
+        environments: t.ContainerList = [
+            {
+                "name": "dev",
+                "config": {
+                    "plugins": {
+                        "extractors": extractors,
+                        "loaders": loaders,
+                        "transformers": transformers,
+                    },
+                },
+            },
+        ]
+        config: t.ContainerMapping = {
             "version": 1,
             "default_environment": "dev",
             "project_id": project_id,
-            "environments": [
-                {
-                    "name": "dev",
-                    "config": {
-                        "plugins": {
-                            "extractors": extractors,
-                            "loaders": loaders,
-                            "transformers": transformers,
-                        },
-                    },
-                },
-            ],
+            "environments": environments,
         }
-        return r.ok({"path": temp_path, "config": config})
+        return r[t.ContainerMapping].ok({"path": str(temp_path), "config": config})
 
     @staticmethod
     def _initialize_project_config(project_path: Path, project_name: str) -> r[Path]:
@@ -283,28 +284,19 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         r containing project creation metadata or validation error
 
         """
-        return (
-            self
-            ._validate_project_creation_params(project_name, project_dir)
-            .flat_map(
-                lambda params: self._create_project_directory(
-                    str(params["name"]),
-                    m.Meltano.PathPayload(value=Path(str(params["parent_dir"]))).value,
-                ),
+        params_r: r[Mapping[str, str | Path]] = self._validate_project_creation_params(project_name, project_dir)
+        dir_r: r[Path] = params_r.flat_map(
+            lambda params: self._create_project_directory(
+                str(params["name"]),
+                m.Meltano.PathPayload(value=Path(str(params["parent_dir"]))).value,
             )
-            .flat_map(self._create_project_structure)
-            .flat_map(
-                lambda project_path: self._initialize_project_config(
-                    project_path,
-                    project_name,
-                ),
-            )
-            .flat_map(
-                lambda project_path: self._build_creation_result(
-                    project_name,
-                    project_path,
-                ),
-            )
+        )
+        struct_r: r[Path] = dir_r.flat_map(self._create_project_structure)
+        init_r: r[Path] = struct_r.flat_map(
+            lambda project_path: self._initialize_project_config(project_path, project_name)
+        )
+        return init_r.flat_map(
+            lambda project_path: self._build_creation_result(project_name, project_path)
         )
 
     def create_temporary_project(
@@ -325,21 +317,15 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         r containing project t.ContainerMapping with standardized structure
 
         """
-        return (
-            self
-            ._validate_project_parameters(project_id, prefix)
-            .flat_map(
-                lambda params: self._create_temp_directory(params["prefix"]).flat_map(
-                    lambda temp_path: self._generate_minimal_config(
-                        temp_path,
-                        params["project_id"],
-                    ),
-                ),
+        params_r2: r[t.StrMapping] = self._validate_project_parameters(project_id, prefix)
+        config_r: r[t.ContainerMapping] = params_r2.flat_map(
+            lambda params: self._create_temp_directory(params["prefix"]).flat_map(
+                lambda temp_path: self._generate_minimal_config(temp_path, params["project_id"])
             )
-            .flat_map(self._extract_and_write_config)
-            .flat_map(self._initialize_project_instance)
-            .flat_map(self._convert_to_project_dict)
         )
+        path_r: r[Path] = config_r.flat_map(self._extract_and_write_config)
+        inst_r: r[Path] = path_r.flat_map(self._initialize_project_instance)
+        return inst_r.flat_map(self._convert_to_project_dict)
 
     @staticmethod
     def build_service_execution_payload(
@@ -392,13 +378,10 @@ class FlextMeltanoProjectService(s[t.Meltano.MeltanoConfigDict]):
         r containing initialized project t.ContainerMapping or validation error
 
         """
-        return (
-            self
-            ._validate_project_path(project_root)
-            .flat_map(self._validate_meltano_config_exists)
-            .flat_map(self._load_project_from_path)
-            .flat_map(self._convert_to_project_dict)
-        )
+        vpath_r: r[Path] = self._validate_project_path(project_root)
+        vcfg_r: r[Path] = vpath_r.flat_map(self._validate_meltano_config_exists)
+        loaded_r: r[Path] = vcfg_r.flat_map(self._load_project_from_path)
+        return loaded_r.flat_map(self._convert_to_project_dict)
 
     def _build_creation_result(
         self,

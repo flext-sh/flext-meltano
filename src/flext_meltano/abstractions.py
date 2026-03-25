@@ -314,7 +314,7 @@ class FlextMeltanoAbstractions:
             tap_cfg = m.Meltano.TapConfig(
                 tap_type=tap_type,
                 connection_config=connection_config,
-                stream_config=stream_config,
+                stream_config=stream_config if stream_config is not None else {},
             )
             instance = m.Meltano.TapInstance(
                 tap_type=tap_type,

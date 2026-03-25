@@ -101,9 +101,6 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
                 config: m.Meltano.DataSinkConfig = (
                     m.Meltano.DataSinkConfig.model_validate(payload_dict)
                 )
-                config: m.Meltano.DataSinkConfig = (
-                    m.Meltano.DataSinkConfig.model_validate(payload_dict)
-                )
             except Exception as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
         else:

@@ -48,9 +48,9 @@ class FlextMeltanoModels(FlextCliModels):
         """Meltano domain namespace."""
 
         @staticmethod
-        def _protect_sensitive_config(
-            value: t.ConfigurationMapping,
-        ) -> t.ConfigurationMapping:
+        def protect_sensitive_config(
+            value: t.ContainerMapping,
+        ) -> t.ContainerMapping:
             """Protect sensitive keys in configuration dict."""
             sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -70,7 +70,7 @@ class FlextMeltanoModels(FlextCliModels):
                 return False
 
             # Transform dict values with protection for sensitive fields
-            protected: t.MutableConfigurationMapping = {}
+            protected: t.MutableContainerMapping = {}
             for key, item in value.items():
                 protected[key] = "[PROTECTED]" if is_sensitive(key) else item
 
@@ -852,19 +852,19 @@ class FlextMeltanoModels(FlextCliModels):
 
             tap_type: Annotated[str, Field(description="Type of the tap")]
             connection_config: Annotated[
-                t.ConfigurationMapping,
+                t.ContainerMapping,
                 Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
-                t.ConfigurationMapping,
+                t.ContainerMapping,
                 Field(
                     description="Stream-specific configuration",
                 ),
             ] = Field(default_factory=dict)
             tap_version: Annotated[
                 str,
-                Field(default="latest", description="Tap version"),
-            ]
+                Field(description="Tap version"),
+            ] = "latest"
 
             @computed_field
             def config_size(self) -> int:
@@ -886,10 +886,10 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: t.ConfigurationMapping,
-            ) -> t.ConfigurationMapping:
+                value: t.ContainerMapping,
+            ) -> t.ContainerMapping:
                 """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
+                return FlextMeltanoModels.Meltano.protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_tap_config(self) -> Self:
@@ -943,10 +943,10 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: t.ConfigurationMapping,
-            ) -> t.ConfigurationMapping:
+                value: t.ContainerMapping,
+            ) -> t.ContainerMapping:
                 """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
+                return FlextMeltanoModels.Meltano.protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_target_config(self) -> Self:
@@ -962,11 +962,11 @@ class FlextMeltanoModels(FlextCliModels):
 
             source_type: Annotated[str, Field(description="Type of the data source")]
             connection_config: Annotated[
-                t.ConfigurationMapping,
+                t.ContainerMapping,
                 Field(description="Connection configuration"),
             ]
             stream_config: Annotated[
-                t.ConfigurationMapping,
+                t.ContainerMapping,
                 Field(
                     description="Stream-specific configuration",
                 ),
@@ -996,10 +996,10 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: t.ConfigurationMapping,
-            ) -> t.ConfigurationMapping:
+                value: t.ContainerMapping,
+            ) -> t.ContainerMapping:
                 """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
+                return FlextMeltanoModels.Meltano.protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_source_config(self) -> Self:
@@ -1311,7 +1311,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             sink_type: Annotated[str, Field(description="Sink type identifier")]
             connection_config: Annotated[
-                t.ConfigurationMapping,
+                t.ContainerMapping,
                 Field(description="Connection configuration dictionary"),
             ]
             batch_size: Annotated[
@@ -1357,10 +1357,10 @@ class FlextMeltanoModels(FlextCliModels):
             @field_serializer("connection_config")
             def serialize_connection_config(
                 self,
-                value: t.ConfigurationMapping,
-            ) -> t.ConfigurationMapping:
+                value: t.ContainerMapping,
+            ) -> t.ContainerMapping:
                 """Serialize connection config with sensitive data protection."""
-                return FlextMeltanoModels._protect_sensitive_config(value)
+                return FlextMeltanoModels.Meltano.protect_sensitive_config(value)
 
             @model_validator(mode="after")
             def validate_sink_config(self) -> Self:
