@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
-# Regenerate with: make codegen
+# Regenerate with: make gen
 #
 """Singer Protocol Implementation for FLEXT Meltano.
 
@@ -33,30 +33,12 @@ if TYPE_CHECKING:
     from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoCatalogManager": [
-        "flext_meltano.singer.catalog",
-        "FlextMeltanoCatalogManager",
-    ],
-    "FlextMeltanoSingerCliTranslator": [
-        "flext_meltano.singer.translator",
-        "FlextMeltanoSingerCliTranslator",
-    ],
-    "FlextMeltanoSingerService": [
-        "flext_meltano.singer.service",
-        "FlextMeltanoSingerService",
-    ],
-    "FlextMeltanoStateManager": [
-        "flext_meltano.singer.state",
-        "FlextMeltanoStateManager",
-    ],
-    "FlextMeltanoTapAbstractions": [
-        "flext_meltano.singer.tap",
-        "FlextMeltanoTapAbstractions",
-    ],
-    "FlextMeltanoTargetAbstractions": [
-        "flext_meltano.singer.target",
-        "FlextMeltanoTargetAbstractions",
-    ],
+    "FlextMeltanoCatalogManager": ["flext_meltano.singer.catalog", "FlextMeltanoCatalogManager"],
+    "FlextMeltanoSingerCliTranslator": ["flext_meltano.singer.translator", "FlextMeltanoSingerCliTranslator"],
+    "FlextMeltanoSingerService": ["flext_meltano.singer.service", "FlextMeltanoSingerService"],
+    "FlextMeltanoStateManager": ["flext_meltano.singer.state", "FlextMeltanoStateManager"],
+    "FlextMeltanoTapAbstractions": ["flext_meltano.singer.tap", "FlextMeltanoTapAbstractions"],
+    "FlextMeltanoTargetAbstractions": ["flext_meltano.singer.target", "FlextMeltanoTargetAbstractions"],
 }
 
 __all__ = [

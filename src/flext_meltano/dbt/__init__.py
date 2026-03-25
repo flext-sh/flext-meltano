@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
-# Regenerate with: make codegen
+# Regenerate with: make gen
 #
 """DBT Transformations for FLEXT Meltano.
 
@@ -26,10 +26,7 @@ if TYPE_CHECKING:
     from flext_meltano.dbt.service import FlextMeltanoDbtService
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoDbtProjectManager": [
-        "flext_meltano.dbt.project",
-        "FlextMeltanoDbtProjectManager",
-    ],
+    "FlextMeltanoDbtProjectManager": ["flext_meltano.dbt.project", "FlextMeltanoDbtProjectManager"],
     "FlextMeltanoDbtRunner": ["flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"],
     "FlextMeltanoDbtService": ["flext_meltano.dbt.service", "FlextMeltanoDbtService"],
 }
