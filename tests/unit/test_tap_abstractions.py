@@ -336,7 +336,10 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         if result.is_success:
             raw = result.value
-            stream_names = _extract_stream_names(raw) if isinstance(raw, dict) else []
+            empty_names: Sequence[str] = []
+            stream_names = (
+                _extract_stream_names(raw) if isinstance(raw, dict) else empty_names
+            )
             self.test_assertions.assert_true(
                 condition=isinstance(stream_names, list),
                 message="Should return list of streams",
@@ -371,7 +374,10 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         if result.is_success:
             raw = result.value
-            stream_names = _extract_stream_names(raw) if isinstance(raw, dict) else []
+            empty_names: Sequence[str] = []
+            stream_names = (
+                _extract_stream_names(raw) if isinstance(raw, dict) else empty_names
+            )
             self.test_assertions.assert_true(
                 condition=isinstance(stream_names, list),
                 message="Should return list of streams",
@@ -401,7 +407,10 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         if result.is_success:
             raw = result.value
-            stream_names = _extract_stream_names(raw) if isinstance(raw, dict) else []
+            empty_names: Sequence[str] = []
+            stream_names = (
+                _extract_stream_names(raw) if isinstance(raw, dict) else empty_names
+            )
             self.test_assertions.assert_true(
                 condition=isinstance(stream_names, list),
                 message="Should return list of streams",

@@ -581,7 +581,9 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 if plugin_type
                 else all_plugins
             )
-            plugins_list = list(filtered_plugins) if filtered_plugins else []
+            plugins_list: list[t.Meltano.MeltanoConfigDict] = (
+                list(filtered_plugins) if filtered_plugins else []
+            )
             plugins_data: Sequence[t.Meltano.MeltanoConfigDict] = [
                 self._normalize_config_mapping({
                     **plugin_entry,

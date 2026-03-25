@@ -181,9 +181,10 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
                 return r[t.Meltano.Singer.StreamCatalog].fail(
                     "Source configuration must have name and type for discovery",
                 )
-            catalog: t.Meltano.Singer.StreamCatalog = {"streams": []}
-            streams = catalog.get("streams", [])
-            self.logger.info("Stream discovery completed", stream_count=len(streams))
+            streams: list[t.Meltano.Singer.CatalogEntry] = []
+            catalog: t.Meltano.Singer.StreamCatalog = {"streams": streams}
+            discovered = catalog.get("streams", streams)
+            self.logger.info("Stream discovery completed", stream_count=len(discovered))
             return r[t.Meltano.Singer.StreamCatalog].ok(catalog)
         except (
             ValueError,

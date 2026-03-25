@@ -197,7 +197,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 "execution_timestamp": str(time.time()),
                 "config": self._meltano_config.model_dump()
                 if u.is_pydantic_model(self._meltano_config)
-                else {},
+                else dict[str, t.NormalizedValue](),
             }
             self.logger.info("FlextMeltanoExecutor executed successfully")
             return r[t.Meltano.ExecutionResultDict].ok(config_data)

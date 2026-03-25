@@ -71,7 +71,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
         environments: t.Meltano.MeltanoConfigDict = {
-            "dev": {"plugins": {"extractors": []}},
+            "dev": {"plugins": {"extractors": list[t.Meltano.MeltanoConfigDict]()}},
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
         config_result = u.Meltano.create_meltano_config_dict(

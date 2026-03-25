@@ -8,11 +8,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import psycopg2
 import pytest
-import redis
 
 from tests import Tk as tk
+
+psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
+redis = pytest.importorskip("redis", reason="redis not installed")
 
 
 class TestDockerIntegration:

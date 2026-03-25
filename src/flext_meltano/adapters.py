@@ -191,7 +191,7 @@ class FlextMeltanoAdapter:
                             },
                             "metadata": [
                                 {
-                                    "breadcrumb": [],
+                                    "breadcrumb": list[str](),
                                     "metadata": {
                                         "table-key-properties": ["id"],
                                         "forced-replication-method": "INCREMENTAL",

@@ -330,7 +330,8 @@ class FlextMeltanoAbstractions:
         _tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
         """Generate Singer catalog from tap instance streams."""
-        catalog: t.ContainerMapping = {"version": 1, "streams": []}
+        streams: list[t.ContainerMapping] = []
+        catalog: t.ContainerMapping = {"version": 1, "streams": streams}
         return r[t.ContainerMapping].ok(catalog)
 
     def get_stream_by_name(
@@ -404,7 +405,7 @@ class FlextMeltanoAbstractions:
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": stream.stream_schema,
-            "metadata": [],
+            "metadata": list[t.ContainerMapping](),
         }
         return r[t.ContainerMapping].ok(entry)
 

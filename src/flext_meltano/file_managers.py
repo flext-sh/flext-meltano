@@ -200,10 +200,11 @@ class FlextMeltanoFileManagers:
                 dir_path = project_root / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
                 created_paths[directory] = dir_path
+            empty_list: t.ContainerList = []
             plugin_items: Mapping[str, t.ContainerList] = {
-                "extractors": [],
-                "loaders": [],
-                "transformers": [],
+                "extractors": list(empty_list),
+                "loaders": list(empty_list),
+                "transformers": list(empty_list),
             }
             meltano_config: t.Meltano.FileConfigDict = {
                 "version": 1,
