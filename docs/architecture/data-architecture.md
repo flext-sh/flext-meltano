@@ -336,14 +336,26 @@ class PipelineConfig:
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
+<<<<<<< Updated upstream
     def validate_record(self, record: dict, schema: dict) -> r[ValidatedRecord]:
+=======
+    def validate_record(
+        self, record: dict, schema: dict
+    ) -> FlextResult[ValidatedRecord]:
+>>>>>>> Stashed changes
         """Validate record against Singer schema."""
         try:
             # JSON Schema validation
             validate(instance=record, schema=schema)
             return r.ok(ValidatedRecord(record=record, schema=schema))
         except ValidationError as e:
+<<<<<<< Updated upstream
             return r.fail(ValidationError(f"Schema validation failed: {e.message}"))
+=======
+            return FlextResult.fail(
+                ValidationError(f"Schema validation failed: {e.message}")
+            )
+>>>>>>> Stashed changes
 
     def validate_stream_schema(self, schema: dict) -> r[ValidatedSchema]:
         """Validate Singer stream schema."""

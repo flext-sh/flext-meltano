@@ -83,7 +83,13 @@ class FlextOracleTapService(FlextService):
         super().__init__()
         self._tap_abstractions = FlextMeltanoTapAbstractions()
 
+<<<<<<< Updated upstream
     def discover_oracle_streams(self, config: dict) -> r[Sequence[StreamDefinition]]:
+=======
+    def discover_oracle_streams(
+        self, config: dict
+    ) -> FlextResult[list[StreamDefinition]]:
+>>>>>>> Stashed changes
         """Discover Oracle database streams using flext-meltano."""
         return self._tap_abstractions.discover_catalog("tap-oracle")
 
@@ -223,7 +229,11 @@ class EnterpriseELTService(FlextService):
 
     def execute_elt_pipeline(
         self, tap_name: str, target_name: str, dbt_models: t.StringList = None
+<<<<<<< Updated upstream
     ) -> r[t.Dict]:
+=======
+    ) -> FlextResult[t.Dict]:
+>>>>>>> Stashed changes
         """Execute complete ELT pipeline."""
 
         # 1. Extract and Load using Meltano
@@ -271,7 +281,11 @@ response = bridge.handle_bridge_request({
     "args": ["tap-csv", "target-jsonl"],
 })
 
+<<<<<<< Updated upstream
 # Response format follows r structure
+=======
+# Response format follows FlextResult structure
+>>>>>>> Stashed changes
 {"success": True, "data": {"records_processed": 1000}, "error": None}
 ```
 

@@ -193,7 +193,11 @@ graph TD
 
 ```python
 from flext_core import (
+<<<<<<< Updated upstream
     r,  # Railway-oriented programming
+=======
+    FlextResult,  # Railway-oriented programming
+>>>>>>> Stashed changes
     FlextService,  # Service base class
     FlextLogger,  # Logging infrastructure
     FlextContainer,  # Dependency injection
@@ -254,8 +258,13 @@ class FlextMeltanoTypes:
     class Singer:
         """Singer protocol integration types."""
 
+<<<<<<< Updated upstream
         type Tap = SingerTap
         type Target = SingerTarget
+=======
+        type Tap = object
+        type Target = object
+>>>>>>> Stashed changes
         type MessageType = str
         type RecordMessage = JsonObject
 
@@ -294,8 +303,15 @@ class StreamDefinition(BaseModel):
 ### **r Pattern Implementation**
 
 ```python
+<<<<<<< Updated upstream
 # All operations return r[T] for railway-oriented programming
 def process_elt_pipeline(tap_config: TapConfig, target_config: t.Dict) -> r[t.Dict]:
+=======
+# All operations return FlextResult[T] for railway-oriented programming
+def process_elt_pipeline(
+    tap_config: TapConfig, target_config: t.Dict
+) -> FlextResult[t.Dict]:
+>>>>>>> Stashed changes
     """Process ELT pipeline with comprehensive error handling."""
 
     # Validation phase

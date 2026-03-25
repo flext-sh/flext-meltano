@@ -447,7 +447,11 @@ validators = FlextMeltanoValidators()
 
 # Validate Singer schema
 schema_validation = validators.validate_singer_schema({
+<<<<<<< Updated upstream
     "type": "t.NormalizedValue",
+=======
+    "type": "object",
+>>>>>>> Stashed changes
     "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
 })
 

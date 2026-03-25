@@ -169,6 +169,7 @@ import pytest
 from flext_meltano import FlextMeltanoSettings
 
 
+
 @pytest.fixture
 def test_config():
     """Provide test configuration for unit tests."""

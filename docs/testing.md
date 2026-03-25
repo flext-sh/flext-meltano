@@ -298,7 +298,11 @@ import pytest
 def mock_meltano_adapter():
     """Provide mocked Meltano adapter for testing."""
     with patch("flext_meltano.adapters.FlextMeltanoAdapter") as mock:
+<<<<<<< Updated upstream
         mock.return_value.run_tap.return_value = r.ok({"status": "success"})
+=======
+        mock.return_value.run_tap.return_value = FlextResult.ok({"status": "success"})
+>>>>>>> Stashed changes
         yield mock
 
 

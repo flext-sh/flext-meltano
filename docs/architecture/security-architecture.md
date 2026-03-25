@@ -264,6 +264,7 @@ class AccessRequest:
     context: Dict[str, t.NormalizedValue]  # environment, time, location, etc.
 
 
+
 class ABACPolicy:
     """Attribute-based access control policy."""
 
@@ -320,7 +321,11 @@ class SessionManager:
 
     def validate_session(
         self, session_id: str, ip_address: str
+<<<<<<< Updated upstream
     ) -> Optional[Dict[str, t.NormalizedValue]]:
+=======
+    ) -> Optional[Dict[str, object]]:
+>>>>>>> Stashed changes
         """Validate session and update activity."""
         session_key = f"session:{session_id}"
         session_data = self.redis.get(session_key)
@@ -761,10 +766,14 @@ class SecurityAuditor:
         }
 
     def log_security_event(
+<<<<<<< Updated upstream
         self,
         event_type: str,
         details: Dict[str, t.NormalizedValue],
         severity: str = "INFO",
+=======
+        self, event_type: str, details: Dict[str, object], severity: str = "INFO"
+>>>>>>> Stashed changes
     ) -> None:
         """Log security event with structured data."""
 

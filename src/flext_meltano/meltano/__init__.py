@@ -18,9 +18,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
+
 if TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano.meltano.bridge import FlextMeltanoBridge
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
@@ -33,30 +33,12 @@ if TYPE_CHECKING:
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextMeltanoBridge": ["flext_meltano.meltano.bridge", "FlextMeltanoBridge"],
-    "FlextMeltanoComponentService": [
-        "flext_meltano.meltano.plugins",
-        "FlextMeltanoComponentService",
-    ],
-    "FlextMeltanoDbtTransformationRunner": [
-        "flext_meltano.meltano.runner",
-        "FlextMeltanoDbtTransformationRunner",
-    ],
-    "FlextMeltanoLibraryRunner": [
-        "flext_meltano.meltano.runner",
-        "FlextMeltanoLibraryRunner",
-    ],
-    "FlextMeltanoMeltanoService": [
-        "flext_meltano.meltano.service",
-        "FlextMeltanoMeltanoService",
-    ],
-    "FlextMeltanoOrchestrationService": [
-        "flext_meltano.meltano.pipelines",
-        "FlextMeltanoOrchestrationService",
-    ],
-    "FlextMeltanoProjectManager": [
-        "flext_meltano.meltano.project",
-        "FlextMeltanoProjectManager",
-    ],
+    "FlextMeltanoComponentService": ["flext_meltano.meltano.plugins", "FlextMeltanoComponentService"],
+    "FlextMeltanoDbtTransformationRunner": ["flext_meltano.meltano.runner", "FlextMeltanoDbtTransformationRunner"],
+    "FlextMeltanoLibraryRunner": ["flext_meltano.meltano.runner", "FlextMeltanoLibraryRunner"],
+    "FlextMeltanoMeltanoService": ["flext_meltano.meltano.service", "FlextMeltanoMeltanoService"],
+    "FlextMeltanoOrchestrationService": ["flext_meltano.meltano.pipelines", "FlextMeltanoOrchestrationService"],
+    "FlextMeltanoProjectManager": ["flext_meltano.meltano.project", "FlextMeltanoProjectManager"],
 }
 
 __all__ = [
@@ -87,7 +69,6 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
-
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -102,7 +83,6 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
-
     """
     return sorted(__all__)
 

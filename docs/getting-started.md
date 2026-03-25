@@ -136,13 +136,19 @@ from flext_core import t
 from flext_core import u
 
 
+<<<<<<< Updated upstream
 # All flext-meltano operations return r[T]
 def example_operation() -> r[str]:
+=======
+# All flext-meltano operations return FlextResult[T]
+def example_operation() -> FlextResult[str]:
+>>>>>>> Stashed changes
     try:
         # Your operation logic
         return r.ok("Operation successful")
     except Exception as e:
         return r.fail(f"Operation failed: {e}")
+
 
 
 # Usage pattern
