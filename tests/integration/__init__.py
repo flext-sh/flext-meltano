@@ -25,10 +25,7 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "TestDockerIntegration": [
-        "tests.integration.test_docker_integration",
-        "TestDockerIntegration",
-    ],
+    "TestDockerIntegration": ["tests.integration.test_docker_integration", "TestDockerIntegration"],
     "psycopg2": ["tests.integration.test_docker_integration", "psycopg2"],
     "redis": ["tests.integration.test_docker_integration", "redis"],
 }

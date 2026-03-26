@@ -56,7 +56,7 @@ class FlextMeltanoCLI:
         self.logger = FlextLogger(__name__)
         self._cli = FlextCli()
         self._api = FlextMeltano()
-        self.output = self._cli.output
+        self.output = self._cli
         self.pipeline_manager = FlextMeltanoPipelineManager(self)
         self.singer_manager = FlextMeltanoSingerManager(self)
         self.dbt_manager = FlextMeltanoDbtManager(self)
