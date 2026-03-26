@@ -569,7 +569,21 @@ class TestFlextMeltanoExecutorComplete:
         cli_app = cli_result.value
         if isinstance(cli_app, dict):
             tm.that(cli_app, has="executor")
-            mock_plugins_result = r.ok(["plugin1", "plugin2"])
+            mock_plugins: Sequence[t.Meltano.PluginDefinition] = [
+                {
+                    "name": "plugin1",
+                    "variants": ["default"],
+                    "metadata": {"status": "active"},
+                },
+                {
+                    "name": "plugin2",
+                    "variants": ["default"],
+                    "metadata": {"status": "active"},
+                },
+            ]
+            mock_plugins_result = r[Sequence[t.Meltano.PluginDefinition]].ok(
+                mock_plugins,
+            )
             with mock.patch.object(
                 FlextMeltanoExecutor,
                 "list_plugins",
@@ -577,8 +591,7 @@ class TestFlextMeltanoExecutorComplete:
             ):
                 plugins_result = executor.list_plugins()
                 tm.ok(plugins_result)
-                if plugins_result.value is not None:
-                    tm.that(plugins_result.value, eq=True)
+                tm.that(plugins_result.value, eq=mock_plugins)
                 version_result = executor.execute()
                 tm.that(version_result, is_=r)
 

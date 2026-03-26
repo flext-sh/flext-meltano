@@ -17,6 +17,7 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
+from flext_cli import cli
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 

@@ -57,12 +57,12 @@ class FlextMeltanoSettings(FlextSettings):
 
     @field_validator("log_level")
     @classmethod
-    def _validate_log_level(cls, value: str) -> str:
-        normalized = value.strip().upper()
+    def _validate_log_level(cls, value: c.LogLevel | str) -> c.LogLevel:
+        normalized = str(value).strip().upper()
         if normalized not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
             msg = "Invalid log_level"
             raise ValueError(msg)
-        return normalized
+        return c.LogLevel(normalized)
 
     def get_project_file(self) -> r[Path]:
         """Return the canonical pipeline file path."""
@@ -92,7 +92,7 @@ class FlextMeltanoSettings(FlextSettings):
         return {
             self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
             self.MELTANO_ENVIRONMENT_ENV: self.environment,
-            self.MELTANO_LOG_LEVEL_ENV: self.log_level,
+            self.MELTANO_LOG_LEVEL_ENV: self.log_level.value,
         }
 
     @classmethod
