@@ -270,11 +270,22 @@ class FlextMeltanoAbstractions:
         _tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
         """Discover available streams for tap instance."""
-        streams: Sequence[t.ContainerMapping] = [
+        stream_defs: Sequence[t.ContainerMapping] = [
             {"stream_name": "users", "tap_stream_id": "users"},
             {"stream_name": "orders", "tap_stream_id": "orders"},
         ]
-        return r[t.ContainerMapping].ok({"streams": streams})
+        for stream_def in stream_defs:
+            name = str(stream_def.get("stream_name", ""))
+            if name and name not in self._stream_registry:
+                self._stream_registry[name] = m.Meltano.StreamDefinition(
+                    stream_name=name,
+                    stream_schema={
+                        "type": "object",
+                        "properties": {"id": {"type": "integer"}},
+                    },
+                    source_type=_tap_instance.tap_type,
+                )
+        return r[t.ContainerMapping].ok({"streams": stream_defs})
 
     def sync_stream(
         self,
@@ -351,7 +362,8 @@ class FlextMeltanoAbstractions:
                 raw_streams = [s for s in raw_val if isinstance(s, dict)]
         for stream in raw_streams:
             if stream.get("stream_name") == stream_name:
-                return r[t.ContainerMapping].ok(stream)
+                result_stream: t.ContainerMapping = {**stream, "name": stream_name}
+                return r[t.ContainerMapping].ok(result_stream)
         return r[t.ContainerMapping].fail(f"Stream '{stream_name}' not found")
 
     def list_streams(
@@ -383,8 +395,38 @@ class FlextMeltanoAbstractions:
         _stream: m.Meltano.StreamDefinition,
         _limit: int | None = None,
     ) -> r[Sequence[t.ContainerMapping]]:
-        """Extract records from a stream."""
-        records: Sequence[t.ContainerMapping] = []
+        """Extract records from a stream (mock data based on schema properties)."""
+        schema = _stream.stream_schema
+        properties: Mapping[str, t.ContainerMapping] = {}
+        if isinstance(schema, dict):
+            props_val = schema.get("properties")
+            if isinstance(props_val, dict):
+                properties = {
+                    field_name: field_definition
+                    for field_name, field_definition in props_val.items()
+                    if isinstance(field_definition, dict)
+                }
+        mock_record: MutableMapping[str, str | int | float] = {}
+        for field_name, field_def in properties.items():
+            field_type = (
+                field_def.get("type", "string")
+                if isinstance(field_def, dict)
+                else "string"
+            )
+            if field_type == "integer":
+                mock_record[field_name] = 1
+            elif field_type == "number":
+                mock_record[field_name] = 1.0
+            else:
+                mock_record[field_name] = f"mock_{field_name}"
+        if not mock_record:
+            mock_record["id"] = 1
+        total_records = 3
+        if _limit is not None:
+            total_records = min(_limit, total_records)
+        records: Sequence[t.ContainerMapping] = [
+            dict(mock_record) for _ in range(total_records)
+        ]
         return r[Sequence[t.ContainerMapping]].ok(records)
 
     def execute(self) -> r[t.ContainerMapping]:

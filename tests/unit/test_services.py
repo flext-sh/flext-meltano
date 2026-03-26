@@ -540,7 +540,7 @@ class TestServiceArchitecture:
 
     def test_service_inheritance_hierarchy(self) -> None:
         """Test that unified service properly inherits from s."""
-        tm.that(issubclass(FlextMeltanoService, s), eq=True)
+        tm.that(FlextMeltanoService.__mro__, has=s)
         tap_service_result = self.service.create_tap_service("tap-test")
         target_service_result = self.service.create_target_service("target-test")
         dbt_service_result = self.service.create_dbt_service("dbt-test")

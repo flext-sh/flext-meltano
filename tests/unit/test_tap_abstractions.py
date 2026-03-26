@@ -494,8 +494,8 @@ class TestFlextMeltanoAbstractionsComplete:
         if result.is_success:
             catalog = result.value
             self.test_assertions.assert_true(
-                condition=isinstance(catalog, t.Dict),
-                message="Should return catalog t.Dict",
+                condition=isinstance(catalog, dict),
+                message="Should return catalog dict",
             )
             self.test_assertions.assert_equal(
                 actual=catalog["version"],

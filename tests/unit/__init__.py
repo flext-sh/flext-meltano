@@ -79,7 +79,7 @@ if TYPE_CHECKING:
         TestTapConfigEnhanced,
         TestTargetConfigEnhanced,
     )
-    from tests.unit.test_plugin_protocols import TestFlextMeltanoPluginProtocolsUnified
+    from tests.unit.test_plugin_protocols import TestFlextMeltanoPluginProtocols
     from tests.unit.test_services import (
         TestDbtService,
         TestFlextMeltanoServiceInitialization,
@@ -195,9 +195,9 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "tests.unit.test_api",
         "TestFlextMeltanoPluginOperations",
     ],
-    "TestFlextMeltanoPluginProtocolsUnified": [
+    "TestFlextMeltanoPluginProtocols": [
         "tests.unit.test_plugin_protocols",
-        "TestFlextMeltanoPluginProtocolsUnified",
+        "TestFlextMeltanoPluginProtocols",
     ],
     "TestFlextMeltanoProjectOperations": [
         "tests.unit.test_api",
@@ -360,7 +360,7 @@ __all__ = [
     "TestFlextMeltanoLibraryRunner",
     "TestFlextMeltanoPerformance",
     "TestFlextMeltanoPluginOperations",
-    "TestFlextMeltanoPluginProtocolsUnified",
+    "TestFlextMeltanoPluginProtocols",
     "TestFlextMeltanoProjectOperations",
     "TestFlextMeltanoServiceInitialization",
     "TestFlextMeltanoSettings",
