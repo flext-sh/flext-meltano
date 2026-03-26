@@ -958,7 +958,7 @@ class TestFlextMeltanoAbstractionsComplete:
         discovery_result = self.tap_abstractions.discover_streams(tap_instance)
         if discovery_result.is_success:
             raw_catalog = discovery_result.value
-            stream_name_list = (
+            stream_name_list: Sequence[str] = (
                 _extract_stream_names(raw_catalog)
                 if isinstance(raw_catalog, dict)
                 else []

@@ -413,10 +413,12 @@ class FlextMeltanoUtilities(FlextCliUtilities):
         @staticmethod
         def directory_exists(path: Path) -> r[bool]:
             """Check if directory exists."""
-            return FlextCliUtilities.try_(
-                lambda: path.exists() and path.is_dir(),
-                catch=(OSError, ValueError),
-            ).map_error(lambda e: f"Failed to check directory existence: {e}")
+            try:
+                return r[bool].ok(path.exists() and path.is_dir())
+            except (OSError, ValueError) as exc:
+                return r[bool].fail(
+                    f"Failed to check directory existence: {exc}",
+                )
 
         @staticmethod
         def supported_types() -> t.StrSequence:

@@ -18,7 +18,7 @@ from collections.abc import Mapping
 
 from flext_tests import tm
 
-from tests import m, t
+from tests import m, t, u
 
 
 class TestCliModelConverterWithTapRunParams:
@@ -34,7 +34,7 @@ class TestCliModelConverterWithTapRunParams:
             "state_file": None,
             "properties_file": None,
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -51,7 +51,7 @@ class TestCliModelConverterWithTapRunParams:
             "config_file": "/path/to/config.json",
             "discover": False,
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -66,7 +66,7 @@ class TestCliModelConverterWithTapRunParams:
             "tap_name": "tap-postgres",
             "discover": True,
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -86,7 +86,7 @@ class TestCliModelConverterWithTapRunParams:
             "properties_file": "/properties.json",
             "discover": False,
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -102,7 +102,7 @@ class TestCliModelConverterWithTapRunParams:
     def test_converter_tap_run_params_missing_required(self) -> None:
         """Test validation error when tap_name is missing."""
         cli_args: t.ContainerMapping = {"discover": False}
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -116,7 +116,7 @@ class TestCliModelConverterWithTapRunParams:
             "tap_name": "tap-postgres",
             "discover": "not-a-boolean",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -134,7 +134,7 @@ class TestCliModelConverterWithTargetRunParams:
             "config_file": None,
             "input_file": None,
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -150,7 +150,7 @@ class TestCliModelConverterWithTargetRunParams:
             "target_name": "target-postgres",
             "config_file": "/path/to/config.json",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -165,7 +165,7 @@ class TestCliModelConverterWithTargetRunParams:
             "target_name": "target-postgres",
             "input_file": "/path/to/input.jsonl",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -181,7 +181,7 @@ class TestCliModelConverterWithTargetRunParams:
             "config_file": "/config.json",
             "input_file": "/input.jsonl",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -194,7 +194,7 @@ class TestCliModelConverterWithTargetRunParams:
     def test_converter_target_run_params_missing_required(self) -> None:
         """Test validation error when target_name is missing."""
         cli_args: t.ContainerMapping = {"config_file": "/config.json"}
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -212,7 +212,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "tap_name": "tap-postgres",
             "config_file": "/path/to/config.json",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -227,7 +227,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "target_name": "target-postgres",
             "config_file": "/path/to/config.json",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -244,7 +244,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "catalog_file": "/catalog.json",
             "state_file": "/state.json",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -263,7 +263,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "catalog_file": "/catalog.json",
             "state_file": "/state.json",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -279,7 +279,7 @@ class TestCliModelConverterWithPipelineRunParams:
     def test_converter_pipeline_run_params_missing_tap_name(self) -> None:
         """Test validation error when tap_name is missing."""
         cli_args: t.ContainerMapping = {"target_name": "target-postgres"}
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -289,7 +289,7 @@ class TestCliModelConverterWithPipelineRunParams:
     def test_converter_pipeline_run_params_missing_target_name(self) -> None:
         """Test validation error when target_name is missing."""
         cli_args: t.ContainerMapping = {"tap_name": "tap-postgres"}
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -303,7 +303,7 @@ class TestCliModelConverterWithDbtRunParams:
     def test_converter_dbt_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectDbtRunParams model."""
         cli_args: t.ContainerMapping = {"project_dir": "/dbt/project"}
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -319,7 +319,7 @@ class TestCliModelConverterWithDbtRunParams:
             "project_dir": "/dbt/project",
             "models": "users orders",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -334,7 +334,7 @@ class TestCliModelConverterWithDbtRunParams:
             "select": "tag:daily",
             "exclude": "tag:deprecated",
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -349,7 +349,7 @@ class TestCliModelConverterWithDbtRunParams:
             "project_dir": "/dbt/project",
             "full_refresh": True,
         }
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -360,7 +360,7 @@ class TestCliModelConverterWithDbtRunParams:
     def test_converter_dbt_run_params_missing_required(self) -> None:
         """Test validation error when project_dir is missing."""
         cli_args: t.ContainerMapping = {"models": "users"}
-        result = m.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.CliModelConverter.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )

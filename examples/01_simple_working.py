@@ -41,10 +41,7 @@ def simple_config_example() -> None:
     """Example using real FlextMeltanoSettings functionality."""
     config = FlextMeltanoSettings()
     logger.info("Config created: %s", config)
-    if config is not None:
-        logger.info(f"Environment: {getattr(config, 'environment', 'unknown')}")
-    else:
-        logger.info("Environment: config is None")
+    logger.info(f"Environment: {getattr(config, 'environment', 'unknown')}")
 
 
 if __name__ == "__main__":

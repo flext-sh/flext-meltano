@@ -106,7 +106,9 @@ class TestTargetConfigEnhanced:
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         """Test TargetConfig validation with invalid batch_size type."""
         with pytest.raises(ValidationError, match="Input should be a valid integer"):
-            m.Meltano.TargetConfig(target_type="target-csv", batch_size="invalid")
+            m.Meltano.TargetConfig(
+                target_type="target-csv", batch_size=cast("int", "invalid")
+            )
 
 
 class TestStreamInfoEnhanced:

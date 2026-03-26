@@ -9,12 +9,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_infra import FlextInfraModels
 from flext_tests import FlextTestsModels
 
 from flext_meltano import FlextMeltanoModels
 
 
-class FlextMeltanoTestModels(FlextTestsModels, FlextMeltanoModels):
+class FlextMeltanoTestModels(FlextTestsModels, FlextInfraModels, FlextMeltanoModels):
     """Test models - composition of FlextTestsModels + FlextMeltanoModels.
 
     Hierarchy:

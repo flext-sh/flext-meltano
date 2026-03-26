@@ -63,14 +63,14 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("exec-pipeline", config)
         tm.ok(create_result)
-        mock_command_result = MagicMock()
+        mock_command_result = MagicMock(spec=m.Infra.CommandOutput)
         mock_command_result.exit_code = 0
         mock_command_result.stdout = "pipeline ok"
         mock_command_result.stderr = ""
         with patch.object(
             FlextInfraUtilitiesSubprocess,
             "run_raw",
-            return_value=r.ok(mock_command_result),
+            return_value=r[m.Infra.CommandOutput].ok(mock_command_result),
         ) as run_mock:
             result = execute_pipeline("exec-pipeline")
     tm.ok(result)
@@ -162,14 +162,14 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
             config_json,
         ])
         tm.ok(create_result)
-        mock_command_result = MagicMock()
+        mock_command_result = MagicMock(spec=m.Infra.CommandOutput)
         mock_command_result.exit_code = 0
         mock_command_result.stdout = "ok"
         mock_command_result.stderr = ""
         with patch.object(
             FlextInfraUtilitiesSubprocess,
             "run_raw",
-            return_value=r.ok(mock_command_result),
+            return_value=r[m.Infra.CommandOutput].ok(mock_command_result),
         ):
             run_result = manager.handle_command(["run", "lifecycle-pipeline"])
         list_result = manager.handle_command(["list"])

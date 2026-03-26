@@ -17,7 +17,6 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
-from flext_cli import cli
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
@@ -50,7 +49,7 @@ class FlextMeltanoCommandRouter:
     def route_command(self, args: t.StrSequence) -> int:
         """Route command to appropriate handler using composition."""
         if not args or args[0] in {"--help", "-h"}:
-            cli.show_banner()
+            self.cli.show_banner()
             self.logger.info("FLEXT Meltano CLI - Main Help")
             return 0
         command = args[0]
@@ -72,13 +71,13 @@ class FlextMeltanoCommandRouter:
     ) -> r[Callable[[t.StrSequence], r[str]]]:
         """Get command handler for given command."""
         command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
-            "pipeline": cli.pipeline_manager.handle_command,
-            "tap": cli.singer_manager.handle_tap_command,
-            "target": cli.singer_manager.handle_target_command,
-            "dbt": cli.dbt_manager.handle_command,
-            "plugin": cli.plugin_manager.handle_command,
-            "status": cli.status_manager.handle_command,
-            "version": cli.status_manager.handle_version_command,
+            "pipeline": self.cli.pipeline_manager.handle_command,
+            "tap": self.cli.singer_manager.handle_tap_command,
+            "target": self.cli.singer_manager.handle_target_command,
+            "dbt": self.cli.dbt_manager.handle_command,
+            "plugin": self.cli.plugin_manager.handle_command,
+            "status": self.cli.status_manager.handle_command,
+            "version": self.cli.status_manager.handle_version_command,
         }
         handler = command_map.get(command)
         if handler is None:
@@ -355,7 +354,7 @@ class FlextMeltanoPipelineManager:
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle pipeline command using composition."""
         if not args or args[0] in {"--help", "-h"}:
-            cli.show_pipeline_help()
+            self.cli.show_pipeline_help()
             return r[str].ok("help")
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -516,7 +515,7 @@ class FlextMeltanoSingerManager:
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle Singer command by routing to tap or target subcommands."""
         if not args or args[0] in {"--help", "-h"}:
-            cli.show_tap_help()
+            self.cli.show_tap_help()
             return r[str].ok("help")
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -529,7 +528,7 @@ class FlextMeltanoSingerManager:
     def handle_tap_command(self, args: t.StrSequence) -> r[str]:
         """Handle tap command."""
         if not args or args[0] in {"--help", "-h"}:
-            cli.show_tap_help()
+            self.cli.show_tap_help()
             return r[str].ok("help")
         subcommand = args[0]
         return self._execute_tap_operation(subcommand, args[1:])
@@ -537,7 +536,7 @@ class FlextMeltanoSingerManager:
     def handle_target_command(self, args: t.StrSequence) -> r[str]:
         """Handle target command."""
         if not args or args[0] in {"--help", "-h"}:
-            cli.show_target_help()
+            self.cli.show_target_help()
             return r[str].ok("help")
         subcommand = args[0]
         return self._execute_target_operation(subcommand, args[1:])
@@ -604,7 +603,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
         """Handle DBT command."""
         return self._handle_command(
             args,
-            cli.show_dbt_help,
+            self.cli.show_dbt_help,
             self._execute_dbt_operation,
         )
 
@@ -630,7 +629,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
         """Handle plugin command."""
         return self._handle_command(
             args,
-            cli.show_plugin_help,
+            self.cli.show_plugin_help,
             self._execute_plugin_operation,
         )
 
@@ -655,7 +654,7 @@ class FlextMeltanoStatusManager:
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle status command."""
         if not args or args[0] in {"--help", "-h"}:
-            cli.show_status_help()
+            self.cli.show_status_help()
             return r[str].ok("help")
         subcommand = args[0]
         return self._execute_status_operation(subcommand, args[1:])
