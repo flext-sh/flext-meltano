@@ -18,17 +18,25 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from tests.integration.test_docker_integration import TestDockerIntegration
+    from tests.integration.test_docker_integration import (
+        TestDockerIntegration,
+        psycopg2,
+        redis,
+    )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestDockerIntegration": [
         "tests.integration.test_docker_integration",
         "TestDockerIntegration",
     ],
+    "psycopg2": ["tests.integration.test_docker_integration", "psycopg2"],
+    "redis": ["tests.integration.test_docker_integration", "redis"],
 }
 
 __all__ = [
     "TestDockerIntegration",
+    "psycopg2",
+    "redis",
 ]
 
 

@@ -56,7 +56,11 @@ if TYPE_CHECKING:
         docker_manager,
         docker_services,
     )
-    from tests.integration.test_docker_integration import TestDockerIntegration
+    from tests.integration.test_docker_integration import (
+        TestDockerIntegration,
+        psycopg2,
+        redis,
+    )
     from tests.models import FlextMeltanoTestModels, FlextMeltanoTestModels as m
     from tests.protocols import (
         FlextMeltanoTestProtocols,
@@ -393,9 +397,11 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "p": ["tests.protocols", "FlextMeltanoTestProtocols"],
     "pipeline_execution_config": ["tests.conftest", "pipeline_execution_config"],
     "postgres_service": ["tests.conftest", "postgres_service"],
+    "psycopg2": ["tests.integration.test_docker_integration", "psycopg2"],
     "pytest_configure": ["tests.conftest", "pytest_configure"],
     "pytestmark": ["tests.unit.test_api", "pytestmark"],
     "r": ["flext_tests", "r"],
+    "redis": ["tests.integration.test_docker_integration", "redis"],
     "redis_service": ["tests.conftest", "redis_service"],
     "s": ["flext_tests", "s"],
     "sample_csv_data": ["tests.conftest", "sample_csv_data"],
@@ -542,9 +548,11 @@ __all__ = [
     "p",
     "pipeline_execution_config",
     "postgres_service",
+    "psycopg2",
     "pytest_configure",
     "pytestmark",
     "r",
+    "redis",
     "redis_service",
     "s",
     "sample_csv_data",
