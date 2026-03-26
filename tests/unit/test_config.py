@@ -17,13 +17,12 @@ from pathlib import Path
 
 import pytest
 from flext_core import FlextSettings
-from flext_core._constants.settings import FlextConstantsSettings
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoSettings
 from tests import c
 
-LogLevel = FlextConstantsSettings.LogLevel
+LogLevel = c.LogLevel
 
 
 class TestFlextMeltanoSettings:

@@ -13,9 +13,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
 from unittest.mock import MagicMock, patch
 
+from flext_core import r
+from flext_infra import m as m_infra
 from flext_tests import tm
 
 from flext_meltano import FlextMeltanoSingerCliTranslator, m
@@ -416,13 +417,19 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     """Test execute_singer_command method."""
 
-    @patch("flext_meltano.singer.translator.subprocess.run")
-    def test_execute_singer_command_success(self, mock_run: MagicMock) -> None:
+    _MOCK_TARGET = (
+        "flext_meltano.singer.translator.FlextInfraUtilitiesSubprocess.run_raw"
+    )
+
+    @patch(_MOCK_TARGET)
+    def test_execute_singer_command_success(self, mock_run_raw: MagicMock) -> None:
         """Test successful command execution."""
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout=b"Success output",
-            stderr=b"",
+        mock_run_raw.return_value = r[m_infra.Infra.CommandOutput].ok(
+            m_infra.Infra.CommandOutput(
+                stdout="Success output",
+                stderr="",
+                exit_code=0,
+            ),
         )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
             "tap-postgres",
@@ -434,28 +441,32 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         tm.that(output["stdout"], eq="Success output")
         tm.that(output["stderr"], eq="")
         tm.that(output["returncode"], eq=0)
-        mock_run.assert_called_once()
+        mock_run_raw.assert_called_once()
 
-    @patch("flext_meltano.singer.translator.subprocess.run")
-    def test_execute_singer_command_with_input(self, mock_run: MagicMock) -> None:
+    @patch(_MOCK_TARGET)
+    def test_execute_singer_command_with_input(self, mock_run_raw: MagicMock) -> None:
         """Test command execution with input data."""
-        mock_run.return_value = MagicMock(returncode=0, stdout=b"Success", stderr=b"")
+        mock_run_raw.return_value = r[m_infra.Infra.CommandOutput].ok(
+            m_infra.Infra.CommandOutput(stdout="Success", stderr="", exit_code=0),
+        )
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             ["target-postgres"],
             input_data=input_data,
         )
         tm.ok(result)
-        call_args = mock_run.call_args
-        tm.that(call_args.kwargs["input"], eq=input_data.encode())
+        call_args = mock_run_raw.call_args
+        tm.that(call_args.kwargs["input_data"], eq=input_data.encode())
 
-    @patch("flext_meltano.singer.translator.subprocess.run")
-    def test_execute_singer_command_failure(self, mock_run: MagicMock) -> None:
-        """Test command execution failure."""
-        mock_run.return_value = MagicMock(
-            returncode=1,
-            stdout=b"",
-            stderr=b"Error: Connection failed",
+    @patch(_MOCK_TARGET)
+    def test_execute_singer_command_failure(self, mock_run_raw: MagicMock) -> None:
+        """Test command execution failure (non-zero exit code)."""
+        mock_run_raw.return_value = r[m_infra.Infra.CommandOutput].ok(
+            m_infra.Infra.CommandOutput(
+                stdout="",
+                stderr="Error: Connection failed",
+                exit_code=1,
+            ),
         )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
             "tap-postgres",
@@ -463,37 +474,41 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         tm.fail(result)
         tm.that(str(result.error), has="Connection failed")
 
-    @patch("flext_meltano.singer.translator.subprocess.run")
-    def test_execute_singer_command_timeout(self, mock_run: MagicMock) -> None:
-        """Test command execution timeout."""
-        mock_run.side_effect = subprocess.TimeoutExpired("tap-postgres", 10)
+    @patch(_MOCK_TARGET)
+    def test_execute_singer_command_timeout(self, mock_run_raw: MagicMock) -> None:
+        """Test command execution timeout (run_raw returns failure)."""
+        mock_run_raw.return_value = r[m_infra.Infra.CommandOutput].fail(
+            "timeout 10s: tap-postgres",
+        )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
             ["tap-postgres"],
             timeout=10,
         )
         tm.fail(result)
-        tm.that(str(result.error), has="timed out after 10 seconds")
+        tm.that(str(result.error), has="timeout")
 
-    @patch("subprocess.run")
-    def test_execute_singer_command_not_found(self, mock_run: MagicMock) -> None:
-        """Test command not found error."""
-        mock_run.side_effect = FileNotFoundError("tap-nonexistent not found")
+    @patch(_MOCK_TARGET)
+    def test_execute_singer_command_not_found(self, mock_run_raw: MagicMock) -> None:
+        """Test command not found error (run_raw returns failure)."""
+        mock_run_raw.return_value = r[m_infra.Infra.CommandOutput].fail(
+            "execution error: tap-nonexistent not found",
+        )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
             "tap-nonexistent",
         ])
         tm.fail(result)
-        tm.that(
-            "tap-nonexistent" in str(result.error) and "not found" in str(result.error),
-            eq=True,
-        )
+        tm.that(str(result.error), has="tap-nonexistent")
+        tm.that(str(result.error), has="not found")
 
-    @patch("flext_meltano.singer.translator.subprocess.run")
+    @patch(_MOCK_TARGET)
     def test_execute_singer_command_generic_exception(
         self,
-        mock_run: MagicMock,
+        mock_run_raw: MagicMock,
     ) -> None:
-        """Test generic exception handling."""
-        mock_run.side_effect = RuntimeError("Unexpected error")
+        """Test generic exception handling (run_raw returns failure)."""
+        mock_run_raw.return_value = r[m_infra.Infra.CommandOutput].fail(
+            "execution error: Unexpected error",
+        )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
             "tap-postgres",
         ])
