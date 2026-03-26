@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import sys
 
-from flext_cli import FlextCli
+from flext_cli import cli
 from flext_core import FlextLogger
 
 from flext_meltano import (
@@ -54,7 +54,7 @@ class FlextMeltanoCLI:
         """
         super().__init__()
         self.logger = FlextLogger(__name__)
-        self._cli = FlextCli()
+        self._cli = cli()
         self._api = FlextMeltano()
         self.output = self._cli
         self.pipeline_manager = FlextMeltanoPipelineManager(self)

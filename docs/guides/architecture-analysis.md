@@ -259,9 +259,8 @@ if result.is_failure:
 
 ```python
 # CLI command integration
-from flext_cli import FlextCli
+from flext_cli import cli
 
-cli = FlextCli()
 cli.register_command("meltano", MeltanoCommandHandler())
 cli.register_command("pipeline", PipelineCommandHandler())
 ```
