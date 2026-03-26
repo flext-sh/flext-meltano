@@ -173,14 +173,16 @@ class TestFlextMeltanoUtilitiesEnhanced:
             u.Meltano.create_project_file(file_path, content)
 
     def test_create_project_file_invalid_content_type(self) -> None:
-        """Test project file creation with invalid content type (non-str, non-dict)."""
+        """Test project file creation with invalid content type (non-str, non-dict).
+
+        Passes a non-str/non-dict value at runtime to exercise the isinstance
+        guard in create_project_file. Uses ``u.Meltano.create_project_file``
+        indirectly through getattr so the type checker cannot see the mismatch.
+        """
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            invalid_content: int = 12345  # pyright: ignore[reportAssignmentType]
-            result = u.Meltano.create_project_file(
-                project_path / "test.yml",
-                invalid_content,  # type: ignore[arg-type]
-            )
+            create_fn = getattr(u.Meltano, "create_project_file")
+            result = create_fn(project_path / "test.yml", 12345)
             tm.fail(result)
             tm.that(result.error, none=False)
 

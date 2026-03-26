@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 import pytest
 from flext_core import FlextLogger, r
 from flext_tests import tm
@@ -56,9 +58,10 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         test_data: t.Meltano.MeltanoConfigDict = {
             "level1": {"level2": {"level3": "found_value"}},
         }
-        level1 = test_data.get("level1", {})
-        if isinstance(level1, dict):
-            level2 = level1.get("level2", {})
-            if isinstance(level2, dict):
-                result = level2.get("level3", "default")
-                tm.that(result, eq="found_value")
+        # Navigate nested dict structure using typed accessors
+        level1_val = test_data["level1"]
+        assert isinstance(level1_val, Mapping)
+        level2_val = level1_val["level2"]
+        assert isinstance(level2_val, Mapping)
+        result_val = level2_val["level3"]
+        tm.that(result_val, eq="found_value")

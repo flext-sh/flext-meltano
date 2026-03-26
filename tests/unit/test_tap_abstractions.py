@@ -174,10 +174,7 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_version="v1.0.0",
         )
         result = self.tap_abstractions.process(config)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         config_result = self.tap_abstractions.process(config)
         self.test_assertions.assert_true(
             condition=config_result.is_success,
@@ -268,16 +265,10 @@ class TestFlextMeltanoAbstractionsComplete:
             connection_config=connection_config,
             stream_config=stream_config,
         )
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             tap_instance = result.value
-            self.test_assertions.assert_true(
-                condition=isinstance(tap_instance, m.Meltano.TapInstance),
-                message="Should return TapInstance",
-            )
+            tm.that(tap_instance, is_=m.Meltano.TapInstance)
 
     def test_validate_tap_instance(self) -> None:
         """Test tap instance validation using process method and flext_tests."""
@@ -303,10 +294,7 @@ class TestFlextMeltanoAbstractionsComplete:
                 "Validation failed at creation",
             )
         valid_result = self.tap_abstractions.process(valid_instance.config)
-        self.test_assertions.assert_true(
-            condition=isinstance(valid_result, r),
-            message="Should return r",
-        )
+        tm.that(valid_result, is_=r)
         if valid_result.is_success:
             self.test_assertions.assert_true(
                 condition=bool(valid_result.value),
@@ -330,10 +318,7 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         result = self.tap_abstractions.discover_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             raw = result.value
             empty_names: Sequence[str] = []
@@ -368,10 +353,7 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="csv_tap_123",
         )
         result = self.tap_abstractions.discover_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             raw = result.value
             empty_names: Sequence[str] = []
@@ -401,10 +383,7 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="unknown_tap_123",
         )
         result = self.tap_abstractions.discover_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             raw = result.value
             empty_names: Sequence[str] = []
@@ -448,10 +427,7 @@ class TestFlextMeltanoAbstractionsComplete:
             message="Stream discovery should succeed",
         )
         stream_result = self.tap_abstractions.get_stream_by_name(tap_instance, "users")
-        self.test_assertions.assert_true(
-            condition=isinstance(stream_result, r),
-            message="Should return r",
-        )
+        tm.that(stream_result, is_=r)
         if stream_result.is_success:
             stream = stream_result.value
             self.test_assertions.assert_true(
@@ -487,10 +463,7 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         result = self.tap_abstractions.generate_catalog(tap_instance)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             catalog = result.value
             self.test_assertions.assert_true(
@@ -512,11 +485,7 @@ class TestFlextMeltanoAbstractionsComplete:
                 condition=isinstance(streams, list),
                 message="Streams should be a list",
             )
-            if isinstance(streams, list):
-                self.test_assertions.assert_true(
-                    condition=isinstance(streams, list),
-                    message="Streams should be a list (may be empty for mock connections)",
-                )
+            tm.that(bool(streams) or streams == [], eq=True)
 
     def test_catalog_entry_structure(self) -> None:
         """Test catalog entry structure using flext_tests."""
@@ -531,10 +500,7 @@ class TestFlextMeltanoAbstractionsComplete:
             source_type="tap-postgres",
         )
         result = self.tap_abstractions._create_catalog_entry_from_stream(stream)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             entry = result.value
             self.test_assertions.assert_equal(
@@ -575,10 +541,7 @@ class TestFlextMeltanoAbstractionsComplete:
             source_type="tap-postgres",
         )
         result = self.tap_abstractions.extract_records(stream)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             records = result.value
             self.test_assertions.assert_true(
@@ -623,10 +586,7 @@ class TestFlextMeltanoAbstractionsComplete:
             source_type="tap-postgres",
         )
         result = self.tap_abstractions.extract_records(stream, _limit=1)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             records = result.value
             self.test_assertions.assert_equal(
@@ -652,10 +612,7 @@ class TestFlextMeltanoAbstractionsComplete:
             source_type="tap-postgres",
         )
         result = self.tap_abstractions.extract_records(stream)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             records = result.value
             self.test_assertions.assert_true(
@@ -698,10 +655,7 @@ class TestFlextMeltanoAbstractionsComplete:
         if not hasattr(self.tap_abstractions, "sync_stream"):
             pytest.skip("sync_stream not available")
         result = self.tap_abstractions.sync_stream(tap_instance, "users", mock_target)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             sync_stats = result.value
             self.test_assertions.assert_equal(
@@ -739,10 +693,7 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="csv_tap_123",
         )
         result = self.tap_abstractions.sync_stream(tap_instance, "data")
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             sync_stats = result.value
             self.test_assertions.assert_equal(
@@ -832,16 +783,10 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_create_instance_factory(self) -> None:
         """Test create_instance factory method using flext_tests."""
         result = FlextMeltanoAbstractions.create_result_instance()
-        self.test_assertions.assert_true(
-            condition=isinstance(result, r),
-            message="Should return r",
-        )
+        tm.that(result, is_=r)
         if result.is_success:
             instance = result.value
-            self.test_assertions.assert_true(
-                condition=isinstance(instance, FlextMeltanoAbstractions),
-                message="Should return FlextMeltanoAbstractions instance",
-            )
+            assert isinstance(instance, FlextMeltanoAbstractions)
             if hasattr(instance, "service_name"):
                 service_name_val = getattr(instance, "service_name")
                 self.test_assertions.assert_equal(
@@ -853,18 +798,12 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_tap_abstractions_error_handling(self) -> None:
         """Test tap abstractions error handling."""
         timeout_error = TimeoutError("Connection timed out")
-        self.test_assertions.assert_true(
-            condition=isinstance(timeout_error, Exception),
-            message="Should create timeout error",
-        )
+        tm.that(timeout_error, is_=Exception)
         validation_error = ValidationError.from_exception_data(
             title="Validation Error",
             line_errors=[],
         )
-        self.test_assertions.assert_true(
-            condition=isinstance(validation_error, Exception),
-            message="Should create validation error",
-        )
+        tm.that(validation_error, is_=Exception)
 
     def test_invalid_tap_config_creation(self) -> None:
         """Test invalid tap config creation using flext_tests."""
