@@ -257,6 +257,7 @@ extraPaths = [
   "src",
 ]
 ignore = [
+  "**/*.pyi",
   "../typings",
   "../typings/generated",
 ]
