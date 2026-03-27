@@ -38,7 +38,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         ...     "name": source - csv,
         ...     "namespace": "source_csv",
         ... }
-        >>> result: r = validator.validate_pipeline_component_business_rules(config)
+        >>> result: r = validator.validate_component_rules(config)
         >>> if result.is_success:
         ...     logger.info("Component configuration is valid")
 
@@ -86,7 +86,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[t.ScalarMapping].fail(error_msg)
 
     @classmethod
-    def validate_pipeline_component_business_rules(
+    def validate_component_rules(
         cls,
         config: t.ConfigurationMapping,
     ) -> r[bool]:
@@ -186,7 +186,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         r containing boolean validation result or error details.
 
         """
-        return cls.validate_pipeline_component_business_rules(config)
+        return cls.validate_component_rules(config)
 
     @classmethod
     def validate_transformation_business_rules(
