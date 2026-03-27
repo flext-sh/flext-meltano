@@ -39,54 +39,21 @@ if TYPE_CHECKING:
     from flext_meltano.services.validators import FlextMeltanoValidators
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoAbstractions": [
-        "flext_meltano.services.abstractions",
-        "FlextMeltanoAbstractions",
-    ],
+    "FlextMeltanoAbstractions": ["flext_meltano.services.abstractions", "FlextMeltanoAbstractions"],
     "FlextMeltanoAdapter": ["flext_meltano.services.adapters", "FlextMeltanoAdapter"],
     "FlextMeltanoBridge": ["flext_meltano.services.bridge", "FlextMeltanoBridge"],
-    "FlextMeltanoCommandRouter": [
-        "flext_meltano.services.cli_managers",
-        "FlextMeltanoCommandRouter",
-    ],
-    "FlextMeltanoDbtManager": [
-        "flext_meltano.services.cli_managers",
-        "FlextMeltanoDbtManager",
-    ],
+    "FlextMeltanoCommandRouter": ["flext_meltano.services.cli_managers", "FlextMeltanoCommandRouter"],
+    "FlextMeltanoDbtManager": ["flext_meltano.services.cli_managers", "FlextMeltanoDbtManager"],
     "FlextMeltanoExecutor": ["flext_meltano.services.executor", "FlextMeltanoExecutor"],
-    "FlextMeltanoFileManagers": [
-        "flext_meltano.services.file_managers",
-        "FlextMeltanoFileManagers",
-    ],
-    "FlextMeltanoLibraryRunner": [
-        "flext_meltano.services.library_runner",
-        "FlextMeltanoLibraryRunner",
-    ],
-    "FlextMeltanoPipelineManager": [
-        "flext_meltano.services.cli_managers",
-        "FlextMeltanoPipelineManager",
-    ],
-    "FlextMeltanoPluginManager": [
-        "flext_meltano.services.cli_managers",
-        "FlextMeltanoPluginManager",
-    ],
-    "FlextMeltanoProjectService": [
-        "flext_meltano.services.project_service",
-        "FlextMeltanoProjectService",
-    ],
+    "FlextMeltanoFileManagers": ["flext_meltano.services.file_managers", "FlextMeltanoFileManagers"],
+    "FlextMeltanoLibraryRunner": ["flext_meltano.services.library_runner", "FlextMeltanoLibraryRunner"],
+    "FlextMeltanoPipelineManager": ["flext_meltano.services.cli_managers", "FlextMeltanoPipelineManager"],
+    "FlextMeltanoPluginManager": ["flext_meltano.services.cli_managers", "FlextMeltanoPluginManager"],
+    "FlextMeltanoProjectService": ["flext_meltano.services.project_service", "FlextMeltanoProjectService"],
     "FlextMeltanoService": ["flext_meltano.services.services", "FlextMeltanoService"],
-    "FlextMeltanoSingerManager": [
-        "flext_meltano.services.cli_managers",
-        "FlextMeltanoSingerManager",
-    ],
-    "FlextMeltanoStatusManager": [
-        "flext_meltano.services.cli_managers",
-        "FlextMeltanoStatusManager",
-    ],
-    "FlextMeltanoValidators": [
-        "flext_meltano.services.validators",
-        "FlextMeltanoValidators",
-    ],
+    "FlextMeltanoSingerManager": ["flext_meltano.services.cli_managers", "FlextMeltanoSingerManager"],
+    "FlextMeltanoStatusManager": ["flext_meltano.services.cli_managers", "FlextMeltanoStatusManager"],
+    "FlextMeltanoValidators": ["flext_meltano.services.validators", "FlextMeltanoValidators"],
 }
 
 __all__ = [
