@@ -292,7 +292,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         return r[t.Dict].ok(
             t.Dict({
                 "stream_name": stream_name,
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "records_processed": 0,
                 "target_loaded": target is not None,
             }),

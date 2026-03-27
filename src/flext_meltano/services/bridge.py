@@ -10,12 +10,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, r
+from typing import override
 
-from flext_meltano import p, t, u
+from flext_core import r
+
+from flext_meltano import c, t, u
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoBridge:
+class FlextMeltanoBridge(FlextMeltanoServiceBase):
     """Go Bridge - JSON API para integração Go ↔ Python.
 
     Provides JSON-based communication between Go and Python components
@@ -24,7 +27,7 @@ class FlextMeltanoBridge:
 
     def __init__(self) -> None:
         """Initialize the bridge."""
-        self.logger: p.Logger = FlextLogger(__name__)
+        super().__init__()
 
     @staticmethod
     def discover_plugins() -> r[t.ConfigurationMapping]:
@@ -34,7 +37,7 @@ class FlextMeltanoBridge:
                 "extractors": "tap-csv,tap-postgres,tap-json",
                 "loaders": "target-csv,target-postgres,target-jsonl",
                 "transformers": "dbt-postgres,dbt-snowflake",
-                "status": "discovered",
+                "status": c.Meltano.Enums.StreamStatus.DISCOVERED,
                 "timestamp": u.generate_iso_timestamp(),
             }
             return r[t.ScalarMapping].ok(result_data)
@@ -60,7 +63,7 @@ class FlextMeltanoBridge:
             result_data: t.Meltano.ExecutionResultDict = {
                 "command": command,
                 "args": args or {},
-                "status": "executed",
+                "status": c.Meltano.Enums.OperationStatus.EXECUTED,
                 "timestamp": u.generate_iso_timestamp(),
             }
             return r[t.Meltano.ExecutionResultDict].ok(result_data)
@@ -78,6 +81,13 @@ class FlextMeltanoBridge:
         """Validate connection to Go bridge."""
         connected: bool = True
         return r[bool].ok(connected)
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute bridge service."""
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
+        )
 
 
 __all__ = ["FlextMeltanoBridge"]

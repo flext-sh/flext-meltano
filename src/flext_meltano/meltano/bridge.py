@@ -13,16 +13,12 @@ from __future__ import annotations
 from flext_core import FlextLogger
 
 from flext_meltano import (
-    FlextMeltanoConstants,
-    FlextMeltanoModels,
-    FlextMeltanoTypes,
+    c,
+    m,
     p,
     r,
     u,
 )
-
-t = FlextMeltanoTypes
-c = FlextMeltanoConstants
 
 
 class FlextMeltanoBridge:
@@ -98,7 +94,7 @@ class FlextMeltanoBridge:
         """
         try:
             args_dict: t.Meltano.MeltanoConfigDict = (
-                FlextMeltanoModels.Meltano.ConfigMappingPayload.model_validate({
+                m.Meltano.ConfigMappingPayload.model_validate({
                     "values": args,
                 }).values
                 if args
@@ -107,7 +103,7 @@ class FlextMeltanoBridge:
             result: t.Meltano.Bridge.BridgeStatus = {
                 "command": command,
                 "args": str(args_dict),
-                "status": "executed",
+                "status": c.Meltano.Enums.OperationStatus.EXECUTED,
                 "timestamp": u.generate_iso_timestamp(),
             }
             return r[t.Meltano.Bridge.BridgeStatus].ok(result)

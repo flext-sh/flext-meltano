@@ -11,19 +11,22 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
-from flext_core import FlextLogger, r
+from flext_core import r
 
 from flext_meltano import (
     FlextMeltanoBridge,
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
+    c,
     p,
     t,
 )
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
+class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner, FlextMeltanoServiceBase):
     """Unified library runner providing complete Meltano functionality.
 
     This class consolidates all Meltano operations (DBT transformations, Singer
@@ -33,9 +36,22 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
 
     def __init__(self) -> None:
         """Initialize the library runner."""
-        self.logger: p.Logger = FlextLogger(__name__)
+        super().__init__()
         self._executor = FlextMeltanoExecutor()
         self._bridge = FlextMeltanoBridge()
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute the library runner service.
+
+        Returns:
+            r containing runner status and capabilities.
+
+        """
+        return r[t.Meltano.MeltanoConfigDict].ok({
+            "service_type": "flext_meltano_library_runner",
+            "status": c.Meltano.Enums.OperationStatus.READY,
+        })
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ResultDict]:
@@ -49,8 +65,8 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
         try:
             dbt_runner: t.Meltano.ResultDict = {
                 "type": "dbt_runner",
-                "status": "available",
-                "capabilities": ["run", "test", "docs", "seed"],
+                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                "capabilities": list(c.Meltano.Capabilities.DBT),
             }
             return r[t.Meltano.ResultDict].ok(dbt_runner)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -68,8 +84,8 @@ class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner):
         try:
             singer_manager: t.Meltano.ResultDict = {
                 "type": "singer_manager",
-                "status": "available",
-                "capabilities": ["discover", "sync", "validate"],
+                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                "capabilities": list(c.Meltano.Capabilities.SINGER),
             }
             return r[t.Meltano.ResultDict].ok(singer_manager)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

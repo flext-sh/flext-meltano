@@ -20,7 +20,7 @@ from pathlib import Path
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano import c, m, p, t
+from flext_meltano import c, m, p, t, u
 
 
 class FlextMeltanoCommandRouter:
@@ -69,13 +69,13 @@ class FlextMeltanoCommandRouter:
     ) -> r[Callable[[t.StrSequence], r[str]]]:
         """Get command handler for given command."""
         command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
-            "pipeline": self.cli.pipeline_manager.handle_command,
-            "tap": self.cli.singer_manager.handle_tap_command,
-            "target": self.cli.singer_manager.handle_target_command,
-            "dbt": self.cli.dbt_manager.handle_command,
-            "plugin": self.cli.plugin_manager.handle_command,
-            "status": self.cli.status_manager.handle_command,
-            "version": self.cli.status_manager.handle_version_command,
+            c.Meltano.Enums.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
+            c.Meltano.Enums.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
+            c.Meltano.Enums.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,
+            c.Meltano.Enums.CliCommand.DBT: self.cli.dbt_manager.handle_command,
+            c.Meltano.Enums.CliCommand.PLUGIN: self.cli.plugin_manager.handle_command,
+            c.Meltano.Enums.CliCommand.STATUS: self.cli.status_manager.handle_command,
+            c.Meltano.Enums.CliCommand.VERSION: self.cli.status_manager.handle_version_command,
         }
         handler = command_map.get(command)
         if handler is None:
@@ -128,20 +128,6 @@ class FlextMeltanoPipelineManager:
             FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
             / FlextMeltanoPipelineManager._PIPELINE_PID_FILE
         )
-
-    @staticmethod
-    def _is_process_running(pid: int) -> bool:
-        if pid <= 0:
-            return False
-        try:
-            os.kill(pid, 0)
-        except ProcessLookupError:
-            return False
-        except PermissionError:
-            return True
-        except OSError:
-            return False
-        return True
 
     @staticmethod
     def _execute_pipeline_operation(
@@ -267,7 +253,7 @@ class FlextMeltanoPipelineManager:
             return r[str].fail(
                 f"Failed to read status for pipeline '{pipeline_name}': {exc}",
             )
-        if FlextMeltanoPipelineManager._is_process_running(pid):
+        if u.Meltano.is_process_running(pid):
             return r[str].ok("running")
         try:
             pid_path.unlink()
@@ -292,7 +278,7 @@ class FlextMeltanoPipelineManager:
             return r[str].fail(
                 f"Failed to read PID for pipeline '{pipeline_name}': {exc}",
             )
-        if not FlextMeltanoPipelineManager._is_process_running(pid):
+        if not u.Meltano.is_process_running(pid):
             try:
                 pid_path.unlink()
             except FileNotFoundError:
@@ -314,7 +300,7 @@ class FlextMeltanoPipelineManager:
             return r[str].fail(f"Failed to stop pipeline '{pipeline_name}': {exc}")
         deadline = time.monotonic() + timeout_seconds
         while time.monotonic() < deadline:
-            if not FlextMeltanoPipelineManager._is_process_running(pid):
+            if not u.Meltano.is_process_running(pid):
                 try:
                     pid_path.unlink()
                 except FileNotFoundError:
@@ -411,12 +397,12 @@ class FlextMeltanoPipelineManager:
     ) -> r[Callable[[t.StrSequence], r[str]]]:
         """Get pipeline operation handler."""
         operation_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
-            "create": self._create_pipeline,
-            "run": self._run_pipeline,
-            "list": self._list_pipelines,
-            "status": self._get_pipeline_status,
-            "stop": self._stop_pipeline,
-            "delete": self._delete_pipeline,
+            c.Meltano.Enums.PipelineCommand.CREATE: self._create_pipeline,
+            c.Meltano.Enums.PipelineCommand.RUN: self._run_pipeline,
+            c.Meltano.Enums.PipelineCommand.LIST: self._list_pipelines,
+            c.Meltano.Enums.PipelineCommand.STATUS: self._get_pipeline_status,
+            c.Meltano.Enums.PipelineCommand.STOP: self._stop_pipeline,
+            c.Meltano.Enums.PipelineCommand.DELETE: self._delete_pipeline,
         }
         handler = operation_map.get(subcommand)
         if handler is None:

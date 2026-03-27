@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
-from flext_core import r, s
+from flext_core import r
 
 from flext_meltano import (
     FlextMeltanoBridge,
@@ -26,9 +26,10 @@ from flext_meltano import (
     t,
     u,
 )
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
+class FlextMeltanoExecutor(FlextMeltanoServiceBase):
     """Unified executor architecture following flext-core patterns.
 
     Provides complete Meltano command execution with proper error handling,
@@ -75,7 +76,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 "command": action,
                 "action": action,
                 "args": args,
-                "status": "executed",
+                "status": c.Meltano.Enums.OperationStatus.EXECUTED,
             })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.ExecutionResultDict].fail(f"Action failed: {e}")
@@ -86,7 +87,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         return r[t.Meltano.ExecutionResultDict].ok({
             "command": "health",
             "command_type": "health",
-            "status": "healthy",
+            "status": c.Meltano.Enums.OperationStatus.HEALTHY,
             "health": "OK",
             "components": ["bridge", "adapter", "executor"],
         })
@@ -117,7 +118,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
     def _handle_cli_no_args() -> r[t.Meltano.ExecutionResultDict]:
         """Handle CLI with no arguments - delegates to ready state."""
         return r[t.Meltano.ExecutionResultDict].ok({
-            "status": "ready",
+            "status": c.Meltano.Enums.OperationStatus.READY,
             "command_type": "cli",
             "message": "No arguments provided - ready for commands",
         })
@@ -131,7 +132,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
                 executor.run(args)
                 if args
                 else r[t.Meltano.ExecutionResultDict].ok({
-                    "status": "ready",
+                    "status": c.Meltano.Enums.OperationStatus.READY,
                     "command_type": "cli_runner",
                     "args": args,
                 })
@@ -159,18 +160,10 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
     @staticmethod
     def list_commands() -> r[t.Meltano.ExecutionResultDict]:
         """List available commands - returns command list."""
-        commands_list = [
-            "version",
-            "help",
-            "health",
-            "pipeline",
-            "run",
-            "install",
-            "list",
-            "invoke",
-            "select",
+        commands_list = [cmd.value for cmd in c.Meltano.Enums.ExecutorCommand]
+        available = [
+            cmd for cmd in commands_list if cmd in {"version", "help", "health"}
         ]
-        available = [c for c in commands_list if c in {"version", "help", "health"}]
         return r[t.Meltano.ExecutionResultDict].ok({
             "commands": commands_list,
             "available_commands": available,
@@ -193,7 +186,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         try:
             config_data: t.Meltano.ExecutionResultDict = {
                 "executor_type": "flext_meltano_executor",
-                "status": "ready",
+                "status": c.Meltano.Enums.OperationStatus.READY,
                 "execution_timestamp": str(time.time()),
                 "config": self._meltano_config.model_dump()
                 if u.is_pydantic_model(self._meltano_config)
@@ -307,7 +300,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
             return r[t.Meltano.ExecutionResultDict].ok({
-                "status": "ready",
+                "status": c.Meltano.Enums.OperationStatus.READY,
                 "command_type": "cli",
                 "message": "CLI ready for commands",
             })
@@ -350,7 +343,7 @@ class FlextMeltanoExecutor(s[t.Meltano.ExecutionResultDict]):
         """Handle CLI other arguments - delegates to action executor."""
         if not args:
             return r[t.Meltano.ExecutionResultDict].ok({
-                "status": "ready",
+                "status": c.Meltano.Enums.OperationStatus.READY,
                 "command_type": "cli",
                 "message": "Ready for commands",
             })

@@ -16,7 +16,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, c, p, t
 
 
 class FlextMeltanoDbtTransformationRunner:
@@ -78,7 +78,9 @@ class FlextMeltanoLibraryRunner(
     def execute(self) -> r[t.Meltano.ExecutionResultDict]:
         """Execute library runner logic."""
         try:
-            return r[t.Meltano.ExecutionResultDict].ok({"status": "ready"})
+            return r[t.Meltano.ExecutionResultDict].ok({
+                "status": c.Meltano.Enums.OperationStatus.READY
+            })
         except (
             ValueError,
             TypeError,
@@ -98,8 +100,8 @@ class FlextMeltanoLibraryRunner(
         try:
             dbt_runner: t.Meltano.ExecutionResultDict = {
                 "type": "dbt_runner",
-                "status": "available",
-                "capabilities": ["run", "test", "docs", "seed"],
+                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                "capabilities": list(c.Meltano.Capabilities.DBT),
             }
             return r[t.Meltano.ExecutionResultDict].ok(dbt_runner)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -113,8 +115,8 @@ class FlextMeltanoLibraryRunner(
         try:
             singer_manager: t.Meltano.ExecutionResultDict = {
                 "type": "singer_manager",
-                "status": "available",
-                "capabilities": ["discover", "sync", "validate"],
+                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                "capabilities": list(c.Meltano.Capabilities.SINGER),
             }
             return r[t.Meltano.ExecutionResultDict].ok(singer_manager)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:

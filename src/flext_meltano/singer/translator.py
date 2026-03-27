@@ -15,7 +15,7 @@ from collections.abc import MutableSequence
 from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano import m, t
+from flext_meltano import c, m, t
 
 
 class FlextMeltanoSingerCliTranslator:
@@ -29,7 +29,7 @@ class FlextMeltanoSingerCliTranslator:
     def execute_singer_command(
         command: t.StrSequence,
         input_data: str | None = None,
-        timeout: int = 300,
+        timeout: int = c.Meltano.BatchDefaults.COMMAND_TIMEOUT,
     ) -> r[t.Meltano.CLI.ProcessResult]:
         """Execute Singer SDK command and capture output.
 

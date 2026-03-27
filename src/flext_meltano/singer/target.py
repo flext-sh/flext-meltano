@@ -13,7 +13,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import FlextMeltanoSettings, m, t
+from flext_meltano import FlextMeltanoSettings, c, m, t
 
 
 class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
@@ -58,7 +58,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
                 "sink_name": f"{sink_config.sink_type}_sink",
                 "sink_type": sink_config.sink_type,
                 "config": sink_config.connection_config,
-                "status": "configured",
+                "status": c.Meltano.Enums.OperationStatus.CONFIGURED,
             })
             self.logger.info(
                 "Sink configured successfully",

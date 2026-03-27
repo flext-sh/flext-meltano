@@ -14,7 +14,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import m, t
+from flext_meltano import c, m, t
 
 
 class FlextMeltanoDbtRunner(s[str]):
@@ -53,8 +53,12 @@ class FlextMeltanoDbtRunner(s[str]):
                 return r[t.Meltano.ExecutionResultDict].fail("No project root set")
             self.logger.info("Generating DBT documentation", cwd=str(self.project_root))
             result: t.Meltano.ExecutionResultDict = {
-                "status": "completed",
-                "docs_path": str(self.project_root / "target" / "index.html"),
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
+                "docs_path": str(
+                    self.project_root
+                    / c.Meltano.FilePaths.DBT_OUTPUT_DIR
+                    / c.Meltano.FilePaths.DBT_DOCS_INDEX
+                ),
             }
             self.logger.info("DBT documentation generated")
             return r[t.Meltano.ExecutionResultDict].ok(result)

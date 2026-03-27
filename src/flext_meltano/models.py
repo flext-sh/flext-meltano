@@ -47,7 +47,6 @@ class FlextMeltanoModels(FlextCliModels):
 
             def is_sensitive(k: str) -> bool:
                 normalized = u.normalize(k, case="lower")
-                # Convert set to list of str for processing
                 sensitive_keys_list: t.StrSequence = list(sensitive_keys)
                 checks_result = u.process(
                     sensitive_keys_list,
@@ -60,11 +59,9 @@ class FlextMeltanoModels(FlextCliModels):
                     return u.any_(*checks)
                 return False
 
-            # Transform dict values with protection for sensitive fields
             protected: t.MutableContainerMapping = {}
             for key, item in value.items():
                 protected[key] = "[PROTECTED]" if is_sensitive(key) else item
-
             return protected
 
         @staticmethod

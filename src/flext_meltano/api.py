@@ -139,7 +139,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         result_data: t.Meltano.MeltanoConfigDict = {
             "environment": environment_name,
             "configuration": u.Meltano.normalize_config(config),
-            "status": "configured",
+            "status": c.Meltano.Enums.OperationStatus.CONFIGURED,
         }
         return r[t.Meltano.MeltanoConfigDict].ok(result_data)
 
@@ -239,7 +239,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                     "target": target_name,
                     "pipeline_name": f"{tap_name}_to_{target_name}",
                     "configuration": u.Meltano.normalize_config(config),
-                    "status": "created",
+                    "status": c.Meltano.Enums.OperationStatus.CREATED,
                     "created_at": str(time.time()),
                     "api_version": self.version,
                     "timeout_seconds": getattr(self._config, "timeout_seconds", 300),
@@ -318,7 +318,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 "service_name": self.service_name,
                 "version": self.version,
                 "status": c.CommonStatus.ACTIVE,
-                "operations": ["pipeline", "plugin", "dbt", "environment"],
+                "operations": list(c.Meltano.Operations.ALL),
             },
         )
         return r[m.Meltano.ConfigMappingPayload].ok(payload)
@@ -348,7 +348,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             execution_duration = time.time() - execution_start
             execution_result: t.Meltano.MeltanoConfigDict = {
                 "pipeline_id": pipeline_id,
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "execution_duration": execution_duration,
                 "executed_at": str(time.time()),
                 "configuration": u.Meltano.normalize_config(config),
@@ -405,7 +405,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             execution_start = time.time()
             execution_duration = time.time() - execution_start
             return r[t.Meltano.MeltanoConfigDict].ok({
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "execution_duration": execution_duration,
                 "executed_at": str(time.time()),
                 "api_version": self.version,
@@ -489,7 +489,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             result_data: t.Meltano.MeltanoConfigDict = {
                 "plugin_name": plugin_name,
                 "plugin_type": plugin_type,
-                "status": "installed",
+                "status": c.Meltano.Enums.OperationStatus.INSTALLED,
                 "configuration": plugin_config,
                 "installed_at": str(time.time()),
                 "api_version": self.version,
@@ -507,9 +507,21 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         """List installed plugins using flext-core patterns."""
         try:
             all_plugins = [
-                {"name": "tap-csv", "type": "extractors", "status": "installed"},
-                {"name": "target-postgres", "type": "loaders", "status": "installed"},
-                {"name": "dbt-postgres", "type": "transformers", "status": "installed"},
+                {
+                    "name": "tap-csv",
+                    "type": "extractors",
+                    "status": c.Meltano.Enums.OperationStatus.INSTALLED,
+                },
+                {
+                    "name": "target-postgres",
+                    "type": "loaders",
+                    "status": c.Meltano.Enums.OperationStatus.INSTALLED,
+                },
+                {
+                    "name": "dbt-postgres",
+                    "type": "transformers",
+                    "status": c.Meltano.Enums.OperationStatus.INSTALLED,
+                },
             ]
             filtered_plugins = (
                 u.filter(all_plugins, lambda p: p.get("type") == plugin_type)
@@ -562,7 +574,9 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 return r[t.Meltano.ResultDict].ok({
                     str(k): v for k, v in load_result.value.items()
                 })
-            return r[t.Meltano.ResultDict].ok({"status": "initialized"})
+            return r[t.Meltano.ResultDict].ok({
+                "status": c.Meltano.Enums.StreamStatus.INITIALIZED
+            })
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.Meltano.ResultDict].fail(f"Failed to load data: {e}")
 
@@ -582,7 +596,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             )
             result_data: t.Meltano.MeltanoConfigDict = {
                 "models": [str(model_name) for model_name in models_to_run],
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "execution_duration": execution_duration,
                 "configuration": u.Meltano.normalize_config(config),
                 "executed_at": str(time.time()),
@@ -631,7 +645,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 "tap": tap_name,
                 "target": target_name,
                 "dbt_models": [str(model_name) for model_name in (dbt_models or [])],
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "stages": {
                     "extract_duration": extract_duration,
                     "load_duration": load_duration,
@@ -670,7 +684,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             execution_duration = time.time() - execution_start
             return r[t.Meltano.MeltanoConfigDict].ok({
                 f"{component_key}_name": component_name,
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "execution_duration": execution_duration,
                 "executed_at": str(time.time()),
                 "api_version": self.version,
@@ -733,7 +747,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             )
             result_data: t.Meltano.MeltanoConfigDict = {
                 "models": [str(model_name) for model_name in models_to_test],
-                "status": "passed",
+                "status": c.Meltano.Enums.OperationStatus.PASSED,
                 "tests_executed": tests_count,
                 "execution_duration": execution_duration,
                 "configuration": u.Meltano.normalize_config(config),

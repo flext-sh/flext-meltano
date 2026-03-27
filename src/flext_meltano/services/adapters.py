@@ -15,10 +15,11 @@ from typing import override
 import meltano
 from flext_core import FlextSettings, r, s
 
-from flext_meltano import FlextMeltanoSettings, t
+from flext_meltano import FlextMeltanoSettings, c, t
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoAdapter:
+class FlextMeltanoAdapter(FlextMeltanoServiceBase):
     """Base adapter namespace class for focused integrations."""
 
     class ProjectAdapter(s[t.Meltano.ExecutionResultDict]):
@@ -42,7 +43,7 @@ class FlextMeltanoAdapter:
                 result: t.Meltano.ExecutionResultDict = {
                     "project_name": project_name,
                     "project_path": str(project_path),
-                    "status": "created",
+                    "status": c.Meltano.Enums.OperationStatus.CREATED,
                     "created_at": str(time.time()),
                 }
                 return r[t.Meltano.ExecutionResultDict].ok(result)
@@ -134,7 +135,9 @@ class FlextMeltanoAdapter:
         @override
         def execute(self) -> r[t.Meltano.ExecutionResultDict]:
             """Execute default pipeline operation."""
-            return r[t.Meltano.ExecutionResultDict].ok({"status": "ready"})
+            return r[t.Meltano.ExecutionResultDict].ok({
+                "status": c.Meltano.Enums.OperationStatus.READY
+            })
 
         def execute_pipeline(
             self,
@@ -155,7 +158,7 @@ class FlextMeltanoAdapter:
                     "pipeline_id": f"{tap_name}_{target_name}_{int(time.time())}",
                     "tap": tap_name,
                     "target": target_name,
-                    "status": "completed",
+                    "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                     "execution_duration": 0.5,
                     "stages": {"extract_duration": 0.3, "load_duration": 0.2},
                 }
@@ -193,9 +196,13 @@ class FlextMeltanoAdapter:
                                 {
                                     "breadcrumb": list[str](),
                                     "metadata": {
-                                        "table-key-properties": ["id"],
-                                        "forced-replication-method": "INCREMENTAL",
-                                        "valid-replication-keys": ["updated_at"],
+                                        c.Meltano.Enums.SingerMetadataKey.TABLE_KEY_PROPERTIES: [
+                                            "id"
+                                        ],
+                                        c.Meltano.Enums.SingerMetadataKey.FORCED_REPLICATION_METHOD: "INCREMENTAL",
+                                        c.Meltano.Enums.SingerMetadataKey.VALID_REPLICATION_KEYS: [
+                                            "updated_at"
+                                        ],
                                     },
                                 },
                             ],
@@ -231,7 +238,7 @@ class FlextMeltanoAdapter:
             """Execute DBT operation."""
             try:
                 dbt_result: t.Meltano.DbtResultDict = {
-                    "status": "completed",
+                    "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                     "models_run": 5,
                     "tests_run": 12,
                     "execution_time": 45.2,
@@ -239,6 +246,13 @@ class FlextMeltanoAdapter:
                 return r[t.Meltano.DbtResultDict].ok(dbt_result)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
                 return r[t.Meltano.DbtResultDict].fail(f"DBT operation failed: {ex}")
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute adapter service."""
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            {"status": c.Meltano.Enums.OperationStatus.READY},
+        )
 
 
 __all__ = ["FlextMeltanoAdapter"]

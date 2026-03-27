@@ -13,13 +13,15 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextLogger, r
 
 from flext_meltano import c, m, p, t, u
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoAbstractions:
+class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
     """UNIFIED abstraction class providing pipeline functionality with nested helpers.
 
     This class consolidates all pipeline wrapper functionality into a single unified
@@ -46,7 +48,7 @@ class FlextMeltanoAbstractions:
                     "project_path": str(project_path),
                     "source_name": source_name,
                     "sink_name": sink_name,
-                    "status": "initialized",
+                    "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
                 }
                 return r[t.StrMapping].ok(pipeline_context)
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -63,7 +65,7 @@ class FlextMeltanoAbstractions:
             """Execute data pipeline with given context and configurations."""
             try:
                 result: t.Meltano.ELT.PipelineResult = {
-                    "status": "completed",
+                    "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                     "source": str(
                         source_config.get("name", c.IDENTIFIER_UNKNOWN),
                     ),
@@ -81,7 +83,6 @@ class FlextMeltanoAbstractions:
     def __init__(self) -> None:
         """Initialize unified abstractions with FLEXT patterns."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
         self._project_path: Path | None = None
         self._stream_registry: MutableMapping[str, m.Meltano.StreamDefinition] = {}
         self._runner_helper = self._RunnerHelper(self.logger)
@@ -108,7 +109,7 @@ class FlextMeltanoAbstractions:
                 "project": str(project.root_dir),
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
-                "status": "initialized",
+                "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
             }
             return r[t.Meltano.MeltanoConfigDict].ok(elt_context)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -138,7 +139,7 @@ class FlextMeltanoAbstractions:
         """Execute data pipeline."""
         pipeline_context: Mapping[str, str | None] = {
             "project_path": str(self._project_path) if self._project_path else None,
-            "status": "initialized",
+            "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
         }
         return self._runner_helper.execute_data_pipeline(
             pipeline_context,
@@ -155,7 +156,7 @@ class FlextMeltanoAbstractions:
         """Execute singer pipeline."""
         try:
             result: t.Meltano.ELT.PipelineResult = {
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "records_processed": 0,
                 "elt_context": str(elt_context),
             }
@@ -190,12 +191,20 @@ class FlextMeltanoAbstractions:
         """Get components of specified type."""
         try:
             components: Sequence[t.Meltano.PluginDefinition] = [
-                {"name": "source-csv", "type": "sources", "status": "available"},
-                {"name": "sink-postgres", "type": "sinks", "status": "available"},
+                {
+                    "name": "source-csv",
+                    "type": "sources",
+                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                },
+                {
+                    "name": "sink-postgres",
+                    "type": "sinks",
+                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                },
                 {
                     "name": "transform-dbt",
                     "type": "transformers",
-                    "status": "available",
+                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
                 },
             ]
             filtered_components = u.filter(
@@ -222,12 +231,12 @@ class FlextMeltanoAbstractions:
                 "tap-csv": {
                     "name": "tap-csv",
                     "type": "extractors",
-                    "status": "available",
+                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
                 },
                 "target-postgres": {
                     "name": "target-postgres",
                     "type": "loaders",
-                    "status": "available",
+                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
                 },
             }
             filtered_plugins: Mapping[str, t.Meltano.PluginDefinition] = {
@@ -296,7 +305,7 @@ class FlextMeltanoAbstractions:
         """Sync a stream from tap to target."""
         result: t.ContainerMapping = {
             "stream_name": stream_name,
-            "status": "completed",
+            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
             "target_loaded": target_config is not None,
             "records_processed": 0,
         }
@@ -429,9 +438,12 @@ class FlextMeltanoAbstractions:
         ]
         return r[Sequence[t.ContainerMapping]].ok(records)
 
-    def execute(self) -> r[t.ContainerMapping]:
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute abstractions service."""
-        return r[t.ContainerMapping].ok({"status": "ok"})
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
+        )
 
     @staticmethod
     def create_result_instance() -> r[FlextMeltanoAbstractions]:

@@ -9,14 +9,16 @@ from __future__ import annotations
 
 import contextlib
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextLogger, r
 from pydantic import ValidationError
 
-from flext_meltano import m, t
+from flext_meltano import c, m, t
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoValidators:
+class FlextMeltanoValidators(FlextMeltanoServiceBase):
     """Generic pipeline business rule validators using foundation.
 
     This class provides complete validation for pipeline-specific business rules
@@ -222,6 +224,13 @@ class FlextMeltanoValidators:
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Transformation validation failed: {error}")
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute validators service."""
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
+        )
 
 
 __all__ = ["FlextMeltanoValidators"]

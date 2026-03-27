@@ -18,6 +18,7 @@ from pydantic import Field
 
 from flext_meltano import (
     FlextMeltanoProjectManager,
+    c,
     m,
     r,
     t,
@@ -154,7 +155,7 @@ class FlextMeltanoMeltanoService(s[str]):
                 return r[t.Meltano.ELT.PipelineResult].fail(project_result.error)
             result: t.Meltano.ELT.PipelineResult = {
                 "success": True,
-                "status": "completed",
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "exit_code": 0,
             }
             self.logger.info("Meltano pipeline executed", status=str(result["status"]))

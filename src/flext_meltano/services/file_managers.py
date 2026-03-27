@@ -14,15 +14,17 @@ import shutil
 import tempfile
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
+from typing import override
 
 import yaml
 from flext_cli import u
 from flext_core import FlextLogger, r
 
 from flext_meltano import c, m, t
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoFileManagers:
+class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
     """DOMAIN-SPECIFIC Meltano file managers using flext-core as SOURCE OF TRUTH.
 
     Contains ONLY Meltano-specific file operations that cannot be generalized to flext-core.
@@ -280,6 +282,13 @@ class FlextMeltanoFileManagers:
             return r[bool].fail(f"Invalid YAML syntax: {e}")
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[bool].fail(f"Failed to validate YAML: {e}")
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute file managers service."""
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
+        )
 
     @staticmethod
     def _normalize_file_config(

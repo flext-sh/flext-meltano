@@ -11,9 +11,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from typing import override
 
 from flext_cli import cli
-from flext_core import FlextLogger
+from flext_core import r
 
 from flext_meltano import (
     FlextMeltano,
@@ -23,12 +24,14 @@ from flext_meltano import (
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
+    c,
     p,
     t,
 )
+from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoCLI:
+class FlextMeltanoCLI(FlextMeltanoServiceBase):
     """SOLID-compliant CLI for FLEXT Meltano operations.
 
     Uses composition for pipeline management, Singer operations, DBT operations,
@@ -53,7 +56,6 @@ class FlextMeltanoCLI:
         DBT operations, plugin management, and monitoring.
         """
         super().__init__()
-        self.logger = FlextLogger(__name__)
         self._cli = cli
         self._api = FlextMeltano()
         self.output = self._cli
@@ -99,6 +101,13 @@ class FlextMeltanoCLI:
     def show_target_help(self) -> None:
         """Show target help."""
         self.output.print_message("Target commands: run, test")
+
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute CLI service."""
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
+        )
 
 
 def main() -> int:

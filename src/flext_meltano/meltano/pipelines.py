@@ -168,7 +168,7 @@ class FlextMeltanoOrchestrationService(s[t.Meltano.MeltanoConfigDict]):
                 "project": str(project_root),
                 "extractor_name": extractor_name,
                 "loader_name": loader_name,
-                "status": "initialized",
+                "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
             }
             extractor_plugin_obj = plugins[0]
             loader_plugin_obj = plugins[1]
