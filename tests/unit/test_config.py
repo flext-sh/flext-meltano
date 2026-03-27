@@ -52,7 +52,10 @@ class TestFlextMeltanoSettings:
         config.project_root = Path("/test")
         tm.that({".meltano", "config"}, has=config.config_dir.name)
         tm.that(config.logs_dir.name, eq="logs")
-        tm.that({"development", "testing"}, has=config.environment)
+        tm.that(
+            set(FlextMeltanoSettings.get_supported_environments()),
+            has=config.environment,
+        )
         tm.that({"INFO", "DEBUG", "WARNING"}, has=config.log_level)
 
     def test_path_validation_success(self) -> None:
