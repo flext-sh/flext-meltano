@@ -31,7 +31,7 @@ def simple_bridge_example() -> None:
 
 def simple_executor_example() -> None:
     """Example using real FlextMeltanoExecutor functionality."""
-    executor = FlextMeltanoExecutor(config={})
+    executor = FlextMeltanoExecutor(config_overrides={})
     result = executor.execute_meltano_command(["meltano", "version"])
     if result.is_success:
         logger.info(f"Executor result: {result.value}")

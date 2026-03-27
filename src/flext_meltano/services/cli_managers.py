@@ -16,11 +16,53 @@ import signal
 import time
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
+from typing import Protocol
 
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano import c, m, p, t, u
+
+
+class _CommandRouterCli(Protocol):
+    @property
+    def pipeline_manager(self) -> p.Meltano.CLIManager: ...
+
+    @property
+    def singer_manager(self) -> p.Meltano.SingerManager: ...
+
+    @property
+    def dbt_manager(self) -> p.Meltano.CLIManager: ...
+
+    @property
+    def plugin_manager(self) -> p.Meltano.CLIManager: ...
+
+    @property
+    def status_manager(self) -> p.Meltano.StatusManager: ...
+
+    def show_banner(self) -> None: ...
+
+
+class _PipelineCli(Protocol):
+    def show_pipeline_help(self) -> None: ...
+
+
+class _SingerCli(Protocol):
+    def show_tap_help(self) -> None: ...
+
+    def show_target_help(self) -> None: ...
+
+
+class _DbtCli(Protocol):
+    def show_dbt_help(self) -> None: ...
+
+
+class _PluginCli(Protocol):
+    def show_plugin_help(self) -> None: ...
+
+
+class _StatusCli(Protocol):
+    def show_status_help(self) -> None: ...
 
 
 class FlextMeltanoCommandRouter:
@@ -30,7 +72,7 @@ class FlextMeltanoCommandRouter:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: p.Meltano.CLI) -> None:
+    def __init__(self, cli: _CommandRouterCli) -> None:
         """Initialize command router with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -96,7 +138,7 @@ class FlextMeltanoPipelineManager:
     _PIPELINE_CONFIG_FILE = c.Meltano.CliDefaults.PIPELINE_CONFIG_FILE
     _PIPELINE_PID_FILE = c.Meltano.CliDefaults.PIPELINE_PID_FILE
 
-    def __init__(self, cli: p.Meltano.CLI) -> None:
+    def __init__(self, cli: _PipelineCli) -> None:
         """Initialize pipeline manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -490,7 +532,7 @@ class FlextMeltanoSingerManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: p.Meltano.CLI) -> None:
+    def __init__(self, cli: _SingerCli) -> None:
         """Initialize Singer manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -543,7 +585,6 @@ class FlextMeltanoSingerManager:
 
 
 class _FlextMeltanoSimpleCommandManager:
-    cli: p.Meltano.CLI
     logger: FlextLogger
 
     def _handle_command(
@@ -577,7 +618,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: p.Meltano.CLI) -> None:
+    def __init__(self, cli: _DbtCli) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -603,7 +644,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: p.Meltano.CLI) -> None:
+    def __init__(self, cli: _PluginCli) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -629,7 +670,7 @@ class FlextMeltanoStatusManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    def __init__(self, cli: p.Meltano.CLI) -> None:
+    def __init__(self, cli: _StatusCli) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()
         self.cli = cli

@@ -36,7 +36,6 @@ if TYPE_CHECKING:
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
-    from flext_meltano.meltano.bridge import FlextMeltanoBridge
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
@@ -52,6 +51,7 @@ if TYPE_CHECKING:
     )
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.adapters import FlextMeltanoAdapter
+    from flext_meltano.services.bridge import FlextMeltanoBridge
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
         FlextMeltanoDbtManager,
@@ -85,7 +85,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "FlextMeltanoAbstractions",
     ],
     "FlextMeltanoAdapter": ["flext_meltano.services.adapters", "FlextMeltanoAdapter"],
-    "FlextMeltanoBridge": ["flext_meltano.meltano.bridge", "FlextMeltanoBridge"],
+    "FlextMeltanoBridge": ["flext_meltano.services.bridge", "FlextMeltanoBridge"],
     "FlextMeltanoCLI": ["flext_meltano.cli", "FlextMeltanoCLI"],
     "FlextMeltanoCatalogManager": [
         "flext_meltano.singer.catalog",

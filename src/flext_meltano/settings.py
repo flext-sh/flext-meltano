@@ -7,12 +7,16 @@ from typing import Annotated, ClassVar
 
 from flext_core import FlextSettings, r
 from pydantic import Field, field_validator
+from pydantic_settings import SettingsConfigDict
 
 from flext_meltano import c, t
 
 
+@FlextSettings.auto_register("meltano")
 class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration services."""
+
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(extra="ignore")
 
     MELTANO_VERSION: ClassVar[str] = "3.9.1"
     SINGER_SDK_VERSION: ClassVar[str] = "0.48.0"
@@ -24,11 +28,20 @@ class FlextMeltanoSettings(FlextSettings):
     MELTANO_ENVIRONMENT_ENV: ClassVar[str] = "MELTANO_ENVIRONMENT"
     MELTANO_LOG_LEVEL_ENV: ClassVar[str] = "MELTANO_LOG_LEVEL"
 
-    project_root: Annotated[Path, Field(default=Path())]
+    project_root: Annotated[
+        Path,
+        Field(default=Path(), validation_alias=MELTANO_PROJECT_ROOT_ENV),
+    ]
     config_dir: Annotated[Path, Field(default=Path(".meltano"))]
     logs_dir: Annotated[Path, Field(default=Path("logs"))]
-    environment: Annotated[str, Field(default="development")]
-    log_level: Annotated[c.LogLevel, Field(default=c.LogLevel.INFO)]
+    environment: Annotated[
+        str,
+        Field(default="development", validation_alias=MELTANO_ENVIRONMENT_ENV),
+    ]
+    log_level: Annotated[
+        c.LogLevel,
+        Field(default=c.LogLevel.INFO, validation_alias=MELTANO_LOG_LEVEL_ENV),
+    ]
     meltano_version: Annotated[str, Field(default=MELTANO_VERSION)]
     singer_sdk_version: Annotated[str, Field(default=SINGER_SDK_VERSION)]
     dbt_version: Annotated[str, Field(default=DBT_VERSION)]
@@ -47,6 +60,12 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def _validate_environment(cls, value: str) -> str:
         normalized = value.strip().lower()
+        aliases = {
+            "dev": "development",
+            "test": "testing",
+            "prod": "production",
+        }
+        normalized = aliases.get(normalized, normalized)
         if normalized not in {"development", "testing", "production"}:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)
@@ -141,6 +160,12 @@ class FlextMeltanoSettings(FlextSettings):
     def create_for_environment(cls, env_type: str) -> FlextMeltanoSettings:
         """Create settings for a named runtime environment."""
         normalized = env_type.strip().lower()
+        aliases = {
+            "dev": "development",
+            "test": "testing",
+            "prod": "production",
+        }
+        normalized = aliases.get(normalized, normalized)
         if normalized not in {"development", "testing", "production"}:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)

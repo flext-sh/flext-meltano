@@ -36,7 +36,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test executor with custom configuration."""
         with tempfile.TemporaryDirectory() as temp_dir:
             config = {"project_root": temp_dir}
-            executor = FlextMeltanoExecutor(config=config)
+            executor = FlextMeltanoExecutor(config_overrides=config)
             assert executor is not None
 
     def test_bridge_property_lazy_loading(self) -> None:
@@ -314,7 +314,9 @@ class TestFlextMeltanoExecutorComplete:
     def test_error_handling_with_invalid_project_root(self) -> None:
         """Test error handling with invalid configuration."""
         invalid_path = Path("/nonexistent/invalid/path")
-        executor = FlextMeltanoExecutor(config={"project_root": str(invalid_path)})
+        executor = FlextMeltanoExecutor(
+            config_overrides={"project_root": str(invalid_path)},
+        )
         result = executor.version()
         tm.that(result, is_=r)
         if not result.is_success:

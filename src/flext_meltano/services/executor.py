@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import override
 
 from flext_core import r
+from pydantic import PrivateAttr
 
 from flext_meltano import (
     FlextMeltanoBridge,
@@ -35,10 +36,15 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
     timeout management, and result processing.
     """
 
+    service_name: str = "FlextMeltanoExecutor"
+    _bridge_instance: FlextMeltanoBridge | None = PrivateAttr(default=None)
+
     @property
     def bridge(self) -> FlextMeltanoBridge:
         """Get bridge instance - lazy initialized."""
-        return FlextMeltanoBridge()
+        if self._bridge_instance is None:
+            self._bridge_instance = FlextMeltanoBridge()
+        return self._bridge_instance
 
     @property
     def project_root(self) -> Path:

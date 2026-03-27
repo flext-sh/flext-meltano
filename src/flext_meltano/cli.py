@@ -15,6 +15,7 @@ from typing import override
 
 from flext_cli import cli
 from flext_core import r
+from pydantic import PrivateAttr
 
 from flext_meltano import (
     FlextMeltanoCommandRouter,
@@ -38,29 +39,61 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
     Single class per module following SOLID principles strictly.
     """
 
-    output: p.Meltano.Output
-    pipeline_manager: p.Meltano.CLIManager
-    singer_manager: p.Meltano.SingerManager
-    dbt_manager: p.Meltano.CLIManager
-    plugin_manager: p.Meltano.CLIManager
-    status_manager: p.Meltano.StatusManager
-    command_router: FlextMeltanoCommandRouter
+    service_name: str = "FlextMeltanoCLI"
+    _output: p.Meltano.Output = PrivateAttr()
+    _pipeline_manager: p.Meltano.CLIManager = PrivateAttr()
+    _singer_manager: p.Meltano.SingerManager = PrivateAttr()
+    _dbt_manager: p.Meltano.CLIManager = PrivateAttr()
+    _plugin_manager: p.Meltano.CLIManager = PrivateAttr()
+    _status_manager: p.Meltano.StatusManager = PrivateAttr()
+    _command_router: FlextMeltanoCommandRouter = PrivateAttr()
 
-    def __init__(self) -> None:
-        """Initialize CLI with SOLID delegation.
+    @override
+    def model_post_init(self, __context: t.ScalarMapping | None, /) -> None:
+        """Bind CLI collaborators after Pydantic service initialization."""
+        super().model_post_init(__context)
+        self._output = cli
+        self._pipeline_manager = FlextMeltanoPipelineManager(self)
+        self._singer_manager = FlextMeltanoSingerManager(self)
+        self._dbt_manager = FlextMeltanoDbtManager(self)
+        self._plugin_manager = FlextMeltanoPluginManager(self)
+        self._status_manager = FlextMeltanoStatusManager(self)
+        self._command_router = FlextMeltanoCommandRouter(self)
 
-        Uses composition for command routing, pipeline operations, Singer operations,
-        DBT operations, plugin management, and monitoring.
-        """
-        super().__init__()
-        self._cli = cli
-        self.output = self._cli
-        self.pipeline_manager = FlextMeltanoPipelineManager(self)
-        self.singer_manager = FlextMeltanoSingerManager(self)
-        self.dbt_manager = FlextMeltanoDbtManager(self)
-        self.plugin_manager = FlextMeltanoPluginManager(self)
-        self.status_manager = FlextMeltanoStatusManager(self)
-        self.command_router = FlextMeltanoCommandRouter(self)
+    @property
+    def output(self) -> p.Meltano.Output:
+        """CLI output backend."""
+        return self._output
+
+    @property
+    def pipeline_manager(self) -> p.Meltano.CLIManager:
+        """Pipeline manager."""
+        return self._pipeline_manager
+
+    @property
+    def singer_manager(self) -> p.Meltano.SingerManager:
+        """Singer manager."""
+        return self._singer_manager
+
+    @property
+    def dbt_manager(self) -> p.Meltano.CLIManager:
+        """DBT manager."""
+        return self._dbt_manager
+
+    @property
+    def plugin_manager(self) -> p.Meltano.CLIManager:
+        """Plugin manager."""
+        return self._plugin_manager
+
+    @property
+    def status_manager(self) -> p.Meltano.StatusManager:
+        """Status manager."""
+        return self._status_manager
+
+    @property
+    def command_router(self) -> FlextMeltanoCommandRouter:
+        """Command router."""
+        return self._command_router
 
     def main(self, args: t.StrSequence | None = None) -> int:
         """Main CLI entry point."""

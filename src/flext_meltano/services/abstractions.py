@@ -29,6 +29,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
     _project_path: ClassVar[Path | None] = None
+    service_name: str = "FlextMeltanoAbstractions"
 
     class _RunnerHelper:
         """Helper class for data pipeline runner operations."""

@@ -21,7 +21,6 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.meltano.bridge import FlextMeltanoBridge
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
@@ -32,7 +31,6 @@ if TYPE_CHECKING:
     from flext_meltano.meltano.service import FlextMeltanoMeltanoService
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoBridge": ["flext_meltano.meltano.bridge", "FlextMeltanoBridge"],
     "FlextMeltanoComponentService": [
         "flext_meltano.meltano.plugins",
         "FlextMeltanoComponentService",
@@ -60,7 +58,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
 }
 
 __all__ = [
-    "FlextMeltanoBridge",
     "FlextMeltanoComponentService",
     "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoLibraryRunner",
