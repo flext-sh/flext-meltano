@@ -9,9 +9,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import ClassVar
 
 import singer_sdk.typing as singer_sdk_typing
 from flext_cli import FlextCliTypes
+from pydantic import TypeAdapter
 
 from flext_meltano import c
 
@@ -26,6 +28,10 @@ class FlextMeltanoTypes(FlextCliTypes):
 
     class Meltano:
         """Meltano plugin complex types namespace."""
+
+        CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[FlextCliTypes.ContainerMapping]] = (
+            TypeAdapter(FlextCliTypes.ContainerMapping)
+        )
 
         type ValidatorInput = (
             FlextCliTypes.ContainerMapping

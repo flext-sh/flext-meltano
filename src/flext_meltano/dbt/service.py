@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import TypeVar, override
+from typing import override
 
 from flext_core import r, s
 
@@ -21,8 +21,6 @@ from flext_meltano import (
     m,
     t,
 )
-
-_ResultT = TypeVar("_ResultT")
 
 
 class FlextMeltanoDbtService(s[str]):
@@ -203,14 +201,14 @@ class FlextMeltanoDbtService(s[str]):
             success_logger=log_success,
         )
 
-    def _run_dbt_operation(
+    def _run_dbt_operation[T](
         self,
         operation_name: str,
         failure_label: str,
         models: t.StrSequence | None,
-        operation: Callable[[], r[_ResultT]],
-        success_logger: Callable[[_ResultT], None],
-    ) -> r[_ResultT]:
+        operation: Callable[[], r[T]],
+        success_logger: Callable[[T], None],
+    ) -> r[T]:
         try:
             self.logger.info("Running DBT %s", operation_name, models=str(models or []))
             result = operation()
@@ -227,7 +225,7 @@ class FlextMeltanoDbtService(s[str]):
             ImportError,
         ) as e:
             self.logger.exception("DBT %s failed", failure_label, error=str(e))
-            return r[_ResultT].fail(f"DBT {failure_label} failed: {e}")
+            return r[T].fail(f"DBT {failure_label} failed: {e}")
 
 
 __all__ = ["FlextMeltanoDbtService"]

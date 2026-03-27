@@ -421,7 +421,7 @@ class FlextMeltanoAbstractions:
                 mock_record[field_name] = f"mock_{field_name}"
         if not mock_record:
             mock_record["id"] = 1
-        total_records = 3
+        total_records = c.Meltano.Defaults.MOCK_RECORD_COUNT
         if _limit is not None:
             total_records = min(_limit, total_records)
         records: Sequence[t.ContainerMapping] = [

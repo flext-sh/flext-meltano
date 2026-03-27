@@ -20,9 +20,7 @@ from pathlib import Path
 from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano import m, p, t
-
-_MIN_ARGS_WITH_CONFIG = 2
+from flext_meltano import c, m, p, t
 
 
 class FlextMeltanoCommandRouter:
@@ -94,9 +92,9 @@ class FlextMeltanoPipelineManager:
     Uses composition and railway-oriented programming for maintainability.
     """
 
-    _PIPELINES_ROOT_ENV = "FLEXT_MELTANO_PIPELINES_DIR"
-    _PIPELINE_CONFIG_FILE = "pipeline.json"
-    _PIPELINE_PID_FILE = "pipeline.pid"
+    _PIPELINES_ROOT_ENV = c.Meltano.CliDefaults.PIPELINES_ROOT_ENV
+    _PIPELINE_CONFIG_FILE = c.Meltano.CliDefaults.PIPELINE_CONFIG_FILE
+    _PIPELINE_PID_FILE = c.Meltano.CliDefaults.PIPELINE_PID_FILE
 
     def __init__(self, cli: p.Meltano.CLI) -> None:
         """Initialize pipeline manager with CLI reference."""
@@ -381,7 +379,7 @@ class FlextMeltanoPipelineManager:
             ]
             | None
         ) = None
-        if len(_args) >= _MIN_ARGS_WITH_CONFIG:
+        if len(_args) >= c.Meltano.CliDefaults.MIN_ARGS_WITH_CONFIG:
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
                     _args[1],

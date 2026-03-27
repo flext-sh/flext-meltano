@@ -196,6 +196,16 @@ class FlextMeltanoConstants(FlextCliConstants):
                 ERROR = "error"
                 TIMEOUT = "timeout"
                 CANCELLED = "cancelled"
+                CONFIGURED = "configured"
+                INSTALLED = "installed"
+                CREATED = "created"
+                READY = "ready"
+                AVAILABLE = "available"
+                EXECUTED = "executed"
+                HEALTHY = "healthy"
+                OK = "OK"
+                PASSED = "passed"
+                PROCESSED = "processed"
 
             @unique
             class RunMode(StrEnum):
@@ -254,6 +264,62 @@ class FlextMeltanoConstants(FlextCliConstants):
                 StreamStatus.EXTRACTING,
             })
 
+            @unique
+            class PipelineCommand(StrEnum):
+                """Pipeline CLI subcommands."""
+
+                CREATE = "create"
+                RUN = "run"
+                LIST = "list"
+                STATUS = "status"
+                STOP = "stop"
+                DELETE = "delete"
+
+            @unique
+            class CliCommand(StrEnum):
+                """Top-level CLI command routing identifiers."""
+
+                PIPELINE = "pipeline"
+                TAP = "tap"
+                TARGET = "target"
+                DBT = "dbt"
+                PLUGIN = "plugin"
+                STATUS = "status"
+                VERSION = "version"
+
+            @unique
+            class ExecutorCommand(StrEnum):
+                """Executor available commands."""
+
+                VERSION = "version"
+                HELP = "help"
+                HEALTH = "health"
+                PIPELINE = "pipeline"
+                RUN = "run"
+                INSTALL = "install"
+                LIST = "list"
+                INVOKE = "invoke"
+                SELECT = "select"
+
+            @unique
+            class SingerMetadataKey(StrEnum):
+                """Singer catalog metadata field names."""
+
+                TABLE_KEY_PROPERTIES = "table-key-properties"
+                FORCED_REPLICATION_METHOD = "forced-replication-method"
+                VALID_REPLICATION_KEYS = "valid-replication-keys"
+
+            @unique
+            class SchemaKey(StrEnum):
+                """JSON Schema structure field names."""
+
+                TYPE = "type"
+                PROPERTIES = "properties"
+                OBJECT = "object"
+                INTEGER = "integer"
+                STRING = "string"
+                NUMBER = "number"
+
         class Logging:
             """Logging configuration constants."""
 
@@ -297,14 +363,20 @@ class FlextMeltanoConstants(FlextCliConstants):
             """Valid environment sets for validation."""
 
             VALID: Final[frozenset[str]] = frozenset({
-                "development", "staging", "production", "testing",
+                "development",
+                "staging",
+                "production",
+                "testing",
             })
 
         class ComponentTypes:
             """Valid component/plugin type sets."""
 
             VALID: Final[frozenset[str]] = frozenset({
-                "sources", "sinks", "transformers", "orchestrators",
+                "sources",
+                "sinks",
+                "transformers",
+                "orchestrators",
             })
 
         class Prefixes:
@@ -336,6 +408,60 @@ class FlextMeltanoConstants(FlextCliConstants):
 
             DBT: Final[tuple[str, ...]] = ("run", "test", "docs", "seed")
             SINGER: Final[tuple[str, ...]] = ("discover", "sync", "validate")
+
+        class Operations:
+            """API operation identifiers."""
+
+            ALL: Final[tuple[str, ...]] = (
+                "pipeline",
+                "plugin",
+                "dbt",
+                "environment",
+            )
+            DISPATCH: Final[tuple[str, ...]] = (
+                "create_pipeline",
+                "execute_pipeline",
+                "install_plugin",
+                "list_plugins",
+                "configure_environment",
+                "run_dbt_models",
+                "test_dbt_models",
+                "run_elt_pipeline",
+            )
+
+        class Handlers:
+            """Service handler type identifiers."""
+
+            ALL: Final[tuple[str, ...]] = ("source", "sink", "pipeline")
+
+        class MockValues:
+            """Default values for mock/stub data generation."""
+
+            EXECUTION_DURATION: Final[float] = 0.5
+            STAGE_DURATIONS: Final[tuple[float, ...]] = (0.3, 0.2)
+            DBT_EXECUTION_TIME: Final[float] = 45.2
+            DEFAULT_MOCK_INT: Final[int] = 1
+            DEFAULT_MOCK_FLOAT: Final[float] = 1.0
+
+        class FilePaths:
+            """Additional file/directory path constants."""
+
+            DBT_OUTPUT_DIR: Final[str] = "target"
+            DBT_DOCS_INDEX: Final[str] = "index.html"
+            STANDARD_DIRS: Final[tuple[str, ...]] = (
+                "extract",
+                "load",
+                "transform",
+                "analyze",
+                "notebook",
+                "orchestrate",
+            )
+
+        class BatchDefaults:
+            """Batch processing defaults."""
+
+            DEFAULT_BATCH_SIZE: Final[int] = 1000
+            COMMAND_TIMEOUT: Final[int] = 300
 
 
 c = FlextMeltanoConstants

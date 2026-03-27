@@ -132,10 +132,9 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
         """Configure environment using flext-core railway patterns."""
         if u.empty(environment_name):
             return r[t.Meltano.MeltanoConfigDict].fail("Environment name is required")
-        valid_environments = {"development", "staging", "production", "testing"}
-        if environment_name not in valid_environments:
+        if environment_name not in c.Meltano.Environments.VALID:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid environment: {environment_name}. Valid: {valid_environments}",
+                f"Invalid environment: {environment_name}. Valid: {c.Meltano.Environments.VALID}",
             )
         result_data: t.Meltano.MeltanoConfigDict = {
             "environment": environment_name,
@@ -213,11 +212,11 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
                 return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].fail(
                     "Both tap_name and target_name are required for pipeline creation",
                 )
-            if not u.starts(tap_name, "tap-"):
+            if not u.starts(tap_name, c.Meltano.Prefixes.TAP):
                 return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].fail(
                     f"Invalid tap name format: {tap_name}. Must start with 'tap-'",
                 )
-            if not u.starts(target_name, "target-"):
+            if not u.starts(target_name, c.Meltano.Prefixes.TARGET):
                 return r[tuple[str, str, t.Meltano.MeltanoConfigDict]].fail(
                     f"Invalid target name format: {target_name}. Must start with 'target-'",
                 )
@@ -466,12 +465,17 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             return r[t.Meltano.MeltanoConfigDict].fail(
                 "Plugin type and name are required",
             )
-        valid_types = {"extractors", "loaders", "transformers", "orchestrators"}
+        valid_types = c.Meltano.ComponentTypes.VALID
         if plugin_type not in valid_types:
             return r[t.Meltano.MeltanoConfigDict].fail(
                 f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
-        if not u.starts(plugin_name, "tap-", "target-", "dbt-"):
+        if not u.starts(
+            plugin_name,
+            c.Meltano.Prefixes.TAP,
+            c.Meltano.Prefixes.TARGET,
+            c.Meltano.Prefixes.DBT,
+        ):
             return r[t.Meltano.MeltanoConfigDict].fail(
                 f"Invalid plugin name format: {plugin_name}",
             )
@@ -690,7 +694,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             component_name=tap_name,
             component_key="tap",
             component_label="Tap",
-            validation_prefix="tap-",
+            validation_prefix=c.Meltano.Prefixes.TAP,
             execution_error_message="Tap execution failed",
         )
 
@@ -708,7 +712,7 @@ class FlextMeltano(s[m.Meltano.ConfigMappingPayload]):
             component_name=target_name,
             component_key="target",
             component_label="Target",
-            validation_prefix="target-",
+            validation_prefix=c.Meltano.Prefixes.TARGET,
             execution_error_message="Target execution failed",
         )
 

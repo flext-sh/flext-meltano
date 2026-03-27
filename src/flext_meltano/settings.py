@@ -24,9 +24,6 @@ class FlextMeltanoSettings(FlextSettings):
     MELTANO_ENVIRONMENT_ENV: ClassVar[str] = "MELTANO_ENVIRONMENT"
     MELTANO_LOG_LEVEL_ENV: ClassVar[str] = "MELTANO_LOG_LEVEL"
 
-    class ConfigBuilders:
-        """Namespace for configuration builder utilities."""
-
     project_root: Annotated[Path, Field(default=Path())]
     config_dir: Annotated[Path, Field(default=Path(".meltano"))]
     logs_dir: Annotated[Path, Field(default=Path("logs"))]

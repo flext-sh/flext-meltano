@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import ClassVar, override
+from typing import override
 
 from flext_core import r, s
 
@@ -23,8 +23,6 @@ class FlextMeltanoStateManager(s[m.Meltano.SingerStateMessage]):
     Handles loading, updating, and persisting state for incremental
     syncs with proper error handling and r patterns.
     """
-
-    StateEntry: ClassVar[type[m.Meltano.SingerStateEntry]] = m.Meltano.SingerStateEntry
 
     def __init__(self) -> None:
         """Initialize state manager."""

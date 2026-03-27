@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
-from typing import ClassVar, override
+from typing import override
 
 from flext_core import FlextService, r
 from meltano.core.project import Project
@@ -32,7 +32,6 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     """
 
-    ProjectInfo: ClassVar[type[dict[str, t.Container]]] = dict
     _metadata_extra: dict[str, str] = PrivateAttr(
         default_factory=lambda: dict[str, str](),
     )

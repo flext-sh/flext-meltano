@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import inspect
 import os
 import tempfile
 from pathlib import Path
@@ -230,11 +229,6 @@ class TestFlextMeltanoSettingsEnums:
         """Test that FlextMeltanoSettings uses c for enum values."""
         tm.that(hasattr(c, "LogLevel"), eq=True)
         tm.that(FlextMeltanoSettings.model_fields["environment"].default, is_=str)
-
-    def test_config_builders_nested_class(self) -> None:
-        """Test ConfigBuilders nested class exists."""
-        tm.that(hasattr(FlextMeltanoSettings, "ConfigBuilders"), eq=True)
-        tm.that(inspect.isclass(FlextMeltanoSettings.ConfigBuilders), eq=True)
 
 
 class TestFlextMeltanoSettingsConstants:

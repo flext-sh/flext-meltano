@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import ClassVar, override
+from typing import override
 
 from flext_core import s
 
@@ -42,11 +42,6 @@ class FlextMeltanoSingerService(s[str]):
     state_manager: Manages sync state and bookmarks
 
     """
-
-    PipelineConfig: ClassVar[type[m.Meltano.SingerPipelineConfig]] = (
-        m.Meltano.SingerPipelineConfig
-    )
-    SyncResult: ClassVar[type[m.Meltano.SingerSyncResult]] = m.Meltano.SingerSyncResult
 
     def __init__(self) -> None:
         """Initialize Singer orchestration service."""
