@@ -1,0 +1,65 @@
+src/flext_meltano/meltano/pipelines.py
+  163779a08dc80215 171
+src/flext_meltano/services/__init__.py
+  163779a08dc80215 4-13
+src/flext_meltano/api.py
+  163779a08dc80215 142,242,321,351,408,492,578,599,648,687,750
+src/flext_meltano/services/bridge.py
+  163779a08dc80215 13,15-16,18,21,30,85-91
+src/flext_meltano/services/file_managers.py
+  163779a08dc80215 24,27,286-292
+src/flext_meltano/base.py
+  163779a08dc80215 1-38
+src/flext_meltano/services/library_runner.py
+  163779a08dc80215 14,16,26,29,39,43-55
+src/flext_meltano/services/abstractions.py
+  163779a08dc80215 16-17,21,24,441-442,444-445
+src/flext_meltano/singer/target.py
+  163779a08dc80215 16
+src/flext_meltano/utilities.py
+  163779a08dc80215 10-11,20,494-662
+src/flext_meltano/services/services.py
+  163779a08dc80215 15,18,21
+src/flext_meltano/services/adapters.py
+  163779a08dc80215 19,22,250-257
+src/flext_meltano/meltano/service.py
+  163779a08dc80215 21,158
+src/flext_meltano/singer/translator.py
+  163779a08dc80215 18,32
+src/flext_meltano/meltano/bridge.py
+  163779a08dc80215 106
+src/flext_meltano/singer/tap.py
+  163779a08dc80215 295
+src/flext_meltano/dbt/runner.py
+  163779a08dc80215 17,56,59-60
+src/flext_meltano/services/validators.py
+  163779a08dc80215 12-13,17-18,21,228-235
+src/flext_meltano/services/cli.py
+  163779a08dc80215 14-15,27,31,34,105-111
+src/flext_meltano/meltano/runner.py
+  163779a08dc80215 19,82,103-104,118-119
+src/flext_meltano/services/executor.py
+  163779a08dc80215 18,29,32
+src/flext_meltano/services/project_service.py
+  163779a08dc80215 27,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "70ce36ac697279c999e9e91ff4f4b46cb13a377d",
+  "prompts": {
+    "163779a08dc80215": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "476f592d-b040-4145-8fff-0c104b26ad9a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 518,
+      "total_deletions": 416,
+      "accepted_lines": 456,
+      "overriden_lines": 7
+    }
+  }
+}
