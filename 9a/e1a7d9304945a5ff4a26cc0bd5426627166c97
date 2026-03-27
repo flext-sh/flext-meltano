@@ -1,0 +1,47 @@
+tests/unit/test_services.py
+  163779a08dc80215 29
+src/flext_meltano/services/abstractions.py
+  163779a08dc80215 16,30-32,36,85-88,176,260,267
+tests/unit/test_executors.py
+  163779a08dc80215 174-176,426,559
+src/flext_meltano/services/services.py
+  163779a08dc80215 21,23-24,151,155,350-351,359-360,362,372-373,378
+src/flext_meltano/services/validators.py
+  163779a08dc80215 19,85,172
+src/flext_meltano/base.py
+  163779a08dc80215 13,22
+src/flext_meltano/api.py
+  163779a08dc80215 1,3-5,13,15,18,20-22,24,31,34-44,46-48,51,53-58,61-62,67,72,74
+tests/unit/test_tap_abstractions.py
+  163779a08dc80215 176,178,198-201,280,287
+src/flext_meltano/services/project_service.py
+  163779a08dc80215 42-45,196
+src/flext_meltano/services/executor.py
+  163779a08dc80215 40-41,45-46,174-175,185,238,260,298,303
+src/flext_meltano/__init__.py
+  163779a08dc80215 89,204
+src/flext_meltano/services/file_managers.py
+  163779a08dc80215 25,98,135
+src/flext_meltano/services/bridge.py
+  163779a08dc80215 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "9ae1a7d9304945a5ff4a26cc0bd5426627166c97",
+  "prompts": {
+    "163779a08dc80215": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "476f592d-b040-4145-8fff-0c104b26ad9a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 188,
+      "total_deletions": 270,
+      "accepted_lines": 136,
+      "overriden_lines": 6
+    }
+  }
+}
