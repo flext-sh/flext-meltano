@@ -17,18 +17,17 @@ from flext_cli import cli
 from flext_core import r
 
 from flext_meltano import (
-    FlextMeltano,
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
+    FlextMeltanoServiceBase,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
     c,
     p,
     t,
 )
-from flext_meltano.base import FlextMeltanoServiceBase
 
 
 class FlextMeltanoCLI(FlextMeltanoServiceBase):
@@ -39,9 +38,7 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
     Single class per module following SOLID principles strictly.
     """
 
-    logger: p.Logger
     output: p.Meltano.Output
-    _api: FlextMeltano
     pipeline_manager: p.Meltano.CLIManager
     singer_manager: p.Meltano.SingerManager
     dbt_manager: p.Meltano.CLIManager
@@ -57,7 +54,6 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
         """
         super().__init__()
         self._cli = cli
-        self._api = FlextMeltano()
         self.output = self._cli
         self.pipeline_manager = FlextMeltanoPipelineManager(self)
         self.singer_manager = FlextMeltanoSingerManager(self)

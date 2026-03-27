@@ -20,13 +20,12 @@ from flext_core import r
 from flext_meltano import (
     FlextMeltanoBridge,
     FlextMeltanoCLI,
-    FlextMeltanoSettings,
+    FlextMeltanoServiceBase,
     c,
     m,
     t,
     u,
 )
-from flext_meltano.base import FlextMeltanoServiceBase
 
 
 class FlextMeltanoExecutor(FlextMeltanoServiceBase):
@@ -36,31 +35,15 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
     timeout management, and result processing.
     """
 
-    _bridge: FlextMeltanoBridge
-    _meltano_config: FlextMeltanoSettings
-
-    def __init__(self, config: t.Meltano.MeltanoConfigDict | None = None) -> None:
-        """Initialize executor with configuration."""
-        super().__init__()
-        config_guard = u.guard(config, dict, return_value=True)
-        if config_guard:
-            try:
-                self._meltano_config = FlextMeltanoSettings.model_validate(config_guard)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError):
-                self._meltano_config = FlextMeltanoSettings()
-        else:
-            self._meltano_config = FlextMeltanoSettings()
-        self._bridge = FlextMeltanoBridge()
-
     @property
     def bridge(self) -> FlextMeltanoBridge:
-        """Get bridge instance - delegates to instance attribute."""
-        return self._bridge
+        """Get bridge instance - lazy initialized."""
+        return FlextMeltanoBridge()
 
     @property
     def project_root(self) -> Path:
-        """Get project root directory - delegates to config."""
-        project_root = getattr(self._meltano_config, "project_root", None)
+        """Get project root directory - delegates to settings."""
+        project_root = getattr(self.settings, "project_root", None)
         if project_root is not None:
             return m.Meltano.PathPayload(value=project_root).value
         return Path.cwd()
@@ -188,8 +171,8 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
                 "executor_type": "flext_meltano_executor",
                 "status": c.Meltano.Enums.OperationStatus.READY,
                 "execution_timestamp": str(time.time()),
-                "config": self._meltano_config.model_dump()
-                if u.is_pydantic_model(self._meltano_config)
+                "config": self.settings.model_dump()
+                if u.is_pydantic_model(self.settings)
                 else dict[str, t.NormalizedValue](),
             }
             self.logger.info("FlextMeltanoExecutor executed successfully")
@@ -199,7 +182,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
             self.logger.exception(error_msg)
             return r[t.Meltano.ExecutionResultDict].fail(error_msg)
 
-    def execute_command(
+    def execute_meltano_command(
         self,
         command: t.StrSequence,
         timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
@@ -252,7 +235,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
             command = ["dbt", dbt_command]
             if args:
                 command.extend(args)
-            return self.execute_command(command)
+            return self.execute_meltano_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[m.Meltano.CommandExecutionResult].fail(f"DBT command failed: {e}")
 
@@ -274,7 +257,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         """
         try:
             command = ["meltano", "run", tap_name, target_name]
-            return self.execute_command(command)
+            return self.execute_meltano_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[m.Meltano.CommandExecutionResult].fail(
                 f"Pipeline execution failed: {e}",
@@ -312,12 +295,12 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
             return r[int].ok(1)
         return self._route_command(args[0], args[1:]).map(lambda _: 0)
 
-    def run_pipeline(
+    def run_pipeline_command(
         self,
         tap_name: str,
         target_name: str,
     ) -> r[t.Meltano.ExecutionResultDict]:
-        """Run complete ELT pipeline - delegates to execute_pipeline."""
+        """Run complete ELT pipeline command - delegates to execute_pipeline."""
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
             lambda execution_result: {

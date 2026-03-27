@@ -26,7 +26,7 @@ class TestFlextMeltanoServiceInitialization:
         """Test proper service initialization."""
         tm.that(self.service, is_=FlextMeltanoService)
         tm.that(self.service.service_name, eq="flext_meltano_service")
-        tm.that(self.service.version, eq="0.9.9")
+        tm.that(self.service.service_version, eq="0.9.9")
         tm.that(hasattr(self.service, "create_tap_service"), eq=True)
         tm.that(hasattr(self.service, "create_target_service"), eq=True)
         tm.that(hasattr(self.service, "create_dbt_service"), eq=True)

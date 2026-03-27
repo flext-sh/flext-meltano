@@ -14,8 +14,7 @@ from typing import override
 
 from flext_core import r
 
-from flext_meltano import c, t, u
-from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano import FlextMeltanoServiceBase, c, t, u
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):
@@ -24,10 +23,6 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     Provides JSON-based communication between Go and Python components
     for Meltano operations.
     """
-
-    def __init__(self) -> None:
-        """Initialize the bridge."""
-        super().__init__()
 
     @staticmethod
     def discover_plugins() -> r[t.ConfigurationMapping]:
@@ -45,7 +40,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             return r[t.ScalarMapping].fail(f"Plugin discovery failed: {e}")
 
     @staticmethod
-    def execute_command(
+    def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
     ) -> r[t.Meltano.ExecutionResultDict]:

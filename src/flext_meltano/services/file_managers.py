@@ -20,8 +20,9 @@ import yaml
 from flext_cli import u
 from flext_core import FlextLogger, r
 
-from flext_meltano import c, m, t
-from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
+
+_module_logger = FlextLogger(__name__)
 
 
 class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
@@ -35,8 +36,6 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
     - Contains ONLY Meltano-specific operations (YAML configs, project structure)
     - Uses tempfile standard library with u (FlextUtilities) validation
     """
-
-    _logger = FlextLogger(__name__)
 
     @classmethod
     def cleanup_temp_directory(cls, temp_path: Path) -> r[bool]:
@@ -96,7 +95,7 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
 
         def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-            FlextMeltanoFileManagers._logger.info(
+            _module_logger.info(
                 f"Created temporary directory: {temp_dir}",
             )
             return temp_dir
@@ -133,7 +132,7 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
             raw_validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data,
             }).values
-            validated = FlextMeltanoFileManagers._normalize_file_config(raw_validated)
+            validated = cls._normalize_file_config(raw_validated)
             return r[t.Meltano.FileConfigDict].ok(validated)
         except (
             yaml.YAMLError,

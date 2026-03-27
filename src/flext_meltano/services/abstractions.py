@@ -13,12 +13,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
-from typing import override
+from typing import ClassVar, override
 
-from flext_core import FlextLogger, r
+from flext_core import r
 
-from flext_meltano import c, m, p, t, u
-from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, t, u
 
 
 class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
@@ -28,10 +27,13 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
     class following FLEXT 'one class per module' pattern with nested helper classes.
     """
 
+    _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
+    _project_path: ClassVar[Path | None] = None
+
     class _RunnerHelper:
         """Helper class for data pipeline runner operations."""
 
-        def __init__(self, logger: FlextLogger) -> None:
+        def __init__(self, logger: p.Logger) -> None:
             """Initialize runner helper."""
             super().__init__()
             self.logger = logger
@@ -80,12 +82,10 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
                 self.logger.exception(error_msg)
                 return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
 
-    def __init__(self) -> None:
-        """Initialize unified abstractions with FLEXT patterns."""
-        super().__init__()
-        self._project_path: Path | None = None
-        self._stream_registry: MutableMapping[str, m.Meltano.StreamDefinition] = {}
-        self._runner_helper = self._RunnerHelper(self.logger)
+    @property
+    def _runner_helper(self) -> _RunnerHelper:
+        """Lazy-initialize runner helper."""
+        return self._RunnerHelper(self.logger)
 
     def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
         """Add a plugin."""
@@ -173,7 +173,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
                 return r[Path].fail(
                     f"Project path is not a valid directory: {project_root}",
                 )
-            self._project_path = project_root
+            FlextMeltanoAbstractions._project_path = project_root
             self.logger.info(
                 "Pipeline project loaded successfully",
                 project_root=str(project_root),
@@ -257,14 +257,14 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[Path].fail(f"Failed to get project root: {e}")
 
-    def process(
+    def process_tap_config(
         self,
         config: m.Meltano.TapConfig,
     ) -> r[m.Meltano.TapConfig]:
         """Process tap configuration."""
         return r[m.Meltano.TapConfig].ok(config)
 
-    def build(
+    def build_tap_instance(
         self,
         tap_instance: m.Meltano.TapInstance,
     ) -> t.ContainerMapping:

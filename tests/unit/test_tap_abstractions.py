@@ -173,9 +173,9 @@ class TestFlextMeltanoAbstractionsComplete:
             connection_config={"host": "localhost", "database": "test"},
             tap_version="v1.0.0",
         )
-        result = self.tap_abstractions.process(config)
+        result = self.tap_abstractions.process_tap_config(config)
         tm.that(result, is_=r)
-        config_result = self.tap_abstractions.process(config)
+        config_result = self.tap_abstractions.process_tap_config(config)
         self.test_assertions.assert_true(
             condition=config_result.is_success,
             message="Valid config should pass processing",
@@ -195,21 +195,10 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="test_tap_123",
             status="ready",
         )
-        result = self.tap_abstractions.build(tap_instance)
-        self.test_assertions.assert_true(
-            condition=isinstance(result, dict),
-            message="Should return dict",
-        )
-        self.test_assertions.assert_equal(
-            actual=result["tap_id"],
-            expected="test_tap_123",
-            message="Tap ID should match",
-        )
-        self.test_assertions.assert_equal(
-            actual=result["tap_type"],
-            expected="tap-csv",
-            message="Tap type should match",
-        )
+        result = self.tap_abstractions.build_tap_instance(tap_instance)
+        assert isinstance(result, dict)
+        tm.that(result["tap_id"], eq="test_tap_123")
+        tm.that(result["tap_type"], eq="tap-csv")
 
     def test_get_stream_config(self) -> None:
         """Test get_stream_config method using flext_tests."""
@@ -288,12 +277,14 @@ class TestFlextMeltanoAbstractionsComplete:
                 config=invalid_config,
                 tap_id="",
             )
-            invalid_result = self.tap_abstractions.process(invalid_instance.config)
+            invalid_result = self.tap_abstractions.process_tap_config(
+                invalid_instance.config
+            )
         except (ValidationError, ValueError):
             invalid_result = r[m.Meltano.TapConfig].fail(
                 "Validation failed at creation",
             )
-        valid_result = self.tap_abstractions.process(valid_instance.config)
+        valid_result = self.tap_abstractions.process_tap_config(valid_instance.config)
         tm.that(valid_result, is_=r)
         if valid_result.is_success:
             self.test_assertions.assert_true(

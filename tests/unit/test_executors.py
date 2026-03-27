@@ -171,9 +171,9 @@ class TestFlextMeltanoExecutorComplete:
         else:
             tm.that(result.error, eq=True)
 
-    def test_run_pipeline_method(self) -> None:
-        """Test run_pipeline method."""
-        result = self.executor.run_pipeline("tap-csv", "target-jsonl")
+    def test_run_pipeline_command_method(self) -> None:
+        """Test run_pipeline_command method."""
+        result = self.executor.run_pipeline_command("tap-csv", "target-jsonl")
         tm.that(result, is_=r)
         if not result.is_success:
             tm.that(result.error, eq=True)
@@ -423,7 +423,7 @@ class TestFlextMeltanoExecutorComplete:
         ]
         for tap, target in problematic_pipelines:
             try:
-                result = self.executor.run_pipeline(tap, target)
+                result = self.executor.run_pipeline_command(tap, target)
                 tm.that(result, is_=r)
                 if not result.is_success:
                     tm.that(result.error, eq=True)
@@ -556,7 +556,7 @@ class TestFlextMeltanoExecutorComplete:
                 pass
             with mock.patch.object(
                 FlextMeltanoExecutor,
-                "run_pipeline",
+                "run_pipeline_command",
                 return_value=r.fail("Pipeline execution failed"),
             ):
                 pass

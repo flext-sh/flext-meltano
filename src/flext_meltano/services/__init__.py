@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.adapters import FlextMeltanoAdapter
     from flext_meltano.services.bridge import FlextMeltanoBridge
-    from flext_meltano.services.cli import FlextMeltanoCLI, main
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
         FlextMeltanoDbtManager,
@@ -46,7 +45,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     ],
     "FlextMeltanoAdapter": ["flext_meltano.services.adapters", "FlextMeltanoAdapter"],
     "FlextMeltanoBridge": ["flext_meltano.services.bridge", "FlextMeltanoBridge"],
-    "FlextMeltanoCLI": ["flext_meltano.services.cli", "FlextMeltanoCLI"],
     "FlextMeltanoCommandRouter": [
         "flext_meltano.services.cli_managers",
         "FlextMeltanoCommandRouter",
@@ -89,14 +87,12 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.services.validators",
         "FlextMeltanoValidators",
     ],
-    "main": ["flext_meltano.services.cli", "main"],
 }
 
 __all__ = [
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
-    "FlextMeltanoCLI",
     "FlextMeltanoCommandRouter",
     "FlextMeltanoDbtManager",
     "FlextMeltanoExecutor",
@@ -109,7 +105,6 @@ __all__ = [
     "FlextMeltanoSingerManager",
     "FlextMeltanoStatusManager",
     "FlextMeltanoValidators",
-    "main",
 ]
 
 

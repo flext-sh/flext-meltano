@@ -26,13 +26,13 @@ def simple_bridge_example() -> None:
     discovery_result = bridge.discover_plugins()
     if discovery_result.is_success:
         plugins = discovery_result.value
-        logger.info(f"Found {len(plugins)} available plugins")
+        logger.info(f"Found {len(plugins)} plugin categories")
 
 
 def simple_executor_example() -> None:
     """Example using real FlextMeltanoExecutor functionality."""
     executor = FlextMeltanoExecutor(config={})
-    result = executor.execute_command(["meltano", "version"])
+    result = executor.execute_meltano_command(["meltano", "version"])
     if result.is_success:
         logger.info(f"Executor result: {result.value}")
 

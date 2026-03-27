@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
     from flext_core import FlextTypes
 
-    from flext_meltano import dbt, meltano, services, singer
+    from flext_meltano import dbt, services, singer
     from flext_meltano.__version__ import (
         __all__,
         __author__,
@@ -26,8 +26,9 @@ if TYPE_CHECKING:
         __version__,
         __version_info__,
     )
-    from flext_meltano.api import FlextMeltano
+    from flext_meltano.api import FlextMeltano, meltano
     from flext_meltano.base import FlextMeltanoServiceBase
+    from flext_meltano.cli import FlextMeltanoCLI, main
     from flext_meltano.constants import (
         FlextMeltanoConstants,
         FlextMeltanoConstants as c,
@@ -51,7 +52,6 @@ if TYPE_CHECKING:
     )
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.adapters import FlextMeltanoAdapter
-    from flext_meltano.services.cli import FlextMeltanoCLI, main
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
         FlextMeltanoDbtManager,
@@ -86,7 +86,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     ],
     "FlextMeltanoAdapter": ["flext_meltano.services.adapters", "FlextMeltanoAdapter"],
     "FlextMeltanoBridge": ["flext_meltano.meltano.bridge", "FlextMeltanoBridge"],
-    "FlextMeltanoCLI": ["flext_meltano.services.cli", "FlextMeltanoCLI"],
+    "FlextMeltanoCLI": ["flext_meltano.cli", "FlextMeltanoCLI"],
     "FlextMeltanoCatalogManager": [
         "flext_meltano.singer.catalog",
         "FlextMeltanoCatalogManager",
@@ -201,8 +201,8 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "e": ["flext_cli", "e"],
     "h": ["flext_cli", "h"],
     "m": ["flext_meltano.models", "FlextMeltanoModels"],
-    "main": ["flext_meltano.services.cli", "main"],
-    "meltano": ["flext_meltano.meltano", ""],
+    "main": ["flext_meltano.cli", "main"],
+    "meltano": ["flext_meltano.api", "meltano"],
     "p": ["flext_meltano.protocols", "FlextMeltanoProtocols"],
     "r": ["flext_cli", "r"],
     "s": ["flext_cli", "s"],

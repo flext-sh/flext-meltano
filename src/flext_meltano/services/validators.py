@@ -14,8 +14,9 @@ from typing import override
 from flext_core import FlextLogger, r
 from pydantic import ValidationError
 
-from flext_meltano import c, m, t
-from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
+
+_module_logger = FlextLogger(__name__)
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
@@ -42,8 +43,6 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         ...     logger.info("Component configuration is valid")
 
     """
-
-    _logger = FlextLogger(__name__)
 
     @classmethod
     def validate_connection_config(
@@ -83,7 +82,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[t.ScalarMapping].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
-            cls._logger.exception(error_msg)
+            _module_logger.exception(error_msg)
             return r[t.ScalarMapping].fail(error_msg)
 
     @classmethod
@@ -170,7 +169,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
-            cls._logger.exception(error_msg)
+            _module_logger.exception(error_msg)
             return r[bool].fail(error_msg)
 
     @classmethod

@@ -12,13 +12,7 @@ from __future__ import annotations
 
 from flext_core import FlextLogger
 
-from flext_meltano import (
-    c,
-    m,
-    p,
-    r,
-    u,
-)
+from flext_meltano import c, m, p, r, t, u
 
 
 class FlextMeltanoBridge:

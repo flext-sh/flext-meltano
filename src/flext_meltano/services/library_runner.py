@@ -19,14 +19,16 @@ from flext_meltano import (
     FlextMeltanoBridge,
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
+    FlextMeltanoServiceBase,
     c,
     p,
     t,
 )
-from flext_meltano.base import FlextMeltanoServiceBase
 
 
-class FlextMeltanoLibraryRunner(FlextMeltanoDbtTransformationRunner, FlextMeltanoServiceBase):
+class FlextMeltanoLibraryRunner(
+    FlextMeltanoDbtTransformationRunner, FlextMeltanoServiceBase
+):
     """Unified library runner providing complete Meltano functionality.
 
     This class consolidates all Meltano operations (DBT transformations, Singer

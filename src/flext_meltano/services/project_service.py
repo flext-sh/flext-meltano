@@ -16,6 +16,7 @@ from typing import override
 
 from flext_meltano import (
     FlextMeltanoAbstractions,
+    FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     FlextMeltanoValidators,
     c,
@@ -24,7 +25,6 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.base import FlextMeltanoServiceBase
 
 
 class FlextMeltanoProjectService(FlextMeltanoServiceBase):
@@ -39,13 +39,10 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     Extends flext-core foundation for enterprise data pipeline orchestration.
     """
 
-    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
-        """Initialize project service with complete FLEXT ecosystem integration."""
-        super().__init__()
-        self._meltano_config: FlextMeltanoSettings = (
-            config if config is not None else FlextMeltanoSettings.model_validate({})
-        )
-        self._abstractions = FlextMeltanoAbstractions()
+    @property
+    def _abstractions(self) -> FlextMeltanoAbstractions:
+        """Lazy-initialize abstractions service."""
+        return FlextMeltanoAbstractions()
 
     @staticmethod
     def _validate_project_creation_params(
@@ -196,7 +193,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         """
         result = self.build_service_execution_payload(
             "flext_meltano_project_service",
-            self._meltano_config,
+            self.settings,
         )
         if result.is_success:
             self.logger.info("FlextMeltanoProjectService executed successfully")

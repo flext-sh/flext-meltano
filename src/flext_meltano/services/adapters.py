@@ -15,8 +15,7 @@ from typing import override
 import meltano
 from flext_core import FlextSettings, r, s
 
-from flext_meltano import FlextMeltanoSettings, c, t
-from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, t
 
 
 class FlextMeltanoAdapter(FlextMeltanoServiceBase):
