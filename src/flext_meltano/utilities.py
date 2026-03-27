@@ -387,6 +387,46 @@ class FlextMeltanoUtilities(FlextCliUtilities):
                 filename = c.Meltano.Paths.MELTANO_PROJECT_FILE
                 return r[bool].fail(f"Writing {filename}: {err}")
 
+        @classmethod
+        def normalize_container_value(
+            cls,
+            value: t.NormalizedValue,
+        ) -> t.NormalizedValue:
+            """Recursively normalize a value, converting Paths to strings and dropping None."""
+            if isinstance(value, Path):
+                return str(value)
+            if isinstance(value, t.SCALAR_TYPES):
+                return value
+            if isinstance(value, (list, tuple)):
+                return [
+                    cls.normalize_container_value(item)
+                    for item in value
+                    if item is not None
+                ]
+            if isinstance(value, Mapping):
+                return {
+                    str(key): cls.normalize_container_value(item)
+                    for key, item in value.items()
+                    if item is not None
+                }
+            return str(value)
+
+        @classmethod
+        def normalize_config(
+            cls,
+            value: t.Meltano.MeltanoConfigDict | t.ContainerMapping | None,
+        ) -> t.Meltano.MeltanoConfigDict:
+            """Normalize a config mapping, recursively converting values and dropping None."""
+            if value is None:
+                empty: t.Meltano.MeltanoConfigDict = {}
+                return empty
+            normalized: t.MutableContainerMapping = {}
+            for key, item in value.items():
+                if item is None:
+                    continue
+                normalized[str(key)] = cls.normalize_container_value(item)
+            return normalized
+
         @staticmethod
         def create_project_file(
             file_path: Path,

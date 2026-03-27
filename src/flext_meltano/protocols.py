@@ -228,27 +228,27 @@ class FlextMeltanoProtocols(FlextCliProtocols):
                 ...
 
             def show_dbt_help(self) -> None:
-                """Show DBT helFlextProtocols."""
+                """Show DBT help."""
                 ...
 
             def show_pipeline_help(self) -> None:
-                """Show pipeline helFlextProtocols."""
+                """Show pipeline help."""
                 ...
 
             def show_plugin_help(self) -> None:
-                """Show plugin helFlextProtocols."""
+                """Show plugin help."""
                 ...
 
             def show_status_help(self) -> None:
-                """Show status helFlextProtocols."""
+                """Show status help."""
                 ...
 
             def show_tap_help(self) -> None:
-                """Show tap helFlextProtocols."""
+                """Show tap help."""
                 ...
 
             def show_target_help(self) -> None:
-                """Show target helFlextProtocols."""
+                """Show target help."""
                 ...
 
         @runtime_checkable

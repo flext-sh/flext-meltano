@@ -46,7 +46,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         constructor_config = service_config or m.Meltano.ServiceConstructorConfig(
             config=None,
             service_name="flext_meltano_service",
-            service_version="0.9.9",
+            service_version=c.Meltano.Defaults.SERVICE_VERSION,
             source_name=None,
             sink_name=None,
             transformation_name=None,
@@ -125,10 +125,9 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
         """Configure environment."""
         if not environment_name:
             return r[t.Meltano.MeltanoConfigDict].fail("Environment name is required")
-        valid_environments = {"development", "staging", "production", "testing"}
-        if environment_name not in valid_environments:
+        if environment_name not in c.Meltano.Environments.VALID:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid environment: {environment_name}. Valid: {valid_environments}",
+                f"Invalid environment: {environment_name}. Valid: {c.Meltano.Environments.VALID}",
             )
         return r[t.Meltano.MeltanoConfigDict].ok({
             "environment": environment_name,
@@ -165,7 +164,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
                 service_config=m.Meltano.ServiceConstructorConfig(
                     config=None,
                     service_name=f"{sink_name}_service",
-                    service_version="0.9.9",
+                    service_version=c.Meltano.Defaults.SERVICE_VERSION,
                     source_name=None,
                     sink_name=sink_name,
                     transformation_name=None,
@@ -192,7 +191,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
                 service_config=m.Meltano.ServiceConstructorConfig(
                     config=None,
                     service_name=f"{source_name}_service",
-                    service_version="0.9.9",
+                    service_version=c.Meltano.Defaults.SERVICE_VERSION,
                     source_name=source_name,
                     sink_name=None,
                     transformation_name=None,
@@ -232,7 +231,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
                 service_config=m.Meltano.ServiceConstructorConfig(
                     config=None,
                     service_name=f"{transformation_name}_service",
-                    service_version="0.9.9",
+                    service_version=c.Meltano.Defaults.SERVICE_VERSION,
                     source_name=None,
                     sink_name=None,
                     transformation_name=transformation_name,
@@ -301,7 +300,7 @@ class FlextMeltanoService(s[t.Meltano.MeltanoConfigDict]):
             return r[t.Meltano.MeltanoConfigDict].fail(
                 "Component type and name are required",
             )
-        if component_type not in {"sources", "sinks", "transformers", "orchestrators"}:
+        if component_type not in c.Meltano.ComponentTypes.VALID:
             return r[t.Meltano.MeltanoConfigDict].fail(
                 f"Invalid component type: {component_type}",
             )

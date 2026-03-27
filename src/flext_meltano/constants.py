@@ -293,6 +293,50 @@ class FlextMeltanoConstants(FlextCliConstants):
             DATA_LOADER = "data-loader"
             TRANSFORMATION_SERVICE = "transformation-service"
 
+        class Environments:
+            """Valid environment sets for validation."""
+
+            VALID: Final[frozenset[str]] = frozenset({
+                "development", "staging", "production", "testing",
+            })
+
+        class ComponentTypes:
+            """Valid component/plugin type sets."""
+
+            VALID: Final[frozenset[str]] = frozenset({
+                "sources", "sinks", "transformers", "orchestrators",
+            })
+
+        class Prefixes:
+            """Plugin name prefix conventions."""
+
+            TAP: Final[str] = "tap-"
+            TARGET: Final[str] = "target-"
+            DBT: Final[str] = "dbt-"
+
+        class Defaults:
+            """Default values used across services."""
+
+            SERVICE_VERSION: Final[str] = "0.9.9"
+            API_VERSION: Final[str] = "0.9.0"
+            TIMEOUT_SECONDS: Final[int] = 300
+            TEST_MULTIPLIER: Final[int] = 3
+            MOCK_RECORD_COUNT: Final[int] = 3
+
+        class CliDefaults:
+            """CLI-specific default values."""
+
+            MIN_ARGS_WITH_CONFIG: Final[int] = 2
+            PIPELINES_ROOT_ENV: Final[str] = "FLEXT_MELTANO_PIPELINES_DIR"
+            PIPELINE_CONFIG_FILE: Final[str] = "pipeline.json"
+            PIPELINE_PID_FILE: Final[str] = "pipeline.pid"
+
+        class Capabilities:
+            """Plugin capability lists."""
+
+            DBT: Final[tuple[str, ...]] = ("run", "test", "docs", "seed")
+            SINGER: Final[tuple[str, ...]] = ("discover", "sync", "validate")
+
 
 c = FlextMeltanoConstants
 __all__ = ["FlextMeltanoConstants", "c"]

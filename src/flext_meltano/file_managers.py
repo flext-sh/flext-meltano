@@ -36,7 +36,7 @@ class FlextMeltanoFileManagers:
     - Uses tempfile standard library with u (FlextUtilities) validation
     """
 
-    logger = FlextLogger(__name__)
+    _logger = FlextLogger(__name__)
 
     @classmethod
     def cleanup_temp_directory(cls, temp_path: Path) -> r[bool]:
@@ -96,7 +96,7 @@ class FlextMeltanoFileManagers:
 
         def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-            FlextMeltanoFileManagers.logger.info(
+            FlextMeltanoFileManagers._logger.info(
                 f"Created temporary directory: {temp_dir}",
             )
             return temp_dir

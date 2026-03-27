@@ -27,6 +27,15 @@ class FlextMeltanoTypes(FlextCliTypes):
     class Meltano:
         """Meltano plugin complex types namespace."""
 
+        type ValidatorInput = (
+            FlextCliTypes.ContainerMapping
+            | Mapping[str, FlextCliTypes.ContainerMapping | None]
+            | Sequence[FlextCliTypes.ContainerMapping | None]
+            | tuple[FlextCliTypes.ContainerMapping | None, ...]
+            | set[FlextCliTypes.ContainerMapping | None]
+            | None
+        )
+
         type MeltanoValue = Mapping[str, FlextCliTypes.ContainerValue] | None
 
         type PluginDefinition = Mapping[

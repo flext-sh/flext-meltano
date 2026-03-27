@@ -28,15 +28,6 @@ from pydantic import (
 
 from flext_meltano import c, t
 
-type _ValidatorInput = (
-    t.ContainerMapping
-    | Mapping[str, t.ContainerMapping | None]
-    | Sequence[t.ContainerMapping | None]
-    | tuple[t.ContainerMapping | None, ...]
-    | set[t.ContainerMapping | None]
-    | None
-)
-
 
 class FlextMeltanoModels(FlextCliModels):
     """Generic pipeline models.
@@ -77,7 +68,7 @@ class FlextMeltanoModels(FlextCliModels):
             return protected
 
         @staticmethod
-        def _validated_string_list(value: _ValidatorInput) -> t.StrSequence:
+        def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
             """Normalize arbitrary values into a validated list of strings."""
             return FlextMeltanoModels.Meltano.StringListValue.model_validate({
                 "items": value,
@@ -95,7 +86,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("items", mode="before")
             @classmethod
-            def normalize_items(cls, value: _ValidatorInput) -> t.StrSequence:
+            def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.StrSequence:
                 """Convert sequence-like values into string lists."""
                 if isinstance(value, (list, tuple, set)):
                     return [str(item) for item in value if item is not None]
@@ -113,7 +104,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("items", mode="before")
             @classmethod
-            def normalize_items(cls, value: _ValidatorInput) -> Sequence[bool]:
+            def normalize_items(cls, value: t.Meltano.ValidatorInput) -> Sequence[bool]:
                 """Convert sequence-like values into booleans."""
                 if isinstance(value, (list, tuple, set)):
                     return [bool(item) for item in value]
@@ -1842,7 +1833,9 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("schema_definition", mode="before")
             @classmethod
-            def normalize_schema(cls, value: _ValidatorInput) -> t.ContainerMapping:
+            def normalize_schema(
+                cls, value: t.Meltano.ValidatorInput
+            ) -> t.ContainerMapping:
                 """Normalize mapping input before JSON validation."""
                 match value:
                     case Mapping():
@@ -1863,7 +1856,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_records(
                 cls,
-                value: _ValidatorInput,
+                value: t.Meltano.ValidatorInput,
             ) -> Sequence[t.FlatContainerMapping] | t.StrSequence:
                 """Normalize mixed record input into dict records."""
                 match value:
@@ -1903,7 +1896,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_values(
                 cls,
-                value: _ValidatorInput,
+                value: t.Meltano.ValidatorInput,
             ) -> Mapping[
                 str,
                 t.Scalar
@@ -1947,7 +1940,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("value", mode="before")
             @classmethod
-            def normalize_path(cls, value: _ValidatorInput) -> Path:
+            def normalize_path(cls, value: t.Meltano.ValidatorInput) -> Path:
                 """Normalize mixed path input into Path objects."""
                 if value is None:
                     return Path()
@@ -1963,7 +1956,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("content", mode="before")
             @classmethod
-            def normalize_content(cls, value: _ValidatorInput) -> str:
+            def normalize_content(cls, value: t.Meltano.ValidatorInput) -> str:
                 """Normalize dict content via yaml.dump, pass str through."""
                 match value:
                     case Mapping():
@@ -1990,7 +1983,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_variant(
                 cls,
-                value: str | _ValidatorInput,
+                value: str | t.Meltano.ValidatorInput,
             ) -> str | t.StrSequence | t.ScalarMapping | None:
                 """Normalize variant_raw into typed union."""
                 match value:
@@ -2038,13 +2031,15 @@ class FlextMeltanoModels(FlextCliModels):
                 mode="before",
             )
             @classmethod
-            def normalize_string_fields(cls, value: _ValidatorInput) -> str:
+            def normalize_string_fields(cls, value: t.Meltano.ValidatorInput) -> str:
                 """Normalize optional string fields from external payloads."""
                 return "" if value is None else str(value)
 
             @field_validator("variants", mode="before")
             @classmethod
-            def normalize_variants(cls, value: _ValidatorInput) -> t.ContainerMapping:
+            def normalize_variants(
+                cls, value: t.Meltano.ValidatorInput
+            ) -> t.ContainerMapping:
                 """Normalize variant maps from external payloads."""
                 match value:
                     case Mapping():
@@ -2083,7 +2078,9 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("plugins", mode="before")
             @classmethod
-            def normalize_plugins(cls, value: _ValidatorInput) -> t.ContainerMapping:
+            def normalize_plugins(
+                cls, value: t.Meltano.ValidatorInput
+            ) -> t.ContainerMapping:
                 """Normalize plugin catalog mapping."""
                 match value:
                     case Mapping():
@@ -2120,7 +2117,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_mapping_payloads(
                 cls,
-                value: _ValidatorInput,
+                value: t.Meltano.ValidatorInput,
             ) -> t.ContainerMapping:
                 """Normalize mapping-like payloads into dictionaries."""
                 match value:
@@ -2137,7 +2134,7 @@ class FlextMeltanoModels(FlextCliModels):
                 mode="before",
             )
             @classmethod
-            def normalize_required_strings(cls, value: _ValidatorInput) -> str:
+            def normalize_required_strings(cls, value: t.Meltano.ValidatorInput) -> str:
                 """Normalize required string fields from context payloads."""
                 normalized = "" if value is None else str(value)
                 return normalized.strip()
@@ -2160,7 +2157,7 @@ class FlextMeltanoModels(FlextCliModels):
             @classmethod
             def normalize_execution_result(
                 cls,
-                value: _ValidatorInput,
+                value: t.Meltano.ValidatorInput,
             ) -> t.ContainerMapping:
                 """Normalize execution result map payload."""
                 match value:
@@ -2172,7 +2169,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("project_root", mode="before")
             @classmethod
-            def normalize_project_root(cls, value: _ValidatorInput) -> str:
+            def normalize_project_root(cls, value: t.Meltano.ValidatorInput) -> str:
                 """Normalize project root from mixed payload values."""
                 normalized = "unknown" if value is None else str(value)
                 return normalized.strip() or "unknown"
@@ -2191,7 +2188,7 @@ class FlextMeltanoModels(FlextCliModels):
 
             @field_validator("values", mode="before")
             @classmethod
-            def normalize_values(cls, value: _ValidatorInput) -> t.StrMapping:
+            def normalize_values(cls, value: t.Meltano.ValidatorInput) -> t.StrMapping:
                 """Keep scalar execution values and stringify them."""
                 match value:
                     case Mapping():

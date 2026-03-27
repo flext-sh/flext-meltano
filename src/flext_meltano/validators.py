@@ -15,11 +15,9 @@ from pydantic import ValidationError
 
 from flext_meltano import m, t
 
-logger = FlextLogger(__name__)
-
 
 class FlextMeltanoValidators:
-    """Generic pipeline business rule validators using uoundation.
+    """Generic pipeline business rule validators using foundation.
 
     This class provides complete validation for pipeline-specific business rules
     while delegating generic validation operations to flext-core. It follows the
@@ -42,6 +40,8 @@ class FlextMeltanoValidators:
         ...     logger.info("Component configuration is valid")
 
     """
+
+    _logger = FlextLogger(__name__)
 
     @classmethod
     def validate_connection_config(
@@ -81,7 +81,7 @@ class FlextMeltanoValidators:
             return r[t.ScalarMapping].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
-            logger.exception(error_msg)
+            cls._logger.exception(error_msg)
             return r[t.ScalarMapping].fail(error_msg)
 
     @classmethod
@@ -168,7 +168,7 @@ class FlextMeltanoValidators:
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
-            logger.exception(error_msg)
+            cls._logger.exception(error_msg)
             return r[bool].fail(error_msg)
 
     @classmethod
