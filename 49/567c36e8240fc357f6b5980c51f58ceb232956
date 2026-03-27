@@ -1,0 +1,39 @@
+src/flext_meltano/api.py
+  163779a08dc80215 142,242,283,355,438,483,519,583,637,735,762,780,798,816,835,851,869,892
+src/flext_meltano/typings.py
+  163779a08dc80215 30-38
+src/flext_meltano/protocols.py
+  163779a08dc80215 231,235,239,243,247,251
+src/flext_meltano/models.py
+  163779a08dc80215 71,89,107,1837,1859,1899,1943,1959,1986,2034,2041,2082,2120,2137,2160,2172,2191
+src/flext_meltano/validators.py
+  163779a08dc80215 20,44-45,84,171
+src/flext_meltano/constants.py
+  163779a08dc80215 296-339
+src/flext_meltano/services.py
+  163779a08dc80215 49,128,130,167,194,234,303
+src/flext_meltano/file_managers.py
+  163779a08dc80215 39,99
+src/flext_meltano/utilities.py
+  163779a08dc80215 390-429
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "49567c36e8240fc357f6b5980c51f58ceb232956",
+  "prompts": {
+    "163779a08dc80215": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "476f592d-b040-4145-8fff-0c104b26ad9a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 148,
+      "total_deletions": 135,
+      "accepted_lines": 148,
+      "overriden_lines": 0
+    }
+  }
+}
