@@ -1,0 +1,113 @@
+src/flext_meltano/_models/payloads_data.py
+  65695a6562cb7b5d 1-27,29-49,51-85,87-97,99-157,159-198
+src/flext_meltano/_models/results_dbt.py
+  65695a6562cb7b5d 1-45,47-52,54-74,76-81,83-119
+src/flext_meltano/_models/singer_catalog.py
+  65695a6562cb7b5d 1-38,40-54,56-59,64-72,74-82,84-110,112-129
+src/flext_meltano/services/__init__.py
+  65695a6562cb7b5d 58,77
+src/flext_meltano/_models/sources_params.py
+  65695a6562cb7b5d 1-144
+src/flext_meltano/services/project_service.py
+  65695a6562cb7b5d 27,72,75-76,79,85,102,110-111,136,148
+tests/unit/test_tap_abstractions.py
+  65695a6562cb7b5d 14,47,52
+src/flext_meltano/_models/singer.py
+  65695a6562cb7b5d 1-20,22-29,31-37,39-45,47-55,58-62,65-71,73-75,77-107,109-120
+src/flext_meltano/_models/logging_config.py
+  65695a6562cb7b5d 1-187
+src/flext_meltano/dbt/project.py
+  65695a6562cb7b5d 20,23,30,36,56,63,117,119,138,143,174
+src/flext_meltano/utilities.py
+  65695a6562cb7b5d 10,12-16,26-30
+src/flext_meltano/services/adapters.py
+  65695a6562cb7b5d 19-22,94,96,98,142,161-162,164-165
+src/flext_meltano/_utilities/project.py
+  65695a6562cb7b5d 1-128,131-195
+src/flext_meltano/_models/context.py
+  65695a6562cb7b5d 1-91,93-140
+src/flext_meltano/singer/catalog.py
+  65695a6562cb7b5d 14,18,26,30,51,73,101,121,146
+src/flext_meltano/_models/projects.py
+  65695a6562cb7b5d 1-94,97-101,104-133,135-136,138-155
+src/flext_meltano/_models/sources.py
+  65695a6562cb7b5d 1-4,6-17,21-163
+src/flext_meltano/meltano/project.py
+  65695a6562cb7b5d 20,23,43,49,67,94,99,134-135,149-153
+src/flext_meltano/_models/__init__.py
+  65695a6562cb7b5d 4-7,10,16-24,26,28-33,46-47,49,54-55,57,66-67,69,73-75,82-83,85-87,89,94-95,97,112-115,117,119-120,122,124-127,129,131-132
+src/flext_meltano/api.py
+  65695a6562cb7b5d 27-29
+src/flext_meltano/_models/discovery.py
+  65695a6562cb7b5d 1-70,73-88
+src/flext_meltano/singer/tap.py
+  65695a6562cb7b5d 11,14,17,26,28,33-34,43,45,52,75,87,89,93,96
+src/flext_meltano/services/cli_managers.py
+  65695a6562cb7b5d 1,3,27,29,32-33,42,50,55-56,62-63,66-68,84,89,107,111,154,169-172,176,179,196,199,247,250,265-288,437-449,451-454,475,477,533-537,618,640,662
+src/flext_meltano/_models/instances_data.py
+  65695a6562cb7b5d 1-118,121-122,124-127,130-144,147-194
+src/flext_meltano/_models/core.py
+  65695a6562cb7b5d 1-85
+src/flext_meltano/_utilities/__init__.py
+  65695a6562cb7b5d 4-7,10,35-39
+src/flext_meltano/_utilities/yaml.py
+  65695a6562cb7b5d 1-191
+src/flext_meltano/_models/results.py
+  65695a6562cb7b5d 1-21,24-29,31-33,35-74,76-77,79-116
+src/flext_meltano/services/file_managers.py
+  65695a6562cb7b5d 11,19,25,35,53,70,88,141
+src/flext_meltano/services/library_runner.py
+  65695a6562cb7b5d 28,38,46,59,77,133
+src/flext_meltano/meltano/plugin_discovery.py
+  65695a6562cb7b5d 1-173
+src/flext_meltano/meltano/plugins.py
+  65695a6562cb7b5d 18,22,46,105
+src/flext_meltano/_models/projects_plugin.py
+  65695a6562cb7b5d 1-56,58-59,61,63-64,66-84
+tests/unit/test_executors.py
+  65695a6562cb7b5d 21-22
+src/flext_meltano/_utilities/config.py
+  65695a6562cb7b5d 1-196
+src/flext_meltano/_models/transformations.py
+  65695a6562cb7b5d 1-200
+src/flext_meltano/services/validators.py
+  65695a6562cb7b5d 20,27,36,40,53,62,78,83,91
+src/flext_meltano/models.py
+  65695a6562cb7b5d 11-32,42-62
+src/flext_meltano/_models/results_pipeline.py
+  65695a6562cb7b5d 1-148
+src/flext_meltano/services/abstractions.py
+  65695a6562cb7b5d 1,22,27,70,183,185,194,213,259,309,313-320,333,339,344-346,357-363,366-367,369
+src/flext_meltano/_models/payloads.py
+  65695a6562cb7b5d 1-20,23-28,31-37,40-64,66-77,79
+src/flext_meltano/services/services.py
+  65695a6562cb7b5d 17,19-53,56-57,59-86,90,97,111,148,150,155,159,192
+src/flext_meltano/__init__.py
+  65695a6562cb7b5d 94-97,112-114,149,200
+src/flext_meltano/services/executor.py
+  65695a6562cb7b5d 1,27,70,93,135,150,159-179,211,234,247,287-290
+src/flext_meltano/_models/cli_params.py
+  65695a6562cb7b5d 1-173
+src/flext_meltano/_models/instances.py
+  65695a6562cb7b5d 1-63,65-83,85-90,92-94,96-104,106-107,109-138,140-142,144-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "7abb1b2fd2c6eff4f504ede3abbde717cc032e9d",
+  "prompts": {
+    "65695a6562cb7b5d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d8e05333-b80e-479a-91eb-941aa715ac42",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 10563,
+      "total_deletions": 11022,
+      "accepted_lines": 6579,
+      "overriden_lines": 92
+    }
+  }
+}
