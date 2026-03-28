@@ -20,7 +20,14 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+    from flext_meltano.services.abstractions import (
+        FlextMeltanoAbstractions,
+        FlextMeltanoAbstractionsTap,
+    )
+    from flext_meltano.services.adapter_extensions import (
+        FlextMeltanoDbtAdapter,
+        FlextMeltanoPipelineAdapter,
+    )
     from flext_meltano.services.adapters import FlextMeltanoAdapter
     from flext_meltano.services.bridge import FlextMeltanoBridge
     from flext_meltano.services.cli_managers import (
@@ -31,17 +38,25 @@ if TYPE_CHECKING:
         FlextMeltanoSingerManager,
         FlextMeltanoStatusManager,
     )
-    from flext_meltano.services.executor import FlextMeltanoExecutor
+    from flext_meltano.services.executor import (
+        FlextMeltanoExecutor,
+        FlextMeltanoExecutorCommands,
+    )
     from flext_meltano.services.file_managers import FlextMeltanoFileManagers
     from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.validators import FlextMeltanoValidators
+    from flext_meltano.services.yaml_operations import FlextMeltanoYamlOperationsMixin
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextMeltanoAbstractions": [
         "flext_meltano.services.abstractions",
         "FlextMeltanoAbstractions",
+    ],
+    "FlextMeltanoAbstractionsTap": [
+        "flext_meltano.services.abstractions",
+        "FlextMeltanoAbstractionsTap",
     ],
     "FlextMeltanoAdapter": ["flext_meltano.services.adapters", "FlextMeltanoAdapter"],
     "FlextMeltanoBridge": ["flext_meltano.services.bridge", "FlextMeltanoBridge"],
@@ -49,11 +64,19 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.services.cli_managers",
         "FlextMeltanoCommandRouter",
     ],
+    "FlextMeltanoDbtAdapter": [
+        "flext_meltano.services.adapter_extensions",
+        "FlextMeltanoDbtAdapter",
+    ],
     "FlextMeltanoDbtManager": [
         "flext_meltano.services.cli_managers",
         "FlextMeltanoDbtManager",
     ],
     "FlextMeltanoExecutor": ["flext_meltano.services.executor", "FlextMeltanoExecutor"],
+    "FlextMeltanoExecutorCommands": [
+        "flext_meltano.services.executor",
+        "FlextMeltanoExecutorCommands",
+    ],
     "FlextMeltanoFileManagers": [
         "flext_meltano.services.file_managers",
         "FlextMeltanoFileManagers",
@@ -61,6 +84,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextMeltanoLibraryRunner": [
         "flext_meltano.services.library_runner",
         "FlextMeltanoLibraryRunner",
+    ],
+    "FlextMeltanoPipelineAdapter": [
+        "flext_meltano.services.adapter_extensions",
+        "FlextMeltanoPipelineAdapter",
     ],
     "FlextMeltanoPipelineManager": [
         "flext_meltano.services.cli_managers",
@@ -87,17 +114,25 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.services.validators",
         "FlextMeltanoValidators",
     ],
+    "FlextMeltanoYamlOperationsMixin": [
+        "flext_meltano.services.yaml_operations",
+        "FlextMeltanoYamlOperationsMixin",
+    ],
 }
 
 __all__ = [
     "FlextMeltanoAbstractions",
+    "FlextMeltanoAbstractionsTap",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoCommandRouter",
+    "FlextMeltanoDbtAdapter",
     "FlextMeltanoDbtManager",
     "FlextMeltanoExecutor",
+    "FlextMeltanoExecutorCommands",
     "FlextMeltanoFileManagers",
     "FlextMeltanoLibraryRunner",
+    "FlextMeltanoPipelineAdapter",
     "FlextMeltanoPipelineManager",
     "FlextMeltanoPluginManager",
     "FlextMeltanoProjectService",
@@ -105,6 +140,7 @@ __all__ = [
     "FlextMeltanoSingerManager",
     "FlextMeltanoStatusManager",
     "FlextMeltanoValidators",
+    "FlextMeltanoYamlOperationsMixin",
 ]
 
 

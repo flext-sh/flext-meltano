@@ -1,7 +1,6 @@
-"""FLEXT Meltano CLI Managers - SOLID-compliant CLI manager classes.
+"""FLEXT Meltano CLI Managers - Command router, Singer, DBT, plugin, status managers.
 
-This module provides focused CLI manager functionality following SOLID principles
-with one class per module architecture, consolidated for better organization.
+Includes pipeline management (paths, CRUD, lifecycle, and the full pipeline manager).
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -24,130 +23,23 @@ from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_meltano import c, m, p, t, u
 
 
-class _CommandRouterCli(Protocol):
-    @property
-    def pipeline_manager(self) -> p.Meltano.CLIManager: ...
-
-    @property
-    def singer_manager(self) -> p.Meltano.SingerManager: ...
-
-    @property
-    def dbt_manager(self) -> p.Meltano.CLIManager: ...
-
-    @property
-    def plugin_manager(self) -> p.Meltano.CLIManager: ...
-
-    @property
-    def status_manager(self) -> p.Meltano.StatusManager: ...
-
-    def show_banner(self) -> None: ...
-
-
 class _PipelineCli(Protocol):
+    """Protocol-like base for pipeline CLI help display."""
+
     def show_pipeline_help(self) -> None: ...
 
 
-class _SingerCli(Protocol):
-    def show_tap_help(self) -> None: ...
-
-    def show_target_help(self) -> None: ...
-
-
-class _DbtCli(Protocol):
-    def show_dbt_help(self) -> None: ...
-
-
-class _PluginCli(Protocol):
-    def show_plugin_help(self) -> None: ...
-
-
-class _StatusCli(Protocol):
-    def show_status_help(self) -> None: ...
-
-
-class FlextMeltanoCommandRouter:
-    """SOLID-compliant command router for FLEXT Meltano CLI.
-
-    Single responsibility: route CLI commands to appropriate handlers.
-    Uses composition and railway-oriented programming for maintainability.
-    """
-
-    def __init__(self, cli: _CommandRouterCli) -> None:
-        """Initialize command router with CLI reference."""
-        super().__init__()
-        self.cli = cli
-        self.logger = FlextLogger(__name__)
-
-    @staticmethod
-    def _execute_command(
-        handler: Callable[[t.StrSequence], r[str]],
-        args: t.StrSequence,
-    ) -> r[str]:
-        """Execute command handler."""
-        return handler(args)
-
-    def route_command(self, args: t.StrSequence) -> int:
-        """Route command to appropriate handler using composition."""
-        if not args or args[0] in {"--help", "-h"}:
-            self.cli.show_banner()
-            self.logger.info("FLEXT Meltano CLI - Main Help")
-            return 0
-        command = args[0]
-        command_args = args[1:]
-        handler_result = self._get_command_handler(command)
-        if handler_result.is_failure:
-            self.logger.error(f"Command error: {handler_result.error}")
-            return 1
-        handler = handler_result.value
-        execute_result = self._execute_command(handler, command_args)
-        if execute_result.is_failure:
-            self.logger.error(f"Execution error: {execute_result.error}")
-            return 1
-        return 0
-
-    def _get_command_handler(
-        self,
-        command: str,
-    ) -> r[Callable[[t.StrSequence], r[str]]]:
-        """Get command handler for given command."""
-        command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
-            c.Meltano.Enums.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
-            c.Meltano.Enums.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
-            c.Meltano.Enums.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,
-            c.Meltano.Enums.CliCommand.DBT: self.cli.dbt_manager.handle_command,
-            c.Meltano.Enums.CliCommand.PLUGIN: self.cli.plugin_manager.handle_command,
-            c.Meltano.Enums.CliCommand.STATUS: self.cli.status_manager.handle_command,
-            c.Meltano.Enums.CliCommand.VERSION: self.cli.status_manager.handle_version_command,
-        }
-        handler = command_map.get(command)
-        if handler is None:
-            return r[Callable[[t.StrSequence], r[str]]].fail(
-                f"Unknown command: {command}",
-            )
-        return r[Callable[[t.StrSequence], r[str]]].ok(handler)
-
-
-class FlextMeltanoPipelineManager:
-    """SOLID-compliant pipeline manager for FLEXT Meltano CLI.
-
-    Single responsibility: handle pipeline-related CLI commands.
-    Uses composition and railway-oriented programming for maintainability.
-    """
+class _PipelinePaths:
+    """Shared path resolution for pipeline directories and files."""
 
     _PIPELINES_ROOT_ENV = c.Meltano.CliDefaults.PIPELINES_ROOT_ENV
     _PIPELINE_CONFIG_FILE = c.Meltano.CliDefaults.PIPELINE_CONFIG_FILE
     _PIPELINE_PID_FILE = c.Meltano.CliDefaults.PIPELINE_PID_FILE
 
-    def __init__(self, cli: _PipelineCli) -> None:
-        """Initialize pipeline manager with CLI reference."""
-        super().__init__()
-        self.cli = cli
-        self.logger = FlextLogger(__name__)
-
     @staticmethod
     def _pipelines_root_dir() -> Path:
         configured_root = os.environ.get(
-            FlextMeltanoPipelineManager._PIPELINES_ROOT_ENV,
+            _PipelinePaths._PIPELINES_ROOT_ENV,
         )
         if configured_root and configured_root.strip():
             return Path(configured_root).expanduser().resolve()
@@ -155,29 +47,25 @@ class FlextMeltanoPipelineManager:
 
     @staticmethod
     def _pipeline_dir(pipeline_name: str) -> Path:
-        return FlextMeltanoPipelineManager._pipelines_root_dir() / pipeline_name
+        return _PipelinePaths._pipelines_root_dir() / pipeline_name
 
     @staticmethod
     def _pipeline_config_path(pipeline_name: str) -> Path:
         return (
-            FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
-            / FlextMeltanoPipelineManager._PIPELINE_CONFIG_FILE
+            _PipelinePaths._pipeline_dir(pipeline_name)
+            / _PipelinePaths._PIPELINE_CONFIG_FILE
         )
 
     @staticmethod
     def _pipeline_pid_path(pipeline_name: str) -> Path:
         return (
-            FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
-            / FlextMeltanoPipelineManager._PIPELINE_PID_FILE
+            _PipelinePaths._pipeline_dir(pipeline_name)
+            / _PipelinePaths._PIPELINE_PID_FILE
         )
 
-    @staticmethod
-    def _execute_pipeline_operation(
-        handler: Callable[[t.StrSequence], r[str]],
-        args: t.StrSequence,
-    ) -> r[str]:
-        """Execute pipeline operation."""
-        return handler(args)
+
+class _PipelineCrudOperations(_PipelinePaths):
+    """Static CRUD operations for pipelines - create, execute, list."""
 
     @staticmethod
     def create_pipeline(
@@ -193,14 +81,12 @@ class FlextMeltanoPipelineManager:
             return r[str].fail("Pipeline creation requires a non-empty pipeline name")
         if config is None:
             return r[str].fail("Pipeline creation not configured")
-        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+        pipeline_dir = _PipelinePaths._pipeline_dir(pipeline_name)
         if pipeline_dir.exists():
             return r[str].fail(f"Pipeline '{pipeline_name}' already exists")
         try:
             pipeline_dir.mkdir(parents=True, exist_ok=False)
-            config_path = FlextMeltanoPipelineManager._pipeline_config_path(
-                pipeline_name,
-            )
+            config_path = _PipelinePaths._pipeline_config_path(pipeline_name)
             validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": dict(config),
             })
@@ -218,11 +104,11 @@ class FlextMeltanoPipelineManager:
         command_args: t.StrSequence | None = None,
     ) -> r[str]:
         """Execute a Meltano pipeline."""
-        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+        pipeline_dir = _PipelinePaths._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
         configured_command: t.StrSequence | None = None
-        config_path = FlextMeltanoPipelineManager._pipeline_config_path(pipeline_name)
+        config_path = _PipelinePaths._pipeline_config_path(pipeline_name)
         if config_path.exists():
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
@@ -265,7 +151,7 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def list_pipelines() -> r[t.StrSequence]:
         """List all available Meltano pipelines."""
-        pipelines_root = FlextMeltanoPipelineManager._pipelines_root_dir()
+        pipelines_root = _PipelinePaths._pipelines_root_dir()
         if not pipelines_root.exists():
             return r[t.StrSequence].ok([])
         if not pipelines_root.is_dir():
@@ -280,13 +166,17 @@ class FlextMeltanoPipelineManager:
             return r[t.StrSequence].fail(f"Failed to list pipelines: {exc}")
         return r[t.StrSequence].ok(pipeline_names)
 
+
+class _PipelineLifecycleOperations(_PipelinePaths):
+    """Static lifecycle operations for pipelines - status, stop, delete."""
+
     @staticmethod
     def get_pipeline_status(pipeline_name: str) -> r[str]:
         """Get the status of a specific Meltano pipeline."""
-        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+        pipeline_dir = _PipelinePaths._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
-        pid_path = FlextMeltanoPipelineManager._pipeline_pid_path(pipeline_name)
+        pid_path = _PipelinePaths._pipeline_pid_path(pipeline_name)
         if not pid_path.exists():
             return r[str].ok("stopped")
         try:
@@ -303,10 +193,10 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
         """Stop a running Meltano pipeline."""
-        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+        pipeline_dir = _PipelinePaths._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
-        pid_path = FlextMeltanoPipelineManager._pipeline_pid_path(pipeline_name)
+        pid_path = _PipelinePaths._pipeline_pid_path(pipeline_name)
         if not pid_path.exists():
             return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
         try:
@@ -354,10 +244,10 @@ class FlextMeltanoPipelineManager:
     @staticmethod
     def delete_pipeline(pipeline_name: str) -> r[str]:
         """Delete a Meltano pipeline."""
-        pipeline_dir = FlextMeltanoPipelineManager._pipeline_dir(pipeline_name)
+        pipeline_dir = _PipelinePaths._pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
             return r[str].fail(f"Pipeline '{pipeline_name}' not found")
-        status_result = FlextMeltanoPipelineManager.get_pipeline_status(pipeline_name)
+        status_result = _PipelineLifecycleOperations.get_pipeline_status(pipeline_name)
         if status_result.is_failure:
             return r[str].fail(status_result.error)
         if status_result.value == "running":
@@ -371,6 +261,30 @@ class FlextMeltanoPipelineManager:
         if pipeline_dir.exists():
             return r[str].fail(f"Pipeline '{pipeline_name}' deletion was not confirmed")
         return r[str].ok("deleted")
+
+
+class FlextMeltanoPipelineManager(
+    _PipelineCrudOperations,
+    _PipelineLifecycleOperations,
+):
+    """Pipeline manager for FLEXT Meltano CLI.
+
+    Handles pipeline-related CLI commands using composition and r[T].
+    """
+
+    def __init__(self, cli: _PipelineCli) -> None:
+        """Initialize pipeline manager with CLI reference."""
+        super().__init__()
+        self.cli = cli
+        self.logger = FlextLogger(__name__)
+
+    @staticmethod
+    def _execute_pipeline_operation(
+        handler: Callable[[t.StrSequence], r[str]],
+        args: t.StrSequence,
+    ) -> r[str]:
+        """Execute pipeline operation."""
+        return handler(args)
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle pipeline command using composition."""
@@ -520,12 +434,106 @@ class FlextMeltanoPipelineManager:
         return r[str].ok(result.value)
 
 
-class FlextMeltanoSingerManager:
-    """SOLID-compliant Singer manager for FLEXT Meltano CLI.
+class _SingerCli(Protocol):
+    def show_tap_help(self) -> None: ...
 
-    Single responsibility: handle Singer tap/target CLI commands.
-    Uses composition and railway-oriented programming for maintainability.
+    def show_target_help(self) -> None: ...
+
+
+class _DbtCli(Protocol):
+    def show_dbt_help(self) -> None: ...
+
+
+class _PluginCli(Protocol):
+    def show_plugin_help(self) -> None: ...
+
+
+class _StatusCli(Protocol):
+    def show_status_help(self) -> None: ...
+
+
+class _CommandRouterCli(Protocol):
+    @property
+    def pipeline_manager(self) -> p.Meltano.CLIManager: ...
+
+    @property
+    def singer_manager(self) -> p.Meltano.SingerManager: ...
+
+    @property
+    def dbt_manager(self) -> p.Meltano.CLIManager: ...
+
+    @property
+    def plugin_manager(self) -> p.Meltano.CLIManager: ...
+
+    @property
+    def status_manager(self) -> p.Meltano.StatusManager: ...
+
+    def show_banner(self) -> None: ...
+
+
+class FlextMeltanoCommandRouter:
+    """Command router for FLEXT Meltano CLI.
+
+    Routes CLI commands to appropriate handlers.
     """
+
+    def __init__(self, cli: _CommandRouterCli) -> None:
+        """Initialize command router with CLI reference."""
+        super().__init__()
+        self.cli = cli
+        self.logger = FlextLogger(__name__)
+
+    @staticmethod
+    def _execute_command(
+        handler: Callable[[t.StrSequence], r[str]],
+        args: t.StrSequence,
+    ) -> r[str]:
+        """Execute command handler."""
+        return handler(args)
+
+    def route_command(self, args: t.StrSequence) -> int:
+        """Route command to appropriate handler using composition."""
+        if not args or args[0] in {"--help", "-h"}:
+            self.cli.show_banner()
+            self.logger.info("FLEXT Meltano CLI - Main Help")
+            return 0
+        command = args[0]
+        command_args = args[1:]
+        handler_result = self._get_command_handler(command)
+        if handler_result.is_failure:
+            self.logger.error(f"Command error: {handler_result.error}")
+            return 1
+        handler = handler_result.value
+        execute_result = self._execute_command(handler, command_args)
+        if execute_result.is_failure:
+            self.logger.error(f"Execution error: {execute_result.error}")
+            return 1
+        return 0
+
+    def _get_command_handler(
+        self,
+        command: str,
+    ) -> r[Callable[[t.StrSequence], r[str]]]:
+        """Get command handler for given command."""
+        command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
+            c.Meltano.Enums.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
+            c.Meltano.Enums.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
+            c.Meltano.Enums.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,
+            c.Meltano.Enums.CliCommand.DBT: self.cli.dbt_manager.handle_command,
+            c.Meltano.Enums.CliCommand.PLUGIN: self.cli.plugin_manager.handle_command,
+            c.Meltano.Enums.CliCommand.STATUS: self.cli.status_manager.handle_command,
+            c.Meltano.Enums.CliCommand.VERSION: self.cli.status_manager.handle_version_command,
+        }
+        handler = command_map.get(command)
+        if handler is None:
+            return r[Callable[[t.StrSequence], r[str]]].fail(
+                f"Unknown command: {command}",
+            )
+        return r[Callable[[t.StrSequence], r[str]]].ok(handler)
+
+
+class FlextMeltanoSingerManager:
+    """Handle Singer tap/target CLI commands."""
 
     def __init__(self, cli: _SingerCli) -> None:
         """Initialize Singer manager with CLI reference."""
@@ -607,11 +615,7 @@ class _FlextMeltanoSimpleCommandManager:
 
 
 class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
-    """SOLID-compliant DBT manager for FLEXT Meltano CLI.
-
-    Single responsibility: handle DBT CLI commands.
-    Uses composition and railway-oriented programming for maintainability.
-    """
+    """Handle DBT CLI commands."""
 
     def __init__(self, cli: _DbtCli) -> None:
         """Initialize DBT manager with CLI reference."""
@@ -633,11 +637,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
 
 
 class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
-    """SOLID-compliant plugin manager for FLEXT Meltano CLI.
-
-    Single responsibility: handle plugin CLI commands.
-    Uses composition and railway-oriented programming for maintainability.
-    """
+    """Handle plugin CLI commands."""
 
     def __init__(self, cli: _PluginCli) -> None:
         """Initialize plugin manager with CLI reference."""
@@ -659,11 +659,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
 
 
 class FlextMeltanoStatusManager:
-    """SOLID-compliant status manager for FLEXT Meltano CLI.
-
-    Single responsibility: handle status and monitoring CLI commands.
-    Uses composition and railway-oriented programming for maintainability.
-    """
+    """Handle status and monitoring CLI commands."""
 
     def __init__(self, cli: _StatusCli) -> None:
         """Initialize status manager with CLI reference."""

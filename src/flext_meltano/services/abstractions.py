@@ -1,12 +1,7 @@
-"""FLEXT Pipeline Abstractions - Unified abstraction layer for data pipeline operations.
-
-This module provides the FlextMeltanoAbstractions class that wraps Meltano CLI
-operations via subprocess, providing r[T]-based error handling for all fallible
-operations.
+"""FLEXT Pipeline Abstractions - Core Meltano CLI operations via subprocess.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
@@ -24,24 +19,12 @@ _OPERATION_ERRORS = (ValueError, TypeError, KeyError, AttributeError, OSError)
 
 
 class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
-    """Unified abstraction wrapping Meltano CLI operations via subprocess.
-
-    All pipeline interactions delegate to ``meltano`` CLI through
-    ``FlextInfraUtilitiesSubprocess``, returning ``r[T]`` results for
-    consistent error propagation.
-    """
+    """Core abstraction wrapping Meltano CLI via subprocess with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
     service_name: str = "FlextMeltanoAbstractions"
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
-    def _run_meltano(
-        self,
-        args: Sequence[str],
-    ) -> r[str]:
+    def _run_meltano(self, args: Sequence[str]) -> r[str]:
         """Run a meltano CLI command and return stdout on success."""
         cmd: Sequence[str] = ["meltano", *args]
         cwd = (
@@ -60,10 +43,6 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
                 stderr_out or f"meltano exited with code {completed.exit_code}",
             )
         return r[str].ok(completed.stdout.strip())
-
-    # ------------------------------------------------------------------
-    # Plugin management
-    # ------------------------------------------------------------------
 
     def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
@@ -88,7 +67,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
 
     def get_plugins_of_type(
         self,
-        _project: p.Meltano.Project,
+        _project: p.Meltano.Project | t.Meltano.Dbt.Project | FlextMeltanoServiceBase,
         plugin_type: str,
     ) -> r[Mapping[str, t.Meltano.PluginDefinition]]:
         """List installed plugins of *plugin_type* via ``meltano list``."""
@@ -112,10 +91,6 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
             return r[Mapping[str, t.Meltano.PluginDefinition]].fail(error_msg)
-
-    # ------------------------------------------------------------------
-    # Pipeline execution
-    # ------------------------------------------------------------------
 
     def execute_singer_pipeline(
         self,
@@ -150,10 +125,6 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
             self.logger.exception(error_msg)
             return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
 
-    # ------------------------------------------------------------------
-    # Project management
-    # ------------------------------------------------------------------
-
     def find_project(self, project_root: Path) -> r[Path]:
         """Find and validate a Meltano project directory."""
         try:
@@ -181,14 +152,37 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         except _OPERATION_ERRORS as e:
             return r[Path].fail(f"Failed to get project root: {e}")
 
-    # ------------------------------------------------------------------
-    # Tap / stream operations
-    # ------------------------------------------------------------------
+    @override
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Execute abstractions service and return real configuration state."""
+        return r[t.Meltano.MeltanoConfigDict].ok({
+            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
+            "project_root": str(self.settings.project_root),
+            "environment": self.settings.environment,
+            "meltano_version": self.settings.meltano_version,
+        })
 
-    def process_tap_config(
+    @staticmethod
+    def create_result_instance() -> r[FlextMeltanoAbstractions]:
+        """Factory method for creating a FlextMeltanoAbstractions instance."""
+        return r[FlextMeltanoAbstractions].ok(FlextMeltanoAbstractions())
+
+    def _create_catalog_entry_from_stream(
         self,
-        config: m.Meltano.TapConfig,
-    ) -> r[m.Meltano.TapConfig]:
+        stream: m.Meltano.StreamDefinition,
+    ) -> r[t.ContainerMapping]:
+        """Create Singer catalog entry from stream definition."""
+        entry: t.ContainerMapping = {
+            "tap_stream_id": stream.stream_name,
+            "stream": stream.stream_name,
+            "schema": stream.stream_schema,
+            "metadata": list[t.ContainerMapping](),
+        }
+        return r[t.ContainerMapping].ok(entry)
+
+    # -- Tap-specific operations (discovery, sync, catalog) --
+
+    def process_tap_config(self, config: m.Meltano.TapConfig) -> r[m.Meltano.TapConfig]:
         """Validate and return tap configuration."""
         return r[m.Meltano.TapConfig].ok(config)
 
@@ -197,10 +191,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         tap_instance: m.Meltano.TapInstance,
     ) -> t.ContainerMapping:
         """Build tap instance representation."""
-        return {
-            "tap_id": tap_instance.tap_id,
-            "tap_type": tap_instance.tap_type,
-        }
+        return {"tap_id": tap_instance.tap_id, "tap_type": tap_instance.tap_type}
 
     def discover_streams(
         self,
@@ -219,9 +210,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
             for line in cmd_result.value.splitlines():
                 name = line.strip()
                 if name and not name.startswith("["):
-                    stream_defs.append(
-                        {"stream_name": name, "tap_stream_id": name},
-                    )
+                    stream_defs.append({"stream_name": name, "tap_stream_id": name})
                     if name not in self._stream_registry:
                         self._stream_registry[name] = m.Meltano.StreamDefinition(
                             stream_name=name,
@@ -267,7 +256,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
             }
             if cmd_result.is_failure:
                 return r[t.ContainerMapping].fail(
-                    cmd_result.error or "Stream sync failed",
+                    cmd_result.error or "Stream sync failed"
                 )
             return r[t.ContainerMapping].ok(result)
         except _OPERATION_ERRORS as e:
@@ -317,22 +306,18 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         discovery = self.discover_streams(tap_instance)
         if discovery.is_failure:
             return r[t.ContainerMapping].fail(
-                discovery.error or "Catalog generation failed",
+                discovery.error or "Catalog generation failed"
             )
         raw = discovery.value
         streams: list[t.ContainerMapping] = []
-        if isinstance(raw, dict):
-            raw_val = raw.get("streams")
-            if isinstance(raw_val, list):
-                for s in raw_val:
-                    if isinstance(s, dict):
-                        name = str(s.get("stream_name", ""))
-                        if name in self._stream_registry:
-                            entry_r = self._create_catalog_entry_from_stream(
-                                self._stream_registry[name],
-                            )
-                            if entry_r.is_success:
-                                streams.append(entry_r.value)
+        for s in _extract_raw_streams(raw):
+            name = str(s.get("stream_name", ""))
+            if name in self._stream_registry:
+                entry_r = self._create_catalog_entry_from_stream(
+                    self._stream_registry[name],
+                )
+                if entry_r.is_success:
+                    streams.append(entry_r.value)
         catalog: t.ContainerMapping = {"version": 1, "streams": streams}
         return r[t.ContainerMapping].ok(catalog)
 
@@ -345,33 +330,20 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         discovery = self.discover_streams(tap_instance)
         if discovery.is_failure:
             return r[t.ContainerMapping].fail(discovery.error or "Discovery failed")
-        raw = discovery.value
-        raw_streams: list[t.ContainerMapping] = []
-        if isinstance(raw, dict):
-            raw_val = raw.get("streams")
-            if isinstance(raw_val, list):
-                raw_streams = [s for s in raw_val if isinstance(s, dict)]
-        for stream in raw_streams:
+        for stream in _extract_raw_streams(discovery.value):
             if stream.get("stream_name") == stream_name:
                 result_stream: t.ContainerMapping = {**stream, "name": stream_name}
                 return r[t.ContainerMapping].ok(result_stream)
         return r[t.ContainerMapping].fail(f"Stream '{stream_name}' not found")
 
-    def list_streams(
-        self,
-        tap_instance: m.Meltano.TapInstance,
-    ) -> Sequence[str]:
+    def list_streams(self, tap_instance: m.Meltano.TapInstance) -> Sequence[str]:
         """List stream names available in tap instance."""
         discovery = self.discover_streams(tap_instance)
         if discovery.is_failure:
             return []
-        raw = discovery.value
-        raw_streams: list[t.ContainerMapping] = []
-        if isinstance(raw, dict):
-            raw_val = raw.get("streams")
-            if isinstance(raw_val, list):
-                raw_streams = [s for s in raw_val if isinstance(s, dict)]
-        return [str(s.get("stream_name", "")) for s in raw_streams]
+        return [
+            str(s.get("stream_name", "")) for s in _extract_raw_streams(discovery.value)
+        ]
 
     def get_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
         """Get tap type from instance."""
@@ -381,37 +353,17 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         """Get list of registered stream names."""
         return [*self._stream_registry.keys()]
 
-    # ------------------------------------------------------------------
-    # Lifecycle
-    # ------------------------------------------------------------------
 
-    @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute abstractions service and return real configuration state."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-            "project_root": str(self.settings.project_root),
-            "environment": self.settings.environment,
-            "meltano_version": self.settings.meltano_version,
-        })
-
-    @staticmethod
-    def create_result_instance() -> r[FlextMeltanoAbstractions]:
-        """Factory method for creating a FlextMeltanoAbstractions instance."""
-        return r[FlextMeltanoAbstractions].ok(FlextMeltanoAbstractions())
-
-    def _create_catalog_entry_from_stream(
-        self,
-        stream: m.Meltano.StreamDefinition,
-    ) -> r[t.ContainerMapping]:
-        """Create Singer catalog entry from stream definition."""
-        entry: t.ContainerMapping = {
-            "tap_stream_id": stream.stream_name,
-            "stream": stream.stream_name,
-            "schema": stream.stream_schema,
-            "metadata": list[t.ContainerMapping](),
-        }
-        return r[t.ContainerMapping].ok(entry)
+def _extract_raw_streams(raw: t.ContainerMapping) -> list[t.ContainerMapping]:
+    """Extract stream dicts from a discovery result mapping."""
+    if isinstance(raw, dict):
+        raw_val = raw.get("streams")
+        if isinstance(raw_val, list):
+            return [s for s in raw_val if isinstance(s, dict)]
+    return []
 
 
-__all__ = ["FlextMeltanoAbstractions"]
+# Backward-compatible alias for code that imported the tap subclass
+FlextMeltanoAbstractionsTap = FlextMeltanoAbstractions
+
+__all__ = ["FlextMeltanoAbstractions", "FlextMeltanoAbstractionsTap"]

@@ -1,8 +1,5 @@
 """Singer Catalog Management - Schema discovery and catalog handling.
 
-This module provides catalog management for Singer with FLEXT ecosystem
-patterns and railway-oriented programming.
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -14,20 +11,11 @@ from typing import override
 
 from flext_core import FlextService
 
-from flext_meltano import (
-    m,
-    p,
-    r,
-    t,
-)
+from flext_meltano import m, p, r, t
 
 
 class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
-    """Manages Singer catalogs (schemas and stream definitions).
-
-    Handles catalog discovery, loading, validation, and manipulation
-    with proper error handling and r patterns.
-    """
+    """Manages Singer catalogs (schemas and stream definitions)."""
 
     def __init__(self) -> None:
         """Initialize catalog manager."""
@@ -35,20 +23,11 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         self._catalog = m.Meltano.SingerCatalog()
 
     def discover_streams(self, tap: p.Meltano.SingerTap) -> r[m.Meltano.SingerCatalog]:
-        """Discover streams from a tap.
-
-        Args:
-        tap: Singer tap instance with discover() method
-
-        Returns:
-        r containing discovered catalog
-
-        """
+        """Discover streams from a tap."""
         try:
             self._catalog = tap.discover()
             self.logger.info(
-                "Streams discovered",
-                stream_count=len(self._catalog.streams),
+                "Streams discovered", stream_count=len(self._catalog.streams)
             )
             return r[m.Meltano.SingerCatalog].ok(self._catalog)
         except (
@@ -69,22 +48,14 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
         return r[m.Meltano.SingerCatalog].ok(self._catalog)
 
     def get_stream_schema(self, stream_name: str) -> r[t.FlatContainerMapping]:
-        """Get schema for a specific stream.
-
-        Args:
-        stream_name: Name of the stream
-
-        Returns:
-        r containing stream schema or None
-
-        """
+        """Get schema for a specific stream."""
         try:
             for entry in self._catalog.streams:
                 if entry.stream == stream_name:
                     self.logger.debug("Stream schema retrieved", stream=stream_name)
                     return r[t.FlatContainerMapping].ok(entry.schema_definition)
             return r[t.FlatContainerMapping].fail(
-                f"Stream not found in catalog: {stream_name}",
+                f"Stream not found in catalog: {stream_name}"
             )
         except (
             ValueError,
@@ -99,19 +70,11 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             return r[t.FlatContainerMapping].fail(f"Failed to get schema: {e}")
 
     def load_catalog(self, catalog_file: Path) -> r[m.Meltano.SingerCatalog]:
-        """Load catalog from file.
-
-        Args:
-        catalog_file: Path to catalog file
-
-        Returns:
-        r containing loaded catalog
-
-        """
+        """Load catalog from file."""
         try:
             if not catalog_file.exists():
                 return r[m.Meltano.SingerCatalog].fail(
-                    f"Catalog file not found: {catalog_file}",
+                    f"Catalog file not found: {catalog_file}"
                 )
             self._catalog = m.Meltano.SingerCatalog.model_validate_json(
                 catalog_file.read_text(encoding="utf-8"),
@@ -135,15 +98,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
 
     def save_catalog(self, catalog_file: Path) -> r[None]:
-        """Save catalog to file.
-
-        Args:
-        catalog_file: Path to save catalog
-
-        Returns:
-        r with success status
-
-        """
+        """Save catalog to file."""
         try:
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
             with catalog_file.open("w", encoding="utf-8") as f:
@@ -163,15 +118,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             return r[None].fail(f"Failed to save catalog: {e}")
 
     def select_streams(self, stream_names: t.StrSequence) -> r[m.Meltano.SingerCatalog]:
-        """Select specific streams from catalog.
-
-        Args:
-        stream_names: List of stream names to select
-
-        Returns:
-        r containing filtered catalog
-
-        """
+        """Select specific streams from catalog."""
         try:
             selected = [
                 entry for entry in self._catalog.streams if entry.stream in stream_names
@@ -196,12 +143,7 @@ class FlextMeltanoCatalogManager(FlextService[m.Meltano.SingerCatalog]):
             return r[m.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 
     def set_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:
-        """Set catalog data directly.
-
-        Args:
-        catalog: Catalog model to set
-
-        """
+        """Set catalog data directly."""
         self._catalog = catalog
 
 

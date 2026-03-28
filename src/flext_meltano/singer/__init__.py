@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
     from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
+    from flext_meltano.singer.tap_source import FlextMeltanoTapSourceMixin
     from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
     from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
@@ -80,6 +81,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.singer.tap",
         "FlextMeltanoTapAbstractions",
     ],
+    "FlextMeltanoTapSourceMixin": [
+        "flext_meltano.singer.tap_source",
+        "FlextMeltanoTapSourceMixin",
+    ],
     "FlextMeltanoTargetAbstractions": [
         "flext_meltano.singer.target",
         "FlextMeltanoTargetAbstractions",
@@ -97,6 +102,7 @@ __all__ = [
     "FlextMeltanoSingerTapBase",
     "FlextMeltanoStateManager",
     "FlextMeltanoTapAbstractions",
+    "FlextMeltanoTapSourceMixin",
     "FlextMeltanoTargetAbstractions",
 ]
 

@@ -11,7 +11,7 @@ from flext_core import r
 from flext_tests import tm
 from pydantic_core import ValidationError
 
-from flext_meltano import FlextMeltanoAbstractions, m
+from flext_meltano import FlextMeltanoAbstractions, FlextMeltanoAbstractionsTap, m
 from tests import t
 
 
@@ -44,12 +44,12 @@ class _TestAssertions:
 class TestFlextMeltanoAbstractionsComplete:
     """Complete test suite for FlextMeltanoAbstractions."""
 
-    tap_abstractions: FlextMeltanoAbstractions
+    tap_abstractions: FlextMeltanoAbstractionsTap
     test_assertions: _TestAssertions
 
     def setup_method(self) -> None:
         """Setup for each test."""
-        self.tap_abstractions = FlextMeltanoAbstractions()
+        self.tap_abstractions = FlextMeltanoAbstractionsTap()
         if not hasattr(self, "test_assertions"):
             self.test_assertions = _TestAssertions()
 

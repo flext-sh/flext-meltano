@@ -1,8 +1,5 @@
 """Meltano Project Integration - Deep integration with meltano-sdk.
 
-This module provides project management for Meltano with FLEXT ecosystem
-patterns and railway-oriented programming.
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -20,24 +17,10 @@ from flext_meltano import m, t, u
 
 
 class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]):
-    """Manages Meltano projects with deep SDK integration.
-
-    Provides programmatic access to Meltano projects, plugins, and
-    configurations through wrapped meltano-sdk APIs.
-
-    Attributes:
-    project_root: Root directory of Meltano project
-    project: Wrapped meltano.core.project.Project instance
-
-    """
+    """Manages Meltano projects with deep SDK integration."""
 
     def __init__(self, root: Path | None = None) -> None:
-        """Initialize Meltano project manager.
-
-        Args:
-            root: Root directory of Meltano project (optional)
-
-        """
+        """Initialize Meltano project manager."""
         super().__init__()
         self.project_root: Path | None = root
         self.project: Project | None = None
@@ -57,23 +40,13 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         self,
         plugin_type: str | None = None,
     ) -> r[Sequence[t.Meltano.PluginDefinition]]:
-        """Get plugins from the project.
-
-        Args:
-        plugin_type: Optional plugin type to filter (tap, target, dbt, etc.)
-
-        Returns:
-        r containing list of plugins
-
-        """
+        """Get plugins from the project, optionally filtered by type."""
         try:
             if not self.project:
                 return r[Sequence[t.Meltano.PluginDefinition]].fail("No project loaded")
             plugins = self._extract_plugins(plugin_type)
             self.logger.info(
-                "Plugins retrieved",
-                count=u.count(plugins),
-                type=plugin_type or "",
+                "Plugins retrieved", count=u.count(plugins), type=plugin_type or ""
             )
             return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
         except (
@@ -87,19 +60,11 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         ) as e:
             self.logger.exception("Failed to get plugins", error=str(e))
             return r[Sequence[t.Meltano.PluginDefinition]].fail(
-                f"Failed to get plugins: {e}",
+                f"Failed to get plugins: {e}"
             )
 
     def initialize_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
-        """Initialize a new Meltano project.
-
-        Args:
-        root: Root directory for the project
-
-        Returns:
-        r containing project information
-
-        """
+        """Initialize a new Meltano project."""
         try:
             root.mkdir(parents=True, exist_ok=True)
             self.project = Project(root)
@@ -122,32 +87,16 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         ) as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to initialize project: {e}",
+                f"Failed to initialize project: {e}"
             )
 
     def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
-        """Install a plugin in the project.
-
-        Args:
-            name: Name of the plugin to install
-
-        Returns:
-            r containing plugin information
-
-        """
+        """Install a plugin in the project."""
         msg = f"Plugin installation requires meltano-core SDK integration: install_plugin({name!r})"
         raise NotImplementedError(msg)
 
     def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
-        """Load an existing Meltano project.
-
-        Args:
-        root: Root directory of the project
-
-        Returns:
-        r containing project information
-
-        """
+        """Load an existing Meltano project."""
         try:
             if not root.exists():
                 return r[t.Meltano.Project.ProjectMetadata].fail(
@@ -173,7 +122,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         ) as e:
             self.logger.exception("Failed to load project", error=str(e))
             return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to load project: {e}",
+                f"Failed to load project: {e}"
             )
 
     def _extract_plugins(
@@ -182,12 +131,10 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     ) -> Sequence[t.Meltano.PluginDefinition]:
         """Extract plugins from project, optionally filtered by type."""
         plugins: MutableSequence[t.Meltano.PluginDefinition] = []
-        if getattr(self.project, "plugins", None) is None:
+        plugins_attr = getattr(self.project, "plugins", None)
+        if plugins_attr is None:
             return plugins
         try:
-            plugins_attr = getattr(self.project, "plugins", None)
-            if plugins_attr is None:
-                return plugins
             for plugin in plugins_attr:
                 if not (
                     getattr(plugin, "name", None) is not None
@@ -196,17 +143,14 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                     continue
                 if plugin_type is not None and plugin.type != plugin_type:
                     continue
-                variant_raw = getattr(plugin, "variant", None)
                 plugin_def: MutableMapping[
                     str,
                     str | Sequence[str] | Mapping[str, t.Scalar | None],
-                ] = {
-                    "name": plugin.name,
-                    "type": plugin.type,
-                }
-                variant_normalized = m.Meltano.VariantPayload.model_validate({
-                    "value": variant_raw,
-                }).value
+                ] = {"name": plugin.name, "type": plugin.type}
+                variant_raw = getattr(plugin, "variant", None)
+                variant_normalized = m.Meltano.VariantPayload.model_validate(
+                    {"value": variant_raw},
+                ).value
                 if variant_normalized is not None:
                     plugin_def["variant"] = variant_normalized
                 plugins.append(plugin_def)

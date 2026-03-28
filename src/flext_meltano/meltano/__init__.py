@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
+    from flext_meltano.meltano.plugin_discovery import FlextMeltanoPluginDiscoveryMixin
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
     from flext_meltano.meltano.project import FlextMeltanoProjectManager
     from flext_meltano.meltano.runner import (
@@ -51,6 +52,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.meltano.pipelines",
         "FlextMeltanoOrchestrationService",
     ],
+    "FlextMeltanoPluginDiscoveryMixin": [
+        "flext_meltano.meltano.plugin_discovery",
+        "FlextMeltanoPluginDiscoveryMixin",
+    ],
     "FlextMeltanoProjectManager": [
         "flext_meltano.meltano.project",
         "FlextMeltanoProjectManager",
@@ -63,6 +68,7 @@ __all__ = [
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoMeltanoService",
     "FlextMeltanoOrchestrationService",
+    "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoProjectManager",
 ]
 

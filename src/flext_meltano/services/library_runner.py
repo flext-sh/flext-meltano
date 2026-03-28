@@ -1,11 +1,7 @@
 """FLEXT Meltano Library Runner - Unified library runner for Meltano operations.
 
-This module provides the FlextMeltanoLibraryRunner class for complete Meltano
-functionality including ELT pipelines and DBT transformations.
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
@@ -29,12 +25,7 @@ from flext_meltano import (
 class FlextMeltanoLibraryRunner(
     FlextMeltanoDbtTransformationRunner, FlextMeltanoServiceBase
 ):
-    """Unified library runner providing complete Meltano functionality.
-
-    This class consolidates all Meltano operations (DBT transformations, Singer
-    protocols, ELT pipelines) into a single, well-structured interface following
-    Zero Tolerance architectural principles.
-    """
+    """Unified library runner providing complete Meltano functionality."""
 
     def __init__(self) -> None:
         """Initialize the library runner."""
@@ -44,12 +35,7 @@ class FlextMeltanoLibraryRunner(
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute the library runner service.
-
-        Returns:
-            r containing runner status and capabilities.
-
-        """
+        """Execute the library runner service."""
         return r[t.Meltano.MeltanoConfigDict].ok({
             "service_type": "flext_meltano_library_runner",
             "status": c.Meltano.Enums.OperationStatus.READY,
@@ -57,13 +43,7 @@ class FlextMeltanoLibraryRunner(
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ResultDict]:
-        """Get DBT runner instance for DBT operations.
-
-        Returns:
-            r with DBT runner information containing type, status,
-            and available capabilities.
-
-        """
+        """Get DBT runner instance for DBT operations."""
         try:
             dbt_runner: t.Meltano.ResultDict = {
                 "type": "dbt_runner",
@@ -76,13 +56,7 @@ class FlextMeltanoLibraryRunner(
 
     @staticmethod
     def get_singer_manager() -> r[t.Meltano.ResultDict]:
-        """Get Singer manager instance for Singer operations.
-
-        Returns:
-            r with Singer manager information containing type, status,
-            and available capabilities.
-
-        """
+        """Get Singer manager instance for Singer operations."""
         try:
             singer_manager: t.Meltano.ResultDict = {
                 "type": "singer_manager",
@@ -100,18 +74,7 @@ class FlextMeltanoLibraryRunner(
         dbt_models: t.StrSequence | None = None,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.Processing.EltPipelineResult]:
-        """Execute complete ELT pipeline with optional DBT transformations.
-
-        Args:
-            tap_name: Name of the Singer tap to use
-            target_name: Name of the Singer target to use
-            dbt_models: Optional list of DBT models to run
-            config: Optional pipeline configuration
-
-        Returns:
-            r with complete ELT pipeline execution results
-
-        """
+        """Execute complete ELT pipeline with optional DBT transformations."""
         try:
             self.logger.info(
                 "Starting complete ELT pipeline",
@@ -167,17 +130,7 @@ class FlextMeltanoLibraryRunner(
         target: p.Meltano.SingerTarget,
         config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.Processing.EltPipelineResult]:
-        """Run a complete ELT pipeline from tap to target.
-
-        Args:
-        tap: Singer tap to extract data from
-        target: Singer target to load data into
-        config: Pipeline configuration
-
-        Returns:
-        r with ELT pipeline execution results
-
-        """
+        """Run a complete ELT pipeline from tap to target."""
         try:
             self.logger.info(
                 "Starting ELT pipeline",

@@ -1,11 +1,7 @@
-"""FLEXT Meltano Executor - Unified command execution service.
-
-This module provides the FlextMeltanoExecutor class for complete Meltano
-command execution with proper error handling, timeout management, and result processing.
+"""FLEXT Meltano Executor - Core command execution service.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
@@ -28,11 +24,7 @@ from flext_meltano import (
 
 
 class FlextMeltanoExecutor(FlextMeltanoServiceBase):
-    """Unified executor architecture following flext-core patterns.
-
-    Provides complete Meltano command execution with proper error handling,
-    timeout management, and result processing.
-    """
+    """Core executor providing Meltano command execution with error handling."""
 
     service_name: str = "FlextMeltanoExecutor"
 
@@ -43,25 +35,6 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         if project_root is not None:
             return m.Meltano.PathPayload(value=project_root).value
         return Path.cwd()
-
-    @staticmethod
-    def create_cli_runner(args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
-        """Create CLI runner for command execution - static factory."""
-        try:
-            executor = FlextMeltanoExecutor()
-            return (
-                executor.run(args)
-                if args
-                else r[t.Meltano.ExecutionResultDict].ok({
-                    "status": c.Meltano.Enums.OperationStatus.READY,
-                    "command_type": "cli_runner",
-                    "args": args,
-                })
-            )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Failed to create CLI runner: {e}",
-            )
 
     @staticmethod
     def create_flext_cli() -> r[FlextMeltanoCLI]:
@@ -94,12 +67,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
 
     @override
     def execute(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Execute the Meltano executor service.
-
-        Returns:
-        r containing executor configuration and status.
-
-        """
+        """Execute the Meltano executor service."""
         try:
             config_data: t.Meltano.ExecutionResultDict = {
                 "executor_type": "flext_meltano_executor",
@@ -122,17 +90,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
-        """Execute a Meltano command with timeout and error handling.
-
-        Args:
-            command: Command to execute as string sequence.
-            timeout: Timeout in seconds.
-            _cwd: Working directory override; defaults to project_root.
-
-        Returns:
-            r with execution result.
-
-        """
+        """Execute a Meltano command with timeout and error handling."""
         try:
             start_time = time.time()
             cwd = str(self.project_root) if _cwd is None else str(_cwd)
@@ -174,16 +132,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         dbt_command: str,
         args: t.StrSequence | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
-        """Execute a DBT command.
-
-        Args:
-            dbt_command: DBT subcommand (run, test, docs, etc.)
-            args: Additional arguments.
-
-        Returns:
-            r with DBT execution result.
-
-        """
+        """Execute a DBT command."""
         try:
             command: list[str] = ["dbt", dbt_command]
             if args:
@@ -198,22 +147,34 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         target_name: str,
         _config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
-        """Execute a complete ELT pipeline.
-
-        Args:
-            tap_name: Name of the tap to use.
-            target_name: Name of the target to use.
-
-        Returns:
-            r with pipeline execution result.
-
-        """
+        """Execute a complete ELT pipeline."""
         try:
             command: list[str] = ["meltano", "run", tap_name, target_name]
             return self.execute_meltano_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[m.Meltano.CommandExecutionResult].fail(
                 f"Pipeline execution failed: {e}",
+            )
+
+    # -- Command routing and convenience methods --
+
+    @staticmethod
+    def create_cli_runner(args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
+        """Create CLI runner for command execution - static factory."""
+        try:
+            executor = FlextMeltanoExecutor()
+            return (
+                executor.run(args)
+                if args
+                else r[t.Meltano.ExecutionResultDict].ok({
+                    "status": c.Meltano.Enums.OperationStatus.READY,
+                    "command_type": "cli_runner",
+                    "args": args,
+                })
+            )
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[t.Meltano.ExecutionResultDict].fail(
+                f"Failed to create CLI runner: {e}",
             )
 
     def health(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -247,9 +208,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         """Run command with arguments - delegates to command router."""
         if not args:
             return r[t.Meltano.ExecutionResultDict].fail("Arguments cannot be empty")
-        command = args[0]
-        command_args = args[1:]
-        return self._route_command(command, command_args)
+        return self._route_command(args[0], args[1:])
 
     def run_cli(self, args: t.StrSequence | None) -> r[t.Meltano.ExecutionResultDict]:
         """Run CLI with arguments - delegates to run or returns help."""
@@ -272,7 +231,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         tap_name: str,
         target_name: str,
     ) -> r[t.Meltano.ExecutionResultDict]:
-        """Run complete ELT pipeline command - delegates to execute_pipeline."""
+        """Run complete ELT pipeline command."""
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
             lambda execution_result: {
@@ -285,8 +244,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
 
     def version(self) -> r[t.Meltano.ExecutionResultDict]:
         """Get version information from meltano."""
-        version_result = self.get_version()
-        return version_result.map(
+        return self.get_version().map(
             lambda ver: {
                 "command": "version",
                 "command_type": "version",
@@ -326,4 +284,7 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         )
 
 
-__all__ = ["FlextMeltanoExecutor"]
+# Backward-compatible alias for code that imported the commands subclass
+FlextMeltanoExecutorCommands = FlextMeltanoExecutor
+
+__all__ = ["FlextMeltanoExecutor", "FlextMeltanoExecutorCommands"]

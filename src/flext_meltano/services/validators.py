@@ -2,7 +2,6 @@
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
@@ -16,80 +15,29 @@ from pydantic import ValidationError
 
 from flext_meltano import FlextMeltanoServiceBase, m, t
 
-_module_logger = FlextLogger(__name__)
-
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
-    """Generic pipeline business rule validators using foundation.
-
-    This class provides complete validation for pipeline-specific business rules
-    while delegating generic validation operations to flext-core. It follows the
-    zero duplication principle by containing only pipeline specific validation logic.
-
-    The validator supports validation for:
-    - Pipeline component configurations
-    - Pipeline project structures
-    - Transformation project configurations
-    - Connection configurations
-
-    Example:
-        >>> validator = FlextMeltanoValidators()
-        >>> config: t.ContainerMapping = {
-        ...     "name": source - csv,
-        ...     "namespace": "source_csv",
-        ... }
-        >>> result: r = validator.validate_component_rules(config)
-        >>> if result.is_success:
-        ...     logger.info("Component configuration is valid")
-
-    """
+    """Generic pipeline business rule validators using foundation."""
 
     @classmethod
     def validate_connection_config(
         cls,
         config: t.ConfigurationMapping,
     ) -> r[t.ConfigurationMapping]:
-        """Validate connection configuration with domain-specific business rules.
-
-        Validates connection configuration data for pipeline services,
-        ensuring proper format and required fields.
-
-        Args:
-            config: Connection configuration dictionary to validate.
-
-        Returns:
-            r containing validated configuration or error details.
-
-        Example:
-            >>> config: Mapping[str, t.NormalizedValue
-            ...     "host": "localhost",
-            ...     "port": 5432,
-            ...     "database": "mydb",
-            ... }
-            >>> result: r[Mapping[str, t.NormalizedValue(
-            ...     FlextMeltanoValidators.validate_connection_config(config)
-            ... )
-            >>> if result.is_success:
-            ...     validated_config: Mapping[str, objectesult.value
-            ...     logger.info("Validated config", config=validated_config)
-
-        """
+        """Validate connection configuration with domain-specific business rules."""
         try:
             if not config:
                 return r[t.ScalarMapping].fail(
-                    "Connection configuration cannot be empty",
+                    "Connection configuration cannot be empty"
                 )
             return r[t.ScalarMapping].ok(config)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate connection config: {e}"
-            _module_logger.exception(error_msg)
+            FlextLogger(__name__).exception(error_msg)
             return r[t.ScalarMapping].fail(error_msg)
 
     @classmethod
-    def validate_component_rules(
-        cls,
-        config: t.ConfigurationMapping,
-    ) -> r[bool]:
+    def validate_component_rules(cls, config: t.ConfigurationMapping) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
             m.Meltano.PluginComponentConfig.model_validate(config)
@@ -102,29 +50,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         cls,
         config: t.ConfigurationMapping,
     ) -> r[bool]:
-        """Validate pipeline project business rules.
-
-        Validates pipeline project configuration including version requirements
-        and project ID format restrictions.
-
-        Args:
-            config: Project configuration dictionary to validate.
-
-        Returns:
-            r containing boolean validation result or error details.
-
-        Example:
-            >>> config: t.ContainerMapping = {
-            ...     "version": 1,
-            ...     "project_id": my - meltano - project,
-            ... }
-            >>> result = FlextMeltanoValidators.validate_meltano_project_business_rules(
-            ...     config
-            ... )
-            >>> if result.is_success and result.value:
-            ...     logger.info("Project configuration is valid")
-
-        """
+        """Validate pipeline project business rules."""
         try:
             m.Meltano.PipelineProjectModel.model_validate(config)
             return r[bool].ok(value=True)
@@ -133,27 +59,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_pipeline_project_structure(cls, project_path: Path) -> r[bool]:
-        """Validate pipeline project structure with domain-specific business rules.
-
-        Performs complete validation of the pipeline project directory
-        structure, checking for required files and directories.
-
-        Args:
-            project_path: Path to the pipeline project directory.
-
-        Returns:
-            r containing boolean validation result or error details.
-
-        Example:
-            >>> from pathlib import Path
-            >>> project_path = Path("/path/to/pipeline/project")
-            >>> result = FlextMeltanoValidators.validate_pipeline_project_structure(
-            ...     project_path
-            ... )
-            >>> if result.is_success and result.value:
-            ...     logger.info("Project structure is valid")
-
-        """
+        """Validate pipeline project structure with domain-specific business rules."""
         try:
             if not project_path.exists():
                 return r[bool].fail(f"Project path does not exist: {project_path}")
@@ -169,23 +75,12 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to validate project structure: {e}"
-            _module_logger.exception(error_msg)
+            FlextLogger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 
     @classmethod
     def validate_plugin_config(cls, config: t.ConfigurationMapping) -> r[bool]:
-        """Validate plugin configuration with complete business rules.
-
-        Validates plugin configuration data for Meltano plugins,
-        ensuring proper format, required fields, and business rules.
-
-        Args:
-        config: Plugin configuration to validate.
-
-        Returns:
-        r containing boolean validation result or error details.
-
-        """
+        """Validate plugin configuration with complete business rules."""
         return cls.validate_component_rules(config)
 
     @classmethod
@@ -193,31 +88,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         cls,
         config: t.ConfigurationMapping,
     ) -> r[bool]:
-        """Validate transformation-specific business rules.
-
-        Validates transformation project configuration including project name format
-        requirements and version specifications.
-
-        Args:
-            config: Transformation configuration dictionary to validate.
-
-        Returns:
-            r containing boolean validation result or error details.
-
-        Example:
-            >>> config: t.ContainerMapping = {
-            ...     "name": "my_transformation_project",
-            ...     "version": 1.0.0,
-            ... }
-            >>> result: r = (
-            ...     FlextMeltanoValidators.validate_transformation_business_rules(
-            ...         config
-            ...     )
-            ... )
-            >>> if result.is_success and result.value:
-            ...     logger.info("Transformation configuration is valid")
-
-        """
+        """Validate transformation-specific business rules."""
         try:
             m.Meltano.TransformationProjectModel.model_validate(config)
             return r[bool].ok(value=True)

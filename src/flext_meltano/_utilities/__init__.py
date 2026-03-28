@@ -1,7 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make gen
 #
-"""FLEXT Meltano typings submodules."""
+"""FLEXT Meltano utilities submodules."""
 
 from __future__ import annotations
 
@@ -13,29 +13,29 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano._typings.base import FlextMeltanoTypingsBase
-    from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
-    from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
+    from flext_meltano._utilities.config import FlextMeltanoUtilitiesConfig
+    from flext_meltano._utilities.project import FlextMeltanoUtilitiesProject
+    from flext_meltano._utilities.yaml import FlextMeltanoUtilitiesYaml
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoTypingsBase": [
-        "flext_meltano._typings.base",
-        "FlextMeltanoTypingsBase",
+    "FlextMeltanoUtilitiesConfig": [
+        "flext_meltano._utilities.config",
+        "FlextMeltanoUtilitiesConfig",
     ],
-    "FlextMeltanoTypingsDomains": [
-        "flext_meltano._typings.domains",
-        "FlextMeltanoTypingsDomains",
+    "FlextMeltanoUtilitiesProject": [
+        "flext_meltano._utilities.project",
+        "FlextMeltanoUtilitiesProject",
     ],
-    "FlextMeltanoTypingsSinger": [
-        "flext_meltano._typings.singer",
-        "FlextMeltanoTypingsSinger",
+    "FlextMeltanoUtilitiesYaml": [
+        "flext_meltano._utilities.yaml",
+        "FlextMeltanoUtilitiesYaml",
     ],
 }
 
 __all__ = [
-    "FlextMeltanoTypingsBase",
-    "FlextMeltanoTypingsDomains",
-    "FlextMeltanoTypingsSinger",
+    "FlextMeltanoUtilitiesConfig",
+    "FlextMeltanoUtilitiesProject",
+    "FlextMeltanoUtilitiesYaml",
 ]
 
 

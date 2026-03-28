@@ -1,8 +1,5 @@
 """DBT Project Integration - Manifest parsing and model discovery.
 
-This module provides project management for DBT with FLEXT ecosystem
-patterns and railway-oriented programming.
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -20,46 +17,23 @@ from flext_meltano import m, t
 
 
 class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
-    """Manages DBT project manifests and model discovery.
-
-    Provides manifest parsing, model/test enumeration from
-    dbt manifest.json files.
-
-    Attributes:
-    project_root: Root directory of DBT project
-    manifest: Parsed DBT manifest
-
-    """
+    """Manages DBT project manifests and model discovery."""
 
     def __init__(self, root: Path | None = None) -> None:
-        """Initialize DBT project manager.
-
-        Args:
-        root: Root directory of DBT project (optional)
-
-        """
+        """Initialize DBT project manager."""
         super().__init__()
         self.project_root = root
         self.manifest: t.Meltano.Dbt.ManifestData | None = None
 
     @override
     def execute(self, **_kwargs: t.Scalar) -> r[m.Meltano.DbtProjectInfo]:
-        """Execute (implements Service pattern).
-
-        Loads the project and returns info with real model/test counts
-        from the manifest if available.
-        """
+        """Execute (implements Service pattern)."""
         if not self.project_root:
             return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
         return self.load_project(self.project_root)
 
     def get_models(self) -> r[Sequence[t.Meltano.Dbt.ModelConfiguration]]:
-        """Get all models from manifest.
-
-        Returns:
-        r containing list of models
-
-        """
+        """Get all models from manifest."""
         try:
             model_nodes_result = self._get_manifest_nodes("model")
             if model_nodes_result.is_failure:
@@ -79,25 +53,14 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             ]
             self.logger.info("Models retrieved", count=len(models))
             return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].ok(models)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-        ) as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].fail(
-                f"Failed to get models: {e}",
+                f"Failed to get models: {e}"
             )
 
     def get_tests(self) -> r[Sequence[t.Meltano.Dbt.TestConfiguration]]:
-        """Get all tests from manifest.
-
-        Returns:
-        r containing list of tests
-
-        """
+        """Get all tests from manifest."""
         try:
             test_nodes_result = self._get_manifest_nodes("test")
             if test_nodes_result.is_failure:
@@ -120,7 +83,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
         except (ValidationError, OSError, ValueError, TypeError) as e:
             self.logger.exception("Failed to get tests", error=str(e))
             return r[Sequence[t.Meltano.Dbt.TestConfiguration]].fail(
-                f"Failed to get tests: {e}",
+                f"Failed to get tests: {e}"
             )
 
     def _get_manifest_nodes(
@@ -147,22 +110,13 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             return r[Sequence[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
         except (ValidationError, OSError, ValueError, TypeError) as e:
             return r[Sequence[m.Meltano.DbtManifestNode]].fail(
-                f"Failed to read manifest nodes: {e}",
+                f"Failed to read manifest nodes: {e}"
             )
 
     def load_manifest(
-        self,
-        manifest_path: Path | None = None,
+        self, manifest_path: Path | None = None
     ) -> r[t.Meltano.Dbt.ManifestData]:
-        """Load DBT manifest.
-
-        Args:
-        manifest_path: Path to manifest file (optional)
-
-        Returns:
-        r containing manifest dictionary
-
-        """
+        """Load DBT manifest."""
         try:
             if manifest_path is None:
                 if self.project_root is None:
@@ -170,7 +124,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 manifest_path = self.project_root / "target" / "manifest.json"
             if not manifest_path.exists():
                 return r[t.Meltano.Dbt.ManifestData].fail(
-                    f"Manifest not found: {manifest_path}",
+                    f"Manifest not found: {manifest_path}"
                 )
             parsed_manifest = m.Meltano.DbtManifest.model_validate_json(
                 manifest_path.read_text(encoding="utf-8"),
@@ -181,34 +135,18 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             self.manifest = manifest_data
             self.logger.info("DBT manifest loaded", file=str(manifest_path))
             return r[t.Meltano.Dbt.ManifestData].ok(self.manifest)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-        ) as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             self.logger.exception("Failed to load manifest", error=str(e))
             return r[t.Meltano.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
 
     def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
-        """Load a DBT project and discover models/tests from manifest.
-
-        Args:
-        root: Root directory of the DBT project
-
-        Returns:
-        r containing project information with real model/test counts
-
-        """
+        """Load a DBT project and discover models/tests from manifest."""
         try:
             if not root.exists():
                 return r[m.Meltano.DbtProjectInfo].fail(
-                    f"DBT project directory not found: {root}",
+                    f"DBT project directory not found: {root}"
                 )
             self.project_root = root
-
-            # Try to load manifest for real counts
             models_count = 0
             tests_count = 0
             manifest_result = self.load_manifest()
@@ -219,7 +157,6 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 tests_result = self.get_tests()
                 if tests_result.is_success:
                     tests_count = len(tests_result.value)
-
             info = m.Meltano.DbtProjectInfo(
                 root=root,
                 name=str(root.name),
@@ -234,13 +171,7 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                 tests=tests_count,
             )
             return r[m.Meltano.DbtProjectInfo].ok(info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-        ) as e:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
