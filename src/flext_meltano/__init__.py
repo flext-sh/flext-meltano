@@ -151,7 +151,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     ],
     "FlextMeltanoAdapter": ["flext_meltano.services.adapters", "FlextMeltanoAdapter"],
     "FlextMeltanoBridge": ["flext_meltano.services.bridge", "FlextMeltanoBridge"],
-    "FlextMeltanoCLI": ["flext_meltano.cli", "FlextMeltanoCLI"],
+    "FlextMeltanoCLI": ["flext_meltano._utilities.cli", "FlextMeltanoCLI"],
     "FlextMeltanoCatalogManager": [
         "flext_meltano.singer.catalog",
         "FlextMeltanoCatalogManager",
@@ -440,7 +440,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "e": ["flext_cli", "e"],
     "h": ["flext_cli", "h"],
     "m": ["flext_meltano.models", "FlextMeltanoModels"],
-    "main": ["flext_meltano.cli", "main"],
+    "main": ["flext_meltano._utilities.cli", "main"],
     "meltano": ["flext_meltano.api", "meltano"],
     "p": ["flext_meltano.protocols", "FlextMeltanoProtocols"],
     "r": ["flext_cli", "r"],
