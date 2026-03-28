@@ -18,11 +18,9 @@ from pydantic import Field
 
 from flext_meltano import (
     FlextMeltanoProjectManager,
-    c,
     m,
     r,
     t,
-    u,
 )
 
 
@@ -67,31 +65,14 @@ class FlextMeltanoMeltanoService(s[str]):
         """Create a new Meltano project.
 
         Args:
-        root: Root directory for the project
+            root: Root directory for the project
 
         Returns:
-        r containing project information
+            r containing project information
 
         """
-        try:
-            self.logger.info("Creating Meltano project", root=str(root))
-            result = self.project_manager.initialize_project(root)
-            if result.is_success:
-                self.logger.info("Meltano project created")
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to create project", error=str(e))
-            return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to create project: {e}",
-            )
+        self.logger.info("Creating Meltano project", root=str(root))
+        return self.project_manager.initialize_project(root)
 
     def discover_plugins(
         self,
@@ -100,40 +81,19 @@ class FlextMeltanoMeltanoService(s[str]):
         """Discover plugins in the project.
 
         Args:
-        plugin_type: Optional plugin type to filter
+            plugin_type: Optional plugin type to filter
 
         Returns:
-        r containing list of plugins
+            r containing list of plugins
 
         """
-        try:
-            self.logger.info("Discovering plugins", type=plugin_type or "")
-            result = self.project_manager.get_plugins(plugin_type)
-            if result.is_success:
-                plugins: list[t.Meltano.PluginDefinition] = (
-                    list(result.value) if result.value else []
-                )
-                self.logger.info("Plugins discovered", count=u.count(plugins))
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to discover plugins", error=str(e))
-            return r[Sequence[t.Meltano.PluginDefinition]].fail(
-                f"Failed to discover plugins: {e}",
-            )
+        self.logger.info("Discovering plugins", type=plugin_type or "")
+        return self.project_manager.get_plugins(plugin_type)
 
     @override
     def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
-        msg = "Meltano service initialized"
-        return r[str].ok(msg)
+        return r[str].ok("Meltano service ready")
 
     def execute_pipeline(
         self,
@@ -142,67 +102,30 @@ class FlextMeltanoMeltanoService(s[str]):
         """Execute a Meltano pipeline.
 
         Args:
-        config: Pipeline configuration
+            config: Pipeline configuration
 
         Returns:
-        r containing pipeline result
+            r containing pipeline result
 
         """
-        try:
-            self.logger.info("Executing Meltano pipeline", run_config=config.run_config)
-            project_result = self.project_manager.load_project(config.project_root)
-            if project_result.is_failure:
-                return r[t.Meltano.ELT.PipelineResult].fail(project_result.error)
-            result: t.Meltano.ELT.PipelineResult = {
-                "success": True,
-                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                "exit_code": 0,
-            }
-            self.logger.info("Meltano pipeline executed", status=str(result["status"]))
-            return r[t.Meltano.ELT.PipelineResult].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to execute pipeline", error=str(e))
-            return r[t.Meltano.ELT.PipelineResult].fail(
-                f"Failed to execute pipeline: {e}",
-            )
+        msg = (
+            f"Pipeline execution requires meltano-core SDK integration: "
+            f"run_config={config.run_config!r}, project_root={config.project_root!r}"
+        )
+        raise NotImplementedError(msg)
 
     def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Load an existing Meltano project.
 
         Args:
-        root: Root directory of the project
+            root: Root directory of the project
 
         Returns:
-        r containing project information
+            r containing project information
 
         """
-        try:
-            self.logger.info("Loading Meltano project", root=str(root))
-            result = self.project_manager.load_project(root)
-            if result.is_success:
-                self.logger.info("Meltano project loaded")
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to load project", error=str(e))
-            return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to load project: {e}",
-            )
+        self.logger.info("Loading Meltano project", root=str(root))
+        return self.project_manager.load_project(root)
 
 
 __all__ = ["FlextMeltanoMeltanoService"]

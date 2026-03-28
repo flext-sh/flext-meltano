@@ -15,7 +15,6 @@ from typing import override
 
 from flext_core import FlextService, r
 from meltano.core.project import Project
-from pydantic import PrivateAttr
 
 from flext_meltano import m, t, u
 
@@ -31,11 +30,6 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     project: Wrapped meltano.core.project.Project instance
 
     """
-
-    _metadata_extra: dict[str, str] = PrivateAttr(
-        default_factory=lambda: dict[str, str](),
-    )
-    _sealed: bool = PrivateAttr(default=False)
 
     def __init__(self, root: Path | None = None) -> None:
         """Initialize Meltano project manager.
@@ -135,28 +129,14 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
         """Install a plugin in the project.
 
         Args:
-        name: Name of the plugin to install
+            name: Name of the plugin to install
 
         Returns:
-        r containing plugin information
+            r containing plugin information
 
         """
-        try:
-            self.logger.info("Installing plugin", name=name)
-            plugin_info: t.Meltano.PluginInfo = {"name": name, "status": "installing"}
-            self.logger.info("Plugin installed", name=name)
-            return r[t.Meltano.PluginInfo].ok(plugin_info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Failed to install plugin", error=str(e))
-            return r[t.Meltano.PluginInfo].fail(f"Failed to install plugin: {e}")
+        msg = f"Plugin installation requires meltano-core SDK integration: install_plugin({name!r})"
+        raise NotImplementedError(msg)
 
     def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Load an existing Meltano project.
@@ -230,8 +210,8 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 if variant_normalized is not None:
                     plugin_def["variant"] = variant_normalized
                 plugins.append(plugin_def)
-        except (TypeError, AttributeError):
-            pass
+        except (TypeError, AttributeError) as e:
+            self.logger.warning(f"Failed to extract plugins: {e}")
         return plugins
 
 

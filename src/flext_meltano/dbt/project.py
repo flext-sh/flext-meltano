@@ -1,4 +1,4 @@
-"""DBT Project Integration - Deep integration with dbt-core.
+"""DBT Project Integration - Manifest parsing and model discovery.
 
 This module provides project management for DBT with FLEXT ecosystem
 patterns and railway-oriented programming.
@@ -20,10 +20,10 @@ from flext_meltano import m, t
 
 
 class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
-    """Manages DBT projects with deep SDK integration.
+    """Manages DBT project manifests and model discovery.
 
-    Provides programmatic access to DBT projects, manifests, and
-    configurations through wrapped dbt-core APIs.
+    Provides manifest parsing, model/test enumeration from
+    dbt manifest.json files.
 
     Attributes:
     project_root: Root directory of DBT project
@@ -44,17 +44,14 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
 
     @override
     def execute(self, **_kwargs: t.Scalar) -> r[m.Meltano.DbtProjectInfo]:
-        """Execute (implements Service pattern)."""
-        if self.project_root:
-            info = m.Meltano.DbtProjectInfo(
-                root=self.project_root,
-                name=str(self.project_root.name),
-                dbt_version=None,
-                models_count=0,
-                tests_count=0,
-            )
-            return r[m.Meltano.DbtProjectInfo].ok(info)
-        return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
+        """Execute (implements Service pattern).
+
+        Loads the project and returns info with real model/test counts
+        from the manifest if available.
+        """
+        if not self.project_root:
+            return r[m.Meltano.DbtProjectInfo].fail("No project loaded")
+        return self.load_project(self.project_root)
 
     def get_models(self) -> r[Sequence[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from manifest.
@@ -88,8 +85,6 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             KeyError,
             AttributeError,
             OSError,
-            RuntimeError,
-            ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].fail(
@@ -192,20 +187,18 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             KeyError,
             AttributeError,
             OSError,
-            RuntimeError,
-            ImportError,
         ) as e:
             self.logger.exception("Failed to load manifest", error=str(e))
             return r[t.Meltano.Dbt.ManifestData].fail(f"Failed to load manifest: {e}")
 
     def load_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
-        """Load a DBT project.
+        """Load a DBT project and discover models/tests from manifest.
 
         Args:
         root: Root directory of the DBT project
 
         Returns:
-        r containing project information
+        r containing project information with real model/test counts
 
         """
         try:
@@ -214,14 +207,32 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
                     f"DBT project directory not found: {root}",
                 )
             self.project_root = root
+
+            # Try to load manifest for real counts
+            models_count = 0
+            tests_count = 0
+            manifest_result = self.load_manifest()
+            if manifest_result.is_success:
+                models_result = self.get_models()
+                if models_result.is_success:
+                    models_count = len(models_result.value)
+                tests_result = self.get_tests()
+                if tests_result.is_success:
+                    tests_count = len(tests_result.value)
+
             info = m.Meltano.DbtProjectInfo(
                 root=root,
                 name=str(root.name),
                 dbt_version=None,
-                models_count=0,
-                tests_count=0,
+                models_count=models_count,
+                tests_count=tests_count,
             )
-            self.logger.info("DBT project loaded", root=str(root))
+            self.logger.info(
+                "DBT project loaded",
+                root=str(root),
+                models=models_count,
+                tests=tests_count,
+            )
             return r[m.Meltano.DbtProjectInfo].ok(info)
         except (
             ValueError,
@@ -229,8 +240,6 @@ class FlextMeltanoDbtProjectManager(s[m.Meltano.DbtProjectInfo]):
             KeyError,
             AttributeError,
             OSError,
-            RuntimeError,
-            ImportError,
         ) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")

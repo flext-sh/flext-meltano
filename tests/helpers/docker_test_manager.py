@@ -312,8 +312,8 @@ class Tk(ContainerManager):
         if self.containers_started and (not self.keep_running):
             try:
                 self.stop_services(remove_volumes=True)
-            except Exception:
-                self.logger.exception("Failed to cleanup containers")
+            except Exception as e:
+                self.logger.exception("Failed to cleanup containers", error=str(e))
 
     @contextmanager
     def service_context(self, services: t.StrSequence | None = None) -> Generator[Tk]:

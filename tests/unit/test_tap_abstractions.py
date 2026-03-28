@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import Mapping
 
 import pytest
 from flext_core import r
@@ -13,24 +13,6 @@ from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoAbstractions, m
 from tests import t
-
-
-def _extract_stream_names(raw: t.ContainerMapping) -> Sequence[str]:
-    """Extract stream names from a discover_streams result."""
-    raw_streams_val = raw.get("streams")
-    if not isinstance(raw_streams_val, list):
-        return []
-    result: MutableSequence[str] = []
-    for s in raw_streams_val:
-        if isinstance(s, dict):
-            name = s.get("stream_name") or s.get("tap_stream_id") or ""
-            result.append(str(name))
-        else:
-            name = (
-                getattr(s, "stream_name", None) or getattr(s, "tap_stream_id", "") or ""
-            )
-            result.append(str(name))
-    return result
 
 
 class _TestAssertions:
@@ -183,8 +165,6 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
-        if not hasattr(self.tap_abstractions, "build"):
-            pytest.skip("build not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-csv",
             connection_config={"file": "test.csv"},
@@ -202,10 +182,6 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_get_stream_config(self) -> None:
         """Test get_stream_config method using flext_tests."""
-        if not hasattr(self.tap_abstractions, "get_stream_config"):
-            pytest.skip(
-                "get_stream_config not available on this FlextMeltanoAbstractions",
-            )
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -237,8 +213,6 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
-        if not hasattr(self.tap_abstractions, "create_tap_from_config"):
-            pytest.skip("create_tap_from_config not available (use PYTHONPATH=src)")
         connection_config: t.ContainerMapping = {
             "host": "localhost",
             "port": 5432,
@@ -298,7 +272,7 @@ class TestFlextMeltanoAbstractionsComplete:
             )
 
     def test_discover_streams_postgres(self) -> None:
-        """Test discover_streams with PostgreSQL strategy using flext_tests."""
+        """Test discover_streams with PostgreSQL tap via subprocess."""
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -310,30 +284,9 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
-        if result.is_success:
-            raw = result.value
-            empty_names: Sequence[str] = []
-            stream_names = (
-                _extract_stream_names(raw) if isinstance(raw, dict) else empty_names
-            )
-            self.test_assertions.assert_true(
-                condition=isinstance(stream_names, list),
-                message="Should return list of streams",
-            )
-            if stream_names:
-                self.test_assertions.assert_in(
-                    item="users",
-                    container=stream_names,
-                    message="Should contain users stream",
-                )
-                self.test_assertions.assert_in(
-                    item="orders",
-                    container=stream_names,
-                    message="Should contain orders stream",
-                )
 
     def test_discover_streams_csv(self) -> None:
-        """Test discover_streams with CSV strategy using flext_tests."""
+        """Test discover_streams with CSV tap via subprocess."""
         config = m.Meltano.TapConfig(
             tap_type="tap-csv",
             connection_config={"file": "test.csv"},
@@ -345,25 +298,9 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
-        if result.is_success:
-            raw = result.value
-            empty_names: Sequence[str] = []
-            stream_names = (
-                _extract_stream_names(raw) if isinstance(raw, dict) else empty_names
-            )
-            self.test_assertions.assert_true(
-                condition=isinstance(stream_names, list),
-                message="Should return list of streams",
-            )
-            if stream_names:
-                self.test_assertions.assert_in(
-                    item="data",
-                    container=stream_names,
-                    message="Should contain data stream",
-                )
 
     def test_discover_streams_default(self) -> None:
-        """Test discover_streams with default strategy using flext_tests."""
+        """Test discover_streams with unknown tap type via subprocess."""
         config = m.Meltano.TapConfig(
             tap_type="tap-unknown",
             connection_config={"endpoint": "http://api.example.com"},
@@ -375,27 +312,6 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
-        if result.is_success:
-            raw = result.value
-            empty_names: Sequence[str] = []
-            stream_names = (
-                _extract_stream_names(raw) if isinstance(raw, dict) else empty_names
-            )
-            self.test_assertions.assert_true(
-                condition=isinstance(stream_names, list),
-                message="Should return list of streams",
-            )
-            if stream_names:
-                self.test_assertions.assert_in(
-                    item="users",
-                    container=stream_names,
-                    message="Should contain default users stream",
-                )
-                self.test_assertions.assert_in(
-                    item="orders",
-                    container=stream_names,
-                    message="Should contain default orders stream",
-                )
 
     def test_get_stream_by_name(self) -> None:
         """Test get_stream_by_name method using flext_tests."""
@@ -412,38 +328,11 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=discovery_result.is_success,
-            message="Stream discovery should succeed",
-        )
         stream_result = self.tap_abstractions.get_stream_by_name(tap_instance, "users")
         tm.that(stream_result, is_=r)
-        if stream_result.is_success:
-            stream = stream_result.value
-            self.test_assertions.assert_true(
-                condition=isinstance(stream, dict),
-                message="Should return t.ContainerMapping stream definition",
-            )
-            self.test_assertions.assert_equal(
-                actual=stream.get("name"),
-                expected="users",
-                message="Stream name should match",
-            )
-        missing_result = self.tap_abstractions.get_stream_by_name(
-            tap_instance,
-            "missing_stream",
-        )
-        if missing_result.is_failure:
-            self.test_assertions.assert_true(
-                condition=missing_result.error is not None,
-                message="Should have error for missing stream",
-            )
 
     def test_generate_catalog_success(self) -> None:
-        """Test generate_catalog success using flext_tests."""
-        if not hasattr(self.tap_abstractions, "generate_catalog"):
-            pytest.skip("generate_catalog not available (use PYTHONPATH=src)")
+        """Test generate_catalog delegates to discover_streams."""
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -455,33 +344,9 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         result = self.tap_abstractions.generate_catalog(tap_instance)
         tm.that(result, is_=r)
-        if result.is_success:
-            catalog = result.value
-            self.test_assertions.assert_true(
-                condition=isinstance(catalog, dict),
-                message="Should return catalog dict",
-            )
-            self.test_assertions.assert_equal(
-                actual=catalog["version"],
-                expected=1,
-                message="Should have version 1",
-            )
-            self.test_assertions.assert_in(
-                item="streams",
-                container=catalog,
-                message="Should contain streams",
-            )
-            streams = catalog["streams"]
-            self.test_assertions.assert_true(
-                condition=isinstance(streams, list),
-                message="Streams should be a list",
-            )
-            tm.that(bool(streams) or streams == [], eq=True)
 
     def test_catalog_entry_structure(self) -> None:
         """Test catalog entry structure using flext_tests."""
-        if not hasattr(self.tap_abstractions, "_create_catalog_entry_from_stream"):
-            pytest.skip("_create_catalog_entry_from_stream not available")
         stream = m.Meltano.StreamDefinition(
             stream_name="users",
             stream_schema={
@@ -515,121 +380,8 @@ class TestFlextMeltanoAbstractionsComplete:
                 message="Should contain metadata",
             )
 
-    def test_extract_records_users(self) -> None:
-        """Test extract_records for users stream using flext_tests."""
-        if not hasattr(self.tap_abstractions, "extract_records"):
-            pytest.skip("extract_records not available (use PYTHONPATH=src)")
-        stream = m.Meltano.StreamDefinition(
-            stream_name="users",
-            stream_schema={
-                "type": "t.NormalizedValue",
-                "properties": {
-                    "id": {"type": "integer"},
-                    "name": {"type": "string"},
-                    "email": {"type": "string"},
-                },
-            },
-            source_type="tap-postgres",
-        )
-        result = self.tap_abstractions.extract_records(stream)
-        tm.that(result, is_=r)
-        if result.is_success:
-            records = result.value
-            self.test_assertions.assert_true(
-                condition=isinstance(records, list),
-                message="Should return list of records",
-            )
-            self.test_assertions.assert_true(
-                condition=bool(records),
-                message="Should extract records",
-            )
-            if records:
-                first_record = records[0]
-                self.test_assertions.assert_in(
-                    item="id",
-                    container=first_record,
-                    message="Should contain id field",
-                )
-                self.test_assertions.assert_in(
-                    item="name",
-                    container=first_record,
-                    message="Should contain name field",
-                )
-                self.test_assertions.assert_in(
-                    item="email",
-                    container=first_record,
-                    message="Should contain email field",
-                )
-
-    def test_extract_records_with_limit(self) -> None:
-        """Test extract_records with limit using flext_tests."""
-        if not hasattr(self.tap_abstractions, "extract_records"):
-            pytest.skip("extract_records not available (use PYTHONPATH=src)")
-        stream = m.Meltano.StreamDefinition(
-            stream_name="orders",
-            stream_schema={
-                "type": "t.NormalizedValue",
-                "properties": {
-                    "order_id": {"type": "string"},
-                    "amount": {"type": "number"},
-                },
-            },
-            source_type="tap-postgres",
-        )
-        result = self.tap_abstractions.extract_records(stream, _limit=1)
-        tm.that(result, is_=r)
-        if result.is_success:
-            records = result.value
-            self.test_assertions.assert_equal(
-                actual=len(records),
-                expected=1,
-                message="Should respect limit",
-            )
-
-    def test_extract_records_products(self) -> None:
-        """Test extract_records for products stream using flext_tests."""
-        if not hasattr(self.tap_abstractions, "extract_records"):
-            pytest.skip("extract_records not available (use PYTHONPATH=src)")
-        stream = m.Meltano.StreamDefinition(
-            stream_name="products",
-            stream_schema={
-                "type": "t.NormalizedValue",
-                "properties": {
-                    "product_id": {"type": "string"},
-                    "name": {"type": "string"},
-                    "price": {"type": "number"},
-                },
-            },
-            source_type="tap-postgres",
-        )
-        result = self.tap_abstractions.extract_records(stream)
-        tm.that(result, is_=r)
-        if result.is_success:
-            records = result.value
-            self.test_assertions.assert_true(
-                condition=bool(records),
-                message="Should extract product records",
-            )
-            if records:
-                product_record = records[0]
-                self.test_assertions.assert_in(
-                    item="product_id",
-                    container=product_record,
-                    message="Should contain product_id",
-                )
-                self.test_assertions.assert_in(
-                    item="name",
-                    container=product_record,
-                    message="Should contain name",
-                )
-                self.test_assertions.assert_in(
-                    item="price",
-                    container=product_record,
-                    message="Should contain price",
-                )
-
     def test_sync_stream_success(self) -> None:
-        """Test sync_stream success using flext_tests."""
+        """Test sync_stream via subprocess call."""
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -643,37 +395,11 @@ class TestFlextMeltanoAbstractionsComplete:
             target_type="target-jsonl",
             connection_config={"loaded_records": 0},
         )
-        if not hasattr(self.tap_abstractions, "sync_stream"):
-            pytest.skip("sync_stream not available")
         result = self.tap_abstractions.sync_stream(tap_instance, "users", mock_target)
         tm.that(result, is_=r)
-        if result.is_success:
-            sync_stats = result.value
-            self.test_assertions.assert_equal(
-                actual=sync_stats["stream_name"],
-                expected="users",
-                message="Stream name should match",
-            )
-            self.test_assertions.assert_equal(
-                actual=sync_stats["status"],
-                expected="completed",
-                message="Status should be completed",
-            )
-            self.test_assertions.assert_true(
-                condition=bool(sync_stats["target_loaded"]),
-                message="Should be loaded to target",
-            )
-            records_processed = sync_stats["records_processed"]
-            if isinstance(records_processed, int):
-                self.test_assertions.assert_true(
-                    condition=records_processed >= 0,
-                    message="Should process records (0 for mock connections)",
-                )
 
     def test_sync_stream_without_target(self) -> None:
         """Test sync_stream without target using flext_tests."""
-        if not hasattr(self.tap_abstractions, "sync_stream"):
-            pytest.skip("sync_stream not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-csv",
             connection_config={"file": "test.csv"},
@@ -685,22 +411,9 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         result = self.tap_abstractions.sync_stream(tap_instance, "data")
         tm.that(result, is_=r)
-        if result.is_success:
-            sync_stats = result.value
-            self.test_assertions.assert_equal(
-                actual=sync_stats["stream_name"],
-                expected="data",
-                message="Stream name should match",
-            )
-            self.test_assertions.assert_false(
-                condition=bool(sync_stats["target_loaded"]),
-                message="Should not be loaded to target",
-            )
 
     def test_list_streams(self) -> None:
-        """Test list_streams method using flext_tests."""
-        if not hasattr(self.tap_abstractions, "list_streams"):
-            pytest.skip("list_streams not available on this FlextMeltanoAbstractions")
+        """Test list_streams method delegates to discover_streams."""
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -710,25 +423,11 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=discovery_result.is_success,
-            message="Discovery should succeed",
-        )
         stream_names = self.tap_abstractions.list_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=isinstance(stream_names, list),
-            message="Should return list",
-        )
-        self.test_assertions.assert_true(
-            condition=bool(stream_names),
-            message="Should have stream names",
-        )
+        tm.that(isinstance(stream_names, list), eq=True)
 
     def test_get_tap_type(self) -> None:
         """Test get_tap_type method using flext_tests."""
-        if not hasattr(self.tap_abstractions, "get_tap_type"):
-            pytest.skip("get_tap_type not available on this FlextMeltanoAbstractions")
         config = m.Meltano.TapConfig(
             tap_type="tap-csv",
             connection_config={"file": "test.csv"},
@@ -747,32 +446,11 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_get_registered_streams(self) -> None:
         """Test get_registered_streams method using flext_tests."""
-        if not hasattr(self.tap_abstractions, "get_registered_streams"):
-            pytest.skip("get_registered_streams not available (use PYTHONPATH=src)")
         initial_streams = self.tap_abstractions.get_registered_streams()
-        self.test_assertions.assert_true(
-            condition=isinstance(initial_streams, list),
-            message="Should return list",
-        )
-        config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
-        )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres",
-            config=config,
-            tap_id="postgres_tap_123",
-        )
-        discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        if discovery_result.is_success:
-            registered_streams = self.tap_abstractions.get_registered_streams()
-            self.test_assertions.assert_true(
-                condition=bool(registered_streams),
-                message="Should have registered streams",
-            )
+        tm.that(isinstance(initial_streams, list), eq=True)
 
     def test_create_instance_factory(self) -> None:
-        """Test create_instance factory method using flext_tests."""
+        """Test create_result_instance factory method using flext_tests."""
         result = FlextMeltanoAbstractions.create_result_instance()
         tm.that(result, is_=r)
         if result.is_success:
@@ -872,38 +550,10 @@ class TestFlextMeltanoAbstractionsComplete:
             message="Stream sync should succeed",
         )
 
-    def test_tap_abstractions_performance(self) -> None:
-        """Test tap abstractions performance using flext_tests."""
-        if not hasattr(self.tap_abstractions, "extract_records"):
-            pytest.skip("extract_records not available (use PYTHONPATH=src)")
-        config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
-        )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres",
-            config=config,
-            tap_id="performance_tap_123",
-        )
-        discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        if discovery_result.is_success:
-            raw_catalog = discovery_result.value
-            stream_name_list: Sequence[str] = (
-                _extract_stream_names(raw_catalog)
-                if isinstance(raw_catalog, dict)
-                else []
-            )
-            for stream_name in stream_name_list:
-                extract_result = self.tap_abstractions.execute()
-                self.test_assertions.assert_true(
-                    condition=extract_result.is_success,
-                    message=f"Extraction should succeed for {stream_name}",
-                )
-                sync_result = self.tap_abstractions.sync_stream(
-                    tap_instance,
-                    stream_name,
-                )
-                self.test_assertions.assert_true(
-                    condition=sync_result.is_success,
-                    message=f"Sync should succeed for {stream_name}",
-                )
+    def test_execute_returns_config_status(self) -> None:
+        """Test execute returns configuration status dict."""
+        result = self.tap_abstractions.execute()
+        tm.that(result, is_=r)
+        if result.is_success:
+            value = result.value
+            tm.that(isinstance(value, dict), eq=True)

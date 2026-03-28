@@ -11,12 +11,12 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import r, s
+from flext_core import r
 
-from flext_meltano import FlextMeltanoSettings, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
 
 
-class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
+class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     """UNIFIED Sink Abstractions class consolidating ALL sink functionality.
 
     This single class provides:
@@ -27,13 +27,6 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
 
     Following FLEXT 'one class per module' pattern.
     """
-
-    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
-        """Initialize unified sink abstractions with FLEXT configuration."""
-        super().__init__()
-        self._meltano_config: FlextMeltanoSettings = (
-            config if config is not None else FlextMeltanoSettings()
-        )
 
     def configure_sink(
         self,
@@ -129,7 +122,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
             sink_instance = m.Meltano.DataSinkInstance(
                 sink_type=sink_config.sink_type,
                 config=sink_config,
-                status="configured",
+                status=c.Meltano.Enums.OperationStatus.CONFIGURED,
             )
             self.logger.info(
                 "Sink instance created successfully",
@@ -153,7 +146,7 @@ class FlextMeltanoTargetAbstractions(s[t.Meltano.MeltanoConfigDict]):
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[t.Meltano.MeltanoConfigDict].ok(self._meltano_config.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
 
     def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
         """Validate a sink configuration.

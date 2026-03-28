@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import override
 
 from flext_core import r
@@ -143,50 +142,6 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             )
 
     @staticmethod
-    def discover() -> r[t.Meltano.ResultDict]:
-        """Discover data source schema - railway-oriented operation."""
-        return r[t.Meltano.ResultDict].ok({"streams": ""})
-
-    @staticmethod
-    def execute_pipeline_by_id(
-        pipeline_id: str,
-        _config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute generic pipeline by ID - railway-oriented operation."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "pipeline_id": pipeline_id,
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-        })
-
-    @staticmethod
-    def extract_source(_schema: t.Meltano.SchemaDict) -> r[t.Meltano.ResultDict]:
-        """Extract data from source - railway-oriented operation."""
-        return r[t.Meltano.ResultDict].ok({
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED
-        })
-
-    @staticmethod
-    def generate_docs() -> r[t.Meltano.MeltanoConfigDict]:
-        """Generate pipeline documentation."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-            "docs_generated": True,
-        })
-
-    @staticmethod
-    def get_default_config() -> r[t.Meltano.MeltanoConfigDict]:
-        """Get default configuration."""
-        return r[t.Meltano.MeltanoConfigDict].ok({})
-
-    @staticmethod
-    def get_profiles_config() -> r[t.Meltano.MeltanoConfigDict]:
-        """Get transformation profiles configuration."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "profile_name": "flext_pipeline_profile",
-            "target": "dev",
-        })
-
-    @staticmethod
     def install_component(
         component_type: str,
         component_name: str,
@@ -207,122 +162,6 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "status": c.Meltano.Enums.OperationStatus.INSTALLED,
             "configuration": config or {},
         })
-
-    @staticmethod
-    def list_components(
-        component_type: str | None = None,
-    ) -> r[Sequence[t.Meltano.MeltanoConfigDict]]:
-        """List available pipeline components."""
-        components: Sequence[t.Meltano.MeltanoConfigDict] = [
-            {
-                "name": "source-csv",
-                "type": "sources",
-                "status": c.Meltano.Enums.OperationStatus.INSTALLED,
-            },
-            {
-                "name": "sink-postgres",
-                "type": "sinks",
-                "status": c.Meltano.Enums.OperationStatus.INSTALLED,
-            },
-            {
-                "name": "transform-postgres",
-                "type": "transformers",
-                "status": c.Meltano.Enums.OperationStatus.INSTALLED,
-            },
-        ]
-        if component_type:
-            filtered = u.filter(
-                components,
-                lambda c: c.get("type") == component_type,
-            )
-            components = list(filtered) if filtered else []
-        return r[Sequence[t.Meltano.MeltanoConfigDict]].ok(components)
-
-    @staticmethod
-    def list_pipelines() -> r[Sequence[t.Meltano.MeltanoConfigDict]]:
-        """List configured pipelines."""
-        return r[Sequence[t.Meltano.MeltanoConfigDict]].ok([])
-
-    @staticmethod
-    def load_batch(_records: Sequence[t.Meltano.RecordDict]) -> r[t.Meltano.ResultDict]:
-        """Load batch of records to sink - railway-oriented operation."""
-        return r[t.Meltano.ResultDict].ok({
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED
-        })
-
-    @staticmethod
-    def load_record(_record: t.Meltano.RecordDict) -> r[t.Meltano.ResultDict]:
-        """Load single record to sink - railway-oriented operation."""
-        return r[t.Meltano.ResultDict].ok({
-            "status": c.Meltano.Enums.OperationStatus.PROCESSED
-        })
-
-    @staticmethod
-    def run_pipeline(
-        source_name: str,
-        sink_name: str,
-        _transformation_models: t.StrSequence | None = None,
-        _config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Run complete data pipeline - railway-oriented operation."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "source": source_name,
-            "sink": sink_name,
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-        })
-
-    @staticmethod
-    def run_sink(sink_name: str) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute a data sink."""
-        if not sink_name:
-            return r[t.Meltano.MeltanoConfigDict].fail("Sink name is required")
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "sink_name": sink_name,
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-        })
-
-    @staticmethod
-    def run_source(source_name: str) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute a data source."""
-        if not source_name:
-            return r[t.Meltano.MeltanoConfigDict].fail("Source name is required")
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "source_name": source_name,
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-        })
-
-    @staticmethod
-    def run_transformation_models(
-        models: t.StrSequence | None = None,
-        config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Run transformation models."""
-        models_to_run = models or ["all_models"]
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "models": models_to_run,
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-            "configuration": config or {},
-        })
-
-    @staticmethod
-    def test_transformation_models(
-        models: t.StrSequence | None = None,
-        config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Test transformation models."""
-        models_to_test = models or ["all_models"]
-        result_dict: t.Meltano.MeltanoConfigDict = {
-            "models": models_to_test,
-            "status": c.Meltano.Enums.OperationStatus.PASSED,
-            "tests_executed": u.mul(u.count(models_to_test), 3),
-            "configuration": config or {},
-        }
-        return r[t.Meltano.MeltanoConfigDict].ok(result_dict)
-
-    @staticmethod
-    def validate_service() -> r[bool]:
-        """Validate service configuration."""
-        return r[bool].ok(value=True)
 
     @staticmethod
     def validate_service_config(config: t.Meltano.MeltanoConfigDict) -> r[bool]:
@@ -352,6 +191,10 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "status": c.CommonStatus.ACTIVE,
             "handlers": list(c.Meltano.Handlers.ALL),
         })
+
+    def get_default_config(self) -> r[t.Meltano.MeltanoConfigDict]:
+        """Get default configuration from current settings."""
+        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
 
     def get_info(self) -> r[t.Meltano.PluginInfo]:
         """Get service information."""

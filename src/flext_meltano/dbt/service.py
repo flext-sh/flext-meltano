@@ -1,7 +1,7 @@
 """DBT Orchestration Service - Data transformation execution.
 
-This module provides DBT orchestration with deep SDK integration,
-FLEXT ecosystem patterns, and railway-oriented programming.
+This module provides DBT orchestration with FLEXT ecosystem
+patterns and railway-oriented programming.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -24,17 +24,10 @@ from flext_meltano import (
 
 
 class FlextMeltanoDbtService(s[str]):
-    """Orchestrates DBT transformations with deep SDK integration.
+    """Orchestrates DBT transformations.
 
-    Provides complete DBT orchestration including:
-    - Project lifecycle management
-    - Manifest and model discovery
-    - Model execution and testing
-    - Documentation generation
-    - Error handling with r[T]
-
-    This service integrates directly with dbt-core, providing a
-    programmatic API for complete transformation operations.
+    Provides project lifecycle management, manifest/model discovery,
+    and delegates execution to FlextMeltanoDbtRunner.
 
     Attributes:
     project_manager: Manages DBT projects
@@ -51,38 +44,16 @@ class FlextMeltanoDbtService(s[str]):
     @override
     def execute(self) -> r[str]:
         """Execute (implements Service pattern)."""
-        msg = "DBT service initialized"
-        return r[str].ok(msg)
+        return r[str].ok("DBT service initialized")
 
-    def generate_docs(self, **kwargs: t.Scalar) -> r[t.Meltano.ExecutionResultDict]:
+    def generate_docs(self, **kwargs: t.Scalar) -> None:
         """Generate DBT documentation.
 
-        Args:
-        **kwargs: Additional dbt docs arguments
-
-        Returns:
-        r containing documentation result
+        Raises:
+        NotImplementedError: Delegates to runner which is not yet implemented.
 
         """
-        try:
-            self.logger.info("Generating DBT documentation")
-            result = self.runner.docs_generate(**kwargs)
-            if result.is_success:
-                self.logger.info("DBT documentation generated")
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}",
-            )
+        self.runner.docs_generate(**kwargs)
 
     def get_project_models(self) -> r[Sequence[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from the project.
@@ -104,8 +75,6 @@ class FlextMeltanoDbtService(s[str]):
             KeyError,
             AttributeError,
             OSError,
-            RuntimeError,
-            ImportError,
         ) as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].fail(
@@ -135,8 +104,6 @@ class FlextMeltanoDbtService(s[str]):
             KeyError,
             AttributeError,
             OSError,
-            RuntimeError,
-            ImportError,
         ) as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
@@ -145,87 +112,27 @@ class FlextMeltanoDbtService(s[str]):
         self,
         models: t.StrSequence | None = None,
         **kwargs: t.Scalar,
-    ) -> r[m.Meltano.DbtRunResult]:
+    ) -> None:
         """Run DBT models.
 
-        Args:
-        models: Optional list of specific models to run
-        **kwargs: Additional dbt run arguments
-
-        Returns:
-        r containing run result
+        Raises:
+        NotImplementedError: Delegates to runner which is not yet implemented.
 
         """
-
-        def execute_operation() -> r[m.Meltano.DbtRunResult]:
-            return self.runner.run_models(models, **kwargs)
-
-        def log_success(result: m.Meltano.DbtRunResult) -> None:
-            self.logger.info("DBT run completed", models_run=result.models_run)
-
-        return self._run_dbt_operation(
-            operation_name="models",
-            failure_label="run",
-            models=models,
-            operation=execute_operation,
-            success_logger=log_success,
-        )
+        self.runner.run_models(models, **kwargs)
 
     def run_tests(
         self,
         models: t.StrSequence | None = None,
         **kwargs: t.Scalar,
-    ) -> r[m.Meltano.DbtTestResult]:
+    ) -> None:
         """Run DBT tests.
 
-        Args:
-        models: Optional list of specific models to test
-        **kwargs: Additional dbt test arguments
-
-        Returns:
-        r containing test result
+        Raises:
+        NotImplementedError: Delegates to runner which is not yet implemented.
 
         """
-
-        def execute_operation() -> r[m.Meltano.DbtTestResult]:
-            return self.runner.run_tests(models, **kwargs)
-
-        def log_success(result: m.Meltano.DbtTestResult) -> None:
-            self.logger.info("DBT tests completed", tests_run=result.tests_run)
-
-        return self._run_dbt_operation(
-            operation_name="tests",
-            failure_label="tests",
-            models=models,
-            operation=execute_operation,
-            success_logger=log_success,
-        )
-
-    def _run_dbt_operation[T](
-        self,
-        operation_name: str,
-        failure_label: str,
-        models: t.StrSequence | None,
-        operation: Callable[[], r[T]],
-        success_logger: Callable[[T], None],
-    ) -> r[T]:
-        try:
-            self.logger.info("Running DBT %s", operation_name, models=str(models or []))
-            result = operation()
-            if result.is_success:
-                success_logger(result.value)
-            return result
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT %s failed", failure_label, error=str(e))
-            return r[T].fail(f"DBT {failure_label} failed: {e}")
+        self.runner.run_tests(models, **kwargs)
 
 
 __all__ = ["FlextMeltanoDbtService"]

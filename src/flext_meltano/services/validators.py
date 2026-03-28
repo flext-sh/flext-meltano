@@ -14,7 +14,7 @@ from typing import override
 from flext_core import FlextLogger, r
 from pydantic import ValidationError
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, m, t
 
 _module_logger = FlextLogger(__name__)
 
@@ -226,10 +226,8 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute validators service."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
-        )
+        """Execute validators service — returns current settings."""
+        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
 
 
 __all__ = ["FlextMeltanoValidators"]

@@ -67,6 +67,13 @@ if TYPE_CHECKING:
     from flext_meltano.services.validators import FlextMeltanoValidators
     from flext_meltano.settings import FlextMeltanoSettings
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+    from flext_meltano.singer.sdk import (
+        FlextMeltanoSingerContext,
+        FlextMeltanoSingerRecord,
+        FlextMeltanoSingerSinkBase,
+        FlextMeltanoSingerStreamBase,
+        FlextMeltanoSingerTapBase,
+    )
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
     from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
@@ -156,13 +163,33 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.singer.translator",
         "FlextMeltanoSingerCliTranslator",
     ],
+    "FlextMeltanoSingerContext": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerContext",
+    ],
     "FlextMeltanoSingerManager": [
         "flext_meltano.services.cli_managers",
         "FlextMeltanoSingerManager",
     ],
+    "FlextMeltanoSingerRecord": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerRecord",
+    ],
     "FlextMeltanoSingerService": [
         "flext_meltano.singer.service",
         "FlextMeltanoSingerService",
+    ],
+    "FlextMeltanoSingerSinkBase": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerSinkBase",
+    ],
+    "FlextMeltanoSingerStreamBase": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerStreamBase",
+    ],
+    "FlextMeltanoSingerTapBase": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerTapBase",
     ],
     "FlextMeltanoStateManager": [
         "flext_meltano.singer.state",
@@ -243,8 +270,13 @@ __all__ = [
     "FlextMeltanoServiceBase",
     "FlextMeltanoSettings",
     "FlextMeltanoSingerCliTranslator",
+    "FlextMeltanoSingerContext",
     "FlextMeltanoSingerManager",
+    "FlextMeltanoSingerRecord",
     "FlextMeltanoSingerService",
+    "FlextMeltanoSingerSinkBase",
+    "FlextMeltanoSingerStreamBase",
+    "FlextMeltanoSingerTapBase",
     "FlextMeltanoStateManager",
     "FlextMeltanoStatusManager",
     "FlextMeltanoTapAbstractions",

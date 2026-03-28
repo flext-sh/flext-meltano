@@ -1,8 +1,8 @@
-"""FLEXT Pipeline Abstractions - UNIFIED abstraction layer for data pipeline operations.
+"""FLEXT Pipeline Abstractions - Unified abstraction layer for data pipeline operations.
 
-This module provides a SINGLE UNIFIED class with nested helpers for data pipeline
-functionality, eliminating direct domain imports and providing a clean interface
-for the FLEXT ecosystem.
+This module provides the FlextMeltanoAbstractions class that wraps Meltano CLI
+operations via subprocess, providing r[T]-based error handling for all fallible
+operations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -11,258 +11,185 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from typing import ClassVar, override
 
 from flext_core import r
+from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, t
+
+_OPERATION_ERRORS = (ValueError, TypeError, KeyError, AttributeError, OSError)
 
 
 class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
-    """UNIFIED abstraction class providing pipeline functionality with nested helpers.
+    """Unified abstraction wrapping Meltano CLI operations via subprocess.
 
-    This class consolidates all pipeline wrapper functionality into a single unified
-    class following FLEXT 'one class per module' pattern with nested helper classes.
+    All pipeline interactions delegate to ``meltano`` CLI through
+    ``FlextInfraUtilitiesSubprocess``, returning ``r[T]`` results for
+    consistent error propagation.
     """
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    _project_path: ClassVar[Path | None] = None
     service_name: str = "FlextMeltanoAbstractions"
 
-    class _RunnerHelper:
-        """Helper class for data pipeline runner operations."""
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
 
-        def __init__(self, logger: p.Logger) -> None:
-            """Initialize runner helper."""
-            super().__init__()
-            self.logger = logger
+    def _run_meltano(
+        self,
+        args: Sequence[str],
+    ) -> r[str]:
+        """Run a meltano CLI command and return stdout on success."""
+        cmd: Sequence[str] = ["meltano", *args]
+        cwd = (
+            self.settings.project_root if self.settings.project_root != Path() else None
+        )
+        run_result = FlextInfraUtilitiesSubprocess.run_raw(cmd, cwd=cwd)
+        if run_result.is_failure:
+            error_msg = run_result.error or "Unknown error"
+            if "FileNotFoundError" in error_msg or "not found" in error_msg.lower():
+                return r[str].fail("Meltano CLI executable not found")
+            return r[str].fail(f"Meltano command failed: {error_msg}")
+        completed = run_result.value
+        if completed.exit_code != 0:
+            stderr_out = completed.stderr.strip() or completed.stdout.strip()
+            return r[str].fail(
+                stderr_out or f"meltano exited with code {completed.exit_code}",
+            )
+        return r[str].ok(completed.stdout.strip())
 
-        def create_pipeline_context(
-            self,
-            project_path: Path,
-            source_name: str,
-            sink_name: str,
-        ) -> r[t.StrMapping]:
-            """Create pipeline context for data pipeline operations."""
-            try:
-                pipeline_context: t.StrMapping = {
-                    "project_path": str(project_path),
-                    "source_name": source_name,
-                    "sink_name": sink_name,
-                    "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
-                }
-                return r[t.StrMapping].ok(pipeline_context)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                error_msg = f"Failed to create pipeline context: {e}"
-                self.logger.exception(error_msg)
-                return r[t.StrMapping].fail(error_msg)
-
-        def execute_data_pipeline(
-            self,
-            _pipeline_context: Mapping[str, str | None],
-            source_config: t.Meltano.MeltanoConfigDict,
-            sink_config: t.Meltano.MeltanoConfigDict,
-        ) -> r[t.Meltano.ELT.PipelineResult]:
-            """Execute data pipeline with given context and configurations."""
-            try:
-                result: t.Meltano.ELT.PipelineResult = {
-                    "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                    "source": str(
-                        source_config.get("name", c.IDENTIFIER_UNKNOWN),
-                    ),
-                    "sink": str(
-                        sink_config.get("name", c.IDENTIFIER_UNKNOWN),
-                    ),
-                    "records_processed": 0,
-                }
-                return r[t.Meltano.ELT.PipelineResult].ok(result)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-                error_msg = f"Failed to execute data pipeline: {e}"
-                self.logger.exception(error_msg)
-                return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
-
-    @property
-    def _runner_helper(self) -> _RunnerHelper:
-        """Lazy-initialize runner helper."""
-        return self._RunnerHelper(self.logger)
+    # ------------------------------------------------------------------
+    # Plugin management
+    # ------------------------------------------------------------------
 
     def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
-        """Add a plugin."""
+        """Add a plugin to the Meltano project via ``meltano add``."""
         try:
-            self.logger.info("Adding plugin", plugin_config=str(plugin_config))
+            plugin_type = str(plugin_config.get("plugin_type", ""))
+            plugin_name = str(plugin_config.get("plugin_name", ""))
+            if not plugin_type or not plugin_name:
+                return r[bool].fail("plugin_type and plugin_name are required")
+            cmd_result = self._run_meltano(["add", plugin_type, plugin_name])
+            if cmd_result.is_failure:
+                return r[bool].fail(cmd_result.error or "Failed to add plugin")
+            self.logger.info(
+                "Plugin added",
+                plugin_type=plugin_type,
+                plugin_name=plugin_name,
+            )
             return r[bool].ok(value=True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except _OPERATION_ERRORS as e:
             error_msg = f"Failed to add plugin: {e}"
             self.logger.exception(error_msg)
             return r[bool].fail(error_msg)
-
-    def create_elt_context(
-        self,
-        project: p.Meltano.Project,
-        extractor_name: str,
-        loader_name: str,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Create ELT context for pipeline execution."""
-        try:
-            elt_context: t.Meltano.MeltanoConfigDict = {
-                "project": str(project.root_dir),
-                "extractor_name": extractor_name,
-                "loader_name": loader_name,
-                "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
-            }
-            return r[t.Meltano.MeltanoConfigDict].ok(elt_context)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to create ELT context: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
-
-    def create_pipeline_context(
-        self,
-        source_name: str,
-        sink_name: str,
-    ) -> r[t.StrMapping]:
-        """Create pipeline context."""
-        if not self._project_path:
-            return r[t.StrMapping].fail("No project loaded")
-        return self._runner_helper.create_pipeline_context(
-            self._project_path,
-            source_name,
-            sink_name,
-        )
-
-    def execute_data_pipeline(
-        self,
-        source_config: t.Meltano.MeltanoConfigDict,
-        sink_config: t.Meltano.MeltanoConfigDict,
-    ) -> r[t.Meltano.ELT.PipelineResult]:
-        """Execute data pipeline."""
-        pipeline_context: Mapping[str, str | None] = {
-            "project_path": str(self._project_path) if self._project_path else None,
-            "status": c.Meltano.Enums.StreamStatus.INITIALIZED,
-        }
-        return self._runner_helper.execute_data_pipeline(
-            pipeline_context,
-            source_config,
-            sink_config,
-        )
-
-    def execute_singer_pipeline(
-        self,
-        elt_context: t.Meltano.MeltanoConfigDict,
-        _extractor_plugin: p.Meltano.Plugin,
-        _loader_plugin: p.Meltano.Plugin,
-    ) -> r[t.Meltano.ELT.PipelineResult]:
-        """Execute singer pipeline."""
-        try:
-            result: t.Meltano.ELT.PipelineResult = {
-                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                "records_processed": 0,
-                "elt_context": str(elt_context),
-            }
-            return r[t.Meltano.ELT.PipelineResult].ok(result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to execute singer pipeline: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
-
-    def find_project(self, project_root: Path) -> r[Path]:
-        """Find and validate pipeline project directory."""
-        try:
-            if not project_root.exists() or not project_root.is_dir():
-                return r[Path].fail(
-                    f"Project path is not a valid directory: {project_root}",
-                )
-            FlextMeltanoAbstractions._project_path = project_root
-            self.logger.info(
-                "Pipeline project loaded successfully",
-                project_root=str(project_root),
-            )
-            return r[Path].ok(project_root)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to load pipeline project: {e}"
-            self.logger.exception(error_msg)
-            return r[Path].fail(error_msg)
-
-    def get_components_of_type(
-        self,
-        component_type: str,
-    ) -> r[Sequence[t.Meltano.PluginDefinition]]:
-        """Get components of specified type."""
-        try:
-            components: Sequence[t.Meltano.PluginDefinition] = [
-                {
-                    "name": "source-csv",
-                    "type": "sources",
-                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                },
-                {
-                    "name": "sink-postgres",
-                    "type": "sinks",
-                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                },
-                {
-                    "name": "transform-dbt",
-                    "type": "transformers",
-                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                },
-            ]
-            filtered_components = u.filter(
-                components,
-                lambda comp: dict(comp).get("type", "") == component_type,
-            )
-            result_list: Sequence[t.Meltano.PluginDefinition] = (
-                list(filtered_components) if filtered_components else []
-            )
-            return r[Sequence[t.Meltano.PluginDefinition]].ok(result_list)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to get components of type {component_type}: {e}"
-            self.logger.exception(error_msg)
-            return r[Sequence[t.Meltano.PluginDefinition]].fail(error_msg)
 
     def get_plugins_of_type(
         self,
         _project: p.Meltano.Project,
         plugin_type: str,
     ) -> r[Mapping[str, t.Meltano.PluginDefinition]]:
-        """Get plugins of specified type."""
+        """List installed plugins of *plugin_type* via ``meltano list``."""
         try:
-            plugins: Mapping[str, t.Meltano.PluginDefinition] = {
-                "tap-csv": {
-                    "name": "tap-csv",
-                    "type": "extractors",
-                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                },
-                "target-postgres": {
-                    "name": "target-postgres",
-                    "type": "loaders",
-                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                },
-            }
-            filtered_plugins: Mapping[str, t.Meltano.PluginDefinition] = {
-                k: v for k, v in plugins.items() if v.get("type", "") == plugin_type
-            }
-            return r[Mapping[str, t.Meltano.PluginDefinition]].ok(filtered_plugins)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            cmd_result = self._run_meltano(["list", plugin_type])
+            if cmd_result.is_failure:
+                return r[Mapping[str, t.Meltano.PluginDefinition]].fail(
+                    cmd_result.error or f"Failed to list {plugin_type}",
+                )
+            plugins: MutableMapping[str, t.Meltano.PluginDefinition] = {}
+            for line in cmd_result.value.splitlines():
+                name = line.strip()
+                if name:
+                    plugins[name] = {
+                        "name": name,
+                        "type": plugin_type,
+                        "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                    }
+            return r[Mapping[str, t.Meltano.PluginDefinition]].ok(plugins)
+        except _OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
             return r[Mapping[str, t.Meltano.PluginDefinition]].fail(error_msg)
 
-    def get_project_root(self) -> r[Path]:
-        """Get the root directory of the current project."""
-        if not self._project_path:
-            return r[Path].fail("No project loaded")
+    # ------------------------------------------------------------------
+    # Pipeline execution
+    # ------------------------------------------------------------------
+
+    def execute_singer_pipeline(
+        self,
+        elt_context: t.Meltano.MeltanoConfigDict,
+        extractor_plugin: p.Meltano.Plugin,
+        loader_plugin: p.Meltano.Plugin,
+    ) -> r[t.Meltano.ELT.PipelineResult]:
+        """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
-            return r[Path].ok(self._project_path)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            extractor_name = str(
+                getattr(extractor_plugin, "name", None)
+                or elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN),
+            )
+            loader_name = str(
+                getattr(loader_plugin, "name", None)
+                or elt_context.get("loader_name", c.IDENTIFIER_UNKNOWN),
+            )
+            cmd_result = self._run_meltano(["elt", extractor_name, loader_name])
+            if cmd_result.is_failure:
+                return r[t.Meltano.ELT.PipelineResult].fail(
+                    cmd_result.error or "Pipeline execution failed",
+                )
+            result: t.Meltano.ELT.PipelineResult = {
+                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
+                "source": extractor_name,
+                "sink": loader_name,
+                "records_processed": 0,
+            }
+            return r[t.Meltano.ELT.PipelineResult].ok(result)
+        except _OPERATION_ERRORS as e:
+            error_msg = f"Failed to execute singer pipeline: {e}"
+            self.logger.exception(error_msg)
+            return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
+
+    # ------------------------------------------------------------------
+    # Project management
+    # ------------------------------------------------------------------
+
+    def find_project(self, project_root: Path) -> r[Path]:
+        """Find and validate a Meltano project directory."""
+        try:
+            if not project_root.exists() or not project_root.is_dir():
+                return r[Path].fail(
+                    f"Project path is not a valid directory: {project_root}",
+                )
+            self.logger.info(
+                "Pipeline project loaded successfully",
+                project_root=str(project_root),
+            )
+            return r[Path].ok(project_root)
+        except _OPERATION_ERRORS as e:
+            error_msg = f"Failed to load pipeline project: {e}"
+            self.logger.exception(error_msg)
+            return r[Path].fail(error_msg)
+
+    def get_project_root(self) -> r[Path]:
+        """Get the root directory from settings."""
+        project_root = self.settings.project_root
+        if project_root == Path():
+            return r[Path].fail("No project root configured in settings")
+        try:
+            return r[Path].ok(project_root)
+        except _OPERATION_ERRORS as e:
             return r[Path].fail(f"Failed to get project root: {e}")
+
+    # ------------------------------------------------------------------
+    # Tap / stream operations
+    # ------------------------------------------------------------------
 
     def process_tap_config(
         self,
         config: m.Meltano.TapConfig,
     ) -> r[m.Meltano.TapConfig]:
-        """Process tap configuration."""
+        """Validate and return tap configuration."""
         return r[m.Meltano.TapConfig].ok(config)
 
     def build_tap_instance(
@@ -277,40 +204,76 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
 
     def discover_streams(
         self,
-        _tap_instance: m.Meltano.TapInstance,
+        tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
-        """Discover available streams for tap instance."""
-        stream_defs: Sequence[t.ContainerMapping] = [
-            {"stream_name": "users", "tap_stream_id": "users"},
-            {"stream_name": "orders", "tap_stream_id": "orders"},
-        ]
-        for stream_def in stream_defs:
-            name = str(stream_def.get("stream_name", ""))
-            if name and name not in self._stream_registry:
-                self._stream_registry[name] = m.Meltano.StreamDefinition(
-                    stream_name=name,
-                    stream_schema={
-                        "type": "object",
-                        "properties": {"id": {"type": "integer"}},
-                    },
-                    source_type=_tap_instance.tap_type,
+        """Discover available streams via ``meltano select --list``."""
+        try:
+            cmd_result = self._run_meltano(
+                ["select", tap_instance.tap_type, "--list", "--all"],
+            )
+            if cmd_result.is_failure:
+                return r[t.ContainerMapping].fail(
+                    cmd_result.error or "Stream discovery failed",
                 )
-        return r[t.ContainerMapping].ok({"streams": stream_defs})
+            stream_defs: list[t.ContainerMapping] = []
+            for line in cmd_result.value.splitlines():
+                name = line.strip()
+                if name and not name.startswith("["):
+                    stream_defs.append(
+                        {"stream_name": name, "tap_stream_id": name},
+                    )
+                    if name not in self._stream_registry:
+                        self._stream_registry[name] = m.Meltano.StreamDefinition(
+                            stream_name=name,
+                            stream_schema={"type": "object", "properties": {}},
+                            source_type=tap_instance.tap_type,
+                        )
+            return r[t.ContainerMapping].ok({"streams": stream_defs})
+        except _OPERATION_ERRORS as e:
+            error_msg = f"Failed to discover streams: {e}"
+            self.logger.exception(error_msg)
+            return r[t.ContainerMapping].fail(error_msg)
 
     def sync_stream(
         self,
-        _tap_instance: m.Meltano.TapInstance,
+        tap_instance: m.Meltano.TapInstance,
         stream_name: str,
         target_config: m.Meltano.TargetConfig | None = None,
     ) -> r[t.ContainerMapping]:
-        """Sync a stream from tap to target."""
-        result: t.ContainerMapping = {
-            "stream_name": stream_name,
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-            "target_loaded": target_config is not None,
-            "records_processed": 0,
-        }
-        return r[t.ContainerMapping].ok(result)
+        """Sync a single stream via ``meltano elt`` with stream selection."""
+        try:
+            loader_name = (
+                target_config.target_type
+                if target_config is not None
+                else c.IDENTIFIER_UNKNOWN
+            )
+            cmd_args = [
+                "elt",
+                tap_instance.tap_type,
+                str(loader_name),
+                "--select",
+                stream_name,
+            ]
+            cmd_result = self._run_meltano(cmd_args)
+            status = (
+                c.Meltano.Enums.StreamStatus.COMPLETED
+                if cmd_result.is_success
+                else c.Meltano.Enums.StreamStatus.FAILED
+            )
+            result: t.ContainerMapping = {
+                "stream_name": stream_name,
+                "status": status,
+                "target_loaded": target_config is not None,
+            }
+            if cmd_result.is_failure:
+                return r[t.ContainerMapping].fail(
+                    cmd_result.error or "Stream sync failed",
+                )
+            return r[t.ContainerMapping].ok(result)
+        except _OPERATION_ERRORS as e:
+            error_msg = f"Failed to sync stream {stream_name}: {e}"
+            self.logger.exception(error_msg)
+            return r[t.ContainerMapping].fail(error_msg)
 
     def get_stream_config(
         self,
@@ -343,15 +306,33 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
                 tap_id=f"{tap_type}_auto",
             )
             return r[m.Meltano.TapInstance].ok(instance)
-        except (ValueError, TypeError, AttributeError) as e:
+        except _OPERATION_ERRORS as e:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
 
     def generate_catalog(
         self,
-        _tap_instance: m.Meltano.TapInstance,
+        tap_instance: m.Meltano.TapInstance,
     ) -> r[t.ContainerMapping]:
-        """Generate Singer catalog from tap instance streams."""
+        """Generate Singer catalog by discovering streams from the tap."""
+        discovery = self.discover_streams(tap_instance)
+        if discovery.is_failure:
+            return r[t.ContainerMapping].fail(
+                discovery.error or "Catalog generation failed",
+            )
+        raw = discovery.value
         streams: list[t.ContainerMapping] = []
+        if isinstance(raw, dict):
+            raw_val = raw.get("streams")
+            if isinstance(raw_val, list):
+                for s in raw_val:
+                    if isinstance(s, dict):
+                        name = str(s.get("stream_name", ""))
+                        if name in self._stream_registry:
+                            entry_r = self._create_catalog_entry_from_stream(
+                                self._stream_registry[name],
+                            )
+                            if entry_r.is_success:
+                                streams.append(entry_r.value)
         catalog: t.ContainerMapping = {"version": 1, "streams": streams}
         return r[t.ContainerMapping].ok(catalog)
 
@@ -365,7 +346,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         if discovery.is_failure:
             return r[t.ContainerMapping].fail(discovery.error or "Discovery failed")
         raw = discovery.value
-        raw_streams: MutableSequence[t.ContainerMapping] = []
+        raw_streams: list[t.ContainerMapping] = []
         if isinstance(raw, dict):
             raw_val = raw.get("streams")
             if isinstance(raw_val, list):
@@ -385,7 +366,7 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         if discovery.is_failure:
             return []
         raw = discovery.value
-        raw_streams: MutableSequence[t.ContainerMapping] = []
+        raw_streams: list[t.ContainerMapping] = []
         if isinstance(raw, dict):
             raw_val = raw.get("streams")
             if isinstance(raw_val, list):
@@ -400,51 +381,19 @@ class FlextMeltanoAbstractions(FlextMeltanoServiceBase):
         """Get list of registered stream names."""
         return [*self._stream_registry.keys()]
 
-    def extract_records(
-        self,
-        _stream: m.Meltano.StreamDefinition,
-        _limit: int | None = None,
-    ) -> r[Sequence[t.ContainerMapping]]:
-        """Extract records from a stream (mock data based on schema properties)."""
-        schema = _stream.stream_schema
-        properties: Mapping[str, t.ContainerMapping] = {}
-        if isinstance(schema, dict):
-            props_val = schema.get("properties")
-            if isinstance(props_val, dict):
-                properties = {
-                    field_name: field_definition
-                    for field_name, field_definition in props_val.items()
-                    if isinstance(field_definition, dict)
-                }
-        mock_record: MutableMapping[str, str | int | float] = {}
-        for field_name, field_def in properties.items():
-            field_type = (
-                field_def.get("type", "string")
-                if isinstance(field_def, dict)
-                else "string"
-            )
-            if field_type == "integer":
-                mock_record[field_name] = 1
-            elif field_type == "number":
-                mock_record[field_name] = 1.0
-            else:
-                mock_record[field_name] = f"mock_{field_name}"
-        if not mock_record:
-            mock_record["id"] = 1
-        total_records = c.Meltano.Defaults.MOCK_RECORD_COUNT
-        if _limit is not None:
-            total_records = min(_limit, total_records)
-        records: Sequence[t.ContainerMapping] = [
-            dict(mock_record) for _ in range(total_records)
-        ]
-        return r[Sequence[t.ContainerMapping]].ok(records)
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute abstractions service."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
-        )
+        """Execute abstractions service and return real configuration state."""
+        return r[t.Meltano.MeltanoConfigDict].ok({
+            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
+            "project_root": str(self.settings.project_root),
+            "environment": self.settings.environment,
+            "meltano_version": self.settings.meltano_version,
+        })
 
     @staticmethod
     def create_result_instance() -> r[FlextMeltanoAbstractions]:

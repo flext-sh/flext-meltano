@@ -128,7 +128,9 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
             with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
                 config_data = yaml.safe_load(f)
             if config_data is None:
-                return r[t.Meltano.FileConfigDict].ok({})
+                return r[t.Meltano.FileConfigDict].fail(
+                    f"Failed to load YAML config: Empty YAML file: {file_path}",
+                )
             raw_validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data,
             }).values
@@ -284,10 +286,8 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute file managers service."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            {"status": c.Meltano.Enums.StreamStatus.COMPLETED},
-        )
+        """Execute file managers service — returns current settings."""
+        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
 
     @staticmethod
     def _normalize_file_config(

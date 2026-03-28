@@ -26,6 +26,13 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+    from flext_meltano.singer.sdk import (
+        FlextMeltanoSingerContext,
+        FlextMeltanoSingerRecord,
+        FlextMeltanoSingerSinkBase,
+        FlextMeltanoSingerStreamBase,
+        FlextMeltanoSingerTapBase,
+    )
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
     from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
@@ -41,9 +48,29 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.singer.translator",
         "FlextMeltanoSingerCliTranslator",
     ],
+    "FlextMeltanoSingerContext": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerContext",
+    ],
+    "FlextMeltanoSingerRecord": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerRecord",
+    ],
     "FlextMeltanoSingerService": [
         "flext_meltano.singer.service",
         "FlextMeltanoSingerService",
+    ],
+    "FlextMeltanoSingerSinkBase": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerSinkBase",
+    ],
+    "FlextMeltanoSingerStreamBase": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerStreamBase",
+    ],
+    "FlextMeltanoSingerTapBase": [
+        "flext_meltano.singer.sdk",
+        "FlextMeltanoSingerTapBase",
     ],
     "FlextMeltanoStateManager": [
         "flext_meltano.singer.state",
@@ -62,7 +89,12 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
 __all__ = [
     "FlextMeltanoCatalogManager",
     "FlextMeltanoSingerCliTranslator",
+    "FlextMeltanoSingerContext",
+    "FlextMeltanoSingerRecord",
     "FlextMeltanoSingerService",
+    "FlextMeltanoSingerSinkBase",
+    "FlextMeltanoSingerStreamBase",
+    "FlextMeltanoSingerTapBase",
     "FlextMeltanoStateManager",
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTargetAbstractions",

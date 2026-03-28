@@ -16,7 +16,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, c, p, t
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
 
 
 class FlextMeltanoDbtTransformationRunner:
@@ -76,53 +76,9 @@ class FlextMeltanoLibraryRunner(
 
     @override
     def execute(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Execute library runner logic."""
-        try:
-            return r[t.Meltano.ExecutionResultDict].ok({
-                "status": c.Meltano.Enums.OperationStatus.READY
-            })
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Runner execution failed: {e}",
-            )
-
-    @staticmethod
-    def get_dbt_runner() -> r[t.Meltano.ExecutionResultDict]:
-        """Get DBT runner instance for DBT operations."""
-        try:
-            dbt_runner: t.Meltano.ExecutionResultDict = {
-                "type": "dbt_runner",
-                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                "capabilities": list(c.Meltano.Capabilities.DBT),
-            }
-            return r[t.Meltano.ExecutionResultDict].ok(dbt_runner)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Failed to get DBT runner: {e}",
-            )
-
-    @staticmethod
-    def get_singer_manager() -> r[t.Meltano.ExecutionResultDict]:
-        """Get Singer manager instance for Singer operations."""
-        try:
-            singer_manager: t.Meltano.ExecutionResultDict = {
-                "type": "singer_manager",
-                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                "capabilities": list(c.Meltano.Capabilities.SINGER),
-            }
-            return r[t.Meltano.ExecutionResultDict].ok(singer_manager)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Failed to get Singer manager: {e}",
-            )
+        """Execute library runner — returns executor status."""
+        msg = "Library runner execution requires meltano-core SDK integration"
+        raise NotImplementedError(msg)
 
     def execute_complete_elt_pipeline(
         self,

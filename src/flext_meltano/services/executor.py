@@ -10,16 +10,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import subprocess
 import time
-from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
 from flext_core import r
-from pydantic import PrivateAttr
 
 from flext_meltano import (
-    FlextMeltanoBridge,
     FlextMeltanoCLI,
     FlextMeltanoServiceBase,
     c,
@@ -37,14 +35,6 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
     """
 
     service_name: str = "FlextMeltanoExecutor"
-    _bridge_instance: FlextMeltanoBridge | None = PrivateAttr(default=None)
-
-    @property
-    def bridge(self) -> FlextMeltanoBridge:
-        """Get bridge instance - lazy initialized."""
-        if self._bridge_instance is None:
-            self._bridge_instance = FlextMeltanoBridge()
-        return self._bridge_instance
 
     @property
     def project_root(self) -> Path:
@@ -53,64 +43,6 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         if project_root is not None:
             return m.Meltano.PathPayload(value=project_root).value
         return Path.cwd()
-
-    @staticmethod
-    def _execute_action_command(
-        action: str,
-        args: t.StrSequence,
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Execute action command - delegates to appropriate handler."""
-        try:
-            return r[t.Meltano.ExecutionResultDict].ok({
-                "command": action,
-                "action": action,
-                "args": args,
-                "status": c.Meltano.Enums.OperationStatus.EXECUTED,
-            })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(f"Action failed: {e}")
-
-    @staticmethod
-    def _execute_health_command() -> r[t.Meltano.ExecutionResultDict]:
-        """Execute health command - delegates to adapter."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "command": "health",
-            "command_type": "health",
-            "status": c.Meltano.Enums.OperationStatus.HEALTHY,
-            "health": "OK",
-            "components": ["bridge", "adapter", "executor"],
-        })
-
-    @staticmethod
-    def _execute_help_command() -> r[t.Meltano.ExecutionResultDict]:
-        """Execute help command - returns help info."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "command": "help",
-            "command_type": "help",
-            "status": "success",
-            "help": "FLEXT Meltano CLI - Data integration framework",
-        })
-
-    @staticmethod
-    def _execute_version_command() -> r[t.Meltano.ExecutionResultDict]:
-        """Execute version command - returns version info."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "command": "version",
-            "command_type": "version",
-            "status": "success",
-            "version": c.Meltano.FLEXT_MELTANO_VERSION,
-            "success": True,
-            "cli_type": "flext_meltano",
-        })
-
-    @staticmethod
-    def _handle_cli_no_args() -> r[t.Meltano.ExecutionResultDict]:
-        """Handle CLI with no arguments - delegates to ready state."""
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "status": c.Meltano.Enums.OperationStatus.READY,
-            "command_type": "cli",
-            "message": "No arguments provided - ready for commands",
-        })
 
     @staticmethod
     def create_cli_runner(args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
@@ -142,27 +74,23 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
 
     @staticmethod
     def get_version() -> r[str]:
-        """Get version information from Meltano/DBT."""
-        version: str = "3.0.0"
-        return r[str].ok(version)
-
-    @staticmethod
-    def list_commands() -> r[t.Meltano.ExecutionResultDict]:
-        """List available commands - returns command list."""
-        commands_list = [cmd.value for cmd in c.Meltano.Enums.ExecutorCommand]
-        available = [
-            cmd for cmd in commands_list if cmd in {"version", "help", "health"}
-        ]
-        return r[t.Meltano.ExecutionResultDict].ok({
-            "commands": commands_list,
-            "available_commands": available,
-        })
-
-    @staticmethod
-    def list_plugins() -> r[Sequence[t.Meltano.PluginDefinition]]:
-        """List available plugins - delegates to adapter."""
-        plugins: Sequence[t.Meltano.PluginDefinition] = []
-        return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
+        """Get version information from Meltano CLI."""
+        try:
+            proc = subprocess.run(
+                ["meltano", "version"],  # noqa: S607
+                capture_output=True,
+                text=True,
+                timeout=10,
+                check=False,
+            )
+            version = (
+                proc.stdout.strip()
+                if proc.returncode == 0
+                else c.Meltano.Defaults.SERVICE_VERSION
+            )
+            return r[str].ok(version)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[str].fail(f"Failed to get version: {e}")
 
     @override
     def execute(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -197,26 +125,45 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         """Execute a Meltano command with timeout and error handling.
 
         Args:
-            command: Command to execute as string list
-            timeout: Timeout in seconds
+            command: Command to execute as string sequence.
+            timeout: Timeout in seconds.
+            _cwd: Working directory override; defaults to project_root.
 
         Returns:
-            r with execution result
+            r with execution result.
 
         """
         try:
             start_time = time.time()
-            self.logger.info("Executing command", command=str(command), timeout=timeout)
+            cwd = str(self.project_root) if _cwd is None else str(_cwd)
+            self.logger.info(
+                "Executing command",
+                command=str(command),
+                timeout=timeout,
+                cwd=cwd,
+            )
+            proc = subprocess.run(
+                list(command),
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=cwd,
+                check=False,
+            )
             execution_time = time.time() - start_time
             result = m.Meltano.CommandExecutionResult(
                 command=command,
-                success=True,
-                exit_code=0,
-                output="Command executed successfully",
-                error="",
+                success=proc.returncode == 0,
+                exit_code=proc.returncode,
+                output=proc.stdout,
+                error=proc.stderr,
                 execution_time=execution_time,
             )
             return r[m.Meltano.CommandExecutionResult].ok(result)
+        except subprocess.TimeoutExpired as e:
+            error_msg = f"Command timed out after {timeout}s: {e}"
+            self.logger.exception(error_msg)
+            return r[m.Meltano.CommandExecutionResult].fail(error_msg)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Command execution failed: {e}"
             self.logger.exception(error_msg)
@@ -230,15 +177,15 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         """Execute a DBT command.
 
         Args:
-        dbt_command: DBT subcommand (run, test, docs, etc.)
-        args: Additional arguments
+            dbt_command: DBT subcommand (run, test, docs, etc.)
+            args: Additional arguments.
 
         Returns:
-        r with DBT execution result
+            r with DBT execution result.
 
         """
         try:
-            command = ["dbt", dbt_command]
+            command: list[str] = ["dbt", dbt_command]
             if args:
                 command.extend(args)
             return self.execute_meltano_command(command)
@@ -254,15 +201,15 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         """Execute a complete ELT pipeline.
 
         Args:
-            tap_name: Name of the tap to use
-            target_name: Name of the target to use
+            tap_name: Name of the tap to use.
+            target_name: Name of the target to use.
 
         Returns:
-            r with pipeline execution result
+            r with pipeline execution result.
 
         """
         try:
-            command = ["meltano", "run", tap_name, target_name]
+            command: list[str] = ["meltano", "run", tap_name, target_name]
             return self.execute_meltano_command(command)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[m.Meltano.CommandExecutionResult].fail(
@@ -270,12 +217,31 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
             )
 
     def health(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Check system health - delegates to handler."""
-        return self._execute_health_command()
+        """Check system health by running meltano invoke."""
+        result = self.execute_meltano_command(["meltano", "version"])
+        return result.map(
+            lambda cmd_result: {
+                "command": "health",
+                "command_type": "health",
+                "status": c.Meltano.Enums.OperationStatus.HEALTHY
+                if cmd_result.success
+                else c.Meltano.Enums.OperationStatus.ERROR,
+                "health": "OK" if cmd_result.success else "DEGRADED",
+                "exit_code": cmd_result.exit_code,
+            },
+        )
 
     def help(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Get help information - delegates to handler."""
-        return self._execute_help_command()
+        """Get help information from meltano --help."""
+        result = self.execute_meltano_command(["meltano", "--help"])
+        return result.map(
+            lambda cmd_result: {
+                "command": "help",
+                "command_type": "help",
+                "status": "success" if cmd_result.success else "failed",
+                "help": cmd_result.output,
+            },
+        )
 
     def run(self, args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
         """Run command with arguments - delegates to command router."""
@@ -318,59 +284,46 @@ class FlextMeltanoExecutor(FlextMeltanoServiceBase):
         )
 
     def version(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Get version information - delegates to handler."""
-        return self._execute_version_command()
-
-    def _handle_cli_help_args(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle CLI help arguments - delegates to help handler."""
-        return self._execute_help_command()
-
-    def _handle_cli_other_args(
-        self,
-        args: t.StrSequence,
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle CLI other arguments - delegates to action executor."""
-        if not args:
-            return r[t.Meltano.ExecutionResultDict].ok({
-                "status": c.Meltano.Enums.OperationStatus.READY,
-                "command_type": "cli",
-                "message": "Ready for commands",
-            })
-        command = args[0]
-        return self._route_command(command, args[1:])
-
-    def _handle_cli_version_args(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle CLI version arguments - delegates to version handler."""
-        return self._execute_version_command()
-
-    def _handle_default_command(
-        self,
-        args: t.StrSequence,
-    ) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle default command - delegates to action executor."""
-        return self._execute_action_command("default", args)
-
-    def _handle_help_command(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle help command - delegates to executor."""
-        return self._execute_help_command()
-
-    def _handle_version_command(self) -> r[t.Meltano.ExecutionResultDict]:
-        """Handle version command - delegates to executor."""
-        return self._execute_version_command()
+        """Get version information from meltano."""
+        version_result = self.get_version()
+        return version_result.map(
+            lambda ver: {
+                "command": "version",
+                "command_type": "version",
+                "status": "success",
+                "version": ver,
+                "success": True,
+                "cli_type": "flext_meltano",
+            },
+        )
 
     def _route_command(
         self,
         command: str,
         args: t.StrSequence,
     ) -> r[t.Meltano.ExecutionResultDict]:
-        """Route command to appropriate handler - delegates to handlers."""
+        """Route command to appropriate handler."""
         if command == "version":
-            return self._execute_version_command()
+            return self.version()
         if command == "help":
-            return self._execute_help_command()
+            return self.help()
         if command == "health":
-            return self._execute_health_command()
-        return self._execute_action_command(command, args)
+            return self.health()
+        full_command: list[str] = ["meltano", command, *args]
+        result = self.execute_meltano_command(full_command)
+        return result.map(
+            lambda cmd_result: {
+                "command": command,
+                "action": command,
+                "args": args,
+                "status": c.Meltano.Enums.OperationStatus.EXECUTED
+                if cmd_result.success
+                else c.Meltano.Enums.OperationStatus.ERROR,
+                "exit_code": cmd_result.exit_code,
+                "output": cmd_result.output,
+                "error": cmd_result.error,
+            },
+        )
 
 
 __all__ = ["FlextMeltanoExecutor"]

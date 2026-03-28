@@ -14,14 +14,11 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import c, m, t
+from flext_meltano import t
 
 
 class FlextMeltanoDbtRunner(s[str]):
-    """Executes DBT commands programmatically with deep SDK integration.
-
-    Provides programmatic DBT execution for run, test, and documentation
-    operations with r error handling.
+    """Executes DBT commands programmatically.
 
     Attributes:
     project_root: Root directory of DBT project
@@ -38,135 +35,50 @@ class FlextMeltanoDbtRunner(s[str]):
         super().__init__()
         self.project_root: Path | None = project_root
 
-    def docs_generate(self, **_kwargs: t.Scalar) -> r[t.Meltano.ExecutionResultDict]:
+    def docs_generate(self, **_kwargs: t.Scalar) -> None:
         """Generate DBT documentation.
 
-        Args:
-        **_kwargs: Additional dbt docs arguments
-
-        Returns:
-        r containing documentation generation result
+        Raises:
+        NotImplementedError: Requires dbt-core programmatic API or subprocess integration.
 
         """
-        try:
-            if not self.project_root:
-                return r[t.Meltano.ExecutionResultDict].fail("No project root set")
-            self.logger.info("Generating DBT documentation", cwd=str(self.project_root))
-            result: t.Meltano.ExecutionResultDict = {
-                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                "docs_path": str(
-                    self.project_root
-                    / c.Meltano.FilePaths.DBT_OUTPUT_DIR
-                    / c.Meltano.FilePaths.DBT_DOCS_INDEX
-                ),
-            }
-            self.logger.info("DBT documentation generated")
-            return r[t.Meltano.ExecutionResultDict].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT documentation generation failed", error=str(e))
-            return r[t.Meltano.ExecutionResultDict].fail(
-                f"Documentation generation failed: {e}",
-            )
+        msg = "DBT docs generate: requires dbt-core programmatic API or subprocess integration"
+        raise NotImplementedError(msg)
 
     @override
     def execute(self, **_kwargs: t.Scalar) -> r[str]:
         """Execute (implements Service pattern)."""
         if self.project_root:
-            msg = f"DBT runner: {self.project_root}"
-            return r[str].ok(msg)
+            return r[str].ok(f"DBT runner: {self.project_root}")
         return r[str].fail("No project root set")
 
     def run_models(
         self,
         models: t.StrSequence | None = None,
         **_kwargs: t.Scalar,
-    ) -> r[m.Meltano.DbtRunResult]:
+    ) -> None:
         """Run DBT models.
 
-        Args:
-        models: Optional list of models to run
-        **_kwargs: Additional dbt run arguments
-
-        Returns:
-        r containing run result
+        Raises:
+        NotImplementedError: Requires dbt-core programmatic API or subprocess integration.
 
         """
-        try:
-            if not self.project_root:
-                return r[m.Meltano.DbtRunResult].fail("No project root set")
-            self.logger.info(
-                "Starting DBT run",
-                models=str(models or []),
-                cwd=str(self.project_root),
-            )
-            result = m.Meltano.DbtRunResult(
-                success=True,
-                models_run=len(models) if models else 0,
-                status="completed",
-            )
-            self.logger.info("DBT run completed", models_run=result.models_run)
-            return r[m.Meltano.DbtRunResult].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT run failed", error=str(e))
-            return r[m.Meltano.DbtRunResult].fail(f"DBT run failed: {e}")
+        msg = "DBT run models: requires dbt-core programmatic API or subprocess integration"
+        raise NotImplementedError(msg)
 
     def run_tests(
         self,
         models: t.StrSequence | None = None,
         **_kwargs: t.Scalar,
-    ) -> r[m.Meltano.DbtTestResult]:
+    ) -> None:
         """Run DBT tests.
 
-        Args:
-        models: Optional list of models to test
-        **_kwargs: Additional dbt test arguments
-
-        Returns:
-        r containing test result
+        Raises:
+        NotImplementedError: Requires dbt-core programmatic API or subprocess integration.
 
         """
-        try:
-            if not self.project_root:
-                return r[m.Meltano.DbtTestResult].fail("No project root set")
-            self.logger.info(
-                "Starting DBT tests",
-                models=str(models or []),
-                cwd=str(self.project_root),
-            )
-            result = m.Meltano.DbtTestResult(
-                success=True,
-                tests_run=0,
-                status="completed",
-            )
-            self.logger.info("DBT tests completed", tests_run=result.tests_run)
-            return r[m.Meltano.DbtTestResult].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("DBT tests failed", error=str(e))
-            return r[m.Meltano.DbtTestResult].fail(f"DBT tests failed: {e}")
+        msg = "DBT run tests: requires dbt-core programmatic API or subprocess integration"
+        raise NotImplementedError(msg)
 
 
 __all__ = ["FlextMeltanoDbtRunner"]

@@ -19,17 +19,16 @@ from typing import TypeIs, override
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoProjectService,
-    FlextMeltanoSettings,
+    FlextMeltanoServiceBase,
     m,
     p,
     r,
-    s,
     t,
     u,
 )
 
 
-class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
+class FlextMeltanoComponentService(FlextMeltanoServiceBase):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
@@ -47,13 +46,6 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
         """Type guard for protocol-compatible Meltano project objects."""
         return hasattr(value, "root_dir") and callable(
             getattr(value, "find_plugins", None),
-        )
-
-    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
-        """Initialize component service with FLEXT configuration."""
-        super().__init__()
-        self._meltano_config: FlextMeltanoSettings = (
-            config if config is not None else FlextMeltanoSettings.model_validate({})
         )
 
     @staticmethod
@@ -195,22 +187,8 @@ class FlextMeltanoComponentService(s[t.Meltano.MeltanoConfigDict]):
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute the pipeline component service.
-
-        Returns:
-        r containing plugin service configuration and status.
-
-        """
-        result = FlextMeltanoProjectService.build_service_execution_payload(
-            "flext_meltano_plugin_service",
-            self._meltano_config,
-        )
-        if result.is_success:
-            self.logger.info("FlextMeltanoPluginService executed successfully")
-            return result
-        error_msg = result.error or "Plugin service execution failed"
-        self.logger.error(error_msg)
-        return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
+        """Execute the pipeline component service."""
+        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
 
     def get_plugin_info(
         self,

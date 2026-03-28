@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import tempfile
 from collections.abc import Callable
-from typing import Any
 
 import pytest
 from flext_tests import tm
@@ -41,7 +40,7 @@ class TestTapService:
     """Test TapService functionality using unified architecture."""
 
     service: FlextMeltanoService
-    create_tap_service: Callable[..., Any]
+    create_tap_service: Callable[..., r[FlextMeltanoService]]
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
@@ -99,23 +98,8 @@ class TestTapService:
         result = tap_service.get_info()
         tm.that(result, is_=r)
 
-    def test_tap_service_create_tap_instance(self) -> None:
-        """Test TapService create_tap_instance method."""
-        service_result = self.create_tap_service("tap-csv")
-        tm.ok(service_result)
-        tap_service = service_result.value
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: t.ContainerMapping = {"file_path": tmp_file.name}
-            try:
-                result = tap_service.create_instance(config)
-            except TypeError:
-                pytest.skip(
-                    "create_instance(config) not available (use PYTHONPATH=src)",
-                )
-            tm.that(result, is_=r)
-
     def test_tap_service_validate_tap_config(self) -> None:
-        """Test TapService validate_tap_config method."""
+        """Test TapService validate_service_config method."""
         service_result = self.create_tap_service("tap-csv")
         tm.ok(service_result)
         tap_service = service_result.value
@@ -125,27 +109,22 @@ class TestTapService:
             tm.that(result, is_=r)
 
     def test_tap_service_get_default_config(self) -> None:
-        """Test TapService get_default_config method."""
+        """Test TapService get_default_config method returns settings dump."""
         service_result = self.create_tap_service("tap-csv")
         tm.ok(service_result)
         tap_service = service_result.value
         result = tap_service.get_default_config()
         tm.that(result, is_=r)
-
-    def test_tap_service_validate_service(self) -> None:
-        """Test TapService validate_service method."""
-        service_result = self.create_tap_service("tap-csv")
-        tm.ok(service_result)
-        tap_service = service_result.value
-        result = tap_service.validate_service()
-        tm.that(result, is_=r)
+        if result.is_success:
+            config_val = result.value
+            tm.that(isinstance(config_val, dict), eq=True)
 
 
 class TestTargetService:
     """Test TargetService functionality using unified architecture."""
 
     service: FlextMeltanoService
-    create_target_service: Callable[..., Any]
+    create_target_service: Callable[..., r[FlextMeltanoService]]
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
@@ -195,23 +174,8 @@ class TestTargetService:
         result = target_service.get_info()
         tm.that(result, is_=r)
 
-    def test_target_service_create_target_instance(self) -> None:
-        """Test TargetService create_target_instance method."""
-        service_result = self.create_target_service("target-csv")
-        tm.ok(service_result)
-        target_service = service_result.value
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            config: t.ContainerMapping = {"output_path": tmp_file.name}
-            try:
-                result = target_service.create_instance(config)
-            except TypeError:
-                pytest.skip(
-                    "create_instance(config) not available (use PYTHONPATH=src)",
-                )
-            tm.that(result, is_=r)
-
     def test_target_service_validate_target_config(self) -> None:
-        """Test TargetService validate_target_config method."""
+        """Test TargetService validate_service_config method."""
         service_result = self.create_target_service("target-csv")
         tm.ok(service_result)
         target_service = service_result.value
@@ -221,27 +185,22 @@ class TestTargetService:
             tm.that(result, is_=r)
 
     def test_target_service_get_default_config(self) -> None:
-        """Test TargetService get_default_config method."""
+        """Test TargetService get_default_config method returns settings dump."""
         service_result = self.create_target_service("target-csv")
         tm.ok(service_result)
         target_service = service_result.value
         result = target_service.get_default_config()
         tm.that(result, is_=r)
-
-    def test_target_service_validate_service(self) -> None:
-        """Test TargetService validate_service method."""
-        service_result = self.create_target_service("target-csv")
-        tm.ok(service_result)
-        target_service = service_result.value
-        result = target_service.validate_service()
-        tm.that(result, is_=r)
+        if result.is_success:
+            config_val = result.value
+            tm.that(isinstance(config_val, dict), eq=True)
 
 
 class TestDbtService:
     """Test DbtService functionality using unified architecture."""
 
     service: FlextMeltanoService
-    create_dbt_service: Callable[..., Any]
+    create_dbt_service: Callable[..., r[FlextMeltanoService]]
 
     def setup_method(self) -> None:
         """Set up test fixtures."""
@@ -289,14 +248,6 @@ class TestDbtService:
         tm.ok(service_result)
         dbt_service = service_result.value
         result = dbt_service.get_info()
-        tm.that(result, is_=r)
-
-    def test_dbt_service_get_profiles_config(self) -> None:
-        """Test DbtService get_profiles_config method."""
-        service_result = self.create_dbt_service("my_dbt_project")
-        tm.ok(service_result)
-        dbt_service = service_result.value
-        result = dbt_service.get_profiles_config()
         tm.that(result, is_=r)
 
 
@@ -403,8 +354,6 @@ class TestServiceIntegration:
         if tap_result.is_success:
             tap_service = tap_result.value
             tm.that(tap_service, none=False)
-            validate_result = tap_service.validate_service()
-            tm.that(validate_result, is_=r)
             config_validate_result = tap_service.validate_config()
             tm.that(config_validate_result, is_=r)
             info_result = tap_service.get_info()
@@ -417,8 +366,6 @@ class TestServiceIntegration:
         if target_result.is_success:
             target_service = target_result.value
             tm.that(target_service, none=False)
-            validate_result = target_service.validate_service()
-            tm.that(validate_result, is_=r)
             info_result = target_service.get_info()
             tm.that(info_result, is_=r)
 
@@ -429,8 +376,6 @@ class TestServiceIntegration:
         if dbt_result.is_success:
             dbt_service = dbt_result.value
             tm.that(dbt_service, none=False)
-            profiles_result = dbt_service.get_profiles_config()
-            tm.that(profiles_result, is_=r)
             info_result = dbt_service.get_info()
             tm.that(info_result, is_=r)
 
@@ -442,7 +387,7 @@ class TestServiceIntegration:
         tm.that(tap_result, is_=r)
         tm.that(target_result, is_=r)
         tm.that(dbt_result, is_=r)
-        if all(r.is_success for r in [tap_result, target_result, dbt_result]):
+        if all(res.is_success for res in [tap_result, target_result, dbt_result]):
             tap_service = tap_result.value
             target_service = target_result.value
             dbt_service = dbt_result.value
@@ -459,7 +404,9 @@ class TestServiceIntegration:
             tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as input_file,
             tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as output_file,
         ):
-            services_to_test: list[tuple[str, Callable[..., Any], dict[str, str]]] = [
+            services_to_test: list[
+                tuple[str, Callable[..., r[FlextMeltanoService]], dict[str, str]]
+            ] = [
                 (
                     "tap-csv",
                     self.service.create_tap_service,
@@ -514,7 +461,6 @@ class TestServiceErrorHandling:
             tm.that(tap_service, none=False)
             methods_to_test = [
                 tap_service.validate_config,
-                tap_service.validate_service,
                 tap_service.get_info,
                 tap_service.get_default_config,
                 tap_service.execute,

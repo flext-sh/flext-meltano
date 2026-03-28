@@ -297,12 +297,7 @@ class FlextMeltanoPipelineManager:
             )
         if u.Meltano.is_process_running(pid):
             return r[str].ok("running")
-        try:
-            pid_path.unlink()
-        except FileNotFoundError:
-            pass
-        except OSError:
-            pass
+        pid_path.unlink(missing_ok=True)
         return r[str].ok("stopped")
 
     @staticmethod

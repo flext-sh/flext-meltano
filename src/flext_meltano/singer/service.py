@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -105,38 +104,12 @@ class FlextMeltanoSingerService(s[str]):
         r containing sync result with metrics
 
         """
-        try:
-            self.logger.info("Starting Singer sync")
-            records_processed = 0
-            records_written = 0
-            errors = 0
-            records: Sequence[m.Meltano.SingerRecordMessage] = []
-            tap.sync(catalog, state)
-            target.consume(records)
-            result = m.Meltano.SingerSyncResult.model_validate({
-                "records_processed": records_processed,
-                "records_written": records_written,
-                "errors": errors,
-                "state": state.value,
-                "duration_seconds": 0.0,
-            })
-            self.logger.info(
-                "Singer sync completed",
-                records=records_processed,
-                written=records_written,
-            )
-            return r[m.Meltano.SingerSyncResult].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Singer sync failed", error=str(e))
-            return r[m.Meltano.SingerSyncResult].fail(f"Singer sync failed: {e}")
+        _ = tap, target, catalog, state
+        msg = (
+            "Singer protocol: requires singer-sdk tap/target integration "
+            "to pipe tap stdout into target stdin and collect metrics"
+        )
+        raise NotImplementedError(msg)
 
     def load_catalog_from_file(self, catalog_path: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.

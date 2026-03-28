@@ -1,7 +1,7 @@
-"""Comprehensive tests for FlextMeltano - Real API testing without mocks.
+"""Tests for FlextMeltano MRO facade - real API testing.
 
-Tests the main unified API for FLEXT Meltano operations following enterprise
-testing standards with real Meltano integration.
+Tests the main unified API (FlextMeltano) which is an MRO facade over
+Meltano services. Only tests methods that actually exist on the facade.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -38,28 +38,68 @@ class TestFlextMeltanoInitialization:
         api = FlextMeltano(service_name="test-api")
         tm.that(api, none=False)
 
-    def test_api_version_property(self) -> None:
-        """Test API version method."""
-        api = FlextMeltano()
-        version_result = api.version()
-        tm.ok(version_result)
-        tm.that(version_result.value, none=False)
+    def test_api_service_name_property(self) -> None:
+        """Test API service name property."""
+        api = FlextMeltano(service_name="test-service")
+        tm.that(api.service_name, eq="test-service")
 
-    def test_api_execute_returns_result(self) -> None:
-        """Test API execute method returns result."""
+    def test_api_get_instance_returns_singleton(self) -> None:
+        """Test get_instance returns the same instance."""
+        FlextMeltano._instance = None
+        instance1 = FlextMeltano.get_instance()
+        instance2 = FlextMeltano.get_instance()
+        tm.that(instance1 is instance2, eq=True)
+        FlextMeltano._instance = None
+
+    def test_api_has_expected_attributes(self) -> None:
+        """Test basic API attributes exist."""
+        api = FlextMeltano()
+        tm.that(hasattr(api, "execute"), eq=True)
+        tm.that(hasattr(api, "service_name"), eq=True)
+
+
+class TestFlextMeltanoExecuteMethod:
+    """Test FlextMeltano execute method."""
+
+    def test_execute_returns_result(self) -> None:
+        """Test execute method returns r."""
         api = FlextMeltano()
         result = api.execute()
         tm.ok(result)
         tm.that(result.value, none=False)
 
+    def test_execute_contains_version(self) -> None:
+        """Test execute result contains version info."""
+        api = FlextMeltano()
+        result = api.execute()
+        tm.ok(result)
+        tm.that("version" in result.value, eq=True)
+
+    def test_execute_contains_service_name(self) -> None:
+        """Test execute result contains service_name."""
+        api = FlextMeltano()
+        result = api.execute()
+        tm.ok(result)
+        tm.that("service_name" in result.value, eq=True)
+
+    def test_execute_contains_status(self) -> None:
+        """Test execute result contains status."""
+        api = FlextMeltano()
+        result = api.execute()
+        tm.ok(result)
+        tm.that("status" in result.value, eq=True)
+
+    def test_execute_contains_handlers(self) -> None:
+        """Test execute result contains handlers list."""
+        api = FlextMeltano()
+        result = api.execute()
+        tm.ok(result)
+        tm.that("handlers" in result.value, eq=True)
+        tm.that(result.value["handlers"], is_=list)
+
 
 class TestFlextMeltanoProjectOperations:
     """Test FlextMeltano project creation and validation operations."""
-
-    def test_api_service_name_property(self) -> None:
-        """Test API service name property."""
-        api = FlextMeltano(service_name="test-service")
-        tm.that(api.service_name, eq="test-service")
 
     def test_create_project_invalid_name(self) -> None:
         """Test project creation with invalid name."""
@@ -84,28 +124,25 @@ class TestFlextMeltanoProjectOperations:
 
     def test_validate_project_nonexistent(self) -> None:
         """Test validation of non-existent project."""
-        api = FlextMeltano()
         with tempfile.TemporaryDirectory() as temp_dir:
             nonexistent = Path(temp_dir) / "nonexistent"
-            result = api.validate_project(nonexistent)
+            result = FlextMeltano.validate_project(nonexistent)
             tm.fail(result)
             tm.that(result.error, none=False)
 
     def test_validate_project_with_path(self) -> None:
         """Test project validation with specific path."""
-        api = FlextMeltano()
         with tempfile.TemporaryDirectory() as temp_dir:
-            result = api.validate_project(Path(temp_dir))
+            result = FlextMeltano.validate_project(Path(temp_dir))
             tm.that(result.is_success or result.is_failure, eq=True)
 
 
 class TestFlextMeltanoPluginOperations:
-    """Test FlextMeltano plugin installation and listing operations."""
+    """Test FlextMeltano install_component (from FlextMeltanoService)."""
 
     def test_install_component_without_project(self) -> None:
         """Test component installation without valid project."""
-        api = FlextMeltano()
-        result = api.install_component(
+        result = FlextMeltano.install_component(
             component_type="extractors",
             component_name="tap-csv",
         )
@@ -113,8 +150,7 @@ class TestFlextMeltanoPluginOperations:
 
     def test_install_component_invalid_type(self) -> None:
         """Test component installation with invalid type."""
-        api = FlextMeltano()
-        result = api.install_component(
+        result = FlextMeltano.install_component(
             component_type="invalid_type",
             component_name="tap-csv",
         )
@@ -123,159 +159,28 @@ class TestFlextMeltanoPluginOperations:
 
     def test_install_component_with_config(self) -> None:
         """Test component installation with configuration."""
-        api = FlextMeltano()
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp_file:
-            tmp_path = tmp_file.name
-        result = api.install_component(
+        result = FlextMeltano.install_component(
             component_type="extractors",
             component_name="tap-csv",
-            config={"path": tmp_path},
+            config={"path": "/tmp/test.csv"},
         )
         tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_list_plugins_without_project(self) -> None:
-        """Test listing plugins without valid project."""
-        api = FlextMeltano()
-        result = api.list_plugins()
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_list_plugins_returns_sequence(self) -> None:
-        """Test listing plugins returns a sequence result."""
-        api = FlextMeltano()
-        result = api.list_plugins()
-        tm.ok(result)
 
 
 class TestFlextMeltanoCatalogOperations:
-    """Test FlextMeltano catalog discovery operations."""
-
-    def test_discover_returns_result(self) -> None:
-        """Test discover returns a result."""
-        api = FlextMeltano()
-        result = api.discover()
-        tm.that(result.is_failure or result.is_success, eq=True)
+    """Test FlextMeltano discover_plugins (from FlextMeltanoBridge)."""
 
     def test_discover_plugins_returns_result(self) -> None:
-        """Test discover plugins returns a result."""
+        """Test discover_plugins returns a result."""
         bridge_result = FlextMeltano.discover_plugins()
         tm.that(bridge_result.is_failure or bridge_result.is_success, eq=True)
 
-    def test_api_basic_functionality(self) -> None:
-        """Test basic API functionality."""
-        api = FlextMeltano()
-        tm.that(hasattr(api, "version"), eq=True)
-        tm.that(hasattr(api, "service_name"), eq=True)
 
-
-class TestFlextMeltanoDataOperations:
-    """Test FlextMeltano data extraction and loading operations."""
-
-    def test_extract_source_with_schema(self) -> None:
-        """Test data extraction with schema."""
-        api = FlextMeltano()
-        schema: t.Meltano.SchemaDict = {"type": "object"}
-        result = api.extract_source(schema)
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_run_source_without_name(self) -> None:
-        """Test source run with empty name."""
-        api = FlextMeltano()
-        result = api.run_source("")
-        tm.fail(result)
-
-    def test_load_batch_without_records(self) -> None:
-        """Test batch loading with empty records."""
-        api = FlextMeltano()
-        records: Sequence[t.Meltano.RecordDict] = []
-        result = api.load_batch(records)
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_load_batch_with_records(self) -> None:
-        """Test batch loading with actual records."""
-        api = FlextMeltano()
-        records: Sequence[t.Meltano.RecordDict] = [{"id": 1, "name": "test"}]
-        result = api.load_batch(records)
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_run_sink_without_name(self) -> None:
-        """Test sink run with empty name."""
-        api = FlextMeltano()
-        result = api.run_sink("")
-        tm.fail(result)
-
-    def test_run_source_with_name(self) -> None:
-        """Test source run with name."""
-        api = FlextMeltano()
-        result = api.run_source("source-csv")
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-
-class TestFlextMeltanoDbtOperations:
-    """Test FlextMeltano DBT operations."""
-
-    def test_run_transformation_models_without_models(self) -> None:
-        """Test transformation run with empty model list uses all_models default."""
-        api = FlextMeltano()
-        result = api.run_transformation_models(models=[])
-        tm.ok(result)
-        tm.that(result.value, none=False)
-        models_val = result.value.get("models")
-        tm.that(models_val, eq=["all_models"])
-
-    def test_run_transformation_models_with_list(self) -> None:
-        """Test transformation run with specific models."""
-        api = FlextMeltano()
-        result = api.run_transformation_models(models=["model1"])
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_test_transformation_models_without_models(self) -> None:
-        """Test transformation test with empty model list uses all_models default."""
-        api = FlextMeltano()
-        result = api.test_transformation_models(models=[])
-        tm.ok(result)
-        tm.that(result.value, none=False)
-        models_val = result.value.get("models")
-        tm.that(models_val, eq=["all_models"])
-
-    def test_run_transformation_models_with_models(self) -> None:
-        """Test transformation run with model list."""
-        api = FlextMeltano()
-        result = api.run_transformation_models(models=["model1"])
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_test_transformation_models_with_models(self) -> None:
-        """Test transformation test with model list."""
-        api = FlextMeltano()
-        result = api.test_transformation_models(models=["model1"])
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-
-class TestFlextMeltanoELTPipeline:
-    """Test FlextMeltano complete ELT pipeline operations."""
-
-    def test_run_pipeline_without_source(self) -> None:
-        """Test pipeline without source name."""
-        api = FlextMeltano()
-        result = api.run_pipeline(source_name="", sink_name="target-jsonl")
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_run_pipeline_without_sink(self) -> None:
-        """Test pipeline without sink name."""
-        api = FlextMeltano()
-        result = api.run_pipeline(source_name="tap-csv", sink_name="")
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_run_pipeline_with_source_and_sink(self) -> None:
-        """Test pipeline with source and sink."""
-        api = FlextMeltano()
-        result = api.run_pipeline(
-            source_name="tap-csv",
-            sink_name="target-jsonl",
-        )
-        tm.that(result.is_failure or result.is_success, eq=True)
+class TestFlextMeltanoPipelineOperations:
+    """Test FlextMeltano pipeline execution (from FlextMeltanoExecutor)."""
 
     def test_execute_pipeline_tap_target(self) -> None:
-        """Test execute pipeline with tap and target."""
+        """Test execute_pipeline with tap and target."""
         api = FlextMeltano()
         result = api.execute_pipeline(
             tap_name="tap-csv",
@@ -303,8 +208,7 @@ class TestFlextMeltanoErrorHandling:
 
     def test_validate_project_exception_handling(self) -> None:
         """Test project validation handles exceptions gracefully."""
-        api = FlextMeltano()
-        result = api.validate_project(Path("/invalid/path"))
+        result = FlextMeltano.validate_project(Path("/invalid/path"))
         tm.fail(result)
         tm.that(result.error, none=False)
 
@@ -326,46 +230,10 @@ class TestFlextMeltanoIntegration:
                 or "already exists" in (create_result.error or ""),
                 eq=True,
             )
-            validate_result = api.validate_project(project_path)
+            validate_result = FlextMeltano.validate_project(project_path)
             tm.that(validate_result.is_failure or validate_result.is_success, eq=True)
-            plugins_result = api.list_plugins()
+            plugins_result = FlextMeltano.discover_plugins()
             tm.that(plugins_result.is_failure or plugins_result.is_success, eq=True)
-
-    def test_api_service_operations(self) -> None:
-        """Test API service operations."""
-        api = FlextMeltano()
-        tm.that(api, none=False)
-        with tempfile.TemporaryDirectory() as temp_dir:
-            result = api.create_project(
-                project_name="context_test",
-                project_dir=Path(temp_dir),
-            )
-            tm.that(result.is_success or result.is_failure, eq=True)
-
-
-class TestFlextMeltanoExecuteMethod:
-    """Test FlextMeltano execute method."""
-
-    def test_execute_returns_config(self) -> None:
-        """Test execute method returns config dict."""
-        api = FlextMeltano()
-        result = api.execute()
-        tm.ok(result)
-        tm.that(result.value, none=False)
-
-    def test_execute_contains_version(self) -> None:
-        """Test execute result contains version info."""
-        api = FlextMeltano()
-        result = api.execute()
-        tm.ok(result)
-        value_str = str(result.value)
-        tm.that("version" in value_str, eq=True)
-
-    def test_execute_returns_success(self) -> None:
-        """Test execute method returns success."""
-        api = FlextMeltano()
-        result = api.execute()
-        tm.that(result.is_success or result.is_failure, eq=True)
 
 
 @pytest.mark.benchmark
@@ -393,8 +261,7 @@ class TestFlextMeltanoSuccessPaths:
 
     def test_validate_project_exception_path(self) -> None:
         """Test project validation exception handling."""
-        api = FlextMeltano()
-        result = api.validate_project(Path("/nonexistent/path"))
+        result = FlextMeltano.validate_project(Path("/nonexistent/path"))
         tm.fail(result)
         tm.that(
             result.error
@@ -409,58 +276,15 @@ class TestFlextMeltanoSuccessPaths:
 
     def test_install_component_exception_path(self) -> None:
         """Test component installation exception handling."""
-        api = FlextMeltano()
-        result = api.install_component(
+        result = FlextMeltano.install_component(
             component_type="invalid",
             component_name="nonexistent-plugin",
         )
         tm.fail(result)
 
-    def test_list_plugins_exception_path(self) -> None:
-        """Test plugin listing returns result."""
-        api = FlextMeltano()
-        result = api.list_plugins()
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_discover_exception_path(self) -> None:
-        """Test discover returns result."""
-        api = FlextMeltano()
-        result = api.discover()
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_extract_source_exception_path(self) -> None:
-        """Test data extraction exception handling."""
-        api = FlextMeltano()
-        schema: t.Meltano.SchemaDict = {"stream": "nonexistent-stream"}
-        result = api.extract_source(schema)
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_load_batch_exception_path(self) -> None:
-        """Test batch loading exception handling."""
-        api = FlextMeltano()
-        records: Sequence[t.Meltano.RecordDict] = []
-        result = api.load_batch(records)
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_run_transformation_models_exception_path(self) -> None:
-        """Test transformation models execution exception handling."""
-        api = FlextMeltano()
-        result = api.run_transformation_models(models=["model1"])
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_test_transformation_models_exception_path(self) -> None:
-        """Test transformation models testing exception handling."""
-        api = FlextMeltano()
-        result = api.test_transformation_models(models=["model1"])
-        tm.that(result.is_failure or result.is_success, eq=True)
-
-    def test_run_pipeline_exception_path(self) -> None:
-        """Test pipeline exception handling."""
-        api = FlextMeltano()
-        result = api.run_pipeline(
-            source_name="tap",
-            sink_name="target",
-        )
+    def test_discover_plugins_exception_path(self) -> None:
+        """Test discover_plugins returns result."""
+        result = FlextMeltano.discover_plugins()
         tm.that(result.is_failure or result.is_success, eq=True)
 
 

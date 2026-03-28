@@ -11,20 +11,13 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextRuntime, r, s
+from flext_core import FlextRuntime, r
 
-from flext_meltano import FlextMeltanoSettings, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
 
 
-class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
+class FlextMeltanoTapAbstractions(FlextMeltanoServiceBase):
     """UNIFIED Source Abstractions class consolidating ALL source functionality."""
-
-    def __init__(self, config: FlextMeltanoSettings | None = None) -> None:
-        """Initialize unified source abstractions with FLEXT configuration."""
-        super().__init__()
-        self._meltano_config: FlextMeltanoSettings = (
-            config if config is not None else FlextMeltanoSettings()
-        )
 
     @classmethod
     def create_result_instance(cls) -> r[FlextMeltanoTapAbstractions]:
@@ -88,7 +81,7 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
                 config=config,
-                status="configured",
+                status=c.Meltano.Enums.OperationStatus.CONFIGURED,
                 source_id=source_id,
             )
             self.logger.info(
@@ -163,52 +156,26 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
         r containing discovered stream catalog
 
         """
-        try:
-            source_type_raw = getattr(source_config, "source_type", None) or getattr(
-                source_config,
-                "tap_type",
-                None,
-            )
-            source_type_str: str = (
-                str(source_type_raw) if source_type_raw is not None else ""
-            )
-            self.logger.info(
-                "Discovering streams for source",
-                source_type=source_type_str,
-                source_name=source_type_str,
-            )
-            if not source_type_str:
-                return r[t.Meltano.Singer.StreamCatalog].fail(
-                    "Source configuration must have name and type for discovery",
-                )
-            streams: list[t.Meltano.Singer.CatalogEntry] = []
-            catalog: t.Meltano.Singer.StreamCatalog = {"streams": streams}
-            discovered = catalog.get("streams", streams)
-            self.logger.info("Stream discovery completed", stream_count=len(discovered))
-            return r[t.Meltano.Singer.StreamCatalog].ok(catalog)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            self.logger.exception("Stream discovery failed", error=str(e))
-            return r[t.Meltano.Singer.StreamCatalog].fail(
-                f"Stream discovery failed: {e}",
-            )
+        _ = source_config
+        msg = (
+            "Singer protocol: requires singer-sdk tap integration "
+            "to run tap --discover and parse catalog output"
+        )
+        raise NotImplementedError(msg)
 
     @override
-    def execute(self) -> r[t.Meltano.Singer.StreamCatalog]:
+    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute source abstraction operations (implements Service).
 
         Returns:
-            r containing empty stream catalog ready for discovery
+            r containing discovered stream catalog
 
         """
-        return r[t.Meltano.Singer.StreamCatalog].ok({"streams": []})
+        msg = (
+            "Singer protocol: requires tap configuration and discovery "
+            "before execution - use discover_streams() first"
+        )
+        raise NotImplementedError(msg)
 
     def generate_catalog(
         self,
@@ -226,7 +193,11 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
 
         """
         _ = source_config
-        return r[t.Dict].ok(t.Dict({"version": 1, "streams": []}))
+        msg = (
+            "Singer protocol: requires singer-sdk tap integration "
+            "to generate catalog from tap discovery output"
+        )
+        raise NotImplementedError(msg)
 
     def process_source(
         self,
@@ -288,15 +259,12 @@ class FlextMeltanoTapAbstractions(s[t.Meltano.Singer.StreamCatalog]):
             r containing synchronization statistics
 
         """
-        _ = source_config
-        return r[t.Dict].ok(
-            t.Dict({
-                "stream_name": stream_name,
-                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                "records_processed": 0,
-                "target_loaded": target is not None,
-            }),
+        _ = source_config, stream_name, target
+        msg = (
+            "Singer protocol: requires singer-sdk integration "
+            "to pipe tap stream output into target stdin"
         )
+        raise NotImplementedError(msg)
 
     def validate_stream_schema(self, stream_def: m.Meltano.StreamDefinition) -> r[bool]:
         """Validate a stream definition's schema.

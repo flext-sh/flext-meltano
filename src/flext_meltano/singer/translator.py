@@ -46,18 +46,6 @@ class FlextMeltanoSingerCliTranslator:
             return r[t.Meltano.CLI.ProcessResult].fail(
                 "Invalid command: must be non-empty list",
             )
-
-        def is_string_argument(arg: str) -> bool:
-            match arg:
-                case str():
-                    return True
-                case _:
-                    return False
-
-        if not all(is_string_argument(arg) for arg in command):
-            return r[t.Meltano.CLI.ProcessResult].fail(
-                "Invalid command: all arguments must be strings",
-            )
         process_input = input_data.encode() if input_data else None
         cmd_result = FlextInfraUtilitiesSubprocess.run_raw(
             list(command),

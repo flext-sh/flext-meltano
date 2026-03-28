@@ -7,8 +7,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import subprocess
 import time
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -35,18 +36,38 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             project_name: str,
             project_dir: Path,
         ) -> r[t.Meltano.ExecutionResultDict]:
-            """Create new Meltano project with SOLID delegation."""
+            """Create new Meltano project via CLI."""
             try:
                 project_path = Path(project_dir) / project_name
-                project_path.mkdir(parents=True, exist_ok=True)
+                proc = subprocess.run(
+                    ["meltano", "init", project_name],  # noqa: S607
+                    capture_output=True,
+                    text=True,
+                    cwd=str(project_dir),
+                    timeout=60,
+                    check=False,
+                )
                 result: t.Meltano.ExecutionResultDict = {
                     "project_name": project_name,
                     "project_path": str(project_path),
-                    "status": c.Meltano.Enums.OperationStatus.CREATED,
+                    "status": (
+                        c.Meltano.Enums.OperationStatus.CREATED
+                        if proc.returncode == 0
+                        else c.Meltano.Enums.OperationStatus.ERROR
+                    ),
+                    "output": proc.stdout,
+                    "error": proc.stderr,
                     "created_at": str(time.time()),
                 }
                 return r[t.Meltano.ExecutionResultDict].ok(result)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                subprocess.TimeoutExpired,
+            ) as ex:
                 return r[t.Meltano.ExecutionResultDict].fail(
                     f"Project creation failed: {ex}",
                 )
@@ -58,7 +79,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
 
         def get_version(self) -> r[t.Meltano.ExecutionResultDict]:
             """Get Meltano version information using native API."""
-            meltano_version = getattr(meltano, "__version__", "3.9.1")
+            meltano_version = getattr(meltano, "__version__", "unknown")
             version_info: t.Meltano.ExecutionResultDict = {
                 "version": meltano_version,
                 "meltano": meltano_version,
@@ -90,20 +111,34 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             self,
             plugin_type: str | None = None,
         ) -> r[Sequence[t.Meltano.PluginDefinition]]:
-            """Discover available plugins of specified type.
-
-            Note: Real plugin discovery requires u.
-            Use FlextMeltano.discover_plugins() for full implementation.
-            """
+            """Discover available plugins via Meltano CLI."""
             try:
-                plugins: Sequence[t.Meltano.PluginDefinition] = [
-                    {"name": "tap-postgres", "type": "tap", "variant": "meltanolabs"},
-                    {
-                        "name": "target-jsonl",
-                        "type": "target",
-                        "variant": "meltanolabs",
-                    },
-                ]
+                proc = subprocess.run(
+                    ["meltano", "list"],  # noqa: S607
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=False,
+                )
+                if proc.returncode != 0:
+                    return r[Sequence[t.Meltano.PluginDefinition]].fail(
+                        f"meltano list failed: {proc.stderr}",
+                    )
+                plugins: list[t.Meltano.PluginDefinition] = []
+                for line in proc.stdout.splitlines():
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    ptype = (
+                        "tap"
+                        if stripped.startswith("tap-")
+                        else "target"
+                        if stripped.startswith("target-")
+                        else "transformer"
+                        if stripped.startswith("dbt-")
+                        else "other"
+                    )
+                    plugins.append({"name": stripped, "type": ptype})
                 if plugin_type:
                     plugins = [
                         plugin
@@ -111,12 +146,18 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                         if plugin.get("type") == plugin_type
                     ]
                 return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                subprocess.TimeoutExpired,
+            ) as ex:
                 return r[Sequence[t.Meltano.PluginDefinition]].fail(
                     f"Plugin discovery failed: {ex}",
                 )
 
-        @override
         @override
         def execute(self) -> r[Sequence[t.Meltano.PluginDefinition]]:
             """Execute default plugin operation."""
@@ -135,7 +176,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         def execute(self) -> r[t.Meltano.ExecutionResultDict]:
             """Execute default pipeline operation."""
             return r[t.Meltano.ExecutionResultDict].ok({
-                "status": c.Meltano.Enums.OperationStatus.READY
+                "status": c.Meltano.Enums.OperationStatus.READY,
             })
 
         def execute_pipeline(
@@ -143,7 +184,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             tap_name: str,
             target_name: str,
         ) -> r[t.Meltano.ExecutionResultDict]:
-            """Execute ELT pipeline using Meltano."""
+            """Execute ELT pipeline using Meltano CLI."""
             try:
                 if not tap_name.startswith("tap-"):
                     return r[t.Meltano.ExecutionResultDict].fail(
@@ -153,71 +194,40 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                     return r[t.Meltano.ExecutionResultDict].fail(
                         f"Invalid target name format: {target_name}",
                     )
+                start = time.monotonic()
+                proc = subprocess.run(
+                    ["meltano", "elt", tap_name, target_name],  # noqa: S607
+                    capture_output=True,
+                    text=True,
+                    timeout=300,
+                    check=False,
+                )
+                duration = time.monotonic() - start
                 execution_result: t.Meltano.ExecutionResultDict = {
-                    "pipeline_id": f"{tap_name}_{target_name}_{int(time.time())}",
                     "tap": tap_name,
                     "target": target_name,
-                    "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                    "execution_duration": 0.5,
-                    "stages": {"extract_duration": 0.3, "load_duration": 0.2},
+                    "status": (
+                        c.Meltano.Enums.StreamStatus.COMPLETED
+                        if proc.returncode == 0
+                        else c.Meltano.Enums.StreamStatus.FAILED
+                    ),
+                    "success": proc.returncode == 0,
+                    "output": proc.stdout,
+                    "error": proc.stderr,
+                    "execution_duration": duration,
                 }
                 return r[t.Meltano.ExecutionResultDict].ok(execution_result)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                subprocess.TimeoutExpired,
+            ) as ex:
                 return r[t.Meltano.ExecutionResultDict].fail(
                     f"Pipeline execution failed: {ex}",
                 )
-
-    class SingerAdapter(s[t.Meltano.SingerCatalogDict]):
-        """Focused adapter for Singer protocol operations following SOLID principles."""
-
-        @override
-        @classmethod
-        def _get_service_config_type(cls) -> type[FlextSettings]:
-            """Return FlextMeltanoSettings for this service."""
-            return FlextMeltanoSettings
-
-        def create_tap_stream_catalog(self) -> r[t.Meltano.SingerCatalogDict]:
-            """Create Singer tap stream catalog."""
-            try:
-                catalog: t.Meltano.SingerCatalogDict = {
-                    "streams": [
-                        {
-                            "tap_stream_id": "users",
-                            "stream": "users",
-                            "schema": {
-                                "type": "t.NormalizedValue",
-                                "properties": {
-                                    "id": {"type": "integer"},
-                                    "name": {"type": "string"},
-                                },
-                            },
-                            "metadata": [
-                                {
-                                    "breadcrumb": list[str](),
-                                    "metadata": {
-                                        c.Meltano.Enums.SingerMetadataKey.TABLE_KEY_PROPERTIES: [
-                                            "id"
-                                        ],
-                                        c.Meltano.Enums.SingerMetadataKey.FORCED_REPLICATION_METHOD: "INCREMENTAL",
-                                        c.Meltano.Enums.SingerMetadataKey.VALID_REPLICATION_KEYS: [
-                                            "updated_at"
-                                        ],
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                }
-                return r[t.Meltano.SingerCatalogDict].ok(catalog)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-                return r[t.Meltano.SingerCatalogDict].fail(
-                    f"Catalog creation failed: {ex}",
-                )
-
-        @override
-        def execute(self) -> r[t.Meltano.SingerCatalogDict]:
-            """Execute default singer operation."""
-            return self.create_tap_stream_catalog()
 
     class DbtAdapter(s[t.Meltano.DbtResultDict]):
         """Focused adapter for DBT operations following SOLID principles."""
@@ -234,24 +244,43 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             return self.execute_dbt_operation()
 
         def execute_dbt_operation(self) -> r[t.Meltano.DbtResultDict]:
-            """Execute DBT operation."""
+            """Execute DBT operation via Meltano invoke."""
             try:
+                start = time.monotonic()
+                proc = subprocess.run(
+                    ["meltano", "invoke", "dbt-postgres:run"],  # noqa: S607
+                    capture_output=True,
+                    text=True,
+                    timeout=600,
+                    check=False,
+                )
+                duration = time.monotonic() - start
                 dbt_result: t.Meltano.DbtResultDict = {
-                    "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-                    "models_run": 5,
-                    "tests_run": 12,
-                    "execution_time": 45.2,
+                    "status": (
+                        c.Meltano.Enums.StreamStatus.COMPLETED
+                        if proc.returncode == 0
+                        else c.Meltano.Enums.StreamStatus.FAILED
+                    ),
+                    "success": proc.returncode == 0,
+                    "output": proc.stdout,
+                    "error": proc.stderr,
+                    "execution_time": duration,
                 }
                 return r[t.Meltano.DbtResultDict].ok(dbt_result)
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                subprocess.TimeoutExpired,
+            ) as ex:
                 return r[t.Meltano.DbtResultDict].fail(f"DBT operation failed: {ex}")
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute adapter service."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            {"status": c.Meltano.Enums.OperationStatus.READY},
-        )
+    def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
+        """Execute adapter service returning current settings."""
+        return r[Mapping[str, t.NormalizedValue]].ok(self.settings.model_dump())
 
 
 __all__ = ["FlextMeltanoAdapter"]

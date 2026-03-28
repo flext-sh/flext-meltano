@@ -83,14 +83,12 @@ if TYPE_CHECKING:
     )
     from tests.unit.test_api import (
         TestFlextMeltanoCatalogOperations,
-        TestFlextMeltanoDataOperations,
-        TestFlextMeltanoDbtOperations,
-        TestFlextMeltanoELTPipeline,
         TestFlextMeltanoErrorHandling,
         TestFlextMeltanoExecuteMethod,
         TestFlextMeltanoInitialization,
         TestFlextMeltanoIntegration,
         TestFlextMeltanoPerformance,
+        TestFlextMeltanoPipelineOperations,
         TestFlextMeltanoPluginOperations,
         TestFlextMeltanoProjectOperations,
         TestFlextMeltanoSuccessPaths,
@@ -115,9 +113,7 @@ if TYPE_CHECKING:
     from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
     from tests.unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
     from tests.unit.test_library_runner import (
-        TestFlextDbtProgrammaticRunner,
         TestFlextMeltanoLibraryRunner,
-        TestFlextSingerProtocolManager,
         TestProjectAdapterIntegration,
     )
     from tests.unit.test_models import (
@@ -201,10 +197,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "tests.integration.test_docker_integration",
         "TestDockerIntegration",
     ],
-    "TestFlextDbtProgrammaticRunner": [
-        "tests.unit.test_library_runner",
-        "TestFlextDbtProgrammaticRunner",
-    ],
     "TestFlextMeltanoAbstractionsComplete": [
         "tests.unit.test_tap_abstractions",
         "TestFlextMeltanoAbstractionsComplete",
@@ -212,18 +204,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestFlextMeltanoCatalogOperations": [
         "tests.unit.test_api",
         "TestFlextMeltanoCatalogOperations",
-    ],
-    "TestFlextMeltanoDataOperations": [
-        "tests.unit.test_api",
-        "TestFlextMeltanoDataOperations",
-    ],
-    "TestFlextMeltanoDbtOperations": [
-        "tests.unit.test_api",
-        "TestFlextMeltanoDbtOperations",
-    ],
-    "TestFlextMeltanoELTPipeline": [
-        "tests.unit.test_api",
-        "TestFlextMeltanoELTPipeline",
     ],
     "TestFlextMeltanoErrorHandling": [
         "tests.unit.test_api",
@@ -260,6 +240,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestFlextMeltanoPerformance": [
         "tests.unit.test_api",
         "TestFlextMeltanoPerformance",
+    ],
+    "TestFlextMeltanoPipelineOperations": [
+        "tests.unit.test_api",
+        "TestFlextMeltanoPipelineOperations",
     ],
     "TestFlextMeltanoPluginOperations": [
         "tests.unit.test_api",
@@ -330,10 +314,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestFlextMeltanoValidatorsComprehensive": [
         "tests.unit.test_validators",
         "TestFlextMeltanoValidatorsComprehensive",
-    ],
-    "TestFlextSingerProtocolManager": [
-        "tests.unit.test_library_runner",
-        "TestFlextSingerProtocolManager",
     ],
     "TestFlextSingerTypes": ["tests.unit.test_singer_types", "TestFlextSingerTypes"],
     "TestMeltanoProjectModelEnhanced": [
@@ -469,12 +449,8 @@ __all__ = [
     "TestDbtProjectModelEnhanced",
     "TestDbtService",
     "TestDockerIntegration",
-    "TestFlextDbtProgrammaticRunner",
     "TestFlextMeltanoAbstractionsComplete",
     "TestFlextMeltanoCatalogOperations",
-    "TestFlextMeltanoDataOperations",
-    "TestFlextMeltanoDbtOperations",
-    "TestFlextMeltanoELTPipeline",
     "TestFlextMeltanoErrorHandling",
     "TestFlextMeltanoExecuteMethod",
     "TestFlextMeltanoExecutionResult",
@@ -484,6 +460,7 @@ __all__ = [
     "TestFlextMeltanoIntegration",
     "TestFlextMeltanoLibraryRunner",
     "TestFlextMeltanoPerformance",
+    "TestFlextMeltanoPipelineOperations",
     "TestFlextMeltanoPluginOperations",
     "TestFlextMeltanoPluginProtocols",
     "TestFlextMeltanoProjectOperations",
@@ -503,7 +480,6 @@ __all__ = [
     "TestFlextMeltanoTypes",
     "TestFlextMeltanoUtilitiesEnhanced",
     "TestFlextMeltanoValidatorsComprehensive",
-    "TestFlextSingerProtocolManager",
     "TestFlextSingerTypes",
     "TestMeltanoProjectModelEnhanced",
     "TestModelIntegration",
