@@ -162,13 +162,6 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             "meltano_version": self.settings.meltano_version,
         })
 
-    @staticmethod
-    def create_result_instance() -> r[_FlextMeltanoAbstractionsBase]:
-        """Factory method for creating a FlextMeltanoAbstractions instance."""
-        from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-
-        return r[_FlextMeltanoAbstractionsBase].ok(FlextMeltanoAbstractions())
-
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
@@ -181,3 +174,23 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             "metadata": list[t.ContainerMapping](),
         }
         return r[t.ContainerMapping].ok(entry)
+
+    def get_stream_config(
+        self,
+        config: m.Meltano.TapConfig,
+        stream_name: str,
+    ) -> t.ContainerMapping:
+        """Get configuration for a specific stream."""
+        if config.stream_config and stream_name in config.stream_config:
+            val = config.stream_config[stream_name]
+            if isinstance(val, dict):
+                return val
+        return {}
+
+    def get_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
+        """Get tap type from instance."""
+        return tap_instance.tap_type
+
+    def get_registered_streams(self) -> Sequence[str]:
+        """Get list of registered stream names."""
+        return [*self._stream_registry.keys()]

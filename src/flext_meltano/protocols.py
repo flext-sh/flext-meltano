@@ -15,42 +15,20 @@ from flext_meltano._protocols import (
     FlextMeltanoProtocolsServices,
     FlextMeltanoProtocolsSinger,
 )
+from flext_meltano._protocols.cli import FlextMeltanoProtocolsBase
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):
-    """Unified Meltano protocols extending FlextCliProtocols.
-
-    Extends p to inherit all foundation protocols (Result, Service, etc.)
-    and adds Meltano/Singer/DBT-specific protocols in the Meltano namespace.
-
-    Architecture:
-    - EXTENDS: p (inherits Foundation, Domain, Application, etc.)
-    - ADDS: Meltano/Singer/DBT-specific protocols in Meltano namespace
-    - PROVIDES: Root-level alias `p` for convenient access
-
-    Usage:
-    from flext_core import p
-
-    # Foundation protocols (inherited)
-    result: FlextCliProtocols.Result[str]
-    service: FlextCliProtocols.Service[str]
-
-    # Meltano-specific protocols
-    tap: FlextCliProtocols.Meltano.Tap
-    target: FlextCliProtocols.Meltano.Target
-    """
+    """Unified Meltano protocols extending FlextCliProtocols."""
 
     class Meltano(
         FlextMeltanoProtocolsPlugin,
         FlextMeltanoProtocolsProject,
         FlextMeltanoProtocolsServices,
         FlextMeltanoProtocolsSinger,
+        FlextMeltanoProtocolsBase,
     ):
-        """Meltano ELT domain-specific protocols.
-
-        Provides protocols for Meltano plugins, Singer taps/targets/streams,
-        DBT runners, and service operations.
-        """
+        """Meltano ELT domain-specific protocols."""
 
 
 p = FlextMeltanoProtocols

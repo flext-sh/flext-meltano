@@ -141,7 +141,4 @@ class FlextMeltanoExecutor(_FlextMeltanoExecutorBase):
         )
 
 
-# Backward-compatible alias for code that imported the commands subclass
-FlextMeltanoExecutorCommands = FlextMeltanoExecutor
-
-__all__ = ["FlextMeltanoExecutor", "FlextMeltanoExecutorCommands"]
+__all__ = ["FlextMeltanoExecutor"]

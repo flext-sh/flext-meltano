@@ -20,6 +20,11 @@ from flext_meltano.services._abstractions_base import (
 class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
     """Core abstraction wrapping Meltano CLI via subprocess with r[T] results."""
 
+    @staticmethod
+    def create_result_instance() -> r[FlextMeltanoAbstractions]:
+        """Factory method for creating a FlextMeltanoAbstractions instance."""
+        return r[FlextMeltanoAbstractions].ok(FlextMeltanoAbstractions())
+
     # -- Tap-specific operations (discovery, sync, catalog) --
 
     def process_tap_config(self, config: m.Meltano.TapConfig) -> r[m.Meltano.TapConfig]:
@@ -104,18 +109,6 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
             self.logger.exception(error_msg)
             return r[t.ContainerMapping].fail(error_msg)
 
-    def get_stream_config(
-        self,
-        config: m.Meltano.TapConfig,
-        stream_name: str,
-    ) -> t.ContainerMapping:
-        """Get configuration for a specific stream."""
-        if config.stream_config and stream_name in config.stream_config:
-            val = config.stream_config[stream_name]
-            if isinstance(val, dict):
-                return val
-        return {}
-
     def create_tap_from_config(
         self,
         tap_type: str,
@@ -185,14 +178,6 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
             str(s.get("stream_name", "")) for s in _extract_raw_streams(discovery.value)
         ]
 
-    def get_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
-        """Get tap type from instance."""
-        return tap_instance.tap_type
-
-    def get_registered_streams(self) -> Sequence[str]:
-        """Get list of registered stream names."""
-        return [*self._stream_registry.keys()]
-
 
 def _extract_raw_streams(raw: t.ContainerMapping) -> list[t.ContainerMapping]:
     """Extract stream dicts from a discovery result mapping."""
@@ -203,7 +188,4 @@ def _extract_raw_streams(raw: t.ContainerMapping) -> list[t.ContainerMapping]:
     return []
 
 
-# Backward-compatible alias for code that imported the tap subclass
-FlextMeltanoAbstractionsTap = FlextMeltanoAbstractions
-
-__all__ = ["FlextMeltanoAbstractions", "FlextMeltanoAbstractionsTap"]
+__all__ = ["FlextMeltanoAbstractions"]

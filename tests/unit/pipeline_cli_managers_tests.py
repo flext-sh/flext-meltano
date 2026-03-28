@@ -103,10 +103,10 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
         tm.ok(create_pipeline("status-pipeline", {"command": ["run", "tap", "target"]}))
         pid_file = tmp_path / "pipelines" / "status-pipeline" / "pipeline.pid"
         pid_file.write_text("1234", encoding="utf-8")
-        with patch("flext_meltano.services.cli_managers.os.kill", return_value=None):
+        with patch("flext_meltano.services._pipeline_ops.os.kill", return_value=None):
             running_result = get_pipeline_status("status-pipeline")
         with patch(
-            "flext_meltano.services.cli_managers.os.kill",
+            "flext_meltano.services._pipeline_ops.os.kill",
             side_effect=ProcessLookupError,
         ):
             stopped_result = get_pipeline_status("status-pipeline")
@@ -136,7 +136,7 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
             raise AssertionError(msg)
 
         with patch(
-            "flext_meltano.services.cli_managers.os.kill",
+            "flext_meltano.services._pipeline_ops.os.kill",
             side_effect=fake_kill,
         ):
             pass
