@@ -1,0 +1,25 @@
+src/flext_meltano/services/_abstractions_base.py
+  65695a6562cb7b5d 1-183
+src/flext_meltano/services/abstractions.py
+  65695a6562cb7b5d 1,9,13-17,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "7b7adf4c406f8b407c4a6bfb42397ad91f584144",
+  "prompts": {
+    "65695a6562cb7b5d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d8e05333-b80e-479a-91eb-941aa715ac42",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 192,
+      "total_deletions": 169,
+      "accepted_lines": 191,
+      "overriden_lines": 0
+    }
+  }
+}
