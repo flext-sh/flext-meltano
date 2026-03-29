@@ -18,8 +18,7 @@ class FlextMeltanoOrchestrationService(FlextMeltanoServiceBase):
     """Service for data pipeline orchestration.
 
     Delegates pipeline execution to FlextMeltanoAbstractions which wraps
-    the meltano-core SDK. Methods that cannot be implemented yet raise
-    NotImplementedError.
+    the meltano-core SDK. Unavailable operations return r[T].fail().
     """
 
     @cached_property
@@ -48,11 +47,10 @@ class FlextMeltanoOrchestrationService(FlextMeltanoServiceBase):
             r containing pipeline execution results
 
         """
-        msg = (
+        return r[t.Meltano.ELT.PipelineResult].fail(
             "Pipeline execution requires meltano-core SDK integration: "
             f"execute_pipeline({project_path!r}, {source_name!r}, {sink_name!r})"
         )
-        raise NotImplementedError(msg)
 
 
 __all__ = ["FlextMeltanoOrchestrationService"]

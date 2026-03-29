@@ -108,11 +108,10 @@ class FlextMeltanoMeltanoService(s[str]):
             r containing pipeline result
 
         """
-        msg = (
+        return r[t.Meltano.ELT.PipelineResult].fail(
             f"Pipeline execution requires meltano-core SDK integration: "
             f"run_config={config.run_config!r}, project_root={config.project_root!r}"
         )
-        raise NotImplementedError(msg)
 
     def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Load an existing Meltano project.

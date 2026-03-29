@@ -92,8 +92,9 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
 
     def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
         """Install a plugin in the project."""
-        msg = f"Plugin installation requires meltano-core SDK integration: install_plugin({name!r})"
-        raise NotImplementedError(msg)
+        return r[t.Meltano.PluginInfo].fail(
+            f"Plugin installation requires meltano-core SDK integration: install_plugin({name!r})"
+        )
 
     def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Load an existing Meltano project."""

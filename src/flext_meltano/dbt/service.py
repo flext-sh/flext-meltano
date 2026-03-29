@@ -46,14 +46,14 @@ class FlextMeltanoDbtService(s[str]):
         """Execute (implements Service pattern)."""
         return r[str].ok("DBT service initialized")
 
-    def generate_docs(self, **kwargs: t.Scalar) -> None:
+    def generate_docs(self, **kwargs: t.Scalar) -> r[str]:
         """Generate DBT documentation.
 
-        Raises:
-        NotImplementedError: Delegates to runner which is not yet implemented.
+        Returns:
+        r containing result or failure message
 
         """
-        self.runner.docs_generate(**kwargs)
+        return self.runner.docs_generate(**kwargs)
 
     def get_project_models(self) -> r[Sequence[t.Meltano.Dbt.ModelConfiguration]]:
         """Get all models from the project.
@@ -112,27 +112,27 @@ class FlextMeltanoDbtService(s[str]):
         self,
         models: t.StrSequence | None = None,
         **kwargs: t.Scalar,
-    ) -> None:
+    ) -> r[str]:
         """Run DBT models.
 
-        Raises:
-        NotImplementedError: Delegates to runner which is not yet implemented.
+        Returns:
+        r containing result or failure message
 
         """
-        self.runner.run_models(models, **kwargs)
+        return self.runner.run_models(models, **kwargs)
 
     def run_tests(
         self,
         models: t.StrSequence | None = None,
         **kwargs: t.Scalar,
-    ) -> None:
+    ) -> r[str]:
         """Run DBT tests.
 
-        Raises:
-        NotImplementedError: Delegates to runner which is not yet implemented.
+        Returns:
+        r containing result or failure message
 
         """
-        self.runner.run_tests(models, **kwargs)
+        return self.runner.run_tests(models, **kwargs)
 
 
 __all__ = ["FlextMeltanoDbtService"]

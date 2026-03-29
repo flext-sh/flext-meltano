@@ -35,15 +35,16 @@ class FlextMeltanoDbtRunner(s[str]):
         super().__init__()
         self.project_root: Path | None = project_root
 
-    def docs_generate(self, **_kwargs: t.Scalar) -> None:
+    def docs_generate(self, **_kwargs: t.Scalar) -> r[str]:
         """Generate DBT documentation.
 
-        Raises:
-        NotImplementedError: Requires dbt-core programmatic API or subprocess integration.
+        Returns:
+        r containing result or failure message
 
         """
-        msg = "DBT docs generate: requires dbt-core programmatic API or subprocess integration"
-        raise NotImplementedError(msg)
+        return r[str].fail(
+            "DBT docs generate: requires dbt-core programmatic API or subprocess integration"
+        )
 
     @override
     def execute(self, **_kwargs: t.Scalar) -> r[str]:
@@ -56,29 +57,33 @@ class FlextMeltanoDbtRunner(s[str]):
         self,
         models: t.StrSequence | None = None,
         **_kwargs: t.Scalar,
-    ) -> None:
+    ) -> r[str]:
         """Run DBT models.
 
-        Raises:
-        NotImplementedError: Requires dbt-core programmatic API or subprocess integration.
+        Returns:
+        r containing result or failure message
 
         """
-        msg = "DBT run models: requires dbt-core programmatic API or subprocess integration"
-        raise NotImplementedError(msg)
+        _ = models
+        return r[str].fail(
+            "DBT run models: requires dbt-core programmatic API or subprocess integration"
+        )
 
     def run_tests(
         self,
         models: t.StrSequence | None = None,
         **_kwargs: t.Scalar,
-    ) -> None:
+    ) -> r[str]:
         """Run DBT tests.
 
-        Raises:
-        NotImplementedError: Requires dbt-core programmatic API or subprocess integration.
+        Returns:
+        r containing result or failure message
 
         """
-        msg = "DBT run tests: requires dbt-core programmatic API or subprocess integration"
-        raise NotImplementedError(msg)
+        _ = models
+        return r[str].fail(
+            "DBT run tests: requires dbt-core programmatic API or subprocess integration"
+        )
 
 
 __all__ = ["FlextMeltanoDbtRunner"]

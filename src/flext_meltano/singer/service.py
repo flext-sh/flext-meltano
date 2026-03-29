@@ -105,11 +105,10 @@ class FlextMeltanoSingerService(s[str]):
 
         """
         _ = tap, target, catalog, state
-        msg = (
+        return r[m.Meltano.SingerSyncResult].fail(
             "Singer protocol: requires singer-sdk tap/target integration "
             "to pipe tap stdout into target stdin and collect metrics"
         )
-        raise NotImplementedError(msg)
 
     def load_catalog_from_file(self, catalog_path: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from file.

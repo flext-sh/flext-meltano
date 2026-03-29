@@ -77,8 +77,9 @@ class FlextMeltanoLibraryRunner(
     @override
     def execute(self) -> r[t.Meltano.ExecutionResultDict]:
         """Execute library runner — returns executor status."""
-        msg = "Library runner execution requires meltano-core SDK integration"
-        raise NotImplementedError(msg)
+        return r[t.Meltano.ExecutionResultDict].fail(
+            "Library runner execution requires meltano-core SDK integration"
+        )
 
     def execute_complete_elt_pipeline(
         self,
