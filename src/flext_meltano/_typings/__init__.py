@@ -18,9 +18,18 @@ if TYPE_CHECKING:
     from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoTypingsBase": ["flext_meltano._typings.base", "FlextMeltanoTypingsBase"],
-    "FlextMeltanoTypingsDomains": ["flext_meltano._typings.domains", "FlextMeltanoTypingsDomains"],
-    "FlextMeltanoTypingsSinger": ["flext_meltano._typings.singer", "FlextMeltanoTypingsSinger"],
+    "FlextMeltanoTypingsBase": [
+        "flext_meltano._typings.base",
+        "FlextMeltanoTypingsBase",
+    ],
+    "FlextMeltanoTypingsDomains": [
+        "flext_meltano._typings.domains",
+        "FlextMeltanoTypingsDomains",
+    ],
+    "FlextMeltanoTypingsSinger": [
+        "flext_meltano._typings.singer",
+        "FlextMeltanoTypingsSinger",
+    ],
 }
 
 __all__ = [

@@ -20,11 +20,26 @@ if TYPE_CHECKING:
     from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoProtocolsBase": ["flext_meltano._protocols.cli", "FlextMeltanoProtocolsBase"],
-    "FlextMeltanoProtocolsPlugin": ["flext_meltano._protocols.plugin", "FlextMeltanoProtocolsPlugin"],
-    "FlextMeltanoProtocolsProject": ["flext_meltano._protocols.project", "FlextMeltanoProtocolsProject"],
-    "FlextMeltanoProtocolsServices": ["flext_meltano._protocols.services", "FlextMeltanoProtocolsServices"],
-    "FlextMeltanoProtocolsSinger": ["flext_meltano._protocols.singer", "FlextMeltanoProtocolsSinger"],
+    "FlextMeltanoProtocolsBase": [
+        "flext_meltano._protocols.cli",
+        "FlextMeltanoProtocolsBase",
+    ],
+    "FlextMeltanoProtocolsPlugin": [
+        "flext_meltano._protocols.plugin",
+        "FlextMeltanoProtocolsPlugin",
+    ],
+    "FlextMeltanoProtocolsProject": [
+        "flext_meltano._protocols.project",
+        "FlextMeltanoProtocolsProject",
+    ],
+    "FlextMeltanoProtocolsServices": [
+        "flext_meltano._protocols.services",
+        "FlextMeltanoProtocolsServices",
+    ],
+    "FlextMeltanoProtocolsSinger": [
+        "flext_meltano._protocols.singer",
+        "FlextMeltanoProtocolsSinger",
+    ],
 }
 
 __all__ = [

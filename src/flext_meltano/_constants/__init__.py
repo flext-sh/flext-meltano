@@ -18,9 +18,18 @@ if TYPE_CHECKING:
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoConstantsBase": ["flext_meltano._constants.base", "FlextMeltanoConstantsBase"],
-    "FlextMeltanoConstantsConfig": ["flext_meltano._constants.config", "FlextMeltanoConstantsConfig"],
-    "FlextMeltanoConstantsEnums": ["flext_meltano._constants.enums", "FlextMeltanoConstantsEnums"],
+    "FlextMeltanoConstantsBase": [
+        "flext_meltano._constants.base",
+        "FlextMeltanoConstantsBase",
+    ],
+    "FlextMeltanoConstantsConfig": [
+        "flext_meltano._constants.config",
+        "FlextMeltanoConstantsConfig",
+    ],
+    "FlextMeltanoConstantsEnums": [
+        "flext_meltano._constants.enums",
+        "FlextMeltanoConstantsEnums",
+    ],
 }
 
 __all__ = [

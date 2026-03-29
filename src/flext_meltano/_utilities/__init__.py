@@ -22,10 +22,22 @@ if TYPE_CHECKING:
     from flext_meltano._utilities.yaml import FlextMeltanoUtilitiesYaml
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoUtilitiesConfig": ["flext_meltano._utilities.config", "FlextMeltanoUtilitiesConfig"],
-    "FlextMeltanoUtilitiesProject": ["flext_meltano._utilities.project", "FlextMeltanoUtilitiesProject"],
-    "FlextMeltanoUtilitiesSinger": ["flext_meltano._utilities.singer", "FlextMeltanoUtilitiesSinger"],
-    "FlextMeltanoUtilitiesYaml": ["flext_meltano._utilities.yaml", "FlextMeltanoUtilitiesYaml"],
+    "FlextMeltanoUtilitiesConfig": [
+        "flext_meltano._utilities.config",
+        "FlextMeltanoUtilitiesConfig",
+    ],
+    "FlextMeltanoUtilitiesProject": [
+        "flext_meltano._utilities.project",
+        "FlextMeltanoUtilitiesProject",
+    ],
+    "FlextMeltanoUtilitiesSinger": [
+        "flext_meltano._utilities.singer",
+        "FlextMeltanoUtilitiesSinger",
+    ],
+    "FlextMeltanoUtilitiesYaml": [
+        "flext_meltano._utilities.yaml",
+        "FlextMeltanoUtilitiesYaml",
+    ],
     "SingerTargetHandler": ["flext_meltano._utilities.singer", "SingerTargetHandler"],
 }
 
