@@ -12,12 +12,12 @@ from flext_core import r
 
 from flext_meltano import c, m, t
 from flext_meltano.services._abstractions_base import (
-    _OPERATION_ERRORS,
-    _FlextMeltanoAbstractionsBase,
+    OPERATION_ERRORS,
+    FlextMeltanoAbstractionsBase,
 )
 
 
-class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
+class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     """Core abstraction wrapping Meltano CLI via subprocess with r[T] results."""
 
     @staticmethod
@@ -63,7 +63,7 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
                             source_type=tap_instance.tap_type,
                         )
             return r[t.ContainerMapping].ok({"streams": stream_defs})
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             error_msg = f"Failed to discover streams: {e}"
             self.logger.exception(error_msg)
             return r[t.ContainerMapping].fail(error_msg)
@@ -104,7 +104,7 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
                     cmd_result.error or "Stream sync failed"
                 )
             return r[t.ContainerMapping].ok(result)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             error_msg = f"Failed to sync stream {stream_name}: {e}"
             self.logger.exception(error_msg)
             return r[t.ContainerMapping].fail(error_msg)
@@ -128,7 +128,7 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
                 tap_id=f"{tap_type}_auto",
             )
             return r[m.Meltano.TapInstance].ok(instance)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
 
     def generate_catalog(
@@ -143,7 +143,7 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
             )
         raw = discovery.value
         streams: list[t.ContainerMapping] = []
-        for s in _extract_raw_streams(raw):
+        for s in self._extract_raw_streams(raw):
             name = str(s.get("stream_name", ""))
             if name in self._stream_registry:
                 entry_r = self._create_catalog_entry_from_stream(
@@ -163,7 +163,7 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
         discovery = self.discover_streams(tap_instance)
         if discovery.is_failure:
             return r[t.ContainerMapping].fail(discovery.error or "Discovery failed")
-        for stream in _extract_raw_streams(discovery.value):
+        for stream in self._extract_raw_streams(discovery.value):
             if stream.get("stream_name") == stream_name:
                 result_stream: t.ContainerMapping = {**stream, "name": stream_name}
                 return r[t.ContainerMapping].ok(result_stream)
@@ -175,17 +175,18 @@ class FlextMeltanoAbstractions(_FlextMeltanoAbstractionsBase):
         if discovery.is_failure:
             return []
         return [
-            str(s.get("stream_name", "")) for s in _extract_raw_streams(discovery.value)
+            str(s.get("stream_name", ""))
+            for s in self._extract_raw_streams(discovery.value)
         ]
 
-
-def _extract_raw_streams(raw: t.ContainerMapping) -> list[t.ContainerMapping]:
-    """Extract stream dicts from a discovery result mapping."""
-    if isinstance(raw, dict):
-        raw_val = raw.get("streams")
-        if isinstance(raw_val, list):
-            return [s for s in raw_val if isinstance(s, dict)]
-    return []
+    @staticmethod
+    def _extract_raw_streams(raw: t.ContainerMapping) -> list[t.ContainerMapping]:
+        """Extract stream dicts from a discovery result mapping."""
+        if isinstance(raw, dict):
+            raw_val = raw.get("streams")
+            if isinstance(raw_val, list):
+                return [s for s in raw_val if isinstance(s, dict)]
+        return []
 
 
 __all__ = ["FlextMeltanoAbstractions"]

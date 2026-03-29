@@ -103,10 +103,13 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
         tm.ok(create_pipeline("status-pipeline", {"command": ["run", "tap", "target"]}))
         pid_file = tmp_path / "pipelines" / "status-pipeline" / "pipeline.pid"
         pid_file.write_text("1234", encoding="utf-8")
-        with patch("flext_meltano.services._pipeline_ops.os.kill", return_value=None):
+        with patch(
+            "flext_meltano.services._pipeline_lifecycle.os.kill",
+            return_value=None,
+        ):
             running_result = get_pipeline_status("status-pipeline")
         with patch(
-            "flext_meltano.services._pipeline_ops.os.kill",
+            "flext_meltano.services._pipeline_lifecycle.os.kill",
             side_effect=ProcessLookupError,
         ):
             stopped_result = get_pipeline_status("status-pipeline")
@@ -136,11 +139,16 @@ def test_get_pipeline_status_checks_process_state(tmp_path: Path) -> None:
             raise AssertionError(msg)
 
         with patch(
-            "flext_meltano.services._pipeline_ops.os.kill",
+            "flext_meltano.services._pipeline_lifecycle.os.kill",
             side_effect=fake_kill,
         ):
-            pass
+            stop_result = FlextMeltanoPipelineManager.stop_pipeline(
+                "status-pipeline-2",
+            )
     tm.ok(running_result)
+    tm.ok(stop_result)
+    tm.that(stop_result.value, eq="stopped")
+    tm.that(not pid_file.exists(), eq=True)
 
 
 def test_delete_pipeline_removes_configuration_directory(tmp_path: Path) -> None:

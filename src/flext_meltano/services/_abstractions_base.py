@@ -15,10 +15,10 @@ from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, t
 
-_OPERATION_ERRORS = (ValueError, TypeError, KeyError, AttributeError, OSError)
+OPERATION_ERRORS = (ValueError, TypeError, KeyError, AttributeError, OSError)
 
 
-class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
+class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping Meltano CLI via subprocess with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
@@ -60,7 +60,7 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 plugin_name=plugin_name,
             )
             return r[bool].ok(value=True)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             error_msg = f"Failed to add plugin: {e}"
             self.logger.exception(error_msg)
             return r[bool].fail(error_msg)
@@ -87,7 +87,7 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                         "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
                     }
             return r[Mapping[str, t.Meltano.PluginDefinition]].ok(plugins)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             self.logger.exception(error_msg)
             return r[Mapping[str, t.Meltano.PluginDefinition]].fail(error_msg)
@@ -120,7 +120,7 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 "records_processed": 0,
             }
             return r[t.Meltano.ELT.PipelineResult].ok(result)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             self.logger.exception(error_msg)
             return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
@@ -137,7 +137,7 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 project_root=str(project_root),
             )
             return r[Path].ok(project_root)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             error_msg = f"Failed to load pipeline project: {e}"
             self.logger.exception(error_msg)
             return r[Path].fail(error_msg)
@@ -149,7 +149,7 @@ class _FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail("No project root configured in settings")
         try:
             return r[Path].ok(project_root)
-        except _OPERATION_ERRORS as e:
+        except OPERATION_ERRORS as e:
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override

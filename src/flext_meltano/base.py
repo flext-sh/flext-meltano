@@ -14,13 +14,13 @@ from collections.abc import Mapping, Sequence
 from types import ModuleType
 from typing import Annotated, override
 
-from flext_core import FlextSettings, p, s, t
+from flext_core import FlextService, FlextSettings
 from pydantic import Field
 
-from flext_meltano import FlextMeltanoSettings, c
+from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase(s[Mapping[str, t.NormalizedValue]]):
+class FlextMeltanoServiceBase(FlextService[Mapping[str, t.NormalizedValue]]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -64,14 +64,14 @@ class FlextMeltanoServiceBase(s[Mapping[str, t.NormalizedValue]]):
         config_type: type[p.Settings] | None = None,
         config_overrides: t.ContainerMapping | None = None,
         initial_context: p.Context | None = None,
-        subproject: str | None = None,
-        services: Mapping[str, t.RegisterableService] | None = None,
-        factories: Mapping[str, t.FactoryCallable] | None = None,
-        resources: Mapping[str, t.ResourceCallable] | None = None,
-        container_overrides: t.ScalarMapping | None = None,
-        wire_modules: Sequence[ModuleType] | None = None,
-        wire_packages: t.StrSequence | None = None,
-        wire_classes: Sequence[type] | None = None,
+        _subproject: str | None = None,
+        _services: Mapping[str, t.RegisterableService] | None = None,
+        _factories: Mapping[str, t.FactoryCallable] | None = None,
+        _resources: Mapping[str, t.ResourceCallable] | None = None,
+        _container_overrides: t.ScalarMapping | None = None,
+        _wire_modules: Sequence[ModuleType] | None = None,
+        _wire_packages: t.StrSequence | None = None,
+        _wire_classes: Sequence[type] | None = None,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
         source_name: str | None = None,
@@ -90,14 +90,6 @@ class FlextMeltanoServiceBase(s[Mapping[str, t.NormalizedValue]]):
             config_type=config_type,
             config_overrides=normalized_overrides,
             initial_context=initial_context,
-            subproject=subproject,
-            services=services,
-            factories=factories,
-            resources=resources,
-            container_overrides=container_overrides,
-            wire_modules=wire_modules,
-            wire_packages=wire_packages,
-            wire_classes=wire_classes,
         )
         if service_name is not None:
             self.service_name = service_name
@@ -123,4 +115,5 @@ class FlextMeltanoServiceBase(s[Mapping[str, t.NormalizedValue]]):
         )
 
 
+s = FlextMeltanoServiceBase
 __all__ = ["FlextMeltanoServiceBase"]

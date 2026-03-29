@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import tempfile
-import unittest
 from collections.abc import Mapping
+from unittest.mock import patch
 
 import pytest
 from flext_core import r
@@ -505,9 +505,6 @@ class TestFlextMeltanoAbstractionsComplete:
         result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
 
-    @unittest.skip(
-        "API methods not yet implemented: create_tap_from_config, generate_catalog, sync_stream. Requires implementation in FlextMeltanoAbstractions.",
-    )
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
         connection_config: t.ContainerMapping = {
@@ -524,31 +521,34 @@ class TestFlextMeltanoAbstractionsComplete:
             condition=create_result.is_success,
             message="Tap creation should succeed",
         )
-        config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config=connection_config,
-            stream_config=stream_config,
-        )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres",
-            config=config,
-            tap_id="workflow_tap_123",
-        )
-        discovery_result = self.tap_abstractions.discover_streams(tap_instance)
-        self.test_assertions.assert_true(
-            condition=discovery_result.is_success,
-            message="Stream discovery should succeed",
-        )
-        catalog_result = self.tap_abstractions.generate_catalog(tap_instance)
-        self.test_assertions.assert_true(
-            condition=catalog_result.is_success,
-            message="Catalog generation should succeed",
-        )
-        sync_result = self.tap_abstractions.sync_stream(tap_instance, "users")
-        self.test_assertions.assert_true(
-            condition=sync_result.is_success,
-            message="Stream sync should succeed",
-        )
+        if create_result.is_failure:
+            msg = create_result.error or "Tap creation should succeed"
+            raise AssertionError(msg)
+        tap_instance = create_result.value
+        with patch.object(
+            FlextMeltanoAbstractions,
+            "_run_meltano",
+            side_effect=[
+                r[str].ok("users\norders"),
+                r[str].ok("users\norders"),
+                r[str].ok("sync ok"),
+            ],
+        ):
+            discovery_result = self.tap_abstractions.discover_streams(tap_instance)
+            self.test_assertions.assert_true(
+                condition=discovery_result.is_success,
+                message="Stream discovery should succeed",
+            )
+            catalog_result = self.tap_abstractions.generate_catalog(tap_instance)
+            self.test_assertions.assert_true(
+                condition=catalog_result.is_success,
+                message="Catalog generation should succeed",
+            )
+            sync_result = self.tap_abstractions.sync_stream(tap_instance, "users")
+            self.test_assertions.assert_true(
+                condition=sync_result.is_success,
+                message="Stream sync should succeed",
+            )
 
     def test_execute_returns_config_status(self) -> None:
         """Test execute returns configuration status dict."""

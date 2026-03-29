@@ -13,12 +13,17 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano._protocols.cli import FlextMeltanoProtocolsBase
     from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
     from flext_meltano._protocols.project import FlextMeltanoProtocolsProject
     from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
     from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextMeltanoProtocolsBase": [
+        "flext_meltano._protocols.cli",
+        "FlextMeltanoProtocolsBase",
+    ],
     "FlextMeltanoProtocolsPlugin": [
         "flext_meltano._protocols.plugin",
         "FlextMeltanoProtocolsPlugin",
@@ -38,6 +43,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
 }
 
 __all__ = [
+    "FlextMeltanoProtocolsBase",
     "FlextMeltanoProtocolsPlugin",
     "FlextMeltanoProtocolsProject",
     "FlextMeltanoProtocolsServices",

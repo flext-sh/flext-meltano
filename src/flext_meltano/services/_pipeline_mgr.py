@@ -13,9 +13,11 @@ from flext_core import FlextLogger, r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano import c, m, t
+from flext_meltano.services._pipeline_lifecycle import (
+    FlextMeltanoPipelineLifecycleOperations,
+)
 from flext_meltano.services._pipeline_ops import (
-    _PipelineCrudOperations,
-    _PipelineLifecycleOperations,
+    FlextMeltanoPipelineCrudOperations,
 )
 
 
@@ -26,8 +28,8 @@ class _PipelineCli(Protocol):
 
 
 class FlextMeltanoPipelineManager(
-    _PipelineCrudOperations,
-    _PipelineLifecycleOperations,
+    FlextMeltanoPipelineCrudOperations,
+    FlextMeltanoPipelineLifecycleOperations,
 ):
     """Pipeline manager for FLEXT Meltano CLI.
 

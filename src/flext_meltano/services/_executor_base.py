@@ -23,7 +23,7 @@ from flext_meltano import (
 )
 
 
-class _FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
+class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
     service_name: str = "FlextMeltanoExecutor"
