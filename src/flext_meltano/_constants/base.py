@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Final
 
 from flext_cli import FlextCliConstants
+from pydantic import ValidationError
 
 
 class FlextMeltanoConstantsBase:
@@ -92,12 +93,24 @@ class FlextMeltanoConstantsBase:
         MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
 
     class Singer:
-        """Singer protocol message metadata."""
+        """Singer protocol message metadata and shared constants."""
 
         MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
         MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
         MESSAGE_TYPE_STATE: Final[str] = "STATE"
+        MESSAGE_TYPE_ACTIVATE_VERSION: Final[str] = "ACTIVATE_VERSION"
         MESSAGE_TYPE_METRIC: Final[str] = "METRIC"
+
+        SAFE_EXCEPTIONS: Final[tuple[type[Exception], ...]] = (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+            ValidationError,
+        )
 
     class Dbt:
         """DBT transformation constants."""

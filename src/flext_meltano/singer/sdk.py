@@ -1,19 +1,21 @@
-"""Canonical Singer SDK bridge owned by flext-meltano."""
+"""Singer SDK bridge — delegates to m.Meltano.Singer* namespace classes.
+
+Kept as thin re-export module for backward compatibility during migration.
+Canonical access is via m.Meltano.SingerTapBase, m.Meltano.SingerTargetBase, etc.
+"""
 
 from __future__ import annotations
 
 from collections.abc import Sequence
 
-from singer_sdk import Sink
-from singer_sdk.helpers.types import Context, Record
-from singer_sdk.streams import Stream
-from singer_sdk.tap_base import Tap
+from flext_meltano._models.singer_sdk import FlextMeltanoModelsSingerSdk
 
-FlextMeltanoSingerContext = Context
-FlextMeltanoSingerRecord = Record
-FlextMeltanoSingerSinkBase = Sink
-FlextMeltanoSingerStreamBase = Stream
-FlextMeltanoSingerTapBase = Tap
+FlextMeltanoSingerContext = FlextMeltanoModelsSingerSdk.SingerContext
+FlextMeltanoSingerRecord = FlextMeltanoModelsSingerSdk.SingerRecord
+FlextMeltanoSingerSinkBase = FlextMeltanoModelsSingerSdk.SingerSinkBase
+FlextMeltanoSingerStreamBase = FlextMeltanoModelsSingerSdk.SingerStreamBase
+FlextMeltanoSingerTapBase = FlextMeltanoModelsSingerSdk.SingerTapBase
+FlextMeltanoSingerTargetBase = FlextMeltanoModelsSingerSdk.SingerTargetBase
 
 __all__: Sequence[str] = [
     "FlextMeltanoSingerContext",
@@ -21,4 +23,5 @@ __all__: Sequence[str] = [
     "FlextMeltanoSingerSinkBase",
     "FlextMeltanoSingerStreamBase",
     "FlextMeltanoSingerTapBase",
+    "FlextMeltanoSingerTargetBase",
 ]

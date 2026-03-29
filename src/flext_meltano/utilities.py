@@ -12,6 +12,7 @@ from flext_cli import FlextCliUtilities
 from flext_meltano._utilities import (
     FlextMeltanoUtilitiesConfig,
     FlextMeltanoUtilitiesProject,
+    FlextMeltanoUtilitiesSinger,
     FlextMeltanoUtilitiesYaml,
 )
 
@@ -27,11 +28,13 @@ class FlextMeltanoUtilities(FlextCliUtilities):
         FlextMeltanoUtilitiesYaml,
         FlextMeltanoUtilitiesConfig,
         FlextMeltanoUtilitiesProject,
+        FlextMeltanoUtilitiesSinger,
     ):
-        """Plugin-related utility methods.
+        """Meltano domain utility methods.
 
-        NOTE: These methods were moved from constants.py to follow
-        FLEXT pattern: constants contain ONLY pure constants, no methods.
+        Includes Singer protocol utilities (message emission, stdin
+        processing, catalog construction) alongside config, project,
+        and YAML utilities.
         """
 
 

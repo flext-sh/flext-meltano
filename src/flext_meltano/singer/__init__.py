@@ -32,6 +32,7 @@ if TYPE_CHECKING:
         FlextMeltanoSingerSinkBase,
         FlextMeltanoSingerStreamBase,
         FlextMeltanoSingerTapBase,
+        FlextMeltanoSingerTargetBase,
     )
     from flext_meltano.singer.service import FlextMeltanoSingerService
     from flext_meltano.singer.state import FlextMeltanoStateManager
@@ -41,54 +42,19 @@ if TYPE_CHECKING:
     from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoCatalogManager": [
-        "flext_meltano.singer.catalog",
-        "FlextMeltanoCatalogManager",
-    ],
-    "FlextMeltanoSingerCliTranslator": [
-        "flext_meltano.singer.translator",
-        "FlextMeltanoSingerCliTranslator",
-    ],
-    "FlextMeltanoSingerContext": [
-        "flext_meltano.singer.sdk",
-        "FlextMeltanoSingerContext",
-    ],
-    "FlextMeltanoSingerRecord": [
-        "flext_meltano.singer.sdk",
-        "FlextMeltanoSingerRecord",
-    ],
-    "FlextMeltanoSingerService": [
-        "flext_meltano.singer.service",
-        "FlextMeltanoSingerService",
-    ],
-    "FlextMeltanoSingerSinkBase": [
-        "flext_meltano.singer.sdk",
-        "FlextMeltanoSingerSinkBase",
-    ],
-    "FlextMeltanoSingerStreamBase": [
-        "flext_meltano.singer.sdk",
-        "FlextMeltanoSingerStreamBase",
-    ],
-    "FlextMeltanoSingerTapBase": [
-        "flext_meltano.singer.sdk",
-        "FlextMeltanoSingerTapBase",
-    ],
-    "FlextMeltanoStateManager": [
-        "flext_meltano.singer.state",
-        "FlextMeltanoStateManager",
-    ],
-    "FlextMeltanoTapAbstractions": [
-        "flext_meltano.singer.tap",
-        "FlextMeltanoTapAbstractions",
-    ],
-    "FlextMeltanoTapSourceMixin": [
-        "flext_meltano.singer.tap_source",
-        "FlextMeltanoTapSourceMixin",
-    ],
-    "FlextMeltanoTargetAbstractions": [
-        "flext_meltano.singer.target",
-        "FlextMeltanoTargetAbstractions",
-    ],
+    "FlextMeltanoCatalogManager": ["flext_meltano.singer.catalog", "FlextMeltanoCatalogManager"],
+    "FlextMeltanoSingerCliTranslator": ["flext_meltano.singer.translator", "FlextMeltanoSingerCliTranslator"],
+    "FlextMeltanoSingerContext": ["flext_meltano.singer.sdk", "FlextMeltanoSingerContext"],
+    "FlextMeltanoSingerRecord": ["flext_meltano.singer.sdk", "FlextMeltanoSingerRecord"],
+    "FlextMeltanoSingerService": ["flext_meltano.singer.service", "FlextMeltanoSingerService"],
+    "FlextMeltanoSingerSinkBase": ["flext_meltano.singer.sdk", "FlextMeltanoSingerSinkBase"],
+    "FlextMeltanoSingerStreamBase": ["flext_meltano.singer.sdk", "FlextMeltanoSingerStreamBase"],
+    "FlextMeltanoSingerTapBase": ["flext_meltano.singer.sdk", "FlextMeltanoSingerTapBase"],
+    "FlextMeltanoSingerTargetBase": ["flext_meltano.singer.sdk", "FlextMeltanoSingerTargetBase"],
+    "FlextMeltanoStateManager": ["flext_meltano.singer.state", "FlextMeltanoStateManager"],
+    "FlextMeltanoTapAbstractions": ["flext_meltano.singer.tap", "FlextMeltanoTapAbstractions"],
+    "FlextMeltanoTapSourceMixin": ["flext_meltano.singer.tap_source", "FlextMeltanoTapSourceMixin"],
+    "FlextMeltanoTargetAbstractions": ["flext_meltano.singer.target", "FlextMeltanoTargetAbstractions"],
 }
 
 __all__ = [
@@ -100,6 +66,7 @@ __all__ = [
     "FlextMeltanoSingerSinkBase",
     "FlextMeltanoSingerStreamBase",
     "FlextMeltanoSingerTapBase",
+    "FlextMeltanoSingerTargetBase",
     "FlextMeltanoStateManager",
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTapSourceMixin",
