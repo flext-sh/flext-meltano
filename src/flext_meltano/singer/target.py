@@ -74,7 +74,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
     def create_flext_target(
         self,
-        sink_config: m.Meltano.DataSinkConfig | t.Dict,
+        sink_config: m.Meltano.DataSinkConfig | t.ContainerMapping,
     ) -> r[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration.
 
@@ -87,14 +87,10 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
         """
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
-                if isinstance(sink_config, dict):
-                    payload_dict = dict(sink_config)
-                else:
-                    payload_dict = sink_config.root
                 config: m.Meltano.DataSinkConfig = (
-                    m.Meltano.DataSinkConfig.model_validate(payload_dict)
+                    m.Meltano.DataSinkConfig.model_validate(dict(sink_config))
                 )
-            except Exception as e:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
         else:
             config = sink_config

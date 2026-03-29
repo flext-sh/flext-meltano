@@ -91,7 +91,6 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         connection_config: t.ConfigurationMapping,
         stream_config: t.ConfigurationMapping | None = None,
         tap_version: str = "1.0.0",
-        _version: str | None = None,
     ) -> r[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""
         try:

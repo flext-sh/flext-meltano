@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from typing import Protocol
 
 from flext_core import FlextLogger, r
 
@@ -22,33 +21,10 @@ from flext_meltano.services._cli_small_managers import (
 from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
 
 
-class _SingerCli(Protocol):
-    """Protocol for Singer CLI help display."""
-
-    def show_tap_help(self) -> None: ...
-    def show_target_help(self) -> None: ...
-
-
-class _CommandRouterCli(Protocol):
-    """Protocol for command router CLI integration."""
-
-    @property
-    def pipeline_manager(self) -> p.Meltano.CLIManager: ...
-    @property
-    def singer_manager(self) -> p.Meltano.SingerManager: ...
-    @property
-    def dbt_manager(self) -> p.Meltano.CLIManager: ...
-    @property
-    def plugin_manager(self) -> p.Meltano.CLIManager: ...
-    @property
-    def status_manager(self) -> p.Meltano.StatusManager: ...
-    def show_banner(self) -> None: ...
-
-
 class FlextMeltanoCommandRouter:
     """Routes CLI commands to appropriate handlers."""
 
-    def __init__(self, cli: _CommandRouterCli) -> None:
+    def __init__(self, cli: p.Meltano.CommandRouterCli) -> None:
         """Initialize command router with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -104,7 +80,7 @@ class FlextMeltanoCommandRouter:
 class FlextMeltanoSingerManager:
     """Handle Singer tap/target CLI commands."""
 
-    def __init__(self, cli: _SingerCli) -> None:
+    def __init__(self, cli: p.Meltano.SingerCli) -> None:
         """Initialize Singer manager with CLI reference."""
         super().__init__()
         self.cli = cli

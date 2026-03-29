@@ -1,7 +1,7 @@
 """Singer Tap Protocol Implementation for FLEXT Meltano.
 
 Concrete operations only — abstract contracts live in p.Meltano.Singer.*
-protocols. NotImplementedError stubs removed per AGENTS.md §3.4.
+protocols.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

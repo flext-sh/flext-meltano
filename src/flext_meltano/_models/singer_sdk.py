@@ -9,6 +9,8 @@ Access pattern: m.Meltano.SingerTapBase, m.Meltano.SingerTargetBase, etc.
 
 from __future__ import annotations
 
+from abc import ABC
+
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record
 from singer_sdk.streams import Stream
@@ -24,9 +26,20 @@ class FlextMeltanoModelsSingerSdk:
     instead of importing singer_sdk directly.
     """
 
-    SingerTapBase = Tap
-    SingerSinkBase = Sink
-    SingerStreamBase = Stream
-    SingerTargetBase = Target
-    SingerContext = Context
-    SingerRecord = Record
+    class SingerTapBase(Tap):
+        pass
+
+    class SingerSinkBase(Sink, ABC):
+        pass
+
+    class SingerStreamBase(Stream, ABC):
+        pass
+
+    class SingerTargetBase(Target):
+        pass
+
+    class SingerContext(Context):
+        pass
+
+    class SingerRecord(Record):
+        pass

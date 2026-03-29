@@ -7,29 +7,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Protocol
 
 from flext_core import FlextLogger, r
 
-from flext_meltano import t
-
-
-class _DbtCli(Protocol):
-    """Protocol for DBT CLI help display."""
-
-    def show_dbt_help(self) -> None: ...
-
-
-class _PluginCli(Protocol):
-    """Protocol for plugin CLI help display."""
-
-    def show_plugin_help(self) -> None: ...
-
-
-class _StatusCli(Protocol):
-    """Protocol for status CLI help display."""
-
-    def show_status_help(self) -> None: ...
+from flext_meltano import p, t
 
 
 class _FlextMeltanoSimpleCommandManager:
@@ -60,7 +41,7 @@ class _FlextMeltanoSimpleCommandManager:
 class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     """Handle DBT CLI commands."""
 
-    def __init__(self, cli: _DbtCli) -> None:
+    def __init__(self, cli: p.Meltano.DbtCli) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -79,7 +60,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
 class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     """Handle plugin CLI commands."""
 
-    def __init__(self, cli: _PluginCli) -> None:
+    def __init__(self, cli: p.Meltano.PluginCli) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -98,7 +79,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
 class FlextMeltanoStatusManager:
     """Handle status and monitoring CLI commands."""
 
-    def __init__(self, cli: _StatusCli) -> None:
+    def __init__(self, cli: p.Meltano.StatusCli) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()
         self.cli = cli

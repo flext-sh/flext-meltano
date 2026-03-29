@@ -10,7 +10,6 @@ from collections.abc import Callable, Mapping, Sequence
 from typing import Protocol
 
 from flext_core import FlextLogger, r
-from flext_infra import FlextInfraUtilitiesSubprocess
 
 from flext_meltano import c, m, t
 from flext_meltano.services._pipeline_lifecycle import (
@@ -147,32 +146,6 @@ class FlextMeltanoPipelineManager(
             return r[str].fail(result.error)
         self.logger.info("Configured pipelines", pipelines=", ".join(result.value))
         return r[str].ok(", ".join(result.value) or "none")
-
-    def _run_meltano_command(self, command: t.StrSequence) -> r[str]:
-        runner = FlextInfraUtilitiesSubprocess()
-        run_result = runner.run_raw(command)
-        if run_result.is_failure:
-            error_msg = run_result.error or "Unknown error"
-            if "FileNotFoundError" in error_msg or "not found" in error_msg.lower():
-                return r[str].fail("Meltano CLI executable not found")
-            return r[str].fail(f"Failed to execute Meltano CLI command: {error_msg}")
-        completed = run_result.value
-        if completed.exit_code != 0:
-            command_error = completed.stderr.strip() or completed.stdout.strip()
-            if not command_error:
-                command_error = (
-                    f"Meltano command failed with exit code {completed.exit_code}"
-                )
-            self.logger.error(
-                "Meltano pipeline command failed",
-                command=" ".join(command),
-                exit_code=completed.exit_code,
-                stderr=completed.stderr,
-            )
-            return r[str].fail(command_error)
-        if completed.stdout.strip():
-            self.logger.info(completed.stdout.strip())
-        return r[str].ok(completed.stdout.strip() or "executed")
 
     def _run_pipeline(self, _args: t.StrSequence) -> r[str]:
         """Run pipeline."""

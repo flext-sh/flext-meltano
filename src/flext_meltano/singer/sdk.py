@@ -1,6 +1,8 @@
 """Singer SDK bridge — delegates to m.Meltano.Singer* namespace classes.
 
-Kept as thin re-export module for backward compatibility during migration.
+Module-level aliases exist for lazy-import registration: the root __init__.py
+and singer/__init__.py both reference ``flext_meltano.singer.sdk.<Name>`` in
+their _LAZY_IMPORTS tables. Removing these aliases would break lazy loading.
 Canonical access is via m.Meltano.SingerTapBase, m.Meltano.SingerTargetBase, etc.
 """
 
