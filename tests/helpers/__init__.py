@@ -24,29 +24,16 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from tests.helpers import docker_test_manager as docker_test_manager
-    from tests.helpers.docker_test_manager import (
-        ContainerManager as ContainerManager,
-        Tk as Tk,
-        docker_manager as docker_manager,
-        docker_services as docker_services,
-    )
+    from tests.helpers import docker_test_manager
+    from tests.helpers.docker_test_manager import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "ContainerManager": ["tests.helpers.docker_test_manager", "ContainerManager"],
-    "Tk": ["tests.helpers.docker_test_manager", "Tk"],
-    "docker_manager": ["tests.helpers.docker_test_manager", "docker_manager"],
-    "docker_services": ["tests.helpers.docker_test_manager", "docker_services"],
-    "docker_test_manager": ["tests.helpers.docker_test_manager", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "ContainerManager": "tests.helpers.docker_test_manager",
+    "Tk": "tests.helpers.docker_test_manager",
+    "docker_manager": "tests.helpers.docker_test_manager",
+    "docker_services": "tests.helpers.docker_test_manager",
+    "docker_test_manager": "tests.helpers.docker_test_manager",
 }
 
-_EXPORTS: Sequence[str] = [
-    "ContainerManager",
-    "Tk",
-    "docker_manager",
-    "docker_services",
-    "docker_test_manager",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))

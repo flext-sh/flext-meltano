@@ -19,39 +19,19 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano.dbt import (
-        project as project,
-        runner as runner,
-        service as service,
-    )
-    from flext_meltano.dbt.project import (
-        FlextMeltanoDbtProjectManager as FlextMeltanoDbtProjectManager,
-    )
-    from flext_meltano.dbt.runner import FlextMeltanoDbtRunner as FlextMeltanoDbtRunner
-    from flext_meltano.dbt.service import (
-        FlextMeltanoDbtService as FlextMeltanoDbtService,
-    )
+    from flext_meltano.dbt import project, runner, service
+    from flext_meltano.dbt.project import *
+    from flext_meltano.dbt.runner import *
+    from flext_meltano.dbt.service import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoDbtProjectManager": [
-        "flext_meltano.dbt.project",
-        "FlextMeltanoDbtProjectManager",
-    ],
-    "FlextMeltanoDbtRunner": ["flext_meltano.dbt.runner", "FlextMeltanoDbtRunner"],
-    "FlextMeltanoDbtService": ["flext_meltano.dbt.service", "FlextMeltanoDbtService"],
-    "project": ["flext_meltano.dbt.project", ""],
-    "runner": ["flext_meltano.dbt.runner", ""],
-    "service": ["flext_meltano.dbt.service", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "FlextMeltanoDbtProjectManager": "flext_meltano.dbt.project",
+    "FlextMeltanoDbtRunner": "flext_meltano.dbt.runner",
+    "FlextMeltanoDbtService": "flext_meltano.dbt.service",
+    "project": "flext_meltano.dbt.project",
+    "runner": "flext_meltano.dbt.runner",
+    "service": "flext_meltano.dbt.service",
 }
 
-_EXPORTS: Sequence[str] = [
-    "FlextMeltanoDbtProjectManager",
-    "FlextMeltanoDbtRunner",
-    "FlextMeltanoDbtService",
-    "project",
-    "runner",
-    "service",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))

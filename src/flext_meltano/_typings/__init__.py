@@ -11,47 +11,19 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano._typings import (
-        base as base,
-        domains as domains,
-        singer as singer,
-    )
-    from flext_meltano._typings.base import (
-        FlextMeltanoTypingsBase as FlextMeltanoTypingsBase,
-    )
-    from flext_meltano._typings.domains import (
-        FlextMeltanoTypingsDomains as FlextMeltanoTypingsDomains,
-    )
-    from flext_meltano._typings.singer import (
-        FlextMeltanoTypingsSinger as FlextMeltanoTypingsSinger,
-    )
+    from flext_meltano._typings import base, domains, singer
+    from flext_meltano._typings.base import *
+    from flext_meltano._typings.domains import *
+    from flext_meltano._typings.singer import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextMeltanoTypingsBase": [
-        "flext_meltano._typings.base",
-        "FlextMeltanoTypingsBase",
-    ],
-    "FlextMeltanoTypingsDomains": [
-        "flext_meltano._typings.domains",
-        "FlextMeltanoTypingsDomains",
-    ],
-    "FlextMeltanoTypingsSinger": [
-        "flext_meltano._typings.singer",
-        "FlextMeltanoTypingsSinger",
-    ],
-    "base": ["flext_meltano._typings.base", ""],
-    "domains": ["flext_meltano._typings.domains", ""],
-    "singer": ["flext_meltano._typings.singer", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "FlextMeltanoTypingsBase": "flext_meltano._typings.base",
+    "FlextMeltanoTypingsDomains": "flext_meltano._typings.domains",
+    "FlextMeltanoTypingsSinger": "flext_meltano._typings.singer",
+    "base": "flext_meltano._typings.base",
+    "domains": "flext_meltano._typings.domains",
+    "singer": "flext_meltano._typings.singer",
 }
 
-_EXPORTS: Sequence[str] = [
-    "FlextMeltanoTypingsBase",
-    "FlextMeltanoTypingsDomains",
-    "FlextMeltanoTypingsSinger",
-    "base",
-    "domains",
-    "singer",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
