@@ -1,15 +1,16 @@
 """Singer SDK base class re-exports inside m.Meltano namespace.
 
 Absorbs the loose module-level aliases from singer/sdk.py into a proper
-namespace class per AGENTS.md §2.2. Follows the same flat naming pattern
-as FlextMeltanoModelsSinger (SingerSchemaMessage, SingerRecordMessage, etc.)
+namespace class per AGENTS.md §2.2.
+
+Base classes (Tap, Sink, Stream, Target) are re-exported as-is via assignment
+so consumers can subclass them. Type aliases (Context, Record) are also
+direct assignments to preserve identity with singer_sdk originals.
 
 Access pattern: m.Meltano.SingerTapBase, m.Meltano.SingerTargetBase, etc.
 """
 
 from __future__ import annotations
-
-from abc import ABC
 
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record
@@ -26,20 +27,9 @@ class FlextMeltanoModelsSingerSdk:
     instead of importing singer_sdk directly.
     """
 
-    class SingerTapBase(Tap):
-        pass
-
-    class SingerSinkBase(Sink, ABC):
-        pass
-
-    class SingerStreamBase(Stream, ABC):
-        pass
-
-    class SingerTargetBase(Target):
-        pass
-
-    class SingerContext(Context):
-        pass
-
-    class SingerRecord(Record):
-        pass
+    SingerTapBase = Tap
+    SingerSinkBase = Sink
+    SingerStreamBase = Stream
+    SingerTargetBase = Target
+    SingerContext = Context
+    SingerRecord = Record
