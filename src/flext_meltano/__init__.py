@@ -10,6 +10,17 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
+from flext_meltano.__version__ import (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
+)
+
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
     from flext_core import FlextTypes
@@ -23,16 +34,6 @@ if TYPE_CHECKING:
         dbt,
         services,
         singer,
-    )
-    from flext_meltano.__version__ import (
-        __author__,
-        __author_email__,
-        __description__,
-        __license__,
-        __title__,
-        __url__,
-        __version__,
-        __version_info__,
     )
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
     from flext_meltano._constants.config import FlextMeltanoConstantsConfig
@@ -467,14 +468,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "OPERATION_ERRORS",
     ],
     "SingerTargetHandler": ["flext_meltano._utilities.singer", "SingerTargetHandler"],
-    "__author__": ["flext_meltano.__version__", "__author__"],
-    "__author_email__": ["flext_meltano.__version__", "__author_email__"],
-    "__description__": ["flext_meltano.__version__", "__description__"],
-    "__license__": ["flext_meltano.__version__", "__license__"],
-    "__title__": ["flext_meltano.__version__", "__title__"],
-    "__url__": ["flext_meltano.__version__", "__url__"],
-    "__version__": ["flext_meltano.__version__", "__version__"],
-    "__version_info__": ["flext_meltano.__version__", "__version_info__"],
     "_constants": ["flext_meltano._constants", ""],
     "_models": ["flext_meltano._models", ""],
     "_protocols": ["flext_meltano._protocols", ""],
