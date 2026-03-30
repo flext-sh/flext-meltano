@@ -65,12 +65,12 @@ class FlextMeltanoUtilitiesSinger:
 
             """
             try:
-                msg = m.Meltano.SingerSchemaMessage(
-                    stream=stream_name,
-                    schema=schema,
-                    key_properties=list(key_properties),
-                    bookmark_properties=list(bookmark_properties or []),
-                )
+                msg = m.Meltano.SingerSchemaMessage.model_validate({
+                    "stream": stream_name,
+                    "schema": schema,
+                    "key_properties": list(key_properties),
+                    "bookmark_properties": list(bookmark_properties or []),
+                })
                 line = msg.model_dump_json(by_alias=True)
                 sys.stdout.write(line + "\n")
                 sys.stdout.flush()
@@ -224,17 +224,17 @@ class FlextMeltanoUtilitiesSinger:
                         ),
                     },
                 )
-                entry = m.Meltano.SingerCatalogEntry(
-                    tap_stream_id=stream_name,
-                    stream=stream_name,
-                    schema=schema,
-                    key_properties=list(key_properties),
-                    metadata=[metadata_entry],
-                    replication_key=replication_key,
-                    replication_method="INCREMENTAL"
+                entry = m.Meltano.SingerCatalogEntry.model_validate({
+                    "tap_stream_id": stream_name,
+                    "stream": stream_name,
+                    "schema": schema,
+                    "key_properties": list(key_properties),
+                    "metadata": [metadata_entry],
+                    "replication_key": replication_key,
+                    "replication_method": "INCREMENTAL"
                     if replication_key
                     else "FULL_TABLE",
-                )
+                })
                 return r[m.Meltano.SingerCatalogEntry].ok(entry)
             except c.Meltano.Singer.SAFE_EXCEPTIONS as e:
                 return r[m.Meltano.SingerCatalogEntry].fail(
