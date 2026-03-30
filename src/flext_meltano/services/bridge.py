@@ -31,7 +31,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         """Discover installed Meltano plugins via CLI."""
         try:
             proc = subprocess.run(
-                ["meltano", "list"],  # noqa: S607
+                ["meltano", "list"],
                 capture_output=True,
                 text=True,
                 timeout=30,
@@ -97,7 +97,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         """Get Meltano version via CLI."""
         try:
             proc = subprocess.run(
-                ["meltano", "version"],  # noqa: S607
+                ["meltano", "version"],
                 capture_output=True,
                 text=True,
                 timeout=15,
@@ -114,7 +114,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         """Validate connection to Meltano CLI by running version check."""
         try:
             proc = subprocess.run(
-                ["meltano", "version"],  # noqa: S607
+                ["meltano", "version"],
                 capture_output=True,
                 text=True,
                 timeout=10,

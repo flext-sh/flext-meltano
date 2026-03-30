@@ -47,7 +47,7 @@ class FlextMeltanoPipelineAdapter(s[t.Meltano.ExecutionResultDict]):
                 )
             start = time.monotonic()
             proc = subprocess.run(
-                ["meltano", "elt", tap_name, target_name],  # noqa: S607
+                ["meltano", "elt", tap_name, target_name],
                 capture_output=True,
                 text=True,
                 timeout=300,
@@ -99,7 +99,7 @@ class FlextMeltanoDbtAdapter(s[t.Meltano.DbtResultDict]):
         try:
             start = time.monotonic()
             proc = subprocess.run(
-                ["meltano", "invoke", "dbt-postgres:run"],  # noqa: S607
+                ["meltano", "invoke", "dbt-postgres:run"],
                 capture_output=True,
                 text=True,
                 timeout=600,

@@ -45,7 +45,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             try:
                 project_path = Path(project_dir) / project_name
                 proc = subprocess.run(
-                    ["meltano", "init", project_name],  # noqa: S607
+                    ["meltano", "init", project_name],
                     capture_output=True,
                     text=True,
                     cwd=str(project_dir),
@@ -116,7 +116,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             """Discover available plugins via Meltano CLI."""
             try:
                 proc = subprocess.run(
-                    ["meltano", "list"],  # noqa: S607
+                    ["meltano", "list"],
                     capture_output=True,
                     text=True,
                     timeout=30,

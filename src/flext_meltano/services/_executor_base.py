@@ -50,7 +50,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         """Get version information from Meltano CLI."""
         try:
             proc = subprocess.run(
-                ["meltano", "version"],  # noqa: S607
+                ["meltano", "version"],
                 capture_output=True,
                 text=True,
                 timeout=10,

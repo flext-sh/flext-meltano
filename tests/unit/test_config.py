@@ -32,7 +32,7 @@ _MELTANO_ENV_VARS = (
 
 
 @pytest.fixture(autouse=True)
-def _clean_meltano_env(monkeypatch: pytest.MonkeyPatch) -> None:  # pyright: ignore[reportUnusedFunction]
+def _clean_meltano_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Remove Meltano env vars so pydantic-settings doesn't override init kwargs."""
     for var in _MELTANO_ENV_VARS:
         monkeypatch.delenv(var, raising=False)
