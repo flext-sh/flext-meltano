@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
 from flext_core import r
 from flext_tests import tm
 
@@ -27,11 +26,12 @@ class TestFlextMeltanoLibraryRunner:
         tm.that(runner, none=False)
         tm.that(hasattr(runner, "logger"), eq=True)
 
-    def test_execute_raises_not_implemented(self) -> None:
-        """Test execute raises NotImplementedError (requires meltano-core SDK)."""
+    def test_execute_returns_failure(self) -> None:
+        """Test execute returns r[T].fail (requires meltano-core SDK)."""
         runner = FlextMeltanoLibraryRunner()
-        with pytest.raises(NotImplementedError, match="meltano-core SDK"):
-            runner.execute()
+        result = runner.execute()
+        tm.that(result.is_failure, eq=True)
+        tm.that("meltano-core SDK" in (result.error or ""), eq=True)
 
     def test_execute_complete_elt_pipeline(self) -> None:
         """Test complete E-L-T pipeline execution delegates to subprocess."""
