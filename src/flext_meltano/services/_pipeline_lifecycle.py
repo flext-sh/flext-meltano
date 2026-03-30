@@ -15,8 +15,7 @@ from pathlib import Path
 
 from flext_core import r
 
-from flext_meltano import u
-from flext_meltano.services._pipeline_ops import FlextMeltanoPipelinePaths
+from flext_meltano import FlextMeltanoPipelinePaths, u
 
 
 class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):

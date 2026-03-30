@@ -11,12 +11,12 @@ from typing import Protocol
 
 from flext_core import FlextLogger, r
 
-from flext_meltano import c, m, t
-from flext_meltano.services._pipeline_lifecycle import (
-    FlextMeltanoPipelineLifecycleOperations,
-)
-from flext_meltano.services._pipeline_ops import (
+from flext_meltano import (
     FlextMeltanoPipelineCrudOperations,
+    FlextMeltanoPipelineLifecycleOperations,
+    c,
+    m,
+    t,
 )
 
 

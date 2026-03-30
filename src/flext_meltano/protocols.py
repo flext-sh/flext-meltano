@@ -9,13 +9,13 @@ from __future__ import annotations
 
 from flext_cli import FlextCliProtocols
 
-from flext_meltano._protocols import (
+from flext_meltano import (
+    FlextMeltanoProtocolsBase,
     FlextMeltanoProtocolsPlugin,
     FlextMeltanoProtocolsProject,
     FlextMeltanoProtocolsServices,
     FlextMeltanoProtocolsSinger,
 )
-from flext_meltano._protocols.cli import FlextMeltanoProtocolsBase
 
 
 class FlextMeltanoProtocols(FlextCliProtocols):

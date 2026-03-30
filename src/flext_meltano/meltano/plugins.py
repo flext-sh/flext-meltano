@@ -10,12 +10,12 @@ from typing import override
 
 from flext_meltano import (
     FlextMeltanoAbstractions,
+    FlextMeltanoPluginDiscoveryMixin,
     FlextMeltanoServiceBase,
     p,
     r,
     t,
 )
-from flext_meltano.meltano.plugin_discovery import FlextMeltanoPluginDiscoveryMixin
 
 
 class FlextMeltanoComponentService(

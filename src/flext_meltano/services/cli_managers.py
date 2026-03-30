@@ -12,13 +12,15 @@ from collections.abc import Callable, Mapping
 
 from flext_core import FlextLogger, r
 
-from flext_meltano import c, p, t
-from flext_meltano.services._cli_small_managers import (
+from flext_meltano import (
     FlextMeltanoDbtManager,
+    FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
     FlextMeltanoStatusManager,
+    c,
+    p,
+    t,
 )
-from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
 
 
 class FlextMeltanoCommandRouter:

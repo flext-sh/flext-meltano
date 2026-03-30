@@ -18,7 +18,7 @@ from unittest import mock
 from flext_core import FlextLogger, r
 from flext_tests import tm
 
-from flext_meltano.services.executor import (
+from flext_meltano import (
     FlextMeltanoExecutor,
 )
 from tests import t

@@ -8,8 +8,7 @@ from typing import Annotated, Self
 from flext_cli import FlextCliModels, u
 from pydantic import Field, computed_field, model_validator
 
-from flext_meltano import c, t
-from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano import FlextMeltanoModelsSources, c, t
 
 _INITIALIZED = c.Meltano.Enums.StreamStatus.INITIALIZED
 

@@ -15,7 +15,10 @@ from typing import ClassVar, override
 from flext_core import r
 
 from flext_meltano import (
+    FlextMeltanoAbstractions,
     FlextMeltanoAdapter,
+    FlextMeltanoBridge,
+    FlextMeltanoExecutor,
     FlextMeltanoFileManagers,
     FlextMeltanoProjectService,
     FlextMeltanoService,
@@ -24,9 +27,6 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.bridge import FlextMeltanoBridge
-from flext_meltano.services.executor import FlextMeltanoExecutor
 
 
 class FlextMeltano(

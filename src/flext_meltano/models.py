@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from flext_cli import FlextCliModels
 
-from flext_meltano._models import (
+from flext_meltano import (
     FlextMeltanoModelsCliParams,
     FlextMeltanoModelsContext,
     FlextMeltanoModelsCore,

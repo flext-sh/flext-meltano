@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from flext_cli import FlextCliTypes
 
-from flext_meltano._typings import (
+from flext_meltano import (
     FlextMeltanoTypingsBase,
     FlextMeltanoTypingsDomains,
     FlextMeltanoTypingsSinger,

@@ -10,10 +10,12 @@ from collections.abc import Sequence
 
 from flext_core import r
 
-from flext_meltano import c, m, t
-from flext_meltano.services._abstractions_base import (
+from flext_meltano import (
     OPERATION_ERRORS,
     FlextMeltanoAbstractionsBase,
+    c,
+    m,
+    t,
 )
 
 

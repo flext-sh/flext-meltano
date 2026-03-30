@@ -25,7 +25,6 @@ if TYPE_CHECKING:
         singer,
     )
     from flext_meltano.__version__ import (
-        __all__,
         __author__,
         __author_email__,
         __description__,
@@ -468,7 +467,6 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "OPERATION_ERRORS",
     ],
     "SingerTargetHandler": ["flext_meltano._utilities.singer", "SingerTargetHandler"],
-    "__all__": ["flext_meltano.__version__", "__all__"],
     "__author__": ["flext_meltano.__version__", "__author__"],
     "__author_email__": ["flext_meltano.__version__", "__author_email__"],
     "__description__": ["flext_meltano.__version__", "__description__"],
@@ -592,7 +590,6 @@ __all__ = [
     "FlextMeltanoValidators",
     "FlextMeltanoYamlOperationsMixin",
     "SingerTargetHandler",
-    "__all__",
     "__author__",
     "__author_email__",
     "__description__",

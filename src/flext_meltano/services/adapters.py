@@ -15,10 +15,13 @@ from typing import override
 import meltano
 from flext_core import FlextSettings, r, s
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, t
-from flext_meltano.services.adapter_extensions import (
+from flext_meltano import (
     FlextMeltanoDbtAdapter,
     FlextMeltanoPipelineAdapter,
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    t,
 )
 
 

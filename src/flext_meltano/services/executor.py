@@ -8,8 +8,7 @@ from __future__ import annotations
 
 from flext_core import r
 
-from flext_meltano import c, t
-from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano import FlextMeltanoExecutorBase, c, t
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):

@@ -15,8 +15,7 @@ from typing import override
 from flext_cli import u
 from flext_core import FlextLogger, r
 
-from flext_meltano import FlextMeltanoServiceBase, c, t
-from flext_meltano.services.yaml_operations import FlextMeltanoYamlOperationsMixin
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoYamlOperationsMixin, c, t
 
 _module_logger = FlextLogger(__name__)
 

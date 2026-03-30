@@ -11,8 +11,7 @@ from __future__ import annotations
 
 from flext_core import r
 
-from flext_meltano import FlextMeltanoServiceBase, c, m
-from flext_meltano.singer.tap_source import FlextMeltanoTapSourceMixin
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoTapSourceMixin, c, m
 
 
 class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServiceBase):
