@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano._typings import base, domains, singer
     from flext_meltano._typings.base import FlextMeltanoTypingsBase
     from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
     from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
@@ -30,12 +31,18 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano._typings.singer",
         "FlextMeltanoTypingsSinger",
     ],
+    "base": ["flext_meltano._typings.base", ""],
+    "domains": ["flext_meltano._typings.domains", ""],
+    "singer": ["flext_meltano._typings.singer", ""],
 }
 
 __all__ = [
     "FlextMeltanoTypingsBase",
     "FlextMeltanoTypingsDomains",
     "FlextMeltanoTypingsSinger",
+    "base",
+    "domains",
+    "singer",
 ]
 
 

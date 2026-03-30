@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano._utilities import config, project, singer, yaml
     from flext_meltano._utilities.config import FlextMeltanoUtilitiesConfig
     from flext_meltano._utilities.project import FlextMeltanoUtilitiesProject
     from flext_meltano._utilities.singer import (
@@ -39,6 +40,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "FlextMeltanoUtilitiesYaml",
     ],
     "SingerTargetHandler": ["flext_meltano._utilities.singer", "SingerTargetHandler"],
+    "config": ["flext_meltano._utilities.config", ""],
+    "project": ["flext_meltano._utilities.project", ""],
+    "singer": ["flext_meltano._utilities.singer", ""],
+    "yaml": ["flext_meltano._utilities.yaml", ""],
 }
 
 __all__ = [
@@ -47,6 +52,10 @@ __all__ = [
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoUtilitiesYaml",
     "SingerTargetHandler",
+    "config",
+    "project",
+    "singer",
+    "yaml",
 ]
 
 

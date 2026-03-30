@@ -21,6 +21,14 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano.meltano import (
+        pipelines,
+        plugin_discovery,
+        plugins,
+        project,
+        runner,
+        service,
+    )
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugin_discovery import FlextMeltanoPluginDiscoveryMixin
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
@@ -60,6 +68,12 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.meltano.project",
         "FlextMeltanoProjectManager",
     ],
+    "pipelines": ["flext_meltano.meltano.pipelines", ""],
+    "plugin_discovery": ["flext_meltano.meltano.plugin_discovery", ""],
+    "plugins": ["flext_meltano.meltano.plugins", ""],
+    "project": ["flext_meltano.meltano.project", ""],
+    "runner": ["flext_meltano.meltano.runner", ""],
+    "service": ["flext_meltano.meltano.service", ""],
 }
 
 __all__ = [
@@ -70,6 +84,12 @@ __all__ = [
     "FlextMeltanoOrchestrationService",
     "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoProjectManager",
+    "pipelines",
+    "plugin_discovery",
+    "plugins",
+    "project",
+    "runner",
+    "service",
 ]
 
 

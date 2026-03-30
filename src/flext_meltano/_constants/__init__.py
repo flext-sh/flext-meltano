@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano._constants import base, config, enums
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
     from flext_meltano._constants.config import FlextMeltanoConstantsConfig
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
@@ -30,12 +31,18 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano._constants.enums",
         "FlextMeltanoConstantsEnums",
     ],
+    "base": ["flext_meltano._constants.base", ""],
+    "config": ["flext_meltano._constants.config", ""],
+    "enums": ["flext_meltano._constants.enums", ""],
 }
 
 __all__ = [
     "FlextMeltanoConstantsBase",
     "FlextMeltanoConstantsConfig",
     "FlextMeltanoConstantsEnums",
+    "base",
+    "config",
+    "enums",
 ]
 
 

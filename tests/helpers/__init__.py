@@ -26,6 +26,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from tests.helpers import docker_test_manager
     from tests.helpers.docker_test_manager import (
         ContainerManager,
         Tk,
@@ -38,6 +39,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "Tk": ["tests.helpers.docker_test_manager", "Tk"],
     "docker_manager": ["tests.helpers.docker_test_manager", "docker_manager"],
     "docker_services": ["tests.helpers.docker_test_manager", "docker_services"],
+    "docker_test_manager": ["tests.helpers.docker_test_manager", ""],
 }
 
 __all__ = [
@@ -45,6 +47,7 @@ __all__ = [
     "Tk",
     "docker_manager",
     "docker_services",
+    "docker_test_manager",
 ]
 
 

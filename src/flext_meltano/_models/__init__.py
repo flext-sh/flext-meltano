@@ -13,6 +13,28 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano._models import (
+        cli_params,
+        context,
+        core,
+        discovery,
+        instances,
+        instances_data,
+        logging_config,
+        payloads,
+        payloads_data,
+        projects,
+        projects_plugin,
+        results,
+        results_dbt,
+        results_pipeline,
+        singer,
+        singer_catalog,
+        singer_sdk,
+        sources,
+        sources_params,
+        transformations,
+    )
     from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
     from flext_meltano._models.context import FlextMeltanoModelsContext
     from flext_meltano._models.core import FlextMeltanoModelsCore
@@ -112,6 +134,26 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano._models.transformations",
         "FlextMeltanoModelsTransformations",
     ],
+    "cli_params": ["flext_meltano._models.cli_params", ""],
+    "context": ["flext_meltano._models.context", ""],
+    "core": ["flext_meltano._models.core", ""],
+    "discovery": ["flext_meltano._models.discovery", ""],
+    "instances": ["flext_meltano._models.instances", ""],
+    "instances_data": ["flext_meltano._models.instances_data", ""],
+    "logging_config": ["flext_meltano._models.logging_config", ""],
+    "payloads": ["flext_meltano._models.payloads", ""],
+    "payloads_data": ["flext_meltano._models.payloads_data", ""],
+    "projects": ["flext_meltano._models.projects", ""],
+    "projects_plugin": ["flext_meltano._models.projects_plugin", ""],
+    "results": ["flext_meltano._models.results", ""],
+    "results_dbt": ["flext_meltano._models.results_dbt", ""],
+    "results_pipeline": ["flext_meltano._models.results_pipeline", ""],
+    "singer": ["flext_meltano._models.singer", ""],
+    "singer_catalog": ["flext_meltano._models.singer_catalog", ""],
+    "singer_sdk": ["flext_meltano._models.singer_sdk", ""],
+    "sources": ["flext_meltano._models.sources", ""],
+    "sources_params": ["flext_meltano._models.sources_params", ""],
+    "transformations": ["flext_meltano._models.transformations", ""],
 }
 
 __all__ = [
@@ -135,6 +177,26 @@ __all__ = [
     "FlextMeltanoModelsSources",
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
+    "cli_params",
+    "context",
+    "core",
+    "discovery",
+    "instances",
+    "instances_data",
+    "logging_config",
+    "payloads",
+    "payloads_data",
+    "projects",
+    "projects_plugin",
+    "results",
+    "results_dbt",
+    "results_pipeline",
+    "singer",
+    "singer_catalog",
+    "singer_sdk",
+    "sources",
+    "sources_params",
+    "transformations",
 ]
 
 

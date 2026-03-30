@@ -31,13 +31,43 @@ if TYPE_CHECKING:
         _protocols,
         _typings,
         _utilities,
+        api,
+        base,
+        cli,
+        constants,
         dbt,
-        services,
-        singer,
+        models,
+        protocols,
+        settings,
+        typings,
+        utilities,
     )
+    from flext_meltano._constants import config, enums
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
     from flext_meltano._constants.config import FlextMeltanoConstantsConfig
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+    from flext_meltano._models import (
+        cli_params,
+        context,
+        core,
+        discovery,
+        instances,
+        instances_data,
+        logging_config,
+        payloads,
+        payloads_data,
+        projects,
+        projects_plugin,
+        results,
+        results_dbt,
+        results_pipeline,
+        singer,
+        singer_catalog,
+        singer_sdk,
+        sources,
+        sources_params,
+        transformations,
+    )
     from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
     from flext_meltano._models.context import FlextMeltanoModelsContext
     from flext_meltano._models.core import FlextMeltanoModelsCore
@@ -58,14 +88,17 @@ if TYPE_CHECKING:
     from flext_meltano._models.sources import FlextMeltanoModelsSources
     from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
     from flext_meltano._models.transformations import FlextMeltanoModelsTransformations
+    from flext_meltano._protocols import plugin, project, services
     from flext_meltano._protocols.cli import FlextMeltanoProtocolsBase
     from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
     from flext_meltano._protocols.project import FlextMeltanoProtocolsProject
     from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
     from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
+    from flext_meltano._typings import domains
     from flext_meltano._typings.base import FlextMeltanoTypingsBase
     from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
     from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
+    from flext_meltano._utilities import yaml
     from flext_meltano._utilities.config import FlextMeltanoUtilitiesConfig
     from flext_meltano._utilities.project import FlextMeltanoUtilitiesProject
     from flext_meltano._utilities.singer import (
@@ -80,9 +113,11 @@ if TYPE_CHECKING:
         FlextMeltanoConstants,
         FlextMeltanoConstants as c,
     )
+    from flext_meltano.dbt import runner, service
     from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
     from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
     from flext_meltano.dbt.service import FlextMeltanoDbtService
+    from flext_meltano.meltano import pipelines, plugin_discovery, plugins
     from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
     from flext_meltano.meltano.plugin_discovery import FlextMeltanoPluginDiscoveryMixin
     from flext_meltano.meltano.plugins import FlextMeltanoComponentService
@@ -96,6 +131,19 @@ if TYPE_CHECKING:
     from flext_meltano.protocols import (
         FlextMeltanoProtocols,
         FlextMeltanoProtocols as p,
+    )
+    from flext_meltano.services import (
+        abstractions,
+        adapter_extensions,
+        adapters,
+        bridge,
+        cli_managers,
+        executor,
+        file_managers,
+        library_runner,
+        project_service,
+        validators,
+        yaml_operations,
     )
     from flext_meltano.services._abstractions_base import (
         OPERATION_ERRORS,
@@ -133,6 +181,15 @@ if TYPE_CHECKING:
     from flext_meltano.services.validators import FlextMeltanoValidators
     from flext_meltano.services.yaml_operations import FlextMeltanoYamlOperationsMixin
     from flext_meltano.settings import FlextMeltanoSettings
+    from flext_meltano.singer import (
+        catalog,
+        sdk,
+        state,
+        tap,
+        tap_source,
+        target,
+        translator,
+    )
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
     from flext_meltano.singer.sdk import (
         FlextMeltanoSingerContext,
@@ -473,22 +530,79 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "_protocols": ["flext_meltano._protocols", ""],
     "_typings": ["flext_meltano._typings", ""],
     "_utilities": ["flext_meltano._utilities", ""],
+    "abstractions": ["flext_meltano.services.abstractions", ""],
+    "adapter_extensions": ["flext_meltano.services.adapter_extensions", ""],
+    "adapters": ["flext_meltano.services.adapters", ""],
+    "api": ["flext_meltano.api", ""],
+    "base": ["flext_meltano.base", ""],
+    "bridge": ["flext_meltano.services.bridge", ""],
     "c": ["flext_meltano.constants", "FlextMeltanoConstants"],
+    "catalog": ["flext_meltano.singer.catalog", ""],
+    "cli": ["flext_meltano.cli", ""],
+    "cli_managers": ["flext_meltano.services.cli_managers", ""],
+    "cli_params": ["flext_meltano._models.cli_params", ""],
+    "config": ["flext_meltano._constants.config", ""],
+    "constants": ["flext_meltano.constants", ""],
+    "context": ["flext_meltano._models.context", ""],
+    "core": ["flext_meltano._models.core", ""],
     "d": ["flext_cli", "d"],
     "dbt": ["flext_meltano.dbt", ""],
+    "discovery": ["flext_meltano._models.discovery", ""],
+    "domains": ["flext_meltano._typings.domains", ""],
     "e": ["flext_cli", "e"],
+    "enums": ["flext_meltano._constants.enums", ""],
+    "executor": ["flext_meltano.services.executor", ""],
+    "file_managers": ["flext_meltano.services.file_managers", ""],
     "h": ["flext_cli", "h"],
+    "instances": ["flext_meltano._models.instances", ""],
+    "instances_data": ["flext_meltano._models.instances_data", ""],
+    "library_runner": ["flext_meltano.services.library_runner", ""],
+    "logging_config": ["flext_meltano._models.logging_config", ""],
     "m": ["flext_meltano.models", "FlextMeltanoModels"],
     "main": ["flext_meltano.cli", "main"],
     "meltano": ["flext_meltano.api", "meltano"],
+    "models": ["flext_meltano.models", ""],
     "p": ["flext_meltano.protocols", "FlextMeltanoProtocols"],
+    "payloads": ["flext_meltano._models.payloads", ""],
+    "payloads_data": ["flext_meltano._models.payloads_data", ""],
+    "pipelines": ["flext_meltano.meltano.pipelines", ""],
+    "plugin": ["flext_meltano._protocols.plugin", ""],
+    "plugin_discovery": ["flext_meltano.meltano.plugin_discovery", ""],
+    "plugins": ["flext_meltano.meltano.plugins", ""],
+    "project": ["flext_meltano._protocols.project", ""],
+    "project_service": ["flext_meltano.services.project_service", ""],
+    "projects": ["flext_meltano._models.projects", ""],
+    "projects_plugin": ["flext_meltano._models.projects_plugin", ""],
+    "protocols": ["flext_meltano.protocols", ""],
     "r": ["flext_cli", "r"],
+    "results": ["flext_meltano._models.results", ""],
+    "results_dbt": ["flext_meltano._models.results_dbt", ""],
+    "results_pipeline": ["flext_meltano._models.results_pipeline", ""],
+    "runner": ["flext_meltano.dbt.runner", ""],
     "s": ["flext_cli", "s"],
-    "services": ["flext_meltano.services", ""],
-    "singer": ["flext_meltano.singer", ""],
+    "sdk": ["flext_meltano.singer.sdk", ""],
+    "service": ["flext_meltano.dbt.service", ""],
+    "services": ["flext_meltano._protocols.services", ""],
+    "settings": ["flext_meltano.settings", ""],
+    "singer": ["flext_meltano._models.singer", ""],
+    "singer_catalog": ["flext_meltano._models.singer_catalog", ""],
+    "singer_sdk": ["flext_meltano._models.singer_sdk", ""],
+    "sources": ["flext_meltano._models.sources", ""],
+    "sources_params": ["flext_meltano._models.sources_params", ""],
+    "state": ["flext_meltano.singer.state", ""],
     "t": ["flext_meltano.typings", "FlextMeltanoTypes"],
+    "tap": ["flext_meltano.singer.tap", ""],
+    "tap_source": ["flext_meltano.singer.tap_source", ""],
+    "target": ["flext_meltano.singer.target", ""],
+    "transformations": ["flext_meltano._models.transformations", ""],
+    "translator": ["flext_meltano.singer.translator", ""],
+    "typings": ["flext_meltano.typings", ""],
     "u": ["flext_meltano.utilities", "FlextMeltanoUtilities"],
+    "utilities": ["flext_meltano.utilities", ""],
+    "validators": ["flext_meltano.services.validators", ""],
     "x": ["flext_cli", "x"],
+    "yaml": ["flext_meltano._utilities.yaml", ""],
+    "yaml_operations": ["flext_meltano.services.yaml_operations", ""],
 }
 
 __all__ = [
@@ -596,22 +710,79 @@ __all__ = [
     "_protocols",
     "_typings",
     "_utilities",
+    "abstractions",
+    "adapter_extensions",
+    "adapters",
+    "api",
+    "base",
+    "bridge",
     "c",
+    "catalog",
+    "cli",
+    "cli_managers",
+    "cli_params",
+    "config",
+    "constants",
+    "context",
+    "core",
     "d",
     "dbt",
+    "discovery",
+    "domains",
     "e",
+    "enums",
+    "executor",
+    "file_managers",
     "h",
+    "instances",
+    "instances_data",
+    "library_runner",
+    "logging_config",
     "m",
     "main",
     "meltano",
+    "models",
     "p",
+    "payloads",
+    "payloads_data",
+    "pipelines",
+    "plugin",
+    "plugin_discovery",
+    "plugins",
+    "project",
+    "project_service",
+    "projects",
+    "projects_plugin",
+    "protocols",
     "r",
+    "results",
+    "results_dbt",
+    "results_pipeline",
+    "runner",
     "s",
+    "sdk",
+    "service",
     "services",
+    "settings",
     "singer",
+    "singer_catalog",
+    "singer_sdk",
+    "sources",
+    "sources_params",
+    "state",
     "t",
+    "tap",
+    "tap_source",
+    "target",
+    "transformations",
+    "translator",
+    "typings",
     "u",
+    "utilities",
+    "validators",
     "x",
+    "yaml",
+    "yaml_operations",
 ]
 
 

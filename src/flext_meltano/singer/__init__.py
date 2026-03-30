@@ -25,6 +25,16 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano.singer import (
+        catalog,
+        sdk,
+        service,
+        state,
+        tap,
+        tap_source,
+        target,
+        translator,
+    )
     from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
     from flext_meltano.singer.sdk import (
         FlextMeltanoSingerContext,
@@ -94,6 +104,14 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.singer.target",
         "FlextMeltanoTargetAbstractions",
     ],
+    "catalog": ["flext_meltano.singer.catalog", ""],
+    "sdk": ["flext_meltano.singer.sdk", ""],
+    "service": ["flext_meltano.singer.service", ""],
+    "state": ["flext_meltano.singer.state", ""],
+    "tap": ["flext_meltano.singer.tap", ""],
+    "tap_source": ["flext_meltano.singer.tap_source", ""],
+    "target": ["flext_meltano.singer.target", ""],
+    "translator": ["flext_meltano.singer.translator", ""],
 }
 
 __all__ = [
@@ -110,6 +128,14 @@ __all__ = [
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTapSourceMixin",
     "FlextMeltanoTargetAbstractions",
+    "catalog",
+    "sdk",
+    "service",
+    "state",
+    "tap",
+    "tap_source",
+    "target",
+    "translator",
 ]
 
 

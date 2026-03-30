@@ -20,6 +20,20 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_meltano.services import (
+        abstractions,
+        adapter_extensions,
+        adapters,
+        bridge,
+        cli_managers,
+        executor,
+        file_managers,
+        library_runner,
+        project_service,
+        services,
+        validators,
+        yaml_operations,
+    )
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.adapter_extensions import (
         FlextMeltanoDbtAdapter,
@@ -104,6 +118,18 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_meltano.services.yaml_operations",
         "FlextMeltanoYamlOperationsMixin",
     ],
+    "abstractions": ["flext_meltano.services.abstractions", ""],
+    "adapter_extensions": ["flext_meltano.services.adapter_extensions", ""],
+    "adapters": ["flext_meltano.services.adapters", ""],
+    "bridge": ["flext_meltano.services.bridge", ""],
+    "cli_managers": ["flext_meltano.services.cli_managers", ""],
+    "executor": ["flext_meltano.services.executor", ""],
+    "file_managers": ["flext_meltano.services.file_managers", ""],
+    "library_runner": ["flext_meltano.services.library_runner", ""],
+    "project_service": ["flext_meltano.services.project_service", ""],
+    "services": ["flext_meltano.services.services", ""],
+    "validators": ["flext_meltano.services.validators", ""],
+    "yaml_operations": ["flext_meltano.services.yaml_operations", ""],
 }
 
 __all__ = [
@@ -125,6 +151,18 @@ __all__ = [
     "FlextMeltanoStatusManager",
     "FlextMeltanoValidators",
     "FlextMeltanoYamlOperationsMixin",
+    "abstractions",
+    "adapter_extensions",
+    "adapters",
+    "bridge",
+    "cli_managers",
+    "executor",
+    "file_managers",
+    "library_runner",
+    "project_service",
+    "services",
+    "validators",
+    "yaml_operations",
 ]
 
 
