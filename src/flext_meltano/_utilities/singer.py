@@ -125,7 +125,7 @@ class FlextMeltanoUtilitiesSinger:
 
             """
             try:
-                msg = m.Meltano.SingerStateMessage(value=value)
+                msg = m.Meltano.SingerStateMessage.model_validate({"value": value})
                 line = msg.model_dump_json(by_alias=True)
                 sys.stdout.write(line + "\n")
                 sys.stdout.flush()
