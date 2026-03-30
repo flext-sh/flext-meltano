@@ -5,189 +5,208 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_core import FlextTypes
-    from flext_tests import d, e, h, r, s, x
-
     from tests import (
-        conftest,
-        constants,
-        helpers,
-        integration,
-        models,
-        protocols,
-        typings,
-        unit,
-        utilities,
+        conftest as conftest,
+        constants as constants,
+        helpers as helpers,
+        integration as integration,
+        models as models,
+        protocols as protocols,
+        typings as typings,
+        unit as unit,
+        utilities as utilities,
     )
     from tests.conftest import (
-        CliRunner,
-        MockCliResult,
-        MockCliRunner,
-        MockMeltanoService,
-        MockSingerTap,
-        MockSingerTarget,
-        job_run_config,
-        meltano_cli_runner,
-        meltano_invoke_args,
-        meltano_project,
-        meltano_service,
-        meltano_yml_config,
-        mock_meltano_service,
-        mock_singer_tap,
-        mock_singer_target,
-        pipeline_execution_config,
-        postgres_service,
-        pytest_configure,
-        redis_service,
-        sample_csv_data,
-        sample_schedule_config,
-        set_test_environment,
-        singer_records,
-        singer_schema,
-        singer_state,
-        tap_csv_config,
-        target_csv_config,
-        test_environment_config,
-        test_meltano_project_dir,
+        CliRunner as CliRunner,
+        MockCliResult as MockCliResult,
+        MockCliRunner as MockCliRunner,
+        MockMeltanoService as MockMeltanoService,
+        MockSingerTap as MockSingerTap,
+        MockSingerTarget as MockSingerTarget,
+        job_run_config as job_run_config,
+        meltano_cli_runner as meltano_cli_runner,
+        meltano_invoke_args as meltano_invoke_args,
+        meltano_project as meltano_project,
+        meltano_service as meltano_service,
+        meltano_yml_config as meltano_yml_config,
+        mock_meltano_service as mock_meltano_service,
+        mock_singer_tap as mock_singer_tap,
+        mock_singer_target as mock_singer_target,
+        pipeline_execution_config as pipeline_execution_config,
+        postgres_service as postgres_service,
+        pytest_configure as pytest_configure,
+        redis_service as redis_service,
+        sample_csv_data as sample_csv_data,
+        sample_schedule_config as sample_schedule_config,
+        set_test_environment as set_test_environment,
+        singer_records as singer_records,
+        singer_schema as singer_schema,
+        singer_state as singer_state,
+        tap_csv_config as tap_csv_config,
+        target_csv_config as target_csv_config,
+        test_environment_config as test_environment_config,
+        test_meltano_project_dir as test_meltano_project_dir,
     )
     from tests.constants import (
-        FlextMeltanoTestConstants,
+        FlextMeltanoTestConstants as FlextMeltanoTestConstants,
         FlextMeltanoTestConstants as c,
     )
-    from tests.helpers import docker_test_manager
+    from tests.helpers import docker_test_manager as docker_test_manager
     from tests.helpers.docker_test_manager import (
-        ContainerManager,
-        Tk,
-        docker_manager,
-        docker_services,
+        ContainerManager as ContainerManager,
+        Tk as Tk,
+        docker_manager as docker_manager,
+        docker_services as docker_services,
     )
-    from tests.integration import test_docker_integration
+    from tests.integration import test_docker_integration as test_docker_integration
     from tests.integration.test_docker_integration import (
-        TestDockerIntegration,
-        psycopg2,
-        redis,
+        TestDockerIntegration as TestDockerIntegration,
+        psycopg2 as psycopg2,
+        redis as redis,
     )
-    from tests.models import FlextMeltanoTestModels, FlextMeltanoTestModels as m
+    from tests.models import (
+        FlextMeltanoTestModels as FlextMeltanoTestModels,
+        FlextMeltanoTestModels as m,
+    )
     from tests.protocols import (
-        FlextMeltanoTestProtocols,
+        FlextMeltanoTestProtocols as FlextMeltanoTestProtocols,
         FlextMeltanoTestProtocols as p,
     )
-    from tests.typings import FlextMeltanoTestTypes, FlextMeltanoTestTypes as t
+    from tests.typings import (
+        FlextMeltanoTestTypes as FlextMeltanoTestTypes,
+        FlextMeltanoTestTypes as t,
+    )
     from tests.unit import (
-        pipeline_cli_managers_tests,
-        test_api,
-        test_cli_integration,
-        test_config,
-        test_constants,
-        test_execution_result,
-        test_executors,
-        test_file_managers,
-        test_library_runner,
-        test_models,
-        test_plugin_protocols,
-        test_services,
-        test_singer_cli_translator,
-        test_singer_types,
-        test_tap_abstractions,
-        test_target_abstractions,
-        test_typings,
-        test_utilities,
-        test_validators,
+        pipeline_cli_managers_tests as pipeline_cli_managers_tests,
+        test_api as test_api,
+        test_cli_integration as test_cli_integration,
+        test_config as test_config,
+        test_constants as test_constants,
+        test_execution_result as test_execution_result,
+        test_executors as test_executors,
+        test_file_managers as test_file_managers,
+        test_library_runner as test_library_runner,
+        test_models as test_models,
+        test_plugin_protocols as test_plugin_protocols,
+        test_services as test_services,
+        test_singer_cli_translator as test_singer_cli_translator,
+        test_singer_types as test_singer_types,
+        test_tap_abstractions as test_tap_abstractions,
+        test_target_abstractions as test_target_abstractions,
+        test_typings as test_typings,
+        test_utilities as test_utilities,
+        test_validators as test_validators,
     )
     from tests.unit.pipeline_cli_managers_tests import (
-        create_pipeline,
-        delete_pipeline,
-        execute_pipeline,
-        get_pipeline_status,
-        list_pipelines,
-        test_create_pipeline_creates_directory_and_configuration,
-        test_create_pipeline_fails_without_configuration,
-        test_delete_pipeline_removes_configuration_directory,
-        test_execute_pipeline_fails_when_pipeline_execution_is_not_configured,
-        test_execute_pipeline_runs_real_subprocess_contract,
-        test_get_pipeline_status_checks_process_state,
-        test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
+        create_pipeline as create_pipeline,
+        delete_pipeline as delete_pipeline,
+        execute_pipeline as execute_pipeline,
+        get_pipeline_status as get_pipeline_status,
+        list_pipelines as list_pipelines,
+        test_create_pipeline_creates_directory_and_configuration as test_create_pipeline_creates_directory_and_configuration,
+        test_create_pipeline_fails_without_configuration as test_create_pipeline_fails_without_configuration,
+        test_delete_pipeline_removes_configuration_directory as test_delete_pipeline_removes_configuration_directory,
+        test_execute_pipeline_fails_when_pipeline_execution_is_not_configured as test_execute_pipeline_fails_when_pipeline_execution_is_not_configured,
+        test_execute_pipeline_runs_real_subprocess_contract as test_execute_pipeline_runs_real_subprocess_contract,
+        test_get_pipeline_status_checks_process_state as test_get_pipeline_status_checks_process_state,
+        test_pipeline_manager_lifecycle_commands_delegate_to_real_operations as test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
     )
     from tests.unit.test_api import (
-        TestFlextMeltanoCatalogOperations,
-        TestFlextMeltanoErrorHandling,
-        TestFlextMeltanoExecuteMethod,
-        TestFlextMeltanoInitialization,
-        TestFlextMeltanoIntegration,
-        TestFlextMeltanoPerformance,
-        TestFlextMeltanoPipelineOperations,
-        TestFlextMeltanoPluginOperations,
-        TestFlextMeltanoProjectOperations,
-        TestFlextMeltanoSuccessPaths,
-        pytestmark,
+        TestFlextMeltanoCatalogOperations as TestFlextMeltanoCatalogOperations,
+        TestFlextMeltanoErrorHandling as TestFlextMeltanoErrorHandling,
+        TestFlextMeltanoExecuteMethod as TestFlextMeltanoExecuteMethod,
+        TestFlextMeltanoInitialization as TestFlextMeltanoInitialization,
+        TestFlextMeltanoIntegration as TestFlextMeltanoIntegration,
+        TestFlextMeltanoPerformance as TestFlextMeltanoPerformance,
+        TestFlextMeltanoPipelineOperations as TestFlextMeltanoPipelineOperations,
+        TestFlextMeltanoPluginOperations as TestFlextMeltanoPluginOperations,
+        TestFlextMeltanoProjectOperations as TestFlextMeltanoProjectOperations,
+        TestFlextMeltanoSuccessPaths as TestFlextMeltanoSuccessPaths,
+        pytestmark as pytestmark,
     )
     from tests.unit.test_cli_integration import (
-        TestCliModelConverterWithDbtRunParams,
-        TestCliModelConverterWithPipelineRunParams,
-        TestCliModelConverterWithTapRunParams,
-        TestCliModelConverterWithTargetRunParams,
+        TestCliModelConverterWithDbtRunParams as TestCliModelConverterWithDbtRunParams,
+        TestCliModelConverterWithPipelineRunParams as TestCliModelConverterWithPipelineRunParams,
+        TestCliModelConverterWithTapRunParams as TestCliModelConverterWithTapRunParams,
+        TestCliModelConverterWithTargetRunParams as TestCliModelConverterWithTargetRunParams,
     )
     from tests.unit.test_config import (
-        LogLevel,
-        TestFlextMeltanoSettings,
-        TestFlextMeltanoSettingsConstants,
-        TestFlextMeltanoSettingsEdgeCases,
-        TestFlextMeltanoSettingsEnums,
-        TestFlextMeltanoSettingsIntegration,
+        LogLevel as LogLevel,
+        TestFlextMeltanoSettings as TestFlextMeltanoSettings,
+        TestFlextMeltanoSettingsConstants as TestFlextMeltanoSettingsConstants,
+        TestFlextMeltanoSettingsEdgeCases as TestFlextMeltanoSettingsEdgeCases,
+        TestFlextMeltanoSettingsEnums as TestFlextMeltanoSettingsEnums,
+        TestFlextMeltanoSettingsIntegration as TestFlextMeltanoSettingsIntegration,
     )
-    from tests.unit.test_constants import Testc
-    from tests.unit.test_execution_result import TestFlextMeltanoExecutionResult
-    from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
-    from tests.unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
+    from tests.unit.test_constants import Testc as Testc
+    from tests.unit.test_execution_result import (
+        TestFlextMeltanoExecutionResult as TestFlextMeltanoExecutionResult,
+    )
+    from tests.unit.test_executors import (
+        TestFlextMeltanoExecutorComplete as TestFlextMeltanoExecutorComplete,
+    )
+    from tests.unit.test_file_managers import (
+        TestFlextMeltanoFileManagersComprehensive as TestFlextMeltanoFileManagersComprehensive,
+    )
     from tests.unit.test_library_runner import (
-        TestFlextMeltanoLibraryRunner,
-        TestProjectAdapterIntegration,
+        TestFlextMeltanoLibraryRunner as TestFlextMeltanoLibraryRunner,
+        TestProjectAdapterIntegration as TestProjectAdapterIntegration,
     )
     from tests.unit.test_models import (
-        TestDbtProjectModelEnhanced,
-        TestMeltanoProjectModelEnhanced,
-        TestModelIntegration,
-        TestPluginModelEnhanced,
-        TestStreamInfoEnhanced,
-        TestTapConfigEnhanced,
-        TestTargetConfigEnhanced,
+        TestDbtProjectModelEnhanced as TestDbtProjectModelEnhanced,
+        TestMeltanoProjectModelEnhanced as TestMeltanoProjectModelEnhanced,
+        TestModelIntegration as TestModelIntegration,
+        TestPluginModelEnhanced as TestPluginModelEnhanced,
+        TestStreamInfoEnhanced as TestStreamInfoEnhanced,
+        TestTapConfigEnhanced as TestTapConfigEnhanced,
+        TestTargetConfigEnhanced as TestTargetConfigEnhanced,
     )
-    from tests.unit.test_plugin_protocols import TestFlextMeltanoPluginProtocols
+    from tests.unit.test_plugin_protocols import (
+        TestFlextMeltanoPluginProtocols as TestFlextMeltanoPluginProtocols,
+    )
     from tests.unit.test_services import (
-        TestDbtService,
-        TestFlextMeltanoServiceInitialization,
-        TestServiceArchitecture,
-        TestServiceErrorHandling,
-        TestServiceFactoryMethods,
-        TestServiceGenericMethods,
-        TestServiceIntegration,
-        TestTapService,
-        TestTargetService,
+        TestDbtService as TestDbtService,
+        TestFlextMeltanoServiceInitialization as TestFlextMeltanoServiceInitialization,
+        TestServiceArchitecture as TestServiceArchitecture,
+        TestServiceErrorHandling as TestServiceErrorHandling,
+        TestServiceFactoryMethods as TestServiceFactoryMethods,
+        TestServiceGenericMethods as TestServiceGenericMethods,
+        TestServiceIntegration as TestServiceIntegration,
+        TestTapService as TestTapService,
+        TestTargetService as TestTargetService,
     )
     from tests.unit.test_singer_cli_translator import (
-        TestFlextMeltanoSingerCliTranslatorDbtRun,
-        TestFlextMeltanoSingerCliTranslatorExecuteCommand,
-        TestFlextMeltanoSingerCliTranslatorPipelineRun,
-        TestFlextMeltanoSingerCliTranslatorTapRun,
-        TestFlextMeltanoSingerCliTranslatorTargetRun,
+        TestFlextMeltanoSingerCliTranslatorDbtRun as TestFlextMeltanoSingerCliTranslatorDbtRun,
+        TestFlextMeltanoSingerCliTranslatorExecuteCommand as TestFlextMeltanoSingerCliTranslatorExecuteCommand,
+        TestFlextMeltanoSingerCliTranslatorPipelineRun as TestFlextMeltanoSingerCliTranslatorPipelineRun,
+        TestFlextMeltanoSingerCliTranslatorTapRun as TestFlextMeltanoSingerCliTranslatorTapRun,
+        TestFlextMeltanoSingerCliTranslatorTargetRun as TestFlextMeltanoSingerCliTranslatorTargetRun,
     )
-    from tests.unit.test_singer_types import TestFlextSingerTypes
-    from tests.unit.test_tap_abstractions import TestFlextMeltanoAbstractionsComplete
+    from tests.unit.test_singer_types import (
+        TestFlextSingerTypes as TestFlextSingerTypes,
+    )
+    from tests.unit.test_tap_abstractions import (
+        TestFlextMeltanoAbstractionsComplete as TestFlextMeltanoAbstractionsComplete,
+    )
     from tests.unit.test_target_abstractions import (
-        TestFlextMeltanoTargetAbstractionsComplete,
-        logger,
+        TestFlextMeltanoTargetAbstractionsComplete as TestFlextMeltanoTargetAbstractionsComplete,
+        logger as logger,
     )
-    from tests.unit.test_typings import TestFlextMeltanoTypes
-    from tests.unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
-    from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
+    from tests.unit.test_typings import TestFlextMeltanoTypes as TestFlextMeltanoTypes
+    from tests.unit.test_utilities import (
+        TestFlextMeltanoUtilitiesEnhanced as TestFlextMeltanoUtilitiesEnhanced,
+    )
+    from tests.unit.test_validators import (
+        TestFlextMeltanoValidatorsComprehensive as TestFlextMeltanoValidatorsComprehensive,
+    )
     from tests.utilities import (
-        FlextMeltanoTestUtilities,
+        FlextMeltanoTestUtilities as FlextMeltanoTestUtilities,
         FlextMeltanoTestUtilities as u,
     )
 
@@ -488,7 +507,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "x": ["flext_tests", "x"],
 }
 
-__all__ = [
+_EXPORTS: Sequence[str] = [
     "CliRunner",
     "ContainerManager",
     "FlextMeltanoTestConstants",
@@ -642,41 +661,4 @@ __all__ = [
 ]
 
 
-_LAZY_CACHE: MutableMapping[str, FlextTypes.ModuleExport] = {}
-
-
-def __getattr__(name: str) -> FlextTypes.ModuleExport:
-    """Lazy-load module attributes on first access (PEP 562).
-
-    A local cache ``_LAZY_CACHE`` persists resolved objects across repeated
-    accesses during process lifetime.
-
-    Args:
-        name: Attribute name requested by dir()/import.
-
-    Returns:
-        Lazy-loaded module export type.
-
-    Raises:
-        AttributeError: If attribute not registered.
-
-    """
-    if name in _LAZY_CACHE:
-        return _LAZY_CACHE[name]
-
-    value = lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-    _LAZY_CACHE[name] = value
-    return value
-
-
-def __dir__() -> Sequence[str]:
-    """Return list of available attributes for dir() and autocomplete.
-
-    Returns:
-        List of public names from module exports.
-
-    """
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
