@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano._protocols import cli, plugin, project, services, singer
     from flext_meltano._protocols.cli import *
     from flext_meltano._protocols.plugin import *
     from flext_meltano._protocols.project import *
@@ -32,4 +31,4 @@ _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
 }
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

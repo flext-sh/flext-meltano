@@ -11,28 +11,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano._models import (
-        cli_params,
-        context,
-        core,
-        discovery,
-        instances,
-        instances_data,
-        logging_config,
-        payloads,
-        payloads_data,
-        projects,
-        projects_plugin,
-        results,
-        results_dbt,
-        results_pipeline,
-        singer,
-        singer_catalog,
-        singer_sdk,
-        sources,
-        sources_params,
-        transformations,
-    )
     from flext_meltano._models.cli_params import *
     from flext_meltano._models.context import *
     from flext_meltano._models.core import *
@@ -98,4 +76,4 @@ _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
 }
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

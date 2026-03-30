@@ -23,16 +23,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano.singer import (
-        catalog,
-        sdk,
-        service,
-        state,
-        tap,
-        tap_source,
-        target,
-        translator,
-    )
     from flext_meltano.singer.catalog import *
     from flext_meltano.singer.sdk import *
     from flext_meltano.singer.service import *
@@ -67,4 +57,4 @@ _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
 }
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
