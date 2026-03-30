@@ -1,0 +1,23 @@
+src/flext_meltano/_utilities/singer.py
+  cbe03c2b31a6d762 68-73,227-234,237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "b8772fe5c6b65a1de9fc9368cd34deae2b30584f",
+  "prompts": {
+    "cbe03c2b31a6d762": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e15d9cb2-b1b1-44be-81cc-15da002006f6",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 15,
+      "accepted_lines": 15,
+      "overriden_lines": 0
+    }
+  }
+}
