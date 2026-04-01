@@ -16,7 +16,6 @@ from flext_core import FlextLogger, r
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
-    FlextMeltanoYamlOperationsMixin,
     c,
     t,
     u,
@@ -25,9 +24,7 @@ from flext_meltano import (
 _module_logger = FlextLogger(__name__)
 
 
-class FlextMeltanoFileManagers(
-    FlextMeltanoYamlOperationsMixin, FlextMeltanoServiceBase
-):
+class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
     """DOMAIN-SPECIFIC Meltano file managers using flext-core as SOURCE OF TRUTH.
 
     Contains ONLY Meltano-specific file operations that cannot be generalized
@@ -145,6 +142,27 @@ class FlextMeltanoFileManagers(
     def validate_project_structure(cls, project_root: Path) -> r[bool]:
         """Validate Meltano project structure."""
         return u.Meltano.validate_project_structure(project_root)
+
+    # ------------------------------------------------------------------
+    # YAML operations — delegate to u.Meltano.* utilities
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def load_yaml_config(cls, file_path: Path) -> r[t.Meltano.FileConfigDict]:
+        """Load YAML config with validation. Delegates to u.Meltano."""
+        return u.Meltano.load_raw_yaml(file_path)
+
+    @classmethod
+    def save_yaml_config(
+        cls, config: t.Meltano.FileConfigDict, file_path: Path
+    ) -> r[bool]:
+        """Save YAML config to file. Delegates to u.Meltano."""
+        return u.Meltano.save_raw_yaml(config, file_path)
+
+    @classmethod
+    def validate_yaml_file(cls, file_path: Path) -> r[bool]:
+        """Validate YAML file syntax and existence. Delegates to u.Meltano."""
+        return u.Meltano.validate_yaml_syntax(file_path)
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:

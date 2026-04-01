@@ -1,0 +1,111 @@
+"""DBT Runner — MRO mixin for FlextMeltano facade.
+
+Programmatic DBT execution via subprocess. Implements actual dbt
+command execution (replaces previous stubs).
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
+from __future__ import annotations
+
+from collections.abc import MutableSequence
+from pathlib import Path
+
+from flext_core import r
+from flext_infra import FlextInfraUtilitiesSubprocess
+from pydantic import PrivateAttr
+
+from flext_meltano import FlextMeltanoServiceBase, t
+
+
+class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
+    """DBT command execution mixin for MRO composition on FlextMeltano.
+
+    Runs dbt commands via subprocess with proper error handling.
+    """
+
+    _dbt_runner_project_root: Path | None = PrivateAttr(default=None)
+
+    def _build_dbt_command(
+        self,
+        subcommand: str,
+        models: t.StrSequence | None = None,
+        extra_args: t.StrSequence | None = None,
+    ) -> MutableSequence[str]:
+        """Build dbt CLI command with standard arguments."""
+        cmd: MutableSequence[str] = ["dbt", subcommand]
+        if self._dbt_runner_project_root:
+            cmd.extend(["--project-dir", str(self._dbt_runner_project_root)])
+        if models:
+            cmd.extend(["--models", *models])
+        if extra_args:
+            cmd.extend(extra_args)
+        return cmd
+
+    def _run_dbt_subprocess(
+        self,
+        cmd: MutableSequence[str],
+        operation: str,
+    ) -> r[str]:
+        """Execute a dbt command via subprocess."""
+        try:
+            self.logger.info(f"Running dbt {operation}", command=" ".join(cmd))
+            result = FlextInfraUtilitiesSubprocess.run_raw(list(cmd))
+            if result.is_failure:
+                return r[str].fail(result.error or f"dbt {operation} failed")
+            out = result.value
+            if out.exit_code != 0:
+                stderr_msg = out.stderr or f"dbt {operation} failed"
+                self.logger.warning(
+                    f"dbt {operation} returned non-zero exit code",
+                    exit_code=out.exit_code,
+                    stderr=stderr_msg,
+                )
+                return r[str].fail(stderr_msg)
+            self.logger.info(f"dbt {operation} completed successfully")
+            return r[str].ok(out.stdout)
+        except (
+            ValueError,
+            TypeError,
+            OSError,
+            RuntimeError,
+        ) as e:
+            self.logger.exception(f"dbt {operation} failed", error=str(e))
+            return r[str].fail(f"dbt {operation} failed: {e}")
+
+    def dbt_run_models(
+        self,
+        models: t.StrSequence | None = None,
+    ) -> r[str]:
+        """Run dbt models via subprocess."""
+        cmd = self._build_dbt_command("run", models=models)
+        return self._run_dbt_subprocess(cmd, "run")
+
+    def dbt_run_tests(
+        self,
+        models: t.StrSequence | None = None,
+    ) -> r[str]:
+        """Run dbt tests via subprocess."""
+        cmd = self._build_dbt_command("test", models=models)
+        return self._run_dbt_subprocess(cmd, "test")
+
+    def dbt_compile(
+        self,
+        models: t.StrSequence | None = None,
+    ) -> r[str]:
+        """Compile dbt models via subprocess."""
+        cmd = self._build_dbt_command("compile", models=models)
+        return self._run_dbt_subprocess(cmd, "compile")
+
+    def dbt_docs_generate(self) -> r[str]:
+        """Generate dbt documentation via subprocess."""
+        cmd = self._build_dbt_command("docs", extra_args=["generate"])
+        return self._run_dbt_subprocess(cmd, "docs generate")
+
+    def set_dbt_project_root(self, root: Path) -> None:
+        """Set the dbt project root directory."""
+        self._dbt_runner_project_root = root
+
+
+__all__ = ["FlextMeltanoDbtRunnerMixin"]

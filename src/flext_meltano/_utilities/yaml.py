@@ -1,20 +1,31 @@
-"""FLEXT Meltano Utilities - YAML file operations."""
+"""FLEXT Meltano Utilities - YAML file operations.
+
+Pure helpers for YAML loading, saving, validation, and writing.
+Services delegate to these helpers — never import from services/.
+"""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TextIO
 
 import yaml
-from flext_cli import FlextCliUtilities, r
+from flext_cli import FlextCliUtilities, r, u as cli_u
 from flext_core import FlextLogger
 
-from flext_meltano import FlextMeltanoFileManagers, c, m, t
+from flext_meltano import c, m, t
 
 
 class FlextMeltanoUtilitiesYaml:
-    """YAML loading, validation, and writing utilities for Meltano configs."""
+    """YAML loading, validation, and writing utilities for Meltano configs.
+
+    All methods are pure helpers with no service-layer dependencies.
+    """
+
+    # ------------------------------------------------------------------
+    # Low-level helpers
+    # ------------------------------------------------------------------
 
     @classmethod
     def _close_file_handle(cls, file_handle: TextIO) -> r[None]:
@@ -72,22 +83,90 @@ class FlextMeltanoUtilitiesYaml:
             return r[bool].ok(value=True)
         except (yaml.YAMLError, ValueError, TypeError, AttributeError):
             return r[bool].fail(
-                "Failed to write YAML content: non-serializable t.NormalizedValue",
+                "Failed to write YAML content: non-serializable value",
             )
+
+    # ------------------------------------------------------------------
+    # Raw YAML I/O (SOURCE OF TRUTH for all YAML operations)
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def load_raw_yaml(cls, file_path: Path) -> r[t.Meltano.FileConfigDict]:
+        """Load and validate a YAML file, returning normalized config dict.
+
+        This is the canonical YAML loading implementation. Services delegate here.
+        """
+        try:
+            if not cli_u.is_string_non_empty(str(file_path)):
+                return r[t.Meltano.FileConfigDict].fail(
+                    f"Failed to load YAML config: Invalid YAML file path: {file_path}",
+                )
+            if not file_path.exists():
+                return r[t.Meltano.FileConfigDict].fail(
+                    f"Failed to load YAML config: YAML file not found: {file_path}",
+                )
+            with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
+                config_data = yaml.safe_load(f)
+            if config_data is None:
+                return r[t.Meltano.FileConfigDict].fail(
+                    f"Failed to load YAML config: Empty YAML file: {file_path}",
+                )
+            raw_validated = m.Meltano.ConfigMappingPayload.model_validate({
+                "values": config_data,
+            }).values
+            validated = _normalize_file_config(raw_validated)
+            return r[t.Meltano.FileConfigDict].ok(validated)
+        except (
+            yaml.YAMLError,
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+        ) as e:
+            return r[t.Meltano.FileConfigDict].fail(f"Failed to load YAML config: {e}")
+
+    @classmethod
+    def save_raw_yaml(
+        cls, config: t.Meltano.FileConfigDict, file_path: Path
+    ) -> r[bool]:
+        """Save config dict to a YAML file.
+
+        This is the canonical YAML saving implementation. Services delegate here.
+        """
+        try:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            with file_path.open("w", encoding=c.DEFAULT_ENCODING) as f:
+                yaml.dump(
+                    config, f, indent=2, default_flow_style=False, sort_keys=False
+                )
+            return r[bool].ok(True)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+            return r[bool].fail(f"Failed to save YAML config: {exc}")
+
+    @classmethod
+    def validate_yaml_syntax(cls, file_path: Path) -> r[bool]:
+        """Validate YAML file syntax and existence."""
+        try:
+            if not cli_u.is_string_non_empty(str(file_path)):
+                return r[bool].fail(f"Invalid YAML file path: {file_path}")
+            if not file_path.exists():
+                return r[bool].fail(f"YAML file not found: {file_path}")
+            with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
+                yaml.safe_load(f)
+            return r[bool].ok(value=True)
+        except yaml.YAMLError as e:
+            return r[bool].fail(f"Invalid YAML syntax: {e}")
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+            return r[bool].fail(f"Failed to validate YAML: {e}")
+
+    # ------------------------------------------------------------------
+    # Higher-level convenience (still pure, no service dependencies)
+    # ------------------------------------------------------------------
 
     @classmethod
     def load_yaml_config(cls, path: Path) -> r[t.Meltano.MeltanoConfigDict]:
-        """Load YAML config using monadic composition with resource management.
-
-        Delegates to FlextMeltanoFileManagers as SOURCE OF TRUTH.
-
-        Args:
-        path: Path to YAML configuration file.
-
-        Returns:
-        r containing loaded configuration dictionary.
-
-        """
+        """Load YAML config with path validation and type normalization."""
 
         def convert_to_dict(
             config_dict: t.Meltano.FileConfigDict,
@@ -113,7 +192,7 @@ class FlextMeltanoUtilitiesYaml:
 
         validated_path: r[Path] = r[Path].ok(path).flat_map(cls._validate_yaml_path)
         loaded: r[t.Meltano.MeltanoConfigDict] = validated_path.flat_map(
-            FlextMeltanoFileManagers.load_yaml_config
+            cls.load_raw_yaml
         )
         result = loaded.map(convert_to_dict)
         return (
@@ -149,10 +228,7 @@ class FlextMeltanoUtilitiesYaml:
         config: t.Meltano.MeltanoConfigDict,
         target_path: Path,
     ) -> r[bool]:
-        """Write MELTANO-SPECIFIC YAML configuration using monadic resource management."""
-
-        def write_operation(_unused_value: None, file_handle: TextIO, /) -> r[bool]:
-            return cls._write_yaml_content(file_handle, config)
+        """Write Meltano YAML configuration with resource management."""
 
         def cleanup_file_handle(file_handle: TextIO) -> None:
             try:
@@ -175,7 +251,7 @@ class FlextMeltanoUtilitiesYaml:
                 return r[bool].fail(f"Writing {filename}: {open_result.error}")
             resource = open_result.value
             try:
-                return write_operation(None, resource)
+                return cls._write_yaml_content(resource, config)
             finally:
                 cleanup_file_handle(resource)
         except (
@@ -189,3 +265,30 @@ class FlextMeltanoUtilitiesYaml:
         ) as err:
             filename = c.Meltano.Paths.MELTANO_PROJECT_FILE
             return r[bool].fail(f"Writing {filename}: {err}")
+
+
+def _normalize_file_config(
+    raw: Mapping[
+        str,
+        t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
+    ],
+) -> t.ContainerMapping:
+    """Normalize raw config values into ContainerMapping."""
+    normalized: t.MutableContainerMapping = {}
+    for key, value in raw.items():
+        if value is None or cli_u.is_scalar(value):
+            normalized[key] = value
+            continue
+        if isinstance(value, list):
+            normalized[key] = [item for item in value if item is not None]
+            continue
+        if isinstance(value, Mapping):
+            nested: t.MutableConfigurationMapping = {}
+            for nested_key, nested_value in value.items():
+                if cli_u.is_scalar(nested_value):
+                    nested[str(nested_key)] = nested_value
+            normalized[key] = nested
+    return normalized
+
+
+__all__ = ["FlextMeltanoUtilitiesYaml"]

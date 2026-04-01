@@ -1,7 +1,7 @@
 """Public API facade for flext-meltano.
 
 MRO facade over Meltano services (abstractions, adapters, bridge, executor,
-file managers, pipeline, project, validators).
+file managers, pipeline, project, validators, singer, dbt).
 All operations return r[T].
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -18,10 +18,19 @@ from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoAdapter,
     FlextMeltanoBridge,
+    FlextMeltanoDbtOrchestrationMixin,
+    FlextMeltanoDbtProjectMixin,
+    FlextMeltanoDbtRunnerMixin,
     FlextMeltanoExecutor,
     FlextMeltanoFileManagers,
     FlextMeltanoProjectService,
     FlextMeltanoService,
+    FlextMeltanoSingerCatalogMixin,
+    FlextMeltanoSingerCliTranslator,
+    FlextMeltanoSingerOrchestrationMixin,
+    FlextMeltanoSingerStateMixin,
+    FlextMeltanoTapAbstractions,
+    FlextMeltanoTargetAbstractions,
     FlextMeltanoValidators,
     c,
     t,
@@ -30,6 +39,18 @@ from flext_meltano import (
 
 
 class FlextMeltano(
+    # Singer domain
+    FlextMeltanoSingerCatalogMixin,
+    FlextMeltanoSingerStateMixin,
+    FlextMeltanoSingerOrchestrationMixin,
+    FlextMeltanoTapAbstractions,
+    FlextMeltanoTargetAbstractions,
+    FlextMeltanoSingerCliTranslator,
+    # DBT domain
+    FlextMeltanoDbtProjectMixin,
+    FlextMeltanoDbtRunnerMixin,
+    FlextMeltanoDbtOrchestrationMixin,
+    # Meltano runtime
     FlextMeltanoAbstractions,
     FlextMeltanoAdapter,
     FlextMeltanoBridge,
@@ -41,8 +62,10 @@ class FlextMeltano(
 ):
     """Coordinate Meltano operations and expose domain services.
 
-    MRO facade over Meltano services (abstractions, adapters, bridge,
-    executor, file managers, pipeline, project, validators).
+    MRO facade over all Meltano services: Singer protocol (catalog, state,
+    tap, target, translator), DBT (project, runner, orchestration), and
+    Meltano runtime (abstractions, adapters, bridge, executor, file managers,
+    pipeline, project, validators).
     All operations return r[T].
     """
 
