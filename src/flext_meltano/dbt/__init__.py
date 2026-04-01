@@ -21,9 +21,10 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.dbt.project import *
-    from flext_meltano.dbt.runner import *
-    from flext_meltano.dbt.service import *
+    from flext_meltano.dbt import project, runner, service
+    from flext_meltano.dbt.project import FlextMeltanoDbtProjectManager
+    from flext_meltano.dbt.runner import FlextMeltanoDbtRunner
+    from flext_meltano.dbt.service import FlextMeltanoDbtService
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextMeltanoDbtProjectManager": "flext_meltano.dbt.project",

@@ -20,32 +20,85 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.services._abstractions_base import *
-    from flext_meltano.services._cli_small_managers import *
-    from flext_meltano.services._executor_base import *
-    from flext_meltano.services._pipeline_lifecycle import *
-    from flext_meltano.services._pipeline_mgr import *
-    from flext_meltano.services._pipeline_ops import *
-    from flext_meltano.services.abstractions import *
-    from flext_meltano.services.adapter_extensions import *
-    from flext_meltano.services.adapters import *
-    from flext_meltano.services.bridge import *
-    from flext_meltano.services.cli_managers import *
-    from flext_meltano.services.dbt_orchestration import *
-    from flext_meltano.services.dbt_project import *
-    from flext_meltano.services.dbt_runner import *
-    from flext_meltano.services.executor import *
-    from flext_meltano.services.file_managers import *
-    from flext_meltano.services.library_runner import *
-    from flext_meltano.services.project_service import *
-    from flext_meltano.services.services import *
-    from flext_meltano.services.singer_catalog import *
-    from flext_meltano.services.singer_orchestration import *
-    from flext_meltano.services.singer_state import *
-    from flext_meltano.services.singer_tap import *
-    from flext_meltano.services.singer_target import *
-    from flext_meltano.services.singer_translator import *
-    from flext_meltano.services.validators import *
+    from flext_meltano.services import (
+        _abstractions_base,
+        _cli_small_managers,
+        _executor_base,
+        _pipeline_lifecycle,
+        _pipeline_mgr,
+        _pipeline_ops,
+        abstractions,
+        adapter_extensions,
+        adapters,
+        bridge,
+        cli_managers,
+        dbt_orchestration,
+        dbt_project,
+        dbt_runner,
+        executor,
+        file_managers,
+        library_runner,
+        project_service,
+        services,
+        singer_catalog,
+        singer_orchestration,
+        singer_state,
+        singer_tap,
+        singer_target,
+        singer_translator,
+        validators,
+    )
+    from flext_meltano.services._abstractions_base import (
+        OPERATION_ERRORS,
+        FlextMeltanoAbstractionsBase,
+    )
+    from flext_meltano.services._cli_small_managers import (
+        FlextMeltanoDbtManager,
+        FlextMeltanoPluginManager,
+        FlextMeltanoStatusManager,
+    )
+    from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+    from flext_meltano.services._pipeline_lifecycle import (
+        FlextMeltanoPipelineLifecycleOperations,
+    )
+    from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
+    from flext_meltano.services._pipeline_ops import (
+        FlextMeltanoPipelineCrudOperations,
+        FlextMeltanoPipelinePaths,
+    )
+    from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+    from flext_meltano.services.adapter_extensions import (
+        FlextMeltanoDbtAdapter,
+        FlextMeltanoPipelineAdapter,
+    )
+    from flext_meltano.services.adapters import FlextMeltanoAdapter
+    from flext_meltano.services.bridge import FlextMeltanoBridge
+    from flext_meltano.services.cli_managers import (
+        FlextMeltanoCommandRouter,
+        FlextMeltanoSingerManager,
+    )
+    from flext_meltano.services.dbt_orchestration import (
+        FlextMeltanoDbtOrchestrationMixin,
+    )
+    from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
+    from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
+    from flext_meltano.services.executor import FlextMeltanoExecutor
+    from flext_meltano.services.file_managers import FlextMeltanoFileManagers
+    from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
+    from flext_meltano.services.project_service import FlextMeltanoProjectService
+    from flext_meltano.services.services import FlextMeltanoService
+    from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
+    from flext_meltano.services.singer_orchestration import (
+        FlextMeltanoSingerOrchestrationMixin,
+    )
+    from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
+    from flext_meltano.services.singer_tap import (
+        FlextMeltanoTapAbstractions,
+        FlextMeltanoTapSourceMixin,
+    )
+    from flext_meltano.services.singer_target import FlextMeltanoTargetAbstractions
+    from flext_meltano.services.singer_translator import FlextMeltanoSingerCliTranslator
+    from flext_meltano.services.validators import FlextMeltanoValidators
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextMeltanoAbstractions": "flext_meltano.services.abstractions",

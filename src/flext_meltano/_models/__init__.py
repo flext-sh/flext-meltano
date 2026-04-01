@@ -13,26 +13,48 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano._models.cli_params import *
-    from flext_meltano._models.context import *
-    from flext_meltano._models.core import *
-    from flext_meltano._models.discovery import *
-    from flext_meltano._models.instances import *
-    from flext_meltano._models.instances_data import *
-    from flext_meltano._models.logging_config import *
-    from flext_meltano._models.payloads import *
-    from flext_meltano._models.payloads_data import *
-    from flext_meltano._models.projects import *
-    from flext_meltano._models.projects_plugin import *
-    from flext_meltano._models.results import *
-    from flext_meltano._models.results_dbt import *
-    from flext_meltano._models.results_pipeline import *
-    from flext_meltano._models.singer import *
-    from flext_meltano._models.singer_catalog import *
-    from flext_meltano._models.singer_sdk import *
-    from flext_meltano._models.sources import *
-    from flext_meltano._models.sources_params import *
-    from flext_meltano._models.transformations import *
+    from flext_meltano._models import (
+        cli_params,
+        context,
+        core,
+        discovery,
+        instances,
+        instances_data,
+        logging_config,
+        payloads,
+        payloads_data,
+        projects,
+        projects_plugin,
+        results,
+        results_dbt,
+        results_pipeline,
+        singer,
+        singer_catalog,
+        singer_sdk,
+        sources,
+        sources_params,
+        transformations,
+    )
+    from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
+    from flext_meltano._models.context import FlextMeltanoModelsContext
+    from flext_meltano._models.core import FlextMeltanoModelsCore
+    from flext_meltano._models.discovery import FlextMeltanoModelsDiscovery
+    from flext_meltano._models.instances import FlextMeltanoModelsInstances
+    from flext_meltano._models.instances_data import FlextMeltanoModelsInstancesData
+    from flext_meltano._models.logging_config import FlextMeltanoModelsLogging
+    from flext_meltano._models.payloads import FlextMeltanoModelsPayloads
+    from flext_meltano._models.payloads_data import FlextMeltanoModelsPayloadsData
+    from flext_meltano._models.projects import FlextMeltanoModelsProjects
+    from flext_meltano._models.projects_plugin import FlextMeltanoModelsProjectsPlugin
+    from flext_meltano._models.results import FlextMeltanoModelsResults
+    from flext_meltano._models.results_dbt import FlextMeltanoModelsResultsDbt
+    from flext_meltano._models.results_pipeline import FlextMeltanoModelsResultsPipeline
+    from flext_meltano._models.singer import FlextMeltanoModelsSinger
+    from flext_meltano._models.singer_catalog import FlextMeltanoModelsSingerCatalog
+    from flext_meltano._models.singer_sdk import FlextMeltanoModelsSingerSdk
+    from flext_meltano._models.sources import FlextMeltanoModelsSources
+    from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
+    from flext_meltano._models.transformations import FlextMeltanoModelsTransformations
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextMeltanoModelsCliParams": "flext_meltano._models.cli_params",

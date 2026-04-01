@@ -26,7 +26,13 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from tests.helpers.docker_test_manager import *
+    from tests.helpers import docker_test_manager
+    from tests.helpers.docker_test_manager import (
+        ContainerManager,
+        Tk,
+        docker_manager,
+        docker_services,
+    )
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "ContainerManager": "tests.helpers.docker_test_manager",

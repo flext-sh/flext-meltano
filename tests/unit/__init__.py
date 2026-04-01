@@ -17,7 +17,41 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from tests.unit.pipeline_cli_managers_tests import *
+    from tests.unit import (
+        pipeline_cli_managers_tests,
+        test_api,
+        test_cli_integration,
+        test_config,
+        test_constants,
+        test_execution_result,
+        test_executors,
+        test_file_managers,
+        test_library_runner,
+        test_models,
+        test_plugin_protocols,
+        test_services,
+        test_singer_cli_translator,
+        test_singer_types,
+        test_tap_abstractions,
+        test_target_abstractions,
+        test_typings,
+        test_utilities,
+        test_validators,
+    )
+    from tests.unit.pipeline_cli_managers_tests import (
+        create_pipeline,
+        delete_pipeline,
+        execute_pipeline,
+        get_pipeline_status,
+        list_pipelines,
+        test_create_pipeline_creates_directory_and_configuration,
+        test_create_pipeline_fails_without_configuration,
+        test_delete_pipeline_removes_configuration_directory,
+        test_execute_pipeline_fails_when_pipeline_execution_is_not_configured,
+        test_execute_pipeline_runs_real_subprocess_contract,
+        test_get_pipeline_status_checks_process_state,
+        test_pipeline_manager_lifecycle_commands_delegate_to_real_operations,
+    )
     from tests.unit.test_api import (
         TestFlextMeltanoCatalogOperations,
         TestFlextMeltanoErrorHandling,

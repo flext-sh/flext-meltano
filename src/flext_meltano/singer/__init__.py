@@ -25,14 +25,31 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.singer.catalog import *
-    from flext_meltano.singer.sdk import *
-    from flext_meltano.singer.service import *
-    from flext_meltano.singer.state import *
-    from flext_meltano.singer.tap import *
-    from flext_meltano.singer.tap_source import *
-    from flext_meltano.singer.target import *
-    from flext_meltano.singer.translator import *
+    from flext_meltano.singer import (
+        catalog,
+        sdk,
+        service,
+        state,
+        tap,
+        tap_source,
+        target,
+        translator,
+    )
+    from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+    from flext_meltano.singer.sdk import (
+        FlextMeltanoSingerContext,
+        FlextMeltanoSingerRecord,
+        FlextMeltanoSingerSinkBase,
+        FlextMeltanoSingerStreamBase,
+        FlextMeltanoSingerTapBase,
+        FlextMeltanoSingerTargetBase,
+    )
+    from flext_meltano.singer.service import FlextMeltanoSingerService
+    from flext_meltano.singer.state import FlextMeltanoStateManager
+    from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
+    from flext_meltano.singer.tap_source import FlextMeltanoTapSourceMixin
+    from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
+    from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextMeltanoCatalogManager": "flext_meltano.singer.catalog",

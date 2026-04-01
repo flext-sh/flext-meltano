@@ -21,12 +21,23 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.meltano.pipelines import *
-    from flext_meltano.meltano.plugin_discovery import *
-    from flext_meltano.meltano.plugins import *
-    from flext_meltano.meltano.project import *
-    from flext_meltano.meltano.runner import *
-    from flext_meltano.meltano.service import *
+    from flext_meltano.meltano import (
+        pipelines,
+        plugin_discovery,
+        plugins,
+        project,
+        runner,
+        service,
+    )
+    from flext_meltano.meltano.pipelines import FlextMeltanoOrchestrationService
+    from flext_meltano.meltano.plugin_discovery import FlextMeltanoPluginDiscoveryMixin
+    from flext_meltano.meltano.plugins import FlextMeltanoComponentService
+    from flext_meltano.meltano.project import FlextMeltanoProjectManager
+    from flext_meltano.meltano.runner import (
+        FlextMeltanoDbtTransformationRunner,
+        FlextMeltanoLibraryRunner,
+    )
+    from flext_meltano.meltano.service import FlextMeltanoMeltanoService
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextMeltanoComponentService": "flext_meltano.meltano.plugins",
