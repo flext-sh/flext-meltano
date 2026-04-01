@@ -6,12 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import importlib
 import os
-from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-from flext_core import FlextLogger, r
-from flext_infra import FlextInfraUtilitiesSubprocess
+from flext_core import FlextLogger, r, u
 
 from flext_meltano import c, m, t
 
@@ -28,8 +27,9 @@ class FlextMeltanoPipelinePaths:
         configured_root = os.environ.get(
             FlextMeltanoPipelinePaths._PIPELINES_ROOT_ENV,
         )
-        if configured_root and configured_root.strip():
-            return Path(configured_root).expanduser().resolve()
+        normalized_root = u.to_str(configured_root).strip()
+        if u.chk(normalized_root, empty=False):
+            return Path(normalized_root).expanduser().resolve()
         return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
 
     @staticmethod
@@ -57,11 +57,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     @staticmethod
     def create_pipeline(
         pipeline_name: str,
-        config: Mapping[
-            str,
-            t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
-        ]
-        | None,
+        config: t.ContainerMapping | None,
     ) -> r[str]:
         """Create a new Meltano pipeline with the given configuration."""
         if not pipeline_name.strip():
@@ -79,9 +75,9 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
             validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": dict(config),
             })
-            config_path.write_text(
+            u.write_file(
+                config_path,
                 validated.model_dump_json(indent=2),
-                encoding="utf-8",
             )
         except OSError as exc:
             return r[str].fail(f"Failed to create pipeline '{pipeline_name}': {exc}")
@@ -116,26 +112,33 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         meltano_args = command_args or configured_command
         if not meltano_args:
             return r[str].fail("Pipeline execution not configured")
-        command = ["meltano", *meltano_args]
-        runner = FlextInfraUtilitiesSubprocess()
-        run_result = runner.run_raw(command, cwd=pipeline_dir)
+        executor_module = importlib.import_module(
+            "flext_meltano.services._executor_base",
+        )
+        executor_type = getattr(executor_module, "FlextMeltanoExecutorBase")
+        run_result: r[m.Meltano.CommandExecutionResult] = (
+            executor_type().execute_meltano_command(
+                list(meltano_args),
+                _cwd=pipeline_dir,
+            )
+        )
         if run_result.is_failure:
             error_msg = run_result.error or "Unknown error"
-            if "FileNotFoundError" in error_msg or "not found" in error_msg.lower():
-                return r[str].fail("Meltano CLI executable not found")
-            return r[str].fail(f"Failed to execute Meltano CLI command: {error_msg}")
-        completed = run_result.value
+            return r[str].fail(
+                f"Failed to execute Meltano runtime command: {error_msg}"
+            )
+        completed: m.Meltano.CommandExecutionResult = run_result.value
         if completed.exit_code != 0:
-            command_error = completed.stderr.strip() or completed.stdout.strip()
-            if not command_error:
-                command_error = (
-                    f"Meltano command failed with exit code {completed.exit_code}"
-                )
+            command_error = u.Meltano.command_failure_message(
+                completed,
+                default=f"Meltano command failed with exit code {completed.exit_code}",
+            )
             return r[str].fail(command_error)
         logger = FlextLogger(__name__)
-        if completed.stdout.strip():
-            logger.info(completed.stdout.strip())
-        return r[str].ok(completed.stdout.strip() or "executed")
+        output = u.to_str(completed.output).strip()
+        if u.chk(output, empty=False):
+            logger.info(output)
+        return r[str].ok(output or "executed")
 
     @staticmethod
     def list_pipelines() -> r[t.StrSequence]:

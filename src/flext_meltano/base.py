@@ -14,7 +14,7 @@ from collections.abc import Mapping, Sequence
 from types import ModuleType
 from typing import Annotated, override
 
-from flext_core import FlextService, FlextSettings
+from flext_core import FlextService
 from pydantic import Field
 
 from flext_meltano import FlextMeltanoSettings, c, p, t
@@ -109,10 +109,12 @@ class FlextMeltanoServiceBase(FlextService[Mapping[str, t.NormalizedValue]]):
         config = self.config
         if isinstance(config, FlextMeltanoSettings):
             return config
-        return FlextSettings.get_global().get_namespace(
-            "meltano",
-            FlextMeltanoSettings,
+        normalized_overrides = (
+            {str(key): value for key, value in self.config_overrides.items()}
+            if self.config_overrides
+            else {}
         )
+        return FlextMeltanoSettings(**normalized_overrides)
 
 
 s = FlextMeltanoServiceBase

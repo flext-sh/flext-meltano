@@ -29,10 +29,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     def execute(self, **_kwargs: t.Container) -> r[t.Meltano.Project.ProjectMetadata]:
         """Execute (implements Service pattern)."""
         if self.project_root:
-            info: t.Meltano.Project.ProjectMetadata = {
-                "root": str(self.project_root),
-                "name": str(self.project_root.name),
-            }
+            info = u.Meltano.build_project_metadata(self.project_root)
             return r[t.Meltano.Project.ProjectMetadata].ok(info)
         return r[t.Meltano.Project.ProjectMetadata].fail("No project loaded")
 
@@ -66,14 +63,14 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     def initialize_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Initialize a new Meltano project."""
         try:
-            root.mkdir(parents=True, exist_ok=True)
+            ensure_result = u.Meltano.ensure_directory(root, exist_ok=True)
+            if ensure_result.is_failure:
+                return r[t.Meltano.Project.ProjectMetadata].fail(
+                    ensure_result.error or "Failed to prepare project directory",
+                )
             self.project = Project(root)
             self.project_root = root
-            info: t.Meltano.Project.ProjectMetadata = {
-                "root": str(root),
-                "name": str(root.name),
-                "state": "initialized",
-            }
+            info = u.Meltano.build_project_metadata(root, state="initialized")
             self.logger.info("Meltano project initialized", root=str(root))
             return r[t.Meltano.Project.ProjectMetadata].ok(info)
         except (
@@ -93,7 +90,8 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
     def install_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
         """Install a plugin in the project."""
         return r[t.Meltano.PluginInfo].fail(
-            f"Plugin installation requires meltano-core SDK integration: install_plugin({name!r})"
+            "Plugin installation requires meltano-core SDK integration: "
+            f"install_plugin({name!r})"
         )
 
     def load_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
@@ -105,11 +103,7 @@ class FlextMeltanoProjectManager(FlextService[t.Meltano.Project.ProjectMetadata]
                 )
             self.project = Project(root)
             self.project_root = root
-            info: t.Meltano.Project.ProjectMetadata = {
-                "root": str(root),
-                "name": str(root.name),
-                "state": "loaded",
-            }
+            info = u.Meltano.build_project_metadata(root, state="loaded")
             self.logger.info("Meltano project loaded", root=str(root))
             return r[t.Meltano.Project.ProjectMetadata].ok(info)
         except (

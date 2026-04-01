@@ -6,22 +6,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
 import time
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import override
 
-import meltano
 from flext_core import FlextSettings, r, s
 
 from flext_meltano import (
     FlextMeltanoDbtAdapter,
+    FlextMeltanoExecutorBase,
     FlextMeltanoPipelineAdapter,
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     c,
     t,
+    u,
 )
 
 
@@ -41,41 +41,26 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             project_name: str,
             project_dir: Path,
         ) -> r[t.Meltano.ExecutionResultDict]:
-            """Create new Meltano project via CLI."""
-            try:
-                project_path = Path(project_dir) / project_name
-                proc = subprocess.run(
-                    ["meltano", "init", project_name],
-                    capture_output=True,
-                    text=True,
-                    cwd=str(project_dir),
-                    timeout=60,
-                    check=False,
+            """Create a new Meltano project via the imported library."""
+            project_path = Path(project_dir) / project_name
+            init_result = FlextMeltanoExecutorBase.initialize_project_root(
+                project_path,
+            )
+            if init_result.is_failure:
+                return r[t.Meltano.ExecutionResultDict].fail(
+                    init_result.error or "Project creation failed",
                 )
-                result: t.Meltano.ExecutionResultDict = {
+            result: t.Meltano.ExecutionResultDict = u.Meltano.build_status_payload(
+                c.Meltano.Enums.OperationStatus.CREATED,
+                extra_fields={
                     "project_name": project_name,
                     "project_path": str(project_path),
-                    "status": (
-                        c.Meltano.Enums.OperationStatus.CREATED
-                        if proc.returncode == 0
-                        else c.Meltano.Enums.OperationStatus.ERROR
-                    ),
-                    "output": proc.stdout,
-                    "error": proc.stderr,
+                    "output": f"Initialized {c.Meltano.Paths.MELTANO_PROJECT_FILE}",
+                    "error": "",
                     "created_at": str(time.time()),
-                }
-                return r[t.Meltano.ExecutionResultDict].ok(result)
-            except (
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-                subprocess.TimeoutExpired,
-            ) as ex:
-                return r[t.Meltano.ExecutionResultDict].fail(
-                    f"Project creation failed: {ex}"
-                )
+                },
+            )
+            return r[t.Meltano.ExecutionResultDict].ok(result)
 
         @override
         def execute(self) -> r[t.Meltano.ExecutionResultDict]:
@@ -84,7 +69,12 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
 
         def get_version(self) -> r[t.Meltano.ExecutionResultDict]:
             """Get Meltano version information using native API."""
-            meltano_version = getattr(meltano, "__version__", "unknown")
+            version_result = FlextMeltanoExecutorBase.get_version()
+            if version_result.is_failure:
+                return r[t.Meltano.ExecutionResultDict].fail(
+                    version_result.error or "Failed to get Meltano version",
+                )
+            meltano_version = version_result.value
             version_info: t.Meltano.ExecutionResultDict = {
                 "version": meltano_version,
                 "meltano": meltano_version,
@@ -98,7 +88,8 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         ) -> r[t.Meltano.ExecutionResultDict]:
             """Initialize Meltano project using railway pattern."""
             return self.create_project(
-                project_name=project_root.name, project_dir=project_root
+                project_name=project_root.name,
+                project_dir=project_root.parent,
             )
 
     class PluginAdapter(s[Sequence[t.Meltano.PluginDefinition]]):
@@ -113,45 +104,32 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             self,
             plugin_type: str | None = None,
         ) -> r[Sequence[t.Meltano.PluginDefinition]]:
-            """Discover available plugins via Meltano CLI."""
+            """Discover available plugins via Meltano project runtime."""
             try:
-                proc = subprocess.run(
-                    ["meltano", "list"],
-                    capture_output=True,
-                    text=True,
-                    timeout=30,
-                    check=False,
+                executor = FlextMeltanoExecutorBase()
+                plugins_result = executor.get_project_plugins(
+                    plugin_type=plugin_type,
+                    _cwd=u.Meltano.resolve_project_root(self.settings),
                 )
-                if proc.returncode != 0:
+                if plugins_result.is_failure:
                     return r[Sequence[t.Meltano.PluginDefinition]].fail(
-                        f"meltano list failed: {proc.stderr}",
+                        plugins_result.error or "Plugin discovery failed",
                     )
                 plugins: list[t.Meltano.PluginDefinition] = []
-                for line in proc.stdout.splitlines():
-                    stripped = line.strip()
-                    if not stripped:
+                for plugin in plugins_result.value:
+                    plugin_name = str(plugin.get("name", ""))
+                    plugin_group = str(plugin.get("type", ""))
+                    if not plugin_name:
                         continue
-                    ptype = (
-                        "tap"
-                        if stripped.startswith("tap-")
-                        else "target"
-                        if stripped.startswith("target-")
-                        else "transformer"
-                        if stripped.startswith("dbt-")
-                        else "other"
-                    )
-                    plugins.append({"name": stripped, "type": ptype})
-                if plugin_type:
-                    plugins = [p for p in plugins if p.get("type") == plugin_type]
+                    plugins.append({
+                        "name": plugin_name,
+                        "type": u.Meltano.normalize_discovered_plugin_type(
+                            plugin_group,
+                            plugin_name,
+                        ),
+                    })
                 return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
-            except (
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-                subprocess.TimeoutExpired,
-            ) as ex:
+            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
                 return r[Sequence[t.Meltano.PluginDefinition]].fail(
                     f"Plugin discovery failed: {ex}"
                 )
@@ -170,7 +148,9 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Execute adapter service returning current settings."""
-        return r[Mapping[str, t.NormalizedValue]].ok(self.settings.model_dump())
+        return r[Mapping[str, t.NormalizedValue]].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
 
 __all__ = ["FlextMeltanoAdapter"]

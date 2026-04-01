@@ -1,4 +1,4 @@
-"""FLEXT Pipeline Abstractions - Base class with core Meltano CLI operations.
+"""FLEXT Pipeline Abstractions - Base class with in-process Meltano operations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,98 +6,133 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import importlib
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
-from typing import ClassVar, override
+from typing import TYPE_CHECKING, ClassVar, override
 
 from flext_core import r
-from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
+
+if TYPE_CHECKING:
+    from flext_meltano import FlextMeltanoExecutorBase
 
 OPERATION_ERRORS = (ValueError, TypeError, KeyError, AttributeError, OSError)
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
-    """Base abstraction wrapping Meltano CLI via subprocess with r[T] results."""
+    """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
     service_name: str = "FlextMeltanoAbstractions"
 
-    def _run_meltano(self, args: Sequence[str]) -> r[str]:
-        """Run a meltano CLI command and return stdout on success."""
-        cmd: Sequence[str] = ["meltano", *args]
-        cwd = (
-            self.settings.project_root if self.settings.project_root != Path() else None
+    @staticmethod
+    def _build_executor(
+        _settings: object,
+    ) -> FlextMeltanoExecutorBase:
+        """Create an executor lazily to avoid import cycles during package init."""
+        executor_module = importlib.import_module(
+            "flext_meltano.services._executor_base",
         )
-        run_result = FlextInfraUtilitiesSubprocess.run_raw(cmd, cwd=cwd)
+        executor_type = getattr(executor_module, "FlextMeltanoExecutorBase")
+        return executor_type()
+
+    def _run_meltano(self, args: Sequence[str]) -> r[str]:
+        """Run a Meltano runtime command and return stdout on success."""
+        cwd = u.Meltano.resolve_project_root(self.settings)
+        run_result: r[m.Meltano.CommandExecutionResult] = self._build_executor(
+            self.settings,
+        ).execute_meltano_command(
+            list(args),
+            _cwd=cwd,
+        )
         if run_result.is_failure:
-            error_msg = run_result.error or "Unknown error"
-            if "FileNotFoundError" in error_msg or "not found" in error_msg.lower():
-                return r[str].fail("Meltano CLI executable not found")
+            error_msg = str(run_result.error or "Unknown error")
             return r[str].fail(f"Meltano command failed: {error_msg}")
-        completed = run_result.value
+        completed: m.Meltano.CommandExecutionResult = run_result.value
         if completed.exit_code != 0:
-            stderr_out = completed.stderr.strip() or completed.stdout.strip()
+            stderr_out = completed.error.strip() or completed.output.strip()
             return r[str].fail(
                 stderr_out or f"meltano exited with code {completed.exit_code}",
             )
-        return r[str].ok(completed.stdout.strip())
+        return r[str].ok(completed.output.strip())
 
-    def add_plugin(self, plugin_config: t.Meltano.PluginConfiguration) -> r[bool]:
+    def add_plugin(self, plugin_config: Mapping[str, object]) -> r[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
             plugin_name = str(plugin_config.get("plugin_name", ""))
             if not plugin_type or not plugin_name:
                 return r[bool].fail("plugin_type and plugin_name are required")
-            cmd_result = self._run_meltano(["add", plugin_type, plugin_name])
+            cmd_result = self._run_meltano(
+                [c.Meltano.Commands.ADD, plugin_type, plugin_name],
+            )
             if cmd_result.is_failure:
                 return r[bool].fail(cmd_result.error or "Failed to add plugin")
-            self.logger.info(
-                "Plugin added",
-                plugin_type=plugin_type,
-                plugin_name=plugin_name,
-            )
             return r[bool].ok(value=True)
         except OPERATION_ERRORS as e:
             error_msg = f"Failed to add plugin: {e}"
-            self.logger.exception(error_msg)
             return r[bool].fail(error_msg)
+
+    @staticmethod
+    def _resolve_project_root(project: object) -> Path | None:
+        """Extract a project root path from supported project-like objects."""
+        root_candidate = getattr(project, "root_dir", None) or getattr(
+            project,
+            "root",
+            None,
+        )
+        if isinstance(root_candidate, Path):
+            return root_candidate
+        if isinstance(root_candidate, str) and root_candidate:
+            return Path(root_candidate)
+        if isinstance(project, Mapping):
+            for key in ("root_dir", "root"):
+                mapping_value = project.get(key)
+                if isinstance(mapping_value, Path):
+                    return mapping_value
+                if isinstance(mapping_value, str) and mapping_value:
+                    return Path(mapping_value)
+        return None
 
     def get_plugins_of_type(
         self,
-        _project: p.Meltano.Project | t.Meltano.Dbt.Project | FlextMeltanoServiceBase,
+        _project: object,
         plugin_type: str,
-    ) -> r[Mapping[str, t.Meltano.PluginDefinition]]:
-        """List installed plugins of *plugin_type* via ``meltano list``."""
+    ) -> r[dict[str, dict[str, str]]]:
+        """List installed project plugins of *plugin_type* via Meltano runtime."""
         try:
-            cmd_result = self._run_meltano(["list", plugin_type])
-            if cmd_result.is_failure:
-                return r[Mapping[str, t.Meltano.PluginDefinition]].fail(
-                    cmd_result.error or f"Failed to list {plugin_type}",
+            cwd = self._resolve_project_root(_project)
+            plugins_result = self._build_executor(self.settings).get_project_plugins(
+                plugin_type=u.Meltano.normalize_plugin_group(plugin_type),
+                _cwd=cwd,
+            )
+            if plugins_result.is_failure:
+                return r[dict[str, dict[str, str]]].fail(
+                    plugins_result.error or f"Failed to list {plugin_type}",
                 )
-            plugins: MutableMapping[str, t.Meltano.PluginDefinition] = {}
-            for line in cmd_result.value.splitlines():
-                name = line.strip()
-                if name:
-                    plugins[name] = {
-                        "name": name,
-                        "type": plugin_type,
-                        "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                    }
-            return r[Mapping[str, t.Meltano.PluginDefinition]].ok(plugins)
+            plugins: dict[str, dict[str, str]] = {}
+            for plugin in plugins_result.value:
+                plugin_name = str(plugin.get("name", ""))
+                if not plugin_name:
+                    continue
+                plugins[plugin_name] = {
+                    "name": plugin_name,
+                    "type": plugin_type,
+                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                }
+            return r[dict[str, dict[str, str]]].ok(plugins)
         except OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
-            self.logger.exception(error_msg)
-            return r[Mapping[str, t.Meltano.PluginDefinition]].fail(error_msg)
+            return r[dict[str, dict[str, str]]].fail(error_msg)
 
     def execute_singer_pipeline(
         self,
-        elt_context: t.Meltano.MeltanoConfigDict,
-        extractor_plugin: p.Meltano.Plugin,
-        loader_plugin: p.Meltano.Plugin,
-    ) -> r[t.Meltano.ELT.PipelineResult]:
+        elt_context: Mapping[str, object],
+        extractor_plugin: object,
+        loader_plugin: object,
+    ) -> r[dict[str, str | int]]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
             extractor_name = str(
@@ -108,22 +143,23 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 getattr(loader_plugin, "name", None)
                 or elt_context.get("loader_name", c.IDENTIFIER_UNKNOWN),
             )
-            cmd_result = self._run_meltano(["elt", extractor_name, loader_name])
+            cmd_result = self._run_meltano(
+                [c.Meltano.Commands.ELT, extractor_name, loader_name],
+            )
             if cmd_result.is_failure:
-                return r[t.Meltano.ELT.PipelineResult].fail(
+                return r[dict[str, str | int]].fail(
                     cmd_result.error or "Pipeline execution failed",
                 )
-            result: t.Meltano.ELT.PipelineResult = {
+            result: dict[str, str | int] = {
                 "status": c.Meltano.Enums.StreamStatus.COMPLETED,
                 "source": extractor_name,
                 "sink": loader_name,
                 "records_processed": 0,
             }
-            return r[t.Meltano.ELT.PipelineResult].ok(result)
+            return r[dict[str, str | int]].ok(result)
         except OPERATION_ERRORS as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
-            self.logger.exception(error_msg)
-            return r[t.Meltano.ELT.PipelineResult].fail(error_msg)
+            return r[dict[str, str | int]].fail(error_msg)
 
     def find_project(self, project_root: Path) -> r[Path]:
         """Find and validate a Meltano project directory."""
@@ -132,14 +168,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 return r[Path].fail(
                     f"Project path is not a valid directory: {project_root}",
                 )
-            self.logger.info(
-                "Pipeline project loaded successfully",
-                project_root=str(project_root),
-            )
             return r[Path].ok(project_root)
         except OPERATION_ERRORS as e:
             error_msg = f"Failed to load pipeline project: {e}"
-            self.logger.exception(error_msg)
             return r[Path].fail(error_msg)
 
     def get_project_root(self) -> r[Path]:
@@ -153,33 +184,34 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Execute abstractions service and return real configuration state."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
+        project_root = u.Meltano.resolve_project_root(self.settings)
+        return r[Mapping[str, t.NormalizedValue]].ok({
             "status": c.Meltano.Enums.StreamStatus.COMPLETED,
-            "project_root": str(self.settings.project_root),
-            "environment": self.settings.environment,
-            "meltano_version": self.settings.meltano_version,
+            "project_root": str(project_root) if project_root is not None else "",
+            "environment": str(getattr(self.settings, "environment", "")),
+            "meltano_version": str(getattr(self.settings, "meltano_version", "")),
         })
 
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> r[t.ContainerMapping]:
+    ) -> r[dict[str, object]]:
         """Create Singer catalog entry from stream definition."""
-        entry: t.ContainerMapping = {
+        entry: dict[str, object] = {
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": stream.stream_schema,
-            "metadata": list[t.ContainerMapping](),
+            "metadata": list[dict[str, object]](),
         }
-        return r[t.ContainerMapping].ok(entry)
+        return r[dict[str, object]].ok(entry)
 
     def get_stream_config(
         self,
         config: m.Meltano.TapConfig,
         stream_name: str,
-    ) -> t.ContainerMapping:
+    ) -> Mapping[str, object]:
         """Get configuration for a specific stream."""
         if config.stream_config and stream_name in config.stream_config:
             val = config.stream_config[stream_name]

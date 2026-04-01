@@ -12,6 +12,7 @@ from flext_cli import FlextCliUtilities
 from flext_meltano import (
     FlextMeltanoUtilitiesConfig,
     FlextMeltanoUtilitiesProject,
+    FlextMeltanoUtilitiesRuntime,
     FlextMeltanoUtilitiesSinger,
     FlextMeltanoUtilitiesYaml,
 )
@@ -26,6 +27,7 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
     class Meltano(
         FlextMeltanoUtilitiesYaml,
+        FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesConfig,
         FlextMeltanoUtilitiesProject,
         FlextMeltanoUtilitiesSinger,

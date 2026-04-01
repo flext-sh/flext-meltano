@@ -6,13 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
-import time
 from typing import override
 
 from flext_core import FlextSettings, r, s
 
-from flext_meltano import FlextMeltanoSettings, c, t
+from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoSettings, c, m, t, u
 
 
 class FlextMeltanoPipelineAdapter(s[t.Meltano.ExecutionResultDict]):
@@ -35,47 +33,40 @@ class FlextMeltanoPipelineAdapter(s[t.Meltano.ExecutionResultDict]):
         tap_name: str,
         target_name: str,
     ) -> r[t.Meltano.ExecutionResultDict]:
-        """Execute ELT pipeline using Meltano CLI."""
+        """Execute ELT pipeline using Meltano runtime."""
         try:
-            if not tap_name.startswith("tap-"):
+            if not tap_name.startswith(c.Meltano.Prefixes.TAP):
                 return r[t.Meltano.ExecutionResultDict].fail(
                     f"Invalid tap name format: {tap_name}"
                 )
-            if not target_name.startswith("target-"):
+            if not target_name.startswith(c.Meltano.Prefixes.TARGET):
                 return r[t.Meltano.ExecutionResultDict].fail(
                     f"Invalid target name format: {target_name}"
                 )
-            start = time.monotonic()
-            proc = subprocess.run(
-                ["meltano", "elt", tap_name, target_name],
-                capture_output=True,
-                text=True,
-                timeout=300,
-                check=False,
+            executor = FlextMeltanoExecutorBase()
+            execution_result = executor.execute_meltano_command(
+                u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
+                _cwd=u.Meltano.resolve_project_root(self.settings),
             )
-            duration = time.monotonic() - start
-            execution_result: t.Meltano.ExecutionResultDict = {
-                "tap": tap_name,
-                "target": target_name,
-                "status": (
-                    c.Meltano.Enums.StreamStatus.COMPLETED
-                    if proc.returncode == 0
-                    else c.Meltano.Enums.StreamStatus.FAILED
-                ),
-                "success": proc.returncode == 0,
-                "output": proc.stdout,
-                "error": proc.stderr,
-                "execution_duration": duration,
-            }
-            return r[t.Meltano.ExecutionResultDict].ok(execution_result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            subprocess.TimeoutExpired,
-        ) as ex:
+            if execution_result.is_failure:
+                return r[t.Meltano.ExecutionResultDict].fail(
+                    execution_result.error or "Pipeline execution failed"
+                )
+            command_result: m.Meltano.CommandExecutionResult = execution_result.value
+            pipeline_result: t.Meltano.ExecutionResultDict = (
+                u.Meltano.build_command_execution_payload(
+                    command_result,
+                    extra_fields={
+                        "tap": tap_name,
+                        "target": target_name,
+                    },
+                    success_status=c.Meltano.Enums.StreamStatus.COMPLETED,
+                    failure_status=c.Meltano.Enums.StreamStatus.FAILED,
+                    duration_field="execution_duration",
+                )
+            )
+            return r[t.Meltano.ExecutionResultDict].ok(pipeline_result)
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[t.Meltano.ExecutionResultDict].fail(
                 f"Pipeline execution failed: {ex}"
             )
@@ -95,37 +86,28 @@ class FlextMeltanoDbtAdapter(s[t.Meltano.DbtResultDict]):
         return self.execute_dbt_operation()
 
     def execute_dbt_operation(self) -> r[t.Meltano.DbtResultDict]:
-        """Execute DBT operation via Meltano invoke."""
+        """Execute DBT operation via Meltano runtime."""
         try:
-            start = time.monotonic()
-            proc = subprocess.run(
-                ["meltano", "invoke", "dbt-postgres:run"],
-                capture_output=True,
-                text=True,
-                timeout=600,
-                check=False,
+            executor = FlextMeltanoExecutorBase()
+            execution_result = executor.execute_meltano_command(
+                u.Meltano.build_dbt_runtime_command(c.Meltano.Dbt.COMMAND_RUN),
+                _cwd=u.Meltano.resolve_project_root(self.settings),
             )
-            duration = time.monotonic() - start
-            dbt_result: t.Meltano.DbtResultDict = {
-                "status": (
-                    c.Meltano.Enums.StreamStatus.COMPLETED
-                    if proc.returncode == 0
-                    else c.Meltano.Enums.StreamStatus.FAILED
-                ),
-                "success": proc.returncode == 0,
-                "output": proc.stdout,
-                "error": proc.stderr,
-                "execution_time": duration,
-            }
+            if execution_result.is_failure:
+                return r[t.Meltano.DbtResultDict].fail(
+                    execution_result.error or "DBT operation failed"
+                )
+            command_result: m.Meltano.CommandExecutionResult = execution_result.value
+            dbt_result: t.Meltano.DbtResultDict = (
+                u.Meltano.build_command_execution_payload(
+                    command_result,
+                    success_status=c.Meltano.Enums.StreamStatus.COMPLETED,
+                    failure_status=c.Meltano.Enums.StreamStatus.FAILED,
+                    duration_field="execution_time",
+                )
+            )
             return r[t.Meltano.DbtResultDict].ok(dbt_result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            subprocess.TimeoutExpired,
-        ) as ex:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[t.Meltano.DbtResultDict].fail(f"DBT operation failed: {ex}")
 
 

@@ -15,15 +15,15 @@ from pydantic import PrivateAttr
 
 from flext_meltano import (
     FlextMeltanoCommandRouter,
-    FlextMeltanoConstants as c,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
-    FlextMeltanoProtocols as p,
     FlextMeltanoServiceBase,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
-    FlextMeltanoTypes as t,
+    c,
+    p,
+    t,
 )
 
 

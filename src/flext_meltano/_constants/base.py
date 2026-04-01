@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_cli import FlextCliConstants
 from pydantic import ValidationError
 
 
@@ -43,27 +42,45 @@ class FlextMeltanoConstantsBase:
     class Paths:
         """Filesystem layout for Meltano projects."""
 
-        PROJECT_FILE: Final[str] = "pipeline.yml"
-        MELTANO_PROJECT_FILE: Final[str] = "pipeline.yml"
+        PROJECT_FILE: Final[str] = "meltano.yml"
+        MELTANO_PROJECT_FILE: Final[str] = "meltano.yml"
         STATE_DIR: Final[str] = ".pipeline"
         LOGS_DIR: Final[str] = "logs"
         OUTPUT_DIR: Final[str] = "output"
+        TRANSFORM_DIR: Final[str] = "transform"
+        VENV_DIR: Final[str] = ".meltano/python"
 
     class Commands:
         """CLI commands used by Meltano."""
 
+        BINARY: Final[str] = "meltano"
+        ALL_OPTION: Final[str] = "--all"
+        CWD_OPTION: Final[str] = "--cwd"
+        ENVIRONMENT_OPTION: Final[str] = "--environment"
+        HELP_OPTION: Final[str] = "--help"
+        LIST_OPTION: Final[str] = "--list"
+        MODELS_OPTION: Final[str] = "--models"
+        NO_ENVIRONMENT_OPTION: Final[str] = "--no-environment"
+        SELECT_OPTION: Final[str] = "--select"
+        SHORT_HELP_OPTION: Final[str] = "-h"
+        VERSION_OPTION: Final[str] = "--version"
+        ADD: Final[str] = "add"
+        ELT: Final[str] = "elt"
+        INIT: Final[str] = "init"
         INSTALL: Final[str] = "install"
+        INVOKE: Final[str] = "invoke"
         RUN: Final[str] = "run"
+        SELECT: Final[str] = "select"
         PIPELINE: Final[str] = "pipeline"
 
     class Network:
         """Network defaults derived from flext-core."""
 
-        MELTANO_DEFAULT_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_LIMIT
-        DEFAULT_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS
-        DISCOVERY_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS * 2
-        REQUEST_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS * 2
-        CONNECTION_TIMEOUT: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS
+        MELTANO_DEFAULT_TIMEOUT: Final[int] = 300
+        DEFAULT_TIMEOUT: Final[int] = 30
+        DISCOVERY_TIMEOUT: Final[int] = 60
+        REQUEST_TIMEOUT: Final[int] = 60
+        CONNECTION_TIMEOUT: Final[int] = 30
         BUFFER_SIZE: Final[int] = 8192
         MAX_PARALLEL_STREAMS: Final[int] = 4
 
@@ -79,6 +96,7 @@ class FlextMeltanoConstantsBase:
         """Plugin management constants."""
 
         CONFIG_VERSION: Final[int] = 1
+        DBT_DEFAULT_NAME: Final[str] = "dbt-postgres"
         DISCOVERY_FILENAME: Final[str] = "catalog.json"
         STATE_FILENAME: Final[str] = "state.json"
         DEFAULT_VARIANT: Final[str] = "meltanolabs"
@@ -86,11 +104,16 @@ class FlextMeltanoConstantsBase:
         PREFIX_TAP: Final[str] = "tap"
         PREFIX_TARGET: Final[str] = "target"
         PREFIX_DBT: Final[str] = "dbt"
-        INSTALLATION_TIMEOUT: Final[int] = (
-            FlextCliConstants.DEFAULT_TIMEOUT_SECONDS * 10
-        )
+        INSTALLATION_TIMEOUT: Final[int] = 300
         MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
         MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
+
+    class EnvironmentVariables:
+        """Environment variable names used by Meltano runtime settings."""
+
+        PROJECT_ROOT: Final[str] = "MELTANO_PROJECT_ROOT"
+        ENVIRONMENT: Final[str] = "MELTANO_ENVIRONMENT"
+        LOG_LEVEL: Final[str] = "MELTANO_LOG_LEVEL"
 
     class Singer:
         """Singer protocol message metadata and shared constants."""

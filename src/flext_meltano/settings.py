@@ -9,7 +9,7 @@ from flext_core import FlextSettings, r
 from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_meltano import c, t
+from flext_meltano import c, t, u
 
 
 @FlextSettings.auto_register("meltano")
@@ -18,15 +18,17 @@ class FlextMeltanoSettings(FlextSettings):
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(extra="ignore")
 
-    MELTANO_VERSION: ClassVar[str] = "3.9.1"
-    SINGER_SDK_VERSION: ClassVar[str] = "0.48.0"
-    DBT_VERSION: ClassVar[str] = "1.10.5"
-    PROJECT_FILE: ClassVar[str] = "pipeline.yml"
-    STATE_DIR: ClassVar[str] = ".pipeline"
-    VENV_DIR: ClassVar[str] = ".meltano/python"
-    MELTANO_PROJECT_ROOT_ENV: ClassVar[str] = "MELTANO_PROJECT_ROOT"
-    MELTANO_ENVIRONMENT_ENV: ClassVar[str] = "MELTANO_ENVIRONMENT"
-    MELTANO_LOG_LEVEL_ENV: ClassVar[str] = "MELTANO_LOG_LEVEL"
+    MELTANO_VERSION: ClassVar[str] = c.Meltano.Versions.MELTANO_REQUIRED
+    SINGER_SDK_VERSION: ClassVar[str] = c.Meltano.Versions.SINGER_SDK_REQUIRED
+    DBT_VERSION: ClassVar[str] = c.Meltano.Versions.DBT_REQUIRED
+    PROJECT_FILE: ClassVar[str] = c.Meltano.Paths.MELTANO_PROJECT_FILE
+    STATE_DIR: ClassVar[str] = c.Meltano.Paths.STATE_DIR
+    VENV_DIR: ClassVar[str] = c.Meltano.Paths.VENV_DIR
+    MELTANO_PROJECT_ROOT_ENV: ClassVar[str] = (
+        c.Meltano.EnvironmentVariables.PROJECT_ROOT
+    )
+    MELTANO_ENVIRONMENT_ENV: ClassVar[str] = c.Meltano.EnvironmentVariables.ENVIRONMENT
+    MELTANO_LOG_LEVEL_ENV: ClassVar[str] = c.Meltano.EnvironmentVariables.LOG_LEVEL
 
     project_root: Annotated[
         Path,
@@ -61,15 +63,19 @@ class FlextMeltanoSettings(FlextSettings):
     def _validate_environment(cls, value: str) -> str:
         normalized = value.strip().lower()
         aliases = {
-            "dev": "development",
-            "test": "testing",
-            "prod": "production",
+            "dev": c.Meltano.Enums.Environment.DEVELOPMENT,
+            "test": c.Meltano.Enums.Environment.TESTING,
+            "prod": c.Meltano.Enums.Environment.PRODUCTION,
         }
         normalized = aliases.get(normalized, normalized)
-        if normalized not in {"development", "testing", "production"}:
+        if normalized not in {
+            c.Meltano.Enums.Environment.DEVELOPMENT,
+            c.Meltano.Enums.Environment.TESTING,
+            c.Meltano.Enums.Environment.PRODUCTION,
+        }:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)
-        return normalized
+        return str(normalized)
 
     @field_validator("log_level")
     @classmethod
@@ -94,14 +100,11 @@ class FlextMeltanoSettings(FlextSettings):
 
     def get_absolute_venv_dir(self) -> Path:
         """Return absolute Meltano virtualenv directory."""
-        return (self.project_root / ".meltano" / "python").resolve()
+        return (self.project_root / Path(self.VENV_DIR)).resolve()
 
     def validate_project_structure(self) -> r[bool]:
         """Validate required project structure artifacts."""
-        pipeline_file = self.project_root / self.PROJECT_FILE
-        if not pipeline_file.exists():
-            return r[bool].fail(f"{self.PROJECT_FILE} not found in {self.project_root}")
-        return r[bool].ok(True)
+        return u.Meltano.validate_project_structure(self.project_root)
 
     def get_environment_variables(self) -> t.StrMapping:
         """Build runtime environment variables for Meltano commands."""
@@ -134,12 +137,20 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def get_supported_plugin_types(cls) -> t.StrSequence:
         """Return supported Meltano plugin categories."""
-        return ["extractors", "loaders", "transforms"]
+        return [
+            c.Meltano.Enums.PluginType.EXTRACTORS,
+            c.Meltano.Enums.PluginType.LOADERS,
+            c.Meltano.Enums.PluginType.TRANSFORMS,
+        ]
 
     @classmethod
     def get_supported_environments(cls) -> t.StrSequence:
         """Return list of valid deployment environment names."""
-        return ["development", "testing", "production"]
+        return [
+            c.Meltano.Enums.Environment.DEVELOPMENT,
+            c.Meltano.Enums.Environment.TESTING,
+            c.Meltano.Enums.Environment.PRODUCTION,
+        ]
 
     @classmethod
     def get_supported_log_levels(cls) -> t.StrSequence:
@@ -161,15 +172,19 @@ class FlextMeltanoSettings(FlextSettings):
         """Create settings for a named runtime environment."""
         normalized = env_type.strip().lower()
         aliases = {
-            "dev": "development",
-            "test": "testing",
-            "prod": "production",
+            "dev": c.Meltano.Enums.Environment.DEVELOPMENT,
+            "test": c.Meltano.Enums.Environment.TESTING,
+            "prod": c.Meltano.Enums.Environment.PRODUCTION,
         }
         normalized = aliases.get(normalized, normalized)
-        if normalized not in {"development", "testing", "production"}:
+        if normalized not in {
+            c.Meltano.Enums.Environment.DEVELOPMENT,
+            c.Meltano.Enums.Environment.TESTING,
+            c.Meltano.Enums.Environment.PRODUCTION,
+        }:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)
-        return cls(environment=normalized)
+        return cls(environment=str(normalized))
 
 
 __all__ = ["FlextMeltanoSettings"]

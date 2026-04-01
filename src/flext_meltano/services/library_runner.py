@@ -19,6 +19,7 @@ from flext_meltano import (
     c,
     p,
     t,
+    u,
 )
 
 
@@ -35,37 +36,30 @@ class FlextMeltanoLibraryRunner(
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute the library runner service."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "service_type": "flext_meltano_library_runner",
-            "status": c.Meltano.Enums.OperationStatus.READY,
-        })
+        """Execute library runner — explicit SDK integration is still required."""
+        return r[t.Meltano.MeltanoConfigDict].fail(
+            "Library runner execution requires meltano-core SDK integration"
+        )
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ResultDict]:
         """Get DBT runner instance for DBT operations."""
-        try:
-            dbt_runner: t.Meltano.ResultDict = {
-                "type": "dbt_runner",
-                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                "capabilities": list(c.Meltano.Capabilities.DBT),
-            }
-            return r[t.Meltano.ResultDict].ok(dbt_runner)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ResultDict].fail(f"Failed to get DBT runner: {e}")
+        return r[t.Meltano.ResultDict].ok(
+            u.Meltano.build_capabilities_payload(
+                "dbt_runner",
+                c.Meltano.Capabilities.DBT,
+            )
+        )
 
     @staticmethod
     def get_singer_manager() -> r[t.Meltano.ResultDict]:
         """Get Singer manager instance for Singer operations."""
-        try:
-            singer_manager: t.Meltano.ResultDict = {
-                "type": "singer_manager",
-                "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
-                "capabilities": list(c.Meltano.Capabilities.SINGER),
-            }
-            return r[t.Meltano.ResultDict].ok(singer_manager)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.ResultDict].fail(f"Failed to get Singer manager: {e}")
+        return r[t.Meltano.ResultDict].ok(
+            u.Meltano.build_capabilities_payload(
+                "singer_manager",
+                c.Meltano.Capabilities.SINGER,
+            )
+        )
 
     def execute_complete_elt_pipeline(
         self,
@@ -88,15 +82,16 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = {
-                "success": execution_result.success,
-                "tap_name": tap_name,
-                "target_name": target_name,
-                "execution_time": execution_result.execution_time,
-                "exit_code": execution_result.exit_code,
-                "output": execution_result.output or "",
-                "error": execution_result.error or "",
-            }
+            elt_result: t.Meltano.Processing.EltPipelineResult = (
+                u.Meltano.build_command_execution_payload(
+                    execution_result,
+                    extra_fields={
+                        "tap_name": tap_name,
+                        "target_name": target_name,
+                    },
+                    duration_field="execution_time",
+                )
+            )
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
                 if dbt_result.is_failure:
@@ -104,7 +99,10 @@ class FlextMeltanoLibraryRunner(
                     elt_result["dbt_error"] = dbt_result.error or ""
                 else:
                     elt_result["dbt_success"] = True
-                    elt_result["dbt_models_run"] = ",".join(dbt_models)
+                    elt_result["dbt_models_run"] = u.join(
+                        dbt_models,
+                        separator=",",
+                    )
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
@@ -143,15 +141,16 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = {
-                "success": execution_result.success,
-                "tap_name": tap.name,
-                "target_name": target.name,
-                "execution_time": execution_result.execution_time,
-                "exit_code": execution_result.exit_code,
-                "output": execution_result.output,
-                "error": execution_result.error,
-            }
+            elt_result: t.Meltano.Processing.EltPipelineResult = (
+                u.Meltano.build_command_execution_payload(
+                    execution_result,
+                    extra_fields={
+                        "tap_name": tap.name,
+                        "target_name": target.name,
+                    },
+                    duration_field="execution_time",
+                )
+            )
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"ELT pipeline execution failed: {e}"

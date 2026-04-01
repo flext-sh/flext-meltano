@@ -23,6 +23,8 @@ from typing import TYPE_CHECKING as _TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
+    from flext_core import FlextTypes
+
     from flext_meltano.singer.catalog import *
     from flext_meltano.singer.sdk import *
     from flext_meltano.singer.service import *

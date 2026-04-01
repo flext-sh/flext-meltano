@@ -11,7 +11,7 @@ from typing import override
 
 from flext_core import r
 
-from flext_meltano import FlextMeltanoAbstractions, FlextMeltanoServiceBase, t
+from flext_meltano import FlextMeltanoAbstractions, FlextMeltanoServiceBase, t, u
 
 
 class FlextMeltanoOrchestrationService(FlextMeltanoServiceBase):
@@ -28,7 +28,9 @@ class FlextMeltanoOrchestrationService(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute orchestration service logic."""
-        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
     def execute_pipeline(
         self,

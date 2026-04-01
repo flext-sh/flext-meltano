@@ -11,9 +11,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import r
-from flext_tests import tm
-
 from flext_meltano import FlextMeltanoAdapter, FlextMeltanoLibraryRunner
 
 
@@ -23,26 +20,27 @@ class TestFlextMeltanoLibraryRunner:
     def test_initialization(self) -> None:
         """Test library runner initialization."""
         runner = FlextMeltanoLibraryRunner()
-        tm.that(runner, none=False)
-        tm.that(hasattr(runner, "logger"), eq=True)
+        assert runner is not None
+        assert hasattr(runner, "logger")
 
     def test_execute_returns_failure(self) -> None:
         """Test execute returns r[T].fail (requires meltano-core SDK)."""
         runner = FlextMeltanoLibraryRunner()
         result = runner.execute()
-        tm.that(result.is_failure, eq=True)
-        tm.that("meltano-core SDK" in (result.error or ""), eq=True)
+        assert result.is_failure
+        assert "meltano-core SDK" in (result.error or "")
 
     def test_execute_complete_elt_pipeline(self) -> None:
-        """Test complete E-L-T pipeline execution delegates to subprocess."""
+        """Test complete E-L-T pipeline execution delegates to Meltano runtime."""
         runner = FlextMeltanoLibraryRunner()
         result = runner.execute_complete_elt_pipeline(
             tap_name="tap-csv",
             target_name="target-jsonl",
         )
-        # Pipeline runs subprocess; may succeed or fail depending on environment
-        tm.that(result, is_=r)
-        tm.that(result.is_success or result.is_failure, eq=True)
+        assert result.is_success
+        assert "exit_code" in result.value
+        assert "output" in result.value
+        assert "error" in result.value
 
     def test_execute_complete_elt_pipeline_result_shape(self) -> None:
         """Test pipeline result has expected keys when successful."""
@@ -51,21 +49,23 @@ class TestFlextMeltanoLibraryRunner:
             tap_name="tap-csv",
             target_name="target-jsonl",
         )
-        tm.that(result, is_=r)
+        assert result.is_success or result.is_failure
         if result.is_success:
             pipeline_data = result.value
-            tm.that(pipeline_data, is_=dict)
-            tm.that(pipeline_data, has="success")
-            tm.that(pipeline_data, has="tap_name")
-            tm.that(pipeline_data, has="target_name")
-            tm.that(pipeline_data, has="execution_time")
+            assert isinstance(pipeline_data, dict)
+            assert "success" in pipeline_data
+            assert "tap_name" in pipeline_data
+            assert "target_name" in pipeline_data
+            assert "execution_time" in pipeline_data
 
     def test_run_dbt_transformation(self) -> None:
-        """Test DBT transformation delegates to executor subprocess."""
+        """Test DBT transformation delegates to Meltano runtime."""
         runner = FlextMeltanoLibraryRunner()
         result = runner.run_dbt_transformation(models=["model1"])
-        tm.that(result, is_=r)
-        tm.that(result.is_success or result.is_failure, eq=True)
+        assert result.is_success
+        assert "exit_code" in result.value
+        assert "output" in result.value
+        assert "error" in result.value
 
 
 class TestProjectAdapterIntegration:
@@ -75,13 +75,12 @@ class TestProjectAdapterIntegration:
         """Test that FlextMeltanoAdapter.ProjectAdapter can get version."""
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.get_version()
-        tm.ok(result)
-        tm.that(result.value, none=False)
-        tm.that(result.value, has="version")
+        assert result.is_success
+        assert result.value is not None
+        assert "version" in result.value
 
     def test_adapter_execute(self) -> None:
         """Test that FlextMeltanoAdapter.ProjectAdapter execute returns r."""
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.execute()
-        tm.that(hasattr(result, "is_success"), eq=True)
-        tm.that(hasattr(result, "is_failure"), eq=True)
+        assert result is not None

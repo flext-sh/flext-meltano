@@ -12,10 +12,15 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import override
 
-from flext_cli import u
 from flext_core import FlextLogger, r
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoYamlOperationsMixin, c, t
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoYamlOperationsMixin,
+    c,
+    t,
+    u,
+)
 
 _module_logger = FlextLogger(__name__)
 
@@ -25,7 +30,8 @@ class FlextMeltanoFileManagers(
 ):
     """DOMAIN-SPECIFIC Meltano file managers using flext-core as SOURCE OF TRUTH.
 
-    Contains ONLY Meltano-specific file operations that cannot be generalized to flext-core.
+    Contains ONLY Meltano-specific file operations that cannot be generalized
+    to flext-core.
     ALL general file operations MUST use u (FlextUtilities) directly.
     """
 
@@ -138,22 +144,14 @@ class FlextMeltanoFileManagers(
     @classmethod
     def validate_project_structure(cls, project_root: Path) -> r[bool]:
         """Validate Meltano project structure."""
-        try:
-            if not project_root.exists():
-                return r[bool].fail(f"Project path does not exist: {project_root}")
-            if not project_root.is_dir():
-                return r[bool].fail(f"Project path is not a directory: {project_root}")
-            pipeline_config = project_root / "pipeline.yml"
-            if not pipeline_config.exists():
-                return r[bool].fail(f"pipeline.yml not found in {project_root}")
-            return r[bool].ok(value=True)
-        except (ValueError, TypeError, OSError) as e:
-            return r[bool].fail(f"Failed to validate project structure: {e}")
+        return u.Meltano.validate_project_structure(project_root)
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute file managers service — returns current settings."""
-        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
 
 __all__ = ["FlextMeltanoFileManagers"]

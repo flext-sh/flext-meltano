@@ -118,18 +118,14 @@ def _build_plugin_info(
 ) -> t.StrMapping:
     """Build plugin info dict from a plugin definition."""
     source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
-    variants_str = (
-        u.join(list(source.variants.keys()), separator=",") if source.variants else ""
+    return u.Meltano.build_plugin_discovery_item(
+        plugin_name,
+        plugin_type,
+        default_variant=source.default_variant,
+        variants=source.variants,
+        description=source.description,
+        logo_url=source.logo_url,
     )
-    constructed: t.MutableContainerMapping = {
-        "name": plugin_name,
-        "type": plugin_type,
-        "default_variant": source.default_variant,
-        "variants": variants_str,
-        "logo_url": source.logo_url,
-        "description": source.description,
-    }
-    return m.Meltano.PluginDiscoveryItem.model_validate(constructed).model_dump()
 
 
 def _extract_plugin_info(
@@ -154,19 +150,14 @@ def _extract_plugin_info(
         return r[t.StrMapping].fail(
             f"Plugin '{plugin_name}' not found in {plugin_type}"
         )
-    variants_str = (
-        u.join(list(plugin_value.variants.keys()), separator=",")
-        if plugin_value.variants
-        else ""
+    plugin_info = u.Meltano.build_plugin_discovery_item(
+        plugin_name,
+        plugin_type,
+        default_variant=plugin_value.default_variant,
+        variants=plugin_value.variants,
+        description=plugin_value.description,
+        logo_url=plugin_value.logo_url,
     )
-    plugin_info = m.Meltano.PluginDiscoveryItem.model_validate({
-        "name": plugin_name,
-        "type": plugin_type,
-        "default_variant": plugin_value.default_variant,
-        "variants": variants_str,
-        "description": plugin_value.description,
-        "logo_url": plugin_value.logo_url,
-    }).model_dump()
     return r[t.StrMapping].ok(plugin_info)
 
 

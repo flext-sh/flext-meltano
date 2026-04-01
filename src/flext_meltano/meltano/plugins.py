@@ -15,6 +15,7 @@ from flext_meltano import (
     p,
     r,
     t,
+    u,
 )
 
 
@@ -63,7 +64,9 @@ class FlextMeltanoComponentService(
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute the pipeline component service."""
-        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
     def _build_plugin_addition_result(
         self,
@@ -93,19 +96,16 @@ class FlextMeltanoComponentService(
         plugin_name: str,
     ) -> r[bool]:
         """Execute the actual plugin addition using abstraction layer."""
-        try:
-            plugin_config: t.Meltano.PluginConfiguration = {
-                "project_root": str(project.root_dir),
-                "plugin_type": plugin_type_str,
-                "plugin_name": plugin_name,
-            }
-            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
-            add_result: r[bool] = abstractions.add_plugin(plugin_config)
-            if add_result.is_failure:
-                return r[bool].fail(add_result.error or "Plugin addition failed")
-            return r[bool].ok(value=True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[bool].fail(f"Plugin addition failed: {e}")
+        plugin_config: t.Meltano.PluginConfiguration = {
+            "project_root": str(project.root_dir),
+            "plugin_type": plugin_type_str,
+            "plugin_name": plugin_name,
+        }
+        abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+        add_result: r[bool] = abstractions.add_plugin(plugin_config)
+        if add_result.is_failure:
+            return r[bool].fail(add_result.error or "Plugin addition failed")
+        return r[bool].ok(value=True)
 
     def _log_plugin_addition_start(self, plugin_name: str, plugin_type: str) -> r[None]:
         """Log plugin addition start."""

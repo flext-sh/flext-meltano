@@ -1,7 +1,7 @@
 """FLEXT Meltano Bridge - Go ↔ Python bridge communication.
 
 This module provides the FlextMeltanoBridge class for JSON-based communication
-between Go and Python components for Meltano operations.
+between Go and Python components using the imported Meltano runtime.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,13 +10,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess
 from collections.abc import Mapping
 from typing import override
 
 from flext_core import r
 
-from flext_meltano import FlextMeltanoServiceBase, t
+from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, t, u
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):
@@ -28,37 +27,22 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
     @staticmethod
     def discover_plugins() -> r[t.StrSequence]:
-        """Discover installed Meltano plugins via CLI."""
-        try:
-            proc = subprocess.run(
-                ["meltano", "list"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-                check=False,
+        """Discover installed Meltano plugins from the active project runtime."""
+        executor = FlextMeltanoExecutorBase()
+        plugins_result = executor.get_project_plugins()
+        if plugins_result.is_failure:
+            return r[t.StrSequence].fail(
+                plugins_result.error or "Plugin discovery failed",
             )
-            if proc.returncode != 0:
-                return r[t.StrSequence].fail(f"meltano list failed: {proc.stderr}")
-            plugins = [
-                line.strip() for line in proc.stdout.splitlines() if line.strip()
-            ]
-            return r[t.StrSequence].ok(plugins)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            subprocess.TimeoutExpired,
-        ) as e:
-            return r[t.StrSequence].fail(f"Plugin discovery failed: {e}")
+        plugin_names = u.Meltano.extract_plugin_names(plugins_result.value)
+        return r[t.StrSequence].ok(plugin_names)
 
     @staticmethod
     def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
     ) -> r[t.Meltano.ExecutionResultDict]:
-        """Execute a Meltano CLI command.
+        """Execute a Meltano runtime command.
 
         Args:
             command: Command name to execute.
@@ -68,66 +52,40 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             r with command execution results.
 
         """
-        try:
-            cmd = ["meltano", command]
-            if args:
-                cmd.extend(f"--{k}={v}" for k, v in args.items())
-            proc = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=60, check=False
+        executor = FlextMeltanoExecutorBase()
+        cmd = u.Meltano.build_bridge_command_args(command, args)
+        command_result = executor.execute_meltano_command(cmd)
+        if command_result.is_failure:
+            return r[t.Meltano.ExecutionResultDict].fail(
+                command_result.error or "Command failed",
             )
-            result: t.Meltano.ExecutionResultDict = {
-                "command": command,
-                "success": proc.returncode == 0,
-                "output": proc.stdout,
-                "error": proc.stderr,
-            }
-            return r[t.Meltano.ExecutionResultDict].ok(result)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            subprocess.TimeoutExpired,
-        ) as e:
-            return r[t.Meltano.ExecutionResultDict].fail(f"Command failed: {e}")
+        command_execution = command_result.value
+        result: t.Meltano.ExecutionResultDict = (
+            u.Meltano.build_command_execution_payload(
+                command_execution,
+                extra_fields={"command": command},
+                status_field=None,
+                duration_field=None,
+            )
+        )
+        return r[t.Meltano.ExecutionResultDict].ok(result)
 
     @staticmethod
     def get_version() -> r[str]:
-        """Get Meltano version via CLI."""
-        try:
-            proc = subprocess.run(
-                ["meltano", "version"],
-                capture_output=True,
-                text=True,
-                timeout=15,
-                check=False,
-            )
-            if proc.returncode != 0:
-                return r[str].fail(f"meltano version failed: {proc.stderr}")
-            return r[str].ok(proc.stdout.strip())
-        except (OSError, subprocess.TimeoutExpired) as e:
-            return r[str].fail(f"Version check failed: {e}")
+        """Get Meltano version from the imported library."""
+        return FlextMeltanoExecutorBase.get_version()
 
     @staticmethod
     def validate_connection() -> r[bool]:
-        """Validate connection to Meltano CLI by running version check."""
-        try:
-            proc = subprocess.run(
-                ["meltano", "version"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-                check=False,
-            )
-            return r[bool].ok(proc.returncode == 0)
-        except (OSError, subprocess.TimeoutExpired):
-            return r[bool].ok(False)
+        """Validate Meltano runtime availability via library version lookup."""
+        return r[bool].ok(FlextMeltanoBridge.get_version().is_success)
 
     @override
     def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Execute bridge service returning current settings."""
-        return r[Mapping[str, t.NormalizedValue]].ok(self.settings.model_dump())
+        return r[Mapping[str, t.NormalizedValue]].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
 
 __all__ = ["FlextMeltanoBridge"]

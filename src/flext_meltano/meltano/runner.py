@@ -16,7 +16,7 @@ from typing import override
 
 from flext_core import r, s
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, p, t
+from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, c, p, t, u
 
 
 class FlextMeltanoDbtTransformationRunner:
@@ -33,23 +33,26 @@ class FlextMeltanoDbtTransformationRunner:
         try:
             args: MutableSequence[str] = []
             if models:
-                args.extend(["--models", *models])
-            result = executor.execute_dbt_command("run", args)
+                args.extend([c.Meltano.Commands.MODELS_OPTION, *models])
+            result = executor.execute_dbt_command(c.Meltano.Dbt.COMMAND_RUN, args)
             if result.is_failure:
                 return r[t.Meltano.Processing.DbtTransformationResult].fail(
                     result.error or "DBT transformation failed",
                 )
             execution_result = result.value
-            dbt_result: t.Meltano.Processing.DbtTransformationResult = {
-                "success": execution_result.success,
-                "exit_code": execution_result.exit_code,
-                "models_run": ",".join(models) if models else "all",
-                "execution_method": "library_runner",
-                "project_dir": str(project_dir) if project_dir else "",
-                "execution_time": execution_result.execution_time,
-                "output": execution_result.output or "",
-                "error": execution_result.error or "",
-            }
+            dbt_result: t.Meltano.Processing.DbtTransformationResult = (
+                u.Meltano.build_command_execution_payload(
+                    execution_result,
+                    extra_fields={
+                        "models_run": u.join(models, separator=",")
+                        if models
+                        else "all",
+                        "execution_method": "library_runner",
+                        "project_dir": str(project_dir) if project_dir else "",
+                    },
+                    duration_field="execution_time",
+                )
+            )
             return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"DBT transformation failed: {e}"
@@ -102,15 +105,16 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = {
-                "success": execution_result.success,
-                "tap_name": tap_name,
-                "target_name": target_name,
-                "execution_time": execution_result.execution_time,
-                "exit_code": execution_result.exit_code,
-                "output": execution_result.output or "",
-                "error": execution_result.error or "",
-            }
+            elt_result: t.Meltano.Processing.EltPipelineResult = (
+                u.Meltano.build_command_execution_payload(
+                    execution_result,
+                    extra_fields={
+                        "tap_name": tap_name,
+                        "target_name": target_name,
+                    },
+                    duration_field="execution_time",
+                )
+            )
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
                 if dbt_result.is_failure:
@@ -118,7 +122,10 @@ class FlextMeltanoLibraryRunner(
                     elt_result["dbt_error"] = dbt_result.error or ""
                 else:
                     elt_result["dbt_success"] = True
-                    elt_result["dbt_models_run"] = ",".join(dbt_models)
+                    elt_result["dbt_models_run"] = u.join(
+                        dbt_models,
+                        separator=",",
+                    )
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
@@ -167,15 +174,16 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = {
-                "success": execution_result.success,
-                "tap_name": tap.name,
-                "target_name": target.name,
-                "execution_time": execution_result.execution_time,
-                "exit_code": execution_result.exit_code,
-                "output": execution_result.output,
-                "error": execution_result.error,
-            }
+            elt_result: t.Meltano.Processing.EltPipelineResult = (
+                u.Meltano.build_command_execution_payload(
+                    execution_result,
+                    extra_fields={
+                        "tap_name": tap.name,
+                        "target_name": target.name,
+                    },
+                    duration_field="execution_time",
+                )
+            )
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"ELT pipeline execution failed: {e}"

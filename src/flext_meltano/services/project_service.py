@@ -10,6 +10,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
+from flext_core import r
+
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoServiceBase,
@@ -17,7 +19,6 @@ from flext_meltano import (
     FlextMeltanoValidators,
     c,
     m,
-    r,
     t,
     u,
 )
@@ -120,16 +121,13 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         meltano_config: FlextMeltanoSettings,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Build normalized execution payload for service health responses."""
-        try:
-            return r[t.Meltano.MeltanoConfigDict].ok({
-                "service_type": service_type,
-                "status": c.Meltano.Enums.OperationStatus.READY,
-                "config": meltano_config.model_dump()
-                if u.is_pydantic_model(meltano_config)
-                else {},
-            })
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.Meltano.MeltanoConfigDict].fail(f"Service execution failed: {e}")
+        payload: t.Meltano.MeltanoConfigDict = u.Meltano.build_status_payload(
+            c.Meltano.Enums.OperationStatus.READY,
+            extra_fields={"service_type": service_type},
+            config=meltano_config,
+            config_field="config",
+        )
+        return r[t.Meltano.MeltanoConfigDict].ok(payload)
 
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
@@ -155,24 +153,16 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         self, project_name: str, project_path: Path
     ) -> r[t.StrMapping]:
         """Build successful project creation result."""
-        try:
-            result: t.StrMapping = {
-                "success": "true",
-                "project_name": project_name,
-                "project_path": str(project_path),
-                "creation_method": "manual_file_creation",
-                "meltano_yml_exists": str(
-                    (project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE).exists()
-                ),
-            }
-            self.logger.info(
-                "Meltano project created successfully",
-                project_name=project_name,
-                project_path=str(project_path),
-            )
-            return r[t.StrMapping].ok(result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[t.StrMapping].fail(f"Failed to build creation result: {e}")
+        result = u.Meltano.build_project_creation_result(
+            project_name,
+            project_path,
+        )
+        self.logger.info(
+            "Meltano project created successfully",
+            project_name=project_name,
+            project_path=str(project_path),
+        )
+        return r[t.StrMapping].ok(result)
 
     def _initialize_project_instance(self, project_path: Path) -> r[Path]:
         """Initialize Meltano project instance using abstractions."""

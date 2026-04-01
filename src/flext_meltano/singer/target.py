@@ -13,7 +13,7 @@ from typing import override
 
 from flext_core import r
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 
 class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
@@ -142,7 +142,9 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
     def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
         """Validate a sink configuration.

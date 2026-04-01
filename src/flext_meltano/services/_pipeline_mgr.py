@@ -17,6 +17,7 @@ from flext_meltano import (
     c,
     m,
     t,
+    u,
 )
 
 
@@ -51,9 +52,9 @@ class FlextMeltanoPipelineManager(
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle pipeline command using composition."""
-        if not args or args[0] in {"--help", "-h"}:
+        if u.Meltano.is_help_request(args):
             self.cli.show_pipeline_help()
-            return r[str].ok("help")
+            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
         subcommand = args[0]
         subcommand_args = args[1:]
         handler_result = self._get_pipeline_handler(subcommand)

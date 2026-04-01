@@ -11,16 +11,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
-from flext_core import r
-from flext_tests import tm
 from pytest_benchmark.fixture import BenchmarkFixture
 
-from flext_meltano import FlextMeltano
-from tests import t
+from flext_meltano import FlextMeltano, FlextMeltanoAdapter, c
 
 pytestmark = pytest.mark.unit
 
@@ -31,31 +27,31 @@ class TestFlextMeltanoInitialization:
     def test_api_initialization_default(self) -> None:
         """Test API initialization with default parameters."""
         api = FlextMeltano()
-        tm.that(api, none=False)
+        assert api is not None
 
     def test_api_initialization_with_service_name(self) -> None:
         """Test API initialization with specific service name."""
         api = FlextMeltano(service_name="test-api")
-        tm.that(api, none=False)
+        assert api is not None
 
     def test_api_service_name_property(self) -> None:
         """Test API service name property."""
         api = FlextMeltano(service_name="test-service")
-        tm.that(api.service_name, eq="test-service")
+        assert api.service_name == "test-service"
 
     def test_api_get_instance_returns_singleton(self) -> None:
         """Test get_instance returns the same instance."""
         FlextMeltano._instance = None
         instance1 = FlextMeltano.get_instance()
         instance2 = FlextMeltano.get_instance()
-        tm.that(instance1 is instance2, eq=True)
+        assert instance1 is instance2
         FlextMeltano._instance = None
 
     def test_api_has_expected_attributes(self) -> None:
         """Test basic API attributes exist."""
         api = FlextMeltano()
-        tm.that(hasattr(api, "execute"), eq=True)
-        tm.that(hasattr(api, "service_name"), eq=True)
+        assert hasattr(api, "execute")
+        assert hasattr(api, "service_name")
 
 
 class TestFlextMeltanoExecuteMethod:
@@ -65,37 +61,37 @@ class TestFlextMeltanoExecuteMethod:
         """Test execute method returns r."""
         api = FlextMeltano()
         result = api.execute()
-        tm.ok(result)
-        tm.that(result.value, none=False)
+        assert result.is_success
+        assert result.value is not None
 
     def test_execute_contains_version(self) -> None:
         """Test execute result contains version info."""
         api = FlextMeltano()
         result = api.execute()
-        tm.ok(result)
-        tm.that("version" in result.value, eq=True)
+        assert result.is_success
+        assert "version" in result.value
 
     def test_execute_contains_service_name(self) -> None:
         """Test execute result contains service_name."""
         api = FlextMeltano()
         result = api.execute()
-        tm.ok(result)
-        tm.that("service_name" in result.value, eq=True)
+        assert result.is_success
+        assert "service_name" in result.value
 
     def test_execute_contains_status(self) -> None:
         """Test execute result contains status."""
         api = FlextMeltano()
         result = api.execute()
-        tm.ok(result)
-        tm.that("status" in result.value, eq=True)
+        assert result.is_success
+        assert "status" in result.value
 
     def test_execute_contains_handlers(self) -> None:
         """Test execute result contains handlers list."""
         api = FlextMeltano()
         result = api.execute()
-        tm.ok(result)
-        tm.that("handlers" in result.value, eq=True)
-        tm.that(result.value["handlers"], is_=list)
+        assert result.is_success
+        assert "handlers" in result.value
+        assert isinstance(result.value["handlers"], list)
 
 
 class TestFlextMeltanoProjectOperations:
@@ -109,8 +105,8 @@ class TestFlextMeltanoProjectOperations:
                 project_name="",
                 project_dir=Path(temp_dir),
             )
-            tm.fail(result)
-            tm.that(result.error, none=False)
+            assert result.is_failure
+            assert result.error is not None
 
     def test_create_project_with_config(self) -> None:
         """Test project creation with project_dir."""
@@ -120,21 +116,23 @@ class TestFlextMeltanoProjectOperations:
                 project_name="config_test",
                 project_dir=Path(temp_dir),
             )
-            tm.that(result.is_success or result.is_failure, eq=True)
+            assert result.is_success
+            project_path = Path(str(result.value["project_path"]))
+            assert (project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE).exists()
 
     def test_validate_project_nonexistent(self) -> None:
         """Test validation of non-existent project."""
         with tempfile.TemporaryDirectory() as temp_dir:
             nonexistent = Path(temp_dir) / "nonexistent"
             result = FlextMeltano.validate_project(nonexistent)
-            tm.fail(result)
-            tm.that(result.error, none=False)
+            assert result.is_failure
+            assert result.error is not None
 
     def test_validate_project_with_path(self) -> None:
         """Test project validation with specific path."""
         with tempfile.TemporaryDirectory() as temp_dir:
             result = FlextMeltano.validate_project(Path(temp_dir))
-            tm.that(result.is_success or result.is_failure, eq=True)
+            assert result.is_success or result.is_failure
 
 
 class TestFlextMeltanoPluginOperations:
@@ -146,7 +144,7 @@ class TestFlextMeltanoPluginOperations:
             component_type="extractors",
             component_name="tap-csv",
         )
-        tm.that(result.is_failure or result.is_success, eq=True)
+        assert result.is_failure or result.is_success
 
     def test_install_component_invalid_type(self) -> None:
         """Test component installation with invalid type."""
@@ -154,8 +152,8 @@ class TestFlextMeltanoPluginOperations:
             component_type="invalid_type",
             component_name="tap-csv",
         )
-        tm.fail(result)
-        tm.that(result.error, none=False)
+        assert result.is_failure
+        assert result.error is not None
 
     def test_install_component_with_config(self) -> None:
         """Test component installation with configuration."""
@@ -164,16 +162,33 @@ class TestFlextMeltanoPluginOperations:
             component_name="tap-csv",
             config={"path": "/tmp/test.csv"},
         )
-        tm.that(result.is_failure or result.is_success, eq=True)
+        assert result.is_failure or result.is_success
 
 
 class TestFlextMeltanoCatalogOperations:
     """Test FlextMeltano discover_plugins (from FlextMeltanoBridge)."""
 
-    def test_discover_plugins_returns_result(self) -> None:
-        """Test discover_plugins returns a result."""
+    def test_discover_plugins_requires_active_project(self) -> None:
+        """Test discover_plugins fails when no Meltano project is active."""
         bridge_result = FlextMeltano.discover_plugins()
-        tm.that(bridge_result.is_failure or bridge_result.is_success, eq=True)
+        assert bridge_result.is_failure
+        assert "failed to load meltano project" in (bridge_result.error or "").lower()
+
+    def test_discover_plugins_returns_empty_list_for_new_project(self) -> None:
+        """Test discover_plugins succeeds for a newly initialized project."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir) / "plugins_project"
+            create_result = FlextMeltanoAdapter.ProjectAdapter().create_project(
+                project_name=project_root.name,
+                project_dir=project_root.parent,
+            )
+            assert create_result.is_success
+            adapter = FlextMeltanoAdapter.PluginAdapter(
+                config_overrides={"project_root": str(project_root)},
+            )
+            plugins_result = adapter.discover_plugins()
+            assert plugins_result.is_success
+            assert isinstance(plugins_result.value, list)
 
 
 class TestFlextMeltanoPipelineOperations:
@@ -186,7 +201,7 @@ class TestFlextMeltanoPipelineOperations:
             tap_name="tap-csv",
             target_name="target-jsonl",
         )
-        tm.that(result.is_failure or result.is_success, eq=True)
+        assert result.is_failure or result.is_success
 
 
 class TestFlextMeltanoErrorHandling:
@@ -195,7 +210,7 @@ class TestFlextMeltanoErrorHandling:
     def test_api_default_initialization(self) -> None:
         """Test API initializes with defaults."""
         api = FlextMeltano()
-        tm.that(api, none=False)
+        assert api is not None
 
     def test_create_project_exception_handling(self) -> None:
         """Test project creation handles exceptions gracefully."""
@@ -204,13 +219,13 @@ class TestFlextMeltanoErrorHandling:
             project_name="test",
             project_dir=Path("/invalid/path/that/does/not/exist"),
         )
-        tm.that(result.is_failure or result.is_success, eq=True)
+        assert result.is_failure or result.is_success
 
     def test_validate_project_exception_handling(self) -> None:
         """Test project validation handles exceptions gracefully."""
         result = FlextMeltano.validate_project(Path("/invalid/path"))
-        tm.fail(result)
-        tm.that(result.error, none=False)
+        assert result.is_failure
+        assert result.error is not None
 
 
 class TestFlextMeltanoIntegration:
@@ -225,15 +240,13 @@ class TestFlextMeltanoIntegration:
                 project_name="integration_test",
                 project_dir=project_path.parent,
             )
-            tm.that(
-                create_result.is_success
-                or "already exists" in (create_result.error or ""),
-                eq=True,
+            assert create_result.is_success or "already exists" in (
+                create_result.error or ""
             )
             validate_result = FlextMeltano.validate_project(project_path)
-            tm.that(validate_result.is_failure or validate_result.is_success, eq=True)
+            assert validate_result.is_failure or validate_result.is_success
             plugins_result = FlextMeltano.discover_plugins()
-            tm.that(plugins_result.is_failure or plugins_result.is_success, eq=True)
+            assert plugins_result.is_failure or plugins_result.is_success
 
 
 @pytest.mark.benchmark
@@ -247,31 +260,25 @@ class TestFlextMeltanoSuccessPaths:
             project_name="test",
             project_dir=Path("/nonexistent/impossible/path/that/cannot/exist"),
         )
-        tm.fail(result)
-        tm.that(
-            result.error
-            and (
-                "Failed to create" in result.error
-                or "Project creation failed" in result.error
-                or "Permission denied" in result.error
-                or "not found" in result.error
-            ),
-            eq=True,
+        assert result.is_failure
+        assert result.error is not None
+        assert (
+            "Failed to create" in result.error
+            or "Project creation failed" in result.error
+            or "Permission denied" in result.error
+            or "not found" in result.error
         )
 
     def test_validate_project_exception_path(self) -> None:
         """Test project validation exception handling."""
         result = FlextMeltano.validate_project(Path("/nonexistent/path"))
-        tm.fail(result)
-        tm.that(
-            result.error
-            and (
-                "Failed to validate project" in result.error
-                or "not found" in result.error
-                or "validate" in (result.error or "").lower()
-                or ("exist" in (result.error or "").lower())
-            ),
-            eq=True,
+        assert result.is_failure
+        assert result.error is not None
+        assert (
+            "Failed to validate project" in result.error
+            or "not found" in result.error
+            or "validate" in result.error.lower()
+            or "exist" in result.error.lower()
         )
 
     def test_install_component_exception_path(self) -> None:
@@ -280,12 +287,12 @@ class TestFlextMeltanoSuccessPaths:
             component_type="invalid",
             component_name="nonexistent-plugin",
         )
-        tm.fail(result)
+        assert result.is_failure
 
     def test_discover_plugins_exception_path(self) -> None:
         """Test discover_plugins returns result."""
         result = FlextMeltano.discover_plugins()
-        tm.that(result.is_failure or result.is_success, eq=True)
+        assert result.is_failure or result.is_success
 
 
 @pytest.mark.benchmark
@@ -307,7 +314,7 @@ class TestFlextMeltanoPerformance:
         """Benchmark API execute performance."""
         api = FlextMeltano()
 
-        def run_execute() -> r[Mapping[str, t.NormalizedValue]]:
+        def run_execute() -> object:
             return api.execute()
 
         benchmark(run_execute)

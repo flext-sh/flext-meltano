@@ -7,12 +7,84 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_cli import FlextCliUtilities, r
+from flext_core import u
 
 from flext_meltano import c, m, t
 
 
 class FlextMeltanoUtilitiesConfig:
     """Configuration creation, normalization, and plugin catalog utilities."""
+
+    @classmethod
+    def coerce_config_mapping(
+        cls,
+        value: object | None,
+    ) -> t.Meltano.MeltanoConfigDict:
+        """Coerce settings/model/config inputs into canonical Meltano config dict."""
+        if value is None:
+            return {}
+        if u.is_pydantic_model(value):
+            model_data = value.model_dump()
+            if isinstance(model_data, Mapping):
+                return cls.normalize_config(model_data)
+            return {}
+        if isinstance(value, Mapping):
+            return cls.normalize_config(value)
+        return {}
+
+    @classmethod
+    def build_status_payload(
+        cls,
+        status: str,
+        *,
+        extra_fields: t.ContainerMapping | None = None,
+        config: object | None = None,
+        config_field: str | None = None,
+        status_field: str | None = "status",
+    ) -> t.ContainerMapping:
+        """Build a canonical status payload with optional normalized config."""
+        payload: t.ContainerMapping = {}
+        if status_field is not None:
+            payload[status_field] = status
+        if config_field is not None:
+            payload[config_field] = cls.coerce_config_mapping(config)
+        if extra_fields is None:
+            return payload
+        merged = u.merge_mappings(payload, extra_fields, strategy="replace")
+        if merged.is_success:
+            return merged.value
+        return {
+            **payload,
+            **extra_fields,
+        }
+
+    @classmethod
+    def build_capabilities_payload(
+        cls,
+        item_type: str,
+        capabilities: Sequence[str],
+        *,
+        status: str = c.Meltano.Enums.OperationStatus.AVAILABLE,
+        extra_fields: t.ContainerMapping | None = None,
+    ) -> t.Meltano.ResultDict:
+        """Build a canonical payload for capability-based service discovery."""
+        type_payload: t.ContainerMapping = {
+            "type": item_type,
+            "capabilities": list(capabilities),
+        }
+        if extra_fields is not None:
+            merged = u.merge_mappings(type_payload, extra_fields, strategy="replace")
+            if merged.is_success:
+                type_payload = merged.value
+            else:
+                type_payload = {
+                    **type_payload,
+                    **extra_fields,
+                }
+        return cls.build_status_payload(
+            status,
+            extra_fields=type_payload,
+        )
 
     @classmethod
     def create_meltano_config_dict(
@@ -142,7 +214,10 @@ class FlextMeltanoUtilitiesConfig:
 
     @classmethod
     def normalize_container_value(cls, value: t.NormalizedValue) -> t.NormalizedValue:
-        """Recursively normalize a value, converting Paths to strings and dropping None."""
+        """Recursively normalize values.
+
+        Converts paths to strings and drops None values.
+        """
         if isinstance(value, Path):
             return str(value)
         if isinstance(value, t.SCALAR_TYPES):
@@ -162,7 +237,10 @@ class FlextMeltanoUtilitiesConfig:
         cls,
         value: t.Meltano.MeltanoConfigDict | t.ContainerMapping | None,
     ) -> t.Meltano.MeltanoConfigDict:
-        """Normalize a config mapping, recursively converting values and dropping None."""
+        """Normalize config mappings.
+
+        Recursively converts values and drops None entries.
+        """
         if value is None:
             empty: t.Meltano.MeltanoConfigDict = {}
             return empty

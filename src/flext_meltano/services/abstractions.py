@@ -1,4 +1,4 @@
-"""FLEXT Pipeline Abstractions - Tap-specific Meltano CLI operations.
+"""FLEXT Pipeline Abstractions - Tap-specific Meltano runtime operations.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -20,7 +20,7 @@ from flext_meltano import (
 
 
 class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
-    """Core abstraction wrapping Meltano CLI via subprocess with r[T] results."""
+    """Core abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     @staticmethod
     def create_result_instance() -> r[FlextMeltanoAbstractions]:
@@ -47,7 +47,12 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         """Discover available streams via ``meltano select --list``."""
         try:
             cmd_result = self._run_meltano(
-                ["select", tap_instance.tap_type, "--list", "--all"],
+                [
+                    c.Meltano.Commands.SELECT,
+                    tap_instance.tap_type,
+                    c.Meltano.Commands.LIST_OPTION,
+                    c.Meltano.Commands.ALL_OPTION,
+                ],
             )
             if cmd_result.is_failure:
                 return r[t.ContainerMapping].fail(
@@ -84,10 +89,10 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 else c.IDENTIFIER_UNKNOWN
             )
             cmd_args = [
-                "elt",
+                c.Meltano.Commands.ELT,
                 tap_instance.tap_type,
                 str(loader_name),
-                "--select",
+                c.Meltano.Commands.SELECT_OPTION,
                 stream_name,
             ]
             cmd_result = self._run_meltano(cmd_args)

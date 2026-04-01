@@ -17,58 +17,56 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     """Generic data pipeline service with factory methods."""
 
     @staticmethod
+    def _create_specialized_service(
+        component_name: str,
+        *,
+        field_name: str,
+        component_label: str,
+    ) -> r[FlextMeltanoService]:
+        """Create a specialized Meltano service using a shared utility path."""
+        return u.try_(
+            lambda: FlextMeltanoService(
+                service_name=f"{component_name}_service",
+                service_version=c.Meltano.Defaults.SERVICE_VERSION,
+                **{field_name: component_name},
+            ),
+            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+        ).map_error(
+            lambda ex: f"Failed to create {component_label} '{component_name}': {ex}"
+        )
+
+    @staticmethod
     def create_sink_service(
         sink_name: str, **_config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create data sink service."""
-        try:
-            return r[FlextMeltanoService].ok(
-                FlextMeltanoService(
-                    service_name=f"{sink_name}_service",
-                    service_version=c.Meltano.Defaults.SERVICE_VERSION,
-                    sink_name=sink_name,
-                )
-            )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-            return r[FlextMeltanoService].fail(
-                f"Failed to create sink service '{sink_name}': {ex}"
-            )
+        return FlextMeltanoService._create_specialized_service(
+            sink_name,
+            field_name="sink_name",
+            component_label="sink service",
+        )
 
     @staticmethod
     def create_source_service(
         source_name: str, **_config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create data source service."""
-        try:
-            return r[FlextMeltanoService].ok(
-                FlextMeltanoService(
-                    service_name=f"{source_name}_service",
-                    service_version=c.Meltano.Defaults.SERVICE_VERSION,
-                    source_name=source_name,
-                )
-            )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-            return r[FlextMeltanoService].fail(
-                f"Failed to create source service '{source_name}': {ex}"
-            )
+        return FlextMeltanoService._create_specialized_service(
+            source_name,
+            field_name="source_name",
+            component_label="source service",
+        )
 
     @staticmethod
     def create_transformation_service(
         transformation_name: str, **_config: t.Scalar
     ) -> r[FlextMeltanoService]:
         """Create transformation service."""
-        try:
-            return r[FlextMeltanoService].ok(
-                FlextMeltanoService(
-                    service_name=f"{transformation_name}_service",
-                    service_version=c.Meltano.Defaults.SERVICE_VERSION,
-                    transformation_name=transformation_name,
-                )
-            )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-            return r[FlextMeltanoService].fail(
-                f"Failed to create transformation service '{transformation_name}': {ex}"
-            )
+        return FlextMeltanoService._create_specialized_service(
+            transformation_name,
+            field_name="transformation_name",
+            component_label="transformation service",
+        )
 
     @staticmethod
     def create_dbt_service(name: str, **cfg: t.Scalar) -> r[FlextMeltanoService]:
@@ -94,13 +92,19 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.MeltanoConfigDict].fail("Environment name is required")
         if environment_name not in c.Meltano.Environments.VALID:
             return r[t.Meltano.MeltanoConfigDict].fail(
-                f"Invalid environment: {environment_name}. Valid: {c.Meltano.Environments.VALID}"
+                "Invalid environment: "
+                f"{environment_name}. "
+                f"Valid: {c.Meltano.Environments.VALID}"
             )
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "environment": environment_name,
-            "configuration": config or {},
-            "status": c.Meltano.Enums.OperationStatus.CONFIGURED,
-        })
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.build_status_payload(
+                c.Meltano.Enums.OperationStatus.CONFIGURED,
+                extra_fields={
+                    "environment": environment_name,
+                    "configuration": config or {},
+                },
+            )
+        )
 
     @staticmethod
     def configure_pipeline(
@@ -109,11 +113,15 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         _config: t.Meltano.MeltanoConfigDict | None = None,
     ) -> r[t.Meltano.MeltanoConfigDict]:
         """Configure generic data pipeline."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "source": source_name,
-            "sink": sink_name,
-            "status": c.Meltano.Enums.OperationStatus.CONFIGURED,
-        })
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.build_status_payload(
+                c.Meltano.Enums.OperationStatus.CONFIGURED,
+                extra_fields={
+                    "source": source_name,
+                    "sink": sink_name,
+                },
+            )
+        )
 
     @staticmethod
     def install_component(
@@ -130,12 +138,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.MeltanoConfigDict].fail(
                 f"Invalid component type: {component_type}"
             )
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "component_name": component_name,
-            "component_type": component_type,
-            "status": c.Meltano.Enums.OperationStatus.INSTALLED,
-            "configuration": config or {},
-        })
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.build_status_payload(
+                c.Meltano.Enums.OperationStatus.INSTALLED,
+                extra_fields={
+                    "component_name": component_name,
+                    "component_type": component_type,
+                    "configuration": config or {},
+                },
+            )
+        )
 
     @staticmethod
     def validate_service_config(config: t.Meltano.MeltanoConfigDict) -> r[bool]:
@@ -157,16 +169,22 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute service with railway pattern."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "service_name": c.Meltano.Metadata.APPLICATION_NAME,
-            "version": c.Meltano.FLEXT_MELTANO_VERSION,
-            "status": c.CommonStatus.ACTIVE,
-            "handlers": list(c.Meltano.Handlers.ALL),
-        })
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.build_status_payload(
+                c.CommonStatus.ACTIVE,
+                extra_fields={
+                    "service_name": c.Meltano.Metadata.APPLICATION_NAME,
+                    "version": c.Meltano.FLEXT_MELTANO_VERSION,
+                    "handlers": list(c.Meltano.Handlers.ALL),
+                },
+            )
+        )
 
     def get_default_config(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Get default configuration from current settings."""
-        return r[t.Meltano.MeltanoConfigDict].ok(self.settings.model_dump())
+        return r[t.Meltano.MeltanoConfigDict].ok(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
     def get_info(self) -> r[t.Meltano.PluginInfo]:
         """Get service information."""
@@ -190,7 +208,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     def validate_config(self) -> r[bool]:
         """Validate current service configuration."""
-        return self.validate_service_config(self.settings.model_dump())
+        return self.validate_service_config(
+            u.Meltano.coerce_config_mapping(self.settings)
+        )
 
 
 __all__ = ["FlextMeltanoService"]

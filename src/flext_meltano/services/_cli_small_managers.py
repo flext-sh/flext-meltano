@@ -10,7 +10,7 @@ from collections.abc import Callable
 
 from flext_core import FlextLogger, r
 
-from flext_meltano import p, t
+from flext_meltano import c, p, t, u
 
 
 class _FlextMeltanoSimpleCommandManager:
@@ -25,9 +25,9 @@ class _FlextMeltanoSimpleCommandManager:
         operation_handler: Callable[[str, t.StrSequence], r[str]],
     ) -> r[str]:
         """Route command to help or operation handler."""
-        if not args or args[0] in {"--help", "-h"}:
+        if u.Meltano.is_help_request(args):
             help_handler()
-            return r[str].ok("help")
+            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
         return operation_handler(args[0], args[1:])
 
     def _log_unimplemented(self, label: str, operation: str) -> r[str]:
@@ -87,9 +87,9 @@ class FlextMeltanoStatusManager:
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle status command."""
-        if not args or args[0] in {"--help", "-h"}:
+        if u.Meltano.is_help_request(args):
             self.cli.show_status_help()
-            return r[str].ok("help")
+            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
         return self._execute_status_operation(args[0], args[1:])
 
     def handle_version_command(self, args: t.StrSequence) -> r[str]:
