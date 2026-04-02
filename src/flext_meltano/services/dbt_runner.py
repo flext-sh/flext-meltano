@@ -50,7 +50,11 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
     ) -> r[str]:
         """Execute a dbt command via subprocess."""
         try:
-            self.logger.info(f"Running dbt {operation}", command=" ".join(cmd))
+            self.logger.info(
+                "Running dbt operation",
+                operation=operation,
+                command=" ".join(cmd),
+            )
             result = FlextInfraUtilitiesSubprocess.run_raw(list(cmd))
             if result.is_failure:
                 return r[str].fail(result.error or f"dbt {operation} failed")
@@ -58,12 +62,13 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             if out.exit_code != 0:
                 stderr_msg = out.stderr or f"dbt {operation} failed"
                 self.logger.warning(
-                    f"dbt {operation} returned non-zero exit code",
+                    "dbt operation returned non-zero exit code",
+                    operation=operation,
                     exit_code=out.exit_code,
                     stderr=stderr_msg,
                 )
                 return r[str].fail(stderr_msg)
-            self.logger.info(f"dbt {operation} completed successfully")
+            self.logger.info("dbt operation completed", operation=operation)
             return r[str].ok(out.stdout)
         except (
             ValueError,
@@ -71,7 +76,9 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             OSError,
             RuntimeError,
         ) as e:
-            self.logger.exception(f"dbt {operation} failed", error=str(e))
+            self.logger.exception(
+                "dbt operation failed", operation=operation, error=str(e)
+            )
             return r[str].fail(f"dbt {operation} failed: {e}")
 
     def dbt_run_models(

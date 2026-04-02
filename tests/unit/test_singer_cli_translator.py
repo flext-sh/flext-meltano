@@ -16,10 +16,11 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 from flext_core import r
-from flext_infra import m as m_infra
+from flext_infra import FlextInfraModels as m_infra
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoSingerCliTranslator, m
+from flext_meltano import FlextMeltanoSingerCliTranslator
+from tests import m
 
 
 class TestFlextMeltanoSingerCliTranslatorTapRun:
@@ -418,7 +419,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     """Test execute_singer_command method."""
 
     _MOCK_TARGET = (
-        "flext_meltano.singer.translator.FlextInfraUtilitiesSubprocess.run_raw"
+        "flext_meltano.services.singer_translator.FlextInfraUtilitiesSubprocess.run_raw"
     )
 
     @patch(_MOCK_TARGET)

@@ -1,15 +1,10 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make gen
 #
-"""Singer Protocol Implementation for FLEXT Meltano.
+"""Singer SDK type aliases for consumer subclassing.
 
-This module provides deep integration with singer-sdk following the Singer
-specification with FLEXT ecosystem patterns and railway-oriented programming.
-
-NOTE: Heavy modules (service, tap, target) are NOT imported at package level
-to avoid circular imports. Import them explicitly when needed:
-    from flext_meltano.singer.service import FlextMeltanoSingerService
-    from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
+This package provides ONLY Singer SDK re-exports (Tap, Target, Stream, Sink).
+All service logic lives in ``flext_meltano.services.singer_*`` modules.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -25,17 +20,7 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_meltano.singer import (
-        catalog,
-        sdk,
-        service,
-        state,
-        tap,
-        tap_source,
-        target,
-        translator,
-    )
-    from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
+    from flext_meltano.singer import sdk
     from flext_meltano.singer.sdk import (
         FlextMeltanoSingerContext,
         FlextMeltanoSingerRecord,
@@ -44,35 +29,15 @@ if _TYPE_CHECKING:
         FlextMeltanoSingerTapBase,
         FlextMeltanoSingerTargetBase,
     )
-    from flext_meltano.singer.service import FlextMeltanoSingerService
-    from flext_meltano.singer.state import FlextMeltanoStateManager
-    from flext_meltano.singer.tap import FlextMeltanoTapAbstractions
-    from flext_meltano.singer.tap_source import FlextMeltanoTapSourceMixin
-    from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
-    from flext_meltano.singer.translator import FlextMeltanoSingerCliTranslator
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
-    "FlextMeltanoCatalogManager": "flext_meltano.singer.catalog",
-    "FlextMeltanoSingerCliTranslator": "flext_meltano.singer.translator",
     "FlextMeltanoSingerContext": "flext_meltano.singer.sdk",
     "FlextMeltanoSingerRecord": "flext_meltano.singer.sdk",
-    "FlextMeltanoSingerService": "flext_meltano.singer.service",
     "FlextMeltanoSingerSinkBase": "flext_meltano.singer.sdk",
     "FlextMeltanoSingerStreamBase": "flext_meltano.singer.sdk",
     "FlextMeltanoSingerTapBase": "flext_meltano.singer.sdk",
     "FlextMeltanoSingerTargetBase": "flext_meltano.singer.sdk",
-    "FlextMeltanoStateManager": "flext_meltano.singer.state",
-    "FlextMeltanoTapAbstractions": "flext_meltano.singer.tap",
-    "FlextMeltanoTapSourceMixin": "flext_meltano.singer.tap_source",
-    "FlextMeltanoTargetAbstractions": "flext_meltano.singer.target",
-    "catalog": "flext_meltano.singer.catalog",
     "sdk": "flext_meltano.singer.sdk",
-    "service": "flext_meltano.singer.service",
-    "state": "flext_meltano.singer.state",
-    "tap": "flext_meltano.singer.tap",
-    "tap_source": "flext_meltano.singer.tap_source",
-    "target": "flext_meltano.singer.target",
-    "translator": "flext_meltano.singer.translator",
 }
 
 

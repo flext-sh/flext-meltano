@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import override
 
 from flext_core import r
+from pydantic import PrivateAttr
 
 from flext_meltano import (
     FlextMeltanoBridge,
@@ -26,20 +26,17 @@ from flext_meltano import (
 class FlextMeltanoLibraryRunner(
     FlextMeltanoDbtTransformationRunner, FlextMeltanoServiceBase
 ):
-    """Unified library runner providing complete Meltano functionality."""
+    """Unified library runner mixin for MRO composition on FlextMeltano.
 
-    def __init__(self) -> None:
-        """Initialize the library runner."""
-        super().__init__()
-        self._executor = FlextMeltanoExecutor()
-        self._bridge = FlextMeltanoBridge()
+    Provides ELT pipeline execution and DBT transformation orchestration.
+    """
 
-    @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Execute library runner — explicit SDK integration is still required."""
-        return r[t.Meltano.MeltanoConfigDict].fail(
-            "Library runner execution requires meltano-core SDK integration"
-        )
+    _elt_executor: FlextMeltanoExecutor = PrivateAttr(
+        default_factory=FlextMeltanoExecutor,
+    )
+    _elt_bridge: FlextMeltanoBridge = PrivateAttr(
+        default_factory=FlextMeltanoBridge,
+    )
 
     @staticmethod
     def get_dbt_runner() -> r[t.Meltano.ResultDict]:
@@ -76,7 +73,7 @@ class FlextMeltanoLibraryRunner(
                 target_name=target_name,
                 dbt_models=str(dbt_models or []),
             )
-            result = self._executor.execute_pipeline(tap_name, target_name, config)
+            result = self._elt_executor.execute_pipeline(tap_name, target_name, config)
             if result.is_failure:
                 return r[t.Meltano.Processing.EltPipelineResult].fail(
                     result.error or "EL pipeline execution failed",
@@ -116,7 +113,7 @@ class FlextMeltanoLibraryRunner(
     ) -> r[t.Meltano.Processing.DbtTransformationResult]:
         """Run DBT transformation using the configured Meltano executor."""
         return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
-            executor=self._executor,
+            executor=self._elt_executor,
             logger=self.logger,
             models=models,
             project_dir=project_dir,
@@ -135,7 +132,7 @@ class FlextMeltanoLibraryRunner(
                 tap_name=tap.name,
                 target_name=target.name,
             )
-            result = self._executor.execute_pipeline(tap.name, target.name, config)
+            result = self._elt_executor.execute_pipeline(tap.name, target.name, config)
             if result.is_failure:
                 return r[t.Meltano.Processing.EltPipelineResult].fail(
                     result.error or "Pipeline execution failed",

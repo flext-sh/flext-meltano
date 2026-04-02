@@ -16,7 +16,8 @@ from typing import cast
 import pytest
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoValidators, r, t
+from flext_meltano import FlextMeltanoValidators, r
+from tests import t
 
 
 class TestFlextMeltanoValidatorsComprehensive:

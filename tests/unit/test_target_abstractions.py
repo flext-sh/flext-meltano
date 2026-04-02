@@ -12,8 +12,8 @@ import pytest
 from flext_core import FlextLogger, r
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoTargetAbstractions, t
-from tests import u
+from flext_meltano import FlextMeltanoTargetAbstractions
+from tests import t, u
 
 logger = FlextLogger(__name__)
 

@@ -28,29 +28,15 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
     ) -> r[m.Meltano.DataSourceInstance]:
-        """Create a source instance from configuration."""
+        """Create a source instance from configuration via isinstance narrowing."""
         try:
-            source_type = getattr(source_config, "source_type", None) or getattr(
-                source_config,
-                "tap_type",
-                c.IDENTIFIER_UNKNOWN,
-            )
-            if not isinstance(source_type, str):
-                source_type = c.IDENTIFIER_UNKNOWN
-            source_identifier = getattr(
-                source_config,
-                "source_identifier",
-                None,
-            ) or getattr(source_config, "tap_identifier", c.IDENTIFIER_UNKNOWN)
-            self.logger.info(
-                "Creating source instance",
-                source_name=source_type,
-                source_type=source_type,
-            )
-            source_id = f"{source_type}:{source_identifier}"
             if isinstance(source_config, m.Meltano.DataSourceConfig):
+                source_type = source_config.source_type
+                source_id = f"{source_type}:{source_type}"
                 config = source_config
             elif isinstance(source_config, m.Meltano.TapConfig):
+                source_type = source_config.tap_type
+                source_id = f"{source_type}:{source_type}"
                 config = m.Meltano.DataSourceConfig.model_validate({
                     "source_type": source_config.tap_type,
                     "connection_config": source_config.connection_config,
@@ -58,12 +44,19 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                     "source_version": source_config.tap_version,
                 })
             else:
+                source_type = source_config.tap_type
+                source_id = f"{source_type}:{source_config.tap_id}"
                 config = m.Meltano.DataSourceConfig.model_validate({
                     "source_type": source_config.tap_type,
                     "connection_config": source_config.config.connection_config,
                     "stream_config": source_config.config.stream_config or {},
                     "source_version": source_config.config.tap_version,
                 })
+            self.logger.info(
+                "Creating source instance",
+                source_name=source_type,
+                source_type=source_type,
+            )
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
                 config=config,
@@ -111,7 +104,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                     tap_id=inst.source_id,
                 ),
             )
-        except Exception as exc:
+        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
 
 
@@ -128,17 +121,18 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
         self,
         items: m.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
     ) -> r[bool]:
-        """Process a source configuration for validation."""
+        """Process a source configuration for validation via isinstance narrowing."""
         try:
-            source_type = getattr(items, "source_type", None) or getattr(
-                items,
-                "tap_type",
-                c.IDENTIFIER_UNKNOWN,
-            )
+            if isinstance(items, m.Meltano.DataSourceConfig):
+                source_type = items.source_type
+            elif isinstance(items, m.Meltano.TapConfig):
+                source_type = items.tap_type
+            else:
+                source_type = items.tap_type
             self.logger.debug(
                 "Processing source configuration", source_name=source_type
             )
-            if not source_type or source_type == c.IDENTIFIER_UNKNOWN:
+            if not source_type:
                 return r[bool].fail("Source configuration must have a type")
             return r[bool].ok(value=True)
         except c.Meltano.Singer.SAFE_EXCEPTIONS as e:

@@ -11,8 +11,8 @@ from flext_core import r
 from flext_tests import tm
 from pydantic_core import ValidationError
 
-from flext_meltano import FlextMeltanoAbstractions, m
-from tests import t
+from flext_meltano import FlextMeltanoAbstractions
+from tests import m, t
 
 
 class _TestAssertions:
@@ -28,15 +28,15 @@ class _TestAssertions:
 
     @staticmethod
     def assert_equal(
-        actual: t.NormalizedValue,
-        expected: t.NormalizedValue,
+        actual: t.Tests.Testobject,
+        expected: t.Tests.Testobject,
         message: str = "",
     ) -> None:
         tm.that(actual, eq=expected)
         _ = message or f"expected {expected!r}, got {actual!r}"
 
     @staticmethod
-    def assert_in(item: str, container: t.NormalizedValue, message: str = "") -> None:
+    def assert_in(item: str, container: t.Tests.Testobject, message: str = "") -> None:
         if isinstance(container, dict):
             tm.that(container, has=item)
 
@@ -205,11 +205,7 @@ class TestFlextMeltanoAbstractionsComplete:
             condition=bool(orders_config["selected"]),
             message="Orders should not be selected",
         )
-        self.test_assertions.assert_equal(
-            actual=missing_config,
-            expected={},
-            message="Missing stream should return empty dict",
-        )
+        assert missing_config == {}
 
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
@@ -359,26 +355,10 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(result, is_=r)
         if result.is_success:
             entry = result.value
-            self.test_assertions.assert_equal(
-                actual=entry["tap_stream_id"],
-                expected="users",
-                message="Tap stream ID should match",
-            )
-            self.test_assertions.assert_equal(
-                actual=entry["stream"],
-                expected="users",
-                message="Stream name should match",
-            )
-            self.test_assertions.assert_in(
-                item="schema",
-                container=entry,
-                message="Should contain schema",
-            )
-            self.test_assertions.assert_in(
-                item="metadata",
-                container=entry,
-                message="Should contain metadata",
-            )
+            assert entry["tap_stream_id"] == "users"
+            assert entry["stream"] == "users"
+            assert "schema" in entry
+            assert "metadata" in entry
 
     def test_sync_stream_success(self) -> None:
         """Test sync_stream via subprocess call."""

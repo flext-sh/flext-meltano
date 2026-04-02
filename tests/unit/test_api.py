@@ -16,7 +16,8 @@ from pathlib import Path
 import pytest
 from pytest_benchmark.fixture import BenchmarkFixture
 
-from flext_meltano import FlextMeltano, FlextMeltanoAdapter, c
+from flext_meltano import FlextMeltano, FlextMeltanoAdapter
+from tests import c
 
 pytestmark = pytest.mark.unit
 
@@ -170,7 +171,7 @@ class TestFlextMeltanoCatalogOperations:
 
     def test_discover_plugins_requires_active_project(self) -> None:
         """Test discover_plugins fails when no Meltano project is active."""
-        bridge_result = FlextMeltano.discover_plugins()
+        bridge_result = FlextMeltano().discover_plugins()
         assert bridge_result.is_failure
         assert "failed to load meltano project" in (bridge_result.error or "").lower()
 
@@ -245,7 +246,7 @@ class TestFlextMeltanoIntegration:
             )
             validate_result = FlextMeltano.validate_project(project_path)
             assert validate_result.is_failure or validate_result.is_success
-            plugins_result = FlextMeltano.discover_plugins()
+            plugins_result = FlextMeltano().discover_plugins()
             assert plugins_result.is_failure or plugins_result.is_success
 
 
@@ -291,7 +292,7 @@ class TestFlextMeltanoSuccessPaths:
 
     def test_discover_plugins_exception_path(self) -> None:
         """Test discover_plugins returns result."""
-        result = FlextMeltano.discover_plugins()
+        result = FlextMeltano().discover_plugins()
         assert result.is_failure or result.is_success
 
 

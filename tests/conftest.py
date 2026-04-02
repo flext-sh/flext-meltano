@@ -19,8 +19,7 @@ from typing import Protocol
 import pytest
 import yaml
 
-from flext_meltano import t
-from tests import Tk
+from tests import Tk, t
 
 
 class MockCliResult:

@@ -13,7 +13,7 @@ import pytest
 from flext_tests import tm
 from pydantic import ValidationError
 
-from flext_meltano import m, t
+from tests import m, t
 
 
 class TestTapConfigEnhanced:

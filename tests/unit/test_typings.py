@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from flext_tests import tm
 
-from flext_meltano import t
+from tests import t
 
 
 class TestFlextMeltanoTypes:

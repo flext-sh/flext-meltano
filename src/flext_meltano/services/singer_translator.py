@@ -14,13 +14,12 @@ from collections.abc import MutableSequence
 from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
-from flext_meltano import c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
 
 
-class FlextMeltanoSingerCliTranslator:
+class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
     """Translates Pydantic models to Singer SDK CLI commands.
 
-    All methods are static — no instance state needed.
     Composable via MRO on FlextMeltano facade.
     """
 

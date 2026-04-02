@@ -21,7 +21,7 @@ from typing import Any
 import pytest
 from flext_core import FlextLogger, r
 
-from flext_meltano import t
+from tests import t
 
 
 class ContainerManager:
