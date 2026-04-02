@@ -69,8 +69,6 @@ class FlextMeltanoUtilitiesYaml:
         config: t.Meltano.MeltanoConfigDict,
     ) -> r[bool]:
         """Write YAML content to file handle."""
-        if getattr(file_handle, "write", None) is None:
-            return r[bool].fail("Invalid file handle: missing write method")
         try:
             yaml.dump(
                 config,

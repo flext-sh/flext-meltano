@@ -430,8 +430,8 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(isinstance(initial_streams, list), eq=True)
 
     def test_create_instance_factory(self) -> None:
-        """Test create_result_instance factory method using flext_tests."""
-        result = FlextMeltanoAbstractions.create_result_instance()
+        """Test create_abstractions_instance factory method using flext_tests."""
+        result = FlextMeltanoAbstractions.create_abstractions_instance()
         tm.that(result, is_=r)
         if result.is_success:
             instance = result.value

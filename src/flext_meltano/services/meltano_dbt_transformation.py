@@ -38,19 +38,19 @@ class FlextMeltanoDbtTransformationRunner:
                     result.error or "DBT transformation failed",
                 )
             execution_result = result.value
-            dbt_result: t.Meltano.Processing.DbtTransformationResult = (
-                u.Meltano.build_command_execution_payload(
-                    execution_result,
-                    extra_fields={
-                        "models_run": u.join(models, separator=",")
-                        if models
-                        else "all",
-                        "execution_method": "library_runner",
-                        "project_dir": str(project_dir) if project_dir else "",
-                    },
-                    duration_field="execution_time",
-                )
+            payload = u.Meltano.build_command_execution_payload(
+                execution_result,
+                extra_fields={
+                    "models_run": u.join(models, separator=",") if models else "all",
+                    "execution_method": "library_runner",
+                    "project_dir": str(project_dir) if project_dir else "",
+                },
+                duration_field="execution_time",
             )
+            dbt_result: t.Meltano.Processing.DbtTransformationResult = {
+                str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
+                for k, v in payload.items()
+            }
             return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"DBT transformation failed: {e}"

@@ -114,8 +114,8 @@ class FlextMeltanoTypingsDomains:
     class Processing:
         """Meltano-specific processing types."""
 
-        type DbtTransformationResult = dict[str, FlextCliTypes.ContainerValue]
-        type SingerProcessingResult = dict[str, FlextCliTypes.ContainerValue]
-        type SingerExecutionResult = dict[str, FlextCliTypes.ContainerValue]
-        type EltPipelineResult = dict[str, FlextCliTypes.ContainerValue]
+        type DbtTransformationResult = FlextCliTypes.MutableContainerMapping
+        type SingerProcessingResult = FlextCliTypes.MutableContainerMapping
+        type SingerExecutionResult = FlextCliTypes.MutableContainerMapping
+        type EltPipelineResult = FlextCliTypes.MutableContainerMapping
         type Headers = FlextCliTypes.StrMapping

@@ -26,7 +26,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     """
 
     @staticmethod
-    def discover_plugins() -> r[t.StrSequence]:
+    def discover_installed_plugins() -> r[t.StrSequence]:
         """Discover installed Meltano plugins from the active project runtime."""
         executor = FlextMeltanoExecutorBase()
         plugins_result = executor.get_project_plugins()
@@ -74,11 +74,6 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def get_version() -> r[str]:
         """Get Meltano version from the imported library."""
         return FlextMeltanoExecutorBase.get_version()
-
-    @staticmethod
-    def validate_connection() -> r[bool]:
-        """Validate Meltano runtime availability via library version lookup."""
-        return r[bool].ok(FlextMeltanoBridge.get_version().is_success)
 
     @override
     def execute(self) -> r[Mapping[str, t.NormalizedValue]]:

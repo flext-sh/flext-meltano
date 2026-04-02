@@ -87,13 +87,6 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 f"Failed to initialize project: {e}"
             )
 
-    def install_sdk_plugin(self, name: str) -> r[t.Meltano.PluginInfo]:
-        """Install a plugin in the SDK project."""
-        return r[t.Meltano.PluginInfo].fail(
-            "Plugin installation requires meltano-core SDK integration: "
-            f"install_plugin({name!r})"
-        )
-
     def load_sdk_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
         """Load an existing Meltano project via SDK."""
         try:
@@ -126,23 +119,29 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     ) -> Sequence[t.Meltano.PluginDefinition]:
         """Extract plugins from SDK project, optionally filtered by type."""
         plugins: MutableSequence[t.Meltano.PluginDefinition] = []
-        plugins_attr = getattr(self._sdk_project, "plugins", None)
-        if plugins_attr is None:
+        if self._sdk_project is None:
             return plugins
         try:
-            for plugin in plugins_attr:
-                if not (
-                    getattr(plugin, "name", None) is not None
-                    and getattr(plugin, "type", None) is not None
-                ):
+            sdk_plugins_service = self._sdk_project.plugins
+        except AttributeError:
+            return plugins
+        try:
+            for plugin in sdk_plugins_service.plugins():
+                try:
+                    name = plugin.name
+                    plugin_kind = plugin.type
+                except AttributeError:
                     continue
-                if plugin_type is not None and plugin.type != plugin_type:
+                if plugin_type is not None and plugin_kind != plugin_type:
                     continue
                 plugin_def: MutableMapping[
                     str,
                     str | Sequence[str] | Mapping[str, t.Scalar | None],
-                ] = {"name": plugin.name, "type": plugin.type}
-                variant_raw = getattr(plugin, "variant", None)
+                ] = {"name": name, "type": plugin_kind}
+                try:
+                    variant_raw = plugin.variant
+                except AttributeError:
+                    variant_raw = None
                 variant_normalized = m.Meltano.VariantPayload.model_validate(
                     {"value": variant_raw},
                 ).value
@@ -150,7 +149,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     plugin_def["variant"] = variant_normalized
                 plugins.append(plugin_def)
         except (TypeError, AttributeError) as e:
-            self.logger.warning(f"Failed to extract plugins: {e}")
+            self.logger.warning("Failed to extract plugins", error=str(e))
         return plugins
 
 

@@ -6,8 +6,9 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_core import u
+from pydantic import BaseModel
 
-from flext_meltano import c, m, t
+from flext_meltano import c, m, p, t
 
 
 class FlextMeltanoUtilitiesRuntime:
@@ -85,12 +86,24 @@ class FlextMeltanoUtilitiesRuntime:
         }
 
     @staticmethod
-    def resolve_project_root(settings: object) -> Path | None:
+    def resolve_project_root(settings: t.ValueOrModel | p.Settings) -> Path | None:
         """Extract and normalize project_root from a settings-like object."""
-        project_root = getattr(settings, "project_root", None)
-        if project_root in {None, Path()}:
+        if isinstance(settings, Mapping):
+            raw = settings.get("project_root")
+        elif isinstance(settings, BaseModel):
+            model_data = settings.model_dump()
+            raw = model_data.get("project_root")
+        elif isinstance(settings, (Path, str)):
+            raw = settings
+        else:
+            raw = None
+        if raw is None or raw == Path():
             return None
-        return m.Meltano.PathPayload(value=project_root).value
+        if isinstance(raw, Path):
+            return raw
+        if isinstance(raw, str) and raw:
+            return m.Meltano.PathPayload(value=Path(raw)).value
+        return None
 
     @staticmethod
     def normalize_environment_name(environment_name: str | None) -> str:
@@ -99,10 +112,10 @@ class FlextMeltanoUtilitiesRuntime:
             u.to_str(environment_name, default=""),
             case="lower",
         ).strip()
-        aliases = {
-            c.Meltano.Enums.Environment.DEVELOPMENT: "dev",
-            c.Meltano.Enums.Environment.TESTING: "test",
-            c.Meltano.Enums.Environment.PRODUCTION: "prod",
+        aliases: Mapping[str, str] = {
+            c.Meltano.Enums.Environment.DEVELOPMENT.value: "dev",
+            c.Meltano.Enums.Environment.TESTING.value: "test",
+            c.Meltano.Enums.Environment.PRODUCTION.value: "prod",
         }
         return aliases.get(normalized, normalized)
 
@@ -149,25 +162,29 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def build_discovered_plugin(
         raw_type: str,
-        raw_plugin: Mapping[str, object],
+        raw_plugin: t.ContainerMapping,
     ) -> dict[str, str] | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape."""
-        plugin_name = u.to_str(raw_plugin.get("name", "")).strip()
+        name_val = raw_plugin.get("name", "")
+        plugin_name = str(name_val).strip() if name_val is not None else ""
         if not u.chk(plugin_name, empty=False):
             return None
+        ns_val = raw_plugin.get("namespace", "")
+        pip_val = raw_plugin.get("pip_url", "")
+        variant_val = raw_plugin.get("variant", "")
         plugin_data: t.ContainerMapping = {
             "name": plugin_name,
             "type": FlextMeltanoUtilitiesRuntime.normalize_plugin_group(raw_type)
             or u.to_str(raw_type),
-            "namespace": u.to_str(raw_plugin.get("namespace", "")).strip(),
-            "pip_url": u.to_str(raw_plugin.get("pip_url", "")).strip(),
-            "variant": u.to_str(raw_plugin.get("variant", "")).strip(),
+            "namespace": str(ns_val).strip() if ns_val is not None else "",
+            "pip_url": str(pip_val).strip() if pip_val is not None else "",
+            "variant": str(variant_val).strip() if variant_val is not None else "",
         }
         filtered = u.filter_dict(
             plugin_data,
             lambda _key, value: u.chk(value, empty=False),
         )
-        return {str(key): u.to_str(value) for key, value in filtered.items()}
+        return {str(key): str(value) for key, value in filtered.items()}
 
     @staticmethod
     def extract_plugin_names(
@@ -229,7 +246,7 @@ class FlextMeltanoUtilitiesRuntime:
         duration_field: str | None = "execution_time",
     ) -> t.ContainerMapping:
         """Build a standard command payload for services over Meltano runtime."""
-        payload: t.ContainerMapping = {
+        payload: t.MutableContainerMapping = {
             "success": command_result.success,
             "output": u.to_str(command_result.output),
             "error": u.to_str(command_result.error),
@@ -237,12 +254,12 @@ class FlextMeltanoUtilitiesRuntime:
         }
         if status_field is not None:
             payload[status_field] = FlextMeltanoUtilitiesRuntime.command_status(
-                command_result.success,
+                success=command_result.success,
                 success_status=success_status,
                 failure_status=failure_status,
             )
         if duration_field is not None:
-            payload[duration_field] = command_result.execution_time
+            payload[duration_field] = float(command_result.execution_time)
         if extra_fields is None:
             return payload
         merged = u.merge_mappings(payload, extra_fields, strategy="replace")

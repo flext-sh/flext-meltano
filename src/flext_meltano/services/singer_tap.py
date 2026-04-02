@@ -18,7 +18,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     """Mixin providing source instance creation and tap factory methods."""
 
     @classmethod
-    def create_result_instance(cls) -> r[FlextMeltanoTapSourceMixin]:
+    def create_tap_source_instance(cls) -> r[FlextMeltanoTapSourceMixin]:
         """Create a tap abstractions instance wrapped in Result."""
         return r[FlextMeltanoTapSourceMixin].ok(FlextRuntime.create_instance(cls))
 
@@ -84,8 +84,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: t.ConfigurationMapping,
-        stream_config: t.ConfigurationMapping | None = None,
+        connection_config: t.ContainerMapping,
+        stream_config: t.ContainerMapping | None = None,
         tap_version: str = "1.0.0",
     ) -> r[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""

@@ -42,14 +42,6 @@ class FlextMeltanoPipelineManager(
         self.cli = cli
         self.logger = FlextLogger(__name__)
 
-    @staticmethod
-    def _execute_pipeline_operation(
-        handler: Callable[[t.StrSequence], r[str]],
-        args: t.StrSequence,
-    ) -> r[str]:
-        """Execute pipeline operation."""
-        return handler(args)
-
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle pipeline command using composition."""
         if u.Meltano.is_help_request(args):
@@ -60,8 +52,7 @@ class FlextMeltanoPipelineManager(
         handler_result = self._get_pipeline_handler(subcommand)
         if handler_result.is_failure:
             return r[str].fail(handler_result.error)
-        handler = handler_result.value
-        return self._execute_pipeline_operation(handler, subcommand_args)
+        return handler_result.value(subcommand_args)
 
     def _create_pipeline(self, _args: t.StrSequence) -> r[str]:
         """Create new pipeline."""

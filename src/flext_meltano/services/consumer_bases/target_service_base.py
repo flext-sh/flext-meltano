@@ -107,7 +107,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
                 else list(self._sinks.values())
             )
             for sink in targets:
-                sink.flush()
+                context = sink.start_drain()
+                sink.process_batch(context)
+                sink.mark_drained()
             return r[None].ok(None)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             return r[None].fail(str(exc))

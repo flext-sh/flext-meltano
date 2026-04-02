@@ -102,7 +102,7 @@ class FlextMeltanoComponentService(
             "plugin_name": plugin_name,
         }
         abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
-        add_result: r[bool] = abstractions.add_plugin(plugin_config)
+        add_result: r[bool] = abstractions.add_plugin_by_config(plugin_config)
         if add_result.is_failure:
             return r[bool].fail(add_result.error or "Plugin addition failed")
         return r[bool].ok(value=True)

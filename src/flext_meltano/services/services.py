@@ -24,12 +24,26 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         component_label: str,
     ) -> r[FlextMeltanoService]:
         """Create a specialized Meltano service using a shared utility path."""
+
+        def _build() -> FlextMeltanoService:
+            kwargs: dict[str, str | None] = {
+                "service_name": f"{component_name}_service",
+                "service_version": c.Meltano.Defaults.SERVICE_VERSION,
+                "source_name": None,
+                "sink_name": None,
+                "transformation_name": None,
+            }
+            kwargs[field_name] = component_name
+            return FlextMeltanoService(
+                service_name=kwargs["service_name"] or "",
+                service_version=kwargs["service_version"] or "",
+                source_name=kwargs.get("source_name"),
+                sink_name=kwargs.get("sink_name"),
+                transformation_name=kwargs.get("transformation_name"),
+            )
+
         return u.try_(
-            lambda: FlextMeltanoService(
-                service_name=f"{component_name}_service",
-                service_version=c.Meltano.Defaults.SERVICE_VERSION,
-                **{field_name: component_name},
-            ),
+            _build,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
         ).map_error(
             lambda ex: f"Failed to create {component_label} '{component_name}': {ex}"
@@ -156,16 +170,6 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(value=True)
 
-    def create_from_config(
-        self, config: t.Meltano.MeltanoConfigDict | t.NormalizedValue
-    ) -> r[t.Meltano.MeltanoConfigDict]:
-        """Create a service instance from configuration."""
-        if not isinstance(config, dict):
-            return r[t.Meltano.MeltanoConfigDict].fail(
-                "Configuration must be a dictionary"
-            )
-        return r[t.Meltano.MeltanoConfigDict].ok(dict(config))
-
     @override
     def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
         """Execute service with railway pattern."""
@@ -193,17 +197,6 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "type": "pipeline_service",
             "description": c.Meltano.Metadata.APPLICATION_DESCRIPTION,
-        })
-
-    def get_service_status(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Get service status."""
-        return self.execute()
-
-    def get_version_info(self) -> r[t.Meltano.MeltanoConfigDict]:
-        """Get version information."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
-            "api_version": c.Meltano.FLEXT_MELTANO_VERSION,
-            "service_name": c.Meltano.Metadata.APPLICATION_NAME,
         })
 
     def validate_config(self) -> r[bool]:

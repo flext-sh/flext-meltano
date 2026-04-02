@@ -48,7 +48,7 @@ class FlextMeltanoUtilitiesProject:
         state: str | None = None,
     ) -> t.Meltano.Project.ProjectMetadata:
         """Build canonical project metadata mapping from a project root."""
-        metadata: t.ContainerMapping = {
+        metadata: dict[str, t.Scalar | None] = {
             "root": str(project_root),
             "name": str(project_root.name),
         }
@@ -143,22 +143,24 @@ class FlextMeltanoUtilitiesProject:
         ),
     ) -> r[t.Meltano.Dbt.Project]:
         """Convert Meltano project value to FLEXT ContainerMapping representation."""
+
+        def _convert() -> t.Meltano.Dbt.Project:
+            if isinstance(project, Mapping):
+                return {
+                    "name": str(project.get("name", "meltano_project")),
+                    "root": str(project.get("root", c.IDENTIFIER_UNKNOWN)),
+                    "settings": str(project.get("settings", "")),
+                    "meltano_version": str(project.get("meltano_version", "")),
+                }
+            return {
+                "name": "meltano_project",
+                "root": c.IDENTIFIER_UNKNOWN,
+                "settings": "",
+                "meltano_version": "",
+            }
+
         return u.try_(
-            lambda: {
-                "name": u.to_str(
-                    getattr(project, "name", None),
-                    default="meltano_project",
-                ),
-                "root": u.to_str(
-                    getattr(project, "root", None),
-                    default=c.IDENTIFIER_UNKNOWN,
-                ),
-                "settings": u.to_str(getattr(project, "settings", None), default=""),
-                "meltano_version": u.to_str(
-                    getattr(project, "meltano_version", None),
-                    default="",
-                ),
-            },
+            _convert,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
         ).map_error(lambda e: f"Failed to convert project: {e}")
 

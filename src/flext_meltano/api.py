@@ -1,8 +1,6 @@
 """Public API facade for flext-meltano.
 
-MRO facade over Meltano services (abstractions, adapters, bridge, executor,
-file managers, pipeline, project, validators, singer, dbt).
-All operations return r[T].
+MRO facade over Meltano services. All operations return r[T].
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -63,14 +61,7 @@ class FlextMeltano(
     FlextMeltanoService,
     FlextMeltanoValidators,
 ):
-    """Coordinate Meltano operations and expose domain services.
-
-    MRO facade over all Meltano services: Singer protocol (catalog, state,
-    tap, target, translator), DBT (project, runner, orchestration), and
-    Meltano runtime (abstractions, adapters, bridge, executor, file managers,
-    pipeline, project, validators).
-    All operations return r[T].
-    """
+    """MRO facade over all Meltano services. All operations return r[T]."""
 
     _instance: ClassVar[FlextMeltano | None] = None
 

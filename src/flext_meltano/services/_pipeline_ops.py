@@ -6,13 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import importlib
 import os
 from pathlib import Path
 
-from flext_core import FlextLogger, r, u
+from flext_core import FlextLogger, r
 
-from flext_meltano import c, m, t
+import flext_meltano.services as meltano_services
+from flext_meltano import c, m, t, u
 
 
 class FlextMeltanoPipelinePaths:
@@ -112,12 +112,8 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         meltano_args = command_args or configured_command
         if not meltano_args:
             return r[str].fail("Pipeline execution not configured")
-        executor_module = importlib.import_module(
-            "flext_meltano.services._executor_base",
-        )
-        executor_type = getattr(executor_module, "FlextMeltanoExecutorBase")
         run_result: r[m.Meltano.CommandExecutionResult] = (
-            executor_type().execute_meltano_command(
+            meltano_services.FlextMeltanoExecutorBase().execute_meltano_command(
                 list(meltano_args),
                 _cwd=pipeline_dir,
             )

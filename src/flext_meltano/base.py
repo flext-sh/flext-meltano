@@ -27,7 +27,7 @@ class FlextMeltanoServiceBase(FlextService[Mapping[str, t.NormalizedValue]]):
     `execute` method from FlextService.
     """
 
-    config_type: type[p.Settings] | None = FlextMeltanoSettings
+    config_type: type | None = FlextMeltanoSettings
 
     service_name: Annotated[
         t.NonEmptyStr,
@@ -109,12 +109,13 @@ class FlextMeltanoServiceBase(FlextService[Mapping[str, t.NormalizedValue]]):
         config = self.config
         if isinstance(config, FlextMeltanoSettings):
             return config
-        normalized_overrides = (
+        empty_overrides: t.MutableContainerMapping = {}
+        normalized_overrides: t.MutableContainerMapping = (
             {str(key): value for key, value in self.config_overrides.items()}
             if self.config_overrides
-            else {}
+            else empty_overrides
         )
-        return FlextMeltanoSettings(**normalized_overrides)
+        return FlextMeltanoSettings.model_validate(normalized_overrides)
 
 
 s = FlextMeltanoServiceBase

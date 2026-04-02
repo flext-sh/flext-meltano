@@ -23,10 +23,10 @@ def simple_bridge_example() -> None:
     version_result = bridge.get_version()
     if version_result.is_success:
         logger.info(f"Meltano version: {version_result.value}")
-    discovery_result = bridge.discover_plugins()
+    discovery_result = bridge.discover_installed_plugins()
     if discovery_result.is_success:
         plugins = discovery_result.value
-        logger.info(f"Found {len(plugins)} plugin categories")
+        logger.info(f"Found {len(plugins)} installed plugins")
 
 
 def simple_executor_example() -> None:

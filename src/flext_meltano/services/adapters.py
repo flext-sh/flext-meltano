@@ -14,9 +14,7 @@ from typing import override
 from flext_core import FlextSettings, r, s
 
 from flext_meltano import (
-    FlextMeltanoDbtAdapter,
     FlextMeltanoExecutorBase,
-    FlextMeltanoPipelineAdapter,
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     c,
@@ -109,7 +107,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                 executor = FlextMeltanoExecutorBase()
                 plugins_result = executor.get_project_plugins(
                     plugin_type=plugin_type,
-                    _cwd=u.Meltano.resolve_project_root(self.settings),
+                    _cwd=u.Meltano.resolve_project_root(self.settings.model_dump()),
                 )
                 if plugins_result.is_failure:
                     return r[Sequence[t.Meltano.PluginDefinition]].fail(
@@ -138,12 +136,6 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         def execute(self) -> r[Sequence[t.Meltano.PluginDefinition]]:
             """Execute default plugin operation."""
             return self.discover_plugins()
-
-    class PipelineAdapter(FlextMeltanoPipelineAdapter):
-        """Pipeline adapter — delegates to extracted implementation."""
-
-    class DbtAdapter(FlextMeltanoDbtAdapter):
-        """DBT adapter — delegates to extracted implementation."""
 
     @override
     def execute(self) -> r[Mapping[str, t.NormalizedValue]]:

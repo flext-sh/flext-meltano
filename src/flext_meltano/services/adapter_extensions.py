@@ -46,7 +46,7 @@ class FlextMeltanoPipelineAdapter(s[t.Meltano.ExecutionResultDict]):
             executor = FlextMeltanoExecutorBase()
             execution_result = executor.execute_meltano_command(
                 u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
-                _cwd=u.Meltano.resolve_project_root(self.settings),
+                _cwd=u.Meltano.resolve_project_root(self.settings.model_dump()),
             )
             if execution_result.is_failure:
                 return r[t.Meltano.ExecutionResultDict].fail(
@@ -91,7 +91,7 @@ class FlextMeltanoDbtAdapter(s[t.Meltano.DbtResultDict]):
             executor = FlextMeltanoExecutorBase()
             execution_result = executor.execute_meltano_command(
                 u.Meltano.build_dbt_runtime_command(c.Meltano.Dbt.COMMAND_RUN),
-                _cwd=u.Meltano.resolve_project_root(self.settings),
+                _cwd=u.Meltano.resolve_project_root(self.settings.model_dump()),
             )
             if execution_result.is_failure:
                 return r[t.Meltano.DbtResultDict].fail(

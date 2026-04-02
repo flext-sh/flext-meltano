@@ -19,23 +19,6 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     """Generic pipeline business rule validators using foundation."""
 
     @classmethod
-    def validate_connection_config(
-        cls,
-        config: t.ConfigurationMapping,
-    ) -> r[t.ConfigurationMapping]:
-        """Validate connection configuration with domain-specific business rules."""
-        try:
-            if not config:
-                return r[t.ScalarMapping].fail(
-                    "Connection configuration cannot be empty"
-                )
-            return r[t.ScalarMapping].ok(config)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            error_msg = f"Failed to validate connection config: {e}"
-            FlextLogger(__name__).exception(error_msg)
-            return r[t.ScalarMapping].fail(error_msg)
-
-    @classmethod
     def validate_component_rules(cls, config: t.ConfigurationMapping) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:

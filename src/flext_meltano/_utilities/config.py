@@ -18,16 +18,14 @@ class FlextMeltanoUtilitiesConfig:
     @classmethod
     def coerce_config_mapping(
         cls,
-        value: object | None,
+        value: t.ValueOrModel | None,
     ) -> t.Meltano.MeltanoConfigDict:
         """Coerce settings/model/config inputs into canonical Meltano config dict."""
         if value is None:
             return {}
         if u.is_pydantic_model(value):
             model_data = value.model_dump()
-            if isinstance(model_data, Mapping):
-                return cls.normalize_config(model_data)
-            return {}
+            return cls.normalize_config(model_data)
         if isinstance(value, Mapping):
             return cls.normalize_config(value)
         return {}
@@ -38,12 +36,12 @@ class FlextMeltanoUtilitiesConfig:
         status: str,
         *,
         extra_fields: t.ContainerMapping | None = None,
-        config: object | None = None,
+        config: t.ValueOrModel | None = None,
         config_field: str | None = None,
         status_field: str | None = "status",
     ) -> t.ContainerMapping:
         """Build a canonical status payload with optional normalized config."""
-        payload: t.ContainerMapping = {}
+        payload: t.MutableContainerMapping = {}
         if status_field is not None:
             payload[status_field] = status
         if config_field is not None:

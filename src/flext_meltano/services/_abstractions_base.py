@@ -6,13 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import importlib
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, override
 
 from flext_core import r
 
+import flext_meltano.services as meltano_services
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 if TYPE_CHECKING:
@@ -32,11 +32,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         _settings: object,
     ) -> FlextMeltanoExecutorBase:
         """Create an executor lazily to avoid import cycles during package init."""
-        executor_module = importlib.import_module(
-            "flext_meltano.services._executor_base",
-        )
-        executor_type = getattr(executor_module, "FlextMeltanoExecutorBase")
-        return executor_type()
+        return meltano_services.FlextMeltanoExecutorBase()
 
     def _run_meltano(self, args: Sequence[str]) -> r[str]:
         """Run a Meltano runtime command and return stdout on success."""
@@ -58,7 +54,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             )
         return r[str].ok(completed.output.strip())
 
-    def add_plugin(self, plugin_config: Mapping[str, object]) -> r[bool]:
+    def add_plugin_by_config(self, plugin_config: Mapping[str, object]) -> r[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
@@ -78,15 +74,6 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     @staticmethod
     def _resolve_project_root(project: object) -> Path | None:
         """Extract a project root path from supported project-like objects."""
-        root_candidate = getattr(project, "root_dir", None) or getattr(
-            project,
-            "root",
-            None,
-        )
-        if isinstance(root_candidate, Path):
-            return root_candidate
-        if isinstance(root_candidate, str) and root_candidate:
-            return Path(root_candidate)
         if isinstance(project, Mapping):
             for key in ("root_dir", "root"):
                 mapping_value = project.get(key)
@@ -136,12 +123,14 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
             extractor_name = str(
-                getattr(extractor_plugin, "name", None)
-                or elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN),
+                elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN)
+                if not isinstance(extractor_plugin, Mapping)
+                else extractor_plugin.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             loader_name = str(
-                getattr(loader_plugin, "name", None)
-                or elt_context.get("loader_name", c.IDENTIFIER_UNKNOWN),
+                elt_context.get("loader_name", c.IDENTIFIER_UNKNOWN)
+                if not isinstance(loader_plugin, Mapping)
+                else loader_plugin.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             cmd_result = self._run_meltano(
                 [c.Meltano.Commands.ELT, extractor_name, loader_name],
@@ -190,22 +179,22 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         return r[Mapping[str, t.NormalizedValue]].ok({
             "status": c.Meltano.Enums.StreamStatus.COMPLETED,
             "project_root": str(project_root) if project_root is not None else "",
-            "environment": str(getattr(self.settings, "environment", "")),
-            "meltano_version": str(getattr(self.settings, "meltano_version", "")),
+            "environment": self.settings.environment,
+            "meltano_version": self.settings.meltano_version,
         })
 
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> r[dict[str, object]]:
+    ) -> r[t.ContainerMapping]:
         """Create Singer catalog entry from stream definition."""
-        entry: dict[str, object] = {
+        entry: t.MutableContainerMapping = {
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": stream.stream_schema,
-            "metadata": list[dict[str, object]](),
+            "metadata": list[t.ContainerMapping](),
         }
-        return r[dict[str, object]].ok(entry)
+        return r[t.ContainerMapping].ok(entry)
 
     def get_stream_config(
         self,

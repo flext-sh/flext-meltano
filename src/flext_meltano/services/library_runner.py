@@ -16,7 +16,6 @@ from flext_meltano import (
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
     FlextMeltanoServiceBase,
-    c,
     p,
     t,
     u,
@@ -37,26 +36,6 @@ class FlextMeltanoLibraryRunner(
     _elt_bridge: FlextMeltanoBridge = PrivateAttr(
         default_factory=FlextMeltanoBridge,
     )
-
-    @staticmethod
-    def get_dbt_runner() -> r[t.Meltano.ResultDict]:
-        """Get DBT runner instance for DBT operations."""
-        return r[t.Meltano.ResultDict].ok(
-            u.Meltano.build_capabilities_payload(
-                "dbt_runner",
-                c.Meltano.Capabilities.DBT,
-            )
-        )
-
-    @staticmethod
-    def get_singer_manager() -> r[t.Meltano.ResultDict]:
-        """Get Singer manager instance for Singer operations."""
-        return r[t.Meltano.ResultDict].ok(
-            u.Meltano.build_capabilities_payload(
-                "singer_manager",
-                c.Meltano.Capabilities.SINGER,
-            )
-        )
 
     def execute_complete_elt_pipeline(
         self,
@@ -79,16 +58,18 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = (
-                u.Meltano.build_command_execution_payload(
-                    execution_result,
-                    extra_fields={
-                        "tap_name": tap_name,
-                        "target_name": target_name,
-                    },
-                    duration_field="execution_time",
-                )
+            payload = u.Meltano.build_command_execution_payload(
+                execution_result,
+                extra_fields={
+                    "tap_name": tap_name,
+                    "target_name": target_name,
+                },
+                duration_field="execution_time",
             )
+            elt_result: t.Meltano.Processing.EltPipelineResult = {
+                str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
+                for k, v in payload.items()
+            }
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
                 if dbt_result.is_failure:
@@ -138,16 +119,18 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            elt_result: t.Meltano.Processing.EltPipelineResult = (
-                u.Meltano.build_command_execution_payload(
-                    execution_result,
-                    extra_fields={
-                        "tap_name": tap.name,
-                        "target_name": target.name,
-                    },
-                    duration_field="execution_time",
-                )
+            payload = u.Meltano.build_command_execution_payload(
+                execution_result,
+                extra_fields={
+                    "tap_name": tap.name,
+                    "target_name": target.name,
+                },
+                duration_field="execution_time",
             )
+            elt_result: t.Meltano.Processing.EltPipelineResult = {
+                str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
+                for k, v in payload.items()
+            }
             return r[t.Meltano.Processing.EltPipelineResult].ok(elt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"ELT pipeline execution failed: {e}"

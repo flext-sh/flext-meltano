@@ -33,14 +33,6 @@ class FlextMeltanoCommandRouter:
         self.cli = cli
         self.logger = FlextLogger(__name__)
 
-    @staticmethod
-    def _execute_command(
-        handler: Callable[[t.StrSequence], r[str]],
-        args: t.StrSequence,
-    ) -> r[str]:
-        """Execute command handler."""
-        return handler(args)
-
     def route_command(self, args: t.StrSequence) -> int:
         """Route command to appropriate handler using composition."""
         if u.Meltano.is_help_request(args):
@@ -50,11 +42,11 @@ class FlextMeltanoCommandRouter:
         command, command_args = args[0], args[1:]
         handler_result = self._get_command_handler(command)
         if handler_result.is_failure:
-            self.logger.error(f"Command error: {handler_result.error}")
+            self.logger.error("Command error", error=str(handler_result.error))
             return 1
-        execute_result = self._execute_command(handler_result.value, command_args)
+        execute_result = handler_result.value(command_args)
         if execute_result.is_failure:
-            self.logger.error(f"Execution error: {execute_result.error}")
+            self.logger.error("Execution error", error=str(execute_result.error))
             return 1
         return 0
 

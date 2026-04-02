@@ -73,7 +73,7 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
 
         def _create() -> Path:
             temp_dir = Path(tempfile.mkdtemp(prefix=prefix))
-            _module_logger.info(f"Created temporary directory: {temp_dir}")
+            _module_logger.info("Created temporary directory", path=str(temp_dir))
             return temp_dir
 
         return u.try_(

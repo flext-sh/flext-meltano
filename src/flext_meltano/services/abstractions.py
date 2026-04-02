@@ -23,7 +23,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     """Core abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     @staticmethod
-    def create_result_instance() -> r[FlextMeltanoAbstractions]:
+    def create_abstractions_instance() -> r[FlextMeltanoAbstractions]:
         """Factory method for creating a FlextMeltanoAbstractions instance."""
         return r[FlextMeltanoAbstractions].ok(FlextMeltanoAbstractions())
 

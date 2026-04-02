@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import importlib
 import os
 import time
 from collections.abc import Mapping, Sequence
@@ -29,6 +28,7 @@ from meltano.core.project_init_service import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
+import flext_meltano as meltano_package
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 if TYPE_CHECKING:
@@ -51,10 +51,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     def create_flext_cli() -> r[FlextMeltanoCLI]:
         """Create FLEXT CLI instance - delegates to CLI module."""
         return u.try_(
-            lambda: getattr(
-                importlib.import_module("flext_meltano.cli"),
-                "FlextMeltanoCLI",
-            )(),
+            lambda: meltano_package.FlextMeltanoCLI(),
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
         ).map_error(lambda e: f"Failed to create CLI: {e}")
 
@@ -62,11 +59,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     def get_version() -> r[str]:
         """Get version information from the imported Meltano package."""
         return u.try_(
-            lambda: getattr(
-                meltano,
-                "__version__",
-                c.Meltano.Defaults.SERVICE_VERSION,
-            ),
+            lambda: meltano.__version__,
             catch=(
                 ValueError,
                 TypeError,
@@ -154,9 +147,11 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
         discovered: list[dict[str, str]] = []
-        current_plugins = project_result.value.plugins.current_plugins
-        if hasattr(current_plugins, "canonical"):
-            current_plugins = current_plugins.canonical()
+        current_plugins_raw = project_result.value.plugins.current_plugins
+        canonical_fn = getattr(current_plugins_raw, "canonical", None)
+        current_plugins = (
+            canonical_fn() if callable(canonical_fn) else current_plugins_raw
+        )
         if not isinstance(current_plugins, Mapping):
             return r[list[dict[str, str]]].ok(discovered)
         for raw_type, raw_plugins in current_plugins.items():
@@ -179,7 +174,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     def _runtime_environment_args(self, _cwd: Path | None = None) -> list[str]:
         """Select a runtime environment explicitly to avoid leaking test env vars."""
         selected_environment = u.Meltano.normalize_environment_name(
-            u.to_str(getattr(self.settings, "environment", "")),
+            self.settings.environment,
         )
         if not selected_environment:
             return [c.Meltano.Commands.NO_ENVIRONMENT_OPTION]
@@ -206,7 +201,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 "executor_type": "flext_meltano_executor",
                 "execution_timestamp": str(time.time()),
             },
-            config=self.settings,
+            config=self.settings.model_dump(),
             config_field="config",
         )
         self.logger.info("FlextMeltanoExecutor executed successfully")
@@ -311,9 +306,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             ImportError,
             SQLAlchemyError,
         ) as e:
-            error_msg = f"Command execution failed: {e}"
-            self.logger.exception(error_msg)
-            return r[m.Meltano.CommandExecutionResult].fail(error_msg)
+            self.logger.exception("Command execution failed", error=str(e))
+            return r[m.Meltano.CommandExecutionResult].fail(str(e))
 
     def execute_dbt_command(
         self,
@@ -326,7 +320,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 u.Meltano.build_dbt_runtime_command(dbt_command, args),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[m.Meltano.CommandExecutionResult].fail(f"DBT command failed: {e}")
+            return r[m.Meltano.CommandExecutionResult].fail(str(e))
 
     def execute_pipeline(
         self,
@@ -340,6 +334,4 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[m.Meltano.CommandExecutionResult].fail(
-                f"Pipeline execution failed: {e}",
-            )
+            return r[m.Meltano.CommandExecutionResult].fail(str(e))
