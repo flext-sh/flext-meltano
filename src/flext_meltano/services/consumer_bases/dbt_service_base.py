@@ -108,7 +108,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         subcommand: str,
         models: t.StrSequence | None = None,
         extra_args: t.StrSequence | None = None,
-    ) -> Sequence[str]:
+    ) -> t.StrSequence:
         """Build dbt CLI command."""
         cmd: list[str] = ["dbt", subcommand]
         if self._dbt_project_root:
@@ -119,7 +119,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             cmd.extend(extra_args)
         return cmd
 
-    def _run_dbt_cmd(self, cmd: Sequence[str], operation: str) -> r[str]:
+    def _run_dbt_cmd(self, cmd: t.StrSequence, operation: str) -> r[str]:
         """Execute a dbt command via subprocess."""
         try:
             self.logger.info(

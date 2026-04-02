@@ -40,7 +40,7 @@ class FlextMeltanoTypingsBase:
 
     type PluginDefinition = Mapping[
         str,
-        str | Sequence[str] | Mapping[str, FlextCliTypes.Scalar | None],
+        str | FlextCliTypes.StrSequence | Mapping[str, FlextCliTypes.Scalar | None],
     ]
     type PluginConfiguration = FlextCliTypes.ContainerMapping
     type PluginCatalog = Mapping[
@@ -52,7 +52,7 @@ class FlextMeltanoTypingsBase:
         FlextMeltanoTypingsBase.PluginDefinition
         | FlextMeltanoTypingsBase.PluginConfiguration,
     ]
-    type PluginInstallation = Mapping[str, str | bool | Sequence[str]]
+    type PluginInstallation = Mapping[str, str | bool | FlextCliTypes.StrSequence]
     type PluginExecution = Mapping[
         str,
         Mapping[str, FlextCliTypes.ContainerValue] | None,
@@ -81,12 +81,12 @@ class FlextMeltanoTypingsBase:
     type RunContextDict = FlextCliTypes.ContainerMapping
     type FileConfigDict = Mapping[
         str,
-        FlextCliTypes.NormalizedValue | Sequence[str],
+        FlextCliTypes.NormalizedValue | FlextCliTypes.StrSequence,
     ]
     PathDict = Mapping[str, str | Path]
-    type PluginList = Sequence[str]
-    type PluginNameList = Sequence[str]
-    type PluginTypeList = Sequence[str]
+    type PluginList = FlextCliTypes.StrSequence
+    type PluginNameList = FlextCliTypes.StrSequence
+    type PluginTypeList = FlextCliTypes.StrSequence
     type ExecutionResultDict = FlextCliTypes.ContainerMapping
     type ExecutionStatusDict = FlextCliTypes.StrMapping
     type RuntimeConfigDict = Mapping[
@@ -99,14 +99,14 @@ class FlextMeltanoTypingsBase:
     type SingerConfigDict = FlextCliTypes.ContainerMapping
     type SingerSchemaDict = Mapping[str, FlextCliTypes.Scalar | None]
     type SingerMessageList = Sequence[Mapping[str, FlextCliTypes.Scalar | None]]
-    type StreamNameList = Sequence[str]
+    type StreamNameList = FlextCliTypes.StrSequence
     type DbtModelDict = FlextCliTypes.ContainerMapping
     type DbtProfileDict = FlextCliTypes.ContainerMapping
     type DbtProjectDict = FlextCliTypes.ContainerMapping
     type DbtManifestDict = FlextCliTypes.ContainerMapping
     type DbtResultDict = FlextCliTypes.ContainerMapping
-    type DbtModelList = Sequence[str]
-    type DbtTestList = Sequence[str]
+    type DbtModelList = FlextCliTypes.StrSequence
+    type DbtTestList = FlextCliTypes.StrSequence
 
     class Pipeline:
         """Pipeline execution complex types namespace."""
@@ -117,4 +117,4 @@ class FlextMeltanoTypingsBase:
         type RunContextDict = FlextCliTypes.ContainerMapping
         type ExecutionLogsDict = FlextCliTypes.ContainerMapping
         type MetricsDict = Mapping[str, float]
-        type ErrorsDict = Mapping[str, str]
+        type ErrorsDict = FlextCliTypes.StrMapping

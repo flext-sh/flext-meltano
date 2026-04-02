@@ -15,7 +15,7 @@ class FlextMeltanoUtilitiesRuntime:
     """Runtime-focused helpers for in-process Meltano execution."""
 
     @staticmethod
-    def _normalized_parts(values: Sequence[str]) -> list[str]:
+    def _normalized_parts(values: t.StrSequence) -> list[str]:
         """Normalize a sequence of CLI-like values to stripped non-empty strings."""
         stripped_values = u.map(
             u.to_str_list(values),
@@ -29,7 +29,7 @@ class FlextMeltanoUtilitiesRuntime:
         )
 
     @staticmethod
-    def normalize_runtime_command(command: Sequence[str]) -> list[str]:
+    def normalize_runtime_command(command: t.StrSequence) -> list[str]:
         """Normalize legacy Meltano command arguments for in-process execution."""
         normalized = FlextMeltanoUtilitiesRuntime._normalized_parts(command)
         if normalized and normalized[0] == c.Meltano.Commands.BINARY:
@@ -77,7 +77,7 @@ class FlextMeltanoUtilitiesRuntime:
         return mapping.get(normalized, normalized)
 
     @staticmethod
-    def is_help_request(args: Sequence[str]) -> bool:
+    def is_help_request(args: t.StrSequence) -> bool:
         """Return whether the provided args request CLI help."""
         normalized_args = FlextMeltanoUtilitiesRuntime._normalized_parts(args)
         return not normalized_args or normalized_args[0] in {
@@ -112,7 +112,7 @@ class FlextMeltanoUtilitiesRuntime:
             u.to_str(environment_name, default=""),
             case="lower",
         ).strip()
-        aliases: Mapping[str, str] = {
+        aliases: t.StrMapping = {
             c.Meltano.Enums.Environment.DEVELOPMENT.value: "dev",
             c.Meltano.Enums.Environment.TESTING.value: "test",
             c.Meltano.Enums.Environment.PRODUCTION.value: "prod",
@@ -132,7 +132,7 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def build_dbt_runtime_command(
         dbt_command: str,
-        args: Sequence[str] | None = None,
+        args: t.StrSequence | None = None,
     ) -> list[str]:
         """Build the canonical Meltano DBT invoke runtime command."""
         command = [
@@ -188,7 +188,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def extract_plugin_names(
-        plugins: Sequence[Mapping[str, str]],
+        plugins: Sequence[t.StrMapping],
     ) -> t.StrSequence:
         """Extract non-empty plugin names from normalized plugin mappings."""
         return list(

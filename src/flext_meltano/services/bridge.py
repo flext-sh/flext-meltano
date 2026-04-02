@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import override
 
 from flext_core import r
@@ -75,11 +74,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return FlextMeltanoExecutorBase.get_version()
 
     @override
-    def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute bridge service returning current settings."""
-        return r[Mapping[str, t.NormalizedValue]].ok(
-            u.Meltano.coerce_config_mapping(self.settings)
-        )
+        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
 
 
 __all__ = ["FlextMeltanoBridge"]

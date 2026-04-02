@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from collections.abc import Sequence
 from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
@@ -85,18 +84,18 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     # Singer operations
     # ------------------------------------------------------------------
 
-    def run_discover(self) -> r[Sequence[str]]:
+    def run_discover(self) -> r[t.StrSequence]:
         """Discover stream names from the tap."""
         try:
             tap = self._get_or_create_tap()
             streams = tap.discover_streams()
-            stream_names: Sequence[str] = [str(s.name) for s in streams]
+            stream_names: t.StrSequence = [str(s.name) for s in streams]
             self.logger.info(
                 "Streams discovered",
                 tap=self.tap_name,
                 count=len(stream_names),
             )
-            return r[Sequence[str]].ok(stream_names)
+            return r[t.StrSequence].ok(stream_names)
         except (
             ValueError,
             TypeError,
@@ -106,7 +105,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
             RuntimeError,
         ) as exc:
             self.logger.exception("Discovery failed", error=str(exc))
-            return r[Sequence[str]].fail(str(exc))
+            return r[t.StrSequence].fail(str(exc))
 
     def run_sync(self) -> r[str]:
         """Execute Singer sync via tap."""

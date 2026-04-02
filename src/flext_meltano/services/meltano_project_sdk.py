@@ -136,7 +136,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     continue
                 plugin_def: MutableMapping[
                     str,
-                    str | Sequence[str] | Mapping[str, t.Scalar | None],
+                    str | t.StrSequence | Mapping[str, t.Scalar | None],
                 ] = {"name": name, "type": plugin_kind}
                 try:
                     variant_raw = plugin.variant

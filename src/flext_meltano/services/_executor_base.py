@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path
@@ -210,7 +210,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def execute_meltano_command(
         self,
-        command: Sequence[str],
+        command: t.StrSequence,
         timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
@@ -313,7 +313,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     def execute_dbt_command(
         self,
         dbt_command: str,
-        args: Sequence[str] | None = None,
+        args: t.StrSequence | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a DBT command."""
         try:

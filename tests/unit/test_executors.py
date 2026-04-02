@@ -17,6 +17,7 @@ from unittest import mock
 
 from flext_core import FlextLogger, r
 from flext_meltano import FlextMeltanoExecutor, FlextMeltanoExecutorBase
+from tests import t
 
 logger = FlextLogger(__name__)
 
@@ -275,7 +276,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases."""
-        edge_case_commands: Sequence[tuple[str, Sequence[str]]] = [
+        edge_case_commands: Sequence[tuple[str, t.StrSequence]] = [
             ("nonexistent", []),
             ("version", ["extra", "args"]),
         ]

@@ -108,7 +108,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             return r[t.StrMapping].fail(error_msg)
 
 
-def _is_meltano_project(value: Mapping[str, t.NormalizedValue] | None) -> bool:
+def _is_meltano_project(value: t.ContainerMapping | None) -> bool:
     """Type guard for protocol-compatible Meltano project objects."""
     if value is None:
         return False
@@ -117,7 +117,7 @@ def _is_meltano_project(value: Mapping[str, t.NormalizedValue] | None) -> bool:
 
 def _build_plugin_info(
     plugin_name: str,
-    indexed_plugin: Mapping[str, str],
+    indexed_plugin: t.StrMapping,
     plugin_type: str,
 ) -> t.StrMapping:
     """Build plugin info dict from a plugin definition."""
@@ -133,7 +133,7 @@ def _build_plugin_info(
 
 
 def _extract_plugin_info(
-    plugins_data: Mapping[str, Mapping[str, str]],
+    plugins_data: Mapping[str, t.StrMapping],
     plugin_name: str,
     plugin_type: str,
 ) -> r[t.StrMapping]:

@@ -60,7 +60,7 @@ class FlextMeltanoUtilitiesConfig:
     def build_capabilities_payload(
         cls,
         item_type: str,
-        capabilities: Sequence[str],
+        capabilities: t.StrSequence,
         *,
         status: str = c.Meltano.Enums.OperationStatus.AVAILABLE,
         extra_fields: t.ContainerMapping | None = None,

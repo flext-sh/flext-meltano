@@ -6,8 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 from flext_core import r
 from flext_meltano import (
     OPERATION_ERRORS,
@@ -175,7 +173,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 return r[t.ContainerMapping].ok(result_stream)
         return r[t.ContainerMapping].fail(f"Stream '{stream_name}' not found")
 
-    def list_streams(self, tap_instance: m.Meltano.TapInstance) -> Sequence[str]:
+    def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
         """List stream names available in tap instance."""
         discovery = self.discover_streams(tap_instance)
         if discovery.is_failure:

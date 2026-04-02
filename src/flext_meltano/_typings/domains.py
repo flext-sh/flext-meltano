@@ -38,7 +38,7 @@ class FlextMeltanoTypingsDomains:
             str,
             Mapping[str, FlextCliTypes.ContainerValue] | None,
         ]
-        type Project = Mapping[str, str | bool | Sequence[str]]
+        type Project = Mapping[str, str | bool | FlextCliTypes.StrSequence]
 
     class Project:
         """Meltano-specific project types."""
@@ -53,7 +53,9 @@ class FlextMeltanoTypingsDomains:
             str,
             Mapping[str, FlextCliTypes.ContainerValue] | None,
         ]
-        type PipelineConfig = Mapping[str, FlextCliTypes.Scalar | Sequence[str]]
+        type PipelineConfig = Mapping[
+            str, FlextCliTypes.Scalar | FlextCliTypes.StrSequence
+        ]
         type SingerConfig = Mapping[str, FlextCliTypes.Scalar | None]
         type DbtConfig = Mapping[
             str,
@@ -82,8 +84,10 @@ class FlextMeltanoTypingsDomains:
     class CLI:
         """CLI operation complex types namespace."""
 
-        type Command = Sequence[str]
-        type ProcessResult = Mapping[str, FlextCliTypes.Scalar | Sequence[str]]
+        type Command = FlextCliTypes.StrSequence
+        type ProcessResult = Mapping[
+            str, FlextCliTypes.Scalar | FlextCliTypes.StrSequence
+        ]
         type CommandResult = FlextCliTypes.ConfigurationMapping
         type ExecutionResult = Mapping[str, FlextCliTypes.Scalar | None]
         type CLIStatus = FlextCliTypes.FeatureFlagMapping

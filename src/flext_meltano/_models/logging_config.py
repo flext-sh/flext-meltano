@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-
 from pydantic import BaseModel, computed_field
+
+from flext_meltano import t
 
 
 class FlextMeltanoModelsLogging:
@@ -130,7 +130,7 @@ class FlextMeltanoModelsLogging:
         debug_performance_profile: bool = False
 
         @computed_field
-        def extract_dict(self) -> Mapping[str, bool]:
+        def extract_dict(self) -> t.BoolMapping:
             """Extract logging as dictionary."""
             return {
                 "operations": self.extract_operations,
@@ -144,7 +144,7 @@ class FlextMeltanoModelsLogging:
             }
 
         @computed_field
-        def load_dict(self) -> Mapping[str, bool]:
+        def load_dict(self) -> t.BoolMapping:
             """Load logging as dictionary."""
             return {
                 "operations": self.load_operations,
@@ -158,7 +158,7 @@ class FlextMeltanoModelsLogging:
             }
 
         @computed_field
-        def pipeline_dict(self) -> Mapping[str, bool]:
+        def pipeline_dict(self) -> t.BoolMapping:
             """Pipeline logging as dictionary."""
             return {
                 "execution": self.pipeline_execution,
@@ -173,7 +173,7 @@ class FlextMeltanoModelsLogging:
             }
 
         @computed_field
-        def transform_dict(self) -> Mapping[str, bool]:
+        def transform_dict(self) -> t.BoolMapping:
             """Transform logging as dictionary."""
             return {
                 "operations": self.transform_operations,

@@ -20,7 +20,7 @@ from flext_core import FlextService
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase(FlextService[Mapping[str, t.NormalizedValue]]):
+class FlextMeltanoServiceBase(FlextService[t.ContainerMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -59,7 +59,7 @@ class FlextMeltanoServiceBase(FlextService[Mapping[str, t.NormalizedValue]]):
     def __init__(
         self,
         /,
-        config: FlextMeltanoSettings | Mapping[str, t.NormalizedValue] | None = None,
+        config: FlextMeltanoSettings | t.ContainerMapping | None = None,
         *,
         config_type: type[p.Settings] | None = None,
         config_overrides: t.ContainerMapping | None = None,

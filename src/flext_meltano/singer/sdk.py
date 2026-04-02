@@ -10,13 +10,13 @@ so that mypy recognizes them as valid types for subclassing.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record
 from singer_sdk.streams import Stream
 from singer_sdk.tap_base import Tap
 from singer_sdk.target_base import Target
+
+from flext_meltano import t
 
 FlextMeltanoSingerContext = Context
 FlextMeltanoSingerRecord = Record
@@ -25,7 +25,7 @@ FlextMeltanoSingerStreamBase = Stream
 FlextMeltanoSingerTapBase = Tap
 FlextMeltanoSingerTargetBase = Target
 
-__all__: Sequence[str] = [
+__all__: t.StrSequence = [
     "FlextMeltanoSingerContext",
     "FlextMeltanoSingerRecord",
     "FlextMeltanoSingerSinkBase",

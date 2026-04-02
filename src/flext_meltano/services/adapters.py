@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -137,11 +137,9 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             return self.discover_plugins()
 
     @override
-    def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute adapter service returning current settings."""
-        return r[Mapping[str, t.NormalizedValue]].ok(
-            u.Meltano.coerce_config_mapping(self.settings)
-        )
+        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
 
 
 __all__ = ["FlextMeltanoAdapter"]

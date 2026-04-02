@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, override
 
@@ -33,7 +33,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """Create an executor lazily to avoid import cycles during package init."""
         return meltano_services.FlextMeltanoExecutorBase()
 
-    def _run_meltano(self, args: Sequence[str]) -> r[str]:
+    def _run_meltano(self, args: t.StrSequence) -> r[str]:
         """Run a Meltano runtime command and return stdout on success."""
         cwd = u.Meltano.resolve_project_root(self.settings)
         run_result: r[m.Meltano.CommandExecutionResult] = self._build_executor(
@@ -172,10 +172,10 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override
-    def execute(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute abstractions service and return real configuration state."""
         project_root = u.Meltano.resolve_project_root(self.settings)
-        return r[Mapping[str, t.NormalizedValue]].ok({
+        return r[t.ContainerMapping].ok({
             "status": c.Meltano.Enums.StreamStatus.COMPLETED,
             "project_root": str(project_root) if project_root is not None else "",
             "environment": self.settings.environment,
@@ -211,6 +211,6 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """Get tap type from instance."""
         return tap_instance.tap_type
 
-    def get_registered_streams(self) -> Sequence[str]:
+    def get_registered_streams(self) -> t.StrSequence:
         """Get list of registered stream names."""
         return [*self._stream_registry.keys()]

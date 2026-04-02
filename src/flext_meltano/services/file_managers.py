@@ -54,7 +54,7 @@ class FlextMeltanoFileManagers(FlextMeltanoServiceBase):
         """Create directory structure using direct pathlib implementation."""
 
         def _create_dirs() -> t.StrMapping:
-            created_paths: MutableMapping[str, str] = {}
+            created_paths: t.MutableStrMapping = {}
             for directory in directories:
                 dir_path = base_path / directory
                 dir_path.mkdir(parents=True, exist_ok=True)
