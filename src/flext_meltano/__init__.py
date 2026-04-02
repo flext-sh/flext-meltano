@@ -21,9 +21,13 @@ from flext_meltano.__version__ import (
 )
 
 if _TYPE_CHECKING:
-    from flext_cli import d, e, h, r, s, x
-
     from flext_core import FlextTypes
+    from flext_core.decorators import FlextDecorators as d
+    from flext_core.exceptions import FlextExceptions as e
+    from flext_core.handlers import FlextHandlers as h
+    from flext_core.mixins import FlextMixins as x
+    from flext_core.result import FlextResult as r
+    from flext_core.service import FlextService as s
     from flext_meltano import (
         _constants,
         _models,
@@ -239,23 +243,23 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = merge_lazy_imports(
         "c": ("flext_meltano.constants", "FlextMeltanoConstants"),
         "cli": "flext_meltano.cli",
         "constants": "flext_meltano.constants",
-        "d": "flext_cli",
-        "e": "flext_cli",
-        "h": "flext_cli",
+        "d": ("flext_core.decorators", "FlextDecorators"),
+        "e": ("flext_core.exceptions", "FlextExceptions"),
+        "h": ("flext_core.handlers", "FlextHandlers"),
         "m": ("flext_meltano.models", "FlextMeltanoModels"),
         "main": "flext_meltano.cli",
         "meltano": "flext_meltano.api",
         "models": "flext_meltano.models",
         "p": ("flext_meltano.protocols", "FlextMeltanoProtocols"),
         "protocols": "flext_meltano.protocols",
-        "r": "flext_cli",
-        "s": "flext_cli",
+        "r": ("flext_core.result", "FlextResult"),
+        "s": ("flext_core.service", "FlextService"),
         "settings": "flext_meltano.settings",
         "t": ("flext_meltano.typings", "FlextMeltanoTypes"),
         "typings": "flext_meltano.typings",
         "u": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
         "utilities": "flext_meltano.utilities",
-        "x": "flext_cli",
+        "x": ("flext_core.mixins", "FlextMixins"),
     },
 )
 
