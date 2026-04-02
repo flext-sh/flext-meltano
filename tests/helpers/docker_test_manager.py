@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from flext_core import FlextLogger, r
 
+from flext_core import FlextLogger, r
 from tests import t
 
 

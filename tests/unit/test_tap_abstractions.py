@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Mapping
 from unittest.mock import patch
 
 import pytest
-from flext_core import r
 from flext_tests import tm
 from pydantic_core import ValidationError
 
+from flext_core import r
 from flext_meltano import FlextMeltanoAbstractions
 from tests import m, t
 
@@ -55,7 +54,7 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_tap_config_validation(self) -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""
-        connection_config: Mapping[str, int | str] = {
+        connection_config: t.HeaderMapping = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",

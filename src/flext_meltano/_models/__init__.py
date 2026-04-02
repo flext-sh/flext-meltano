@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano._models import (
         cli_params,
         context,
@@ -56,7 +55,7 @@ if _TYPE_CHECKING:
     from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
     from flext_meltano._models.transformations import FlextMeltanoModelsTransformations
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextMeltanoModelsCliParams": "flext_meltano._models.cli_params",
     "FlextMeltanoModelsContext": "flext_meltano._models.context",
     "FlextMeltanoModelsCore": "flext_meltano._models.core",

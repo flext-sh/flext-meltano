@@ -9,7 +9,6 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import r
-
 from flext_meltano import FlextMeltanoServiceBase, c, t, u
 
 

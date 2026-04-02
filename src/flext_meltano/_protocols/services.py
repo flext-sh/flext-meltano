@@ -10,8 +10,8 @@ from __future__ import annotations
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
-from flext_core import r
 
+from flext_core import r
 from flext_meltano import t
 
 

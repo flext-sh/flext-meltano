@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
-from flext_core import u
 from pydantic import BaseModel
 
+from flext_core import u
 from flext_meltano import c, m, p, t
 
 

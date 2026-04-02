@@ -8,8 +8,8 @@ from pathlib import Path
 
 import yaml
 from flext_cli import r
-from flext_core import u
 
+from flext_core import u
 from flext_meltano import c, m, p, t
 
 

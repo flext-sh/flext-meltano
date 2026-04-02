@@ -9,9 +9,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 import pytest
-from flext_core import FlextLogger, r
 from flext_tests import tm
 
+from flext_core import FlextLogger, r
 from flext_meltano import FlextMeltanoTargetAbstractions
 from tests import t, u
 

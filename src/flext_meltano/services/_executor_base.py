@@ -16,7 +16,6 @@ from typing import TYPE_CHECKING, override
 
 import meltano
 from click import Abort, ClickException
-from flext_core import r
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -26,9 +25,11 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
+from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 import flext_meltano as meltano_package
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 if TYPE_CHECKING:
@@ -79,8 +80,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         if isinstance(raw_exit_code, int):
             return raw_exit_code
         try:
-            return int(str(raw_exit_code))
-        except (TypeError, ValueError):
+            return t.Meltano.INTEGER_ADAPTER.validate_python(raw_exit_code)
+        except ValidationError:
             return 1
 
     def _project_search_root(self, _cwd: Path | None = None) -> Path | None:

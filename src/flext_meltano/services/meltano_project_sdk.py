@@ -12,10 +12,10 @@ from __future__ import annotations
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 
-from flext_core import r
 from meltano.core.project import Project
 from pydantic import PrivateAttr
 
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, m, t, u
 
 

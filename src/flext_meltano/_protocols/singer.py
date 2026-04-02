@@ -12,6 +12,7 @@ from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
+from flext_core import r
 from flext_meltano import m, t
 
 
@@ -141,4 +142,25 @@ class FlextMeltanoProtocolsSinger:
             Number of records consumed
 
             """
+            ...
+
+    @runtime_checkable
+    class SingerTargetHandler(Protocol):
+        """Protocol for Singer target message handlers.
+
+        Consumers implement this protocol to handle Singer messages
+        routed by process_stdin(). Domain-specific logic stays in
+        the consumer; generic stdin parsing stays here.
+        """
+
+        def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> r[None]:
+            """Handle a SCHEMA message."""
+            ...
+
+        def handle_record(self, message: m.Meltano.SingerRecordMessage) -> r[None]:
+            """Handle a RECORD message."""
+            ...
+
+        def handle_state(self, message: m.Meltano.SingerStateMessage) -> r[None]:
+            """Handle a STATE message."""
             ...

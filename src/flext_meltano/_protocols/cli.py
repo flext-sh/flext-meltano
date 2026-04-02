@@ -16,6 +16,9 @@ if TYPE_CHECKING:
 class FlextMeltanoProtocolsBase:
     """Base and Stream protocol definitions."""
 
+    class PipelineCli(Protocol):
+        def show_pipeline_help(self) -> None: ...
+
     class SingerCli(Protocol):
         def show_tap_help(self) -> None: ...
 

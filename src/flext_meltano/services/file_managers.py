@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextLogger, r
-
 from flext_meltano import (
     FlextMeltanoServiceBase,
     c,

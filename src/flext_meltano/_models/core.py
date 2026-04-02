@@ -6,9 +6,9 @@ from collections.abc import Sequence
 from typing import Annotated
 
 from flext_cli import FlextCliModels, u
-from flext_core import r
 from pydantic import Field, field_validator
 
+from flext_core import r
 from flext_meltano import t
 
 

@@ -15,10 +15,10 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from flext_core import r
 from flext_infra import FlextInfraModels as m_infra
 from flext_tests import tm
 
+from flext_core import r
 from flext_meltano import FlextMeltanoSingerCliTranslator
 from tests import m
 

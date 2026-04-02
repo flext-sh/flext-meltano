@@ -11,7 +11,6 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from flext_core import FlextLogger, r
-
 from flext_meltano import (
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,

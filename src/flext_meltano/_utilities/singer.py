@@ -9,34 +9,13 @@ Access pattern: u.Meltano.Singer.emit_schema(), u.Meltano.Singer.process_stdin()
 from __future__ import annotations
 
 import sys
-from typing import Protocol, runtime_checkable
 
 import orjson
 from flext_cli import r
 
-from flext_meltano import c, m, t
+from flext_meltano import c, m, p, t
 
-
-@runtime_checkable
-class SingerTargetHandler(Protocol):
-    """Protocol for Singer target message handlers.
-
-    Consumers implement this protocol to handle Singer messages
-    routed by process_stdin(). Domain-specific logic stays in
-    the consumer; generic stdin parsing stays here.
-    """
-
-    def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> r[None]:
-        """Handle a SCHEMA message."""
-        ...
-
-    def handle_record(self, message: m.Meltano.SingerRecordMessage) -> r[None]:
-        """Handle a RECORD message."""
-        ...
-
-    def handle_state(self, message: m.Meltano.SingerStateMessage) -> r[None]:
-        """Handle a STATE message."""
-        ...
+SingerTargetHandler = p.Meltano.SingerTargetHandler
 
 
 class FlextMeltanoUtilitiesSinger:

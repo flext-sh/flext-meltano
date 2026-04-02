@@ -19,7 +19,6 @@ from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano.services import (
         _abstractions_base,
         _cli_small_managers,
@@ -113,7 +112,7 @@ if _TYPE_CHECKING:
     from flext_meltano.services.singer_translator import FlextMeltanoSingerCliTranslator
     from flext_meltano.services.validators import FlextMeltanoValidators
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = merge_lazy_imports(
     ("flext_meltano.services.consumer_bases",),
     {
         "FlextMeltanoAbstractions": "flext_meltano.services.abstractions",

@@ -15,9 +15,9 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextSettings
 from flext_tests import tm
 
+from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoSettings
 from tests import c
 

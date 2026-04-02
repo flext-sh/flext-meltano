@@ -19,7 +19,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano.singer import sdk
     from flext_meltano.singer.sdk import (
         FlextMeltanoSingerContext,
@@ -30,7 +29,7 @@ if _TYPE_CHECKING:
         FlextMeltanoSingerTargetBase,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextMeltanoSingerContext": "flext_meltano.singer.sdk",
     "FlextMeltanoSingerRecord": "flext_meltano.singer.sdk",
     "FlextMeltanoSingerSinkBase": "flext_meltano.singer.sdk",

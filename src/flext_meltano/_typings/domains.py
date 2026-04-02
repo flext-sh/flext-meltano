@@ -21,7 +21,7 @@ class FlextMeltanoTypingsDomains:
         """DBT transformation complex types namespace."""
 
         type ModelConfiguration = Mapping[str, FlextCliTypes.Scalar | None]
-        type TestConfiguration = Mapping[str, str | Sequence[str]]
+        type TestConfiguration = FlextCliTypes.AttributeMapping
         type ProfileConfiguration = Mapping[
             str,
             Mapping[str, FlextCliTypes.Scalar | None],
@@ -71,7 +71,7 @@ class FlextMeltanoTypingsDomains:
             str,
             Mapping[str, FlextCliTypes.ContainerValue] | None,
         ]
-        type VersionInfo = Mapping[str, str | int]
+        type VersionInfo = FlextCliTypes.HeaderMapping
         type ConnectionInfo = FlextCliTypes.ConfigurationMapping
         type BridgeConfig = Mapping[
             str,
@@ -86,7 +86,7 @@ class FlextMeltanoTypingsDomains:
         type ProcessResult = Mapping[str, FlextCliTypes.Scalar | Sequence[str]]
         type CommandResult = FlextCliTypes.ConfigurationMapping
         type ExecutionResult = Mapping[str, FlextCliTypes.Scalar | None]
-        type CLIStatus = Mapping[str, str | bool]
+        type CLIStatus = FlextCliTypes.FeatureFlagMapping
 
     class ELT:
         """ELT pipeline complex types namespace."""

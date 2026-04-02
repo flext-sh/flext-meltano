@@ -17,7 +17,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from tests.integration import test_docker_integration
     from tests.integration.test_docker_integration import (
         TestDockerIntegration,
@@ -25,7 +24,7 @@ if _TYPE_CHECKING:
         redis,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "TestDockerIntegration": "tests.integration.test_docker_integration",
     "psycopg2": "tests.integration.test_docker_integration",
     "redis": "tests.integration.test_docker_integration",

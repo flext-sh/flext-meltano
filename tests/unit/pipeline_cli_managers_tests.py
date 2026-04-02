@@ -8,10 +8,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
+from flext_core import r
 from flext_meltano import FlextMeltanoPipelineManager
 from tests import m, t
 

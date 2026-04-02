@@ -7,24 +7,19 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from typing import Protocol
 
 from flext_core import FlextLogger, r
-
 from flext_meltano import (
     FlextMeltanoPipelineCrudOperations,
     FlextMeltanoPipelineLifecycleOperations,
     c,
     m,
+    p,
     t,
     u,
 )
 
-
-class _PipelineCli(Protocol):
-    """Protocol for pipeline CLI help display."""
-
-    def show_pipeline_help(self) -> None: ...
+_PipelineCli = p.Meltano.PipelineCli
 
 
 class FlextMeltanoPipelineManager(

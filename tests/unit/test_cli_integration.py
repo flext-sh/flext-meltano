@@ -14,7 +14,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import typing
-from collections.abc import Mapping
 
 from flext_tests import tm
 
@@ -26,7 +25,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectTapRunParams model."""
-        cli_args: Mapping[str, str | bool | None] = {
+        cli_args: t.OptionalFeatureFlagMapping = {
             "tap_name": "tap-postgres",
             "discover": False,
             "config_file": None,
@@ -46,7 +45,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_with_config(self) -> None:
         """Test converting Mapping[str, objecth config to TapRunParams model."""
-        cli_args: Mapping[str, str | bool] = {
+        cli_args: t.FeatureFlagMapping = {
             "tap_name": "tap-postgres",
             "config_file": "/path/to/config.json",
             "discover": False,
@@ -62,7 +61,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_discover_mode(self) -> None:
         """Test converting Mapping[str, objecth discover flag to TapRunParams model."""
-        cli_args: Mapping[str, str | bool] = {
+        cli_args: t.FeatureFlagMapping = {
             "tap_name": "tap-postgres",
             "discover": True,
         }
@@ -78,7 +77,7 @@ class TestCliModelConverterWithTapRunParams:
 
     def test_converter_tap_run_params_all_fields(self) -> None:
         """Test converting Mapping[str, objecth all fields to TapRunParams model."""
-        cli_args: Mapping[str, str | bool] = {
+        cli_args: t.FeatureFlagMapping = {
             "tap_name": "tap-postgres",
             "config_file": "/config.json",
             "catalog_file": "/catalog.json",
@@ -129,7 +128,7 @@ class TestCliModelConverterWithTargetRunParams:
 
     def test_converter_target_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectTargetRunParams model."""
-        cli_args: Mapping[str, str | None] = {
+        cli_args: t.OptionalStrMapping = {
             "target_name": "target-postgres",
             "config_file": None,
             "input_file": None,

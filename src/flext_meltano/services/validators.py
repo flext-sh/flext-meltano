@@ -9,9 +9,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextLogger, r
 from pydantic import ValidationError
 
+from flext_core import FlextLogger, r
 from flext_meltano import FlextMeltanoServiceBase, m, t, u
 
 

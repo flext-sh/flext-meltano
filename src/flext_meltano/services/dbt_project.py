@@ -12,9 +12,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
-from flext_core import r
 from pydantic import PrivateAttr, ValidationError
 
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, m, t
 
 

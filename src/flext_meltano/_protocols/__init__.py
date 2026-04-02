@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano._protocols import cli, plugin, project, services, singer
     from flext_meltano._protocols.cli import FlextMeltanoProtocolsBase
     from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
@@ -20,7 +19,7 @@ if _TYPE_CHECKING:
     from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
     from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextMeltanoProtocolsBase": "flext_meltano._protocols.cli",
     "FlextMeltanoProtocolsPlugin": "flext_meltano._protocols.plugin",
     "FlextMeltanoProtocolsProject": "flext_meltano._protocols.project",

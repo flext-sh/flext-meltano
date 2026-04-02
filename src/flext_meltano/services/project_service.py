@@ -6,12 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from pathlib import Path
 from typing import override
 
 from flext_core import r
-
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoServiceBase,
@@ -36,15 +34,15 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def _validate_project_creation_params(
         project_name: str,
         project_dir: Path,
-    ) -> r[Mapping[str, str | Path]]:
+    ) -> r[t.FlatContainerMapping]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return r[Mapping[str, str | Path]].fail("Project name cannot be empty")
+            return r[t.FlatContainerMapping].fail("Project name cannot be empty")
         if not project_dir.exists():
-            return r[Mapping[str, str | Path]].fail(
+            return r[t.FlatContainerMapping].fail(
                 f"Parent directory not found: {project_dir}"
             )
-        return r[Mapping[str, str | Path]].ok({
+        return r[t.FlatContainerMapping].ok({
             "name": project_name.strip(),
             "parent_dir": project_dir,
         })
@@ -75,7 +73,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
     def create_project(self, project_name: str, project_dir: Path) -> r[t.StrMapping]:
         """Create new Meltano project using railway-oriented file operations."""
-        params_r: r[Mapping[str, str | Path]] = self._validate_project_creation_params(
+        params_r: r[t.FlatContainerMapping] = self._validate_project_creation_params(
             project_name,
             project_dir,
         )

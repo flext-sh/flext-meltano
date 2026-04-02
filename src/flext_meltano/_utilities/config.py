@@ -7,8 +7,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_cli import FlextCliUtilities, r
-from flext_core import u
 
+from flext_core import u
 from flext_meltano import c, m, t
 
 

@@ -9,7 +9,6 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from flext_core import FlextLogger, r
-
 from flext_meltano import c, p, t, u
 
 

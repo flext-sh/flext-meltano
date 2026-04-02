@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano._utilities import config, project, runtime, singer, yaml
     from flext_meltano._utilities.config import FlextMeltanoUtilitiesConfig
     from flext_meltano._utilities.project import FlextMeltanoUtilitiesProject
@@ -23,7 +22,7 @@ if _TYPE_CHECKING:
     )
     from flext_meltano._utilities.yaml import FlextMeltanoUtilitiesYaml
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextMeltanoUtilitiesConfig": "flext_meltano._utilities.config",
     "FlextMeltanoUtilitiesProject": "flext_meltano._utilities.project",
     "FlextMeltanoUtilitiesRuntime": "flext_meltano._utilities.runtime",

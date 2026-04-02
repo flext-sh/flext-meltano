@@ -10,9 +10,8 @@ from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, override
 
-from flext_core import r
-
 import flext_meltano.services as meltano_services
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 if TYPE_CHECKING:

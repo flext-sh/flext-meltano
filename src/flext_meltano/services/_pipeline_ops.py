@@ -9,9 +9,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from flext_core import FlextLogger, r
-
 import flext_meltano.services as meltano_services
+from flext_core import FlextLogger, r
 from flext_meltano import c, m, t, u
 
 
@@ -73,7 +72,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
                 pipeline_name,
             )
             validated = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": dict(config),
+                "values": config,
             })
             u.write_file(
                 config_path,

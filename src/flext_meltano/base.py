@@ -14,9 +14,9 @@ from collections.abc import Mapping, Sequence
 from types import ModuleType
 from typing import Annotated, override
 
-from flext_core import FlextService
 from pydantic import Field
 
+from flext_core import FlextService
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 

@@ -9,7 +9,6 @@ from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 
 from flext_core.lazy import install_lazy_exports, merge_lazy_imports
-
 from flext_meltano.__version__ import (
     __author__,
     __author_email__,
@@ -23,8 +22,8 @@ from flext_meltano.__version__ import (
 
 if _TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
-    from flext_core import FlextTypes
 
+    from flext_core import FlextTypes
     from flext_meltano import (
         _constants,
         _models,
@@ -210,7 +209,7 @@ if _TYPE_CHECKING:
         FlextMeltanoUtilities as u,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = merge_lazy_imports(
     (
         "flext_meltano._constants",
         "flext_meltano._models",

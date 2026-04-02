@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from collections.abc import MutableSequence
 
-from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t
 
 

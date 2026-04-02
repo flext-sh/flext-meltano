@@ -14,9 +14,9 @@ from abc import abstractmethod
 from collections.abc import MutableMapping, Sequence
 from typing import Annotated, ClassVar, Self, override
 
-from flext_core import r
 from pydantic import Field, PrivateAttr
 
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSingerSinkBase, c, t
 
 

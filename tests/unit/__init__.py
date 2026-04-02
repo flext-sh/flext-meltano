@@ -16,7 +16,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from tests.unit import (
         pipeline_cli_managers_tests,
         test_api,
@@ -125,7 +124,7 @@ if _TYPE_CHECKING:
     from tests.unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
     from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "LogLevel": "tests.unit.test_config",
     "TestCliModelConverterWithDbtRunParams": "tests.unit.test_cli_integration",
     "TestCliModelConverterWithPipelineRunParams": "tests.unit.test_cli_integration",

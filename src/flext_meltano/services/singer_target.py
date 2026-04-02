@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import r
-
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 
@@ -68,7 +67,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
                 config: m.Meltano.DataSinkConfig = (
-                    m.Meltano.DataSinkConfig.model_validate(dict(sink_config))
+                    m.Meltano.DataSinkConfig.model_validate(sink_config)
                 )
             except (ValueError, TypeError, KeyError, AttributeError) as e:
                 return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")

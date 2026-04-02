@@ -25,7 +25,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from tests.helpers import docker_test_manager
     from tests.helpers.docker_test_manager import (
         ContainerManager,
@@ -34,7 +33,7 @@ if _TYPE_CHECKING:
         docker_services,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "ContainerManager": "tests.helpers.docker_test_manager",
     "Tk": "tests.helpers.docker_test_manager",
     "docker_manager": "tests.helpers.docker_test_manager",

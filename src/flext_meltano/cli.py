@@ -10,9 +10,9 @@ import sys
 from typing import override
 
 from flext_cli import cli
-from flext_core import r
 from pydantic import PrivateAttr
 
+from flext_core import r
 from flext_meltano import (
     FlextMeltanoCommandRouter,
     FlextMeltanoDbtManager,

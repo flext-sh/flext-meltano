@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_meltano.services.consumer_bases import (
         dbt_service_base,
         tap_service_base,
@@ -28,7 +27,7 @@ if _TYPE_CHECKING:
         FlextMeltanoTargetServiceBase,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextMeltanoDbtServiceBase": "flext_meltano.services.consumer_bases.dbt_service_base",
     "FlextMeltanoTapServiceBase": "flext_meltano.services.consumer_bases.tap_service_base",
     "FlextMeltanoTargetServiceBase": "flext_meltano.services.consumer_bases.target_service_base",

@@ -23,6 +23,9 @@ class FlextMeltanoTypingsBase:
     CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[FlextCliTypes.ContainerMapping]] = (
         TypeAdapter(FlextCliTypes.ContainerMapping)
     )
+    INTEGER_ADAPTER: ClassVar[TypeAdapter[FlextCliTypes.IntegerValue]] = TypeAdapter(
+        FlextCliTypes.IntegerValue
+    )
 
     type ValidatorInput = (
         FlextCliTypes.ContainerMapping
