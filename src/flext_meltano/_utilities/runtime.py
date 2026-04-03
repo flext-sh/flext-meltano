@@ -181,8 +181,7 @@ class FlextMeltanoUtilitiesRuntime:
             "variant": str(variant_val).strip() if variant_val is not None else "",
         }
         filtered = u.filter_dict(
-            plugin_data,
-            lambda _key, value: u.chk(value, empty=False),
+            plugin_data, lambda _key, value: u.chk(value, empty=False)
         )
         return {str(key): str(value) for key, value in filtered.items()}
 
