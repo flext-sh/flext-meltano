@@ -1,7 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make gen
 #
-"""Consumer base classes for flext-(tap|target|dbt)-* projects."""
+"""Consumer bases package."""
 
 from __future__ import annotations
 
@@ -12,28 +12,40 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-    from flext_meltano.services.consumer_bases import (
-        dbt_service_base,
-        tap_service_base,
-        target_service_base,
-    )
-    from flext_meltano.services.consumer_bases.dbt_service_base import (
-        FlextMeltanoDbtServiceBase,
-    )
-    from flext_meltano.services.consumer_bases.tap_service_base import (
-        FlextMeltanoTapServiceBase,
-    )
-    from flext_meltano.services.consumer_bases.target_service_base import (
-        FlextMeltanoTargetServiceBase,
-    )
+    from flext_core.constants import FlextConstants as c
+    from flext_core.decorators import FlextDecorators as d
+    from flext_core.exceptions import FlextExceptions as e
+    from flext_core.handlers import FlextHandlers as h
+    from flext_core.mixins import FlextMixins as x
+    from flext_core.models import FlextModels as m
+    from flext_core.protocols import FlextProtocols as p
+    from flext_core.result import FlextResult as r
+    from flext_core.service import FlextService as s
+    from flext_core.typings import FlextTypes as t
+    from flext_core.utilities import FlextUtilities as u
+    from flext_meltano import dbt_service_base, tap_service_base, target_service_base
+    from flext_meltano.dbt_service_base import FlextMeltanoDbtServiceBase
+    from flext_meltano.tap_service_base import FlextMeltanoTapServiceBase
+    from flext_meltano.target_service_base import FlextMeltanoTargetServiceBase
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextMeltanoDbtServiceBase": "flext_meltano.services.consumer_bases.dbt_service_base",
-    "FlextMeltanoTapServiceBase": "flext_meltano.services.consumer_bases.tap_service_base",
-    "FlextMeltanoTargetServiceBase": "flext_meltano.services.consumer_bases.target_service_base",
-    "dbt_service_base": "flext_meltano.services.consumer_bases.dbt_service_base",
-    "tap_service_base": "flext_meltano.services.consumer_bases.tap_service_base",
-    "target_service_base": "flext_meltano.services.consumer_bases.target_service_base",
+    "FlextMeltanoDbtServiceBase": "flext_meltano.dbt_service_base",
+    "FlextMeltanoTapServiceBase": "flext_meltano.tap_service_base",
+    "FlextMeltanoTargetServiceBase": "flext_meltano.target_service_base",
+    "c": ("flext_core.constants", "FlextConstants"),
+    "d": ("flext_core.decorators", "FlextDecorators"),
+    "dbt_service_base": "flext_meltano.dbt_service_base",
+    "e": ("flext_core.exceptions", "FlextExceptions"),
+    "h": ("flext_core.handlers", "FlextHandlers"),
+    "m": ("flext_core.models", "FlextModels"),
+    "p": ("flext_core.protocols", "FlextProtocols"),
+    "r": ("flext_core.result", "FlextResult"),
+    "s": ("flext_core.service", "FlextService"),
+    "t": ("flext_core.typings", "FlextTypes"),
+    "tap_service_base": "flext_meltano.tap_service_base",
+    "target_service_base": "flext_meltano.target_service_base",
+    "u": ("flext_core.utilities", "FlextUtilities"),
+    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

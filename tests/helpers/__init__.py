@@ -1,20 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make gen
 #
-"""Test helpers for flext-meltano tests.
-
-Provides reusable test utilities and helpers for all test modules.
-Consolidates typings, models, and protocols in unified classes.
-
-Uses standardized short names (m, t, p, u) for easy access in tests.
-Helpers extend main classes and use same short names in place of base classes.
-
-NOTE: Constants have been moved to tests/constants.py - import from tests.constants instead.
-NOTE: Models have been consolidated to tests/models.py - import from tests.models instead.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Helpers package."""
 
 from __future__ import annotations
 
@@ -25,20 +12,40 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-    from tests.helpers import docker_test_manager
-    from tests.helpers.docker_test_manager import (
+    from flext_core.constants import FlextConstants as c
+    from flext_core.decorators import FlextDecorators as d
+    from flext_core.exceptions import FlextExceptions as e
+    from flext_core.handlers import FlextHandlers as h
+    from flext_core.mixins import FlextMixins as x
+    from flext_core.models import FlextModels as m
+    from flext_core.protocols import FlextProtocols as p
+    from flext_core.result import FlextResult as r
+    from flext_core.service import FlextService as s
+    from flext_core.typings import FlextTypes as t
+    from flext_core.utilities import FlextUtilities as u
+    from flext_meltano import docker_test_manager
+    from flext_meltano.docker_test_manager import (
         ContainerManager,
-        Tk,
         docker_manager,
         docker_services,
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "ContainerManager": "tests.helpers.docker_test_manager",
-    "Tk": "tests.helpers.docker_test_manager",
-    "docker_manager": "tests.helpers.docker_test_manager",
-    "docker_services": "tests.helpers.docker_test_manager",
-    "docker_test_manager": "tests.helpers.docker_test_manager",
+    "ContainerManager": "flext_meltano.docker_test_manager",
+    "c": ("flext_core.constants", "FlextConstants"),
+    "d": ("flext_core.decorators", "FlextDecorators"),
+    "docker_manager": "flext_meltano.docker_test_manager",
+    "docker_services": "flext_meltano.docker_test_manager",
+    "docker_test_manager": "flext_meltano.docker_test_manager",
+    "e": ("flext_core.exceptions", "FlextExceptions"),
+    "h": ("flext_core.handlers", "FlextHandlers"),
+    "m": ("flext_core.models", "FlextModels"),
+    "p": ("flext_core.protocols", "FlextProtocols"),
+    "r": ("flext_core.result", "FlextResult"),
+    "s": ("flext_core.service", "FlextService"),
+    "t": ("flext_core.typings", "FlextTypes"),
+    "u": ("flext_core.utilities", "FlextUtilities"),
+    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

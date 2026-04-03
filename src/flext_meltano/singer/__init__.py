@@ -1,14 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make gen
 #
-"""Singer SDK type aliases for consumer subclassing.
-
-This package provides ONLY Singer SDK re-exports (Tap, Target, Stream, Sink).
-All service logic lives in ``flext_meltano.services.singer_*`` modules.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Singer package."""
 
 from __future__ import annotations
 
@@ -19,8 +12,19 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-    from flext_meltano.singer import sdk
-    from flext_meltano.singer.sdk import (
+    from flext_core.constants import FlextConstants as c
+    from flext_core.decorators import FlextDecorators as d
+    from flext_core.exceptions import FlextExceptions as e
+    from flext_core.handlers import FlextHandlers as h
+    from flext_core.mixins import FlextMixins as x
+    from flext_core.models import FlextModels as m
+    from flext_core.protocols import FlextProtocols as p
+    from flext_core.result import FlextResult as r
+    from flext_core.service import FlextService as s
+    from flext_core.typings import FlextTypes as t
+    from flext_core.utilities import FlextUtilities as u
+    from flext_meltano import sdk
+    from flext_meltano.sdk import (
         FlextMeltanoSingerContext,
         FlextMeltanoSingerRecord,
         FlextMeltanoSingerSinkBase,
@@ -30,13 +34,24 @@ if _TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextMeltanoSingerContext": "flext_meltano.singer.sdk",
-    "FlextMeltanoSingerRecord": "flext_meltano.singer.sdk",
-    "FlextMeltanoSingerSinkBase": "flext_meltano.singer.sdk",
-    "FlextMeltanoSingerStreamBase": "flext_meltano.singer.sdk",
-    "FlextMeltanoSingerTapBase": "flext_meltano.singer.sdk",
-    "FlextMeltanoSingerTargetBase": "flext_meltano.singer.sdk",
-    "sdk": "flext_meltano.singer.sdk",
+    "FlextMeltanoSingerContext": "flext_meltano.sdk",
+    "FlextMeltanoSingerRecord": "flext_meltano.sdk",
+    "FlextMeltanoSingerSinkBase": "flext_meltano.sdk",
+    "FlextMeltanoSingerStreamBase": "flext_meltano.sdk",
+    "FlextMeltanoSingerTapBase": "flext_meltano.sdk",
+    "FlextMeltanoSingerTargetBase": "flext_meltano.sdk",
+    "c": ("flext_core.constants", "FlextConstants"),
+    "d": ("flext_core.decorators", "FlextDecorators"),
+    "e": ("flext_core.exceptions", "FlextExceptions"),
+    "h": ("flext_core.handlers", "FlextHandlers"),
+    "m": ("flext_core.models", "FlextModels"),
+    "p": ("flext_core.protocols", "FlextProtocols"),
+    "r": ("flext_core.result", "FlextResult"),
+    "s": ("flext_core.service", "FlextService"),
+    "sdk": "flext_meltano.sdk",
+    "t": ("flext_core.typings", "FlextTypes"),
+    "u": ("flext_core.utilities", "FlextUtilities"),
+    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 
