@@ -14,20 +14,14 @@ if _t.TYPE_CHECKING:
 
     base = _flext_meltano__typings_base
     import flext_meltano._typings.domains as _flext_meltano__typings_domains
+    from flext_meltano._typings.base import FlextMeltanoTypingsBase
 
     domains = _flext_meltano__typings_domains
     import flext_meltano._typings.singer as _flext_meltano__typings_singer
+    from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
 
     singer = _flext_meltano__typings_singer
-
-    _ = (
-        FlextMeltanoTypingsBase,
-        FlextMeltanoTypingsDomains,
-        FlextMeltanoTypingsSinger,
-        base,
-        domains,
-        singer,
-    )
+    from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
 _LAZY_IMPORTS = {
     "FlextMeltanoTypingsBase": "flext_meltano._typings.base",
     "FlextMeltanoTypingsDomains": "flext_meltano._typings.domains",

@@ -14,20 +14,14 @@ if _t.TYPE_CHECKING:
 
     base = _flext_meltano__constants_base
     import flext_meltano._constants.config as _flext_meltano__constants_config
+    from flext_meltano._constants.base import FlextMeltanoConstantsBase
 
     config = _flext_meltano__constants_config
     import flext_meltano._constants.enums as _flext_meltano__constants_enums
+    from flext_meltano._constants.config import FlextMeltanoConstantsConfig
 
     enums = _flext_meltano__constants_enums
-
-    _ = (
-        FlextMeltanoConstantsBase,
-        FlextMeltanoConstantsConfig,
-        FlextMeltanoConstantsEnums,
-        base,
-        config,
-        enums,
-    )
+    from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 _LAZY_IMPORTS = {
     "FlextMeltanoConstantsBase": "flext_meltano._constants.base",
     "FlextMeltanoConstantsConfig": "flext_meltano._constants.config",
