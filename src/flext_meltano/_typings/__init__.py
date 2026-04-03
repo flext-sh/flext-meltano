@@ -5,19 +5,30 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING as _TYPE_CHECKING
+import typing as _t
 
 from flext_core.lazy import install_lazy_exports
 
-if _TYPE_CHECKING:
-    from flext_core import FlextTypes
-    from flext_meltano._typings import base, domains, singer
-    from flext_meltano._typings.base import FlextMeltanoTypingsBase
-    from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
-    from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
+if _t.TYPE_CHECKING:
+    import flext_meltano._typings.base as _flext_meltano__typings_base
 
-_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
+    base = _flext_meltano__typings_base
+    import flext_meltano._typings.domains as _flext_meltano__typings_domains
+
+    domains = _flext_meltano__typings_domains
+    import flext_meltano._typings.singer as _flext_meltano__typings_singer
+
+    singer = _flext_meltano__typings_singer
+
+    _ = (
+        FlextMeltanoTypingsBase,
+        FlextMeltanoTypingsDomains,
+        FlextMeltanoTypingsSinger,
+        base,
+        domains,
+        singer,
+    )
+_LAZY_IMPORTS = {
     "FlextMeltanoTypingsBase": "flext_meltano._typings.base",
     "FlextMeltanoTypingsDomains": "flext_meltano._typings.domains",
     "FlextMeltanoTypingsSinger": "flext_meltano._typings.singer",
@@ -25,6 +36,15 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "domains": "flext_meltano._typings.domains",
     "singer": "flext_meltano._typings.singer",
 }
+
+__all__ = [
+    "FlextMeltanoTypingsBase",
+    "FlextMeltanoTypingsDomains",
+    "FlextMeltanoTypingsSinger",
+    "base",
+    "domains",
+    "singer",
+]
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

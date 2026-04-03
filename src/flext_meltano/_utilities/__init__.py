@@ -5,24 +5,41 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING as _TYPE_CHECKING
+import typing as _t
 
 from flext_core.lazy import install_lazy_exports
 
-if _TYPE_CHECKING:
-    from flext_core import FlextTypes
-    from flext_meltano._utilities import config, project, runtime, singer, yaml
-    from flext_meltano._utilities.config import FlextMeltanoUtilitiesConfig
-    from flext_meltano._utilities.project import FlextMeltanoUtilitiesProject
-    from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-    from flext_meltano._utilities.singer import (
-        FlextMeltanoUtilitiesSinger,
-        SingerTargetHandler,
-    )
-    from flext_meltano._utilities.yaml import FlextMeltanoUtilitiesYaml
+if _t.TYPE_CHECKING:
+    import flext_meltano._utilities.config as _flext_meltano__utilities_config
 
-_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
+    config = _flext_meltano__utilities_config
+    import flext_meltano._utilities.project as _flext_meltano__utilities_project
+
+    project = _flext_meltano__utilities_project
+    import flext_meltano._utilities.runtime as _flext_meltano__utilities_runtime
+
+    runtime = _flext_meltano__utilities_runtime
+    import flext_meltano._utilities.singer as _flext_meltano__utilities_singer
+
+    singer = _flext_meltano__utilities_singer
+    import flext_meltano._utilities.yaml as _flext_meltano__utilities_yaml
+
+    yaml = _flext_meltano__utilities_yaml
+
+    _ = (
+        FlextMeltanoUtilitiesConfig,
+        FlextMeltanoUtilitiesProject,
+        FlextMeltanoUtilitiesRuntime,
+        FlextMeltanoUtilitiesSinger,
+        FlextMeltanoUtilitiesYaml,
+        SingerTargetHandler,
+        config,
+        project,
+        runtime,
+        singer,
+        yaml,
+    )
+_LAZY_IMPORTS = {
     "FlextMeltanoUtilitiesConfig": "flext_meltano._utilities.config",
     "FlextMeltanoUtilitiesProject": "flext_meltano._utilities.project",
     "FlextMeltanoUtilitiesRuntime": "flext_meltano._utilities.runtime",
@@ -35,6 +52,20 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "singer": "flext_meltano._utilities.singer",
     "yaml": "flext_meltano._utilities.yaml",
 }
+
+__all__ = [
+    "FlextMeltanoUtilitiesConfig",
+    "FlextMeltanoUtilitiesProject",
+    "FlextMeltanoUtilitiesRuntime",
+    "FlextMeltanoUtilitiesSinger",
+    "FlextMeltanoUtilitiesYaml",
+    "SingerTargetHandler",
+    "config",
+    "project",
+    "runtime",
+    "singer",
+    "yaml",
+]
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

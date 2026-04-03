@@ -9,10 +9,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from importlib.metadata import PackageMetadata, metadata
 
-_metadata: PackageMetadata | Mapping[str, str] = metadata("flext_meltano")
+from flext_core.typings import FlextTypes as t
+
+_metadata: PackageMetadata | t.StrMapping = metadata("flext_meltano")
 __version__ = _metadata["Version"]
 __version_info__ = tuple(
     int(part) if part.isdigit() else part for part in __version__.split(".")
