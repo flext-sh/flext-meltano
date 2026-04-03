@@ -23,20 +23,22 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_meltano import docker_test_manager
-    from flext_meltano.docker_test_manager import (
+    from tests.helpers import docker_test_manager
+    from tests.helpers.docker_test_manager import (
         ContainerManager,
+        Tk,
         docker_manager,
         docker_services,
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "ContainerManager": "flext_meltano.docker_test_manager",
+    "ContainerManager": "tests.helpers.docker_test_manager",
+    "Tk": "tests.helpers.docker_test_manager",
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
-    "docker_manager": "flext_meltano.docker_test_manager",
-    "docker_services": "flext_meltano.docker_test_manager",
-    "docker_test_manager": "flext_meltano.docker_test_manager",
+    "docker_manager": "tests.helpers.docker_test_manager",
+    "docker_services": "tests.helpers.docker_test_manager",
+    "docker_test_manager": "tests.helpers.docker_test_manager",
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),

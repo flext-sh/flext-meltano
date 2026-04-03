@@ -23,27 +23,27 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_meltano import test_docker_integration
-    from flext_meltano.test_docker_integration import (
+    from tests.integration import test_docker_integration
+    from tests.integration.test_docker_integration import (
         TestDockerIntegration,
         psycopg2,
         redis,
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "TestDockerIntegration": "flext_meltano.test_docker_integration",
+    "TestDockerIntegration": "tests.integration.test_docker_integration",
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
     "p": ("flext_core.protocols", "FlextProtocols"),
-    "psycopg2": "flext_meltano.test_docker_integration",
+    "psycopg2": "tests.integration.test_docker_integration",
     "r": ("flext_core.result", "FlextResult"),
-    "redis": "flext_meltano.test_docker_integration",
+    "redis": "tests.integration.test_docker_integration",
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
-    "test_docker_integration": "flext_meltano.test_docker_integration",
+    "test_docker_integration": "tests.integration.test_docker_integration",
     "u": ("flext_core.utilities", "FlextUtilities"),
     "x": ("flext_core.mixins", "FlextMixins"),
 }

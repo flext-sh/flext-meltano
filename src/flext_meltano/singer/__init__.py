@@ -23,8 +23,8 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_meltano import sdk
-    from flext_meltano.sdk import (
+    from flext_meltano.singer import sdk
+    from flext_meltano.singer.sdk import (
         FlextMeltanoSingerContext,
         FlextMeltanoSingerRecord,
         FlextMeltanoSingerSinkBase,
@@ -34,12 +34,12 @@ if _TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextMeltanoSingerContext": "flext_meltano.sdk",
-    "FlextMeltanoSingerRecord": "flext_meltano.sdk",
-    "FlextMeltanoSingerSinkBase": "flext_meltano.sdk",
-    "FlextMeltanoSingerStreamBase": "flext_meltano.sdk",
-    "FlextMeltanoSingerTapBase": "flext_meltano.sdk",
-    "FlextMeltanoSingerTargetBase": "flext_meltano.sdk",
+    "FlextMeltanoSingerContext": "flext_meltano.singer.sdk",
+    "FlextMeltanoSingerRecord": "flext_meltano.singer.sdk",
+    "FlextMeltanoSingerSinkBase": "flext_meltano.singer.sdk",
+    "FlextMeltanoSingerStreamBase": "flext_meltano.singer.sdk",
+    "FlextMeltanoSingerTapBase": "flext_meltano.singer.sdk",
+    "FlextMeltanoSingerTargetBase": "flext_meltano.singer.sdk",
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
@@ -48,7 +48,7 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
-    "sdk": "flext_meltano.sdk",
+    "sdk": "flext_meltano.singer.sdk",
     "t": ("flext_core.typings", "FlextTypes"),
     "u": ("flext_core.utilities", "FlextUtilities"),
     "x": ("flext_core.mixins", "FlextMixins"),

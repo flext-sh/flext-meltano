@@ -1,14 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make gen
 #
-"""FLEXT Meltano Examples - Working examples using real APIs.
-
-This package contains working examples demonstrating FLEXT Meltano functionality
-using only real APIs and classes that are actually exported.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Examples package."""
 
 from __future__ import annotations
 
