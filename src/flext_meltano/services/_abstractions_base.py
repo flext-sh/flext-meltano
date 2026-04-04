@@ -10,6 +10,8 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, override
 
+from pydantic import ValidationError
+
 import flext_meltano.services as meltano_services
 from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
@@ -32,6 +34,18 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     ) -> FlextMeltanoExecutorBase:
         """Create an executor lazily to avoid import cycles during package init."""
         return meltano_services.FlextMeltanoExecutorBase()
+
+    @staticmethod
+    def _coerce_container_mapping(
+        value: object,
+    ) -> t.ContainerMapping | None:
+        """Normalize runtime objects to canonical container mappings when possible."""
+        if not isinstance(value, Mapping):
+            return None
+        try:
+            return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
+        except ValidationError:
+            return None
 
     def _run_meltano(self, args: t.StrSequence) -> r[str]:
         """Run a Meltano runtime command and return stdout on success."""
@@ -73,9 +87,12 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     @staticmethod
     def _resolve_project_root(project: object) -> Path | None:
         """Extract a project root path from supported project-like objects."""
-        if isinstance(project, Mapping):
+        project_mapping = FlextMeltanoAbstractionsBase._coerce_container_mapping(
+            project,
+        )
+        if project_mapping is not None:
             for key in ("root_dir", "root"):
-                mapping_value = project.get(key)
+                mapping_value = project_mapping.get(key)
                 if isinstance(mapping_value, Path):
                     return mapping_value
                 if isinstance(mapping_value, str) and mapping_value:
@@ -121,15 +138,17 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     ) -> r[dict[str, str | int]]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
+            extractor_mapping = self._coerce_container_mapping(extractor_plugin)
+            loader_mapping = self._coerce_container_mapping(loader_plugin)
             extractor_name = str(
                 elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN)
-                if not isinstance(extractor_plugin, Mapping)
-                else extractor_plugin.get("name") or c.IDENTIFIER_UNKNOWN,
+                if extractor_mapping is None
+                else extractor_mapping.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             loader_name = str(
                 elt_context.get("loader_name", c.IDENTIFIER_UNKNOWN)
-                if not isinstance(loader_plugin, Mapping)
-                else loader_plugin.get("name") or c.IDENTIFIER_UNKNOWN,
+                if loader_mapping is None
+                else loader_mapping.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             cmd_result = self._run_meltano(
                 [c.Meltano.Commands.ELT, extractor_name, loader_name],

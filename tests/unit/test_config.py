@@ -30,6 +30,8 @@ _MELTANO_ENV_VARS = (
     "MELTANO_PROJECT_ROOT",
 )
 
+pytestmark = pytest.mark.usefixtures("_clean_meltano_env")
+
 
 @pytest.fixture(autouse=True)
 def _clean_meltano_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -41,7 +43,7 @@ def _clean_meltano_env(monkeypatch: pytest.MonkeyPatch) -> None:
 class TestFlextMeltanoSettings:
     """Test FlextMeltanoSettings base functionality."""
 
-    def test_basic_config_creation(self) -> None:
+    def test_basic_config_creation(self, _clean_meltano_env: None) -> None:
         """Test basic config creation with all fields."""
         config = FlextMeltanoSettings()
         config.project_root = Path("/test/project")

@@ -63,7 +63,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         command: MutableSequence[str] = [
             "dbt",
             "run",
-            "--project-dir",
+            "--projects-dir",
             params.project_dir,
         ]
         if params.models:

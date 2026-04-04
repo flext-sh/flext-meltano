@@ -21,6 +21,7 @@ from flext_meltano import (
     FlextMeltanoExecutorBase,
     FlextMeltanoLibraryRunner,
     m,
+    t,
 )
 
 
@@ -54,13 +55,20 @@ class TestFlextMeltanoLibraryRunner:
             ),
         )
 
+    @staticmethod
+    def _mock_execute_command(
+        command: t.StrSequence,
+        **_: object,
+    ) -> r[m.Meltano.CommandExecutionResult]:
+        return TestFlextMeltanoLibraryRunner._mock_cmd_result(list(command))
+
     def test_execute_complete_elt_pipeline(self) -> None:
         """Test complete E-L-T pipeline execution delegates to Meltano runtime."""
         runner = FlextMeltanoLibraryRunner()
         with patch.object(
             FlextMeltanoExecutorBase,
             "execute_meltano_command",
-            side_effect=lambda cmd, **kw: self._mock_cmd_result(list(cmd)),
+            side_effect=self._mock_execute_command,
         ):
             result = runner.execute_complete_elt_pipeline(
                 tap_name="tap-csv",
@@ -77,7 +85,7 @@ class TestFlextMeltanoLibraryRunner:
         with patch.object(
             FlextMeltanoExecutorBase,
             "execute_meltano_command",
-            side_effect=lambda cmd, **kw: self._mock_cmd_result(list(cmd)),
+            side_effect=self._mock_execute_command,
         ):
             result = runner.execute_complete_elt_pipeline(
                 tap_name="tap-csv",
@@ -96,7 +104,7 @@ class TestFlextMeltanoLibraryRunner:
         with patch.object(
             FlextMeltanoExecutorBase,
             "execute_meltano_command",
-            side_effect=lambda cmd, **kw: self._mock_cmd_result(list(cmd)),
+            side_effect=self._mock_execute_command,
         ):
             result = runner.run_dbt_transformation(models=["model1"])
         assert result.is_success

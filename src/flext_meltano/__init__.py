@@ -12,16 +12,6 @@ from flext_meltano.__version__ import *
 
 if _t.TYPE_CHECKING:
     import flext_meltano._constants as _flext_meltano__constants
-    from flext_meltano.__version__ import (
-        __author__,
-        __author_email__,
-        __description__,
-        __license__,
-        __title__,
-        __url__,
-        __version__,
-        __version_info__,
-    )
 
     _constants = _flext_meltano__constants
     import flext_meltano._models as _flext_meltano__models

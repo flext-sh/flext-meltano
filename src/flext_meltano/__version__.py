@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from importlib.metadata import PackageMetadata, metadata
 
-from flext_core.typings import FlextTypes as t
+from flext_core import FlextTypes as t
 
 _metadata: PackageMetadata | t.StrMapping = metadata("flext_meltano")
 __version__ = _metadata["Version"]

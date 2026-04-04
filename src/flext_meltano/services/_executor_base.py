@@ -25,7 +25,7 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 import flext_meltano as meltano_package
@@ -41,12 +41,38 @@ else:
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
+    _container_mapping_list_adapter = TypeAdapter(list[t.ContainerMapping])
     service_name: str = "FlextMeltanoExecutor"
 
     @property
     def project_root(self) -> Path:
         """Get project root directory - delegates to settings."""
         return u.Meltano.resolve_project_root(self.settings) or Path.cwd()
+
+    @staticmethod
+    def _coerce_container_mapping(
+        value: object,
+    ) -> t.ContainerMapping | None:
+        """Normalize runtime objects to canonical container mappings when possible."""
+        if not isinstance(value, Mapping):
+            return None
+        try:
+            return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
+        except ValidationError:
+            return None
+
+    @classmethod
+    def _coerce_mapping_list(
+        cls,
+        value: object,
+    ) -> list[t.ContainerMapping] | None:
+        """Normalize runtime plugin lists to canonical mapping lists."""
+        if not isinstance(value, list):
+            return None
+        try:
+            return cls._container_mapping_list_adapter.validate_python(value)
+        except ValidationError:
+            return None
 
     @staticmethod
     def create_flext_cli() -> r[FlextMeltanoCLI]:
@@ -150,17 +176,17 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         discovered: list[dict[str, str]] = []
         current_plugins_raw = project_result.value.plugins.current_plugins
         canonical_fn = getattr(current_plugins_raw, "canonical", None)
-        current_plugins = (
+        current_plugins_value = (
             canonical_fn() if callable(canonical_fn) else current_plugins_raw
         )
-        if not isinstance(current_plugins, Mapping):
+        current_plugins = self._coerce_container_mapping(current_plugins_value)
+        if current_plugins is None:
             return r[list[dict[str, str]]].ok(discovered)
-        for raw_type, raw_plugins in current_plugins.items():
-            if not isinstance(raw_plugins, list):
+        for raw_type, raw_plugins_value in current_plugins.items():
+            raw_plugins = self._coerce_mapping_list(raw_plugins_value)
+            if raw_plugins is None:
                 continue
             for raw_plugin in raw_plugins:
-                if not isinstance(raw_plugin, Mapping):
-                    continue
                 plugin_data = u.Meltano.build_discovered_plugin(
                     u.to_str(raw_type),
                     raw_plugin,

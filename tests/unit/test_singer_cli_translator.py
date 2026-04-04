@@ -300,7 +300,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
         tm.ok(result)
         command = result.value
-        tm.that(command, eq=["dbt", "run", "--project-dir", "/path/to/dbt/project"])
+        tm.that(command, eq=["dbt", "run", "--projects-dir", "/path/to/dbt/project"])
 
     def test_translate_dbt_run_with_models(self) -> None:
         """Test DBT run translation with models parameter."""
@@ -316,7 +316,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             eq=[
                 "dbt",
                 "run",
-                "--project-dir",
+                "--projects-dir",
                 "/path/to/dbt/project",
                 "--models",
                 "users orders",
@@ -337,7 +337,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             eq=[
                 "dbt",
                 "run",
-                "--project-dir",
+                "--projects-dir",
                 "/path/to/dbt/project",
                 "--select",
                 "tag:daily",
@@ -358,7 +358,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             eq=[
                 "dbt",
                 "run",
-                "--project-dir",
+                "--projects-dir",
                 "/path/to/dbt/project",
                 "--exclude",
                 "tag:deprecated",
@@ -379,7 +379,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             eq=[
                 "dbt",
                 "run",
-                "--project-dir",
+                "--projects-dir",
                 "/path/to/dbt/project",
                 "--full-refresh",
             ],
@@ -402,7 +402,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
             eq=[
                 "dbt",
                 "run",
-                "--project-dir",
+                "--projects-dir",
                 "/path/to/dbt/project",
                 "--models",
                 "users orders",

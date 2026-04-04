@@ -112,7 +112,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         """Build dbt CLI command."""
         cmd: list[str] = ["dbt", subcommand]
         if self._dbt_project_root:
-            cmd.extend(["--project-dir", str(self._dbt_project_root)])
+            cmd.extend(["--projects-dir", str(self._dbt_project_root)])
         if models:
             cmd.extend(["--models", *models])
         if extra_args:
