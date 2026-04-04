@@ -10,7 +10,6 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TextIO
 
-import yaml
 from flext_cli import FlextCliUtilities, r, u as cli_u
 
 from flext_core import FlextLogger
@@ -70,16 +69,10 @@ class FlextMeltanoUtilitiesYaml:
     ) -> r[bool]:
         """Write YAML content to file handle."""
         try:
-            yaml.dump(
-                config,
-                file_handle,
-                Dumper=yaml.Dumper,
-                default_flow_style=False,
-                indent=2,
-                allow_unicode=True,
-            )
+            content = FlextCliUtilities.Cli.yaml_dump_str(config)
+            file_handle.write(content)
             return r[bool].ok(value=True)
-        except (yaml.YAMLError, ValueError, TypeError, AttributeError):
+        except (ValueError, TypeError, AttributeError):
             return r[bool].fail(
                 "Failed to write YAML content: non-serializable value",
             )
@@ -103,19 +96,18 @@ class FlextMeltanoUtilitiesYaml:
                 return r[t.Meltano.FileConfigDict].fail(
                     f"Failed to load YAML config: YAML file not found: {file_path}",
                 )
-            with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
-                config_data = yaml.safe_load(f)
-            if config_data is None:
+            load_result = FlextCliUtilities.Cli.yaml_safe_load(file_path)
+            if load_result.is_failure:
                 return r[t.Meltano.FileConfigDict].fail(
-                    f"Failed to load YAML config: Empty YAML file: {file_path}",
+                    f"Failed to load YAML config: {load_result.error}",
                 )
+            config_data = load_result.value
             raw_validated = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": config_data,
             }).values
             validated = _normalize_file_config(raw_validated)
             return r[t.Meltano.FileConfigDict].ok(validated)
         except (
-            yaml.YAMLError,
             ValueError,
             TypeError,
             KeyError,
@@ -132,31 +124,28 @@ class FlextMeltanoUtilitiesYaml:
 
         This is the canonical YAML saving implementation. Services delegate here.
         """
-        try:
-            file_path.parent.mkdir(parents=True, exist_ok=True)
-            with file_path.open("w", encoding=c.DEFAULT_ENCODING) as f:
-                yaml.dump(
-                    config, f, indent=2, default_flow_style=False, sort_keys=False
-                )
-            return r[bool].ok(True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
-            return r[bool].fail(f"Failed to save YAML config: {exc}")
+        dump_result = FlextCliUtilities.Cli.yaml_dump(
+            file_path, config, sort_keys=False, indent=2
+        )
+        if dump_result.is_failure:
+            return r[bool].fail(
+                f"Failed to save YAML config: {dump_result.error}",
+            )
+        return r[bool].ok(True)
 
     @classmethod
     def validate_yaml_syntax(cls, file_path: Path) -> r[bool]:
         """Validate YAML file syntax and existence."""
-        try:
-            if not cli_u.is_string_non_empty(str(file_path)):
-                return r[bool].fail(f"Invalid YAML file path: {file_path}")
-            if not file_path.exists():
-                return r[bool].fail(f"YAML file not found: {file_path}")
-            with file_path.open("r", encoding=c.DEFAULT_ENCODING) as f:
-                yaml.safe_load(f)
-            return r[bool].ok(value=True)
-        except yaml.YAMLError as e:
-            return r[bool].fail(f"Invalid YAML syntax: {e}")
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
-            return r[bool].fail(f"Failed to validate YAML: {e}")
+        if not cli_u.is_string_non_empty(str(file_path)):
+            return r[bool].fail(f"Invalid YAML file path: {file_path}")
+        if not file_path.exists():
+            return r[bool].fail(f"YAML file not found: {file_path}")
+        load_result = FlextCliUtilities.Cli.yaml_safe_load(file_path)
+        if load_result.is_failure:
+            return r[bool].fail(
+                f"Invalid YAML syntax: {load_result.error}",
+            )
+        return r[bool].ok(value=True)
 
     # ------------------------------------------------------------------
     # Higher-level convenience (still pure, no service dependencies)

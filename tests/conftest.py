@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Protocol
 
 import pytest
-import yaml
+from flext_cli import FlextCliUtilities
 
 from tests import Tk, t
 
@@ -126,8 +126,7 @@ def meltano_project(
 ) -> t.Meltano.MeltanoConfigDict:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
-    with meltano_yml.open("w", encoding="utf-8") as f:
-        yaml.dump(meltano_yml_config, f)
+    FlextCliUtilities.Cli.yaml_dump(meltano_yml, meltano_yml_config)
     return {
         "name": "test-project",
         "directory": test_meltano_project_dir,

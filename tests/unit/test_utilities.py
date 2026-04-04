@@ -306,7 +306,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test project structure validation with additional subdirectories."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            (project_path / "pipeline.yml").write_text("project_id: test")
+            (project_path / "meltano.yml").write_text("project_id: test")
             (project_path / ".meltano").mkdir()
             (project_path / ".meltano" / "config").mkdir()
             (project_path / ".meltano" / "logs").mkdir()

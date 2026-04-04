@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
+
 from flext_core import r
 from flext_meltano import FlextMeltanoExecutorBase, c, t, u
 
@@ -69,6 +71,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             ),
         )
 
+    @override
     def run(self, args: t.StrSequence) -> r[t.Meltano.ExecutionResultDict]:
         """Run command with arguments - delegates to command router."""
         if not args:

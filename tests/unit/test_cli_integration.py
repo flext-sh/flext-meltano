@@ -13,8 +13,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import typing
-
 from flext_tests import tm
 
 from tests import m, t, u
@@ -34,7 +32,7 @@ class TestCliModelConverterWithTapRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TapRunParams", result.value)
+        model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, none=True)
         tm.that(model.discover is False, eq=True)
@@ -51,7 +49,7 @@ class TestCliModelConverterWithTapRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TapRunParams", result.value)
+        model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, eq="/path/to/config.json")
 
@@ -66,7 +64,7 @@ class TestCliModelConverterWithTapRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TapRunParams", result.value)
+        model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, none=True)
         tm.that(model.discover is True, eq=True)
@@ -86,7 +84,7 @@ class TestCliModelConverterWithTapRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TapRunParams", result.value)
+        model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, eq="/config.json")
         tm.that(model.catalog_file, eq="/catalog.json")
@@ -132,7 +130,7 @@ class TestCliModelConverterWithTargetRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TargetRunParams", result.value)
+        model = result.value
         tm.that(model.target_name, eq="target-postgres")
         tm.that(model.config_file, none=True)
         tm.that(model.input_file, none=True)
@@ -148,7 +146,7 @@ class TestCliModelConverterWithTargetRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TargetRunParams", result.value)
+        model = result.value
         tm.that(model.target_name, eq="target-postgres")
         tm.that(model.config_file, eq="/path/to/config.json")
 
@@ -163,7 +161,7 @@ class TestCliModelConverterWithTargetRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TargetRunParams", result.value)
+        model = result.value
         tm.that(model.target_name, eq="target-postgres")
         tm.that(model.input_file, eq="/path/to/input.jsonl")
 
@@ -179,7 +177,7 @@ class TestCliModelConverterWithTargetRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TargetRunParams", result.value)
+        model = result.value
         tm.that(model.target_name, eq="target-postgres")
         tm.that(model.config_file, eq="/config.json")
         tm.that(model.input_file, eq="/input.jsonl")
@@ -210,7 +208,7 @@ class TestCliModelConverterWithPipelineRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TapRunParams", result.value)
+        model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, eq="/path/to/config.json")
 
@@ -225,7 +223,7 @@ class TestCliModelConverterWithPipelineRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.TargetRunParams", result.value)
+        model = result.value
         tm.that(model.target_name, eq="target-postgres")
         tm.that(model.config_file, eq="/path/to/config.json")
 
@@ -242,7 +240,7 @@ class TestCliModelConverterWithPipelineRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.PipelineRunParams", result.value)
+        model = result.value
         tm.that(model.catalog_file, eq="/catalog.json")
         tm.that(model.state_file, eq="/state.json")
 
@@ -261,7 +259,7 @@ class TestCliModelConverterWithPipelineRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.PipelineRunParams", result.value)
+        model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.target_name, eq="target-postgres")
         tm.that(model.tap_config, eq="/tap-config.json")
@@ -301,7 +299,7 @@ class TestCliModelConverterWithDbtRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.DbtRunParams", result.value)
+        model = result.value
         tm.that(model.project_dir, eq="/dbt/project")
         tm.that(model.models, none=True)
         tm.that(model.full_refresh is False, eq=True)
@@ -317,7 +315,7 @@ class TestCliModelConverterWithDbtRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.DbtRunParams", result.value)
+        model = result.value
         tm.that(model.models, eq="users orders")
 
     def test_converter_dbt_run_params_with_select_exclude(self) -> None:
@@ -332,7 +330,7 @@ class TestCliModelConverterWithDbtRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.DbtRunParams", result.value)
+        model = result.value
         tm.that(model.select, eq="tag:daily")
         tm.that(model.exclude, eq="tag:deprecated")
 
@@ -347,7 +345,7 @@ class TestCliModelConverterWithDbtRunParams:
             cli_args,
         )
         tm.ok(result)
-        model = typing.cast("m.Meltano.DbtRunParams", result.value)
+        model = result.value
         tm.that(model.full_refresh is True, eq=True)
 
     def test_converter_dbt_run_params_missing_required(self) -> None:

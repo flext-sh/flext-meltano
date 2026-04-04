@@ -75,24 +75,14 @@ if _t.TYPE_CHECKING:
     )
 
     consumer_bases = _flext_meltano_services_consumer_bases
-    import flext_meltano.services.consumer_bases.dbt_service_base as _flext_meltano_services_consumer_bases_dbt_service_base
-
-    dbt_service_base = _flext_meltano_services_consumer_bases_dbt_service_base
-    import flext_meltano.services.consumer_bases.tap_service_base as _flext_meltano_services_consumer_bases_tap_service_base
-    from flext_meltano.services.consumer_bases.dbt_service_base import (
-        FlextMeltanoDbtServiceBase,
-    )
-
-    tap_service_base = _flext_meltano_services_consumer_bases_tap_service_base
-    import flext_meltano.services.consumer_bases.target_service_base as _flext_meltano_services_consumer_bases_target_service_base
-    from flext_meltano.services.consumer_bases.tap_service_base import (
-        FlextMeltanoTapServiceBase,
-    )
-
-    target_service_base = _flext_meltano_services_consumer_bases_target_service_base
     import flext_meltano.services.dbt_project as _flext_meltano_services_dbt_project
-    from flext_meltano.services.consumer_bases.target_service_base import (
+    from flext_meltano.services.consumer_bases import (
+        FlextMeltanoDbtServiceBase,
+        FlextMeltanoTapServiceBase,
         FlextMeltanoTargetServiceBase,
+        dbt_service_base,
+        tap_service_base,
+        target_service_base,
     )
 
     dbt_project = _flext_meltano_services_dbt_project

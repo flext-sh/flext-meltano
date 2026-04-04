@@ -111,12 +111,8 @@ class FlextMeltanoUtilitiesConfig:
             project_name_val = str(
                 raw_config.get("project_name") or raw_config.get("project_id") or "",
             )
-            cfg = FlextCliUtilities.build(
-                raw_config,
-                ops={"transform": {"normalize": False, "strip_none": False}},
-            )
             cfg_dict = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": cfg,
+                "values": raw_config,
             }).values
             plugins_val = cfg_dict.get("plugins")
             plugins_dict: t.Meltano.MeltanoConfigDict = {}

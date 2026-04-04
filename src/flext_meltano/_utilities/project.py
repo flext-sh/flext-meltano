@@ -6,8 +6,7 @@ import tempfile
 from collections.abc import Mapping
 from pathlib import Path
 
-import yaml
-from flext_cli import r
+from flext_cli import FlextCliUtilities, r
 
 from flext_core import u
 from flext_meltano import c, m, p, t
@@ -100,7 +99,7 @@ class FlextMeltanoUtilitiesProject:
             u.write_file(file_path, text)
             return file_path
 
-        return u.try_(_create, catch=(OSError, ValueError, yaml.YAMLError)).map_error(
+        return u.try_(_create, catch=(OSError, ValueError)).map_error(
             lambda e: f"Failed to create project file: {e}"
         )
 
@@ -282,16 +281,11 @@ class FlextMeltanoUtilitiesProject:
         config: t.ContainerMapping,
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
-
-        def _write() -> Path:
-            config_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
-            with config_file.open("w", encoding="utf-8") as f:
-                yaml.safe_dump(config, f, default_flow_style=False)
-            return project_path
-
-        return u.try_(
-            _write,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
-        ).map_error(
-            lambda e: f"Failed to write {c.Meltano.Paths.MELTANO_PROJECT_FILE}: {e}",
-        )
+        config_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
+        dump_result = FlextCliUtilities.Cli.yaml_dump(config_file, config)
+        if dump_result.is_failure:
+            return r[Path].fail(
+                f"Failed to write {c.Meltano.Paths.MELTANO_PROJECT_FILE}: "
+                f"{dump_result.error}",
+            )
+        return r[Path].ok(project_path)

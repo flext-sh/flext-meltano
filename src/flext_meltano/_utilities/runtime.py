@@ -180,9 +180,7 @@ class FlextMeltanoUtilitiesRuntime:
             "pip_url": str(pip_val).strip() if pip_val is not None else "",
             "variant": str(variant_val).strip() if variant_val is not None else "",
         }
-        filtered = u.filter_dict(
-            plugin_data, lambda _key, value: u.chk(value, empty=False)
-        )
+        filtered = u.filter(plugin_data, lambda value: u.chk(value, empty=False))
         return {str(key): str(value) for key, value in filtered.items()}
 
     @staticmethod

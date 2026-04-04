@@ -6,8 +6,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import Annotated
 
-import yaml
-from flext_cli import FlextCliModels, u
+from flext_cli import FlextCliModels, FlextCliUtilities, u
 from pydantic import Field, field_validator
 
 from flext_meltano import t
@@ -148,15 +147,10 @@ class FlextMeltanoModelsPayloadsData:
         @field_validator("content", mode="before")
         @classmethod
         def normalize_content(cls, value: t.Meltano.ValidatorInput) -> str:
-            """Normalize dict content via yaml.dump, pass str through."""
+            """Normalize dict content via yaml_dump_str, pass str through."""
             match value:
                 case Mapping():
-                    return yaml.dump(
-                        dict(value),
-                        default_flow_style=False,
-                        indent=2,
-                        allow_unicode=True,
-                    )
+                    return FlextCliUtilities.Cli.yaml_dump_str(dict(value))
                 case None:
                     return ""
                 case _:
