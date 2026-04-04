@@ -153,7 +153,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
             drain_sink: _SingerDrainSink = sink_result.value
-            drain_sink.process_record(dict(record), {})
+            drain_sink.process_record(dict(record.items()), {})
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             return r[bool].fail(str(exc))
