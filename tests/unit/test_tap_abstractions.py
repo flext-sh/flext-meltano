@@ -278,7 +278,8 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("users\norders"),
         ):
             result = self.tap_abstractions.discover_streams(tap_instance)
@@ -296,7 +297,8 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="csv_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("data"),
         ):
             result = self.tap_abstractions.discover_streams(tap_instance)
@@ -314,7 +316,8 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="unknown_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].fail("Unknown tap type"),
         ):
             result = self.tap_abstractions.discover_streams(tap_instance)
@@ -336,11 +339,13 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("users\norders"),
         ):
             stream_result = self.tap_abstractions.get_stream_by_name(
-                tap_instance, "users",
+                tap_instance,
+                "users",
             )
         tm.that(stream_result, is_=r)
 
@@ -356,7 +361,8 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("users\norders"),
         ):
             result = self.tap_abstractions.generate_catalog(tap_instance)
@@ -397,11 +403,14 @@ class TestFlextMeltanoAbstractionsComplete:
             connection_config={"loaded_records": 0},
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("sync ok"),
         ):
             result = self.tap_abstractions.sync_stream(
-                tap_instance, "users", mock_target,
+                tap_instance,
+                "users",
+                mock_target,
             )
         tm.that(result, is_=r)
 
@@ -417,7 +426,8 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="csv_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("sync ok"),
         ):
             result = self.tap_abstractions.sync_stream(tap_instance, "data")
@@ -435,7 +445,8 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].ok("users\norders"),
         ):
             stream_names = self.tap_abstractions.list_streams(tap_instance)
@@ -518,7 +529,8 @@ class TestFlextMeltanoAbstractionsComplete:
         assert self.tap_abstractions is not None
         tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         with patch.object(
-            FlextMeltanoAbstractions, "_run_meltano",
+            FlextMeltanoAbstractions,
+            "_run_meltano",
             return_value=r[str].fail("No streams found"),
         ):
             result = self.tap_abstractions.discover_streams(tap_instance)
