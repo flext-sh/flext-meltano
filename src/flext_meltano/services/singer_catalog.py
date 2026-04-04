@@ -55,14 +55,14 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to discover: {e}")
 
-    def get_stream_schema(self, stream_name: str) -> r[t.FlatContainerMapping]:
+    def get_stream_schema(self, stream_name: str) -> r[t.ContainerValueMapping]:
         """Get schema for a specific stream from cached catalog."""
         try:
             for entry in self._singer_catalog.streams:
                 if entry.stream == stream_name:
                     self.logger.debug("Stream schema retrieved", stream=stream_name)
-                    return r[t.FlatContainerMapping].ok(entry.schema_definition)
-            return r[t.FlatContainerMapping].fail(
+                    return r[t.ContainerValueMapping].ok(entry.schema_definition)
+            return r[t.ContainerValueMapping].fail(
                 f"Stream not found in catalog: {stream_name}"
             )
         except (
@@ -75,7 +75,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             ImportError,
         ) as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
-            return r[t.FlatContainerMapping].fail(f"Failed to get schema: {e}")
+            return r[t.ContainerValueMapping].fail(f"Failed to get schema: {e}")
 
     def load_catalog(self, catalog_file: Path) -> r[m.Meltano.SingerCatalog]:
         """Load catalog from JSON file."""

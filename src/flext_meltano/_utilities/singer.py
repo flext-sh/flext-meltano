@@ -60,7 +60,7 @@ class FlextMeltanoUtilitiesSinger:
         @staticmethod
         def emit_record(
             stream_name: str,
-            record: t.FlatContainerMapping,
+            record: t.ContainerValueMapping,
             time_extracted: str | None = None,
             version: int | None = None,
         ) -> r[str]:

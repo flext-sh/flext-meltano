@@ -31,7 +31,7 @@ class FlextMeltanoModelsSingerCatalog:
         tap_stream_id: Annotated[str, Field(description="Tap stream identifier")]
         stream: Annotated[str, Field(description="Singer stream name")]
         schema_definition: Annotated[
-            t.FlatContainerMapping,
+            t.ContainerValueMapping,
             Field(
                 alias="schema",
                 serialization_alias="schema",
