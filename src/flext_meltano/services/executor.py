@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import override
 
+from meltano.core.error import ProjectNotFound
+
 from flext_core import r
 from flext_meltano import FlextMeltanoExecutorBase, c, t, u
 
@@ -134,26 +136,43 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         args: t.StrSequence,
     ) -> r[t.Meltano.ExecutionResultDict]:
         """Route command to appropriate handler."""
-        if command == c.Meltano.Enums.ExecutorCommand.VERSION:
-            return self.version()
-        if command == c.Meltano.Enums.ExecutorCommand.HELP:
-            return self.help()
-        if command == c.Meltano.Enums.ExecutorCommand.HEALTH:
-            return self.health()
-        full_command: list[str] = [command, *args]
-        result = self.execute_meltano_command(full_command)
-        return result.map(
-            lambda cmd_result: u.Meltano.build_command_execution_payload(
-                cmd_result,
-                extra_fields={
-                    "command": command,
-                    "action": command,
-                    "args": list(args),
-                },
-                success_status=c.Meltano.Enums.OperationStatus.EXECUTED,
-                duration_field=None,
-            ),
-        )
+        try:
+            if command == c.Meltano.Enums.ExecutorCommand.VERSION:
+                return self.version()
+            if command == c.Meltano.Enums.ExecutorCommand.HELP:
+                return self.help()
+            if command == c.Meltano.Enums.ExecutorCommand.HEALTH:
+                return self.health()
+            full_command: list[str] = [command, *args]
+            result = self.execute_meltano_command(full_command)
+            if result.is_failure:
+                return r[t.Meltano.ExecutionResultDict].fail(
+                    result.error or f"Command '{command}' failed",
+                )
+            return result.map(
+                lambda cmd_result: u.Meltano.build_command_execution_payload(
+                    cmd_result,
+                    extra_fields={
+                        "command": command,
+                        "action": command,
+                        "args": list(args),
+                    },
+                    success_status=c.Meltano.Enums.OperationStatus.EXECUTED,
+                    duration_field=None,
+                ),
+            )
+        except (
+            ProjectNotFound,
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+        ) as exc:
+            return r[t.Meltano.ExecutionResultDict].fail(
+                f"Command routing failed: {exc}",
+            )
 
 
 __all__ = ["FlextMeltanoExecutor"]
