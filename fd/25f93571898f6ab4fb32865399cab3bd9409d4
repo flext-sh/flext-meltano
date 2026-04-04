@@ -1,0 +1,23 @@
+src/flext_meltano/services/executor.py
+  cdbb584679205432 139,148-175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "fd25f93571898f6ab4fb32865399cab3bd9409d4",
+  "prompts": {
+    "cdbb584679205432": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "deb21ed0-98e4-498f-8592-3944a588496c",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 23,
+      "accepted_lines": 29,
+      "overriden_lines": 0
+    }
+  }
+}
