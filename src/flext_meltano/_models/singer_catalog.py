@@ -18,12 +18,12 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerCatalogMetadata(FlextCliModels.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
-        breadcrumb: Annotated[
-            t.StrSequence, Field(description="Singer metadata breadcrumb path")
-        ] = Field(default_factory=list)
-        metadata: Annotated[
-            t.ContainerMapping, Field(description="Singer metadata properties")
-        ] = Field(default_factory=dict)
+        breadcrumb: t.StrSequence = Field(
+            default_factory=list, description="Singer metadata breadcrumb path"
+        )
+        metadata: t.ContainerMapping = Field(
+            default_factory=dict, description="Singer metadata properties"
+        )
 
     class SingerCatalogEntry(FlextCliModels.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
@@ -39,17 +39,17 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer stream schema payload",
             ),
         ]
-        metadata: Annotated[
-            Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata],
-            Field(description="Singer stream metadata blocks"),
-        ] = Field(
-            default_factory=lambda: list[
-                FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
-            ]()
+        metadata: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata] = (
+            Field(
+                default_factory=lambda: list[
+                    FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
+                ](),
+                description="Singer stream metadata blocks",
+            )
         )
-        key_properties: Annotated[
-            t.StrSequence, Field(description="Primary key columns for this stream")
-        ] = Field(default_factory=list)
+        key_properties: t.StrSequence = Field(
+            default_factory=list, description="Primary key columns for this stream"
+        )
         replication_key: Annotated[
             str | None,
             Field(default=None, description="Column used for incremental replication"),
@@ -82,13 +82,11 @@ class FlextMeltanoModelsSingerCatalog:
                 default="CATALOG", description="Singer catalog message discriminator"
             ),
         ] = "CATALOG"
-        streams: Annotated[
-            Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry],
-            Field(description="Singer catalog stream entries"),
-        ] = Field(
+        streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = Field(
             default_factory=lambda: list[
                 FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
-            ]()
+            ](),
+            description="Singer catalog stream entries",
         )
 
     class SingerPipelineConfig(FlextCliModels.Entity):
@@ -121,9 +119,9 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, Field(description="Number of errors")]
-        state: Annotated[
-            t.ContainerMapping, Field(description="Final state payload")
-        ] = Field(default_factory=dict)
+        state: t.ContainerMapping = Field(
+            default_factory=dict, description="Final state payload"
+        )
         duration_seconds: Annotated[
             t.NonNegativeFloat, Field(description="Execution duration")
         ]

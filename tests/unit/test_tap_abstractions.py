@@ -267,7 +267,7 @@ class TestFlextMeltanoAbstractionsComplete:
             )
 
     def test_discover_streams_postgres(self) -> None:
-        """Test discover_streams with PostgreSQL tap via subprocess."""
+        """Test discover_streams with PostgreSQL tap via mocked runtime."""
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -277,11 +277,15 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        result = self.tap_abstractions.discover_streams(tap_instance)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("users\norders"),
+        ):
+            result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
 
     def test_discover_streams_csv(self) -> None:
-        """Test discover_streams with CSV tap via subprocess."""
+        """Test discover_streams with CSV tap via mocked runtime."""
         config = m.Meltano.TapConfig(
             tap_type="tap-csv",
             connection_config={"file": "test.csv"},
@@ -291,11 +295,15 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="csv_tap_123",
         )
-        result = self.tap_abstractions.discover_streams(tap_instance)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("data"),
+        ):
+            result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
 
     def test_discover_streams_default(self) -> None:
-        """Test discover_streams with unknown tap type via subprocess."""
+        """Test discover_streams with unknown tap type via mocked runtime."""
         config = m.Meltano.TapConfig(
             tap_type="tap-unknown",
             connection_config={"endpoint": "http://api.example.com"},
@@ -305,7 +313,11 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="unknown_tap_123",
         )
-        result = self.tap_abstractions.discover_streams(tap_instance)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].fail("Unknown tap type"),
+        ):
+            result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
 
     def test_get_stream_by_name(self) -> None:
@@ -323,7 +335,13 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        stream_result = self.tap_abstractions.get_stream_by_name(tap_instance, "users")
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("users\norders"),
+        ):
+            stream_result = self.tap_abstractions.get_stream_by_name(
+                tap_instance, "users",
+            )
         tm.that(stream_result, is_=r)
 
     def test_generate_catalog_success(self) -> None:
@@ -337,7 +355,11 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        result = self.tap_abstractions.generate_catalog(tap_instance)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("users\norders"),
+        ):
+            result = self.tap_abstractions.generate_catalog(tap_instance)
         tm.that(result, is_=r)
 
     def test_catalog_entry_structure(self) -> None:
@@ -360,7 +382,7 @@ class TestFlextMeltanoAbstractionsComplete:
             assert "metadata" in entry
 
     def test_sync_stream_success(self) -> None:
-        """Test sync_stream via subprocess call."""
+        """Test sync_stream via mocked runtime call."""
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
@@ -374,7 +396,13 @@ class TestFlextMeltanoAbstractionsComplete:
             target_type="target-jsonl",
             connection_config={"loaded_records": 0},
         )
-        result = self.tap_abstractions.sync_stream(tap_instance, "users", mock_target)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("sync ok"),
+        ):
+            result = self.tap_abstractions.sync_stream(
+                tap_instance, "users", mock_target,
+            )
         tm.that(result, is_=r)
 
     def test_sync_stream_without_target(self) -> None:
@@ -388,7 +416,11 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="csv_tap_123",
         )
-        result = self.tap_abstractions.sync_stream(tap_instance, "data")
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("sync ok"),
+        ):
+            result = self.tap_abstractions.sync_stream(tap_instance, "data")
         tm.that(result, is_=r)
 
     def test_list_streams(self) -> None:
@@ -402,7 +434,11 @@ class TestFlextMeltanoAbstractionsComplete:
             config=config,
             tap_id="postgres_tap_123",
         )
-        stream_names = self.tap_abstractions.list_streams(tap_instance)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].ok("users\norders"),
+        ):
+            stream_names = self.tap_abstractions.list_streams(tap_instance)
         tm.that(isinstance(stream_names, list), eq=True)
 
     def test_get_tap_type(self) -> None:
@@ -481,7 +517,11 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         assert self.tap_abstractions is not None
         tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
-        result = self.tap_abstractions.discover_streams(tap_instance)
+        with patch.object(
+            FlextMeltanoAbstractions, "_run_meltano",
+            return_value=r[str].fail("No streams found"),
+        ):
+            result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
 
     def test_complete_tap_workflow(self) -> None:

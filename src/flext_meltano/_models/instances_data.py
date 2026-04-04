@@ -173,10 +173,9 @@ class FlextMeltanoModelsInstancesData:
             str | None, Field(default=None, description="Unique sink identifier")
         ] = None
         sink_type: Annotated[str, Field(description="Type of the data sink")]
-        config: Annotated[
-            FlextMeltanoModelsInstancesData.DataSinkConfig,
-            Field(description="Sink configuration"),
-        ]
+        config: FlextMeltanoModelsInstancesData.DataSinkConfig = Field(
+            description="Sink configuration"
+        )
         adapter: Annotated[
             t.ContainerValue | None, Field(default=None, description="Adapter instance")
         ] = None

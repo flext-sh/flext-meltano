@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import FlextCliModels, u
-from pydantic import ConfigDict, Field, computed_field, model_validator
+from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import c, t
 
@@ -15,7 +15,7 @@ from flext_meltano import c, t
 class FlextMeltanoModelsProjects:
     """Project configuration models."""
 
-    class DbtManifestNode(FlextCliModels.ArbitraryTypesModel):
+    class DbtManifestNode(FlextCliModels.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
 
         name: Annotated[str | None, Field(default=None, description="Node name")]
@@ -23,9 +23,9 @@ class FlextMeltanoModelsProjects:
         description: Annotated[
             str | None, Field(default=None, description="Node description")
         ] = None
-        fqn: Annotated[
-            t.StrSequence, Field(description="Fully qualified name parts")
-        ] = Field(default_factory=list)
+        fqn: t.StrSequence = Field(
+            default_factory=list, description="Fully qualified name parts"
+        )
         resource_type: Annotated[
             str, Field(default="", description="Node resource type (model, test, etc.)")
         ] = ""
@@ -35,15 +35,12 @@ class FlextMeltanoModelsProjects:
             """Fully qualified name as dot-separated string."""
             return ".".join(self.fqn) if self.fqn else ""
 
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
-
-    class DbtManifest(FlextCliModels.ArbitraryTypesModel):
+    class DbtManifest(FlextCliModels.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
-        nodes: Annotated[
-            Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode],
-            Field(description="Manifest nodes keyed by node_id"),
-        ] = Field(default_factory=dict)
+        nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = Field(
+            default_factory=dict, description="Manifest nodes keyed by node_id"
+        )
 
         def get_nodes_by_type(
             self,
@@ -56,8 +53,6 @@ class FlextMeltanoModelsProjects:
                 if node.resource_type == resource_type
             ]
 
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
-
     class MeltanoProjectModel(FlextCliModels.Entity):
         """Generic Meltano project configuration with validation."""
 
@@ -68,12 +63,12 @@ class FlextMeltanoModelsProjects:
         default_environment: Annotated[
             str, Field(default="dev", description="Default environment name")
         ] = "dev"
-        plugins: Annotated[
-            t.ContainerMapping, Field(description="Plugin configurations")
-        ] = Field(default_factory=dict)
-        environments: Annotated[
-            t.ContainerMapping, Field(description="Environment configurations")
-        ] = Field(default_factory=dict)
+        plugins: t.ContainerMapping = Field(
+            default_factory=dict, description="Plugin configurations"
+        )
+        environments: t.ContainerMapping = Field(
+            default_factory=dict, description="Environment configurations"
+        )
 
         @model_validator(mode="after")
         def validate_meltano_project(self) -> Self:
@@ -99,12 +94,13 @@ class FlextMeltanoModelsProjects:
         default_environment: Annotated[
             str, Field(default="dev", description="Default environment")
         ] = "dev"
-        project_root: Annotated[Path, Field(description="Project root directory")] = (
-            Field(default_factory=Path.cwd)
+        project_root: Path = Field(
+            default_factory=Path.cwd, description="Project root directory"
         )
-        environments: Annotated[
-            t.StrSequence, Field(description="Available environments")
-        ] = Field(default_factory=lambda: ["dev", "staging", "prod"])
+        environments: t.StrSequence = Field(
+            default_factory=lambda: ["dev", "staging", "prod"],
+            description="Available environments",
+        )
 
         @computed_field
         def environment_count(self) -> int:

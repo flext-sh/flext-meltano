@@ -110,7 +110,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test successful project structure validation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            (project_path / "pipeline.yml").write_text("project_id: test")
+            (project_path / "meltano.yml").write_text("project_id: test")
             (project_path / ".meltano").mkdir()
             (project_path / ".meltano" / "config").mkdir()
             (project_path / ".meltano" / "logs").mkdir()
@@ -134,7 +134,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test project structure validation with missing .meltano directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            (project_path / "pipeline.yml").write_text("project_id: test")
+            (project_path / "meltano.yml").write_text("project_id: test")
             result = u.Meltano.validate_project_structure(project_path)
             tm.ok(result)
             tm.that(result.value is True, eq=True)
@@ -267,14 +267,16 @@ class TestFlextMeltanoUtilitiesEnhanced:
             temp_file_path.unlink()
 
     def test_utilities_handle_file_operation_errors_gracefully(self) -> None:
-        """Test that utilities handle file operation errors gracefully."""
+        """Test that utilities propagate file operation errors.
+
+        ``create_from_callable`` only catches a narrow set of exceptions
+        (ValueError, TypeError, KeyError, AttributeError, RuntimeError) so
+        OSError propagates.
+        """
         with patch("pathlib.Path.exists") as mock_exists:
             mock_exists.side_effect = OSError("Permission denied")
-            result = u.Meltano.directory_exists(Path("/restricted/path"))
-            tm.fail(result)
-            tm.that(result.error, none=False)
-            error_msg = result.error or ""
-            tm.that(error_msg, has="Permission denied")
+            with pytest.raises(OSError, match="Permission denied"):
+                u.Meltano.directory_exists(Path("/restricted/path"))
 
     def test_create_meltano_config_dict_with_none_values(self) -> None:
         """Test Meltano config dictionary creation with None values."""

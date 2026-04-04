@@ -8,11 +8,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_tests import tm
 
 from flext_core import r
-from flext_meltano import FlextMeltanoPipelineManager
+from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoPipelineManager
 from tests import m, t
 
 create_pipeline = FlextMeltanoPipelineManager.create_pipeline
@@ -60,24 +59,28 @@ def test_execute_pipeline_runs_real_subprocess_contract(tmp_path: Path) -> None:
         str,
         t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
     ] = {"command": command}
+    mock_cmd_result = m.Meltano.CommandExecutionResult(
+        command=["run", "tap-demo", "target-demo"],
+        success=True,
+        exit_code=0,
+        output="pipeline ok",
+        error="",
+        execution_time=0.1,
+    )
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = create_pipeline("exec-pipeline", config)
         tm.ok(create_result)
-        mock_command_result = MagicMock(spec=m.Infra.CommandOutput)
-        mock_command_result.exit_code = 0
-        mock_command_result.stdout = "pipeline ok"
-        mock_command_result.stderr = ""
         with patch.object(
-            FlextInfraUtilitiesSubprocess,
-            "run_raw",
-            return_value=r[m.Infra.CommandOutput].ok(mock_command_result),
+            FlextMeltanoExecutorBase,
+            "execute_meltano_command",
+            return_value=r[m.Meltano.CommandExecutionResult].ok(mock_cmd_result),
         ) as run_mock:
             result = execute_pipeline("exec-pipeline")
     tm.ok(result)
     run_mock.assert_called_once()
     call_args = run_mock.call_args
-    tm.that(call_args[0][0], eq=["meltano", "run", "tap-demo", "target-demo"])
-    tm.that(call_args[1]["cwd"], eq=tmp_path / "pipelines" / "exec-pipeline")
+    tm.that(call_args[0][0], eq=["run", "tap-demo", "target-demo"])
+    tm.that(call_args[1]["_cwd"], eq=tmp_path / "pipelines" / "exec-pipeline")
 
 
 def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
@@ -166,6 +169,14 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
     config_json = m.Meltano.ConfigMappingPayload(
         values={"command": ["run", "tap-demo", "target-demo"]},
     ).model_dump_json()
+    mock_cmd_result = m.Meltano.CommandExecutionResult(
+        command=["run", "tap-demo", "target-demo"],
+        success=True,
+        exit_code=0,
+        output="ok",
+        error="",
+        execution_time=0.1,
+    )
     with patch.dict(os.environ, _set_pipelines_root(tmp_path), clear=False):
         create_result = manager.handle_command([
             "create",
@@ -173,14 +184,10 @@ def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
             config_json,
         ])
         tm.ok(create_result)
-        mock_command_result = MagicMock(spec=m.Infra.CommandOutput)
-        mock_command_result.exit_code = 0
-        mock_command_result.stdout = "ok"
-        mock_command_result.stderr = ""
         with patch.object(
-            FlextInfraUtilitiesSubprocess,
-            "run_raw",
-            return_value=r[m.Infra.CommandOutput].ok(mock_command_result),
+            FlextMeltanoExecutorBase,
+            "execute_meltano_command",
+            return_value=r[m.Meltano.CommandExecutionResult].ok(mock_cmd_result),
         ):
             run_result = manager.handle_command(["run", "lifecycle-pipeline"])
         list_result = manager.handle_command(["list"])

@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_cli import FlextCliModels, u
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
 
 from flext_meltano import c, t
 
@@ -14,21 +14,21 @@ from flext_meltano import c, t
 class FlextMeltanoModelsContext:
     """Pipeline context and configuration models."""
 
-    class PipelineExecutionContext(FlextCliModels.ArbitraryTypesModel):
+    class PipelineExecutionContext(FlextCliModels.FlexibleModel):
         """Typed context envelope for ELT pipeline execution."""
 
         project_root: Annotated[str, Field(description="Project root path")]
-        elt_context: Annotated[
-            t.ContainerMapping, Field(description="ELT execution context")
-        ] = Field(default_factory=dict)
+        elt_context: t.ContainerMapping = Field(
+            default_factory=dict, description="ELT execution context"
+        )
         extractor_name: Annotated[str, Field(description="Extractor name")]
         loader_name: Annotated[t.NonEmptyStr, Field(description="Loader name")]
         execution_completed: Annotated[
             bool, Field(default=False, description="Execution completion flag")
         ] = False
-        execution_result: Annotated[
-            t.ContainerMapping, Field(description="Execution result payload")
-        ] = Field(default_factory=dict)
+        execution_result: t.ContainerMapping = Field(
+            default_factory=dict, description="Execution result payload"
+        )
 
         @field_validator("elt_context", "execution_result", mode="before")
         @classmethod
@@ -50,17 +50,15 @@ class FlextMeltanoModelsContext:
             normalized = "" if value is None else str(value)
             return normalized.strip()
 
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
-
-    class PipelineResultContext(FlextCliModels.ArbitraryTypesModel):
+    class PipelineResultContext(FlextCliModels.FlexibleModel):
         """Typed subset for extracting final pipeline result fields."""
 
         project_root: Annotated[
             str, Field(default="unknown", description="Project root path")
         ] = "unknown"
-        execution_result: Annotated[
-            t.ContainerMapping, Field(description="Execution result payload")
-        ] = Field(default_factory=dict)
+        execution_result: t.ContainerMapping = Field(
+            default_factory=dict, description="Execution result payload"
+        )
 
         @field_validator("execution_result", mode="before")
         @classmethod
@@ -82,15 +80,13 @@ class FlextMeltanoModelsContext:
             normalized = "unknown" if value is None else str(value)
             return normalized.strip() or "unknown"
 
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
-
-    class PipelineExecutionScalarMap(FlextCliModels.ArbitraryTypesModel):
+    class PipelineExecutionScalarMap(FlextCliModels.FlexibleModel):
         """Scalar-only pipeline execution values normalized to strings."""
 
-        values: Annotated[
-            t.StrMapping,
-            Field(description="Execution values filtered to scalar strings"),
-        ] = Field(default_factory=dict)
+        values: t.StrMapping = Field(
+            default_factory=dict,
+            description="Execution values filtered to scalar strings",
+        )
 
         @field_validator("values", mode="before")
         @classmethod
@@ -105,8 +101,6 @@ class FlextMeltanoModelsContext:
                     }
                 case _:
                     return {}
-
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
 
     class PluginComponentConfig(FlextCliModels.Entity):
         """Validated plugin component configuration for pipeline validators."""

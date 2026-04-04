@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_cli import FlextCliModels
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
 
 from flext_meltano import t
 
@@ -14,15 +14,15 @@ from flext_meltano import t
 class FlextMeltanoModelsDiscovery:
     """Plugin discovery source, item, and catalog models."""
 
-    class PluginDiscoverySource(FlextCliModels.ArbitraryTypesModel):
+    class PluginDiscoverySource(FlextCliModels.FlexibleModel):
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
             str, Field(default="", description="Plugin default variant")
         ] = ""
-        variants: Annotated[
-            t.ContainerMapping, Field(description="Available plugin variants")
-        ] = Field(default_factory=dict)
+        variants: t.ContainerMapping = Field(
+            default_factory=dict, description="Available plugin variants"
+        )
         logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
         description: Annotated[
             str, Field(default="", description="Plugin description")
@@ -47,8 +47,6 @@ class FlextMeltanoModelsDiscovery:
                     empty: t.ContainerMapping = {}
                     return empty
 
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")
-
     class PluginDiscoveryItem(FlextCliModels.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
 
@@ -65,7 +63,7 @@ class FlextMeltanoModelsDiscovery:
             str, Field(default="", description="Plugin description")
         ] = ""
 
-    class PluginDiscoveryCatalog(FlextCliModels.ArbitraryTypesModel):
+    class PluginDiscoveryCatalog(FlextCliModels.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
@@ -84,5 +82,3 @@ class FlextMeltanoModelsDiscovery:
                 case _:
                     empty: t.ContainerMapping = {}
                     return empty
-
-        model_config: ClassVar[ConfigDict] = ConfigDict(extra="allow")

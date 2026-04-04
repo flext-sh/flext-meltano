@@ -61,6 +61,9 @@ class FlextMeltanoTypingsBase:
     PluginType = c.Meltano.Enums.PluginType
     PluginVariant = str  # "default" | "singer" | "custom"
 
+    type VariantValue = str | FlextCliTypes.StrSequence | FlextCliTypes.ScalarMapping | None
+    "Normalized plugin variant: string, string list, scalar mapping, or null."
+
     type NestedJsonValue = (
         Mapping[str, FlextCliTypes.ContainerValue] | FlextCliTypes.Scalar | None
     )

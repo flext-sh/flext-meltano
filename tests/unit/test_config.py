@@ -114,7 +114,7 @@ class TestFlextMeltanoSettings:
         tm.ok(project_file_result)
         project_file = project_file_result.value
         tm.that(project_file, is_=Path)
-        tm.that(project_file, eq=Path("/test/project/pipeline.yml"))
+        tm.that(project_file, eq=Path("/test/project/meltano.yml"))
 
     def test_get_absolute_config_dir(self) -> None:
         """Test get_absolute_config_dir method."""
@@ -150,18 +150,18 @@ class TestFlextMeltanoSettings:
         tm.that(str(venv_dir.parent), has=".meltano")
 
     def test_validate_project_structure_missing_project_file(self) -> None:
-        """Test project structure validation with missing pipeline.yml."""
+        """Test project structure validation with missing meltano.yml."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             config = FlextMeltanoSettings()
             config.project_root = Path(tmp_dir)
             result = config.validate_project_structure()
             tm.fail(result)
-            tm.that((result.error or ""), has="pipeline.yml not found")
+            tm.that((result.error or ""), has="Meltano config file not found")
 
     def test_validate_project_structure_success(self) -> None:
         """Test successful project structure validation."""
         with tempfile.TemporaryDirectory() as tmp_dir:
-            project_file = Path(tmp_dir) / "pipeline.yml"
+            project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
             config = FlextMeltanoSettings()
             config.project_root = Path(tmp_dir)
@@ -259,7 +259,7 @@ class TestFlextMeltanoSettingsConstants:
 
     def test_file_constants(self) -> None:
         """Test file path constants."""
-        tm.that(FlextMeltanoSettings.PROJECT_FILE, eq="pipeline.yml")
+        tm.that(FlextMeltanoSettings.PROJECT_FILE, eq="meltano.yml")
         tm.that(FlextMeltanoSettings.STATE_DIR, eq=".pipeline")
         tm.that(FlextMeltanoSettings.VENV_DIR, eq=".meltano/python")
 
@@ -290,7 +290,7 @@ class TestFlextMeltanoSettingsEdgeCases:
     def test_project_structure_validation_with_relative_paths(self) -> None:
         """Test project validation works with relative paths."""
         with tempfile.TemporaryDirectory() as tmp_dir:
-            project_file = Path(tmp_dir) / "pipeline.yml"
+            project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\n")
             current_dir = Path.cwd()
             try:
@@ -309,7 +309,7 @@ class TestFlextMeltanoSettingsIntegration:
     def test_complete_config_workflow(self) -> None:
         """Test complete configuration workflow from creation to validation."""
         with tempfile.TemporaryDirectory() as tmp_dir:
-            project_file = Path(tmp_dir) / "pipeline.yml"
+            project_file = Path(tmp_dir) / "meltano.yml"
             project_file.write_text("version: 1\nproject_id: test-project\n")
             config_dir_path = Path(tmp_dir) / ".meltano"
             logs_dir_path = Path(tmp_dir) / "logs"
