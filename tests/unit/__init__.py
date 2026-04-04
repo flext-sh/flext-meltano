@@ -42,7 +42,6 @@ if _t.TYPE_CHECKING:
         TestFlextMeltanoPluginOperations,
         TestFlextMeltanoProjectOperations,
         TestFlextMeltanoSuccessPaths,
-        pytestmark,
     )
 
     test_cli_integration = _tests_unit_test_cli_integration
@@ -63,6 +62,7 @@ if _t.TYPE_CHECKING:
         TestFlextMeltanoSettingsEdgeCases,
         TestFlextMeltanoSettingsEnums,
         TestFlextMeltanoSettingsIntegration,
+        pytestmark,
     )
 
     test_constants = _tests_unit_test_constants
@@ -232,7 +232,7 @@ _LAZY_IMPORTS = {
     "m": ("flext_core.models", "FlextModels"),
     "p": ("flext_core.protocols", "FlextProtocols"),
     "pipeline_cli_managers_tests": "tests.unit.pipeline_cli_managers_tests",
-    "pytestmark": "tests.unit.test_api",
+    "pytestmark": "tests.unit.test_config",
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
