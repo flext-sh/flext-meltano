@@ -29,13 +29,13 @@ class FlextMeltanoModelsProjectsPlugin:
         ] = "standard"
         settings: Annotated[
             t.ContainerMapping, Field(description="Plugin settings")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Plugin settings")
         capabilities: Annotated[
             t.StrSequence, Field(description="Plugin capabilities")
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Plugin capabilities")
         config_files: Annotated[
             t.StrSequence, Field(description="Plugin configuration files")
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Plugin configuration files")
 
         @computed_field
         def full_plugin_name(self) -> str:

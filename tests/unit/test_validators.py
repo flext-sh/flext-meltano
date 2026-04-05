@@ -82,7 +82,7 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.that(result.is_failure or result.is_success, eq=True)
 
     def test_validate_meltano_config_invalid_version(self) -> None:
-        config: t.ScalarMapping = {"version": 2, "project_id": "test-project"}
+        config: t.ScalarMapping = {"schema_version": 2, "project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
         tm.fail(result)
         tm.fail(result)

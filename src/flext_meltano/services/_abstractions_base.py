@@ -10,34 +10,38 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, override
 
-from pydantic import ValidationError
+from pydantic import Field, ValidationError
 
 import flext_meltano.services as meltano_services
 from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, t, u
 
 if TYPE_CHECKING:
-    from flext_meltano import FlextMeltanoExecutorBase
+    from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoProjectService
 
-OPERATION_ERRORS = (ValueError, TypeError, KeyError, AttributeError, OSError)
+# Re-export from canonical location for backward compatibility with auto-generated __init__.py
+OPERATION_ERRORS = c.Meltano.OPERATION_ERRORS
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    service_name: str = "FlextMeltanoAbstractions"
+    service_name: str = Field(
+        default="FlextMeltanoAbstractions",
+        description="Canonical abstractions service instance name",
+    )
 
     @staticmethod
     def _build_executor(
-        _settings: object,
+        _settings: FlextMeltanoSettings | t.ContainerMapping | None,
     ) -> FlextMeltanoExecutorBase:
         """Create an executor lazily to avoid import cycles during package init."""
         return meltano_services.FlextMeltanoExecutorBase()
 
     @staticmethod
     def _coerce_container_mapping(
-        value: object,
+        value: FlextMeltanoProjectService | t.ContainerMapping | None,
     ) -> t.ContainerMapping | None:
         """Normalize runtime objects to canonical container mappings when possible."""
         if not isinstance(value, Mapping):
@@ -67,7 +71,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             )
         return r[str].ok(completed.output.strip())
 
-    def add_plugin_by_config(self, plugin_config: Mapping[str, object]) -> r[bool]:
+    def add_plugin_by_config(self, plugin_config: t.ContainerMapping) -> r[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
@@ -80,12 +84,14 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             if cmd_result.is_failure:
                 return r[bool].fail(cmd_result.error or "Failed to add plugin")
             return r[bool].ok(value=True)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to add plugin: {e}"
             return r[bool].fail(error_msg)
 
     @staticmethod
-    def _resolve_project_root(project: object) -> Path | None:
+    def _resolve_project_root(
+        project: FlextMeltanoProjectService | t.ContainerMapping | None,
+    ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
         project_mapping = FlextMeltanoAbstractionsBase._coerce_container_mapping(
             project,
@@ -101,7 +107,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def get_plugins_of_type(
         self,
-        _project: object,
+        _project: FlextMeltanoProjectService | t.ContainerMapping | None,
         plugin_type: str,
     ) -> r[dict[str, dict[str, str]]]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""
@@ -126,15 +132,15 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                     "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
                 }
             return r[dict[str, dict[str, str]]].ok(plugins)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             return r[dict[str, dict[str, str]]].fail(error_msg)
 
     def execute_singer_pipeline(
         self,
-        elt_context: Mapping[str, object],
-        extractor_plugin: object,
-        loader_plugin: object,
+        elt_context: t.ContainerMapping,
+        extractor_plugin: t.ContainerMapping | None,
+        loader_plugin: t.ContainerMapping | None,
     ) -> r[dict[str, str | int]]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
@@ -164,7 +170,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 "records_processed": 0,
             }
             return r[dict[str, str | int]].ok(result)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             return r[dict[str, str | int]].fail(error_msg)
 
@@ -176,7 +182,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                     f"Project path is not a valid directory: {project_root}",
                 )
             return r[Path].ok(project_root)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to load pipeline project: {e}"
             return r[Path].fail(error_msg)
 
@@ -187,7 +193,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail("No project root configured in settings")
         try:
             return r[Path].ok(project_root)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override
@@ -218,7 +224,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         self,
         config: m.Meltano.TapConfig,
         stream_name: str,
-    ) -> Mapping[str, object]:
+    ) -> t.ContainerMapping:
         """Get configuration for a specific stream."""
         if config.stream_config and stream_name in config.stream_config:
             val = config.stream_config[stream_name]

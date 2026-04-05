@@ -27,7 +27,10 @@ class FlextMeltanoServiceBase(FlextService[t.ContainerMapping]):
     `execute` method from FlextService.
     """
 
-    config_type: type | None = FlextMeltanoSettings
+    config_type: type | None = Field(
+        default=FlextMeltanoSettings,
+        description="Configuration class for Meltano service initialization",
+    )
 
     service_name: Annotated[
         t.NonEmptyStr,

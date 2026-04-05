@@ -106,14 +106,14 @@ class FlextMeltanoModelsInstancesData:
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             Field(description="Discovered streams"),
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Discovered streams")
         discovered: Annotated[
             bool,
             Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
             t.ConfigurationMapping, Field(description="Additional metadata")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Additional metadata")
         source_id: Annotated[str, Field(description="Unique source identifier")]
 
         @computed_field

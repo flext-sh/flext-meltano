@@ -21,6 +21,8 @@ from flext_cli import FlextCliUtilities
 
 from tests import Tk, t
 
+pytest_plugins = ["flext_tests.conftest_plugin"]
+
 
 class MockCliResult:
     """Mock CLI invocation result."""
@@ -32,7 +34,11 @@ class MockCliResult:
 
 
 class CliRunner(Protocol):
-    """Protocol for CLI runner interface."""
+    """Protocol for CLI runner interface.
+
+    Canonical definition lives in ``FlextMeltanoTestProtocols.Meltano.Tests.CliRunner``.
+    Re-exported here for backward compatibility with auto-generated ``tests/__init__.py``.
+    """
 
     def invoke(self, *args: t.Scalar, **kwargs: t.Scalar) -> MockCliResult:
         """Invoke CLI command."""

@@ -25,7 +25,7 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
-from pydantic import TypeAdapter, ValidationError
+from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 import flext_meltano as meltano_package
@@ -42,7 +42,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
     _container_mapping_list_adapter = TypeAdapter(list[t.ContainerMapping])
-    service_name: str = "FlextMeltanoExecutor"
+    service_name: str = Field(
+        default="FlextMeltanoExecutor",
+        description="Canonical executor service instance name",
+    )
 
     @property
     def project_root(self) -> Path:
@@ -51,7 +54,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _coerce_container_mapping(
-        value: object,
+        value: t.ContainerMapping | None,
     ) -> t.ContainerMapping | None:
         """Normalize runtime objects to canonical container mappings when possible."""
         if not isinstance(value, Mapping):
@@ -64,7 +67,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     @classmethod
     def _coerce_mapping_list(
         cls,
-        value: object,
+        value: list[t.ContainerMapping] | t.NormalizedValue,
     ) -> list[t.ContainerMapping] | None:
         """Normalize runtime plugin lists to canonical mapping lists."""
         if not isinstance(value, list):
@@ -99,7 +102,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ).map_error(lambda e: f"Failed to get version: {e}")
 
     @staticmethod
-    def _normalize_exit_code(raw_exit_code: object) -> int:
+    def _normalize_exit_code(raw_exit_code: int | str | None) -> int:
         """Normalize runtime exit codes into integers."""
         if raw_exit_code is None:
             return 0
@@ -176,10 +179,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         discovered: list[dict[str, str]] = []
         current_plugins_raw = project_result.value.plugins.current_plugins
         canonical_fn = getattr(current_plugins_raw, "canonical", None)
-        current_plugins_value = (
+        raw_canonical = (
             canonical_fn() if callable(canonical_fn) else current_plugins_raw
         )
-        current_plugins = self._coerce_container_mapping(current_plugins_value)
+        current_plugins = self._coerce_container_mapping(raw_canonical)
         if current_plugins is None:
             return r[list[dict[str, str]]].ok(discovered)
         for raw_type, raw_plugins_value in current_plugins.items():

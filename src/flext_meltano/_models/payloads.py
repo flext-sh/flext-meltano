@@ -18,26 +18,29 @@ class FlextMeltanoModelsPayloads:
 
         tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
         target_name: Annotated[str, Field(description="Singer target name")]
-        config: Annotated[t.ContainerMapping, Field(description="Pipeline config")] = (
-            Field(default_factory=dict)
-        )
+        config: Annotated[
+            t.ContainerMapping,
+            Field(description="Pipeline config"),
+        ] = Field(default_factory=dict, description="Pipeline config")
 
     class ExecutePipelinePayload(FlextCliModels.ArbitraryTypesModel):
         """Payload for execute_pipeline operation."""
 
         pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
-        config: Annotated[t.ContainerMapping, Field(description="Execution config")] = (
-            Field(default_factory=dict)
-        )
+        config: Annotated[
+            t.ContainerMapping,
+            Field(description="Execution config"),
+        ] = Field(default_factory=dict, description="Execution config")
 
     class InstallPluginPayload(FlextCliModels.ArbitraryTypesModel):
         """Payload for install_plugin operation."""
 
         plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
-        config: Annotated[t.ContainerMapping, Field(description="Plugin config")] = (
-            Field(default_factory=dict)
-        )
+        config: Annotated[
+            t.ContainerMapping,
+            Field(description="Plugin config"),
+        ] = Field(default_factory=dict, description="Plugin config")
 
     class ListPluginsPayload(FlextCliModels.ArbitraryTypesModel):
         """Payload for list_plugins operation."""
@@ -51,8 +54,9 @@ class FlextMeltanoModelsPayloads:
 
         environment_name: Annotated[str, Field(description="Environment name")]
         config: Annotated[
-            t.ContainerMapping, Field(description="Environment config")
-        ] = Field(default_factory=dict)
+            t.ContainerMapping,
+            Field(description="Environment config"),
+        ] = Field(default_factory=dict, description="Environment config")
 
     class RunDbtModelsPayload(FlextCliModels.ArbitraryTypesModel):
         """Payload for run/test dbt models operation."""

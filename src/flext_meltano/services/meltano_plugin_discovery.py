@@ -22,6 +22,55 @@ from flext_meltano import (
 class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     """Mixin providing plugin discovery and info retrieval."""
 
+    @staticmethod
+    def _is_meltano_project(value: t.ContainerMapping | None) -> bool:
+        """Type guard for protocol-compatible Meltano project objects."""
+        if value is None:
+            return False
+        return "root_dir" in value
+
+    @staticmethod
+    def _build_plugin_info(
+        plugin_name: str,
+        indexed_plugin: t.StrMapping,
+        plugin_type: str,
+    ) -> t.StrMapping:
+        """Build plugin info dict from a plugin definition."""
+        source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
+        return u.Meltano.build_plugin_discovery_item(
+            plugin_name,
+            plugin_type,
+            default_variant=source.default_variant,
+            variants=source.variants,
+            description=source.description,
+            logo_url=source.logo_url,
+        )
+
+    @staticmethod
+    def _extract_plugin_info(
+        plugins_data: Mapping[str, t.StrMapping],
+        plugin_name: str,
+        plugin_type: str,
+    ) -> r[t.StrMapping]:
+        """Extract plugin info from plugins dict."""
+        plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
+            "plugins": plugins_data,
+        }).plugins
+        plugin_value = plugins_dict.get(plugin_name)
+        if plugin_value is None:
+            return r[t.StrMapping].fail(
+                f"Plugin '{plugin_name}' not found in {plugin_type}"
+            )
+        plugin_info = u.Meltano.build_plugin_discovery_item(
+            plugin_name,
+            plugin_type,
+            default_variant=plugin_value.default_variant,
+            variants=plugin_value.variants,
+            description=plugin_value.description,
+            logo_url=plugin_value.logo_url,
+        )
+        return r[t.StrMapping].ok(plugin_info)
+
     def discover_plugins(
         self,
         project: FlextMeltanoProjectService | None = None,
@@ -42,7 +91,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                         or "Failed to create temporary project",
                     )
                 temp_project = temp_project_result.value
-                if not _is_meltano_project(temp_project):
+                if not self._is_meltano_project(temp_project):
                     return r[Sequence[t.StrMapping]].fail(
                         "Temporary project does not satisfy Project",
                     )
@@ -59,7 +108,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 for idx, (k, v) in enumerate(extractors_result.value.items()):
                     if idx >= max_extractors:
                         break
-                    plugins.append(_build_plugin_info(k, v, "extractor"))
+                    plugins.append(self._build_plugin_info(k, v, "extractor"))
             loaders_result = abstractions.get_plugins_of_type(
                 working_project,
                 "loaders",
@@ -68,7 +117,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 for idx, (k, v) in enumerate(loaders_result.value.items()):
                     if idx >= max_loaders:
                         break
-                    plugins.append(_build_plugin_info(k, v, "loader"))
+                    plugins.append(self._build_plugin_info(k, v, "loader"))
             self.logger.info("Discovered plugins", count=u.count(plugins))
             return r[Sequence[t.StrMapping]].ok(plugins)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
@@ -88,7 +137,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     temp_project_result.error or "Failed to create temporary project",
                 )
             temp_project = temp_project_result.value
-            if not _is_meltano_project(temp_project):
+            if not self._is_meltano_project(temp_project):
                 return r[t.StrMapping].fail(
                     "Temporary project does not satisfy Project"
                 )
@@ -101,60 +150,13 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 return r[t.StrMapping].fail(
                     plugins_result.error or "Failed to get plugins"
                 )
-            return _extract_plugin_info(plugins_result.value, plugin_name, plugin_type)
+            return self._extract_plugin_info(
+                plugins_result.value, plugin_name, plugin_type
+            )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
             return r[t.StrMapping].fail(error_msg)
-
-
-def _is_meltano_project(value: t.ContainerMapping | None) -> bool:
-    """Type guard for protocol-compatible Meltano project objects."""
-    if value is None:
-        return False
-    return "root_dir" in value
-
-
-def _build_plugin_info(
-    plugin_name: str,
-    indexed_plugin: t.StrMapping,
-    plugin_type: str,
-) -> t.StrMapping:
-    """Build plugin info dict from a plugin definition."""
-    source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
-    return u.Meltano.build_plugin_discovery_item(
-        plugin_name,
-        plugin_type,
-        default_variant=source.default_variant,
-        variants=source.variants,
-        description=source.description,
-        logo_url=source.logo_url,
-    )
-
-
-def _extract_plugin_info(
-    plugins_data: Mapping[str, t.StrMapping],
-    plugin_name: str,
-    plugin_type: str,
-) -> r[t.StrMapping]:
-    """Extract plugin info from plugins dict."""
-    plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
-        "plugins": plugins_data,
-    }).plugins
-    plugin_value = plugins_dict.get(plugin_name)
-    if plugin_value is None:
-        return r[t.StrMapping].fail(
-            f"Plugin '{plugin_name}' not found in {plugin_type}"
-        )
-    plugin_info = u.Meltano.build_plugin_discovery_item(
-        plugin_name,
-        plugin_type,
-        default_variant=plugin_value.default_variant,
-        variants=plugin_value.variants,
-        description=plugin_value.description,
-        logo_url=plugin_value.logo_url,
-    )
-    return r[t.StrMapping].ok(plugin_info)
 
 
 __all__ = ["FlextMeltanoPluginDiscoveryMixin"]

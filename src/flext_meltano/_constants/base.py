@@ -115,6 +115,14 @@ class FlextMeltanoConstantsBase:
         ENVIRONMENT: Final[str] = "MELTANO_ENVIRONMENT"
         LOG_LEVEL: Final[str] = "MELTANO_LOG_LEVEL"
 
+    OPERATION_ERRORS: Final[tuple[type[Exception], ...]] = (
+        ValueError,
+        TypeError,
+        KeyError,
+        AttributeError,
+        OSError,
+    )
+
     class Singer:
         """Singer protocol message metadata and shared constants."""
 

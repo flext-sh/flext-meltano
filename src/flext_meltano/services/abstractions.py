@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from flext_core import r
 from flext_meltano import (
-    OPERATION_ERRORS,
     FlextMeltanoAbstractionsBase,
     c,
     m,
@@ -67,7 +66,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                             source_type=tap_instance.tap_type,
                         )
             return r[t.ContainerMapping].ok({"streams": stream_defs})
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover streams: {e}"
             self.logger.exception(error_msg)
             return r[t.ContainerMapping].fail(error_msg)
@@ -108,7 +107,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     cmd_result.error or "Stream sync failed"
                 )
             return r[t.ContainerMapping].ok(result)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to sync stream {stream_name}: {e}"
             self.logger.exception(error_msg)
             return r[t.ContainerMapping].fail(error_msg)
@@ -132,7 +131,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 tap_id=f"{tap_type}_auto",
             )
             return r[m.Meltano.TapInstance].ok(instance)
-        except OPERATION_ERRORS as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
 
     def generate_catalog(

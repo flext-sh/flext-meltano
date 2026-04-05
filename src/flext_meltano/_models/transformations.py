@@ -23,16 +23,16 @@ class FlextMeltanoModelsTransformations:
         ] = "1.0.0"
         config: Annotated[
             t.ContainerMapping, Field(description="DBT project configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="DBT project configuration")
         models: Annotated[
             t.ContainerMapping, Field(description="DBT models configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="DBT models configuration")
         sources: Annotated[
             t.ContainerMapping, Field(description="DBT sources configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="DBT sources configuration")
         tests: Annotated[
             t.ContainerMapping, Field(description="DBT tests configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="DBT tests configuration")
 
         @model_validator(mode="after")
         def validate_dbt_project(self) -> Self:
@@ -56,23 +56,23 @@ class FlextMeltanoModelsTransformations:
         model_paths: Annotated[
             t.StrSequence,
             Field(default=["models"], description="Model paths"),
-        ] = Field(default=["models"])
+        ] = Field(default=["models"], description="Model paths")
         analysis_paths: Annotated[
             t.StrSequence,
             Field(default=["analysis"], description="Analysis paths"),
-        ] = Field(default=["analysis"])
+        ] = Field(default=["analysis"], description="Analysis paths")
         test_paths: Annotated[
             t.StrSequence,
             Field(default=["tests"], description="Test paths"),
-        ] = Field(default=["tests"])
+        ] = Field(default=["tests"], description="Test paths")
         seed_paths: Annotated[
             t.StrSequence,
             Field(default=["seeds"], description="Seed paths"),
-        ] = Field(default=["seeds"])
+        ] = Field(default=["seeds"], description="Seed paths")
         macro_paths: Annotated[
             t.StrSequence,
             Field(default=["macros"], description="Macro paths"),
-        ] = Field(default=["macros"])
+        ] = Field(default=["macros"], description="Macro paths")
 
         @computed_field
         def has_custom_paths(self) -> bool:
@@ -135,11 +135,11 @@ class FlextMeltanoModelsTransformations:
         models: Annotated[
             t.StrSequence,
             Field(description="Models to execute"),
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Models to execute")
         exclude: Annotated[
             t.StrSequence,
             Field(description="Models to exclude"),
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Models to exclude")
         full_refresh: Annotated[
             bool,
             Field(default=False, description="Full refresh execution"),

@@ -23,10 +23,10 @@ class FlextMeltanoModelsInstances:
         sink_type: Annotated[str, Field(description="Type of the sink")]
         config: Annotated[
             t.ConfigurationMapping, Field(description="Sink configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Sink configuration")
         sink_schema: Annotated[
             t.FlatContainerMapping, Field(description="Sink schema")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Sink schema")
         status: Annotated[
             str,
             Field(default=_INITIALIZED, description="Current status"),
@@ -64,7 +64,7 @@ class FlextMeltanoModelsInstances:
         ]
         key_properties: Annotated[
             t.StrSequence, Field(description="Primary key properties for the stream")
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Primary key properties")
         replication_method: Annotated[
             str, Field(default="FULL_TABLE", description="Replication method")
         ] = "FULL_TABLE"

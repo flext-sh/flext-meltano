@@ -47,10 +47,10 @@ if _t.TYPE_CHECKING:
     test_cli_integration = _tests_unit_test_cli_integration
     import tests.unit.test_config as _tests_unit_test_config
     from tests.unit.test_cli_integration import (
-        TestCliModelConverterWithDbtRunParams,
-        TestCliModelConverterWithPipelineRunParams,
-        TestCliModelConverterWithTapRunParams,
-        TestCliModelConverterWithTargetRunParams,
+        TestCliModelConversionWithDbtRunParams,
+        TestCliModelConversionWithPipelineRunParams,
+        TestCliModelConversionWithTapRunParams,
+        TestCliModelConversionWithTargetRunParams,
     )
 
     test_config = _tests_unit_test_config
@@ -166,10 +166,10 @@ if _t.TYPE_CHECKING:
     from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
 _LAZY_IMPORTS = {
     "LogLevel": "tests.unit.test_config",
-    "TestCliModelConverterWithDbtRunParams": "tests.unit.test_cli_integration",
-    "TestCliModelConverterWithPipelineRunParams": "tests.unit.test_cli_integration",
-    "TestCliModelConverterWithTapRunParams": "tests.unit.test_cli_integration",
-    "TestCliModelConverterWithTargetRunParams": "tests.unit.test_cli_integration",
+    "TestCliModelConversionWithDbtRunParams": "tests.unit.test_cli_integration",
+    "TestCliModelConversionWithPipelineRunParams": "tests.unit.test_cli_integration",
+    "TestCliModelConversionWithTapRunParams": "tests.unit.test_cli_integration",
+    "TestCliModelConversionWithTargetRunParams": "tests.unit.test_cli_integration",
     "TestDbtProjectModelEnhanced": "tests.unit.test_models",
     "TestDbtService": "tests.unit.test_services",
     "TestFlextMeltanoAbstractionsComplete": "tests.unit.test_tap_abstractions",
@@ -267,10 +267,10 @@ _LAZY_IMPORTS = {
 
 __all__ = [
     "LogLevel",
-    "TestCliModelConverterWithDbtRunParams",
-    "TestCliModelConverterWithPipelineRunParams",
-    "TestCliModelConverterWithTapRunParams",
-    "TestCliModelConverterWithTargetRunParams",
+    "TestCliModelConversionWithDbtRunParams",
+    "TestCliModelConversionWithPipelineRunParams",
+    "TestCliModelConversionWithTapRunParams",
+    "TestCliModelConversionWithTargetRunParams",
     "TestDbtProjectModelEnhanced",
     "TestDbtService",
     "TestFlextMeltanoAbstractionsComplete",

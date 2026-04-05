@@ -10,7 +10,7 @@ import sys
 from typing import override
 
 from flext_cli import cli
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from flext_core import r
 from flext_meltano import (
@@ -30,7 +30,10 @@ from flext_meltano import (
 class FlextMeltanoCLI(FlextMeltanoServiceBase):
     """SOLID-compliant CLI for FLEXT Meltano operations."""
 
-    service_name: str = "FlextMeltanoCLI"
+    service_name: str = Field(
+        default="FlextMeltanoCLI",
+        description="Canonical CLI service instance name",
+    )
     _output: p.Meltano.Output = PrivateAttr()
     _pipeline_manager: p.Meltano.CLIManager = PrivateAttr()
     _singer_manager: p.Meltano.SingerManager = PrivateAttr()

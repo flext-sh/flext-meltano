@@ -56,7 +56,7 @@ class FlextMeltanoModelsCore:
             Field(
                 description="Normalized list of string values",
             ),
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Normalized string values")
 
         @field_validator("items", mode="before")
         @classmethod
@@ -74,7 +74,10 @@ class FlextMeltanoModelsCore:
             Field(
                 description="Normalized list of boolean values",
             ),
-        ] = Field(default_factory=lambda: list[bool]())
+        ] = Field(
+            default_factory=lambda: list[bool](),
+            description="Normalized boolean values",
+        )
 
         @field_validator("items", mode="before")
         @classmethod

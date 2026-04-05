@@ -23,6 +23,7 @@ class FlextMeltanoPipelinePaths:
 
     @staticmethod
     def pipelines_root_dir() -> Path:
+        """Resolve pipelines root from current environment state."""
         configured_root = os.environ.get(
             FlextMeltanoPipelinePaths._PIPELINES_ROOT_ENV,
         )

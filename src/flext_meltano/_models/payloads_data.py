@@ -26,7 +26,7 @@ class FlextMeltanoModelsPayloadsData:
                 validation_alias="schema",
                 description="Schema-like JSON payload",
             ),
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Schema-like JSON payload")
 
         @field_validator("schema_definition", mode="before")
         @classmethod
@@ -47,7 +47,10 @@ class FlextMeltanoModelsPayloadsData:
         records: Annotated[
             Sequence[t.FlatContainerMapping],
             Field(description="Normalized record payloads"),
-        ] = Field(default_factory=lambda: list[t.FlatContainerMapping]())
+        ] = Field(
+            default_factory=lambda: list[t.FlatContainerMapping](),
+            description="Normalized record payloads",
+        )
 
         @field_validator("records", mode="before")
         @classmethod
@@ -85,7 +88,7 @@ class FlextMeltanoModelsPayloadsData:
                 | None,
             ],
             Field(description="Normalized mapping values"),
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Normalized mapping values")
 
         @field_validator("values", mode="before")
         @classmethod
@@ -126,7 +129,7 @@ class FlextMeltanoModelsPayloadsData:
         """Path normalization payload for runtime path conversions."""
 
         value: Annotated[Path, Field(description="Normalized path")] = Field(
-            default_factory=Path
+            default_factory=Path, description="Normalized path"
         )
 
         @field_validator("value", mode="before")

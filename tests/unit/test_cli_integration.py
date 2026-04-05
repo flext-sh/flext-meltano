@@ -1,6 +1,6 @@
 """Comprehensive tests for CLI to Model integration.
 
-Tests the CliModelConverter integration with Meltano models:
+Tests direct CLI model conversion integration with Meltano models:
 - Dict to Pydantic model conversion
 - Validation error propagation
 - Round-trip conversion
@@ -18,8 +18,8 @@ from flext_tests import tm
 from tests import m, t, u
 
 
-class TestCliModelConverterWithTapRunParams:
-    """Test CliModelConverter integration with TapRunParams."""
+class TestCliModelConversionWithTapRunParams:
+    """Test direct CLI model conversion with TapRunParams."""
 
     def test_converter_tap_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectTapRunParams model."""
@@ -27,7 +27,7 @@ class TestCliModelConverterWithTapRunParams:
             "tap_name": "tap-postgres",
             "discover": False,
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -44,7 +44,7 @@ class TestCliModelConverterWithTapRunParams:
             "config_file": "/path/to/config.json",
             "discover": False,
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -59,7 +59,7 @@ class TestCliModelConverterWithTapRunParams:
             "tap_name": "tap-postgres",
             "discover": True,
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -79,7 +79,7 @@ class TestCliModelConverterWithTapRunParams:
             "properties_file": "/properties.json",
             "discover": False,
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -95,7 +95,7 @@ class TestCliModelConverterWithTapRunParams:
     def test_converter_tap_run_params_missing_required(self) -> None:
         """Test validation error when tap_name is missing."""
         cli_args: t.Cli.JsonMapping = {"discover": False}
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -109,7 +109,7 @@ class TestCliModelConverterWithTapRunParams:
             "tap_name": "tap-postgres",
             "discover": "not-a-boolean",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -117,15 +117,15 @@ class TestCliModelConverterWithTapRunParams:
         tm.that(str(result.error).lower(), has="validation")
 
 
-class TestCliModelConverterWithTargetRunParams:
-    """Test CliModelConverter integration with TargetRunParams."""
+class TestCliModelConversionWithTargetRunParams:
+    """Test direct CLI model conversion with TargetRunParams."""
 
     def test_converter_target_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectTargetRunParams model."""
         cli_args: t.Cli.JsonMapping = {
             "target_name": "target-postgres",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -141,7 +141,7 @@ class TestCliModelConverterWithTargetRunParams:
             "target_name": "target-postgres",
             "config_file": "/path/to/config.json",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -156,7 +156,7 @@ class TestCliModelConverterWithTargetRunParams:
             "target_name": "target-postgres",
             "input_file": "/path/to/input.jsonl",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -172,7 +172,7 @@ class TestCliModelConverterWithTargetRunParams:
             "config_file": "/config.json",
             "input_file": "/input.jsonl",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -185,7 +185,7 @@ class TestCliModelConverterWithTargetRunParams:
     def test_converter_target_run_params_missing_required(self) -> None:
         """Test validation error when target_name is missing."""
         cli_args: t.Cli.JsonMapping = {"config_file": "/config.json"}
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -194,8 +194,8 @@ class TestCliModelConverterWithTargetRunParams:
         tm.that(str(result.error).lower(), has="target_name")
 
 
-class TestCliModelConverterWithPipelineRunParams:
-    """Test CliModelConverter integration with PipelineRunParams."""
+class TestCliModelConversionWithPipelineRunParams:
+    """Test direct CLI model conversion with PipelineRunParams."""
 
     def test_converter_tap_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectTapRunParams model."""
@@ -203,7 +203,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "tap_name": "tap-postgres",
             "config_file": "/path/to/config.json",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
             cli_args,
         )
@@ -218,7 +218,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "target_name": "target-postgres",
             "config_file": "/path/to/config.json",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
             cli_args,
         )
@@ -235,7 +235,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "catalog_file": "/catalog.json",
             "state_file": "/state.json",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -254,7 +254,7 @@ class TestCliModelConverterWithPipelineRunParams:
             "catalog_file": "/catalog.json",
             "state_file": "/state.json",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -270,7 +270,7 @@ class TestCliModelConverterWithPipelineRunParams:
     def test_converter_pipeline_run_params_missing_tap_name(self) -> None:
         """Test validation error when tap_name is missing."""
         cli_args: t.Cli.JsonMapping = {"target_name": "target-postgres"}
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -280,7 +280,7 @@ class TestCliModelConverterWithPipelineRunParams:
     def test_converter_pipeline_run_params_missing_target_name(self) -> None:
         """Test validation error when target_name is missing."""
         cli_args: t.Cli.JsonMapping = {"tap_name": "tap-postgres"}
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
             cli_args,
         )
@@ -288,13 +288,13 @@ class TestCliModelConverterWithPipelineRunParams:
         tm.that(str(result.error).lower(), has="validation")
 
 
-class TestCliModelConverterWithDbtRunParams:
-    """Test CliModelConverter integration with DbtRunParams."""
+class TestCliModelConversionWithDbtRunParams:
+    """Test direct CLI model conversion with DbtRunParams."""
 
     def test_converter_dbt_run_params_minimal(self) -> None:
         """Test converting minimal Mapping[str, objectDbtRunParams model."""
         cli_args: t.Cli.JsonMapping = {"project_dir": "/dbt/project"}
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -310,7 +310,7 @@ class TestCliModelConverterWithDbtRunParams:
             "project_dir": "/dbt/project",
             "models": "users orders",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -325,7 +325,7 @@ class TestCliModelConverterWithDbtRunParams:
             "select": "tag:daily",
             "exclude": "tag:deprecated",
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -340,7 +340,7 @@ class TestCliModelConverterWithDbtRunParams:
             "project_dir": "/dbt/project",
             "full_refresh": True,
         }
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )
@@ -351,7 +351,7 @@ class TestCliModelConverterWithDbtRunParams:
     def test_converter_dbt_run_params_missing_required(self) -> None:
         """Test validation error when project_dir is missing."""
         cli_args: t.Cli.JsonMapping = {"models": "users"}
-        result = u.Cli.CliModelConverter.cli_args_to_model(
+        result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
             cli_args,
         )

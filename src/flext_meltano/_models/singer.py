@@ -32,11 +32,14 @@ class FlextMeltanoModelsSinger:
         ]
         key_properties: Annotated[
             t.StrSequence, Field(description="Singer stream key properties")
-        ] = Field(default_factory=list)
+        ] = Field(default_factory=list, description="Singer stream key properties")
         bookmark_properties: Annotated[
             t.StrSequence,
             Field(description="Singer bookmark columns for incremental replication"),
-        ] = Field(default_factory=list)
+        ] = Field(
+            default_factory=list,
+            description="Singer bookmark columns for incremental replication",
+        )
 
     class SingerRecordMessage(FlextCliModels.ArbitraryTypesModel):
         """Canonical Singer RECORD message model."""
@@ -74,7 +77,7 @@ class FlextMeltanoModelsSinger:
         value: Annotated[
             t.MutableContainerMapping,
             Field(description="Singer state bookmark payload"),
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Singer state bookmark payload")
 
     class SingerActivateVersionMessage(FlextCliModels.ArbitraryTypesModel):
         """Canonical Singer ACTIVATE_VERSION message model.

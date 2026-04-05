@@ -40,7 +40,7 @@ class FlextMeltanoModelsResultsPipeline:
         ] = 0
         pipeline_metadata: Annotated[
             t.ConfigurationMapping, Field(description="Pipeline execution metadata")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Pipeline execution metadata")
 
         @computed_field
         def completed_stages(self) -> t.StrSequence:

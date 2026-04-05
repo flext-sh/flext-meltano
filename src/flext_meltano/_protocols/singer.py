@@ -145,6 +145,26 @@ class FlextMeltanoProtocolsSinger:
             ...
 
     @runtime_checkable
+    class SingerDrainSink(Protocol):
+        """Typed sink contract for target service drain and record operations.
+
+        Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
+        batches through the Singer sink lifecycle.
+        """
+
+        def start_drain(self) -> t.MutableContainerMapping: ...
+
+        def process_batch(self, context: t.MutableContainerMapping) -> None: ...
+
+        def mark_drained(self) -> None: ...
+
+        def process_record(
+            self,
+            record: t.MutableContainerMapping,
+            context: t.MutableContainerMapping,
+        ) -> None: ...
+
+    @runtime_checkable
     class SingerTargetHandler(Protocol):
         """Protocol for Singer target message handlers.
 

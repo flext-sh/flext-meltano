@@ -29,24 +29,66 @@ class FlextMeltanoSettings(FlextSettings):
     )
     MELTANO_ENVIRONMENT_ENV: ClassVar[str] = c.Meltano.EnvironmentVariables.ENVIRONMENT
     MELTANO_LOG_LEVEL_ENV: ClassVar[str] = c.Meltano.EnvironmentVariables.LOG_LEVEL
+    PIPELINES_DIR_ENV: ClassVar[str] = c.Meltano.CliDefaults.PIPELINES_ROOT_ENV
 
     project_root: Annotated[
         Path,
-        Field(default=Path(), validation_alias=MELTANO_PROJECT_ROOT_ENV),
+        Field(
+            default=Path(),
+            validation_alias=MELTANO_PROJECT_ROOT_ENV,
+            description="Root directory of the Meltano project",
+        ),
     ]
-    config_dir: Annotated[Path, Field(default=Path(".meltano"))]
-    logs_dir: Annotated[Path, Field(default=Path("logs"))]
+    config_dir: Annotated[
+        Path,
+        Field(default=Path(".meltano"), description="Meltano configuration directory"),
+    ]
+    logs_dir: Annotated[
+        Path, Field(default=Path("logs"), description="Meltano logs directory")
+    ]
     environment: Annotated[
         str,
-        Field(default="development", validation_alias=MELTANO_ENVIRONMENT_ENV),
+        Field(
+            default="development",
+            validation_alias=MELTANO_ENVIRONMENT_ENV,
+            description="Active Meltano runtime environment",
+        ),
     ]
     log_level: Annotated[
         c.LogLevel,
-        Field(default=c.LogLevel.INFO, validation_alias=MELTANO_LOG_LEVEL_ENV),
+        Field(
+            default=c.LogLevel.INFO,
+            validation_alias=MELTANO_LOG_LEVEL_ENV,
+            description="Meltano logging level",
+        ),
     ]
-    meltano_version: Annotated[str, Field(default=MELTANO_VERSION)]
-    singer_sdk_version: Annotated[str, Field(default=SINGER_SDK_VERSION)]
-    dbt_version: Annotated[str, Field(default=DBT_VERSION)]
+    meltano_version: Annotated[
+        str,
+        Field(default=MELTANO_VERSION, description="Required Meltano version"),
+    ]
+    singer_sdk_version: Annotated[
+        str,
+        Field(default=SINGER_SDK_VERSION, description="Required Singer SDK version"),
+    ]
+    dbt_version: Annotated[
+        str, Field(default=DBT_VERSION, description="Required dbt version")
+    ]
+    pipelines_dir: Annotated[
+        Path,
+        Field(
+            default=Path(),
+            validation_alias=PIPELINES_DIR_ENV,
+            description="Root directory for pipeline configurations",
+        ),
+    ]
+
+    @field_validator("pipelines_dir", mode="before")
+    @classmethod
+    def _coerce_pipelines_dir(cls, value: t.Scalar) -> Path:
+        text = str(value).strip()
+        if text:
+            return Path(text).expanduser().resolve()
+        return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
 
     @field_validator("project_root", mode="before")
     @classmethod

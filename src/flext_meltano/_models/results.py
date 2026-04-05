@@ -20,7 +20,10 @@ class FlextMeltanoModelsResults:
         operation: Annotated[str, Field(description="Operation performed")]
         status: Annotated[str, Field(description="Execution status")]
         start_time: Annotated[datetime, Field(description="Execution start time")] = (
-            Field(default_factory=lambda: datetime.now(tz=UTC))
+            Field(
+                default_factory=lambda: datetime.now(tz=UTC),
+                description="Execution start time",
+            )
         )
         end_time: Annotated[
             datetime | None, Field(default=None, description="Execution end time")
@@ -38,7 +41,7 @@ class FlextMeltanoModelsResults:
         ] = None
         metadata: Annotated[
             t.ConfigurationMapping, Field(description="Additional execution metadata")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Additional execution metadata")
 
         @computed_field
         def execution_rate_per_second(self) -> float:

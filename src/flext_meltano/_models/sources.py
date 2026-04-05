@@ -26,7 +26,7 @@ class FlextMeltanoModelsSources:
         ]
         stream_config: Annotated[
             t.ContainerMapping, Field(description="Stream-specific configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Stream-specific configuration")
         tap_version: Annotated[str, Field(description="Tap version")] = "latest"
 
         @computed_field
@@ -70,7 +70,7 @@ class FlextMeltanoModelsSources:
         target_type: Annotated[str, Field(description="Type of the target")]
         connection_config: Annotated[
             t.ContainerMapping, Field(description="Connection configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Connection configuration")
         batch_size: Annotated[
             int | None, Field(default=None, description="Batch size for data loading")
         ] = None
@@ -120,7 +120,7 @@ class FlextMeltanoModelsSources:
         ]
         stream_config: Annotated[
             t.ContainerMapping, Field(description="Stream-specific configuration")
-        ] = Field(default_factory=dict)
+        ] = Field(default_factory=dict, description="Stream-specific configuration")
         source_version: Annotated[
             str, Field(default="latest", description="Source version")
         ] = "latest"

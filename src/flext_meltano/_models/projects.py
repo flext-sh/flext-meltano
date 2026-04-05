@@ -81,13 +81,13 @@ class FlextMeltanoModelsProjects:
     class PipelineProjectModel(FlextCliModels.Entity):
         """Generic pipeline project configuration with validation."""
 
-        version: Annotated[
+        schema_version: Annotated[
             int,
             Field(
                 default=1,
                 ge=1,
                 le=1,
-                description="Project version (only version 1 supported)",
+                description="Pipeline schema version (only version 1 supported)",
             ),
         ] = 1
         project_id: Annotated[str, Field(description="Project ID required")]

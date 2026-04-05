@@ -12,34 +12,12 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from collections.abc import MutableMapping, Sequence
-from typing import Annotated, ClassVar, Protocol, Self, override, runtime_checkable
+from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
 
 from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSingerSinkBase, c, t
-
-
-@runtime_checkable
-class _SingerDrainSink(Protocol):
-    """Typed sink contract for target service drain and record operations."""
-
-    def start_drain(self) -> dict[object, object]: ...
-
-    def process_batch(self, context: dict[object, object]) -> None: ...
-
-    def mark_drained(self) -> None: ...
-
-    def process_record(
-        self,
-        record: dict[object, object],
-        context: dict[object, object],
-    ) -> None: ...
-
-
-def _create_sink_registry() -> MutableMapping[str, FlextMeltanoSingerSinkBase]:
-    """Create the private sink registry with an explicit typed mapping."""
-    return {}
 
 
 class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
@@ -63,7 +41,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     ] = "target"
 
     _sinks: MutableMapping[str, FlextMeltanoSingerSinkBase] = PrivateAttr(
-        default_factory=_create_sink_registry,
+        default_factory=dict,
     )
     _instance: ClassVar[Self | None] = None
 
@@ -129,10 +107,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
                 else list(self._sinks.values())
             )
             for sink in targets:
-                drain_sink: _SingerDrainSink = sink
-                context = drain_sink.start_drain()
-                drain_sink.process_batch(context)
-                drain_sink.mark_drained()
+                context = sink.start_drain()
+                sink.process_batch(context)
+                sink.mark_drained()
             return r[None].ok(None)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             return r[None].fail(str(exc))
@@ -152,8 +129,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         if sink_result.is_failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            drain_sink: _SingerDrainSink = sink_result.value
-            drain_sink.process_record(dict(record.items()), {})
+            sink = sink_result.value
+            sink.process_record(dict(record.items()), {})
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             return r[bool].fail(str(exc))
