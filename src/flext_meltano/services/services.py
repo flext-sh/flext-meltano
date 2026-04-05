@@ -27,7 +27,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         def _build() -> FlextMeltanoService:
             kwargs: dict[str, str | None] = {
                 "service_name": f"{component_name}_service",
-                "service_version": c.Meltano.Defaults.SERVICE_VERSION,
+                "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
                 "source_name": None,
                 "sink_name": None,
                 "transformation_name": None,
@@ -98,20 +98,20 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, config: t.Meltano.MeltanoConfigDict | None = None
-    ) -> r[t.Meltano.MeltanoConfigDict]:
+        environment_name: str, config: t.ContainerMapping | None = None
+    ) -> r[t.ContainerMapping]:
         """Configure environment."""
         if not environment_name:
-            return r[t.Meltano.MeltanoConfigDict].fail("Environment name is required")
-        if environment_name not in c.Meltano.Environments.VALID:
-            return r[t.Meltano.MeltanoConfigDict].fail(
+            return r[t.ContainerMapping].fail("Environment name is required")
+        if environment_name not in c.Meltano.ENVIRONMENTS_VALID:
+            return r[t.ContainerMapping].fail(
                 "Invalid environment: "
                 f"{environment_name}. "
-                f"Valid: {c.Meltano.Environments.VALID}"
+                f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        return r[t.Meltano.MeltanoConfigDict].ok(
+        return r[t.ContainerMapping].ok(
             u.Meltano.build_status_payload(
-                c.Meltano.Enums.OperationStatus.CONFIGURED,
+                c.Meltano.OperationStatus.CONFIGURED,
                 extra_fields={
                     "environment": environment_name,
                     "configuration": config or {},
@@ -123,12 +123,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     def configure_pipeline(
         source_name: str,
         sink_name: str,
-        _config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
+        _config: t.ContainerMapping | None = None,
+    ) -> r[t.ContainerMapping]:
         """Configure generic data pipeline."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
+        return r[t.ContainerMapping].ok(
             u.Meltano.build_status_payload(
-                c.Meltano.Enums.OperationStatus.CONFIGURED,
+                c.Meltano.OperationStatus.CONFIGURED,
                 extra_fields={
                     "source": source_name,
                     "sink": sink_name,
@@ -140,20 +140,18 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     def install_component(
         component_type: str,
         component_name: str,
-        config: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
+        config: t.ContainerMapping | None = None,
+    ) -> r[t.ContainerMapping]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
-            return r[t.Meltano.MeltanoConfigDict].fail(
-                "Component type and name are required"
-            )
-        if component_type not in c.Meltano.ComponentTypes.VALID:
-            return r[t.Meltano.MeltanoConfigDict].fail(
+            return r[t.ContainerMapping].fail("Component type and name are required")
+        if component_type not in c.Meltano.COMPONENT_TYPES_VALID:
+            return r[t.ContainerMapping].fail(
                 f"Invalid component type: {component_type}"
             )
-        return r[t.Meltano.MeltanoConfigDict].ok(
+        return r[t.ContainerMapping].ok(
             u.Meltano.build_status_payload(
-                c.Meltano.Enums.OperationStatus.INSTALLED,
+                c.Meltano.OperationStatus.INSTALLED,
                 extra_fields={
                     "component_name": component_name,
                     "component_type": component_type,
@@ -163,39 +161,37 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         )
 
     @staticmethod
-    def validate_service_config(config: t.Meltano.MeltanoConfigDict) -> r[bool]:
+    def validate_service_config(config: t.ContainerMapping) -> r[bool]:
         """Validate service configuration dictionary."""
         if not u.guard(config, dict):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(value=True)
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute service with railway pattern."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
+        return r[t.ContainerMapping].ok(
             u.Meltano.build_status_payload(
                 c.CommonStatus.ACTIVE,
                 extra_fields={
-                    "service_name": c.Meltano.Metadata.APPLICATION_NAME,
+                    "service_name": c.Meltano.METADATA_APPLICATION_NAME,
                     "version": c.Meltano.FLEXT_MELTANO_VERSION,
-                    "handlers": list(c.Meltano.Handlers.ALL),
+                    "handlers": list(c.Meltano.HANDLER_ALL),
                 },
             )
         )
 
-    def get_default_config(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def get_default_config(self) -> r[t.ContainerMapping]:
         """Get default configuration from current settings."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            u.Meltano.coerce_config_mapping(self.settings)
-        )
+        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
 
-    def get_info(self) -> r[t.Meltano.PluginInfo]:
+    def get_info(self) -> r[t.Meltano.OptionalScalarMap]:
         """Get service information."""
-        return r[t.Meltano.PluginInfo].ok({
-            "name": c.Meltano.Metadata.APPLICATION_NAME,
+        return r[t.Meltano.OptionalScalarMap].ok({
+            "name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "type": "pipeline_service",
-            "description": c.Meltano.Metadata.APPLICATION_DESCRIPTION,
+            "description": c.Meltano.METADATA_APPLICATION_DESCRIPTION,
         })
 
     def validate_config(self) -> r[bool]:

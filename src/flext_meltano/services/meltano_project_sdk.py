@@ -58,21 +58,19 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 f"Failed to get plugins: {e}"
             )
 
-    def initialize_sdk_project(
-        self, root: Path
-    ) -> r[t.Meltano.Project.ProjectMetadata]:
+    def initialize_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
         """Initialize a new Meltano project via SDK."""
         try:
             ensure_result = u.Meltano.ensure_directory(root, exist_ok=True)
             if ensure_result.is_failure:
-                return r[t.Meltano.Project.ProjectMetadata].fail(
+                return r[t.Meltano.OptionalScalarMap].fail(
                     ensure_result.error or "Failed to prepare project directory",
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
             info = u.Meltano.build_project_metadata(root, state="initialized")
             self.logger.info("Meltano project initialized", root=str(root))
-            return r[t.Meltano.Project.ProjectMetadata].ok(info)
+            return r[t.Meltano.OptionalScalarMap].ok(info)
         except (
             ValueError,
             TypeError,
@@ -83,22 +81,22 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             ImportError,
         ) as e:
             self.logger.exception("Failed to initialize project")
-            return r[t.Meltano.Project.ProjectMetadata].fail(
+            return r[t.Meltano.OptionalScalarMap].fail(
                 f"Failed to initialize project: {e}"
             )
 
-    def load_sdk_project(self, root: Path) -> r[t.Meltano.Project.ProjectMetadata]:
+    def load_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
         """Load an existing Meltano project via SDK."""
         try:
             if not root.exists():
-                return r[t.Meltano.Project.ProjectMetadata].fail(
+                return r[t.Meltano.OptionalScalarMap].fail(
                     f"Project directory not found: {root}",
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
             info = u.Meltano.build_project_metadata(root, state="loaded")
             self.logger.info("Meltano project loaded", root=str(root))
-            return r[t.Meltano.Project.ProjectMetadata].ok(info)
+            return r[t.Meltano.OptionalScalarMap].ok(info)
         except (
             ValueError,
             TypeError,
@@ -109,9 +107,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             ImportError,
         ) as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return r[t.Meltano.Project.ProjectMetadata].fail(
-                f"Failed to load project: {e}"
-            )
+            return r[t.Meltano.OptionalScalarMap].fail(f"Failed to load project: {e}")
 
     def _extract_sdk_plugins(
         self,

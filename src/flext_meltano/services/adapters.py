@@ -25,7 +25,7 @@ from flext_meltano import (
 class FlextMeltanoAdapter(FlextMeltanoServiceBase):
     """Base adapter namespace class for focused integrations."""
 
-    class ProjectAdapter(s[t.Meltano.ExecutionResultDict]):
+    class ProjectAdapter(s[t.ContainerMapping]):
         """Focused adapter for Meltano project management following SOLID principles."""
 
         @classmethod
@@ -37,52 +37,50 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             self,
             project_name: str,
             project_dir: Path,
-        ) -> r[t.Meltano.ExecutionResultDict]:
+        ) -> r[t.ContainerMapping]:
             """Create a new Meltano project via the imported library."""
             project_path = Path(project_dir) / project_name
             init_result = FlextMeltanoExecutorBase.initialize_project_root(
                 project_path,
             )
             if init_result.is_failure:
-                return r[t.Meltano.ExecutionResultDict].fail(
+                return r[t.ContainerMapping].fail(
                     init_result.error or "Project creation failed",
                 )
-            result: t.Meltano.ExecutionResultDict = u.Meltano.build_status_payload(
-                c.Meltano.Enums.OperationStatus.CREATED,
+            result: t.ContainerMapping = u.Meltano.build_status_payload(
+                c.Meltano.OperationStatus.CREATED,
                 extra_fields={
                     "project_name": project_name,
                     "project_path": str(project_path),
-                    "output": f"Initialized {c.Meltano.Paths.MELTANO_PROJECT_FILE}",
+                    "output": f"Initialized {c.Meltano.PATH_MELTANO_PROJECT_FILE}",
                     "error": "",
                     "created_at": str(time.time()),
                 },
             )
-            return r[t.Meltano.ExecutionResultDict].ok(result)
+            return r[t.ContainerMapping].ok(result)
 
         @override
-        def execute(self) -> r[t.Meltano.ExecutionResultDict]:
+        def execute(self) -> r[t.ContainerMapping]:
             """Execute default project operation."""
             return self.get_version()
 
-        def get_version(self) -> r[t.Meltano.ExecutionResultDict]:
+        def get_version(self) -> r[t.ContainerMapping]:
             """Get Meltano version information using native API."""
             version_result = FlextMeltanoExecutorBase.get_version()
             if version_result.is_failure:
-                return r[t.Meltano.ExecutionResultDict].fail(
+                return r[t.ContainerMapping].fail(
                     version_result.error or "Failed to get Meltano version",
                 )
             meltano_version = version_result.value
-            version_info: t.Meltano.ExecutionResultDict = {
+            version_info: t.ContainerMapping = {
                 "version": meltano_version,
                 "meltano": meltano_version,
                 "cli_type": "native_meltano_api",
                 "integration": "flext-core",
             }
-            return r[t.Meltano.ExecutionResultDict].ok(version_info)
+            return r[t.ContainerMapping].ok(version_info)
 
-        def initialize_project(
-            self, project_root: Path
-        ) -> r[t.Meltano.ExecutionResultDict]:
+        def initialize_project(self, project_root: Path) -> r[t.ContainerMapping]:
             """Initialize Meltano project using railway pattern."""
             return self.create_project(
                 project_name=project_root.name,

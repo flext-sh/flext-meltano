@@ -20,71 +20,71 @@ class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(FlextCliProtocols.Service[t.Meltano.ResultDict], Protocol):
+    class Tap(FlextCliProtocols.Service[t.ContainerMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
+        def discover(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
+        def execute(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
             self,
             catalog: t.FlatContainerMapping,
-        ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
+        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(FlextCliProtocols.Service[t.Meltano.ResultDict], Protocol):
+    class Target(FlextCliProtocols.Service[t.ContainerMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
+        def execute(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
             self,
-            records: Sequence[t.Meltano.RecordDict],
-        ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
+            records: Sequence[t.Meltano.OptionalScalarMap],
+        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
             self,
-            record: t.Meltano.RecordDict,
-        ) -> FlextCliProtocols.Result[t.Meltano.ResultDict]:
+            record: t.Meltano.OptionalScalarMap,
+        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
     class DbtRunner(
-        FlextCliProtocols.Service[t.Meltano.MeltanoConfigDict],
+        FlextCliProtocols.Service[t.ContainerMapping],
         Protocol,
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
+        def execute(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
         def run(
             self,
             models: t.StrSequence,
-        ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
+        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Run DBT models with r."""
             ...
 
         def test(
             self,
             models: t.StrSequence,
-        ) -> FlextCliProtocols.Result[t.Meltano.MeltanoConfigDict]:
+        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
             """Test DBT models with r."""
             ...
 
@@ -150,18 +150,21 @@ class FlextMeltanoProtocolsSinger:
 
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
+
+        Context/Record types use ``t.MutableContainerValueMapping`` — the canonical
+        bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, ContainerValue]``.
         """
 
-        def start_drain(self) -> t.MutableContainerMapping: ...
+        def start_drain(self) -> t.MutableContainerValueMapping: ...
 
-        def process_batch(self, context: t.MutableContainerMapping) -> None: ...
+        def process_batch(self, context: t.MutableContainerValueMapping) -> None: ...
 
         def mark_drained(self) -> None: ...
 
         def process_record(
             self,
-            record: t.MutableContainerMapping,
-            context: t.MutableContainerMapping,
+            record: t.MutableContainerValueMapping,
+            context: t.MutableContainerValueMapping,
         ) -> None: ...
 
     @runtime_checkable

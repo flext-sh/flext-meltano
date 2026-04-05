@@ -97,10 +97,8 @@ if _t.TYPE_CHECKING:
         FlextMeltanoUtilitiesProject,
         FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesSinger,
-        FlextMeltanoUtilitiesYaml,
         SingerTargetHandler,
         runtime,
-        yaml,
     )
 
     api = _flext_meltano_api
@@ -147,7 +145,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoDbtTransformationRunner,
         FlextMeltanoExecutor,
         FlextMeltanoExecutorBase,
-        FlextMeltanoFileManagers,
         FlextMeltanoLibraryRunner,
         FlextMeltanoPipelineAdapter,
         FlextMeltanoPipelineCrudOperations,
@@ -161,8 +158,14 @@ if _t.TYPE_CHECKING:
         FlextMeltanoService,
         FlextMeltanoSingerCatalogMixin,
         FlextMeltanoSingerCliTranslator,
+        FlextMeltanoSingerContext,
         FlextMeltanoSingerManager,
+        FlextMeltanoSingerRecord,
+        FlextMeltanoSingerSinkBase,
         FlextMeltanoSingerStateMixin,
+        FlextMeltanoSingerStreamBase,
+        FlextMeltanoSingerTapBase,
+        FlextMeltanoSingerTargetBase,
         FlextMeltanoStatusManager,
         FlextMeltanoTapAbstractions,
         FlextMeltanoTapSourceMixin,
@@ -176,7 +179,6 @@ if _t.TYPE_CHECKING:
         dbt_project,
         dbt_runner,
         executor,
-        file_managers,
         library_runner,
         meltano_dbt_transformation,
         meltano_plugin_discovery,
@@ -204,15 +206,6 @@ if _t.TYPE_CHECKING:
     settings = _flext_meltano_settings
     import flext_meltano.typings as _flext_meltano_typings
     from flext_meltano.settings import FlextMeltanoSettings
-    from flext_meltano.singer import (
-        FlextMeltanoSingerContext,
-        FlextMeltanoSingerRecord,
-        FlextMeltanoSingerSinkBase,
-        FlextMeltanoSingerStreamBase,
-        FlextMeltanoSingerTapBase,
-        FlextMeltanoSingerTargetBase,
-        sdk,
-    )
 
     typings = _flext_meltano_typings
     import flext_meltano.utilities as _flext_meltano_utilities
@@ -237,7 +230,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "flext_meltano._typings",
         "flext_meltano._utilities",
         "flext_meltano.services",
-        "flext_meltano.singer",
     ),
     {
         "FlextMeltano": "flext_meltano.api",
@@ -309,7 +301,6 @@ __all__ = [
     "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoExecutor",
     "FlextMeltanoExecutorBase",
-    "FlextMeltanoFileManagers",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoModels",
     "FlextMeltanoModelsCliParams",
@@ -375,7 +366,6 @@ __all__ = [
     "FlextMeltanoUtilitiesProject",
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
-    "FlextMeltanoUtilitiesYaml",
     "FlextMeltanoValidators",
     "SingerTargetHandler",
     "__author__",
@@ -415,7 +405,6 @@ __all__ = [
     "e",
     "enums",
     "executor",
-    "file_managers",
     "h",
     "instances",
     "instances_data",
@@ -444,7 +433,6 @@ __all__ = [
     "results_pipeline",
     "runtime",
     "s",
-    "sdk",
     "services",
     "settings",
     "singer",
@@ -465,7 +453,6 @@ __all__ = [
     "utilities",
     "validators",
     "x",
-    "yaml",
 ]
 
 

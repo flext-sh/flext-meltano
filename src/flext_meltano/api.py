@@ -19,7 +19,6 @@ from flext_meltano import (
     FlextMeltanoDbtProjectMixin,
     FlextMeltanoDbtRunnerMixin,
     FlextMeltanoExecutor,
-    FlextMeltanoFileManagers,
     FlextMeltanoLibraryRunner,
     FlextMeltanoProjectManager,
     FlextMeltanoProjectService,
@@ -55,7 +54,6 @@ class FlextMeltano(
     FlextMeltanoAdapter,
     FlextMeltanoBridge,
     FlextMeltanoExecutor,
-    FlextMeltanoFileManagers,
     FlextMeltanoProjectService,
     FlextMeltanoService,
     FlextMeltanoValidators,
@@ -72,14 +70,14 @@ class FlextMeltano(
         return cls._instance
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute Meltano service with railway pattern."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
+        return r[t.ContainerMapping].ok({
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,
             "timestamp": u.generate_iso_timestamp(),
-            "handlers": list(c.Meltano.Handlers.ALL),
+            "handlers": list(c.Meltano.HANDLER_ALL),
         })
 
 

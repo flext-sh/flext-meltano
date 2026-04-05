@@ -38,7 +38,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 "sink_name": f"{sink_config.sink_type}_sink",
                 "sink_type": sink_config.sink_type,
                 "config": sink_config.connection_config,
-                "status": c.Meltano.Enums.OperationStatus.CONFIGURED,
+                "status": c.Meltano.OperationStatus.CONFIGURED,
             })
             self.logger.info(
                 "Sink configured successfully",
@@ -89,7 +89,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             sink_instance = m.Meltano.DataSinkInstance(
                 sink_type=sink_config.sink_type,
                 config=sink_config,
-                status=c.Meltano.Enums.OperationStatus.CONFIGURED,
+                status=c.Meltano.OperationStatus.CONFIGURED,
             )
             self.logger.info(
                 "Sink instance created successfully",
@@ -111,11 +111,9 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            u.Meltano.coerce_config_mapping(self.settings)
-        )
+        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
 
     def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
         """Validate a sink configuration."""

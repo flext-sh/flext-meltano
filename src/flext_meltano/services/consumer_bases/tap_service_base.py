@@ -147,9 +147,9 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         return self._tap_instance
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute tap service — returns status."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
+        return r[t.ContainerMapping].ok({
             "service": self.tap_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "tap",

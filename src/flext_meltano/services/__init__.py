@@ -94,12 +94,8 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
 
     executor = _flext_meltano_services_executor
-    import flext_meltano.services.file_managers as _flext_meltano_services_file_managers
-    from flext_meltano.services.executor import FlextMeltanoExecutor
-
-    file_managers = _flext_meltano_services_file_managers
     import flext_meltano.services.library_runner as _flext_meltano_services_library_runner
-    from flext_meltano.services.file_managers import FlextMeltanoFileManagers
+    from flext_meltano.services.executor import FlextMeltanoExecutor
 
     library_runner = _flext_meltano_services_library_runner
     import flext_meltano.services.meltano_dbt_transformation as _flext_meltano_services_meltano_dbt_transformation
@@ -134,8 +130,19 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.services import FlextMeltanoService
 
     singer_catalog = _flext_meltano_services_singer_catalog
-    import flext_meltano.services.singer_state as _flext_meltano_services_singer_state
+    import flext_meltano.services.singer_sdk as _flext_meltano_services_singer_sdk
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
+
+    singer_sdk = _flext_meltano_services_singer_sdk
+    import flext_meltano.services.singer_state as _flext_meltano_services_singer_state
+    from flext_meltano.services.singer_sdk import (
+        FlextMeltanoSingerContext,
+        FlextMeltanoSingerRecord,
+        FlextMeltanoSingerSinkBase,
+        FlextMeltanoSingerStreamBase,
+        FlextMeltanoSingerTapBase,
+        FlextMeltanoSingerTargetBase,
+    )
 
     singer_state = _flext_meltano_services_singer_state
     import flext_meltano.services.singer_tap as _flext_meltano_services_singer_tap
@@ -185,7 +192,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "FlextMeltanoDbtTransformationRunner": "flext_meltano.services.meltano_dbt_transformation",
         "FlextMeltanoExecutor": "flext_meltano.services.executor",
         "FlextMeltanoExecutorBase": "flext_meltano.services._executor_base",
-        "FlextMeltanoFileManagers": "flext_meltano.services.file_managers",
         "FlextMeltanoLibraryRunner": "flext_meltano.services.library_runner",
         "FlextMeltanoPipelineAdapter": "flext_meltano.services.adapter_extensions",
         "FlextMeltanoPipelineCrudOperations": "flext_meltano.services._pipeline_ops",
@@ -199,8 +205,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "FlextMeltanoService": "flext_meltano.services.services",
         "FlextMeltanoSingerCatalogMixin": "flext_meltano.services.singer_catalog",
         "FlextMeltanoSingerCliTranslator": "flext_meltano.services.singer_translator",
+        "FlextMeltanoSingerContext": "flext_meltano.services.singer_sdk",
         "FlextMeltanoSingerManager": "flext_meltano.services.cli_managers",
+        "FlextMeltanoSingerRecord": "flext_meltano.services.singer_sdk",
+        "FlextMeltanoSingerSinkBase": "flext_meltano.services.singer_sdk",
         "FlextMeltanoSingerStateMixin": "flext_meltano.services.singer_state",
+        "FlextMeltanoSingerStreamBase": "flext_meltano.services.singer_sdk",
+        "FlextMeltanoSingerTapBase": "flext_meltano.services.singer_sdk",
+        "FlextMeltanoSingerTargetBase": "flext_meltano.services.singer_sdk",
         "FlextMeltanoStatusManager": "flext_meltano.services._cli_small_managers",
         "FlextMeltanoTapAbstractions": "flext_meltano.services.singer_tap",
         "FlextMeltanoTapSourceMixin": "flext_meltano.services.singer_tap",
@@ -225,7 +237,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "dbt_runner": "flext_meltano.services.dbt_runner",
         "e": ("flext_core.exceptions", "FlextExceptions"),
         "executor": "flext_meltano.services.executor",
-        "file_managers": "flext_meltano.services.file_managers",
         "h": ("flext_core.handlers", "FlextHandlers"),
         "library_runner": "flext_meltano.services.library_runner",
         "m": ("flext_core.models", "FlextModels"),
@@ -239,6 +250,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "s": ("flext_core.service", "FlextService"),
         "services": "flext_meltano.services.services",
         "singer_catalog": "flext_meltano.services.singer_catalog",
+        "singer_sdk": "flext_meltano.services.singer_sdk",
         "singer_state": "flext_meltano.services.singer_state",
         "singer_tap": "flext_meltano.services.singer_tap",
         "singer_target": "flext_meltano.services.singer_target",
@@ -266,7 +278,6 @@ __all__ = [
     "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoExecutor",
     "FlextMeltanoExecutorBase",
-    "FlextMeltanoFileManagers",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoPipelineAdapter",
     "FlextMeltanoPipelineCrudOperations",
@@ -280,8 +291,14 @@ __all__ = [
     "FlextMeltanoService",
     "FlextMeltanoSingerCatalogMixin",
     "FlextMeltanoSingerCliTranslator",
+    "FlextMeltanoSingerContext",
     "FlextMeltanoSingerManager",
+    "FlextMeltanoSingerRecord",
+    "FlextMeltanoSingerSinkBase",
     "FlextMeltanoSingerStateMixin",
+    "FlextMeltanoSingerStreamBase",
+    "FlextMeltanoSingerTapBase",
+    "FlextMeltanoSingerTargetBase",
     "FlextMeltanoStatusManager",
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTapServiceBase",
@@ -308,7 +325,6 @@ __all__ = [
     "dbt_service_base",
     "e",
     "executor",
-    "file_managers",
     "h",
     "library_runner",
     "m",
@@ -322,6 +338,7 @@ __all__ = [
     "s",
     "services",
     "singer_catalog",
+    "singer_sdk",
     "singer_state",
     "singer_tap",
     "singer_target",

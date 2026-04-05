@@ -7,119 +7,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 
 from flext_cli import FlextCliTypes
 
-from flext_meltano import c
-
 
 class FlextMeltanoTypingsDomains:
-    """Domain-specific type definitions for Meltano subsystems."""
+    """Domain-specific type definitions for Meltano subsystems.
 
-    class Dbt:
-        """DBT transformation complex types namespace."""
+    All aliases are FLAT namespace with descriptive prefixes.
+    No nested classes. No duplicates. No simple aliases to existing ``t.*``.
+    """
 
-        type ModelConfiguration = Mapping[str, FlextCliTypes.Scalar | None]
-        type TestConfiguration = FlextCliTypes.AttributeMapping
-        type ProfileConfiguration = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.Scalar | None],
-        ]
-        type ProjectConfiguration = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type RunResults = Mapping[
-            str,
-            Sequence[Mapping[str, FlextCliTypes.Scalar | None]],
-        ]
-        type ManifestData = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type Project = Mapping[str, str | bool | FlextCliTypes.StrSequence]
-
-    class Project:
-        """Meltano-specific project types."""
-
-        type ProjectConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type ProjectMetadata = Mapping[str, FlextCliTypes.Scalar | None]
-        type MeltanoProjectType = c.Meltano.MeltanoProjectType
-        type MeltanoProjectConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type PipelineConfig = Mapping[
-            str, FlextCliTypes.Scalar | FlextCliTypes.StrSequence
-        ]
-        type SingerConfig = Mapping[str, FlextCliTypes.Scalar | None]
-        type DbtConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-
-    class Bridge:
-        """Bridge operation complex types namespace."""
-
-        type BridgeMessage = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type BridgeResponse = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type VersionInfo = FlextCliTypes.HeaderMapping
-        type ConnectionInfo = FlextCliTypes.ConfigurationMapping
-        type BridgeConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type BridgeStatus = Mapping[str, FlextCliTypes.Scalar | None]
-
-    class CLI:
-        """CLI operation complex types namespace."""
-
-        type Command = FlextCliTypes.StrSequence
-        type ProcessResult = Mapping[
-            str, FlextCliTypes.Scalar | FlextCliTypes.StrSequence
-        ]
-        type CommandResult = FlextCliTypes.ConfigurationMapping
-        type ExecutionResult = Mapping[str, FlextCliTypes.Scalar | None]
-        type CLIStatus = FlextCliTypes.FeatureFlagMapping
-
-    class ELT:
-        """ELT pipeline complex types namespace."""
-
-        type PipelineResult = Mapping[
-            str,
-            FlextCliTypes.Scalar | FlextCliTypes.ScalarList | None,
-        ]
-        type ExtractConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type LoadConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type TransformConfig = Mapping[
-            str,
-            Mapping[str, FlextCliTypes.ContainerValue] | None,
-        ]
-        type ExtractionResult = Mapping[str, FlextCliTypes.Scalar | None]
-        type LoadingResult = Mapping[str, FlextCliTypes.Scalar | None]
-        type TransformationResult = Mapping[str, FlextCliTypes.Scalar | None]
-
-    class Processing:
-        """Meltano-specific processing types."""
-
-        type DbtTransformationResult = FlextCliTypes.MutableContainerMapping
-        type SingerProcessingResult = FlextCliTypes.MutableContainerMapping
-        type SingerExecutionResult = FlextCliTypes.MutableContainerMapping
-        type EltPipelineResult = FlextCliTypes.MutableContainerMapping
-        type Headers = FlextCliTypes.StrMapping
+    type DbtManifestData = Mapping[
+        str,
+        Mapping[str, FlextCliTypes.ContainerValue] | None,
+    ]
+    type DbtProject = Mapping[str, str | bool | FlextCliTypes.StrSequence]

@@ -78,7 +78,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         """Discover plugins from Meltano Hub using native API."""
         try:
             self.logger.info("Discovering Meltano plugins")
-            working_project: FlextMeltanoProjectService | t.Meltano.Dbt.Project
+            working_project: FlextMeltanoProjectService | t.Meltano.DbtProject
             if project:
                 working_project = project
             else:

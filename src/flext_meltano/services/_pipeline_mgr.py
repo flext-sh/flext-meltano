@@ -31,7 +31,7 @@ class FlextMeltanoPipelineManager(
     Handles pipeline-related CLI commands using composition and r[T].
     """
 
-    def __init__(self, cli: _PipelineCli) -> None:
+    def __init__(self, cli: p.Meltano.PipelineCli) -> None:
         """Initialize pipeline manager with CLI reference."""
         super().__init__()
         self.cli = cli
@@ -41,7 +41,7 @@ class FlextMeltanoPipelineManager(
         """Handle pipeline command using composition."""
         if u.Meltano.is_help_request(args):
             self.cli.show_pipeline_help()
-            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand = args[0]
         subcommand_args = args[1:]
         handler_result = self._get_pipeline_handler(subcommand)
@@ -66,7 +66,7 @@ class FlextMeltanoPipelineManager(
             ]
             | None
         ) = None
-        if len(_args) >= c.Meltano.CliDefaults.MIN_ARGS_WITH_CONFIG:
+        if len(_args) >= c.Meltano.CLI_DEFAULT_MIN_ARGS_WITH_CONFIG:
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
                     _args[1],
@@ -98,12 +98,12 @@ class FlextMeltanoPipelineManager(
     ) -> r[Callable[[t.StrSequence], r[str]]]:
         """Get pipeline operation handler."""
         operation_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
-            c.Meltano.Enums.PipelineCommand.CREATE: self._create_pipeline,
-            c.Meltano.Enums.PipelineCommand.RUN: self._run_pipeline,
-            c.Meltano.Enums.PipelineCommand.LIST: self._list_pipelines,
-            c.Meltano.Enums.PipelineCommand.STATUS: self._get_pipeline_status,
-            c.Meltano.Enums.PipelineCommand.STOP: self._stop_pipeline,
-            c.Meltano.Enums.PipelineCommand.DELETE: self._delete_pipeline,
+            c.Meltano.PipelineCommand.CREATE: self._create_pipeline,
+            c.Meltano.PipelineCommand.RUN: self._run_pipeline,
+            c.Meltano.PipelineCommand.LIST: self._list_pipelines,
+            c.Meltano.PipelineCommand.STATUS: self._get_pipeline_status,
+            c.Meltano.PipelineCommand.STOP: self._stop_pipeline,
+            c.Meltano.PipelineCommand.DELETE: self._delete_pipeline,
         }
         handler = operation_map.get(subcommand)
         if handler is None:

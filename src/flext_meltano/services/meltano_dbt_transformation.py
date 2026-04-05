@@ -25,15 +25,15 @@ class FlextMeltanoDbtTransformationRunner:
         logger: p.Logger,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> r[t.Meltano.Processing.DbtTransformationResult]:
+    ) -> r[t.MutableContainerMapping]:
         """Run DBT ``run`` and normalize output into transformation contract."""
         try:
             args: MutableSequence[str] = []
             if models:
-                args.extend([c.Meltano.Commands.MODELS_OPTION, *models])
-            result = executor.execute_dbt_command(c.Meltano.Dbt.COMMAND_RUN, args)
+                args.extend([c.Meltano.CMD_MODELS_OPTION, *models])
+            result = executor.execute_dbt_command(c.Meltano.DBT_COMMAND_RUN, args)
             if result.is_failure:
-                return r[t.Meltano.Processing.DbtTransformationResult].fail(
+                return r[t.MutableContainerMapping].fail(
                     result.error or "DBT transformation failed",
                 )
             execution_result = result.value
@@ -46,15 +46,15 @@ class FlextMeltanoDbtTransformationRunner:
                 },
                 duration_field="execution_time",
             )
-            dbt_result: t.Meltano.Processing.DbtTransformationResult = {
+            dbt_result: t.MutableContainerMapping = {
                 str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
                 for k, v in payload.items()
             }
-            return r[t.Meltano.Processing.DbtTransformationResult].ok(dbt_result)
+            return r[t.MutableContainerMapping].ok(dbt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             error_msg = f"DBT transformation failed: {e}"
             logger.exception(error_msg)
-            return r[t.Meltano.Processing.DbtTransformationResult].fail(error_msg)
+            return r[t.MutableContainerMapping].fail(error_msg)
 
 
 __all__ = ["FlextMeltanoDbtTransformationRunner"]

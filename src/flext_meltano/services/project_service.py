@@ -97,7 +97,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         self,
         project_id: str | None = None,
         prefix: str = "flext_meltano_",
-    ) -> r[t.Meltano.Dbt.Project]:
+    ) -> r[t.Meltano.DbtProject]:
         """Create temporary Meltano project with railway-oriented validation."""
         params_r2: r[t.StrMapping] = self._validate_project_parameters(
             project_id, prefix
@@ -117,18 +117,18 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def build_service_execution_payload(
         service_type: str,
         meltano_config: FlextMeltanoSettings,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
+    ) -> r[t.ContainerMapping]:
         """Build normalized execution payload for service health responses."""
-        payload: t.Meltano.MeltanoConfigDict = u.Meltano.build_status_payload(
-            c.Meltano.Enums.OperationStatus.READY,
+        payload: t.ContainerMapping = u.Meltano.build_status_payload(
+            c.Meltano.OperationStatus.READY,
             extra_fields={"service_type": service_type},
             config=meltano_config,
             config_field="config",
         )
-        return r[t.Meltano.MeltanoConfigDict].ok(payload)
+        return r[t.ContainerMapping].ok(payload)
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
             "flext_meltano_project_service", self.settings
@@ -138,9 +138,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return result
         error_msg = result.error or "Project service execution failed"
         self.logger.error(error_msg)
-        return r[t.Meltano.MeltanoConfigDict].fail(error_msg)
+        return r[t.ContainerMapping].fail(error_msg)
 
-    def initialize_project(self, project_root: Path) -> r[t.Meltano.Dbt.Project]:
+    def initialize_project(self, project_root: Path) -> r[t.Meltano.DbtProject]:
         """Initialize Meltano project using railway pattern validation chain."""
         vpath_r: r[Path] = self._validate_project_path(project_root)
         vcfg_r: r[Path] = vpath_r.flat_map(u.Meltano.validate_meltano_config_exists)

@@ -121,13 +121,13 @@ class FlextMeltanoModelsContext:
                 raise ValueError(msg)
             if (
                 v.startswith("target-")
-                and len(v) < c.Meltano.Plugin.MIN_TARGET_PLUGIN_NAME_LENGTH
+                and len(v) < c.Meltano.PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH
             ):
                 msg = "Target plugin names must be at least 8 characters"
                 raise ValueError(msg)
             if (
                 v.startswith("tap-")
-                and len(v) < c.Meltano.Plugin.MIN_TAP_PLUGIN_NAME_LENGTH
+                and len(v) < c.Meltano.PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH
             ):
                 msg = "Source component names must be at least 5 characters"
                 raise ValueError(msg)

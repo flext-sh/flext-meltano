@@ -98,12 +98,9 @@ class FlextMeltanoModelsTransformations:
                 + u.count(self.seed_paths)
                 + u.count(self.macro_paths)
             )
-            if total_path_count <= c.Meltano.ModelValidation.STRUCTURE_SIMPLE_MAX_PATHS:
+            if total_path_count <= c.Meltano.VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS:
                 return "simple"
-            if (
-                total_path_count
-                <= c.Meltano.ModelValidation.STRUCTURE_MODERATE_MAX_PATHS
-            ):
+            if total_path_count <= c.Meltano.VALIDATION_STRUCTURE_MODERATE_MAX_PATHS:
                 return "moderate"
             return "complex"
 
@@ -164,9 +161,9 @@ class FlextMeltanoModelsTransformations:
             total_scope = len(self.models) + len(self.exclude)
             if total_scope == 0:
                 return "full_project"
-            if total_scope <= c.Meltano.ModelValidation.DBT_SIMPLE_EXECUTION_THRESHOLD:
+            if total_scope <= c.Meltano.VALIDATION_DBT_SIMPLE_EXECUTION_THRESHOLD:
                 return "simple"
-            if total_scope <= c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD:
+            if total_scope <= c.Meltano.VALIDATION_MAX_WORKERS_THRESHOLD:
                 return "moderate"
             return "complex"
 
@@ -184,7 +181,7 @@ class FlextMeltanoModelsTransformations:
         def validate_execution_consistency(self) -> Self:
             """Validate execution consistency."""
             max_threads = (
-                c.Meltano.ModelValidation.MAX_WORKERS_THRESHOLD // 3
+                c.Meltano.VALIDATION_MAX_WORKERS_THRESHOLD // 3
             )  # ~33, reasonable thread limit
             if self.threads > max_threads:
                 msg = f"Thread count cannot exceed {max_threads}"

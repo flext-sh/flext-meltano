@@ -27,7 +27,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_minimal(self) -> None:
         """Test tap run translation with minimal parameters."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             discover=False,
         )
@@ -38,7 +38,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_discover_mode(self) -> None:
         """Test tap run translation in discover mode."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             discover=True,
         )
@@ -49,7 +49,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_with_config(self) -> None:
         """Test tap run translation with config file."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             config_file="/path/to/config.json",
             discover=False,
@@ -61,7 +61,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_with_catalog(self) -> None:
         """Test tap run translation with catalog file."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             catalog_file="/path/to/catalog.json",
             discover=False,
@@ -73,7 +73,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_with_state(self) -> None:
         """Test tap run translation with state file."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             state_file="/path/to/state.json",
             discover=False,
@@ -85,7 +85,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_with_all_parameters(self) -> None:
         """Test tap run translation with all parameters."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             config_file="/path/to/config.json",
             catalog_file="/path/to/catalog.json",
@@ -102,7 +102,7 @@ class TestFlextMeltanoSingerCliTranslatorTapRun:
 
     def test_translate_tap_run_discover_ignores_other_params(self) -> None:
         """Test that discover mode returns early, ignoring other parameters."""
-        params = m.Meltano.CliParameters.DataSourceParams(
+        params = m.Meltano.CliDataSourceParams(
             source_name="tap-postgres",
             config_file="/path/to/config.json",
             catalog_file="/path/to/catalog.json",
@@ -119,7 +119,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
 
     def test_translate_target_run_minimal(self) -> None:
         """Test target run translation with minimal parameters."""
-        params = m.Meltano.CliParameters.DataSinkParams(sink_name="target-postgres")
+        params = m.Meltano.CliDataSinkParams(sink_name="target-postgres")
         result = FlextMeltanoSingerCliTranslator.translate_target_run(params)
         tm.ok(result)
         command = result.value
@@ -127,7 +127,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
 
     def test_translate_target_run_with_config(self) -> None:
         """Test target run translation with config file."""
-        params = m.Meltano.CliParameters.DataSinkParams(
+        params = m.Meltano.CliDataSinkParams(
             sink_name="target-postgres",
             config_file="/path/to/config.json",
         )
@@ -138,7 +138,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
 
     def test_translate_target_run_with_input(self) -> None:
         """Test target run translation with input file."""
-        params = m.Meltano.CliParameters.DataSinkParams(
+        params = m.Meltano.CliDataSinkParams(
             sink_name="target-postgres",
             input_file="/path/to/input.jsonl",
         )
@@ -149,7 +149,7 @@ class TestFlextMeltanoSingerCliTranslatorTargetRun:
 
     def test_translate_target_run_with_all_parameters(self) -> None:
         """Test target run translation with all parameters."""
-        params = m.Meltano.CliParameters.DataSinkParams(
+        params = m.Meltano.CliDataSinkParams(
             sink_name="target-postgres",
             config_file="/path/to/config.json",
             input_file="/path/to/input.jsonl",
@@ -174,7 +174,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_minimal(self) -> None:
         """Test pipeline run translation with minimal parameters."""
-        params = m.Meltano.CliParameters.PipelineParams(
+        params = m.Meltano.CliPipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
         )
@@ -186,7 +186,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_source_config(self) -> None:
         """Test pipeline run translation with source config."""
-        params = m.Meltano.CliParameters.PipelineParams(
+        params = m.Meltano.CliPipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             source_config="/path/to/tap-config.json",
@@ -206,7 +206,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_sink_config(self) -> None:
         """Test pipeline run translation with sink config."""
-        params = m.Meltano.CliParameters.PipelineParams(
+        params = m.Meltano.CliPipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             sink_config="/path/to/target-config.json",
@@ -226,7 +226,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_catalog(self) -> None:
         """Test pipeline run translation with catalog file."""
-        params = m.Meltano.CliParameters.PipelineParams(
+        params = m.Meltano.CliPipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             catalog_file="/path/to/catalog.json",
@@ -242,7 +242,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_state(self) -> None:
         """Test pipeline run translation with state file."""
-        params = m.Meltano.CliParameters.PipelineParams(
+        params = m.Meltano.CliPipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             state_file="/path/to/state.json",
@@ -255,7 +255,7 @@ class TestFlextMeltanoSingerCliTranslatorPipelineRun:
 
     def test_translate_pipeline_run_with_all_parameters(self) -> None:
         """Test pipeline run translation with all parameters."""
-        params = m.Meltano.CliParameters.PipelineParams(
+        params = m.Meltano.CliPipelineParams(
             source_name="tap-postgres",
             sink_name="target-postgres",
             source_config="/path/to/tap-config.json",
@@ -293,7 +293,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_minimal(self) -> None:
         """Test DBT run translation with minimal parameters."""
-        params = m.Meltano.CliParameters.TransformationParams(
+        params = m.Meltano.CliTransformationParams(
             project_dir="/path/to/dbt/project",
         )
         result = FlextMeltanoSingerCliTranslator.translate_dbt_run(params)
@@ -303,7 +303,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_models(self) -> None:
         """Test DBT run translation with models parameter."""
-        params = m.Meltano.CliParameters.TransformationParams(
+        params = m.Meltano.CliTransformationParams(
             project_dir="/path/to/dbt/project",
             models="users orders",
         )
@@ -324,7 +324,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_select(self) -> None:
         """Test DBT run translation with select parameter."""
-        params = m.Meltano.CliParameters.TransformationParams(
+        params = m.Meltano.CliTransformationParams(
             project_dir="/path/to/dbt/project",
             select="tag:daily",
         )
@@ -345,7 +345,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_exclude(self) -> None:
         """Test DBT run translation with exclude parameter."""
-        params = m.Meltano.CliParameters.TransformationParams(
+        params = m.Meltano.CliTransformationParams(
             project_dir="/path/to/dbt/project",
             exclude="tag:deprecated",
         )
@@ -366,7 +366,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_full_refresh(self) -> None:
         """Test DBT run translation with full refresh flag."""
-        params = m.Meltano.CliParameters.TransformationParams(
+        params = m.Meltano.CliTransformationParams(
             project_dir="/path/to/dbt/project",
             full_refresh=True,
         )
@@ -386,7 +386,7 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 
     def test_translate_dbt_run_with_all_parameters(self) -> None:
         """Test DBT run translation with all parameters."""
-        params = m.Meltano.CliParameters.TransformationParams(
+        params = m.Meltano.CliTransformationParams(
             project_dir="/path/to/dbt/project",
             models="users orders",
             select="tag:daily",

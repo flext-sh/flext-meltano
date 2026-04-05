@@ -67,7 +67,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> t.Meltano.MeltanoConfigDict:
+def meltano_yml_config() -> t.ContainerMapping:
     """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
@@ -128,8 +128,8 @@ def meltano_yml_config() -> t.Meltano.MeltanoConfigDict:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: t.Meltano.MeltanoConfigDict,
-) -> t.Meltano.MeltanoConfigDict:
+    meltano_yml_config: t.ContainerMapping,
+) -> t.ContainerMapping:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     FlextCliUtilities.Cli.yaml_dump(meltano_yml, meltano_yml_config)
@@ -144,7 +144,7 @@ def meltano_project(
 
 
 @pytest.fixture
-def tap_csv_config() -> t.Meltano.MeltanoConfigDict:
+def tap_csv_config() -> t.ContainerMapping:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -159,7 +159,7 @@ def tap_csv_config() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def target_csv_config() -> t.Meltano.MeltanoConfigDict:
+def target_csv_config() -> t.ContainerMapping:
     """Target CSV configuration for testing."""
     return {"destination_path": "output", "file_format": "csv", "delimiter": ","}
 
@@ -194,7 +194,7 @@ def meltano_invoke_args() -> t.StrSequence:
 
 
 @pytest.fixture
-def singer_schema() -> t.Meltano.MeltanoConfigDict:
+def singer_schema() -> t.ContainerMapping:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -213,7 +213,7 @@ def singer_schema() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def singer_records() -> Sequence[t.Meltano.MeltanoConfigDict]:
+def singer_records() -> Sequence[t.ContainerMapping]:
     """Sample Singer records for testing."""
     return [
         {
@@ -240,7 +240,7 @@ def singer_records() -> Sequence[t.Meltano.MeltanoConfigDict]:
 
 
 @pytest.fixture
-def singer_state() -> t.Meltano.MeltanoConfigDict:
+def singer_state() -> t.ContainerMapping:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -256,7 +256,7 @@ def singer_state() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def pipeline_execution_config() -> t.Meltano.MeltanoConfigDict:
+def pipeline_execution_config() -> t.ContainerMapping:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -269,7 +269,7 @@ def pipeline_execution_config() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def test_environment_config() -> t.Meltano.MeltanoConfigDict:
+def test_environment_config() -> t.ContainerMapping:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -281,7 +281,7 @@ def test_environment_config() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def sample_schedule_config() -> t.Meltano.MeltanoConfigDict:
+def sample_schedule_config() -> t.ContainerMapping:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -294,7 +294,7 @@ def sample_schedule_config() -> t.Meltano.MeltanoConfigDict:
 
 
 @pytest.fixture
-def job_run_config() -> t.Meltano.MeltanoConfigDict:
+def job_run_config() -> t.ContainerMapping:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -357,22 +357,22 @@ class MockMeltanoService:
 
     @staticmethod
     def create_project(
-        _config: t.Meltano.MeltanoConfigDict,
-    ) -> t.Meltano.MeltanoConfigDict:
+        _config: t.ContainerMapping,
+    ) -> t.ContainerMapping:
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
     def install_plugin(
         _plugin_type: str,
         plugin_name: str,
-    ) -> t.Meltano.MeltanoConfigDict:
+    ) -> t.ContainerMapping:
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
     def run_pipeline(
         _extractor: str,
         _loader: str,
-    ) -> t.Meltano.MeltanoConfigDict:
+    ) -> t.ContainerMapping:
         return {"execution_id": "test-execution", "status": "running"}
 
 
@@ -385,16 +385,16 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, config: t.Meltano.MeltanoConfigDict) -> None:
+    def __init__(self, config: t.ContainerMapping) -> None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
-    def discover(self) -> t.Meltano.MeltanoConfigDict:
+    def discover(self) -> t.ContainerMapping:
         _ = self.config
         return {"streams": [{"stream": "test_entity", "schema": {}}]}
 
-    def extract(self) -> Sequence[t.Meltano.MeltanoConfigDict]:
+    def extract(self) -> Sequence[t.ContainerMapping]:
         _ = self.config
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -408,15 +408,15 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, config: t.Meltano.MeltanoConfigDict) -> None:
+    def __init__(self, config: t.ContainerMapping) -> None:
         """Initialize the instance."""
         super().__init__()
         self.config = config
 
     def load(
         self,
-        records: Sequence[t.Meltano.MeltanoConfigDict],
-    ) -> t.Meltano.MeltanoConfigDict:
+        records: Sequence[t.ContainerMapping],
+    ) -> t.ContainerMapping:
         _ = self.config
         return {"records_loaded": len(records), "status": "success"}
 

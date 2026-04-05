@@ -7,141 +7,136 @@ from typing import Annotated
 from flext_cli import FlextCliModels
 from pydantic import Field
 
-from flext_core import FlextModels
-
 
 class FlextMeltanoModelsCliParams:
     """CLI parameter models for pipeline operations."""
 
-    class CliParameters(FlextModels):
-        """Base class for all CLI parameter models."""
+    class CliDataSourceParams(FlextCliModels.Entity):
+        """Generic parameters for data source operations."""
 
-        class DataSourceParams(FlextCliModels.Entity):
-            """Generic parameters for data source operations."""
+        source_name: Annotated[
+            str,
+            Field(description="Name of the data source"),
+        ]
+        config_file: Annotated[
+            str | None,
+            Field(
+                default=None,
+                description="Path to source configuration file",
+            ),
+        ] = None
+        catalog_file: Annotated[
+            str | None,
+            Field(
+                default=None,
+                description="Path to catalog file for schema discovery",
+            ),
+        ] = None
+        state_file: Annotated[
+            str | None,
+            Field(
+                default=None,
+                description="Path to state file for incremental sync",
+            ),
+        ] = None
+        discover: Annotated[
+            bool,
+            Field(
+                default=False,
+                description="Run in discovery mode to output schema",
+            ),
+        ] = False
 
-            source_name: Annotated[
-                str,
-                Field(description="Name of the data source"),
-            ]
-            config_file: Annotated[
-                str | None,
-                Field(
-                    default=None,
-                    description="Path to source configuration file",
-                ),
-            ] = None
-            catalog_file: Annotated[
-                str | None,
-                Field(
-                    default=None,
-                    description="Path to catalog file for schema discovery",
-                ),
-            ] = None
-            state_file: Annotated[
-                str | None,
-                Field(
-                    default=None,
-                    description="Path to state file for incremental sync",
-                ),
-            ] = None
-            discover: Annotated[
-                bool,
-                Field(
-                    default=False,
-                    description="Run in discovery mode to output schema",
-                ),
-            ] = False
+    class CliDataSinkParams(FlextCliModels.Entity):
+        """Generic parameters for data sink operations."""
 
-        class DataSinkParams(FlextCliModels.Entity):
-            """Generic parameters for data sink operations."""
+        sink_name: Annotated[str, Field(description="Name of the data sink")]
+        config_file: Annotated[
+            str | None,
+            Field(default=None, description="Path to sink configuration file"),
+        ] = None
+        input_file: Annotated[
+            str | None,
+            Field(
+                default=None,
+                description="Path to input data file (default: stdin)",
+            ),
+        ] = None
 
-            sink_name: Annotated[str, Field(description="Name of the data sink")]
-            config_file: Annotated[
-                str | None,
-                Field(default=None, description="Path to sink configuration file"),
-            ] = None
-            input_file: Annotated[
-                str | None,
-                Field(
-                    default=None,
-                    description="Path to input data file (default: stdin)",
-                ),
-            ] = None
+    class CliPipelineParams(FlextCliModels.Entity):
+        """Generic parameters for pipeline operations."""
 
-        class PipelineParams(FlextCliModels.Entity):
-            """Generic parameters for pipeline operations."""
+        source_name: Annotated[
+            str,
+            Field(description="Name of the data source"),
+        ]
+        sink_name: Annotated[str, Field(description="Name of the data sink")]
+        source_config: Annotated[
+            str | None,
+            Field(
+                default=None,
+                description="Path to source configuration file",
+            ),
+        ] = None
+        sink_config: Annotated[
+            str | None,
+            Field(default=None, description="Path to sink configuration file"),
+        ] = None
+        catalog_file: Annotated[
+            str | None,
+            Field(default=None, description="Path to catalog file"),
+        ] = None
+        state_file: Annotated[
+            str | None,
+            Field(default=None, description="Path to state file"),
+        ] = None
+        state_output_file: Annotated[
+            str | None,
+            Field(default=None, description="Path to write final state"),
+        ] = None
 
-            source_name: Annotated[
-                str,
-                Field(description="Name of the data source"),
-            ]
-            sink_name: Annotated[str, Field(description="Name of the data sink")]
-            source_config: Annotated[
-                str | None,
-                Field(
-                    default=None,
-                    description="Path to source configuration file",
-                ),
-            ] = None
-            sink_config: Annotated[
-                str | None,
-                Field(default=None, description="Path to sink configuration file"),
-            ] = None
-            catalog_file: Annotated[
-                str | None,
-                Field(default=None, description="Path to catalog file"),
-            ] = None
-            state_file: Annotated[
-                str | None,
-                Field(default=None, description="Path to state file"),
-            ] = None
-            state_output_file: Annotated[
-                str | None,
-                Field(default=None, description="Path to write final state"),
-            ] = None
+    class CliTransformationParams(FlextCliModels.Entity):
+        """Generic parameters for transformation operations."""
 
-        class TransformationParams(FlextCliModels.Entity):
-            """Generic parameters for transformation operations."""
+        project_dir: Annotated[
+            str,
+            Field(description="Transformation project directory"),
+        ]
+        models: Annotated[
+            str | None,
+            Field(
+                default=None,
+                description="Specific models to run (space-separated)",
+            ),
+        ] = None
+        select: Annotated[
+            str | None,
+            Field(default=None, description="Selection syntax for models"),
+        ] = None
+        exclude: Annotated[
+            str | None,
+            Field(default=None, description="Exclusion syntax for models"),
+        ] = None
+        full_refresh: Annotated[
+            bool,
+            Field(default=False, description="Run with full refresh"),
+        ] = False
 
-            project_dir: Annotated[
-                str,
-                Field(description="Transformation project directory"),
-            ]
-            models: Annotated[
-                str | None,
-                Field(
-                    default=None,
-                    description="Specific models to run (space-separated)",
-                ),
-            ] = None
-            select: Annotated[
-                str | None,
-                Field(default=None, description="Selection syntax for models"),
-            ] = None
-            exclude: Annotated[
-                str | None,
-                Field(default=None, description="Exclusion syntax for models"),
-            ] = None
-            full_refresh: Annotated[
-                bool,
-                Field(default=False, description="Run with full refresh"),
-            ] = False
+    class CliPluginInstallParams(FlextCliModels.Entity):
+        """Generic parameters for plugin installation."""
 
-        class PluginInstallParams(FlextCliModels.Entity):
-            """Generic parameters for plugin installation."""
-
-            plugin_type: Annotated[
-                str,
-                Field(description="Type of plugin (source, sink, transformer)"),
-            ]
-            plugin_name: Annotated[
-                str,
-                Field(description="Name of the plugin to install"),
-            ]
-            variant: Annotated[
-                str | None,
-                Field(default=None, description="Specific plugin variant"),
-            ] = None
+        plugin_type: Annotated[
+            str,
+            Field(description="Type of plugin (source, sink, transformer)"),
+        ]
+        plugin_name: Annotated[
+            str,
+            Field(description="Name of the plugin to install"),
+        ]
+        variant: Annotated[
+            str | None,
+            Field(default=None, description="Specific plugin variant"),
+        ] = None
 
     class PipelineRunParams(FlextCliModels.Entity):
         """Parameters for pipeline run operations."""

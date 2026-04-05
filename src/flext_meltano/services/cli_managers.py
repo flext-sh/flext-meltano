@@ -55,13 +55,13 @@ class FlextMeltanoCommandRouter:
     ) -> r[Callable[[t.StrSequence], r[str]]]:
         """Get command handler for given command."""
         command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
-            c.Meltano.Enums.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
-            c.Meltano.Enums.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
-            c.Meltano.Enums.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,
-            c.Meltano.Enums.CliCommand.DBT: self.cli.dbt_manager.handle_command,
-            c.Meltano.Enums.CliCommand.PLUGIN: self.cli.plugin_manager.handle_command,
-            c.Meltano.Enums.CliCommand.STATUS: self.cli.status_manager.handle_command,
-            c.Meltano.Enums.CliCommand.VERSION: self.cli.status_manager.handle_version_command,
+            c.Meltano.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
+            c.Meltano.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
+            c.Meltano.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,
+            c.Meltano.CliCommand.DBT: self.cli.dbt_manager.handle_command,
+            c.Meltano.CliCommand.PLUGIN: self.cli.plugin_manager.handle_command,
+            c.Meltano.CliCommand.STATUS: self.cli.status_manager.handle_command,
+            c.Meltano.CliCommand.VERSION: self.cli.status_manager.handle_version_command,
         }
         handler = command_map.get(command)
         if handler is None:
@@ -84,11 +84,11 @@ class FlextMeltanoSingerManager:
         """Handle Singer command by routing to tap or target subcommands."""
         if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
-            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand, subcommand_args = args[0], args[1:]
-        if subcommand == c.Meltano.Enums.CliCommand.TAP:
+        if subcommand == c.Meltano.CliCommand.TAP:
             return self.handle_tap_command(subcommand_args)
-        if subcommand == c.Meltano.Enums.CliCommand.TARGET:
+        if subcommand == c.Meltano.CliCommand.TARGET:
             return self.handle_target_command(subcommand_args)
         return r[str].fail(f"Unknown Singer command: {subcommand}")
 
@@ -96,14 +96,14 @@ class FlextMeltanoSingerManager:
         """Handle tap command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
-            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_tap_operation(args[0], args[1:])
 
     def handle_target_command(self, args: t.StrSequence) -> r[str]:
         """Handle target command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_target_help()
-            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_target_operation(args[0], args[1:])
 
     def _execute_tap_operation(self, operation: str, _args: t.StrSequence) -> r[str]:

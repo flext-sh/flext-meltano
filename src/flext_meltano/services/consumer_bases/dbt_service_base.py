@@ -172,36 +172,36 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def load_manifest(
         self, manifest_path: Path | None = None
-    ) -> r[t.Meltano.Dbt.ManifestData]:
+    ) -> r[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
         try:
             path = manifest_path
             if path is None:
                 if self._dbt_project_root is None:
-                    return r[t.Meltano.Dbt.ManifestData].fail("No project root set")
+                    return r[t.Meltano.DbtManifestData].fail("No project root set")
                 path = self._dbt_project_root / "target" / "manifest.json"
             if not path.exists():
-                return r[t.Meltano.Dbt.ManifestData].fail(str(path))
+                return r[t.Meltano.DbtManifestData].fail(str(path))
             parsed = m.Meltano.DbtManifest.model_validate_json(
                 path.read_text(encoding="utf-8"),
             )
-            manifest_data: t.Meltano.Dbt.ManifestData = {
+            manifest_data: t.Meltano.DbtManifestData = {
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }
-            return r[t.Meltano.Dbt.ManifestData].ok(manifest_data)
+            return r[t.Meltano.DbtManifestData].ok(manifest_data)
         except (ValueError, TypeError, KeyError, OSError) as exc:
-            return r[t.Meltano.Dbt.ManifestData].fail(str(exc))
+            return r[t.Meltano.DbtManifestData].fail(str(exc))
 
-    def get_models(self) -> r[Sequence[t.Meltano.Dbt.ModelConfiguration]]:
+    def get_models(self) -> r[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
         if manifest_result.is_failure:
-            return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].fail(
+            return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
                 manifest_result.error or "Manifest load failed"
             )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
-            models: Sequence[t.Meltano.Dbt.ModelConfiguration] = [
+            models: Sequence[t.Meltano.OptionalScalarMap] = [
                 {
                     "name": str(node.name),
                     "path": str(node.path),
@@ -211,14 +211,14 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 for node in manifest.nodes.values()
                 if node.resource_type == "model"
             ]
-            return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].ok(models)
+            return r[Sequence[t.Meltano.OptionalScalarMap]].ok(models)
         except (ValueError, TypeError, KeyError) as exc:
-            return r[Sequence[t.Meltano.Dbt.ModelConfiguration]].fail(str(exc))
+            return r[Sequence[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute dbt service — returns status."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
+        return r[t.ContainerMapping].ok({
             "service": self.dbt_project_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "dbt",

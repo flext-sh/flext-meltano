@@ -10,7 +10,7 @@ from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import FlextMeltanoModelsSources, c, t
 
-_INITIALIZED = c.Meltano.Enums.StreamStatus.INITIALIZED
+_INITIALIZED = c.Meltano.StreamStatus.INITIALIZED
 
 
 class FlextMeltanoModelsInstances:
@@ -44,8 +44,8 @@ class FlextMeltanoModelsInstances:
                 _INITIALIZED,
                 "configured",
                 "running",
-                c.Meltano.Enums.StreamStatus.COMPLETED,
-                c.Meltano.Enums.StreamStatus.ERROR,
+                c.Meltano.StreamStatus.COMPLETED,
+                c.Meltano.StreamStatus.ERROR,
             }
             if self.status not in valid_statuses:
                 msg = f"Status must be one of: {', '.join(valid_statuses)}"
@@ -102,15 +102,15 @@ class FlextMeltanoModelsInstances:
         def processing_status(self) -> str:
             """Processing status assessment."""
             if (
-                self.status == c.Meltano.Enums.StreamStatus.COMPLETED
+                self.status == c.Meltano.StreamStatus.COMPLETED
                 and self.records_loaded > 0
             ):
-                return c.Meltano.Enums.StreamStatus.SUCCESS
-            if self.status == c.Meltano.Enums.StreamStatus.ERROR:
-                return c.Meltano.Enums.StreamStatus.FAILED
+                return c.Meltano.StreamStatus.SUCCESS
+            if self.status == c.Meltano.StreamStatus.ERROR:
+                return c.Meltano.StreamStatus.FAILED
             if self.records_loaded > 0:
-                return c.Meltano.Enums.StreamStatus.IN_PROGRESS
-            return c.Meltano.Enums.StreamStatus.PENDING
+                return c.Meltano.StreamStatus.IN_PROGRESS
+            return c.Meltano.StreamStatus.PENDING
 
         @model_validator(mode="after")
         def validate_stream_info(self) -> Self:
@@ -118,8 +118,8 @@ class FlextMeltanoModelsInstances:
             if self.records_loaded > 0 and self.batches_processed == 0:
                 msg = "Records loaded but no batches processed"
                 raise ValueError(msg)
-            if self.status not in c.Meltano.Enums.VALID_STATUSES:
-                msg = f"Status must be one of: {', '.join(c.Meltano.Enums.VALID_STATUSES)}"
+            if self.status not in c.Meltano.VALID_STATUSES:
+                msg = f"Status must be one of: {', '.join(c.Meltano.VALID_STATUSES)}"
                 raise ValueError(msg)
             return self
 
@@ -149,9 +149,7 @@ class FlextMeltanoModelsInstances:
         @computed_field
         def active_streams(self) -> Sequence[FlextMeltanoModelsInstances.StreamInfo]:
             """Active streams for extraction."""
-            return [
-                s for s in self.streams if s.status in c.Meltano.Enums.ACTIVE_STATUSES
-            ]
+            return [s for s in self.streams if s.status in c.Meltano.ACTIVE_STATUSES]
 
         @computed_field
         def stream_count(self) -> int:

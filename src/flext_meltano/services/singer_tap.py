@@ -59,7 +59,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
                 config=config,
-                status=c.Meltano.Enums.OperationStatus.CONFIGURED,
+                status=c.Meltano.OperationStatus.CONFIGURED,
                 source_id=source_id,
             )
             self.logger.info(
@@ -134,7 +134,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             if not source_type:
                 return r[bool].fail("Source configuration must have a type")
             return r[bool].ok(value=True)
-        except c.Meltano.Singer.SAFE_EXCEPTIONS as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception(
                 "Source configuration processing failed", error=str(e)
             )
@@ -151,7 +151,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             if "properties" not in stream_def.stream_schema:
                 return r[bool].fail("Stream schema must contain properties")
             return r[bool].ok(value=True)
-        except c.Meltano.Singer.SAFE_EXCEPTIONS as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Schema validation failed", error=str(e))
             return r[bool].fail(f"Schema validation failed: {e}")
 

@@ -127,12 +127,9 @@ class FlextMeltanoModelsProjects:
             prod_envs_list: t.StrSequence = list(prod_envs)
             has_prod = u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
             env_count = u.count(self.environments)
-            if (
-                has_prod
-                and env_count >= c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT
-            ):
+            if has_prod and env_count >= c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT:
                 return "mature"
-            if env_count >= c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT:
+            if env_count >= c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT:
                 return "developing"
             return "basic"
 

@@ -18,18 +18,16 @@ class FlextMeltanoSettings(FlextSettings):
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(extra="ignore")
 
-    MELTANO_VERSION: ClassVar[str] = c.Meltano.Versions.MELTANO_REQUIRED
-    SINGER_SDK_VERSION: ClassVar[str] = c.Meltano.Versions.SINGER_SDK_REQUIRED
-    DBT_VERSION: ClassVar[str] = c.Meltano.Versions.DBT_REQUIRED
-    PROJECT_FILE: ClassVar[str] = c.Meltano.Paths.MELTANO_PROJECT_FILE
-    STATE_DIR: ClassVar[str] = c.Meltano.Paths.STATE_DIR
-    VENV_DIR: ClassVar[str] = c.Meltano.Paths.VENV_DIR
-    MELTANO_PROJECT_ROOT_ENV: ClassVar[str] = (
-        c.Meltano.EnvironmentVariables.PROJECT_ROOT
-    )
-    MELTANO_ENVIRONMENT_ENV: ClassVar[str] = c.Meltano.EnvironmentVariables.ENVIRONMENT
-    MELTANO_LOG_LEVEL_ENV: ClassVar[str] = c.Meltano.EnvironmentVariables.LOG_LEVEL
-    PIPELINES_DIR_ENV: ClassVar[str] = c.Meltano.CliDefaults.PIPELINES_ROOT_ENV
+    MELTANO_VERSION: ClassVar[str] = c.Meltano.VERSION_MELTANO_REQUIRED
+    SINGER_SDK_VERSION: ClassVar[str] = c.Meltano.VERSION_SINGER_SDK_REQUIRED
+    DBT_VERSION: ClassVar[str] = c.Meltano.VERSION_DBT_REQUIRED
+    PROJECT_FILE: ClassVar[str] = c.Meltano.PATH_MELTANO_PROJECT_FILE
+    STATE_DIR: ClassVar[str] = c.Meltano.PATH_STATE_DIR
+    VENV_DIR: ClassVar[str] = c.Meltano.PATH_VENV_DIR
+    MELTANO_PROJECT_ROOT_ENV: ClassVar[str] = c.Meltano.ENV_VAR_PROJECT_ROOT
+    MELTANO_ENVIRONMENT_ENV: ClassVar[str] = c.Meltano.ENV_VAR_ENVIRONMENT
+    MELTANO_LOG_LEVEL_ENV: ClassVar[str] = c.Meltano.ENV_VAR_LOG_LEVEL
+    PIPELINES_DIR_ENV: ClassVar[str] = c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV
 
     project_root: Annotated[
         Path,
@@ -105,15 +103,15 @@ class FlextMeltanoSettings(FlextSettings):
     def _validate_environment(cls, value: str) -> str:
         normalized = value.strip().lower()
         aliases = {
-            "dev": c.Meltano.Enums.Environment.DEVELOPMENT,
-            "test": c.Meltano.Enums.Environment.TESTING,
-            "prod": c.Meltano.Enums.Environment.PRODUCTION,
+            "dev": c.Meltano.Environment.DEVELOPMENT,
+            "test": c.Meltano.Environment.TESTING,
+            "prod": c.Meltano.Environment.PRODUCTION,
         }
         normalized = aliases.get(normalized, normalized)
         if normalized not in {
-            c.Meltano.Enums.Environment.DEVELOPMENT,
-            c.Meltano.Enums.Environment.TESTING,
-            c.Meltano.Enums.Environment.PRODUCTION,
+            c.Meltano.Environment.DEVELOPMENT,
+            c.Meltano.Environment.TESTING,
+            c.Meltano.Environment.PRODUCTION,
         }:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)
@@ -180,18 +178,18 @@ class FlextMeltanoSettings(FlextSettings):
     def get_supported_plugin_types(cls) -> t.StrSequence:
         """Return supported Meltano plugin categories."""
         return [
-            c.Meltano.Enums.PluginType.EXTRACTORS,
-            c.Meltano.Enums.PluginType.LOADERS,
-            c.Meltano.Enums.PluginType.TRANSFORMS,
+            c.Meltano.PluginType.EXTRACTORS,
+            c.Meltano.PluginType.LOADERS,
+            c.Meltano.PluginType.TRANSFORMS,
         ]
 
     @classmethod
     def get_supported_environments(cls) -> t.StrSequence:
         """Return list of valid deployment environment names."""
         return [
-            c.Meltano.Enums.Environment.DEVELOPMENT,
-            c.Meltano.Enums.Environment.TESTING,
-            c.Meltano.Enums.Environment.PRODUCTION,
+            c.Meltano.Environment.DEVELOPMENT,
+            c.Meltano.Environment.TESTING,
+            c.Meltano.Environment.PRODUCTION,
         ]
 
     @classmethod
@@ -214,15 +212,15 @@ class FlextMeltanoSettings(FlextSettings):
         """Create settings for a named runtime environment."""
         normalized = env_type.strip().lower()
         aliases = {
-            "dev": c.Meltano.Enums.Environment.DEVELOPMENT,
-            "test": c.Meltano.Enums.Environment.TESTING,
-            "prod": c.Meltano.Enums.Environment.PRODUCTION,
+            "dev": c.Meltano.Environment.DEVELOPMENT,
+            "test": c.Meltano.Environment.TESTING,
+            "prod": c.Meltano.Environment.PRODUCTION,
         }
         normalized = aliases.get(normalized, normalized)
         if normalized not in {
-            c.Meltano.Enums.Environment.DEVELOPMENT,
-            c.Meltano.Enums.Environment.TESTING,
-            c.Meltano.Enums.Environment.PRODUCTION,
+            c.Meltano.Environment.DEVELOPMENT,
+            c.Meltano.Environment.TESTING,
+            c.Meltano.Environment.PRODUCTION,
         }:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)

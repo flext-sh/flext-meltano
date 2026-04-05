@@ -42,10 +42,10 @@ class FlextMeltanoServiceBase(FlextService[t.ContainerMapping]):
     service_version: Annotated[
         t.NonEmptyStr,
         Field(
-            default=c.Meltano.Defaults.SERVICE_VERSION,
+            default=c.Meltano.DEFAULT_SERVICE_VERSION,
             description="Canonical Meltano service version",
         ),
-    ] = c.Meltano.Defaults.SERVICE_VERSION
+    ] = c.Meltano.DEFAULT_SERVICE_VERSION
     source_name: Annotated[
         str | None,
         Field(default=None, description="Optional source specialization name"),

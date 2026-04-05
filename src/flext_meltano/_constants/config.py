@@ -7,24 +7,25 @@ from typing import Final
 
 
 class FlextMeltanoConstantsConfig:
-    """Meltano configuration, defaults, and operational constants."""
+    """Meltano configuration, defaults, and operational constants.
 
-    class Logging:
-        """Logging configuration constants."""
+    All constants are flat with descriptive prefixes to explain their usage.
+    """
 
-        DEFAULT_LEVEL: Final[str] = "INFO"
-        INCLUDE_TRANSFORM_NAME: Final[bool] = True
-        INCLUDE_RECORD_COUNT: Final[bool] = True
-        LOG_FORMAT: Final[str] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
-        MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
+    # Logging
+    LOGGING_DEFAULT_LEVEL: Final[str] = "INFO"
+    LOGGING_INCLUDE_TRANSFORM_NAME: Final[bool] = True
+    LOGGING_INCLUDE_RECORD_COUNT: Final[bool] = True
+    LOGGING_LOG_FORMAT: Final[str] = (
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
+    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
 
-    class Service:
-        """Service validation constants."""
-
-        MIN_NAME_LENGTH: Final[int] = 3
-        MAX_NAME_LENGTH: Final[int] = 50
-        VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
+    # Service
+    SERVICE_MIN_NAME_LENGTH: Final[int] = 3
+    SERVICE_MAX_NAME_LENGTH: Final[int] = 50
+    SERVICE_VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
 
     @unique
     class MeltanoProjectType(StrEnum):
@@ -46,106 +47,79 @@ class FlextMeltanoConstantsConfig:
         DATA_LOADER = "data-loader"
         TRANSFORMATION_SERVICE = "transformation-service"
 
-    class Environments:
-        """Valid environment sets for validation."""
+    # Environments
+    ENVIRONMENTS_VALID: Final[frozenset[str]] = frozenset({
+        "development",
+        "staging",
+        "production",
+        "testing",
+    })
 
-        VALID: Final[frozenset[str]] = frozenset({
-            "development",
-            "staging",
-            "production",
-            "testing",
-        })
+    # ComponentTypes
+    COMPONENT_TYPES_VALID: Final[frozenset[str]] = frozenset({
+        "sources",
+        "sinks",
+        "transformers",
+        "orchestrators",
+    })
 
-    class ComponentTypes:
-        """Valid component/plugin type sets."""
+    # Defaults
+    DEFAULT_SERVICE_VERSION: Final[str] = "0.9.9"
+    DEFAULT_API_VERSION: Final[str] = "0.9.0"
+    DEFAULT_TIMEOUT_SECONDS: Final[int] = 300
+    DEFAULT_TEST_MULTIPLIER: Final[int] = 3
+    DEFAULT_MOCK_RECORD_COUNT: Final[int] = 3
 
-        VALID: Final[frozenset[str]] = frozenset({
-            "sources",
-            "sinks",
-            "transformers",
-            "orchestrators",
-        })
+    # CliDefaults
+    CLI_DEFAULT_MIN_ARGS_WITH_CONFIG: Final[int] = 2
+    CLI_DEFAULT_PIPELINES_ROOT_ENV: Final[str] = "FLEXT_MELTANO_PIPELINES_DIR"
+    CLI_DEFAULT_PIPELINE_CONFIG_FILE: Final[str] = "pipeline.json"
+    CLI_DEFAULT_PIPELINE_PID_FILE: Final[str] = "pipeline.pid"
 
-    class Prefixes:
-        """Plugin name prefix conventions."""
+    # Capabilities
+    CAPABILITY_DBT: Final[tuple[str, ...]] = ("run", "test", "docs", "seed")
+    CAPABILITY_SINGER: Final[tuple[str, ...]] = ("discover", "sync", "validate")
 
-        TAP: Final[str] = "tap-"
-        TARGET: Final[str] = "target-"
-        DBT: Final[str] = "dbt-"
+    # Operations
+    OPERATION_ALL: Final[tuple[str, ...]] = (
+        "pipeline",
+        "plugin",
+        "dbt",
+        "environment",
+    )
+    OPERATION_DISPATCH: Final[tuple[str, ...]] = (
+        "create_pipeline",
+        "execute_pipeline",
+        "install_plugin",
+        "list_plugins",
+        "configure_environment",
+        "run_dbt_models",
+        "test_dbt_models",
+        "run_elt_pipeline",
+    )
 
-    class Defaults:
-        """Default values used across services."""
+    # Handlers
+    HANDLER_ALL: Final[tuple[str, ...]] = ("source", "sink", "pipeline")
 
-        SERVICE_VERSION: Final[str] = "0.9.9"
-        API_VERSION: Final[str] = "0.9.0"
-        TIMEOUT_SECONDS: Final[int] = 300
-        TEST_MULTIPLIER: Final[int] = 3
-        MOCK_RECORD_COUNT: Final[int] = 3
+    # MockValues
+    MOCK_EXECUTION_DURATION: Final[float] = 0.5
+    MOCK_STAGE_DURATIONS: Final[tuple[float, ...]] = (0.3, 0.2)
+    MOCK_DBT_EXECUTION_TIME: Final[float] = 45.2
+    MOCK_DEFAULT_MOCK_INT: Final[int] = 1
+    MOCK_DEFAULT_MOCK_FLOAT: Final[float] = 1.0
 
-    class CliDefaults:
-        """CLI-specific default values."""
+    # FilePaths
+    FILE_PATH_DBT_OUTPUT_DIR: Final[str] = "target"
+    FILE_PATH_DBT_DOCS_INDEX: Final[str] = "index.html"
+    FILE_PATH_STANDARD_DIRS: Final[tuple[str, ...]] = (
+        "extract",
+        "load",
+        "transform",
+        "analyze",
+        "notebook",
+        "orchestrate",
+    )
 
-        MIN_ARGS_WITH_CONFIG: Final[int] = 2
-        PIPELINES_ROOT_ENV: Final[str] = "FLEXT_MELTANO_PIPELINES_DIR"
-        PIPELINE_CONFIG_FILE: Final[str] = "pipeline.json"
-        PIPELINE_PID_FILE: Final[str] = "pipeline.pid"
-
-    class Capabilities:
-        """Plugin capability lists."""
-
-        DBT: Final[tuple[str, ...]] = ("run", "test", "docs", "seed")
-        SINGER: Final[tuple[str, ...]] = ("discover", "sync", "validate")
-
-    class Operations:
-        """API operation identifiers."""
-
-        ALL: Final[tuple[str, ...]] = (
-            "pipeline",
-            "plugin",
-            "dbt",
-            "environment",
-        )
-        DISPATCH: Final[tuple[str, ...]] = (
-            "create_pipeline",
-            "execute_pipeline",
-            "install_plugin",
-            "list_plugins",
-            "configure_environment",
-            "run_dbt_models",
-            "test_dbt_models",
-            "run_elt_pipeline",
-        )
-
-    class Handlers:
-        """Service handler type identifiers."""
-
-        ALL: Final[tuple[str, ...]] = ("source", "sink", "pipeline")
-
-    class MockValues:
-        """Default values for mock/stub data generation."""
-
-        EXECUTION_DURATION: Final[float] = 0.5
-        STAGE_DURATIONS: Final[tuple[float, ...]] = (0.3, 0.2)
-        DBT_EXECUTION_TIME: Final[float] = 45.2
-        DEFAULT_MOCK_INT: Final[int] = 1
-        DEFAULT_MOCK_FLOAT: Final[float] = 1.0
-
-    class FilePaths:
-        """Additional file/directory path constants."""
-
-        DBT_OUTPUT_DIR: Final[str] = "target"
-        DBT_DOCS_INDEX: Final[str] = "index.html"
-        STANDARD_DIRS: Final[tuple[str, ...]] = (
-            "extract",
-            "load",
-            "transform",
-            "analyze",
-            "notebook",
-            "orchestrate",
-        )
-
-    class BatchDefaults:
-        """Batch processing defaults."""
-
-        DEFAULT_BATCH_SIZE: Final[int] = 1000
-        COMMAND_TIMEOUT: Final[int] = 300
+    # BatchDefaults
+    BATCH_DEFAULT_DEFAULT_BATCH_SIZE: Final[int] = 1000
+    BATCH_DEFAULT_COMMAND_TIMEOUT: Final[int] = 300

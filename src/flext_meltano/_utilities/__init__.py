@@ -25,26 +25,20 @@ if _t.TYPE_CHECKING:
     from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
 
     singer = _flext_meltano__utilities_singer
-    import flext_meltano._utilities.yaml as _flext_meltano__utilities_yaml
     from flext_meltano._utilities.singer import (
         FlextMeltanoUtilitiesSinger,
         SingerTargetHandler,
     )
-
-    yaml = _flext_meltano__utilities_yaml
-    from flext_meltano._utilities.yaml import FlextMeltanoUtilitiesYaml
 _LAZY_IMPORTS = {
     "FlextMeltanoUtilitiesConfig": "flext_meltano._utilities.config",
     "FlextMeltanoUtilitiesProject": "flext_meltano._utilities.project",
     "FlextMeltanoUtilitiesRuntime": "flext_meltano._utilities.runtime",
     "FlextMeltanoUtilitiesSinger": "flext_meltano._utilities.singer",
-    "FlextMeltanoUtilitiesYaml": "flext_meltano._utilities.yaml",
     "SingerTargetHandler": "flext_meltano._utilities.singer",
     "config": "flext_meltano._utilities.config",
     "project": "flext_meltano._utilities.project",
     "runtime": "flext_meltano._utilities.runtime",
     "singer": "flext_meltano._utilities.singer",
-    "yaml": "flext_meltano._utilities.yaml",
 }
 
 __all__ = [
@@ -52,13 +46,11 @@ __all__ = [
     "FlextMeltanoUtilitiesProject",
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
-    "FlextMeltanoUtilitiesYaml",
     "SingerTargetHandler",
     "config",
     "project",
     "runtime",
     "singer",
-    "yaml",
 ]
 
 

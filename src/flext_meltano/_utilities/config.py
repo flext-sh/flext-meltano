@@ -19,7 +19,7 @@ class FlextMeltanoUtilitiesConfig:
     def coerce_config_mapping(
         cls,
         value: t.ValueOrModel | None,
-    ) -> t.Meltano.MeltanoConfigDict:
+    ) -> t.ContainerMapping:
         """Coerce settings/model/config inputs into canonical Meltano config dict."""
         if value is None:
             return {}
@@ -62,9 +62,9 @@ class FlextMeltanoUtilitiesConfig:
         item_type: str,
         capabilities: t.StrSequence,
         *,
-        status: str = c.Meltano.Enums.OperationStatus.AVAILABLE,
+        status: str = c.Meltano.OperationStatus.AVAILABLE,
         extra_fields: t.ContainerMapping | None = None,
-    ) -> t.Meltano.ResultDict:
+    ) -> t.ContainerMapping:
         """Build a canonical payload for capability-based service discovery."""
         type_payload: t.ContainerMapping = {
             "type": item_type,
@@ -91,12 +91,12 @@ class FlextMeltanoUtilitiesConfig:
         project_name: str = "",
         version: str | None = None,
         default_environment: str | None = None,
-        plugins: t.Meltano.MeltanoConfigDict | None = None,
-        environments: t.Meltano.MeltanoConfigDict | None = None,
-    ) -> r[t.Meltano.MeltanoConfigDict]:
+        plugins: t.ContainerMapping | None = None,
+        environments: t.ContainerMapping | None = None,
+    ) -> r[t.ContainerMapping]:
         """Create MELTANO-SPECIFIC configuration dictionary - DOMAIN-SPECIFIC ONLY."""
         try:
-            raw_config: t.Meltano.MeltanoConfigDict = {
+            raw_config: t.ContainerMapping = {
                 "project_id": project_id,
                 "project_name": project_name or project_id,
                 "version": version or 1,
@@ -105,7 +105,7 @@ class FlextMeltanoUtilitiesConfig:
                 "plugins": plugins,
             }
             default_envs: Sequence[t.StrMapping] = [
-                {"name": env} for env in c.Meltano.Metadata.DEFAULT_ENVIRONMENTS
+                {"name": env} for env in c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
             ]
             project_id_val = str(raw_config.get("project_id", ""))
             project_name_val = str(
@@ -115,7 +115,7 @@ class FlextMeltanoUtilitiesConfig:
                 "values": raw_config,
             }).values
             plugins_val = cfg_dict.get("plugins")
-            plugins_dict: t.Meltano.MeltanoConfigDict = {}
+            plugins_dict: t.ContainerMapping = {}
             if isinstance(plugins_val, dict):
                 plugins_dict = {str(k): v for k, v in plugins_val.items()}
             result_cfg = {
@@ -125,7 +125,7 @@ class FlextMeltanoUtilitiesConfig:
                 "environments": cfg_dict.get("environments") or default_envs,
                 "plugins": plugins_dict,
                 "metadata": {
-                    "created_by": c.Meltano.Metadata.CREATED_BY,
+                    "created_by": c.Meltano.METADATA_CREATED_BY,
                     "created_at": FlextCliUtilities.generate_iso_timestamp(),
                     "flext_version": c.Meltano.FLEXT_MELTANO_VERSION,
                 },
@@ -135,7 +135,7 @@ class FlextMeltanoUtilitiesConfig:
                 result_cfg["default_environment"] = default_env_val
             elif not project_name:
                 result_cfg["default_environment"] = (
-                    c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0]
+                    c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
                 )
             normalized_values = m.Meltano.ConfigMappingPayload.model_validate({
                 "values": result_cfg,
@@ -156,9 +156,9 @@ class FlextMeltanoUtilitiesConfig:
                     ]
                 else:
                     normalized_cfg[str(key)] = value
-            return r[t.Meltano.MeltanoConfigDict].ok(normalized_cfg)
+            return r[t.ContainerMapping].ok(normalized_cfg)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as err:
-            return r[t.Meltano.MeltanoConfigDict].fail(
+            return r[t.ContainerMapping].fail(
                 f"Failed to create Meltano config dict: {err}",
             )
 
@@ -170,10 +170,10 @@ class FlextMeltanoUtilitiesConfig:
         namespace: str = "",
         pip_url: str = "",
         executable: str = "",
-    ) -> r[t.Meltano.PluginConfigDict]:
+    ) -> r[t.ContainerValueMapping]:
         """Create MELTANO-SPECIFIC plugin config using DSL builder pattern."""
         safe = FlextCliUtilities.safe_string
-        result: t.Meltano.PluginConfigDict = {
+        result: t.ContainerValueMapping = {
             "name": safe(name),
             "namespace": safe(namespace),
             "pip_url": safe(pip_url),
@@ -182,11 +182,11 @@ class FlextMeltanoUtilitiesConfig:
             "settings": dict[str, t.ContainerValue](),
             "config": dict[str, t.ContainerValue](),
             "metadata": {
-                "created_by": c.Meltano.Metadata.CREATED_BY,
+                "created_by": c.Meltano.METADATA_CREATED_BY,
                 "created_at": FlextCliUtilities.generate_iso_timestamp(),
             },
         }
-        return r[t.Meltano.PluginConfigDict].ok(result)
+        return r[t.ContainerValueMapping].ok(result)
 
     @classmethod
     def default_catalog(cls) -> Sequence[t.Meltano.PluginDefinition]:
@@ -194,11 +194,11 @@ class FlextMeltanoUtilitiesConfig:
         return [
             {
                 "type": plugin_type.value,
-                "variant": c.Meltano.Plugin.DEFAULT_VARIANT,
-                "registry": c.Meltano.Plugin.HUB_URL,
+                "variant": c.Meltano.PLUGIN_DEFAULT_VARIANT,
+                "registry": c.Meltano.PLUGIN_HUB_URL,
                 "identifiers": [plugin_type.value],
             }
-            for plugin_type in c.Meltano.Enums.PluginType.__members__.values()
+            for plugin_type in c.Meltano.PluginType.__members__.values()
         ]
 
     @classmethod
@@ -229,14 +229,14 @@ class FlextMeltanoUtilitiesConfig:
     @classmethod
     def normalize_config(
         cls,
-        value: t.Meltano.MeltanoConfigDict | t.ContainerMapping | None,
-    ) -> t.Meltano.MeltanoConfigDict:
+        value: t.ContainerMapping | None,
+    ) -> t.ContainerMapping:
         """Normalize config mappings.
 
         Recursively converts values and drops None entries.
         """
         if value is None:
-            empty: t.Meltano.MeltanoConfigDict = {}
+            empty: t.ContainerMapping = {}
             return empty
         return {
             str(k): cls.normalize_container_value(v)
@@ -249,7 +249,7 @@ class FlextMeltanoUtilitiesConfig:
         """Return the supported plugin type identifiers."""
         return [
             plugin_type.value
-            for plugin_type in c.Meltano.Enums.PluginType.__members__.values()
+            for plugin_type in c.Meltano.PluginType.__members__.values()
         ]
 
     @staticmethod

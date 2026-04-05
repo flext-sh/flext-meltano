@@ -46,7 +46,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         ConfigMappingPayload serializes nested list values to their string
         representation, so plugin entries are stored as stringified lists.
         """
-        plugins: t.Meltano.MeltanoConfigDict = {
+        plugins: t.ContainerMapping = {
             "extractors": [{"name": "tap-postgres"}],
             "loaders": [{"name": "target-csv"}],
         }
@@ -70,7 +70,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
 
     def test_create_meltano_config_dict_with_environments(self) -> None:
         """Test Meltano config dictionary creation with environments."""
-        environments: t.Meltano.MeltanoConfigDict = {
+        environments: t.ContainerMapping = {
             "dev": {"plugins": {"extractors": ["tap-demo"]}},
             "prod": {"plugins": {"extractors": [{"name": "tap-postgres"}]}},
         }
@@ -152,7 +152,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
         """Test successful project file creation."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
-            content: t.Meltano.MeltanoConfigDict = {
+            content: t.ContainerMapping = {
                 "project_id": "test-project",
                 "version": "1.0.0",
             }
@@ -168,7 +168,7 @@ class TestFlextMeltanoUtilitiesEnhanced:
     def test_create_project_file_directory_not_exists(self) -> None:
         """Test project file creation in non-existent directory raises PermissionError."""
         file_path = Path("/nonexistent/directory/pipeline.yml")
-        content: t.Meltano.MeltanoConfigDict = {"project_id": "test"}
+        content: t.ContainerMapping = {"project_id": "test"}
         with pytest.raises(PermissionError):
             u.Meltano.create_project_file(file_path, content)
 
@@ -185,63 +185,6 @@ class TestFlextMeltanoUtilitiesEnhanced:
             result = create_fn(project_path / "test.yml", 12345)
             tm.fail(result)
             tm.that(result.error, none=False)
-
-    def test_load_yaml_file_success(self) -> None:
-        """Test successful YAML file loading."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yaml_file = Path(temp_dir) / "config.yml"
-            with yaml_file.open("w", encoding="utf-8") as f:
-                f.write("project_id: test-project\nversion: 1.0.0\n")
-            result = u.Meltano.load_yaml_config(yaml_file)
-            tm.ok(result)
-            tm.that(result.value["project_id"], eq="test-project")
-            tm.that(result.value["version"], eq="1.0.0")
-
-    def test_load_yaml_file_invalid_format(self) -> None:
-        """Test YAML file loading with invalid format."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yaml_file = Path(temp_dir) / "invalid.yml"
-            with yaml_file.open("w", encoding="utf-8") as f:
-                f.write("invalid: yaml: content: [")
-            result = u.Meltano.load_yaml_config(yaml_file)
-            tm.fail(result)
-            error = result.error
-            tm.that(error, none=False)
-            if error is not None:
-                tm.that(error, has="Failed to load YAML")
-
-    def test_load_yaml_file_nonexistent(self) -> None:
-        """Test YAML file loading with nonexistent file."""
-        result = u.Meltano.load_yaml_config(Path("/nonexistent/file.yml"))
-        tm.fail(result)
-        error = result.error
-        tm.that(error, none=False)
-        if error is not None:
-            tm.that(error, has="File does not exist")
-
-    def test_save_yaml_file_success(self) -> None:
-        """Test successful YAML file saving."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yaml_file = Path(temp_dir) / "output.yml"
-            content: t.Meltano.MeltanoConfigDict = {
-                "project_id": "save-test",
-                "version": "2.0.0",
-            }
-            result = u.Meltano.write_meltano_yml(content, yaml_file)
-            tm.ok(result)
-            tm.that(yaml_file.exists(), eq=True)
-            saved_content = yaml_file.read_text()
-            tm.that(saved_content, has="project_id: save-test")
-            tm.that(saved_content, has="version: 2.0.0")
-
-    def test_save_yaml_file_invalid_content(self) -> None:
-        """Test YAML loading fails on malformed YAML content."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yaml_file = Path(temp_dir) / "output.yml"
-            yaml_file.write_text(":\n  - :\n  [bad", encoding="utf-8")
-            load_result = u.Meltano.load_yaml_config(yaml_file)
-            tm.fail(load_result)
-            tm.that(load_result.error, none=False)
 
     def test_directory_exists_success(self) -> None:
         """Test successful directory existence check."""

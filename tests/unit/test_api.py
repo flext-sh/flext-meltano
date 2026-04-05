@@ -121,7 +121,7 @@ class TestFlextMeltanoProjectOperations:
             )
             assert result.is_success
             project_path = Path(str(result.value["project_path"]))
-            assert (project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE).exists()
+            assert (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists()
 
     def test_validate_project_nonexistent(self) -> None:
         """Test validation of non-existent project."""

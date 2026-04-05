@@ -62,6 +62,7 @@ if _t.TYPE_CHECKING:
         TestFlextMeltanoSettingsEdgeCases,
         TestFlextMeltanoSettingsEnums,
         TestFlextMeltanoSettingsIntegration,
+        clean_meltano_env,
         pytestmark,
     )
 
@@ -74,12 +75,8 @@ if _t.TYPE_CHECKING:
     from tests.unit.test_execution_result import TestFlextMeltanoExecutionResult
 
     test_executors = _tests_unit_test_executors
-    import tests.unit.test_file_managers as _tests_unit_test_file_managers
-    from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
-
-    test_file_managers = _tests_unit_test_file_managers
     import tests.unit.test_library_runner as _tests_unit_test_library_runner
-    from tests.unit.test_file_managers import TestFlextMeltanoFileManagersComprehensive
+    from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
 
     test_library_runner = _tests_unit_test_library_runner
     import tests.unit.test_models as _tests_unit_test_models
@@ -178,7 +175,6 @@ _LAZY_IMPORTS = {
     "TestFlextMeltanoExecuteMethod": "tests.unit.test_api",
     "TestFlextMeltanoExecutionResult": "tests.unit.test_execution_result",
     "TestFlextMeltanoExecutorComplete": "tests.unit.test_executors",
-    "TestFlextMeltanoFileManagersComprehensive": "tests.unit.test_file_managers",
     "TestFlextMeltanoInitialization": "tests.unit.test_api",
     "TestFlextMeltanoIntegration": "tests.unit.test_api",
     "TestFlextMeltanoLibraryRunner": "tests.unit.test_library_runner",
@@ -220,6 +216,7 @@ _LAZY_IMPORTS = {
     "TestTargetService": "tests.unit.test_services",
     "Testc": "tests.unit.test_constants",
     "c": ("flext_core.constants", "FlextConstants"),
+    "clean_meltano_env": "tests.unit.test_config",
     "create_pipeline": "tests.unit.pipeline_cli_managers_tests",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "delete_pipeline": "tests.unit.pipeline_cli_managers_tests",
@@ -247,7 +244,6 @@ _LAZY_IMPORTS = {
     "test_execute_pipeline_runs_real_subprocess_contract": "tests.unit.pipeline_cli_managers_tests",
     "test_execution_result": "tests.unit.test_execution_result",
     "test_executors": "tests.unit.test_executors",
-    "test_file_managers": "tests.unit.test_file_managers",
     "test_get_pipeline_status_checks_process_state": "tests.unit.pipeline_cli_managers_tests",
     "test_library_runner": "tests.unit.test_library_runner",
     "test_models": "tests.unit.test_models",
@@ -279,7 +275,6 @@ __all__ = [
     "TestFlextMeltanoExecuteMethod",
     "TestFlextMeltanoExecutionResult",
     "TestFlextMeltanoExecutorComplete",
-    "TestFlextMeltanoFileManagersComprehensive",
     "TestFlextMeltanoInitialization",
     "TestFlextMeltanoIntegration",
     "TestFlextMeltanoLibraryRunner",
@@ -321,6 +316,7 @@ __all__ = [
     "TestTargetService",
     "Testc",
     "c",
+    "clean_meltano_env",
     "create_pipeline",
     "d",
     "delete_pipeline",
@@ -348,7 +344,6 @@ __all__ = [
     "test_execute_pipeline_runs_real_subprocess_contract",
     "test_execution_result",
     "test_executors",
-    "test_file_managers",
     "test_get_pipeline_status_checks_process_state",
     "test_library_runner",
     "test_models",

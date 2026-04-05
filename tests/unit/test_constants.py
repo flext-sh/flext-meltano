@@ -21,50 +21,50 @@ class Testc:
     def test_meltano_namespace(self) -> None:
         """Test Meltano namespace constants."""
         tm.that(c.Meltano.FLEXT_MELTANO_VERSION, is_=str)
-        tm.that(c.Meltano.Metadata.APPLICATION_NAME, is_=str)
-        tm.that(c.Meltano.Metadata.APPLICATION_DESCRIPTION, is_=str)
-        tm.that(c.Meltano.Paths.PROJECT_FILE, is_=str)
-        tm.that(c.Meltano.Paths.STATE_DIR, is_=str)
+        tm.that(c.Meltano.METADATA_APPLICATION_NAME, is_=str)
+        tm.that(c.Meltano.METADATA_APPLICATION_DESCRIPTION, is_=str)
+        tm.that(c.Meltano.PATH_PROJECT_FILE, is_=str)
+        tm.that(c.Meltano.PATH_STATE_DIR, is_=str)
 
     def test_singer_namespace(self) -> None:
         """Test Singer protocol constants."""
         tm.that(c.Meltano.SDK_VERSION_REQUIRED, is_=str)
-        tm.that(c.Meltano.Singer.MESSAGE_TYPE_SCHEMA, is_=str)
-        tm.that(c.Meltano.Singer.MESSAGE_TYPE_RECORD, is_=str)
+        tm.that(c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA, is_=str)
+        tm.that(c.Meltano.SINGER_MESSAGE_TYPE_RECORD, is_=str)
 
     def test_dbt_namespace(self) -> None:
         """Test DBT constants."""
-        tm.that(c.Meltano.Dbt.PROJECT_FILE, is_=str)
-        tm.that(c.Meltano.Dbt.COMMAND_RUN, is_=str)
-        tm.that(c.Meltano.Dbt.COMMAND_TEST, is_=str)
+        tm.that(c.Meltano.DBT_PROJECT_FILE, is_=str)
+        tm.that(c.Meltano.DBT_COMMAND_RUN, is_=str)
+        tm.that(c.Meltano.DBT_COMMAND_TEST, is_=str)
 
     def test_plugin_namespace(self) -> None:
         """Test Plugin constants."""
-        tm.that(c.Meltano.Enums.PluginType.EXTRACTORS, is_=str)
-        tm.that(c.Meltano.Enums.PluginType.LOADERS, is_=str)
-        tm.that(c.Meltano.Enums.PluginType.TRANSFORMS, is_=str)
+        tm.that(c.Meltano.PluginType.EXTRACTORS, is_=str)
+        tm.that(c.Meltano.PluginType.LOADERS, is_=str)
+        tm.that(c.Meltano.PluginType.TRANSFORMS, is_=str)
         tm.that(c.Meltano.DEFAULT_VARIANT, is_=str)
 
     def test_service_namespace(self) -> None:
         """Test Service namespace constants."""
-        tm.that(c.Meltano.Service.MIN_NAME_LENGTH, is_=int)
+        tm.that(c.Meltano.SERVICE_MIN_NAME_LENGTH, is_=int)
 
     def test_model_namespace(self) -> None:
         """Test ModelValidation namespace constants."""
-        tm.that(c.Meltano.ModelValidation.MATURITY_MATURE_ENV_COUNT, is_=int)
-        tm.that(c.Meltano.ModelValidation.MATURITY_DEVELOPING_ENV_COUNT, is_=int)
-        tm.that(c.Meltano.ModelValidation.COMPLEXITY_MINIMAL_SETTINGS, is_=int)
-        tm.that(c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS, is_=int)
+        tm.that(c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT, is_=int)
+        tm.that(c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT, is_=int)
+        tm.that(c.Meltano.VALIDATION_COMPLEXITY_MINIMAL_SETTINGS, is_=int)
+        tm.that(c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS, is_=int)
 
     def test_logging_namespace(self) -> None:
         """Test Logging namespace constants."""
-        tm.that(c.Meltano.Logging.DEFAULT_LEVEL, is_=str)
-        tm.that(c.Meltano.Logging.INCLUDE_TRANSFORM_NAME, is_=bool)
-        tm.that(c.Meltano.Logging.INCLUDE_RECORD_COUNT, is_=bool)
+        tm.that(c.Meltano.LOGGING_DEFAULT_LEVEL, is_=str)
+        tm.that(c.Meltano.LOGGING_INCLUDE_TRANSFORM_NAME, is_=bool)
+        tm.that(c.Meltano.LOGGING_INCLUDE_RECORD_COUNT, is_=bool)
 
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
-        plugin_types = c.Meltano.Enums.PluginType
+        plugin_types = c.Meltano.PluginType
         tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)
         tm.that(hasattr(plugin_types, "LOADERS"), eq=True)
         tm.that(hasattr(plugin_types, "TRANSFORMS"), eq=True)
@@ -81,22 +81,17 @@ class Testc:
         expected_namespaces = ["Meltano"]
         for namespace in expected_namespaces:
             tm.that(hasattr(c, namespace), eq=True)
-        meltano_namespaces = [
-            "Metadata",
-            "Paths",
-            "Singer",
-            "Dbt",
-            "ModelValidation",
-            "Logging",
-            "Plugin",
-            "Enums",
+        meltano_constants = [
+            "FLEXT_MELTANO_VERSION",
+            "METADATA_APPLICATION_NAME",
+            "SINGER_MESSAGE_TYPE_SCHEMA",
         ]
-        for namespace in meltano_namespaces:
-            tm.that(hasattr(c.Meltano, namespace), eq=True)
+        for constant in meltano_constants:
+            tm.that(hasattr(c.Meltano, constant), eq=True)
 
     def test_export_completeness(self) -> None:
         """Test that all necessary constants are exported."""
         tm.that(hasattr(c, "Meltano"), eq=True)
-        tm.that(hasattr(c.Meltano.Enums, "PluginType"), eq=True)
-        plugin_types = c.Meltano.Enums.PluginType
+        tm.that(hasattr(c.Meltano, "PluginType"), eq=True)
+        plugin_types = c.Meltano.PluginType
         tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)

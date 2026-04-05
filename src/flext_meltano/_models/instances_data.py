@@ -16,7 +16,7 @@ from flext_meltano import (
     t,
 )
 
-_INITIALIZED = c.Meltano.Enums.StreamStatus.INITIALIZED
+_INITIALIZED = c.Meltano.StreamStatus.INITIALIZED
 
 
 class FlextMeltanoModelsInstancesData:
@@ -54,12 +54,12 @@ class FlextMeltanoModelsInstancesData:
             """Processing efficiency assessment."""
             if (
                 self.batch_size
-                >= c.Meltano.ModelValidation.EXECUTION_HIGH_PERFORMANCE_THRESHOLD
+                >= c.Meltano.VALIDATION_EXECUTION_HIGH_PERFORMANCE_THRESHOLD
             ):
                 return "high"
             if (
                 self.batch_size
-                >= c.Meltano.ModelValidation.EXECUTION_GOOD_PERFORMANCE_THRESHOLD
+                >= c.Meltano.VALIDATION_EXECUTION_GOOD_PERFORMANCE_THRESHOLD
             ):
                 return "medium"
             return "low"
@@ -82,7 +82,7 @@ class FlextMeltanoModelsInstancesData:
             if not self.sink_type or not self.sink_type.strip():
                 msg = "Sink type must be non-empty string"
                 raise ValueError(msg)
-            max_reasonable = c.Meltano.Logging.MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
+            max_reasonable = c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
             if self.batch_size > max_reasonable:
                 msg = f"Batch size too large (max {max_reasonable})"
                 raise ValueError(msg)
@@ -122,7 +122,7 @@ class FlextMeltanoModelsInstancesData:
             return len([
                 stream
                 for stream in self.streams.values()
-                if stream.status in c.Meltano.Enums.ACTIVE_STATUSES
+                if stream.status in c.Meltano.ACTIVE_STATUSES
             ])
 
         @computed_field

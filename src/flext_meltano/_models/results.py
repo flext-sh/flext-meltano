@@ -59,7 +59,7 @@ class FlextMeltanoModelsResults:
         def is_successful(self) -> bool:
             """Check if execution was successful."""
             return (
-                self.status == c.Meltano.Enums.OperationStatus.SUCCESS
+                self.status == c.Meltano.OperationStatus.SUCCESS
                 and self.error_message is None
             )
 
@@ -71,14 +71,11 @@ class FlextMeltanoModelsResults:
             else:
                 rate = self.records_processed / self.duration_seconds
 
-            if rate >= c.Meltano.ModelValidation.EXECUTION_HIGH_PERFORMANCE_THRESHOLD:
+            if rate >= c.Meltano.VALIDATION_EXECUTION_HIGH_PERFORMANCE_THRESHOLD:
                 return "high_performance"
-            if rate >= c.Meltano.ModelValidation.EXECUTION_GOOD_PERFORMANCE_THRESHOLD:
+            if rate >= c.Meltano.VALIDATION_EXECUTION_GOOD_PERFORMANCE_THRESHOLD:
                 return "good_performance"
-            if (
-                rate
-                >= c.Meltano.ModelValidation.EXECUTION_MODERATE_PERFORMANCE_THRESHOLD
-            ):
+            if rate >= c.Meltano.VALIDATION_EXECUTION_MODERATE_PERFORMANCE_THRESHOLD:
                 return "moderate_performance"
             return "low_performance"
 
@@ -87,11 +84,11 @@ class FlextMeltanoModelsResults:
         def validate_status(cls, v: str) -> str:
             """Validate execution status."""
             valid_statuses = [
-                c.Meltano.Enums.OperationStatus.PENDING,
-                c.Meltano.Enums.OperationStatus.RUNNING,
-                c.Meltano.Enums.OperationStatus.SUCCESS,
-                c.Meltano.Enums.OperationStatus.ERROR,
-                c.Meltano.Enums.OperationStatus.TIMEOUT,
+                c.Meltano.OperationStatus.PENDING,
+                c.Meltano.OperationStatus.RUNNING,
+                c.Meltano.OperationStatus.SUCCESS,
+                c.Meltano.OperationStatus.ERROR,
+                c.Meltano.OperationStatus.TIMEOUT,
             ]
             if v not in valid_statuses:
                 msg = f"Status must be one of: {', '.join(valid_statuses)}"
@@ -110,7 +107,7 @@ class FlextMeltanoModelsResults:
                     raise ValueError(msg)
 
             if (
-                self.status == c.Meltano.Enums.OperationStatus.ERROR
+                self.status == c.Meltano.OperationStatus.ERROR
                 and not self.error_message
             ):
                 msg = "Error status requires error message"

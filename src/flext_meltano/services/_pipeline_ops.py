@@ -17,9 +17,9 @@ from flext_meltano import c, m, t, u
 class FlextMeltanoPipelinePaths:
     """Shared path resolution for pipeline directories and files."""
 
-    _PIPELINES_ROOT_ENV = c.Meltano.CliDefaults.PIPELINES_ROOT_ENV
-    _PIPELINE_CONFIG_FILE = c.Meltano.CliDefaults.PIPELINE_CONFIG_FILE
-    _PIPELINE_PID_FILE = c.Meltano.CliDefaults.PIPELINE_PID_FILE
+    _PIPELINES_ROOT_ENV = c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV
+    _PIPELINE_CONFIG_FILE = c.Meltano.CLI_DEFAULT_PIPELINE_CONFIG_FILE
+    _PIPELINE_PID_FILE = c.Meltano.CLI_DEFAULT_PIPELINE_PID_FILE
 
     @staticmethod
     def pipelines_root_dir() -> Path:

@@ -182,7 +182,13 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         raw_canonical = (
             canonical_fn() if callable(canonical_fn) else current_plugins_raw
         )
-        current_plugins = self._coerce_container_mapping(raw_canonical)
+        try:
+            coerced_input = t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(
+                raw_canonical,
+            )
+        except ValidationError:
+            coerced_input = None
+        current_plugins = self._coerce_container_mapping(coerced_input)
         if current_plugins is None:
             return r[list[dict[str, str]]].ok(discovered)
         for raw_type, raw_plugins_value in current_plugins.items():
@@ -207,26 +213,26 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             self.settings.environment,
         )
         if not selected_environment:
-            return [c.Meltano.Commands.NO_ENVIRONMENT_OPTION]
+            return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
         project_result = self.load_project(_cwd)
         if project_result.is_failure:
-            return [c.Meltano.Commands.NO_ENVIRONMENT_OPTION]
+            return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
         available_environments = {
             environment.name
             for environment in project_result.value.meltano.environments
         }
         if selected_environment not in available_environments:
-            return [c.Meltano.Commands.NO_ENVIRONMENT_OPTION]
+            return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
         return [
-            c.Meltano.Commands.ENVIRONMENT_OPTION,
+            c.Meltano.CMD_ENVIRONMENT_OPTION,
             selected_environment,
         ]
 
     @override
-    def execute(self) -> r[t.Meltano.ExecutionResultDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute the Meltano executor service."""
-        config_data: t.Meltano.ExecutionResultDict = u.Meltano.build_status_payload(
-            c.Meltano.Enums.OperationStatus.READY,
+        config_data: t.ContainerMapping = u.Meltano.build_status_payload(
+            c.Meltano.OperationStatus.READY,
             extra_fields={
                 "executor_type": "flext_meltano_executor",
                 "execution_timestamp": str(time.time()),
@@ -235,12 +241,12 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             config_field="config",
         )
         self.logger.info("FlextMeltanoExecutor executed successfully")
-        return r[t.Meltano.ExecutionResultDict].ok(config_data)
+        return r[t.ContainerMapping].ok(config_data)
 
     def execute_meltano_command(
         self,
         command: t.StrSequence,
-        timeout: int = c.Meltano.Network.MELTANO_DEFAULT_TIMEOUT,
+        timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a Meltano runtime command in-process and capture its output."""
@@ -258,8 +264,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                     "Command cannot be empty",
                 )
             needs_project_context = normalized_command[0] not in {
-                c.Meltano.Commands.HELP_OPTION,
-                c.Meltano.Commands.VERSION_OPTION,
+                c.Meltano.CMD_HELP_OPTION,
+                c.Meltano.CMD_VERSION_OPTION,
             }
             working_dir = self.project_root if _cwd is None else _cwd
             cwd = m.Meltano.PathPayload(value=working_dir).value
@@ -267,7 +273,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             if needs_project_context:
                 runtime_args = [
                     *self._runtime_environment_args(cwd),
-                    c.Meltano.Commands.CWD_OPTION,
+                    c.Meltano.CMD_CWD_OPTION,
                     str(cwd),
                     *normalized_command,
                 ]
@@ -286,7 +292,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
                     meltano_cli.main(
                         args=runtime_args,
-                        prog_name=c.Meltano.Commands.BINARY,
+                        prog_name=c.Meltano.CMD_BINARY,
                         standalone_mode=False,
                     )
             except SystemExit as e:
@@ -356,7 +362,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-        _config: t.Meltano.MeltanoConfigDict | None = None,
+        _config: t.ContainerMapping | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:

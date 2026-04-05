@@ -31,10 +31,10 @@ class FlextMeltanoModelsResultsPipeline:
         overall_status: Annotated[
             str,
             Field(
-                default=c.Meltano.Enums.OperationStatus.PENDING,
+                default=c.Meltano.OperationStatus.PENDING,
                 description="Overall pipeline status",
             ),
-        ] = c.Meltano.Enums.OperationStatus.PENDING
+        ] = c.Meltano.OperationStatus.PENDING
         total_records: Annotated[
             t.NonNegativeInt, Field(default=0, description="Total records processed")
         ] = 0
@@ -73,7 +73,7 @@ class FlextMeltanoModelsResultsPipeline:
 
         def _all_stages_successful(self) -> bool:
             """Check if all stages completed successfully."""
-            s = c.Meltano.Enums.OperationStatus.SUCCESS
+            s = c.Meltano.OperationStatus.SUCCESS
             return bool(
                 self.source_result
                 and self.source_result.status == s
@@ -111,11 +111,11 @@ class FlextMeltanoModelsResultsPipeline:
         def validate_overall_status(cls, v: str) -> str:
             """Validate overall pipeline status."""
             valid_statuses = [
-                c.Meltano.Enums.OperationStatus.PENDING,
-                c.Meltano.Enums.OperationStatus.RUNNING,
-                c.Meltano.Enums.OperationStatus.SUCCESS,
+                c.Meltano.OperationStatus.PENDING,
+                c.Meltano.OperationStatus.RUNNING,
+                c.Meltano.OperationStatus.SUCCESS,
                 "partial",
-                c.Meltano.Enums.OperationStatus.ERROR,
+                c.Meltano.OperationStatus.ERROR,
             ]
             if v not in valid_statuses:
                 msg = f"Overall status must be one of: {', '.join(valid_statuses)}"
@@ -140,8 +140,8 @@ class FlextMeltanoModelsResultsPipeline:
 
             if (
                 self._all_stages_successful()
-                and self.overall_status != c.Meltano.Enums.OperationStatus.SUCCESS
+                and self.overall_status != c.Meltano.OperationStatus.SUCCESS
             ):
-                self.overall_status = c.Meltano.Enums.OperationStatus.SUCCESS
+                self.overall_status = c.Meltano.OperationStatus.SUCCESS
 
             return self

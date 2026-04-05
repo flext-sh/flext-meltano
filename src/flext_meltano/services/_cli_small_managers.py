@@ -26,7 +26,7 @@ class _FlextMeltanoSimpleCommandManager:
         """Route command to help or operation handler."""
         if u.Meltano.is_help_request(args):
             help_handler()
-            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return operation_handler(args[0], args[1:])
 
     def _log_unimplemented(self, label: str, operation: str) -> r[str]:
@@ -88,7 +88,7 @@ class FlextMeltanoStatusManager:
         """Handle status command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_status_help()
-            return r[str].ok(c.Meltano.Enums.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_status_operation(args[0], args[1:])
 
     def handle_version_command(self, args: t.StrSequence) -> r[str]:

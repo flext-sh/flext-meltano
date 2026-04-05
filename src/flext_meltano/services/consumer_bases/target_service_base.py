@@ -12,12 +12,13 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from collections.abc import MutableMapping, Sequence
+from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
 
 from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSingerSinkBase, c, t
+from flext_meltano import FlextMeltanoServiceBase, c, p, t
 
 
 class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
@@ -40,8 +41,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
-    _sinks: MutableMapping[str, FlextMeltanoSingerSinkBase] = PrivateAttr(
-        default_factory=dict,
+    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = PrivateAttr(
+        default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
     _instance: ClassVar[Self | None] = None
 
@@ -57,7 +58,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         self,
         stream_name: str,
         schema: t.FlatContainerMapping,
-    ) -> FlextMeltanoSingerSinkBase:
+    ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
         Consumer implements this with domain-specific sink logic.
@@ -86,17 +87,17 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         self,
         stream_name: str,
         schema: t.FlatContainerMapping,
-    ) -> r[FlextMeltanoSingerSinkBase]:
+    ) -> r[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream."""
         try:
             if stream_name in self._sinks:
-                return r[FlextMeltanoSingerSinkBase].ok(self._sinks[stream_name])
+                return r[p.Meltano.SingerDrainSink].ok(self._sinks[stream_name])
             sink = self.create_sink(stream_name, schema)
             self._sinks[stream_name] = sink
             self.logger.debug("Sink created", stream=stream_name)
-            return r[FlextMeltanoSingerSinkBase].ok(sink)
+            return r[p.Meltano.SingerDrainSink].ok(sink)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
-            return r[FlextMeltanoSingerSinkBase].fail(str(exc))
+            return r[p.Meltano.SingerDrainSink].fail(str(exc))
 
     def flush(self, stream_name: str | None = None) -> r[None]:
         """Flush records for a specific stream or all streams."""
@@ -129,8 +130,12 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         if sink_result.is_failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            sink = sink_result.value
-            sink.process_record(dict(record.items()), {})
+            record_dict: dict[str, t.ContainerValue] = {
+                str(k): (str(v) if isinstance(v, Path) else v)
+                for k, v in record.items()
+            }
+            empty_context: t.MutableContainerValueMapping = {}
+            sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
             return r[bool].fail(str(exc))
@@ -164,9 +169,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         return r[None].ok(None)
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute target service — returns status."""
-        return r[t.Meltano.MeltanoConfigDict].ok({
+        return r[t.ContainerMapping].ok({
             "service": self.target_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "target",

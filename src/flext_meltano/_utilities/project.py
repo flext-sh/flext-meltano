@@ -22,10 +22,13 @@ class FlextMeltanoUtilitiesProject:
         exist_ok: bool = True,
     ) -> r[Path]:
         """Ensure a directory exists and return its normalized path."""
+
+        def _ensure() -> Path:
+            directory_path.mkdir(parents=True, exist_ok=exist_ok)
+            return directory_path
+
         return u.try_(
-            lambda: (
-                directory_path.mkdir(parents=True, exist_ok=exist_ok) or directory_path
-            ),
+            _ensure,
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
         ).map_error(lambda e: f"Failed to ensure directory exists: {e}")
 
@@ -45,7 +48,7 @@ class FlextMeltanoUtilitiesProject:
         project_root: Path,
         *,
         state: str | None = None,
-    ) -> t.Meltano.Project.ProjectMetadata:
+    ) -> t.Meltano.OptionalScalarMap:
         """Build canonical project metadata mapping from a project root."""
         metadata: dict[str, t.Scalar | None] = {
             "root": str(project_root),
@@ -70,19 +73,19 @@ class FlextMeltanoUtilitiesProject:
             "project_path": str(project_path),
             "creation_method": creation_method,
             "meltano_yml_exists": str(
-                (project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE).exists()
+                (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists()
             ),
         }
 
     @staticmethod
     def create_project_file(
         file_path: Path,
-        content: str | t.Meltano.MeltanoConfigDict,
+        content: str | t.ContainerMapping,
     ) -> r[Path]:
         """Create a project file with content."""
         if not isinstance(content, (str, dict)):
             return r[Path].fail("Invalid content type: must be string or dict")
-        guard: str | t.Meltano.MeltanoConfigDict = content
+        guard: str | t.ContainerMapping = content
 
         def _create() -> Path:
             ensured_parent = FlextMeltanoUtilitiesProject.ensure_directory(
@@ -119,7 +122,7 @@ class FlextMeltanoUtilitiesProject:
             if not project_path.exists():
                 msg = f"Project path does not exist: {project_path}"
                 raise ValueError(msg)
-            meltano_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
+            meltano_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
             if meltano_file.exists():
                 return True
             msg = f"Meltano config file not found: {meltano_file}"
@@ -134,16 +137,16 @@ class FlextMeltanoUtilitiesProject:
     def convert_to_project_dict(
         project: (
             p.Meltano.Project
-            | t.Meltano.Dbt.Project
+            | t.Meltano.DbtProject
             | Mapping[str, t.ContainerMapping | None]
             | Path
             | t.ContainerMapping
             | None
         ),
-    ) -> r[t.Meltano.Dbt.Project]:
+    ) -> r[t.Meltano.DbtProject]:
         """Convert Meltano project value to FLEXT ContainerMapping representation."""
 
-        def _convert() -> t.Meltano.Dbt.Project:
+        def _convert() -> t.Meltano.DbtProject:
             if isinstance(project, Mapping):
                 return {
                     "name": str(project.get("name", "meltano_project")),
@@ -176,7 +179,7 @@ class FlextMeltanoUtilitiesProject:
         """Create standard Meltano project directory structure."""
 
         def _create() -> Path:
-            for d in [*c.Meltano.FilePaths.STANDARD_DIRS, c.Meltano.Paths.OUTPUT_DIR]:
+            for d in [*c.Meltano.FILE_PATH_STANDARD_DIRS, c.Meltano.PATH_OUTPUT_DIR]:
                 (project_path / d).mkdir(exist_ok=True)
                 (project_path / d / ".gitkeep").touch()
             return project_path
@@ -217,12 +220,12 @@ class FlextMeltanoUtilitiesProject:
     ) -> r[t.ContainerMapping]:
         """Generate minimal meltano.yml configuration."""
         config: t.ContainerMapping = {
-            "version": c.Meltano.Plugin.CONFIG_VERSION,
-            "default_environment": c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0],
+            "version": c.Meltano.PLUGIN_CONFIG_VERSION,
+            "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
             "project_id": project_id,
             "environments": [
                 {
-                    "name": c.Meltano.Metadata.DEFAULT_ENVIRONMENTS[0],
+                    "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                     "config": {
                         "plugins": {
                             "extractors": list[t.ContainerMapping](),
@@ -240,9 +243,9 @@ class FlextMeltanoUtilitiesProject:
         """Initialize meltano.yml configuration file."""
 
         def _initialize() -> Path:
-            environments = c.Meltano.Metadata.DEFAULT_ENVIRONMENTS
+            environments = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
             config_content = (
-                f"version: {c.Meltano.Plugin.CONFIG_VERSION}\n"
+                f"version: {c.Meltano.PLUGIN_CONFIG_VERSION}\n"
                 f"default_environment: {environments[0]}\n"
                 f"project_id: {project_name}\n"
                 "environments:\n"
@@ -250,7 +253,7 @@ class FlextMeltanoUtilitiesProject:
                 f"- name: {environments[1]}\n"
                 f"- name: {environments[2]}\n"
             )
-            config_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
+            config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
             u.write_file(config_file, config_content)
             return project_path
 
@@ -259,18 +262,18 @@ class FlextMeltanoUtilitiesProject:
             catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
         ).map_error(
             lambda e: (
-                f"Failed to initialize {c.Meltano.Paths.MELTANO_PROJECT_FILE}: {e}"
+                f"Failed to initialize {c.Meltano.PATH_MELTANO_PROJECT_FILE}: {e}"
             ),
         )
 
     @staticmethod
     def validate_meltano_config_exists(project_root: Path) -> r[Path]:
         """Validate meltano.yml exists in project directory."""
-        meltano_yml = project_root / c.Meltano.Paths.MELTANO_PROJECT_FILE
+        meltano_yml = project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
             return r[Path].fail(
                 "Not a Meltano project: "
-                f"{c.Meltano.Paths.MELTANO_PROJECT_FILE} "
+                f"{c.Meltano.PATH_MELTANO_PROJECT_FILE} "
                 f"not found in {project_root}",
             )
         return r[Path].ok(project_root)
@@ -281,11 +284,11 @@ class FlextMeltanoUtilitiesProject:
         config: t.ContainerMapping,
     ) -> r[Path]:
         """Write meltano.yml configuration file."""
-        config_file = project_path / c.Meltano.Paths.MELTANO_PROJECT_FILE
+        config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
         dump_result = FlextCliUtilities.Cli.yaml_dump(config_file, config)
         if dump_result.is_failure:
             return r[Path].fail(
-                f"Failed to write {c.Meltano.Paths.MELTANO_PROJECT_FILE}: "
+                f"Failed to write {c.Meltano.PATH_MELTANO_PROJECT_FILE}: "
                 f"{dump_result.error}",
             )
         return r[Path].ok(project_path)

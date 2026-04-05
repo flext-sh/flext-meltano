@@ -39,7 +39,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
-    ) -> r[t.Meltano.ExecutionResultDict]:
+    ) -> r[t.ContainerMapping]:
         """Execute a Meltano runtime command.
 
         Args:
@@ -54,19 +54,17 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         cmd = u.Meltano.build_bridge_command_args(command, args)
         command_result = executor.execute_meltano_command(cmd)
         if command_result.is_failure:
-            return r[t.Meltano.ExecutionResultDict].fail(
+            return r[t.ContainerMapping].fail(
                 command_result.error or "Command failed",
             )
         command_execution = command_result.value
-        result: t.Meltano.ExecutionResultDict = (
-            u.Meltano.build_command_execution_payload(
-                command_execution,
-                extra_fields={"command": command},
-                status_field=None,
-                duration_field=None,
-            )
+        result: t.ContainerMapping = u.Meltano.build_command_execution_payload(
+            command_execution,
+            extra_fields={"command": command},
+            status_field=None,
+            duration_field=None,
         )
-        return r[t.Meltano.ExecutionResultDict].ok(result)
+        return r[t.ContainerMapping].ok(result)
 
     @staticmethod
     def get_version() -> r[str]:

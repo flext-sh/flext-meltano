@@ -41,7 +41,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _coerce_container_mapping(
-        value: FlextMeltanoProjectService | t.ContainerMapping | None,
+        value: t.ContainerMapping | None,
     ) -> t.ContainerMapping | None:
         """Normalize runtime objects to canonical container mappings when possible."""
         if not isinstance(value, Mapping):
@@ -79,7 +79,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             if not plugin_type or not plugin_name:
                 return r[bool].fail("plugin_type and plugin_name are required")
             cmd_result = self._run_meltano(
-                [c.Meltano.Commands.ADD, plugin_type, plugin_name],
+                [c.Meltano.CMD_ADD, plugin_type, plugin_name],
             )
             if cmd_result.is_failure:
                 return r[bool].fail(cmd_result.error or "Failed to add plugin")
@@ -94,7 +94,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
         project_mapping = FlextMeltanoAbstractionsBase._coerce_container_mapping(
-            project,
+            project if isinstance(project, Mapping) else None,
         )
         if project_mapping is not None:
             for key in ("root_dir", "root"):
@@ -129,7 +129,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 plugins[plugin_name] = {
                     "name": plugin_name,
                     "type": plugin_type,
-                    "status": c.Meltano.Enums.OperationStatus.AVAILABLE,
+                    "status": c.Meltano.OperationStatus.AVAILABLE,
                 }
             return r[dict[str, dict[str, str]]].ok(plugins)
         except c.Meltano.OPERATION_ERRORS as e:
@@ -157,14 +157,14 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 else loader_mapping.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             cmd_result = self._run_meltano(
-                [c.Meltano.Commands.ELT, extractor_name, loader_name],
+                [c.Meltano.CMD_ELT, extractor_name, loader_name],
             )
             if cmd_result.is_failure:
                 return r[dict[str, str | int]].fail(
                     cmd_result.error or "Pipeline execution failed",
                 )
             result: dict[str, str | int] = {
-                "status": c.Meltano.Enums.StreamStatus.COMPLETED,
+                "status": c.Meltano.StreamStatus.COMPLETED,
                 "source": extractor_name,
                 "sink": loader_name,
                 "records_processed": 0,
@@ -201,7 +201,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """Execute abstractions service and return real configuration state."""
         project_root = u.Meltano.resolve_project_root(self.settings)
         return r[t.ContainerMapping].ok({
-            "status": c.Meltano.Enums.StreamStatus.COMPLETED,
+            "status": c.Meltano.StreamStatus.COMPLETED,
             "project_root": str(project_root) if project_root is not None else "",
             "environment": self.settings.environment,
             "meltano_version": self.settings.meltano_version,

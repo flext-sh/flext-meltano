@@ -54,15 +54,9 @@ class FlextMeltanoModelsProjectsPlugin:
             settings_count = u.count(settings_keys)
             if settings_count == 0:
                 return "minimal"
-            if (
-                settings_count
-                <= c.Meltano.ModelValidation.COMPLEXITY_SIMPLE_MAX_SETTINGS
-            ):
+            if settings_count <= c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS:
                 return "simple"
-            if (
-                settings_count
-                <= c.Meltano.ModelValidation.COMPLEXITY_MODERATE_MAX_SETTINGS
-            ):
+            if settings_count <= c.Meltano.VALIDATION_COMPLEXITY_MODERATE_MAX_SETTINGS:
                 return "moderate"
             return "complex"
 

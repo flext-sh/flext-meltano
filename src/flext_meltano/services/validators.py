@@ -77,11 +77,9 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].fail(f"Transformation validation failed: {error}")
 
     @override
-    def execute(self) -> r[t.Meltano.MeltanoConfigDict]:
+    def execute(self) -> r[t.ContainerMapping]:
         """Execute validators service — returns current settings."""
-        return r[t.Meltano.MeltanoConfigDict].ok(
-            u.Meltano.coerce_config_mapping(self.settings)
-        )
+        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
 
 
 __all__ = ["FlextMeltanoValidators"]

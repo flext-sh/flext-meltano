@@ -32,15 +32,15 @@ class FlextMeltanoUtilitiesRuntime:
     def normalize_runtime_command(command: t.StrSequence) -> list[str]:
         """Normalize legacy Meltano command arguments for in-process execution."""
         normalized = FlextMeltanoUtilitiesRuntime._normalized_parts(command)
-        if normalized and normalized[0] == c.Meltano.Commands.BINARY:
+        if normalized and normalized[0] == c.Meltano.CMD_BINARY:
             normalized = normalized[1:]
         if not normalized:
             return normalized
         match normalized[0]:
-            case c.Meltano.Enums.ExecutorCommand.VERSION:
-                return [c.Meltano.Commands.VERSION_OPTION, *normalized[1:]]
-            case c.Meltano.Enums.ExecutorCommand.HELP:
-                return [c.Meltano.Commands.HELP_OPTION, *normalized[1:]]
+            case c.Meltano.ExecutorCommand.VERSION:
+                return [c.Meltano.CMD_VERSION_OPTION, *normalized[1:]]
+            case c.Meltano.ExecutorCommand.HELP:
+                return [c.Meltano.CMD_HELP_OPTION, *normalized[1:]]
             case _:
                 return normalized
 
@@ -51,28 +51,20 @@ class FlextMeltanoUtilitiesRuntime:
             return None
         normalized = u.normalize(u.to_str(plugin_type), case="lower").strip()
         mapping = {
-            "extractor": c.Meltano.Enums.PluginType.EXTRACTORS.value,
-            c.Meltano.Enums.PluginType.EXTRACTORS.value: (
-                c.Meltano.Enums.PluginType.EXTRACTORS.value
+            "extractor": c.Meltano.PluginType.EXTRACTORS.value,
+            c.Meltano.PluginType.EXTRACTORS.value: (
+                c.Meltano.PluginType.EXTRACTORS.value
             ),
-            c.Meltano.Prefixes.TAP.rstrip(
-                "-"
-            ): c.Meltano.Enums.PluginType.EXTRACTORS.value,
-            "loader": c.Meltano.Enums.PluginType.LOADERS.value,
-            c.Meltano.Enums.PluginType.LOADERS.value: (
-                c.Meltano.Enums.PluginType.LOADERS.value
+            c.Meltano.PREFIX_TAP.rstrip("-"): c.Meltano.PluginType.EXTRACTORS.value,
+            "loader": c.Meltano.PluginType.LOADERS.value,
+            c.Meltano.PluginType.LOADERS.value: (c.Meltano.PluginType.LOADERS.value),
+            c.Meltano.PREFIX_TARGET.rstrip("-"): c.Meltano.PluginType.LOADERS.value,
+            "transformer": c.Meltano.PluginType.TRANSFORMS.value,
+            "transformers": c.Meltano.PluginType.TRANSFORMS.value,
+            c.Meltano.PluginType.TRANSFORMS.value: (
+                c.Meltano.PluginType.TRANSFORMS.value
             ),
-            c.Meltano.Prefixes.TARGET.rstrip(
-                "-"
-            ): c.Meltano.Enums.PluginType.LOADERS.value,
-            "transformer": c.Meltano.Enums.PluginType.TRANSFORMS.value,
-            "transformers": c.Meltano.Enums.PluginType.TRANSFORMS.value,
-            c.Meltano.Enums.PluginType.TRANSFORMS.value: (
-                c.Meltano.Enums.PluginType.TRANSFORMS.value
-            ),
-            c.Meltano.Prefixes.DBT.rstrip(
-                "-"
-            ): c.Meltano.Enums.PluginType.TRANSFORMS.value,
+            c.Meltano.PREFIX_DBT.rstrip("-"): c.Meltano.PluginType.TRANSFORMS.value,
         }
         return mapping.get(normalized, normalized)
 
@@ -81,8 +73,8 @@ class FlextMeltanoUtilitiesRuntime:
         """Return whether the provided args request CLI help."""
         normalized_args = FlextMeltanoUtilitiesRuntime._normalized_parts(args)
         return not normalized_args or normalized_args[0] in {
-            c.Meltano.Commands.HELP_OPTION,
-            c.Meltano.Commands.SHORT_HELP_OPTION,
+            c.Meltano.CMD_HELP_OPTION,
+            c.Meltano.CMD_SHORT_HELP_OPTION,
         }
 
     @staticmethod
@@ -113,9 +105,9 @@ class FlextMeltanoUtilitiesRuntime:
             case="lower",
         ).strip()
         aliases: t.StrMapping = {
-            c.Meltano.Enums.Environment.DEVELOPMENT.value: "dev",
-            c.Meltano.Enums.Environment.TESTING.value: "test",
-            c.Meltano.Enums.Environment.PRODUCTION.value: "prod",
+            c.Meltano.Environment.DEVELOPMENT.value: "dev",
+            c.Meltano.Environment.TESTING.value: "test",
+            c.Meltano.Environment.PRODUCTION.value: "prod",
         }
         return aliases.get(normalized, normalized)
 
@@ -126,7 +118,7 @@ class FlextMeltanoUtilitiesRuntime:
     ) -> list[str]:
         """Build the canonical Meltano ELT runtime command."""
         return FlextMeltanoUtilitiesRuntime._normalized_parts(
-            [c.Meltano.Commands.ELT, tap_name, target_name],
+            [c.Meltano.CMD_ELT, tap_name, target_name],
         )
 
     @staticmethod
@@ -136,8 +128,8 @@ class FlextMeltanoUtilitiesRuntime:
     ) -> list[str]:
         """Build the canonical Meltano DBT invoke runtime command."""
         command = [
-            c.Meltano.Commands.INVOKE,
-            f"{c.Meltano.Plugin.DBT_DEFAULT_NAME}:{dbt_command}",
+            c.Meltano.CMD_INVOKE,
+            f"{c.Meltano.PLUGIN_DBT_DEFAULT_NAME}:{dbt_command}",
         ]
         if args:
             command.extend(FlextMeltanoUtilitiesRuntime._normalized_parts(args))
@@ -237,8 +229,8 @@ class FlextMeltanoUtilitiesRuntime:
         command_result: m.Meltano.CommandExecutionResult,
         *,
         extra_fields: t.ContainerMapping | None = None,
-        success_status: str = c.Meltano.Enums.OperationStatus.SUCCESS,
-        failure_status: str = c.Meltano.Enums.OperationStatus.ERROR,
+        success_status: str = c.Meltano.OperationStatus.SUCCESS,
+        failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
     ) -> t.ContainerMapping:
@@ -286,13 +278,13 @@ class FlextMeltanoUtilitiesRuntime:
     def normalize_discovered_plugin_type(plugin_type: str, plugin_name: str) -> str:
         """Normalize Meltano project plugin groups to public discovery labels."""
         normalized = FlextMeltanoUtilitiesRuntime.normalize_plugin_group(plugin_type)
-        if normalized == c.Meltano.Enums.PluginType.EXTRACTORS.value:
-            return c.Meltano.Prefixes.TAP.rstrip("-")
-        if normalized == c.Meltano.Enums.PluginType.LOADERS.value:
-            return c.Meltano.Prefixes.TARGET.rstrip("-")
+        if normalized == c.Meltano.PluginType.EXTRACTORS.value:
+            return c.Meltano.PREFIX_TAP.rstrip("-")
+        if normalized == c.Meltano.PluginType.LOADERS.value:
+            return c.Meltano.PREFIX_TARGET.rstrip("-")
         if (
-            normalized == c.Meltano.Enums.PluginType.TRANSFORMS.value
-            or plugin_name.startswith(c.Meltano.Prefixes.DBT)
+            normalized == c.Meltano.PluginType.TRANSFORMS.value
+            or plugin_name.startswith(c.Meltano.PREFIX_DBT)
         ):
             return "transformer"
         return normalized or plugin_type

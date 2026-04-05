@@ -86,10 +86,10 @@ class FlextMeltanoModelsSourcesParams:
         status: Annotated[
             str,
             Field(
-                default=c.Meltano.Enums.StreamStatus.DISCOVERED,
+                default=c.Meltano.StreamStatus.DISCOVERED,
                 description="Current status of the stream",
             ),
-        ] = c.Meltano.Enums.StreamStatus.DISCOVERED
+        ] = c.Meltano.StreamStatus.DISCOVERED
         records_extracted: Annotated[
             t.NonNegativeInt,
             Field(default=0, description="Number of records extracted"),
@@ -103,7 +103,7 @@ class FlextMeltanoModelsSourcesParams:
         @computed_field
         def is_active(self) -> bool:
             """Check if stream is active."""
-            return self.status in c.Meltano.Enums.ACTIVE_STATUSES
+            return self.status in c.Meltano.ACTIVE_STATUSES
 
         @computed_field
         def schema_properties_count(self) -> int:
@@ -134,9 +134,9 @@ class FlextMeltanoModelsSourcesParams:
             if "properties" not in self.stream_schema:
                 msg = "Stream schema must contain properties"
                 raise ValueError(msg)
-            valid_statuses = c.Meltano.Enums.ACTIVE_STATUSES | {
-                c.Meltano.Enums.StreamStatus.COMPLETED,
-                c.Meltano.Enums.StreamStatus.ERROR,
+            valid_statuses = c.Meltano.ACTIVE_STATUSES | {
+                c.Meltano.StreamStatus.COMPLETED,
+                c.Meltano.StreamStatus.ERROR,
             }
             if self.status not in valid_statuses:
                 msg = f"Status must be one of: {', '.join(valid_statuses)}"

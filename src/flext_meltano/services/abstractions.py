@@ -44,10 +44,10 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         try:
             cmd_result = self._run_meltano(
                 [
-                    c.Meltano.Commands.SELECT,
+                    c.Meltano.CMD_SELECT,
                     tap_instance.tap_type,
-                    c.Meltano.Commands.LIST_OPTION,
-                    c.Meltano.Commands.ALL_OPTION,
+                    c.Meltano.CMD_LIST_OPTION,
+                    c.Meltano.CMD_ALL_OPTION,
                 ],
             )
             if cmd_result.is_failure:
@@ -85,17 +85,17 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 else c.IDENTIFIER_UNKNOWN
             )
             cmd_args = [
-                c.Meltano.Commands.ELT,
+                c.Meltano.CMD_ELT,
                 tap_instance.tap_type,
                 str(loader_name),
-                c.Meltano.Commands.SELECT_OPTION,
+                c.Meltano.CMD_SELECT_OPTION,
                 stream_name,
             ]
             cmd_result = self._run_meltano(cmd_args)
             status = (
-                c.Meltano.Enums.StreamStatus.COMPLETED
+                c.Meltano.StreamStatus.COMPLETED
                 if cmd_result.is_success
-                else c.Meltano.Enums.StreamStatus.FAILED
+                else c.Meltano.StreamStatus.FAILED
             )
             result: t.ContainerMapping = {
                 "stream_name": stream_name,
