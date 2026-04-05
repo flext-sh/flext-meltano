@@ -12,7 +12,7 @@ from typing import override
 from pydantic import ValidationError
 
 from flext_core import FlextLogger, r
-from flext_meltano import FlextMeltanoServiceBase, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, m, t
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
@@ -42,21 +42,27 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     @classmethod
     def validate_pipeline_project_structure(cls, project_path: Path) -> r[bool]:
         """Validate pipeline project structure with domain-specific business rules."""
-        validation_result = u.Meltano.validate_project_structure(project_path)
-        if validation_result.is_failure:
+        if not project_path.exists() or not project_path.is_dir():
             error_msg = (
-                validation_result.error or "Failed to validate project structure"
+                f"Project path {project_path} does not exist or is not a directory"
             )
             FlextLogger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
-        ensure_result = u.Meltano.ensure_project_subdirectory(
-            project_path,
-            "transform",
-        )
-        if ensure_result.is_failure:
-            error_msg = ensure_result.error or "Failed to prepare transform directory"
+
+        meltano_yml = project_path / "meltano.yml"
+        if not meltano_yml.exists():
+            error_msg = f"Project path {project_path} does not contain meltano.yml"
             FlextLogger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
+
+        transform_dir = project_path / "transform"
+        try:
+            transform_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            error_msg = f"Failed to prepare transform directory: {e}"
+            FlextLogger(__name__).exception(error_msg)
+            return r[bool].fail(error_msg)
+
         return r[bool].ok(value=True)
 
     @classmethod
@@ -79,7 +85,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.ContainerMapping]:
         """Execute validators service — returns current settings."""
-        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
+        return r[t.ContainerMapping].ok(self.settings.model_dump())
 
 
 __all__ = ["FlextMeltanoValidators"]

@@ -8,11 +8,18 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextSettings, r, s
-from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoSettings, c, m, t, u
+from flext_core import FlextSettings, r
+from flext_meltano import (
+    FlextMeltanoExecutorBase,
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    t,
+)
 
 
-class FlextMeltanoPipelineAdapter(s[t.ContainerMapping]):
+class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
     """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
     @classmethod
@@ -44,32 +51,31 @@ class FlextMeltanoPipelineAdapter(s[t.ContainerMapping]):
                 )
             executor = FlextMeltanoExecutorBase()
             execution_result = executor.execute_meltano_command(
-                u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
-                _cwd=u.Meltano.resolve_project_root(self.settings.model_dump()),
+                [c.Meltano.CMD_RUN, tap_name, target_name],
+                _cwd=self.settings.project_root,
             )
             if execution_result.is_failure:
                 return r[t.ContainerMapping].fail(
                     execution_result.error or "Pipeline execution failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
-            pipeline_result: t.ContainerMapping = (
-                u.Meltano.build_command_execution_payload(
-                    command_result,
-                    extra_fields={
-                        "tap": tap_name,
-                        "target": target_name,
-                    },
-                    success_status=c.Meltano.StreamStatus.COMPLETED,
-                    failure_status=c.Meltano.StreamStatus.FAILED,
-                    duration_field="execution_duration",
-                )
-            )
+            pipeline_result: t.ContainerMapping = {
+                "status": c.Meltano.StreamStatus.COMPLETED
+                if command_result.success
+                else c.Meltano.StreamStatus.FAILED,
+                "execution_duration": command_result.execution_time,
+                "tap": tap_name,
+                "target": target_name,
+                "command": command_result.command,
+                "output": command_result.output,
+                "error": command_result.error,
+            }
             return r[t.ContainerMapping].ok(pipeline_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[t.ContainerMapping].fail(f"Pipeline execution failed: {ex}")
 
 
-class FlextMeltanoDbtAdapter(s[t.ContainerMapping]):
+class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
     """Focused adapter for DBT operations following SOLID principles."""
 
     @override
@@ -87,20 +93,27 @@ class FlextMeltanoDbtAdapter(s[t.ContainerMapping]):
         try:
             executor = FlextMeltanoExecutorBase()
             execution_result = executor.execute_meltano_command(
-                u.Meltano.build_dbt_runtime_command(c.Meltano.DBT_COMMAND_RUN),
-                _cwd=u.Meltano.resolve_project_root(self.settings.model_dump()),
+                [
+                    c.Meltano.CMD_INVOKE,
+                    c.Meltano.PLUGIN_DBT_DEFAULT_NAME,
+                    c.Meltano.DBT_COMMAND_RUN,
+                ],
+                _cwd=self.settings.project_root,
             )
             if execution_result.is_failure:
                 return r[t.ContainerMapping].fail(
                     execution_result.error or "DBT operation failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
-            dbt_result: t.ContainerMapping = u.Meltano.build_command_execution_payload(
-                command_result,
-                success_status=c.Meltano.StreamStatus.COMPLETED,
-                failure_status=c.Meltano.StreamStatus.FAILED,
-                duration_field="execution_time",
-            )
+            dbt_result: t.ContainerMapping = {
+                "status": c.Meltano.StreamStatus.COMPLETED
+                if command_result.success
+                else c.Meltano.StreamStatus.FAILED,
+                "execution_time": command_result.execution_time,
+                "command": command_result.command,
+                "output": command_result.output,
+                "error": command_result.error,
+            }
             return r[t.ContainerMapping].ok(dbt_result)
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
             return r[t.ContainerMapping].fail(f"DBT operation failed: {ex}")

@@ -109,15 +109,11 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        return r[t.ContainerMapping].ok(
-            u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.CONFIGURED,
-                extra_fields={
-                    "environment": environment_name,
-                    "configuration": config or {},
-                },
-            )
-        )
+        return r[t.ContainerMapping].ok({
+            "status": c.Meltano.OperationStatus.CONFIGURED,
+            "environment": environment_name,
+            "configuration": config or {},
+        })
 
     @staticmethod
     def configure_pipeline(
@@ -126,15 +122,11 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         _config: t.ContainerMapping | None = None,
     ) -> r[t.ContainerMapping]:
         """Configure generic data pipeline."""
-        return r[t.ContainerMapping].ok(
-            u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.CONFIGURED,
-                extra_fields={
-                    "source": source_name,
-                    "sink": sink_name,
-                },
-            )
-        )
+        return r[t.ContainerMapping].ok({
+            "status": c.Meltano.OperationStatus.CONFIGURED,
+            "source": source_name,
+            "sink": sink_name,
+        })
 
     @staticmethod
     def install_component(
@@ -149,16 +141,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.ContainerMapping].fail(
                 f"Invalid component type: {component_type}"
             )
-        return r[t.ContainerMapping].ok(
-            u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.INSTALLED,
-                extra_fields={
-                    "component_name": component_name,
-                    "component_type": component_type,
-                    "configuration": config or {},
-                },
-            )
-        )
+        return r[t.ContainerMapping].ok({
+            "status": c.Meltano.OperationStatus.INSTALLED,
+            "component_name": component_name,
+            "component_type": component_type,
+            "configuration": config or {},
+        })
 
     @staticmethod
     def validate_service_config(config: t.ContainerMapping) -> r[bool]:
@@ -170,20 +158,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.ContainerMapping]:
         """Execute service with railway pattern."""
-        return r[t.ContainerMapping].ok(
-            u.Meltano.build_status_payload(
-                c.CommonStatus.ACTIVE,
-                extra_fields={
-                    "service_name": c.Meltano.METADATA_APPLICATION_NAME,
-                    "version": c.Meltano.FLEXT_MELTANO_VERSION,
-                    "handlers": list(c.Meltano.HANDLER_ALL),
-                },
-            )
-        )
+        return r[t.ContainerMapping].ok({
+            "status": c.CommonStatus.ACTIVE,
+            "service_name": c.Meltano.METADATA_APPLICATION_NAME,
+            "version": c.Meltano.FLEXT_MELTANO_VERSION,
+            "handlers": list(c.Meltano.HANDLER_ALL),
+        })
 
     def get_default_config(self) -> r[t.ContainerMapping]:
         """Get default configuration from current settings."""
-        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
+        return r[t.ContainerMapping].ok(self.settings.model_dump())
 
     def get_info(self) -> r[t.Meltano.OptionalScalarMap]:
         """Get service information."""
@@ -196,9 +180,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     def validate_config(self) -> r[bool]:
         """Validate current service configuration."""
-        return self.validate_service_config(
-            u.Meltano.coerce_config_mapping(self.settings)
-        )
+        return self.validate_service_config(self.settings.model_dump())
 
 
 __all__ = ["FlextMeltanoService"]

@@ -231,15 +231,12 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.ContainerMapping]:
         """Execute the Meltano executor service."""
-        config_data: t.ContainerMapping = u.Meltano.build_status_payload(
-            c.Meltano.OperationStatus.READY,
-            extra_fields={
-                "executor_type": "flext_meltano_executor",
-                "execution_timestamp": str(time.time()),
-            },
-            config=self.settings.model_dump(),
-            config_field="config",
-        )
+        config_data: t.ContainerMapping = {
+            "status": c.Meltano.OperationStatus.READY,
+            "executor_type": "flext_meltano_executor",
+            "execution_timestamp": str(time.time()),
+            "config": self.settings.model_dump(),
+        }
         self.logger.info("FlextMeltanoExecutor executed successfully")
         return r[t.ContainerMapping].ok(config_data)
 

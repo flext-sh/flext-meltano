@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 from flext_core import r
-from flext_meltano import FlextMeltanoPipelinePaths, u
+from flext_meltano import FlextMeltanoPipelinePaths
 
 
 class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
@@ -25,6 +25,21 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         """Remove a file, ignoring missing or inaccessible errors."""
         with contextlib.suppress(FileNotFoundError, OSError):
             path.unlink()
+
+    @staticmethod
+    def _is_process_running(pid: int) -> bool:
+        """Check if a process with the given PID is running."""
+        if pid <= 0:
+            return False
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
+        except OSError:
+            return False
+        return True
 
     @staticmethod
     def _check_pipeline_dir(pipeline_name: str) -> r[Path]:
@@ -68,7 +83,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
                 f"{pid_result.error}",
             )
         pid, _ = pid_result.value
-        if u.Meltano.is_process_running(pid):
+        if FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
             return r[str].ok("running")
         pid_path.unlink(missing_ok=True)
         return r[str].ok("stopped")
@@ -85,7 +100,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         if pid_result.is_failure:
             return r[str].fail(pid_result.error)
         pid, pid_path = pid_result.value
-        if not u.Meltano.is_process_running(pid):
+        if not FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
             FlextMeltanoPipelineLifecycleOperations._safe_unlink(pid_path)
             return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
         try:
@@ -97,7 +112,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
             return r[str].fail(f"Failed to stop pipeline '{pipeline_name}': {exc}")
         deadline = time.monotonic() + timeout_seconds
         while time.monotonic() < deadline:
-            if not u.Meltano.is_process_running(pid):
+            if not FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
                 FlextMeltanoPipelineLifecycleOperations._safe_unlink(pid_path)
                 return r[str].ok("stopped")
             time.sleep(0.1)

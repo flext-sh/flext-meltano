@@ -93,8 +93,6 @@ if _t.TYPE_CHECKING:
     _utilities = _flext_meltano__utilities
     import flext_meltano.api as _flext_meltano_api
     from flext_meltano._utilities import (
-        FlextMeltanoUtilitiesConfig,
-        FlextMeltanoUtilitiesProject,
         FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesSinger,
         SingerTargetHandler,
@@ -362,8 +360,6 @@ __all__ = [
     "FlextMeltanoTypingsDomains",
     "FlextMeltanoTypingsSinger",
     "FlextMeltanoUtilities",
-    "FlextMeltanoUtilitiesConfig",
-    "FlextMeltanoUtilitiesProject",
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoValidators",

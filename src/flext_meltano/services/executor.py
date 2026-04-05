@@ -23,15 +23,11 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             return (
                 executor.run(args)
                 if args
-                else r[t.ContainerMapping].ok(
-                    u.Meltano.build_status_payload(
-                        c.Meltano.OperationStatus.READY,
-                        extra_fields={
-                            "command_type": "cli_runner",
-                            "args": list(args),
-                        },
-                    )
-                )
+                else r[t.ContainerMapping].ok({
+                    "status": c.Meltano.OperationStatus.READY,
+                    "command_type": "cli_runner",
+                    "args": list(args),
+                })
             )
         except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
             return r[t.ContainerMapping].fail(
@@ -42,33 +38,29 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         """Check system health by running meltano invoke."""
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.VERSION])
         return result.map(
-            lambda cmd_result: u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.HEALTHY
+            lambda cmd_result: {
+                "status": c.Meltano.OperationStatus.HEALTHY
                 if cmd_result.success
                 else c.Meltano.OperationStatus.ERROR,
-                extra_fields={
-                    "command": "health",
-                    "command_type": "health",
-                    "health": "OK" if cmd_result.success else "DEGRADED",
-                    "exit_code": cmd_result.exit_code,
-                },
-            ),
+                "command": "health",
+                "command_type": "health",
+                "health": "OK" if cmd_result.success else "DEGRADED",
+                "exit_code": cmd_result.exit_code,
+            }
         )
 
     def help(self) -> r[t.ContainerMapping]:
         """Get help information from meltano --help."""
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.HELP])
         return result.map(
-            lambda cmd_result: u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.SUCCESS
+            lambda cmd_result: {
+                "status": c.Meltano.OperationStatus.SUCCESS
                 if cmd_result.success
                 else c.Meltano.OperationStatus.ERROR,
-                extra_fields={
-                    "command": c.Meltano.ExecutorCommand.HELP,
-                    "command_type": c.Meltano.ExecutorCommand.HELP,
-                    "help": cmd_result.output,
-                },
-            ),
+                "command": c.Meltano.ExecutorCommand.HELP,
+                "command_type": c.Meltano.ExecutorCommand.HELP,
+                "help": cmd_result.output,
+            }
         )
 
     def run(self, args: t.StrSequence) -> r[t.ContainerMapping]:
@@ -80,15 +72,11 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     def run_cli(self, args: t.StrSequence | None) -> r[t.ContainerMapping]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
-            return r[t.ContainerMapping].ok(
-                u.Meltano.build_status_payload(
-                    c.Meltano.OperationStatus.READY,
-                    extra_fields={
-                        "command_type": "cli",
-                        "message": "CLI ready for commands",
-                    },
-                )
-            )
+            return r[t.ContainerMapping].ok({
+                "status": c.Meltano.OperationStatus.READY,
+                "command_type": "cli",
+                "message": "CLI ready for commands",
+            })
         return self.run(args)
 
     def run_command(self, args: t.StrSequence) -> r[int]:
@@ -115,16 +103,14 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     def version(self) -> r[t.ContainerMapping]:
         """Get version information from meltano."""
         return self.get_version().map(
-            lambda ver: u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.SUCCESS,
-                extra_fields={
-                    "command": c.Meltano.ExecutorCommand.VERSION,
-                    "command_type": c.Meltano.ExecutorCommand.VERSION,
-                    "version": ver,
-                    "success": True,
-                    "cli_type": "flext_meltano",
-                },
-            ),
+            lambda ver: {
+                "status": c.Meltano.OperationStatus.SUCCESS,
+                "command": c.Meltano.ExecutorCommand.VERSION,
+                "command_type": c.Meltano.ExecutorCommand.VERSION,
+                "version": ver,
+                "success": True,
+                "cli_type": "flext_meltano",
+            }
         )
 
     def _route_command(

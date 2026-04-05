@@ -19,7 +19,6 @@ from flext_meltano import (
     c,
     p,
     t,
-    u,
 )
 
 
@@ -34,7 +33,7 @@ class FlextMeltanoCommandRouter:
 
     def route_command(self, args: t.StrSequence) -> int:
         """Route command to appropriate handler using composition."""
-        if u.Meltano.is_help_request(args):
+        if "--help" in args or "-h" in args:
             self.cli.show_banner()
             self.logger.info("FLEXT Meltano CLI - Main Help")
             return 0
@@ -82,7 +81,7 @@ class FlextMeltanoSingerManager:
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle Singer command by routing to tap or target subcommands."""
-        if u.Meltano.is_help_request(args):
+        if "--help" in args or "-h" in args:
             self.cli.show_tap_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand, subcommand_args = args[0], args[1:]
@@ -94,14 +93,14 @@ class FlextMeltanoSingerManager:
 
     def handle_tap_command(self, args: t.StrSequence) -> r[str]:
         """Handle tap command."""
-        if u.Meltano.is_help_request(args):
+        if "--help" in args or "-h" in args:
             self.cli.show_tap_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_tap_operation(args[0], args[1:])
 
     def handle_target_command(self, args: t.StrSequence) -> r[str]:
         """Handle target command."""
-        if u.Meltano.is_help_request(args):
+        if "--help" in args or "-h" in args:
             self.cli.show_target_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_target_operation(args[0], args[1:])

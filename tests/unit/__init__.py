@@ -42,28 +42,16 @@ if _t.TYPE_CHECKING:
         TestFlextMeltanoPluginOperations,
         TestFlextMeltanoProjectOperations,
         TestFlextMeltanoSuccessPaths,
+        pytestmark,
     )
 
     test_cli_integration = _tests_unit_test_cli_integration
-    import tests.unit.test_config as _tests_unit_test_config
+    import tests.unit.test_constants as _tests_unit_test_constants
     from tests.unit.test_cli_integration import (
         TestCliModelConversionWithDbtRunParams,
         TestCliModelConversionWithPipelineRunParams,
         TestCliModelConversionWithTapRunParams,
         TestCliModelConversionWithTargetRunParams,
-    )
-
-    test_config = _tests_unit_test_config
-    import tests.unit.test_constants as _tests_unit_test_constants
-    from tests.unit.test_config import (
-        LogLevel,
-        TestFlextMeltanoSettings,
-        TestFlextMeltanoSettingsConstants,
-        TestFlextMeltanoSettingsEdgeCases,
-        TestFlextMeltanoSettingsEnums,
-        TestFlextMeltanoSettingsIntegration,
-        clean_meltano_env,
-        pytestmark,
     )
 
     test_constants = _tests_unit_test_constants
@@ -141,12 +129,8 @@ if _t.TYPE_CHECKING:
     )
 
     test_typings = _tests_unit_test_typings
-    import tests.unit.test_utilities as _tests_unit_test_utilities
-    from tests.unit.test_typings import TestFlextMeltanoTypes
-
-    test_utilities = _tests_unit_test_utilities
     import tests.unit.test_validators as _tests_unit_test_validators
-    from tests.unit.test_utilities import TestFlextMeltanoUtilitiesEnhanced
+    from tests.unit.test_typings import TestFlextMeltanoTypes
 
     test_validators = _tests_unit_test_validators
     from flext_core.constants import FlextConstants as c
@@ -162,7 +146,6 @@ if _t.TYPE_CHECKING:
     from flext_core.utilities import FlextUtilities as u
     from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
 _LAZY_IMPORTS = {
-    "LogLevel": "tests.unit.test_config",
     "TestCliModelConversionWithDbtRunParams": "tests.unit.test_cli_integration",
     "TestCliModelConversionWithPipelineRunParams": "tests.unit.test_cli_integration",
     "TestCliModelConversionWithTapRunParams": "tests.unit.test_cli_integration",
@@ -184,11 +167,6 @@ _LAZY_IMPORTS = {
     "TestFlextMeltanoPluginProtocols": "tests.unit.test_plugin_protocols",
     "TestFlextMeltanoProjectOperations": "tests.unit.test_api",
     "TestFlextMeltanoServiceInitialization": "tests.unit.test_services",
-    "TestFlextMeltanoSettings": "tests.unit.test_config",
-    "TestFlextMeltanoSettingsConstants": "tests.unit.test_config",
-    "TestFlextMeltanoSettingsEdgeCases": "tests.unit.test_config",
-    "TestFlextMeltanoSettingsEnums": "tests.unit.test_config",
-    "TestFlextMeltanoSettingsIntegration": "tests.unit.test_config",
     "TestFlextMeltanoSingerCliTranslatorDbtRun": "tests.unit.test_singer_cli_translator",
     "TestFlextMeltanoSingerCliTranslatorExecuteCommand": "tests.unit.test_singer_cli_translator",
     "TestFlextMeltanoSingerCliTranslatorPipelineRun": "tests.unit.test_singer_cli_translator",
@@ -197,7 +175,6 @@ _LAZY_IMPORTS = {
     "TestFlextMeltanoSuccessPaths": "tests.unit.test_api",
     "TestFlextMeltanoTargetAbstractionsComplete": "tests.unit.test_target_abstractions",
     "TestFlextMeltanoTypes": "tests.unit.test_typings",
-    "TestFlextMeltanoUtilitiesEnhanced": "tests.unit.test_utilities",
     "TestFlextMeltanoValidatorsComprehensive": "tests.unit.test_validators",
     "TestFlextSingerTypes": "tests.unit.test_singer_types",
     "TestMeltanoProjectModelEnhanced": "tests.unit.test_models",
@@ -216,7 +193,6 @@ _LAZY_IMPORTS = {
     "TestTargetService": "tests.unit.test_services",
     "Testc": "tests.unit.test_constants",
     "c": ("flext_core.constants", "FlextConstants"),
-    "clean_meltano_env": "tests.unit.test_config",
     "create_pipeline": "tests.unit.pipeline_cli_managers_tests",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "delete_pipeline": "tests.unit.pipeline_cli_managers_tests",
@@ -229,13 +205,12 @@ _LAZY_IMPORTS = {
     "m": ("flext_core.models", "FlextModels"),
     "p": ("flext_core.protocols", "FlextProtocols"),
     "pipeline_cli_managers_tests": "tests.unit.pipeline_cli_managers_tests",
-    "pytestmark": "tests.unit.test_config",
+    "pytestmark": "tests.unit.test_api",
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
     "test_api": "tests.unit.test_api",
     "test_cli_integration": "tests.unit.test_cli_integration",
-    "test_config": "tests.unit.test_config",
     "test_constants": "tests.unit.test_constants",
     "test_create_pipeline_creates_directory_and_configuration": "tests.unit.pipeline_cli_managers_tests",
     "test_create_pipeline_fails_without_configuration": "tests.unit.pipeline_cli_managers_tests",
@@ -255,14 +230,12 @@ _LAZY_IMPORTS = {
     "test_tap_abstractions": "tests.unit.test_tap_abstractions",
     "test_target_abstractions": "tests.unit.test_target_abstractions",
     "test_typings": "tests.unit.test_typings",
-    "test_utilities": "tests.unit.test_utilities",
     "test_validators": "tests.unit.test_validators",
     "u": ("flext_core.utilities", "FlextUtilities"),
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 __all__ = [
-    "LogLevel",
     "TestCliModelConversionWithDbtRunParams",
     "TestCliModelConversionWithPipelineRunParams",
     "TestCliModelConversionWithTapRunParams",
@@ -284,11 +257,6 @@ __all__ = [
     "TestFlextMeltanoPluginProtocols",
     "TestFlextMeltanoProjectOperations",
     "TestFlextMeltanoServiceInitialization",
-    "TestFlextMeltanoSettings",
-    "TestFlextMeltanoSettingsConstants",
-    "TestFlextMeltanoSettingsEdgeCases",
-    "TestFlextMeltanoSettingsEnums",
-    "TestFlextMeltanoSettingsIntegration",
     "TestFlextMeltanoSingerCliTranslatorDbtRun",
     "TestFlextMeltanoSingerCliTranslatorExecuteCommand",
     "TestFlextMeltanoSingerCliTranslatorPipelineRun",
@@ -297,7 +265,6 @@ __all__ = [
     "TestFlextMeltanoSuccessPaths",
     "TestFlextMeltanoTargetAbstractionsComplete",
     "TestFlextMeltanoTypes",
-    "TestFlextMeltanoUtilitiesEnhanced",
     "TestFlextMeltanoValidatorsComprehensive",
     "TestFlextSingerTypes",
     "TestMeltanoProjectModelEnhanced",
@@ -316,7 +283,6 @@ __all__ = [
     "TestTargetService",
     "Testc",
     "c",
-    "clean_meltano_env",
     "create_pipeline",
     "d",
     "delete_pipeline",
@@ -335,7 +301,6 @@ __all__ = [
     "t",
     "test_api",
     "test_cli_integration",
-    "test_config",
     "test_constants",
     "test_create_pipeline_creates_directory_and_configuration",
     "test_create_pipeline_fails_without_configuration",
@@ -355,7 +320,6 @@ __all__ = [
     "test_tap_abstractions",
     "test_target_abstractions",
     "test_typings",
-    "test_utilities",
     "test_validators",
     "u",
     "x",

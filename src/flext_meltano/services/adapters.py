@@ -11,21 +11,20 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextSettings, r, s
+from flext_core import FlextSettings, r
 from flext_meltano import (
     FlextMeltanoExecutorBase,
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     c,
     t,
-    u,
 )
 
 
 class FlextMeltanoAdapter(FlextMeltanoServiceBase):
     """Base adapter namespace class for focused integrations."""
 
-    class ProjectAdapter(s[t.ContainerMapping]):
+    class ProjectAdapter(FlextMeltanoServiceBase):
         """Focused adapter for Meltano project management following SOLID principles."""
 
         @classmethod
@@ -47,16 +46,14 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                 return r[t.ContainerMapping].fail(
                     init_result.error or "Project creation failed",
                 )
-            result: t.ContainerMapping = u.Meltano.build_status_payload(
-                c.Meltano.OperationStatus.CREATED,
-                extra_fields={
-                    "project_name": project_name,
-                    "project_path": str(project_path),
-                    "output": f"Initialized {c.Meltano.PATH_MELTANO_PROJECT_FILE}",
-                    "error": "",
-                    "created_at": str(time.time()),
-                },
-            )
+            result: t.ContainerMapping = {
+                "status": c.Meltano.OperationStatus.CREATED,
+                "project_name": project_name,
+                "project_path": str(project_path),
+                "output": f"Initialized {c.Meltano.PATH_MELTANO_PROJECT_FILE}",
+                "error": "",
+                "created_at": str(time.time()),
+            }
             return r[t.ContainerMapping].ok(result)
 
         @override
@@ -87,7 +84,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                 project_dir=project_root.parent,
             )
 
-    class PluginAdapter(s[Sequence[t.Meltano.PluginDefinition]]):
+    class PluginAdapter(FlextMeltanoServiceBase):
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
         @classmethod
@@ -98,16 +95,16 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         def discover_plugins(
             self,
             plugin_type: str | None = None,
-        ) -> r[Sequence[t.Meltano.PluginDefinition]]:
+        ) -> r[t.ContainerMapping]:
             """Discover available plugins via Meltano project runtime."""
             try:
                 executor = FlextMeltanoExecutorBase()
                 plugins_result = executor.get_project_plugins(
                     plugin_type=plugin_type,
-                    _cwd=u.Meltano.resolve_project_root(self.settings.model_dump()),
+                    _cwd=self.settings.project_root,
                 )
                 if plugins_result.is_failure:
-                    return r[Sequence[t.Meltano.PluginDefinition]].fail(
+                    return r[t.ContainerMapping].fail(
                         plugins_result.error or "Plugin discovery failed",
                     )
                 plugins: list[t.Meltano.PluginDefinition] = []
@@ -118,26 +115,23 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                         continue
                     plugins.append({
                         "name": plugin_name,
-                        "type": u.Meltano.normalize_discovered_plugin_type(
-                            plugin_group,
-                            plugin_name,
-                        ),
+                        "type": plugin_group,
                     })
-                return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
+                return r[t.ContainerMapping].ok({"plugins": plugins})
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-                return r[Sequence[t.Meltano.PluginDefinition]].fail(
+                return r[t.ContainerMapping].fail(
                     f"Plugin discovery failed: {ex}"
                 )
 
         @override
-        def execute(self) -> r[Sequence[t.Meltano.PluginDefinition]]:
+        def execute(self) -> r[t.ContainerMapping]:
             """Execute default plugin operation."""
             return self.discover_plugins()
 
     @override
     def execute(self) -> r[t.ContainerMapping]:
         """Execute adapter service returning current settings."""
-        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
+        return r[t.ContainerMapping].ok(self.settings.model_dump())
 
 
 __all__ = ["FlextMeltanoAdapter"]

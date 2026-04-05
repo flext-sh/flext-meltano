@@ -9,7 +9,7 @@ from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_core import FlextSettings, r
-from flext_meltano import c, t, u
+from flext_meltano import c, t
 
 
 @FlextSettings.auto_register("meltano")
@@ -144,7 +144,13 @@ class FlextMeltanoSettings(FlextSettings):
 
     def validate_project_structure(self) -> r[bool]:
         """Validate required project structure artifacts."""
-        return u.Meltano.validate_project_structure(self.project_root)
+        if not self.project_root.exists() or not self.project_root.is_dir():
+            return r[bool].fail(f"Project path {self.project_root} does not exist")
+        if not (self.project_root / "meltano.yml").exists():
+            return r[bool].fail(
+                f"Project path {self.project_root} does not contain meltano.yml"
+            )
+        return r[bool].ok(value=True)
 
     def get_environment_variables(self) -> t.StrMapping:
         """Build runtime environment variables for Meltano commands."""

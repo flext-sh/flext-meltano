@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import r
-from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, t, u
+from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, t
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):
@@ -32,7 +32,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             return r[t.StrSequence].fail(
                 plugins_result.error or "Plugin discovery failed",
             )
-        plugin_names = u.Meltano.extract_plugin_names(plugins_result.value)
+        plugin_names = [
+            str(p.get("name", "")) for p in plugins_result.value if p.get("name")
+        ]
         return r[t.StrSequence].ok(plugin_names)
 
     @staticmethod
@@ -51,19 +53,21 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
         """
         executor = FlextMeltanoExecutorBase()
-        cmd = u.Meltano.build_bridge_command_args(command, args)
+        cmd = [command]
+        if args:
+            for k, v in args.items():
+                cmd.append(f"--{k}={v}")
         command_result = executor.execute_meltano_command(cmd)
         if command_result.is_failure:
             return r[t.ContainerMapping].fail(
                 command_result.error or "Command failed",
             )
         command_execution = command_result.value
-        result: t.ContainerMapping = u.Meltano.build_command_execution_payload(
-            command_execution,
-            extra_fields={"command": command},
-            status_field=None,
-            duration_field=None,
-        )
+        result: t.ContainerMapping = {
+            "command": command,
+            "output": command_execution.output,
+            "error": command_execution.error,
+        }
         return r[t.ContainerMapping].ok(result)
 
     @staticmethod
@@ -74,7 +78,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     @override
     def execute(self) -> r[t.ContainerMapping]:
         """Execute bridge service returning current settings."""
-        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
+        return r[t.ContainerMapping].ok(self.settings.model_dump())
 
 
 __all__ = ["FlextMeltanoBridge"]

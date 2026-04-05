@@ -61,14 +61,15 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     def initialize_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
         """Initialize a new Meltano project via SDK."""
         try:
-            ensure_result = u.Meltano.ensure_directory(root, exist_ok=True)
-            if ensure_result.is_failure:
+            try:
+                root.mkdir(parents=True, exist_ok=True)
+            except OSError as e:
                 return r[t.Meltano.OptionalScalarMap].fail(
-                    ensure_result.error or "Failed to prepare project directory",
+                    f"Failed to prepare project directory: {e}",
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
-            info = u.Meltano.build_project_metadata(root, state="initialized")
+            info = {"project_root": str(root), "state": "initialized"}
             self.logger.info("Meltano project initialized", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
         except (
@@ -94,7 +95,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
-            info = u.Meltano.build_project_metadata(root, state="loaded")
+            info = {"project_root": str(root), "state": "loaded"}
             self.logger.info("Meltano project loaded", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
         except (

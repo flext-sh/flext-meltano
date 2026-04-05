@@ -15,7 +15,6 @@ from flext_meltano import (
     p,
     r,
     t,
-    u,
 )
 
 
@@ -64,7 +63,7 @@ class FlextMeltanoComponentService(
     @override
     def execute(self) -> r[t.ContainerMapping]:
         """Execute the pipeline component service."""
-        return r[t.ContainerMapping].ok(u.Meltano.coerce_config_mapping(self.settings))
+        return r[t.ContainerMapping].ok(self.settings.model_dump())
 
     def _build_plugin_addition_result(
         self,

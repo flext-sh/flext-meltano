@@ -10,8 +10,6 @@ from __future__ import annotations
 from flext_cli import FlextCliUtilities
 
 from flext_meltano import (
-    FlextMeltanoUtilitiesConfig,
-    FlextMeltanoUtilitiesProject,
     FlextMeltanoUtilitiesRuntime,
     FlextMeltanoUtilitiesSinger,
 )
@@ -26,8 +24,6 @@ class FlextMeltanoUtilities(FlextCliUtilities):
 
     class Meltano(
         FlextMeltanoUtilitiesRuntime,
-        FlextMeltanoUtilitiesConfig,
-        FlextMeltanoUtilitiesProject,
         FlextMeltanoUtilitiesSinger,
     ):
         """Meltano domain utility methods.
