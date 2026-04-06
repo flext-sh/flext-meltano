@@ -8,8 +8,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_core import r
-from flext_core.result import FlextResult
+from flext_core import FlextResult, r
 from flext_meltano import (
     FlextMeltanoAbstractionsBase,
     c,

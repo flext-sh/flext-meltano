@@ -7,7 +7,7 @@ from typing import override
 
 import click
 
-from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
+from flext_meltano import FlextMeltanoSingerTapAdapter
 
 
 class _StreamInfo:

@@ -8,8 +8,7 @@ from typing import Annotated, ClassVar, Self
 from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextSettings, r
-from flext_core.result import FlextResult
+from flext_core import FlextResult, FlextSettings, r
 from flext_meltano import c, t
 
 

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_core.result import FlextResult
+from flext_core import FlextResult
 from flext_meltano import FlextMeltanoServiceBase, c, m, r, t
 
 
