@@ -104,13 +104,22 @@ if _t.TYPE_CHECKING:
     )
 
     test_singer_cli_translator = _tests_unit_test_singer_cli_translator
-    import tests.unit.test_singer_types as _tests_unit_test_singer_types
+    import tests.unit.test_singer_sdk_adapter as _tests_unit_test_singer_sdk_adapter
     from tests.unit.test_singer_cli_translator import (
         TestFlextMeltanoSingerCliTranslatorDbtRun,
         TestFlextMeltanoSingerCliTranslatorExecuteCommand,
         TestFlextMeltanoSingerCliTranslatorPipelineRun,
         TestFlextMeltanoSingerCliTranslatorTapRun,
         TestFlextMeltanoSingerCliTranslatorTargetRun,
+    )
+
+    test_singer_sdk_adapter = _tests_unit_test_singer_sdk_adapter
+    import tests.unit.test_singer_types as _tests_unit_test_singer_types
+    from tests.unit.test_singer_sdk_adapter import (
+        test_adapter_delegates_sync,
+        test_adapter_exposes_config_and_streams,
+        test_adapter_normalizes_successful_cli_exit_code,
+        test_adapter_normalizes_system_exit,
     )
 
     test_singer_types = _tests_unit_test_singer_types
@@ -209,6 +218,10 @@ _LAZY_IMPORTS = {
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
+    "test_adapter_delegates_sync": "tests.unit.test_singer_sdk_adapter",
+    "test_adapter_exposes_config_and_streams": "tests.unit.test_singer_sdk_adapter",
+    "test_adapter_normalizes_successful_cli_exit_code": "tests.unit.test_singer_sdk_adapter",
+    "test_adapter_normalizes_system_exit": "tests.unit.test_singer_sdk_adapter",
     "test_api": "tests.unit.test_api",
     "test_cli_integration": "tests.unit.test_cli_integration",
     "test_constants": "tests.unit.test_constants",
@@ -226,6 +239,7 @@ _LAZY_IMPORTS = {
     "test_plugin_protocols": "tests.unit.test_plugin_protocols",
     "test_services": "tests.unit.test_services",
     "test_singer_cli_translator": "tests.unit.test_singer_cli_translator",
+    "test_singer_sdk_adapter": "tests.unit.test_singer_sdk_adapter",
     "test_singer_types": "tests.unit.test_singer_types",
     "test_tap_abstractions": "tests.unit.test_tap_abstractions",
     "test_target_abstractions": "tests.unit.test_target_abstractions",
@@ -299,6 +313,10 @@ __all__ = [
     "r",
     "s",
     "t",
+    "test_adapter_delegates_sync",
+    "test_adapter_exposes_config_and_streams",
+    "test_adapter_normalizes_successful_cli_exit_code",
+    "test_adapter_normalizes_system_exit",
     "test_api",
     "test_cli_integration",
     "test_constants",
@@ -316,6 +334,7 @@ __all__ = [
     "test_plugin_protocols",
     "test_services",
     "test_singer_cli_translator",
+    "test_singer_sdk_adapter",
     "test_singer_types",
     "test_tap_abstractions",
     "test_target_abstractions",

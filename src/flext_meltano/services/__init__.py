@@ -137,6 +137,7 @@ if _t.TYPE_CHECKING:
         FlextMeltanoSingerRecord,
         FlextMeltanoSingerSinkBase,
         FlextMeltanoSingerStreamBase,
+        FlextMeltanoSingerTapAdapter,
         FlextMeltanoSingerTapBase,
         FlextMeltanoSingerTargetBase,
     )
@@ -208,6 +209,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "FlextMeltanoSingerSinkBase": "flext_meltano.services.singer_sdk",
         "FlextMeltanoSingerStateMixin": "flext_meltano.services.singer_state",
         "FlextMeltanoSingerStreamBase": "flext_meltano.services.singer_sdk",
+        "FlextMeltanoSingerTapAdapter": "flext_meltano.services.singer_sdk",
         "FlextMeltanoSingerTapBase": "flext_meltano.services.singer_sdk",
         "FlextMeltanoSingerTargetBase": "flext_meltano.services.singer_sdk",
         "FlextMeltanoStatusManager": "flext_meltano.services._cli_small_managers",
@@ -298,6 +300,7 @@ __all__ = [
     "FlextMeltanoSingerSinkBase",
     "FlextMeltanoSingerStateMixin",
     "FlextMeltanoSingerStreamBase",
+    "FlextMeltanoSingerTapAdapter",
     "FlextMeltanoSingerTapBase",
     "FlextMeltanoSingerTargetBase",
     "FlextMeltanoStatusManager",
