@@ -1,0 +1,89 @@
+src/flext_meltano/services/meltano_plugins.py
+  d3ada1e5d497edb1 15,34
+src/flext_meltano/services/singer_catalog.py
+  d3ada1e5d497edb1 17,46,60,82,99,118
+src/flext_meltano/services/adapter_extensions.py
+  d3ada1e5d497edb1 74,118
+src/flext_meltano/services/adapters.py
+  d3ada1e5d497edb1 120
+src/flext_meltano/services/_abstractions_base.py
+  d3ada1e5d497edb1 16,108,117,120,130,133,140,159,162,168,171
+src/flext_meltano/services/singer_state.py
+  d3ada1e5d497edb1 17,43,66,81,110
+src/flext_meltano/services/services.py
+  d3ada1e5d497edb1 28,46
+src/flext_meltano/services/meltano_dbt_transformation.py
+  d3ada1e5d497edb1 54
+src/flext_meltano/services/library_runner.py
+  d3ada1e5d497edb1 19,86,136
+src/flext_meltano/services/_executor_base.py
+  d3ada1e5d497edb1 11,32,82,168,172,176,190,205,207,352,366
+src/flext_meltano/_utilities/runtime.py
+  d3ada1e5d497edb1 8,18,32,118,128,142,158,202
+src/flext_meltano/_models/instances.py
+  d3ada1e5d497edb1 30-31,42,74-75,144-145
+src/flext_meltano/services/singer_target.py
+  d3ada1e5d497edb1 47,90,111
+src/flext_meltano/services/singer_tap.py
+  d3ada1e5d497edb1 68,97
+src/flext_meltano/_utilities/__init__.py
+  d3ada1e5d497edb1 20
+src/flext_meltano/services/meltano_project_sdk.py
+  d3ada1e5d497edb1 19,47,67,85
+src/flext_meltano/services/singer_translator.py
+  d3ada1e5d497edb1 14
+src/flext_meltano/services/dbt_project.py
+  d3ada1e5d497edb1 19,52,118
+src/flext_meltano/_typings/domains.py
+  d3ada1e5d497edb1 22
+src/flext_meltano/services/consumer_bases/dbt_service_base.py
+  d3ada1e5d497edb1 22,181
+src/flext_meltano/services/_pipeline_ops.py
+  d3ada1e5d497edb1 15
+src/flext_meltano/services/consumer_bases/tap_service_base.py
+  d3ada1e5d497edb1 22
+src/flext_meltano/services/project_service.py
+  d3ada1e5d497edb1 19,21
+src/flext_meltano/services/cli_managers.py
+  d3ada1e5d497edb1 36,84,96,103
+src/flext_meltano/settings.py
+  d3ada1e5d497edb1 149,151,166,171,176,181
+src/flext_meltano/services/dbt_runner.py
+  d3ada1e5d497edb1 18,57
+src/flext_meltano/services/validators.py
+  d3ada1e5d497edb1 15,52,54,58
+src/flext_meltano/services/executor.py
+  d3ada1e5d497edb1 32
+src/flext_meltano/services/meltano_plugin_discovery.py
+  d3ada1e5d497edb1 15,104,115,124,157
+src/flext_meltano/services/_pipeline_mgr.py
+  d3ada1e5d497edb1 39,56
+src/flext_meltano/services/consumer_bases/target_service_base.py
+  d3ada1e5d497edb1 98,114,139
+src/flext_meltano/services/_cli_small_managers.py
+  d3ada1e5d497edb1 27,89
+src/flext_meltano/services/__init__.py
+  d3ada1e5d497edb1 17
+src/flext_meltano/_typings/base.py
+  d3ada1e5d497edb1 62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "52b9d130382cb79632742ffec366e932f9ca287c",
+  "prompts": {
+    "d3ada1e5d497edb1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a3e077c-5cc8-4cbe-b4df-b55506e62047",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 123,
+      "total_deletions": 279,
+      "accepted_lines": 117,
+      "overriden_lines": 0
+    }
+  }
+}
