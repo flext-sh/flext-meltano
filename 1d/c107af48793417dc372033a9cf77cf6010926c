@@ -1,0 +1,29 @@
+src/flext_meltano/_protocols/services.py
+  d3ada1e5d497edb1 10-11,17,24-43
+src/flext_meltano/services/_abstractions_base.py
+  d3ada1e5d497edb1 11,16,30-31,86,103
+src/flext_meltano/services/meltano_dbt_transformation.py
+  d3ada1e5d497edb1 16,24
+src/flext_meltano/services/meltano_plugin_discovery.py
+  d3ada1e5d497edb1 77,82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "1dc107af48793417dc372033a9cf77cf6010926c",
+  "prompts": {
+    "d3ada1e5d497edb1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a3e077c-5cc8-4cbe-b4df-b55506e62047",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 37,
+      "total_deletions": 17,
+      "accepted_lines": 34,
+      "overriden_lines": 0
+    }
+  }
+}
