@@ -80,9 +80,14 @@ class FlextMeltanoModelsInstancesData:
             if not self.sink_type or not self.sink_type.strip():
                 msg = "Sink type must be non-empty string"
                 raise ValueError(msg)
-            max_reasonable = c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
-            if self.batch_size > max_reasonable:
-                msg = f"Batch size too large (max {max_reasonable})"
+            c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL = (
+                c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
+            )
+            if (
+                self.batch_size
+                > c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
+            ):
+                msg = f"Batch size too large (max {c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL})"
                 raise ValueError(msg)
             return self
 

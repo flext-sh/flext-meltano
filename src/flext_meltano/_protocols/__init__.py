@@ -31,11 +31,26 @@ if _t.TYPE_CHECKING:
     singer = _flext_meltano__protocols_singer
     from flext_meltano._protocols.singer import FlextMeltanoProtocolsSinger
 _LAZY_IMPORTS = {
-    "FlextMeltanoProtocolsBase": "flext_meltano._protocols.cli",
-    "FlextMeltanoProtocolsPlugin": "flext_meltano._protocols.plugin",
-    "FlextMeltanoProtocolsProject": "flext_meltano._protocols.project",
-    "FlextMeltanoProtocolsServices": "flext_meltano._protocols.services",
-    "FlextMeltanoProtocolsSinger": "flext_meltano._protocols.singer",
+    "FlextMeltanoProtocolsBase": (
+        "flext_meltano._protocols.cli",
+        "FlextMeltanoProtocolsBase",
+    ),
+    "FlextMeltanoProtocolsPlugin": (
+        "flext_meltano._protocols.plugin",
+        "FlextMeltanoProtocolsPlugin",
+    ),
+    "FlextMeltanoProtocolsProject": (
+        "flext_meltano._protocols.project",
+        "FlextMeltanoProtocolsProject",
+    ),
+    "FlextMeltanoProtocolsServices": (
+        "flext_meltano._protocols.services",
+        "FlextMeltanoProtocolsServices",
+    ),
+    "FlextMeltanoProtocolsSinger": (
+        "flext_meltano._protocols.singer",
+        "FlextMeltanoProtocolsSinger",
+    ),
     "cli": "flext_meltano._protocols.cli",
     "plugin": "flext_meltano._protocols.plugin",
     "project": "flext_meltano._protocols.project",

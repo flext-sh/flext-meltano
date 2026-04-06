@@ -23,9 +23,18 @@ if _t.TYPE_CHECKING:
     singer = _flext_meltano__typings_singer
     from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
 _LAZY_IMPORTS = {
-    "FlextMeltanoTypingsBase": "flext_meltano._typings.base",
-    "FlextMeltanoTypingsDomains": "flext_meltano._typings.domains",
-    "FlextMeltanoTypingsSinger": "flext_meltano._typings.singer",
+    "FlextMeltanoTypingsBase": (
+        "flext_meltano._typings.base",
+        "FlextMeltanoTypingsBase",
+    ),
+    "FlextMeltanoTypingsDomains": (
+        "flext_meltano._typings.domains",
+        "FlextMeltanoTypingsDomains",
+    ),
+    "FlextMeltanoTypingsSinger": (
+        "flext_meltano._typings.singer",
+        "FlextMeltanoTypingsSinger",
+    ),
     "base": "flext_meltano._typings.base",
     "domains": "flext_meltano._typings.domains",
     "singer": "flext_meltano._typings.singer",

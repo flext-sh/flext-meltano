@@ -28,8 +28,14 @@ from meltano.core.project_init_service import (
 from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-import flext_meltano as meltano_package
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_core.result import FlextResult as r
+from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano.cli import FlextMeltanoCLI
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.protocols import FlextMeltanoProtocols as p
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
@@ -76,7 +82,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         """Create FLEXT CLI instance - delegates to CLI module."""
 
         def _build() -> p.Meltano.CLI:
-            return meltano_package.FlextMeltanoCLI()
+            return FlextMeltanoCLI()
 
         return u.try_(
             _build,

@@ -31,12 +31,12 @@ if _t.TYPE_CHECKING:
         docker_services,
     )
 _LAZY_IMPORTS = {
-    "ContainerManager": "tests.helpers.docker_test_manager",
-    "Tk": "tests.helpers.docker_test_manager",
+    "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
+    "Tk": ("tests.helpers.docker_test_manager", "Tk"),
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
-    "docker_manager": "tests.helpers.docker_test_manager",
-    "docker_services": "tests.helpers.docker_test_manager",
+    "docker_manager": ("tests.helpers.docker_test_manager", "docker_manager"),
+    "docker_services": ("tests.helpers.docker_test_manager", "docker_services"),
     "docker_test_manager": "tests.helpers.docker_test_manager",
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),

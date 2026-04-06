@@ -177,46 +177,163 @@ if _t.TYPE_CHECKING:
 _LAZY_IMPORTS = merge_lazy_imports(
     ("flext_meltano.services.consumer_bases",),
     {
-        "FlextMeltanoAbstractions": "flext_meltano.services.abstractions",
-        "FlextMeltanoAbstractionsBase": "flext_meltano.services._abstractions_base",
-        "FlextMeltanoAdapter": "flext_meltano.services.adapters",
-        "FlextMeltanoBridge": "flext_meltano.services.bridge",
-        "FlextMeltanoCommandRouter": "flext_meltano.services.cli_managers",
-        "FlextMeltanoComponentService": "flext_meltano.services.meltano_plugins",
-        "FlextMeltanoDbtAdapter": "flext_meltano.services.adapter_extensions",
-        "FlextMeltanoDbtManager": "flext_meltano.services._cli_small_managers",
-        "FlextMeltanoDbtProjectMixin": "flext_meltano.services.dbt_project",
-        "FlextMeltanoDbtRunnerMixin": "flext_meltano.services.dbt_runner",
-        "FlextMeltanoDbtTransformationRunner": "flext_meltano.services.meltano_dbt_transformation",
-        "FlextMeltanoExecutor": "flext_meltano.services.executor",
-        "FlextMeltanoExecutorBase": "flext_meltano.services._executor_base",
-        "FlextMeltanoLibraryRunner": "flext_meltano.services.library_runner",
-        "FlextMeltanoPipelineAdapter": "flext_meltano.services.adapter_extensions",
-        "FlextMeltanoPipelineCrudOperations": "flext_meltano.services._pipeline_ops",
-        "FlextMeltanoPipelineLifecycleOperations": "flext_meltano.services._pipeline_lifecycle",
-        "FlextMeltanoPipelineManager": "flext_meltano.services._pipeline_mgr",
-        "FlextMeltanoPipelinePaths": "flext_meltano.services._pipeline_ops",
-        "FlextMeltanoPluginDiscoveryMixin": "flext_meltano.services.meltano_plugin_discovery",
-        "FlextMeltanoPluginManager": "flext_meltano.services._cli_small_managers",
-        "FlextMeltanoProjectManager": "flext_meltano.services.meltano_project_sdk",
-        "FlextMeltanoProjectService": "flext_meltano.services.project_service",
-        "FlextMeltanoService": "flext_meltano.services.services",
-        "FlextMeltanoSingerCatalogMixin": "flext_meltano.services.singer_catalog",
-        "FlextMeltanoSingerCliTranslator": "flext_meltano.services.singer_translator",
-        "FlextMeltanoSingerContext": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoSingerManager": "flext_meltano.services.cli_managers",
-        "FlextMeltanoSingerRecord": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoSingerSinkBase": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoSingerStateMixin": "flext_meltano.services.singer_state",
-        "FlextMeltanoSingerStreamBase": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoSingerTapAdapter": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoSingerTapBase": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoSingerTargetBase": "flext_meltano.services.singer_sdk",
-        "FlextMeltanoStatusManager": "flext_meltano.services._cli_small_managers",
-        "FlextMeltanoTapAbstractions": "flext_meltano.services.singer_tap",
-        "FlextMeltanoTapSourceMixin": "flext_meltano.services.singer_tap",
-        "FlextMeltanoTargetAbstractions": "flext_meltano.services.singer_target",
-        "FlextMeltanoValidators": "flext_meltano.services.validators",
+        "FlextMeltanoAbstractions": (
+            "flext_meltano.services.abstractions",
+            "FlextMeltanoAbstractions",
+        ),
+        "FlextMeltanoAbstractionsBase": (
+            "flext_meltano.services._abstractions_base",
+            "FlextMeltanoAbstractionsBase",
+        ),
+        "FlextMeltanoAdapter": (
+            "flext_meltano.services.adapters",
+            "FlextMeltanoAdapter",
+        ),
+        "FlextMeltanoBridge": ("flext_meltano.services.bridge", "FlextMeltanoBridge"),
+        "FlextMeltanoCommandRouter": (
+            "flext_meltano.services.cli_managers",
+            "FlextMeltanoCommandRouter",
+        ),
+        "FlextMeltanoComponentService": (
+            "flext_meltano.services.meltano_plugins",
+            "FlextMeltanoComponentService",
+        ),
+        "FlextMeltanoDbtAdapter": (
+            "flext_meltano.services.adapter_extensions",
+            "FlextMeltanoDbtAdapter",
+        ),
+        "FlextMeltanoDbtManager": (
+            "flext_meltano.services._cli_small_managers",
+            "FlextMeltanoDbtManager",
+        ),
+        "FlextMeltanoDbtProjectMixin": (
+            "flext_meltano.services.dbt_project",
+            "FlextMeltanoDbtProjectMixin",
+        ),
+        "FlextMeltanoDbtRunnerMixin": (
+            "flext_meltano.services.dbt_runner",
+            "FlextMeltanoDbtRunnerMixin",
+        ),
+        "FlextMeltanoDbtTransformationRunner": (
+            "flext_meltano.services.meltano_dbt_transformation",
+            "FlextMeltanoDbtTransformationRunner",
+        ),
+        "FlextMeltanoExecutor": (
+            "flext_meltano.services.executor",
+            "FlextMeltanoExecutor",
+        ),
+        "FlextMeltanoExecutorBase": (
+            "flext_meltano.services._executor_base",
+            "FlextMeltanoExecutorBase",
+        ),
+        "FlextMeltanoLibraryRunner": (
+            "flext_meltano.services.library_runner",
+            "FlextMeltanoLibraryRunner",
+        ),
+        "FlextMeltanoPipelineAdapter": (
+            "flext_meltano.services.adapter_extensions",
+            "FlextMeltanoPipelineAdapter",
+        ),
+        "FlextMeltanoPipelineCrudOperations": (
+            "flext_meltano.services._pipeline_ops",
+            "FlextMeltanoPipelineCrudOperations",
+        ),
+        "FlextMeltanoPipelineLifecycleOperations": (
+            "flext_meltano.services._pipeline_lifecycle",
+            "FlextMeltanoPipelineLifecycleOperations",
+        ),
+        "FlextMeltanoPipelineManager": (
+            "flext_meltano.services._pipeline_mgr",
+            "FlextMeltanoPipelineManager",
+        ),
+        "FlextMeltanoPipelinePaths": (
+            "flext_meltano.services._pipeline_ops",
+            "FlextMeltanoPipelinePaths",
+        ),
+        "FlextMeltanoPluginDiscoveryMixin": (
+            "flext_meltano.services.meltano_plugin_discovery",
+            "FlextMeltanoPluginDiscoveryMixin",
+        ),
+        "FlextMeltanoPluginManager": (
+            "flext_meltano.services._cli_small_managers",
+            "FlextMeltanoPluginManager",
+        ),
+        "FlextMeltanoProjectManager": (
+            "flext_meltano.services.meltano_project_sdk",
+            "FlextMeltanoProjectManager",
+        ),
+        "FlextMeltanoProjectService": (
+            "flext_meltano.services.project_service",
+            "FlextMeltanoProjectService",
+        ),
+        "FlextMeltanoService": (
+            "flext_meltano.services.services",
+            "FlextMeltanoService",
+        ),
+        "FlextMeltanoSingerCatalogMixin": (
+            "flext_meltano.services.singer_catalog",
+            "FlextMeltanoSingerCatalogMixin",
+        ),
+        "FlextMeltanoSingerCliTranslator": (
+            "flext_meltano.services.singer_translator",
+            "FlextMeltanoSingerCliTranslator",
+        ),
+        "FlextMeltanoSingerContext": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerContext",
+        ),
+        "FlextMeltanoSingerManager": (
+            "flext_meltano.services.cli_managers",
+            "FlextMeltanoSingerManager",
+        ),
+        "FlextMeltanoSingerRecord": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerRecord",
+        ),
+        "FlextMeltanoSingerSinkBase": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerSinkBase",
+        ),
+        "FlextMeltanoSingerStateMixin": (
+            "flext_meltano.services.singer_state",
+            "FlextMeltanoSingerStateMixin",
+        ),
+        "FlextMeltanoSingerStreamBase": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerStreamBase",
+        ),
+        "FlextMeltanoSingerTapAdapter": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerTapAdapter",
+        ),
+        "FlextMeltanoSingerTapBase": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerTapBase",
+        ),
+        "FlextMeltanoSingerTargetBase": (
+            "flext_meltano.services.singer_sdk",
+            "FlextMeltanoSingerTargetBase",
+        ),
+        "FlextMeltanoStatusManager": (
+            "flext_meltano.services._cli_small_managers",
+            "FlextMeltanoStatusManager",
+        ),
+        "FlextMeltanoTapAbstractions": (
+            "flext_meltano.services.singer_tap",
+            "FlextMeltanoTapAbstractions",
+        ),
+        "FlextMeltanoTapSourceMixin": (
+            "flext_meltano.services.singer_tap",
+            "FlextMeltanoTapSourceMixin",
+        ),
+        "FlextMeltanoTargetAbstractions": (
+            "flext_meltano.services.singer_target",
+            "FlextMeltanoTargetAbstractions",
+        ),
+        "FlextMeltanoValidators": (
+            "flext_meltano.services.validators",
+            "FlextMeltanoValidators",
+        ),
         "_abstractions_base": "flext_meltano.services._abstractions_base",
         "_cli_small_managers": "flext_meltano.services._cli_small_managers",
         "_executor_base": "flext_meltano.services._executor_base",

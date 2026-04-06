@@ -23,9 +23,18 @@ if _t.TYPE_CHECKING:
     enums = _flext_meltano__constants_enums
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 _LAZY_IMPORTS = {
-    "FlextMeltanoConstantsBase": "flext_meltano._constants.base",
-    "FlextMeltanoConstantsConfig": "flext_meltano._constants.config",
-    "FlextMeltanoConstantsEnums": "flext_meltano._constants.enums",
+    "FlextMeltanoConstantsBase": (
+        "flext_meltano._constants.base",
+        "FlextMeltanoConstantsBase",
+    ),
+    "FlextMeltanoConstantsConfig": (
+        "flext_meltano._constants.config",
+        "FlextMeltanoConstantsConfig",
+    ),
+    "FlextMeltanoConstantsEnums": (
+        "flext_meltano._constants.enums",
+        "FlextMeltanoConstantsEnums",
+    ),
     "base": "flext_meltano._constants.base",
     "config": "flext_meltano._constants.config",
     "enums": "flext_meltano._constants.enums",

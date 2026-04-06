@@ -91,26 +91,83 @@ if _t.TYPE_CHECKING:
     transformations = _flext_meltano__models_transformations
     from flext_meltano._models.transformations import FlextMeltanoModelsTransformations
 _LAZY_IMPORTS = {
-    "FlextMeltanoModelsCliParams": "flext_meltano._models.cli_params",
-    "FlextMeltanoModelsContext": "flext_meltano._models.context",
-    "FlextMeltanoModelsCore": "flext_meltano._models.core",
-    "FlextMeltanoModelsDiscovery": "flext_meltano._models.discovery",
-    "FlextMeltanoModelsInstances": "flext_meltano._models.instances",
-    "FlextMeltanoModelsInstancesData": "flext_meltano._models.instances_data",
-    "FlextMeltanoModelsLogging": "flext_meltano._models.logging_config",
-    "FlextMeltanoModelsPayloads": "flext_meltano._models.payloads",
-    "FlextMeltanoModelsPayloadsData": "flext_meltano._models.payloads_data",
-    "FlextMeltanoModelsProjects": "flext_meltano._models.projects",
-    "FlextMeltanoModelsProjectsPlugin": "flext_meltano._models.projects_plugin",
-    "FlextMeltanoModelsResults": "flext_meltano._models.results",
-    "FlextMeltanoModelsResultsDbt": "flext_meltano._models.results_dbt",
-    "FlextMeltanoModelsResultsPipeline": "flext_meltano._models.results_pipeline",
-    "FlextMeltanoModelsSinger": "flext_meltano._models.singer",
-    "FlextMeltanoModelsSingerCatalog": "flext_meltano._models.singer_catalog",
-    "FlextMeltanoModelsSingerSdk": "flext_meltano._models.singer_sdk",
-    "FlextMeltanoModelsSources": "flext_meltano._models.sources",
-    "FlextMeltanoModelsSourcesParams": "flext_meltano._models.sources_params",
-    "FlextMeltanoModelsTransformations": "flext_meltano._models.transformations",
+    "FlextMeltanoModelsCliParams": (
+        "flext_meltano._models.cli_params",
+        "FlextMeltanoModelsCliParams",
+    ),
+    "FlextMeltanoModelsContext": (
+        "flext_meltano._models.context",
+        "FlextMeltanoModelsContext",
+    ),
+    "FlextMeltanoModelsCore": ("flext_meltano._models.core", "FlextMeltanoModelsCore"),
+    "FlextMeltanoModelsDiscovery": (
+        "flext_meltano._models.discovery",
+        "FlextMeltanoModelsDiscovery",
+    ),
+    "FlextMeltanoModelsInstances": (
+        "flext_meltano._models.instances",
+        "FlextMeltanoModelsInstances",
+    ),
+    "FlextMeltanoModelsInstancesData": (
+        "flext_meltano._models.instances_data",
+        "FlextMeltanoModelsInstancesData",
+    ),
+    "FlextMeltanoModelsLogging": (
+        "flext_meltano._models.logging_config",
+        "FlextMeltanoModelsLogging",
+    ),
+    "FlextMeltanoModelsPayloads": (
+        "flext_meltano._models.payloads",
+        "FlextMeltanoModelsPayloads",
+    ),
+    "FlextMeltanoModelsPayloadsData": (
+        "flext_meltano._models.payloads_data",
+        "FlextMeltanoModelsPayloadsData",
+    ),
+    "FlextMeltanoModelsProjects": (
+        "flext_meltano._models.projects",
+        "FlextMeltanoModelsProjects",
+    ),
+    "FlextMeltanoModelsProjectsPlugin": (
+        "flext_meltano._models.projects_plugin",
+        "FlextMeltanoModelsProjectsPlugin",
+    ),
+    "FlextMeltanoModelsResults": (
+        "flext_meltano._models.results",
+        "FlextMeltanoModelsResults",
+    ),
+    "FlextMeltanoModelsResultsDbt": (
+        "flext_meltano._models.results_dbt",
+        "FlextMeltanoModelsResultsDbt",
+    ),
+    "FlextMeltanoModelsResultsPipeline": (
+        "flext_meltano._models.results_pipeline",
+        "FlextMeltanoModelsResultsPipeline",
+    ),
+    "FlextMeltanoModelsSinger": (
+        "flext_meltano._models.singer",
+        "FlextMeltanoModelsSinger",
+    ),
+    "FlextMeltanoModelsSingerCatalog": (
+        "flext_meltano._models.singer_catalog",
+        "FlextMeltanoModelsSingerCatalog",
+    ),
+    "FlextMeltanoModelsSingerSdk": (
+        "flext_meltano._models.singer_sdk",
+        "FlextMeltanoModelsSingerSdk",
+    ),
+    "FlextMeltanoModelsSources": (
+        "flext_meltano._models.sources",
+        "FlextMeltanoModelsSources",
+    ),
+    "FlextMeltanoModelsSourcesParams": (
+        "flext_meltano._models.sources_params",
+        "FlextMeltanoModelsSourcesParams",
+    ),
+    "FlextMeltanoModelsTransformations": (
+        "flext_meltano._models.transformations",
+        "FlextMeltanoModelsTransformations",
+    ),
     "cli_params": "flext_meltano._models.cli_params",
     "context": "flext_meltano._models.context",
     "core": "flext_meltano._models.core",
