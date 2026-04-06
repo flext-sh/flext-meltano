@@ -71,7 +71,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                 "error": command_result.error,
             }
             return r[t.ContainerMapping].ok(pipeline_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+        except c.Meltano.OPERATION_ERRORS as ex:
             return r[t.ContainerMapping].fail(f"Pipeline execution failed: {ex}")
 
 
@@ -115,7 +115,7 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
                 "error": command_result.error,
             }
             return r[t.ContainerMapping].ok(dbt_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+        except c.Meltano.OPERATION_ERRORS as ex:
             return r[t.ContainerMapping].fail(f"DBT operation failed: {ex}")
 
 

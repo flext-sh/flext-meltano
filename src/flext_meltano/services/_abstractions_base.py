@@ -13,14 +13,10 @@ from typing import TYPE_CHECKING, ClassVar, override
 from pydantic import Field, ValidationError
 
 import flext_meltano.services as meltano_services
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, r, t, u
 
 if TYPE_CHECKING:
     from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoProjectService
-
-# Re-export from canonical location for backward compatibility with auto-generated __init__.py
-OPERATION_ERRORS = c.Meltano.OPERATION_ERRORS
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
@@ -109,7 +105,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         self,
         _project: FlextMeltanoProjectService | t.ContainerMapping | None,
         plugin_type: str,
-    ) -> r[dict[str, dict[str, str]]]:
+    ) -> r[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""
         try:
             cwd = self._resolve_project_root(_project)
@@ -118,10 +114,10 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 _cwd=cwd,
             )
             if plugins_result.is_failure:
-                return r[dict[str, dict[str, str]]].fail(
+                return r[t.Meltano.NestedStrMapping].fail(
                     plugins_result.error or f"Failed to list {plugin_type}",
                 )
-            plugins: dict[str, dict[str, str]] = {}
+            plugins: dict[str, t.StrMapping] = {}
             for plugin in plugins_result.value:
                 plugin_name = str(plugin.get("name", ""))
                 if not plugin_name:
@@ -131,17 +127,17 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                     "type": plugin_type,
                     "status": c.Meltano.OperationStatus.AVAILABLE,
                 }
-            return r[dict[str, dict[str, str]]].ok(plugins)
+            return r[t.Meltano.NestedStrMapping].ok(plugins)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
-            return r[dict[str, dict[str, str]]].fail(error_msg)
+            return r[t.Meltano.NestedStrMapping].fail(error_msg)
 
     def execute_singer_pipeline(
         self,
         elt_context: t.ContainerMapping,
         extractor_plugin: t.ContainerMapping | None,
         loader_plugin: t.ContainerMapping | None,
-    ) -> r[dict[str, str | int]]:
+    ) -> r[t.HeaderMapping]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
             extractor_mapping = self._coerce_container_mapping(extractor_plugin)
@@ -160,19 +156,19 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 [c.Meltano.CMD_ELT, extractor_name, loader_name],
             )
             if cmd_result.is_failure:
-                return r[dict[str, str | int]].fail(
+                return r[t.HeaderMapping].fail(
                     cmd_result.error or "Pipeline execution failed",
                 )
-            result: dict[str, str | int] = {
+            result: t.MutableHeaderMapping = {
                 "status": c.Meltano.StreamStatus.COMPLETED,
                 "source": extractor_name,
                 "sink": loader_name,
                 "records_processed": 0,
             }
-            return r[dict[str, str | int]].ok(result)
+            return r[t.HeaderMapping].ok(result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
-            return r[dict[str, str | int]].fail(error_msg)
+            return r[t.HeaderMapping].fail(error_msg)
 
     def find_project(self, project_root: Path) -> r[Path]:
         """Find and validate a Meltano project directory."""

@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
+from flext_infra import u
 from pydantic import BaseModel
 
-from flext_core import u
 from flext_meltano import c, m, p, t
 
 
@@ -15,7 +15,7 @@ class FlextMeltanoUtilitiesRuntime:
     """Runtime-focused helpers for in-process Meltano execution."""
 
     @staticmethod
-    def _normalized_parts(values: t.StrSequence) -> list[str]:
+    def _normalized_parts(values: t.StrSequence) -> t.StrSequence:
         """Normalize a sequence of CLI-like values to stripped non-empty strings."""
         stripped_values = u.map(
             u.to_str_list(values),
@@ -29,7 +29,7 @@ class FlextMeltanoUtilitiesRuntime:
         )
 
     @staticmethod
-    def normalize_runtime_command(command: t.StrSequence) -> list[str]:
+    def normalize_runtime_command(command: t.StrSequence) -> t.StrSequence:
         """Normalize legacy Meltano command arguments for in-process execution."""
         normalized = FlextMeltanoUtilitiesRuntime._normalized_parts(command)
         if normalized and normalized[0] == c.Meltano.CMD_BINARY:
@@ -115,7 +115,7 @@ class FlextMeltanoUtilitiesRuntime:
     def build_pipeline_runtime_command(
         tap_name: str,
         target_name: str,
-    ) -> list[str]:
+    ) -> t.StrSequence:
         """Build the canonical Meltano ELT runtime command."""
         return FlextMeltanoUtilitiesRuntime._normalized_parts(
             [c.Meltano.CMD_ELT, tap_name, target_name],
@@ -125,7 +125,7 @@ class FlextMeltanoUtilitiesRuntime:
     def build_dbt_runtime_command(
         dbt_command: str,
         args: t.StrSequence | None = None,
-    ) -> list[str]:
+    ) -> t.StrSequence:
         """Build the canonical Meltano DBT invoke runtime command."""
         command = [
             c.Meltano.CMD_INVOKE,
@@ -139,7 +139,7 @@ class FlextMeltanoUtilitiesRuntime:
     def build_bridge_command_args(
         command: str,
         args: t.ConfigurationMapping | None = None,
-    ) -> list[str]:
+    ) -> t.StrSequence:
         """Build Meltano bridge command arguments from command + key/value args."""
         command_args = FlextMeltanoUtilitiesRuntime._normalized_parts([command])
         if args is None:
@@ -155,7 +155,7 @@ class FlextMeltanoUtilitiesRuntime:
     def build_discovered_plugin(
         raw_type: str,
         raw_plugin: t.ContainerMapping,
-    ) -> dict[str, str] | None:
+    ) -> t.StrMapping | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape."""
         name_val = raw_plugin.get("name", "")
         plugin_name = str(name_val).strip() if name_val is not None else ""
@@ -199,7 +199,7 @@ class FlextMeltanoUtilitiesRuntime:
         plugin_type: str,
         *,
         default_variant: str = "",
-        variants: Mapping[str, object] | None = None,
+        variants: t.ContainerMapping | None = None,
         description: str = "",
         logo_url: str = "",
     ) -> t.StrMapping:

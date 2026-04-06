@@ -146,9 +146,9 @@ class FlextMeltanoSettings(FlextSettings):
         """Validate required project structure artifacts."""
         if not self.project_root.exists() or not self.project_root.is_dir():
             return r[bool].fail(f"Project path {self.project_root} does not exist")
-        if not (self.project_root / "meltano.yml").exists():
+        if not (self.project_root / self.PROJECT_FILE).exists():
             return r[bool].fail(
-                f"Project path {self.project_root} does not contain meltano.yml"
+                f"Project path {self.project_root} does not contain {self.PROJECT_FILE}"
             )
         return r[bool].ok(value=True)
 
@@ -163,22 +163,22 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def get_version(cls) -> str:
         """Return package semantic version."""
-        return "0.9.0"
+        return c.Meltano.FLEXT_MELTANO_VERSION
 
     @classmethod
     def get_name(cls) -> str:
         """Return package distribution name."""
-        return "flext-meltano"
+        return c.Meltano.PROJECT_PREFIX
 
     @classmethod
     def get_default_timeout(cls) -> int:
         """Return default command timeout in seconds."""
-        return 30
+        return c.Meltano.NETWORK_DEFAULT_TIMEOUT
 
     @classmethod
     def get_default_batch_size(cls) -> int:
         """Return default batch size for operations."""
-        return 1000
+        return c.Meltano.BATCH_DEFAULT_DEFAULT_BATCH_SIZE
 
     @classmethod
     def get_supported_plugin_types(cls) -> t.StrSequence:

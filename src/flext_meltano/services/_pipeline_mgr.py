@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping
 
 from flext_core import FlextLogger, r
 from flext_meltano import (
@@ -17,8 +17,6 @@ from flext_meltano import (
     p,
     t,
 )
-
-_PipelineCli = p.Meltano.PipelineCli
 
 
 class FlextMeltanoPipelineManager(
@@ -38,7 +36,7 @@ class FlextMeltanoPipelineManager(
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle pipeline command using composition."""
-        if "--help" in args or "-h" in args:
+        if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
             self.cli.show_pipeline_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand = args[0]
@@ -55,16 +53,7 @@ class FlextMeltanoPipelineManager(
                 "Pipeline creation requires pipeline name and JSON configuration",
             )
         pipeline_name = _args[0]
-        config_payload: (
-            Mapping[
-                str,
-                t.Scalar
-                | Sequence[t.Scalar | None]
-                | Mapping[str, t.Scalar | None]
-                | None,
-            ]
-            | None
-        ) = None
+        config_payload: t.ContainerMapping | None = None
         if len(_args) >= c.Meltano.CLI_DEFAULT_MIN_ARGS_WITH_CONFIG:
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(

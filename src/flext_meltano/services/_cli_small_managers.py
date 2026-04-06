@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from flext_core import FlextLogger, r
-from flext_meltano import c, p, t
+from flext_core import FlextLogger
+from flext_meltano import c, p, r, t
 
 
 class _FlextMeltanoSimpleCommandManager:
@@ -24,7 +24,7 @@ class _FlextMeltanoSimpleCommandManager:
         operation_handler: Callable[[str, t.StrSequence], r[str]],
     ) -> r[str]:
         """Route command to help or operation handler."""
-        if "--help" in args or "-h" in args:
+        if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
             help_handler()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return operation_handler(args[0], args[1:])
@@ -86,7 +86,7 @@ class FlextMeltanoStatusManager:
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle status command."""
-        if "--help" in args or "-h" in args:
+        if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
             self.cli.show_status_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_status_operation(args[0], args[1:])

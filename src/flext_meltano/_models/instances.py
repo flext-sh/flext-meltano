@@ -10,8 +10,6 @@ from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import FlextMeltanoModelsSources, c, t
 
-_INITIALIZED = c.Meltano.StreamStatus.INITIALIZED
-
 
 class FlextMeltanoModelsInstances:
     """Instance and stream models."""
@@ -29,8 +27,8 @@ class FlextMeltanoModelsInstances:
         ] = Field(default_factory=dict, description="Sink schema")
         status: Annotated[
             str,
-            Field(default=_INITIALIZED, description="Current status"),
-        ] = _INITIALIZED
+            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"),
+        ] = c.Meltano.StreamStatus.INITIALIZED
 
         @computed_field
         def config_keys_count(self) -> int:
@@ -41,7 +39,7 @@ class FlextMeltanoModelsInstances:
         def validate_sink_definition(self) -> Self:
             """Validate sink definition consistency."""
             valid_statuses = {
-                _INITIALIZED,
+                c.Meltano.StreamStatus.INITIALIZED,
                 "configured",
                 "running",
                 c.Meltano.StreamStatus.COMPLETED,
@@ -73,8 +71,8 @@ class FlextMeltanoModelsInstances:
         ] = None
         status: Annotated[
             str,
-            Field(default=_INITIALIZED, description="Stream processing status"),
-        ] = _INITIALIZED
+            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Stream processing status"),
+        ] = c.Meltano.StreamStatus.INITIALIZED
         records_loaded: Annotated[
             t.NonNegativeInt, Field(default=0, description="Number of records loaded")
         ] = 0
@@ -143,8 +141,8 @@ class FlextMeltanoModelsInstances:
         )
         status: Annotated[
             str,
-            Field(default=_INITIALIZED, description="Tap status"),
-        ] = _INITIALIZED
+            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status"),
+        ] = c.Meltano.StreamStatus.INITIALIZED
 
         @computed_field
         def active_streams(self) -> Sequence[FlextMeltanoModelsInstances.StreamInfo]:

@@ -17,8 +17,7 @@ from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, p, t
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
 
 
 class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
@@ -96,7 +95,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
             self._sinks[stream_name] = sink
             self.logger.debug("Sink created", stream=stream_name)
             return r[p.Meltano.SingerDrainSink].ok(sink)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+        except c.Meltano.OPERATION_ERRORS as exc:
             return r[p.Meltano.SingerDrainSink].fail(str(exc))
 
     def flush(self, stream_name: str | None = None) -> r[None]:
@@ -112,7 +111,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
                 sink.process_batch(context)
                 sink.mark_drained()
             return r[None].ok(None)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+        except c.Meltano.OPERATION_ERRORS as exc:
             return r[None].fail(str(exc))
 
     # ------------------------------------------------------------------
@@ -137,7 +136,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
             empty_context: t.MutableContainerValueMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+        except c.Meltano.OPERATION_ERRORS as exc:
             return r[bool].fail(str(exc))
 
     def process_batch(

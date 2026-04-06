@@ -11,10 +11,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from flext_cli import cli
 from pydantic import PrivateAttr
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, m
+from flext_meltano import FlextMeltanoServiceBase, c, m, r
 
 
 class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
@@ -40,15 +40,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             if value is None:
                 return r[str].fail(f"Bookmark not found: {stream_name}.{bookmark_key}")
             return r[str].ok(str(value))
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get bookmark", error=str(e))
             return r[str].fail(f"Failed to get bookmark: {e}")
 
@@ -59,24 +51,19 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         """Load state from file or return in-memory state."""
         try:
             if state_file and state_file.exists():
-                self._singer_state = m.Meltano.SingerStateMessage.model_validate_json(
-                    state_file.read_text(encoding="utf-8"),
+                load_result = cli.read_json_model(
+                    state_file, m.Meltano.SingerStateMessage
                 )
+                if load_result.is_failure:
+                    return r[m.Meltano.SingerStateMessage].fail(str(load_result.error))
+                self._singer_state = load_result.value
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),
                     entries=len(self._singer_state.value),
                 )
             return r[m.Meltano.SingerStateMessage].ok(self._singer_state)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load state", error=str(e))
             return r[m.Meltano.SingerStateMessage].fail(f"Failed to load state: {e}")
 
@@ -84,19 +71,14 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         """Save state to file."""
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
-            with state_file.open("w", encoding="utf-8") as f:
-                f.write(self._singer_state.model_dump_json(indent=2))
+            write_result = cli.write_text_file(
+                state_file, self._singer_state.model_dump_json(indent=2)
+            )
+            if write_result.is_failure:
+                return r[None].fail(str(write_result.error))
             self.logger.info("State saved to file", file=str(state_file))
             return r[None].ok(None)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to save state", error=str(e))
             return r[None].fail(f"Failed to save state: {e}")
 
@@ -125,15 +107,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                     )
             self.logger.debug("Bookmark updated", stream=stream_name, key=bookmark_key)
             return r[None].ok(None)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to update bookmark", error=str(e))
             return r[None].fail(f"Failed to update bookmark: {e}")
 

@@ -11,10 +11,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from flext_cli import cli
 from pydantic import PrivateAttr
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, m, p, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
 
 
 class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
@@ -43,15 +43,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 stream_count=len(self._singer_catalog.streams),
             )
             return r[m.Meltano.SingerCatalog].ok(self._singer_catalog)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to discover: {e}")
 
@@ -65,15 +57,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             return r[t.ContainerValueMapping].fail(
                 f"Stream not found in catalog: {stream_name}"
             )
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get stream schema", error=str(e))
             return r[t.ContainerValueMapping].fail(f"Failed to get schema: {e}")
 
@@ -84,24 +68,18 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 return r[m.Meltano.SingerCatalog].fail(
                     f"Catalog file not found: {catalog_file}"
                 )
-            self._singer_catalog = m.Meltano.SingerCatalog.model_validate_json(
-                catalog_file.read_text(encoding="utf-8"),
-            )
+
+            load_result = cli.read_json_model(catalog_file, m.Meltano.SingerCatalog)
+            if load_result.is_failure:
+                return r[m.Meltano.SingerCatalog].fail(str(load_result.error))
+            self._singer_catalog = load_result.value
             self.logger.info(
                 "Catalog loaded from file",
                 file=str(catalog_file),
                 stream_count=len(self._singer_catalog.streams),
             )
             return r[m.Meltano.SingerCatalog].ok(self._singer_catalog)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
 
@@ -109,19 +87,16 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         """Save catalog to JSON file."""
         try:
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
-            with catalog_file.open("w", encoding="utf-8") as f:
-                f.write(self._singer_catalog.model_dump_json(indent=2, by_alias=True))
+
+            write_result = cli.write_text_file(
+                catalog_file,
+                self._singer_catalog.model_dump_json(indent=2, by_alias=True),
+            )
+            if write_result.is_failure:
+                return r[None].fail(str(write_result.error))
             self.logger.info("Catalog saved to file", file=str(catalog_file))
             return r[None].ok(None)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to save catalog", error=str(e))
             return r[None].fail(f"Failed to save catalog: {e}")
 
@@ -140,15 +115,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 selected=len(selected),
             )
             return r[m.Meltano.SingerCatalog].ok(filtered_catalog)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to select streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 

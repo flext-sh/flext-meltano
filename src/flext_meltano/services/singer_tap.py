@@ -9,8 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import r, u
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
 class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
@@ -66,15 +65,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "Source instance created successfully", source_name=source_type
             )
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail(
                 f"Source instance creation failed: {e}"
@@ -103,7 +94,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                     tap_id=inst.source_id,
                 ),
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+        except c.Meltano.OPERATION_ERRORS as exc:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
 
 

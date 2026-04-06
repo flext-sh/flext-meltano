@@ -16,7 +16,7 @@ from flext_meltano import (
     t,
 )
 
-_INITIALIZED = c.Meltano.StreamStatus.INITIALIZED
+c.Meltano.StreamStatus.INITIALIZED = c.Meltano.StreamStatus.INITIALIZED
 
 
 class FlextMeltanoModelsInstancesData:
@@ -101,8 +101,8 @@ class FlextMeltanoModelsInstancesData:
         ] = None
         status: Annotated[
             str,
-            Field(default=_INITIALIZED, description="Current status"),
-        ] = _INITIALIZED
+            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"),
+        ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             Field(description="Discovered streams"),
@@ -181,8 +181,8 @@ class FlextMeltanoModelsInstancesData:
         ] = None
         status: Annotated[
             str,
-            Field(default=_INITIALIZED, description="Current status"),
-        ] = _INITIALIZED
+            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"),
+        ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[
             t.BatchSize, Field(default=1000, description="Batch processing size")
         ] = 1000

@@ -9,9 +9,11 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from flext_cli import cli
+
 import flext_meltano.services as meltano_services
-from flext_core import FlextLogger, r
-from flext_meltano import c, m, t, u
+from flext_core import FlextLogger
+from flext_meltano import c, m, r, t, u
 
 
 class FlextMeltanoPipelinePaths:
@@ -95,9 +97,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         configured_command: t.StrSequence | None = None
         config_path = FlextMeltanoPipelinePaths.pipeline_config_path(pipeline_name)
         if config_path.exists():
-            from flext_cli.services.file_tools import FlextCliFileTools
-
-            config_mapping_result = FlextCliFileTools.read_json_model(
+            config_mapping_result = cli.read_json_model(
                 config_path, m.Meltano.ConfigMappingPayload
             )
             if config_mapping_result.is_failure:

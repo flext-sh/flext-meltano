@@ -25,7 +25,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         """Create a specialized Meltano service using a shared utility path."""
 
         def _build() -> FlextMeltanoService:
-            kwargs: dict[str, str | None] = {
+            kwargs: t.MutableOptionalStrMapping = {
                 "service_name": f"{component_name}_service",
                 "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
                 "source_name": None,
@@ -43,7 +43,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
         return u.try_(
             _build,
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            catch=c.Meltano.OPERATION_ERRORS,
         ).map_error(
             lambda ex: f"Failed to create {component_label} '{component_name}': {ex}"
         )

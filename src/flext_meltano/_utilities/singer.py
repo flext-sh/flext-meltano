@@ -15,8 +15,6 @@ from flext_cli import r
 
 from flext_meltano import c, m, p, t
 
-SingerTargetHandler = p.Meltano.SingerTargetHandler
-
 
 class FlextMeltanoUtilitiesSinger:
     """Singer protocol utilities for message emission and stdin processing."""

@@ -16,6 +16,7 @@ from flext_meltano import (
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
     FlextMeltanoServiceBase,
+    c,
     p,
     t,
     u,
@@ -82,7 +83,7 @@ class FlextMeltanoLibraryRunner(
                         separator=",",
                     )
             return r[t.MutableContainerMapping].ok(elt_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
             return r[t.MutableContainerMapping].fail(error_msg)
@@ -132,7 +133,7 @@ class FlextMeltanoLibraryRunner(
                 for k, v in payload.items()
             }
             return r[t.MutableContainerMapping].ok(elt_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
             return r[t.MutableContainerMapping].fail(error_msg)

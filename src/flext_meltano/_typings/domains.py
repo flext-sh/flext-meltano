@@ -19,6 +19,7 @@ class FlextMeltanoTypingsDomains:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
+    type NestedStrMapping = Mapping[str, FlextCliTypes.StrMapping]
     type DbtManifestData = Mapping[
         str,
         Mapping[str, FlextCliTypes.ContainerValue] | None,

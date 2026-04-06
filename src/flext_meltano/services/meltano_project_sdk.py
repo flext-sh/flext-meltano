@@ -16,7 +16,7 @@ from meltano.core.project import Project
 from pydantic import PrivateAttr
 
 from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
@@ -44,15 +44,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 type=plugin_type or "",
             )
             return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get plugins", error=str(e))
             return r[Sequence[t.Meltano.PluginDefinition]].fail(
                 f"Failed to get plugins: {e}"
@@ -72,15 +64,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             info = {"project_root": str(root), "state": "initialized"}
             self.logger.info("Meltano project initialized", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.OptionalScalarMap].fail(
                 f"Failed to initialize project: {e}"
@@ -98,15 +82,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             info = {"project_root": str(root), "state": "loaded"}
             self.logger.info("Meltano project loaded", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load project", error=str(e))
             return r[t.Meltano.OptionalScalarMap].fail(f"Failed to load project: {e}")
 

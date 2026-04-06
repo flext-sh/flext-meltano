@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path
@@ -29,13 +29,10 @@ from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 import flext_meltano as meltano_package
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 if TYPE_CHECKING:
     from flext_meltano import FlextMeltanoCLI
-else:
-    FlextMeltanoCLI = object
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
@@ -82,7 +79,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         """Create FLEXT CLI instance - delegates to CLI module."""
         return u.try_(
             lambda: meltano_package.FlextMeltanoCLI(),
-            catch=(ValueError, TypeError, KeyError, AttributeError, OSError),
+            catch=c.Meltano.OPERATION_ERRORS,
         ).map_error(lambda e: f"Failed to create CLI: {e}")
 
     @staticmethod
@@ -168,15 +165,15 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         plugin_type: str | None = None,
         _cwd: Path | None = None,
-    ) -> r[list[dict[str, str]]]:
+    ) -> r[Sequence[t.StrMapping]]:
         """Return project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.is_failure:
-            return r[list[dict[str, str]]].fail(
+            return r[Sequence[t.StrMapping]].fail(
                 project_result.error or "Failed to load Meltano project",
             )
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
-        discovered: list[dict[str, str]] = []
+        discovered: list[t.StrMapping] = []
         current_plugins_raw = project_result.value.plugins.current_plugins
         canonical_fn = getattr(current_plugins_raw, "canonical", None)
         raw_canonical = (
@@ -190,7 +187,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             coerced_input = None
         current_plugins = self._coerce_container_mapping(coerced_input)
         if current_plugins is None:
-            return r[list[dict[str, str]]].ok(discovered)
+            return r[Sequence[t.StrMapping]].ok(discovered)
         for raw_type, raw_plugins_value in current_plugins.items():
             raw_plugins = self._coerce_mapping_list(raw_plugins_value)
             if raw_plugins is None:
@@ -205,9 +202,9 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 if selected_type is not None and plugin_data["type"] != selected_type:
                     continue
                 discovered.append(plugin_data)
-        return r[list[dict[str, str]]].ok(discovered)
+        return r[Sequence[t.StrMapping]].ok(discovered)
 
-    def _runtime_environment_args(self, _cwd: Path | None = None) -> list[str]:
+    def _runtime_environment_args(self, _cwd: Path | None = None) -> t.StrSequence:
         """Select a runtime environment explicitly to avoid leaking test env vars."""
         selected_environment = u.Meltano.normalize_environment_name(
             self.settings.environment,
@@ -352,7 +349,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return self.execute_meltano_command(
                 u.Meltano.build_dbt_runtime_command(dbt_command, args),
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             return r[m.Meltano.CommandExecutionResult].fail(str(e))
 
     def execute_pipeline(
@@ -366,5 +363,5 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return self.execute_meltano_command(
                 u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             return r[m.Meltano.CommandExecutionResult].fail(str(e))

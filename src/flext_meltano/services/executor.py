@@ -29,7 +29,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                     "args": list(args),
                 })
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             return r[t.ContainerMapping].fail(
                 f"Failed to create CLI runner: {e}",
             )

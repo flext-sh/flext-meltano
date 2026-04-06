@@ -17,14 +17,10 @@ if _t.TYPE_CHECKING:
     from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
 
     singer = _flext_meltano__utilities_singer
-    from flext_meltano._utilities.singer import (
-        FlextMeltanoUtilitiesSinger,
-        SingerTargetHandler,
-    )
+    from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
 _LAZY_IMPORTS = {
     "FlextMeltanoUtilitiesRuntime": "flext_meltano._utilities.runtime",
     "FlextMeltanoUtilitiesSinger": "flext_meltano._utilities.singer",
-    "SingerTargetHandler": "flext_meltano._utilities.singer",
     "runtime": "flext_meltano._utilities.runtime",
     "singer": "flext_meltano._utilities.singer",
 }
@@ -32,7 +28,6 @@ _LAZY_IMPORTS = {
 __all__ = [
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
-    "SingerTargetHandler",
     "runtime",
     "singer",
 ]

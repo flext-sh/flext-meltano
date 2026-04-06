@@ -11,10 +11,7 @@ from __future__ import annotations
 
 from collections.abc import MutableSequence
 
-from flext_infra import FlextInfraUtilitiesSubprocess
-
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
 class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
@@ -35,7 +32,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
                 "Invalid command: must be non-empty list",
             )
         process_input = input_data.encode() if input_data else None
-        cmd_result = FlextInfraUtilitiesSubprocess.run_raw(
+        cmd_result = u.Infra.run_raw(
             list(command),
             timeout=timeout,
             input_data=process_input,

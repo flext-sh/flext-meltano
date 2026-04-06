@@ -19,8 +19,7 @@ from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSingerTapBase, c, t
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSingerTapBase, c, r, t
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):

@@ -51,7 +51,7 @@ class FlextMeltanoDbtTransformationRunner:
                 for k, v in payload.items()
             }
             return r[t.MutableContainerMapping].ok(dbt_result)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"DBT transformation failed: {e}"
             logger.exception(error_msg)
             return r[t.MutableContainerMapping].fail(error_msg)

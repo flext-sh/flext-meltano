@@ -14,10 +14,7 @@ if _t.TYPE_CHECKING:
 
     _abstractions_base = _flext_meltano_services__abstractions_base
     import flext_meltano.services._cli_small_managers as _flext_meltano_services__cli_small_managers
-    from flext_meltano.services._abstractions_base import (
-        OPERATION_ERRORS,
-        FlextMeltanoAbstractionsBase,
-    )
+    from flext_meltano.services._abstractions_base import FlextMeltanoAbstractionsBase
 
     _cli_small_managers = _flext_meltano_services__cli_small_managers
     import flext_meltano.services._executor_base as _flext_meltano_services__executor_base
@@ -218,7 +215,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "FlextMeltanoTapSourceMixin": "flext_meltano.services.singer_tap",
         "FlextMeltanoTargetAbstractions": "flext_meltano.services.singer_target",
         "FlextMeltanoValidators": "flext_meltano.services.validators",
-        "OPERATION_ERRORS": "flext_meltano.services._abstractions_base",
         "_abstractions_base": "flext_meltano.services._abstractions_base",
         "_cli_small_managers": "flext_meltano.services._cli_small_managers",
         "_executor_base": "flext_meltano.services._executor_base",
@@ -261,9 +257,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "x": ("flext_core.mixins", "FlextMixins"),
     },
 )
+_ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
+_ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
+_ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
+_ = _LAZY_IMPORTS.pop("output", None)
+_ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
-    "OPERATION_ERRORS",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAbstractionsBase",
     "FlextMeltanoAdapter",

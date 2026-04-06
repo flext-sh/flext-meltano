@@ -16,11 +16,10 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
-from flext_infra import FlextInfraUtilitiesSubprocess
+from flext_cli import cli
 from pydantic import Field, PrivateAttr
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
@@ -127,7 +126,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 operation=operation,
                 command=" ".join(cmd),
             )
-            result = FlextInfraUtilitiesSubprocess.run_raw(list(cmd))
+            result = u.Infra.run_raw(list(cmd))
             if result.is_failure:
                 return r[str].fail(result.error or operation)
             out = result.value
@@ -179,12 +178,14 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             if path is None:
                 if self._dbt_project_root is None:
                     return r[t.Meltano.DbtManifestData].fail("No project root set")
-                path = self._dbt_project_root / "target" / "manifest.json"
+                path = self._dbt_project_root / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR / c.Meltano.DBT_MANIFEST_FILE
             if not path.exists():
                 return r[t.Meltano.DbtManifestData].fail(str(path))
-            parsed = m.Meltano.DbtManifest.model_validate_json(
-                path.read_text(encoding="utf-8"),
-            )
+
+            parsed_result = cli.read_json_model(path, m.Meltano.DbtManifest)
+            if parsed_result.is_failure:
+                return r[t.Meltano.DbtManifestData].fail(str(parsed_result.error))
+            parsed = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }

@@ -12,6 +12,7 @@ from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoProjectService,
     FlextMeltanoServiceBase,
+    c,
     m,
     r,
     t,
@@ -100,7 +101,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
             extractors_result = abstractions.get_plugins_of_type(
                 working_project,
-                "extractors",
+                c.Meltano.PluginType.EXTRACTORS.value,
             )
             max_extractors = 10
             max_loaders = 5
@@ -111,7 +112,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     plugins.append(self._build_plugin_info(k, v, "extractor"))
             loaders_result = abstractions.get_plugins_of_type(
                 working_project,
-                "loaders",
+                c.Meltano.PluginType.LOADERS.value,
             )
             if loaders_result.is_success:
                 for idx, (k, v) in enumerate(loaders_result.value.items()):
@@ -120,7 +121,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     plugins.append(self._build_plugin_info(k, v, "loader"))
             self.logger.info("Discovered plugins", count=u.count(plugins))
             return r[Sequence[t.StrMapping]].ok(plugins)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
             return r[Sequence[t.StrMapping]].fail(error_msg)
@@ -153,7 +154,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             return self._extract_plugin_info(
                 plugins_result.value, plugin_name, plugin_type
             )
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)
             return r[t.StrMapping].fail(error_msg)

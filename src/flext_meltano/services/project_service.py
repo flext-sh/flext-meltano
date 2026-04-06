@@ -10,16 +10,15 @@ import tempfile
 from pathlib import Path
 from typing import override
 
-from flext_cli import FlextCliUtilities, r
-
-from flext_core import u
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     FlextMeltanoValidators,
     c,
+    r,
     t,
+    u,
 )
 
 
@@ -136,7 +135,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                 ],
             }
             config_file = temp_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
-            dump_result = FlextCliUtilities.Cli.yaml_dump(config_file, config)
+            dump_result = u.Cli.yaml_dump(config_file, config)
             if dump_result.is_failure:
                 return r[t.Meltano.DbtProject].fail(
                     dump_result.error or "YAML dump failed"

@@ -95,7 +95,6 @@ if _t.TYPE_CHECKING:
     from flext_meltano._utilities import (
         FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesSinger,
-        SingerTargetHandler,
         runtime,
     )
 
@@ -129,7 +128,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoProtocols as p,
     )
     from flext_meltano.services import (
-        OPERATION_ERRORS,
         FlextMeltanoAbstractions,
         FlextMeltanoAbstractionsBase,
         FlextMeltanoAdapter,
@@ -276,9 +274,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "x": ("flext_core.mixins", "FlextMixins"),
     },
 )
+_ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
+_ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
+_ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
+_ = _LAZY_IMPORTS.pop("output", None)
+_ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
-    "OPERATION_ERRORS",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAbstractionsBase",
@@ -363,7 +366,6 @@ __all__ = [
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoValidators",
-    "SingerTargetHandler",
     "__author__",
     "__author_email__",
     "__description__",

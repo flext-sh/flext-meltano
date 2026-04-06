@@ -12,6 +12,7 @@ from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoPluginDiscoveryMixin,
     FlextMeltanoServiceBase,
+    c,
     p,
     r,
     t,
@@ -30,7 +31,7 @@ class FlextMeltanoComponentService(
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> r[str]:
         """Validate plugin type."""
-        valid_types = ["extractors", "loaders", "transformers"]
+        valid_types = [pt.value for pt in c.Meltano.PluginType]
         if plugin_type not in valid_types:
             return r[str].fail(
                 f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"

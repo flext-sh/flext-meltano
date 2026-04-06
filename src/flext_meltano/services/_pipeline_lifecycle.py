@@ -13,6 +13,8 @@ import signal
 import time
 from pathlib import Path
 
+from flext_cli import cli
+
 from flext_core import r
 from flext_meltano import FlextMeltanoPipelinePaths
 
@@ -58,7 +60,12 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
                 f"Pipeline '{pipeline_name}' is not running",
             )
         try:
-            pid = int(pid_path.read_text(encoding="utf-8").strip())
+            pid_result = cli.read_text_file(pid_path)
+            if pid_result.is_failure:
+                return r[tuple[int, Path]].fail(
+                    f"Failed to read PID for pipeline '{pipeline_name}': {pid_result.error}"
+                )
+            pid = int(pid_result.value.strip())
         except (ValueError, OSError) as exc:
             return r[tuple[int, Path]].fail(
                 f"Failed to read PID for pipeline '{pipeline_name}': {exc}",

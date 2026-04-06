@@ -59,7 +59,7 @@ class FlextMeltanoTypingsBase:
         str,
         FlextCliTypes.NormalizedValue | FlextCliTypes.StrSequence,
     ]
-    PathDict = Mapping[str, str | Path]
+    type PathDict = Mapping[str, str | Path]
 
     type OptionalScalarMap = Mapping[str, FlextCliTypes.Scalar | None]
 

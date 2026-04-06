@@ -117,7 +117,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                         "type": plugin_group,
                     })
                 return r[t.ContainerMapping].ok({"plugins": plugins})
-            except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
+            except c.Meltano.OPERATION_ERRORS as ex:
                 return r[t.ContainerMapping].fail(f"Plugin discovery failed: {ex}")
 
         @override

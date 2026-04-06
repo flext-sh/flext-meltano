@@ -12,11 +12,10 @@ from __future__ import annotations
 from collections.abc import MutableSequence
 from pathlib import Path
 
-from flext_infra import FlextInfraUtilitiesSubprocess
 from pydantic import PrivateAttr
 
 from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, t
+from flext_meltano import FlextMeltanoServiceBase, t, u
 
 
 class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
@@ -55,7 +54,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
                 operation=operation,
                 command=" ".join(cmd),
             )
-            result = FlextInfraUtilitiesSubprocess.run_raw(list(cmd))
+            result = u.Infra.run_raw(list(cmd))
             if result.is_failure:
                 return r[str].fail(result.error or f"dbt {operation} failed")
             out = result.value

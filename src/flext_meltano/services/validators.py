@@ -12,7 +12,7 @@ from typing import override
 from pydantic import ValidationError
 
 from flext_core import FlextLogger, r
-from flext_meltano import FlextMeltanoServiceBase, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
@@ -49,13 +49,13 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             FlextLogger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 
-        meltano_yml = project_path / "meltano.yml"
+        meltano_yml = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
-            error_msg = f"Project path {project_path} does not contain meltano.yml"
+            error_msg = f"Project path {project_path} does not contain {c.Meltano.PATH_MELTANO_PROJECT_FILE}"
             FlextLogger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 
-        transform_dir = project_path / "transform"
+        transform_dir = project_path / c.Meltano.PATH_TRANSFORM_DIR
         try:
             transform_dir.mkdir(parents=True, exist_ok=True)
         except OSError as e:

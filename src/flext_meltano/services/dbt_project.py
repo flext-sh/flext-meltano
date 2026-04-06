@@ -12,10 +12,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
+from flext_cli import cli
 from pydantic import PrivateAttr, ValidationError
 
 from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t
 
 
 class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
@@ -48,7 +49,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             ]
             self.logger.info("Models retrieved", count=len(models))
             return r[Sequence[t.Meltano.OptionalScalarMap]].ok(models)
-        except (ValueError, TypeError, KeyError, AttributeError, OSError) as e:
+        except c.Meltano.OPERATION_ERRORS as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
                 f"Failed to get models: {e}"
@@ -114,14 +115,12 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             if manifest_path is None:
                 if self._dbt_project_root is None:
                     return r[t.Meltano.DbtManifestData].fail("No project loaded")
-                manifest_path = self._dbt_project_root / "target" / "manifest.json"
+                manifest_path = self._dbt_project_root / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR / c.Meltano.DBT_MANIFEST_FILE
             if not manifest_path.exists():
                 return r[t.Meltano.DbtManifestData].fail(
                     f"Manifest not found: {manifest_path}"
                 )
-            from flext_cli.services.file_tools import FlextCliFileTools
-
-            parsed_manifest_result = FlextCliFileTools.read_json_model(
+            parsed_manifest_result = cli.read_json_model(
                 manifest_path, m.Meltano.DbtManifest
             )
             if parsed_manifest_result.is_failure:

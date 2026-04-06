@@ -11,8 +11,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t
 
 
 class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
@@ -45,15 +44,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 sink_name=sink_def.sink_name,
             )
             return r[m.Meltano.DataSinkDefinition].ok(sink_def)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Sink configuration failed", error=str(e))
             return r[m.Meltano.DataSinkDefinition].fail(
                 f"Sink configuration failed: {e}",
@@ -96,15 +87,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 sink_name=sink_instance.config.sink_type,
             )
             return r[m.Meltano.DataSinkInstance].ok(sink_instance)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
             return r[m.Meltano.DataSinkInstance].fail(
                 f"Sink instance creation failed: {e}",
@@ -125,15 +108,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             if not sink_config.sink_type:
                 return r[bool].fail("Target configuration must have name and type")
             return r[bool].ok(value=True)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception(
                 "Target configuration validation failed",
                 error=str(e),
