@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import atexit
-import subprocess
 import time
 from collections.abc import Generator, Mapping, MutableSequence
 from contextlib import contextmanager
@@ -21,7 +20,7 @@ from typing import Any
 import pytest
 
 from flext_core import FlextLogger, r
-from tests import t
+from tests import m, t, u
 
 
 class ContainerManager:
@@ -43,7 +42,7 @@ class ContainerManager:
         self,
         command: t.StrSequence,
         timeout: int = 300,
-    ) -> r[subprocess.CompletedProcess[str]]:
+    ) -> r[m.Cli.CommandOutput]:
         """Run a docker-compose command with error handling.
 
         Args:
@@ -54,32 +53,22 @@ class ContainerManager:
             r with command result
 
         """
-        try:
-            full_command: MutableSequence[str] = [
-                "docker-compose",
-                "-f",
-                str(self.compose_file),
-                "-p",
-                self.project_name,
-            ] + list(command)
-            result = subprocess.run(
-                full_command,
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
+        full_command: MutableSequence[str] = [
+            "docker-compose",
+            "-f",
+            str(self.compose_file),
+            "-p",
+            self.project_name,
+        ] + list(command)
+        result = u.Cli.run_raw(full_command, timeout=timeout)
+        if result.is_failure:
+            return r[m.Cli.CommandOutput].fail(result.error or "Command error")
+        output = result.value
+        if output.exit_code != 0:
+            return r[m.Cli.CommandOutput].fail(
+                f"Command failed: {' '.join(full_command)}\n{output.stderr}",
             )
-            if result.returncode != 0:
-                return r[subprocess.CompletedProcess[str]].fail(
-                    f"Command failed: {' '.join(full_command)}\n{result.stderr}",
-                )
-            return r[subprocess.CompletedProcess[str]].ok(result)
-        except subprocess.TimeoutExpired:
-            return r[subprocess.CompletedProcess[str]].fail(
-                f"Command timed out: {' '.join(command)}",
-            )
-        except Exception as e:
-            return r[subprocess.CompletedProcess[str]].fail(f"Command error: {e}")
+        return r[m.Cli.CommandOutput].ok(output)
 
 
 class Tk(ContainerManager):
@@ -218,34 +207,26 @@ class Tk(ContainerManager):
             r with execution results
 
         """
-        try:
-            cmd = [
-                "docker-compose",
-                "-f",
-                str(self.compose_file),
-                "-p",
-                self.project_name,
-                "exec",
-            ]
-            cmd.extend(["-T", service_name])
-            cmd.extend(command)
-            result = subprocess.run(
-                cmd,
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-            )
-            return r[Mapping[str, Any]].ok({
-                "returncode": result.returncode,
-                "stdout": result.stdout,
-                "stderr": result.stderr,
-                "success": result.returncode == 0,
-            })
-        except subprocess.TimeoutExpired:
-            return r[Mapping[str, Any]].fail("Command execution timed out")
-        except Exception as e:
-            return r[Mapping[str, Any]].fail(f"Command execution failed: {e}")
+        cmd = [
+            "docker-compose",
+            "-f",
+            str(self.compose_file),
+            "-p",
+            self.project_name,
+            "exec",
+        ]
+        cmd.extend(["-T", service_name])
+        cmd.extend(command)
+        result = u.Cli.run_raw(cmd, timeout=timeout)
+        if result.is_failure:
+            return r[Mapping[str, Any]].fail(result.error or "Command execution failed")
+        output = result.value
+        return r[Mapping[str, Any]].ok({
+            "returncode": output.exit_code,
+            "stdout": output.stdout,
+            "stderr": output.stderr,
+            "success": output.exit_code == 0,
+        })
 
     def _wait_for_services(self, timeout: int) -> bool:
         """Wait for services to be healthy.
@@ -259,31 +240,29 @@ class Tk(ContainerManager):
         """
         start_time = time.time()
         while time.time() - start_time < timeout:
-            try:
-                cmd = [
-                    "docker-compose",
-                    "-f",
-                    str(self.compose_file),
-                    "-p",
-                    self.project_name,
-                    "ps",
-                    "-q",
-                ]
-                result = subprocess.run(
-                    cmd,
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    timeout=30,
+            cmd = [
+                "docker-compose",
+                "-f",
+                str(self.compose_file),
+                "-p",
+                self.project_name,
+                "ps",
+                "-q",
+            ]
+            result = u.Cli.run_raw(cmd, timeout=30)
+            if result.is_failure:
+                self.logger.warning(
+                    "Error checking service health: %s",
+                    result.error or "unknown error",
                 )
+            else:
+                output = result.value
                 if (
-                    result.returncode == 0
-                    and result.stdout.strip()
+                    output.exit_code == 0
+                    and output.stdout.strip()
                     and self._check_service_health()
                 ):
                     return True
-            except Exception as e:
-                self.logger.warning(f"Error checking service health: {e}")
             time.sleep(2)
         return False
 
