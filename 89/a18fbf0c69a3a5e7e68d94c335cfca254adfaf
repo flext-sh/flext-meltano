@@ -1,0 +1,25 @@
+src/flext_meltano/_protocols/services.py
+  d3ada1e5d497edb1 44-60
+src/flext_meltano/services/library_runner.py
+  d3ada1e5d497edb1 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "89a18fbf0c69a3a5e7e68d94c335cfca254adfaf",
+  "prompts": {
+    "d3ada1e5d497edb1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a3e077c-5cc8-4cbe-b4df-b55506e62047",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 20,
+      "total_deletions": 6,
+      "accepted_lines": 18,
+      "overriden_lines": 0
+    }
+  }
+}
