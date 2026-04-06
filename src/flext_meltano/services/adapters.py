@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import time
-from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
@@ -119,9 +118,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                     })
                 return r[t.ContainerMapping].ok({"plugins": plugins})
             except (ValueError, TypeError, KeyError, AttributeError, OSError) as ex:
-                return r[t.ContainerMapping].fail(
-                    f"Plugin discovery failed: {ex}"
-                )
+                return r[t.ContainerMapping].fail(f"Plugin discovery failed: {ex}")
 
         @override
         def execute(self) -> r[t.ContainerMapping]:
