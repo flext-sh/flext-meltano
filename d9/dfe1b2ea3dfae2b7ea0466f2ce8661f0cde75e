@@ -1,0 +1,29 @@
+src/flext_meltano/_protocols/services.py
+  d3ada1e5d497edb1 62-68
+src/flext_meltano/cli.py
+  d3ada1e5d497edb1 43,88
+src/flext_meltano/_protocols/singer.py
+  d3ada1e5d497edb1 91-97,99,102-103,115-126
+src/flext_meltano/services/consumer_bases/tap_service_base.py
+  d3ada1e5d497edb1 22,45,59,139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "d9dfe1b2ea3dfae2b7ea0466f2ce8661f0cde75e",
+  "prompts": {
+    "d3ada1e5d497edb1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a3e077c-5cc8-4cbe-b4df-b55506e62047",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 67,
+      "total_deletions": 74,
+      "accepted_lines": 49,
+      "overriden_lines": 4
+    }
+  }
+}
