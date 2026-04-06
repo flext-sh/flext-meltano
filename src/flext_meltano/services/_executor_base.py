@@ -12,7 +12,7 @@ from collections.abc import Mapping, Sequence
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path
-from typing import TYPE_CHECKING, override
+from typing import override
 
 import meltano
 from click import Abort, ClickException
@@ -29,10 +29,7 @@ from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 import flext_meltano as meltano_package
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
-
-if TYPE_CHECKING:
-    from flext_meltano import FlextMeltanoCLI
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
@@ -75,7 +72,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return None
 
     @staticmethod
-    def create_flext_cli() -> r[FlextMeltanoCLI]:
+    def create_flext_cli() -> r[p.Meltano.CLI]:
         """Create FLEXT CLI instance - delegates to CLI module."""
         return u.try_(
             lambda: meltano_package.FlextMeltanoCLI(),

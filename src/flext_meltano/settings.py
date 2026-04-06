@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, Self
 
 from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
@@ -204,17 +204,17 @@ class FlextMeltanoSettings(FlextSettings):
         return ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
     @classmethod
-    def create_from_project_root(cls, project_root: Path) -> r[FlextMeltanoSettings]:
+    def create_from_project_root(cls, project_root: Path) -> r[Self]:
         """Create settings from a project root path."""
         try:
-            return r[FlextMeltanoSettings].ok(
-                FlextMeltanoSettings(project_root=project_root),
+            return r[Self].ok(
+                cls(project_root=project_root),
             )
         except ValueError as error:
-            return r[FlextMeltanoSettings].fail(str(error))
+            return r[Self].fail(str(error))
 
     @classmethod
-    def create_for_environment(cls, env_type: str) -> FlextMeltanoSettings:
+    def create_for_environment(cls, env_type: str) -> Self:
         """Create settings for a named runtime environment."""
         normalized = env_type.strip().lower()
         aliases = {

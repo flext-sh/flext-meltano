@@ -83,11 +83,20 @@ class FlextMeltanoProtocolsServices:
     class CLI(Protocol):
         """CLI protocol for manager composition - avoids circular imports."""
 
-        pipeline_manager: FlextMeltanoProtocolsServices.CLIManager
-        singer_manager: FlextMeltanoProtocolsServices.SingerManager
-        dbt_manager: FlextMeltanoProtocolsServices.CLIManager
-        plugin_manager: FlextMeltanoProtocolsServices.CLIManager
-        status_manager: FlextMeltanoProtocolsServices.StatusManager
+        @property
+        def pipeline_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
+
+        @property
+        def singer_manager(self) -> FlextMeltanoProtocolsServices.SingerManager: ...
+
+        @property
+        def dbt_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
+
+        @property
+        def plugin_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
+
+        @property
+        def status_manager(self) -> FlextMeltanoProtocolsServices.StatusManager: ...
 
         def show_banner(self) -> None:
             """Show CLI banner."""

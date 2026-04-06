@@ -98,7 +98,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     )
                 working_project = temp_project
             plugins: MutableSequence[t.StrMapping] = []
-            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+            abstractions = FlextMeltanoAbstractions()
             extractors_result = abstractions.get_plugins_of_type(
                 working_project,
                 c.Meltano.PluginType.EXTRACTORS.value,
@@ -142,7 +142,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 return r[t.StrMapping].fail(
                     "Temporary project does not satisfy Project"
                 )
-            abstractions: FlextMeltanoAbstractions = FlextMeltanoAbstractions()
+            abstractions = FlextMeltanoAbstractions()
             plugins_result = abstractions.get_plugins_of_type(
                 temp_project,
                 plugin_type,

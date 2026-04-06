@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import Self
+
 from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
@@ -16,9 +18,9 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     """Mixin providing source instance creation and tap factory methods."""
 
     @classmethod
-    def create_tap_source_instance(cls) -> r[FlextMeltanoTapSourceMixin]:
+    def create_tap_source_instance(cls) -> r[Self]:
         """Create a tap abstractions instance wrapped in Result."""
-        return r[FlextMeltanoTapSourceMixin].ok(u.create_instance(cls))
+        return r[Self].ok(u.create_instance(cls))
 
     def create_source_instance(
         self,

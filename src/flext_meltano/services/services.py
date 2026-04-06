@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
+from typing import Self, override
 
 from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, t, u
@@ -15,13 +15,14 @@ from flext_meltano import FlextMeltanoServiceBase, c, t, u
 class FlextMeltanoService(FlextMeltanoServiceBase):
     """Generic data pipeline service with factory methods."""
 
-    @staticmethod
+    @classmethod
     def _create_specialized_service(
+        cls,
         component_name: str,
         *,
         field_name: str,
         component_label: str,
-    ) -> r[FlextMeltanoService]:
+    ) -> r[Self]:
         """Create a specialized Meltano service using a shared utility path."""
 
         def _build() -> FlextMeltanoService:
@@ -33,7 +34,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 "transformation_name": None,
             }
             kwargs[field_name] = component_name
-            return FlextMeltanoService(
+            return cls(
                 service_name=kwargs["service_name"] or "",
                 service_version=kwargs["service_version"] or "",
                 source_name=kwargs.get("source_name"),
@@ -48,53 +49,49 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             lambda ex: f"Failed to create {component_label} '{component_name}': {ex}"
         )
 
-    @staticmethod
-    def create_sink_service(
-        sink_name: str, **_config: t.Scalar
-    ) -> r[FlextMeltanoService]:
+    @classmethod
+    def create_sink_service(cls, sink_name: str, **_config: t.Scalar) -> r[Self]:
         """Create data sink service."""
-        return FlextMeltanoService._create_specialized_service(
+        return cls._create_specialized_service(
             sink_name,
             field_name="sink_name",
             component_label="sink service",
         )
 
-    @staticmethod
-    def create_source_service(
-        source_name: str, **_config: t.Scalar
-    ) -> r[FlextMeltanoService]:
+    @classmethod
+    def create_source_service(cls, source_name: str, **_config: t.Scalar) -> r[Self]:
         """Create data source service."""
-        return FlextMeltanoService._create_specialized_service(
+        return cls._create_specialized_service(
             source_name,
             field_name="source_name",
             component_label="source service",
         )
 
-    @staticmethod
+    @classmethod
     def create_transformation_service(
-        transformation_name: str, **_config: t.Scalar
-    ) -> r[FlextMeltanoService]:
+        cls, transformation_name: str, **_config: t.Scalar
+    ) -> r[Self]:
         """Create transformation service."""
-        return FlextMeltanoService._create_specialized_service(
+        return cls._create_specialized_service(
             transformation_name,
             field_name="transformation_name",
             component_label="transformation service",
         )
 
-    @staticmethod
-    def create_dbt_service(name: str, **cfg: t.Scalar) -> r[FlextMeltanoService]:
+    @classmethod
+    def create_dbt_service(cls, name: str, **cfg: t.Scalar) -> r[Self]:
         """Create DBT transformation service."""
-        return FlextMeltanoService.create_transformation_service(name, **cfg)
+        return cls.create_transformation_service(name, **cfg)
 
-    @staticmethod
-    def create_tap_service(name: str, **cfg: t.Scalar) -> r[FlextMeltanoService]:
+    @classmethod
+    def create_tap_service(cls, name: str, **cfg: t.Scalar) -> r[Self]:
         """Create Singer tap service."""
-        return FlextMeltanoService.create_source_service(name, **cfg)
+        return cls.create_source_service(name, **cfg)
 
-    @staticmethod
-    def create_target_service(name: str, **cfg: t.Scalar) -> r[FlextMeltanoService]:
+    @classmethod
+    def create_target_service(cls, name: str, **cfg: t.Scalar) -> r[Self]:
         """Create Singer target service."""
-        return FlextMeltanoService.create_sink_service(name, **cfg)
+        return cls.create_sink_service(name, **cfg)
 
     @staticmethod
     def configure_environment(

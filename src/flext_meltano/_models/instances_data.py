@@ -16,8 +16,6 @@ from flext_meltano import (
     t,
 )
 
-c.Meltano.StreamStatus.INITIALIZED = c.Meltano.StreamStatus.INITIALIZED
-
 
 class FlextMeltanoModelsInstancesData:
     """Data source and sink instance and config models."""
@@ -101,7 +99,9 @@ class FlextMeltanoModelsInstancesData:
         ] = None
         status: Annotated[
             str,
-            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"),
+            Field(
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
+            ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
@@ -181,7 +181,9 @@ class FlextMeltanoModelsInstancesData:
         ] = None
         status: Annotated[
             str,
-            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"),
+            Field(
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
+            ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[
             t.BatchSize, Field(default=1000, description="Batch processing size")

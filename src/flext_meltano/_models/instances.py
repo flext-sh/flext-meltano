@@ -27,7 +27,9 @@ class FlextMeltanoModelsInstances:
         ] = Field(default_factory=dict, description="Sink schema")
         status: Annotated[
             str,
-            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"),
+            Field(
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
+            ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
         @computed_field
@@ -71,7 +73,10 @@ class FlextMeltanoModelsInstances:
         ] = None
         status: Annotated[
             str,
-            Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Stream processing status"),
+            Field(
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Stream processing status",
+            ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         records_loaded: Annotated[
             t.NonNegativeInt, Field(default=0, description="Number of records loaded")

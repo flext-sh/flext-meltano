@@ -178,7 +178,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             if path is None:
                 if self._dbt_project_root is None:
                     return r[t.Meltano.DbtManifestData].fail("No project root set")
-                path = self._dbt_project_root / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR / c.Meltano.DBT_MANIFEST_FILE
+                path = (
+                    self._dbt_project_root
+                    / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
+                    / c.Meltano.DBT_MANIFEST_FILE
+                )
             if not path.exists():
                 return r[t.Meltano.DbtManifestData].fail(str(path))
 

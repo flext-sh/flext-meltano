@@ -115,7 +115,11 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             if manifest_path is None:
                 if self._dbt_project_root is None:
                     return r[t.Meltano.DbtManifestData].fail("No project loaded")
-                manifest_path = self._dbt_project_root / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR / c.Meltano.DBT_MANIFEST_FILE
+                manifest_path = (
+                    self._dbt_project_root
+                    / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
+                    / c.Meltano.DBT_MANIFEST_FILE
+                )
             if not manifest_path.exists():
                 return r[t.Meltano.DbtManifestData].fail(
                     f"Manifest not found: {manifest_path}"

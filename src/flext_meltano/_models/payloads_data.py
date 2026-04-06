@@ -6,7 +6,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import Annotated
 
-from flext_cli import FlextCliModels, FlextCliUtilities, u
+from flext_cli import FlextCliModels, u
 from pydantic import Field, field_validator
 
 from flext_meltano import t
@@ -153,7 +153,7 @@ class FlextMeltanoModelsPayloadsData:
             """Normalize dict content via yaml_dump_str, pass str through."""
             match value:
                 case Mapping():
-                    return FlextCliUtilities.Cli.yaml_dump_str(dict(value))
+                    return u.Cli.yaml_dump_str(dict(value))
                 case None:
                     return ""
                 case _:

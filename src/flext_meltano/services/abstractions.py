@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import Self
+
 from flext_core import r
 from flext_meltano import (
     FlextMeltanoAbstractionsBase,
@@ -18,10 +20,10 @@ from flext_meltano import (
 class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     """Core abstraction wrapping the imported Meltano runtime with r[T] results."""
 
-    @staticmethod
-    def create_abstractions_instance() -> r[FlextMeltanoAbstractions]:
+    @classmethod
+    def create_abstractions_instance(cls) -> r[Self]:
         """Factory method for creating a FlextMeltanoAbstractions instance."""
-        return r[FlextMeltanoAbstractions].ok(FlextMeltanoAbstractions())
+        return r[Self].ok(cls())
 
     # -- Tap-specific operations (discovery, sync, catalog) --
 

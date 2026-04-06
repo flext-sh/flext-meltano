@@ -13,9 +13,9 @@ from typing import override
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
     FlextMeltanoValidators,
     c,
+    p,
     r,
     t,
     u,
@@ -157,7 +157,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     @staticmethod
     def build_service_execution_payload(
         service_type: str,
-        meltano_config: FlextMeltanoSettings,
+        meltano_config: p.Settings,
     ) -> r[t.ContainerMapping]:
         """Build normalized execution payload for service health responses."""
         payload: t.ContainerMapping = {
