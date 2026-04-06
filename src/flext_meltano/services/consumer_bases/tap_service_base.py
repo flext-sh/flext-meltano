@@ -19,7 +19,7 @@ from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSingerTapBase, c, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
@@ -42,7 +42,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
-    _tap_instance: FlextMeltanoSingerTapBase | None = PrivateAttr(default=None)
+    _tap_instance: p.Meltano.SingerTapInstance | None = PrivateAttr(default=None)
     _instance: ClassVar[Self | None] = None
 
     @classmethod
@@ -56,7 +56,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     def create_tap_instance(
         self,
         config: t.ContainerMapping | None = None,
-    ) -> FlextMeltanoSingerTapBase:
+    ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
         Consumer implements this with its domain-specific Tap class.
@@ -67,14 +67,11 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point — routes to Singer SDK tap.cli()."""
+        """Main CLI entry point through the internal Singer bridge."""
         try:
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
-            tap.cli(args=command_args)
-            return 0
-        except SystemExit as exc:
-            return exc.code if isinstance(exc.code, int) else 1
+            return tap.run_cli(command_args, self.tap_name)
         except (ValueError, TypeError, OSError, RuntimeError) as exc:
             self.logger.exception("Tap CLI failed", error=str(exc))
             return 1
@@ -139,7 +136,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     # Internal
     # ------------------------------------------------------------------
 
-    def _get_or_create_tap(self) -> FlextMeltanoSingerTapBase:
+    def _get_or_create_tap(self) -> p.Meltano.SingerTapInstance:
         """Lazy-create and cache the tap instance."""
         if self._tap_instance is None:
             self._tap_instance = self.create_tap_instance()

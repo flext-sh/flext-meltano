@@ -40,7 +40,7 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
     _dbt_manager: p.Meltano.CLIManager = PrivateAttr()
     _plugin_manager: p.Meltano.CLIManager = PrivateAttr()
     _status_manager: p.Meltano.StatusManager = PrivateAttr()
-    _command_router: FlextMeltanoCommandRouter = PrivateAttr()
+    _command_router: p.Meltano.CommandRouter = PrivateAttr()
 
     @override
     def model_post_init(self, __context: t.ScalarMapping | None, /) -> None:
@@ -85,7 +85,7 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
         return self._status_manager
 
     @property
-    def command_router(self) -> FlextMeltanoCommandRouter:
+    def command_router(self) -> p.Meltano.CommandRouter:
         """Command router."""
         return self._command_router
 

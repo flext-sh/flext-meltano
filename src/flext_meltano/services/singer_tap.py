@@ -11,7 +11,8 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
+from flext_core.result import FlextResult
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t
 
 
 class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
@@ -20,7 +21,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     @classmethod
     def create_tap_source_instance(cls) -> r[Self]:
         """Create a tap abstractions instance wrapped in Result."""
-        return r[Self].ok(u.create_instance(cls))
+        instance: Self = cls()
+        return FlextResult[Self](value=instance, is_success=True)
 
     def create_source_instance(
         self,

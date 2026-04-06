@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Self, override
 
 from flext_core import r
+from flext_core.result import FlextResult
 from flext_meltano import FlextMeltanoServiceBase, c, t, u
 
 
@@ -24,8 +25,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         component_label: str,
     ) -> r[Self]:
         """Create a specialized Meltano service using a shared utility path."""
-
-        def _build() -> FlextMeltanoService:
+        try:
             kwargs: t.MutableOptionalStrMapping = {
                 "service_name": f"{component_name}_service",
                 "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
@@ -34,20 +34,20 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 "transformation_name": None,
             }
             kwargs[field_name] = component_name
-            return cls(
+            instance: Self = cls(
                 service_name=kwargs["service_name"] or "",
                 service_version=kwargs["service_version"] or "",
                 source_name=kwargs.get("source_name"),
                 sink_name=kwargs.get("sink_name"),
                 transformation_name=kwargs.get("transformation_name"),
             )
-
-        return u.try_(
-            _build,
-            catch=c.Meltano.OPERATION_ERRORS,
-        ).map_error(
-            lambda ex: f"Failed to create {component_label} '{component_name}': {ex}"
-        )
+            success: r[Self] = FlextResult[Self](value=instance, is_success=True)
+            return success
+        except c.Meltano.OPERATION_ERRORS as ex:
+            failure: r[Self] = FlextResult[Self].fail(
+                f"Failed to create {component_label} '{component_name}': {ex}"
+            )
+            return failure
 
     @classmethod
     def create_sink_service(cls, sink_name: str, **_config: t.Scalar) -> r[Self]:

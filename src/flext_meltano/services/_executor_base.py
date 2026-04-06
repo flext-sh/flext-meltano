@@ -74,8 +74,12 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     @staticmethod
     def create_flext_cli() -> r[p.Meltano.CLI]:
         """Create FLEXT CLI instance - delegates to CLI module."""
+
+        def _build() -> p.Meltano.CLI:
+            return meltano_package.FlextMeltanoCLI()
+
         return u.try_(
-            lambda: meltano_package.FlextMeltanoCLI(),
+            _build,
             catch=c.Meltano.OPERATION_ERRORS,
         ).map_error(lambda e: f"Failed to create CLI: {e}")
 

@@ -9,6 +9,7 @@ from pydantic import Field, field_validator
 from pydantic_settings import SettingsConfigDict
 
 from flext_core import FlextSettings, r
+from flext_core.result import FlextResult
 from flext_meltano import c, t
 
 
@@ -207,11 +208,12 @@ class FlextMeltanoSettings(FlextSettings):
     def create_from_project_root(cls, project_root: Path) -> r[Self]:
         """Create settings from a project root path."""
         try:
-            return r[Self].ok(
-                cls(project_root=project_root),
-            )
+            instance: Self = cls(project_root=project_root)
+            success: r[Self] = FlextResult[Self](value=instance, is_success=True)
+            return success
         except ValueError as error:
-            return r[Self].fail(str(error))
+            failure: r[Self] = FlextResult[Self].fail(str(error))
+            return failure
 
     @classmethod
     def create_for_environment(cls, env_type: str) -> Self:

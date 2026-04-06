@@ -59,6 +59,14 @@ class FlextMeltanoProtocolsServices:
             ...
 
     @runtime_checkable
+    class CommandRouter(Protocol):
+        """Protocol for CLI command routing."""
+
+        def route_command(self, args: t.StrSequence) -> int:
+            """Route command to appropriate handler."""
+            ...
+
+    @runtime_checkable
     class ServiceCall(FlextCliProtocols.Service[t.Container], Protocol):
         """Service call protocol extending Service."""
 

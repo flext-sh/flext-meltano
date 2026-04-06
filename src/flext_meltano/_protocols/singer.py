@@ -88,6 +88,42 @@ class FlextMeltanoProtocolsSinger:
             """Test DBT models with r."""
             ...
 
+    class SingerStreamInfo(Protocol):
+        """Minimal protocol for stream objects returned by discover_streams."""
+
+        @property
+        def name(self) -> str: ...
+
+    class SingerTapInstance(Protocol):
+        """Internal tap runtime contract consumed by tap service bases.
+
+        Singer SDK details stay behind a bridge in ``flext-meltano`` so
+        consumer projects depend only on FLEXT's own runtime surface.
+        """
+
+        @property
+        def config(self) -> t.ContainerMapping:
+            """Tap configuration."""
+            ...
+
+        def run_cli(
+            self,
+            args: t.StrSequence,
+            prog_name: str,
+        ) -> int:
+            """Execute the tap CLI and return a normalized exit code."""
+            ...
+
+        def discover_streams(
+            self,
+        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+            """Discover available streams."""
+            ...
+
+        def sync_all(self) -> None:
+            """Execute Singer sync for all selected streams."""
+            ...
+
     class SingerTap(Protocol):
         """Singer Tap protocol definition for data extraction.
 
@@ -130,7 +166,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        config: m.Meltano.TargetConfig
+        config: t.ContainerMapping
 
         def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
