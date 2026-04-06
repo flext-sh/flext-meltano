@@ -196,7 +196,9 @@ class TestFlextMeltanoCatalogOperations:
             )
             plugins_result = adapter.discover_plugins()
             assert plugins_result.is_success
-            assert isinstance(plugins_result.value, list)
+            assert isinstance(plugins_result.value, dict)
+            assert isinstance(plugins_result.value["plugins"], list)
+            assert plugins_result.value["plugins"] == []
 
 
 class TestFlextMeltanoPipelineOperations:
