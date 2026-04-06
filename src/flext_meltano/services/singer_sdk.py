@@ -1,10 +1,6 @@
 """Singer SDK bridge — canonical re-exports for consumer projects.
 
-Module-level aliases exist for lazy-import registration: the root __init__.py
-and singer/__init__.py both reference ``flext_meltano.singer.sdk.<Name>`` in
-their _LAZY_IMPORTS tables.
-
-These are direct re-exports from singer_sdk (allowed in flext-meltano/src/)
+Direct re-exports from singer_sdk (allowed in flext-meltano/src/)
 so that mypy recognizes them as valid types for subclassing.
 """
 
@@ -45,14 +41,6 @@ class _SingerTapSdkBackend(Protocol):
         ...
 
 
-FlextMeltanoSingerContext = Context
-FlextMeltanoSingerRecord = Record
-FlextMeltanoSingerSinkBase = Sink
-FlextMeltanoSingerStreamBase = Stream
-FlextMeltanoSingerTapBase = Tap
-FlextMeltanoSingerTargetBase = Target
-
-
 class FlextMeltanoSingerTapAdapter:
     """Bridge a Singer SDK tap instance into FLEXT's internal runtime contract."""
 
@@ -88,11 +76,11 @@ class FlextMeltanoSingerTapAdapter:
 
 
 __all__: t.StrSequence = [
-    "FlextMeltanoSingerContext",
-    "FlextMeltanoSingerRecord",
-    "FlextMeltanoSingerSinkBase",
-    "FlextMeltanoSingerStreamBase",
+    "Context",
     "FlextMeltanoSingerTapAdapter",
-    "FlextMeltanoSingerTapBase",
-    "FlextMeltanoSingerTargetBase",
+    "Record",
+    "Sink",
+    "Stream",
+    "Tap",
+    "Target",
 ]
