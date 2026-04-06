@@ -119,9 +119,16 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 return r[t.Meltano.DbtManifestData].fail(
                     f"Manifest not found: {manifest_path}"
                 )
-            parsed_manifest = m.Meltano.DbtManifest.model_validate_json(
-                manifest_path.read_text(encoding="utf-8"),
+            from flext_cli.services.file_tools import FlextCliFileTools
+
+            parsed_manifest_result = FlextCliFileTools.read_json_model(
+                manifest_path, m.Meltano.DbtManifest
             )
+            if parsed_manifest_result.is_failure:
+                return r[t.Meltano.DbtManifestData].fail(
+                    f"Manifest reading failed: {parsed_manifest_result.error}"
+                )
+            parsed_manifest = parsed_manifest_result.value
             manifest_data: t.Meltano.DbtManifestData = {
                 "nodes": {k: v.model_dump() for k, v in parsed_manifest.nodes.items()},
             }
