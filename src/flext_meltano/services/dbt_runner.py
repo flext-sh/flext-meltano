@@ -54,7 +54,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
                 operation=operation,
                 command=" ".join(cmd),
             )
-            result = u.Infra.run_raw(list(cmd))
+            result = u.Cli.run_raw(list(cmd))
             if result.is_failure:
                 return r[str].fail(result.error or f"dbt {operation} failed")
             out = result.value

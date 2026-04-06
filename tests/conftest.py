@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Protocol
 
 import pytest
-from flext_cli import FlextCliUtilities
+from flext_cli import u as cli_u
 
 from tests import Tk, t
 
@@ -132,7 +132,7 @@ def meltano_project(
 ) -> t.ContainerMapping:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
-    FlextCliUtilities.Cli.yaml_dump(meltano_yml, meltano_yml_config)
+    cli_u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
     return {
         "name": "test-project",
         "directory": test_meltano_project_dir,

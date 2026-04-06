@@ -126,7 +126,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 operation=operation,
                 command=" ".join(cmd),
             )
-            result = u.Infra.run_raw(list(cmd))
+            result = u.Cli.run_raw(list(cmd))
             if result.is_failure:
                 return r[str].fail(result.error or operation)
             out = result.value

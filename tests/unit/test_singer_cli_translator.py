@@ -417,15 +417,13 @@ class TestFlextMeltanoSingerCliTranslatorDbtRun:
 class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     """Test execute_singer_command method."""
 
-    _MOCK_TARGET = (
-        "flext_meltano.services.singer_translator.FlextInfraUtilitiesSubprocess.run_raw"
-    )
+    _MOCK_TARGET = "flext_meltano.services.singer_translator.u.Cli.run_raw"
 
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_success(self, mock_run_raw: MagicMock) -> None:
         """Test successful command execution."""
-        mock_run_raw.return_value = r[m.Infra.CommandOutput].ok(
-            m.Infra.CommandOutput(
+        mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
+            m.Cli.CommandOutput(
                 stdout="Success output",
                 stderr="",
                 exit_code=0,
@@ -446,8 +444,8 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_with_input(self, mock_run_raw: MagicMock) -> None:
         """Test command execution with input data."""
-        mock_run_raw.return_value = r[m.Infra.CommandOutput].ok(
-            m.Infra.CommandOutput(stdout="Success", stderr="", exit_code=0),
+        mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
+            m.Cli.CommandOutput(stdout="Success", stderr="", exit_code=0),
         )
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
@@ -461,8 +459,8 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_failure(self, mock_run_raw: MagicMock) -> None:
         """Test command execution failure (non-zero exit code)."""
-        mock_run_raw.return_value = r[m.Infra.CommandOutput].ok(
-            m.Infra.CommandOutput(
+        mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
+            m.Cli.CommandOutput(
                 stdout="",
                 stderr="Error: Connection failed",
                 exit_code=1,
@@ -477,7 +475,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_timeout(self, mock_run_raw: MagicMock) -> None:
         """Test command execution timeout (run_raw returns failure)."""
-        mock_run_raw.return_value = r[m.Infra.CommandOutput].fail(
+        mock_run_raw.return_value = r[m.Cli.CommandOutput].fail(
             "timeout 10s: tap-postgres",
         )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
@@ -490,7 +488,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_not_found(self, mock_run_raw: MagicMock) -> None:
         """Test command not found error (run_raw returns failure)."""
-        mock_run_raw.return_value = r[m.Infra.CommandOutput].fail(
+        mock_run_raw.return_value = r[m.Cli.CommandOutput].fail(
             "execution error: tap-nonexistent not found",
         )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([
@@ -506,7 +504,7 @@ class TestFlextMeltanoSingerCliTranslatorExecuteCommand:
         mock_run_raw: MagicMock,
     ) -> None:
         """Test generic exception handling (run_raw returns failure)."""
-        mock_run_raw.return_value = r[m.Infra.CommandOutput].fail(
+        mock_run_raw.return_value = r[m.Cli.CommandOutput].fail(
             "execution error: Unexpected error",
         )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command([

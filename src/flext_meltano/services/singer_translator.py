@@ -32,10 +32,8 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
                 "Invalid command: must be non-empty list",
             )
         process_input = input_data.encode() if input_data else None
-        cmd_result = u.Infra.run_raw(
-            list(command),
-            timeout=timeout,
-            input_data=process_input,
+        cmd_result = u.Cli.run_raw(
+            list(command), timeout=timeout, input_data=process_input
         )
         if cmd_result.is_failure:
             return r[t.Meltano.CliProcessResult].fail(
