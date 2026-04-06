@@ -7,16 +7,39 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 
 from flext_core import r
-from flext_meltano import t
+from flext_meltano import m, t
 
 
 class FlextMeltanoProtocolsServices:
     """Service, CLI, and Manager protocol definitions."""
+
+    @runtime_checkable
+    class MeltanoExecutor(Protocol):
+        """Protocol for Meltano command execution."""
+
+        def execute_meltano_command(
+            self,
+            command: t.StrSequence,
+            timeout: int = ...,
+            _cwd: Path | None = None,
+        ) -> r[m.Meltano.CommandExecutionResult]:
+            """Execute a Meltano runtime command."""
+            ...
+
+        def get_project_plugins(
+            self,
+            plugin_type: str | None = None,
+            _cwd: Path | None = None,
+        ) -> r[Sequence[t.StrMapping]]:
+            """Return project-scoped plugin definitions."""
+            ...
 
     @runtime_checkable
     class ServiceCall(FlextCliProtocols.Service[t.Container], Protocol):

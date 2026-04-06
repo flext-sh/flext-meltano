@@ -13,7 +13,7 @@ from collections.abc import MutableSequence
 from pathlib import Path
 
 from flext_core import r
-from flext_meltano import FlextMeltanoExecutor, c, p, t, u
+from flext_meltano import c, p, t, u
 
 
 class FlextMeltanoDbtTransformationRunner:
@@ -21,7 +21,7 @@ class FlextMeltanoDbtTransformationRunner:
 
     @staticmethod
     def execute_dbt_transformation(
-        executor: FlextMeltanoExecutor,
+        executor: p.Meltano.MeltanoExecutor,
         logger: p.Logger,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,

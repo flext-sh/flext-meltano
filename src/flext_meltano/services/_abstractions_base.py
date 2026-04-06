@@ -8,15 +8,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, override
+from typing import ClassVar, override
 
 from pydantic import Field, ValidationError
 
 import flext_meltano.services as meltano_services
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, r, t, u
-
-if TYPE_CHECKING:
-    from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoProjectService
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
@@ -30,8 +27,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _build_executor(
-        _settings: FlextMeltanoSettings | t.ContainerMapping | None,
-    ) -> FlextMeltanoExecutorBase:
+        _settings: p.Settings | t.ContainerMapping | None,
+    ) -> p.Meltano.MeltanoExecutor:
         """Create an executor lazily to avoid import cycles during package init."""
         return meltano_services.FlextMeltanoExecutorBase()
 
@@ -86,7 +83,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _resolve_project_root(
-        project: FlextMeltanoProjectService | t.ContainerMapping | None,
+        project: t.ValueOrModel | t.ContainerMapping | None,
     ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
         project_mapping = FlextMeltanoAbstractionsBase._coerce_container_mapping(
@@ -103,7 +100,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def get_plugins_of_type(
         self,
-        _project: FlextMeltanoProjectService | t.ContainerMapping | None,
+        _project: t.ValueOrModel | t.ContainerMapping | None,
         plugin_type: str,
     ) -> r[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""
