@@ -41,6 +41,23 @@ class FlextMeltanoProtocolsServices:
             """Return project-scoped plugin definitions."""
             ...
 
+        def execute_dbt_command(
+            self,
+            dbt_command: str,
+            args: t.StrSequence | None = None,
+        ) -> r[m.Meltano.CommandExecutionResult]:
+            """Execute a DBT command."""
+            ...
+
+        def execute_pipeline(
+            self,
+            tap_name: str,
+            target_name: str,
+            _config: t.ContainerMapping | None = None,
+        ) -> r[m.Meltano.CommandExecutionResult]:
+            """Execute a complete ELT pipeline."""
+            ...
+
     @runtime_checkable
     class ServiceCall(FlextCliProtocols.Service[t.Container], Protocol):
         """Service call protocol extending Service."""

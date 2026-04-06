@@ -12,7 +12,6 @@ from pydantic import PrivateAttr
 
 from flext_core import r
 from flext_meltano import (
-    FlextMeltanoBridge,
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
     FlextMeltanoServiceBase,
@@ -31,11 +30,8 @@ class FlextMeltanoLibraryRunner(
     Provides ELT pipeline execution and DBT transformation orchestration.
     """
 
-    _elt_executor: FlextMeltanoExecutor = PrivateAttr(
+    _elt_executor: p.Meltano.MeltanoExecutor = PrivateAttr(
         default_factory=FlextMeltanoExecutor,
-    )
-    _elt_bridge: FlextMeltanoBridge = PrivateAttr(
-        default_factory=FlextMeltanoBridge,
     )
 
     def execute_complete_elt_pipeline(
