@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 import singer_sdk.typing as singer_sdk_typing
-from flext_cli import FlextCliTypes
+from flext_cli import t
 
 from flext_meltano import c
 
@@ -25,7 +25,7 @@ class FlextMeltanoTypingsSinger:
 
     type SingerCatalogEntry = Mapping[
         str,
-        str | Mapping[str, FlextCliTypes.Scalar | None],
+        str | Mapping[str, t.Scalar | None],
     ]
     type SingerStreamCatalog = Mapping[
         str,

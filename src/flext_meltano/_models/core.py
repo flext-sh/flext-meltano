@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Annotated
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, field_validator
 
 from flext_core import r
@@ -48,7 +48,7 @@ class FlextMeltanoModelsCore:
             "items": value,
         }).items
 
-    class StringListValue(FlextCliModels.ArbitraryTypesModel):
+    class StringListValue(m.ArbitraryTypesModel):
         """Validated string list wrapper for result normalization."""
 
         items: Annotated[
@@ -66,7 +66,7 @@ class FlextMeltanoModelsCore:
                 return [str(item) for item in value if item is not None]
             return []
 
-    class BooleanListValue(FlextCliModels.ArbitraryTypesModel):
+    class BooleanListValue(m.ArbitraryTypesModel):
         """Validated boolean list wrapper for process output."""
 
         items: Annotated[

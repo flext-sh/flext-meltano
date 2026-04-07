@@ -6,7 +6,7 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import Annotated
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field
 
 from flext_meltano import t
@@ -15,7 +15,7 @@ from flext_meltano import t
 class FlextMeltanoModelsResultsDbt:
     """DBT-specific result models."""
 
-    class DbtProjectInfo(FlextCliModels.ArbitraryTypesModel):
+    class DbtProjectInfo(m.ArbitraryTypesModel):
         """Information about a DBT project."""
 
         root: Annotated[Path, Field(description="Project root directory")]
@@ -30,7 +30,7 @@ class FlextMeltanoModelsResultsDbt:
             t.NonNegativeInt, Field(default=0, description="Number of tests")
         ] = 0
 
-    class DbtRunResult(FlextCliModels.ArbitraryTypesModel):
+    class DbtRunResult(m.ArbitraryTypesModel):
         """Result of a DBT model run operation."""
 
         success: Annotated[
@@ -53,7 +53,7 @@ class FlextMeltanoModelsResultsDbt:
             Field(default=None, description="Total execution time in seconds"),
         ] = None
 
-    class DbtTestResult(FlextCliModels.ArbitraryTypesModel):
+    class DbtTestResult(m.ArbitraryTypesModel):
         """Result of a DBT test operation."""
 
         success: Annotated[
@@ -82,7 +82,7 @@ class FlextMeltanoModelsResultsDbt:
             Field(default=None, description="Total execution time in seconds"),
         ] = None
 
-    class CommandExecutionResult(FlextCliModels.ArbitraryTypesModel):
+    class CommandExecutionResult(m.ArbitraryTypesModel):
         """Execution result model for Meltano command operations following flext-core patterns."""
 
         command: Annotated[

@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from flext_cli import FlextCliProtocols
+from flext_cli import p
 
 from flext_meltano import t
 
@@ -52,11 +52,11 @@ class FlextMeltanoProtocolsProject:
             """Check if adapter is currently connected."""
             ...
 
-        def connect(self) -> FlextCliProtocols.Result[bool]:
+        def connect(self) -> p.Result[bool]:
             """Establish connection to the data source/sink."""
             ...
 
-        def disconnect(self) -> FlextCliProtocols.Result[bool]:
+        def disconnect(self) -> p.Result[bool]:
             """Close connection to the data source/sink."""
             ...
 

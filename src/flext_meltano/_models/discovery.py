@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field, field_validator
 
 from flext_meltano import t
@@ -14,7 +14,7 @@ from flext_meltano import t
 class FlextMeltanoModelsDiscovery:
     """Plugin discovery source, item, and catalog models."""
 
-    class PluginDiscoverySource(FlextCliModels.FlexibleModel):
+    class PluginDiscoverySource(m.FlexibleModel):
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
@@ -47,7 +47,7 @@ class FlextMeltanoModelsDiscovery:
                     empty: t.ContainerMapping = {}
                     return empty
 
-    class PluginDiscoveryItem(FlextCliModels.ArbitraryTypesModel):
+    class PluginDiscoveryItem(m.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
 
         name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
@@ -63,7 +63,7 @@ class FlextMeltanoModelsDiscovery:
             str, Field(default="", description="Plugin description")
         ] = ""
 
-    class PluginDiscoveryCatalog(FlextCliModels.FlexibleModel):
+    class PluginDiscoveryCatalog(m.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (

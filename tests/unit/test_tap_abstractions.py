@@ -27,15 +27,17 @@ class _TestAssertions:
 
     @staticmethod
     def assert_equal(
-        actual: t.Tests.Testobject,
-        expected: t.Tests.Testobject,
+        actual: t.Tests.TestobjectSerializable,
+        expected: t.Tests.TestobjectSerializable,
         message: str = "",
     ) -> None:
         tm.that(actual, eq=expected)
         _ = message or f"expected {expected!r}, got {actual!r}"
 
     @staticmethod
-    def assert_in(item: str, container: t.Tests.Testobject, message: str = "") -> None:
+    def assert_in(
+        item: str, container: t.Tests.TestobjectSerializable, message: str = ""
+    ) -> None:
         if isinstance(container, dict):
             tm.that(container, has=item)
 

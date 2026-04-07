@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import c, t
@@ -13,7 +13,7 @@ from flext_meltano import c, t
 class FlextMeltanoModelsTransformations:
     """Transformation project and execution models."""
 
-    class DbtProjectModel(FlextCliModels.Entity):
+    class DbtProjectModel(m.Entity):
         """Generic DBT project configuration with validation."""
 
         name: Annotated[str, Field(description="DBT project name")]
@@ -47,7 +47,7 @@ class FlextMeltanoModelsTransformations:
 
             return self
 
-    class TransformationProjectModel(FlextCliModels.Entity):
+    class TransformationProjectModel(m.Entity):
         """Generic transformation project configuration with validation."""
 
         name: Annotated[t.NonEmptyStr, Field(description="Project name")]
@@ -125,7 +125,7 @@ class FlextMeltanoModelsTransformations:
 
             return self
 
-    class TransformationExecutionModel(FlextCliModels.Entity):
+    class TransformationExecutionModel(m.Entity):
         """Generic transformation execution configuration with validation."""
 
         command: Annotated[str, Field(description="Command to execute")]

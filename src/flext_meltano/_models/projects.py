@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import c, t
@@ -15,7 +15,7 @@ from flext_meltano import c, t
 class FlextMeltanoModelsProjects:
     """Project configuration models."""
 
-    class DbtManifestNode(FlextCliModels.FlexibleModel):
+    class DbtManifestNode(m.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
 
         name: Annotated[str | None, Field(default=None, description="Node name")]
@@ -35,7 +35,7 @@ class FlextMeltanoModelsProjects:
             """Fully qualified name as dot-separated string."""
             return ".".join(self.fqn) if self.fqn else ""
 
-    class DbtManifest(FlextCliModels.FlexibleModel):
+    class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = Field(
@@ -53,7 +53,7 @@ class FlextMeltanoModelsProjects:
                 if node.resource_type == resource_type
             ]
 
-    class MeltanoProjectModel(FlextCliModels.Entity):
+    class MeltanoProjectModel(m.Entity):
         """Generic Meltano project configuration with validation."""
 
         project_id: Annotated[str, Field(description="Unique project identifier")]
@@ -78,7 +78,7 @@ class FlextMeltanoModelsProjects:
                 raise ValueError(msg)
             return self
 
-    class PipelineProjectModel(FlextCliModels.Entity):
+    class PipelineProjectModel(m.Entity):
         """Generic pipeline project configuration with validation."""
 
         schema_version: Annotated[

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field
 
 from flext_meltano import t
@@ -13,7 +13,7 @@ from flext_meltano import t
 class FlextMeltanoModelsPayloads:
     """API payload models for pipeline operations."""
 
-    class CreatePipelinePayload(FlextCliModels.ArbitraryTypesModel):
+    class CreatePipelinePayload(m.ArbitraryTypesModel):
         """Payload for create_pipeline operation."""
 
         tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
@@ -23,7 +23,7 @@ class FlextMeltanoModelsPayloads:
             Field(description="Pipeline config"),
         ] = Field(default_factory=dict, description="Pipeline config")
 
-    class ExecutePipelinePayload(FlextCliModels.ArbitraryTypesModel):
+    class ExecutePipelinePayload(m.ArbitraryTypesModel):
         """Payload for execute_pipeline operation."""
 
         pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
@@ -32,7 +32,7 @@ class FlextMeltanoModelsPayloads:
             Field(description="Execution config"),
         ] = Field(default_factory=dict, description="Execution config")
 
-    class InstallPluginPayload(FlextCliModels.ArbitraryTypesModel):
+    class InstallPluginPayload(m.ArbitraryTypesModel):
         """Payload for install_plugin operation."""
 
         plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
@@ -42,14 +42,14 @@ class FlextMeltanoModelsPayloads:
             Field(description="Plugin config"),
         ] = Field(default_factory=dict, description="Plugin config")
 
-    class ListPluginsPayload(FlextCliModels.ArbitraryTypesModel):
+    class ListPluginsPayload(m.ArbitraryTypesModel):
         """Payload for list_plugins operation."""
 
         plugin_type: Annotated[
             str | None, Field(default=None, description="Filter by plugin type")
         ] = None
 
-    class ConfigureEnvironmentPayload(FlextCliModels.ArbitraryTypesModel):
+    class ConfigureEnvironmentPayload(m.ArbitraryTypesModel):
         """Payload for configure_environment operation."""
 
         environment_name: Annotated[str, Field(description="Environment name")]
@@ -58,7 +58,7 @@ class FlextMeltanoModelsPayloads:
             Field(description="Environment config"),
         ] = Field(default_factory=dict, description="Environment config")
 
-    class RunDbtModelsPayload(FlextCliModels.ArbitraryTypesModel):
+    class RunDbtModelsPayload(m.ArbitraryTypesModel):
         """Payload for run/test dbt models operation."""
 
         models: Annotated[
@@ -69,7 +69,7 @@ class FlextMeltanoModelsPayloads:
             Field(default=None, description="Execution config"),
         ] = None
 
-    class RunEltPipelinePayload(FlextCliModels.ArbitraryTypesModel):
+    class RunEltPipelinePayload(m.ArbitraryTypesModel):
         """Payload for run_elt_pipeline operation."""
 
         tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]

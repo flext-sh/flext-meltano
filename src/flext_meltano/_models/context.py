@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, field_validator
 
 from flext_meltano import c, t
@@ -14,7 +14,7 @@ from flext_meltano import c, t
 class FlextMeltanoModelsContext:
     """Pipeline context and configuration models."""
 
-    class PipelineExecutionContext(FlextCliModels.FlexibleModel):
+    class PipelineExecutionContext(m.FlexibleModel):
         """Typed context envelope for ELT pipeline execution."""
 
         project_root: Annotated[str, Field(description="Project root path")]
@@ -50,7 +50,7 @@ class FlextMeltanoModelsContext:
             normalized = "" if value is None else str(value)
             return normalized.strip()
 
-    class PipelineResultContext(FlextCliModels.FlexibleModel):
+    class PipelineResultContext(m.FlexibleModel):
         """Typed subset for extracting final pipeline result fields."""
 
         project_root: Annotated[
@@ -80,7 +80,7 @@ class FlextMeltanoModelsContext:
             normalized = "unknown" if value is None else str(value)
             return normalized.strip() or "unknown"
 
-    class PipelineExecutionScalarMap(FlextCliModels.FlexibleModel):
+    class PipelineExecutionScalarMap(m.FlexibleModel):
         """Scalar-only pipeline execution values normalized to strings."""
 
         values: t.StrMapping = Field(
@@ -102,7 +102,7 @@ class FlextMeltanoModelsContext:
                 case _:
                     return {}
 
-    class PluginComponentConfig(FlextCliModels.Entity):
+    class PluginComponentConfig(m.Entity):
         """Validated plugin component configuration for pipeline validators."""
 
         name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]

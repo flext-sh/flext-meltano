@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Annotated, Literal
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field
 
 from flext_meltano import t
@@ -15,7 +15,7 @@ from flext_meltano import t
 class FlextMeltanoModelsSingerCatalog:
     """Singer catalog, pipeline config, and sync result models."""
 
-    class SingerCatalogMetadata(FlextCliModels.ArbitraryTypesModel):
+    class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
         breadcrumb: t.StrSequence = Field(
@@ -25,7 +25,7 @@ class FlextMeltanoModelsSingerCatalog:
             default_factory=dict, description="Singer metadata properties"
         )
 
-    class SingerCatalogEntry(FlextCliModels.ArbitraryTypesModel):
+    class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
 
         tap_stream_id: Annotated[str, Field(description="Tap stream identifier")]
@@ -73,7 +73,7 @@ class FlextMeltanoModelsSingerCatalog:
             Field(default=None, description="Estimated row count from source"),
         ] = None
 
-    class SingerCatalog(FlextCliModels.ArbitraryTypesModel):
+    class SingerCatalog(m.ArbitraryTypesModel):
         """Singer catalog response model."""
 
         type: Annotated[
@@ -89,7 +89,7 @@ class FlextMeltanoModelsSingerCatalog:
             description="Singer catalog stream entries",
         )
 
-    class SingerPipelineConfig(FlextCliModels.Entity):
+    class SingerPipelineConfig(m.Entity):
         """Configuration for a Singer ELT pipeline."""
 
         tap_config_path: Annotated[
@@ -109,7 +109,7 @@ class FlextMeltanoModelsSingerCatalog:
             Field(default=None, description="Specific streams to sync"),
         ] = None
 
-    class SingerSyncResult(FlextCliModels.Entity):
+    class SingerSyncResult(m.Entity):
         """Result of a Singer sync operation."""
 
         records_processed: Annotated[

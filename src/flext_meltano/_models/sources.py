@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated, ClassVar, Self
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field, field_serializer, model_validator
 
 from flext_meltano import FlextMeltanoModelsCore, FlextMeltanoModelsSourcesParams, t
@@ -17,7 +17,7 @@ class FlextMeltanoModelsSources:
         type[FlextMeltanoModelsSourcesParams.StreamDefinition]
     ] = FlextMeltanoModelsSourcesParams.StreamDefinition
 
-    class TapConfig(FlextCliModels.Entity):
+    class TapConfig(m.Entity):
         """Generic tap configuration for data extraction."""
 
         tap_type: Annotated[str, Field(description="Type of the tap")]
@@ -64,7 +64,7 @@ class FlextMeltanoModelsSources:
                 raise ValueError(msg)
             return self
 
-    class TargetConfig(FlextCliModels.Entity):
+    class TargetConfig(m.Entity):
         """Generic target configuration for data loading."""
 
         target_type: Annotated[str, Field(description="Type of the target")]
@@ -111,7 +111,7 @@ class FlextMeltanoModelsSources:
                 raise ValueError(msg)
             return self
 
-    class DataSourceConfig(FlextCliModels.Entity):
+    class DataSourceConfig(m.Entity):
         """Generic data source configuration with validation."""
 
         source_type: Annotated[str, Field(description="Type of the data source")]

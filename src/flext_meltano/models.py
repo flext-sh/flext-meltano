@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 
 from flext_meltano import (
     FlextMeltanoModelsCliParams,
@@ -34,7 +34,7 @@ from flext_meltano import (
 )
 
 
-class FlextMeltanoModels(FlextCliModels):
+class FlextMeltanoModels(m):
     """Generic pipeline models.
 
     Provides reusable Pydantic models for pipeline operations.

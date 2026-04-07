@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Protocol, override, runtime_checkable
 
-from flext_cli import FlextCliProtocols
+from flext_cli import p
 
 from flext_core import r
 from flext_meltano import m, t
@@ -20,71 +20,71 @@ class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(FlextCliProtocols.Service[t.ContainerMapping], Protocol):
+    class Tap(p.Service[t.ContainerMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        def discover(self) -> p.Result[t.ContainerMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.ContainerMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
             self,
             catalog: t.FlatContainerMapping,
-        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(FlextCliProtocols.Service[t.ContainerMapping], Protocol):
+    class Target(p.Service[t.ContainerMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.ContainerMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
             self,
             records: Sequence[t.Meltano.OptionalScalarMap],
-        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
             self,
             record: t.Meltano.OptionalScalarMap,
-        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
     class DbtRunner(
-        FlextCliProtocols.Service[t.ContainerMapping],
+        p.Service[t.ContainerMapping],
         Protocol,
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.ContainerMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
         def run(
             self,
             models: t.StrSequence,
-        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Run DBT models with r."""
             ...
 
         def test(
             self,
             models: t.StrSequence,
-        ) -> FlextCliProtocols.Result[t.ContainerMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Test DBT models with r."""
             ...
 
