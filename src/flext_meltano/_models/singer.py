@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated, Literal, Self
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field, model_validator
 
 from flext_meltano import t
@@ -13,7 +13,7 @@ from flext_meltano import t
 class FlextMeltanoModelsSinger:
     """Singer protocol message models."""
 
-    class SingerSchemaMessage(FlextCliModels.ArbitraryTypesModel):
+    class SingerSchemaMessage(m.ArbitraryTypesModel):
         """Canonical Singer SCHEMA message model."""
 
         type: Annotated[
@@ -41,7 +41,7 @@ class FlextMeltanoModelsSinger:
             description="Singer bookmark columns for incremental replication",
         )
 
-    class SingerRecordMessage(FlextCliModels.ArbitraryTypesModel):
+    class SingerRecordMessage(m.ArbitraryTypesModel):
         """Canonical Singer RECORD message model."""
 
         type: Annotated[
@@ -67,7 +67,7 @@ class FlextMeltanoModelsSinger:
             ),
         ] = None
 
-    class SingerStateMessage(FlextCliModels.ArbitraryTypesModel):
+    class SingerStateMessage(m.ArbitraryTypesModel):
         """Canonical Singer STATE message model."""
 
         type: Annotated[
@@ -79,7 +79,7 @@ class FlextMeltanoModelsSinger:
             Field(description="Singer state bookmark payload"),
         ] = Field(default_factory=dict, description="Singer state bookmark payload")
 
-    class SingerActivateVersionMessage(FlextCliModels.ArbitraryTypesModel):
+    class SingerActivateVersionMessage(m.ArbitraryTypesModel):
         """Canonical Singer ACTIVATE_VERSION message model.
 
         Sent by a tap to signal that all records for a stream version
@@ -98,7 +98,7 @@ class FlextMeltanoModelsSinger:
             t.PositiveInt, Field(description="Stream version to activate")
         ]
 
-    class SingerStateEntry(FlextCliModels.Entity):
+    class SingerStateEntry(m.Entity):
         """Singer state entry for a stream bookmark.
 
         Tracks per-stream incremental sync bookmarks with validation

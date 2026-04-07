@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import FlextMeltanoModelsSources, c, t
@@ -14,7 +14,7 @@ from flext_meltano import FlextMeltanoModelsSources, c, t
 class FlextMeltanoModelsInstances:
     """Instance and stream models."""
 
-    class DataSinkDefinition(FlextCliModels.Entity):
+    class DataSinkDefinition(m.Entity):
         """Generic data sink definition for pipeline operations."""
 
         sink_name: Annotated[str, Field(description="Name of the sink")]
@@ -52,7 +52,7 @@ class FlextMeltanoModelsInstances:
                 raise ValueError(msg)
             return self
 
-    class StreamInfo(FlextCliModels.Entity):
+    class StreamInfo(m.Entity):
         """Generic stream information for data pipeline operations."""
 
         stream_name: Annotated[
@@ -126,7 +126,7 @@ class FlextMeltanoModelsInstances:
                 raise ValueError(msg)
             return self
 
-    class TapInstance(FlextCliModels.Entity):
+    class TapInstance(m.Entity):
         """Generic tap instance for data extraction."""
 
         tap_id: Annotated[

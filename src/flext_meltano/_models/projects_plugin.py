@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import c, t
@@ -13,7 +13,7 @@ from flext_meltano import c, t
 class FlextMeltanoModelsProjectsPlugin:
     """Plugin configuration model."""
 
-    class PluginModel(FlextCliModels.TimestampedModel):
+    class PluginModel(m.TimestampedModel):
         """Generic plugin configuration for pipeline operations."""
 
         name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]

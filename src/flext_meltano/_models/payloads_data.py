@@ -6,7 +6,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import Annotated
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, field_validator
 
 from flext_meltano import t
@@ -15,7 +15,7 @@ from flext_meltano import t
 class FlextMeltanoModelsPayloadsData:
     """Data normalization payload models with validators."""
 
-    class JsonSchemaPayload(FlextCliModels.ArbitraryTypesModel):
+    class JsonSchemaPayload(m.ArbitraryTypesModel):
         """Typed schema payload used by API extract flow."""
 
         schema_definition: Annotated[
@@ -41,7 +41,7 @@ class FlextMeltanoModelsPayloadsData:
                     empty_schema: t.ContainerMapping = {}
                     return empty_schema
 
-    class JsonRecordBatchPayload(FlextCliModels.ArbitraryTypesModel):
+    class JsonRecordBatchPayload(m.ArbitraryTypesModel):
         """Typed record batch payload used by API load flow."""
 
         records: Annotated[
@@ -76,7 +76,7 @@ class FlextMeltanoModelsPayloadsData:
                 case _:
                     return []
 
-    class ConfigMappingPayload(FlextCliModels.ArbitraryTypesModel):
+    class ConfigMappingPayload(m.ArbitraryTypesModel):
         """Normalized mapping payload with string keys."""
 
         values: Annotated[
@@ -125,7 +125,7 @@ class FlextMeltanoModelsPayloadsData:
                     result[str(key)] = str(item)
             return result
 
-    class PathPayload(FlextCliModels.ArbitraryTypesModel):
+    class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
 
         value: Annotated[Path, Field(description="Normalized path")] = Field(
@@ -140,7 +140,7 @@ class FlextMeltanoModelsPayloadsData:
                 return Path()
             return Path(str(value))
 
-    class FileContentPayload(FlextCliModels.ArbitraryTypesModel):
+    class FileContentPayload(m.ArbitraryTypesModel):
         """Normalize str|dict content to writable string for file operations."""
 
         content: Annotated[
@@ -159,7 +159,7 @@ class FlextMeltanoModelsPayloadsData:
                 case _:
                     return str(value)
 
-    class VariantPayload(FlextCliModels.ArbitraryTypesModel):
+    class VariantPayload(m.ArbitraryTypesModel):
         """Normalize plugin variant from external extraction (str|list|dict)."""
 
         value: t.Meltano.VariantValue = Field(

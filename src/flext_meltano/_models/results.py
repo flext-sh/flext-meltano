@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field, computed_field, field_validator, model_validator
 
 from flext_meltano import c, t
@@ -14,7 +14,7 @@ from flext_meltano import c, t
 class FlextMeltanoModelsResults:
     """Execution result models."""
 
-    class ExecutionResult(FlextCliModels.TimestampedModel):
+    class ExecutionResult(m.TimestampedModel):
         """Generic execution result tracking with validation."""
 
         operation: Annotated[str, Field(description="Operation performed")]

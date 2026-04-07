@@ -27,8 +27,8 @@ class FlextMeltanoTestConstants(FlextTestsConstants, FlextMeltanoConstants):
     Access project constants via inner class inheriting from FlextMeltanoConstants.Meltano.
 
     Access patterns:
-    - c.Tests.Docker.* (container testing)
-    - c.Tests.Matcher.* (assertion messages)
+    - c.Tests.* (container testing)
+    - c.Tests.* (assertion messages)
     - c.Tests.Factory.* (test data generation)
     - c.Meltano.* (domain constants from production)
     - c.Paths.* (project-specific test data)

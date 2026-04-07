@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field, computed_field, field_validator, model_validator
 
 from flext_meltano import FlextMeltanoModelsResults, c, t
@@ -13,7 +13,7 @@ from flext_meltano import FlextMeltanoModelsResults, c, t
 class FlextMeltanoModelsResultsPipeline:
     """Pipeline result models."""
 
-    class PipelineResult(FlextCliModels.TimestampedModel):
+    class PipelineResult(m.TimestampedModel):
         """Generic pipeline execution result with complete validation."""
 
         pipeline_id: Annotated[str, Field(description="Pipeline identifier")]

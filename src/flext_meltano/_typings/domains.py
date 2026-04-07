@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_cli import FlextCliTypes
+from flext_cli import t
 
 
 class FlextMeltanoTypingsDomains:
@@ -19,9 +19,9 @@ class FlextMeltanoTypingsDomains:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    type NestedStrMapping = Mapping[str, FlextCliTypes.StrMapping]
+    type NestedStrMapping = Mapping[str, t.StrMapping]
     type DbtManifestData = Mapping[
         str,
-        Mapping[str, FlextCliTypes.ContainerValue] | None,
+        Mapping[str, t.ContainerValue] | None,
     ]
-    type DbtProject = Mapping[str, str | bool | FlextCliTypes.StrSequence]
+    type DbtProject = Mapping[str, str | bool | t.StrSequence]

@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
-from flext_cli import FlextCliProtocols
+from flext_cli import p
 
 from flext_core import r
 from flext_meltano import m, t
@@ -67,19 +67,19 @@ class FlextMeltanoProtocolsServices:
             ...
 
     @runtime_checkable
-    class ServiceCall(FlextCliProtocols.Service[t.Container], Protocol):
+    class ServiceCall(p.Service[t.Container], Protocol):
         """Service call protocol extending Service."""
 
         def call(
             self,
             operation: str,
             payload: t.ConfigurationMapping,
-        ) -> FlextCliProtocols.Result[t.Container]:
+        ) -> p.Result[t.Container]:
             """Execute service call with r."""
             ...
 
         @override
-        def execute(self) -> FlextCliProtocols.Result[t.Container]:
+        def execute(self) -> p.Result[t.Container]:
             """Execute service operation (implements Service)."""
             ...
 

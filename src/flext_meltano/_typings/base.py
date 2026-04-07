@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import ClassVar
 
-from flext_cli import FlextCliTypes
+from flext_cli import t
 from pydantic import TypeAdapter
 
 from flext_meltano import c
@@ -24,25 +24,23 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[FlextCliTypes.ContainerMapping]] = (
-        TypeAdapter(FlextCliTypes.ContainerMapping)
+    CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[t.ContainerMapping]] = TypeAdapter(
+        t.ContainerMapping
     )
-    INTEGER_ADAPTER: ClassVar[TypeAdapter[FlextCliTypes.IntegerValue]] = TypeAdapter(
-        FlextCliTypes.IntegerValue
-    )
+    INTEGER_ADAPTER: ClassVar[TypeAdapter[t.IntegerValue]] = TypeAdapter(t.IntegerValue)
 
     type ValidatorInput = (
-        FlextCliTypes.ContainerMapping
-        | Mapping[str, FlextCliTypes.ContainerMapping | None]
-        | Sequence[FlextCliTypes.ContainerMapping | None]
-        | tuple[FlextCliTypes.ContainerMapping | None, ...]
-        | set[FlextCliTypes.ContainerMapping | None]
+        t.ContainerMapping
+        | Mapping[str, t.ContainerMapping | None]
+        | Sequence[t.ContainerMapping | None]
+        | tuple[t.ContainerMapping | None, ...]
+        | set[t.ContainerMapping | None]
         | None
     )
 
     type PluginDefinition = Mapping[
         str,
-        str | FlextCliTypes.StrSequence | Mapping[str, FlextCliTypes.Scalar | None],
+        str | t.StrSequence | Mapping[str, t.Scalar | None],
     ]
     type PluginCatalog = Mapping[
         str,
@@ -50,19 +48,15 @@ class FlextMeltanoTypingsBase:
     ]
     PluginType = c.Meltano.PluginType
 
-    type VariantValue = (
-        str | FlextCliTypes.StrSequence | FlextCliTypes.ScalarMapping | None
-    )
+    type VariantValue = str | t.StrSequence | t.ScalarMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""
 
     type FileConfigDict = Mapping[
         str,
-        FlextCliTypes.NormalizedValue | FlextCliTypes.StrSequence,
+        t.NormalizedValue | t.StrSequence,
     ]
     type PathDict = Mapping[str, str | Path]
 
-    type OptionalScalarMap = Mapping[str, FlextCliTypes.Scalar | None]
+    type OptionalScalarMap = Mapping[str, t.Scalar | None]
 
-    type CliProcessResult = Mapping[
-        str, FlextCliTypes.Scalar | FlextCliTypes.StrSequence
-    ]
+    type CliProcessResult = Mapping[str, t.Scalar | t.StrSequence]

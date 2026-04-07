@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
-from flext_cli import FlextCliModels, u
+from flext_cli import m, u
 from pydantic import Field, computed_field, field_serializer, model_validator
 
 from flext_meltano import (
@@ -20,7 +20,7 @@ from flext_meltano import (
 class FlextMeltanoModelsInstancesData:
     """Data source and sink instance and config models."""
 
-    class DataSinkConfig(FlextCliModels.Entity):
+    class DataSinkConfig(m.Entity):
         """Generic data sink configuration with validation."""
 
         sink_type: Annotated[str, Field(description="Sink type identifier")]
@@ -80,18 +80,13 @@ class FlextMeltanoModelsInstancesData:
             if not self.sink_type or not self.sink_type.strip():
                 msg = "Sink type must be non-empty string"
                 raise ValueError(msg)
-            c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL = (
-                c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
-            )
-            if (
-                self.batch_size
-                > c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
-            ):
-                msg = f"Batch size too large (max {c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL})"
+            threshold = c.Meltano.LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL
+            if self.batch_size > threshold:
+                msg = f"Batch size too large (max {threshold})"
                 raise ValueError(msg)
             return self
 
-    class DataSourceInstance(FlextCliModels.Entity):
+    class DataSourceInstance(m.Entity):
         """Generic data source instance for pipeline operations."""
 
         source_type: Annotated[str, Field(description="Type of the data source")]
@@ -171,7 +166,7 @@ class FlextMeltanoModelsInstancesData:
                 raise ValueError(msg)
             return self
 
-    class DataSinkInstance(FlextCliModels.Entity):
+    class DataSinkInstance(m.Entity):
         """Generic data sink instance for pipeline operations."""
 
         sink_id: Annotated[

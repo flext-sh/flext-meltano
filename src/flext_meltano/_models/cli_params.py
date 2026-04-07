@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from flext_cli import FlextCliModels
+from flext_cli import m
 from pydantic import Field
 
 
 class FlextMeltanoModelsCliParams:
     """CLI parameter models for pipeline operations."""
 
-    class CliDataSourceParams(FlextCliModels.Entity):
+    class CliDataSourceParams(m.Entity):
         """Generic parameters for data source operations."""
 
         source_name: Annotated[
@@ -47,7 +47,7 @@ class FlextMeltanoModelsCliParams:
             ),
         ] = False
 
-    class CliDataSinkParams(FlextCliModels.Entity):
+    class CliDataSinkParams(m.Entity):
         """Generic parameters for data sink operations."""
 
         sink_name: Annotated[str, Field(description="Name of the data sink")]
@@ -63,7 +63,7 @@ class FlextMeltanoModelsCliParams:
             ),
         ] = None
 
-    class CliPipelineParams(FlextCliModels.Entity):
+    class CliPipelineParams(m.Entity):
         """Generic parameters for pipeline operations."""
 
         source_name: Annotated[
@@ -95,7 +95,7 @@ class FlextMeltanoModelsCliParams:
             Field(default=None, description="Path to write final state"),
         ] = None
 
-    class CliTransformationParams(FlextCliModels.Entity):
+    class CliTransformationParams(m.Entity):
         """Generic parameters for transformation operations."""
 
         project_dir: Annotated[
@@ -122,7 +122,7 @@ class FlextMeltanoModelsCliParams:
             Field(default=False, description="Run with full refresh"),
         ] = False
 
-    class CliPluginInstallParams(FlextCliModels.Entity):
+    class CliPluginInstallParams(m.Entity):
         """Generic parameters for plugin installation."""
 
         plugin_type: Annotated[
@@ -138,7 +138,7 @@ class FlextMeltanoModelsCliParams:
             Field(default=None, description="Specific plugin variant"),
         ] = None
 
-    class PipelineRunParams(FlextCliModels.Entity):
+    class PipelineRunParams(m.Entity):
         """Parameters for pipeline run operations."""
 
         tap_name: Annotated[str, Field(description="Name of the tap to run")]
