@@ -11,8 +11,7 @@ from collections.abc import Mapping, Sequence
 
 from flext_cli import t
 
-from flext_meltano import c
-from flext_meltano._models.singer_sdk import FlextMeltanoModelsSingerSdk
+from flext_meltano import FlextMeltanoModelsSingerSdk, c
 
 
 class FlextMeltanoTypingsSinger:

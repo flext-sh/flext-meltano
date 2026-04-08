@@ -28,14 +28,16 @@ from meltano.core.project_init_service import (
 from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_core.result import FlextResult as r
-from flext_meltano.base import FlextMeltanoServiceBase
-from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.protocols import FlextMeltanoProtocols as p
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_core import FlextResult as r
+from flext_meltano import (
+    FlextMeltanoCLI,
+    FlextMeltanoConstants as c,
+    FlextMeltanoModels as m,
+    FlextMeltanoProtocols as p,
+    FlextMeltanoServiceBase,
+    FlextMeltanoTypes as t,
+    FlextMeltanoUtilities as u,
+)
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):

@@ -8,9 +8,16 @@ from pathlib import Path
 from typing import Protocol, override
 
 from flext_core import FlextLogger
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
-from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
-from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
+from flext_meltano import (
+    FlextMeltanoDbtRunnerMixin,
+    FlextMeltanoProjectManager,
+    FlextMeltanoServiceBase,
+    c,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class _DbtOperationService(Protocol):
