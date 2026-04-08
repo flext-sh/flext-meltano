@@ -16,17 +16,6 @@ if _t.TYPE_CHECKING:
     from flext_core.mixins import FlextMixins as x
     from flext_core.result import FlextResult as r
     from flext_core.service import FlextService as s
-    from tests import (
-        conftest,
-        constants,
-        helpers,
-        integration,
-        models,
-        protocols,
-        typings,
-        unit,
-        utilities,
-    )
     from tests.constants import (
         TestsFlextMeltanoConstants,
         TestsFlextMeltanoConstants as c,

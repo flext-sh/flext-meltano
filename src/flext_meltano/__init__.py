@@ -16,22 +16,7 @@ if _t.TYPE_CHECKING:
     from flext_core.handlers import FlextHandlers as h
     from flext_core.mixins import FlextMixins as x
     from flext_core.result import FlextResult as r
-    from flext_meltano import (
-        _constants,
-        _models,
-        _protocols,
-        _typings,
-        _utilities,
-        api,
-        base,
-        cli,
-        constants,
-        models,
-        protocols,
-        settings,
-        typings,
-        utilities,
-    )
+    from flext_meltano import cli
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
     from flext_meltano._constants.config import FlextMeltanoConstantsConfig
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
