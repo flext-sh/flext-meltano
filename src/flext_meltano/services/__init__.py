@@ -10,40 +10,7 @@ import typing as _t
 from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if _t.TYPE_CHECKING:
-    import flext_meltano.services._abstractions_base as _flext_meltano_services__abstractions_base
-
-    _abstractions_base = _flext_meltano_services__abstractions_base
-    import flext_meltano.services._cli_small_managers as _flext_meltano_services__cli_small_managers
-    from flext_meltano.services._abstractions_base import FlextMeltanoAbstractionsBase
-
-    _cli_small_managers = _flext_meltano_services__cli_small_managers
-    import flext_meltano.services._executor_base as _flext_meltano_services__executor_base
-    from flext_meltano.services._cli_small_managers import (
-        FlextMeltanoDbtManager,
-        FlextMeltanoPluginManager,
-        FlextMeltanoStatusManager,
-    )
-
-    _executor_base = _flext_meltano_services__executor_base
-    import flext_meltano.services._pipeline_lifecycle as _flext_meltano_services__pipeline_lifecycle
-    from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
-
-    _pipeline_lifecycle = _flext_meltano_services__pipeline_lifecycle
-    import flext_meltano.services._pipeline_mgr as _flext_meltano_services__pipeline_mgr
-    from flext_meltano.services._pipeline_lifecycle import (
-        FlextMeltanoPipelineLifecycleOperations,
-    )
-
-    _pipeline_mgr = _flext_meltano_services__pipeline_mgr
-    import flext_meltano.services._pipeline_ops as _flext_meltano_services__pipeline_ops
-    from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
-
-    _pipeline_ops = _flext_meltano_services__pipeline_ops
     import flext_meltano.services.abstractions as _flext_meltano_services_abstractions
-    from flext_meltano.services._pipeline_ops import (
-        FlextMeltanoPipelineCrudOperations,
-        FlextMeltanoPipelinePaths,
-    )
 
     abstractions = _flext_meltano_services_abstractions
     import flext_meltano.services.adapter_extensions as _flext_meltano_services_adapter_extensions
@@ -68,7 +35,11 @@ if _t.TYPE_CHECKING:
     import flext_meltano.services.consumer_bases as _flext_meltano_services_consumer_bases
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
+        FlextMeltanoDbtManager,
+        FlextMeltanoPipelineManager,
+        FlextMeltanoPluginManager,
         FlextMeltanoSingerManager,
+        FlextMeltanoStatusManager,
     )
 
     consumer_bases = _flext_meltano_services_consumer_bases
@@ -77,9 +48,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoDbtServiceBase,
         FlextMeltanoTapServiceBase,
         FlextMeltanoTargetServiceBase,
-        dbt_service_base,
-        tap_service_base,
-        target_service_base,
     )
 
     dbt_project = _flext_meltano_services_dbt_project
@@ -182,10 +150,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "flext_meltano.services.abstractions",
             "FlextMeltanoAbstractions",
         ),
-        "FlextMeltanoAbstractionsBase": (
-            "flext_meltano.services._abstractions_base",
-            "FlextMeltanoAbstractionsBase",
-        ),
         "FlextMeltanoAdapter": (
             "flext_meltano.services.adapters",
             "FlextMeltanoAdapter",
@@ -204,7 +168,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "FlextMeltanoDbtAdapter",
         ),
         "FlextMeltanoDbtManager": (
-            "flext_meltano.services._cli_small_managers",
+            "flext_meltano.services.cli_managers",
             "FlextMeltanoDbtManager",
         ),
         "FlextMeltanoDbtProjectMixin": (
@@ -223,10 +187,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "flext_meltano.services.executor",
             "FlextMeltanoExecutor",
         ),
-        "FlextMeltanoExecutorBase": (
-            "flext_meltano.services._executor_base",
-            "FlextMeltanoExecutorBase",
-        ),
         "FlextMeltanoLibraryRunner": (
             "flext_meltano.services.library_runner",
             "FlextMeltanoLibraryRunner",
@@ -235,28 +195,16 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "flext_meltano.services.adapter_extensions",
             "FlextMeltanoPipelineAdapter",
         ),
-        "FlextMeltanoPipelineCrudOperations": (
-            "flext_meltano.services._pipeline_ops",
-            "FlextMeltanoPipelineCrudOperations",
-        ),
-        "FlextMeltanoPipelineLifecycleOperations": (
-            "flext_meltano.services._pipeline_lifecycle",
-            "FlextMeltanoPipelineLifecycleOperations",
-        ),
         "FlextMeltanoPipelineManager": (
-            "flext_meltano.services._pipeline_mgr",
+            "flext_meltano.services.cli_managers",
             "FlextMeltanoPipelineManager",
-        ),
-        "FlextMeltanoPipelinePaths": (
-            "flext_meltano.services._pipeline_ops",
-            "FlextMeltanoPipelinePaths",
         ),
         "FlextMeltanoPluginDiscoveryMixin": (
             "flext_meltano.services.meltano_plugin_discovery",
             "FlextMeltanoPluginDiscoveryMixin",
         ),
         "FlextMeltanoPluginManager": (
-            "flext_meltano.services._cli_small_managers",
+            "flext_meltano.services.cli_managers",
             "FlextMeltanoPluginManager",
         ),
         "FlextMeltanoProjectManager": (
@@ -292,7 +240,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "FlextMeltanoSingerTapAdapter",
         ),
         "FlextMeltanoStatusManager": (
-            "flext_meltano.services._cli_small_managers",
+            "flext_meltano.services.cli_managers",
             "FlextMeltanoStatusManager",
         ),
         "FlextMeltanoTapAbstractions": (
@@ -316,12 +264,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "Stream": ("flext_meltano.services.singer_sdk", "Stream"),
         "Tap": ("flext_meltano.services.singer_sdk", "Tap"),
         "Target": ("flext_meltano.services.singer_sdk", "Target"),
-        "_abstractions_base": "flext_meltano.services._abstractions_base",
-        "_cli_small_managers": "flext_meltano.services._cli_small_managers",
-        "_executor_base": "flext_meltano.services._executor_base",
-        "_pipeline_lifecycle": "flext_meltano.services._pipeline_lifecycle",
-        "_pipeline_mgr": "flext_meltano.services._pipeline_mgr",
-        "_pipeline_ops": "flext_meltano.services._pipeline_ops",
         "abstractions": "flext_meltano.services.abstractions",
         "adapter_extensions": "flext_meltano.services.adapter_extensions",
         "adapters": "flext_meltano.services.adapters",
@@ -361,6 +303,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
 _ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
 _ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
 _ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("logger", None)
 _ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
 _ = _LAZY_IMPORTS.pop("output", None)
 _ = _LAZY_IMPORTS.pop("output_reporting", None)
@@ -368,7 +311,6 @@ _ = _LAZY_IMPORTS.pop("output_reporting", None)
 __all__ = [
     "Context",
     "FlextMeltanoAbstractions",
-    "FlextMeltanoAbstractionsBase",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoCommandRouter",
@@ -380,13 +322,9 @@ __all__ = [
     "FlextMeltanoDbtServiceBase",
     "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoExecutor",
-    "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoPipelineAdapter",
-    "FlextMeltanoPipelineCrudOperations",
-    "FlextMeltanoPipelineLifecycleOperations",
     "FlextMeltanoPipelineManager",
-    "FlextMeltanoPipelinePaths",
     "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoPluginManager",
     "FlextMeltanoProjectManager",
@@ -409,12 +347,6 @@ __all__ = [
     "Stream",
     "Tap",
     "Target",
-    "_abstractions_base",
-    "_cli_small_managers",
-    "_executor_base",
-    "_pipeline_lifecycle",
-    "_pipeline_mgr",
-    "_pipeline_ops",
     "abstractions",
     "adapter_extensions",
     "adapters",
@@ -425,7 +357,6 @@ __all__ = [
     "d",
     "dbt_project",
     "dbt_runner",
-    "dbt_service_base",
     "e",
     "executor",
     "h",
@@ -447,8 +378,6 @@ __all__ = [
     "singer_target",
     "singer_translator",
     "t",
-    "tap_service_base",
-    "target_service_base",
     "u",
     "validators",
     "x",

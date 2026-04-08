@@ -24,25 +24,14 @@ if _t.TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from tests.integration.test_docker_integration import (
-        TestDockerIntegration,
-        psycopg2,
-        redis,
-    )
 _LAZY_IMPORTS = {
-    "TestDockerIntegration": (
-        "tests.integration.test_docker_integration",
-        "TestDockerIntegration",
-    ),
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
     "p": ("flext_core.protocols", "FlextProtocols"),
-    "psycopg2": ("tests.integration.test_docker_integration", "psycopg2"),
     "r": ("flext_core.result", "FlextResult"),
-    "redis": ("tests.integration.test_docker_integration", "redis"),
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
     "test_docker_integration": "tests.integration.test_docker_integration",
@@ -51,16 +40,13 @@ _LAZY_IMPORTS = {
 }
 
 __all__ = [
-    "TestDockerIntegration",
     "c",
     "d",
     "e",
     "h",
     "m",
     "p",
-    "psycopg2",
     "r",
-    "redis",
     "s",
     "t",
     "test_docker_integration",

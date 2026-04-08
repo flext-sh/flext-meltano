@@ -1,6 +1,6 @@
 """Test protocol definitions for flext-meltano.
 
-Provides FlextMeltanoTestProtocols, combining FlextTestsProtocols with
+Provides TestsFlextMeltanoProtocols, combining TestsFlextProtocols with
 FlextMeltanoProtocols for test-specific protocol definitions.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -16,12 +16,12 @@ from flext_tests import FlextTestsProtocols
 from flext_meltano import FlextMeltanoProtocols, t
 
 
-class FlextMeltanoTestProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
-    """Test protocols combining FlextTestsProtocols and FlextMeltanoProtocols.
+class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
+    """Test protocols combining TestsFlextProtocols and FlextMeltanoProtocols.
 
     Provides access to:
-    - p.Tests.Docker.* (from FlextTestsProtocols)
-    - p.Tests.Factory.* (from FlextTestsProtocols)
+    - p.Tests.Docker.* (from TestsFlextProtocols)
+    - p.Tests.Factory.* (from TestsFlextProtocols)
     - p.Meltano.* (from FlextMeltanoProtocols)
     """
 
@@ -31,7 +31,7 @@ class FlextMeltanoTestProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
         class Tests:
             """Project-specific test protocols.
 
-            Extends FlextTestsProtocols.Tests with Meltano-specific protocols.
+            Extends TestsFlextProtocols.Tests with Meltano-specific protocols.
             """
 
             class CliRunner(Protocol):
@@ -39,7 +39,7 @@ class FlextMeltanoTestProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
 
                 def invoke(
                     self, *args: t.Scalar, **kwargs: t.Scalar
-                ) -> FlextMeltanoTestProtocols.Meltano.Tests.MockCliResultLike:
+                ) -> TestsFlextMeltanoProtocols.Meltano.Tests.MockCliResultLike:
                     """Invoke CLI command."""
                     ...
 
@@ -50,5 +50,5 @@ class FlextMeltanoTestProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
                 output: str
 
 
-p = FlextMeltanoTestProtocols
-__all__ = ["FlextMeltanoTestProtocols", "p"]
+p = TestsFlextMeltanoProtocols
+__all__ = ["TestsFlextMeltanoProtocols", "p"]

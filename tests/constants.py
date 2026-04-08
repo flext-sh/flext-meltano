@@ -1,6 +1,6 @@
 """Constants for flext-meltano tests.
 
-Provides FlextMeltanoTestConstants, extending FlextTestsConstants with flext-meltano-specific
+Provides TestsFlextMeltanoConstants, extending FlextTestsConstants with flext-meltano-specific
 constants using COMPOSITION INHERITANCE.
 
 Inheritance hierarchy:
@@ -20,7 +20,7 @@ from flext_tests import FlextTestsConstants
 from flext_meltano import FlextMeltanoConstants
 
 
-class FlextMeltanoTestConstants(FlextTestsConstants, FlextMeltanoConstants):
+class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
     MANDATORY: Inherits from FlextTestsConstants for test infrastructure (.Tests.*).
@@ -54,5 +54,5 @@ class FlextMeltanoTestConstants(FlextTestsConstants, FlextMeltanoConstants):
                 TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
 
-c = FlextMeltanoTestConstants
-__all__ = ["FlextMeltanoTestConstants", "c"]
+c = TestsFlextMeltanoConstants
+__all__ = ["TestsFlextMeltanoConstants", "c"]

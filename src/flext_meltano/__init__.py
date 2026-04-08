@@ -19,8 +19,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoConstantsBase,
         FlextMeltanoConstantsConfig,
         FlextMeltanoConstantsEnums,
-        config,
-        enums,
     )
 
     _models = _flext_meltano__models
@@ -46,26 +44,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoModelsSources,
         FlextMeltanoModelsSourcesParams,
         FlextMeltanoModelsTransformations,
-        cli_params,
-        context,
-        core,
-        discovery,
-        instances,
-        instances_data,
-        logging_config,
-        payloads,
-        payloads_data,
-        projects,
-        projects_plugin,
-        results,
-        results_dbt,
-        results_pipeline,
-        singer,
-        singer_catalog,
-        singer_sdk,
-        sources,
-        sources_params,
-        transformations,
     )
 
     _protocols = _flext_meltano__protocols
@@ -76,9 +54,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoProtocolsProject,
         FlextMeltanoProtocolsServices,
         FlextMeltanoProtocolsSinger,
-        plugin,
-        project,
-        services,
     )
 
     _typings = _flext_meltano__typings
@@ -87,7 +62,6 @@ if _t.TYPE_CHECKING:
         FlextMeltanoTypingsBase,
         FlextMeltanoTypingsDomains,
         FlextMeltanoTypingsSinger,
-        domains,
     )
 
     _utilities = _flext_meltano__utilities
@@ -95,7 +69,6 @@ if _t.TYPE_CHECKING:
     from flext_meltano._utilities import (
         FlextMeltanoUtilitiesRuntime,
         FlextMeltanoUtilitiesSinger,
-        runtime,
     )
 
     api = _flext_meltano_api
@@ -104,11 +77,11 @@ if _t.TYPE_CHECKING:
 
     base = _flext_meltano_base
     import flext_meltano.cli as _flext_meltano_cli
-    from flext_meltano.base import FlextMeltanoServiceBase
+    from flext_meltano.base import FlextMeltanoServiceBase, FlextMeltanoServiceBase as s
 
     cli = _flext_meltano_cli
     import flext_meltano.constants as _flext_meltano_constants
-    from flext_meltano.cli import FlextMeltanoCLI, main
+    from flext_meltano.cli import FlextMeltanoCLI
 
     constants = _flext_meltano_constants
     import flext_meltano.models as _flext_meltano_models
@@ -122,15 +95,17 @@ if _t.TYPE_CHECKING:
     from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
 
     protocols = _flext_meltano_protocols
-    import flext_meltano.services.consumer_bases as _flext_meltano_services_consumer_bases
+    import flext_meltano.services as _flext_meltano_services
     from flext_meltano.protocols import (
         FlextMeltanoProtocols,
         FlextMeltanoProtocols as p,
     )
+
+    services = _flext_meltano_services
+    import flext_meltano.settings as _flext_meltano_settings
     from flext_meltano.services import (
         Context,
         FlextMeltanoAbstractions,
-        FlextMeltanoAbstractionsBase,
         FlextMeltanoAdapter,
         FlextMeltanoBridge,
         FlextMeltanoCommandRouter,
@@ -141,13 +116,9 @@ if _t.TYPE_CHECKING:
         FlextMeltanoDbtRunnerMixin,
         FlextMeltanoDbtTransformationRunner,
         FlextMeltanoExecutor,
-        FlextMeltanoExecutorBase,
         FlextMeltanoLibraryRunner,
         FlextMeltanoPipelineAdapter,
-        FlextMeltanoPipelineCrudOperations,
-        FlextMeltanoPipelineLifecycleOperations,
         FlextMeltanoPipelineManager,
-        FlextMeltanoPipelinePaths,
         FlextMeltanoPluginDiscoveryMixin,
         FlextMeltanoPluginManager,
         FlextMeltanoProjectManager,
@@ -168,36 +139,11 @@ if _t.TYPE_CHECKING:
         Stream,
         Tap,
         Target,
-        abstractions,
-        adapter_extensions,
-        adapters,
-        bridge,
-        cli_managers,
-        dbt_project,
-        dbt_runner,
-        executor,
-        library_runner,
-        meltano_dbt_transformation,
-        meltano_plugin_discovery,
-        meltano_plugins,
-        meltano_project_sdk,
-        project_service,
-        singer_state,
-        singer_tap,
-        singer_target,
-        singer_translator,
-        validators,
     )
-
-    consumer_bases = _flext_meltano_services_consumer_bases
-    import flext_meltano.settings as _flext_meltano_settings
     from flext_meltano.services.consumer_bases import (
         FlextMeltanoDbtServiceBase,
         FlextMeltanoTapServiceBase,
         FlextMeltanoTargetServiceBase,
-        dbt_service_base,
-        tap_service_base,
-        target_service_base,
     )
 
     settings = _flext_meltano_settings
@@ -214,7 +160,6 @@ if _t.TYPE_CHECKING:
     from flext_core.handlers import FlextHandlers as h
     from flext_core.mixins import FlextMixins as x
     from flext_core.result import FlextResult as r
-    from flext_core.service import FlextService as s
     from flext_meltano.utilities import (
         FlextMeltanoUtilities,
         FlextMeltanoUtilities as u,
@@ -260,13 +205,13 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "e": ("flext_core.exceptions", "FlextExceptions"),
         "h": ("flext_core.handlers", "FlextHandlers"),
         "m": ("flext_meltano.models", "FlextMeltanoModels"),
-        "main": ("flext_meltano.cli", "main"),
         "meltano": ("flext_meltano.api", "meltano"),
         "models": "flext_meltano.models",
         "p": ("flext_meltano.protocols", "FlextMeltanoProtocols"),
         "protocols": "flext_meltano.protocols",
         "r": ("flext_core.result", "FlextResult"),
-        "s": ("flext_core.service", "FlextService"),
+        "s": ("flext_meltano.base", "FlextMeltanoServiceBase"),
+        "services": "flext_meltano.services",
         "settings": "flext_meltano.settings",
         "t": ("flext_meltano.typings", "FlextMeltanoTypes"),
         "typings": "flext_meltano.typings",
@@ -278,6 +223,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
 _ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
 _ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
 _ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("logger", None)
 _ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
 _ = _LAZY_IMPORTS.pop("output", None)
 _ = _LAZY_IMPORTS.pop("output_reporting", None)
@@ -286,7 +232,6 @@ __all__ = [
     "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
-    "FlextMeltanoAbstractionsBase",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoCLI",
@@ -303,7 +248,6 @@ __all__ = [
     "FlextMeltanoDbtServiceBase",
     "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoExecutor",
-    "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoModels",
     "FlextMeltanoModelsCliParams",
@@ -327,10 +271,7 @@ __all__ = [
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
     "FlextMeltanoPipelineAdapter",
-    "FlextMeltanoPipelineCrudOperations",
-    "FlextMeltanoPipelineLifecycleOperations",
     "FlextMeltanoPipelineManager",
-    "FlextMeltanoPipelinePaths",
     "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoPluginManager",
     "FlextMeltanoProjectManager",
@@ -381,77 +322,27 @@ __all__ = [
     "_protocols",
     "_typings",
     "_utilities",
-    "abstractions",
-    "adapter_extensions",
-    "adapters",
     "api",
     "base",
-    "bridge",
     "c",
     "cli",
-    "cli_managers",
-    "cli_params",
-    "config",
     "constants",
-    "consumer_bases",
-    "context",
-    "core",
     "d",
-    "dbt_project",
-    "dbt_runner",
-    "dbt_service_base",
-    "discovery",
-    "domains",
     "e",
-    "enums",
-    "executor",
     "h",
-    "instances",
-    "instances_data",
-    "library_runner",
-    "logging_config",
     "m",
-    "main",
     "meltano",
-    "meltano_dbt_transformation",
-    "meltano_plugin_discovery",
-    "meltano_plugins",
-    "meltano_project_sdk",
     "models",
     "p",
-    "payloads",
-    "payloads_data",
-    "plugin",
-    "project",
-    "project_service",
-    "projects",
-    "projects_plugin",
     "protocols",
     "r",
-    "results",
-    "results_dbt",
-    "results_pipeline",
-    "runtime",
     "s",
     "services",
     "settings",
-    "singer",
-    "singer_catalog",
-    "singer_sdk",
-    "singer_state",
-    "singer_tap",
-    "singer_target",
-    "singer_translator",
-    "sources",
-    "sources_params",
     "t",
-    "tap_service_base",
-    "target_service_base",
-    "transformations",
     "typings",
     "u",
     "utilities",
-    "validators",
     "x",
 ]
 

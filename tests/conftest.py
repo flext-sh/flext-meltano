@@ -35,7 +35,7 @@ class MockCliResult:
 class CliRunner(Protocol):
     """Protocol for CLI runner interface.
 
-    Canonical definition lives in ``FlextMeltanoTestProtocols.Meltano.Tests.CliRunner``.
+    Canonical definition lives in ``TestsFlextMeltanoProtocols.Meltano.Tests.CliRunner``.
     Re-exported here for backward compatibility with auto-generated ``tests/__init__.py``.
     """
 

@@ -60,14 +60,16 @@ class FlextMeltano(
 ):
     """MRO facade over all Meltano services. All operations return r[T]."""
 
-    _instance: ClassVar[FlextMeltano | None] = None
+    _instance: ClassVar[object | None] = None
 
     @classmethod
     def get_instance(cls) -> FlextMeltano:
         """Return the shared Meltano facade instance."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
+        instance = FlextMeltano._instance
+        if not isinstance(instance, FlextMeltano):
+            instance = FlextMeltano()
+            FlextMeltano._instance = instance
+        return instance
 
     @override
     def execute(self) -> r[t.ContainerMapping]:
@@ -82,5 +84,6 @@ class FlextMeltano(
 
 
 meltano = FlextMeltano.get_instance()
+
 
 __all__ = ["FlextMeltano", "meltano"]

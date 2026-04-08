@@ -1,6 +1,6 @@
 """Test models for flext-meltano.
 
-Provides test-specific models extending FlextTestsModels and FlextMeltanoModels
+Provides test-specific models extending TestsFlextModels and FlextMeltanoModels
 with proper hierarchy composition.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -15,13 +15,13 @@ from flext_tests import FlextTestsModels
 from flext_meltano import FlextMeltanoModels
 
 
-class FlextMeltanoTestModels(FlextTestsModels, FlextInfraModels, FlextMeltanoModels):
-    """Test models - composition of FlextTestsModels + FlextMeltanoModels.
+class TestsFlextMeltanoModels(FlextTestsModels, FlextInfraModels, FlextMeltanoModels):
+    """Test models - composition of TestsFlextModels + FlextMeltanoModels.
 
     Hierarchy:
-    - FlextTestsModels: Generic test utilities from flext-tests
+    - TestsFlextModels: Generic test utilities from flext-tests
     - FlextMeltanoModels: Domain models from flext-meltano
-    - FlextMeltanoTestModels: Composition + namespace .Tests
+    - TestsFlextMeltanoModels: Composition + namespace .Tests
 
     Access patterns:
     - m.Tests.* - Project-specific test fixtures
@@ -39,6 +39,6 @@ class FlextMeltanoTestModels(FlextTestsModels, FlextInfraModels, FlextMeltanoMod
             """
 
 
-m = FlextMeltanoTestModels
+m = TestsFlextMeltanoModels
 
-__all__ = ["FlextMeltanoTestModels", "m"]
+__all__ = ["TestsFlextMeltanoModels", "m"]

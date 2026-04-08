@@ -24,19 +24,9 @@ if _t.TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from tests.helpers.docker_test_manager import (
-        ContainerManager,
-        Tk,
-        docker_manager,
-        docker_services,
-    )
 _LAZY_IMPORTS = {
-    "ContainerManager": ("tests.helpers.docker_test_manager", "ContainerManager"),
-    "Tk": ("tests.helpers.docker_test_manager", "Tk"),
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
-    "docker_manager": ("tests.helpers.docker_test_manager", "docker_manager"),
-    "docker_services": ("tests.helpers.docker_test_manager", "docker_services"),
     "docker_test_manager": "tests.helpers.docker_test_manager",
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
@@ -50,12 +40,8 @@ _LAZY_IMPORTS = {
 }
 
 __all__ = [
-    "ContainerManager",
-    "Tk",
     "c",
     "d",
-    "docker_manager",
-    "docker_services",
     "docker_test_manager",
     "e",
     "h",

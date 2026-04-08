@@ -1,6 +1,6 @@
 """Test utilities for flext-meltano.
 
-Provides FlextMeltanoTestUtilities, combining FlextTestsUtilities with
+Provides TestsFlextMeltanoUtilities, combining TestsFlextUtilities with
 FlextMeltanoUtilities for test-specific utilities.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -14,7 +14,7 @@ from flext_tests import FlextTestsUtilities
 from flext_meltano import FlextMeltanoUtilities
 
 
-class FlextMeltanoTestUtilities(FlextTestsUtilities, FlextMeltanoUtilities):
+class TestsFlextMeltanoUtilities(FlextTestsUtilities, FlextMeltanoUtilities):
     """Test utilities for flext-meltano."""
 
     class Meltano(FlextMeltanoUtilities.Meltano):
@@ -24,5 +24,5 @@ class FlextMeltanoTestUtilities(FlextTestsUtilities, FlextMeltanoUtilities):
             """Meltano test utilities."""
 
 
-u = FlextMeltanoTestUtilities
-__all__ = ["FlextMeltanoTestUtilities", "u"]
+u = TestsFlextMeltanoUtilities
+__all__ = ["TestsFlextMeltanoUtilities", "u"]
