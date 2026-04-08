@@ -5,7 +5,11 @@ from __future__ import annotations
 
 import typing as _t
 
-from flext_core.lazy import install_lazy_exports, merge_lazy_imports
+from flext_core.lazy import (
+    build_lazy_import_map,
+    install_lazy_exports,
+    merge_lazy_imports,
+)
 from flext_meltano.__version__ import *
 
 if _t.TYPE_CHECKING:
@@ -130,38 +134,48 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "._utilities",
         ".services",
     ),
-    {
-        "FlextMeltano": ".api",
-        "FlextMeltanoCLI": ".cli",
-        "FlextMeltanoConstants": ".constants",
-        "FlextMeltanoModels": ".models",
-        "FlextMeltanoProtocols": ".protocols",
-        "FlextMeltanoServiceBase": ".base",
-        "FlextMeltanoSettings": ".settings",
-        "FlextMeltanoTypes": ".typings",
-        "FlextMeltanoUtilities": ".utilities",
-        "__author__": ".__version__",
-        "__author_email__": ".__version__",
-        "__description__": ".__version__",
-        "__license__": ".__version__",
-        "__title__": ".__version__",
-        "__url__": ".__version__",
-        "__version__": ".__version__",
-        "__version_info__": ".__version__",
-        "c": (".constants", "FlextMeltanoConstants"),
-        "d": ("flext_core.decorators", "FlextDecorators"),
-        "e": ("flext_core.exceptions", "FlextExceptions"),
-        "h": ("flext_core.handlers", "FlextHandlers"),
-        "m": (".models", "FlextMeltanoModels"),
-        "main": ".cli",
-        "meltano": ".api",
-        "p": (".protocols", "FlextMeltanoProtocols"),
-        "r": ("flext_core.result", "FlextResult"),
-        "s": (".base", "FlextMeltanoServiceBase"),
-        "t": (".typings", "FlextMeltanoTypes"),
-        "u": (".utilities", "FlextMeltanoUtilities"),
-        "x": ("flext_core.mixins", "FlextMixins"),
-    },
+    build_lazy_import_map(
+        {
+            ".__version__": (
+                "__author__",
+                "__author_email__",
+                "__description__",
+                "__license__",
+                "__title__",
+                "__url__",
+                "__version__",
+                "__version_info__",
+            ),
+            ".api": (
+                "FlextMeltano",
+                "meltano",
+            ),
+            ".base": ("FlextMeltanoServiceBase",),
+            ".cli": (
+                "FlextMeltanoCLI",
+                "main",
+            ),
+            ".constants": ("FlextMeltanoConstants",),
+            ".models": ("FlextMeltanoModels",),
+            ".protocols": ("FlextMeltanoProtocols",),
+            ".settings": ("FlextMeltanoSettings",),
+            ".typings": ("FlextMeltanoTypes",),
+            ".utilities": ("FlextMeltanoUtilities",),
+        },
+        alias_groups={
+            ".base": (("s", "FlextMeltanoServiceBase"),),
+            ".constants": (("c", "FlextMeltanoConstants"),),
+            ".models": (("m", "FlextMeltanoModels"),),
+            ".protocols": (("p", "FlextMeltanoProtocols"),),
+            ".typings": (("t", "FlextMeltanoTypes"),),
+            ".utilities": (("u", "FlextMeltanoUtilities"),),
+            "flext_core.decorators": (("d", "FlextDecorators"),),
+            "flext_core.exceptions": (("e", "FlextExceptions"),),
+            "flext_core.handlers": (("h", "FlextHandlers"),),
+            "flext_core.mixins": (("x", "FlextMixins"),),
+            "flext_core.result": (("r", "FlextResult"),),
+        },
+    ),
     exclude_names=(
         "cleanup_submodule_namespace",
         "install_lazy_exports",
