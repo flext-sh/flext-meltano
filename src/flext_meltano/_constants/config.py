@@ -6,7 +6,7 @@ from enum import StrEnum, unique
 from typing import Final
 
 
-class FlextMeltanoConstantsConfig:
+class FlextMeltanoConstantsSettings:
     """Meltano configuration, defaults, and operational constants.
 
     All constants are flat with descriptive prefixes to explain their usage.

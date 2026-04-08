@@ -266,11 +266,11 @@ from flext_core import (
     FlextContainer,  # Dependency injection
     FlextModels,  # Base model classes
     FlextLogger,  # Structured logging
-    FlextService,  # Base service class
+    s,  # Base service class
 )
 
 
-class FlextMeltanoService(FlextService):
+class FlextMeltanoService(s):
     """FLEXT-Meltano service extending FLEXT-Core patterns."""
 
     def discover_plugins(self) -> r[List[PluginInfo]]:
@@ -572,9 +572,9 @@ from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
-from flext_core import FlextDecorators
+from flext_core import d
 from flext_core import FlextDispatcher
-from flext_core import FlextExceptions
+from flext_core import e
 from flext_core import h
 from flext_core import FlextLogger
 from flext_core import x
@@ -584,13 +584,13 @@ from flext_core import p
 from flext_core import FlextRegistry
 from flext_core import r
 from flext_core import u
-from flext_core import FlextService
+from flext_core import s
 from flext_core import t
 from flext_core import u
 from flext_meltano import FlextMeltanoTap, FlextMeltanoTarget
 
 
-class MyFLEXTProject(FlextService):
+class MyFLEXTProject(s):
     """FLEXT project extending foundation patterns."""
 
     def __init__(self):

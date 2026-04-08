@@ -6,7 +6,7 @@ from flext_cli import FlextCliConstants
 
 from flext_meltano import (
     FlextMeltanoConstantsBase,
-    FlextMeltanoConstantsConfig,
+    FlextMeltanoConstantsSettings,
     FlextMeltanoConstantsEnums,
 )
 
@@ -17,7 +17,7 @@ class FlextMeltanoConstants(FlextCliConstants):
     class Meltano(
         FlextMeltanoConstantsBase,
         FlextMeltanoConstantsEnums,
-        FlextMeltanoConstantsConfig,
+        FlextMeltanoConstantsSettings,
     ):
         """Meltano domain constants namespace."""
 

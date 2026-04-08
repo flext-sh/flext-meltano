@@ -1,7 +1,7 @@
 """Meltano SDK Project Management — MRO mixin for FlextMeltano facade.
 
 Deep integration with meltano-core Project SDK. Moved from meltano/project.py
-and converted from standalone FlextService to facade mixin.
+and converted from standalone s to facade mixin.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

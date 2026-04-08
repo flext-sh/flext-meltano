@@ -68,7 +68,7 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 - **Total Lines**: 7,266 across 20 Python modules
 - **Architecture**: Single unified class per module (FLEXT compliant)
 - **Error Handling**: r pattern implementation (95% coverage)
-- **Service Pattern**: FlextService implementations (90% coverage)
+- **Service Pattern**: s implementations (90% coverage)
 
 ### **Key Components**
 

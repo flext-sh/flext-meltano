@@ -1,7 +1,7 @@
 """Shared service foundation for flext-meltano components.
 
 Centralizes access to configuration singleton while maintaining inheritance
-aligned with `FlextService` from flext-core, avoiding duplication of initialization
+aligned with `s` from flext-core, avoiding duplication of initialization
 across library services.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -16,15 +16,15 @@ from typing import Annotated, override
 
 from pydantic import Field
 
-from flext_core import FlextService
+from flext_core import s
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase(FlextService[t.ContainerMapping]):
+class FlextMeltanoServiceBase(s[t.ContainerMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
-    `execute` method from FlextService.
+    `execute` method from s.
     """
 
     config_type: type | None = Field(

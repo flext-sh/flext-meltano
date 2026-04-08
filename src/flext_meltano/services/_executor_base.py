@@ -28,7 +28,7 @@ from meltano.core.project_init_service import (
 from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_core import FlextResult as r
+from flext_core import r
 from flext_meltano import (
     FlextMeltanoCLI,
     FlextMeltanoConstants as c,

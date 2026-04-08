@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_core import FlextResult, r
+from flext_core import r
 from flext_meltano import (
     FlextMeltanoAbstractionsBase,
     c,
@@ -24,7 +24,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def create_abstractions_instance(cls) -> r[Self]:
         """Factory method for creating a FlextMeltanoAbstractions instance."""
         instance: Self = cls()
-        return FlextResult[Self](value=instance, is_success=True)
+        return r[Self](value=instance, is_success=True)
 
     # -- Tap-specific operations (discovery, sync, catalog) --
 

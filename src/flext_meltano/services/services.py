@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_core import FlextResult, r
+from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, t, u
 
 
@@ -40,10 +40,10 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 sink_name=kwargs.get("sink_name"),
                 transformation_name=kwargs.get("transformation_name"),
             )
-            success: r[Self] = FlextResult[Self](value=instance, is_success=True)
+            success: r[Self] = r[Self](value=instance, is_success=True)
             return success
         except c.Meltano.OPERATION_ERRORS as ex:
-            failure: r[Self] = FlextResult[Self].fail(
+            failure: r[Self] = r[Self].fail(
                 f"Failed to create {component_label} '{component_name}': {ex}"
             )
             return failure

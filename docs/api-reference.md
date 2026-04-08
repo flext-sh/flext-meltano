@@ -81,7 +81,7 @@ ______________________________________________________________________
 **Primary service for Meltano project management and plugin operations**
 
 ```python
-class FlextMeltanoService(FlextService):
+class FlextMeltanoService(s):
     """Main orchestration service for Meltano project operations."""
 
     def __init__(
@@ -183,7 +183,7 @@ def execute_target(
 **Meltano CLI integration and execution adapter**
 
 ```python
-class FlextMeltanoAdapter(FlextService):
+class FlextMeltanoAdapter(s):
     """Adapter for Meltano CLI integration and execution."""
 
     def __init__(self, project_root: Path | str | None = None) -> None:
@@ -248,7 +248,7 @@ def list_plugins(
 **Advanced pipeline execution engine**
 
 ```python
-class FlextMeltanoExecutor(FlextService):
+class FlextMeltanoExecutor(s):
     """Advanced pipeline execution engine with orchestration."""
 ```
 
@@ -299,7 +299,7 @@ ______________________________________________________________________
 **Singer tap implementation with enterprise features**
 
 ```python
-class FlextSingerTap(FlextService):
+class FlextSingerTap(s):
     """Singer tap implementation with discovery, sync, and state management."""
 
     def __init__(
@@ -373,7 +373,7 @@ def validate_config(self) -> r[FlextMeltanoModels.ValidationResult]:
 **Singer target implementation with batch processing**
 
 ```python
-class FlextSingerTarget(FlextService):
+class FlextSingerTarget(s):
     """Singer target implementation with batch processing and error handling."""
 
     def __init__(self, target_name: str, config: t.Dict) -> None:
@@ -433,7 +433,7 @@ ______________________________________________________________________
 **Plugin lifecycle management and operations**
 
 ```python
-class FlextPluginService(FlextService):
+class FlextPluginService(s):
     """Service for plugin lifecycle management and operations."""
 
     def __init__(self, project_root: Path | str | None = None) -> None:
@@ -516,7 +516,7 @@ def update_plugin(
 **Plugin registry and discovery system**
 
 ```python
-class FlextPluginRegistry(FlextService):
+class FlextPluginRegistry(s):
     """Plugin registry for plugin discovery and management."""
 ```
 
@@ -584,7 +584,7 @@ ______________________________________________________________________
 **Pipeline orchestration and execution service**
 
 ```python
-class FlextMeltanoService(FlextService):
+class FlextMeltanoService(s):
     """Service for pipeline orchestration and execution."""
 ```
 
@@ -648,7 +648,7 @@ def monitor_pipeline(self, pipeline_id: str) -> r[FlextMeltanoModels.PipelineSta
 **Advanced pipeline execution engine**
 
 ```python
-class FlextMeltanoExecutor(FlextService):
+class FlextMeltanoExecutor(s):
     """Advanced pipeline execution engine with orchestration."""
 ```
 
@@ -702,7 +702,7 @@ ______________________________________________________________________
 **Meltano project management service**
 
 ```python
-class FlextProjectService(FlextService):
+class FlextProjectService(s):
     """Service for Meltano project management."""
 ```
 
