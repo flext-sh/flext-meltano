@@ -20,9 +20,6 @@ _LAZY_IMPORTS = {
         "flext_meltano._constants.enums",
         "FlextMeltanoConstantsEnums",
     ),
-    "base": "flext_meltano._constants.base",
-    "config": "flext_meltano._constants.config",
-    "enums": "flext_meltano._constants.enums",
 }
 
 

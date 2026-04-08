@@ -16,8 +16,6 @@ _LAZY_IMPORTS = {
         "flext_meltano._utilities.singer",
         "FlextMeltanoUtilitiesSinger",
     ),
-    "runtime": "flext_meltano._utilities.runtime",
-    "singer": "flext_meltano._utilities.singer",
 }
 
 

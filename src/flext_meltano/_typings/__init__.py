@@ -20,9 +20,6 @@ _LAZY_IMPORTS = {
         "flext_meltano._typings.singer",
         "FlextMeltanoTypingsSinger",
     ),
-    "base": "flext_meltano._typings.base",
-    "domains": "flext_meltano._typings.domains",
-    "singer": "flext_meltano._typings.singer",
 }
 
 

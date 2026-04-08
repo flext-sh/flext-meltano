@@ -28,11 +28,6 @@ _LAZY_IMPORTS = {
         "flext_meltano._protocols.singer",
         "FlextMeltanoProtocolsSinger",
     ),
-    "cli": "flext_meltano._protocols.cli",
-    "plugin": "flext_meltano._protocols.plugin",
-    "project": "flext_meltano._protocols.project",
-    "services": "flext_meltano._protocols.services",
-    "singer": "flext_meltano._protocols.singer",
 }
 
 
