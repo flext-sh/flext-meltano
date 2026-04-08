@@ -8,18 +8,9 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "FlextMeltanoTypingsBase": (
-        "flext_meltano._typings.base",
-        "FlextMeltanoTypingsBase",
-    ),
-    "FlextMeltanoTypingsDomains": (
-        "flext_meltano._typings.domains",
-        "FlextMeltanoTypingsDomains",
-    ),
-    "FlextMeltanoTypingsSinger": (
-        "flext_meltano._typings.singer",
-        "FlextMeltanoTypingsSinger",
-    ),
+    "FlextMeltanoTypingsBase": ".base",
+    "FlextMeltanoTypingsDomains": ".domains",
+    "FlextMeltanoTypingsSinger": ".singer",
 }
 
 

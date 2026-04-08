@@ -8,18 +8,9 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "FlextMeltanoDbtServiceBase": (
-        "flext_meltano.services.consumer_bases.dbt_service_base",
-        "FlextMeltanoDbtServiceBase",
-    ),
-    "FlextMeltanoTapServiceBase": (
-        "flext_meltano.services.consumer_bases.tap_service_base",
-        "FlextMeltanoTapServiceBase",
-    ),
-    "FlextMeltanoTargetServiceBase": (
-        "flext_meltano.services.consumer_bases.target_service_base",
-        "FlextMeltanoTargetServiceBase",
-    ),
+    "FlextMeltanoDbtServiceBase": ".dbt_service_base",
+    "FlextMeltanoTapServiceBase": ".tap_service_base",
+    "FlextMeltanoTargetServiceBase": ".target_service_base",
 }
 
 

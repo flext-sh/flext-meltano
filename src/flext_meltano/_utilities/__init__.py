@@ -8,14 +8,8 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "FlextMeltanoUtilitiesRuntime": (
-        "flext_meltano._utilities.runtime",
-        "FlextMeltanoUtilitiesRuntime",
-    ),
-    "FlextMeltanoUtilitiesSinger": (
-        "flext_meltano._utilities.singer",
-        "FlextMeltanoUtilitiesSinger",
-    ),
+    "FlextMeltanoUtilitiesRuntime": ".runtime",
+    "FlextMeltanoUtilitiesSinger": ".singer",
 }
 
 

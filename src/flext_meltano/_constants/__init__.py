@@ -8,18 +8,9 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "FlextMeltanoConstantsBase": (
-        "flext_meltano._constants.base",
-        "FlextMeltanoConstantsBase",
-    ),
-    "FlextMeltanoConstantsConfig": (
-        "flext_meltano._constants.config",
-        "FlextMeltanoConstantsConfig",
-    ),
-    "FlextMeltanoConstantsEnums": (
-        "flext_meltano._constants.enums",
-        "FlextMeltanoConstantsEnums",
-    ),
+    "FlextMeltanoConstantsBase": ".base",
+    "FlextMeltanoConstantsConfig": ".config",
+    "FlextMeltanoConstantsEnums": ".enums",
 }
 
 
