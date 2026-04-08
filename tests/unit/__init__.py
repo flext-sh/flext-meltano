@@ -46,12 +46,22 @@ if _t.TYPE_CHECKING:
     )
 
     test_cli_integration = _tests_unit_test_cli_integration
-    import tests.unit.test_constants as _tests_unit_test_constants
+    import tests.unit.test_cli_small_managers as _tests_unit_test_cli_small_managers
     from tests.unit.test_cli_integration import (
         TestCliModelConversionWithDbtRunParams,
         TestCliModelConversionWithPipelineRunParams,
         TestCliModelConversionWithTapRunParams,
         TestCliModelConversionWithTargetRunParams,
+    )
+
+    test_cli_small_managers = _tests_unit_test_cli_small_managers
+    import tests.unit.test_constants as _tests_unit_test_constants
+    from tests.unit.test_cli_small_managers import (
+        test_dbt_manager_fails_for_unsupported_operation,
+        test_dbt_manager_routes_supported_operation_to_service,
+        test_plugin_manager_routes_list_and_install,
+        test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops,
+        test_status_manager_routes_show_health_and_version,
     )
 
     test_constants = _tests_unit_test_constants
@@ -338,6 +348,7 @@ _LAZY_IMPORTS = {
     ),
     "test_api": "tests.unit.test_api",
     "test_cli_integration": "tests.unit.test_cli_integration",
+    "test_cli_small_managers": "tests.unit.test_cli_small_managers",
     "test_constants": "tests.unit.test_constants",
     "test_create_pipeline_creates_directory_and_configuration": (
         "tests.unit.pipeline_cli_managers_tests",
@@ -346,6 +357,14 @@ _LAZY_IMPORTS = {
     "test_create_pipeline_fails_without_configuration": (
         "tests.unit.pipeline_cli_managers_tests",
         "test_create_pipeline_fails_without_configuration",
+    ),
+    "test_dbt_manager_fails_for_unsupported_operation": (
+        "tests.unit.test_cli_small_managers",
+        "test_dbt_manager_fails_for_unsupported_operation",
+    ),
+    "test_dbt_manager_routes_supported_operation_to_service": (
+        "tests.unit.test_cli_small_managers",
+        "test_dbt_manager_routes_supported_operation_to_service",
     ),
     "test_delete_pipeline_removes_configuration_directory": (
         "tests.unit.pipeline_cli_managers_tests",
@@ -371,11 +390,23 @@ _LAZY_IMPORTS = {
         "tests.unit.pipeline_cli_managers_tests",
         "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
     ),
+    "test_plugin_manager_routes_list_and_install": (
+        "tests.unit.test_cli_small_managers",
+        "test_plugin_manager_routes_list_and_install",
+    ),
     "test_plugin_protocols": "tests.unit.test_plugin_protocols",
     "test_services": "tests.unit.test_services",
     "test_singer_cli_translator": "tests.unit.test_singer_cli_translator",
+    "test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops": (
+        "tests.unit.test_cli_small_managers",
+        "test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops",
+    ),
     "test_singer_sdk_adapter": "tests.unit.test_singer_sdk_adapter",
     "test_singer_types": "tests.unit.test_singer_types",
+    "test_status_manager_routes_show_health_and_version": (
+        "tests.unit.test_cli_small_managers",
+        "test_status_manager_routes_show_health_and_version",
+    ),
     "test_tap_abstractions": "tests.unit.test_tap_abstractions",
     "test_target_abstractions": "tests.unit.test_target_abstractions",
     "test_typings": "tests.unit.test_typings",
@@ -454,9 +485,12 @@ __all__ = [
     "test_adapter_normalizes_system_exit",
     "test_api",
     "test_cli_integration",
+    "test_cli_small_managers",
     "test_constants",
     "test_create_pipeline_creates_directory_and_configuration",
     "test_create_pipeline_fails_without_configuration",
+    "test_dbt_manager_fails_for_unsupported_operation",
+    "test_dbt_manager_routes_supported_operation_to_service",
     "test_delete_pipeline_removes_configuration_directory",
     "test_execute_pipeline_fails_when_pipeline_execution_is_not_configured",
     "test_execute_pipeline_runs_real_subprocess_contract",
@@ -466,11 +500,14 @@ __all__ = [
     "test_library_runner",
     "test_models",
     "test_pipeline_manager_lifecycle_commands_delegate_to_real_operations",
+    "test_plugin_manager_routes_list_and_install",
     "test_plugin_protocols",
     "test_services",
     "test_singer_cli_translator",
+    "test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops",
     "test_singer_sdk_adapter",
     "test_singer_types",
+    "test_status_manager_routes_show_health_and_version",
     "test_tap_abstractions",
     "test_target_abstractions",
     "test_typings",

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from flext_tests import tm
 
-from tests import t
+from tests import m, t
 
 
 class TestFlextMeltanoTypes:
@@ -58,6 +58,8 @@ class TestFlextMeltanoTypes:
         tm.that(hasattr(t.Meltano, "SingerPropertiesList"), eq=True)
         tm.that(hasattr(t.Meltano, "SingerStringType"), eq=True)
         tm.that(hasattr(t.Meltano, "SingerIntegerType"), eq=True)
+        assert t.Meltano.SingerProperty is m.Meltano.SingerProperty
+        assert t.Meltano.SingerStringType is m.Meltano.SingerStringType
 
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""

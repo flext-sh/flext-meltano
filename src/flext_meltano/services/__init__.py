@@ -177,6 +177,7 @@ if _t.TYPE_CHECKING:
 _LAZY_IMPORTS = merge_lazy_imports(
     ("flext_meltano.services.consumer_bases",),
     {
+        "Context": ("flext_meltano.services.singer_sdk", "Context"),
         "FlextMeltanoAbstractions": (
             "flext_meltano.services.abstractions",
             "FlextMeltanoAbstractions",
@@ -278,41 +279,17 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "flext_meltano.services.singer_translator",
             "FlextMeltanoSingerCliTranslator",
         ),
-        "Context": (
-            "flext_meltano.services.singer_sdk",
-            "Context",
-        ),
         "FlextMeltanoSingerManager": (
             "flext_meltano.services.cli_managers",
             "FlextMeltanoSingerManager",
-        ),
-        "Record": (
-            "flext_meltano.services.singer_sdk",
-            "Record",
-        ),
-        "Sink": (
-            "flext_meltano.services.singer_sdk",
-            "Sink",
         ),
         "FlextMeltanoSingerStateMixin": (
             "flext_meltano.services.singer_state",
             "FlextMeltanoSingerStateMixin",
         ),
-        "Stream": (
-            "flext_meltano.services.singer_sdk",
-            "Stream",
-        ),
         "FlextMeltanoSingerTapAdapter": (
             "flext_meltano.services.singer_sdk",
             "FlextMeltanoSingerTapAdapter",
-        ),
-        "Tap": (
-            "flext_meltano.services.singer_sdk",
-            "Tap",
-        ),
-        "Target": (
-            "flext_meltano.services.singer_sdk",
-            "Target",
         ),
         "FlextMeltanoStatusManager": (
             "flext_meltano.services._cli_small_managers",
@@ -334,6 +311,11 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "flext_meltano.services.validators",
             "FlextMeltanoValidators",
         ),
+        "Record": ("flext_meltano.services.singer_sdk", "Record"),
+        "Sink": ("flext_meltano.services.singer_sdk", "Sink"),
+        "Stream": ("flext_meltano.services.singer_sdk", "Stream"),
+        "Tap": ("flext_meltano.services.singer_sdk", "Tap"),
+        "Target": ("flext_meltano.services.singer_sdk", "Target"),
         "_abstractions_base": "flext_meltano.services._abstractions_base",
         "_cli_small_managers": "flext_meltano.services._cli_small_managers",
         "_executor_base": "flext_meltano.services._executor_base",

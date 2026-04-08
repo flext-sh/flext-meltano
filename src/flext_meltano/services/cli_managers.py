@@ -19,6 +19,7 @@ from flext_meltano import (
     c,
     p,
     t,
+    u,
 )
 
 
@@ -81,7 +82,7 @@ class FlextMeltanoSingerManager:
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle Singer command by routing to tap or target subcommands."""
-        if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
+        if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand, subcommand_args = args[0], args[1:]
@@ -93,31 +94,31 @@ class FlextMeltanoSingerManager:
 
     def handle_tap_command(self, args: t.StrSequence) -> r[str]:
         """Handle tap command."""
-        if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
+        if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_tap_operation(args[0], args[1:])
 
     def handle_target_command(self, args: t.StrSequence) -> r[str]:
         """Handle target command."""
-        if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
+        if u.Meltano.is_help_request(args):
             self.cli.show_target_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_target_operation(args[0], args[1:])
 
     def _execute_tap_operation(self, operation: str, _args: t.StrSequence) -> r[str]:
         self.logger.info(
-            "Tap operation '%s' not implemented in this refactor",
+            "Tap operation '%s' is not supported by the current CLI manager",
             operation,
         )
-        return r[str].ok("not implemented")
+        return r[str].fail(f"Tap operation '{operation}' is not supported")
 
     def _execute_target_operation(self, operation: str, _args: t.StrSequence) -> r[str]:
         self.logger.info(
-            "Target operation '%s' not implemented in this refactor",
+            "Target operation '%s' is not supported by the current CLI manager",
             operation,
         )
-        return r[str].ok("not implemented")
+        return r[str].fail(f"Target operation '{operation}' is not supported")
 
 
 __all__ = [
