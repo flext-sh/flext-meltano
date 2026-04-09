@@ -6,8 +6,8 @@ from flext_cli import FlextCliConstants
 
 from flext_meltano import (
     FlextMeltanoConstantsBase,
-    FlextMeltanoConstantsSettings,
     FlextMeltanoConstantsEnums,
+    FlextMeltanoConstantsSettings,
 )
 
 
