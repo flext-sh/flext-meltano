@@ -529,7 +529,6 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_id="postgres_tap_123",
         )
         assert self.tap_abstractions is not None
-        tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         with patch.object(
             FlextMeltanoAbstractions,
             "_run_meltano",

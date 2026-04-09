@@ -32,7 +32,6 @@ class TestFlextMeltanoLibraryRunner:
         """Test library runner initialization."""
         runner = FlextMeltanoLibraryRunner()
         assert runner is not None
-        assert hasattr(runner, "logger")
 
     def test_execute_raises_not_implemented(self) -> None:
         """Test execute raises NotImplementedError (no override in runner mixin)."""

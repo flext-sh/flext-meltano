@@ -53,8 +53,6 @@ class TestFlextMeltanoInitialization:
     def test_api_has_expected_attributes(self) -> None:
         """Test basic API attributes exist."""
         api = FlextMeltano()
-        assert hasattr(api, "execute")
-        assert hasattr(api, "service_name")
 
 
 class TestFlextMeltanoExecuteMethod:

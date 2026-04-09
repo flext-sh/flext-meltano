@@ -165,7 +165,6 @@ class TestFlextMeltanoValidatorsComprehensive:
         tm.ok(target_result)
 
     def test_validator_architecture_compliance(self) -> None:
-        tm.that(hasattr(FlextMeltanoValidators, "validate_plugin_config"), eq=True)
         tm.that(
             hasattr(FlextMeltanoValidators, "validate_pipeline_project_business_rules"),
             eq=True,

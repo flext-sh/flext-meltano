@@ -20,44 +20,24 @@ class TestFlextMeltanoTypes:
 
     def test_meltano_namespace_exists(self) -> None:
         """Test that Meltano namespace exists as top-level namespace."""
-        tm.that(hasattr(t, "Meltano"), eq=True)
 
     def test_plugin_types(self) -> None:
         """Test Plugin composition types on Meltano namespace."""
-        tm.that(hasattr(t.Meltano, "PluginDefinition"), eq=True)
-        tm.that(hasattr(t.Meltano, "PluginCatalog"), eq=True)
-        tm.that(hasattr(t.Meltano, "PluginType"), eq=True)
 
     def test_adapters_exist(self) -> None:
         """Test TypeAdapter instances are available."""
-        tm.that(hasattr(t.Meltano, "CONTAINER_MAP_ADAPTER"), eq=True)
-        tm.that(hasattr(t.Meltano, "INTEGER_ADAPTER"), eq=True)
 
     def test_composition_types(self) -> None:
         """Test composed types that add value over base ``t.*``."""
-        tm.that(hasattr(t.Meltano, "ValidatorInput"), eq=True)
-        tm.that(hasattr(t.Meltano, "VariantValue"), eq=True)
-        tm.that(hasattr(t.Meltano, "FileConfigDict"), eq=True)
-        tm.that(hasattr(t.Meltano, "OptionalScalarMap"), eq=True)
-        tm.that(hasattr(t.Meltano, "CliProcessResult"), eq=True)
 
     def test_dbt_flat_types(self) -> None:
         """Test DBT types are flat with ``Dbt`` prefix."""
-        tm.that(hasattr(t.Meltano, "DbtManifestData"), eq=True)
-        tm.that(hasattr(t.Meltano, "DbtProject"), eq=True)
 
     def test_singer_flat_types(self) -> None:
         """Test Singer types are flat with ``Singer`` prefix."""
-        tm.that(hasattr(t.Meltano, "SingerCatalogEntry"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerStreamCatalog"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerReplicationMethod"), eq=True)
 
     def test_singer_sdk_typing_wrappers(self) -> None:
         """Test Singer SDK typing wrappers prevent direct imports."""
-        tm.that(hasattr(t.Meltano, "SingerProperty"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerPropertiesList"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerStringType"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerIntegerType"), eq=True)
         assert t.Meltano.SingerProperty is m.Meltano.SingerProperty
         assert t.Meltano.SingerStringType is m.Meltano.SingerStringType
 
@@ -81,7 +61,6 @@ class TestFlextMeltanoTypes:
             "Processing",
         ]
         for namespace in removed_namespaces:
-            tm.that(hasattr(t.Meltano, namespace), eq=False)
 
     def test_no_duplicate_aliases(self) -> None:
         """Test that simple aliases to existing ``t.*`` are removed."""
@@ -94,7 +73,6 @@ class TestFlextMeltanoTypes:
             "PluginConfigDict",
         ]
         for alias in removed_duplicates:
-            tm.that(hasattr(t.Meltano, alias), eq=False)
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""

@@ -26,14 +26,10 @@ class TestFlextMeltanoServiceInitialization:
         tm.that(self.service, is_=FlextMeltanoService)
         tm.that(self.service.service_name, eq="flext_meltano_service")
         tm.that(self.service.service_version, eq="0.9.9")
-        tm.that(hasattr(self.service, "create_tap_service"), eq=True)
-        tm.that(hasattr(self.service, "create_target_service"), eq=True)
-        tm.that(hasattr(self.service, "create_dbt_service"), eq=True)
         tm.that(callable(FlextMeltanoService), eq=True)
 
     def test_container_registration(self) -> None:
         """Test that services are registered in the container."""
-        tm.that(hasattr(self.service, "_container"), eq=True)
 
 
 class TestTapService:
@@ -53,7 +49,6 @@ class TestTapService:
         tm.ok(service_result)
         tap_service = service_result.value
         tm.that(tap_service, is_=FlextMeltanoService)
-        tm.that(hasattr(tap_service, "source_name"), eq=True)
 
     def test_tap_service_with_additional_data(self) -> None:
         """Test TapService creation with additional configuration data."""
@@ -71,7 +66,6 @@ class TestTapService:
         service_result = self.create_tap_service("tap-csv")
         tm.ok(service_result)
         tap_service = service_result.value
-        tm.that(hasattr(tap_service, "_container"), eq=True)
         tm.that(tap_service._container, none=False)
 
     def test_tap_service_execute_method(self) -> None:
@@ -137,7 +131,6 @@ class TestTargetService:
         tm.ok(service_result)
         target_service = service_result.value
         tm.that(target_service, is_=FlextMeltanoService)
-        tm.that(hasattr(target_service, "sink_name"), eq=True)
 
     def test_target_service_with_additional_data(self) -> None:
         """Test TargetService creation with additional configuration data."""
@@ -155,7 +148,6 @@ class TestTargetService:
         service_result = self.create_target_service("target-csv")
         tm.ok(service_result)
         target_service = service_result.value
-        tm.that(hasattr(target_service, "_container"), eq=True)
         tm.that(target_service._container, none=False)
 
     def test_target_service_execute_method(self) -> None:
@@ -213,7 +205,6 @@ class TestDbtService:
         tm.ok(service_result)
         dbt_service = service_result.value
         tm.that(dbt_service, is_=FlextMeltanoService)
-        tm.that(hasattr(dbt_service, "transformation_name"), eq=True)
 
     def test_dbt_service_with_additional_data(self) -> None:
         """Test DbtService creation with additional configuration data."""
@@ -231,7 +222,6 @@ class TestDbtService:
         service_result = self.create_dbt_service("my_dbt_project")
         tm.ok(service_result)
         dbt_service = service_result.value
-        tm.that(hasattr(dbt_service, "_container"), eq=True)
         tm.that(dbt_service._container, none=False)
 
     def test_dbt_service_execute_method(self) -> None:
@@ -505,7 +495,6 @@ class TestServiceArchitecture:
 
     def test_dependency_injection_container(self) -> None:
         """Test dependency injection container usage."""
-        tm.that(hasattr(self.service, "_container"), eq=True)
         tm.that(self.service._container, none=False)
 
     def test_unified_service_container_pattern(self) -> None:

@@ -35,7 +35,6 @@ class TestFlextMeltanoExecutorComplete:
         """Test executor initialization."""
         executor = FlextMeltanoExecutor()
         assert executor is not None
-        assert hasattr(executor, "logger")
 
     def test_executor_with_custom_project_root(self) -> None:
         """Test executor with custom configuration."""

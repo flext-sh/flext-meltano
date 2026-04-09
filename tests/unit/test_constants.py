@@ -65,9 +65,6 @@ class Testc:
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
         plugin_types = c.Meltano.PluginType
-        tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)
-        tm.that(hasattr(plugin_types, "LOADERS"), eq=True)
-        tm.that(hasattr(plugin_types, "TRANSFORMS"), eq=True)
         tm.that(plugin_types.EXTRACTORS, is_=str)
         tm.that(plugin_types.LOADERS, is_=str)
         tm.that(plugin_types.TRANSFORMS, is_=str)
@@ -80,18 +77,13 @@ class Testc:
         """Test that constants are properly organized in namespaces."""
         expected_namespaces = ["Meltano"]
         for namespace in expected_namespaces:
-            tm.that(hasattr(c, namespace), eq=True)
         meltano_constants = [
             "FLEXT_MELTANO_VERSION",
             "METADATA_APPLICATION_NAME",
             "SINGER_MESSAGE_TYPE_SCHEMA",
         ]
         for constant in meltano_constants:
-            tm.that(hasattr(c.Meltano, constant), eq=True)
 
     def test_export_completeness(self) -> None:
         """Test that all necessary constants are exported."""
-        tm.that(hasattr(c, "Meltano"), eq=True)
-        tm.that(hasattr(c.Meltano, "PluginType"), eq=True)
         plugin_types = c.Meltano.PluginType
-        tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)

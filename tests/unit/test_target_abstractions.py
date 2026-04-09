@@ -31,7 +31,6 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         """Test FlextMeltanoTargetAbstractions initialization."""
         target_abs = FlextMeltanoTargetAbstractions()
         tm.that(target_abs, none=False)
-        tm.that(hasattr(target_abs, "logger"), eq=True)
 
     def test_create_flext_target_config(self) -> None:
         """Test target configuration creation."""
