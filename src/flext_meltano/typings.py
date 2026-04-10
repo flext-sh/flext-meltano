@@ -12,7 +12,6 @@ from flext_cli import t
 from flext_meltano import (
     FlextMeltanoTypingsBase,
     FlextMeltanoTypingsDomains,
-    FlextMeltanoTypingsSinger,
 )
 
 
@@ -26,7 +25,6 @@ class FlextMeltanoTypes(t):
 
     class Meltano(
         FlextMeltanoTypingsBase,
-        FlextMeltanoTypingsSinger,
         FlextMeltanoTypingsDomains,
     ):
         """Meltano plugin complex types namespace."""

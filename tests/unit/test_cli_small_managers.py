@@ -4,14 +4,13 @@ from __future__ import annotations
 
 from flext_tests import tm
 
-from flext_core import r
 from flext_meltano import (
     FlextMeltanoDbtManager,
     FlextMeltanoPluginManager,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
-    t,
 )
+from tests import r, t
 
 
 class _StubDbtCli:
@@ -88,65 +87,66 @@ class _StubStatusService:
         return r[str].ok('{"status": "ready"}')
 
 
-def test_dbt_manager_routes_supported_operation_to_service() -> None:
-    cli = _StubDbtCli()
-    service = _StubDbtService()
-    manager = FlextMeltanoDbtManager(cli, service=service)
+class TestFlextMeltanoCliSmallManagers:
+    """Unit tests for small Meltano CLI managers."""
 
-    result = manager.handle_command(["run", "--models", "orders"])
+    def test_dbt_manager_routes_supported_operation_to_service(
+        self,
+    ) -> None:
+        cli = _StubDbtCli()
+        service = _StubDbtService()
+        manager = FlextMeltanoDbtManager(cli, service=service)
 
-    tm.ok(result)
-    tm.that(result.value, eq="dbt:run")
-    tm.that(service.calls, eq=[("run", ["--models", "orders"])])
+        result = manager.handle_command(["run", "--models", "orders"])
 
+        tm.ok(result)
+        tm.that(result.value, eq="dbt:run")
+        tm.that(service.calls, eq=[("run", ["--models", "orders"])])
 
-def test_dbt_manager_fails_for_unsupported_operation() -> None:
-    manager = FlextMeltanoDbtManager(_StubDbtCli(), service=_StubDbtService())
+    def test_dbt_manager_fails_for_unsupported_operation(self) -> None:
+        manager = FlextMeltanoDbtManager(_StubDbtCli(), service=_StubDbtService())
 
-    result = manager.handle_command(["seed"])
+        result = manager.handle_command(["seed"])
 
-    tm.fail(result)
-    tm.that(str(result.error), has="not supported")
+        tm.fail(result)
+        tm.that(str(result.error), has="not supported")
 
+    def test_plugin_manager_routes_list_and_install(self) -> None:
+        cli = _StubPluginCli()
+        service = _StubPluginService()
+        manager = FlextMeltanoPluginManager(cli, service=service)
 
-def test_plugin_manager_routes_list_and_install() -> None:
-    cli = _StubPluginCli()
-    service = _StubPluginService()
-    manager = FlextMeltanoPluginManager(cli, service=service)
+        list_result = manager.handle_command(["list", "extractors"])
+        install_result = manager.handle_command(["install", "extractors", "tap-demo"])
 
-    list_result = manager.handle_command(["list", "extractors"])
-    install_result = manager.handle_command(["install", "extractors", "tap-demo"])
+        tm.ok(list_result)
+        tm.ok(install_result)
+        tm.that(
+            service.calls,
+            eq=[("list", ("extractors",)), ("install", ("extractors", "tap-demo"))],
+        )
 
-    tm.ok(list_result)
-    tm.ok(install_result)
-    tm.that(
-        service.calls,
-        eq=[("list", ("extractors",)), ("install", ("extractors", "tap-demo"))],
-    )
+    def test_status_manager_routes_show_health_and_version(self) -> None:
+        manager = FlextMeltanoStatusManager(_StubStatusCli(), service=_StubStatusService())
 
+        show_result = manager.handle_command(["show"])
+        health_result = manager.handle_command(["health"])
+        version_result = manager.handle_version_command([])
 
-def test_status_manager_routes_show_health_and_version() -> None:
-    manager = FlextMeltanoStatusManager(_StubStatusCli(), service=_StubStatusService())
+        tm.ok(show_result)
+        tm.ok(health_result)
+        tm.ok(version_result)
+        tm.that(show_result.value, has='"ready"')
+        tm.that(health_result.value, has='"healthy"')
+        tm.that(version_result.value, eq="3.9.1")
 
-    show_result = manager.handle_command(["show"])
-    health_result = manager.handle_command(["health"])
-    version_result = manager.handle_version_command([])
+    def test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops(self) -> None:
+        manager = FlextMeltanoSingerManager(_StubSingerCli())
 
-    tm.ok(show_result)
-    tm.ok(health_result)
-    tm.ok(version_result)
-    tm.that(show_result.value, has='"ready"')
-    tm.that(health_result.value, has='"healthy"')
-    tm.that(version_result.value, eq="3.9.1")
+        tap_result = manager.handle_tap_command(["run", "tap-demo"])
+        target_result = manager.handle_target_command(["run", "target-demo"])
 
-
-def test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops() -> None:
-    manager = FlextMeltanoSingerManager(_StubSingerCli())
-
-    tap_result = manager.handle_tap_command(["run", "tap-demo"])
-    target_result = manager.handle_target_command(["run", "target-demo"])
-
-    tm.fail(tap_result)
-    tm.fail(target_result)
-    tm.that(str(tap_result.error), has="not supported")
-    tm.that(str(target_result.error), has="not supported")
+        tm.fail(tap_result)
+        tm.fail(target_result)
+        tm.that(str(tap_result.error), has="not supported")
+        tm.that(str(target_result.error), has="not supported")

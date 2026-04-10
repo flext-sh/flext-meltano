@@ -7,9 +7,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+from typing import Literal
 
 from flext_cli import t
+
+from flext_core import r
 
 
 class FlextMeltanoTypingsDomains:
@@ -25,3 +28,5 @@ class FlextMeltanoTypingsDomains:
         Mapping[str, t.ContainerValue] | None,
     ]
     type DbtProject = Mapping[str, str | bool | t.StrSequence]
+    type PublicFactory[TService] = Callable[..., r[TService]]
+    type PublicFactoryName = Literal["Tap", "Target", "Dbt"]

@@ -15,9 +15,9 @@ from collections.abc import Sequence
 from pathlib import Path
 from unittest import mock
 
-from flext_core import FlextLogger, r
-from flext_meltano import FlextMeltanoExecutor, FlextMeltanoExecutorBase
-from tests import t
+from flext_core import FlextLogger
+from flext_meltano import FlextMeltanoExecutor
+from tests import r, t
 
 logger = FlextLogger(__name__)
 
@@ -115,7 +115,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test run_pipeline_command method."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "pipeline_project"
-            init_result = FlextMeltanoExecutorBase.initialize_project_root(project_root)
+            init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.is_success
             executor = FlextMeltanoExecutor(
                 config_overrides={"project_root": str(project_root)},
@@ -218,7 +218,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test execute_pipeline method."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "executor_pipeline_project"
-            init_result = FlextMeltanoExecutorBase.initialize_project_root(project_root)
+            init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.is_success
             executor = FlextMeltanoExecutor(
                 config_overrides={"project_root": str(project_root)},
@@ -233,7 +233,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test execute_dbt_command method."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "executor_dbt_project"
-            init_result = FlextMeltanoExecutorBase.initialize_project_root(project_root)
+            init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.is_success
             executor = FlextMeltanoExecutor(
                 config_overrides={"project_root": str(project_root)},

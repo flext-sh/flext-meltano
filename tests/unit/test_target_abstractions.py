@@ -11,9 +11,9 @@ from collections.abc import Mapping
 import pytest
 from flext_tests import tm
 
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger
 from flext_meltano import FlextMeltanoTargetAbstractions
-from tests import t, u
+from tests import r, t, u
 
 logger = FlextLogger(__name__)
 

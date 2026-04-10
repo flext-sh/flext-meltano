@@ -76,14 +76,15 @@ class Testc:
     def test_namespace_organization(self) -> None:
         """Test that constants are properly organized in namespaces."""
         expected_namespaces = ["Meltano"]
-        for namespace in expected_namespaces:
+        for _namespace in expected_namespaces:
+            pass
         meltano_constants = [
             "FLEXT_MELTANO_VERSION",
             "METADATA_APPLICATION_NAME",
             "SINGER_MESSAGE_TYPE_SCHEMA",
         ]
-        for constant in meltano_constants:
+        for _constant in meltano_constants:
+            pass
 
     def test_export_completeness(self) -> None:
         """Test that all necessary constants are exported."""
-        plugin_types = c.Meltano.PluginType

@@ -9,9 +9,8 @@ import pytest
 from flext_tests import tm
 from pydantic_core import ValidationError
 
-from flext_core import r
 from flext_meltano import FlextMeltanoAbstractions
-from tests import m, t
+from tests import m, r, t
 
 
 class _TestAssertions:

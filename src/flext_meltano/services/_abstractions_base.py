@@ -12,8 +12,13 @@ from typing import ClassVar, override
 
 from pydantic import Field, ValidationError
 
-import flext_meltano.services as meltano_services
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_core import r
+from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
@@ -24,13 +29,6 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         default="FlextMeltanoAbstractions",
         description="Canonical abstractions service instance name",
     )
-
-    @staticmethod
-    def _build_executor(
-        _settings: p.Settings | t.ContainerMapping | None,
-    ) -> p.Meltano.MeltanoExecutor:
-        """Create an executor lazily to avoid import cycles during package init."""
-        return meltano_services.FlextMeltanoExecutorBase()
 
     @staticmethod
     def _coerce_container_mapping(
@@ -47,11 +45,11 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _run_meltano(self, args: t.StrSequence) -> r[str]:
         """Run a Meltano runtime command and return stdout on success."""
         cwd = u.Meltano.resolve_project_root(self.settings)
-        run_result: r[m.Meltano.CommandExecutionResult] = self._build_executor(
-            self.settings,
-        ).execute_meltano_command(
-            list(args),
-            _cwd=cwd,
+        run_result: r[m.Meltano.CommandExecutionResult] = (
+            FlextMeltanoExecutorBase().execute_meltano_command(
+                list(args),
+                _cwd=cwd,
+            )
         )
         if run_result.is_failure:
             error_msg = str(run_result.error or "Unknown error")
@@ -106,7 +104,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """List installed project plugins of *plugin_type* via Meltano runtime."""
         try:
             cwd = self._resolve_project_root(_project)
-            plugins_result = self._build_executor(self.settings).get_project_plugins(
+            plugins_result = FlextMeltanoExecutorBase().get_project_plugins(
                 plugin_type=u.Meltano.normalize_plugin_group(plugin_type),
                 _cwd=cwd,
             )

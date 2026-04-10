@@ -25,28 +25,25 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     ) -> r[Self]:
         """Create a specialized Meltano service using a shared utility path."""
         try:
-            kwargs: t.MutableOptionalStrMapping = {
-                "service_name": f"{component_name}_service",
-                "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
+            service_kwargs: t.MutableOptionalStrMapping = {
                 "source_name": None,
                 "sink_name": None,
                 "transformation_name": None,
             }
-            kwargs[field_name] = component_name
-            instance: Self = cls(
-                service_name=kwargs["service_name"] or "",
-                service_version=kwargs["service_version"] or "",
-                source_name=kwargs.get("source_name"),
-                sink_name=kwargs.get("sink_name"),
-                transformation_name=kwargs.get("transformation_name"),
+            service_kwargs[field_name] = component_name
+            return r[Self].ok(
+                cls(
+                    service_name=f"{component_name}_service",
+                    service_version=c.Meltano.DEFAULT_SERVICE_VERSION,
+                    source_name=service_kwargs["source_name"],
+                    sink_name=service_kwargs["sink_name"],
+                    transformation_name=service_kwargs["transformation_name"],
+                )
             )
-            success: r[Self] = r[Self](value=instance, is_success=True)
-            return success
         except c.Meltano.OPERATION_ERRORS as ex:
-            failure: r[Self] = r[Self].fail(
+            return r[Self].fail(
                 f"Failed to create {component_label} '{component_name}': {ex}"
             )
-            return failure
 
     @classmethod
     def create_sink_service(cls, sink_name: str, **_config: t.Scalar) -> r[Self]:
@@ -76,21 +73,6 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             field_name="transformation_name",
             component_label="transformation service",
         )
-
-    @classmethod
-    def create_dbt_service(cls, name: str, **cfg: t.Scalar) -> r[Self]:
-        """Create DBT transformation service."""
-        return cls.create_transformation_service(name, **cfg)
-
-    @classmethod
-    def create_tap_service(cls, name: str, **cfg: t.Scalar) -> r[Self]:
-        """Create Singer tap service."""
-        return cls.create_source_service(name, **cfg)
-
-    @classmethod
-    def create_target_service(cls, name: str, **cfg: t.Scalar) -> r[Self]:
-        """Create Singer target service."""
-        return cls.create_sink_service(name, **cfg)
 
     @staticmethod
     def configure_environment(

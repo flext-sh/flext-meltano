@@ -11,9 +11,12 @@ from pathlib import Path
 
 from flext_cli import cli
 
-import flext_meltano.services as meltano_services
-from flext_core import FlextLogger
-from flext_meltano import c, m, r, t, u
+from flext_core import FlextLogger, r
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoPipelinePaths:
@@ -115,7 +118,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         if not meltano_args:
             return r[str].fail("Pipeline execution not configured")
         run_result: r[m.Meltano.CommandExecutionResult] = (
-            meltano_services.FlextMeltanoExecutorBase().execute_meltano_command(
+            FlextMeltanoExecutorBase().execute_meltano_command(
                 list(meltano_args),
                 _cwd=pipeline_dir,
             )

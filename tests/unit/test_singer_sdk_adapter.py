@@ -43,28 +43,28 @@ class _FailingTap(_SuccessfulTap):
         return _FailingCommand("tap-fail")
 
 
-def test_adapter_exposes_config_and_streams() -> None:
-    """The adapter preserves the internal tap runtime contract."""
-    adapter = FlextMeltanoSingerTapAdapter(_SuccessfulTap())
-    assert adapter.config == {"tap": "ok"}
-    assert [stream.name for stream in adapter.discover_streams()] == ["users"]
+class TestFlextMeltanoSingerSdkAdapter:
+    """Test suite for the Singer SDK tap adapter bridge."""
 
+    def test_adapter_exposes_config_and_streams(self) -> None:
+        """The adapter preserves the internal tap runtime contract."""
+        adapter = FlextMeltanoSingerTapAdapter(_SuccessfulTap())
+        assert adapter.config == {"tap": "ok"}
+        assert [stream.name for stream in adapter.discover_streams()] == ["users"]
 
-def test_adapter_delegates_sync() -> None:
-    """Sync execution is delegated to the wrapped Singer tap."""
-    tap = _SuccessfulTap()
-    adapter = FlextMeltanoSingerTapAdapter(tap)
-    adapter.sync_all()
-    assert tap.synced is True
+    def test_adapter_delegates_sync(self) -> None:
+        """Sync execution is delegated to the wrapped Singer tap."""
+        tap = _SuccessfulTap()
+        adapter = FlextMeltanoSingerTapAdapter(tap)
+        adapter.sync_all()
+        assert tap.synced is True
 
+    def test_adapter_normalizes_successful_cli_exit_code(self) -> None:
+        """Successful Singer CLI execution returns zero."""
+        adapter = FlextMeltanoSingerTapAdapter(_SuccessfulTap())
+        assert adapter.run_cli([], "tap-ok") == 0
 
-def test_adapter_normalizes_successful_cli_exit_code() -> None:
-    """Successful Singer CLI execution returns zero."""
-    adapter = FlextMeltanoSingerTapAdapter(_SuccessfulTap())
-    assert adapter.run_cli([], "tap-ok") == 0
-
-
-def test_adapter_normalizes_system_exit() -> None:
-    """Singer CLI failures are converted into integer exit codes."""
-    adapter = FlextMeltanoSingerTapAdapter(_FailingTap())
-    assert adapter.run_cli([], "tap-fail") == 3
+    def test_adapter_normalizes_system_exit(self) -> None:
+        """Singer CLI failures are converted into integer exit codes."""
+        adapter = FlextMeltanoSingerTapAdapter(_FailingTap())
+        assert adapter.run_cli([], "tap-fail") == 3

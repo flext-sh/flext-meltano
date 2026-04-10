@@ -8,12 +8,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import psycopg2
 import pytest
-
-from tests import Tk as tk
-
-psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
-redis = pytest.importorskip("redis", reason="redis not installed")
+import redis
+from flext_tests import tk
 
 
 class TestDockerIntegration:
@@ -80,23 +78,22 @@ class TestDockerIntegration:
     @pytest.mark.integration
     def test_docker_services_health(self, docker_services: tk) -> None:
         """Test overall Docker services health."""
-        assert docker_services is not None
-        postgres_url = docker_services.get_service_url("postgres", 5432)
-        redis_url = docker_services.get_service_url("redis", 6379)
-        assert postgres_url is not None
-        assert redis_url is not None
+        postgres_ready = docker_services.wait_for_port_ready("localhost", 5433)
+        redis_ready = docker_services.wait_for_port_ready("localhost", 6380)
+        assert postgres_ready.is_success and postgres_ready.value
+        assert redis_ready.is_success and redis_ready.value
 
     @pytest.mark.docker
     @pytest.mark.integration
     @pytest.mark.slow
     def test_container_lifecycle(self, docker_manager: tk) -> None:
         """Test complete container lifecycle management."""
-        result = docker_manager.start_services(["postgres"])
-        assert result.is_success
-        url = docker_manager.get_service_url("postgres", 5432)
-        assert url is not None
-        result = docker_manager.stop_services()
-        assert result.is_success
+        start_result = docker_manager.start_compose_stack("docker-compose.test.yml")
+        assert start_result.is_success
+        postgres_ready = docker_manager.wait_for_port_ready("localhost", 5433)
+        assert postgres_ready.is_success and postgres_ready.value
+        stop_result = docker_manager.compose_down("docker-compose.test.yml")
+        assert stop_result.is_success
 
     @pytest.mark.docker
     @pytest.mark.integration
@@ -159,8 +156,7 @@ class TestDockerIntegration:
             r = redis.Redis(host="localhost", port=6380, db=0)
             r.set("test_key", "test_value")
             value = r.get("test_key")
-            assert value is not None
-            assert value.decode() == "test_value"
+            assert value == b"test_value"
             r.lpush("test_list", "item1")
             r.lpush("test_list", "item2")
             length = r.llen("test_list")

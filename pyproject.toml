@@ -8,6 +8,14 @@
 build-backend = "hatchling.build"
 requires = [ "hatchling" ]
 
+[dependency-groups]
+dev = [
+  "psycopg2 (>=2.9.11,<3.0.0)",
+  "redis (>=7.4.0,<8.0.0)",
+  "types-psycopg2 (>=2.9.21.20260408,<3.0.0.0)",
+  "types-redis (>=4.6.0.20241004,<5.0.0.0)",
+]
+
 # [CUSTOM] project metadata
 [project]
 

@@ -9,12 +9,10 @@ from __future__ import annotations
 from typing import Self
 
 from flext_core import r
-from flext_meltano import (
-    FlextMeltanoAbstractionsBase,
-    c,
-    m,
-    t,
-)
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.services._abstractions_base import FlextMeltanoAbstractionsBase
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):

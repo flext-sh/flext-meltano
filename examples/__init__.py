@@ -8,19 +8,39 @@ import typing as _t
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if _t.TYPE_CHECKING:
-    from flext_core.constants import FlextConstants as c
+    from examples.constants import (
+        ExamplesFlextMeltanoConstants,
+        ExamplesFlextMeltanoConstants as c,
+    )
+    from examples.models import (
+        ExamplesFlextMeltanoModels,
+        ExamplesFlextMeltanoModels as m,
+    )
+    from examples.protocols import (
+        ExamplesFlextMeltanoProtocols,
+        ExamplesFlextMeltanoProtocols as p,
+    )
+    from examples.typings import (
+        ExamplesFlextMeltanoTypes,
+        ExamplesFlextMeltanoTypes as t,
+    )
+    from examples.utilities import (
+        ExamplesFlextMeltanoUtilities,
+        ExamplesFlextMeltanoUtilities as u,
+    )
     from flext_core.decorators import d
     from flext_core.exceptions import e
     from flext_core.handlers import h
     from flext_core.mixins import x
-    from flext_core.models import FlextModels as m
-    from flext_core.protocols import FlextProtocols as p
     from flext_core.result import r
     from flext_core.service import s
-    from flext_core.typings import FlextTypes as t
-    from flext_core.utilities import FlextUtilities as u
 _LAZY_IMPORTS = build_lazy_import_map(
     {
+        ".constants": ("ExamplesFlextMeltanoConstants",),
+        ".models": ("ExamplesFlextMeltanoModels",),
+        ".protocols": ("ExamplesFlextMeltanoProtocols",),
+        ".typings": ("ExamplesFlextMeltanoTypes",),
+        ".utilities": ("ExamplesFlextMeltanoUtilities",),
         "flext_core.decorators": ("d",),
         "flext_core.exceptions": ("e",),
         "flext_core.handlers": ("h",),
@@ -29,15 +49,20 @@ _LAZY_IMPORTS = build_lazy_import_map(
         "flext_core.service": ("s",),
     },
     alias_groups={
-        "flext_core.constants": (("c", "FlextConstants"),),
-        "flext_core.models": (("m", "FlextModels"),),
-        "flext_core.protocols": (("p", "FlextProtocols"),),
-        "flext_core.typings": (("t", "FlextTypes"),),
-        "flext_core.utilities": (("u", "FlextUtilities"),),
+        ".constants": (("c", "ExamplesFlextMeltanoConstants"),),
+        ".models": (("m", "ExamplesFlextMeltanoModels"),),
+        ".protocols": (("p", "ExamplesFlextMeltanoProtocols"),),
+        ".typings": (("t", "ExamplesFlextMeltanoTypes"),),
+        ".utilities": (("u", "ExamplesFlextMeltanoUtilities"),),
     },
 )
 
 __all__ = [
+    "ExamplesFlextMeltanoConstants",
+    "ExamplesFlextMeltanoModels",
+    "ExamplesFlextMeltanoProtocols",
+    "ExamplesFlextMeltanoTypes",
+    "ExamplesFlextMeltanoUtilities",
     "c",
     "d",
     "e",

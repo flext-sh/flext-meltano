@@ -183,12 +183,11 @@ python example_module.py
 Description of what users should see when running the example.
 """
 
-t.NormalizedValue
+from examples import c, t
+from flext_meltano import meltano
 
-from flext_meltano import FlextMeltanoSettings
 
-
-def demonstrate_pattern() -> t.Dict:
+def demonstrate_pattern() -> t.ContainerMapping:
     """Demonstrate specific pattern with clear documentation.
 
     Returns:
@@ -198,8 +197,14 @@ def demonstrate_pattern() -> t.Dict:
         >>> result = demonstrate_pattern()
         >>> assert result["status"] == "success"
     """
-    # Implementation with enterprise patterns
-    return {"status": "success", "data": "demonstration_complete"}
+    result = meltano.execute_meltano_command([
+        c.Meltano.CMD_BINARY,
+        c.Meltano.ExecutorCommand.VERSION,
+    ])
+    return {
+        "status": "success" if result.is_success else "failure",
+        "data": "demonstration_complete",
+    }
 ```
 
 ### Testing Integration

@@ -29,15 +29,11 @@ from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from flext_core import r
-from flext_meltano import (
-    FlextMeltanoCLI,
-    FlextMeltanoConstants as c,
-    FlextMeltanoModels as m,
-    FlextMeltanoProtocols as p,
-    FlextMeltanoServiceBase,
-    FlextMeltanoTypes as t,
-    FlextMeltanoUtilities as u,
-)
+from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
@@ -78,18 +74,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return cls._container_mapping_list_adapter.validate_python(value)
         except ValidationError:
             return None
-
-    @staticmethod
-    def create_flext_cli() -> r[p.Meltano.CLI]:
-        """Create FLEXT CLI instance - delegates to CLI module."""
-
-        def _build() -> p.Meltano.CLI:
-            return FlextMeltanoCLI()
-
-        return u.try_(
-            _build,
-            catch=c.Meltano.OPERATION_ERRORS,
-        ).map_error(lambda e: f"Failed to create CLI: {e}")
 
     @staticmethod
     def get_version() -> r[str]:

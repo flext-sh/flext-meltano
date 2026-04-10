@@ -13,18 +13,20 @@ from flext_cli import cli
 from pydantic import Field, PrivateAttr
 
 from flext_core import r
-from flext_meltano import (
-    FlextMeltanoCommandRouter,
+from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.protocols import FlextMeltanoProtocols as p
+from flext_meltano.services._cli_small_managers import (
     FlextMeltanoDbtManager,
-    FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
-    FlextMeltanoServiceBase,
-    FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
-    c,
-    p,
-    t,
 )
+from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
+from flext_meltano.services.cli_managers import (
+    FlextMeltanoCommandRouter,
+    FlextMeltanoSingerManager,
+)
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoCLI(FlextMeltanoServiceBase):

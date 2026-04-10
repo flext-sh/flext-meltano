@@ -9,11 +9,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from flext_tests import FlextTestsProtocols
 
-from flext_meltano import FlextMeltanoProtocols, t
+from flext_meltano import FlextMeltanoProtocols
+
+if TYPE_CHECKING:
+    from flext_meltano import FlextMeltanoTypes
 
 
 class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
@@ -38,7 +41,9 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
                 """Protocol for CLI runner interface used in tests."""
 
                 def invoke(
-                    self, *args: t.Scalar, **kwargs: t.Scalar
+                    self,
+                    *args: FlextMeltanoTypes.Scalar,
+                    **kwargs: FlextMeltanoTypes.Scalar,
                 ) -> TestsFlextMeltanoProtocols.Meltano.Tests.MockCliResultLike:
                     """Invoke CLI command."""
                     ...

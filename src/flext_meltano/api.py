@@ -8,31 +8,29 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import ClassVar, override
+from typing import ClassVar, Self, override
 
 from flext_core import r
-from flext_meltano import (
-    FlextMeltanoAbstractions,
-    FlextMeltanoAdapter,
-    FlextMeltanoBridge,
-    FlextMeltanoComponentService,
-    FlextMeltanoDbtProjectMixin,
-    FlextMeltanoDbtRunnerMixin,
-    FlextMeltanoExecutor,
-    FlextMeltanoLibraryRunner,
-    FlextMeltanoProjectManager,
-    FlextMeltanoProjectService,
-    FlextMeltanoService,
-    FlextMeltanoSingerCatalogMixin,
-    FlextMeltanoSingerCliTranslator,
-    FlextMeltanoSingerStateMixin,
-    FlextMeltanoTapAbstractions,
-    FlextMeltanoTargetAbstractions,
-    FlextMeltanoValidators,
-    c,
-    t,
-    u,
-)
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+from flext_meltano.services.adapters import FlextMeltanoAdapter
+from flext_meltano.services.bridge import FlextMeltanoBridge
+from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
+from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
+from flext_meltano.services.executor import FlextMeltanoExecutor
+from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
+from flext_meltano.services.meltano_plugins import FlextMeltanoComponentService
+from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
+from flext_meltano.services.project_service import FlextMeltanoProjectService
+from flext_meltano.services.services import FlextMeltanoService
+from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
+from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
+from flext_meltano.services.singer_tap import FlextMeltanoTapAbstractions
+from flext_meltano.services.singer_target import FlextMeltanoTargetAbstractions
+from flext_meltano.services.singer_translator import FlextMeltanoSingerCliTranslator
+from flext_meltano.services.validators import FlextMeltanoValidators
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltano(
@@ -60,16 +58,32 @@ class FlextMeltano(
 ):
     """MRO facade over all Meltano services. All operations return r[T]."""
 
-    _instance: ClassVar[object | None] = None
+    _instance: ClassVar[FlextMeltano | None] = None
 
     @classmethod
-    def get_instance(cls) -> FlextMeltano:
+    def get_instance(cls) -> Self:
         """Return the shared Meltano facade instance."""
-        instance = FlextMeltano._instance
-        if not isinstance(instance, FlextMeltano):
-            instance = FlextMeltano()
-            FlextMeltano._instance = instance
+        instance = cls._instance
+        if instance is None or not isinstance(instance, cls):
+            instance = cls()
+            cls._instance = instance
         return instance
+
+    def tap(self, name: str, **config: t.Scalar) -> r[Self]:
+        """Create a specialized Tap facade instance through the public API."""
+        return type(self).create_source_service(name, **config)
+
+    def target(self, name: str, **config: t.Scalar) -> r[Self]:
+        """Create a specialized Target facade instance through the public API."""
+        return type(self).create_sink_service(name, **config)
+
+    def dbt(self, name: str, **config: t.Scalar) -> r[Self]:
+        """Create a specialized DBT facade instance through the public API."""
+        return type(self).create_transformation_service(name, **config)
+
+    Tap = tap
+    Target = target
+    Dbt = dbt
 
     @override
     def execute(self) -> r[t.ContainerMapping]:

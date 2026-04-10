@@ -8,7 +8,7 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "pipeline_cli_managers_tests": "tests.unit.pipeline_cli_managers_tests",
+    "tests_pipeline_cli_managers": "tests.unit.tests_pipeline_cli_managers",
     "test_api": "tests.unit.test_api",
     "test_cli_integration": "tests.unit.test_cli_integration",
     "test_cli_small_managers": "tests.unit.test_cli_small_managers",

@@ -12,15 +12,29 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Generator, Sequence
+from collections.abc import Callable, Generator, Sequence
 from pathlib import Path
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import pytest
+from flext_tests import tk
 
-from tests import Tk, t, u
+from flext_core import r
+from flext_meltano import FlextMeltano, meltano
+from tests import u
+
+if TYPE_CHECKING:
+    from tests import t
 
 pytest_plugins = ["flext_tests.conftest_plugin"]
+
+type MeltanoComponentFactory = Callable[..., r[FlextMeltano]]
+type MeltanoComponentSelector = Callable[[FlextMeltano], str | None]
+type MeltanoComponentCase = tuple[
+    MeltanoComponentFactory,
+    str,
+    MeltanoComponentSelector,
+]
 
 
 class MockCliResult:
@@ -44,6 +58,21 @@ class CliRunner(Protocol):
         ...
 
 
+def select_source_name(service: FlextMeltano) -> str | None:
+    """Select the source name from a specialized Tap facade."""
+    return service.source_name
+
+
+def select_sink_name(service: FlextMeltano) -> str | None:
+    """Select the sink name from a specialized Target facade."""
+    return service.sink_name
+
+
+def select_transformation_name(service: FlextMeltano) -> str | None:
+    """Select the transformation name from a specialized DBT facade."""
+    return service.transformation_name
+
+
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
     """Set test environment variables."""
@@ -54,6 +83,28 @@ def set_test_environment() -> Generator[None]:
     os.environ.pop("FLEXT_ENV", None)
     os.environ.pop("FLEXT_LOG_LEVEL", None)
     os.environ.pop("MELTANO_ENVIRONMENT", None)
+
+
+@pytest.fixture(
+    params=[
+        (meltano.Tap, "tap-csv", select_source_name),
+        (meltano.Target, "target-jsonl", select_sink_name),
+        (meltano.Dbt, "analytics", select_transformation_name),
+    ],
+    ids=["tap", "target", "dbt"],
+)
+def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCase:
+    """Canonical public Meltano component factories with expected selectors."""
+    return request.param
+
+
+@pytest.fixture(
+    params=["version", "service_name", "status", "handlers"],
+    ids=["version", "service-name", "status", "handlers"],
+)
+def meltano_execute_field(request: pytest.FixtureRequest) -> str:
+    """Expected fields exposed by the public execute payload."""
+    return str(request.param)
 
 
 @pytest.fixture
@@ -304,38 +355,54 @@ def job_run_config() -> t.ContainerMapping:
     }
 
 
-@pytest.fixture(scope="session")
-def docker_manager() -> Tk:
-    """Session-scoped Docker manager fixture."""
-    return Tk(keep_running=True)
+@pytest.fixture
+def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
+    """Docker manager fixture for Docker-based tests."""
+    temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
+    manager = tk(workspace_root=Path(__file__).resolve().parents[2])
+    manager._state_file = temp_dir / "flext_tests_docker_state.json"
+    manager._dirty_containers.clear()
+    return manager
 
 
 @pytest.fixture
-def docker_services(docker_manager: Tk) -> Generator[Tk]:
+def docker_services(docker_manager: tk) -> Generator[tk]:
     """Function-scoped Docker services fixture."""
-    with docker_manager.service_context():
-        yield docker_manager
+    result = docker_manager.start_compose_stack("docker-compose.test.yml")
+    if result.is_failure:
+        pytest.skip(f"Docker stack unavailable: {result.error}")
+    yield docker_manager
+    _ = docker_manager.compose_down("docker-compose.test.yml")
 
 
 @pytest.fixture
-def postgres_service(docker_manager: Tk) -> Generator[str | None]:
+def postgres_service(docker_services: tk) -> Generator[str | None]:
     """PostgreSQL service fixture."""
-    with docker_manager.service_context(["postgres"]):
-        yield docker_manager.get_service_url("postgres", 5432)
+    ready = docker_services.wait_for_port_ready("localhost", 5433)
+    if ready.is_failure or not ready.value:
+        yield None
+        return
+    yield "localhost:5433"
 
 
 @pytest.fixture
-def redis_service(docker_manager: Tk) -> Generator[str | None]:
+def redis_service(docker_services: tk) -> Generator[str | None]:
     """Redis service fixture."""
-    with docker_manager.service_context(["redis"]):
-        yield docker_manager.get_service_url("redis", 6379)
+    ready = docker_services.wait_for_port_ready("localhost", 6380)
+    if ready.is_failure or not ready.value:
+        yield None
+        return
+    yield "localhost:6380"
 
 
 @pytest.fixture
-def meltano_service(docker_manager: Tk) -> Generator[str | None]:
+def meltano_service(docker_services: tk) -> Generator[str | None]:
     """Meltano service fixture."""
-    with docker_manager.service_context(["meltano"]):
-        yield docker_manager.get_service_url("meltano", 3000)
+    ready = docker_services.wait_for_port_ready("localhost", 3389)
+    if ready.is_failure or not ready.value:
+        yield None
+        return
+    yield "localhost:3389"
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -391,7 +458,17 @@ class MockSingerTap:
 
     def discover(self) -> t.ContainerMapping:
         _ = self.config
-        return {"streams": [{"stream": "test_entity", "schema": {}}]}
+        return {
+            "streams": [
+                {
+                    "stream": "test_entity",
+                    "schema": {
+                        "type": "object",
+                        "properties": {"id": {"type": "integer"}},
+                    },
+                }
+            ]
+        }
 
     def extract(self) -> Sequence[t.ContainerMapping]:
         _ = self.config

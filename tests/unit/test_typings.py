@@ -60,7 +60,8 @@ class TestFlextMeltanoTypes:
             "ELT",
             "Processing",
         ]
-        for namespace in removed_namespaces:
+        for _namespace in removed_namespaces:
+            pass
 
     def test_no_duplicate_aliases(self) -> None:
         """Test that simple aliases to existing ``t.*`` are removed."""
@@ -72,7 +73,8 @@ class TestFlextMeltanoTypes:
             "PluginConfiguration",
             "PluginConfigDict",
         ]
-        for alias in removed_duplicates:
+        for _alias in removed_duplicates:
+            pass
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""

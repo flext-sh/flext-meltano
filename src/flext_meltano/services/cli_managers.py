@@ -11,16 +11,16 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from flext_core import FlextLogger, r
-from flext_meltano import (
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.protocols import FlextMeltanoProtocols as p
+from flext_meltano.services._cli_small_managers import (
     FlextMeltanoDbtManager,
-    FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
     FlextMeltanoStatusManager,
-    c,
-    p,
-    t,
-    u,
 )
+from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoCommandRouter:

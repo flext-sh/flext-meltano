@@ -9,14 +9,14 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from flext_core import FlextLogger, r
-from flext_meltano import (
-    FlextMeltanoPipelineCrudOperations,
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.protocols import FlextMeltanoProtocols as p
+from flext_meltano.services._pipeline_lifecycle import (
     FlextMeltanoPipelineLifecycleOperations,
-    c,
-    m,
-    p,
-    t,
 )
+from flext_meltano.services._pipeline_ops import FlextMeltanoPipelineCrudOperations
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoPipelineManager(

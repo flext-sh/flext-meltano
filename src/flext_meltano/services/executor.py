@@ -9,11 +9,23 @@ from __future__ import annotations
 from meltano.core.error import ProjectNotFound
 
 from flext_core import r
-from flext_meltano import FlextMeltanoExecutorBase, c, t, u
+from flext_meltano.cli import FlextMeltanoCLI
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     """Core executor providing Meltano command execution with error handling."""
+
+    @staticmethod
+    def create_flext_cli() -> r[FlextMeltanoCLI]:
+        """Create the concrete Meltano CLI facade."""
+        return u.try_(
+            lambda: FlextMeltanoCLI(),
+            catch=c.Meltano.OPERATION_ERRORS,
+        ).map_error(lambda e: f"Failed to create CLI: {e}")
 
     @staticmethod
     def create_cli_runner(args: t.StrSequence) -> r[t.ContainerMapping]:

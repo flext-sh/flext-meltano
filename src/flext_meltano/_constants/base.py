@@ -95,6 +95,14 @@ class FlextMeltanoConstantsBase:
     PREFIX_TAP: Final[str] = "tap"
     PREFIX_TARGET: Final[str] = "target"
     PREFIX_DBT: Final[str] = "dbt"
+    PUBLIC_FACTORY_TAP: Final[str] = "Tap"
+    PUBLIC_FACTORY_TARGET: Final[str] = "Target"
+    PUBLIC_FACTORY_DBT: Final[str] = "Dbt"
+    PUBLIC_FACTORY_NAMES: Final[frozenset[str]] = frozenset({
+        PUBLIC_FACTORY_TAP,
+        PUBLIC_FACTORY_TARGET,
+        PUBLIC_FACTORY_DBT,
+    })
     PLUGIN_INSTALLATION_TIMEOUT: Final[int] = 300
     PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
     PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5

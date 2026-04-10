@@ -15,14 +15,14 @@ from unittest.mock import patch
 
 import pytest
 
-from flext_core import r
 from flext_meltano import (
     FlextMeltanoAdapter,
-    FlextMeltanoExecutorBase,
+    FlextMeltanoExecutor,
     FlextMeltanoLibraryRunner,
     m,
     t,
 )
+from tests import r
 
 
 class TestFlextMeltanoLibraryRunner:
@@ -82,7 +82,7 @@ class TestFlextMeltanoLibraryRunner:
         """Test pipeline result has expected keys when successful."""
         runner = FlextMeltanoLibraryRunner()
         with patch.object(
-            FlextMeltanoExecutorBase,
+            FlextMeltanoExecutor,
             "execute_meltano_command",
             side_effect=self._mock_execute_command,
         ):
@@ -101,7 +101,7 @@ class TestFlextMeltanoLibraryRunner:
         """Test DBT transformation delegates to Meltano runtime."""
         runner = FlextMeltanoLibraryRunner()
         with patch.object(
-            FlextMeltanoExecutorBase,
+            FlextMeltanoExecutor,
             "execute_meltano_command",
             side_effect=self._mock_execute_command,
         ):

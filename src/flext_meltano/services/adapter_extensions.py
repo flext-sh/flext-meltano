@@ -9,14 +9,12 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import FlextSettings, r
-from flext_meltano import (
-    FlextMeltanoExecutorBase,
-    FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
-    c,
-    m,
-    t,
-)
+from flext_meltano.base import FlextMeltanoServiceBase
+from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
