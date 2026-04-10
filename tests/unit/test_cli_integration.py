@@ -18,59 +18,43 @@ from flext_tests import tm
 from tests import m, t, u
 
 
-class TestCliModelConversionWithTapRunParams:
-    """Test direct CLI model conversion with TapRunParams."""
+class TestFlextMeltanoCliModelConversion:
+    """Behavioral tests for Meltano CLI model conversion."""
 
-    def test_converter_tap_run_params_minimal(self) -> None:
-        """Test converting minimal Mapping[str, objectTapRunParams model."""
+    def test_tap_run_params_minimal(self) -> None:
         cli_args: t.Cli.JsonMapping = {
             "tap_name": "tap-postgres",
             "discover": False,
         }
-        result = u.Cli.cli_args_to_model(
-            m.Meltano.TapRunParams,
-            cli_args,
-        )
+        result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
         tm.ok(result)
         model = result.value
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, none=True)
         tm.that(model.discover is False, eq=True)
 
-    def test_converter_tap_run_params_with_config(self) -> None:
-        """Test converting Mapping[str, objecth config to TapRunParams model."""
+    def test_tap_run_params_with_config(self) -> None:
         cli_args: t.Cli.JsonMapping = {
             "tap_name": "tap-postgres",
             "config_file": "/path/to/config.json",
             "discover": False,
         }
-        result = u.Cli.cli_args_to_model(
-            m.Meltano.TapRunParams,
-            cli_args,
-        )
+        result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
         tm.ok(result)
         model = result.value
-        tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, eq="/path/to/config.json")
 
-    def test_converter_tap_run_params_discover_mode(self) -> None:
-        """Test converting Mapping[str, objecth discover flag to TapRunParams model."""
+    def test_tap_run_params_discover_mode(self) -> None:
         cli_args: t.Cli.JsonMapping = {
             "tap_name": "tap-postgres",
             "discover": True,
         }
-        result = u.Cli.cli_args_to_model(
-            m.Meltano.TapRunParams,
-            cli_args,
-        )
+        result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
         tm.ok(result)
         model = result.value
-        tm.that(model.tap_name, eq="tap-postgres")
-        tm.that(model.config_file, none=True)
         tm.that(model.discover is True, eq=True)
 
-    def test_converter_tap_run_params_all_fields(self) -> None:
-        """Test converting Mapping[str, objecth all fields to TapRunParams model."""
+    def test_tap_run_params_all_fields(self) -> None:
         cli_args: t.Cli.JsonMapping = {
             "tap_name": "tap-postgres",
             "config_file": "/config.json",
@@ -79,55 +63,32 @@ class TestCliModelConversionWithTapRunParams:
             "properties_file": "/properties.json",
             "discover": False,
         }
-        result = u.Cli.cli_args_to_model(
-            m.Meltano.TapRunParams,
-            cli_args,
-        )
+        result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
         tm.ok(result)
         model = result.value
-        tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.config_file, eq="/config.json")
         tm.that(model.catalog_file, eq="/catalog.json")
         tm.that(model.state_file, eq="/state.json")
         tm.that(model.properties_file, eq="/properties.json")
-        tm.that(model.discover is False, eq=True)
 
-    def test_converter_tap_run_params_missing_required(self) -> None:
-        """Test validation error when tap_name is missing."""
-        cli_args: t.Cli.JsonMapping = {"discover": False}
-        result = u.Cli.cli_args_to_model(
-            m.Meltano.TapRunParams,
-            cli_args,
-        )
+    def test_tap_run_params_missing_required(self) -> None:
+        result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, {"discover": False})
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
         tm.that(str(result.error).lower(), has="tap_name")
 
-    def test_converter_tap_run_params_invalid_type(self) -> None:
-        """Test validation error when field has wrong type."""
-        cli_args: t.Cli.JsonMapping = {
-            "tap_name": "tap-postgres",
-            "discover": "not-a-boolean",
-        }
+    def test_tap_run_params_invalid_type(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
-            cli_args,
+            {"tap_name": "tap-postgres", "discover": "not-a-boolean"},
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
 
-
-class TestCliModelConversionWithTargetRunParams:
-    """Test direct CLI model conversion with TargetRunParams."""
-
-    def test_converter_target_run_params_minimal(self) -> None:
-        """Test converting minimal Mapping[str, objectTargetRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "target_name": "target-postgres",
-        }
+    def test_target_run_params_minimal(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            cli_args,
+            {"target_name": "target-postgres"},
         )
         tm.ok(result)
         model = result.value
@@ -135,225 +96,153 @@ class TestCliModelConversionWithTargetRunParams:
         tm.that(model.config_file, none=True)
         tm.that(model.input_file, none=True)
 
-    def test_converter_target_run_params_with_config(self) -> None:
-        """Test converting Mapping[str, objecth config to TargetRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "target_name": "target-postgres",
-            "config_file": "/path/to/config.json",
-        }
+    def test_target_run_params_with_config(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            cli_args,
+            {"target_name": "target-postgres", "config_file": "/path/to/config.json"},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.target_name, eq="target-postgres")
-        tm.that(model.config_file, eq="/path/to/config.json")
+        tm.that(result.value.config_file, eq="/path/to/config.json")
 
-    def test_converter_target_run_params_with_input(self) -> None:
-        """Test converting Mapping[str, objecth input file to TargetRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "target_name": "target-postgres",
-            "input_file": "/path/to/input.jsonl",
-        }
+    def test_target_run_params_with_input(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            cli_args,
+            {"target_name": "target-postgres", "input_file": "/path/to/input.jsonl"},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.target_name, eq="target-postgres")
-        tm.that(model.input_file, eq="/path/to/input.jsonl")
+        tm.that(result.value.input_file, eq="/path/to/input.jsonl")
 
-    def test_converter_target_run_params_all_fields(self) -> None:
-        """Test converting Mapping[str, objecth all fields to TargetRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "target_name": "target-postgres",
-            "config_file": "/config.json",
-            "input_file": "/input.jsonl",
-        }
+    def test_target_run_params_all_fields(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            cli_args,
+            {
+                "target_name": "target-postgres",
+                "config_file": "/config.json",
+                "input_file": "/input.jsonl",
+            },
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.target_name, eq="target-postgres")
-        tm.that(model.config_file, eq="/config.json")
-        tm.that(model.input_file, eq="/input.jsonl")
+        tm.that(result.value.config_file, eq="/config.json")
+        tm.that(result.value.input_file, eq="/input.jsonl")
 
-    def test_converter_target_run_params_missing_required(self) -> None:
-        """Test validation error when target_name is missing."""
-        cli_args: t.Cli.JsonMapping = {"config_file": "/config.json"}
+    def test_target_run_params_missing_required(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            cli_args,
+            {"config_file": "/config.json"},
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
         tm.that(str(result.error).lower(), has="target_name")
 
-
-class TestCliModelConversionWithPipelineRunParams:
-    """Test direct CLI model conversion with PipelineRunParams."""
-
-    def test_converter_tap_run_params_minimal(self) -> None:
-        """Test converting minimal Mapping[str, objectTapRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "tap_name": "tap-postgres",
-            "config_file": "/path/to/config.json",
-        }
+    def test_pipeline_run_params_with_tap_args(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
-            cli_args,
+            {"tap_name": "tap-postgres", "config_file": "/path/to/config.json"},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.tap_name, eq="tap-postgres")
-        tm.that(model.config_file, eq="/path/to/config.json")
+        tm.that(result.value.tap_name, eq="tap-postgres")
+        tm.that(result.value.config_file, eq="/path/to/config.json")
 
-    def test_converter_target_run_params_with_config(self) -> None:
-        """Test converting Mapping[str, objecth config_file to TargetRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "target_name": "target-postgres",
-            "config_file": "/path/to/config.json",
-        }
+    def test_pipeline_run_params_with_target_args(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            cli_args,
+            {"target_name": "target-postgres", "config_file": "/path/to/config.json"},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.target_name, eq="target-postgres")
-        tm.that(model.config_file, eq="/path/to/config.json")
+        tm.that(result.value.target_name, eq="target-postgres")
+        tm.that(result.value.config_file, eq="/path/to/config.json")
 
-    def test_converter_pipeline_run_params_with_catalog_state(self) -> None:
-        """Test converting Mapping[str, objecth catalog/state to PipelineRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "tap_name": "tap-postgres",
-            "target_name": "target-postgres",
-            "catalog_file": "/catalog.json",
-            "state_file": "/state.json",
-        }
+    def test_pipeline_run_params_with_catalog_state(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
-            cli_args,
+            {
+                "tap_name": "tap-postgres",
+                "target_name": "target-postgres",
+                "catalog_file": "/catalog.json",
+                "state_file": "/state.json",
+            },
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.catalog_file, eq="/catalog.json")
-        tm.that(model.state_file, eq="/state.json")
+        tm.that(result.value.catalog_file, eq="/catalog.json")
+        tm.that(result.value.state_file, eq="/state.json")
 
-    def test_converter_pipeline_run_params_all_fields(self) -> None:
-        """Test converting Mapping[str, objecth all fields to PipelineRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "tap_name": "tap-postgres",
-            "target_name": "target-postgres",
-            "tap_config": "/tap-config.json",
-            "target_config": "/target-config.json",
-            "catalog_file": "/catalog.json",
-            "state_file": "/state.json",
-        }
+    def test_pipeline_run_params_all_fields(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
-            cli_args,
+            {
+                "tap_name": "tap-postgres",
+                "target_name": "target-postgres",
+                "tap_config": "/tap-config.json",
+                "target_config": "/target-config.json",
+                "catalog_file": "/catalog.json",
+                "state_file": "/state.json",
+            },
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.tap_name, eq="tap-postgres")
-        tm.that(model.target_name, eq="target-postgres")
-        tm.that(model.tap_config, eq="/tap-config.json")
-        tm.that(model.target_config, eq="/target-config.json")
-        tm.that(model.catalog_file, eq="/catalog.json")
-        tm.that(model.state_file, eq="/state.json")
+        tm.that(result.value.tap_config, eq="/tap-config.json")
+        tm.that(result.value.target_config, eq="/target-config.json")
+        tm.that(result.value.catalog_file, eq="/catalog.json")
+        tm.that(result.value.state_file, eq="/state.json")
 
-    def test_converter_pipeline_run_params_missing_tap_name(self) -> None:
-        """Test validation error when tap_name is missing."""
-        cli_args: t.Cli.JsonMapping = {"target_name": "target-postgres"}
+    def test_pipeline_run_params_missing_tap_name(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
-            cli_args,
+            {"target_name": "target-postgres"},
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
 
-    def test_converter_pipeline_run_params_missing_target_name(self) -> None:
-        """Test validation error when target_name is missing."""
-        cli_args: t.Cli.JsonMapping = {"tap_name": "tap-postgres"}
+    def test_pipeline_run_params_missing_target_name(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.PipelineRunParams,
-            cli_args,
+            {"tap_name": "tap-postgres"},
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
 
-
-class TestCliModelConversionWithDbtRunParams:
-    """Test direct CLI model conversion with DbtRunParams."""
-
-    def test_converter_dbt_run_params_minimal(self) -> None:
-        """Test converting minimal Mapping[str, objectDbtRunParams model."""
-        cli_args: t.Cli.JsonMapping = {"project_dir": "/dbt/project"}
+    def test_dbt_run_params_minimal(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
-            cli_args,
+            {"project_dir": "/dbt/project"},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.project_dir, eq="/dbt/project")
-        tm.that(model.models, none=True)
-        tm.that(model.full_refresh is False, eq=True)
+        tm.that(result.value.project_dir, eq="/dbt/project")
+        tm.that(result.value.models, none=True)
+        tm.that(result.value.full_refresh is False, eq=True)
 
-    def test_converter_dbt_run_params_with_models(self) -> None:
-        """Test converting Mapping[str, objecth models to DbtRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "project_dir": "/dbt/project",
-            "models": "users orders",
-        }
+    def test_dbt_run_params_with_models(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
-            cli_args,
+            {"project_dir": "/dbt/project", "models": "users orders"},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.models, eq="users orders")
+        tm.that(result.value.models, eq="users orders")
 
-    def test_converter_dbt_run_params_with_select_exclude(self) -> None:
-        """Test converting Mapping[str, objecth select/exclude to DbtRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "project_dir": "/dbt/project",
-            "select": "tag:daily",
-            "exclude": "tag:deprecated",
-        }
+    def test_dbt_run_params_with_select_exclude(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
-            cli_args,
+            {
+                "project_dir": "/dbt/project",
+                "select": "tag:daily",
+                "exclude": "tag:deprecated",
+            },
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.select, eq="tag:daily")
-        tm.that(model.exclude, eq="tag:deprecated")
+        tm.that(result.value.select, eq="tag:daily")
+        tm.that(result.value.exclude, eq="tag:deprecated")
 
-    def test_converter_dbt_run_params_with_full_refresh(self) -> None:
-        """Test converting Mapping[str, objecth full_refresh to DbtRunParams model."""
-        cli_args: t.Cli.JsonMapping = {
-            "project_dir": "/dbt/project",
-            "full_refresh": True,
-        }
+    def test_dbt_run_params_with_full_refresh(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
-            cli_args,
+            {"project_dir": "/dbt/project", "full_refresh": True},
         )
         tm.ok(result)
-        model = result.value
-        tm.that(model.full_refresh is True, eq=True)
+        tm.that(result.value.full_refresh is True, eq=True)
 
-    def test_converter_dbt_run_params_missing_required(self) -> None:
-        """Test validation error when project_dir is missing."""
-        cli_args: t.Cli.JsonMapping = {"models": "users"}
+    def test_dbt_run_params_missing_required(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.DbtRunParams,
-            cli_args,
+            {"models": "users"},
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")

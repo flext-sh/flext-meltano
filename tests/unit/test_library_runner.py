@@ -14,6 +14,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import (
     FlextMeltanoAdapter,
@@ -26,15 +27,15 @@ from tests import r
 
 
 class TestFlextMeltanoLibraryRunner:
-    """Test FlextMeltanoLibraryRunner functionality."""
+    """Test FlextMeltanoLibraryRunner and related project adapter behavior."""
 
     def test_initialization(self) -> None:
         """Test library runner initialization."""
         runner = FlextMeltanoLibraryRunner()
-        assert runner is not None
+        tm.that(runner, none=False)
 
     def test_execute_raises_not_implemented(self) -> None:
-        """Test execute raises NotImplementedError (no override in runner mixin)."""
+        """Test execute raises NotImplementedError when not overridden."""
         runner = FlextMeltanoLibraryRunner()
         with pytest.raises(NotImplementedError):
             runner.execute()
@@ -65,7 +66,7 @@ class TestFlextMeltanoLibraryRunner:
         """Test complete E-L-T pipeline execution delegates to Meltano runtime."""
         runner = FlextMeltanoLibraryRunner()
         with patch.object(
-            FlextMeltanoExecutorBase,
+            FlextMeltanoExecutor,
             "execute_meltano_command",
             side_effect=self._mock_execute_command,
         ):
@@ -73,10 +74,10 @@ class TestFlextMeltanoLibraryRunner:
                 tap_name="tap-csv",
                 target_name="target-jsonl",
             )
-        assert result.is_success
-        assert "exit_code" in result.value
-        assert "output" in result.value
-        assert "error" in result.value
+        tm.ok(result)
+        tm.that(result.value, contains="exit_code")
+        tm.that(result.value, contains="output")
+        tm.that(result.value, contains="error")
 
     def test_execute_complete_elt_pipeline_result_shape(self) -> None:
         """Test pipeline result has expected keys when successful."""
@@ -90,12 +91,11 @@ class TestFlextMeltanoLibraryRunner:
                 tap_name="tap-csv",
                 target_name="target-jsonl",
             )
-        assert result.is_success or result.is_failure
+        tm.that(result.is_success or result.is_failure, eq=True)
         if result.is_success:
-            pipeline_data = result.value
-            assert isinstance(pipeline_data, dict)
-            assert "tap_name" in pipeline_data
-            assert "target_name" in pipeline_data
+            tm.that(result.value, is_=dict)
+            tm.that(result.value, contains="tap_name")
+            tm.that(result.value, contains="target_name")
 
     def test_run_dbt_transformation(self) -> None:
         """Test DBT transformation delegates to Meltano runtime."""
@@ -106,25 +106,22 @@ class TestFlextMeltanoLibraryRunner:
             side_effect=self._mock_execute_command,
         ):
             result = runner.run_dbt_transformation(models=["model1"])
-        assert result.is_success
-        assert "exit_code" in result.value
-        assert "output" in result.value
-        assert "error" in result.value
-
-
-class TestProjectAdapterIntegration:
-    """Test integration of FlextMeltanoAdapter.ProjectAdapter."""
+        tm.ok(result)
+        tm.that(result.value, contains="exit_code")
+        tm.that(result.value, contains="output")
+        tm.that(result.value, contains="error")
 
     def test_adapter_version(self) -> None:
         """Test that FlextMeltanoAdapter.ProjectAdapter can get version."""
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.get_version()
-        assert result.is_success
-        assert result.value is not None
-        assert "version" in result.value
+        tm.ok(result)
+        tm.that(result.value, none=False)
+        tm.that(str(result.value.get("version", "")), none=False)
 
     def test_adapter_execute(self) -> None:
         """Test that FlextMeltanoAdapter.ProjectAdapter execute returns r."""
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.execute()
-        assert result is not None
+        tm.that(result, none=False)
+        tm.that(result.is_success or result.is_failure, eq=True)

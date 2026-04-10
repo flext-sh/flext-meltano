@@ -127,7 +127,9 @@ class TestFlextMeltanoCliSmallManagers:
         )
 
     def test_status_manager_routes_show_health_and_version(self) -> None:
-        manager = FlextMeltanoStatusManager(_StubStatusCli(), service=_StubStatusService())
+        manager = FlextMeltanoStatusManager(
+            _StubStatusCli(), service=_StubStatusService()
+        )
 
         show_result = manager.handle_command(["show"])
         health_result = manager.handle_command(["health"])
@@ -140,7 +142,9 @@ class TestFlextMeltanoCliSmallManagers:
         tm.that(health_result.value, has='"healthy"')
         tm.that(version_result.value, eq="3.9.1")
 
-    def test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops(self) -> None:
+    def test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops(
+        self,
+    ) -> None:
         manager = FlextMeltanoSingerManager(_StubSingerCli())
 
         tap_result = manager.handle_tap_command(["run", "tap-demo"])
