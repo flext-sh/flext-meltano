@@ -84,12 +84,12 @@ class TestFlextMeltanoPublicFacade:
         target_service = unwrap_component(
             meltano.Target("target-a"),
             selector=lambda service: service.sink_name,
-            expected_name="tap-a",
+            expected_name="target-a",
         )
         dbt_service = unwrap_component(
             meltano.Dbt("dbt-a"),
             selector=lambda service: service.transformation_name,
-            expected_name="tap-a",
+            expected_name="dbt-a",
         )
         u.Tests.Matchers.that(tap_service is not target_service, eq=True)
         u.Tests.Matchers.that(target_service is not dbt_service, eq=True)

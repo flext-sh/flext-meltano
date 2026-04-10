@@ -13,6 +13,12 @@ _LAZY_IMPORTS = merge_lazy_imports(
     (".consumer_bases",),
     build_lazy_import_map(
         {
+            "._cli_small_managers": (
+                "FlextMeltanoDbtManager",
+                "FlextMeltanoPluginManager",
+                "FlextMeltanoStatusManager",
+            ),
+            "._pipeline_mgr": ("FlextMeltanoPipelineManager",),
             ".abstractions": ("FlextMeltanoAbstractions",),
             ".adapter_extensions": (
                 "FlextMeltanoDbtAdapter",
@@ -22,11 +28,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".bridge": ("FlextMeltanoBridge",),
             ".cli_managers": (
                 "FlextMeltanoCommandRouter",
-                "FlextMeltanoDbtManager",
-                "FlextMeltanoPipelineManager",
-                "FlextMeltanoPluginManager",
                 "FlextMeltanoSingerManager",
-                "FlextMeltanoStatusManager",
             ),
             ".dbt_project": ("FlextMeltanoDbtProjectMixin",),
             ".dbt_runner": ("FlextMeltanoDbtRunnerMixin",),
@@ -39,15 +41,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".project_service": ("FlextMeltanoProjectService",),
             ".services": ("FlextMeltanoService",),
             ".singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
-            ".singer_sdk": (
-                "Context",
-                "FlextMeltanoSingerTapAdapter",
-                "Record",
-                "Sink",
-                "Stream",
-                "Tap",
-                "Target",
-            ),
+            ".singer_sdk": ("FlextMeltanoSingerTapAdapter",),
             ".singer_state": ("FlextMeltanoSingerStateMixin",),
             ".singer_tap": (
                 "FlextMeltanoTapAbstractions",
@@ -56,6 +50,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".singer_target": ("FlextMeltanoTargetAbstractions",),
             ".singer_translator": ("FlextMeltanoSingerCliTranslator",),
             ".validators": ("FlextMeltanoValidators",),
+            "singer_sdk": ("Sink",),
+            "singer_sdk.helpers.types": (
+                "Context",
+                "Record",
+            ),
+            "singer_sdk.streams": ("Stream",),
+            "singer_sdk.tap_base": ("Tap",),
+            "singer_sdk.target_base": ("Target",),
         },
     ),
     exclude_names=(

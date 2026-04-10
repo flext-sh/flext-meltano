@@ -38,7 +38,7 @@ class TestFlextMeltanoApiFacade:
         """Project creation fails fast on invalid input."""
         u.Tests.Matchers.fail(
             meltano.create_project(project_name="", project_dir=tmp_path),
-            none=False,
+            has="empty",
         )
 
     def test_create_project_writes_meltano_project_file(

@@ -359,7 +359,7 @@ def job_run_config() -> t.ContainerMapping:
 def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
     """Docker manager fixture for Docker-based tests."""
     temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
-    manager = tk(workspace_root=Path(__file__).resolve().parents[2])
+    manager = tk(workspace_root=Path(__file__).resolve().parents[1])
     manager._state_file = temp_dir / "flext_tests_docker_state.json"
     manager._dirty_containers.clear()
     return manager

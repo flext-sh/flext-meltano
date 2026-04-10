@@ -13,6 +13,12 @@ from flext_core.lazy import (
 from flext_meltano.__version__ import *
 
 if _t.TYPE_CHECKING:
+    from singer_sdk import Sink
+    from singer_sdk.helpers.types import Context, Record
+    from singer_sdk.streams import Stream
+    from singer_sdk.tap_base import Tap
+    from singer_sdk.target_base import Target
+
     from flext_core.decorators import d
     from flext_core.exceptions import e
     from flext_core.handlers import h
@@ -63,6 +69,12 @@ if _t.TYPE_CHECKING:
         FlextMeltanoProtocols,
         FlextMeltanoProtocols as p,
     )
+    from flext_meltano.services._cli_small_managers import (
+        FlextMeltanoDbtManager,
+        FlextMeltanoPluginManager,
+        FlextMeltanoStatusManager,
+    )
+    from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.adapter_extensions import (
         FlextMeltanoDbtAdapter,
@@ -72,11 +84,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.bridge import FlextMeltanoBridge
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
-        FlextMeltanoDbtManager,
-        FlextMeltanoPipelineManager,
-        FlextMeltanoPluginManager,
         FlextMeltanoSingerManager,
-        FlextMeltanoStatusManager,
     )
     from flext_meltano.services.consumer_bases.dbt_service_base import (
         FlextMeltanoDbtServiceBase,
@@ -102,15 +110,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from flext_meltano.services.singer_sdk import (
-        Context,
-        FlextMeltanoSingerTapAdapter,
-        Record,
-        Sink,
-        Stream,
-        Tap,
-        Target,
-    )
+    from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
     from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
     from flext_meltano.services.singer_tap import (
         FlextMeltanoTapAbstractions,
@@ -166,6 +166,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "flext_core.handlers": ("h",),
             "flext_core.mixins": ("x",),
             "flext_core.result": ("r",),
+            "singer_sdk": ("Sink",),
+            "singer_sdk.helpers.types": (
+                "Context",
+                "Record",
+            ),
+            "singer_sdk.streams": ("Stream",),
+            "singer_sdk.tap_base": ("Tap",),
+            "singer_sdk.target_base": ("Target",),
         },
         alias_groups={
             ".base": (("s", "FlextMeltanoServiceBase"),),
