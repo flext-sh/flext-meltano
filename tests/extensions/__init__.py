@@ -1,11 +1,13 @@
-"""Test package for flext-meltano extensions.
-
-This package contains tests for extension functionality.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
-"""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Extensions package."""
 
 from __future__ import annotations
+
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
+
+_LAZY_IMPORTS = build_lazy_import_map(
+    {},
+)
+
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

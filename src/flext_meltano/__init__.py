@@ -13,9 +13,9 @@ from flext_core.lazy import (
 from flext_meltano.__version__ import *
 
 if _t.TYPE_CHECKING:
-    from singer_sdk import Sink
-    from singer_sdk.helpers.types import Context, Record
-    from singer_sdk.streams import Stream
+    from flext_cli.base import s
+    from singer_sdk.sinks.core import Sink
+    from singer_sdk.streams.core import Stream
     from singer_sdk.tap_base import Tap
     from singer_sdk.target_base import Target
 
@@ -58,17 +58,11 @@ if _t.TYPE_CHECKING:
     from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
     from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
     from flext_meltano.api import FlextMeltano, meltano
-    from flext_meltano.base import FlextMeltanoServiceBase, FlextMeltanoServiceBase as s
+    from flext_meltano.base import FlextMeltanoServiceBase
     from flext_meltano.cli import FlextMeltanoCLI, main
-    from flext_meltano.constants import (
-        FlextMeltanoConstants,
-        FlextMeltanoConstants as c,
-    )
-    from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
-    from flext_meltano.protocols import (
-        FlextMeltanoProtocols,
-        FlextMeltanoProtocols as p,
-    )
+    from flext_meltano.constants import FlextMeltanoConstants, c
+    from flext_meltano.models import FlextMeltanoModels, m
+    from flext_meltano.protocols import FlextMeltanoProtocols, p
     from flext_meltano.services._cli_small_managers import (
         FlextMeltanoDbtManager,
         FlextMeltanoPluginManager,
@@ -110,7 +104,11 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
+    from flext_meltano.services.singer_sdk import (
+        Context,
+        FlextMeltanoSingerTapAdapter,
+        Record,
+    )
     from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
     from flext_meltano.services.singer_tap import (
         FlextMeltanoTapAbstractions,
@@ -120,11 +118,8 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.singer_translator import FlextMeltanoSingerCliTranslator
     from flext_meltano.services.validators import FlextMeltanoValidators
     from flext_meltano.settings import FlextMeltanoSettings
-    from flext_meltano.typings import FlextMeltanoTypes, FlextMeltanoTypes as t
-    from flext_meltano.utilities import (
-        FlextMeltanoUtilities,
-        FlextMeltanoUtilities as u,
-    )
+    from flext_meltano.typings import FlextMeltanoTypes, t
+    from flext_meltano.utilities import FlextMeltanoUtilities, u
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         "._constants",
@@ -155,33 +150,37 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextMeltanoCLI",
                 "main",
             ),
-            ".constants": ("FlextMeltanoConstants",),
-            ".models": ("FlextMeltanoModels",),
-            ".protocols": ("FlextMeltanoProtocols",),
+            ".constants": (
+                "FlextMeltanoConstants",
+                "c",
+            ),
+            ".models": (
+                "FlextMeltanoModels",
+                "m",
+            ),
+            ".protocols": (
+                "FlextMeltanoProtocols",
+                "p",
+            ),
             ".settings": ("FlextMeltanoSettings",),
-            ".typings": ("FlextMeltanoTypes",),
-            ".utilities": ("FlextMeltanoUtilities",),
+            ".typings": (
+                "FlextMeltanoTypes",
+                "t",
+            ),
+            ".utilities": (
+                "FlextMeltanoUtilities",
+                "u",
+            ),
+            "flext_cli.base": ("s",),
             "flext_core.decorators": ("d",),
             "flext_core.exceptions": ("e",),
             "flext_core.handlers": ("h",),
             "flext_core.mixins": ("x",),
             "flext_core.result": ("r",),
-            "singer_sdk": ("Sink",),
-            "singer_sdk.helpers.types": (
-                "Context",
-                "Record",
-            ),
-            "singer_sdk.streams": ("Stream",),
+            "singer_sdk.sinks.core": ("Sink",),
+            "singer_sdk.streams.core": ("Stream",),
             "singer_sdk.tap_base": ("Tap",),
             "singer_sdk.target_base": ("Target",),
-        },
-        alias_groups={
-            ".base": (("s", "FlextMeltanoServiceBase"),),
-            ".constants": (("c", "FlextMeltanoConstants"),),
-            ".models": (("m", "FlextMeltanoModels"),),
-            ".protocols": (("p", "FlextMeltanoProtocols"),),
-            ".typings": (("t", "FlextMeltanoTypes"),),
-            ".utilities": (("u", "FlextMeltanoUtilities"),),
         },
     ),
     exclude_names=(
@@ -195,6 +194,9 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     module_name=__name__,
 )
+
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__ = [
     "Context",
@@ -299,6 +301,3 @@ __all__ = [
     "u",
     "x",
 ]
-
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

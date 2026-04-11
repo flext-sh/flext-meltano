@@ -1,32 +1,32 @@
-# AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
-# Regenerate with: make gen
-#
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """Unit package."""
 
 from __future__ import annotations
 
-from flext_core.lazy import install_lazy_exports
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
-_LAZY_IMPORTS = {
-    "tests_pipeline_cli_managers": "tests.unit.tests_pipeline_cli_managers",
-    "test_api": "tests.unit.test_api",
-    "test_cli_integration": "tests.unit.test_cli_integration",
-    "test_cli_small_managers": "tests.unit.test_cli_small_managers",
-    "test_constants": "tests.unit.test_constants",
-    "test_execution_result": "tests.unit.test_execution_result",
-    "test_executors": "tests.unit.test_executors",
-    "test_library_runner": "tests.unit.test_library_runner",
-    "test_models": "tests.unit.test_models",
-    "test_plugin_protocols": "tests.unit.test_plugin_protocols",
-    "test_services": "tests.unit.test_services",
-    "test_singer_cli_translator": "tests.unit.test_singer_cli_translator",
-    "test_singer_sdk_adapter": "tests.unit.test_singer_sdk_adapter",
-    "test_singer_types": "tests.unit.test_singer_types",
-    "test_tap_abstractions": "tests.unit.test_tap_abstractions",
-    "test_target_abstractions": "tests.unit.test_target_abstractions",
-    "test_typings": "tests.unit.test_typings",
-    "test_validators": "tests.unit.test_validators",
-}
+_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".test_api": ("test_api",),
+        ".test_cli_integration": ("test_cli_integration",),
+        ".test_cli_small_managers": ("test_cli_small_managers",),
+        ".test_constants": ("test_constants",),
+        ".test_execution_result": ("test_execution_result",),
+        ".test_executors": ("test_executors",),
+        ".test_library_runner": ("test_library_runner",),
+        ".test_models": ("test_models",),
+        ".test_plugin_protocols": ("test_plugin_protocols",),
+        ".test_services": ("test_services",),
+        ".test_singer_cli_translator": ("test_singer_cli_translator",),
+        ".test_singer_sdk_adapter": ("test_singer_sdk_adapter",),
+        ".test_singer_types": ("test_singer_types",),
+        ".test_tap_abstractions": ("test_tap_abstractions",),
+        ".test_target_abstractions": ("test_target_abstractions",),
+        ".test_typings": ("test_typings",),
+        ".test_validators": ("test_validators",),
+        ".tests_pipeline_cli_managers": ("tests_pipeline_cli_managers",),
+    },
+)
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
