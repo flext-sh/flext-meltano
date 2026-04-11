@@ -2,7 +2,7 @@
 
 Provides dbt project management, model/test execution, manifest parsing,
 and CLI dispatch via MRO. Consumer dbt projects override
-``get_connection_profile()`` only.
+``connection_profile`` only.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -27,7 +27,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     Subclasses MUST define:
     - ``dbt_project_name``: canonical dbt project name
-    - ``get_connection_profile()``: returns dbt connection profile dict
+    - ``connection_profile``: returns dbt connection profile dict
 
     This base provides via MRO:
     - dbt command execution (``run_models``, ``run_tests``, ``compile_models``)
@@ -53,8 +53,10 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         return cls._instance
 
     @abstractmethod
-    def get_connection_profile(self) -> t.ContainerMapping:
-        """Return dbt connection profile for this project.
+    @property
+    @abstractmethod
+    def connection_profile(self) -> t.ContainerMapping:
+        """Dbt connection profile for this project.
 
         Consumer implements with domain-specific connection config
         (e.g. Oracle DSN, LDAP bind DN, etc.).
