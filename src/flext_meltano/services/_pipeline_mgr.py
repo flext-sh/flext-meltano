@@ -17,6 +17,7 @@ from flext_meltano.services._pipeline_lifecycle import (
 )
 from flext_meltano.services._pipeline_ops import FlextMeltanoPipelineCrudOperations
 from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoPipelineManager(

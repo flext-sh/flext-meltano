@@ -97,7 +97,7 @@ class FlextMeltanoModelsContext:
                     return {
                         str(key): str(item)
                         for key, item in value.items()
-                        if u.is_type(item, (str, int, bool, float))
+                        if u.matches_type(item, (str, int, bool, float))
                     }
                 case _:
                     return {}
