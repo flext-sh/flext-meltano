@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 
-from flext_core import FlextLogger, r
+from flext_core import r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.services._cli_small_managers import (
@@ -30,7 +30,7 @@ class FlextMeltanoCommandRouter:
         """Initialize command router with CLI reference."""
         super().__init__()
         self.cli = cli
-        self.logger = FlextLogger(__name__)
+        self.logger = u.fetch_logger(__name__)
 
     def route_command(self, args: t.StrSequence) -> int:
         """Route command to appropriate handler using composition."""
@@ -78,7 +78,7 @@ class FlextMeltanoSingerManager:
         """Initialize Singer manager with CLI reference."""
         super().__init__()
         self.cli = cli
-        self.logger = FlextLogger(__name__)
+        self.logger = u.fetch_logger(__name__)
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle Singer command by routing to tap or target subcommands."""

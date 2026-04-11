@@ -7,7 +7,6 @@ from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Protocol, override
 
-from flext_core import FlextLogger
 from flext_meltano import (
     FlextMeltanoDbtRunnerMixin,
     FlextMeltanoProjectManager,
@@ -220,7 +219,7 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
 class _FlextMeltanoSimpleCommandManager:
     """Base for simple command managers with help + unimplemented handlers."""
 
-    logger: FlextLogger
+    logger: p.Logger
 
     def _handle_command(
         self,
@@ -256,7 +255,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
         super().__init__()
         self.cli = cli
         self._service = service or _FlextMeltanoCliDbtService()
-        self.logger = FlextLogger(__name__)
+        self.logger = u.fetch_logger(__name__)
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle DBT command."""
@@ -289,7 +288,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
         super().__init__()
         self.cli = cli
         self._service = service or _FlextMeltanoCliPluginService()
-        self.logger = FlextLogger(__name__)
+        self.logger = u.fetch_logger(__name__)
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle plugin command."""
@@ -328,7 +327,7 @@ class FlextMeltanoStatusManager:
         super().__init__()
         self.cli = cli
         self._service = service or _FlextMeltanoCliStatusService()
-        self.logger = FlextLogger(__name__)
+        self.logger = u.fetch_logger(__name__)
 
     def handle_command(self, args: t.StrSequence) -> r[str]:
         """Handle status command."""

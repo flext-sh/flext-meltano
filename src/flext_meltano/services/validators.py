@@ -11,8 +11,7 @@ from typing import override
 
 from pydantic import ValidationError
 
-from flext_core import FlextLogger, r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
@@ -46,13 +45,13 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             error_msg = (
                 f"Project path {project_path} does not exist or is not a directory"
             )
-            FlextLogger(__name__).exception(error_msg)
+            u.fetch_logger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 
         meltano_yml = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
             error_msg = f"Project path {project_path} does not contain {c.Meltano.PATH_MELTANO_PROJECT_FILE}"
-            FlextLogger(__name__).exception(error_msg)
+            u.fetch_logger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 
         transform_dir = project_path / c.Meltano.PATH_TRANSFORM_DIR
@@ -60,7 +59,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             transform_dir.mkdir(parents=True, exist_ok=True)
         except OSError as e:
             error_msg = f"Failed to prepare transform directory: {e}"
-            FlextLogger(__name__).exception(error_msg)
+            u.fetch_logger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 
         return r[bool].ok(value=True)

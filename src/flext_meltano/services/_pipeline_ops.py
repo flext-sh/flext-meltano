@@ -11,7 +11,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_core import FlextLogger, r
+from flext_core import r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
@@ -135,7 +135,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
                 default=f"Meltano command failed with exit code {completed.exit_code}",
             )
             return r[str].fail(command_error)
-        logger = FlextLogger(__name__)
+        logger = u.fetch_logger(__name__)
         output = u.to_str(completed.output).strip()
         if u.chk(output, empty=False):
             logger.info(output)

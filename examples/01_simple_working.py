@@ -11,10 +11,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from examples import c
-from flext_core import FlextLogger
 from flext_meltano import meltano
 
-logger = FlextLogger(__name__)
+logger = u.fetch_logger(__name__)
 
 
 def simple_api_example() -> None:

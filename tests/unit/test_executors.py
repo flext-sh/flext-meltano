@@ -15,11 +15,10 @@ from collections.abc import Sequence
 from pathlib import Path
 from unittest import mock
 
-from flext_core import FlextLogger
 from flext_meltano import FlextMeltanoExecutor
-from tests import r, t
+from tests import r, t, u
 
-logger = FlextLogger(__name__)
+logger = u.fetch_logger(__name__)
 
 
 class TestFlextMeltanoExecutorComplete:

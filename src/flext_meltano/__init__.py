@@ -63,7 +63,11 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.bridge import FlextMeltanoBridge
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
+        FlextMeltanoDbtManager,
+        FlextMeltanoPipelineManager,
+        FlextMeltanoPluginManager,
         FlextMeltanoSingerManager,
+        FlextMeltanoStatusManager,
     )
     from flext_meltano.services.consumer_bases.dbt_service_base import (
         FlextMeltanoDbtServiceBase,
@@ -89,7 +93,15 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
+    from flext_meltano.services.singer_sdk import (
+        Context,
+        FlextMeltanoSingerTapAdapter,
+        Record,
+        Sink,
+        Stream,
+        Tap,
+        Target,
+    )
     from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
     from flext_meltano.services.singer_tap import (
         FlextMeltanoTapAbstractions,
@@ -178,6 +190,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__ = [
+    "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",
@@ -190,6 +203,7 @@ __all__ = [
     "FlextMeltanoConstantsEnums",
     "FlextMeltanoConstantsSettings",
     "FlextMeltanoDbtAdapter",
+    "FlextMeltanoDbtManager",
     "FlextMeltanoDbtProjectMixin",
     "FlextMeltanoDbtRunnerMixin",
     "FlextMeltanoDbtServiceBase",
@@ -218,7 +232,9 @@ __all__ = [
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
     "FlextMeltanoPipelineAdapter",
+    "FlextMeltanoPipelineManager",
     "FlextMeltanoPluginDiscoveryMixin",
+    "FlextMeltanoPluginManager",
     "FlextMeltanoProjectManager",
     "FlextMeltanoProjectService",
     "FlextMeltanoProtocols",
@@ -235,6 +251,7 @@ __all__ = [
     "FlextMeltanoSingerManager",
     "FlextMeltanoSingerStateMixin",
     "FlextMeltanoSingerTapAdapter",
+    "FlextMeltanoStatusManager",
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTapServiceBase",
     "FlextMeltanoTapSourceMixin",
@@ -248,6 +265,11 @@ __all__ = [
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoValidators",
+    "Record",
+    "Sink",
+    "Stream",
+    "Tap",
+    "Target",
     "__author__",
     "__author_email__",
     "__description__",
