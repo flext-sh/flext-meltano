@@ -176,7 +176,7 @@ class TestFlextMeltanoExecutionResult:
 
     def test_model_dump_json_failure(self) -> None:
         """Test model_dump_json with failed execution."""
-        command = ["meltano", "config", "invalid-plugin"]
+        command = ["meltano", "settings", "invalid-plugin"]
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=False,

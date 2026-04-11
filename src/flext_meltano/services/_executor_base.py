@@ -225,7 +225,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             "status": c.Meltano.OperationStatus.READY,
             "executor_type": "flext_meltano_executor",
             "execution_timestamp": str(time.time()),
-            "config": self.settings.model_dump(),
+            "settings": self.settings.model_dump(),
         }
         self.logger.info("FlextMeltanoExecutor executed successfully")
         return r[t.ContainerMapping].ok(config_data)

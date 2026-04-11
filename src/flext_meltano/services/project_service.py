@@ -117,14 +117,14 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         params = params_r.value
         try:
             temp_path = Path(tempfile.mkdtemp(prefix=str(params["prefix"])))
-            config: t.ContainerMapping = {
+            settings: t.ContainerMapping = {
                 "version": c.Meltano.PLUGIN_CONFIG_VERSION,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                 "project_id": str(params["project_id"]),
                 "environments": [
                     {
                         "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
-                        "config": {
+                        "settings": {
                             "plugins": {
                                 "extractors": list[t.ContainerMapping](),
                                 "loaders": list[t.ContainerMapping](),
@@ -135,7 +135,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                 ],
             }
             config_file = temp_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
-            dump_result = u.Cli.yaml_dump(config_file, config)
+            dump_result = u.Cli.yaml_dump(config_file, settings)
             if dump_result.failure:
                 return r[t.Meltano.DbtProject].fail(
                     dump_result.error or "YAML dump failed"
@@ -163,7 +163,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         payload: t.ContainerMapping = {
             "status": c.Meltano.OperationStatus.READY,
             "service_type": service_type,
-            "config": meltano_config.model_dump(),
+            "settings": meltano_config.model_dump(),
         }
         return r[t.ContainerMapping].ok(payload)
 

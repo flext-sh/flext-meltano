@@ -69,17 +69,17 @@ class FlextMeltano(
             cls._instance = instance
         return instance
 
-    def tap(self, name: str, **config: t.Scalar) -> r[Self]:
+    def tap(self, name: str, **settings: t.Scalar) -> r[Self]:
         """Create a specialized Tap facade instance through the public API."""
-        return type(self).create_source_service(name, **config)
+        return type(self).create_source_service(name, **settings)
 
-    def target(self, name: str, **config: t.Scalar) -> r[Self]:
+    def target(self, name: str, **settings: t.Scalar) -> r[Self]:
         """Create a specialized Target facade instance through the public API."""
-        return type(self).create_sink_service(name, **config)
+        return type(self).create_sink_service(name, **settings)
 
-    def dbt(self, name: str, **config: t.Scalar) -> r[Self]:
+    def dbt(self, name: str, **settings: t.Scalar) -> r[Self]:
         """Create a specialized DBT facade instance through the public API."""
-        return type(self).create_transformation_service(name, **config)
+        return type(self).create_transformation_service(name, **settings)
 
     Tap = tap
     Target = target

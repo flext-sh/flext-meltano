@@ -26,7 +26,7 @@ class TestFlextMeltanoPipelineCliManagers:
         tmp_path: Path,
     ) -> None:
         command: Sequence[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
-        config: Mapping[
+        settings: Mapping[
             str,
             t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
         ] = {
@@ -36,7 +36,7 @@ class TestFlextMeltanoPipelineCliManagers:
 
         with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
             result = FlextMeltanoPipelineManager.create_pipeline(
-                "daily-pipeline", config
+                "daily-pipeline", settings
             )
 
         tm.ok(result)
@@ -45,7 +45,7 @@ class TestFlextMeltanoPipelineCliManagers:
         stored = m.Meltano.ConfigMappingPayload.model_validate_json(
             (pipeline_dir / "pipeline.json").read_text(encoding="utf-8"),
         )
-        tm.that(stored.values, eq=config)
+        tm.that(stored.values, eq=settings)
 
     def test_create_pipeline_fails_without_configuration(
         self,
@@ -62,7 +62,7 @@ class TestFlextMeltanoPipelineCliManagers:
         tmp_path: Path,
     ) -> None:
         command: Sequence[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
-        config: Mapping[
+        settings: Mapping[
             str,
             t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
         ] = {"command": command}
@@ -77,7 +77,7 @@ class TestFlextMeltanoPipelineCliManagers:
 
         with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
             create_result = FlextMeltanoPipelineManager.create_pipeline(
-                "exec-pipeline", config
+                "exec-pipeline", settings
             )
             tm.ok(create_result)
             with patch.object(

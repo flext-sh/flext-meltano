@@ -81,7 +81,7 @@ class TestFlextMeltanoTypes:
         plugin_def = {
             "name": "tap-users",
             "variants": ["default"],
-            "config": {"batch_size": 1000},
+            "settings": {"batch_size": 1000},
         }
         catalog = {
             "tap_stream_id": "users",

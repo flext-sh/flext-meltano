@@ -73,7 +73,7 @@ result = (
 **Type Safety**: Error types are preserved through the entire flow
 
 ```python
-def process_pipeline(config: dict) -> r[PipelineResult]:
+def process_pipeline(settings: dict) -> r[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
     return r.ok(PipelineResult(...))
 ```
@@ -167,13 +167,13 @@ class PipelineError(FlextMeltanoError):
 ### Railway Pattern Usage
 
 ```python
-def create_and_run_pipeline(config: PipelineConfig) -> r[PipelineResult]:
+def create_and_run_pipeline(settings: PipelineConfig) -> r[PipelineResult]:
     return (
-        validate_config(config)
+        validate_config(settings)
         .flat_map(lambda cfg: discover_plugins(cfg))
         .flat_map(lambda plugins: validate_plugins(plugins))
         .flat_map(lambda valid_plugins: install_plugins(valid_plugins))
-        .flat_map(lambda installed: run_pipeline(installed, config))
+        .flat_map(lambda installed: run_pipeline(installed, settings))
         .map(lambda result: PipelineResult.from_execution(result))
     )
 ```

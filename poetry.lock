@@ -1580,7 +1580,7 @@ all = ["adbc-driver-manager", "fsspec", "ipython", "numpy", "pandas", "pyarrow"]
 [[package]]
 name = "editorconfig"
 version = "0.17.1"
-description = "EditorConfig File Locator and Interpreter for Python"
+description = "EditorSettings File Locator and Interpreter for Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
@@ -2199,7 +2199,7 @@ files = [
 [[package]]
 name = "iniconfig"
 version = "2.3.0"
-description = "brain-dead simple config-ini parsing"
+description = "brain-dead simple settings-ini parsing"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]

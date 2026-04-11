@@ -62,12 +62,12 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     @staticmethod
     def create_pipeline(
         pipeline_name: str,
-        config: t.ContainerMapping | None,
+        settings: t.ContainerMapping | None,
     ) -> r[str]:
         """Create a new Meltano pipeline with the given configuration."""
         if not pipeline_name.strip():
             return r[str].fail("Pipeline creation requires a non-empty pipeline name")
-        if config is None:
+        if settings is None:
             return r[str].fail("Pipeline creation not configured")
         pipeline_dir = FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
         if pipeline_dir.exists():
@@ -78,7 +78,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
                 pipeline_name,
             )
             validated = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": config,
+                "values": settings,
             })
             u.write_file(
                 config_path,

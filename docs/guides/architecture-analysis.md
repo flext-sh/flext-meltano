@@ -84,7 +84,7 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 # Plugin operations
 discover_plugins() -> r[Sequence[PluginInfo]]
 install_plugin(name: str, version: str | None) -> r[PluginInstallResult]
-execute_tap(name: str, config: dict) -> r[TapExecutionResult]
+execute_tap(name: str, settings: dict) -> r[TapExecutionResult]
 
 # Pipeline operations
 execute_pipeline(tap: str, target: str) -> r[PipelineResult]
@@ -126,7 +126,7 @@ validate_configuration() -> r[bool]
 class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
-    def __init__(self, tap_name: str, config: t.Dict, state: t.Dict | None = None)
+    def __init__(self, tap_name: str, settings: t.Dict, state: t.Dict | None = None)
     async def discover(self) -> r[Catalog]
     async def sync(self, streams: t.StringList | None = None) -> r[SyncResult]
 ```
@@ -137,7 +137,7 @@ class FlextSingerTap(s):
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, config: t.Dict)
+    def __init__(self, target_name: str, settings: t.Dict)
     async def load_records(self, records: Sequence[t.Dict]) -> r[LoadResult]
     async def flush(self) -> r[FlushResult]
 ```
@@ -250,7 +250,7 @@ container.register_singleton(FlextMeltanoService, create_meltano_service)
 container.register_singleton(FlextMeltanoAdapter, create_meltano_adapter)
 
 # Railway-oriented programming
-result = meltano_service.execute_tap("tap-csv", config)
+result = meltano_service.execute_tap("tap-csv", settings)
 if result.is_failure:
     logger.error("Tap execution failed", extra=result.error_context)
 ```
@@ -290,7 +290,7 @@ result = adapter.execute_cli_command(["meltano", "run", "tap-csv", "target-jsonl
 
 ```python
 # Native Singer protocol usage
-tap = FlextSingerTap("tap-gitlab", config={"api_url": "https://gitlab.com"})
+tap = FlextSingerTap("tap-gitlab", settings={"api_url": "https://gitlab.com"})
 catalog = tap.discover().unwrap()
 sync_result = tap.sync(catalog.streams[:5]).unwrap()
 ```

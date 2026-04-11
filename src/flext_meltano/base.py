@@ -62,7 +62,7 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
     def __init__(
         self,
         /,
-        config: FlextMeltanoSettings | t.ContainerMapping | None = None,
+        settings: FlextMeltanoSettings | t.ContainerMapping | None = None,
         *,
         config_type: type[p.Settings] | None = None,
         config_overrides: t.ContainerMapping | None = None,
@@ -81,17 +81,17 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
         sink_name: str | None = None,
         transformation_name: str | None = None,
     ) -> None:
-        """Accept canonical `config` input and map it to service overrides."""
+        """Accept canonical `settings` input and map it to service overrides."""
         normalized_overrides = config_overrides
-        if normalized_overrides is None and config is not None:
+        if normalized_overrides is None and settings is not None:
             normalized_overrides = (
-                config.model_dump()
-                if isinstance(config, FlextMeltanoSettings)
-                else {str(key): value for key, value in config.items()}
+                settings.model_dump()
+                if isinstance(settings, FlextMeltanoSettings)
+                else {str(key): value for key, value in settings.items()}
             )
         super().__init__(
-            config_type=config_type,
-            config_overrides=normalized_overrides,
+            settings_type=config_type,
+            settings_overrides=normalized_overrides,
             initial_context=initial_context,
         )
         if service_name is not None:
@@ -109,9 +109,9 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
     @override
     def settings(self) -> FlextMeltanoSettings:
         """Return the typed Meltano settings namespace."""
-        config = self.config
-        if isinstance(config, FlextMeltanoSettings):
-            return config
+        settings = self.settings
+        if isinstance(settings, FlextMeltanoSettings):
+            return settings
         empty_overrides: t.MutableContainerMapping = {}
         normalized_overrides: t.MutableContainerMapping = (
             {str(key): value for key, value in self.config_overrides.items()}

@@ -17,7 +17,7 @@ class _StreamInfo:
 
 class _SuccessfulTap:
     def __init__(self) -> None:
-        self.config = {"tap": "ok"}
+        self.settings = {"tap": "ok"}
         self.synced = False
 
     @classmethod
@@ -49,7 +49,7 @@ class TestFlextMeltanoSingerSdkAdapter:
     def test_adapter_exposes_config_and_streams(self) -> None:
         """The adapter preserves the internal tap runtime contract."""
         adapter = FlextMeltanoSingerTapAdapter(_SuccessfulTap())
-        assert adapter.config == {"tap": "ok"}
+        assert adapter.settings == {"tap": "ok"}
         assert [stream.name for stream in adapter.discover_streams()] == ["users"]
 
     def test_adapter_delegates_sync(self) -> None:

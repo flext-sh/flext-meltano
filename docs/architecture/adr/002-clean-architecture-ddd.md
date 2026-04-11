@@ -73,7 +73,7 @@ def test_pipeline_validation():
 ```python
 # Adapter pattern allows external system changes
 class MeltanoAdapter:
-    def run_tap(self, config) -> r[TapResult]:
+    def run_tap(self, settings) -> r[TapResult]:
         # Implementation can change without affecting callers
 ```
 
@@ -166,7 +166,7 @@ src/flext_meltano/
 ├── services.py               # 🎯 Application Layer - Use cases
 ├── adapters.py               # 🔌 Infrastructure Layer - External integrations
 ├── models.py                 # 📦 Domain Layer - Business entities
-├── config.py                 # ⚙️ Infrastructure Layer - Configuration
+├── settings.py                 # ⚙️ Infrastructure Layer - Configuration
 ├── exceptions.py             # 🚨 Domain Layer - Business errors
 └── __init__.py               # 🚪 API Layer - Public interface
 ```
@@ -177,16 +177,16 @@ src/flext_meltano/
 
 ```python
 # api.py
-def create_pipeline(config: dict) -> r[Pipeline]:
-    return FlextMeltanoService().create_pipeline(config)
+def create_pipeline(settings: dict) -> r[Pipeline]:
+    return FlextMeltanoService().create_pipeline(settings)
 ```
 
 **Application Layer → Domain Layer**
 
 ```python
 # services.py
-def create_pipeline(self, config: dict) -> r[Pipeline]:
-    validated_config = self.config_validator.validate(config)
+def create_pipeline(self, settings: dict) -> r[Pipeline]:
+    validated_config = self.config_validator.validate(settings)
     return validated_config.map(lambda cfg: Pipeline.create(cfg))
 ```
 
@@ -212,7 +212,7 @@ class FlextMeltanoService:
         # Use injected dependencies
         return (
             self.config_validator
-            .validate(pipeline.config)
+            .validate(pipeline.settings)
             .flat_map(lambda _: self.meltano_adapter.run_pipeline(pipeline))
             .flat_map(lambda result: self.dbt_adapter.run_transformations(result))
         )

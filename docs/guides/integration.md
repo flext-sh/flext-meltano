@@ -83,13 +83,13 @@ class FlextOracleTapService(s):
         super().__init__()
         self._tap_abstractions = FlextMeltanoTapAbstractions()
 
-    def discover_oracle_streams(self, config: dict) -> r[Sequence[StreamDefinition]]:
+    def discover_oracle_streams(self, settings: dict) -> r[Sequence[StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
         return self._tap_abstractions.discover_catalog("tap-oracle")
 
-    def extract_oracle_data(self, stream: str, config: dict) -> r[list]:
+    def extract_oracle_data(self, stream: str, settings: dict) -> r[list]:
         """Extract data using flext-meltano abstractions."""
-        return self._tap_abstractions.extract_data("tap-oracle", config)
+        return self._tap_abstractions.extract_data("tap-oracle", settings)
 ```
 
 ### Target Implementation Pattern
@@ -128,7 +128,7 @@ class FlextOracleTargetService(s):
         super().__init__()
         self._target_abstractions = FlextMeltanoTargetAbstractions()
 
-    def load_to_oracle(self, records: list, config: dict) -> r[t.Dict]:
+    def load_to_oracle(self, records: list, settings: dict) -> r[t.Dict]:
         """Load records to Oracle using flext-meltano abstractions."""
         return self._target_abstractions.load_data("target-oracle", records)
 ```
@@ -428,7 +428,7 @@ container.register("target_abstractions", FlextMeltanoTargetAbstractions)
 from flext_meltano import FlextMeltanoSettingsBuilders
 
 builder = FlextMeltanoSettingsBuilders()
-config = builder.build_pipeline_config(tap_settings, target_settings)
+settings = builder.build_pipeline_config(tap_settings, target_settings)
 ```
 
 **3. Error Handling**:

@@ -16,8 +16,8 @@ if _t.TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
 
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
-    from flext_meltano._constants.config import FlextMeltanoConstantsSettings
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+    from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
     from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
     from flext_meltano._models.context import FlextMeltanoModelsContext
     from flext_meltano._models.core import FlextMeltanoModelsCore
@@ -93,15 +93,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from flext_meltano.services.singer_sdk import (
-        Context,
-        FlextMeltanoSingerTapAdapter,
-        Record,
-        Sink,
-        Stream,
-        Tap,
-        Target,
-    )
+    from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
     from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
     from flext_meltano.services.singer_tap import (
         FlextMeltanoTapAbstractions,
@@ -190,7 +182,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__ = [
-    "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",
@@ -265,11 +256,6 @@ __all__ = [
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoValidators",
-    "Record",
-    "Sink",
-    "Stream",
-    "Tap",
-    "Target",
     "__author__",
     "__author_email__",
     "__description__",

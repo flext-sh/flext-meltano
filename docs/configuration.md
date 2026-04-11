@@ -156,8 +156,8 @@ from flext_core import s
 from flext_core import t
 from flext_core import u
 
-config = FlextMeltanoSettings()
-validation_result: r[bool] = config.validate_meltano_config()
+settings = FlextMeltanoSettings()
+validation_result: r[bool] = settings.validate_meltano_config()
 
 if validation_result.is_success:
     print("Meltano configuration is valid")
@@ -343,7 +343,7 @@ ______________________________________________________________________
 # meltano.yml - development settings
 environments:
   - name: dev
-    config:
+    settings:
       plugins:
         extractors:
           - name: tap-csv
@@ -363,7 +363,7 @@ environments:
 # meltano.yml - production settings
 environments:
   - name: prod
-    config:
+    settings:
       plugins:
         extractors:
           - name: tap-csv
@@ -382,13 +382,13 @@ environments:
 ```python
 from flext_meltano import FlextMeltanoSettings
 
-config = FlextMeltanoSettings()
+settings = FlextMeltanoSettings()
 
 # Load development configuration
-dev_config = config.load_configuration("dev")
+dev_config = settings.load_configuration("dev")
 
 # Load production configuration
-prod_config = config.load_configuration("prod")
+prod_config = settings.load_configuration("prod")
 ```
 
 ______________________________________________________________________

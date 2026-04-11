@@ -162,7 +162,7 @@ tap_info = registry.find_plugin("tap-gitlab")
 │ 🔧 Plugin Management Services       │ ← Programmatic APIs
 │ 📦 Singer Protocol Implementation   │ ← Direct protocol handling
 │ 🚀 Pipeline Orchestration           │ ← Service-based execution
-│ 📁 Generic Configuration           │ ← Abstracted config management
+│ 📁 Generic Configuration           │ ← Abstracted settings management
 └─────────────────────────────────────┘
          ↓
 ┌─────────────────────────────────────┐
@@ -187,9 +187,9 @@ plugins = service.discover_plugins()
 result = service.install_plugin("tap-gitlab")
 
 # Pipeline execution (protocol-based)
-tap_result = service.execute_tap("tap-gitlab", config={"api_url": "..."})
+tap_result = service.execute_tap("tap-gitlab", settings={"api_url": "..."})
 target_result = service.execute_target(
-    "target-postgres", records, config={"host": "..."}
+    "target-postgres", records, settings={"host": "..."}
 )
 ```
 
@@ -204,7 +204,7 @@ registry = plugin_service.get_plugin_registry()
 
 # Direct plugin operations
 tap_plugin = registry.load_plugin("tap-gitlab")
-config = tap_plugin.validate_configuration(user_config)
+settings = tap_plugin.validate_configuration(user_config)
 ```
 
 #### FlextSingerService (Protocol Implementation)
@@ -214,7 +214,7 @@ config = tap_plugin.validate_configuration(user_config)
 ```python
 # Protocol-based execution
 singer_service = FlextSingerService()
-tap = singer_service.create_tap("tap-gitlab", config)
+tap = singer_service.create_tap("tap-gitlab", settings)
 catalog = tap.discover()
 sync_result = tap.sync(selected_streams)
 ```
@@ -266,7 +266,7 @@ def install_plugin(
 ```python
 def execute_tap(
     tap_name: str,
-    config: t.Dict,
+    settings: t.Dict,
     state: t.Dict | None = None,
     streams: t.StringList | None = None,
 ) -> r[TapExecutionResult]:
@@ -274,7 +274,7 @@ def execute_tap(
 
     Args:
         tap_name: Name of the tap to execute
-        config: Tap configuration dictionary
+        settings: Tap configuration dictionary
         state: Initial state for incremental sync
         streams: Specific streams to sync
 
@@ -287,14 +287,14 @@ def execute_tap(
 
 ```python
 def execute_target(
-    target_name: str, records: Sequence[t.Dict], config: t.Dict
+    target_name: str, records: Sequence[t.Dict], settings: t.Dict
 ) -> r[TargetExecutionResult]:
     """Execute Singer target with records.
 
     Args:
         target_name: Name of the target to execute
         records: Records to load into the target
-        config: Target configuration dictionary
+        settings: Target configuration dictionary
 
     Returns:
         Execution result with load statistics
@@ -306,11 +306,11 @@ def execute_target(
 #### Pipeline Configuration API
 
 ```python
-def create_pipeline(config: PipelineConfig) -> r[Pipeline]:
+def create_pipeline(settings: PipelineConfig) -> r[Pipeline]:
     """Create pipeline configuration.
 
     Args:
-        config: Pipeline configuration with tap/target/transformer
+        settings: Pipeline configuration with tap/target/transformer
 
     Returns:
         Configured pipeline ready for execution

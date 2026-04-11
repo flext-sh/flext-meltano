@@ -29,7 +29,7 @@ class FlextMeltanoUtilities(FlextInfraUtilities):
         """Meltano domain utility methods.
 
         Includes Singer protocol utilities (message emission, stdin
-        processing, catalog construction) alongside config, project,
+        processing, catalog construction) alongside settings, project,
         and YAML utilities.
         """
 

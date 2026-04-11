@@ -19,7 +19,7 @@ class FlextMeltanoModelsInstances:
 
         sink_name: Annotated[str, Field(description="Name of the sink")]
         sink_type: Annotated[str, Field(description="Type of the sink")]
-        config: Annotated[
+        settings: Annotated[
             t.ConfigurationMapping, Field(description="Sink configuration")
         ] = Field(default_factory=dict, description="Sink configuration")
         sink_schema: Annotated[
@@ -34,8 +34,8 @@ class FlextMeltanoModelsInstances:
 
         @computed_field
         def config_keys_count(self) -> int:
-            """Number of config keys."""
-            return u.count(list(self.config.keys()))
+            """Number of settings keys."""
+            return u.count(list(self.settings.keys()))
 
         @model_validator(mode="after")
         def validate_sink_definition(self) -> Self:
@@ -133,7 +133,7 @@ class FlextMeltanoModelsInstances:
             str | None, Field(default=None, description="Unique tap identifier")
         ] = None
         tap_type: Annotated[str, Field(description="Type of the tap")]
-        config: Annotated[
+        settings: Annotated[
             FlextMeltanoModelsSources.TapConfig, Field(description="Tap configuration")
         ]
         adapter: Annotated[

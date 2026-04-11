@@ -32,7 +32,7 @@ class FlextMeltanoProtocolsPlugin:
             """Get plugin configuration."""
             ...
 
-        def validate_config(self, config: t.ConfigurationMapping) -> bool:
+        def validate_config(self, settings: t.ConfigurationMapping) -> bool:
             """Validate plugin configuration. # INTERFACE."""
             ...
 

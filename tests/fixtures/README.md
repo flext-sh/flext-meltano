@@ -359,7 +359,7 @@ def documented_fixture() -> Iterator[str]:
 
 ```python
 # Fixture registration and discovery
-def pytest_configure(config):
+def pytest_configure(settings):
     """Register custom fixtures."""
     # Automatically discover fixtures in fixtures/ directory
     fixture_modules = discover_fixture_modules("tests/fixtures")
@@ -399,10 +399,10 @@ def test_csv_processing(sample_users_csv):
 # Using configuration fixtures
 def test_meltano_integration(meltano_test_project, flext_meltano_config):
     """Test Meltano integration with fixtures."""
-    config = flext_meltano_config
-    config.project_root = str(meltano_test_project)
+    settings = flext_meltano_config
+    settings.project_root = str(meltano_test_project)
 
-    bridge = FlextMeltanoBridge(config)
+    bridge = FlextMeltanoBridge(settings)
     result = bridge.get_version()
 
     assert result.success
@@ -424,7 +424,7 @@ def complete_test_environment(
         meltano_project=meltano_test_project,
         data_source=sample_users_csv,
         database=mock_database_connection,
-        config=flext_meltano_config,
+        settings=flext_meltano_config,
     )
 ```
 

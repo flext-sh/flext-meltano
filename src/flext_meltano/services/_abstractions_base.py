@@ -213,12 +213,12 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def get_stream_config(
         self,
-        config: m.Meltano.TapConfig,
+        settings: m.Meltano.TapConfig,
         stream_name: str,
     ) -> t.ContainerMapping:
         """Get configuration for a specific stream."""
-        if config.stream_config and stream_name in config.stream_config:
-            val = config.stream_config[stream_name]
+        if settings.stream_config and stream_name in settings.stream_config:
+            val = settings.stream_config[stream_name]
             if isinstance(val, dict):
                 return val
         return {}

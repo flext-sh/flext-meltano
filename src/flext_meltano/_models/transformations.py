@@ -21,7 +21,7 @@ class FlextMeltanoModelsTransformations:
         dbt_version: Annotated[
             str, Field(default="1.0.0", description="DBT project version")
         ] = "1.0.0"
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping, Field(description="DBT project configuration")
         ] = Field(default_factory=dict, description="DBT project configuration")
         models: Annotated[

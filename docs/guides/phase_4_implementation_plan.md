@@ -333,7 +333,7 @@ ______________________________________________________________________
 **Target Modules:**
 
 - `pipeline_service.py` - 90% → 95%
-- `config.py` - 95% → 100%
+- `settings.py` - 95% → 100%
 - `utilities.py` - 83% → 95%
 - `executors.py` - 85% → 95%
 
@@ -443,7 +443,7 @@ ______________________________________________________________________
 | `singer.py`           | 567      | 88%     | 95%     | High         | Medium   |
 | `plugin_service.py`   | 723      | 85%     | 95%     | High         | Medium   |
 | `pipeline_service.py` | 856      | 90%     | 95%     | High         | Medium   |
-| `config.py`           | 334      | 95%     | 100%    | Medium       | Low      |
+| `settings.py`           | 334      | 95%     | 100%    | Medium       | Low      |
 | `utilities.py`        | 289      | 83%     | 95%     | Medium       | Low      |
 | **Overall**           | **7212** | **87%** | **95%** | **Critical** | **High** |
 

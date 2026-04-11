@@ -1,4 +1,4 @@
-"""FLEXT Meltano config constants — logging, service, defaults, capabilities."""
+"""FLEXT Meltano settings constants — logging, service, defaults, capabilities."""
 
 from __future__ import annotations
 

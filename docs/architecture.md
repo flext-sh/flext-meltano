@@ -116,8 +116,8 @@ src/flext_meltano/
 **Settings and Environment Management**
 
 ```python
-├── config.py                # FlextMeltanoSettings (configuration management)
-├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic config)
+├── settings.py                # FlextMeltanoSettings (configuration management)
+├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic settings)
 └── utilities.py            # u (helper functions)
 ```
 
@@ -320,7 +320,7 @@ class FlextMeltanoError(Exception):
     """Base exception for all flext-meltano operations."""
 
 
-class FlextMeltanoSettingsurationError(FlextMeltanoError):
+class FlextMeltanoConfigurationError(FlextMeltanoError):
     """Configuration-related errors."""
 
 

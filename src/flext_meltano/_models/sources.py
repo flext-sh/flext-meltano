@@ -50,7 +50,7 @@ class FlextMeltanoModelsSources:
         def serialize_connection_config(
             self, value: t.ContainerMapping
         ) -> t.ContainerMapping:
-            """Serialize connection config with sensitive data protection."""
+            """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
         @model_validator(mode="after")
@@ -100,7 +100,7 @@ class FlextMeltanoModelsSources:
         def serialize_connection_config(
             self, value: t.ContainerMapping
         ) -> t.ContainerMapping:
-            """Serialize connection config with sensitive data protection."""
+            """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
         @model_validator(mode="after")
@@ -146,7 +146,7 @@ class FlextMeltanoModelsSources:
         def serialize_connection_config(
             self, value: t.ContainerMapping
         ) -> t.ContainerMapping:
-            """Serialize connection config with sensitive data protection."""
+            """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
         @model_validator(mode="after")

@@ -131,7 +131,7 @@ class FlextMeltanoSettings(FlextSettings):
         return r[Path].ok(self.project_root / self.PROJECT_FILE)
 
     def get_absolute_config_dir(self) -> r[Path]:
-        """Return absolute Meltano config directory path."""
+        """Return absolute Meltano settings directory path."""
         return r[Path].ok((self.project_root / self.config_dir).resolve())
 
     def get_absolute_logs_dir(self) -> r[Path]:

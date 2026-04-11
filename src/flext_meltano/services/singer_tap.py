@@ -34,11 +34,11 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             if isinstance(source_config, m.Meltano.DataSourceConfig):
                 source_type = source_config.source_type
                 source_id = f"{source_type}:{source_type}"
-                config = source_config
+                settings = source_config
             elif isinstance(source_config, m.Meltano.TapConfig):
                 source_type = source_config.tap_type
                 source_id = f"{source_type}:{source_type}"
-                config = m.Meltano.DataSourceConfig.model_validate({
+                settings = m.Meltano.DataSourceConfig.model_validate({
                     "source_type": source_config.tap_type,
                     "connection_config": source_config.connection_config,
                     "stream_config": source_config.stream_config or {},
@@ -47,11 +47,11 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             else:
                 source_type = source_config.tap_type
                 source_id = f"{source_type}:{source_config.tap_id}"
-                config = m.Meltano.DataSourceConfig.model_validate({
+                settings = m.Meltano.DataSourceConfig.model_validate({
                     "source_type": source_config.tap_type,
-                    "connection_config": source_config.config.connection_config,
-                    "stream_config": source_config.config.stream_config or {},
-                    "source_version": source_config.config.tap_version,
+                    "connection_config": source_config.settings.connection_config,
+                    "stream_config": source_config.settings.stream_config or {},
+                    "source_version": source_config.settings.tap_version,
                 })
             self.logger.info(
                 "Creating source instance",
@@ -60,7 +60,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             )
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
-                config=config,
+                settings=settings,
                 status=c.Meltano.OperationStatus.CONFIGURED,
                 source_id=source_id,
             )
@@ -83,17 +83,17 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     ) -> r[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""
         try:
-            config = m.Meltano.TapConfig.model_validate({
+            settings = m.Meltano.TapConfig.model_validate({
                 "tap_type": tap_type,
                 "connection_config": connection_config,
                 "stream_config": stream_config or {},
                 "tap_version": tap_version,
                 "domain_events": [],
             })
-            return self.create_source_instance(config).map(
+            return self.create_source_instance(settings).map(
                 lambda inst: m.Meltano.TapInstance(
                     tap_type=inst.source_type,
-                    config=config,
+                    settings=settings,
                     tap_id=inst.source_id,
                 ),
             )

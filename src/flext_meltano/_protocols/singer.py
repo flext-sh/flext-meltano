@@ -102,7 +102,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def config(self) -> t.ContainerMapping:
+        def settings(self) -> t.ContainerMapping:
             """Tap configuration."""
             ...
 
@@ -166,7 +166,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        config: t.ContainerMapping
+        settings: t.ContainerMapping
 
         def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.

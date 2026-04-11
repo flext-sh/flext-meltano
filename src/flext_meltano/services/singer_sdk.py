@@ -28,7 +28,7 @@ class _SingerTapSdkBackend(Protocol):
         ...
 
     @property
-    def config(self) -> t.ContainerMapping:
+    def settings(self) -> t.ContainerMapping:
         """Expose the normalized tap configuration."""
         ...
 
@@ -49,9 +49,9 @@ class FlextMeltanoSingerTapAdapter:
         self._tap = tap
 
     @property
-    def config(self) -> t.ContainerMapping:
+    def settings(self) -> t.ContainerMapping:
         """Expose the tap configuration through the internal contract."""
-        return self._tap.config
+        return self._tap.settings
 
     def run_cli(
         self,

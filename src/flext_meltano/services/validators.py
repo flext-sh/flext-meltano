@@ -18,22 +18,22 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     """Generic pipeline business rule validators using foundation."""
 
     @classmethod
-    def validate_component_rules(cls, config: t.ConfigurationMapping) -> r[bool]:
+    def validate_component_rules(cls, settings: t.ConfigurationMapping) -> r[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
-            m.Meltano.PluginComponentConfig.model_validate(config)
+            m.Meltano.PluginComponentConfig.model_validate(settings)
             return r[bool].ok(value=True)
         except ValidationError as error:
-            return r[bool].fail(f"Plugin config validation failed: {error}")
+            return r[bool].fail(f"Plugin settings validation failed: {error}")
 
     @classmethod
     def validate_pipeline_project_business_rules(
         cls,
-        config: t.ConfigurationMapping,
+        settings: t.ConfigurationMapping,
     ) -> r[bool]:
         """Validate pipeline project business rules."""
         try:
-            m.Meltano.PipelineProjectModel.model_validate(config)
+            m.Meltano.PipelineProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Project validation failed: {error}")
@@ -65,18 +65,18 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         return r[bool].ok(value=True)
 
     @classmethod
-    def validate_plugin_config(cls, config: t.ConfigurationMapping) -> r[bool]:
+    def validate_plugin_config(cls, settings: t.ConfigurationMapping) -> r[bool]:
         """Validate plugin configuration with complete business rules."""
-        return cls.validate_component_rules(config)
+        return cls.validate_component_rules(settings)
 
     @classmethod
     def validate_transformation_business_rules(
         cls,
-        config: t.ConfigurationMapping,
+        settings: t.ConfigurationMapping,
     ) -> r[bool]:
         """Validate transformation-specific business rules."""
         try:
-            m.Meltano.TransformationProjectModel.model_validate(config)
+            m.Meltano.TransformationProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
         except ValidationError as error:
             return r[bool].fail(f"Transformation validation failed: {error}")

@@ -20,17 +20,17 @@ class TestFlextMeltanoModels:
     """Canonical tests for Meltano model validation and composition."""
 
     def test_tap_config_with_minimal_data(self) -> None:
-        config = m.Meltano.TapConfig(
+        settings = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "localhost"},
         )
-        tm.that(config.tap_type, eq="tap-postgres")
-        tm.that(config.connection_config, eq={"host": "localhost"})
-        tm.that(config.stream_config, eq={})
-        tm.that(config.tap_version, eq="latest")
+        tm.that(settings.tap_type, eq="tap-postgres")
+        tm.that(settings.connection_config, eq={"host": "localhost"})
+        tm.that(settings.stream_config, eq={})
+        tm.that(settings.tap_version, eq="latest")
 
     def test_tap_config_with_full_data(self) -> None:
-        config = m.Meltano.TapConfig(
+        settings = m.Meltano.TapConfig(
             tap_type="tap-mysql",
             connection_config={
                 "host": "db.example.com",
@@ -44,11 +44,11 @@ class TestFlextMeltanoModels:
             },
             tap_version="1.0.0",
         )
-        tm.that(config.tap_type, eq="tap-mysql")
-        tm.that(config.connection_config["host"], eq="db.example.com")
-        tm.that(config.connection_config["port"], eq=3306)
-        tm.that(config.stream_config, has="users")
-        tm.that(config.tap_version, eq="1.0.0")
+        tm.that(settings.tap_type, eq="tap-mysql")
+        tm.that(settings.connection_config["host"], eq="db.example.com")
+        tm.that(settings.connection_config["port"], eq=3306)
+        tm.that(settings.stream_config, has="users")
+        tm.that(settings.tap_version, eq="1.0.0")
 
     def test_tap_config_validation_empty_tap_type(self) -> None:
         with pytest.raises(ValidationError, match="tap_type cannot be empty"):
@@ -63,14 +63,14 @@ class TestFlextMeltanoModels:
             )
 
     def test_target_config_with_minimal_data(self) -> None:
-        config = m.Meltano.TargetConfig(target_type="target-csv")
-        tm.that(config.target_type, eq="target-csv")
-        tm.that(config.connection_config, eq={})
-        tm.that(config.batch_size, none=True)
-        tm.that(config.batch_wait_limit, none=True)
+        settings = m.Meltano.TargetConfig(target_type="target-csv")
+        tm.that(settings.target_type, eq="target-csv")
+        tm.that(settings.connection_config, eq={})
+        tm.that(settings.batch_size, none=True)
+        tm.that(settings.batch_wait_limit, none=True)
 
     def test_target_config_with_full_data(self) -> None:
-        config = m.Meltano.TargetConfig(
+        settings = m.Meltano.TargetConfig(
             target_type="target-postgres",
             connection_config={
                 "host": "localhost",
@@ -82,11 +82,11 @@ class TestFlextMeltanoModels:
             batch_size=1000,
             batch_wait_limit=30.0,
         )
-        tm.that(config.target_type, eq="target-postgres")
-        tm.that(config.connection_config["database"], eq="analytics")
-        tm.that(config.batch_size, eq=1000)
-        if config.batch_wait_limit is not None:
-            tm.that(abs(config.batch_wait_limit - 30.0), lt=1e-9)
+        tm.that(settings.target_type, eq="target-postgres")
+        tm.that(settings.connection_config["database"], eq="analytics")
+        tm.that(settings.batch_size, eq=1000)
+        if settings.batch_wait_limit is not None:
+            tm.that(abs(settings.batch_wait_limit - 30.0), lt=1e-9)
 
     def test_target_config_validation_empty_target_type(self) -> None:
         with pytest.raises(ValidationError, match="target_type cannot be empty"):
@@ -213,7 +213,7 @@ class TestFlextMeltanoModels:
             executable="tap-postgres",
             capabilities=["catalog", "discover", "sync"],
             settings={"host": "string", "port": "integer"},
-            config_files=["config.json"],
+            config_files=["settings.json"],
         )
         tm.that(plugin.name, eq="tap-postgres")
         tm.that(plugin.namespace, eq="meltanolabs")
@@ -250,7 +250,7 @@ class TestFlextMeltanoModels:
         tm.that(dbt_project.name, eq="analytics")
         tm.that(dbt_project.profile, eq="default")
         tm.that(dbt_project.dbt_version, eq="1.0.0")
-        tm.that(dbt_project.config, eq={})
+        tm.that(dbt_project.settings, eq={})
         tm.that(dbt_project.models, eq={})
         tm.that(dbt_project.sources, eq={})
         tm.that(dbt_project.tests, eq={})
@@ -260,7 +260,7 @@ class TestFlextMeltanoModels:
             name="data-warehouse",
             profile="postgres",
             dbt_version="2.1.0",
-            config={"materialized": "table", "on_schema_change": "fail_safe"},
+            settings={"materialized": "table", "on_schema_change": "fail_safe"},
             models={"staging": "view"},
             sources={"raw_data": "users"},
             tests={"unit": "test_user_validity"},
@@ -268,7 +268,7 @@ class TestFlextMeltanoModels:
         tm.that(dbt_project.name, eq="data-warehouse")
         tm.that(dbt_project.profile, eq="postgres")
         tm.that(dbt_project.dbt_version, eq="2.1.0")
-        tm.that(dbt_project.config["materialized"], eq="table")
+        tm.that(dbt_project.settings["materialized"], eq="table")
         tm.that(dbt_project.models, has="staging")
         tm.that(dbt_project.sources, has="raw_data")
         tm.that(dbt_project.tests, has="unit")
@@ -287,7 +287,7 @@ class TestFlextMeltanoModels:
             m.Meltano.DbtProjectModel(
                 name="test-project",
                 profile="default",
-                config=invalid_config,
+                settings=invalid_config,
             )
 
     def test_tap_and_target_config_integration(self) -> None:

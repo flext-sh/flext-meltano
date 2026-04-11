@@ -313,17 +313,17 @@ class ConnectionPoolManager:
     def _create_pool(self, service_name: str) -> None:
         """Create connection pool for service."""
 
-        config = self.pool_configs.get(service_name)
-        if not config:
-            raise ConfigurationError(f"No pool config for {service_name}")
+        settings = self.pool_configs.get(service_name)
+        if not settings:
+            raise ConfigurationError(f"No pool settings for {service_name}")
 
         pool = ConnectionPool(
-            host=config.host,
-            port=config.port,
-            max_connections=config.max_connections,
-            min_connections=config.min_connections,
-            max_idle_time=config.max_idle_time,
-            health_check_interval=config.health_check_interval,
+            host=settings.host,
+            port=settings.port,
+            max_connections=settings.max_connections,
+            min_connections=settings.min_connections,
+            max_idle_time=settings.max_idle_time,
+            health_check_interval=settings.health_check_interval,
         )
 
         self.pools[service_name] = pool
@@ -663,7 +663,7 @@ class HorizontalScaler:
 
     def __init__(self, orchestrator_client, scaling_config: ScalingConfig):
         self.orchestrator = orchestrator_client
-        self.config = scaling_config
+        self.settings = scaling_config
         self.current_instances = {}
         self.scaling_history = []
 
@@ -673,7 +673,7 @@ class HorizontalScaler:
         actions = []
 
         # Check each service
-        for service_name, service_config in self.config.services.items():
+        for service_name, service_config in self.settings.services.items():
             current_count = self.current_instances.get(
                 service_name, service_config.min_instances
             )
@@ -713,7 +713,7 @@ class HorizontalScaler:
                     )
 
             # Queue-based scaling for workers
-            if service_name in self.config.worker_services:
+            if service_name in self.settings.worker_services:
                 queue_depth = service_metrics.queue_depth
                 if queue_depth > service_config.queue_threshold:
                     new_count = min(
@@ -790,7 +790,7 @@ class HorizontalScaler:
 
         recommendations = []
 
-        for service_name, service_config in self.config.services.items():
+        for service_name, service_config in self.settings.services.items():
             service_metrics = metrics.get_service_metrics(service_name)
 
             # Cost optimization recommendations
@@ -829,8 +829,8 @@ class DataScaler:
 
     def __init__(self, database_client, sharding_config: ShardingConfig):
         self.db = database_client
-        self.config = sharding_config
-        self.shard_manager = ShardManager(self.config)
+        self.settings = sharding_config
+        self.shard_manager = ShardManager(self.settings)
 
     def evaluate_data_scaling(self, metrics: DataMetrics) -> List[DataScalingAction]:
         """Evaluate data growth and determine scaling actions."""
@@ -839,7 +839,7 @@ class DataScaler:
 
         # Check table sizes
         for table_name, table_metrics in metrics.table_sizes.items():
-            if table_metrics.size_gb > self.config.max_table_size_gb:
+            if table_metrics.size_gb > self.settings.max_table_size_gb:
                 actions.append(
                     DataScalingAction(
                         action_type="shard_table",
@@ -851,8 +851,8 @@ class DataScaler:
 
         # Check query performance
         for query_name, query_metrics in metrics.query_performance.items():
-            if query_metrics.avg_execution_time > self.config.max_query_time_seconds:
-                if query_metrics.table_size > self.config.partition_threshold_gb:
+            if query_metrics.avg_execution_time > self.settings.max_query_time_seconds:
+                if query_metrics.table_size > self.settings.partition_threshold_gb:
                     actions.append(
                         DataScalingAction(
                             action_type="add_partition",
@@ -864,7 +864,7 @@ class DataScaler:
 
         # Check read/write ratios
         for table_name, rw_metrics in metrics.read_write_ratios.items():
-            if rw_metrics.read_ratio > self.config.read_replica_threshold:
+            if rw_metrics.read_ratio > self.settings.read_replica_threshold:
                 actions.append(
                     DataScalingAction(
                         action_type="add_read_replica",
@@ -932,7 +932,7 @@ class DataScaler:
         access_patterns = self.db.get_access_patterns(table_name)
 
         # Base calculation on data size
-        base_shards = max(2, table_size // self.config.shard_size_gb)
+        base_shards = max(2, table_size // self.settings.shard_size_gb)
 
         # Adjust for access patterns
         if access_patterns.is_write_heavy:
@@ -942,7 +942,7 @@ class DataScaler:
             # More shards for read-heavy workloads
             shard_count = base_shards * 2
 
-        return min(shard_count, self.config.max_shards_per_table)
+        return min(shard_count, self.settings.max_shards_per_table)
 ```
 
 #### 3. Functional Scaling
@@ -1719,7 +1719,7 @@ class AvailabilityManager:
 
     def __init__(self, orchestrator_client, availability_config: AvailabilityConfig):
         self.orchestrator = orchestrator_client
-        self.config = availability_config
+        self.settings = availability_config
         self.current_primary_zone = None
         self.health_monitor = HealthMonitor()
 
@@ -1733,7 +1733,7 @@ class AvailabilityManager:
             try:
                 # Deploy to zone
                 zone_deployment = self.orchestrator.deploy_to_zone(
-                    service_name, zone, self.config.instance_count_per_zone
+                    service_name, zone, self.settings.instance_count_per_zone
                 )
 
                 deployment_result.zone_deployments[zone] = zone_deployment
@@ -1763,7 +1763,7 @@ class AvailabilityManager:
         zone_statuses = {}
         overall_healthy = True
 
-        for service_name in self.config.monitored_services:
+        for service_name in self.settings.monitored_services:
             service_zones = self._get_service_zones(service_name)
             service_healthy = True
 
@@ -1858,7 +1858,7 @@ class AvailabilityManager:
 
         uptime_data = {}
 
-        for service_name in self.config.monitored_services:
+        for service_name in self.settings.monitored_services:
             service_zones = self._get_service_zones(service_name)
 
             # Get health check data for last 30 days
@@ -1880,7 +1880,7 @@ class AvailabilityManager:
 
         mttr_data = {}
 
-        for service_name in self.config.monitored_services:
+        for service_name in self.settings.monitored_services:
             # Get incident data for last 90 days
             incidents = self._get_incident_history(service_name, days=90)
 
@@ -1906,7 +1906,7 @@ class AvailabilityManager:
         sla_compliance = {}
 
         for service_name, uptime_percentage in uptime_metrics.items():
-            target_sla = self.config.service_slas.get(service_name, 99.9)
+            target_sla = self.settings.service_slas.get(service_name, 99.9)
             sla_compliance[service_name] = uptime_percentage >= target_sla
 
         return sla_compliance
@@ -1936,7 +1936,7 @@ class AvailabilityManager:
         high_mttr_services = [
             service
             for service, mttr in mttr_metrics.items()
-            if mttr > self.config.target_mttr_seconds
+            if mttr > self.settings.target_mttr_seconds
         ]
 
         if high_mttr_services:
@@ -2404,8 +2404,8 @@ end note
 class QualityGate:
     """Automated quality gates for code commits."""
 
-    def __init__(self, config: QualityConfig):
-        self.config = config
+    def __init__(self, settings: QualityConfig):
+        self.settings = settings
         self.checks = {
             "linting": self._check_linting,
             "type_checking": self._check_type_safety,
@@ -3162,7 +3162,7 @@ class APIHelpSystem:
                     "description": "Source connector configuration",
                     "properties": {
                         "name": "tap-postgres",
-                        "config": {"host": "localhost", "database": "mydb"},
+                        "settings": {"host": "localhost", "database": "mydb"},
                     },
                 },
                 "target": {
@@ -3189,7 +3189,7 @@ class APIHelpSystem:
                     "name": "postgres-to-snowflake",
                     "tap": {
                         "name": "tap-postgres",
-                        "config": {
+                        "settings": {
                             "host": "postgres.example.com",
                             "database": "analytics",
                             "user": "pipeline_user",
@@ -3198,7 +3198,7 @@ class APIHelpSystem:
                     },
                     "target": {
                         "name": "target-snowflake",
-                        "config": {
+                        "settings": {
                             "account": "company.snowflakecomputing.com",
                             "warehouse": "ANALYTICS_WH",
                             "database": "ANALYTICS_DB",
@@ -3440,8 +3440,8 @@ class TestDataBuilder:
         self.data["name"] = name
         return self
 
-    def with_config(self, config: Dict[str, t.NormalizedValue]) -> "TestDataBuilder":
-        self.data["config"] = config
+    def with_config(self, settings: Dict[str, t.NormalizedValue]) -> "TestDataBuilder":
+        self.data["settings"] = settings
         return self
 
     def with_tags(self, *tags: str) -> "TestDataBuilder":
@@ -3551,17 +3551,17 @@ class PropertyBasedTests:
 
     @given(
         name=st.text(min_size=1, max_size=100),
-        config=st.dictionaries(
+        settings=st.dictionaries(
             keys=st.text(), values=st.one_of(st.text(), st.integers(), st.booleans())
         ),
     )
     def test_pipeline_creation_properties(
-        self, name: str, config: Dict[str, t.NormalizedValue]
+        self, name: str, settings: Dict[str, t.NormalizedValue]
     ):
         """Property-based test for pipeline creation."""
 
-        # Given any valid name and config
-        request = PipelineCreateRequest(name=name, config=config)
+        # Given any valid name and settings
+        request = PipelineCreateRequest(name=name, settings=settings)
 
         # When creating pipeline
         result = self.service.create_pipeline(request)
@@ -3570,7 +3570,7 @@ class PropertyBasedTests:
         if result.is_success:
             pipeline = result.unwrap()
             assert pipeline.name == name
-            assert pipeline.config == config
+            assert pipeline.settings == settings
         else:
             # Must be a validation error
             assert isinstance(result.error, ValidationError)

@@ -126,7 +126,7 @@ System_Boundary(flext_meltano, "FLEXT-Meltano Platform") {
     Container(service, "Service Layer", "Python", "Business logic, orchestration, error handling")
     Container(adapter, "Adapter Layer", "Python", "External system integration (Meltano, DBT, Singer)")
     Container(model, "Domain Model", "Python/Pydantic", "Data models, validation, business entities")
-    Container(config, "Configuration", "Python/YAML", "Configuration management, environment settings")
+    Container(settings, "Configuration", "Python/YAML", "Configuration management, environment settings")
     ContainerDb(state_store, "State Store", "File System/SQLite", "Pipeline state, bookmarks, execution history")
 }
 
@@ -140,7 +140,7 @@ Rel(user, api, "Uses", "HTTP/REST, Python API")
 Rel(api, service, "Orchestrates", "Method calls")
 Rel(service, adapter, "Integrates", "Method calls")
 Rel(service, model, "Validates", "Data binding")
-Rel(service, config, "Configures", "Configuration access")
+Rel(service, settings, "Configures", "Configuration access")
 
 Rel(adapter, meltano_cli, "Executes", "Subprocess calls")
 Rel(adapter, dbt_cli, "Orchestrates", "Subprocess calls")
@@ -337,7 +337,7 @@ end note
 | Class                    | Purpose                  | Key Methods                           | Dependencies                |
 | ------------------------ | ------------------------ | ------------------------------------- | --------------------------- |
 | **FlextMeltano**         | Main API facade          | Unified public interface              | All service classes         |
-| **FlextMeltanoService**  | Core business logic      | Plugin management, pipeline execution | Adapters, models, config    |
+| **FlextMeltanoService**  | Core business logic      | Plugin management, pipeline execution | Adapters, models, settings    |
 | **FlextMeltanoAdapter**  | Meltano integration      | CLI operations, project management    | Meltano CLI, file system    |
 | **FlextMeltanoExecutor** | Pipeline orchestration   | Tap/target execution, monitoring      | Singer service, DBT service |
 | **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |

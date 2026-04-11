@@ -76,7 +76,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, config: t.ContainerMapping | None = None
+        environment_name: str, settings: t.ContainerMapping | None = None
     ) -> r[t.ContainerMapping]:
         """Configure environment."""
         if not environment_name:
@@ -90,7 +90,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         return r[t.ContainerMapping].ok({
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "environment": environment_name,
-            "configuration": config or {},
+            "configuration": settings or {},
         })
 
     @staticmethod
@@ -110,7 +110,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     def install_component(
         component_type: str,
         component_name: str,
-        config: t.ContainerMapping | None = None,
+        settings: t.ContainerMapping | None = None,
     ) -> r[t.ContainerMapping]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
@@ -123,13 +123,13 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,
             "component_type": component_type,
-            "configuration": config or {},
+            "configuration": settings or {},
         })
 
     @staticmethod
-    def validate_service_config(config: t.ContainerMapping) -> r[bool]:
+    def validate_service_config(settings: t.ContainerMapping) -> r[bool]:
         """Validate service configuration dictionary."""
-        if not u.guard(config, dict):
+        if not u.guard(settings, dict):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(value=True)
 

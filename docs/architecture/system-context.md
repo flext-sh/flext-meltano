@@ -336,8 +336,8 @@ class MeltanoAdapter:
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap implementation with ecosystem integration."""
 
-    def __init__(self, config: t.ContainerMapping = None, **kwargs):
-        super().__init__(config, **kwargs)
+    def __init__(self, settings: t.ContainerMapping = None, **kwargs):
+        super().__init__(settings, **kwargs)
         # FLEXT logging integration
         self.logger = FlextLogger.get_logger(self.__class__.__name__)
 
@@ -364,7 +364,7 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
         """Run tap with FLEXT state management."""
         try:
             # FLEXT state initialization
-            state_manager = FlextMeltanoStateManager(self.config)
+            state_manager = FlextMeltanoStateManager(self.settings)
 
             # Run with state tracking
             with state_manager.state_context():

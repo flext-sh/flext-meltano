@@ -1,4 +1,4 @@
-"""FLEXT Meltano models - Data source and sink instance and config models."""
+"""FLEXT Meltano models - Data source and sink instance and settings models."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from flext_meltano import (
 
 
 class FlextMeltanoModelsInstancesData:
-    """Data source and sink instance and config models."""
+    """Data source and sink instance and settings models."""
 
     class DataSinkConfig(m.Entity):
         """Generic data sink configuration with validation."""
@@ -71,7 +71,7 @@ class FlextMeltanoModelsInstancesData:
         def serialize_connection_config(
             self, value: t.ContainerMapping
         ) -> t.ContainerMapping:
-            """Serialize connection config with sensitive data protection."""
+            """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
         @model_validator(mode="after")
@@ -90,7 +90,7 @@ class FlextMeltanoModelsInstancesData:
         """Generic data source instance for pipeline operations."""
 
         source_type: Annotated[str, Field(description="Type of the data source")]
-        config: Annotated[
+        settings: Annotated[
             FlextMeltanoModelsSources.DataSourceConfig,
             Field(description="Source configuration"),
         ]
@@ -158,8 +158,8 @@ class FlextMeltanoModelsInstancesData:
         @model_validator(mode="after")
         def validate_source_instance(self) -> Self:
             """Validate source instance consistency."""
-            if self.config.source_type != self.source_type:
-                msg = "Source type must match between instance and config"
+            if self.settings.source_type != self.source_type:
+                msg = "Source type must match between instance and settings"
                 raise ValueError(msg)
             if self.discovered and not self.streams:
                 msg = "Discovered source must have at least one stream"
@@ -173,7 +173,7 @@ class FlextMeltanoModelsInstancesData:
             str | None, Field(default=None, description="Unique sink identifier")
         ] = None
         sink_type: Annotated[str, Field(description="Type of the data sink")]
-        config: FlextMeltanoModelsInstancesData.DataSinkConfig = Field(
+        settings: FlextMeltanoModelsInstancesData.DataSinkConfig = Field(
             description="Sink configuration"
         )
         adapter: Annotated[

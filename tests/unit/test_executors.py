@@ -38,8 +38,8 @@ class TestFlextMeltanoExecutorComplete:
     def test_executor_with_custom_project_root(self) -> None:
         """Test executor with custom configuration."""
         with tempfile.TemporaryDirectory() as temp_dir:
-            config = {"project_root": temp_dir}
-            executor = FlextMeltanoExecutor(config_overrides=config)
+            settings = {"project_root": temp_dir}
+            executor = FlextMeltanoExecutor(config_overrides=settings)
             assert executor is not None
 
     def test_run_command_no_args(self) -> None:
@@ -140,7 +140,7 @@ class TestFlextMeltanoExecutorComplete:
         assert isinstance(result, r)
 
     def test_execute_method(self) -> None:
-        """Test execute method returns executor config."""
+        """Test execute method returns executor settings."""
         result = self.executor.execute()
         assert isinstance(result, r)
         assert result.success

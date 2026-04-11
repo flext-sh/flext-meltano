@@ -150,7 +150,7 @@ def test_custom_tap_extension():
 
     # Initialize custom extension
     custom_tap = CustomTapExtension(
-        config={
+        settings={
             "source_system": "enterprise_erp",
             "api_endpoint": "https://erp.company.com/api",
         }
@@ -253,7 +253,7 @@ def custom_tap_configuration():
     """Custom tap configuration fixture."""
     return {
         "tap_name": "tap-enterprise-erp",
-        "config": {
+        "settings": {
             "api_url": "https://test-erp.company.com/api",
             "batch_size": 1000,
             "timeout": 30,
@@ -292,9 +292,9 @@ from flext_meltano import FlextMeltanoBase
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
 
-    def __init__(self, config: t.Dict) -> None:
+    def __init__(self, settings: t.Dict) -> None:
         """Initialize enterprise extension with configuration."""
-        super().__init__(config)
+        super().__init__(settings)
         self.validate_enterprise_config()
 
     @abstractmethod

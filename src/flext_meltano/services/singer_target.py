@@ -36,7 +36,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             sink_def = m.Meltano.DataSinkDefinition.model_validate({
                 "sink_name": f"{sink_config.sink_type}_sink",
                 "sink_type": sink_config.sink_type,
-                "config": sink_config.connection_config,
+                "settings": sink_config.connection_config,
                 "status": c.Meltano.OperationStatus.CONFIGURED,
             })
             self.logger.info(
@@ -57,14 +57,16 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
-                config: m.Meltano.DataSinkConfig = (
+                settings: m.Meltano.DataSinkConfig = (
                     m.Meltano.DataSinkConfig.model_validate(sink_config)
                 )
             except (ValueError, TypeError, KeyError, AttributeError) as e:
-                return r[m.Meltano.DataSinkInstance].fail(f"Invalid target config: {e}")
+                return r[m.Meltano.DataSinkInstance].fail(
+                    f"Invalid target settings: {e}"
+                )
         else:
-            config = sink_config
-        return self.create_sink_instance(config)
+            settings = sink_config
+        return self.create_sink_instance(settings)
 
     def create_sink_instance(
         self,
@@ -79,12 +81,12 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
             sink_instance = m.Meltano.DataSinkInstance(
                 sink_type=sink_config.sink_type,
-                config=sink_config,
+                settings=sink_config,
                 status=c.Meltano.OperationStatus.CONFIGURED,
             )
             self.logger.info(
                 "Sink instance created successfully",
-                sink_name=sink_instance.config.sink_type,
+                sink_name=sink_instance.settings.sink_type,
             )
             return r[m.Meltano.DataSinkInstance].ok(sink_instance)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:

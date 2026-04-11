@@ -39,7 +39,7 @@ class FlextMeltanoLibraryRunner(
         tap_name: str,
         target_name: str,
         dbt_models: t.StrSequence | None = None,
-        config: t.ContainerMapping | None = None,
+        settings: t.ContainerMapping | None = None,
     ) -> r[t.MutableContainerMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
@@ -49,7 +49,9 @@ class FlextMeltanoLibraryRunner(
                 target_name=target_name,
                 dbt_models=str(dbt_models or []),
             )
-            result = self._elt_executor.execute_pipeline(tap_name, target_name, config)
+            result = self._elt_executor.execute_pipeline(
+                tap_name, target_name, settings
+            )
             if result.failure:
                 return r[t.MutableContainerMapping].fail(
                     result.error or "EL pipeline execution failed",
@@ -101,7 +103,7 @@ class FlextMeltanoLibraryRunner(
         self,
         tap: p.Meltano.SingerTap,
         target: p.Meltano.SingerTarget,
-        config: t.ContainerMapping | None = None,
+        settings: t.ContainerMapping | None = None,
     ) -> r[t.MutableContainerMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:
@@ -110,7 +112,9 @@ class FlextMeltanoLibraryRunner(
                 tap_name=tap.name,
                 target_name=target.name,
             )
-            result = self._elt_executor.execute_pipeline(tap.name, target.name, config)
+            result = self._elt_executor.execute_pipeline(
+                tap.name, target.name, settings
+            )
             if result.failure:
                 return r[t.MutableContainerMapping].fail(
                     result.error or "Pipeline execution failed",

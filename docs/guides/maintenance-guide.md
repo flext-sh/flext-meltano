@@ -313,7 +313,7 @@ Configure automatic quality checks:
 # Start continuous monitoring
 make docs
 
-# Runs according to config schedule (default: weekly Mondays 09:00 UTC)
+# Runs according to settings schedule (default: weekly Mondays 09:00 UTC)
 ```
 
 ### Pre-commit Hooks
@@ -393,7 +393,7 @@ file docs/some_file.md  # Should be UTF-8
 # Check network connectivity
 curl -I https://example.com
 
-# Update timeout settings in config
+# Update timeout settings in settings
 # docs/.maintenance_config.yaml
 link_validation_timeout: 15  # Increase timeout
 

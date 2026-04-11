@@ -1,4 +1,4 @@
-"""FLEXT Meltano models - Singer catalog and pipeline config models."""
+"""FLEXT Meltano models - Singer catalog and pipeline settings models."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from flext_meltano import t
 
 
 class FlextMeltanoModelsSingerCatalog:
-    """Singer catalog, pipeline config, and sync result models."""
+    """Singer catalog, pipeline settings, and sync result models."""
 
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""

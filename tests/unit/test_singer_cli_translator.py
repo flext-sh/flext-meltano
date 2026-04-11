@@ -50,12 +50,14 @@ class TestFlextMeltanoSingerCliTranslator:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(
             m.Meltano.CliDataSourceParams(
                 source_name="tap-postgres",
-                config_file="/path/to/config.json",
+                config_file="/path/to/settings.json",
                 discover=False,
             ),
         )
         tm.ok(result)
-        tm.that(result.value, eq=["tap-postgres", "--config", "/path/to/config.json"])
+        tm.that(
+            result.value, eq=["tap-postgres", "--settings", "/path/to/settings.json"]
+        )
 
     def test_translate_tap_run_with_catalog(self) -> None:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(
@@ -83,7 +85,7 @@ class TestFlextMeltanoSingerCliTranslator:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(
             m.Meltano.CliDataSourceParams(
                 source_name="tap-postgres",
-                config_file="/path/to/config.json",
+                config_file="/path/to/settings.json",
                 catalog_file="/path/to/catalog.json",
                 state_file="/path/to/state.json",
                 discover=False,
@@ -91,7 +93,7 @@ class TestFlextMeltanoSingerCliTranslator:
         )
         tm.ok(result)
         tm.that(result.value, has="tap-postgres")
-        tm.that(result.value, has="--config")
+        tm.that(result.value, has="--settings")
         tm.that(result.value, has="--catalog")
         tm.that(result.value, has="--state")
 
@@ -99,7 +101,7 @@ class TestFlextMeltanoSingerCliTranslator:
         result = FlextMeltanoSingerCliTranslator.translate_tap_run(
             m.Meltano.CliDataSourceParams(
                 source_name="tap-postgres",
-                config_file="/path/to/config.json",
+                config_file="/path/to/settings.json",
                 catalog_file="/path/to/catalog.json",
                 discover=True,
             ),
@@ -118,12 +120,12 @@ class TestFlextMeltanoSingerCliTranslator:
         result = FlextMeltanoSingerCliTranslator.translate_target_run(
             m.Meltano.CliDataSinkParams(
                 sink_name="target-postgres",
-                config_file="/path/to/config.json",
+                config_file="/path/to/settings.json",
             ),
         )
         tm.ok(result)
         tm.that(
-            result.value, eq=["target-postgres", "--config", "/path/to/config.json"]
+            result.value, eq=["target-postgres", "--settings", "/path/to/settings.json"]
         )
 
     def test_translate_target_run_with_input(self) -> None:
@@ -140,7 +142,7 @@ class TestFlextMeltanoSingerCliTranslator:
         result = FlextMeltanoSingerCliTranslator.translate_target_run(
             m.Meltano.CliDataSinkParams(
                 sink_name="target-postgres",
-                config_file="/path/to/config.json",
+                config_file="/path/to/settings.json",
                 input_file="/path/to/input.jsonl",
             ),
         )
@@ -149,8 +151,8 @@ class TestFlextMeltanoSingerCliTranslator:
             result.value,
             eq=[
                 "target-postgres",
-                "--config",
-                "/path/to/config.json",
+                "--settings",
+                "/path/to/settings.json",
                 "--input",
                 "/path/to/input.jsonl",
             ],
@@ -173,13 +175,14 @@ class TestFlextMeltanoSingerCliTranslator:
             m.Meltano.CliPipelineParams(
                 source_name="tap-postgres",
                 sink_name="target-postgres",
-                source_config="/path/to/tap-config.json",
+                source_config="/path/to/tap-settings.json",
             ),
         )
         tm.ok(result)
         source_command, sink_command = result.value
         tm.that(
-            source_command, eq=["tap-postgres", "--config", "/path/to/tap-config.json"]
+            source_command,
+            eq=["tap-postgres", "--settings", "/path/to/tap-settings.json"],
         )
         tm.that(sink_command, eq=["target-postgres"])
 
@@ -188,7 +191,7 @@ class TestFlextMeltanoSingerCliTranslator:
             m.Meltano.CliPipelineParams(
                 source_name="tap-postgres",
                 sink_name="target-postgres",
-                sink_config="/path/to/target-config.json",
+                sink_config="/path/to/target-settings.json",
             ),
         )
         tm.ok(result)
@@ -196,7 +199,7 @@ class TestFlextMeltanoSingerCliTranslator:
         tm.that(source_command, eq=["tap-postgres"])
         tm.that(
             sink_command,
-            eq=["target-postgres", "--config", "/path/to/target-config.json"],
+            eq=["target-postgres", "--settings", "/path/to/target-settings.json"],
         )
 
     def test_translate_pipeline_run_with_catalog(self) -> None:
@@ -232,8 +235,8 @@ class TestFlextMeltanoSingerCliTranslator:
             m.Meltano.CliPipelineParams(
                 source_name="tap-postgres",
                 sink_name="target-postgres",
-                source_config="/path/to/tap-config.json",
-                sink_config="/path/to/target-config.json",
+                source_config="/path/to/tap-settings.json",
+                sink_config="/path/to/target-settings.json",
                 catalog_file="/path/to/catalog.json",
                 state_file="/path/to/state.json",
             ),
@@ -244,8 +247,8 @@ class TestFlextMeltanoSingerCliTranslator:
             source_command,
             eq=[
                 "tap-postgres",
-                "--config",
-                "/path/to/tap-config.json",
+                "--settings",
+                "/path/to/tap-settings.json",
                 "--catalog",
                 "/path/to/catalog.json",
                 "--state",
@@ -254,7 +257,7 @@ class TestFlextMeltanoSingerCliTranslator:
         )
         tm.that(
             sink_command,
-            eq=["target-postgres", "--config", "/path/to/target-config.json"],
+            eq=["target-postgres", "--settings", "/path/to/target-settings.json"],
         )
 
     def test_translate_dbt_run_minimal(self) -> None:
@@ -381,7 +384,7 @@ class TestFlextMeltanoSingerCliTranslator:
             ),
         )
         result = FlextMeltanoSingerCliTranslator.execute_singer_command(
-            ["tap-postgres", "--config", "config.json"],
+            ["tap-postgres", "--settings", "settings.json"],
         )
         tm.ok(result)
         output = result.value

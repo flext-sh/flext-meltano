@@ -3,7 +3,7 @@
 Provides Singer tap lifecycle via MRO: CLI dispatch, stream discovery,
 sync execution, and connection management. Consumer taps subclass
 ``singer_sdk.Tap`` (required by Singer SDK) — this base wraps the tap
-instance with FLEXT service patterns (``r[T]``, typed config, lifecycle).
+instance with FLEXT service patterns (``r[T]``, typed settings, lifecycle).
 
 Consumer projects inherit this and override ``create_tap_instance()`` only.
 
@@ -55,7 +55,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     @abstractmethod
     def create_tap_instance(
         self,
-        config: t.ContainerMapping | None = None,
+        settings: t.ContainerMapping | None = None,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 

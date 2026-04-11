@@ -81,7 +81,7 @@ tap --> orchestrator: stream metadata & schemas
 == Incremental Sync ==
 orchestrator -> tap: get_state()
 tap --> orchestrator: bookmark state
-orchestrator -> tap: run_tap(state, config)
+orchestrator -> tap: run_tap(state, settings)
 activate tap
 
 == Data Extraction ==

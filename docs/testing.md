@@ -231,7 +231,7 @@ src/flext_meltano/
 ├── services.py               1442 lines (Target: 95%)
 ├── adapters.py                801 lines (Target: 95%)
 ├── models.py                  1300 lines (Target: 95%)
-├── config.py                  95% (Target: 95%)
+├── settings.py                  95% (Target: 95%)
 ├── singer.py                  88% → 95%
 ├── plugin_service.py          85% → 95%
 ├── pipeline_service.py        90% → 95%

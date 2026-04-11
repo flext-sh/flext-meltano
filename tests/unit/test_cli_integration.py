@@ -36,13 +36,13 @@ class TestFlextMeltanoCliModelConversion:
     def test_tap_run_params_with_config(self) -> None:
         cli_args: t.Cli.JsonMapping = {
             "tap_name": "tap-postgres",
-            "config_file": "/path/to/config.json",
+            "config_file": "/path/to/settings.json",
             "discover": False,
         }
         result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
         tm.ok(result)
         model = result.value
-        tm.that(model.config_file, eq="/path/to/config.json")
+        tm.that(model.config_file, eq="/path/to/settings.json")
 
     def test_tap_run_params_discover_mode(self) -> None:
         cli_args: t.Cli.JsonMapping = {
@@ -57,7 +57,7 @@ class TestFlextMeltanoCliModelConversion:
     def test_tap_run_params_all_fields(self) -> None:
         cli_args: t.Cli.JsonMapping = {
             "tap_name": "tap-postgres",
-            "config_file": "/config.json",
+            "config_file": "/settings.json",
             "catalog_file": "/catalog.json",
             "state_file": "/state.json",
             "properties_file": "/properties.json",
@@ -66,7 +66,7 @@ class TestFlextMeltanoCliModelConversion:
         result = u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
         tm.ok(result)
         model = result.value
-        tm.that(model.config_file, eq="/config.json")
+        tm.that(model.config_file, eq="/settings.json")
         tm.that(model.catalog_file, eq="/catalog.json")
         tm.that(model.state_file, eq="/state.json")
         tm.that(model.properties_file, eq="/properties.json")
@@ -99,10 +99,10 @@ class TestFlextMeltanoCliModelConversion:
     def test_target_run_params_with_config(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            {"target_name": "target-postgres", "config_file": "/path/to/config.json"},
+            {"target_name": "target-postgres", "config_file": "/path/to/settings.json"},
         )
         tm.ok(result)
-        tm.that(result.value.config_file, eq="/path/to/config.json")
+        tm.that(result.value.config_file, eq="/path/to/settings.json")
 
     def test_target_run_params_with_input(self) -> None:
         result = u.Cli.cli_args_to_model(
@@ -117,18 +117,18 @@ class TestFlextMeltanoCliModelConversion:
             m.Meltano.TargetRunParams,
             {
                 "target_name": "target-postgres",
-                "config_file": "/config.json",
+                "config_file": "/settings.json",
                 "input_file": "/input.jsonl",
             },
         )
         tm.ok(result)
-        tm.that(result.value.config_file, eq="/config.json")
+        tm.that(result.value.config_file, eq="/settings.json")
         tm.that(result.value.input_file, eq="/input.jsonl")
 
     def test_target_run_params_missing_required(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            {"config_file": "/config.json"},
+            {"config_file": "/settings.json"},
         )
         tm.fail(result)
         tm.that(str(result.error).lower(), has="validation")
@@ -137,20 +137,20 @@ class TestFlextMeltanoCliModelConversion:
     def test_pipeline_run_params_with_tap_args(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TapRunParams,
-            {"tap_name": "tap-postgres", "config_file": "/path/to/config.json"},
+            {"tap_name": "tap-postgres", "config_file": "/path/to/settings.json"},
         )
         tm.ok(result)
         tm.that(result.value.tap_name, eq="tap-postgres")
-        tm.that(result.value.config_file, eq="/path/to/config.json")
+        tm.that(result.value.config_file, eq="/path/to/settings.json")
 
     def test_pipeline_run_params_with_target_args(self) -> None:
         result = u.Cli.cli_args_to_model(
             m.Meltano.TargetRunParams,
-            {"target_name": "target-postgres", "config_file": "/path/to/config.json"},
+            {"target_name": "target-postgres", "config_file": "/path/to/settings.json"},
         )
         tm.ok(result)
         tm.that(result.value.target_name, eq="target-postgres")
-        tm.that(result.value.config_file, eq="/path/to/config.json")
+        tm.that(result.value.config_file, eq="/path/to/settings.json")
 
     def test_pipeline_run_params_with_catalog_state(self) -> None:
         result = u.Cli.cli_args_to_model(
@@ -172,15 +172,15 @@ class TestFlextMeltanoCliModelConversion:
             {
                 "tap_name": "tap-postgres",
                 "target_name": "target-postgres",
-                "tap_config": "/tap-config.json",
-                "target_config": "/target-config.json",
+                "tap_config": "/tap-settings.json",
+                "target_config": "/target-settings.json",
                 "catalog_file": "/catalog.json",
                 "state_file": "/state.json",
             },
         )
         tm.ok(result)
-        tm.that(result.value.tap_config, eq="/tap-config.json")
-        tm.that(result.value.target_config, eq="/target-config.json")
+        tm.that(result.value.tap_config, eq="/tap-settings.json")
+        tm.that(result.value.target_config, eq="/target-settings.json")
         tm.that(result.value.catalog_file, eq="/catalog.json")
         tm.that(result.value.state_file, eq="/state.json")
 

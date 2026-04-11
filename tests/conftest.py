@@ -126,7 +126,7 @@ def meltano_yml_config() -> t.ContainerMapping:
         "environments": [
             {
                 "name": "test",
-                "config": {
+                "settings": {
                     "plugins": {
                         "extractors": [
                             {
@@ -152,7 +152,7 @@ def meltano_yml_config() -> t.ContainerMapping:
                     "name": "tap-csv",
                     "variant": "meltanolabs",
                     "pip_url": "pipelinewise-tap-csv",
-                    "config": {
+                    "settings": {
                         "files": [
                             {
                                 "entity": "test_data",
@@ -168,7 +168,7 @@ def meltano_yml_config() -> t.ContainerMapping:
                     "name": "target-csv",
                     "variant": "meltanolabs",
                     "pip_url": "pipelinewise-target-csv",
-                    "config": {"destination_path": "output"},
+                    "settings": {"destination_path": "output"},
                 },
             ],
         },
@@ -189,7 +189,7 @@ def meltano_project(
         "config_path": test_meltano_project_dir / "pipeline.yml",
         "description": "Test project for flext-meltano",
         "version": "1",
-        "config": meltano_yml_config,
+        "settings": meltano_yml_config,
     }
 
 
@@ -323,7 +323,7 @@ def test_environment_config() -> t.ContainerMapping:
     """Test environment configuration."""
     return {
         "name": "test",
-        "config": {
+        "settings": {
             "project_id": "test-meltano-project",
             "cli": {"log_level": "DEBUG", "log_config": False},
         },
@@ -405,17 +405,17 @@ def meltano_service(docker_services: tk) -> Generator[str | None]:
     yield "localhost:3389"
 
 
-def pytest_configure(config: pytest.Config) -> None:
-    """Configure pytest markers."""
-    config.addinivalue_line("markers", "unit: Unit tests")
-    config.addinivalue_line("markers", "integration: Integration tests")
-    config.addinivalue_line("markers", "e2e: End-to-end tests")
-    config.addinivalue_line("markers", "meltano: Meltano-specific tests")
-    config.addinivalue_line("markers", "singer: Singer protocol tests")
-    config.addinivalue_line("markers", "pipeline: Pipeline execution tests")
-    config.addinivalue_line("markers", "cli: CLI command tests")
-    config.addinivalue_line("markers", "slow: Slow tests")
-    config.addinivalue_line("markers", "docker: Docker-based tests")
+def pytest_configure(settings: pytest.Settings) -> None:
+    """Settingsure pytest markers."""
+    settings.addinivalue_line("markers", "unit: Unit tests")
+    settings.addinivalue_line("markers", "integration: Integration tests")
+    settings.addinivalue_line("markers", "e2e: End-to-end tests")
+    settings.addinivalue_line("markers", "meltano: Meltano-specific tests")
+    settings.addinivalue_line("markers", "singer: Singer protocol tests")
+    settings.addinivalue_line("markers", "pipeline: Pipeline execution tests")
+    settings.addinivalue_line("markers", "cli: CLI command tests")
+    settings.addinivalue_line("markers", "slow: Slow tests")
+    settings.addinivalue_line("markers", "docker: Docker-based tests")
 
 
 class MockMeltanoService:
@@ -451,13 +451,13 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, config: t.ContainerMapping) -> None:
+    def __init__(self, settings: t.ContainerMapping) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.config = config
+        self.settings = settings
 
     def discover(self) -> t.ContainerMapping:
-        _ = self.config
+        _ = self.settings
         return {
             "streams": [
                 {
@@ -471,7 +471,7 @@ class MockSingerTap:
         }
 
     def extract(self) -> Sequence[t.ContainerMapping]:
-        _ = self.config
+        _ = self.settings
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
 
@@ -484,16 +484,16 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, config: t.ContainerMapping) -> None:
+    def __init__(self, settings: t.ContainerMapping) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.config = config
+        self.settings = settings
 
     def load(
         self,
         records: Sequence[t.ContainerMapping],
     ) -> t.ContainerMapping:
-        _ = self.config
+        _ = self.settings
         return {"records_loaded": len(records), "status": "success"}
 
 

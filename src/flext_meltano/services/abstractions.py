@@ -26,9 +26,11 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     # -- Tap-specific operations (discovery, sync, catalog) --
 
-    def process_tap_config(self, config: m.Meltano.TapConfig) -> r[m.Meltano.TapConfig]:
+    def process_tap_config(
+        self, settings: m.Meltano.TapConfig
+    ) -> r[m.Meltano.TapConfig]:
         """Validate and return tap configuration."""
-        return r[m.Meltano.TapConfig].ok(config)
+        return r[m.Meltano.TapConfig].ok(settings)
 
     def build_tap_instance(
         self,
@@ -128,7 +130,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             )
             instance = m.Meltano.TapInstance(
                 tap_type=tap_type,
-                config=tap_cfg,
+                settings=tap_cfg,
                 tap_id=f"{tap_type}_auto",
             )
             return r[m.Meltano.TapInstance].ok(instance)

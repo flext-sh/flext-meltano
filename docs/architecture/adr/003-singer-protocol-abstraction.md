@@ -173,11 +173,11 @@ class FlextMeltanoTap(FlextMeltanoSingerBase):
         except Exception as e:
             return r.fail(SingerError(f"Stream discovery failed: {e}"))
 
-    def run_tap(self, config: dict, state: dict) -> r[TapResult]:
+    def run_tap(self, settings: dict, state: dict) -> r[TapResult]:
         # Railway pattern for tap execution
         return (
             self
-            .validate_config(config)
+            .validate_config(settings)
             .flat_map(lambda _: self.initialize_state(state))
             .flat_map(lambda _: self.execute_streams())
             .map(lambda result: TapResult.from_execution(result))

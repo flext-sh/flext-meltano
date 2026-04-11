@@ -52,13 +52,12 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             cls._instance = cls()
         return cls._instance
 
-    @abstractmethod
     @property
     @abstractmethod
     def connection_profile(self) -> t.ContainerMapping:
         """Dbt connection profile for this project.
 
-        Consumer implements with domain-specific connection config
+        Consumer implements with domain-specific connection settings
         (e.g. Oracle DSN, LDAP bind DN, etc.).
         """
 

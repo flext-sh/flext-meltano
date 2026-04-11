@@ -66,7 +66,7 @@ class TestFlextMeltanoPublicFacade:
         factory: ComponentFactory,
         component_name: str,
     ) -> None:
-        """Component factories accept direct config without wrappers."""
+        """Component factories accept direct settings without wrappers."""
         result = factory(component_name, host="localhost", database="testdb")
         u.Tests.Matchers.that(result, ok=True)
         assert result.success

@@ -18,29 +18,29 @@ class FlextMeltanoModelsPayloads:
 
         tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
         target_name: Annotated[str, Field(description="Singer target name")]
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping,
-            Field(description="Pipeline config"),
-        ] = Field(default_factory=dict, description="Pipeline config")
+            Field(description="Pipeline settings"),
+        ] = Field(default_factory=dict, description="Pipeline settings")
 
     class ExecutePipelinePayload(m.ArbitraryTypesModel):
         """Payload for execute_pipeline operation."""
 
         pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping,
-            Field(description="Execution config"),
-        ] = Field(default_factory=dict, description="Execution config")
+            Field(description="Execution settings"),
+        ] = Field(default_factory=dict, description="Execution settings")
 
     class InstallPluginPayload(m.ArbitraryTypesModel):
         """Payload for install_plugin operation."""
 
         plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping,
-            Field(description="Plugin config"),
-        ] = Field(default_factory=dict, description="Plugin config")
+            Field(description="Plugin settings"),
+        ] = Field(default_factory=dict, description="Plugin settings")
 
     class ListPluginsPayload(m.ArbitraryTypesModel):
         """Payload for list_plugins operation."""
@@ -53,10 +53,10 @@ class FlextMeltanoModelsPayloads:
         """Payload for configure_environment operation."""
 
         environment_name: Annotated[str, Field(description="Environment name")]
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping,
-            Field(description="Environment config"),
-        ] = Field(default_factory=dict, description="Environment config")
+            Field(description="Environment settings"),
+        ] = Field(default_factory=dict, description="Environment settings")
 
     class RunDbtModelsPayload(m.ArbitraryTypesModel):
         """Payload for run/test dbt models operation."""
@@ -64,9 +64,9 @@ class FlextMeltanoModelsPayloads:
         models: Annotated[
             t.StrSequence | None, Field(default=None, description="Models to run")
         ] = None
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping | None,
-            Field(default=None, description="Execution config"),
+            Field(default=None, description="Execution settings"),
         ] = None
 
     class RunEltPipelinePayload(m.ArbitraryTypesModel):
@@ -77,7 +77,7 @@ class FlextMeltanoModelsPayloads:
         dbt_models: Annotated[
             t.StrSequence | None, Field(default=None, description="DBT models to run")
         ] = None
-        config: Annotated[
+        settings: Annotated[
             t.ContainerMapping | None,
-            Field(default=None, description="Pipeline config"),
+            Field(default=None, description="Pipeline settings"),
         ] = None
