@@ -48,7 +48,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
     from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
     from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
-    from flext_meltano.api import FlextMeltano
+    from flext_meltano.api import FlextMeltano, meltano
     from flext_meltano.base import FlextMeltanoServiceBase
     from flext_meltano.cli import FlextMeltanoCLI, main
     from flext_meltano.constants import FlextMeltanoConstants, c
@@ -122,7 +122,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "__version__",
                 "__version_info__",
             ),
-            ".api": ("FlextMeltano",),
+            ".api": (
+                "FlextMeltano",
+                "meltano",
+            ),
             ".base": ("FlextMeltanoServiceBase",),
             ".cli": (
                 "FlextMeltanoCLI",
@@ -259,6 +262,7 @@ __all__ = [
     "h",
     "m",
     "main",
+    "meltano",
     "p",
     "r",
     "s",
