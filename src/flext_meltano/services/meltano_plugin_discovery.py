@@ -86,7 +86,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 temp_project_result = (
                     FlextMeltanoProjectService().create_temporary_project()
                 )
-                if temp_project_result.is_failure:
+                if temp_project_result.failure:
                     return r[Sequence[t.StrMapping]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
@@ -105,7 +105,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             )
             max_extractors = 10
             max_loaders = 5
-            if extractors_result.is_success:
+            if extractors_result.success:
                 for idx, (k, v) in enumerate(extractors_result.value.items()):
                     if idx >= max_extractors:
                         break
@@ -114,7 +114,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 working_project,
                 c.Meltano.PluginType.LOADERS.value,
             )
-            if loaders_result.is_success:
+            if loaders_result.success:
                 for idx, (k, v) in enumerate(loaders_result.value.items()):
                     if idx >= max_loaders:
                         break
@@ -133,7 +133,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 project_id="temp-info-project",
                 prefix="flext_plugin_info_",
             )
-            if temp_project_result.is_failure:
+            if temp_project_result.failure:
                 return r[t.StrMapping].fail(
                     temp_project_result.error or "Failed to create temporary project",
                 )
@@ -147,7 +147,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 temp_project,
                 plugin_type,
             )
-            if plugins_result.is_failure:
+            if plugins_result.failure:
                 return r[t.StrMapping].fail(
                     plugins_result.error or "Failed to get plugins"
                 )

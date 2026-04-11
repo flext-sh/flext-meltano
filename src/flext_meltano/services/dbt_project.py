@@ -32,7 +32,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         """Get all models from manifest."""
         try:
             model_nodes_result = self._get_dbt_manifest_nodes("model")
-            if model_nodes_result.is_failure:
+            if model_nodes_result.failure:
                 return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
                     model_nodes_result.error or "Unknown error",
                 )
@@ -59,7 +59,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         """Get all tests from manifest."""
         try:
             test_nodes_result = self._get_dbt_manifest_nodes("test")
-            if test_nodes_result.is_failure:
+            if test_nodes_result.failure:
                 return r[Sequence[t.AttributeMapping]].fail(
                     test_nodes_result.error or "Unknown error",
                 )
@@ -87,7 +87,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         try:
             if not self._dbt_manifest:
                 manifest_result = self.load_dbt_manifest()
-                if manifest_result.is_failure:
+                if manifest_result.failure:
                     return r[Sequence[m.Meltano.DbtManifestNode]].fail(
                         manifest_result.error or "Unknown error",
                     )
@@ -127,7 +127,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             parsed_manifest_result = cli.read_json_model(
                 manifest_path, m.Meltano.DbtManifest
             )
-            if parsed_manifest_result.is_failure:
+            if parsed_manifest_result.failure:
                 return r[t.Meltano.DbtManifestData].fail(
                     f"Manifest reading failed: {parsed_manifest_result.error}"
                 )
@@ -159,12 +159,12 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             models_count = 0
             tests_count = 0
             manifest_result = self.load_dbt_manifest()
-            if manifest_result.is_success:
+            if manifest_result.success:
                 models_result = self.get_dbt_models()
-                if models_result.is_success:
+                if models_result.success:
                     models_count = len(models_result.value)
                 tests_result = self.get_dbt_tests()
-                if tests_result.is_success:
+                if tests_result.success:
                     tests_count = len(tests_result.value)
             info = m.Meltano.DbtProjectInfo(
                 root=root,

@@ -52,7 +52,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                 [c.Meltano.CMD_RUN, tap_name, target_name],
                 _cwd=self.settings.project_root,
             )
-            if execution_result.is_failure:
+            if execution_result.failure:
                 return r[t.ContainerMapping].fail(
                     execution_result.error or "Pipeline execution failed"
                 )
@@ -98,7 +98,7 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
                 ],
                 _cwd=self.settings.project_root,
             )
-            if execution_result.is_failure:
+            if execution_result.failure:
                 return r[t.ContainerMapping].fail(
                     execution_result.error or "DBT operation failed"
                 )

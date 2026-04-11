@@ -35,7 +35,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         cmd_result = u.Cli.run_raw(
             list(command), timeout=timeout, input_data=process_input
         )
-        if cmd_result.is_failure:
+        if cmd_result.failure:
             return r[t.Meltano.CliProcessResult].fail(
                 cmd_result.error or "Command failed"
             )

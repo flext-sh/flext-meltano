@@ -61,7 +61,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
             )
         try:
             pid_result = cli.read_text_file(pid_path)
-            if pid_result.is_failure:
+            if pid_result.failure:
                 return r[tuple[int, Path]].fail(
                     f"Failed to read PID for pipeline '{pipeline_name}': {pid_result.error}"
                 )
@@ -78,13 +78,13 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         dir_check = FlextMeltanoPipelineLifecycleOperations._check_pipeline_dir(
             pipeline_name,
         )
-        if dir_check.is_failure:
+        if dir_check.failure:
             return r[str].fail(dir_check.error)
         pid_path = FlextMeltanoPipelinePaths.pipeline_pid_path(pipeline_name)
         if not pid_path.exists():
             return r[str].ok("stopped")
         pid_result = FlextMeltanoPipelineLifecycleOperations._read_pid(pipeline_name)
-        if pid_result.is_failure:
+        if pid_result.failure:
             return r[str].fail(
                 f"Failed to read status for pipeline '{pipeline_name}': "
                 f"{pid_result.error}",
@@ -101,10 +101,10 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         dir_check = FlextMeltanoPipelineLifecycleOperations._check_pipeline_dir(
             pipeline_name,
         )
-        if dir_check.is_failure:
+        if dir_check.failure:
             return r[str].fail(dir_check.error)
         pid_result = FlextMeltanoPipelineLifecycleOperations._read_pid(pipeline_name)
-        if pid_result.is_failure:
+        if pid_result.failure:
             return r[str].fail(pid_result.error)
         pid, pid_path = pid_result.value
         if not FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
@@ -134,13 +134,13 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         dir_check = FlextMeltanoPipelineLifecycleOperations._check_pipeline_dir(
             pipeline_name,
         )
-        if dir_check.is_failure:
+        if dir_check.failure:
             return r[str].fail(dir_check.error)
         pipeline_dir = dir_check.value
         status_result = FlextMeltanoPipelineLifecycleOperations.get_pipeline_status(
             pipeline_name,
         )
-        if status_result.is_failure:
+        if status_result.failure:
             return r[str].fail(status_result.error)
         if status_result.value == "running":
             return r[str].fail(

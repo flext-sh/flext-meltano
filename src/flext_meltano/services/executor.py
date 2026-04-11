@@ -140,7 +140,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 return self.health()
             full_command: list[str] = [command, *args]
             result = self.execute_meltano_command(full_command)
-            if result.is_failure:
+            if result.failure:
                 return r[t.ContainerMapping].fail(
                     result.error or f"Command '{command}' failed",
                 )

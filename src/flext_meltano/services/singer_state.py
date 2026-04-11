@@ -54,7 +54,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                 load_result = cli.read_json_model(
                     state_file, m.Meltano.SingerStateMessage
                 )
-                if load_result.is_failure:
+                if load_result.failure:
                     return r[m.Meltano.SingerStateMessage].fail(str(load_result.error))
                 self._singer_state = load_result.value
                 self.logger.info(
@@ -74,7 +74,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             write_result = cli.write_text_file(
                 state_file, self._singer_state.model_dump_json(indent=2)
             )
-            if write_result.is_failure:
+            if write_result.failure:
                 return r[None].fail(str(write_result.error))
             self.logger.info("State saved to file", file=str(state_file))
             return r[None].ok(None)

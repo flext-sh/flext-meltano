@@ -22,7 +22,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def create_abstractions_instance(cls) -> r[Self]:
         """Factory method for creating a FlextMeltanoAbstractions instance."""
         instance: Self = cls()
-        return r[Self](value=instance, is_success=True)
+        return r[Self](value=instance, success=True)
 
     # -- Tap-specific operations (discovery, sync, catalog) --
 
@@ -51,7 +51,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     c.Meltano.CMD_ALL_OPTION,
                 ],
             )
-            if cmd_result.is_failure:
+            if cmd_result.failure:
                 return r[t.ContainerMapping].fail(
                     cmd_result.error or "Stream discovery failed",
                 )
@@ -95,7 +95,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             cmd_result = self._run_meltano(cmd_args)
             status = (
                 c.Meltano.StreamStatus.COMPLETED
-                if cmd_result.is_success
+                if cmd_result.success
                 else c.Meltano.StreamStatus.FAILED
             )
             result: t.ContainerMapping = {
@@ -103,7 +103,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 "status": status,
                 "target_loaded": target_config is not None,
             }
-            if cmd_result.is_failure:
+            if cmd_result.failure:
                 return r[t.ContainerMapping].fail(
                     cmd_result.error or "Stream sync failed"
                 )
@@ -141,7 +141,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     ) -> r[t.ContainerMapping]:
         """Generate Singer catalog by discovering streams from the tap."""
         discovery = self.discover_streams(tap_instance)
-        if discovery.is_failure:
+        if discovery.failure:
             return r[t.ContainerMapping].fail(
                 discovery.error or "Catalog generation failed"
             )
@@ -153,7 +153,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 entry_r = self._create_catalog_entry_from_stream(
                     self._stream_registry[name],
                 )
-                if entry_r.is_success:
+                if entry_r.success:
                     streams.append(entry_r.value)
         catalog: t.ContainerMapping = {"version": 1, "streams": streams}
         return r[t.ContainerMapping].ok(catalog)
@@ -165,7 +165,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     ) -> r[t.ContainerMapping]:
         """Get stream definition by name."""
         discovery = self.discover_streams(tap_instance)
-        if discovery.is_failure:
+        if discovery.failure:
             return r[t.ContainerMapping].fail(discovery.error or "Discovery failed")
         for stream in self._extract_raw_streams(discovery.value):
             if stream.get("stream_name") == stream_name:
@@ -176,7 +176,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
         """List stream names available in tap instance."""
         discovery = self.discover_streams(tap_instance)
-        if discovery.is_failure:
+        if discovery.failure:
             return []
         return [
             str(s.get("stream_name", ""))

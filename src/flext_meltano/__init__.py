@@ -13,13 +13,8 @@ from flext_core.lazy import (
 from flext_meltano.__version__ import *
 
 if _t.TYPE_CHECKING:
-    from flext_cli.base import s
+    from flext_cli import d, e, h, r, s, x
 
-    from flext_core.decorators import d
-    from flext_core.exceptions import e
-    from flext_core.handlers import h
-    from flext_core.mixins import x
-    from flext_core.result import r
     from flext_meltano._constants.base import FlextMeltanoConstantsBase
     from flext_meltano._constants.config import FlextMeltanoConstantsSettings
     from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
@@ -53,18 +48,12 @@ if _t.TYPE_CHECKING:
     from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
     from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
     from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
-    from flext_meltano.api import FlextMeltano, meltano
+    from flext_meltano.api import FlextMeltano
     from flext_meltano.base import FlextMeltanoServiceBase
     from flext_meltano.cli import FlextMeltanoCLI, main
     from flext_meltano.constants import FlextMeltanoConstants, c
     from flext_meltano.models import FlextMeltanoModels, m
     from flext_meltano.protocols import FlextMeltanoProtocols, p
-    from flext_meltano.services._cli_small_managers import (
-        FlextMeltanoDbtManager,
-        FlextMeltanoPluginManager,
-        FlextMeltanoStatusManager,
-    )
-    from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.adapter_extensions import (
         FlextMeltanoDbtAdapter,
@@ -100,15 +89,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from flext_meltano.services.singer_sdk import (
-        Context,
-        FlextMeltanoSingerTapAdapter,
-        Record,
-        Sink,
-        Stream,
-        Tap,
-        Target,
-    )
+    from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
     from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
     from flext_meltano.services.singer_tap import (
         FlextMeltanoTapAbstractions,
@@ -141,10 +122,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "__version__",
                 "__version_info__",
             ),
-            ".api": (
-                "FlextMeltano",
-                "meltano",
-            ),
+            ".api": ("FlextMeltano",),
             ".base": ("FlextMeltanoServiceBase",),
             ".cli": (
                 "FlextMeltanoCLI",
@@ -171,12 +149,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextMeltanoUtilities",
                 "u",
             ),
-            "flext_cli.base": ("s",),
-            "flext_core.decorators": ("d",),
-            "flext_core.exceptions": ("e",),
-            "flext_core.handlers": ("h",),
-            "flext_core.mixins": ("x",),
-            "flext_core.result": ("r",),
+            "flext_cli": (
+                "d",
+                "e",
+                "h",
+                "r",
+                "s",
+                "x",
+            ),
         },
     ),
     exclude_names=(
@@ -195,7 +175,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__ = [
-    "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",
@@ -208,7 +187,6 @@ __all__ = [
     "FlextMeltanoConstantsEnums",
     "FlextMeltanoConstantsSettings",
     "FlextMeltanoDbtAdapter",
-    "FlextMeltanoDbtManager",
     "FlextMeltanoDbtProjectMixin",
     "FlextMeltanoDbtRunnerMixin",
     "FlextMeltanoDbtServiceBase",
@@ -237,9 +215,7 @@ __all__ = [
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
     "FlextMeltanoPipelineAdapter",
-    "FlextMeltanoPipelineManager",
     "FlextMeltanoPluginDiscoveryMixin",
-    "FlextMeltanoPluginManager",
     "FlextMeltanoProjectManager",
     "FlextMeltanoProjectService",
     "FlextMeltanoProtocols",
@@ -256,7 +232,6 @@ __all__ = [
     "FlextMeltanoSingerManager",
     "FlextMeltanoSingerStateMixin",
     "FlextMeltanoSingerTapAdapter",
-    "FlextMeltanoStatusManager",
     "FlextMeltanoTapAbstractions",
     "FlextMeltanoTapServiceBase",
     "FlextMeltanoTapSourceMixin",
@@ -270,11 +245,6 @@ __all__ = [
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoValidators",
-    "Record",
-    "Sink",
-    "Stream",
-    "Tap",
-    "Target",
     "__author__",
     "__author_email__",
     "__description__",
@@ -289,7 +259,6 @@ __all__ = [
     "h",
     "m",
     "main",
-    "meltano",
     "p",
     "r",
     "s",

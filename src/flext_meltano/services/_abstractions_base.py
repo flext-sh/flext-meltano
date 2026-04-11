@@ -51,7 +51,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 _cwd=cwd,
             )
         )
-        if run_result.is_failure:
+        if run_result.failure:
             error_msg = str(run_result.error or "Unknown error")
             return r[str].fail(f"Meltano command failed: {error_msg}")
         completed: m.Meltano.CommandExecutionResult = run_result.value
@@ -72,7 +72,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             cmd_result = self._run_meltano(
                 [c.Meltano.CMD_ADD, plugin_type, plugin_name],
             )
-            if cmd_result.is_failure:
+            if cmd_result.failure:
                 return r[bool].fail(cmd_result.error or "Failed to add plugin")
             return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as e:
@@ -108,7 +108,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 plugin_type=u.Meltano.normalize_plugin_group(plugin_type),
                 _cwd=cwd,
             )
-            if plugins_result.is_failure:
+            if plugins_result.failure:
                 return r[t.Meltano.NestedStrMapping].fail(
                     plugins_result.error or f"Failed to list {plugin_type}",
                 )
@@ -150,7 +150,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             cmd_result = self._run_meltano(
                 [c.Meltano.CMD_ELT, extractor_name, loader_name],
             )
-            if cmd_result.is_failure:
+            if cmd_result.failure:
                 return r[t.HeaderMapping].fail(
                     cmd_result.error or "Pipeline execution failed",
                 )

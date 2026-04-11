@@ -30,7 +30,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         """Discover installed Meltano plugins from the active project runtime."""
         executor = FlextMeltanoExecutorBase()
         plugins_result = executor.get_project_plugins()
-        if plugins_result.is_failure:
+        if plugins_result.failure:
             return r[t.StrSequence].fail(
                 plugins_result.error or "Plugin discovery failed",
             )
@@ -60,7 +60,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             for k, v in args.items():
                 cmd.append(f"--{k}={v}")
         command_result = executor.execute_meltano_command(cmd)
-        if command_result.is_failure:
+        if command_result.failure:
             return r[t.ContainerMapping].fail(
                 command_result.error or "Command failed",
             )

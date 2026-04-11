@@ -50,7 +50,7 @@ class TestFlextMeltanoApiFacade:
             project_name="config_test", project_dir=tmp_path
         )
         u.Tests.Matchers.that(result, ok=True)
-        assert result.is_success
+        assert result.success
         payload = result.value
         u.Tests.Matchers.that(payload, is_=dict)
         project_path = Path(str(payload["project_path"]))

@@ -39,7 +39,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             init_result = FlextMeltanoExecutorBase.initialize_project_root(
                 project_path,
             )
-            if init_result.is_failure:
+            if init_result.failure:
                 return r[t.ContainerMapping].fail(
                     init_result.error or "Project creation failed",
                 )
@@ -61,7 +61,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         def get_version(self) -> r[t.ContainerMapping]:
             """Get Meltano version information using native API."""
             version_result = FlextMeltanoExecutorBase.get_version()
-            if version_result.is_failure:
+            if version_result.failure:
                 return r[t.ContainerMapping].fail(
                     version_result.error or "Failed to get Meltano version",
                 )
@@ -100,7 +100,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                     plugin_type=plugin_type,
                     _cwd=self.settings.project_root,
                 )
-                if plugins_result.is_failure:
+                if plugins_result.failure:
                     return r[t.ContainerMapping].fail(
                         plugins_result.error or "Plugin discovery failed",
                     )

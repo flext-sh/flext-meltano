@@ -47,14 +47,14 @@ class TestFlextMeltanoExecutorComplete:
         """Test run_command with no arguments returns exit code 1."""
         result = self.executor.run_command([])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert result.value == 1
 
     def test_run_command_invalid(self) -> None:
         """Test run_command with invalid command."""
         result = self.executor.run_command(["invalid_command_that_does_not_exist"])
         assert isinstance(result, r)
-        if not result.is_success:
+        if not result.success:
             assert result.error is not None
             assert isinstance(result.error, str)
 
@@ -62,7 +62,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test run method with version argument returns r."""
         result = self.executor.run(["version"])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "version" in result.value
         assert result.value["command"] == "version"
 
@@ -70,7 +70,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test run method with help argument."""
         result = self.executor.run(["help"])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "help" in result.value
         assert "Usage: meltano" in str(result.value["help"])
 
@@ -78,7 +78,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test run method with empty args returns failure."""
         result = self.executor.run([])
         assert isinstance(result, r)
-        assert result.is_failure
+        assert result.failure
         assert result.error is not None
         assert "cannot be empty" in (result.error or "").lower()
 
@@ -86,7 +86,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test health check method."""
         result = self.executor.health()
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert result.value["health"] == "OK"
         assert result.value["status"] == "healthy"
 
@@ -94,7 +94,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test version method returns dict with version info from runtime."""
         result = self.executor.version()
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         version_data = result.value
         assert isinstance(version_data, dict)
         assert "command" in version_data
@@ -108,7 +108,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test help method."""
         result = self.executor.help()
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "Usage: meltano" in str(result.value["help"])
 
     def test_run_pipeline_command_method(self) -> None:
@@ -116,13 +116,13 @@ class TestFlextMeltanoExecutorComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "pipeline_project"
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
-            assert init_result.is_success
+            assert init_result.success
             executor = FlextMeltanoExecutor(
                 config_overrides={"project_root": str(project_root)},
             )
             result = executor.run_pipeline_command("tap-csv", "target-jsonl")
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "exit_code" in result.value
         assert "output" in result.value
 
@@ -131,11 +131,11 @@ class TestFlextMeltanoExecutorComplete:
         result = self.executor._route_command("version", [])
         assert isinstance(result, r)
         # may fail if meltano not on PATH
-        assert result.is_success or result.is_failure
+        assert result.success or result.failure
 
         result = self.executor._route_command("health", [])
         assert isinstance(result, r)
-        assert result.is_success or result.is_failure
+        assert result.success or result.failure
 
         result = self.executor._route_command("unknown", ["args"])
         assert isinstance(result, r)
@@ -144,7 +144,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test execute method returns executor config."""
         result = self.executor.execute()
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         exec_data = result.value
         assert isinstance(exec_data, dict)
         assert "executor_type" in exec_data
@@ -154,32 +154,32 @@ class TestFlextMeltanoExecutorComplete:
         """Test get_version static method returns r[str]."""
         result = FlextMeltanoExecutor.get_version()
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.value, str)
 
     def test_run_cli_none_args(self) -> None:
         """Test run_cli with None returns ready status."""
         result = self.executor.run_cli(None)
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
 
     def test_run_cli_empty_args(self) -> None:
         """Test run_cli with empty list returns ready status."""
         result = self.executor.run_cli([])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
 
     def test_run_cli_version_args(self) -> None:
         """Test run_cli with version args delegates to run."""
         result = self.executor.run_cli(["version"])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "version" in result.value
 
     def test_create_flext_cli(self) -> None:
         """Test create_flext_cli static factory."""
         cli_result = FlextMeltanoExecutor.create_flext_cli()
-        assert cli_result.is_success
+        assert cli_result.success
         cli_app = cli_result.value
         assert cli_app is not None
 
@@ -187,7 +187,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test create_cli_runner with empty args."""
         result = FlextMeltanoExecutor.create_cli_runner([])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         runner_data = result.value
         assert isinstance(runner_data, dict)
 
@@ -195,14 +195,14 @@ class TestFlextMeltanoExecutorComplete:
         """Test create_cli_runner with version args."""
         result = FlextMeltanoExecutor.create_cli_runner(["version"])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "version" in result.value
 
     def test_execute_meltano_command(self) -> None:
         """Test execute_meltano_command normalizes prefixed runtime commands."""
         result = self.executor.execute_meltano_command(["meltano", "version"])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert result.value.success is True
         assert result.value.command[0] == "--version"
 
@@ -210,7 +210,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test execute_meltano_command accepts non-prefixed runtime commands."""
         result = self.executor.execute_meltano_command(["help"])
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert result.value.success is True
         assert result.value.command[0] == "--help"
 
@@ -219,13 +219,13 @@ class TestFlextMeltanoExecutorComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "executor_pipeline_project"
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
-            assert init_result.is_success
+            assert init_result.success
             executor = FlextMeltanoExecutor(
                 config_overrides={"project_root": str(project_root)},
             )
             result = executor.execute_pipeline("tap-csv", "target-jsonl")
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.value.exit_code, int)
         assert result.value.command[0] == "elt"
 
@@ -234,13 +234,13 @@ class TestFlextMeltanoExecutorComplete:
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir) / "executor_dbt_project"
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
-            assert init_result.is_success
+            assert init_result.success
             executor = FlextMeltanoExecutor(
                 config_overrides={"project_root": str(project_root)},
             )
             result = executor.execute_dbt_command("run")
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert isinstance(result.value.exit_code, int)
         assert result.value.command[0] == "invoke"
 
@@ -252,7 +252,7 @@ class TestFlextMeltanoExecutorComplete:
         )
         result = executor.version()
         assert isinstance(result, r)
-        assert result.is_success
+        assert result.success
         assert "version" in result.value
 
     def test_multiple_command_execution(self) -> None:
@@ -260,7 +260,7 @@ class TestFlextMeltanoExecutorComplete:
         for _ in range(3):
             result = self.executor.version()
             assert isinstance(result, r)
-            assert result.is_success
+            assert result.success
 
     def test_concurrent_executor_instances(self) -> None:
         """Test multiple executor instances work independently."""
@@ -270,8 +270,8 @@ class TestFlextMeltanoExecutorComplete:
         result2 = executor2.version()
         assert isinstance(result1, r)
         assert isinstance(result2, r)
-        assert result1.is_success
-        assert result2.is_success
+        assert result1.success
+        assert result2.success
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases."""
@@ -292,7 +292,7 @@ class TestFlextMeltanoExecutorComplete:
         for tap, target in problematic_pipelines:
             result = self.executor.run_pipeline_command(tap, target)
             assert isinstance(result, r)
-            if not result.is_success:
+            if not result.success:
                 assert result.error is not None
                 assert isinstance(result.error, str)
 
@@ -309,6 +309,6 @@ class TestFlextMeltanoExecutorComplete:
             return_value=r[str].fail("Version command failed"),
         ):
             version_result = FlextMeltanoExecutor().version()
-            assert version_result.is_failure
+            assert version_result.failure
             if version_result.error is not None:
                 assert "Version command failed" in str(version_result.error)

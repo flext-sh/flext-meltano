@@ -161,7 +161,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     ) -> r[Sequence[t.StrMapping]]:
         """Return project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
-        if project_result.is_failure:
+        if project_result.failure:
             return r[Sequence[t.StrMapping]].fail(
                 project_result.error or "Failed to load Meltano project",
             )
@@ -205,7 +205,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         if not selected_environment:
             return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
         project_result = self.load_project(_cwd)
-        if project_result.is_failure:
+        if project_result.failure:
             return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
         available_environments = {
             environment.name

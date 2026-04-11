@@ -70,7 +70,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 )
 
             load_result = cli.read_json_model(catalog_file, m.Meltano.SingerCatalog)
-            if load_result.is_failure:
+            if load_result.failure:
                 return r[m.Meltano.SingerCatalog].fail(str(load_result.error))
             self._singer_catalog = load_result.value
             self.logger.info(
@@ -92,7 +92,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 catalog_file,
                 self._singer_catalog.model_dump_json(indent=2, by_alias=True),
             )
-            if write_result.is_failure:
+            if write_result.failure:
                 return r[None].fail(str(write_result.error))
             self.logger.info("Catalog saved to file", file=str(catalog_file))
             return r[None].ok(None)

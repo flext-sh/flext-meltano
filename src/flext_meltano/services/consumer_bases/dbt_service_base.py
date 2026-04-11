@@ -86,7 +86,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                     result = self.generate_docs()
                 case _:
                     result = r[str].fail(str(subcommand))
-            if result.is_failure:
+            if result.failure:
                 self.logger.warning(
                     "dbt command failed",
                     subcommand=subcommand,
@@ -127,7 +127,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 command=" ".join(cmd),
             )
             result = u.Cli.run_raw(list(cmd))
-            if result.is_failure:
+            if result.failure:
                 return r[str].fail(result.error or operation)
             out = result.value
             if out.exit_code != 0:
@@ -187,7 +187,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 return r[t.Meltano.DbtManifestData].fail(str(path))
 
             parsed_result = cli.read_json_model(path, m.Meltano.DbtManifest)
-            if parsed_result.is_failure:
+            if parsed_result.failure:
                 return r[t.Meltano.DbtManifestData].fail(str(parsed_result.error))
             parsed = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
@@ -200,7 +200,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     def get_models(self) -> r[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
-        if manifest_result.is_failure:
+        if manifest_result.failure:
             return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
                 manifest_result.error or "Manifest load failed"
             )

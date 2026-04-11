@@ -40,11 +40,11 @@ class FlextMeltanoCommandRouter:
             return 0
         command, command_args = args[0], args[1:]
         handler_result = self._get_command_handler(command)
-        if handler_result.is_failure:
+        if handler_result.failure:
             self.logger.error("Command error", error=str(handler_result.error))
             return 1
         execute_result = handler_result.value(command_args)
-        if execute_result.is_failure:
+        if execute_result.failure:
             self.logger.error("Execution error", error=str(execute_result.error))
             return 1
         return 0

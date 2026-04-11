@@ -8,18 +8,12 @@ import typing as _t
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if _t.TYPE_CHECKING:
-    from flext_cli.base import s
-
     from examples.constants import ExamplesFlextMeltanoConstants, c
     from examples.models import ExamplesFlextMeltanoModels, m
     from examples.protocols import ExamplesFlextMeltanoProtocols, p
     from examples.typings import ExamplesFlextMeltanoTypes, t
     from examples.utilities import ExamplesFlextMeltanoUtilities, u
-    from flext_core.decorators import d
-    from flext_core.exceptions import e
-    from flext_core.handlers import h
-    from flext_core.mixins import x
-    from flext_core.result import r
+    from flext_meltano import d, e, h, r, s, x
 _LAZY_IMPORTS = build_lazy_import_map(
     {
         ".constants": (
@@ -42,12 +36,14 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "ExamplesFlextMeltanoUtilities",
             "u",
         ),
-        "flext_cli.base": ("s",),
-        "flext_core.decorators": ("d",),
-        "flext_core.exceptions": ("e",),
-        "flext_core.handlers": ("h",),
-        "flext_core.mixins": ("x",),
-        "flext_core.result": ("r",),
+        "flext_meltano": (
+            "d",
+            "e",
+            "h",
+            "r",
+            "s",
+            "x",
+        ),
     },
 )
 

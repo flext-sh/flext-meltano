@@ -79,7 +79,7 @@ class TestFlextMeltanoValidatorsComprehensive:
     def test_validate_meltano_config_missing_version(self) -> None:
         config: t.ScalarMapping = {"project_id": "test-project"}
         result = FlextMeltanoValidators.validate_pipeline_project_business_rules(config)
-        tm.that(result.is_failure or result.is_success, eq=True)
+        tm.that(result.failure or result.success, eq=True)
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         config: t.ScalarMapping = {"schema_version": 2, "project_id": "test-project"}

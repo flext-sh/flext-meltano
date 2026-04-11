@@ -103,7 +103,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
             config_mapping_result = cli.read_json_model(
                 config_path, m.Meltano.ConfigMappingPayload
             )
-            if config_mapping_result.is_failure:
+            if config_mapping_result.failure:
                 return r[str].fail(
                     f"Failed to read pipeline '{pipeline_name}' configuration: {config_mapping_result.error}",
                 )
@@ -123,7 +123,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
                 _cwd=pipeline_dir,
             )
         )
-        if run_result.is_failure:
+        if run_result.failure:
             error_msg = run_result.error or "Unknown error"
             return r[str].fail(
                 f"Failed to execute Meltano runtime command: {error_msg}"

@@ -55,7 +55,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
                 command=" ".join(cmd),
             )
             result = u.Cli.run_raw(list(cmd))
-            if result.is_failure:
+            if result.failure:
                 return r[str].fail(result.error or f"dbt {operation} failed")
             out = result.value
             if out.exit_code != 0:

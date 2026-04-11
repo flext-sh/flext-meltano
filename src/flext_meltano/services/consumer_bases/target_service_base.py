@@ -126,7 +126,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     ) -> r[bool]:
         """Process a single Singer RECORD message."""
         sink_result = self.get_or_create_sink(stream_name, schema)
-        if sink_result.is_failure:
+        if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
             record_dict: dict[str, t.ContainerValue] = {
@@ -149,7 +149,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         processed = 0
         for record in records:
             result = self.process_record(stream_name, record, schema)
-            if result.is_failure:
+            if result.failure:
                 return r[int].fail(result.error or "Batch processing failed")
             processed += 1
         return r[int].ok(processed)

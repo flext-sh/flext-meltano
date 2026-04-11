@@ -159,7 +159,7 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(result, is_=r)
         config_result = self.tap_abstractions.process_tap_config(config)
         self.test_assertions.assert_true(
-            condition=config_result.is_success,
+            condition=config_result.success,
             message="Valid config should pass processing",
         )
 
@@ -225,7 +225,7 @@ class TestFlextMeltanoAbstractionsComplete:
             stream_config=stream_config,
         )
         tm.that(result, is_=r)
-        if result.is_success:
+        if result.success:
             tap_instance = result.value
             tm.that(tap_instance, is_=m.Meltano.TapInstance)
 
@@ -256,12 +256,12 @@ class TestFlextMeltanoAbstractionsComplete:
             )
         valid_result = self.tap_abstractions.process_tap_config(valid_instance.config)
         tm.that(valid_result, is_=r)
-        if valid_result.is_success:
+        if valid_result.success:
             self.test_assertions.assert_true(
                 condition=bool(valid_result.value),
                 message="Valid instance should pass validation",
             )
-        if invalid_result.is_success:
+        if invalid_result.success:
             self.test_assertions.assert_false(
                 condition=bool(invalid_result.value),
                 message="Invalid instance should fail validation",
@@ -381,7 +381,7 @@ class TestFlextMeltanoAbstractionsComplete:
         )
         result = self.tap_abstractions._create_catalog_entry_from_stream(stream)
         tm.that(result, is_=r)
-        if result.is_success:
+        if result.success:
             entry = result.value
             assert entry["tap_stream_id"] == "users"
             assert entry["stream"] == "users"
@@ -480,7 +480,7 @@ class TestFlextMeltanoAbstractionsComplete:
         """Test create_abstractions_instance factory method using flext_tests."""
         result = FlextMeltanoAbstractions.create_abstractions_instance()
         tm.that(result, is_=r)
-        if result.is_success:
+        if result.success:
             instance = result.value
             assert isinstance(instance, FlextMeltanoAbstractions)
             if hasattr(instance, "service_name"):
@@ -508,7 +508,7 @@ class TestFlextMeltanoAbstractionsComplete:
                 tap_type="",
                 connection_config={},
             )
-            if result.is_failure:
+            if result.failure:
                 self.test_assertions.assert_true(
                     condition=result.error is not None,
                     message="Should have error message",
@@ -549,10 +549,10 @@ class TestFlextMeltanoAbstractionsComplete:
             stream_config=stream_config,
         )
         self.test_assertions.assert_true(
-            condition=create_result.is_success,
+            condition=create_result.success,
             message="Tap creation should succeed",
         )
-        if create_result.is_failure:
+        if create_result.failure:
             msg = create_result.error or "Tap creation should succeed"
             raise AssertionError(msg)
         tap_instance = create_result.value
@@ -567,17 +567,17 @@ class TestFlextMeltanoAbstractionsComplete:
         ):
             discovery_result = self.tap_abstractions.discover_streams(tap_instance)
             self.test_assertions.assert_true(
-                condition=discovery_result.is_success,
+                condition=discovery_result.success,
                 message="Stream discovery should succeed",
             )
             catalog_result = self.tap_abstractions.generate_catalog(tap_instance)
             self.test_assertions.assert_true(
-                condition=catalog_result.is_success,
+                condition=catalog_result.success,
                 message="Catalog generation should succeed",
             )
             sync_result = self.tap_abstractions.sync_stream(tap_instance, "users")
             self.test_assertions.assert_true(
-                condition=sync_result.is_success,
+                condition=sync_result.success,
                 message="Stream sync should succeed",
             )
 
@@ -585,6 +585,6 @@ class TestFlextMeltanoAbstractionsComplete:
         """Test execute returns configuration status dict."""
         result = self.tap_abstractions.execute()
         tm.that(result, is_=r)
-        if result.is_success:
+        if result.success:
             value = result.value
             tm.that(isinstance(value, dict), eq=True)

@@ -74,7 +74,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def create_project(self, project_name: str, project_dir: Path) -> r[t.StrMapping]:
         """Create new Meltano project using railway-oriented file operations."""
         params_r = self._validate_project_creation_params(project_name, project_dir)
-        if params_r.is_failure:
+        if params_r.failure:
             return r[t.StrMapping].fail(params_r.error or "Validation failed")
 
         name = str(params_r.value["name"])
@@ -111,7 +111,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     ) -> r[t.Meltano.DbtProject]:
         """Create temporary Meltano project with railway-oriented validation."""
         params_r = self._validate_project_parameters(project_id, prefix)
-        if params_r.is_failure:
+        if params_r.failure:
             return r[t.Meltano.DbtProject].fail(params_r.error or "Validation failed")
 
         params = params_r.value
@@ -136,7 +136,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             }
             config_file = temp_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
             dump_result = u.Cli.yaml_dump(config_file, config)
-            if dump_result.is_failure:
+            if dump_result.failure:
                 return r[t.Meltano.DbtProject].fail(
                     dump_result.error or "YAML dump failed"
                 )
@@ -144,7 +144,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return r[t.Meltano.DbtProject].fail(f"Temp project creation failed: {e}")
 
         inst_r = self._initialize_project_instance(temp_path)
-        if inst_r.is_failure:
+        if inst_r.failure:
             return r[t.Meltano.DbtProject].fail(inst_r.error or "Init failed")
 
         return r[t.Meltano.DbtProject].ok({
@@ -173,7 +173,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         result = self.build_service_execution_payload(
             "flext_meltano_project_service", self.settings
         )
-        if result.is_success:
+        if result.success:
             self.logger.info("FlextMeltanoProjectService executed successfully")
             return result
         error_msg = result.error or "Project service execution failed"
@@ -183,7 +183,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def initialize_project(self, project_root: Path) -> r[t.Meltano.DbtProject]:
         """Initialize Meltano project using railway pattern validation chain."""
         vpath_r = self._validate_project_path(project_root)
-        if vpath_r.is_failure:
+        if vpath_r.failure:
             return r[t.Meltano.DbtProject].fail(vpath_r.error or "Path missing")
 
         meltano_yml = project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE
@@ -191,7 +191,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return r[t.Meltano.DbtProject].fail(f"Not a Meltano project: {meltano_yml}")
 
         loaded_r = self._load_project_from_path(project_root)
-        if loaded_r.is_failure:
+        if loaded_r.failure:
             return r[t.Meltano.DbtProject].fail(loaded_r.error or "Load failed")
 
         return r[t.Meltano.DbtProject].ok({
@@ -224,14 +224,14 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def _initialize_project_instance(self, project_path: Path) -> r[Path]:
         """Initialize Meltano project instance using abstractions."""
         project_result = self._abstractions.find_project(project_path)
-        if project_result.is_failure:
+        if project_result.failure:
             return r[Path].fail(project_result.error or "Failed to initialize project")
         return project_result
 
     def _load_project_from_path(self, project_root: Path) -> r[Path]:
         """Load Meltano project from validated path."""
         project_result = self._abstractions.find_project(project_root)
-        if project_result.is_failure:
+        if project_result.failure:
             return r[Path].fail(
                 project_result.error or "Failed to load Meltano project"
             )

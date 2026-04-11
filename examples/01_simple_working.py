@@ -20,10 +20,10 @@ logger = FlextLogger(__name__)
 def simple_api_example() -> None:
     """Example using the public Meltano facade."""
     version_result = meltano.get_version()
-    if version_result.is_success:
+    if version_result.success:
         logger.info("Meltano version: %s", version_result.value)
     discovery_result = meltano.discover_installed_plugins()
-    if discovery_result.is_success:
+    if discovery_result.success:
         logger.info(
             "Found %s installed plugins",
             len(discovery_result.value),
@@ -35,11 +35,11 @@ def simple_component_example() -> None:
     tap_result = meltano.Tap("tap-csv")
     target_result = meltano.Target("target-jsonl")
     dbt_result = meltano.Dbt("analytics")
-    if tap_result.is_success:
+    if tap_result.success:
         logger.info("Tap source: %s", tap_result.value.source_name)
-    if target_result.is_success:
+    if target_result.success:
         logger.info("Target sink: %s", target_result.value.sink_name)
-    if dbt_result.is_success:
+    if dbt_result.success:
         logger.info("DBT transformation: %s", dbt_result.value.transformation_name)
 
 
@@ -49,7 +49,7 @@ def simple_runtime_example() -> None:
         c.Meltano.CMD_BINARY,
         c.Meltano.ExecutorCommand.VERSION,
     ])
-    if result.is_success:
+    if result.success:
         logger.info("Runtime command result: %s", result.value)
 
 

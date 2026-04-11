@@ -23,7 +23,7 @@ def unwrap_component(
 ) -> FlextMeltano:
     """Assert and unwrap a public Meltano component facade."""
     u.Tests.Matchers.that(result, ok=True)
-    assert result.is_success
+    assert result.success
     service = result.value
     u.Tests.Matchers.that(service, is_=FlextMeltano)
     u.Tests.Matchers.that(selector(service), eq=expected_name)
@@ -69,7 +69,7 @@ class TestFlextMeltanoPublicFacade:
         """Component factories accept direct config without wrappers."""
         result = factory(component_name, host="localhost", database="testdb")
         u.Tests.Matchers.that(result, ok=True)
-        assert result.is_success
+        assert result.success
         service = result.value
         u.Tests.Matchers.that(service, is_=FlextMeltano)
         u.Tests.Matchers.that(service.service_name, eq=f"{component_name}_service")

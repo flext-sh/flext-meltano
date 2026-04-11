@@ -91,8 +91,8 @@ class TestFlextMeltanoLibraryRunner:
                 tap_name="tap-csv",
                 target_name="target-jsonl",
             )
-        tm.that(result.is_success or result.is_failure, eq=True)
-        if result.is_success:
+        tm.that(result.success or result.failure, eq=True)
+        if result.success:
             tm.that(result.value, is_=dict)
             tm.that(result.value, contains="tap_name")
             tm.that(result.value, contains="target_name")
@@ -124,4 +124,4 @@ class TestFlextMeltanoLibraryRunner:
         adapter = FlextMeltanoAdapter.ProjectAdapter()
         result = adapter.execute()
         tm.that(result, none=False)
-        tm.that(result.is_success or result.is_failure, eq=True)
+        tm.that(result.success or result.failure, eq=True)

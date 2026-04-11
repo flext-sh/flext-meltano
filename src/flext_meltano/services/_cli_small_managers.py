@@ -118,7 +118,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             cwd=self._resolve_project_root(),
             timeout=c.Meltano.PLUGIN_INSTALLATION_TIMEOUT,
         )
-        if command_result.is_failure:
+        if command_result.failure:
             return r[str].fail(command_result.error or "Plugin installation failed")
         output = command_result.value
         if output.exit_code != 0:
@@ -181,7 +181,7 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
             [c.Meltano.CMD_BINARY, c.Meltano.CMD_VERSION_OPTION],
             cwd=self._resolve_project_root(),
         )
-        if command_result.is_failure:
+        if command_result.failure:
             return r[str].fail(command_result.error or "Version command failed")
         output = command_result.value
         if output.exit_code != 0:

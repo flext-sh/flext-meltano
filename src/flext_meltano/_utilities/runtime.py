@@ -252,7 +252,7 @@ class FlextMeltanoUtilitiesRuntime:
         if extra_fields is None:
             return payload
         merged = u.merge_mappings(payload, extra_fields, strategy="replace")
-        if merged.is_success:
+        if merged.success:
             return merged.value
         return {
             **payload,

@@ -42,7 +42,7 @@ class FlextMeltanoPipelineManager(
         subcommand = args[0]
         subcommand_args = args[1:]
         handler_result = self._get_pipeline_handler(subcommand)
-        if handler_result.is_failure:
+        if handler_result.failure:
             return r[str].fail(handler_result.error)
         return handler_result.value(subcommand_args)
 
@@ -66,7 +66,7 @@ class FlextMeltanoPipelineManager(
             pipeline_name,
             config_payload,
         )
-        if result.is_failure:
+        if result.failure:
             return r[str].fail(result.error)
         self.logger.info("Pipeline created", pipeline=pipeline_name)
         return r[str].ok(result.value)
@@ -76,7 +76,7 @@ class FlextMeltanoPipelineManager(
         if not _args:
             return r[str].fail("Pipeline delete requires pipeline name")
         result = FlextMeltanoPipelineManager.delete_pipeline(_args[0])
-        if result.is_failure:
+        if result.failure:
             return r[str].fail(result.error)
         return r[str].ok(result.value)
 
@@ -105,7 +105,7 @@ class FlextMeltanoPipelineManager(
         if not _args:
             return r[str].fail("Pipeline status requires pipeline name")
         status_result = FlextMeltanoPipelineManager.get_pipeline_status(_args[0])
-        if status_result.is_failure:
+        if status_result.failure:
             return r[str].fail(status_result.error)
         self.logger.info(
             "Pipeline status",
@@ -117,7 +117,7 @@ class FlextMeltanoPipelineManager(
     def _list_pipelines(self, _args: t.StrSequence) -> r[str]:
         """List pipelines."""
         result = FlextMeltanoPipelineManager.list_pipelines()
-        if result.is_failure:
+        if result.failure:
             return r[str].fail(result.error)
         self.logger.info("Configured pipelines", pipelines=", ".join(result.value))
         return r[str].ok(", ".join(result.value) or "none")
@@ -132,7 +132,7 @@ class FlextMeltanoPipelineManager(
             pipeline_name,
             command_args,
         )
-        if result.is_failure:
+        if result.failure:
             return r[str].fail(result.error)
         return r[str].ok(result.value)
 
@@ -141,6 +141,6 @@ class FlextMeltanoPipelineManager(
         if not _args:
             return r[str].fail("Pipeline stop requires pipeline name")
         result = FlextMeltanoPipelineManager.stop_pipeline(_args[0])
-        if result.is_failure:
+        if result.failure:
             return r[str].fail(result.error)
         return r[str].ok(result.value)

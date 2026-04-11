@@ -136,7 +136,7 @@ class FlextMeltanoUtilitiesSinger:
                 if msg_type == c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA:
                     schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
                     result = handler.handle_schema(schema_msg)
-                    if result.is_failure:
+                    if result.failure:
                         return r[None].fail(
                             f"SCHEMA handler failed for {schema_msg.stream}: "
                             f"{result.error}"
@@ -145,7 +145,7 @@ class FlextMeltanoUtilitiesSinger:
                 elif msg_type == c.Meltano.SINGER_MESSAGE_TYPE_RECORD:
                     record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
                     result = handler.handle_record(record_msg)
-                    if result.is_failure:
+                    if result.failure:
                         return r[None].fail(
                             f"RECORD handler failed for {record_msg.stream}: "
                             f"{result.error}"
@@ -154,7 +154,7 @@ class FlextMeltanoUtilitiesSinger:
                 elif msg_type == c.Meltano.SINGER_MESSAGE_TYPE_STATE:
                     state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
                     result = handler.handle_state(state_msg)
-                    if result.is_failure:
+                    if result.failure:
                         return r[None].fail(f"STATE handler failed: {result.error}")
 
             return r[None].ok(None)

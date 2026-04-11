@@ -32,7 +32,7 @@ class FlextMeltanoDbtTransformationRunner:
             if models:
                 args.extend([c.Meltano.CMD_MODELS_OPTION, *models])
             result = executor.execute_dbt_command(c.Meltano.DBT_COMMAND_RUN, args)
-            if result.is_failure:
+            if result.failure:
                 return r[t.MutableContainerMapping].fail(
                     result.error or "DBT transformation failed",
                 )

@@ -369,7 +369,7 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
 def docker_services(docker_manager: tk) -> Generator[tk]:
     """Function-scoped Docker services fixture."""
     result = docker_manager.start_compose_stack("docker-compose.test.yml")
-    if result.is_failure:
+    if result.failure:
         pytest.skip(f"Docker stack unavailable: {result.error}")
     yield docker_manager
     _ = docker_manager.compose_down("docker-compose.test.yml")
@@ -379,7 +379,7 @@ def docker_services(docker_manager: tk) -> Generator[tk]:
 def postgres_service(docker_services: tk) -> Generator[str | None]:
     """PostgreSQL service fixture."""
     ready = docker_services.wait_for_port_ready("localhost", 5433)
-    if ready.is_failure or not ready.value:
+    if ready.failure or not ready.value:
         yield None
         return
     yield "localhost:5433"
@@ -389,7 +389,7 @@ def postgres_service(docker_services: tk) -> Generator[str | None]:
 def redis_service(docker_services: tk) -> Generator[str | None]:
     """Redis service fixture."""
     ready = docker_services.wait_for_port_ready("localhost", 6380)
-    if ready.is_failure or not ready.value:
+    if ready.failure or not ready.value:
         yield None
         return
     yield "localhost:6380"
@@ -399,7 +399,7 @@ def redis_service(docker_services: tk) -> Generator[str | None]:
 def meltano_service(docker_services: tk) -> Generator[str | None]:
     """Meltano service fixture."""
     ready = docker_services.wait_for_port_ready("localhost", 3389)
-    if ready.is_failure or not ready.value:
+    if ready.failure or not ready.value:
         yield None
         return
     yield "localhost:3389"

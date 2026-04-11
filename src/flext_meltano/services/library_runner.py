@@ -50,7 +50,7 @@ class FlextMeltanoLibraryRunner(
                 dbt_models=str(dbt_models or []),
             )
             result = self._elt_executor.execute_pipeline(tap_name, target_name, config)
-            if result.is_failure:
+            if result.failure:
                 return r[t.MutableContainerMapping].fail(
                     result.error or "EL pipeline execution failed",
                 )
@@ -69,7 +69,7 @@ class FlextMeltanoLibraryRunner(
             }
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
-                if dbt_result.is_failure:
+                if dbt_result.failure:
                     elt_result["dbt_success"] = False
                     elt_result["dbt_error"] = dbt_result.error or ""
                 else:
@@ -111,7 +111,7 @@ class FlextMeltanoLibraryRunner(
                 target_name=target.name,
             )
             result = self._elt_executor.execute_pipeline(tap.name, target.name, config)
-            if result.is_failure:
+            if result.failure:
                 return r[t.MutableContainerMapping].fail(
                     result.error or "Pipeline execution failed",
                 )

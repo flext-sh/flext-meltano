@@ -13,12 +13,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
     (".consumer_bases",),
     build_lazy_import_map(
         {
-            "._cli_small_managers": (
-                "FlextMeltanoDbtManager",
-                "FlextMeltanoPluginManager",
-                "FlextMeltanoStatusManager",
-            ),
-            "._pipeline_mgr": ("FlextMeltanoPipelineManager",),
             ".abstractions": ("FlextMeltanoAbstractions",),
             ".adapter_extensions": (
                 "FlextMeltanoDbtAdapter",
@@ -41,15 +35,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".project_service": ("FlextMeltanoProjectService",),
             ".services": ("FlextMeltanoService",),
             ".singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
-            ".singer_sdk": (
-                "Context",
-                "FlextMeltanoSingerTapAdapter",
-                "Record",
-                "Sink",
-                "Stream",
-                "Tap",
-                "Target",
-            ),
+            ".singer_sdk": ("FlextMeltanoSingerTapAdapter",),
             ".singer_state": ("FlextMeltanoSingerStateMixin",),
             ".singer_tap": (
                 "FlextMeltanoTapAbstractions",
