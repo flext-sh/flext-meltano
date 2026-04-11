@@ -45,6 +45,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "Context",
                 "FlextMeltanoSingerTapAdapter",
                 "Record",
+                "Sink",
+                "Stream",
+                "Tap",
+                "Target",
             ),
             ".singer_state": ("FlextMeltanoSingerStateMixin",),
             ".singer_tap": (
@@ -54,10 +58,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".singer_target": ("FlextMeltanoTargetAbstractions",),
             ".singer_translator": ("FlextMeltanoSingerCliTranslator",),
             ".validators": ("FlextMeltanoValidators",),
-            "singer_sdk.sinks.core": ("Sink",),
-            "singer_sdk.streams.core": ("Stream",),
-            "singer_sdk.tap_base": ("Tap",),
-            "singer_sdk.target_base": ("Target",),
         },
     ),
     exclude_names=(

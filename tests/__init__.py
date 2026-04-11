@@ -12,6 +12,7 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
+    from flext_cli.base import s
     from flext_tests._fixtures.settings import (
         reset_settings,
         settings,
@@ -23,6 +24,11 @@ if _t.TYPE_CHECKING:
     from flext_tests.files import tf
     from flext_tests.validator import tv
 
+    from flext_core.decorators import d
+    from flext_core.exceptions import e
+    from flext_core.handlers import h
+    from flext_core.mixins import x
+    from flext_core.result import r
     from tests.constants import TestsFlextMeltanoConstants, c
     from tests.models import TestsFlextMeltanoModels, m
     from tests.protocols import TestsFlextMeltanoProtocols, p
@@ -55,6 +61,12 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextMeltanoUtilities",
                 "u",
             ),
+            "flext_cli.base": ("s",),
+            "flext_core.decorators": ("d",),
+            "flext_core.exceptions": ("e",),
+            "flext_core.handlers": ("h",),
+            "flext_core.mixins": ("x",),
+            "flext_core.result": ("r",),
             "flext_tests._fixtures.settings": (
                 "reset_settings",
                 "settings",
@@ -89,9 +101,14 @@ __all__ = [
     "TestsFlextMeltanoTypes",
     "TestsFlextMeltanoUtilities",
     "c",
+    "d",
+    "e",
+    "h",
     "m",
     "p",
+    "r",
     "reset_settings",
+    "s",
     "settings",
     "settings_factory",
     "t",
@@ -101,4 +118,5 @@ __all__ = [
     "tm",
     "tv",
     "u",
+    "x",
 ]
