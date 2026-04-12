@@ -6,7 +6,7 @@ so that mypy recognizes them as valid types for subclassing.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Protocol
 
 import click
@@ -28,8 +28,30 @@ class _SingerTapSdkBackend(Protocol):
         ...
 
     @property
-    def settings(self) -> t.ContainerMapping:
-        """Expose the normalized tap configuration."""
+    def config(self) -> Mapping[str, t.ValueOrModel]:
+        """Expose the raw tap configuration."""
+        ...
+
+    def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
+        """Return the tap streams."""
+        ...
+
+    def sync_all(self) -> None:
+        """Run a full Singer sync."""
+        ...
+
+
+class _SingerTapSettingsBackend(Protocol):
+    """Legacy tap backend contract exposing ``settings`` only."""
+
+    @classmethod
+    def get_singer_command(cls) -> click.Command:
+        """Return the Singer SDK command bound to the tap type."""
+        ...
+
+    @property
+    def settings(self) -> Mapping[str, t.ValueOrModel]:
+        """Expose tap settings mapping."""
         ...
 
     def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
@@ -44,14 +66,58 @@ class _SingerTapSdkBackend(Protocol):
 class FlextMeltanoSingerTapAdapter:
     """Bridge a Singer SDK tap instance into FLEXT's internal runtime contract."""
 
-    def __init__(self, tap: _SingerTapSdkBackend) -> None:
+    def __init__(
+        self,
+        tap: _SingerTapSdkBackend | _SingerTapSettingsBackend,
+    ) -> None:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap
 
     @property
     def settings(self) -> t.ContainerMapping:
         """Expose the tap configuration through the internal contract."""
-        return self._tap.settings
+        config_source = getattr(self._tap, "config", None)
+        empty_source: Mapping[str, t.ValueOrModel] = {}
+        if isinstance(config_source, Mapping):
+            source = config_source
+        else:
+            settings_source = getattr(self._tap, "settings", {})
+            source = (
+                settings_source
+                if isinstance(settings_source, Mapping)
+                else empty_source
+            )
+        normalized: dict[str, t.RecursiveContainer] = {}
+        for key, value in source.items():
+            normalized[str(key)] = self._normalize_recursive(value)
+        return normalized
+
+    @staticmethod
+    def _normalize_recursive(value: t.ValueOrModel) -> t.RecursiveContainer:
+        """Normalize Singer config values into recursive container contracts."""
+        if isinstance(value, t.CONTAINER_TYPES):
+            return value
+        if value is None:
+            return None
+        if isinstance(value, p.Model):
+            normalized_model = value.model_dump(mode="json")
+            return {
+                str(key): FlextMeltanoSingerTapAdapter._normalize_recursive(model_value)
+                for key, model_value in normalized_model.items()
+            }
+        if isinstance(value, Mapping):
+            return {
+                str(key): FlextMeltanoSingerTapAdapter._normalize_recursive(
+                    mapping_value
+                )
+                for key, mapping_value in value.items()
+            }
+        if isinstance(value, Sequence) and not isinstance(value, str):
+            return [
+                FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
+                for sequence_value in value
+            ]
+        return str(value)
 
     def run_cli(
         self,
