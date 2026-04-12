@@ -12,12 +12,20 @@ from flext_core import r
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     """Core executor providing Meltano command execution with error handling."""
+
+    def __init__(
+        self,
+        settings: FlextMeltanoSettings | t.ContainerMapping | None = None,
+    ) -> None:
+        """Expose the canonical settings bootstrap on the concrete executor."""
+        super().__init__(settings=settings)
 
     @staticmethod
     def create_flext_cli() -> r[FlextMeltanoCLI]:

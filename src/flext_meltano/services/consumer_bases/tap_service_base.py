@@ -19,6 +19,7 @@ from typing import Annotated, ClassVar, Self, override
 
 from pydantic import Field, PrivateAttr
 
+from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
 
 
@@ -44,6 +45,13 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
 
     _tap_instance: p.Meltano.SingerTapInstance | None = PrivateAttr(default=None)
     _instance: ClassVar[Self | None] = None
+
+    def __init__(
+        self,
+        settings: FlextSettings | t.ContainerMapping | None = None,
+    ) -> None:
+        """Expose the canonical settings bootstrap for tap facades."""
+        super().__init__(settings=settings)
 
     @classmethod
     def get_instance(cls) -> Self:

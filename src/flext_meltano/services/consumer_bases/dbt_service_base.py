@@ -19,6 +19,7 @@ from typing import Annotated, ClassVar, Self, override
 from flext_cli import cli
 from pydantic import Field, PrivateAttr
 
+from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
@@ -44,6 +45,13 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     _dbt_project_root: Path | None = PrivateAttr(default=None)
     _instance: ClassVar[Self | None] = None
+
+    def __init__(
+        self,
+        settings: FlextSettings | t.ContainerMapping | None = None,
+    ) -> None:
+        """Expose the canonical settings bootstrap for dbt consumers."""
+        super().__init__(settings=settings)
 
     @classmethod
     def get_instance(cls) -> Self:

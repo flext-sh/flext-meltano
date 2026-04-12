@@ -16,7 +16,10 @@ from flext_meltano import c, t
 class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration services."""
 
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(extra="ignore")
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_",
+        extra="ignore",
+    )
 
     MELTANO_VERSION: ClassVar[str] = c.Meltano.VERSION_MELTANO_REQUIRED
     SINGER_SDK_VERSION: ClassVar[str] = c.Meltano.VERSION_SINGER_SDK_REQUIRED

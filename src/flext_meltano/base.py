@@ -16,7 +16,7 @@ from typing import Annotated, override
 
 from pydantic import Field
 
-from flext_core import s
+from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
@@ -27,9 +27,9 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
     `execute` method from s.
     """
 
-    config_type: type | None = Field(
+    settings_type: type[FlextSettings] | None = Field(
         default=FlextMeltanoSettings,
-        description="Configuration class for Meltano service initialization",
+        description="Settings class for Meltano service initialization",
     )
 
     service_name: Annotated[
@@ -61,11 +61,9 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
 
     def __init__(
         self,
-        /,
-        settings: FlextMeltanoSettings | t.ContainerMapping | None = None,
+        settings: FlextSettings | t.ContainerMapping | None = None,
         *,
-        config_type: type[p.Settings] | None = None,
-        config_overrides: t.ContainerMapping | None = None,
+        settings_type: type[FlextSettings] | None = None,
         initial_context: p.Context | None = None,
         _subproject: str | None = None,
         _services: Mapping[str, t.RegisterableService] | None = None,
@@ -81,16 +79,14 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
         sink_name: str | None = None,
         transformation_name: str | None = None,
     ) -> None:
-        """Accept canonical `settings` input and map it to service overrides."""
-        normalized_overrides = config_overrides
-        if normalized_overrides is None and settings is not None:
-            normalized_overrides = (
-                settings.model_dump()
-                if isinstance(settings, FlextMeltanoSettings)
-                else {str(key): value for key, value in settings.items()}
-            )
+        """Accept canonical settings input and pass typed runtime state forward."""
+        runtime_settings = settings if isinstance(settings, FlextSettings) else None
+        normalized_overrides: t.ContainerMapping | None = None
+        if isinstance(settings, Mapping) and runtime_settings is None:
+            normalized_overrides = {str(key): value for key, value in settings.items()}
         super().__init__(
-            settings_type=config_type,
+            settings=runtime_settings,
+            settings_type=settings_type or FlextMeltanoSettings,
             settings_overrides=normalized_overrides,
             initial_context=initial_context,
         )
@@ -109,16 +105,11 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
     @override
     def settings(self) -> FlextMeltanoSettings:
         """Return the typed Meltano settings namespace."""
-        settings = self.settings
-        if isinstance(settings, FlextMeltanoSettings):
-            return settings
-        empty_overrides: t.MutableContainerMapping = {}
-        normalized_overrides: t.MutableContainerMapping = (
-            {str(key): value for key, value in self.config_overrides.items()}
-            if self.config_overrides
-            else empty_overrides
-        )
-        return FlextMeltanoSettings.model_validate(normalized_overrides)
+        settings = super().settings
+        if not isinstance(settings, FlextMeltanoSettings):
+            msg = "Meltano service runtime settings must be FlextMeltanoSettings"
+            raise TypeError(msg)
+        return settings
 
 
 s = FlextMeltanoServiceBase

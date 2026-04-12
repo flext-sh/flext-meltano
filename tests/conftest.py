@@ -405,17 +405,17 @@ def meltano_service(docker_services: tk) -> Generator[str | None]:
     yield "localhost:3389"
 
 
-def pytest_configure(settings: pytest.Settings) -> None:
-    """Settingsure pytest markers."""
-    settings.addinivalue_line("markers", "unit: Unit tests")
-    settings.addinivalue_line("markers", "integration: Integration tests")
-    settings.addinivalue_line("markers", "e2e: End-to-end tests")
-    settings.addinivalue_line("markers", "meltano: Meltano-specific tests")
-    settings.addinivalue_line("markers", "singer: Singer protocol tests")
-    settings.addinivalue_line("markers", "pipeline: Pipeline execution tests")
-    settings.addinivalue_line("markers", "cli: CLI command tests")
-    settings.addinivalue_line("markers", "slow: Slow tests")
-    settings.addinivalue_line("markers", "docker: Docker-based tests")
+def pytest_configure(config: pytest.Config) -> None:
+    """Configure pytest markers."""
+    config.addinivalue_line("markers", "unit: Unit tests")
+    config.addinivalue_line("markers", "integration: Integration tests")
+    config.addinivalue_line("markers", "e2e: End-to-end tests")
+    config.addinivalue_line("markers", "meltano: Meltano-specific tests")
+    config.addinivalue_line("markers", "singer: Singer protocol tests")
+    config.addinivalue_line("markers", "pipeline: Pipeline execution tests")
+    config.addinivalue_line("markers", "cli: CLI command tests")
+    config.addinivalue_line("markers", "slow: Slow tests")
+    config.addinivalue_line("markers", "docker: Docker-based tests")
 
 
 class MockMeltanoService:

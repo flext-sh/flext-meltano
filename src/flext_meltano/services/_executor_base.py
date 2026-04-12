@@ -32,6 +32,7 @@ from flext_core import r
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano.settings import FlextMeltanoSettings
 from flext_meltano.typings import FlextMeltanoTypes as t
 from flext_meltano.utilities import FlextMeltanoUtilities as u
 
@@ -44,6 +45,13 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         default="FlextMeltanoExecutor",
         description="Canonical executor service instance name",
     )
+
+    def __init__(
+        self,
+        settings: FlextMeltanoSettings | t.ContainerMapping | None = None,
+    ) -> None:
+        """Expose a minimal typed constructor for executor callers."""
+        super().__init__(settings=settings)
 
     @property
     def project_root(self) -> Path:

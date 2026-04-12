@@ -39,7 +39,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test executor with custom configuration."""
         with tempfile.TemporaryDirectory() as temp_dir:
             settings = {"project_root": temp_dir}
-            executor = FlextMeltanoExecutor(config_overrides=settings)
+            executor = FlextMeltanoExecutor(settings=settings)
             assert executor is not None
 
     def test_run_command_no_args(self) -> None:
@@ -117,7 +117,7 @@ class TestFlextMeltanoExecutorComplete:
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.success
             executor = FlextMeltanoExecutor(
-                config_overrides={"project_root": str(project_root)},
+                settings={"project_root": str(project_root)}
             )
             result = executor.run_pipeline_command("tap-csv", "target-jsonl")
         assert isinstance(result, r)
@@ -220,7 +220,7 @@ class TestFlextMeltanoExecutorComplete:
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.success
             executor = FlextMeltanoExecutor(
-                config_overrides={"project_root": str(project_root)},
+                settings={"project_root": str(project_root)}
             )
             result = executor.execute_pipeline("tap-csv", "target-jsonl")
         assert isinstance(result, r)
@@ -235,7 +235,7 @@ class TestFlextMeltanoExecutorComplete:
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.success
             executor = FlextMeltanoExecutor(
-                config_overrides={"project_root": str(project_root)},
+                settings={"project_root": str(project_root)}
             )
             result = executor.execute_dbt_command("run")
         assert isinstance(result, r)
@@ -246,9 +246,7 @@ class TestFlextMeltanoExecutorComplete:
     def test_error_handling_with_invalid_project_root(self) -> None:
         """Test error handling with invalid configuration."""
         invalid_path = Path("/nonexistent/invalid/path")
-        executor = FlextMeltanoExecutor(
-            config_overrides={"project_root": str(invalid_path)},
-        )
+        executor = FlextMeltanoExecutor(settings={"project_root": str(invalid_path)})
         result = executor.version()
         assert isinstance(result, r)
         assert result.success
