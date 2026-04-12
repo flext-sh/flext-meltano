@@ -39,7 +39,15 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".project_service": ("FlextMeltanoProjectService",),
             ".services": ("FlextMeltanoService",),
             ".singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
-            ".singer_sdk": ("FlextMeltanoSingerTapAdapter",),
+            ".singer_sdk": (
+                "Context",
+                "FlextMeltanoSingerTapAdapter",
+                "Record",
+                "Sink",
+                "Stream",
+                "Tap",
+                "Target",
+            ),
             ".singer_state": ("FlextMeltanoSingerStateMixin",),
             ".singer_tap": (
                 "FlextMeltanoTapAbstractions",
@@ -51,6 +59,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
         },
     ),
     exclude_names=(
+        "FlextDispatcher",
+        "FlextLogger",
+        "FlextRegistry",
+        "FlextRuntime",
         "cleanup_submodule_namespace",
         "install_lazy_exports",
         "lazy_getattr",

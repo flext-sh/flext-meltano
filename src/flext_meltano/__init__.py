@@ -93,7 +93,15 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from flext_meltano.services.singer_sdk import FlextMeltanoSingerTapAdapter
+    from flext_meltano.services.singer_sdk import (
+        Context,
+        FlextMeltanoSingerTapAdapter,
+        Record,
+        Sink,
+        Stream,
+        Tap,
+        Target,
+    )
     from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
     from flext_meltano.services.singer_tap import (
         FlextMeltanoTapAbstractions,
@@ -167,6 +175,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
         },
     ),
     exclude_names=(
+        "FlextDispatcher",
+        "FlextLogger",
+        "FlextRegistry",
+        "FlextRuntime",
         "cleanup_submodule_namespace",
         "install_lazy_exports",
         "lazy_getattr",
@@ -182,6 +194,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__: list[str] = [
+    "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",
@@ -256,6 +269,11 @@ __all__: list[str] = [
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
     "FlextMeltanoValidators",
+    "Record",
+    "Sink",
+    "Stream",
+    "Tap",
+    "Target",
     "__author__",
     "__author_email__",
     "__description__",
