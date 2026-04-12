@@ -26,7 +26,6 @@ from tests import u
 if TYPE_CHECKING:
     from tests import t
 
-pytest_plugins = ["flext_tests.conftest_plugin"]
 
 type MeltanoComponentFactory = Callable[..., r[FlextMeltano]]
 type MeltanoComponentSelector = Callable[[FlextMeltano], str | None]
