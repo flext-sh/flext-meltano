@@ -12,9 +12,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_cli import cli
-from pydantic import PrivateAttr
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
@@ -24,7 +23,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     Internal state ``_singer_catalog`` is initialized as empty catalog.
     """
 
-    _singer_catalog: m.Meltano.SingerCatalog = PrivateAttr(
+    _singer_catalog: m.Meltano.SingerCatalog = u.PrivateAttr(
         default_factory=m.Meltano.SingerCatalog,
     )
 
@@ -124,4 +123,4 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         self._singer_catalog = catalog
 
 
-__all__ = ["FlextMeltanoSingerCatalogMixin"]
+__all__: list[str] = ["FlextMeltanoSingerCatalogMixin"]

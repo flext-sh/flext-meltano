@@ -17,4 +17,4 @@ class ExamplesFlextMeltanoModels(FlextMeltanoModels):
 
 m = ExamplesFlextMeltanoModels
 
-__all__ = ["ExamplesFlextMeltanoModels", "m"]
+__all__: list[str] = ["ExamplesFlextMeltanoModels", "m"]

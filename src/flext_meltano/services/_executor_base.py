@@ -25,23 +25,17 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
-from pydantic import Field, TypeAdapter, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from flext_core import r
-from flext_meltano.base import FlextMeltanoServiceBase
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, t, u
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    _container_mapping_list_adapter = TypeAdapter(list[t.ContainerMapping])
-    service_name: str = Field(
+    _container_mapping_list_adapter = c.TypeAdapter(list[t.ContainerMapping])
+    service_name: str = u.Field(
         default="FlextMeltanoExecutor",
         description="Canonical executor service instance name",
     )
@@ -67,7 +61,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return None
         try:
             return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
-        except ValidationError:
+        except c.ValidationError:
             return None
 
     @classmethod
@@ -80,7 +74,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return None
         try:
             return cls._container_mapping_list_adapter.validate_python(value)
-        except ValidationError:
+        except c.ValidationError:
             return None
 
     @staticmethod
@@ -108,7 +102,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return raw_exit_code
         try:
             return t.Meltano.INTEGER_ADAPTER.validate_python(raw_exit_code)
-        except ValidationError:
+        except c.ValidationError:
             return 1
 
     def _project_search_root(self, _cwd: Path | None = None) -> Path | None:
@@ -184,7 +178,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             coerced_input = t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(
                 raw_canonical,
             )
-        except ValidationError:
+        except c.ValidationError:
             coerced_input = None
         current_plugins = self._coerce_container_mapping(coerced_input)
         if current_plugins is None:

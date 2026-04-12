@@ -118,4 +118,4 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             return r[bool].fail(f"Target configuration validation failed: {e}")
 
 
-__all__ = ["FlextMeltanoTargetAbstractions"]
+__all__: list[str] = ["FlextMeltanoTargetAbstractions"]

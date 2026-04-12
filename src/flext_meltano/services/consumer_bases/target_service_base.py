@@ -15,9 +15,7 @@ from collections.abc import MutableMapping, Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
-from pydantic import Field, PrivateAttr
-
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
 class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
@@ -37,10 +35,10 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
 
     target_name: Annotated[
         t.NonEmptyStr,
-        Field(description="Canonical target name (e.g. target-oracle)"),
+        u.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
-    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = PrivateAttr(
+    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
         default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
     _instance: ClassVar[Self | None] = None
@@ -178,4 +176,4 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         })
 
 
-__all__ = ["FlextMeltanoTargetServiceBase"]
+__all__: list[str] = ["FlextMeltanoTargetServiceBase"]

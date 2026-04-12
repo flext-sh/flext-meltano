@@ -7,9 +7,8 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 from flext_cli import m
-from pydantic import Field
 
-from flext_meltano import t
+from flext_meltano import t, u
 
 
 class FlextMeltanoModelsSingerCatalog:
@@ -18,21 +17,21 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
-        breadcrumb: t.StrSequence = Field(
+        breadcrumb: t.StrSequence = u.Field(
             default_factory=list, description="Singer metadata breadcrumb path"
         )
-        metadata: t.ContainerMapping = Field(
+        metadata: t.ContainerMapping = u.Field(
             default_factory=dict, description="Singer metadata properties"
         )
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
 
-        tap_stream_id: Annotated[str, Field(description="Tap stream identifier")]
-        stream: Annotated[str, Field(description="Singer stream name")]
+        tap_stream_id: Annotated[str, u.Field(description="Tap stream identifier")]
+        stream: Annotated[str, u.Field(description="Singer stream name")]
         schema_definition: Annotated[
             t.ContainerValueMapping,
-            Field(
+            u.Field(
                 alias="schema",
                 serialization_alias="schema",
                 validation_alias="schema",
@@ -40,37 +39,39 @@ class FlextMeltanoModelsSingerCatalog:
             ),
         ]
         metadata: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata] = (
-            Field(
+            u.Field(
                 default_factory=lambda: list[
                     FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
                 ](),
                 description="Singer stream metadata blocks",
             )
         )
-        key_properties: t.StrSequence = Field(
+        key_properties: t.StrSequence = u.Field(
             default_factory=list, description="Primary key columns for this stream"
         )
         replication_key: Annotated[
             str | None,
-            Field(default=None, description="Column used for incremental replication"),
+            u.Field(
+                default=None, description="Column used for incremental replication"
+            ),
         ] = None
         replication_method: Annotated[
             Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None,
-            Field(default=None, description="Replication method for this stream"),
+            u.Field(default=None, description="Replication method for this stream"),
         ] = None
         is_view: Annotated[
             bool | None,
-            Field(default=None, description="Whether this stream is a database view"),
+            u.Field(default=None, description="Whether this stream is a database view"),
         ] = None
         table_name: Annotated[
-            str | None, Field(default=None, description="Source table name")
+            str | None, u.Field(default=None, description="Source table name")
         ] = None
         database_name: Annotated[
-            str | None, Field(default=None, description="Source database name")
+            str | None, u.Field(default=None, description="Source database name")
         ] = None
         row_count: Annotated[
             int | None,
-            Field(default=None, description="Estimated row count from source"),
+            u.Field(default=None, description="Estimated row count from source"),
         ] = None
 
     class SingerCatalog(m.ArbitraryTypesModel):
@@ -78,11 +79,11 @@ class FlextMeltanoModelsSingerCatalog:
 
         type: Annotated[
             Literal["CATALOG"],
-            Field(
+            u.Field(
                 default="CATALOG", description="Singer catalog message discriminator"
             ),
         ] = "CATALOG"
-        streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = Field(
+        streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = u.Field(
             default_factory=lambda: list[
                 FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
             ](),
@@ -93,35 +94,36 @@ class FlextMeltanoModelsSingerCatalog:
         """Configuration for a Singer ELT pipeline."""
 
         tap_config_path: Annotated[
-            Path | None, Field(default=None, description="Path to tap configuration")
+            Path | None, u.Field(default=None, description="Path to tap configuration")
         ] = None
         target_config_path: Annotated[
-            Path | None, Field(default=None, description="Path to target configuration")
+            Path | None,
+            u.Field(default=None, description="Path to target configuration"),
         ] = None
         catalog_path: Annotated[
-            Path | None, Field(default=None, description="Path to catalog file")
+            Path | None, u.Field(default=None, description="Path to catalog file")
         ] = None
         state_path: Annotated[
-            Path | None, Field(default=None, description="Path to state file")
+            Path | None, u.Field(default=None, description="Path to state file")
         ] = None
         selected_streams: Annotated[
             t.StrSequence | None,
-            Field(default=None, description="Specific streams to sync"),
+            u.Field(default=None, description="Specific streams to sync"),
         ] = None
 
     class SingerSyncResult(m.Entity):
         """Result of a Singer sync operation."""
 
         records_processed: Annotated[
-            t.NonNegativeInt, Field(description="Number of records processed")
+            t.NonNegativeInt, u.Field(description="Number of records processed")
         ]
         records_written: Annotated[
-            t.NonNegativeInt, Field(description="Number of records written")
+            t.NonNegativeInt, u.Field(description="Number of records written")
         ]
-        errors: Annotated[t.NonNegativeInt, Field(description="Number of errors")]
-        state: t.ContainerMapping = Field(
+        errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
+        state: t.ContainerMapping = u.Field(
             default_factory=dict, description="Final state payload"
         )
         duration_seconds: Annotated[
-            t.NonNegativeFloat, Field(description="Execution duration")
+            t.NonNegativeFloat, u.Field(description="Execution duration")
         ]

@@ -178,4 +178,4 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             )
 
 
-__all__ = ["FlextMeltanoExecutor"]
+__all__: list[str] = ["FlextMeltanoExecutor"]

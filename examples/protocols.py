@@ -17,4 +17,4 @@ class ExamplesFlextMeltanoProtocols(FlextMeltanoProtocols):
 
 p = ExamplesFlextMeltanoProtocols
 
-__all__ = ["ExamplesFlextMeltanoProtocols", "p"]
+__all__: list[str] = ["ExamplesFlextMeltanoProtocols", "p"]

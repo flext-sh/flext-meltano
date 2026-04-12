@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import Field, computed_field, field_serializer, model_validator
 
 from flext_meltano import (
     FlextMeltanoModelsCore,
@@ -23,31 +22,28 @@ class FlextMeltanoModelsInstancesData:
     class DataSinkConfig(m.Entity):
         """Generic data sink configuration with validation."""
 
-        sink_type: Annotated[str, Field(description="Sink type identifier")]
+        sink_type: Annotated[str, u.Field(description="Sink type identifier")]
         connection_config: Annotated[
-            t.ContainerMapping, Field(description="Connection configuration dictionary")
+            t.ContainerMapping,
+            u.Field(description="Connection configuration dictionary"),
         ]
         batch_size: Annotated[
             t.BatchSize,
-            Field(
-                default=c.DEFAULT_SIZE,
-                description="Batch size for record processing",
+            u.Field(
+                default=c.DEFAULT_SIZE, description="Batch size for record processing"
             ),
         ] = c.DEFAULT_SIZE
         max_batches: Annotated[
             t.PositiveInt,
-            Field(
-                default=c.DEFAULT_SIZE,
-                description="Maximum number of batches",
-            ),
+            u.Field(default=c.DEFAULT_SIZE, description="Maximum number of batches"),
         ] = c.DEFAULT_SIZE
 
-        @computed_field
+        @u.computed_field
         def max_records_capacity(self) -> int:
             """Maximum records capacity."""
             return self.batch_size * self.max_batches
 
-        @computed_field
+        @u.computed_field
         def processing_efficiency(self) -> str:
             """Processing efficiency assessment."""
             if (
@@ -62,19 +58,19 @@ class FlextMeltanoModelsInstancesData:
                 return "medium"
             return "low"
 
-        @computed_field
+        @u.computed_field
         def sink_identifier(self) -> str:
             """Unique sink identifier."""
             return f"{self.sink_type}:batch_{self.batch_size}"
 
-        @field_serializer("connection_config")
+        @u.field_serializer("connection_config")
         def serialize_connection_config(
             self, value: t.ContainerMapping
         ) -> t.ContainerMapping:
             """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_sink_config(self) -> Self:
             """Validate sink configuration consistency."""
             if not self.sink_type or not self.sink_type.strip():
@@ -89,34 +85,35 @@ class FlextMeltanoModelsInstancesData:
     class DataSourceInstance(m.Entity):
         """Generic data source instance for pipeline operations."""
 
-        source_type: Annotated[str, Field(description="Type of the data source")]
+        source_type: Annotated[str, u.Field(description="Type of the data source")]
         settings: Annotated[
             FlextMeltanoModelsSources.DataSourceConfig,
-            Field(description="Source configuration"),
+            u.Field(description="Source configuration"),
         ]
         adapter: Annotated[
-            t.ContainerValue | None, Field(default=None, description="Adapter instance")
+            t.ContainerValue | None,
+            u.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[
             str,
-            Field(
+            u.Field(
                 default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
-            Field(description="Discovered streams"),
-        ] = Field(default_factory=dict, description="Discovered streams")
+            u.Field(description="Discovered streams"),
+        ] = u.Field(default_factory=dict, description="Discovered streams")
         discovered: Annotated[
             bool,
-            Field(default=False, description="Whether streams have been discovered"),
+            u.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
-            t.ConfigurationMapping, Field(description="Additional metadata")
-        ] = Field(default_factory=dict, description="Additional metadata")
-        source_id: Annotated[str, Field(description="Unique source identifier")]
+            t.ConfigurationMapping, u.Field(description="Additional metadata")
+        ] = u.Field(default_factory=dict, description="Additional metadata")
+        source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
-        @computed_field
+        @u.computed_field
         def active_stream_count(self) -> int:
             """Number of active streams."""
             return len([
@@ -125,7 +122,7 @@ class FlextMeltanoModelsInstancesData:
                 if stream.status in c.Meltano.ACTIVE_STATUSES
             ])
 
-        @computed_field
+        @u.computed_field
         def is_ready_for_extraction(self) -> bool:
             """Check if source is ready for data extraction."""
             streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
@@ -137,12 +134,12 @@ class FlextMeltanoModelsInstancesData:
                 and self.status == "configured"
             )
 
-        @computed_field
+        @u.computed_field
         def stream_count(self) -> int:
             """Number of discovered streams."""
             return len(self.streams)
 
-        @computed_field
+        @u.computed_field
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
             streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
@@ -155,7 +152,7 @@ class FlextMeltanoModelsInstancesData:
                 case _:
                     return 0
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_source_instance(self) -> Self:
             """Validate source instance consistency."""
             if self.settings.source_type != self.source_type:
@@ -170,29 +167,31 @@ class FlextMeltanoModelsInstancesData:
         """Generic data sink instance for pipeline operations."""
 
         sink_id: Annotated[
-            str | None, Field(default=None, description="Unique sink identifier")
+            str | None, u.Field(default=None, description="Unique sink identifier")
         ] = None
-        sink_type: Annotated[str, Field(description="Type of the data sink")]
-        settings: FlextMeltanoModelsInstancesData.DataSinkConfig = Field(
+        sink_type: Annotated[str, u.Field(description="Type of the data sink")]
+        settings: FlextMeltanoModelsInstancesData.DataSinkConfig = u.Field(
             description="Sink configuration"
         )
         adapter: Annotated[
-            t.ContainerValue | None, Field(default=None, description="Adapter instance")
+            t.ContainerValue | None,
+            u.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[
             str,
-            Field(
+            u.Field(
                 default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[
-            t.BatchSize, Field(default=1000, description="Batch processing size")
+            t.BatchSize, u.Field(default=1000, description="Batch processing size")
         ] = 1000
         sink_count: Annotated[
-            t.NonNegativeInt, Field(default=0, description="Number of configured sinks")
+            t.NonNegativeInt,
+            u.Field(default=0, description="Number of configured sinks"),
         ] = 0
 
-        @computed_field
+        @u.computed_field
         def is_ready(self) -> bool:
             """Check if sink is ready for processing."""
             return self.status == "configured" and self.adapter is not None

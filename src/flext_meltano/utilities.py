@@ -35,4 +35,4 @@ class FlextMeltanoUtilities(FlextInfraUtilities):
 
 
 u = FlextMeltanoUtilities
-__all__ = ["FlextMeltanoUtilities", "u"]
+__all__: list[str] = ["FlextMeltanoUtilities", "u"]

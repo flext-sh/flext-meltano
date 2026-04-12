@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import PrivateAttr
-
 from flext_core import r
 from flext_meltano import (
     FlextMeltanoDbtTransformationRunner,
@@ -30,7 +28,7 @@ class FlextMeltanoLibraryRunner(
     Provides ELT pipeline execution and DBT transformation orchestration.
     """
 
-    _elt_executor: p.Meltano.MeltanoExecutor = PrivateAttr(
+    _elt_executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
         default_factory=FlextMeltanoExecutor,
     )
 
@@ -139,4 +137,4 @@ class FlextMeltanoLibraryRunner(
             return r[t.MutableContainerMapping].fail(error_msg)
 
 
-__all__ = ["FlextMeltanoLibraryRunner"]
+__all__: list[str] = ["FlextMeltanoLibraryRunner"]

@@ -9,8 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from pydantic import ValidationError
-
 from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
 
 
@@ -23,7 +21,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         try:
             m.Meltano.PluginComponentConfig.model_validate(settings)
             return r[bool].ok(value=True)
-        except ValidationError as error:
+        except c.ValidationError as error:
             return r[bool].fail(f"Plugin settings validation failed: {error}")
 
     @classmethod
@@ -35,7 +33,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         try:
             m.Meltano.PipelineProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
-        except ValidationError as error:
+        except c.ValidationError as error:
             return r[bool].fail(f"Project validation failed: {error}")
 
     @classmethod
@@ -78,7 +76,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         try:
             m.Meltano.TransformationProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
-        except ValidationError as error:
+        except c.ValidationError as error:
             return r[bool].fail(f"Transformation validation failed: {error}")
 
     @override
@@ -87,4 +85,4 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         return r[t.ContainerMapping].ok(self.settings.model_dump())
 
 
-__all__ = ["FlextMeltanoValidators"]
+__all__: list[str] = ["FlextMeltanoValidators"]

@@ -13,7 +13,6 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 
 from meltano.core.project import Project
-from pydantic import PrivateAttr
 
 from flext_core import r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
@@ -26,8 +25,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     (initialize, load, get plugins).
     """
 
-    _sdk_project_root: Path | None = PrivateAttr(default=None)
-    _sdk_project: Project | None = PrivateAttr(default=None)
+    _sdk_project_root: Path | None = u.PrivateAttr(default=None)
+    _sdk_project: Project | None = u.PrivateAttr(default=None)
 
     def get_sdk_plugins(
         self,
@@ -126,4 +125,4 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         return plugins
 
 
-__all__ = ["FlextMeltanoProjectManager"]
+__all__: list[str] = ["FlextMeltanoProjectManager"]

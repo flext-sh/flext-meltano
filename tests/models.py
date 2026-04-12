@@ -41,4 +41,4 @@ class TestsFlextMeltanoModels(FlextTestsModels, FlextInfraModels, FlextMeltanoMo
 
 m = TestsFlextMeltanoModels
 
-__all__ = ["TestsFlextMeltanoModels", "m"]
+__all__: list[str] = ["TestsFlextMeltanoModels", "m"]

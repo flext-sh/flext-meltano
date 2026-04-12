@@ -12,9 +12,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_cli import cli
-from pydantic import PrivateAttr
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r
+from flext_meltano import FlextMeltanoServiceBase, c, m, r, u
 
 
 class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
@@ -24,7 +23,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     syncs with proper error handling and r patterns.
     """
 
-    _singer_state: m.Meltano.SingerStateMessage = PrivateAttr(
+    _singer_state: m.Meltano.SingerStateMessage = u.PrivateAttr(
         default_factory=m.Meltano.SingerStateMessage,
     )
 
@@ -112,4 +111,4 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             return r[None].fail(f"Failed to update bookmark: {e}")
 
 
-__all__ = ["FlextMeltanoSingerStateMixin"]
+__all__: list[str] = ["FlextMeltanoSingerStateMixin"]

@@ -57,4 +57,4 @@ class FlextMeltanoDbtTransformationRunner:
             return r[t.MutableContainerMapping].fail(error_msg)
 
 
-__all__ = ["FlextMeltanoDbtTransformationRunner"]
+__all__: list[str] = ["FlextMeltanoDbtTransformationRunner"]

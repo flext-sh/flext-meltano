@@ -99,7 +99,7 @@ class FlextMeltanoSingerTapAdapter:
             return value
         if value is None:
             return None
-        if isinstance(value, p.Model):
+        if isinstance(value, m.BaseModel):
             normalized_model = value.model_dump(mode="json")
             return {
                 str(key): FlextMeltanoSingerTapAdapter._normalize_recursive(model_value)

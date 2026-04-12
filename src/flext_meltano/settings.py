@@ -5,18 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, ClassVar, Self
 
-from pydantic import Field, field_validator
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import FlextSettings, r
-from flext_meltano import c, t
+from flext_meltano import c, t, u
 
 
 @FlextSettings.auto_register("meltano")
 class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration services."""
 
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+    model_config: ClassVar[c.SettingsConfigDict] = c.SettingsConfigDict(
         env_prefix="FLEXT_MELTANO_",
         extra="ignore",
     )
@@ -34,7 +31,7 @@ class FlextMeltanoSettings(FlextSettings):
 
     project_root: Annotated[
         Path,
-        Field(
+        u.Field(
             default=Path(),
             validation_alias=MELTANO_PROJECT_ROOT_ENV,
             description="Root directory of the Meltano project",
@@ -42,14 +39,16 @@ class FlextMeltanoSettings(FlextSettings):
     ]
     config_dir: Annotated[
         Path,
-        Field(default=Path(".meltano"), description="Meltano configuration directory"),
+        u.Field(
+            default=Path(".meltano"), description="Meltano configuration directory"
+        ),
     ]
     logs_dir: Annotated[
-        Path, Field(default=Path("logs"), description="Meltano logs directory")
+        Path, u.Field(default=Path("logs"), description="Meltano logs directory")
     ]
     environment: Annotated[
         str,
-        Field(
+        u.Field(
             default="development",
             validation_alias=MELTANO_ENVIRONMENT_ENV,
             description="Active Meltano runtime environment",
@@ -57,7 +56,7 @@ class FlextMeltanoSettings(FlextSettings):
     ]
     log_level: Annotated[
         c.LogLevel,
-        Field(
+        u.Field(
             default=c.LogLevel.INFO,
             validation_alias=MELTANO_LOG_LEVEL_ENV,
             description="Meltano logging level",
@@ -65,25 +64,25 @@ class FlextMeltanoSettings(FlextSettings):
     ]
     meltano_version: Annotated[
         str,
-        Field(default=MELTANO_VERSION, description="Required Meltano version"),
+        u.Field(default=MELTANO_VERSION, description="Required Meltano version"),
     ]
     singer_sdk_version: Annotated[
         str,
-        Field(default=SINGER_SDK_VERSION, description="Required Singer SDK version"),
+        u.Field(default=SINGER_SDK_VERSION, description="Required Singer SDK version"),
     ]
     dbt_version: Annotated[
-        str, Field(default=DBT_VERSION, description="Required dbt version")
+        str, u.Field(default=DBT_VERSION, description="Required dbt version")
     ]
     pipelines_dir: Annotated[
         Path,
-        Field(
+        u.Field(
             default=Path(),
             validation_alias=PIPELINES_DIR_ENV,
             description="Root directory for pipeline configurations",
         ),
     ]
 
-    @field_validator("pipelines_dir", mode="before")
+    @u.field_validator("pipelines_dir", mode="before")
     @classmethod
     def _coerce_pipelines_dir(cls, value: t.Scalar) -> Path:
         text = str(value).strip()
@@ -91,17 +90,17 @@ class FlextMeltanoSettings(FlextSettings):
             return Path(text).expanduser().resolve()
         return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
 
-    @field_validator("project_root", mode="before")
+    @u.field_validator("project_root", mode="before")
     @classmethod
     def _coerce_project_root(cls, value: t.Scalar) -> Path:
         return Path(str(value)).resolve()
 
-    @field_validator("config_dir", "logs_dir", mode="before")
+    @u.field_validator("config_dir", "logs_dir", mode="before")
     @classmethod
     def _coerce_path(cls, value: t.Scalar) -> Path:
         return Path(str(value))
 
-    @field_validator("environment")
+    @u.field_validator("environment")
     @classmethod
     def _validate_environment(cls, value: str) -> str:
         normalized = value.strip().lower()
@@ -120,7 +119,7 @@ class FlextMeltanoSettings(FlextSettings):
             raise ValueError(msg)
         return str(normalized)
 
-    @field_validator("log_level")
+    @u.field_validator("log_level")
     @classmethod
     def _validate_log_level(cls, value: c.LogLevel | str) -> c.LogLevel:
         normalized = str(value).strip().upper()
@@ -237,4 +236,4 @@ class FlextMeltanoSettings(FlextSettings):
         return cls(environment=str(normalized))
 
 
-__all__ = ["FlextMeltanoSettings"]
+__all__: list[str] = ["FlextMeltanoSettings"]

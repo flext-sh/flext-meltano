@@ -5,9 +5,8 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import m
-from pydantic import Field, computed_field, field_validator, model_validator
 
-from flext_meltano import FlextMeltanoModelsResults, c, t
+from flext_meltano import FlextMeltanoModelsResults, c, t, u
 
 
 class FlextMeltanoModelsResultsPipeline:
@@ -16,33 +15,33 @@ class FlextMeltanoModelsResultsPipeline:
     class PipelineResult(m.TimestampedModel):
         """Generic pipeline execution result with complete validation."""
 
-        pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
+        pipeline_id: Annotated[str, u.Field(description="Pipeline identifier")]
         source_result: Annotated[
             FlextMeltanoModelsResults.ExecutionResult | None,
-            Field(default=None, description="Source execution result"),
+            u.Field(default=None, description="Source execution result"),
         ] = None
         sink_result: Annotated[
             FlextMeltanoModelsResults.ExecutionResult | None,
-            Field(default=None, description="Sink execution result"),
+            u.Field(default=None, description="Sink execution result"),
         ] = None
-        transformation_result: FlextMeltanoModelsResults.ExecutionResult | None = Field(
-            default=None, description="Transformation execution result"
+        transformation_result: FlextMeltanoModelsResults.ExecutionResult | None = (
+            u.Field(default=None, description="Transformation execution result")
         )
         overall_status: Annotated[
             str,
-            Field(
+            u.Field(
                 default=c.Meltano.OperationStatus.PENDING,
                 description="Overall pipeline status",
             ),
         ] = c.Meltano.OperationStatus.PENDING
         total_records: Annotated[
-            t.NonNegativeInt, Field(default=0, description="Total records processed")
+            t.NonNegativeInt, u.Field(default=0, description="Total records processed")
         ] = 0
         pipeline_metadata: Annotated[
-            t.ConfigurationMapping, Field(description="Pipeline execution metadata")
-        ] = Field(default_factory=dict, description="Pipeline execution metadata")
+            t.ConfigurationMapping, u.Field(description="Pipeline execution metadata")
+        ] = u.Field(default_factory=dict, description="Pipeline execution metadata")
 
-        @computed_field
+        @u.computed_field
         def completed_stages(self) -> t.StrSequence:
             """Completed pipeline stages."""
             return [
@@ -55,7 +54,7 @@ class FlextMeltanoModelsResultsPipeline:
                 if result is not None and result.end_time is not None
             ]
 
-        @computed_field
+        @u.computed_field
         def completion_percentage(self) -> float:
             """Pipeline completion percentage."""
             total_stages = 3
@@ -86,12 +85,12 @@ class FlextMeltanoModelsResultsPipeline:
                 and self.transformation_result.error_message is None,
             )
 
-        @computed_field
+        @u.computed_field
         def is_fully_successful(self) -> bool:
             """Check if all stages completed successfully."""
             return self._all_stages_successful()
 
-        @computed_field
+        @u.computed_field
         def total_duration_seconds(self) -> float:
             """Total pipeline duration."""
             total = 0.0
@@ -106,7 +105,7 @@ class FlextMeltanoModelsResultsPipeline:
                 total += self.transformation_result.duration_seconds
             return total
 
-        @field_validator("overall_status", mode="before")
+        @u.field_validator("overall_status", mode="before")
         @classmethod
         def validate_overall_status(cls, v: str) -> str:
             """Validate overall pipeline status."""
@@ -122,7 +121,7 @@ class FlextMeltanoModelsResultsPipeline:
                 raise ValueError(msg)
             return v
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_pipeline_result(self) -> Self:
             """Validate pipeline result consistency."""
             total_from_stages = 0

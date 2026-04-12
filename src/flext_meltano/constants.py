@@ -23,4 +23,4 @@ class FlextMeltanoConstants(FlextCliConstants):
 
 
 c = FlextMeltanoConstants
-__all__ = ["FlextMeltanoConstants", "c"]
+__all__: list[str] = ["FlextMeltanoConstants", "c"]

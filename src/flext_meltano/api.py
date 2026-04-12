@@ -100,4 +100,4 @@ class FlextMeltano(
 meltano = FlextMeltano.get_instance()
 
 
-__all__ = ["FlextMeltano", "meltano"]
+__all__: list[str] = ["FlextMeltano", "meltano"]

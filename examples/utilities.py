@@ -17,4 +17,4 @@ class ExamplesFlextMeltanoUtilities(FlextMeltanoUtilities):
 
 u = ExamplesFlextMeltanoUtilities
 
-__all__ = ["ExamplesFlextMeltanoUtilities", "u"]
+__all__: list[str] = ["ExamplesFlextMeltanoUtilities", "u"]

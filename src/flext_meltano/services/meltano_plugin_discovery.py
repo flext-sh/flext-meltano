@@ -160,4 +160,4 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             return r[t.StrMapping].fail(error_msg)
 
 
-__all__ = ["FlextMeltanoPluginDiscoveryMixin"]
+__all__: list[str] = ["FlextMeltanoPluginDiscoveryMixin"]

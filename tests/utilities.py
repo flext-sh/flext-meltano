@@ -22,4 +22,4 @@ class TestsFlextMeltanoUtilities(FlextTestsUtilities):
 
 
 u = TestsFlextMeltanoUtilities
-__all__ = ["TestsFlextMeltanoUtilities", "u"]
+__all__: list[str] = ["TestsFlextMeltanoUtilities", "u"]

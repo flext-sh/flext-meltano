@@ -83,4 +83,4 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return r[t.ContainerMapping].ok(self.settings.model_dump())
 
 
-__all__ = ["FlextMeltanoBridge"]
+__all__: list[str] = ["FlextMeltanoBridge"]

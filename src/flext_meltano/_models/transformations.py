@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import c, t
 
@@ -16,25 +15,25 @@ class FlextMeltanoModelsTransformations:
     class DbtProjectModel(m.Entity):
         """Generic DBT project configuration with validation."""
 
-        name: Annotated[str, Field(description="DBT project name")]
-        profile: Annotated[str, Field(description="DBT profile name")]
+        name: Annotated[str, u.Field(description="DBT project name")]
+        profile: Annotated[str, u.Field(description="DBT profile name")]
         dbt_version: Annotated[
-            str, Field(default="1.0.0", description="DBT project version")
+            str, u.Field(default="1.0.0", description="DBT project version")
         ] = "1.0.0"
         settings: Annotated[
-            t.ContainerMapping, Field(description="DBT project configuration")
-        ] = Field(default_factory=dict, description="DBT project configuration")
+            t.ContainerMapping, u.Field(description="DBT project configuration")
+        ] = u.Field(default_factory=dict, description="DBT project configuration")
         models: Annotated[
-            t.ContainerMapping, Field(description="DBT models configuration")
-        ] = Field(default_factory=dict, description="DBT models configuration")
+            t.ContainerMapping, u.Field(description="DBT models configuration")
+        ] = u.Field(default_factory=dict, description="DBT models configuration")
         sources: Annotated[
-            t.ContainerMapping, Field(description="DBT sources configuration")
-        ] = Field(default_factory=dict, description="DBT sources configuration")
+            t.ContainerMapping, u.Field(description="DBT sources configuration")
+        ] = u.Field(default_factory=dict, description="DBT sources configuration")
         tests: Annotated[
-            t.ContainerMapping, Field(description="DBT tests configuration")
-        ] = Field(default_factory=dict, description="DBT tests configuration")
+            t.ContainerMapping, u.Field(description="DBT tests configuration")
+        ] = u.Field(default_factory=dict, description="DBT tests configuration")
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_dbt_project(self) -> Self:
             """Validate DBT project configuration consistency."""
             if not self.name or not self.name.strip():
@@ -50,31 +49,31 @@ class FlextMeltanoModelsTransformations:
     class TransformationProjectModel(m.Entity):
         """Generic transformation project configuration with validation."""
 
-        name: Annotated[t.NonEmptyStr, Field(description="Project name")]
-        transformation_version: Annotated[str, Field(description="Project version")]
-        profile: Annotated[str, Field(description="Profile name")]
+        name: Annotated[t.NonEmptyStr, u.Field(description="Project name")]
+        transformation_version: Annotated[str, u.Field(description="Project version")]
+        profile: Annotated[str, u.Field(description="Profile name")]
         model_paths: Annotated[
             t.StrSequence,
-            Field(default=["models"], description="Model paths"),
-        ] = Field(default=["models"], description="Model paths")
+            u.Field(default=["models"], description="Model paths"),
+        ] = u.Field(default=["models"], description="Model paths")
         analysis_paths: Annotated[
             t.StrSequence,
-            Field(default=["analysis"], description="Analysis paths"),
-        ] = Field(default=["analysis"], description="Analysis paths")
+            u.Field(default=["analysis"], description="Analysis paths"),
+        ] = u.Field(default=["analysis"], description="Analysis paths")
         test_paths: Annotated[
             t.StrSequence,
-            Field(default=["tests"], description="Test paths"),
-        ] = Field(default=["tests"], description="Test paths")
+            u.Field(default=["tests"], description="Test paths"),
+        ] = u.Field(default=["tests"], description="Test paths")
         seed_paths: Annotated[
             t.StrSequence,
-            Field(default=["seeds"], description="Seed paths"),
-        ] = Field(default=["seeds"], description="Seed paths")
+            u.Field(default=["seeds"], description="Seed paths"),
+        ] = u.Field(default=["seeds"], description="Seed paths")
         macro_paths: Annotated[
             t.StrSequence,
-            Field(default=["macros"], description="Macro paths"),
-        ] = Field(default=["macros"], description="Macro paths")
+            u.Field(default=["macros"], description="Macro paths"),
+        ] = u.Field(default=["macros"], description="Macro paths")
 
-        @computed_field
+        @u.computed_field
         def has_custom_paths(self) -> bool:
             """Check if project has custom paths."""
             default_paths = {"models", "analysis", "tests", "seeds", "macros"}
@@ -87,7 +86,7 @@ class FlextMeltanoModelsTransformations:
             }
             return bool(all_paths - default_paths)
 
-        @computed_field
+        @u.computed_field
         def project_structure_complexity(self) -> str:
             """Project structure complexity."""
             # Use u.count() for unified counting (DSL pattern)
@@ -104,7 +103,7 @@ class FlextMeltanoModelsTransformations:
                 return "moderate"
             return "complex"
 
-        @computed_field
+        @u.computed_field
         def total_path_count(self) -> int:
             """Total number of configured paths."""
             # Use u.count() for unified counting (DSL pattern)
@@ -116,7 +115,7 @@ class FlextMeltanoModelsTransformations:
                 + u.count(self.macro_paths)
             )
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:
             """Validate project consistency."""
             if not self.model_paths:
@@ -128,34 +127,34 @@ class FlextMeltanoModelsTransformations:
     class TransformationExecutionModel(m.Entity):
         """Generic transformation execution configuration with validation."""
 
-        command: Annotated[str, Field(description="Command to execute")]
+        command: Annotated[str, u.Field(description="Command to execute")]
         models: Annotated[
             t.StrSequence,
-            Field(description="Models to execute"),
-        ] = Field(default_factory=list, description="Models to execute")
+            u.Field(description="Models to execute"),
+        ] = u.Field(default_factory=list, description="Models to execute")
         exclude: Annotated[
             t.StrSequence,
-            Field(description="Models to exclude"),
-        ] = Field(default_factory=list, description="Models to exclude")
+            u.Field(description="Models to exclude"),
+        ] = u.Field(default_factory=list, description="Models to exclude")
         full_refresh: Annotated[
             bool,
-            Field(default=False, description="Full refresh execution"),
+            u.Field(default=False, description="Full refresh execution"),
         ] = False
         fail_fast: Annotated[
             bool,
-            Field(default=True, description="Fail fast on first error"),
+            u.Field(default=True, description="Fail fast on first error"),
         ] = True
         threads: Annotated[
             t.WorkerCount,
-            Field(default=1, description="Number of threads to use"),
+            u.Field(default=1, description="Number of threads to use"),
         ] = 1
 
-        @computed_field
+        @u.computed_field
         def exclude_count(self) -> int:
             """Number of models to exclude."""
             return len(self.exclude)
 
-        @computed_field
+        @u.computed_field
         def execution_complexity(self) -> str:
             """Execution complexity assessment."""
             total_scope = len(self.models) + len(self.exclude)
@@ -167,17 +166,17 @@ class FlextMeltanoModelsTransformations:
                 return "moderate"
             return "complex"
 
-        @computed_field
+        @u.computed_field
         def is_parallel_execution(self) -> bool:
             """Check if execution uses multiple threads."""
             return self.threads > 1
 
-        @computed_field
+        @u.computed_field
         def model_count(self) -> int:
             """Number of models to execute."""
             return len(self.models)
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_execution_consistency(self) -> Self:
             """Validate execution consistency."""
             max_threads = (

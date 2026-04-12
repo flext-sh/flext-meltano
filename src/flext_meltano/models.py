@@ -67,7 +67,7 @@ class FlextMeltanoModels(FlextCliModels):
 
 m = FlextMeltanoModels
 
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoModels",
     "m",
 ]

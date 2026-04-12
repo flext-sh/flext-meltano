@@ -238,4 +238,4 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         return project_result
 
 
-__all__ = ["FlextMeltanoProjectService"]
+__all__: list[str] = ["FlextMeltanoProjectService"]

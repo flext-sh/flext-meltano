@@ -10,8 +10,6 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import ClassVar, override
 
-from pydantic import Field, ValidationError
-
 from flext_core import r
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
@@ -25,7 +23,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    service_name: str = Field(
+    service_name: str = u.Field(
         default="FlextMeltanoAbstractions",
         description="Canonical abstractions service instance name",
     )
@@ -39,7 +37,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return None
         try:
             return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
-        except ValidationError:
+        except c.ValidationError:
             return None
 
     def _run_meltano(self, args: t.StrSequence) -> r[str]:

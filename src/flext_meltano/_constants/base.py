@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from pydantic import ValidationError
+from flext_core import c
 
 
 class FlextMeltanoConstantsBase:
@@ -135,7 +135,7 @@ class FlextMeltanoConstantsBase:
         OSError,
         RuntimeError,
         ImportError,
-        ValidationError,
+        c.ValidationError,
     )
 
     # Dbt

@@ -121,7 +121,7 @@ class FlextMeltanoSingerManager:
         return r[str].fail(f"Target operation '{operation}' is not supported")
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextMeltanoCommandRouter",
     "FlextMeltanoDbtManager",
     "FlextMeltanoPipelineManager",

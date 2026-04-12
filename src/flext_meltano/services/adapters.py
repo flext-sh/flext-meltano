@@ -129,4 +129,4 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         return r[t.ContainerMapping].ok(self.settings.model_dump())
 
 
-__all__ = ["FlextMeltanoAdapter"]
+__all__: list[str] = ["FlextMeltanoAdapter"]

@@ -54,4 +54,4 @@ class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
 
 
 p = TestsFlextMeltanoProtocols
-__all__ = ["TestsFlextMeltanoProtocols", "p"]
+__all__: list[str] = ["TestsFlextMeltanoProtocols", "p"]

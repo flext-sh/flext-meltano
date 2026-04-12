@@ -14,10 +14,8 @@ from collections.abc import Mapping, Sequence
 from types import ModuleType
 from typing import Annotated, override
 
-from pydantic import Field
-
 from flext_core import FlextSettings, s
-from flext_meltano import FlextMeltanoSettings, c, p, t
+from flext_meltano import FlextMeltanoSettings, c, p, t, u
 
 
 class FlextMeltanoServiceBase(s[t.ContainerMapping]):
@@ -27,36 +25,38 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
     `execute` method from s.
     """
 
-    settings_type: type[FlextSettings] | None = Field(
+    settings_type: type[FlextSettings] | None = u.Field(
         default=FlextMeltanoSettings,
         description="Settings class for Meltano service initialization",
     )
 
     service_name: Annotated[
         t.NonEmptyStr,
-        Field(
+        u.Field(
             default="flext_meltano_service",
             description="Canonical Meltano service instance name",
         ),
     ] = "flext_meltano_service"
     service_version: Annotated[
         t.NonEmptyStr,
-        Field(
+        u.Field(
             default=c.Meltano.DEFAULT_SERVICE_VERSION,
             description="Canonical Meltano service version",
         ),
     ] = c.Meltano.DEFAULT_SERVICE_VERSION
     source_name: Annotated[
         str | None,
-        Field(default=None, description="Optional source specialization name"),
+        u.Field(default=None, description="Optional source specialization name"),
     ] = None
     sink_name: Annotated[
         str | None,
-        Field(default=None, description="Optional sink specialization name"),
+        u.Field(default=None, description="Optional sink specialization name"),
     ] = None
     transformation_name: Annotated[
         str | None,
-        Field(default=None, description="Optional transformation specialization name"),
+        u.Field(
+            default=None, description="Optional transformation specialization name"
+        ),
     ] = None
 
     def __init__(
@@ -113,4 +113,4 @@ class FlextMeltanoServiceBase(s[t.ContainerMapping]):
 
 
 s = FlextMeltanoServiceBase
-__all__ = ["FlextMeltanoServiceBase"]
+__all__: list[str] = ["FlextMeltanoServiceBase"]

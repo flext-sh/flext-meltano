@@ -13,10 +13,9 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from flext_cli import cli
-from pydantic import PrivateAttr, ValidationError
 
 from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 
 class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
@@ -25,8 +24,8 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     Manages DBT project manifests and model/test discovery.
     """
 
-    _dbt_project_root: Path | None = PrivateAttr(default=None)
-    _dbt_manifest: t.Meltano.DbtManifestData | None = PrivateAttr(default=None)
+    _dbt_project_root: Path | None = u.PrivateAttr(default=None)
+    _dbt_manifest: t.Meltano.DbtManifestData | None = u.PrivateAttr(default=None)
 
     def get_dbt_models(self) -> r[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""
@@ -76,7 +75,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             ]
             self.logger.info("Tests retrieved", count=len(tests))
             return r[Sequence[t.AttributeMapping]].ok(tests)
-        except (ValidationError, OSError, ValueError, TypeError) as e:
+        except (c.ValidationError, OSError, ValueError, TypeError) as e:
             self.logger.exception("Failed to get tests", error=str(e))
             return r[Sequence[t.AttributeMapping]].fail(f"Failed to get tests: {e}")
 
@@ -102,7 +101,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 node for node in parsed_nodes if node.resource_type == resource_type
             ]
             return r[Sequence[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
-        except (ValidationError, OSError, ValueError, TypeError) as e:
+        except (c.ValidationError, OSError, ValueError, TypeError) as e:
             return r[Sequence[m.Meltano.DbtManifestNode]].fail(
                 f"Failed to read manifest nodes: {e}"
             )
@@ -191,4 +190,4 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
 
-__all__ = ["FlextMeltanoDbtProjectMixin"]
+__all__: list[str] = ["FlextMeltanoDbtProjectMixin"]

@@ -117,4 +117,4 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
             return r[t.ContainerMapping].fail(f"DBT operation failed: {ex}")
 
 
-__all__ = ["FlextMeltanoDbtAdapter", "FlextMeltanoPipelineAdapter"]
+__all__: list[str] = ["FlextMeltanoDbtAdapter", "FlextMeltanoPipelineAdapter"]

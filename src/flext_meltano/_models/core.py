@@ -6,7 +6,6 @@ from collections.abc import Sequence
 from typing import Annotated
 
 from flext_cli import m, u
-from pydantic import Field, field_validator
 
 from flext_core import r
 from flext_meltano import t
@@ -53,12 +52,10 @@ class FlextMeltanoModelsCore:
 
         items: Annotated[
             t.StrSequence,
-            Field(
-                description="Normalized list of string values",
-            ),
-        ] = Field(default_factory=list, description="Normalized string values")
+            u.Field(description="Normalized list of string values"),
+        ] = u.Field(default_factory=list, description="Normalized string values")
 
-        @field_validator("items", mode="before")
+        @u.field_validator("items", mode="before")
         @classmethod
         def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.StrSequence:
             """Convert sequence-like values into string lists."""
@@ -71,15 +68,13 @@ class FlextMeltanoModelsCore:
 
         items: Annotated[
             Sequence[bool],
-            Field(
-                description="Normalized list of boolean values",
-            ),
-        ] = Field(
+            u.Field(description="Normalized list of boolean values"),
+        ] = u.Field(
             default_factory=lambda: list[bool](),
             description="Normalized boolean values",
         )
 
-        @field_validator("items", mode="before")
+        @u.field_validator("items", mode="before")
         @classmethod
         def normalize_items(cls, value: t.Meltano.ValidatorInput) -> Sequence[bool]:
             """Convert sequence-like values into booleans."""

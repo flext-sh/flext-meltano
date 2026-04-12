@@ -25,4 +25,4 @@ class TestsFlextMeltanoTypes(FlextTestsTypes, FlextMeltanoTypes):
 
 
 t = TestsFlextMeltanoTypes
-__all__ = ["TestsFlextMeltanoTypes", "t"]
+__all__: list[str] = ["TestsFlextMeltanoTypes", "t"]

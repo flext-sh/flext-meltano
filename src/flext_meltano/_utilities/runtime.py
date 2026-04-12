@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_infra import u
-from pydantic import BaseModel
 
 from flext_meltano import c, m, p, t
 
@@ -82,7 +81,7 @@ class FlextMeltanoUtilitiesRuntime:
         """Extract and normalize project_root from a settings-like object."""
         if isinstance(settings, Mapping):
             raw = settings.get("project_root")
-        elif isinstance(settings, BaseModel):
+        elif isinstance(settings, m.BaseModel):
             model_data = settings.model_dump()
             raw = model_data.get("project_root")
         elif isinstance(settings, (Path, str)):

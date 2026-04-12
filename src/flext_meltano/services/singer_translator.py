@@ -120,4 +120,4 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         return r[t.StrSequence].ok(command)
 
 
-__all__ = ["FlextMeltanoSingerCliTranslator"]
+__all__: list[str] = ["FlextMeltanoSingerCliTranslator"]

@@ -161,4 +161,4 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         return self.validate_service_config(self.settings.model_dump())
 
 
-__all__ = ["FlextMeltanoService"]
+__all__: list[str] = ["FlextMeltanoService"]

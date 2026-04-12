@@ -115,4 +115,4 @@ class FlextMeltanoComponentService(
         return r[None].ok(None)
 
 
-__all__ = ["FlextMeltanoComponentService"]
+__all__: list[str] = ["FlextMeltanoComponentService"]

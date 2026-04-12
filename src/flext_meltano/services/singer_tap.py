@@ -150,4 +150,4 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             return r[bool].fail(f"Schema validation failed: {e}")
 
 
-__all__ = ["FlextMeltanoTapAbstractions", "FlextMeltanoTapSourceMixin"]
+__all__: list[str] = ["FlextMeltanoTapAbstractions", "FlextMeltanoTapSourceMixin"]

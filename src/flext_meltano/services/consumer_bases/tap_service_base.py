@@ -17,10 +17,8 @@ import sys
 from abc import abstractmethod
 from typing import Annotated, ClassVar, Self, override
 
-from pydantic import Field, PrivateAttr
-
 from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
@@ -40,10 +38,10 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
 
     tap_name: Annotated[
         t.NonEmptyStr,
-        Field(description="Canonical tap name (e.g. tap-oracle)"),
+        u.Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
-    _tap_instance: p.Meltano.SingerTapInstance | None = PrivateAttr(default=None)
+    _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(default=None)
     _instance: ClassVar[Self | None] = None
 
     def __init__(
@@ -160,4 +158,4 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         })
 
 
-__all__ = ["FlextMeltanoTapServiceBase"]
+__all__: list[str] = ["FlextMeltanoTapServiceBase"]

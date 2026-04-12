@@ -10,9 +10,9 @@ import sys
 from typing import override
 
 from flext_cli import cli
-from pydantic import Field, PrivateAttr
 
 from flext_core import r
+from flext_meltano import u
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.protocols import FlextMeltanoProtocols as p
@@ -32,17 +32,16 @@ from flext_meltano.typings import FlextMeltanoTypes as t
 class FlextMeltanoCLI(FlextMeltanoServiceBase):
     """SOLID-compliant CLI for FLEXT Meltano operations."""
 
-    service_name: str = Field(
-        default="FlextMeltanoCLI",
-        description="Canonical CLI service instance name",
+    service_name: str = u.Field(
+        default="FlextMeltanoCLI", description="Canonical CLI service instance name"
     )
-    _output: p.Meltano.Output = PrivateAttr()
-    _pipeline_manager: p.Meltano.CLIManager = PrivateAttr()
-    _singer_manager: p.Meltano.SingerManager = PrivateAttr()
-    _dbt_manager: p.Meltano.CLIManager = PrivateAttr()
-    _plugin_manager: p.Meltano.CLIManager = PrivateAttr()
-    _status_manager: p.Meltano.StatusManager = PrivateAttr()
-    _command_router: p.Meltano.CommandRouter = PrivateAttr()
+    _output: p.Meltano.Output = u.PrivateAttr()
+    _pipeline_manager: p.Meltano.CLIManager = u.PrivateAttr()
+    _singer_manager: p.Meltano.SingerManager = u.PrivateAttr()
+    _dbt_manager: p.Meltano.CLIManager = u.PrivateAttr()
+    _plugin_manager: p.Meltano.CLIManager = u.PrivateAttr()
+    _status_manager: p.Meltano.StatusManager = u.PrivateAttr()
+    _command_router: p.Meltano.CommandRouter = u.PrivateAttr()
 
     @override
     def model_post_init(self, __context: t.ScalarMapping | None, /) -> None:
@@ -139,4 +138,4 @@ def main() -> int:
     return FlextMeltanoCLI().main()
 
 
-__all__ = ["FlextMeltanoCLI", "main"]
+__all__: list[str] = ["FlextMeltanoCLI", "main"]

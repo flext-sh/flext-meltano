@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
 from flext_cli import cli
-from pydantic import Field, PrivateAttr
 
 from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
@@ -40,10 +39,10 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     dbt_project_name: Annotated[
         t.NonEmptyStr,
-        Field(description="Canonical dbt project name"),
+        u.Field(description="Canonical dbt project name"),
     ] = "dbt"
 
-    _dbt_project_root: Path | None = PrivateAttr(default=None)
+    _dbt_project_root: Path | None = u.PrivateAttr(default=None)
     _instance: ClassVar[Self | None] = None
 
     def __init__(
@@ -239,4 +238,4 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         })
 
 
-__all__ = ["FlextMeltanoDbtServiceBase"]
+__all__: list[str] = ["FlextMeltanoDbtServiceBase"]

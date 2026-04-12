@@ -195,4 +195,4 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         return []
 
 
-__all__ = ["FlextMeltanoAbstractions"]
+__all__: list[str] = ["FlextMeltanoAbstractions"]

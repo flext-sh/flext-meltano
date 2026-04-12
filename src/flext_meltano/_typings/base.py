@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_cli import t
-from pydantic import TypeAdapter
 
 from flext_meltano import c
 
@@ -24,10 +23,12 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[t.ContainerMapping]] = TypeAdapter(
+    CONTAINER_MAP_ADAPTER: ClassVar[c.TypeAdapter[t.ContainerMapping]] = c.TypeAdapter(
         t.ContainerMapping
     )
-    INTEGER_ADAPTER: ClassVar[TypeAdapter[t.IntegerValue]] = TypeAdapter(t.IntegerValue)
+    INTEGER_ADAPTER: ClassVar[c.TypeAdapter[t.IntegerValue]] = c.TypeAdapter(
+        t.IntegerValue
+    )
 
     type ValidatorInput = (
         t.ContainerMapping
