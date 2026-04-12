@@ -16,7 +16,7 @@ from singer_sdk.streams import Stream
 from singer_sdk.tap_base import Tap
 from singer_sdk.target_base import Target
 
-from flext_meltano import p, t
+from flext_meltano import m, p, t
 
 
 class _SingerTapSdkBackend(Protocol):
