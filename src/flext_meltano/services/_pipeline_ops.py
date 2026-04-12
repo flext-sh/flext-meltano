@@ -62,7 +62,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     @staticmethod
     def create_pipeline(
         pipeline_name: str,
-        settings: t.ContainerMapping | None,
+        settings: t.RecursiveContainerMapping | None,
     ) -> r[str]:
         """Create a new Meltano pipeline with the given configuration."""
         if not pipeline_name.strip():

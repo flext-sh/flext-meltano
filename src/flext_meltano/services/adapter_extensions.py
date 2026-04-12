@@ -26,9 +26,9 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
         return FlextMeltanoSettings
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute default pipeline operation."""
-        return r[t.ContainerMapping].ok({
+        return r[t.RecursiveContainerMapping].ok({
             "status": c.Meltano.OperationStatus.READY,
         })
 
@@ -36,15 +36,15 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-    ) -> r[t.ContainerMapping]:
+    ) -> r[t.RecursiveContainerMapping]:
         """Execute ELT pipeline using Meltano runtime."""
         try:
             if not tap_name.startswith(c.Meltano.PREFIX_TAP):
-                return r[t.ContainerMapping].fail(
+                return r[t.RecursiveContainerMapping].fail(
                     f"Invalid tap name format: {tap_name}"
                 )
             if not target_name.startswith(c.Meltano.PREFIX_TARGET):
-                return r[t.ContainerMapping].fail(
+                return r[t.RecursiveContainerMapping].fail(
                     f"Invalid target name format: {target_name}"
                 )
             executor = FlextMeltanoExecutorBase()
@@ -53,11 +53,11 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                 _cwd=self.settings.project_root,
             )
             if execution_result.failure:
-                return r[t.ContainerMapping].fail(
+                return r[t.RecursiveContainerMapping].fail(
                     execution_result.error or "Pipeline execution failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
-            pipeline_result: t.ContainerMapping = {
+            pipeline_result: t.RecursiveContainerMapping = {
                 "status": c.Meltano.StreamStatus.COMPLETED
                 if command_result.success
                 else c.Meltano.StreamStatus.FAILED,
@@ -68,9 +68,11 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                 "output": command_result.output,
                 "error": command_result.error,
             }
-            return r[t.ContainerMapping].ok(pipeline_result)
+            return r[t.RecursiveContainerMapping].ok(pipeline_result)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[t.ContainerMapping].fail(f"Pipeline execution failed: {ex}")
+            return r[t.RecursiveContainerMapping].fail(
+                f"Pipeline execution failed: {ex}"
+            )
 
 
 class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
@@ -82,11 +84,11 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
         return FlextMeltanoSettings
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute default DBT operation."""
         return self.execute_dbt_operation()
 
-    def execute_dbt_operation(self) -> r[t.ContainerMapping]:
+    def execute_dbt_operation(self) -> r[t.RecursiveContainerMapping]:
         """Execute DBT operation via Meltano runtime."""
         try:
             executor = FlextMeltanoExecutorBase()
@@ -99,11 +101,11 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
                 _cwd=self.settings.project_root,
             )
             if execution_result.failure:
-                return r[t.ContainerMapping].fail(
+                return r[t.RecursiveContainerMapping].fail(
                     execution_result.error or "DBT operation failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
-            dbt_result: t.ContainerMapping = {
+            dbt_result: t.RecursiveContainerMapping = {
                 "status": c.Meltano.StreamStatus.COMPLETED
                 if command_result.success
                 else c.Meltano.StreamStatus.FAILED,
@@ -112,9 +114,9 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
                 "output": command_result.output,
                 "error": command_result.error,
             }
-            return r[t.ContainerMapping].ok(dbt_result)
+            return r[t.RecursiveContainerMapping].ok(dbt_result)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[t.ContainerMapping].fail(f"DBT operation failed: {ex}")
+            return r[t.RecursiveContainerMapping].fail(f"DBT operation failed: {ex}")
 
 
 __all__: list[str] = ["FlextMeltanoDbtAdapter", "FlextMeltanoPipelineAdapter"]

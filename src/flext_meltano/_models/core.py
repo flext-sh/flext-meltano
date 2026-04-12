@@ -16,8 +16,8 @@ class FlextMeltanoModelsCore:
 
     @staticmethod
     def protect_sensitive_config(
-        value: t.ContainerMapping,
-    ) -> t.ContainerMapping:
+        value: t.RecursiveContainerMapping,
+    ) -> t.RecursiveContainerMapping:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -35,7 +35,7 @@ class FlextMeltanoModelsCore:
                 return u.any_(*checks)
             return False
 
-        protected: t.MutableContainerMapping = {}
+        protected: t.MutableRecursiveContainerMapping = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
         return protected

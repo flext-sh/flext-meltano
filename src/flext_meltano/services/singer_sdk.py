@@ -74,7 +74,7 @@ class FlextMeltanoSingerTapAdapter:
         self._tap = tap
 
     @property
-    def settings(self) -> t.ContainerMapping:
+    def settings(self) -> t.RecursiveContainerMapping:
         """Expose the tap configuration through the internal contract."""
         config_source = getattr(self._tap, "config", None)
         empty_source: Mapping[str, t.ValueOrModel] = {}

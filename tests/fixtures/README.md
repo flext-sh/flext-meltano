@@ -173,7 +173,7 @@ def sample_api_responses():
 def user_schema_fixture():
     """Standard user schema for Singer testing."""
     return {
-        "type": "t.NormalizedValue",
+        "type": "t.RecursiveContainer",
         "properties": {
             "id": {"type": "integer"},
             "name": {"type": "string"},

@@ -153,7 +153,7 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def build_discovered_plugin(
         raw_type: str,
-        raw_plugin: t.ContainerMapping,
+        raw_plugin: t.RecursiveContainerMapping,
     ) -> t.StrMapping | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape."""
         name_val = raw_plugin.get("name", "")
@@ -163,7 +163,7 @@ class FlextMeltanoUtilitiesRuntime:
         ns_val = raw_plugin.get("namespace", "")
         pip_val = raw_plugin.get("pip_url", "")
         variant_val = raw_plugin.get("variant", "")
-        plugin_data: t.ContainerMapping = {
+        plugin_data: t.RecursiveContainerMapping = {
             "name": plugin_name,
             "type": FlextMeltanoUtilitiesRuntime.normalize_plugin_group(raw_type)
             or u.to_str(raw_type),
@@ -198,7 +198,7 @@ class FlextMeltanoUtilitiesRuntime:
         plugin_type: str,
         *,
         default_variant: str = "",
-        variants: t.ContainerMapping | None = None,
+        variants: t.RecursiveContainerMapping | None = None,
         description: str = "",
         logo_url: str = "",
     ) -> t.StrMapping:
@@ -227,14 +227,14 @@ class FlextMeltanoUtilitiesRuntime:
     def build_command_execution_payload(
         command_result: m.Meltano.CommandExecutionResult,
         *,
-        extra_fields: t.ContainerMapping | None = None,
+        extra_fields: t.RecursiveContainerMapping | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         """Build a standard command payload for services over Meltano runtime."""
-        payload: t.MutableContainerMapping = {
+        payload: t.MutableRecursiveContainerMapping = {
             "success": command_result.success,
             "output": u.to_str(command_result.output),
             "error": u.to_str(command_result.error),

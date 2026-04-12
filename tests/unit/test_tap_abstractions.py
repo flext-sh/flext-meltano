@@ -73,8 +73,8 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
-        stream_schema: t.ContainerMapping = {
-            "type": "t.NormalizedValue",
+        stream_schema: t.RecursiveContainerMapping = {
+            "type": "t.RecursiveContainer",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         stream_def = m.Meltano.StreamDefinition(
@@ -209,7 +209,7 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
-        connection_config: t.ContainerMapping = {
+        connection_config: t.RecursiveContainerMapping = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
@@ -374,7 +374,7 @@ class TestFlextMeltanoAbstractionsComplete:
         stream = m.Meltano.StreamDefinition(
             stream_name="users",
             stream_schema={
-                "type": "t.NormalizedValue",
+                "type": "t.RecursiveContainer",
                 "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
             },
             source_type="tap-postgres",
@@ -538,11 +538,11 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-        connection_config: t.ContainerMapping = {
+        connection_config: t.RecursiveContainerMapping = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: t.ContainerMapping = {"users": {"selected": True}}
+        stream_config: t.RecursiveContainerMapping = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,

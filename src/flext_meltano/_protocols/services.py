@@ -53,7 +53,7 @@ class FlextMeltanoProtocolsServices:
             self,
             tap_name: str,
             target_name: str,
-            _config: t.ContainerMapping | None = None,
+            _config: t.RecursiveContainerMapping | None = None,
         ) -> r[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...

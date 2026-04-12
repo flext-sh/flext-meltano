@@ -34,7 +34,7 @@ from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, t
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    _container_mapping_list_adapter = c.TypeAdapter(list[t.ContainerMapping])
+    _container_mapping_list_adapter = c.TypeAdapter(list[t.RecursiveContainerMapping])
     service_name: str = u.Field(
         default="FlextMeltanoExecutor",
         description="Canonical executor service instance name",
@@ -42,7 +42,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | t.ContainerMapping | None = None,
+        settings: FlextMeltanoSettings | t.RecursiveContainerMapping | None = None,
     ) -> None:
         """Expose a minimal typed constructor for executor callers."""
         super().__init__(settings=settings)
@@ -54,8 +54,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _coerce_container_mapping(
-        value: t.ContainerMapping | None,
-    ) -> t.ContainerMapping | None:
+        value: t.RecursiveContainerMapping | None,
+    ) -> t.RecursiveContainerMapping | None:
         """Normalize runtime objects to canonical container mappings when possible."""
         if not isinstance(value, Mapping):
             return None
@@ -67,8 +67,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     @classmethod
     def _coerce_mapping_list(
         cls,
-        value: list[t.ContainerMapping] | t.NormalizedValue,
-    ) -> list[t.ContainerMapping] | None:
+        value: list[t.RecursiveContainerMapping] | t.RecursiveContainer,
+    ) -> list[t.RecursiveContainerMapping] | None:
         """Normalize runtime plugin lists to canonical mapping lists."""
         if not isinstance(value, list):
             return None
@@ -221,16 +221,16 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ]
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute the Meltano executor service."""
-        config_data: t.ContainerMapping = {
+        config_data: t.RecursiveContainerMapping = {
             "status": c.Meltano.OperationStatus.READY,
             "executor_type": "flext_meltano_executor",
             "execution_timestamp": str(time.time()),
             "settings": self.settings.model_dump(),
         }
         self.logger.info("FlextMeltanoExecutor executed successfully")
-        return r[t.ContainerMapping].ok(config_data)
+        return r[t.RecursiveContainerMapping].ok(config_data)
 
     def execute_meltano_command(
         self,
@@ -351,7 +351,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-        _config: t.ContainerMapping | None = None,
+        _config: t.RecursiveContainerMapping | None = None,
     ) -> r[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:

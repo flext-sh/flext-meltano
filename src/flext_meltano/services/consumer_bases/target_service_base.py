@@ -166,9 +166,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         return r[None].ok(None)
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute target service — returns status."""
-        return r[t.ContainerMapping].ok({
+        return r[t.RecursiveContainerMapping].ok({
             "service": self.target_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "target",

@@ -37,8 +37,8 @@ class FlextMeltanoLibraryRunner(
         tap_name: str,
         target_name: str,
         dbt_models: t.StrSequence | None = None,
-        settings: t.ContainerMapping | None = None,
-    ) -> r[t.MutableContainerMapping]:
+        settings: t.RecursiveContainerMapping | None = None,
+    ) -> r[t.MutableRecursiveContainerMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
             self.logger.info(
@@ -51,7 +51,7 @@ class FlextMeltanoLibraryRunner(
                 tap_name, target_name, settings
             )
             if result.failure:
-                return r[t.MutableContainerMapping].fail(
+                return r[t.MutableRecursiveContainerMapping].fail(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
@@ -63,7 +63,7 @@ class FlextMeltanoLibraryRunner(
                 },
                 duration_field="execution_time",
             )
-            elt_result: t.MutableContainerMapping = {
+            elt_result: t.MutableRecursiveContainerMapping = {
                 str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
                 for k, v in payload.items()
             }
@@ -78,17 +78,17 @@ class FlextMeltanoLibraryRunner(
                         dbt_models,
                         separator=",",
                     )
-            return r[t.MutableContainerMapping].ok(elt_result)
+            return r[t.MutableRecursiveContainerMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MutableContainerMapping].fail(error_msg)
+            return r[t.MutableRecursiveContainerMapping].fail(error_msg)
 
     def run_dbt_transformation(
         self,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> r[t.MutableContainerMapping]:
+    ) -> r[t.MutableRecursiveContainerMapping]:
         """Run DBT transformation using the configured Meltano executor."""
         return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
             executor=self._elt_executor,
@@ -101,8 +101,8 @@ class FlextMeltanoLibraryRunner(
         self,
         tap: p.Meltano.SingerTap,
         target: p.Meltano.SingerTarget,
-        settings: t.ContainerMapping | None = None,
-    ) -> r[t.MutableContainerMapping]:
+        settings: t.RecursiveContainerMapping | None = None,
+    ) -> r[t.MutableRecursiveContainerMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:
             self.logger.info(
@@ -114,7 +114,7 @@ class FlextMeltanoLibraryRunner(
                 tap.name, target.name, settings
             )
             if result.failure:
-                return r[t.MutableContainerMapping].fail(
+                return r[t.MutableRecursiveContainerMapping].fail(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
@@ -126,15 +126,15 @@ class FlextMeltanoLibraryRunner(
                 },
                 duration_field="execution_time",
             )
-            elt_result: t.MutableContainerMapping = {
+            elt_result: t.MutableRecursiveContainerMapping = {
                 str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
                 for k, v in payload.items()
             }
-            return r[t.MutableContainerMapping].ok(elt_result)
+            return r[t.MutableRecursiveContainerMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MutableContainerMapping].fail(error_msg)
+            return r[t.MutableRecursiveContainerMapping].fail(error_msg)
 
 
 __all__: list[str] = ["FlextMeltanoLibraryRunner"]

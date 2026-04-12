@@ -20,7 +20,7 @@ class FlextMeltanoModelsSingerCatalog:
         breadcrumb: t.StrSequence = u.Field(
             default_factory=list, description="Singer metadata breadcrumb path"
         )
-        metadata: t.ContainerMapping = u.Field(
+        metadata: t.RecursiveContainerMapping = u.Field(
             default_factory=dict, description="Singer metadata properties"
         )
 
@@ -121,7 +121,7 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, u.Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: t.ContainerMapping = u.Field(
+        state: t.RecursiveContainerMapping = u.Field(
             default_factory=dict, description="Final state payload"
         )
         duration_seconds: Annotated[

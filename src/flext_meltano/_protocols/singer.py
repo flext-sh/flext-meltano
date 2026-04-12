@@ -20,71 +20,71 @@ class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(p.Service[t.ContainerMapping], Protocol):
+    class Tap(p.Service[t.RecursiveContainerMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> p.Result[t.ContainerMapping]:
+        def discover(self) -> p.Result[t.RecursiveContainerMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.RecursiveContainerMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
             self,
             catalog: t.FlatContainerMapping,
-        ) -> p.Result[t.ContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(p.Service[t.ContainerMapping], Protocol):
+    class Target(p.Service[t.RecursiveContainerMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.RecursiveContainerMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
             self,
             records: Sequence[t.Meltano.OptionalScalarMap],
-        ) -> p.Result[t.ContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
             self,
             record: t.Meltano.OptionalScalarMap,
-        ) -> p.Result[t.ContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
     class DbtRunner(
-        p.Service[t.ContainerMapping],
+        p.Service[t.RecursiveContainerMapping],
         Protocol,
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.RecursiveContainerMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
         def run(
             self,
             models: t.StrSequence,
-        ) -> p.Result[t.ContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Run DBT models with r."""
             ...
 
         def test(
             self,
             models: t.StrSequence,
-        ) -> p.Result[t.ContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Test DBT models with r."""
             ...
 
@@ -102,7 +102,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def settings(self) -> t.ContainerMapping:
+        def settings(self) -> t.RecursiveContainerMapping:
             """Tap configuration."""
             ...
 
@@ -166,7 +166,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        settings: t.ContainerMapping
+        settings: t.RecursiveContainerMapping
 
         def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.

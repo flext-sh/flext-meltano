@@ -25,7 +25,7 @@ class FlextMeltanoDbtTransformationRunner:
         logger: p.Logger,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> r[t.MutableContainerMapping]:
+    ) -> r[t.MutableRecursiveContainerMapping]:
         """Run DBT ``run`` and normalize output into transformation contract."""
         try:
             args: MutableSequence[str] = []
@@ -33,7 +33,7 @@ class FlextMeltanoDbtTransformationRunner:
                 args.extend([c.Meltano.CMD_MODELS_OPTION, *models])
             result = executor.execute_dbt_command(c.Meltano.DBT_COMMAND_RUN, args)
             if result.failure:
-                return r[t.MutableContainerMapping].fail(
+                return r[t.MutableRecursiveContainerMapping].fail(
                     result.error or "DBT transformation failed",
                 )
             execution_result = result.value
@@ -46,15 +46,15 @@ class FlextMeltanoDbtTransformationRunner:
                 },
                 duration_field="execution_time",
             )
-            dbt_result: t.MutableContainerMapping = {
+            dbt_result: t.MutableRecursiveContainerMapping = {
                 str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
                 for k, v in payload.items()
             }
-            return r[t.MutableContainerMapping].ok(dbt_result)
+            return r[t.MutableRecursiveContainerMapping].ok(dbt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"DBT transformation failed: {e}"
             logger.exception(error_msg)
-            return r[t.MutableContainerMapping].fail(error_msg)
+            return r[t.MutableRecursiveContainerMapping].fail(error_msg)
 
 
 __all__: list[str] = ["FlextMeltanoDbtTransformationRunner"]

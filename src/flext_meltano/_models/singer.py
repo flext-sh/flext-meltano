@@ -74,7 +74,7 @@ class FlextMeltanoModelsSinger:
             u.Field(default="STATE", description="Singer message discriminator"),
         ] = "STATE"
         value: Annotated[
-            t.MutableContainerMapping,
+            t.MutableRecursiveContainerMapping,
             u.Field(description="Singer state bookmark payload"),
         ] = u.Field(default_factory=dict, description="Singer state bookmark payload")
 

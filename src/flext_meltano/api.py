@@ -86,9 +86,9 @@ class FlextMeltano(
     Dbt = dbt
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute Meltano service with railway pattern."""
-        return r[t.ContainerMapping].ok({
+        return r[t.RecursiveContainerMapping].ok({
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,

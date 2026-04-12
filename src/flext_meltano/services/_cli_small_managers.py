@@ -52,9 +52,9 @@ class _FlextMeltanoCliDbtService(FlextMeltanoDbtRunnerMixin):
             self.set_dbt_project_root(self.settings.project_root)
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Return current CLI DBT helper state."""
-        return r[t.ContainerMapping].ok(self.settings.model_dump())
+        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
     def run_operation(self, operation: str, args: t.StrSequence) -> r[str]:
         """Execute a DBT subcommand using the runner mixin."""
@@ -70,9 +70,9 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
     """Provide project-scoped plugin operations for CLI routing."""
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Return current CLI plugin helper state."""
-        return r[t.ContainerMapping].ok(self.settings.model_dump())
+        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
     def _resolve_project_root(self) -> Path:
         """Resolve the project root used for plugin operations."""
@@ -164,9 +164,9 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
     """Provide status and version operations for the CLI manager."""
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Return current CLI status helper state."""
-        return r[t.ContainerMapping].ok(self.settings.model_dump())
+        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
     def _resolve_project_root(self) -> Path | None:
         """Return a project root when one is configured."""

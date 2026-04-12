@@ -30,8 +30,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _coerce_container_mapping(
-        value: t.ContainerMapping | None,
-    ) -> t.ContainerMapping | None:
+        value: t.RecursiveContainerMapping | None,
+    ) -> t.RecursiveContainerMapping | None:
         """Normalize runtime objects to canonical container mappings when possible."""
         if not isinstance(value, Mapping):
             return None
@@ -60,7 +60,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             )
         return r[str].ok(completed.output.strip())
 
-    def add_plugin_by_config(self, plugin_config: t.ContainerMapping) -> r[bool]:
+    def add_plugin_by_config(
+        self, plugin_config: t.RecursiveContainerMapping
+    ) -> r[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
@@ -79,7 +81,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _resolve_project_root(
-        project: t.ValueOrModel | t.ContainerMapping | None,
+        project: t.ValueOrModel | t.RecursiveContainerMapping | None,
     ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
         project_mapping = FlextMeltanoAbstractionsBase._coerce_container_mapping(
@@ -96,7 +98,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def get_plugins_of_type(
         self,
-        _project: t.ValueOrModel | t.ContainerMapping | None,
+        _project: t.ValueOrModel | t.RecursiveContainerMapping | None,
         plugin_type: str,
     ) -> r[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""
@@ -127,9 +129,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def execute_singer_pipeline(
         self,
-        elt_context: t.ContainerMapping,
-        extractor_plugin: t.ContainerMapping | None,
-        loader_plugin: t.ContainerMapping | None,
+        elt_context: t.RecursiveContainerMapping,
+        extractor_plugin: t.RecursiveContainerMapping | None,
+        loader_plugin: t.RecursiveContainerMapping | None,
     ) -> r[t.HeaderMapping]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
@@ -186,10 +188,10 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute abstractions service and return real configuration state."""
         project_root = u.Meltano.resolve_project_root(self.settings)
-        return r[t.ContainerMapping].ok({
+        return r[t.RecursiveContainerMapping].ok({
             "status": c.Meltano.StreamStatus.COMPLETED,
             "project_root": str(project_root) if project_root is not None else "",
             "environment": self.settings.environment,
@@ -199,21 +201,21 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> r[t.ContainerMapping]:
+    ) -> r[t.RecursiveContainerMapping]:
         """Create Singer catalog entry from stream definition."""
-        entry: t.MutableContainerMapping = {
+        entry: t.MutableRecursiveContainerMapping = {
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": stream.stream_schema,
-            "metadata": list[t.ContainerMapping](),
+            "metadata": list[t.RecursiveContainerMapping](),
         }
-        return r[t.ContainerMapping].ok(entry)
+        return r[t.RecursiveContainerMapping].ok(entry)
 
     def get_stream_config(
         self,
         settings: m.Meltano.TapConfig,
         stream_name: str,
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         """Get configuration for a specific stream."""
         if settings.stream_config and stream_name in settings.stream_config:
             val = settings.stream_config[stream_name]

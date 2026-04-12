@@ -53,7 +53,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         timestamp = u.generate_iso_timestamp()
         tm.that(timestamp, is_=str)
         tm.that(timestamp, has="T")
-        test_data: t.ContainerMapping = {
+        test_data: t.RecursiveContainerMapping = {
             "level1": {"level2": {"level3": "found_value"}},
         }
         # Navigate nested dict structure using typed accessors

@@ -117,7 +117,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> t.ContainerMapping:
+def meltano_yml_config() -> t.RecursiveContainerMapping:
     """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
@@ -178,8 +178,8 @@ def meltano_yml_config() -> t.ContainerMapping:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: t.ContainerMapping,
-) -> t.ContainerMapping:
+    meltano_yml_config: t.RecursiveContainerMapping,
+) -> t.RecursiveContainerMapping:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
@@ -194,7 +194,7 @@ def meltano_project(
 
 
 @pytest.fixture
-def tap_csv_config() -> t.ContainerMapping:
+def tap_csv_config() -> t.RecursiveContainerMapping:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -209,7 +209,7 @@ def tap_csv_config() -> t.ContainerMapping:
 
 
 @pytest.fixture
-def target_csv_config() -> t.ContainerMapping:
+def target_csv_config() -> t.RecursiveContainerMapping:
     """Target CSV configuration for testing."""
     return {"destination_path": "output", "file_format": "csv", "delimiter": ","}
 
@@ -244,13 +244,13 @@ def meltano_invoke_args() -> t.StrSequence:
 
 
 @pytest.fixture
-def singer_schema() -> t.ContainerMapping:
+def singer_schema() -> t.RecursiveContainerMapping:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
         "stream": "test_entity",
         "schema": {
-            "type": "t.NormalizedValue",
+            "type": "t.RecursiveContainer",
             "properties": {
                 "id": {"type": "integer"},
                 "name": {"type": "string"},
@@ -263,7 +263,7 @@ def singer_schema() -> t.ContainerMapping:
 
 
 @pytest.fixture
-def singer_records() -> Sequence[t.ContainerMapping]:
+def singer_records() -> Sequence[t.RecursiveContainerMapping]:
     """Sample Singer records for testing."""
     return [
         {
@@ -290,7 +290,7 @@ def singer_records() -> Sequence[t.ContainerMapping]:
 
 
 @pytest.fixture
-def singer_state() -> t.ContainerMapping:
+def singer_state() -> t.RecursiveContainerMapping:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -306,7 +306,7 @@ def singer_state() -> t.ContainerMapping:
 
 
 @pytest.fixture
-def pipeline_execution_config() -> t.ContainerMapping:
+def pipeline_execution_config() -> t.RecursiveContainerMapping:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -319,7 +319,7 @@ def pipeline_execution_config() -> t.ContainerMapping:
 
 
 @pytest.fixture
-def test_environment_config() -> t.ContainerMapping:
+def test_environment_config() -> t.RecursiveContainerMapping:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -331,7 +331,7 @@ def test_environment_config() -> t.ContainerMapping:
 
 
 @pytest.fixture
-def sample_schedule_config() -> t.ContainerMapping:
+def sample_schedule_config() -> t.RecursiveContainerMapping:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -344,7 +344,7 @@ def sample_schedule_config() -> t.ContainerMapping:
 
 
 @pytest.fixture
-def job_run_config() -> t.ContainerMapping:
+def job_run_config() -> t.RecursiveContainerMapping:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -423,22 +423,22 @@ class MockMeltanoService:
 
     @staticmethod
     def create_project(
-        _config: t.ContainerMapping,
-    ) -> t.ContainerMapping:
+        _config: t.RecursiveContainerMapping,
+    ) -> t.RecursiveContainerMapping:
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
     def install_plugin(
         _plugin_type: str,
         plugin_name: str,
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
     def run_pipeline(
         _extractor: str,
         _loader: str,
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         return {"execution_id": "test-execution", "status": "running"}
 
 
@@ -451,12 +451,12 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, settings: t.ContainerMapping) -> None:
+    def __init__(self, settings: t.RecursiveContainerMapping) -> None:
         """Initialize the instance."""
         super().__init__()
         self.settings = settings
 
-    def discover(self) -> t.ContainerMapping:
+    def discover(self) -> t.RecursiveContainerMapping:
         _ = self.settings
         return {
             "streams": [
@@ -470,7 +470,7 @@ class MockSingerTap:
             ]
         }
 
-    def extract(self) -> Sequence[t.ContainerMapping]:
+    def extract(self) -> Sequence[t.RecursiveContainerMapping]:
         _ = self.settings
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -484,15 +484,15 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, settings: t.ContainerMapping) -> None:
+    def __init__(self, settings: t.RecursiveContainerMapping) -> None:
         """Initialize the instance."""
         super().__init__()
         self.settings = settings
 
     def load(
         self,
-        records: Sequence[t.ContainerMapping],
-    ) -> t.ContainerMapping:
+        records: Sequence[t.RecursiveContainerMapping],
+    ) -> t.RecursiveContainerMapping:
         _ = self.settings
         return {"records_loaded": len(records), "status": "success"}
 

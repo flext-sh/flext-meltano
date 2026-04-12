@@ -63,10 +63,10 @@ class FlextMeltanoModelsProjects:
         default_environment: Annotated[
             str, u.Field(default="dev", description="Default environment name")
         ] = "dev"
-        plugins: t.ContainerMapping = u.Field(
+        plugins: t.RecursiveContainerMapping = u.Field(
             default_factory=dict, description="Plugin configurations"
         )
-        environments: t.ContainerMapping = u.Field(
+        environments: t.RecursiveContainerMapping = u.Field(
             default_factory=dict, description="Environment configurations"
         )
 

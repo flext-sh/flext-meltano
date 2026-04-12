@@ -85,7 +85,7 @@ class TestFlextMeltanoTypes:
         }
         catalog = {
             "tap_stream_id": "users",
-            "schema": {"type": "t.NormalizedValue"},
+            "schema": {"type": "t.RecursiveContainer"},
         }
         tm.that(str(plugin_def["name"]), eq="tap-users")
         tm.that(list(plugin_def["variants"]), is_=list)

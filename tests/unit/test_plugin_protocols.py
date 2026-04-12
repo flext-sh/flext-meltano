@@ -32,7 +32,7 @@ class TestFlextMeltanoPluginProtocols:
 
     def test_plugin_configuration_resolves_to_mapping(self) -> None:
         """PluginConfiguration type alias resolves to a Mapping-compatible type."""
-        plugin_cfg: t.ContainerMapping = {
+        plugin_cfg: t.RecursiveContainerMapping = {
             "host": "localhost",
             "port": "5432",
             "database": "analytics",
@@ -53,7 +53,7 @@ class TestFlextMeltanoPluginProtocols:
         """Each plugin type alias is a distinct named type."""
         names = {
             str(t.Meltano.PluginDefinition),
-            str(t.ContainerMapping),
+            str(t.RecursiveContainerMapping),
             str(t.Meltano.PluginCatalog),
         }
         tm.that(len(names), eq=3)
@@ -61,5 +61,5 @@ class TestFlextMeltanoPluginProtocols:
     def test_meltano_namespace_contains_all_plugin_types(self) -> None:
         """t.Meltano namespace exposes all three plugin type aliases."""
         tm.that(str(t.Meltano.PluginDefinition), none=False)
-        tm.that(str(t.ContainerMapping), none=False)
+        tm.that(str(t.RecursiveContainerMapping), none=False)
         tm.that(str(t.Meltano.PluginCatalog), none=False)

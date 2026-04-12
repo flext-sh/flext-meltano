@@ -18,7 +18,7 @@ class FlextMeltanoModelsPayloads:
         tap_name: Annotated[t.NonEmptyStr, u.Field(description="Singer tap name")]
         target_name: Annotated[str, u.Field(description="Singer target name")]
         settings: Annotated[
-            t.ContainerMapping,
+            t.RecursiveContainerMapping,
             u.Field(description="Pipeline settings"),
         ] = u.Field(default_factory=dict, description="Pipeline settings")
 
@@ -27,7 +27,7 @@ class FlextMeltanoModelsPayloads:
 
         pipeline_id: Annotated[str, u.Field(description="Pipeline identifier")]
         settings: Annotated[
-            t.ContainerMapping,
+            t.RecursiveContainerMapping,
             u.Field(description="Execution settings"),
         ] = u.Field(default_factory=dict, description="Execution settings")
 
@@ -37,7 +37,7 @@ class FlextMeltanoModelsPayloads:
         plugin_type: Annotated[t.NonEmptyStr, u.Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, u.Field(description="Plugin name")]
         settings: Annotated[
-            t.ContainerMapping,
+            t.RecursiveContainerMapping,
             u.Field(description="Plugin settings"),
         ] = u.Field(default_factory=dict, description="Plugin settings")
 
@@ -53,7 +53,7 @@ class FlextMeltanoModelsPayloads:
 
         environment_name: Annotated[str, u.Field(description="Environment name")]
         settings: Annotated[
-            t.ContainerMapping,
+            t.RecursiveContainerMapping,
             u.Field(description="Environment settings"),
         ] = u.Field(default_factory=dict, description="Environment settings")
 
@@ -64,7 +64,7 @@ class FlextMeltanoModelsPayloads:
             t.StrSequence | None, u.Field(default=None, description="Models to run")
         ] = None
         settings: Annotated[
-            t.ContainerMapping | None,
+            t.RecursiveContainerMapping | None,
             u.Field(default=None, description="Execution settings"),
         ] = None
 
@@ -77,6 +77,6 @@ class FlextMeltanoModelsPayloads:
             t.StrSequence | None, u.Field(default=None, description="DBT models to run")
         ] = None
         settings: Annotated[
-            t.ContainerMapping | None,
+            t.RecursiveContainerMapping | None,
             u.Field(default=None, description="Pipeline settings"),
         ] = None

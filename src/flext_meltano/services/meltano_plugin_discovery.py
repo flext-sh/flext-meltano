@@ -24,7 +24,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     """Mixin providing plugin discovery and info retrieval."""
 
     @staticmethod
-    def _is_meltano_project(value: t.ContainerMapping | None) -> bool:
+    def _is_meltano_project(value: t.RecursiveContainerMapping | None) -> bool:
         """Type guard for protocol-compatible Meltano project objects."""
         if value is None:
             return False

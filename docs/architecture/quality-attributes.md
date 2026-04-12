@@ -219,7 +219,7 @@ class MultiLevelCache:
         self.local_cache = LRUCache(local_cache_size)
         self.cache_metrics = CacheMetrics()
 
-    def get(self, key: str) -> Optional[t.NormalizedValue]:
+    def get(self, key: str) -> Optional[t.RecursiveContainer]:
         """Get value with multi-level cache lookup."""
 
         # Check local cache first (fastest)
@@ -2579,7 +2579,7 @@ class QualityGate:
 class AutomatedCodeReview:
     """Automated code review system."""
 
-    def __init__(self, rules_config: Dict[str, t.NormalizedValue]):
+    def __init__(self, rules_config: Dict[str, t.RecursiveContainer]):
         self.rules = rules_config
         self.review_results = []
 
@@ -2958,7 +2958,7 @@ class APIResponse:
         self,
         data=None,
         error: str = None,
-        metadata: Dict[str, t.NormalizedValue] = None,
+        metadata: Dict[str, t.RecursiveContainer] = None,
     ):
         self.success = error is None
         self.data = data
@@ -2967,7 +2967,7 @@ class APIResponse:
         self.timestamp = datetime.utcnow().isoformat()
         self.request_id = self._generate_request_id()
 
-    def to_dict(self) -> Dict[str, t.NormalizedValue]:
+    def to_dict(self) -> Dict[str, t.RecursiveContainer]:
         """Convert response to dictionary format."""
 
         response = {
@@ -3044,14 +3044,14 @@ class APIResource:
     def __init__(
         self,
         resource_id: str,
-        basic_fields: Dict[str, t.NormalizedValue],
-        detailed_fields: Dict[str, t.NormalizedValue] = None,
+        basic_fields: Dict[str, t.RecursiveContainer],
+        detailed_fields: Dict[str, t.RecursiveContainer] = None,
     ):
         self.id = resource_id
         self.basic_fields = basic_fields
         self.detailed_fields = detailed_fields or {}
 
-    def to_basic_representation(self) -> Dict[str, t.NormalizedValue]:
+    def to_basic_representation(self) -> Dict[str, t.RecursiveContainer]:
         """Return basic resource representation."""
         return {
             "id": self.id,
@@ -3060,7 +3060,7 @@ class APIResource:
             **self.basic_fields,
         }
 
-    def to_detailed_representation(self) -> Dict[str, t.NormalizedValue]:
+    def to_detailed_representation(self) -> Dict[str, t.RecursiveContainer]:
         """Return detailed resource representation."""
         return {
             **self.to_basic_representation(),
@@ -3068,7 +3068,7 @@ class APIResource:
             **self.detailed_fields,
         }
 
-    def to_minimal_representation(self) -> Dict[str, t.NormalizedValue]:
+    def to_minimal_representation(self) -> Dict[str, t.RecursiveContainer]:
         """Return minimal resource representation for lists."""
         return {
             "id": self.id,
@@ -3112,7 +3112,7 @@ class APIHelpSystem:
 
     def get_contextual_help(
         self, endpoint: str, method: str, error_code: str = None
-    ) -> Dict[str, t.NormalizedValue]:
+    ) -> Dict[str, t.RecursiveContainer]:
         """Get contextual help for API endpoint."""
 
         help_info = {
@@ -3145,7 +3145,7 @@ class APIHelpSystem:
 
     def _get_parameter_help(
         self, endpoint: str, method: str
-    ) -> Dict[str, t.NormalizedValue]:
+    ) -> Dict[str, t.RecursiveContainer]:
         """Get parameter documentation."""
 
         if "pipelines" in endpoint:
@@ -3157,7 +3157,7 @@ class APIHelpSystem:
                     "example": "customer-data-sync",
                 },
                 "tap": {
-                    "type": "t.NormalizedValue",
+                    "type": "t.RecursiveContainer",
                     "required": True,
                     "description": "Source connector configuration",
                     "properties": {
@@ -3166,7 +3166,7 @@ class APIHelpSystem:
                     },
                 },
                 "target": {
-                    "type": "t.NormalizedValue",
+                    "type": "t.RecursiveContainer",
                     "required": True,
                     "description": "Destination connector configuration",
                 },
@@ -3176,7 +3176,7 @@ class APIHelpSystem:
 
     def _get_usage_examples(
         self, endpoint: str, method: str
-    ) -> List[Dict[str, t.NormalizedValue]]:
+    ) -> List[Dict[str, t.RecursiveContainer]]:
         """Get usage examples for the endpoint."""
 
         examples = []
@@ -3235,7 +3235,7 @@ class APIHelpSystem:
 
         return tips
 
-    def _get_error_help(self, error_code: str) -> Dict[str, t.NormalizedValue]:
+    def _get_error_help(self, error_code: str) -> Dict[str, t.RecursiveContainer]:
         """Get detailed help for specific error codes."""
 
         error_help = {
@@ -3440,7 +3440,9 @@ class TestDataBuilder:
         self.data["name"] = name
         return self
 
-    def with_config(self, settings: Dict[str, t.NormalizedValue]) -> "TestDataBuilder":
+    def with_config(
+        self, settings: Dict[str, t.RecursiveContainer]
+    ) -> "TestDataBuilder":
         self.data["settings"] = settings
         return self
 
@@ -3502,7 +3504,7 @@ def authenticated_user():
 class TestContext:
     """Test context manager for complex setup."""
 
-    def __init__(self, setup_data: Dict[str, t.NormalizedValue] = None):
+    def __init__(self, setup_data: Dict[str, t.RecursiveContainer] = None):
         self.setup_data = setup_data or {}
 
     def __enter__(self):
@@ -3556,7 +3558,7 @@ class PropertyBasedTests:
         ),
     )
     def test_pipeline_creation_properties(
-        self, name: str, settings: Dict[str, t.NormalizedValue]
+        self, name: str, settings: Dict[str, t.RecursiveContainer]
     ):
         """Property-based test for pipeline creation."""
 
@@ -3652,7 +3654,7 @@ class ContractTests:
         # Define transformation contract
         contract = DataTransformationContract(
             input_schema={
-                "type": "t.NormalizedValue",
+                "type": "t.RecursiveContainer",
                 "properties": {
                     "id": {"type": "integer"},
                     "name": {"type": "string"},
@@ -3661,7 +3663,7 @@ class ContractTests:
                 "required": ["id", "name"],
             },
             output_schema={
-                "type": "t.NormalizedValue",
+                "type": "t.RecursiveContainer",
                 "properties": {
                     "user_id": {"type": "integer"},
                     "full_name": {"type": "string"},
@@ -3779,7 +3781,7 @@ class TestDataManager:
 
     def get_test_data(
         self, dataset_name: str, scenario: str = "default"
-    ) -> Dict[str, t.NormalizedValue]:
+    ) -> Dict[str, t.RecursiveContainer]:
         """Get test data for specific dataset and scenario."""
 
         cache_key = f"{dataset_name}:{scenario}"
@@ -3796,8 +3798,8 @@ class TestDataManager:
         return self.data_cache[cache_key]
 
     def create_dynamic_test_data(
-        self, template: str, overrides: Dict[str, t.NormalizedValue] = None
-    ) -> Dict[str, t.NormalizedValue]:
+        self, template: str, overrides: Dict[str, t.RecursiveContainer] = None
+    ) -> Dict[str, t.RecursiveContainer]:
         """Create dynamic test data from templates."""
 
         template_data = self.get_test_data("templates", template)
@@ -3814,8 +3816,10 @@ class TestDataManager:
         return result
 
     def _deep_merge(
-        self, base: Dict[str, t.NormalizedValue], override: Dict[str, t.NormalizedValue]
-    ) -> Dict[str, t.NormalizedValue]:
+        self,
+        base: Dict[str, t.RecursiveContainer],
+        override: Dict[str, t.RecursiveContainer],
+    ) -> Dict[str, t.RecursiveContainer]:
         """Deep merge dictionaries."""
         result = base.copy()
 

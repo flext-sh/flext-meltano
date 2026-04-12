@@ -52,7 +52,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
     def create_flext_target(
         self,
-        sink_config: m.Meltano.DataSinkConfig | t.ContainerMapping,
+        sink_config: m.Meltano.DataSinkConfig | t.RecursiveContainerMapping,
     ) -> r[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
@@ -96,9 +96,9 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> r[t.RecursiveContainerMapping]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[t.ContainerMapping].ok(self.settings.model_dump())
+        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
     def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
         """Validate a sink configuration."""
