@@ -8,11 +8,8 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_meltano import p, r
-from flext_meltano.constants import c
-from flext_meltano.models import m
+from flext_meltano import c, m, p, r, t
 from flext_meltano.services._abstractions_base import FlextMeltanoAbstractionsBase
-from flext_meltano.typings import t
 
 
 class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Annotated, Self
 
-from flext_cli import m
+from flext_cli import m, u
 
-from flext_meltano import c, t, u
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsSourcesParams:

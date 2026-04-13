@@ -11,12 +11,8 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_meltano import p, r
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano import c, m, p, r, t, u
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
 
 
 class FlextMeltanoPipelinePaths:

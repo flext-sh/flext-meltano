@@ -9,11 +9,11 @@ from __future__ import annotations
 import sys
 from typing import override
 
-from flext_cli import cli
+from flext_cli import cli, r, u
 
-from flext_meltano import p, r, u
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.protocols import p
 from flext_meltano.services._cli_small_managers import (
     FlextMeltanoDbtManager,
     FlextMeltanoPluginManager,

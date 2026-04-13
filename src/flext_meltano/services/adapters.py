@@ -10,18 +10,15 @@ import time
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextSettings, r
-from flext_meltano.base import FlextMeltanoServiceBase
-from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_core import FlextSettings
+from flext_meltano import FlextMeltanoSettings, c, p, r, s, t
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
 
 
-class FlextMeltanoAdapter(FlextMeltanoServiceBase):
+class FlextMeltanoAdapter(s):
     """Base adapter namespace class for focused integrations."""
 
-    class ProjectAdapter(FlextMeltanoServiceBase):
+    class ProjectAdapter(s):
         """Focused adapter for Meltano project management following SOLID principles."""
 
         @classmethod
@@ -83,7 +80,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                 project_dir=project_root.parent,
             )
 
-    class PluginAdapter(FlextMeltanoServiceBase):
+    class PluginAdapter(s):
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
         @classmethod

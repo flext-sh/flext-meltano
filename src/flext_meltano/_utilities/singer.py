@@ -11,7 +11,7 @@ from __future__ import annotations
 import sys
 
 import orjson
-from flext_cli import p, r
+from flext_cli import r
 
 from flext_meltano import c, m, p, t
 

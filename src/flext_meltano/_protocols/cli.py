@@ -7,10 +7,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import Protocol
 
-if TYPE_CHECKING:
-    from flext_meltano import p
+from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
 
 
 class FlextMeltanoProtocolsBase:
@@ -35,18 +34,18 @@ class FlextMeltanoProtocolsBase:
 
     class CommandRouterCli(Protocol):
         @property
-        def pipeline_manager(self) -> p.Meltano.CLIManager: ...
+        def pipeline_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
 
         @property
-        def singer_manager(self) -> p.Meltano.SingerManager: ...
+        def singer_manager(self) -> FlextMeltanoProtocolsServices.SingerManager: ...
 
         @property
-        def dbt_manager(self) -> p.Meltano.CLIManager: ...
+        def dbt_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
 
         @property
-        def plugin_manager(self) -> p.Meltano.CLIManager: ...
+        def plugin_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
 
         @property
-        def status_manager(self) -> p.Meltano.StatusManager: ...
+        def status_manager(self) -> FlextMeltanoProtocolsServices.StatusManager: ...
 
         def show_banner(self) -> None: ...

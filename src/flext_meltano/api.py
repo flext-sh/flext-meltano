@@ -10,8 +10,10 @@ from __future__ import annotations
 
 from typing import ClassVar, Self, override
 
-from flext_meltano import p, r
+from flext_cli import r
+
 from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano.protocols import p
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.adapters import FlextMeltanoAdapter
 from flext_meltano.services.bridge import FlextMeltanoBridge

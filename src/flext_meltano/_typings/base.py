@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import ClassVar
 
-from flext_cli import t
+from flext_cli import t, u
 
 from flext_meltano import c
 
@@ -23,10 +23,10 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[c.TypeAdapter[t.RecursiveContainerMapping]] = (
-        c.TypeAdapter(t.RecursiveContainerMapping)
+    CONTAINER_MAP_ADAPTER: ClassVar[u.TypeAdapter[t.RecursiveContainerMapping]] = (
+        u.TypeAdapter(t.RecursiveContainerMapping)
     )
-    INTEGER_ADAPTER: ClassVar[c.TypeAdapter[t.IntegerValue]] = c.TypeAdapter(
+    INTEGER_ADAPTER: ClassVar[u.TypeAdapter[t.IntegerValue]] = u.TypeAdapter(
         t.IntegerValue
     )
 

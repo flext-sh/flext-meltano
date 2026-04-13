@@ -6,8 +6,6 @@ from typing import Annotated
 
 from flext_cli import m, u
 
-from flext_meltano import t
-
 
 class FlextMeltanoModelsCliParams:
     """CLI parameter models for pipeline operations."""
@@ -58,7 +56,7 @@ class FlextMeltanoModelsCliParams:
         ] = None
         input_file: Annotated[
             str | None,
-            t.Field(
+            u.Field(
                 default=None,
                 description="Path to input data file (default: stdin)",
             ),

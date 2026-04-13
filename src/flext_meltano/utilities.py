@@ -9,10 +9,8 @@ from __future__ import annotations
 
 from flext_infra import FlextInfraUtilities
 
-from flext_meltano import (
-    FlextMeltanoUtilitiesRuntime,
-    FlextMeltanoUtilitiesSinger,
-)
+from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
+from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
 
 
 class FlextMeltanoUtilities(FlextInfraUtilities):

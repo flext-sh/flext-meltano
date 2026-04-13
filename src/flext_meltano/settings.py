@@ -5,8 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, ClassVar, Self
 
-from flext_core import FlextSettings, r
-from flext_meltano import c, t, u
+from flext_cli import r, u
+
+from flext_core import FlextSettings
+from flext_meltano import c, t
+from flext_meltano.protocols import p
 
 
 @FlextSettings.auto_register("meltano")

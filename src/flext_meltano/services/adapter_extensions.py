@@ -8,16 +8,12 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import FlextSettings, r
-from flext_meltano.base import FlextMeltanoServiceBase
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
+from flext_core import FlextSettings
+from flext_meltano import FlextMeltanoSettings, c, m, p, r, s, t
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
-from flext_meltano.settings import FlextMeltanoSettings
-from flext_meltano.typings import FlextMeltanoTypes as t
 
 
-class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
+class FlextMeltanoPipelineAdapter(s):
     """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
     @classmethod
@@ -75,7 +71,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
             )
 
 
-class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
+class FlextMeltanoDbtAdapter(s):
     """Focused adapter for DBT operations following SOLID principles."""
 
     @override

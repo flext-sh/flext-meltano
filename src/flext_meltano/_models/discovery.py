@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated
 
-from flext_cli import m
+from flext_cli import m, u
 
-from flext_meltano import t, u
+from flext_meltano import t
 
 
 class FlextMeltanoModelsDiscovery:

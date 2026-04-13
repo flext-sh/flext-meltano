@@ -7,13 +7,10 @@ from typing import Annotated, Self
 
 from flext_cli import m, u
 
-from flext_meltano import (
-    FlextMeltanoModelsCore,
-    FlextMeltanoModelsSources,
-    FlextMeltanoModelsSourcesParams,
-    c,
-    t,
-)
+from flext_meltano import c, t
+from flext_meltano._models.core import FlextMeltanoModelsCore
+from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
 
 class FlextMeltanoModelsInstancesData:
