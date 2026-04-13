@@ -8,11 +8,11 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_core import p, r
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
+from flext_meltano import p, r
+from flext_meltano.constants import c
+from flext_meltano.models import m
 from flext_meltano.services._abstractions_base import FlextMeltanoAbstractionsBase
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import t
 
 
 class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
@@ -68,7 +68,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                             stream_schema={"type": "object", "properties": {}},
                             source_type=tap_instance.tap_type,
                         )
-            return r[t.RecursiveContainerMapping].ok({"streams": stream_defs})
+            payload: t.RecursiveContainerMapping = {"streams": stream_defs}
+            return r[t.RecursiveContainerMapping].ok(payload)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover streams: {e}"
             self.logger.exception(error_msg)

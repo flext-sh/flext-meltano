@@ -8,8 +8,7 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_core import p, r
-from flext_meltano import FlextMeltanoServiceBase, c, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
 class FlextMeltanoService(FlextMeltanoServiceBase):
@@ -89,11 +88,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "environment": environment_name,
             "configuration": settings or {},
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
     @staticmethod
     def configure_pipeline(
@@ -102,11 +102,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         _config: t.RecursiveContainerMapping | None = None,
     ) -> p.Result[t.RecursiveContainerMapping]:
         """Configure generic data pipeline."""
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
     @staticmethod
     def install_component(
@@ -123,12 +124,13 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.RecursiveContainerMapping].fail(
                 f"Invalid component type: {component_type}"
             )
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,
             "component_type": component_type,
             "configuration": settings or {},
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
     @staticmethod
     def validate_service_config(
@@ -142,12 +144,13 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute service with railway pattern."""
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "status": c.CommonStatus.ACTIVE,
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "handlers": list(c.Meltano.HANDLER_ALL),
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
     def get_default_config(self) -> p.Result[t.RecursiveContainerMapping]:
         """Get default configuration from current settings."""

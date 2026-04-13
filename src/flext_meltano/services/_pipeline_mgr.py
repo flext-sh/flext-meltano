@@ -8,10 +8,9 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 
-from flext_core import p, r
+from flext_meltano import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.services._pipeline_lifecycle import (
     FlextMeltanoPipelineLifecycleOperations,
 )
@@ -84,9 +83,9 @@ class FlextMeltanoPipelineManager(
     def _get_pipeline_handler(
         self,
         subcommand: str,
-    ) -> p.Result[Callable[[t.StrSequence], r[str]]]:
+    ) -> p.Result[Callable[[t.StrSequence], p.Result[str]]]:
         """Get pipeline operation handler."""
-        operation_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
+        operation_map: Mapping[str, Callable[[t.StrSequence], p.Result[str]]] = {
             c.Meltano.PipelineCommand.CREATE: self._create_pipeline,
             c.Meltano.PipelineCommand.RUN: self._run_pipeline,
             c.Meltano.PipelineCommand.LIST: self._list_pipelines,
@@ -96,10 +95,10 @@ class FlextMeltanoPipelineManager(
         }
         handler = operation_map.get(subcommand)
         if handler is None:
-            return r[Callable[[t.StrSequence], r[str]]].fail(
+            return r[Callable[[t.StrSequence], p.Result[str]]].fail(
                 f"Unknown pipeline command: {subcommand}",
             )
-        return r[Callable[[t.StrSequence], r[str]]].ok(handler)
+        return r[Callable[[t.StrSequence], p.Result[str]]].ok(handler)
 
     def _get_pipeline_status(self, _args: t.StrSequence) -> p.Result[str]:
         """Get pipeline status."""

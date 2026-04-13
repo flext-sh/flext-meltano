@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Self, override
 
-from flext_core import p, r
+from flext_meltano import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.adapters import FlextMeltanoAdapter
@@ -88,13 +88,14 @@ class FlextMeltano(
     @override
     def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute Meltano service with railway pattern."""
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,
             "timestamp": u.generate_iso_timestamp(),
             "handlers": list(c.Meltano.HANDLER_ALL),
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
 
 meltano = FlextMeltano.get_instance()

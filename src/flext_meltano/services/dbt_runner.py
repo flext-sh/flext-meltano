@@ -12,8 +12,7 @@ from __future__ import annotations
 from collections.abc import MutableSequence
 from pathlib import Path
 
-from flext_core import p, r
-from flext_meltano import FlextMeltanoServiceBase, t, u
+from flext_meltano import FlextMeltanoServiceBase, p, r, t, u
 
 
 class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
@@ -22,7 +21,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
     Runs dbt commands via subprocess with proper error handling.
     """
 
-    _dbt_runner_project_root: Path | None = u.PrivateAttr(default=None)
+    _dbt_runner_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
 
     def _build_dbt_command(
         self,

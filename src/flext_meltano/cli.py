@@ -11,11 +11,9 @@ from typing import override
 
 from flext_cli import cli
 
-from flext_core import p, r
-from flext_meltano import u
+from flext_meltano import p, r, u
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.services._cli_small_managers import (
     FlextMeltanoDbtManager,
     FlextMeltanoPluginManager,
@@ -32,9 +30,7 @@ from flext_meltano.typings import FlextMeltanoTypes as t
 class FlextMeltanoCLI(FlextMeltanoServiceBase):
     """SOLID-compliant CLI for FLEXT Meltano operations."""
 
-    service_name: str = u.Field(
-        default="FlextMeltanoCLI", description="Canonical CLI service instance name"
-    )
+    service_name: str = "FlextMeltanoCLI"
     _output: p.Meltano.Output = u.PrivateAttr()
     _pipeline_manager: p.Meltano.CLIManager = u.PrivateAttr()
     _singer_manager: p.Meltano.SingerManager = u.PrivateAttr()
@@ -128,9 +124,10 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute CLI service."""
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
 
 def main() -> int:

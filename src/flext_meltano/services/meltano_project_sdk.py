@@ -14,8 +14,7 @@ from pathlib import Path
 
 from meltano.core.project import Project
 
-from flext_core import p, r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
@@ -25,8 +24,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     (initialize, load, get plugins).
     """
 
-    _sdk_project_root: Path | None = u.PrivateAttr(default=None)
-    _sdk_project: Project | None = u.PrivateAttr(default=None)
+    _sdk_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
+    _sdk_project: Project | None = u.PrivateAttr(default_factory=lambda: None)
 
     def get_sdk_plugins(
         self,

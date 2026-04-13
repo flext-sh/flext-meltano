@@ -10,9 +10,8 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 
-from flext_core import p, r
+from flext_meltano import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.services._cli_small_managers import (
     FlextMeltanoDbtManager,
     FlextMeltanoPluginManager,
@@ -52,9 +51,9 @@ class FlextMeltanoCommandRouter:
     def _get_command_handler(
         self,
         command: str,
-    ) -> p.Result[Callable[[t.StrSequence], r[str]]]:
+    ) -> p.Result[Callable[[t.StrSequence], p.Result[str]]]:
         """Get command handler for given command."""
-        command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
+        command_map: Mapping[str, Callable[[t.StrSequence], p.Result[str]]] = {
             c.Meltano.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
             c.Meltano.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
             c.Meltano.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,
@@ -65,10 +64,10 @@ class FlextMeltanoCommandRouter:
         }
         handler = command_map.get(command)
         if handler is None:
-            return r[Callable[[t.StrSequence], r[str]]].fail(
+            return r[Callable[[t.StrSequence], p.Result[str]]].fail(
                 f"Unknown command: {command}",
             )
-        return r[Callable[[t.StrSequence], r[str]]].ok(handler)
+        return r[Callable[[t.StrSequence], p.Result[str]]].ok(handler)
 
 
 class FlextMeltanoSingerManager:

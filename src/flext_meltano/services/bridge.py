@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import p, r
+from flext_meltano import p, r
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
 from flext_meltano.typings import FlextMeltanoTypes as t

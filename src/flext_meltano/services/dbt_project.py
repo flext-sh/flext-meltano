@@ -14,8 +14,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_core import p, r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
@@ -24,8 +23,10 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     Manages DBT project manifests and model/test discovery.
     """
 
-    _dbt_project_root: Path | None = u.PrivateAttr(default=None)
-    _dbt_manifest: t.Meltano.DbtManifestData | None = u.PrivateAttr(default=None)
+    _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
+    _dbt_manifest: t.Meltano.DbtManifestData | None = u.PrivateAttr(
+        default_factory=lambda: None,
+    )
 
     def get_dbt_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""

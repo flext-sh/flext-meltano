@@ -27,18 +27,23 @@ from meltano.core.project_init_service import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_core import p, r
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    _container_mapping_list_adapter = c.TypeAdapter(list[t.RecursiveContainerMapping])
-    service_name: str = u.Field(
-        default="FlextMeltanoExecutor",
-        description="Canonical executor service instance name",
-    )
+    _container_mapping_list_adapter = u.TypeAdapter(list[t.RecursiveContainerMapping])
+    service_name: str = "FlextMeltanoExecutor"
 
     def __init__(
         self,

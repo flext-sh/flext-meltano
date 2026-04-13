@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from meltano.core.error import ProjectNotFound
 
-from flext_core import p, r
+from flext_meltano import p, r
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
@@ -40,14 +40,15 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
+            ready_payload: t.RecursiveContainerMapping = {
+                "status": c.Meltano.OperationStatus.READY,
+                "command_type": "cli_runner",
+                "args": list(args),
+            }
             return (
                 executor.run(args)
                 if args
-                else r[t.RecursiveContainerMapping].ok({
-                    "status": c.Meltano.OperationStatus.READY,
-                    "command_type": "cli_runner",
-                    "args": list(args),
-                })
+                else r[t.RecursiveContainerMapping].ok(ready_payload)
             )
         except c.Meltano.OPERATION_ERRORS as e:
             return r[t.RecursiveContainerMapping].fail(
@@ -94,11 +95,12 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     ) -> p.Result[t.RecursiveContainerMapping]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
-            return r[t.RecursiveContainerMapping].ok({
+            ready_payload: t.RecursiveContainerMapping = {
                 "status": c.Meltano.OperationStatus.READY,
                 "command_type": "cli",
                 "message": "CLI ready for commands",
-            })
+            }
+            return r[t.RecursiveContainerMapping].ok(ready_payload)
         return self.run(args)
 
     def run_command(self, args: t.StrSequence) -> p.Result[int]:

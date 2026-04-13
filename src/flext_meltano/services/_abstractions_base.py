@@ -10,7 +10,7 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import p, r
+from flext_meltano import p, r
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
@@ -23,10 +23,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    service_name: str = u.Field(
-        default="FlextMeltanoAbstractions",
-        description="Canonical abstractions service instance name",
-    )
+    service_name: str = "FlextMeltanoAbstractions"
 
     @staticmethod
     def _coerce_container_mapping(
@@ -43,7 +40,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success."""
         cwd = u.Meltano.resolve_project_root(self.settings)
-        run_result: r[m.Meltano.CommandExecutionResult] = (
+        run_result: p.Result[m.Meltano.CommandExecutionResult] = (
             FlextMeltanoExecutorBase().execute_meltano_command(
                 list(args),
                 _cwd=cwd,
@@ -191,12 +188,13 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute abstractions service and return real configuration state."""
         project_root = u.Meltano.resolve_project_root(self.settings)
-        return r[t.RecursiveContainerMapping].ok({
+        payload: t.RecursiveContainerMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
             "project_root": str(project_root) if project_root is not None else "",
             "environment": self.settings.environment,
             "meltano_version": self.settings.meltano_version,
-        })
+        }
+        return r[t.RecursiveContainerMapping].ok(payload)
 
     def _create_catalog_entry_from_stream(
         self,

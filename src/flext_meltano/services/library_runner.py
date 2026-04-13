@@ -8,13 +8,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import p, r
 from flext_meltano import (
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
     FlextMeltanoServiceBase,
     c,
     p,
+    r,
     t,
     u,
 )
