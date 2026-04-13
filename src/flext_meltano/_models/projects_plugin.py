@@ -37,16 +37,19 @@ class FlextMeltanoModelsProjectsPlugin:
         ] = u.Field(default_factory=list, description="Plugin configuration files")
 
         @u.computed_field
+        @property
         def full_plugin_name(self) -> str:
             """Full plugin name with namespace."""
             return f"{self.namespace}.{self.name}"
 
         @u.computed_field
+        @property
         def has_custom_executable(self) -> bool:
             """Check if plugin has custom executable."""
             return self.executable is not None
 
         @u.computed_field
+        @property
         def plugin_complexity(self) -> str:
             """Plugin complexity assessment."""
             settings_keys = list(self.settings.keys())
@@ -60,6 +63,7 @@ class FlextMeltanoModelsProjectsPlugin:
             return "complex"
 
         @u.computed_field
+        @property
         def settings_count(self) -> int:
             """Number of plugin settings."""
             keys: t.StrSequence = list(self.settings.keys())

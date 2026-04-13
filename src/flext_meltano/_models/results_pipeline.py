@@ -25,9 +25,10 @@ class FlextMeltanoModelsResultsPipeline:
             FlextMeltanoModelsResults.ExecutionResult | None,
             u.Field(default=None, description="Sink execution result"),
         ] = None
-        transformation_result: FlextMeltanoModelsResults.ExecutionResult | None = (
-            u.Field(default=None, description="Transformation execution result")
-        )
+        transformation_result: Annotated[
+            FlextMeltanoModelsResults.ExecutionResult | None,
+            u.Field(default=None, description="Transformation execution result"),
+        ] = None
         overall_status: Annotated[
             str,
             u.Field(
@@ -43,6 +44,7 @@ class FlextMeltanoModelsResultsPipeline:
         ] = u.Field(default_factory=dict, description="Pipeline execution metadata")
 
         @u.computed_field
+        @property
         def completed_stages(self) -> t.StrSequence:
             """Completed pipeline stages."""
             return [
@@ -56,6 +58,7 @@ class FlextMeltanoModelsResultsPipeline:
             ]
 
         @u.computed_field
+        @property
         def completion_percentage(self) -> float:
             """Pipeline completion percentage."""
             total_stages = 3
@@ -87,11 +90,13 @@ class FlextMeltanoModelsResultsPipeline:
             )
 
         @u.computed_field
+        @property
         def is_fully_successful(self) -> bool:
             """Check if all stages completed successfully."""
             return self._all_stages_successful()
 
         @u.computed_field
+        @property
         def total_duration_seconds(self) -> float:
             """Total pipeline duration."""
             total = 0.0

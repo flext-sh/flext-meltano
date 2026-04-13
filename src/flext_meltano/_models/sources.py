@@ -32,6 +32,7 @@ class FlextMeltanoModelsSources:
         tap_version: Annotated[str, u.Field(description="Tap version")] = "latest"
 
         @u.computed_field
+        @property
         def config_size(self) -> int:
             """Total number of configuration parameters."""
             return u.count(list(self.connection_config.keys())) + u.count(
@@ -39,11 +40,13 @@ class FlextMeltanoModelsSources:
             )
 
         @u.computed_field
+        @property
         def has_stream_config(self) -> bool:
             """Check if stream configuration is present."""
             return bool(self.stream_config)
 
         @u.computed_field
+        @property
         def tap_identifier(self) -> str:
             """Unique tap identifier."""
             return f"{self.tap_type}:{self.tap_version}"
@@ -85,16 +88,19 @@ class FlextMeltanoModelsSources:
         ] = "latest"
 
         @u.computed_field
+        @property
         def config_size(self) -> int:
             """Total number of configuration parameters."""
             return len(self.connection_config)
 
         @u.computed_field
+        @property
         def has_connection_config(self) -> bool:
             """Check if connection configuration is present."""
             return bool(self.connection_config)
 
         @u.computed_field
+        @property
         def target_identifier(self) -> str:
             """Unique target identifier."""
             return f"{self.target_type}:{self.target_version}"
@@ -130,6 +136,7 @@ class FlextMeltanoModelsSources:
         ] = "latest"
 
         @u.computed_field
+        @property
         def config_size(self) -> int:
             """Total number of configuration parameters."""
             return u.count(list(self.connection_config.keys())) + u.count(
@@ -137,11 +144,13 @@ class FlextMeltanoModelsSources:
             )
 
         @u.computed_field
+        @property
         def has_stream_config(self) -> bool:
             """Check if stream configuration is present."""
             return bool(self.stream_config)
 
         @u.computed_field
+        @property
         def source_identifier(self) -> str:
             """Unique source identifier."""
             return f"{self.source_type}:{self.source_version}"

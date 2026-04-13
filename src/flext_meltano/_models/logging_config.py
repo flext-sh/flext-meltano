@@ -130,6 +130,7 @@ class FlextMeltanoModelsLogging:
         debug_performance_profile: bool = False
 
         @u.computed_field
+        @property
         def extract_dict(self) -> t.BoolMapping:
             """Extract logging as dictionary."""
             return {
@@ -144,6 +145,7 @@ class FlextMeltanoModelsLogging:
             }
 
         @u.computed_field
+        @property
         def load_dict(self) -> t.BoolMapping:
             """Load logging as dictionary."""
             return {
@@ -158,6 +160,7 @@ class FlextMeltanoModelsLogging:
             }
 
         @u.computed_field
+        @property
         def pipeline_dict(self) -> t.BoolMapping:
             """Pipeline logging as dictionary."""
             return {
@@ -173,6 +176,7 @@ class FlextMeltanoModelsLogging:
             }
 
         @u.computed_field
+        @property
         def transform_dict(self) -> t.BoolMapping:
             """Transform logging as dictionary."""
             return {

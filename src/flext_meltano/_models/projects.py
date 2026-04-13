@@ -31,6 +31,7 @@ class FlextMeltanoModelsProjects:
         ] = ""
 
         @u.computed_field
+        @property
         def fqn_string(self) -> str:
             """Fully qualified name as dot-separated string."""
             return ".".join(self.fqn) if self.fqn else ""
@@ -103,11 +104,13 @@ class FlextMeltanoModelsProjects:
         )
 
         @u.computed_field
+        @property
         def environment_count(self) -> int:
             """Number of environments."""
             return u.count(self.environments)
 
         @u.computed_field
+        @property
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
             prod_environments = {"prod", "production", "live"}
@@ -118,6 +121,7 @@ class FlextMeltanoModelsProjects:
             return u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
 
         @u.computed_field
+        @property
         def project_maturity(self) -> str:
             """Project maturity assessment."""
             prod_envs = {"prod", "production", "live"}

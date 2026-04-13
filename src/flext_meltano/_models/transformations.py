@@ -57,25 +57,41 @@ class FlextMeltanoModelsTransformations:
         model_paths: Annotated[
             t.StrSequence,
             u.Field(default=["models"], description="Model paths"),
-        ] = u.Field(default=["models"], description="Model paths")
+        ] = u.Field(
+            default_factory=lambda: ["models"],
+            description="Model paths",
+        )
         analysis_paths: Annotated[
             t.StrSequence,
             u.Field(default=["analysis"], description="Analysis paths"),
-        ] = u.Field(default=["analysis"], description="Analysis paths")
+        ] = u.Field(
+            default_factory=lambda: ["analysis"],
+            description="Analysis paths",
+        )
         test_paths: Annotated[
             t.StrSequence,
             u.Field(default=["tests"], description="Test paths"),
-        ] = u.Field(default=["tests"], description="Test paths")
+        ] = u.Field(
+            default_factory=lambda: ["tests"],
+            description="Test paths",
+        )
         seed_paths: Annotated[
             t.StrSequence,
             u.Field(default=["seeds"], description="Seed paths"),
-        ] = u.Field(default=["seeds"], description="Seed paths")
+        ] = u.Field(
+            default_factory=lambda: ["seeds"],
+            description="Seed paths",
+        )
         macro_paths: Annotated[
             t.StrSequence,
             u.Field(default=["macros"], description="Macro paths"),
-        ] = u.Field(default=["macros"], description="Macro paths")
+        ] = u.Field(
+            default_factory=lambda: ["macros"],
+            description="Macro paths",
+        )
 
         @u.computed_field
+        @property
         def has_custom_paths(self) -> bool:
             """Check if project has custom paths."""
             default_paths = {"models", "analysis", "tests", "seeds", "macros"}
@@ -89,6 +105,7 @@ class FlextMeltanoModelsTransformations:
             return bool(all_paths - default_paths)
 
         @u.computed_field
+        @property
         def project_structure_complexity(self) -> str:
             """Project structure complexity."""
             # Use u.count() for unified counting (DSL pattern)
@@ -106,6 +123,7 @@ class FlextMeltanoModelsTransformations:
             return "complex"
 
         @u.computed_field
+        @property
         def total_path_count(self) -> int:
             """Total number of configured paths."""
             # Use u.count() for unified counting (DSL pattern)
@@ -152,11 +170,13 @@ class FlextMeltanoModelsTransformations:
         ] = 1
 
         @u.computed_field
+        @property
         def exclude_count(self) -> int:
             """Number of models to exclude."""
             return len(self.exclude)
 
         @u.computed_field
+        @property
         def execution_complexity(self) -> str:
             """Execution complexity assessment."""
             total_scope = len(self.models) + len(self.exclude)
@@ -169,11 +189,13 @@ class FlextMeltanoModelsTransformations:
             return "complex"
 
         @u.computed_field
+        @property
         def is_parallel_execution(self) -> bool:
             """Check if execution uses multiple threads."""
             return self.threads > 1
 
         @u.computed_field
+        @property
         def model_count(self) -> int:
             """Number of models to execute."""
             return len(self.models)

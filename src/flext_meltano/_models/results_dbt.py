@@ -98,6 +98,7 @@ class FlextMeltanoModelsResultsDbt:
         ]
 
         @u.computed_field
+        @property
         def timestamp(self) -> str:
             """ISO timestamp of when the result was generated."""
             return u.generate_iso_timestamp()

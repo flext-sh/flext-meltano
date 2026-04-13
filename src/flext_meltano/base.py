@@ -29,10 +29,10 @@ class FlextMeltanoServiceBase(s[t.RecursiveContainerMapping]):
     `execute` method from s.
     """
 
-    settings_type: type[FlextSettings] | None = u.Field(
-        default=FlextMeltanoSettings,
-        description="Settings class for Meltano service initialization",
-    )
+    settings_type: Annotated[
+        type[FlextSettings] | None,
+        u.Field(description="Settings class for Meltano service initialization"),
+    ] = FlextMeltanoSettings
 
     service_name: Annotated[
         t.NonEmptyStr,

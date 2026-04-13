@@ -36,11 +36,13 @@ class FlextMeltanoModelsInstancesData:
         ] = c.DEFAULT_SIZE
 
         @u.computed_field
+        @property
         def max_records_capacity(self) -> int:
             """Maximum records capacity."""
             return self.batch_size * self.max_batches
 
         @u.computed_field
+        @property
         def processing_efficiency(self) -> str:
             """Processing efficiency assessment."""
             if (
@@ -56,6 +58,7 @@ class FlextMeltanoModelsInstancesData:
             return "low"
 
         @u.computed_field
+        @property
         def sink_identifier(self) -> str:
             """Unique sink identifier."""
             return f"{self.sink_type}:batch_{self.batch_size}"
@@ -111,6 +114,7 @@ class FlextMeltanoModelsInstancesData:
         source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
         @u.computed_field
+        @property
         def active_stream_count(self) -> int:
             """Number of active streams."""
             return len([
@@ -120,6 +124,7 @@ class FlextMeltanoModelsInstancesData:
             ])
 
         @u.computed_field
+        @property
         def is_ready_for_extraction(self) -> bool:
             """Check if source is ready for data extraction."""
             streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
@@ -132,11 +137,13 @@ class FlextMeltanoModelsInstancesData:
             )
 
         @u.computed_field
+        @property
         def stream_count(self) -> int:
             """Number of discovered streams."""
             return len(self.streams)
 
         @u.computed_field
+        @property
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
             streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
@@ -189,6 +196,7 @@ class FlextMeltanoModelsInstancesData:
         ] = 0
 
         @u.computed_field
+        @property
         def is_ready(self) -> bool:
             """Check if sink is ready for processing."""
             return self.status == "configured" and self.adapter is not None

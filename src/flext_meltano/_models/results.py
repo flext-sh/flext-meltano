@@ -43,6 +43,7 @@ class FlextMeltanoModelsResults:
         ] = u.Field(default_factory=dict, description="Additional execution metadata")
 
         @u.computed_field
+        @property
         def execution_rate_per_second(self) -> float:
             """Execution rate (records/second)."""
             if not self.duration_seconds or self.duration_seconds <= 0:
@@ -50,11 +51,13 @@ class FlextMeltanoModelsResults:
             return self.records_processed / self.duration_seconds
 
         @u.computed_field
+        @property
         def is_completed(self) -> bool:
             """Check if execution is completed."""
             return self.end_time is not None
 
         @u.computed_field
+        @property
         def is_successful(self) -> bool:
             """Check if execution was successful."""
             return (
@@ -63,6 +66,7 @@ class FlextMeltanoModelsResults:
             )
 
         @u.computed_field
+        @property
         def performance_category(self) -> str:
             """Performance categorization."""
             if not self.duration_seconds or self.duration_seconds <= 0:
