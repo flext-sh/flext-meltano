@@ -84,7 +84,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         self,
         stream_name: str,
         schema: t.FlatContainerMapping,
-    ) -> r[p.Meltano.SingerDrainSink]:
+    ) -> p.Result[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream."""
         try:
             if stream_name in self._sinks:
@@ -96,7 +96,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[p.Meltano.SingerDrainSink].fail(str(exc))
 
-    def flush(self, stream_name: str | None = None) -> r[None]:
+    def flush(self, stream_name: str | None = None) -> p.Result[None]:
         """Flush records for a specific stream or all streams."""
         try:
             targets = (
@@ -121,7 +121,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         stream_name: str,
         record: t.FlatContainerMapping,
         schema: t.FlatContainerMapping,
-    ) -> r[bool]:
+    ) -> p.Result[bool]:
         """Process a single Singer RECORD message."""
         sink_result = self.get_or_create_sink(stream_name, schema)
         if sink_result.failure:
@@ -142,7 +142,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         stream_name: str,
         records: Sequence[t.FlatContainerMapping],
         schema: t.FlatContainerMapping,
-    ) -> r[int]:
+    ) -> p.Result[int]:
         """Process a batch of records."""
         processed = 0
         for record in records:
@@ -156,17 +156,17 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # Connection lifecycle
     # ------------------------------------------------------------------
 
-    def connect(self) -> r[bool]:
+    def connect(self) -> p.Result[bool]:
         """Connect to the target data store. Override in consumer."""
         return r[bool].ok(value=True)
 
-    def disconnect(self) -> r[None]:
+    def disconnect(self) -> p.Result[None]:
         """Disconnect from the target data store. Override in consumer."""
         self._sinks.clear()
         return r[None].ok(None)
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute target service — returns status."""
         return r[t.RecursiveContainerMapping].ok({
             "service": self.target_name,

@@ -52,7 +52,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         plugins_data: Mapping[str, t.StrMapping],
         plugin_name: str,
         plugin_type: str,
-    ) -> r[t.StrMapping]:
+    ) -> p.Result[t.StrMapping]:
         """Extract plugin info from plugins dict."""
         plugins_dict = m.Meltano.PluginDiscoveryCatalog.model_validate({
             "plugins": plugins_data,
@@ -75,7 +75,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     def discover_plugins(
         self,
         project: t.ValueOrModel | None = None,
-    ) -> r[Sequence[t.StrMapping]]:
+    ) -> p.Result[Sequence[t.StrMapping]]:
         """Discover plugins from Meltano Hub using native API."""
         try:
             self.logger.info("Discovering Meltano plugins")
@@ -126,7 +126,9 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             self.logger.exception(error_msg, error=str(e))
             return r[Sequence[t.StrMapping]].fail(error_msg)
 
-    def get_plugin_info(self, plugin_name: str, plugin_type: str) -> r[t.StrMapping]:
+    def get_plugin_info(
+        self, plugin_name: str, plugin_type: str
+    ) -> p.Result[t.StrMapping]:
         """Get detailed information about specific plugin."""
         try:
             temp_project_result = FlextMeltanoProjectService().create_temporary_project(

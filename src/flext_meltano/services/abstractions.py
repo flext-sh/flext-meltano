@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.services._abstractions_base import FlextMeltanoAbstractionsBase
@@ -19,7 +19,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     """Core abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     @classmethod
-    def create_abstractions_instance(cls) -> r[Self]:
+    def create_abstractions_instance(cls) -> p.Result[Self]:
         """Factory method for creating a FlextMeltanoAbstractions instance."""
         instance: Self = cls()
         return r[Self](value=instance, success=True)
@@ -28,7 +28,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     def process_tap_config(
         self, settings: m.Meltano.TapConfig
-    ) -> r[m.Meltano.TapConfig]:
+    ) -> p.Result[m.Meltano.TapConfig]:
         """Validate and return tap configuration."""
         return r[m.Meltano.TapConfig].ok(settings)
 
@@ -42,7 +42,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def discover_streams(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Discover available streams via ``meltano select --list``."""
         try:
             cmd_result = self._run_meltano(
@@ -79,7 +79,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,
         target_config: m.Meltano.TargetConfig | None = None,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Sync a single stream via ``meltano elt`` with stream selection."""
         try:
             loader_name = (
@@ -120,7 +120,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         tap_type: str,
         connection_config: t.RecursiveContainerMapping,
         stream_config: t.RecursiveContainerMapping | None = None,
-    ) -> r[m.Meltano.TapInstance]:
+    ) -> p.Result[m.Meltano.TapInstance]:
         """Create a TapInstance from configuration."""
         try:
             tap_cfg = m.Meltano.TapConfig(
@@ -140,7 +140,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def generate_catalog(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Generate Singer catalog by discovering streams from the tap."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
@@ -164,7 +164,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         self,
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Get stream definition by name."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:

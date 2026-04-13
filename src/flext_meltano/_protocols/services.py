@@ -13,7 +13,6 @@ from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
 
-from flext_core import r
 from flext_meltano import m, t
 
 
@@ -29,7 +28,7 @@ class FlextMeltanoProtocolsServices:
             command: t.StrSequence,
             timeout: int = ...,
             _cwd: Path | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
@@ -37,7 +36,7 @@ class FlextMeltanoProtocolsServices:
             self,
             plugin_type: str | None = None,
             _cwd: Path | None = None,
-        ) -> r[Sequence[t.StrMapping]]:
+        ) -> p.Result[Sequence[t.StrMapping]]:
             """Return project-scoped plugin definitions."""
             ...
 
@@ -45,7 +44,7 @@ class FlextMeltanoProtocolsServices:
             self,
             dbt_command: str,
             args: t.StrSequence | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 
@@ -54,7 +53,7 @@ class FlextMeltanoProtocolsServices:
             tap_name: str,
             target_name: str,
             _config: t.RecursiveContainerMapping | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
 
@@ -95,7 +94,7 @@ class FlextMeltanoProtocolsServices:
     class CLIManager(Protocol):
         """Base protocol for CLI managers."""
 
-        def handle_command(self, args: t.StrSequence) -> r[str]:
+        def handle_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle CLI command."""
             ...
 
@@ -103,15 +102,15 @@ class FlextMeltanoProtocolsServices:
     class SingerManager(Protocol):
         """Protocol for Singer CLI manager."""
 
-        def handle_command(self, args: t.StrSequence) -> r[str]:
+        def handle_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle CLI command."""
             ...
 
-        def handle_tap_command(self, args: t.StrSequence) -> r[str]:
+        def handle_tap_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle tap command."""
             ...
 
-        def handle_target_command(self, args: t.StrSequence) -> r[str]:
+        def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle target command."""
             ...
 
@@ -119,11 +118,11 @@ class FlextMeltanoProtocolsServices:
     class StatusManager(Protocol):
         """Protocol for Status CLI manager."""
 
-        def handle_command(self, args: t.StrSequence) -> r[str]:
+        def handle_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle CLI command."""
             ...
 
-        def handle_version_command(self, args: t.StrSequence) -> r[str]:
+        def handle_version_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle version command."""
             ...
 

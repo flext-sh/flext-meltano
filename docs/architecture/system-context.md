@@ -273,7 +273,7 @@ from flext_core import (
 class FlextMeltanoService(s):
     """FLEXT-Meltano service extending FLEXT-Core patterns."""
 
-    def discover_plugins(self) -> r[List[PluginInfo]]:
+    def discover_plugins(self) -> p.Result[List[PluginInfo]]:
         """Plugin discovery with FLEXT error handling."""
         try:
             plugins = self.adapter.list_plugins()
@@ -289,7 +289,7 @@ class FlextMeltanoService(s):
 class MeltanoAdapter:
     """Meltano CLI integration with proper error handling."""
 
-    def run_meltano_command(self, command: str, **kwargs) -> r[MeltanoResult]:
+    def run_meltano_command(self, command: str, **kwargs) -> p.Result[MeltanoResult]:
         """Execute Meltano CLI command safely."""
 
         # Build command with proper escaping
@@ -384,15 +384,15 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 class ExternalSystemAdapter(Protocol):
     """Protocol for external system adapters."""
 
-    def connect(self) -> r[Connection]:
+    def connect(self) -> p.Result[Connection]:
         """Establish connection to external system."""
         ...
 
-    def execute_operation(self, operation: Operation) -> r[Result]:
+    def execute_operation(self, operation: Operation) -> p.Result[Result]:
         """Execute operation on external system."""
         ...
 
-    def disconnect(self) -> r[bool]:
+    def disconnect(self) -> p.Result[bool]:
         """Clean up connection to external system."""
         ...
 
@@ -417,7 +417,7 @@ class PluginManager:
         self.plugin_registry: Dict[str, PluginInfo] = {}
         self.plugin_loaders: List[PluginLoader] = []
 
-    def register_plugin(self, plugin_info: PluginInfo) -> r[bool]:
+    def register_plugin(self, plugin_info: PluginInfo) -> p.Result[bool]:
         """Register a plugin in the ecosystem."""
         if plugin_info.name in self.plugin_registry:
             return r.fail(
@@ -433,7 +433,7 @@ class PluginManager:
         self.logger.info(f"Registered plugin: {plugin_info.name}")
         return r.| ok(value=True)
 
-    def load_plugin(self, name: str) -> r[Plugin]:
+    def load_plugin(self, name: str) -> p.Result[Plugin]:
         """Load and initialize a plugin."""
         if name not in self.plugin_registry:
             return r.fail(
@@ -581,7 +581,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -598,7 +598,7 @@ class MyFLEXTProject(s):
         self.tap = FlextMeltanoTap()
         self.target = FlextMeltanoTarget()
 
-    def execute_pipeline(self) -> r[PipelineResult]:
+    def execute_pipeline(self) -> p.Result[PipelineResult]:
         """Execute pipeline using FLEXT foundation."""
         return (
             self.tap
@@ -619,7 +619,7 @@ class FLEXTPluginRegistry:
     def __init__(self):
         self.registered_plugins: Dict[str, PluginMetadata] = {}
 
-    def register_flext_plugin(self, plugin: FLEXTPlugin) -> r[bool]:
+    def register_flext_plugin(self, plugin: FLEXTPlugin) -> p.Result[bool]:
         """Register a FLEXT plugin in the ecosystem."""
 
         # Validate plugin compatibility
@@ -758,7 +758,9 @@ ______________________________________________________________________
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
-    def execute_sync_operation(self, request: OperationRequest) -> r[OperationResponse]:
+    def execute_sync_operation(
+        self, request: OperationRequest
+    ) -> p.Result[OperationResponse]:
         """Execute synchronous operation with timeout and error handling."""
 
         # Validate request
@@ -798,7 +800,7 @@ class CircuitBreakerIntegration:
 
     def execute_with_circuit_breaker(
         self, operation: Callable
-    ) -> r[t.RecursiveContainer]:
+    ) -> p.Result[t.RecursiveContainer]:
         """Execute operation with circuit breaker protection."""
 
         if self.state == CircuitState.OPEN:
@@ -850,7 +852,7 @@ class EventDrivenIntegration:
         self.event_queue = event_queue
         self.event_handlers = event_handlers
 
-    def publish_event(self, event: IntegrationEvent) -> r[bool]:
+    def publish_event(self, event: IntegrationEvent) -> p.Result[bool]:
         """Publish integration event to queue."""
 
         try:
@@ -906,7 +908,7 @@ class MessageQueueIntegration:
         self.dead_letter_queue = dead_letter_queue
         self.max_retries = 3
 
-    def send_message(self, message: QueueMessage) -> r[bool]:
+    def send_message(self, message: QueueMessage) -> p.Result[bool]:
         """Send message to queue with reliability guarantees."""
 
         try:

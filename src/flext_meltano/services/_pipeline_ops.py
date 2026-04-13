@@ -11,7 +11,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
@@ -63,7 +63,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     def create_pipeline(
         pipeline_name: str,
         settings: t.RecursiveContainerMapping | None,
-    ) -> r[str]:
+    ) -> p.Result[str]:
         """Create a new Meltano pipeline with the given configuration."""
         if not pipeline_name.strip():
             return r[str].fail("Pipeline creation requires a non-empty pipeline name")
@@ -92,7 +92,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     def execute_pipeline(
         pipeline_name: str,
         command_args: t.StrSequence | None = None,
-    ) -> r[str]:
+    ) -> p.Result[str]:
         """Execute a Meltano pipeline."""
         pipeline_dir = FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
@@ -142,7 +142,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         return r[str].ok(output or "executed")
 
     @staticmethod
-    def list_pipelines() -> r[t.StrSequence]:
+    def list_pipelines() -> p.Result[t.StrSequence]:
         """List all available Meltano pipelines."""
         pipelines_root = FlextMeltanoPipelinePaths.pipelines_root_dir()
         if not pipelines_root.exists():

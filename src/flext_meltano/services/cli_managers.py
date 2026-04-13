@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.protocols import FlextMeltanoProtocols as p
 from flext_meltano.services._cli_small_managers import (
@@ -52,7 +52,7 @@ class FlextMeltanoCommandRouter:
     def _get_command_handler(
         self,
         command: str,
-    ) -> r[Callable[[t.StrSequence], r[str]]]:
+    ) -> p.Result[Callable[[t.StrSequence], r[str]]]:
         """Get command handler for given command."""
         command_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
             c.Meltano.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
@@ -80,7 +80,7 @@ class FlextMeltanoSingerManager:
         self.cli = cli
         self.logger = u.fetch_logger(__name__)
 
-    def handle_command(self, args: t.StrSequence) -> r[str]:
+    def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle Singer command by routing to tap or target subcommands."""
         if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
@@ -92,28 +92,32 @@ class FlextMeltanoSingerManager:
             return self.handle_target_command(subcommand_args)
         return r[str].fail(f"Unknown Singer command: {subcommand}")
 
-    def handle_tap_command(self, args: t.StrSequence) -> r[str]:
+    def handle_tap_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle tap command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_tap_operation(args[0], args[1:])
 
-    def handle_target_command(self, args: t.StrSequence) -> r[str]:
+    def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle target command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_target_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_target_operation(args[0], args[1:])
 
-    def _execute_tap_operation(self, operation: str, _args: t.StrSequence) -> r[str]:
+    def _execute_tap_operation(
+        self, operation: str, _args: t.StrSequence
+    ) -> p.Result[str]:
         self.logger.info(
             "Tap operation '%s' is not supported by the current CLI manager",
             operation,
         )
         return r[str].fail(f"Tap operation '{operation}' is not supported")
 
-    def _execute_target_operation(self, operation: str, _args: t.StrSequence) -> r[str]:
+    def _execute_target_operation(
+        self, operation: str, _args: t.StrSequence
+    ) -> p.Result[str]:
         self.logger.info(
             "Target operation '%s' is not supported by the current CLI manager",
             operation,

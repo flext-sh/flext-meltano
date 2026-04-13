@@ -231,7 +231,7 @@ class _MeltanoLibraryWrapper:
     """Internal wrapper for meltano library operations."""
 
     @staticmethod
-    def create_project(path: Path) -> r[m.Meltano.ProjectModel]:
+    def create_project(path: Path) -> p.Result[m.Meltano.ProjectModel]:
         """Create Meltano project through library API."""
         # Implementation with proper error handling
 ```
@@ -295,7 +295,9 @@ class StreamDefinition(BaseModel):
 
 ```python
 # All operations return r[T] for railway-oriented programming
-def process_elt_pipeline(tap_config: TapConfig, target_config: t.Dict) -> r[t.Dict]:
+def process_elt_pipeline(
+    tap_config: TapConfig, target_config: t.Dict
+) -> p.Result[t.Dict]:
     """Process ELT pipeline with comprehensive error handling."""
 
     # Validation phase

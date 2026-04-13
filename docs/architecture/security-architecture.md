@@ -823,7 +823,7 @@ class DataPrivacyController:
     def __init__(self, data_store):
         self.data_store = data_store
 
-    def handle_data_subject_request(self, request: DataSubjectRequest) -> r[ComplianceAction]:
+    def handle_data_subject_request(self, request: DataSubjectRequest) -> p.Result[ComplianceAction]:
         """Handle data subject access/deletion requests."""
 
         if request.request_type == 'access':
@@ -858,7 +858,7 @@ class DataPrivacyController:
             'preferences': self.data_store.get_user_preferences(user_id)
         }
 
-    def _delete_user_data(self, user_id: str) -> r[bool]:
+    def _delete_user_data(self, user_id: str) -> p.Result[bool]:
         """Delete all user data."""
         try:
             # Anonymize instead of delete for audit purposes

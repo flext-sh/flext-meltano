@@ -82,13 +82,13 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 ```python
 # Plugin operations
-discover_plugins() -> r[Sequence[PluginInfo]]
-install_plugin(name: str, version: str | None) -> r[PluginInstallResult]
-execute_tap(name: str, settings: dict) -> r[TapExecutionResult]
+discover_plugins() -> p.Result[Sequence[PluginInfo]]
+install_plugin(name: str, version: str | None) -> p.Result[PluginInstallResult]
+execute_tap(name: str, settings: dict) -> p.Result[TapExecutionResult]
 
 # Pipeline operations
-execute_pipeline(tap: str, target: str) -> r[PipelineResult]
-validate_configuration() -> r[bool]
+execute_pipeline(tap: str, target: str) -> p.Result[PipelineResult]
+validate_configuration() -> p.Result[bool]
 ```
 
 #### FlextMeltanoAdapter (CLI Integration)
@@ -127,8 +127,8 @@ class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
     def __init__(self, tap_name: str, settings: t.Dict, state: t.Dict | None = None)
-    async def discover(self) -> r[Catalog]
-    async def sync(self, streams: t.StringList | None = None) -> r[SyncResult]
+    async def discover(self) -> p.Result[Catalog]
+    async def sync(self, streams: t.StringList | None = None) -> p.Result[SyncResult]
 ```
 
 **FlextSingerTarget Architecture:**
@@ -138,8 +138,8 @@ class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
     def __init__(self, target_name: str, settings: t.Dict)
-    async def load_records(self, records: Sequence[t.Dict]) -> r[LoadResult]
-    async def flush(self) -> r[FlushResult]
+    async def load_records(self, records: Sequence[t.Dict]) -> p.Result[LoadResult]
+    async def flush(self) -> p.Result[FlushResult]
 ```
 
 ### Plugin Architecture
@@ -238,7 +238,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t

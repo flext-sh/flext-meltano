@@ -85,7 +85,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -127,7 +127,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -135,7 +135,7 @@ from flext_core import u
 
 
 # All flext-meltano operations return r[T]
-def example_operation() -> r[str]:
+def example_operation() -> p.Result[str]:
     try:
         # Your operation logic
         return r.ok("Operation successful")

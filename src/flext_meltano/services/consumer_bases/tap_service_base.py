@@ -86,7 +86,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     # Singer operations
     # ------------------------------------------------------------------
 
-    def run_discover(self) -> r[t.StrSequence]:
+    def run_discover(self) -> p.Result[t.StrSequence]:
         """Discover stream names from the tap."""
         try:
             tap = self._get_or_create_tap()
@@ -109,7 +109,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
             self.logger.exception("Discovery failed", error=str(exc))
             return r[t.StrSequence].fail(str(exc))
 
-    def run_sync(self) -> r[str]:
+    def run_sync(self) -> p.Result[str]:
         """Execute Singer sync via tap."""
         try:
             tap = self._get_or_create_tap()
@@ -130,11 +130,11 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     # Connection lifecycle
     # ------------------------------------------------------------------
 
-    def connect(self) -> r[bool]:
+    def connect(self) -> p.Result[bool]:
         """Connect to the data source. Override in consumer."""
         return r[bool].ok(value=True)
 
-    def disconnect(self) -> r[None]:
+    def disconnect(self) -> p.Result[None]:
         """Disconnect from the data source. Override in consumer."""
         return r[None].ok(None)
 
@@ -149,7 +149,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         return self._tap_instance
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute tap service — returns status."""
         return r[t.RecursiveContainerMapping].ok({
             "service": self.tap_name,

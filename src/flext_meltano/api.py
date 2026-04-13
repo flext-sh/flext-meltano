@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Self, override
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.adapters import FlextMeltanoAdapter
@@ -69,15 +69,15 @@ class FlextMeltano(
             cls._instance = instance
         return instance
 
-    def tap(self, name: str, **settings: t.Scalar) -> r[Self]:
+    def tap(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
         """Create a specialized Tap facade instance through the public API."""
         return type(self).create_source_service(name, **settings)
 
-    def target(self, name: str, **settings: t.Scalar) -> r[Self]:
+    def target(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
         """Create a specialized Target facade instance through the public API."""
         return type(self).create_sink_service(name, **settings)
 
-    def dbt(self, name: str, **settings: t.Scalar) -> r[Self]:
+    def dbt(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
         """Create a specialized DBT facade instance through the public API."""
         return type(self).create_transformation_service(name, **settings)
 
@@ -86,7 +86,7 @@ class FlextMeltano(
     Dbt = dbt
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute Meltano service with railway pattern."""
         return r[t.RecursiveContainerMapping].ok({
             "service_name": self.service_name,

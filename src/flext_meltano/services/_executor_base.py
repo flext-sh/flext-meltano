@@ -27,7 +27,7 @@ from meltano.core.project_init_service import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, m, t, u
 
 
@@ -78,7 +78,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return None
 
     @staticmethod
-    def get_version() -> r[str]:
+    def get_version() -> p.Result[str]:
         """Get version information from the imported Meltano package."""
         return u.try_(
             lambda: meltano.__version__,
@@ -119,7 +119,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         project_root: Path,
         *,
         force: bool = False,
-    ) -> r[Project]:
+    ) -> p.Result[Project]:
         """Initialize a Meltano project using the library service."""
         return u.try_(
             lambda: ProjectInitService(project_root).init(
@@ -138,7 +138,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             ),
         ).map_error(lambda e: f"Failed to initialize Meltano project: {e}")
 
-    def load_project(self, _cwd: Path | None = None) -> r[Project]:
+    def load_project(self, _cwd: Path | None = None) -> p.Result[Project]:
         """Load a Meltano project using the imported runtime."""
         search_root = self._project_search_root(_cwd)
         return u.try_(
@@ -160,7 +160,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         plugin_type: str | None = None,
         _cwd: Path | None = None,
-    ) -> r[Sequence[t.StrMapping]]:
+    ) -> p.Result[Sequence[t.StrMapping]]:
         """Return project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.failure:
@@ -221,7 +221,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ]
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute the Meltano executor service."""
         config_data: t.RecursiveContainerMapping = {
             "status": c.Meltano.OperationStatus.READY,
@@ -237,7 +237,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         command: t.StrSequence,
         timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
-    ) -> r[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a Meltano runtime command in-process and capture its output."""
         if timeout <= 0:
             return r[m.Meltano.CommandExecutionResult].fail(
@@ -338,7 +338,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         dbt_command: str,
         args: t.StrSequence | None = None,
-    ) -> r[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a DBT command."""
         try:
             return self.execute_meltano_command(
@@ -352,7 +352,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         tap_name: str,
         target_name: str,
         _config: t.RecursiveContainerMapping | None = None,
-    ) -> r[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:
             return self.execute_meltano_command(

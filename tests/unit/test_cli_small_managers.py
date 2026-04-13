@@ -10,7 +10,7 @@ from flext_meltano import (
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
 )
-from tests import r, t
+from tests import p, r, t
 
 
 class _StubDbtCli:
@@ -53,7 +53,7 @@ class _StubDbtService:
     def __init__(self) -> None:
         self.calls: list[tuple[str, list[str]]] = []
 
-    def run_operation(self, operation: str, args: t.StrSequence) -> r[str]:
+    def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]:
         self.calls.append((operation, list(args)))
         return r[str].ok(f"dbt:{operation}")
 
@@ -62,28 +62,28 @@ class _StubPluginService:
     def __init__(self) -> None:
         self.calls: list[tuple[str, tuple[str, ...]]] = []
 
-    def install_plugin(self, plugin_type: str, plugin_name: str) -> r[str]:
+    def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         self.calls.append(("install", (plugin_type, plugin_name)))
         return r[str].ok(f"installed:{plugin_type}:{plugin_name}")
 
-    def get_plugin_info(self, plugin_name: str) -> r[str]:
+    def get_plugin_info(self, plugin_name: str) -> p.Result[str]:
         self.calls.append(("info", (plugin_name,)))
         return r[str].ok(f"info:{plugin_name}")
 
-    def list_plugins(self, plugin_type: str | None = None) -> r[str]:
+    def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]:
         plugin_value = "" if plugin_type is None else plugin_type
         self.calls.append(("list", (plugin_value,)))
         return r[str].ok("[]")
 
 
 class _StubStatusService:
-    def get_version(self) -> r[str]:
+    def get_version(self) -> p.Result[str]:
         return r[str].ok("3.9.1")
 
-    def run_health_check(self) -> r[str]:
+    def run_health_check(self) -> p.Result[str]:
         return r[str].ok('{"status": "healthy"}')
 
-    def show_status(self) -> r[str]:
+    def show_status(self) -> p.Result[str]:
         return r[str].ok('{"status": "ready"}')
 
 

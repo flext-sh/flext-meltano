@@ -14,7 +14,7 @@ from pathlib import Path
 
 from meltano.core.project import Project
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 
@@ -31,7 +31,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     def get_sdk_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> r[Sequence[t.Meltano.PluginDefinition]]:
+    ) -> p.Result[Sequence[t.Meltano.PluginDefinition]]:
         """Get plugins from the SDK project, optionally filtered by type."""
         try:
             if not self._sdk_project:
@@ -49,7 +49,9 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 f"Failed to get plugins: {e}"
             )
 
-    def initialize_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
+    def initialize_sdk_project(
+        self, root: Path
+    ) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Initialize a new Meltano project via SDK."""
         try:
             try:
@@ -69,7 +71,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 f"Failed to initialize project: {e}"
             )
 
-    def load_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
+    def load_sdk_project(self, root: Path) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Load an existing Meltano project via SDK."""
         try:
             if not root.exists():

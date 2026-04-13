@@ -399,7 +399,9 @@ class AsyncPipelineExecutor:
                 self.metrics.pipeline_failed()
                 return PipelineResult.failure(PipelineExecutionError(str(e)))
 
-    async def validate_pipeline_async(self, pipeline: Pipeline) -> r[ValidatedPipeline]:
+    async def validate_pipeline_async(
+        self, pipeline: Pipeline
+    ) -> p.Result[ValidatedPipeline]:
         """Async pipeline validation."""
 
         # Run validation checks concurrently
@@ -1143,7 +1145,7 @@ end note
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
-    def execute_with_railway(self, operation: Operation) -> r[OperationResult]:
+    def execute_with_railway(self, operation: Operation) -> p.Result[OperationResult]:
         """Execute operation using railway pattern with full error handling."""
 
         return (
@@ -1157,7 +1159,7 @@ class RailwayExecutor:
             .map(lambda result: OperationResult.from_success(result))
         )
 
-    def validate_operation(self, operation: Operation) -> r[ValidatedOperation]:
+    def validate_operation(self, operation: Operation) -> p.Result[ValidatedOperation]:
         """Validate operation parameters and constraints."""
 
         # Schema validation
@@ -1187,7 +1189,9 @@ class RailwayExecutor:
 
         return r.ok(ValidatedOperation(operation, schema_result.unwrap()))
 
-    def execute_operation(self, operation: ValidatedOperation) -> r[ExecutionResult]:
+    def execute_operation(
+        self, operation: ValidatedOperation
+    ) -> p.Result[ExecutionResult]:
         """Execute operation with comprehensive error handling."""
 
         try:
@@ -1333,7 +1337,7 @@ class RetryExecutor:
         self.max_delay = max_delay
         self.backoff_factor = backoff_factor
 
-    def execute_with_retry(self, operation: Callable[[], T]) -> r[T]:
+    def execute_with_retry(self, operation: Callable[[], T]) -> p.Result[T]:
         """Execute operation with retry logic."""
 
         last_exception = None

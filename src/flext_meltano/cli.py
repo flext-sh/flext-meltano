@@ -11,7 +11,7 @@ from typing import override
 
 from flext_cli import cli
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import u
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
@@ -126,7 +126,7 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
         self.output.print_message("Target commands: run, test")
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute CLI service."""
         return r[t.RecursiveContainerMapping].ok({
             "status": c.Meltano.StreamStatus.COMPLETED,

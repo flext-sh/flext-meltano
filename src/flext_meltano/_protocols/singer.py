@@ -12,7 +12,6 @@ from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
 
-from flext_core import r
 from flext_meltano import m, t
 
 
@@ -212,14 +211,18 @@ class FlextMeltanoProtocolsSinger:
         the consumer; generic stdin parsing stays here.
         """
 
-        def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> r[None]:
+        def handle_schema(
+            self, message: m.Meltano.SingerSchemaMessage
+        ) -> p.Result[None]:
             """Handle a SCHEMA message."""
             ...
 
-        def handle_record(self, message: m.Meltano.SingerRecordMessage) -> r[None]:
+        def handle_record(
+            self, message: m.Meltano.SingerRecordMessage
+        ) -> p.Result[None]:
             """Handle a RECORD message."""
             ...
 
-        def handle_state(self, message: m.Meltano.SingerStateMessage) -> r[None]:
+        def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[None]:
             """Handle a STATE message."""
             ...

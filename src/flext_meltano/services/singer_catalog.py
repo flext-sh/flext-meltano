@@ -29,7 +29,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
 
     def discover_catalog_streams(
         self, tap: p.Meltano.SingerTap
-    ) -> r[m.Meltano.SingerCatalog]:
+    ) -> p.Result[m.Meltano.SingerCatalog]:
         """Discover streams from a Singer tap instance.
 
         Named ``discover_catalog_streams`` to avoid conflict with
@@ -46,7 +46,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to discover: {e}")
 
-    def get_stream_schema(self, stream_name: str) -> r[t.ContainerValueMapping]:
+    def get_stream_schema(self, stream_name: str) -> p.Result[t.ContainerValueMapping]:
         """Get schema for a specific stream from cached catalog."""
         try:
             for entry in self._singer_catalog.streams:
@@ -60,7 +60,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to get stream schema", error=str(e))
             return r[t.ContainerValueMapping].fail(f"Failed to get schema: {e}")
 
-    def load_catalog(self, catalog_file: Path) -> r[m.Meltano.SingerCatalog]:
+    def load_catalog(self, catalog_file: Path) -> p.Result[m.Meltano.SingerCatalog]:
         """Load catalog from JSON file."""
         try:
             if not catalog_file.exists():
@@ -82,7 +82,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
 
-    def save_catalog(self, catalog_file: Path) -> r[None]:
+    def save_catalog(self, catalog_file: Path) -> p.Result[None]:
         """Save catalog to JSON file."""
         try:
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
@@ -99,7 +99,9 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to save catalog", error=str(e))
             return r[None].fail(f"Failed to save catalog: {e}")
 
-    def select_streams(self, stream_names: t.StrSequence) -> r[m.Meltano.SingerCatalog]:
+    def select_streams(
+        self, stream_names: t.StrSequence
+    ) -> p.Result[m.Meltano.SingerCatalog]:
         """Select specific streams from cached catalog."""
         try:
             selected = [

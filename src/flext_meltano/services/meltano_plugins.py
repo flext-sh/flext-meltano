@@ -29,7 +29,7 @@ class FlextMeltanoComponentService(
     """
 
     @staticmethod
-    def _validate_plugin_type(plugin_type: str) -> r[str]:
+    def _validate_plugin_type(plugin_type: str) -> p.Result[str]:
         """Validate plugin type."""
         valid_types = [pt.value for pt in c.Meltano.PluginType]
         if plugin_type not in valid_types:
@@ -43,7 +43,7 @@ class FlextMeltanoComponentService(
         project: p.Meltano.Project,
         plugin_type: str,
         plugin_name: str,
-    ) -> r[t.StrMapping]:
+    ) -> p.Result[t.StrMapping]:
         """Add plugin to Meltano project using railway-oriented validation chain."""
         return (
             self
@@ -62,7 +62,7 @@ class FlextMeltanoComponentService(
         )
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute the pipeline component service."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
@@ -72,7 +72,7 @@ class FlextMeltanoComponentService(
         plugin_type: str,
         *,
         addition_success: bool,
-    ) -> r[t.StrMapping]:
+    ) -> p.Result[t.StrMapping]:
         """Build successful plugin addition result."""
         plugin_result: t.StrMapping = {
             "success": "true" if addition_success else "false",
@@ -92,7 +92,7 @@ class FlextMeltanoComponentService(
         project: p.Meltano.Project,
         plugin_type_str: str,
         plugin_name: str,
-    ) -> r[bool]:
+    ) -> p.Result[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         plugin_config: t.RecursiveContainerMapping = {
             "project_root": str(project.root_dir),
@@ -105,7 +105,9 @@ class FlextMeltanoComponentService(
             return r[bool].fail(add_result.error or "Plugin addition failed")
         return r[bool].ok(value=True)
 
-    def _log_plugin_addition_start(self, plugin_name: str, plugin_type: str) -> r[None]:
+    def _log_plugin_addition_start(
+        self, plugin_name: str, plugin_type: str
+    ) -> p.Result[None]:
         """Log plugin addition start."""
         self.logger.info(
             "Adding plugin using ProjectAddService",

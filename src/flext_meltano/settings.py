@@ -128,15 +128,15 @@ class FlextMeltanoSettings(FlextSettings):
             raise ValueError(msg)
         return c.LogLevel(normalized)
 
-    def get_project_file(self) -> r[Path]:
+    def get_project_file(self) -> p.Result[Path]:
         """Return the canonical pipeline file path."""
         return r[Path].ok(self.project_root / self.PROJECT_FILE)
 
-    def get_absolute_config_dir(self) -> r[Path]:
+    def get_absolute_config_dir(self) -> p.Result[Path]:
         """Return absolute Meltano settings directory path."""
         return r[Path].ok((self.project_root / self.config_dir).resolve())
 
-    def get_absolute_logs_dir(self) -> r[Path]:
+    def get_absolute_logs_dir(self) -> p.Result[Path]:
         """Return absolute logs directory path."""
         return r[Path].ok((self.project_root / self.logs_dir).resolve())
 
@@ -144,7 +144,7 @@ class FlextMeltanoSettings(FlextSettings):
         """Return absolute Meltano virtualenv directory."""
         return (self.project_root / Path(self.VENV_DIR)).resolve()
 
-    def validate_project_structure(self) -> r[bool]:
+    def validate_project_structure(self) -> p.Result[bool]:
         """Validate required project structure artifacts."""
         if not self.project_root.exists() or not self.project_root.is_dir():
             return r[bool].fail(f"Project path {self.project_root} does not exist")
@@ -206,7 +206,7 @@ class FlextMeltanoSettings(FlextSettings):
         return ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
     @classmethod
-    def create_from_project_root(cls, project_root: Path) -> r[Self]:
+    def create_from_project_root(cls, project_root: Path) -> p.Result[Self]:
         """Create settings from a project root path."""
         try:
             instance: Self = cls(project_root=project_root)

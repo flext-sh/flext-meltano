@@ -9,14 +9,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
     """Generic pipeline business rule validators using foundation."""
 
     @classmethod
-    def validate_component_rules(cls, settings: t.ConfigurationMapping) -> r[bool]:
+    def validate_component_rules(
+        cls, settings: t.ConfigurationMapping
+    ) -> p.Result[bool]:
         """Validate pipeline component business rules with model validation."""
         try:
             m.Meltano.PluginComponentConfig.model_validate(settings)
@@ -28,7 +30,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     def validate_pipeline_project_business_rules(
         cls,
         settings: t.ConfigurationMapping,
-    ) -> r[bool]:
+    ) -> p.Result[bool]:
         """Validate pipeline project business rules."""
         try:
             m.Meltano.PipelineProjectModel.model_validate(settings)
@@ -37,7 +39,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].fail(f"Project validation failed: {error}")
 
     @classmethod
-    def validate_pipeline_project_structure(cls, project_path: Path) -> r[bool]:
+    def validate_pipeline_project_structure(cls, project_path: Path) -> p.Result[bool]:
         """Validate pipeline project structure with domain-specific business rules."""
         if not project_path.exists() or not project_path.is_dir():
             error_msg = (
@@ -63,7 +65,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
         return r[bool].ok(value=True)
 
     @classmethod
-    def validate_plugin_config(cls, settings: t.ConfigurationMapping) -> r[bool]:
+    def validate_plugin_config(cls, settings: t.ConfigurationMapping) -> p.Result[bool]:
         """Validate plugin configuration with complete business rules."""
         return cls.validate_component_rules(settings)
 
@@ -71,7 +73,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     def validate_transformation_business_rules(
         cls,
         settings: t.ConfigurationMapping,
-    ) -> r[bool]:
+    ) -> p.Result[bool]:
         """Validate transformation-specific business rules."""
         try:
             m.Meltano.TransformationProjectModel.model_validate(settings)
@@ -80,7 +82,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].fail(f"Transformation validation failed: {error}")
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute validators service — returns current settings."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 

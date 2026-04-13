@@ -13,7 +13,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, u
 
 
 class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
@@ -27,7 +27,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         default_factory=m.Meltano.SingerStateMessage,
     )
 
-    def get_bookmark(self, stream_name: str, bookmark_key: str) -> r[str]:
+    def get_bookmark(self, stream_name: str, bookmark_key: str) -> p.Result[str]:
         """Get current bookmark value for a stream."""
         try:
             stream_state = self._singer_state.value.get(stream_name)
@@ -46,7 +46,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     def load_state(
         self,
         state_file: Path | None = None,
-    ) -> r[m.Meltano.SingerStateMessage]:
+    ) -> p.Result[m.Meltano.SingerStateMessage]:
         """Load state from file or return in-memory state."""
         try:
             if state_file and state_file.exists():
@@ -66,7 +66,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to load state", error=str(e))
             return r[m.Meltano.SingerStateMessage].fail(f"Failed to load state: {e}")
 
-    def save_state(self, state_file: Path) -> r[None]:
+    def save_state(self, state_file: Path) -> p.Result[None]:
         """Save state to file."""
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
@@ -90,7 +90,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         stream_name: str,
         bookmark_key: str,
         bookmark_value: str,
-    ) -> r[None]:
+    ) -> p.Result[None]:
         """Update bookmark for a stream."""
         try:
             self._singer_state.value.setdefault(stream_name, {})

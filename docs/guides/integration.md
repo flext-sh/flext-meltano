@@ -67,7 +67,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -82,11 +82,13 @@ class FlextOracleTapService(s):
         super().__init__()
         self._tap_abstractions = FlextMeltanoTapAbstractions()
 
-    def discover_oracle_streams(self, settings: dict) -> r[Sequence[StreamDefinition]]:
+    def discover_oracle_streams(
+        self, settings: dict
+    ) -> p.Result[Sequence[StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
         return self._tap_abstractions.discover_catalog("tap-oracle")
 
-    def extract_oracle_data(self, stream: str, settings: dict) -> r[list]:
+    def extract_oracle_data(self, stream: str, settings: dict) -> p.Result[list]:
         """Extract data using flext-meltano abstractions."""
         return self._tap_abstractions.extract_data("tap-oracle", settings)
 ```
@@ -111,7 +113,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -126,7 +128,7 @@ class FlextOracleTargetService(s):
         super().__init__()
         self._target_abstractions = FlextMeltanoTargetAbstractions()
 
-    def load_to_oracle(self, records: list, settings: dict) -> r[t.Dict]:
+    def load_to_oracle(self, records: list, settings: dict) -> p.Result[t.Dict]:
         """Load records to Oracle using flext-meltano abstractions."""
         return self._target_abstractions.load_data("target-oracle", records)
 ```
@@ -155,7 +157,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -170,7 +172,7 @@ class FlextOracleDbtService(s):
         super().__init__()
         self._dbt_service = FlextMeltanoDbtService()
 
-    def run_oracle_models(self, models: t.StringList) -> r[t.Dict]:
+    def run_oracle_models(self, models: t.StringList) -> p.Result[t.Dict]:
         """Execute Oracle-specific dbt models."""
         # Note: Current implementation returns placeholder data
         return self._dbt_service.execute_dbt_operation()
@@ -201,7 +203,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t
@@ -219,7 +221,7 @@ class EnterpriseELTService(s):
 
     def execute_elt_pipeline(
         self, tap_name: str, target_name: str, dbt_models: t.StringList = None
-    ) -> r[t.Dict]:
+    ) -> p.Result[t.Dict]:
         """Execute complete ELT pipeline."""
 
         # 1. Extract and Load using Meltano
@@ -404,7 +406,7 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import r
+from flext_core import r, p
 from flext_core import u
 from flext_core import s
 from flext_core import t

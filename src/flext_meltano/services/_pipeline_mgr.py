@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
 from flext_meltano.protocols import FlextMeltanoProtocols as p
@@ -35,7 +35,7 @@ class FlextMeltanoPipelineManager(
         self.cli = cli
         self.logger = u.fetch_logger(__name__)
 
-    def handle_command(self, args: t.StrSequence) -> r[str]:
+    def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle pipeline command using composition."""
         if c.Meltano.CMD_HELP_OPTION in args or c.Meltano.CMD_SHORT_HELP_OPTION in args:
             self.cli.show_pipeline_help()
@@ -47,7 +47,7 @@ class FlextMeltanoPipelineManager(
             return r[str].fail(handler_result.error)
         return handler_result.value(subcommand_args)
 
-    def _create_pipeline(self, _args: t.StrSequence) -> r[str]:
+    def _create_pipeline(self, _args: t.StrSequence) -> p.Result[str]:
         """Create new pipeline."""
         if not _args:
             return r[str].fail(
@@ -72,7 +72,7 @@ class FlextMeltanoPipelineManager(
         self.logger.info("Pipeline created", pipeline=pipeline_name)
         return r[str].ok(result.value)
 
-    def _delete_pipeline(self, _args: t.StrSequence) -> r[str]:
+    def _delete_pipeline(self, _args: t.StrSequence) -> p.Result[str]:
         """Delete pipeline."""
         if not _args:
             return r[str].fail("Pipeline delete requires pipeline name")
@@ -84,7 +84,7 @@ class FlextMeltanoPipelineManager(
     def _get_pipeline_handler(
         self,
         subcommand: str,
-    ) -> r[Callable[[t.StrSequence], r[str]]]:
+    ) -> p.Result[Callable[[t.StrSequence], r[str]]]:
         """Get pipeline operation handler."""
         operation_map: Mapping[str, Callable[[t.StrSequence], r[str]]] = {
             c.Meltano.PipelineCommand.CREATE: self._create_pipeline,
@@ -101,7 +101,7 @@ class FlextMeltanoPipelineManager(
             )
         return r[Callable[[t.StrSequence], r[str]]].ok(handler)
 
-    def _get_pipeline_status(self, _args: t.StrSequence) -> r[str]:
+    def _get_pipeline_status(self, _args: t.StrSequence) -> p.Result[str]:
         """Get pipeline status."""
         if not _args:
             return r[str].fail("Pipeline status requires pipeline name")
@@ -115,7 +115,7 @@ class FlextMeltanoPipelineManager(
         )
         return r[str].ok(status_result.value)
 
-    def _list_pipelines(self, _args: t.StrSequence) -> r[str]:
+    def _list_pipelines(self, _args: t.StrSequence) -> p.Result[str]:
         """List pipelines."""
         result = FlextMeltanoPipelineManager.list_pipelines()
         if result.failure:
@@ -123,7 +123,7 @@ class FlextMeltanoPipelineManager(
         self.logger.info("Configured pipelines", pipelines=", ".join(result.value))
         return r[str].ok(", ".join(result.value) or "none")
 
-    def _run_pipeline(self, _args: t.StrSequence) -> r[str]:
+    def _run_pipeline(self, _args: t.StrSequence) -> p.Result[str]:
         """Run pipeline."""
         if not _args:
             return r[str].fail("Pipeline execution requires pipeline name")
@@ -137,7 +137,7 @@ class FlextMeltanoPipelineManager(
             return r[str].fail(result.error)
         return r[str].ok(result.value)
 
-    def _stop_pipeline(self, _args: t.StrSequence) -> r[str]:
+    def _stop_pipeline(self, _args: t.StrSequence) -> p.Result[str]:
         """Stop pipeline."""
         if not _args:
             return r[str].fail("Pipeline stop requires pipeline name")

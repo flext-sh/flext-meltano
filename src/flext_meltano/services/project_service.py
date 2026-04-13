@@ -34,7 +34,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def _validate_project_creation_params(
         project_name: str,
         project_dir: Path,
-    ) -> r[t.FlatContainerMapping]:
+    ) -> p.Result[t.FlatContainerMapping]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
             return r[t.FlatContainerMapping].fail("Project name cannot be empty")
@@ -50,7 +50,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     @staticmethod
     def _validate_project_parameters(
         project_id: str | None, prefix: str
-    ) -> r[t.StrMapping]:
+    ) -> p.Result[t.StrMapping]:
         """Validate temporary project creation parameters."""
         if not prefix or not prefix.strip():
             return r[t.StrMapping].fail("Project prefix cannot be empty")
@@ -60,18 +60,20 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         })
 
     @staticmethod
-    def _validate_project_path(project_root: Path) -> r[Path]:
+    def _validate_project_path(project_root: Path) -> p.Result[Path]:
         """Validate project directory exists."""
         if not project_root.exists():
             return r[Path].fail(f"Project directory not found: {project_root}")
         return r[Path].ok(project_root)
 
     @staticmethod
-    def validate_project(project_path: Path) -> r[bool]:
+    def validate_project(project_path: Path) -> p.Result[bool]:
         """Validate Meltano project structure using dedicated validators."""
         return FlextMeltanoValidators.validate_pipeline_project_structure(project_path)
 
-    def create_project(self, project_name: str, project_dir: Path) -> r[t.StrMapping]:
+    def create_project(
+        self, project_name: str, project_dir: Path
+    ) -> p.Result[t.StrMapping]:
         """Create new Meltano project using railway-oriented file operations."""
         params_r = self._validate_project_creation_params(project_name, project_dir)
         if params_r.failure:
@@ -108,7 +110,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         self,
         project_id: str | None = None,
         prefix: str = "flext_meltano_",
-    ) -> r[t.Meltano.DbtProject]:
+    ) -> p.Result[t.Meltano.DbtProject]:
         """Create temporary Meltano project with railway-oriented validation."""
         params_r = self._validate_project_parameters(project_id, prefix)
         if params_r.failure:
@@ -158,7 +160,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def build_service_execution_payload(
         service_type: str,
         meltano_config: p.Settings,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Build normalized execution payload for service health responses."""
         payload: t.RecursiveContainerMapping = {
             "status": c.Meltano.OperationStatus.READY,
@@ -168,7 +170,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         return r[t.RecursiveContainerMapping].ok(payload)
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
             "flext_meltano_project_service", self.settings
@@ -180,7 +182,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         self.logger.error(error_msg)
         return r[t.RecursiveContainerMapping].fail(error_msg)
 
-    def initialize_project(self, project_root: Path) -> r[t.Meltano.DbtProject]:
+    def initialize_project(self, project_root: Path) -> p.Result[t.Meltano.DbtProject]:
         """Initialize Meltano project using railway pattern validation chain."""
         vpath_r = self._validate_project_path(project_root)
         if vpath_r.failure:
@@ -203,7 +205,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
     def _build_creation_result(
         self, project_name: str, project_path: Path
-    ) -> r[t.StrMapping]:
+    ) -> p.Result[t.StrMapping]:
         """Build successful project creation result."""
         result: t.StrMapping = {
             "success": "true",
@@ -221,14 +223,14 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         )
         return r[t.StrMapping].ok(result)
 
-    def _initialize_project_instance(self, project_path: Path) -> r[Path]:
+    def _initialize_project_instance(self, project_path: Path) -> p.Result[Path]:
         """Initialize Meltano project instance using abstractions."""
         project_result = self._abstractions.find_project(project_path)
         if project_result.failure:
             return r[Path].fail(project_result.error or "Failed to initialize project")
         return project_result
 
-    def _load_project_from_path(self, project_root: Path) -> r[Path]:
+    def _load_project_from_path(self, project_root: Path) -> p.Result[Path]:
         """Load Meltano project from validated path."""
         project_result = self._abstractions.find_project(project_root)
         if project_result.failure:

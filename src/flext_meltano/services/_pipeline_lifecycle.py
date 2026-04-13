@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.services._pipeline_ops import FlextMeltanoPipelinePaths
 
 
@@ -44,7 +44,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         return True
 
     @staticmethod
-    def _check_pipeline_dir(pipeline_name: str) -> r[Path]:
+    def _check_pipeline_dir(pipeline_name: str) -> p.Result[Path]:
         """Validate pipeline directory exists and return it."""
         pipeline_dir = FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
@@ -52,7 +52,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         return r[Path].ok(pipeline_dir)
 
     @staticmethod
-    def _read_pid(pipeline_name: str) -> r[tuple[int, Path]]:
+    def _read_pid(pipeline_name: str) -> p.Result[tuple[int, Path]]:
         """Read PID from pipeline pid file, return (pid, pid_path)."""
         pid_path = FlextMeltanoPipelinePaths.pipeline_pid_path(pipeline_name)
         if not pid_path.exists():
@@ -73,7 +73,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         return r[tuple[int, Path]].ok((pid, pid_path))
 
     @staticmethod
-    def get_pipeline_status(pipeline_name: str) -> r[str]:
+    def get_pipeline_status(pipeline_name: str) -> p.Result[str]:
         """Get the status of a specific Meltano pipeline."""
         dir_check = FlextMeltanoPipelineLifecycleOperations._check_pipeline_dir(
             pipeline_name,
@@ -96,7 +96,9 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         return r[str].ok("stopped")
 
     @staticmethod
-    def stop_pipeline(pipeline_name: str, timeout_seconds: float = 10.0) -> r[str]:
+    def stop_pipeline(
+        pipeline_name: str, timeout_seconds: float = 10.0
+    ) -> p.Result[str]:
         """Stop a running Meltano pipeline."""
         dir_check = FlextMeltanoPipelineLifecycleOperations._check_pipeline_dir(
             pipeline_name,
@@ -129,7 +131,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         )
 
     @staticmethod
-    def delete_pipeline(pipeline_name: str) -> r[str]:
+    def delete_pipeline(pipeline_name: str) -> p.Result[str]:
         """Delete a Meltano pipeline."""
         dir_check = FlextMeltanoPipelineLifecycleOperations._check_pipeline_dir(
             pipeline_name,

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
 
 
 class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
@@ -25,7 +25,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     def configure_sink(
         self,
         sink_config: m.Meltano.DataSinkConfig,
-    ) -> r[m.Meltano.DataSinkDefinition]:
+    ) -> p.Result[m.Meltano.DataSinkDefinition]:
         """Configure a sink for a sink configuration."""
         try:
             self.logger.info(
@@ -53,7 +53,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     def create_flext_target(
         self,
         sink_config: m.Meltano.DataSinkConfig | t.RecursiveContainerMapping,
-    ) -> r[m.Meltano.DataSinkInstance]:
+    ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
@@ -71,7 +71,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     def create_sink_instance(
         self,
         sink_config: m.Meltano.DataSinkConfig,
-    ) -> r[m.Meltano.DataSinkInstance]:
+    ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Create a sink instance from configuration."""
         try:
             self.logger.info(
@@ -96,11 +96,13 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute sink abstraction operations (implements Service)."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
-    def validate_sink_config(self, sink_config: m.Meltano.DataSinkConfig) -> r[bool]:
+    def validate_sink_config(
+        self, sink_config: m.Meltano.DataSinkConfig
+    ) -> p.Result[bool]:
         """Validate a sink configuration."""
         try:
             self.logger.debug(

@@ -56,7 +56,7 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 ```python
 # FLEXT pattern - Railway-oriented, type-safe
 class MyCustomTap(FlextMeltanoTap):
-    def discover_streams(self) -> r[List[FlextMeltanoStream]]:
+    def discover_streams(self) -> p.Result[List[FlextMeltanoStream]]:
         return r.ok([MyStream(self)])
 ```
 
@@ -163,7 +163,7 @@ class FlextMeltanoStream(FlextMeltanoSingerBase):
 
 ```python
 class FlextMeltanoTap(FlextMeltanoSingerBase):
-    def discover_streams(self) -> r[List[FlextMeltanoStream]]:
+    def discover_streams(self) -> p.Result[List[FlextMeltanoStream]]:
         try:
             # Singer SDK operations
             streams = super().discover_streams()
@@ -173,7 +173,7 @@ class FlextMeltanoTap(FlextMeltanoSingerBase):
         except Exception as e:
             return r.fail(SingerError(f"Stream discovery failed: {e}"))
 
-    def run_tap(self, settings: dict, state: dict) -> r[TapResult]:
+    def run_tap(self, settings: dict, state: dict) -> p.Result[TapResult]:
         # Railway pattern for tap execution
         return (
             self

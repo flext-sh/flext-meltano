@@ -11,7 +11,7 @@ from __future__ import annotations
 import sys
 
 import orjson
-from flext_cli import r
+from flext_cli import p, r
 
 from flext_meltano import c, m, p, t
 
@@ -25,7 +25,7 @@ class FlextMeltanoUtilitiesSinger:
         schema: t.FlatContainerMapping,
         key_properties: t.StrSequence,
         bookmark_properties: t.StrSequence | None = None,
-    ) -> r[str]:
+    ) -> p.Result[str]:
         """Emit a Singer SCHEMA message as JSON line to stdout.
 
         Args:
@@ -58,7 +58,7 @@ class FlextMeltanoUtilitiesSinger:
         record: t.ContainerValueMapping,
         time_extracted: str | None = None,
         version: int | None = None,
-    ) -> r[str]:
+    ) -> p.Result[str]:
         """Emit a Singer RECORD message as JSON line to stdout.
 
         Args:
@@ -88,7 +88,7 @@ class FlextMeltanoUtilitiesSinger:
     @staticmethod
     def emit_state(
         value: t.MutableRecursiveContainerMapping,
-    ) -> r[str]:
+    ) -> p.Result[str]:
         """Emit a Singer STATE message as JSON line to stdout.
 
         Args:
@@ -110,7 +110,7 @@ class FlextMeltanoUtilitiesSinger:
     @staticmethod
     def process_stdin(
         handler: p.Meltano.SingerTargetHandler,
-    ) -> r[None]:
+    ) -> p.Result[None]:
         """Process Singer messages from stdin and route to handler.
 
         Template method: parses JSON lines from stdin, identifies message
@@ -169,7 +169,7 @@ class FlextMeltanoUtilitiesSinger:
         replication_key: str | None = None,
         *,
         is_selected: bool = True,
-    ) -> r[m.Meltano.SingerCatalogEntry]:
+    ) -> p.Result[m.Meltano.SingerCatalogEntry]:
         """Build a Singer catalog entry from stream metadata.
 
         Generic catalog construction that domain-specific projects

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from meltano.core.error import ProjectNotFound
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.cli import FlextMeltanoCLI
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
@@ -28,7 +28,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         super().__init__(settings=settings)
 
     @staticmethod
-    def create_flext_cli() -> r[FlextMeltanoCLI]:
+    def create_flext_cli() -> p.Result[FlextMeltanoCLI]:
         """Create the concrete Meltano CLI facade."""
         return u.try_(
             lambda: FlextMeltanoCLI(),
@@ -36,7 +36,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         ).map_error(lambda e: f"Failed to create CLI: {e}")
 
     @staticmethod
-    def create_cli_runner(args: t.StrSequence) -> r[t.RecursiveContainerMapping]:
+    def create_cli_runner(args: t.StrSequence) -> p.Result[t.RecursiveContainerMapping]:
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
@@ -54,7 +54,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 f"Failed to create CLI runner: {e}",
             )
 
-    def health(self) -> r[t.RecursiveContainerMapping]:
+    def health(self) -> p.Result[t.RecursiveContainerMapping]:
         """Check system health by running meltano invoke."""
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.VERSION])
         return result.map(
@@ -69,7 +69,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             }
         )
 
-    def help(self) -> r[t.RecursiveContainerMapping]:
+    def help(self) -> p.Result[t.RecursiveContainerMapping]:
         """Get help information from meltano --help."""
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.HELP])
         return result.map(
@@ -83,13 +83,15 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             }
         )
 
-    def run(self, args: t.StrSequence) -> r[t.RecursiveContainerMapping]:
+    def run(self, args: t.StrSequence) -> p.Result[t.RecursiveContainerMapping]:
         """Run command with arguments - delegates to command router."""
         if not args:
             return r[t.RecursiveContainerMapping].fail("Arguments cannot be empty")
         return self._route_command(args[0], args[1:])
 
-    def run_cli(self, args: t.StrSequence | None) -> r[t.RecursiveContainerMapping]:
+    def run_cli(
+        self, args: t.StrSequence | None
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
             return r[t.RecursiveContainerMapping].ok({
@@ -99,7 +101,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             })
         return self.run(args)
 
-    def run_command(self, args: t.StrSequence) -> r[int]:
+    def run_command(self, args: t.StrSequence) -> p.Result[int]:
         """Execute command and return exit code - delegates to routing."""
         if not args:
             return r[int].ok(1)
@@ -109,7 +111,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         self,
         tap_name: str,
         target_name: str,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Run complete ELT pipeline command."""
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
@@ -120,7 +122,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             ),
         )
 
-    def version(self) -> r[t.RecursiveContainerMapping]:
+    def version(self) -> p.Result[t.RecursiveContainerMapping]:
         """Get version information from meltano."""
         return self.get_version().map(
             lambda ver: {
@@ -137,7 +139,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         self,
         command: str,
         args: t.StrSequence,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Route command to appropriate handler."""
         try:
             if command == c.Meltano.ExecutorCommand.VERSION:

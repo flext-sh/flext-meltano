@@ -20,23 +20,23 @@ from flext_meltano import (
 
 
 class _DbtOperationService(Protocol):
-    def run_operation(self, operation: str, args: t.StrSequence) -> r[str]: ...
+    def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]: ...
 
 
 class _PluginOperationService(Protocol):
-    def install_plugin(self, plugin_type: str, plugin_name: str) -> r[str]: ...
+    def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]: ...
 
-    def get_plugin_info(self, plugin_name: str) -> r[str]: ...
+    def get_plugin_info(self, plugin_name: str) -> p.Result[str]: ...
 
-    def list_plugins(self, plugin_type: str | None = None) -> r[str]: ...
+    def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]: ...
 
 
 class _StatusOperationService(Protocol):
-    def get_version(self) -> r[str]: ...
+    def get_version(self) -> p.Result[str]: ...
 
-    def run_health_check(self) -> r[str]: ...
+    def run_health_check(self) -> p.Result[str]: ...
 
-    def show_status(self) -> r[str]: ...
+    def show_status(self) -> p.Result[str]: ...
 
 
 _PLUGIN_INSTALL_ARG_COUNT = 2
@@ -52,11 +52,11 @@ class _FlextMeltanoCliDbtService(FlextMeltanoDbtRunnerMixin):
             self.set_dbt_project_root(self.settings.project_root)
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Return current CLI DBT helper state."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
-    def run_operation(self, operation: str, args: t.StrSequence) -> r[str]:
+    def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]:
         """Execute a DBT subcommand using the runner mixin."""
         normalized_operation = operation.strip().lower()
         command = self._build_dbt_command(
@@ -70,7 +70,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
     """Provide project-scoped plugin operations for CLI routing."""
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Return current CLI plugin helper state."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
@@ -80,7 +80,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             return self.settings.project_root
         return Path.cwd()
 
-    def _load_project(self) -> r[None]:
+    def _load_project(self) -> p.Result[None]:
         """Load the active SDK project before project-scoped operations."""
         return self.load_sdk_project(self._resolve_project_root()).map(lambda _: None)
 
@@ -105,7 +105,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             items.append(item)
         return json.dumps(items, sort_keys=True)
 
-    def install_plugin(self, plugin_type: str, plugin_name: str) -> r[str]:
+    def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         """Install a Meltano plugin using the real Meltano CLI."""
         command_result = u.Cli.run_raw(
             [
@@ -128,12 +128,12 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             output.stdout.strip() or f"Installed {plugin_type}:{plugin_name}"
         )
 
-    def get_plugin_info(self, plugin_name: str) -> r[str]:
+    def get_plugin_info(self, plugin_name: str) -> p.Result[str]:
         """Return deterministic plugin information for one installed plugin."""
 
         def _select_plugin(
             plugins: Sequence[t.Meltano.PluginDefinition],
-        ) -> r[str]:
+        ) -> p.Result[str]:
             for plugin in plugins:
                 current_name = str(plugin.get("name", "")).strip()
                 if current_name != plugin_name:
@@ -153,7 +153,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             lambda _: self.get_sdk_plugins(None).flat_map(_select_plugin)
         )
 
-    def list_plugins(self, plugin_type: str | None = None) -> r[str]:
+    def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]:
         """List installed plugins from the active Meltano project."""
         return self._load_project().flat_map(
             lambda _: self.get_sdk_plugins(plugin_type).map(self._format_plugin_rows)
@@ -164,7 +164,7 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
     """Provide status and version operations for the CLI manager."""
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Return current CLI status helper state."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
@@ -174,7 +174,7 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
             return None
         return self.settings.project_root
 
-    def _run_version_command(self) -> r[str]:
+    def _run_version_command(self) -> p.Result[str]:
         """Execute the real Meltano version command."""
         command_result = u.Cli.run_raw(
             [c.Meltano.CMD_BINARY, c.Meltano.CMD_VERSION_OPTION],
@@ -189,11 +189,11 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
             )
         return r[str].ok((output.stdout or output.stderr).strip())
 
-    def get_version(self) -> r[str]:
+    def get_version(self) -> p.Result[str]:
         """Return Meltano version as a string."""
         return self._run_version_command()
 
-    def run_health_check(self) -> r[str]:
+    def run_health_check(self) -> p.Result[str]:
         """Use the version command as a real runtime health probe."""
         return self._run_version_command().map(
             lambda version_output: json.dumps(
@@ -205,7 +205,7 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
             )
         )
 
-    def show_status(self) -> r[str]:
+    def show_status(self) -> p.Result[str]:
         """Render configured Meltano status data."""
         payload = {
             "environment": self.settings.environment,
@@ -226,14 +226,14 @@ class _FlextMeltanoSimpleCommandManager:
         args: t.StrSequence,
         help_handler: Callable[[], None],
         operation_handler: Callable[[str, t.StrSequence], r[str]],
-    ) -> r[str]:
+    ) -> p.Result[str]:
         """Route command to help or operation handler."""
         if u.Meltano.is_help_request(args):
             help_handler()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return operation_handler(args[0], args[1:])
 
-    def _unsupported_operation(self, label: str, operation: str) -> r[str]:
+    def _unsupported_operation(self, label: str, operation: str) -> p.Result[str]:
         """Return an explicit failure for unsupported CLI operations."""
         self.logger.info(
             "%s operation '%s' is not supported by the current CLI manager",
@@ -257,13 +257,15 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
         self._service = service or _FlextMeltanoCliDbtService()
         self.logger = u.fetch_logger(__name__)
 
-    def handle_command(self, args: t.StrSequence) -> r[str]:
+    def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle DBT command."""
         return self._handle_command(
             args, self.cli.show_dbt_help, self._execute_dbt_operation
         )
 
-    def _execute_dbt_operation(self, operation: str, args: t.StrSequence) -> r[str]:
+    def _execute_dbt_operation(
+        self, operation: str, args: t.StrSequence
+    ) -> p.Result[str]:
         supported_operations = {
             c.Meltano.DBT_COMMAND_RUN,
             c.Meltano.DBT_COMMAND_TEST,
@@ -290,13 +292,15 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
         self._service = service or _FlextMeltanoCliPluginService()
         self.logger = u.fetch_logger(__name__)
 
-    def handle_command(self, args: t.StrSequence) -> r[str]:
+    def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle plugin command."""
         return self._handle_command(
             args, self.cli.show_plugin_help, self._execute_plugin_operation
         )
 
-    def _execute_plugin_operation(self, operation: str, args: t.StrSequence) -> r[str]:
+    def _execute_plugin_operation(
+        self, operation: str, args: t.StrSequence
+    ) -> p.Result[str]:
         match operation:
             case c.Meltano.ExecutorCommand.LIST:
                 plugin_type = args[0] if args else None
@@ -329,19 +333,21 @@ class FlextMeltanoStatusManager:
         self._service = service or _FlextMeltanoCliStatusService()
         self.logger = u.fetch_logger(__name__)
 
-    def handle_command(self, args: t.StrSequence) -> r[str]:
+    def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle status command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_status_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         return self._execute_status_operation(args[0], args[1:])
 
-    def handle_version_command(self, args: t.StrSequence) -> r[str]:
+    def handle_version_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle version command."""
         _ = args
         return self._service.get_version()
 
-    def _execute_status_operation(self, operation: str, args: t.StrSequence) -> r[str]:
+    def _execute_status_operation(
+        self, operation: str, args: t.StrSequence
+    ) -> p.Result[str]:
         _ = args
         if operation in {c.Meltano.CliCommand.STATUS, "show"}:
             return self._service.show_status()

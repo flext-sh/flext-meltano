@@ -19,7 +19,7 @@ from typing import Annotated, ClassVar, Self, override
 from flext_cli import cli
 
 from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
@@ -126,7 +126,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             cmd.extend(extra_args)
         return cmd
 
-    def _run_dbt_cmd(self, cmd: t.StrSequence, operation: str) -> r[str]:
+    def _run_dbt_cmd(self, cmd: t.StrSequence, operation: str) -> p.Result[str]:
         """Execute a dbt command via subprocess."""
         try:
             self.logger.info(
@@ -145,21 +145,21 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         except (ValueError, TypeError, OSError, RuntimeError) as exc:
             return r[str].fail(str(exc))
 
-    def run_models(self, models: t.StrSequence | None = None) -> r[str]:
+    def run_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Run dbt models."""
         return self._run_dbt_cmd(self._build_dbt_cmd("run", models=models), "run")
 
-    def run_tests(self, models: t.StrSequence | None = None) -> r[str]:
+    def run_tests(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Run dbt tests."""
         return self._run_dbt_cmd(self._build_dbt_cmd("test", models=models), "test")
 
-    def compile_models(self, models: t.StrSequence | None = None) -> r[str]:
+    def compile_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Compile dbt models."""
         return self._run_dbt_cmd(
             self._build_dbt_cmd("compile", models=models), "compile"
         )
 
-    def generate_docs(self) -> r[str]:
+    def generate_docs(self) -> p.Result[str]:
         """Generate dbt documentation."""
         return self._run_dbt_cmd(
             self._build_dbt_cmd("docs", extra_args=["generate"]),
@@ -170,7 +170,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     # Project management
     # ------------------------------------------------------------------
 
-    def set_project_root(self, root: Path) -> r[None]:
+    def set_project_root(self, root: Path) -> p.Result[None]:
         """Set dbt project root directory."""
         if not root.exists():
             return r[None].fail(str(root))
@@ -179,7 +179,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def load_manifest(
         self, manifest_path: Path | None = None
-    ) -> r[t.Meltano.DbtManifestData]:
+    ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
         try:
             path = manifest_path
@@ -205,7 +205,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         except (ValueError, TypeError, KeyError, OSError) as exc:
             return r[t.Meltano.DbtManifestData].fail(str(exc))
 
-    def get_models(self) -> r[Sequence[t.Meltano.OptionalScalarMap]]:
+    def get_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
         if manifest_result.failure:
@@ -229,7 +229,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             return r[Sequence[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute dbt service — returns status."""
         return r[t.RecursiveContainerMapping].ok({
             "service": self.dbt_project_name,

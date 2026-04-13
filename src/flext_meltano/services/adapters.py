@@ -33,7 +33,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             self,
             project_name: str,
             project_dir: Path,
-        ) -> r[t.RecursiveContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Create a new Meltano project via the imported library."""
             project_path = Path(project_dir) / project_name
             init_result = FlextMeltanoExecutorBase.initialize_project_root(
@@ -54,11 +54,11 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             return r[t.RecursiveContainerMapping].ok(result)
 
         @override
-        def execute(self) -> r[t.RecursiveContainerMapping]:
+        def execute(self) -> p.Result[t.RecursiveContainerMapping]:
             """Execute default project operation."""
             return self.get_version()
 
-        def get_version(self) -> r[t.RecursiveContainerMapping]:
+        def get_version(self) -> p.Result[t.RecursiveContainerMapping]:
             """Get Meltano version information using native API."""
             version_result = FlextMeltanoExecutorBase.get_version()
             if version_result.failure:
@@ -76,7 +76,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
 
         def initialize_project(
             self, project_root: Path
-        ) -> r[t.RecursiveContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Initialize Meltano project using railway pattern."""
             return self.create_project(
                 project_name=project_root.name,
@@ -94,7 +94,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         def discover_plugins(
             self,
             plugin_type: str | None = None,
-        ) -> r[t.RecursiveContainerMapping]:
+        ) -> p.Result[t.RecursiveContainerMapping]:
             """Discover available plugins via Meltano project runtime."""
             try:
                 executor = FlextMeltanoExecutorBase()
@@ -123,12 +123,12 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                 )
 
         @override
-        def execute(self) -> r[t.RecursiveContainerMapping]:
+        def execute(self) -> p.Result[t.RecursiveContainerMapping]:
             """Execute default plugin operation."""
             return self.discover_plugins()
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute adapter service returning current settings."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 

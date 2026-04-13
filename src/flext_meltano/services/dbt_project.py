@@ -14,7 +14,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
 
 
@@ -27,7 +27,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     _dbt_project_root: Path | None = u.PrivateAttr(default=None)
     _dbt_manifest: t.Meltano.DbtManifestData | None = u.PrivateAttr(default=None)
 
-    def get_dbt_models(self) -> r[Sequence[t.Meltano.OptionalScalarMap]]:
+    def get_dbt_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""
         try:
             model_nodes_result = self._get_dbt_manifest_nodes("model")
@@ -54,7 +54,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 f"Failed to get models: {e}"
             )
 
-    def get_dbt_tests(self) -> r[Sequence[t.AttributeMapping]]:
+    def get_dbt_tests(self) -> p.Result[Sequence[t.AttributeMapping]]:
         """Get all tests from manifest."""
         try:
             test_nodes_result = self._get_dbt_manifest_nodes("test")
@@ -82,7 +82,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     def _get_dbt_manifest_nodes(
         self,
         resource_type: str,
-    ) -> r[Sequence[m.Meltano.DbtManifestNode]]:
+    ) -> p.Result[Sequence[m.Meltano.DbtManifestNode]]:
         try:
             if not self._dbt_manifest:
                 manifest_result = self.load_dbt_manifest()
@@ -108,7 +108,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
 
     def load_dbt_manifest(
         self, manifest_path: Path | None = None
-    ) -> r[t.Meltano.DbtManifestData]:
+    ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load DBT manifest from file."""
         try:
             if manifest_path is None:
@@ -147,7 +147,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to load manifest", error=str(e))
             return r[t.Meltano.DbtManifestData].fail(f"Failed to load manifest: {e}")
 
-    def load_dbt_project(self, root: Path) -> r[m.Meltano.DbtProjectInfo]:
+    def load_dbt_project(self, root: Path) -> p.Result[m.Meltano.DbtProjectInfo]:
         """Load a DBT project and discover models/tests from manifest."""
         try:
             if not root.exists():

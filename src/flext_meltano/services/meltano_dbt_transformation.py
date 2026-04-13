@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import MutableSequence
 from pathlib import Path
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import c, p, t, u
 
 
@@ -25,7 +25,7 @@ class FlextMeltanoDbtTransformationRunner:
         logger: p.Logger,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> r[t.MutableRecursiveContainerMapping]:
+    ) -> p.Result[t.MutableRecursiveContainerMapping]:
         """Run DBT ``run`` and normalize output into transformation contract."""
         try:
             args: MutableSequence[str] = []

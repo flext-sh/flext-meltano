@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
 from flext_meltano.typings import FlextMeltanoTypes as t
@@ -26,7 +26,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     """
 
     @staticmethod
-    def discover_installed_plugins() -> r[t.StrSequence]:
+    def discover_installed_plugins() -> p.Result[t.StrSequence]:
         """Discover installed Meltano plugins from the active project runtime."""
         executor = FlextMeltanoExecutorBase()
         plugins_result = executor.get_project_plugins()
@@ -43,7 +43,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Execute a Meltano runtime command.
 
         Args:
@@ -73,12 +73,12 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return r[t.RecursiveContainerMapping].ok(result)
 
     @staticmethod
-    def get_version() -> r[str]:
+    def get_version() -> p.Result[str]:
         """Get Meltano version from the imported library."""
         return FlextMeltanoExecutorBase.get_version()
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute bridge service returning current settings."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 

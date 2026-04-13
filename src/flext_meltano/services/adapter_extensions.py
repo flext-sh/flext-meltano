@@ -26,7 +26,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
         return FlextMeltanoSettings
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute default pipeline operation."""
         return r[t.RecursiveContainerMapping].ok({
             "status": c.Meltano.OperationStatus.READY,
@@ -36,7 +36,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Execute ELT pipeline using Meltano runtime."""
         try:
             if not tap_name.startswith(c.Meltano.PREFIX_TAP):
@@ -84,11 +84,11 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
         return FlextMeltanoSettings
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute default DBT operation."""
         return self.execute_dbt_operation()
 
-    def execute_dbt_operation(self) -> r[t.RecursiveContainerMapping]:
+    def execute_dbt_operation(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute DBT operation via Meltano runtime."""
         try:
             executor = FlextMeltanoExecutorBase()

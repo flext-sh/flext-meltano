@@ -23,7 +23,7 @@ from flext_meltano import (
     m,
     t,
 )
-from tests import r
+from tests import p, r
 
 
 class TestFlextMeltanoLibraryRunner:
@@ -43,7 +43,7 @@ class TestFlextMeltanoLibraryRunner:
     @staticmethod
     def _mock_cmd_result(
         command: list[str],
-    ) -> r[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         return r[m.Meltano.CommandExecutionResult].ok(
             m.Meltano.CommandExecutionResult(
                 command=command,
@@ -59,7 +59,7 @@ class TestFlextMeltanoLibraryRunner:
     def _mock_execute_command(
         command: t.StrSequence,
         **_: object,
-    ) -> r[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         return TestFlextMeltanoLibraryRunner._mock_cmd_result(list(command))
 
     def test_execute_complete_elt_pipeline(self) -> None:

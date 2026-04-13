@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import MutableSequence
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
@@ -25,7 +25,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         command: t.StrSequence,
         input_data: str | None = None,
         timeout: int = c.Meltano.BATCH_DEFAULT_COMMAND_TIMEOUT,
-    ) -> r[t.Meltano.CliProcessResult]:
+    ) -> p.Result[t.Meltano.CliProcessResult]:
         """Execute Singer SDK command and capture output."""
         if not command:
             return r[t.Meltano.CliProcessResult].fail(
@@ -53,7 +53,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
     @staticmethod
     def translate_dbt_run(
         params: m.Meltano.CliTransformationParams,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Convert TransformationParams to dbt CLI command."""
         command: MutableSequence[str] = [
             "dbt",
@@ -74,7 +74,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
     @staticmethod
     def translate_pipeline_run(
         params: m.Meltano.CliPipelineParams,
-    ) -> r[tuple[t.StrSequence, t.StrSequence]]:
+    ) -> p.Result[tuple[t.StrSequence, t.StrSequence]]:
         """Convert PipelineParams to source and sink CLI commands."""
         source_command: MutableSequence[str] = [params.source_name]
         if params.source_config:
@@ -91,7 +91,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
     @staticmethod
     def translate_tap_run(
         params: m.Meltano.CliDataSourceParams,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Convert DataSourceParams to Singer SDK source CLI command."""
         command: MutableSequence[str] = [params.source_name]
         if params.discover:
@@ -110,7 +110,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
     @staticmethod
     def translate_target_run(
         params: m.Meltano.CliDataSinkParams,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Convert DataSinkParams to Singer SDK sink CLI command."""
         command: MutableSequence[str] = [params.sink_name]
         if params.config_file:

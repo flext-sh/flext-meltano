@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import (
     FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
@@ -38,7 +38,7 @@ class FlextMeltanoLibraryRunner(
         target_name: str,
         dbt_models: t.StrSequence | None = None,
         settings: t.RecursiveContainerMapping | None = None,
-    ) -> r[t.MutableRecursiveContainerMapping]:
+    ) -> p.Result[t.MutableRecursiveContainerMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
             self.logger.info(
@@ -88,7 +88,7 @@ class FlextMeltanoLibraryRunner(
         self,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> r[t.MutableRecursiveContainerMapping]:
+    ) -> p.Result[t.MutableRecursiveContainerMapping]:
         """Run DBT transformation using the configured Meltano executor."""
         return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
             executor=self._elt_executor,
@@ -102,7 +102,7 @@ class FlextMeltanoLibraryRunner(
         tap: p.Meltano.SingerTap,
         target: p.Meltano.SingerTarget,
         settings: t.RecursiveContainerMapping | None = None,
-    ) -> r[t.MutableRecursiveContainerMapping]:
+    ) -> p.Result[t.MutableRecursiveContainerMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:
             self.logger.info(

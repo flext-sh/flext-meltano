@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano import FlextMeltanoServiceBase, c, t, u
 
 
@@ -22,7 +22,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         *,
         field_name: str,
         component_label: str,
-    ) -> r[Self]:
+    ) -> p.Result[Self]:
         """Create a specialized Meltano service using a shared utility path."""
         try:
             service_kwargs: t.MutableOptionalStrMapping = {
@@ -46,7 +46,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             )
 
     @classmethod
-    def create_sink_service(cls, sink_name: str, **_config: t.Scalar) -> r[Self]:
+    def create_sink_service(cls, sink_name: str, **_config: t.Scalar) -> p.Result[Self]:
         """Create data sink service."""
         return cls._create_specialized_service(
             sink_name,
@@ -55,7 +55,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         )
 
     @classmethod
-    def create_source_service(cls, source_name: str, **_config: t.Scalar) -> r[Self]:
+    def create_source_service(
+        cls, source_name: str, **_config: t.Scalar
+    ) -> p.Result[Self]:
         """Create data source service."""
         return cls._create_specialized_service(
             source_name,
@@ -66,7 +68,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @classmethod
     def create_transformation_service(
         cls, transformation_name: str, **_config: t.Scalar
-    ) -> r[Self]:
+    ) -> p.Result[Self]:
         """Create transformation service."""
         return cls._create_specialized_service(
             transformation_name,
@@ -77,7 +79,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @staticmethod
     def configure_environment(
         environment_name: str, settings: t.RecursiveContainerMapping | None = None
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Configure environment."""
         if not environment_name:
             return r[t.RecursiveContainerMapping].fail("Environment name is required")
@@ -98,7 +100,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         source_name: str,
         sink_name: str,
         _config: t.RecursiveContainerMapping | None = None,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Configure generic data pipeline."""
         return r[t.RecursiveContainerMapping].ok({
             "status": c.Meltano.OperationStatus.CONFIGURED,
@@ -111,7 +113,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         component_type: str,
         component_name: str,
         settings: t.RecursiveContainerMapping | None = None,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
             return r[t.RecursiveContainerMapping].fail(
@@ -129,14 +131,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         })
 
     @staticmethod
-    def validate_service_config(settings: t.RecursiveContainerMapping) -> r[bool]:
+    def validate_service_config(
+        settings: t.RecursiveContainerMapping,
+    ) -> p.Result[bool]:
         """Validate service configuration dictionary."""
         if not u.guard(settings, dict):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(value=True)
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute service with railway pattern."""
         return r[t.RecursiveContainerMapping].ok({
             "status": c.CommonStatus.ACTIVE,
@@ -145,11 +149,11 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "handlers": list(c.Meltano.HANDLER_ALL),
         })
 
-    def get_default_config(self) -> r[t.RecursiveContainerMapping]:
+    def get_default_config(self) -> p.Result[t.RecursiveContainerMapping]:
         """Get default configuration from current settings."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
-    def get_info(self) -> r[t.Meltano.OptionalScalarMap]:
+    def get_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""
         return r[t.Meltano.OptionalScalarMap].ok({
             "name": c.Meltano.METADATA_APPLICATION_NAME,
@@ -158,7 +162,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "description": c.Meltano.METADATA_APPLICATION_DESCRIPTION,
         })
 
-    def validate_config(self) -> r[bool]:
+    def validate_config(self) -> p.Result[bool]:
         """Validate current service configuration."""
         return self.validate_service_config(self.settings.model_dump())
 

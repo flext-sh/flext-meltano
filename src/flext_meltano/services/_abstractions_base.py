@@ -10,7 +10,7 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import r
+from flext_core import p, r
 from flext_meltano.base import FlextMeltanoServiceBase
 from flext_meltano.constants import FlextMeltanoConstants as c
 from flext_meltano.models import FlextMeltanoModels as m
@@ -40,7 +40,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         except c.ValidationError:
             return None
 
-    def _run_meltano(self, args: t.StrSequence) -> r[str]:
+    def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success."""
         cwd = u.Meltano.resolve_project_root(self.settings)
         run_result: r[m.Meltano.CommandExecutionResult] = (
@@ -62,7 +62,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def add_plugin_by_config(
         self, plugin_config: t.RecursiveContainerMapping
-    ) -> r[bool]:
+    ) -> p.Result[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
@@ -100,7 +100,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         self,
         _project: t.ValueOrModel | t.RecursiveContainerMapping | None,
         plugin_type: str,
-    ) -> r[t.Meltano.NestedStrMapping]:
+    ) -> p.Result[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""
         try:
             cwd = self._resolve_project_root(_project)
@@ -132,7 +132,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         elt_context: t.RecursiveContainerMapping,
         extractor_plugin: t.RecursiveContainerMapping | None,
         loader_plugin: t.RecursiveContainerMapping | None,
-    ) -> r[t.HeaderMapping]:
+    ) -> p.Result[t.HeaderMapping]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
             extractor_mapping = self._coerce_container_mapping(extractor_plugin)
@@ -165,7 +165,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             error_msg = f"Failed to execute singer pipeline: {e}"
             return r[t.HeaderMapping].fail(error_msg)
 
-    def find_project(self, project_root: Path) -> r[Path]:
+    def find_project(self, project_root: Path) -> p.Result[Path]:
         """Find and validate a Meltano project directory."""
         try:
             if not project_root.exists() or not project_root.is_dir():
@@ -177,7 +177,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             error_msg = f"Failed to load pipeline project: {e}"
             return r[Path].fail(error_msg)
 
-    def get_project_root(self) -> r[Path]:
+    def get_project_root(self) -> p.Result[Path]:
         """Get the root directory from settings."""
         project_root = self.settings.project_root
         if project_root == Path():
@@ -188,7 +188,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override
-    def execute(self) -> r[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
         """Execute abstractions service and return real configuration state."""
         project_root = u.Meltano.resolve_project_root(self.settings)
         return r[t.RecursiveContainerMapping].ok({
@@ -201,7 +201,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Create Singer catalog entry from stream definition."""
         entry: t.MutableRecursiveContainerMapping = {
             "tap_stream_id": stream.stream_name,

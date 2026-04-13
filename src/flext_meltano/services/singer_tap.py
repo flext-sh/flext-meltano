@@ -11,14 +11,14 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
 
 
 class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     """Mixin providing source instance creation and tap factory methods."""
 
     @classmethod
-    def create_tap_source_instance(cls) -> r[Self]:
+    def create_tap_source_instance(cls) -> p.Result[Self]:
         """Create a tap abstractions instance wrapped in Result."""
         instance: Self = cls()
         return r[Self](value=instance, success=True)
@@ -28,7 +28,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         source_config: m.Meltano.DataSourceConfig
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
-    ) -> r[m.Meltano.DataSourceInstance]:
+    ) -> p.Result[m.Meltano.DataSourceInstance]:
         """Create a source instance from configuration via isinstance narrowing."""
         try:
             if isinstance(source_config, m.Meltano.DataSourceConfig):
@@ -80,7 +80,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         connection_config: t.RecursiveContainerMapping,
         stream_config: t.RecursiveContainerMapping | None = None,
         tap_version: str = "1.0.0",
-    ) -> r[m.Meltano.TapInstance]:
+    ) -> p.Result[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""
         try:
             settings = m.Meltano.TapConfig.model_validate({
@@ -113,7 +113,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
     def process_source(
         self,
         items: m.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
-    ) -> r[bool]:
+    ) -> p.Result[bool]:
         """Process a source configuration for validation via isinstance narrowing."""
         try:
             if isinstance(items, m.Meltano.DataSourceConfig):
@@ -134,7 +134,9 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             )
             return r[bool].fail(f"Source configuration processing failed: {e}")
 
-    def validate_stream_schema(self, stream_def: m.Meltano.StreamDefinition) -> r[bool]:
+    def validate_stream_schema(
+        self, stream_def: m.Meltano.StreamDefinition
+    ) -> p.Result[bool]:
         """Validate a stream definition's schema."""
         try:
             self.logger.debug(
