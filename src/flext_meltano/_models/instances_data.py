@@ -134,7 +134,7 @@ class FlextMeltanoModelsInstancesData:
             return (
                 self.discovered
                 and u.count(streams_list) > 0
-                and self.status == "configured"
+                and self.status == c.Meltano.OperationStatus.CONFIGURED.value
             )
 
         @computed_field
@@ -200,4 +200,7 @@ class FlextMeltanoModelsInstancesData:
         @property
         def is_ready(self) -> bool:
             """Check if sink is ready for processing."""
-            return self.status == "configured" and self.adapter is not None
+            return (
+                self.status == c.Meltano.OperationStatus.CONFIGURED.value
+                and self.adapter is not None
+            )

@@ -55,8 +55,8 @@ class FlextMeltanoModelsContext:
         """Typed subset for extracting final pipeline result fields."""
 
         project_root: Annotated[
-            str, u.Field(default="unknown", description="Project root path")
-        ] = "unknown"
+            str, u.Field(default=c.IDENTIFIER_UNKNOWN, description="Project root path")
+        ] = c.IDENTIFIER_UNKNOWN
         execution_result: t.RecursiveContainerMapping = u.Field(
             default_factory=dict, description="Execution result payload"
         )
@@ -78,8 +78,8 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_project_root(cls, value: t.Meltano.ValidatorInput) -> str:
             """Normalize project root from mixed payload values."""
-            normalized = "unknown" if value is None else str(value)
-            return normalized.strip() or "unknown"
+            normalized = c.IDENTIFIER_UNKNOWN if value is None else str(value)
+            return normalized.strip() or c.IDENTIFIER_UNKNOWN
 
     class PipelineExecutionScalarMap(m.FlexibleModel):
         """Scalar-only pipeline execution values normalized to strings."""

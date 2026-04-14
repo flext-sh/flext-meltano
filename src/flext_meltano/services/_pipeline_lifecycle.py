@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_meltano import p, r
+from flext_meltano import c, p, r
 from flext_meltano.services._pipeline_ops import FlextMeltanoPipelinePaths
 
 
@@ -144,7 +144,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         )
         if status_result.failure:
             return r[str].fail(status_result.error)
-        if status_result.value == "running":
+        if status_result.value == c.Meltano.OperationStatus.RUNNING.value:
             return r[str].fail(
                 f"Pipeline '{pipeline_name}' is running. Stop it before deletion",
             )
