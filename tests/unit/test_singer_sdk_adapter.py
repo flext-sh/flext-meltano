@@ -7,7 +7,7 @@ from typing import override
 
 import click
 
-from flext_meltano import FlextMeltanoSingerTapAdapter
+from flext_meltano import FlextMeltanoSingerTapAdapter, t
 
 
 class _StreamInfo:
@@ -37,7 +37,11 @@ class _FailingTap(_SuccessfulTap):
     def get_singer_command(cls) -> click.Command:
         class _FailingCommand(click.Command):
             @override
-            def main(self, *args, **kwargs) -> object:
+            def main(
+                self,
+                *args: t.RecursiveContainer,
+                **kwargs: t.RecursiveContainer,
+            ) -> t.RecursiveContainer:
                 raise SystemExit(3)
 
         return _FailingCommand("tap-fail")

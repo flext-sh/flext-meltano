@@ -58,7 +58,7 @@ class TestFlextMeltanoLibraryRunner:
     @staticmethod
     def _mock_execute_command(
         command: t.StrSequence,
-        **_,
+        **_: t.RecursiveContainer,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         return TestFlextMeltanoLibraryRunner._mock_cmd_result(list(command))
 

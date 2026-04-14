@@ -49,12 +49,18 @@ def simple_runtime_example() -> None:
         c.Meltano.ExecutorCommand.VERSION,
     ])
     if result.success:
-        logger.info("Runtime command result: %s", result.value)
+        logger.info(
+            "Runtime command result: %s",
+            result.value.model_dump(mode="python"),
+        )
 
 
 def simple_config_example() -> None:
     """Example using typed settings through the public facade."""
-    logger.info("Config created: %s", meltano.settings)
+    logger.info(
+        "Config created: %s",
+        meltano.settings.model_dump(mode="python"),
+    )
     logger.info("Environment: %s", meltano.settings.environment)
 
 
