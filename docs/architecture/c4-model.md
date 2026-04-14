@@ -32,7 +32,7 @@
 
 **FLEXT-Meltano Enterprise Data Integration Platform**
 
-**Framework**: C4 Model | **Version**: 1.0 | **Last Updated**: 2025-10-10
+**Framework**: C4 Model | **Version**: 1.0 | **Last Updated**: 2026-04-14
 
 ______________________________________________________________________
 

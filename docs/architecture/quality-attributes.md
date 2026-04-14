@@ -49,7 +49,7 @@
 
 **FLEXT-Meltano Quality Attributes and Cross-Cutting Concerns**
 
-**Version**: 1.0 | **Last Updated**: 2025-10-10
+**Version**: 1.0 | **Last Updated**: 2026-04-14
 
 ______________________________________________________________________
 
@@ -373,7 +373,7 @@ class AsyncPipelineExecutor:
             try:
                 # Validate pipeline
                 validation_result = await self.validate_pipeline_async(pipeline)
-                if validation_result.is_failure:
+                if validation_result.failure:
                     return PipelineResult.failure(validation_result.error)
 
                 # Execute stages concurrently where possible
@@ -1164,14 +1164,14 @@ class RailwayExecutor:
 
         # Schema validation
         schema_result = self.schema_validator.validate(operation.payload)
-        if schema_result.is_failure:
+        if schema_result.failure:
             return r.fail(
                 ValidationError(f"Schema validation failed: {schema_result.error}")
             )
 
         # Business rule validation
         business_result = self.business_validator.validate(operation)
-        if business_result.is_failure:
+        if business_result.failure:
             return r.fail(
                 BusinessRuleViolation(
                     f"Business rule violation: {business_result.error}"
@@ -1180,7 +1180,7 @@ class RailwayExecutor:
 
         # Resource availability check
         resource_result = self.resource_checker.check_availability(operation)
-        if resource_result.is_failure:
+        if resource_result.failure:
             return r.fail(
                 ResourceUnavailableError(
                     f"Resources unavailable: {resource_result.error}"
@@ -2272,7 +2272,7 @@ class DisasterRecoveryManager:
 
         # Test recommendations
         failed_tests = [
-            test.plan_name for test in test_results.plan_tests if not test.success
+            test.plan_name for test in test_results.plan_tests if test.failure
         ]
 
         if failed_tests:
@@ -3213,7 +3213,7 @@ class APIHelpSystem:
                     "id": "pipeline-123",
                     "name": "postgres-to-snowflake",
                     "status": "created",
-                    "created_at": "2025-10-10T10:00:00Z",
+                    "created_at": "2026-04-14T10:00:00Z",
                 },
             })
 
@@ -3408,7 +3408,7 @@ class TestableService:
 
         # Validation
         validation_result = self.validator.validate(request)
-        if validation_result.is_failure:
+        if validation_result.failure:
             return Response.error(validation_result.error)
 
         # Business logic
@@ -3471,8 +3471,8 @@ def test_entity_processing():
 
     result = service.process_entity(entity)
 
-    assert result.is_success
-    assert result.data.tags == ["important", "test"]
+    assert result.success
+    assert result.value.tags == ["important", "test"]
 ```
 
 #### 3. Test Fixtures and Context Managers
@@ -3542,7 +3542,7 @@ def test_complex_pipeline_operation():
 
         result = service.execute_pipeline(context["pipeline"])
 
-        assert result.is_success
+        assert result.success
         # Context automatically cleaned up
 ```
 
@@ -3573,7 +3573,7 @@ class PropertyBasedTests:
         result = self.service.create_pipeline(request)
 
         # Then either succeeds or fails with validation error
-        if result.is_success:
+        if result.success:
             pipeline = result.unwrap()
             assert pipeline.name == name
             assert pipeline.settings == settings
@@ -3905,7 +3905,7 @@ class TestResultAnalyzer:
         # Group failures by type
         failure_types = {}
         for test_result in results.test_cases:
-            if test_result.failed:
+            if test_result.failure:
                 failure_type = self._classify_failure(test_result.error_message)
                 failure_types[failure_type] = failure_types.get(failure_type, 0) + 1
 

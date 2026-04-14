@@ -32,7 +32,7 @@
 
 **Development workflow for the flext-meltano project**
 
-**Last Updated**: 2025-09-17
+**Last Updated**: 2026-04-14
 
 ______________________________________________________________________
 

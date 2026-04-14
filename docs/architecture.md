@@ -35,7 +35,7 @@
 
 **Enterprise Meltano integration library architecture for the FLEXT ecosystem**
 
-**Version**: 0.9.9 RC | **Last Updated**: 2025-09-17
+**Version**: 0.12.0-dev | **Last Updated**: 2026-04-14
 
 ______________________________________________________________________
 
@@ -302,14 +302,14 @@ def process_elt_pipeline(
 
     # Validation phase
     validation_result = validate_configuration(tap_config)
-    if validation_result.is_failure:
+    if validation_result.failure:
         return r[t.Dict].fail(
             f"Configuration validation failed: {validation_result.error}"
         )
 
     # Execution phase
     execution_result = execute_pipeline(tap_config, target_config)
-    if execution_result.is_failure:
+    if execution_result.failure:
         return r[t.Dict].fail(f"Pipeline execution failed: {execution_result.error}")
 
     return r[t.Dict].ok(execution_result.unwrap())

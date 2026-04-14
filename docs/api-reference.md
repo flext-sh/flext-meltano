@@ -35,9 +35,9 @@
 - [Related Documentation](#related-documentation)
 <!-- TOC END -->
 
-**Complete API documentation for FLEXT-Meltano v0.9.9 - Enterprise Data Pipeline Integration**
+**Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline Integration**
 
-**Updated**: 2025-10-05 | **Status**: ✅ Production Ready | **Quality**: 100% Type Safe | **Coverage**: 95%+
+**Updated**: 2026-04-14 | **Status**: ✅ Current | **Quality**: 100% Type Safe | **Coverage**: 95%+
 
 Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin development tools, and enterprise data pipeline orchestration.
 
@@ -113,7 +113,7 @@ def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
     Example:
         >>> service = FlextMeltanoService()
         >>> result = service.discover_plugins()
-        >>> if result.is_success:
+        >>> if result.success:
         ...     plugins = result.unwrap()
         ...     print(f"Found {len(plugins)} plugins")
     """
@@ -330,7 +330,7 @@ def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
     Example:
         >>> tap = FlextSingerTap("tap-gitlab", {"api_url": "https://gitlab.com"})
         >>> result = tap.discover()
-        >>> if result.is_success:
+        >>> if result.success:
         ...     catalog = result.unwrap()
         ...     print(f"Discovered {len(catalog.streams)} streams")
     """
@@ -1014,7 +1014,7 @@ tap_result = service.execute_tap(
     tap_name="tap-csv", settings={"files": ["data/sales.csv"]}
 )
 
-if tap_result.is_success:
+if tap_result.success:
     records = tap_result.unwrap().records
 
     # Execute target
@@ -1044,7 +1044,7 @@ result = executor.execute_pipeline_advanced(
     )
 )
 
-if result.is_success:
+if result.success:
     print(f"Pipeline completed in {result.unwrap().execution_time}s")
 ```
 
@@ -1058,7 +1058,7 @@ plugin_service = FlextPluginService()
 
 # Install plugin
 install_result = plugin_service.install_plugin("tap-gitlab")
-if install_result.is_success:
+if install_result.success:
     print(f"Installed {install_result.unwrap().plugin_name}")
 
 # List available taps
@@ -1068,7 +1068,7 @@ available_taps = [p for p in taps.unwrap() if p.plugin_type == "tap"]
 
 ______________________________________________________________________
 
-**Document Status**: ✅ Complete | **Last Reviewed**: 2025-10-05
+**Document Status**: ✅ Complete | **Last Reviewed**: 2026-04-14
 
 ## Related Documentation
 

@@ -65,7 +65,7 @@ Implement Clean Architecture with Domain-Driven Design, establishing clear bound
 def test_pipeline_validation():
     validator = PipelineValidator()
     result = validator.validate_config(invalid_config)
-    assert result.is_failure
+    assert result.failure
 ```
 
 **Maintainability**: Changes to external systems don't affect business logic

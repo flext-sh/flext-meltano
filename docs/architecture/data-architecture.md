@@ -35,7 +35,7 @@
 
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**
 
-**Version**: 1.0 | **Last Updated**: 2025-10-10
+**Version**: 1.0 | **Last Updated**: 2026-04-14
 
 ______________________________________________________________________
 

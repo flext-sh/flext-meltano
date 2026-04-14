@@ -39,7 +39,7 @@
 
 **FLEXT-Meltano Security Architecture and Compliance Framework**
 
-**Version**: 1.0 | **Last Updated**: 2025-10-10
+**Version**: 1.0 | **Last Updated**: 2026-04-14
 
 ______________________________________________________________________
 
@@ -838,7 +838,7 @@ class DataPrivacyController:
         elif request.request_type == 'deletion':
             # Delete user data (right to be forgotten)
             deletion_result = self._delete_user_data(request.user_id)
-            if deletion_result.is_success:
+            if deletion_result.success:
                 self._audit_data_deletion(request.user_id, request.reason)
                 return r.ok(ComplianceAction(
                     action_type='data_deleted',

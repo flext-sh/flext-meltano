@@ -145,7 +145,7 @@ def example_operation() -> p.Result[str]:
 
 # Usage pattern
 result = example_operation()
-if result.is_success:
+if result.success:
     data = result.unwrap()
     print(f"Success: {data}")
 else:

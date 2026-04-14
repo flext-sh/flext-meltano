@@ -189,7 +189,7 @@ def test_pipeline_failure_handling():
     result = service.create_pipeline(invalid_config)
 
     # Then
-    assert result.is_failure
+    assert result.failure
     assert isinstance(result.error_value, ConfigurationError)
     assert "invalid_param" in str(result.error_value)
 ```

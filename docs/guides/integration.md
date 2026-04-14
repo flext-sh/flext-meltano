@@ -226,14 +226,14 @@ class EnterpriseELTService(s):
 
         # 1. Extract and Load using Meltano
         pipeline_result = self._adapter.run_pipeline(tap_name, target_name)
-        if pipeline_result.is_failure:
+        if pipeline_result.failure:
             return pipeline_result
 
         # 2. Transform using dbt (if specified)
         if dbt_models:
             # Note: Requires dbt integration completion
             transform_result = self._execute_transformations(dbt_models)
-            if transform_result.is_failure:
+            if transform_result.failure:
                 return transform_result
 
         return r[t.Dict].ok({
@@ -415,8 +415,8 @@ from flext_meltano import FlextMeltanoTapAbstractions
 
 # Register services for ecosystem consumption
 container = FlextContainer.get_global()
-container.register("tap_abstractions", FlextMeltanoTapAbstractions)
-container.register("target_abstractions", FlextMeltanoTargetAbstractions)
+container.bind("tap_abstractions", FlextMeltanoTapAbstractions)
+container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
 ```
 
 **2. Configuration Management**:
@@ -433,7 +433,7 @@ settings = builder.build_pipeline_config(tap_settings, target_settings)
 ```python
 # Consistent r patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
-if result.is_failure:
+if result.failure:
     return r[t.Dict].fail(f"Integration failed: {result.error}")
 ```
 
@@ -449,4 +449,4 @@ if result.is_failure:
 
 ______________________________________________________________________
 
-**Integration Guide v0.9.9** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.
+**Integration Guide v0.12.0-dev** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.

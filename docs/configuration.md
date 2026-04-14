@@ -158,7 +158,7 @@ from flext_core import u
 settings = FlextMeltanoSettings()
 validation_result: p.Result[bool] = settings.validate_meltano_config()
 
-if validation_result.is_success:
+if validation_result.success:
     print("Meltano configuration is valid")
 else:
     print(f"Configuration error: {validation_result.error}")
@@ -328,7 +328,7 @@ validation_result = validators.validate_pipeline_config({
     "transform": dbt_config,
 })
 
-if validation_result.is_failure:
+if validation_result.failure:
     print(f"Pipeline validation failed: {validation_result.error}")
 ```
 
@@ -428,7 +428,7 @@ write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.j
 # Backup critical configuration files
 backup_result = file_manager.backup_project_files()
 
-if backup_result.is_success:
+if backup_result.success:
     backup_files = backup_result.unwrap()
     print(f"Backed up {len(backup_files)} configuration files")
 ```
@@ -467,7 +467,7 @@ executor = FlextMeltanoExecutor()
 # Validate execution environment
 env_validation = executor.validate_execution_environment()
 
-if env_validation.is_failure:
+if env_validation.failure:
     print(f"Environment validation failed: {env_validation.error}")
 ```
 
@@ -515,4 +515,4 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-**Configuration Guide v0.9.9** - Reflects current configuration capabilities with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.
+**Configuration Guide v0.12.0-dev** - Reflects current configuration capabilities with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.
