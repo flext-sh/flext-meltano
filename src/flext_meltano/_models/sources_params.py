@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import m, u
+from pydantic import computed_field
 
 from flext_meltano import c, t
 
@@ -95,19 +96,19 @@ class FlextMeltanoModelsSourcesParams:
             u.Field(default=0, description="Number of records extracted"),
         ] = 0
 
-        @u.computed_field
+        @computed_field
         @property
         def has_data(self) -> bool:
             """Check if stream has extracted data."""
             return self.records_extracted > 0
 
-        @u.computed_field
+        @computed_field
         @property
         def is_active(self) -> bool:
             """Check if stream is active."""
             return self.status in c.Meltano.ACTIVE_STATUSES
 
-        @u.computed_field
+        @computed_field
         @property
         def schema_properties_count(self) -> int:
             """Number of schema properties."""

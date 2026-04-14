@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import m, u
+from pydantic import computed_field
 
 from flext_meltano import c, t
 
@@ -56,41 +57,41 @@ class FlextMeltanoModelsTransformations:
         profile: Annotated[str, u.Field(description="Profile name")]
         model_paths: Annotated[
             t.StrSequence,
-            u.Field(default=["models"], description="Model paths"),
+            u.Field(description="Model paths"),
         ] = u.Field(
             default_factory=lambda: ["models"],
             description="Model paths",
         )
         analysis_paths: Annotated[
             t.StrSequence,
-            u.Field(default=["analysis"], description="Analysis paths"),
+            u.Field(description="Analysis paths"),
         ] = u.Field(
             default_factory=lambda: ["analysis"],
             description="Analysis paths",
         )
         test_paths: Annotated[
             t.StrSequence,
-            u.Field(default=["tests"], description="Test paths"),
+            u.Field(description="Test paths"),
         ] = u.Field(
             default_factory=lambda: ["tests"],
             description="Test paths",
         )
         seed_paths: Annotated[
             t.StrSequence,
-            u.Field(default=["seeds"], description="Seed paths"),
+            u.Field(description="Seed paths"),
         ] = u.Field(
             default_factory=lambda: ["seeds"],
             description="Seed paths",
         )
         macro_paths: Annotated[
             t.StrSequence,
-            u.Field(default=["macros"], description="Macro paths"),
+            u.Field(description="Macro paths"),
         ] = u.Field(
             default_factory=lambda: ["macros"],
             description="Macro paths",
         )
 
-        @u.computed_field
+        @computed_field
         @property
         def has_custom_paths(self) -> bool:
             """Check if project has custom paths."""
@@ -104,7 +105,7 @@ class FlextMeltanoModelsTransformations:
             }
             return bool(all_paths - default_paths)
 
-        @u.computed_field
+        @computed_field
         @property
         def project_structure_complexity(self) -> str:
             """Project structure complexity."""
@@ -122,7 +123,7 @@ class FlextMeltanoModelsTransformations:
                 return "moderate"
             return "complex"
 
-        @u.computed_field
+        @computed_field
         @property
         def total_path_count(self) -> int:
             """Total number of configured paths."""
@@ -169,13 +170,13 @@ class FlextMeltanoModelsTransformations:
             u.Field(default=1, description="Number of threads to use"),
         ] = 1
 
-        @u.computed_field
+        @computed_field
         @property
         def exclude_count(self) -> int:
             """Number of models to exclude."""
             return len(self.exclude)
 
-        @u.computed_field
+        @computed_field
         @property
         def execution_complexity(self) -> str:
             """Execution complexity assessment."""
@@ -188,13 +189,13 @@ class FlextMeltanoModelsTransformations:
                 return "moderate"
             return "complex"
 
-        @u.computed_field
+        @computed_field
         @property
         def is_parallel_execution(self) -> bool:
             """Check if execution uses multiple threads."""
             return self.threads > 1
 
-        @u.computed_field
+        @computed_field
         @property
         def model_count(self) -> int:
             """Number of models to execute."""

@@ -9,11 +9,20 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoSettings, c, m, p, r, s, t
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
 
 
-class FlextMeltanoPipelineAdapter(s):
+class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
     """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
     @classmethod
@@ -44,9 +53,10 @@ class FlextMeltanoPipelineAdapter(s):
                     f"Invalid target name format: {target_name}"
                 )
             executor = FlextMeltanoExecutorBase()
+            project_root = u.Meltano.resolve_project_root(self.settings)
             execution_result = executor.execute_meltano_command(
                 [c.Meltano.CMD_RUN, tap_name, target_name],
-                _cwd=self.settings.project_root,
+                _cwd=project_root,
             )
             if execution_result.failure:
                 return r[t.RecursiveContainerMapping].fail(
@@ -71,7 +81,7 @@ class FlextMeltanoPipelineAdapter(s):
             )
 
 
-class FlextMeltanoDbtAdapter(s):
+class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
     """Focused adapter for DBT operations following SOLID principles."""
 
     @override
@@ -88,13 +98,14 @@ class FlextMeltanoDbtAdapter(s):
         """Execute DBT operation via Meltano runtime."""
         try:
             executor = FlextMeltanoExecutorBase()
+            project_root = u.Meltano.resolve_project_root(self.settings)
             execution_result = executor.execute_meltano_command(
                 [
                     c.Meltano.CMD_INVOKE,
                     c.Meltano.PLUGIN_DBT_DEFAULT_NAME,
                     c.Meltano.DBT_COMMAND_RUN,
                 ],
-                _cwd=self.settings.project_root,
+                _cwd=project_root,
             )
             if execution_result.failure:
                 return r[t.RecursiveContainerMapping].fail(

@@ -193,7 +193,7 @@ class FlextApiModels:
         data: ProcessInputModel
 
     class Response(BaseModel):
-        result: r[ProcessedData]
+        result: p.Result[ProcessedData]
         status: int
 
 
@@ -355,7 +355,7 @@ class FlextNewlibModels:
         data: NewlibProcessInputModel
 
     class Response(BaseModel):
-        result: r[NewlibProcessResultModel]
+        result: p.Result[NewlibProcessResultModel]
 ```
 
 ### 3. Add to Workspace

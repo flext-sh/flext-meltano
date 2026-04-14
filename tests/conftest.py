@@ -19,15 +19,14 @@ from typing import TYPE_CHECKING, Protocol
 import pytest
 from flext_tests import tk
 
-from flext_core import r
 from flext_meltano import FlextMeltano, meltano
-from tests import u
+from tests import p, u
 
 if TYPE_CHECKING:
     from tests import t
 
 
-type MeltanoComponentFactory = Callable[..., r[FlextMeltano]]
+type MeltanoComponentFactory = Callable[..., p.Result[FlextMeltano]]
 type MeltanoComponentSelector = Callable[[FlextMeltano], str | None]
 type MeltanoComponentCase = tuple[
     MeltanoComponentFactory,

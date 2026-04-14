@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path
@@ -42,45 +42,36 @@ from flext_meltano import (
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    _container_mapping_list_adapter = u.TypeAdapter(list[t.RecursiveContainerMapping])
-    service_name: str = "FlextMeltanoExecutor"
+    service_name: str = u.Field(
+        "FlextMeltanoExecutor",
+        description="Canonical Meltano executor service name.",
+        validate_default=True,
+    )
 
     def __init__(
         self,
         settings: FlextMeltanoSettings | t.RecursiveContainerMapping | None = None,
+        *,
+        service_name: t.NonEmptyStr | None = None,
+        service_version: t.NonEmptyStr | None = None,
+        source_name: str | None = None,
+        sink_name: str | None = None,
+        transformation_name: str | None = None,
     ) -> None:
         """Expose a minimal typed constructor for executor callers."""
-        super().__init__(settings=settings)
+        super().__init__(
+            settings=settings,
+            service_name=service_name,
+            service_version=service_version,
+            source_name=source_name,
+            sink_name=sink_name,
+            transformation_name=transformation_name,
+        )
 
     @property
     def project_root(self) -> Path:
         """Get project root directory - delegates to settings."""
         return u.Meltano.resolve_project_root(self.settings) or Path.cwd()
-
-    @staticmethod
-    def _coerce_container_mapping(
-        value: t.RecursiveContainerMapping | None,
-    ) -> t.RecursiveContainerMapping | None:
-        """Normalize runtime objects to canonical container mappings when possible."""
-        if not isinstance(value, Mapping):
-            return None
-        try:
-            return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
-        except c.ValidationError:
-            return None
-
-    @classmethod
-    def _coerce_mapping_list(
-        cls,
-        value: list[t.RecursiveContainerMapping] | t.RecursiveContainer,
-    ) -> list[t.RecursiveContainerMapping] | None:
-        """Normalize runtime plugin lists to canonical mapping lists."""
-        if not isinstance(value, list):
-            return None
-        try:
-            return cls._container_mapping_list_adapter.validate_python(value)
-        except c.ValidationError:
-            return None
 
     @staticmethod
     def get_version() -> p.Result[str]:
@@ -173,35 +164,11 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 project_result.error or "Failed to load Meltano project",
             )
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
-        discovered: list[t.StrMapping] = []
         current_plugins_raw = project_result.value.plugins.current_plugins
-        canonical_fn = getattr(current_plugins_raw, "canonical", None)
-        raw_canonical = (
-            canonical_fn() if callable(canonical_fn) else current_plugins_raw
+        discovered = u.Meltano.discover_project_plugins(
+            current_plugins_raw,
+            selected_type=selected_type,
         )
-        try:
-            coerced_input = t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(
-                raw_canonical,
-            )
-        except c.ValidationError:
-            coerced_input = None
-        current_plugins = self._coerce_container_mapping(coerced_input)
-        if current_plugins is None:
-            return r[Sequence[t.StrMapping]].ok(discovered)
-        for raw_type, raw_plugins_value in current_plugins.items():
-            raw_plugins = self._coerce_mapping_list(raw_plugins_value)
-            if raw_plugins is None:
-                continue
-            for raw_plugin in raw_plugins:
-                plugin_data = u.Meltano.build_discovered_plugin(
-                    u.to_str(raw_type),
-                    raw_plugin,
-                )
-                if plugin_data is None:
-                    continue
-                if selected_type is not None and plugin_data["type"] != selected_type:
-                    continue
-                discovered.append(plugin_data)
         return r[Sequence[t.StrMapping]].ok(discovered)
 
     def _runtime_environment_args(self, _cwd: Path | None = None) -> t.StrSequence:
@@ -283,6 +250,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             prior_cwd = Path.cwd()
             runtime_error = ""
             try:
+                Project.deactivate()
                 with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
                     meltano_cli.main(
                         args=runtime_args,
@@ -311,6 +279,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 exit_code = 1
                 runtime_error = str(e)
             finally:
+                Project.deactivate()
                 with suppress(OSError):
                     os.chdir(prior_cwd)
             execution_time = time.monotonic() - start_time

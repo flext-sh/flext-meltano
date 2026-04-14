@@ -11,17 +11,17 @@ from collections.abc import Mapping, MutableSequence, Sequence
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoProjectService,
+    FlextMeltanoServiceBase,
     c,
     m,
     p,
     r,
-    s,
     t,
     u,
 )
 
 
-class FlextMeltanoPluginDiscoveryMixin(s):
+class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     """Mixin providing plugin discovery and info retrieval."""
 
     @staticmethod

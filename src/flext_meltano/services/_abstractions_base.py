@@ -19,19 +19,11 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    service_name: str = "FlextMeltanoAbstractions"
-
-    @staticmethod
-    def _coerce_container_mapping(
-        value: t.RecursiveContainerMapping | None,
-    ) -> t.RecursiveContainerMapping | None:
-        """Normalize runtime objects to canonical container mappings when possible."""
-        if not isinstance(value, Mapping):
-            return None
-        try:
-            return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
-        except c.ValidationError:
-            return None
+    service_name: str = u.Field(
+        "FlextMeltanoAbstractions",
+        description="Canonical Meltano abstractions service name.",
+        validate_default=True,
+    )
 
     def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success."""
@@ -77,7 +69,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         project: t.ValueOrModel | t.RecursiveContainerMapping | None,
     ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
-        project_mapping = FlextMeltanoAbstractionsBase._coerce_container_mapping(
+        project_mapping = u.Meltano.coerce_container_mapping(
             project if isinstance(project, Mapping) else None,
         )
         if project_mapping is not None:
@@ -128,8 +120,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     ) -> p.Result[t.HeaderMapping]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
-            extractor_mapping = self._coerce_container_mapping(extractor_plugin)
-            loader_mapping = self._coerce_container_mapping(loader_plugin)
+            extractor_mapping = u.Meltano.coerce_container_mapping(extractor_plugin)
+            loader_mapping = u.Meltano.coerce_container_mapping(loader_plugin)
             extractor_name = str(
                 elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN)
                 if extractor_mapping is None

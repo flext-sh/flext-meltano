@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated
 
 from flext_cli import m, u
+from pydantic import computed_field
 
 from flext_meltano import t
 
@@ -97,7 +98,7 @@ class FlextMeltanoModelsResultsDbt:
             t.NonNegativeFloat, u.Field(description="Execution time in seconds")
         ]
 
-        @u.computed_field
+        @computed_field
         @property
         def timestamp(self) -> str:
             """ISO timestamp of when the result was generated."""

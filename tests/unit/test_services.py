@@ -6,17 +6,17 @@ from collections.abc import Callable
 
 import pytest
 
-from flext_meltano import FlextMeltano, meltano
-from tests import c, r, s, u
+from flext_meltano import FlextMeltano, FlextMeltanoServiceBase, meltano
+from tests import c, p, u
 
-type ComponentFactory = Callable[..., r[FlextMeltano]]
+type ComponentFactory = Callable[..., p.Result[FlextMeltano]]
 type ComponentSelector = Callable[[FlextMeltano], str | None]
 
 pytestmark = pytest.mark.unit
 
 
 def unwrap_component(
-    result: r[FlextMeltano],
+    result: p.Result[FlextMeltano],
     *,
     selector: ComponentSelector,
     expected_name: str,
@@ -38,7 +38,7 @@ class TestFlextMeltanoPublicFacade:
         """The exported singleton stays stable and inherits the service stack."""
         u.Tests.Matchers.that(meltano, is_=FlextMeltano)
         u.Tests.Matchers.that(type(meltano).get_instance() is meltano, eq=True)
-        u.Tests.Matchers.that(s in FlextMeltano.__mro__, eq=True)
+        u.Tests.Matchers.that(FlextMeltanoServiceBase in FlextMeltano.__mro__, eq=True)
 
     def test_component_factory_returns_specialized_facade(
         self,

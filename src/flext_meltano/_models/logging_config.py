@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from flext_cli import m, u
+from flext_cli import m
+from pydantic import computed_field
 
 from flext_meltano import t
 
@@ -129,7 +130,7 @@ class FlextMeltanoModelsLogging:
         debug_configuration: bool = False
         debug_performance_profile: bool = False
 
-        @u.computed_field
+        @computed_field
         @property
         def extract_dict(self) -> t.BoolMapping:
             """Extract logging as dictionary."""
@@ -144,7 +145,7 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.extract_throughput,
             }
 
-        @u.computed_field
+        @computed_field
         @property
         def load_dict(self) -> t.BoolMapping:
             """Load logging as dictionary."""
@@ -159,7 +160,7 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.load_throughput,
             }
 
-        @u.computed_field
+        @computed_field
         @property
         def pipeline_dict(self) -> t.BoolMapping:
             """Pipeline logging as dictionary."""
@@ -175,7 +176,7 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.pipeline_throughput,
             }
 
-        @u.computed_field
+        @computed_field
         @property
         def transform_dict(self) -> t.BoolMapping:
             """Transform logging as dictionary."""

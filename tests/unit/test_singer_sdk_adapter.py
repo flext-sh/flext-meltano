@@ -37,7 +37,7 @@ class _FailingTap(_SuccessfulTap):
     def get_singer_command(cls) -> click.Command:
         class _FailingCommand(click.Command):
             @override
-            def main(self, *args: object, **kwargs: object) -> object:
+            def main(self, *args, **kwargs) -> object:
                 raise SystemExit(3)
 
         return _FailingCommand("tap-fail")

@@ -42,7 +42,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         u.Field(description="Canonical dbt project name"),
     ] = "dbt"
 
-    _dbt_project_root: Path | None = u.PrivateAttr(default=None)
+    _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
     _instance: ClassVar[Self | None] = None
 
     def __init__(

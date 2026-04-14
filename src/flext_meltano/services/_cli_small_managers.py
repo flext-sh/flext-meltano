@@ -225,7 +225,7 @@ class _FlextMeltanoSimpleCommandManager:
         self,
         args: t.StrSequence,
         help_handler: Callable[[], None],
-        operation_handler: Callable[[str, t.StrSequence], r[str]],
+        operation_handler: Callable[[str, t.StrSequence], p.Result[str]],
     ) -> p.Result[str]:
         """Route command to help or operation handler."""
         if u.Meltano.is_help_request(args):

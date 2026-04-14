@@ -11,14 +11,14 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoSettings, c, p, r, s, t
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t, u
 from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
 
 
-class FlextMeltanoAdapter(s):
+class FlextMeltanoAdapter(FlextMeltanoServiceBase):
     """Base adapter namespace class for focused integrations."""
 
-    class ProjectAdapter(s):
+    class ProjectAdapter(FlextMeltanoServiceBase):
         """Focused adapter for Meltano project management following SOLID principles."""
 
         @classmethod
@@ -80,7 +80,7 @@ class FlextMeltanoAdapter(s):
                 project_dir=project_root.parent,
             )
 
-    class PluginAdapter(s):
+    class PluginAdapter(FlextMeltanoServiceBase):
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
         @classmethod
@@ -95,9 +95,10 @@ class FlextMeltanoAdapter(s):
             """Discover available plugins via Meltano project runtime."""
             try:
                 executor = FlextMeltanoExecutorBase()
+                project_root = u.Meltano.resolve_project_root(self.settings)
                 plugins_result = executor.get_project_plugins(
                     plugin_type=plugin_type,
-                    _cwd=self.settings.project_root,
+                    _cwd=project_root,
                 )
                 if plugins_result.failure:
                     return r[t.RecursiveContainerMapping].fail(

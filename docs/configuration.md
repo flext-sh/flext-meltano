@@ -156,7 +156,7 @@ from flext_core import t
 from flext_core import u
 
 settings = FlextMeltanoSettings()
-validation_result: r[bool] = settings.validate_meltano_config()
+validation_result: p.Result[bool] = settings.validate_meltano_config()
 
 if validation_result.is_success:
     print("Meltano configuration is valid")

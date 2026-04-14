@@ -20,9 +20,22 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     def __init__(
         self,
         settings: FlextMeltanoSettings | t.RecursiveContainerMapping | None = None,
+        *,
+        service_name: t.NonEmptyStr | None = None,
+        service_version: t.NonEmptyStr | None = None,
+        source_name: str | None = None,
+        sink_name: str | None = None,
+        transformation_name: str | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap on the concrete executor."""
-        super().__init__(settings=settings)
+        super().__init__(
+            settings=settings,
+            service_name=service_name,
+            service_version=service_version,
+            source_name=source_name,
+            sink_name=sink_name,
+            transformation_name=transformation_name,
+        )
 
     @staticmethod
     def create_flext_cli() -> p.Result[FlextMeltanoCLI]:

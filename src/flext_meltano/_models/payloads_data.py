@@ -161,9 +161,10 @@ class FlextMeltanoModelsPayloadsData:
     class VariantPayload(m.ArbitraryTypesModel):
         """Normalize plugin variant from external extraction (str|list|dict)."""
 
-        value: t.Meltano.VariantValue = u.Field(
-            default=None, description="Normalized variant value"
-        )
+        value: Annotated[
+            t.Meltano.VariantValue,
+            u.Field(description="Normalized variant value"),
+        ] = None
 
         @u.field_validator("value", mode="before")
         @classmethod

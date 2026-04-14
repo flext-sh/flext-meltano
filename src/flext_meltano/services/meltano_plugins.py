@@ -11,7 +11,6 @@ from typing import override
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoPluginDiscoveryMixin,
-    FlextMeltanoServiceBase,
     c,
     p,
     r,
@@ -19,9 +18,7 @@ from flext_meltano import (
 )
 
 
-class FlextMeltanoComponentService(
-    FlextMeltanoPluginDiscoveryMixin, FlextMeltanoServiceBase
-):
+class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
@@ -100,7 +97,7 @@ class FlextMeltanoComponentService(
             "plugin_name": plugin_name,
         }
         abstractions = FlextMeltanoAbstractions()
-        add_result: r[bool] = abstractions.add_plugin_by_config(plugin_config)
+        add_result: p.Result[bool] = abstractions.add_plugin_by_config(plugin_config)
         if add_result.failure:
             return r[bool].fail(add_result.error or "Plugin addition failed")
         return r[bool].ok(value=True)

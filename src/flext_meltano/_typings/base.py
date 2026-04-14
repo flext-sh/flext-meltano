@@ -26,6 +26,9 @@ class FlextMeltanoTypingsBase:
     CONTAINER_MAP_ADAPTER: ClassVar[u.TypeAdapter[t.RecursiveContainerMapping]] = (
         u.TypeAdapter(t.RecursiveContainerMapping)
     )
+    CONTAINER_MAP_LIST_ADAPTER: ClassVar[
+        u.TypeAdapter[list[t.RecursiveContainerMapping]]
+    ] = u.TypeAdapter(list[t.RecursiveContainerMapping])
     INTEGER_ADAPTER: ClassVar[u.TypeAdapter[t.IntegerValue]] = u.TypeAdapter(
         t.IntegerValue
     )

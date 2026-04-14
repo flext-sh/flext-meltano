@@ -30,7 +30,11 @@ from flext_meltano.typings import FlextMeltanoTypes as t
 class FlextMeltanoCLI(FlextMeltanoServiceBase):
     """SOLID-compliant CLI for FLEXT Meltano operations."""
 
-    service_name: str = "FlextMeltanoCLI"
+    service_name: str = u.Field(
+        "FlextMeltanoCLI",
+        description="Canonical Meltano CLI service name.",
+        validate_default=True,
+    )
     _output: p.Meltano.Output = u.PrivateAttr()
     _pipeline_manager: p.Meltano.CLIManager = u.PrivateAttr()
     _singer_manager: p.Meltano.SingerManager = u.PrivateAttr()

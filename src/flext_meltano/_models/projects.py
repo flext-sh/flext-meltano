@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated, Self
 
 from flext_cli import m, u
+from pydantic import computed_field
 
 from flext_meltano import c, t
 
@@ -30,7 +31,7 @@ class FlextMeltanoModelsProjects:
             u.Field(default="", description="Node resource type (model, test, etc.)"),
         ] = ""
 
-        @u.computed_field
+        @computed_field
         @property
         def fqn_string(self) -> str:
             """Fully qualified name as dot-separated string."""
@@ -103,13 +104,13 @@ class FlextMeltanoModelsProjects:
             description="Available environments",
         )
 
-        @u.computed_field
+        @computed_field
         @property
         def environment_count(self) -> int:
             """Number of environments."""
             return u.count(self.environments)
 
-        @u.computed_field
+        @computed_field
         @property
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
@@ -120,7 +121,7 @@ class FlextMeltanoModelsProjects:
             prod_envs_list: t.StrSequence = list(prod_environments)
             return u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
 
-        @u.computed_field
+        @computed_field
         @property
         def project_maturity(self) -> str:
             """Project maturity assessment."""

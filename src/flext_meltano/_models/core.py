@@ -7,8 +7,7 @@ from typing import Annotated
 
 from flext_cli import m, u
 
-from flext_core import r
-from flext_meltano import t
+from flext_meltano import p, t
 
 
 class FlextMeltanoModelsCore:
@@ -26,7 +25,7 @@ class FlextMeltanoModelsCore:
             sensitive_keys_list: t.StrSequence = list(sensitive_keys)
             checks_result = u.process(
                 sensitive_keys_list,
-                lambda s: r[bool].ok(s in normalized),
+                lambda s: p.Result[bool].ok(s in normalized),
             )
             checks = FlextMeltanoModelsCore.BooleanListValue.model_validate({
                 "items": checks_result.unwrap_or([]),

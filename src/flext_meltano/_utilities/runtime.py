@@ -6,12 +6,38 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_infra import u
+from meltano.core.plugin.base import PluginType as MeltanoPluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 from flext_meltano import c, m, p, t
 
 
 class FlextMeltanoUtilitiesRuntime:
     """Runtime-focused helpers for in-process Meltano execution."""
+
+    @staticmethod
+    def coerce_container_mapping(
+        value: t.RecursiveContainer | None,
+    ) -> t.RecursiveContainerMapping | None:
+        """Normalize runtime objects to canonical container mappings when possible."""
+        if not isinstance(value, Mapping):
+            return None
+        try:
+            return t.Meltano.CONTAINER_MAP_ADAPTER.validate_python(value)
+        except c.ValidationError:
+            return None
+
+    @staticmethod
+    def coerce_container_mapping_list(
+        value: t.RecursiveContainer | None,
+    ) -> list[t.RecursiveContainerMapping] | None:
+        """Normalize runtime objects to canonical mapping lists when possible."""
+        if not isinstance(value, list):
+            return None
+        try:
+            return t.Meltano.CONTAINER_MAP_LIST_ADAPTER.validate_python(value)
+        except c.ValidationError:
+            return None
 
     @staticmethod
     def _normalized_parts(values: t.StrSequence) -> t.StrSequence:
@@ -173,6 +199,47 @@ class FlextMeltanoUtilitiesRuntime:
         }
         filtered = u.filter(plugin_data, lambda value: u.chk(value, empty=False))
         return {str(key): str(value) for key, value in filtered.items()}
+
+    @staticmethod
+    def build_discovered_project_plugin(
+        raw_type: str,
+        raw_plugin: ProjectPlugin,
+    ) -> t.StrMapping | None:
+        """Normalize a Meltano project plugin object into discovery payload shape."""
+        plugin_mapping: t.RecursiveContainerMapping = {
+            "name": raw_plugin.name,
+            "namespace": raw_plugin.namespace,
+            "pip_url": raw_plugin.pip_url,
+            "variant": raw_plugin.variant,
+        }
+        return FlextMeltanoUtilitiesRuntime.build_discovered_plugin(
+            raw_type,
+            plugin_mapping,
+        )
+
+    @staticmethod
+    def discover_project_plugins(
+        current_plugins: Mapping[MeltanoPluginType, Sequence[ProjectPlugin]],
+        *,
+        selected_type: str | None = None,
+    ) -> list[t.StrMapping]:
+        """Normalize Meltano current_plugins catalog into canonical discovery mappings."""
+        discovered: list[t.StrMapping] = []
+        for raw_type, raw_plugins in current_plugins.items():
+            normalized_type = raw_type.value
+            for raw_plugin in raw_plugins:
+                plugin_data = (
+                    FlextMeltanoUtilitiesRuntime.build_discovered_project_plugin(
+                        normalized_type,
+                        raw_plugin,
+                    )
+                )
+                if plugin_data is None:
+                    continue
+                if selected_type is not None and plugin_data["type"] != selected_type:
+                    continue
+                discovered.append(plugin_data)
+        return discovered
 
     @staticmethod
     def extract_plugin_names(
