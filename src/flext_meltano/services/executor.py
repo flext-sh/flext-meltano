@@ -8,10 +8,16 @@ from __future__ import annotations
 
 from meltano.core.error import ProjectNotFound
 
-from flext_meltano import c, p, r, t, u
-from flext_meltano.cli import FlextMeltanoCLI
-from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
-from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano import (
+    FlextMeltanoCLI,
+    FlextMeltanoExecutorBase,
+    FlextMeltanoSettings,
+    c,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):

@@ -12,27 +12,29 @@ from typing import ClassVar, Self, override
 
 from flext_cli import r
 
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.protocols import p
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.adapters import FlextMeltanoAdapter
-from flext_meltano.services.bridge import FlextMeltanoBridge
-from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
-from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
-from flext_meltano.services.executor import FlextMeltanoExecutor
-from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
-from flext_meltano.services.meltano_plugins import FlextMeltanoComponentService
-from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
-from flext_meltano.services.project_service import FlextMeltanoProjectService
-from flext_meltano.services.services import FlextMeltanoService
-from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
-from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
-from flext_meltano.services.singer_tap import FlextMeltanoTapAbstractions
-from flext_meltano.services.singer_target import FlextMeltanoTargetAbstractions
-from flext_meltano.services.singer_translator import FlextMeltanoSingerCliTranslator
-from flext_meltano.services.validators import FlextMeltanoValidators
-from flext_meltano.typings import FlextMeltanoTypes as t
-from flext_meltano.utilities import FlextMeltanoUtilities as u
+from flext_meltano import (
+    FlextMeltanoAbstractions,
+    FlextMeltanoAdapter,
+    FlextMeltanoBridge,
+    FlextMeltanoComponentService,
+    FlextMeltanoConstants as c,
+    FlextMeltanoDbtProjectMixin,
+    FlextMeltanoDbtRunnerMixin,
+    FlextMeltanoExecutor,
+    FlextMeltanoLibraryRunner,
+    FlextMeltanoProjectManager,
+    FlextMeltanoProjectService,
+    FlextMeltanoService,
+    FlextMeltanoSingerCatalogMixin,
+    FlextMeltanoSingerCliTranslator,
+    FlextMeltanoSingerStateMixin,
+    FlextMeltanoTapAbstractions,
+    FlextMeltanoTargetAbstractions,
+    FlextMeltanoTypes as t,
+    FlextMeltanoUtilities as u,
+    FlextMeltanoValidators,
+    p,
+)
 
 
 class FlextMeltano(

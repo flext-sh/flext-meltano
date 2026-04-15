@@ -11,20 +11,18 @@ from typing import override
 
 from flext_cli import cli, r, u
 
-from flext_meltano.base import FlextMeltanoServiceBase
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.protocols import p
-from flext_meltano.services._cli_small_managers import (
-    FlextMeltanoDbtManager,
-    FlextMeltanoPluginManager,
-    FlextMeltanoStatusManager,
-)
-from flext_meltano.services._pipeline_mgr import FlextMeltanoPipelineManager
-from flext_meltano.services.cli_managers import (
+from flext_meltano import (
     FlextMeltanoCommandRouter,
+    FlextMeltanoConstants as c,
+    FlextMeltanoDbtManager,
+    FlextMeltanoPipelineManager,
+    FlextMeltanoPluginManager,
+    FlextMeltanoServiceBase,
     FlextMeltanoSingerManager,
+    FlextMeltanoStatusManager,
+    FlextMeltanoTypes as t,
+    p,
 )
-from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoCLI(FlextMeltanoServiceBase):

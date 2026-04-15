@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
+from flext_meltano import FlextMeltanoProtocolsServices
 
 
 class FlextMeltanoProtocolsBase:

@@ -10,6 +10,7 @@ from typing import override
 
 from flext_core import FlextSettings
 from flext_meltano import (
+    FlextMeltanoExecutorBase,
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     c,
@@ -19,7 +20,6 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):

@@ -8,8 +8,7 @@ from typing import Annotated, Self
 from flext_cli import m, u
 from pydantic import computed_field
 
-from flext_meltano import c, t
-from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano import FlextMeltanoModelsSources, c, t
 
 
 class FlextMeltanoModelsInstances:

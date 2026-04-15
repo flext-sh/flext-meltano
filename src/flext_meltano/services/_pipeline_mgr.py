@@ -8,11 +8,16 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 
-from flext_meltano import c, m, p, r, t, u
-from flext_meltano.services._pipeline_lifecycle import (
+from flext_meltano import (
+    FlextMeltanoPipelineCrudOperations,
     FlextMeltanoPipelineLifecycleOperations,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
 )
-from flext_meltano.services._pipeline_ops import FlextMeltanoPipelineCrudOperations
 
 
 class FlextMeltanoPipelineManager(

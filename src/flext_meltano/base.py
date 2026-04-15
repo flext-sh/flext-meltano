@@ -17,9 +17,7 @@ from typing import Annotated, override
 from flext_cli import u
 
 from flext_core import FlextSettings, s
-from flext_meltano import c, t
-from flext_meltano.protocols import p
-from flext_meltano.settings import FlextMeltanoSettings
+from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
 class FlextMeltanoServiceBase(s[t.RecursiveContainerMapping]):

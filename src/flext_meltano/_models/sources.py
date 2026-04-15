@@ -7,9 +7,7 @@ from typing import Annotated, ClassVar, Self
 from flext_cli import m, u
 from pydantic import computed_field
 
-from flext_meltano import t
-from flext_meltano._models.core import FlextMeltanoModelsCore
-from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
+from flext_meltano import FlextMeltanoModelsCore, FlextMeltanoModelsSourcesParams, t
 
 
 class FlextMeltanoModelsSources:

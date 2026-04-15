@@ -11,8 +11,7 @@ from pathlib import Path
 
 from flext_cli import cli
 
-from flext_meltano import c, m, p, r, t, u
-from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano import FlextMeltanoExecutorBase, c, m, p, r, t, u
 
 
 class FlextMeltanoPipelinePaths:

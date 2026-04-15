@@ -10,9 +10,16 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_meltano import c, m, p, r, t, u
-from flext_meltano.base import FlextMeltanoServiceBase
-from flext_meltano.services._executor_base import FlextMeltanoExecutorBase
+from flext_meltano import (
+    FlextMeltanoExecutorBase,
+    FlextMeltanoServiceBase,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):

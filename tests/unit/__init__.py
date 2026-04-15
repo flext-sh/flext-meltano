@@ -25,6 +25,19 @@ _LAZY_IMPORTS = build_lazy_import_map(
         ".test_typings": ("test_typings",),
         ".test_validators": ("test_validators",),
         ".tests_pipeline_cli_managers": ("tests_pipeline_cli_managers",),
+        "flext_meltano": (
+            "c",
+            "d",
+            "e",
+            "h",
+            "m",
+            "p",
+            "r",
+            "s",
+            "t",
+            "u",
+            "x",
+        ),
     },
 )
 
