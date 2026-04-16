@@ -1,0 +1,30 @@
+docs/guides/development.md
+  h_9db9d35f50cf33 192,195,201,205,351,354,357
+docs/guides/configuration.md
+  h_9db9d35f50cf33 256,381,384,388
+docs/guides/troubleshooting.md
+  h_9db9d35f50cf33 249,517
+src/flext_meltano/settings.py
+  h_9db9d35f50cf33 11,18
+src/flext_meltano/teste.sql
+  h_9db9d35f50cf33 1-76
+tests/unit/test_execution_result.py
+  h_9db9d35f50cf33 18,28
+docs/architecture/data-architecture.md
+  h_9db9d35f50cf33 345
+docs/architecture.md
+  h_9db9d35f50cf33 273,282
+src/flext_meltano/_models/logging_config.py
+  h_9db9d35f50cf33 7,132,147,162,178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "3c6f5c784534149e30334504ba26db45b1ea7824",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
