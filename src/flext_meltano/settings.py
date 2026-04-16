@@ -8,14 +8,14 @@ from typing import Annotated, ClassVar, Self
 from flext_cli import r, u
 
 from flext_core import FlextSettings
-from flext_meltano import c, p, t
+from flext_meltano import c, m, p, t
 
 
 @FlextSettings.auto_register("meltano")
 class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration services."""
 
-    model_config: ClassVar[c.SettingsConfigDict] = c.SettingsConfigDict(
+    model_config: ClassVar[m.SettingsConfigDict] = m.SettingsConfigDict(
         env_prefix="FLEXT_MELTANO_",
         extra="ignore",
     )

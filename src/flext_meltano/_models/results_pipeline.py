@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import computed_field
 
 from flext_meltano import FlextMeltanoModelsResults, c, t
 
@@ -43,7 +42,7 @@ class FlextMeltanoModelsResultsPipeline:
             t.ConfigurationMapping, u.Field(description="Pipeline execution metadata")
         ] = u.Field(default_factory=dict, description="Pipeline execution metadata")
 
-        @computed_field
+        @u.computed_field()
         @property
         def completed_stages(self) -> t.StrSequence:
             """Completed pipeline stages."""
@@ -57,7 +56,7 @@ class FlextMeltanoModelsResultsPipeline:
                 if result is not None and result.end_time is not None
             ]
 
-        @computed_field
+        @u.computed_field()
         @property
         def completion_percentage(self) -> float:
             """Pipeline completion percentage."""
@@ -89,13 +88,13 @@ class FlextMeltanoModelsResultsPipeline:
                 and self.transformation_result.error_message is None,
             )
 
-        @computed_field
+        @u.computed_field()
         @property
         def is_fully_successful(self) -> bool:
             """Check if all stages completed successfully."""
             return self._all_stages_successful()
 
-        @computed_field
+        @u.computed_field()
         @property
         def total_duration_seconds(self) -> float:
             """Total pipeline duration."""

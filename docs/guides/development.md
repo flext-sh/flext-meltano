@@ -189,20 +189,20 @@ def validate_and_process(data: ProcessInputModel) -> ProcessedData:
 ```python
 # ✅ CORRECT - Use [Project]Models pattern
 class FlextApiModels:
-    class Request(BaseModel):
+    class Request(m.BaseModel):
         data: ProcessInputModel
 
-    class Response(BaseModel):
+    class Response(m.BaseModel):
         result: p.Result[ProcessedData]
         status: int
 
 
 # ❌ WRONG - Scattered model definitions
-class ApiRequest(BaseModel):
+class ApiRequest(m.BaseModel):
     data: ProcessInputModel
 
 
-class ApiResponse(BaseModel):
+class ApiResponse(m.BaseModel):
     result: ProcessedData
 ```
 
@@ -348,13 +348,13 @@ class FlextNewlib:
 
 # Models class
 class FlextNewlibModels:
-    class Config(BaseModel):
+    class Config(m.BaseModel):
         setting: str = "default"
 
-    class Request(BaseModel):
+    class Request(m.BaseModel):
         data: NewlibProcessInputModel
 
-    class Response(BaseModel):
+    class Response(m.BaseModel):
         result: p.Result[NewlibProcessResultModel]
 ```
 

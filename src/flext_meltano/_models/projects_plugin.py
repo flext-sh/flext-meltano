@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import computed_field
 
 from flext_meltano import c, t
 
@@ -37,19 +36,19 @@ class FlextMeltanoModelsProjectsPlugin:
             t.StrSequence, u.Field(description="Plugin configuration files")
         ] = u.Field(default_factory=list, description="Plugin configuration files")
 
-        @computed_field
+        @u.computed_field()
         @property
         def full_plugin_name(self) -> str:
             """Full plugin name with namespace."""
             return f"{self.namespace}.{self.name}"
 
-        @computed_field
+        @u.computed_field()
         @property
         def has_custom_executable(self) -> bool:
             """Check if plugin has custom executable."""
             return self.executable is not None
 
-        @computed_field
+        @u.computed_field()
         @property
         def plugin_complexity(self) -> str:
             """Plugin complexity assessment."""
@@ -63,7 +62,7 @@ class FlextMeltanoModelsProjectsPlugin:
                 return "moderate"
             return "complex"
 
-        @computed_field
+        @u.computed_field()
         @property
         def settings_count(self) -> int:
             """Number of plugin settings."""

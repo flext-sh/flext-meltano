@@ -270,7 +270,7 @@ class FlextMeltanoTypes:
 ### **Pydantic Model Integration**
 
 ```python
-class TapConfig(BaseModel):
+class TapConfig(m.BaseModel):
     """Type-safe tap configuration model."""
 
     tap_type: str
@@ -279,7 +279,7 @@ class TapConfig(BaseModel):
     version: str | None = None
 
 
-class StreamDefinition(BaseModel):
+class StreamDefinition(m.BaseModel):
     """Type-safe stream definition model."""
 
     stream_name: str

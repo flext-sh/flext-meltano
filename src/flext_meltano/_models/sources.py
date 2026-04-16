@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
-from pydantic import computed_field
 
 from flext_meltano import FlextMeltanoModelsCore, FlextMeltanoModelsSourcesParams, t
 
@@ -30,7 +29,7 @@ class FlextMeltanoModelsSources:
         ] = u.Field(default_factory=dict, description="Stream-specific configuration")
         tap_version: Annotated[str, u.Field(description="Tap version")] = "latest"
 
-        @computed_field
+        @u.computed_field()
         @property
         def config_size(self) -> int:
             """Total number of configuration parameters."""
@@ -38,13 +37,13 @@ class FlextMeltanoModelsSources:
                 list(self.stream_config.keys())
             )
 
-        @computed_field
+        @u.computed_field()
         @property
         def has_stream_config(self) -> bool:
             """Check if stream configuration is present."""
             return bool(self.stream_config)
 
-        @computed_field
+        @u.computed_field()
         @property
         def tap_identifier(self) -> str:
             """Unique tap identifier."""
@@ -86,19 +85,19 @@ class FlextMeltanoModelsSources:
             str, u.Field(default="latest", description="Target version")
         ] = "latest"
 
-        @computed_field
+        @u.computed_field()
         @property
         def config_size(self) -> int:
             """Total number of configuration parameters."""
             return len(self.connection_config)
 
-        @computed_field
+        @u.computed_field()
         @property
         def has_connection_config(self) -> bool:
             """Check if connection configuration is present."""
             return bool(self.connection_config)
 
-        @computed_field
+        @u.computed_field()
         @property
         def target_identifier(self) -> str:
             """Unique target identifier."""
@@ -134,7 +133,7 @@ class FlextMeltanoModelsSources:
             str, u.Field(default="latest", description="Source version")
         ] = "latest"
 
-        @computed_field
+        @u.computed_field()
         @property
         def config_size(self) -> int:
             """Total number of configuration parameters."""
@@ -142,13 +141,13 @@ class FlextMeltanoModelsSources:
                 list(self.stream_config.keys())
             )
 
-        @computed_field
+        @u.computed_field()
         @property
         def has_stream_config(self) -> bool:
             """Check if stream configuration is present."""
             return bool(self.stream_config)
 
-        @computed_field
+        @u.computed_field()
         @property
         def source_identifier(self) -> str:
             """Unique source identifier."""

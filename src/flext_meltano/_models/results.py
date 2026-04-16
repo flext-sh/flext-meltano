@@ -6,7 +6,6 @@ from datetime import UTC, datetime
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import computed_field
 
 from flext_meltano import c, t
 
@@ -43,7 +42,7 @@ class FlextMeltanoModelsResults:
             t.ConfigurationMapping, u.Field(description="Additional execution metadata")
         ] = u.Field(default_factory=dict, description="Additional execution metadata")
 
-        @computed_field
+        @u.computed_field()
         @property
         def execution_rate_per_second(self) -> float:
             """Execution rate (records/second)."""
@@ -51,13 +50,13 @@ class FlextMeltanoModelsResults:
                 return 0.0
             return self.records_processed / self.duration_seconds
 
-        @computed_field
+        @u.computed_field()
         @property
         def is_completed(self) -> bool:
             """Check if execution is completed."""
             return self.end_time is not None
 
-        @computed_field
+        @u.computed_field()
         @property
         def is_successful(self) -> bool:
             """Check if execution was successful."""
@@ -66,7 +65,7 @@ class FlextMeltanoModelsResults:
                 and self.error_message is None
             )
 
-        @computed_field
+        @u.computed_field()
         @property
         def performance_category(self) -> str:
             """Performance categorization."""

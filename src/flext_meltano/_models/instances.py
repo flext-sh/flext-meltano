@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import computed_field
 
 from flext_meltano import FlextMeltanoModelsSources, c, t
 
@@ -32,7 +31,7 @@ class FlextMeltanoModelsInstances:
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
-        @computed_field
+        @u.computed_field()
         @property
         def config_keys_count(self) -> int:
             """Number of settings keys."""
@@ -89,7 +88,7 @@ class FlextMeltanoModelsInstances:
         ] = 0
         stream_created_at: Annotated[str, u.Field(description="Creation timestamp")]
 
-        @computed_field
+        @u.computed_field()
         @property
         def average_records_per_batch(self) -> float:
             """Average records per batch."""
@@ -99,13 +98,13 @@ class FlextMeltanoModelsInstances:
                 else self.records_loaded / self.batches_processed
             )
 
-        @computed_field
+        @u.computed_field()
         @property
         def has_processed_data(self) -> bool:
             """Check if stream has processed data."""
             return self.records_loaded > 0 or self.batches_processed > 0
 
-        @computed_field
+        @u.computed_field()
         @property
         def processing_status(self) -> str:
             """Processing status assessment."""
@@ -157,13 +156,13 @@ class FlextMeltanoModelsInstances:
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
-        @computed_field
+        @u.computed_field()
         @property
         def active_streams(self) -> Sequence[FlextMeltanoModelsInstances.StreamInfo]:
             """Active streams for extraction."""
             return [s for s in self.streams if s.status in c.Meltano.ACTIVE_STATUSES]
 
-        @computed_field
+        @u.computed_field()
         @property
         def stream_count(self) -> int:
             """Number of available streams."""

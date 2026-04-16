@@ -342,7 +342,7 @@ class SchemaValidator:
             # JSON Schema validation
             validate(instance=record, schema=schema)
             return r.ok(ValidatedRecord(record=record, schema=schema))
-        except ValidationError as e:
+        except c.ValidationError as e:
             return r.fail(ValidationError(f"Schema validation failed: {e.message}"))
 
     def validate_stream_schema(self, schema: dict) -> p.Result[ValidatedSchema]:

@@ -1,0 +1,76 @@
+UPDATE FDSPPRD.PS_DPSP_ESTOQUE_ON e
+   SET e.DPSP_QTDE_VENDIDA = e.DPSP_QTDE_VENDIDA
+ WHERE  (BUSINESS_UNIT, INV_ITEM_ID) in 
+( select BUSINESS_UNIT, INV_ITEM_ID from (
+select org.BUSINESS_UNIT, org.INV_ITEM_ID , org.DPSP_QTDE_VENDIDA, dst.qty, org.LASTUPDDTTM, dst.LASTUPDDTTM
+ from FDSPPRD.PS_DPSP_ESTOQUE_ON  org 
+inner join (select BUSINESS_UNIT, DSP_CODIGO_LOJA, INV_ITEM_ID , QTY, LASTUPDDTTM 
+         from ESUNDPSP.DPSP_ESTOQUE_ON@eo
+         where DSP_CODIGO_LOJA >= 0 and  DSP_CODIGO_LOJA < 1600 )  dst
+       on  (org.BUSINESS_UNIT = dst.BUSINESS_UNIT
+            and org.INV_ITEM_ID = dst.INV_ITEM_ID)
+where org.DSP_CODIGO_LOJA >= 0 and  org.DSP_CODIGO_LOJA < 1600
+and  org.DPSP_QTDE_VENDIDA != dst.qty ) ) ;
+commit;
+         
+SQL> 
+UPDATE FDSPPRD.PS_DPSP_ESTOQUE_ON e
+   SET e.DPSP_QTDE_VENDIDA = e.DPSP_QTDE_VENDIDA
+ WHERE  (BUSINESS_UNIT, INV_ITEM_ID) in 
+( select BUSINESS_UNIT, INV_ITEM_ID from (
+select org.BUSINESS_UNIT, org.INV_ITEM_ID , org.DPSP_QTDE_VENDIDA, dst.qty, org.LASTUPDDTTM, dst.LASTUPDDTTM
+ from FDSPPRD.PS_DPSP_ESTOQUE_ON  org 
+inner join (select BUSINESS_UNIT, DSP_CODIGO_LOJA, INV_ITEM_ID , QTY, LASTUPDDTTM 
+         from ESUNDPSP.DPSP_ESTOQUE_ON@eo
+         where DSP_CODIGO_LOJA >= 0 and  DSP_CODIGO_LOJA < 1800 )  dst
+       on  (org.BUSINESS_UNIT = dst.BUSINESS_UNIT
+            and org.INV_ITEM_ID = dst.INV_ITEM_ID)
+where org.DSP_CODIGO_LOJA >= 0 and  org.DSP_CODIGO_LOJA < 1800
+and  org.DPSP_QTDE_VENDIDA != dst.qty ) ) ;
+commit;
+
+
+UPDATE FDSPPRD.PS_DPSP_ESTOQUE_ON e
+   SET e.DPSP_QTDE_VENDIDA = e.DPSP_QTDE_VENDIDA
+ WHERE  (BUSINESS_UNIT, INV_ITEM_ID) in 
+( select BUSINESS_UNIT, INV_ITEM_ID from (
+select org.BUSINESS_UNIT, org.INV_ITEM_ID , org.DPSP_QTDE_VENDIDA, dst.qty, org.LAST  3  UPDDTTM, dst.LASTUPDDTTM
+ from FDSPPRD.PS_DPSP_ESTOQUE_ON  org 
+inner join (select BUSINESS_UNIT, DSP_CODIGO_LOJA, INV_ITEM_ID , QTY, LASTUPDDTTM 
+         from ESUNDPSP.DPSP_ESTOQUE_ON@eo
+         where DSP_CODIGO_LOJA >= 0 and  DSP_CODIGO_LOJA < 2000  4   )  dst
+       on  (org.BUSINESS_UNIT = dst.BUSINESS_UNIT
+            and org.INV_ITEM_ID = dst.INV_ITEM_ID)
+whe  5  re org.DSP_CODIGO_LOJA >= 0 and  org.DSP_CODIGO_LOJA < 2000
+and  org.DPSP_QTDE_VENDIDA != dst.qty ) ) ;
+commit;
+    
+UPDATE FDSPPRD.PS_DPSP_ESTOQUE_ON e
+   SET e.DPSP_QTDE_VENDIDA = e.DPSP_QTDE_VENDIDA
+ WHERE  (BUSINESS_UNIT, INV_ITEM_ID) in 
+( select BUSINESS_UNIT, INV_ITEM_ID from (
+select org.BUSINESS_UNIT, org.INV_I  6  TEM_ID , org.DPSP_QTDE_VENDIDA, dst.qty, org.LASTUPDDTTM, dst.LASTUPDDTTM
+ from FDSPPRD.PS_DPSP_ESTOQUE_ON  org 
+inner join (select BUSINESS_UNIT, DSP_CODIGO_LOJA, INV_ITEM_ID , QTY, LASTUPDDTTM 
+         from ESUNDPSP.DPSP_ESTOQUE_ON@eo
+         where D  7  SP_CODIGO_LOJA >= 0 and  DSP_CODIGO_LOJA < 2200 )  dst
+       on  (org.BUSINESS_UNIT = dst.BUSINESS_UNIT
+            and org.INV_ITEM_ID = dst.INV_ITEM_ID)
+where org.DSP_CODIGO_LOJA >= 0 and  org.DSP_CODIGO_LOJA < 2200
+and  org.DPSP_QTDE_VENDIDA != d   st.qty ) ) ;
+commit;
+       
+UPDATE FDSPPRD.PS_DPSP_ESTOQUE_ON e
+   SET e.DPSP_QTDE_VENDIDA = e.DPSP_QTDE_VENDIDA
+ WHERE  (BUSINESS_UNIT, INV_ITEM_ID) in 
+( select BUSINESS_UNIT, INV_ITEM_ID from (
+select org.BUSINESS_UNIT, org.INV_ITEM_ID , org.DPSP  9  _QTDE_VENDIDA, dst.qty, org.LASTUPDDTTM, dst.LASTUPDDTTM
+ from FDSPPRD.PS_DPSP_ESTOQUE_ON  org 
+inner join (select BUSINESS_UNIT, DSP_CODIGO_LOJA, INV_ITEM_ID , QTY, LASTUPDDTTM 
+         from ESUNDPSP.DPSP_ESTOQUE_ON@eo
+         where DSP_CODIGO_LOJA >= 0 and  DS 10  P_CODIGO_LOJA < 2400 )  dst
+       on  (org.BUSINESS_UNIT = dst.BUSINESS_UNIT
+            and org.INV_ITEM_ID = dst.INV_ITEM_ID)
+where org.DSP_CODIGO_LOJA >= 0 and  org.DSP_CODIGO_LOJA < 2400
+and  org.DPSP_QTDE_VENDIDA != dst.qty ) ) ;
+commit;

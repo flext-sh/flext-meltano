@@ -10,12 +10,12 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from flext_tests import tm
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
 from tests import m, t
 
 
-class _ExecutionResultJson(BaseModel):
+class _ExecutionResultJson(m.BaseModel):
     command: t.StrSequence
     success: bool
     exit_code: int
@@ -25,7 +25,7 @@ class _ExecutionResultJson(BaseModel):
     timestamp: str
 
 
-_JSON_ADAPTER: TypeAdapter[_ExecutionResultJson] = TypeAdapter(_ExecutionResultJson)
+_JSON_ADAPTER: m.TypeAdapter[_ExecutionResultJson] = TypeAdapter(_ExecutionResultJson)
 
 
 class TestFlextMeltanoExecutionResult:

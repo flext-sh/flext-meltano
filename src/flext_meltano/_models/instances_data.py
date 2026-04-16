@@ -6,7 +6,6 @@ from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import computed_field
 
 from flext_meltano import (
     FlextMeltanoModelsCore,
@@ -39,13 +38,13 @@ class FlextMeltanoModelsInstancesData:
             u.Field(default=c.DEFAULT_SIZE, description="Maximum number of batches"),
         ] = c.DEFAULT_SIZE
 
-        @computed_field
+        @u.computed_field()
         @property
         def max_records_capacity(self) -> int:
             """Maximum records capacity."""
             return self.batch_size * self.max_batches
 
-        @computed_field
+        @u.computed_field()
         @property
         def processing_efficiency(self) -> str:
             """Processing efficiency assessment."""
@@ -61,7 +60,7 @@ class FlextMeltanoModelsInstancesData:
                 return "medium"
             return "low"
 
-        @computed_field
+        @u.computed_field()
         @property
         def sink_identifier(self) -> str:
             """Unique sink identifier."""
@@ -117,7 +116,7 @@ class FlextMeltanoModelsInstancesData:
         ] = u.Field(default_factory=dict, description="Additional metadata")
         source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
-        @computed_field
+        @u.computed_field()
         @property
         def active_stream_count(self) -> int:
             """Number of active streams."""
@@ -127,7 +126,7 @@ class FlextMeltanoModelsInstancesData:
                 if stream.status in c.Meltano.ACTIVE_STATUSES
             ])
 
-        @computed_field
+        @u.computed_field()
         @property
         def is_ready_for_extraction(self) -> bool:
             """Check if source is ready for data extraction."""
@@ -140,13 +139,13 @@ class FlextMeltanoModelsInstancesData:
                 and self.status == c.Meltano.OperationStatus.CONFIGURED.value
             )
 
-        @computed_field
+        @u.computed_field()
         @property
         def stream_count(self) -> int:
             """Number of discovered streams."""
             return len(self.streams)
 
-        @computed_field
+        @u.computed_field()
         @property
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
@@ -199,7 +198,7 @@ class FlextMeltanoModelsInstancesData:
             u.Field(default=0, description="Number of configured sinks"),
         ] = 0
 
-        @computed_field
+        @u.computed_field()
         @property
         def is_ready(self) -> bool:
             """Check if sink is ready for processing."""
