@@ -102,7 +102,7 @@ def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
 - **Learning Curve**: Developers need to understand railway patterns
 - **Boilerplate**: Additional code for result wrapping/unwrapping
 - **Migration Effort**: Converting existing exception-based code
-- **Performance**: Slight overhead from result t.RecursiveContainer creation
+- **Performance**: Slight overhead from result object creation
 
 ### Risks
 

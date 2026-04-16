@@ -3161,7 +3161,7 @@ class APIHelpSystem:
                     "example": "customer-data-sync",
                 },
                 "tap": {
-                    "type": "t.RecursiveContainer",
+                    "type": "object",
                     "required": True,
                     "description": "Source connector configuration",
                     "properties": {
@@ -3170,7 +3170,7 @@ class APIHelpSystem:
                     },
                 },
                 "target": {
-                    "type": "t.RecursiveContainer",
+                    "type": "object",
                     "required": True,
                     "description": "Destination connector configuration",
                 },
@@ -3658,7 +3658,7 @@ class ContractTests:
         # Define transformation contract
         contract = DataTransformationContract(
             input_schema={
-                "type": "t.RecursiveContainer",
+                "type": "object",
                 "properties": {
                     "id": {"type": "integer"},
                     "name": {"type": "string"},
@@ -3667,7 +3667,7 @@ class ContractTests:
                 "required": ["id", "name"],
             },
             output_schema={
-                "type": "t.RecursiveContainer",
+                "type": "object",
                 "properties": {
                     "user_id": {"type": "integer"},
                     "full_name": {"type": "string"},

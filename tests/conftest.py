@@ -248,7 +248,7 @@ def singer_schema() -> t.RecursiveContainerMapping:
         "type": "SCHEMA",
         "stream": "test_entity",
         "schema": {
-            "type": "t.RecursiveContainer",
+            "type": "object",
             "properties": {
                 "id": {"type": "integer"},
                 "name": {"type": "string"},

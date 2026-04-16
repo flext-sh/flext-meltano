@@ -208,7 +208,7 @@ from flext_meltano import StreamDefinition
 stream = StreamDefinition(
     name="users",
     schema={
-        "type": "t.RecursiveContainer",
+        "type": "object",
         "properties": {
             "id": {"type": "integer"},
             "name": {"type": "string"},
@@ -446,7 +446,7 @@ validators = FlextMeltanoValidators()
 
 # Validate Singer schema
 schema_validation = validators.validate_singer_schema({
-    "type": "t.RecursiveContainer",
+    "type": "object",
     "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
 })
 

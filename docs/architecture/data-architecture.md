@@ -297,13 +297,13 @@ class PipelineConfig:
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "t.RecursiveContainer",
+  "type": "object",
   "oneOf": [
     {
       "properties": {
         "type": { "const": "RECORD" },
         "stream": { "type": "string" },
-        "record": { "type": "t.RecursiveContainer" },
+        "record": { "type": "object" },
         "time_extracted": { "type": "string", "format": "date-time" }
       },
       "required": ["type", "stream", "record"]
@@ -311,7 +311,7 @@ class PipelineConfig:
     {
       "properties": {
         "type": { "const": "STATE" },
-        "value": { "type": "t.RecursiveContainer" }
+        "value": { "type": "object" }
       },
       "required": ["type", "value"]
     },

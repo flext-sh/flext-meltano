@@ -74,7 +74,7 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
         stream_schema: t.RecursiveContainerMapping = {
-            "type": "t.RecursiveContainer",
+            "type": "object",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
         stream_def = m.Meltano.StreamDefinition(
@@ -374,7 +374,7 @@ class TestFlextMeltanoAbstractionsComplete:
         stream = m.Meltano.StreamDefinition(
             stream_name="users",
             stream_schema={
-                "type": "t.RecursiveContainer",
+                "type": "object",
                 "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
             },
             source_type="tap-postgres",

@@ -101,7 +101,7 @@ class TestFlextMeltanoModels:
     def test_stream_info_with_minimal_data(self) -> None:
         stream = m.Meltano.StreamInfo(
             stream_name="users",
-            stream_schema={"type": "t.RecursiveContainer", "properties": "id"},
+            stream_schema={"type": "object", "properties": "id"},
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tm.that(stream.stream_name, eq="users")
@@ -115,7 +115,7 @@ class TestFlextMeltanoModels:
         stream = m.Meltano.StreamInfo(
             stream_name="orders",
             stream_schema={
-                "type": "t.RecursiveContainer",
+                "type": "object",
                 "properties": "id,order_date,amount",
             },
             key_properties=["id"],
@@ -135,7 +135,7 @@ class TestFlextMeltanoModels:
         ):
             m.Meltano.StreamInfo(
                 stream_name="",
-                stream_schema={"type": "t.RecursiveContainer"},
+                stream_schema={"type": "object"},
                 stream_created_at="2025-01-01T00:00:00Z",
             )
 
@@ -320,7 +320,7 @@ class TestFlextMeltanoModels:
     def test_stream_info_with_tap_config_integration(self) -> None:
         stream = m.Meltano.StreamInfo(
             stream_name="users",
-            stream_schema={"type": "t.RecursiveContainer", "properties": "id"},
+            stream_schema={"type": "object", "properties": "id"},
             key_properties=["id"],
             stream_created_at="2025-01-01T00:00:00Z",
         )
