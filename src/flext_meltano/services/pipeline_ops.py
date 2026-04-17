@@ -34,10 +34,12 @@ class FlextMeltanoPipelinePaths:
 
     @staticmethod
     def pipeline_dir(pipeline_name: str) -> Path:
+        """Return the directory path for the given pipeline."""
         return FlextMeltanoPipelinePaths.pipelines_root_dir() / pipeline_name
 
     @staticmethod
     def pipeline_config_path(pipeline_name: str) -> Path:
+        """Return the configuration file path for the given pipeline."""
         return (
             FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
             / FlextMeltanoPipelinePaths._PIPELINE_CONFIG_FILE
@@ -45,6 +47,7 @@ class FlextMeltanoPipelinePaths:
 
     @staticmethod
     def pipeline_pid_path(pipeline_name: str) -> Path:
+        """Return the PID file path for the given pipeline."""
         return (
             FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
             / FlextMeltanoPipelinePaths._PIPELINE_PID_FILE
