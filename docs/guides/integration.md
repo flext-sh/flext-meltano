@@ -279,8 +279,8 @@ ______________________________________________________________________
 
 ### FLEXT Project Integration Status
 
-| Project Category        | Integration Pattern            | Status     | Notes                        |
-| ----------------------- | ------------------------------ | ---------- | ---------------------------- |
+| Project Category        | Integration Pattern            | Status    | Notes                        |
+| ----------------------- | ------------------------------ | --------- | ---------------------------- |
 | **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active  | Working Singer abstractions  |
 | **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active  | Real Meltano integration     |
 | **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |

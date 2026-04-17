@@ -55,6 +55,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.models import FlextMeltanoModels, m
     from flext_meltano.protocols import FlextMeltanoProtocols, p
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+    from flext_meltano.services.abstractions_base import FlextMeltanoAbstractionsBase
     from flext_meltano.services.adapter_extensions import (
         FlextMeltanoDbtAdapter,
         FlextMeltanoPipelineAdapter,
@@ -81,6 +82,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
     from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
     from flext_meltano.services.executor import FlextMeltanoExecutor
+    from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
     from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
     from flext_meltano.services.meltano_dbt_transformation import (
         FlextMeltanoDbtTransformationRunner,
@@ -90,6 +92,13 @@ if _t.TYPE_CHECKING:
     )
     from flext_meltano.services.meltano_plugins import FlextMeltanoComponentService
     from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
+    from flext_meltano.services.pipeline_lifecycle import (
+        FlextMeltanoPipelineLifecycleOperations,
+    )
+    from flext_meltano.services.pipeline_ops import (
+        FlextMeltanoPipelineCrudOperations,
+        FlextMeltanoPipelinePaths,
+    )
     from flext_meltano.services.project_service import FlextMeltanoProjectService
     from flext_meltano.services.services import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
@@ -189,6 +198,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "p",
             ),
             ".services.abstractions": ("FlextMeltanoAbstractions",),
+            ".services.abstractions_base": ("FlextMeltanoAbstractionsBase",),
             ".services.adapter_extensions": (
                 "FlextMeltanoDbtAdapter",
                 "FlextMeltanoPipelineAdapter",
@@ -215,6 +225,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".services.dbt_project": ("FlextMeltanoDbtProjectMixin",),
             ".services.dbt_runner": ("FlextMeltanoDbtRunnerMixin",),
             ".services.executor": ("FlextMeltanoExecutor",),
+            ".services.executor_base": ("FlextMeltanoExecutorBase",),
             ".services.library_runner": ("FlextMeltanoLibraryRunner",),
             ".services.meltano_dbt_transformation": (
                 "FlextMeltanoDbtTransformationRunner",
@@ -222,6 +233,13 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".services.meltano_plugin_discovery": ("FlextMeltanoPluginDiscoveryMixin",),
             ".services.meltano_plugins": ("FlextMeltanoComponentService",),
             ".services.meltano_project_sdk": ("FlextMeltanoProjectManager",),
+            ".services.pipeline_lifecycle": (
+                "FlextMeltanoPipelineLifecycleOperations",
+            ),
+            ".services.pipeline_ops": (
+                "FlextMeltanoPipelineCrudOperations",
+                "FlextMeltanoPipelinePaths",
+            ),
             ".services.project_service": ("FlextMeltanoProjectService",),
             ".services.services": ("FlextMeltanoService",),
             ".services.singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
@@ -280,6 +298,7 @@ __all__: list[str] = [
     "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
+    "FlextMeltanoAbstractionsBase",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
     "FlextMeltanoCLI",
@@ -296,6 +315,7 @@ __all__: list[str] = [
     "FlextMeltanoDbtServiceBase",
     "FlextMeltanoDbtTransformationRunner",
     "FlextMeltanoExecutor",
+    "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
     "FlextMeltanoModels",
     "FlextMeltanoModelsCliParams",
@@ -319,7 +339,10 @@ __all__: list[str] = [
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
     "FlextMeltanoPipelineAdapter",
+    "FlextMeltanoPipelineCrudOperations",
+    "FlextMeltanoPipelineLifecycleOperations",
     "FlextMeltanoPipelineManager",
+    "FlextMeltanoPipelinePaths",
     "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoPluginManager",
     "FlextMeltanoProjectManager",

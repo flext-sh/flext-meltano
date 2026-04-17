@@ -76,13 +76,13 @@ make docs
 
 ### Issue Priority Guide
 
-| Priority    | Action Required | Example Issues                            |
-| ----------- | --------------- | ----------------------------------------- |
+| Priority   | Action Required | Example Issues                            |
+| ---------- | --------------- | ----------------------------------------- |
 | 🚨 Critical | Fix immediately | Missing critical files, broken navigation |
 | 🔴 High     | Fix this week   | Broken internal links, missing structure  |
 | 🟡 Medium   | Fix this month  | Style inconsistencies, long lines         |
 | 🔵 Low      | Nice to fix     | Minor formatting improvements             |
-| ℹ️ Info     | Optional        | Suggestions for enhancement               |
+| ℹ️ Info    | Optional        | Suggestions for enhancement               |
 
 ## 🔧 Common Fixes
 

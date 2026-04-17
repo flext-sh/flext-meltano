@@ -2392,8 +2392,8 @@ end note
 
 ### Maintainability Metrics
 
-| Metric                     | Target            | Current      | Status       |
-| -------------------------- | ----------------- | ------------ | ------------ |
+| Metric                     | Target            | Current      | Status      |
+| -------------------------- | ----------------- | ------------ | ----------- |
 | **Cyclomatic Complexity**  | < 10 per function | 7.2          | ✅ Good      |
 | **Code Coverage**          | > 95%             | 0% (blocked) | ❌ Blocked   |
 | **Technical Debt Ratio**   | < 5%              | 2.1%         | ✅ Excellent |
@@ -2944,11 +2944,11 @@ end note
 
 | Metric                         | Target         | Current  | Status               |
 | ------------------------------ | -------------- | -------- | -------------------- |
-| **API Response Time**          | < 500ms        | ~200ms   | ✅ Good              |
+| **API Response Time**          | < 500ms        | ~200ms   | ✅ Good               |
 | **Error Message Clarity**      | 95% actionable | ~90%     | ⚠️ Needs improvement |
-| **Documentation Completeness** | 100%           | 97%      | ✅ Excellent         |
-| **SDK Adoption Rate**          | > 80%          | N/A      | 📊 To be measured    |
-| **Support Ticket Volume**      | < 5/month      | ~2/month | ✅ Good              |
+| **Documentation Completeness** | 100%           | 97%      | ✅ Excellent          |
+| **SDK Adoption Rate**          | > 80%          | N/A      | 📊 To be measured     |
+| **Support Ticket Volume**      | < 5/month      | ~2/month | ✅ Good               |
 
 ### User Experience Optimization
 
@@ -3444,7 +3444,7 @@ class TestDataBuilder:
         self.data["name"] = name
         return self
 
-    def with_config(
+    def u.with_config(
         self, settings: Dict[str, t.RecursiveContainer]
     ) -> "TestDataBuilder":
         self.data["settings"] = settings
@@ -3464,7 +3464,7 @@ def test_entity_processing():
     entity = (
         TestDataBuilder()
         .with_name("test-entity")
-        .with_config({"key": "value"})
+        .u.with_config({"key": "value"})
         .with_tags("important", "test")
         .build()
     )
@@ -3702,8 +3702,8 @@ class ContractTests:
 
 ### Test Quality Metrics
 
-| Metric                  | Target  | Current      | Status     |
-| ----------------------- | ------- | ------------ | ---------- |
+| Metric                  | Target  | Current      | Status    |
+| ----------------------- | ------- | ------------ | --------- |
 | **Line Coverage**       | 95%     | 0% (blocked) | ❌ Blocked |
 | **Branch Coverage**     | 90%     | N/A          | 📊 Blocked |
 | **Mutation Score**      | 85%     | N/A          | 📊 Blocked |

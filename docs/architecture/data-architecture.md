@@ -449,7 +449,7 @@ ______________________________________________________________________
 | **Data Type Consistency** | Type coercion rules     | Transform or reject       |
 | **Referential Integrity** | Foreign key validation  | Conditional loading       |
 | **Business Rules**        | Custom validation logic | Reject or flag            |
-| **Completeness**          | Required field checks   | Reject incomplete records |
+| **Completeness**          | Required field checks | Reject incomplete records |
 
 ### Data Quality Metrics
 

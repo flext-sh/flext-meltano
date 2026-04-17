@@ -337,7 +337,7 @@ end note
 | Class                    | Purpose                  | Key Methods                           | Dependencies                |
 | ------------------------ | ------------------------ | ------------------------------------- | --------------------------- |
 | **FlextMeltano**         | Main API facade          | Unified public interface              | All service classes         |
-| **FlextMeltanoService**  | Core business logic      | Plugin management, pipeline execution | Adapters, models, settings    |
+| **FlextMeltanoService**  | Core business logic      | Plugin management, pipeline execution | Adapters, models, settings  |
 | **FlextMeltanoAdapter**  | Meltano integration      | CLI operations, project management    | Meltano CLI, file system    |
 | **FlextMeltanoExecutor** | Pipeline orchestration   | Tap/target execution, monitoring      | Singer service, DBT service |
 | **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |

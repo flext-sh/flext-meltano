@@ -54,11 +54,11 @@ flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abst
 
 ### **Current Status**
 
-| Component             | Status       | Details                                    |
-| --------------------- | ------------ | ------------------------------------------ |
+| Component             | Status      | Details                                    |
+| --------------------- | ----------- | ------------------------------------------ |
 | **Architecture**      | 🟢 Compliant | Single class per module pattern            |
 | **FLEXT Integration** | 🟢 Strong    | Extensive flext-core usage                 |
-| **Library Imports**   | ⚠️ Issue     | Direct meltano imports require abstraction |
+| **Library Imports**   | ⚠️ Issue    | Direct meltano imports require abstraction |
 | **Type Safety**       | 🟢 Good      | MyPy compliance in src/                    |
 
 ## 🏗️ Implementation Details

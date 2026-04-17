@@ -14,6 +14,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     build_lazy_import_map(
         {
             ".abstractions": ("FlextMeltanoAbstractions",),
+            ".abstractions_base": ("FlextMeltanoAbstractionsBase",),
             ".adapter_extensions": (
                 "FlextMeltanoDbtAdapter",
                 "FlextMeltanoPipelineAdapter",
@@ -34,11 +35,17 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".dbt_project": ("FlextMeltanoDbtProjectMixin",),
             ".dbt_runner": ("FlextMeltanoDbtRunnerMixin",),
             ".executor": ("FlextMeltanoExecutor",),
+            ".executor_base": ("FlextMeltanoExecutorBase",),
             ".library_runner": ("FlextMeltanoLibraryRunner",),
             ".meltano_dbt_transformation": ("FlextMeltanoDbtTransformationRunner",),
             ".meltano_plugin_discovery": ("FlextMeltanoPluginDiscoveryMixin",),
             ".meltano_plugins": ("FlextMeltanoComponentService",),
             ".meltano_project_sdk": ("FlextMeltanoProjectManager",),
+            ".pipeline_lifecycle": ("FlextMeltanoPipelineLifecycleOperations",),
+            ".pipeline_ops": (
+                "FlextMeltanoPipelineCrudOperations",
+                "FlextMeltanoPipelinePaths",
+            ),
             ".project_service": ("FlextMeltanoProjectService",),
             ".services": ("FlextMeltanoService",),
             ".singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
