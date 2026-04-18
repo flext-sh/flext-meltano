@@ -7,20 +7,7 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 _LAZY_IMPORTS = build_lazy_import_map(
     {
-        ".test_docker_integration": ("test_docker_integration",),
-        "flext_meltano": (
-            "c",
-            "d",
-            "e",
-            "h",
-            "m",
-            "p",
-            "r",
-            "s",
-            "t",
-            "u",
-            "x",
-        ),
+        ".test_docker_integration": ("TestDockerIntegration",),
     },
 )
 
