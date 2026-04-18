@@ -1,8 +1,9 @@
-"""Version and package metadata from project declarations.
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Package version and metadata for flext-meltano.
 
-Single source of truth lives in pyproject.toml.
-This module reads required package metadata directly from the local project
-declarations and fails fast if any mandatory field is missing.
+Subclass of ``FlextVersion`` — overrides only ``_metadata``.
+All derived attributes (``__version__``, ``__title__``, etc.) are
+computed automatically via ``FlextVersion.__init_subclass__``.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,33 +11,27 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import tomllib
-from pathlib import Path
+from importlib.metadata import PackageMetadata, metadata
 
-from flext_core import t
+from flext_core import FlextVersion
 
-_PYPROJECT_PATH = Path(__file__).resolve().parents[2] / "pyproject.toml"
-_PROJECT_METADATA = tomllib.loads(_PYPROJECT_PATH.read_text(encoding="utf-8"))[
-    "project"
-]
-_AUTHOR_METADATA = _PROJECT_METADATA["authors"][0]
 
-__version__ = _PROJECT_METADATA["version"]
-_version_without_metadata = __version__.split("+", maxsplit=1)[0]
-_version_base, _has_prerelease, _prerelease = _version_without_metadata.partition("-")
-_base_parts = _version_base.split(".")
-_prerelease_parts: t.StrSequence = _prerelease.split(".") if _has_prerelease else []
-__version_info__ = tuple(
-    int(part) if part.isdigit() else part for part in _base_parts + _prerelease_parts
-)
-__title__ = _PROJECT_METADATA["name"]
-__description__ = _PROJECT_METADATA["description"]
-__author__ = _AUTHOR_METADATA["name"]
-__author_email__ = _AUTHOR_METADATA["email"]
-__license__ = _PROJECT_METADATA["license"]
-_PROJECT_URLS = _PROJECT_METADATA.get("urls", {})
-__url__ = _PROJECT_URLS.get("Homepage", "")
+class FlextMeltanoVersion(FlextVersion):
+    """flext-meltano version — MRO-derived from FlextVersion."""
+
+    _metadata: PackageMetadata = metadata("flext-meltano")
+
+
+__version__ = FlextMeltanoVersion.__version__
+__version_info__ = FlextMeltanoVersion.__version_info__
+__title__ = FlextMeltanoVersion.__title__
+__description__ = FlextMeltanoVersion.__description__
+__author__ = FlextMeltanoVersion.__author__
+__author_email__ = FlextMeltanoVersion.__author_email__
+__license__ = FlextMeltanoVersion.__license__
+__url__ = FlextMeltanoVersion.__url__
 __all__: list[str] = [
+    "FlextMeltanoVersion",
     "__author__",
     "__author_email__",
     "__description__",
