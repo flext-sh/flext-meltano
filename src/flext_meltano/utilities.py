@@ -7,12 +7,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_infra import FlextInfraUtilities
+from flext_cli import u
 
 from flext_meltano import FlextMeltanoUtilitiesRuntime, FlextMeltanoUtilitiesSinger
 
 
-class FlextMeltanoUtilities(FlextInfraUtilities):
+class FlextMeltanoUtilities(u):
     """DOMAIN-SPECIFIC Meltano utilities.
 
     ONLY what cannot be generalized to flext-core.

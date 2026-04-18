@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flext_cli import FlextCliConstants
+from flext_cli import c
 
 from flext_meltano import (
     FlextMeltanoConstantsBase,
@@ -11,7 +11,7 @@ from flext_meltano import (
 )
 
 
-class FlextMeltanoConstants(FlextCliConstants):
+class FlextMeltanoConstants(c):
     """Domain constants for the flext-meltano package."""
 
     class Meltano(
