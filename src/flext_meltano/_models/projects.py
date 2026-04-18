@@ -118,7 +118,7 @@ class FlextMeltanoModelsProjects:
                 u.normalize(env, case="lower") for env in self.environments
             ]
             prod_envs_list: t.StrSequence = list(prod_environments)
-            return u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
+            return any(u.in_(env, prod_envs_list) for env in normalized_envs)
 
         @u.computed_field()
         @property
@@ -129,7 +129,7 @@ class FlextMeltanoModelsProjects:
                 u.normalize(env, case="lower") for env in self.environments
             ]
             prod_envs_list: t.StrSequence = list(prod_envs)
-            has_prod = u.any_(*[u.in_(env, prod_envs_list) for env in normalized_envs])
+            has_prod = any(u.in_(env, prod_envs_list) for env in normalized_envs)
             env_count = u.count(self.environments)
             if has_prod and env_count >= c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT:
                 return "mature"

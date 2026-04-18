@@ -31,7 +31,7 @@ class FlextMeltanoModelsCore:
                 "items": checks_result.unwrap_or([]),
             }).items
             if checks:
-                return u.any_(*checks)
+                return any(checks)
             return False
 
         protected: t.MutableRecursiveContainerMapping = {}

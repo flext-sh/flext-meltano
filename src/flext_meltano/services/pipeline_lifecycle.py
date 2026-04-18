@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import contextlib
 import os
 import shutil
 import signal
@@ -23,9 +22,8 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
 
     @staticmethod
     def _safe_unlink(path: Path) -> None:
-        """Remove a file, ignoring missing or inaccessible errors."""
-        with contextlib.suppress(FileNotFoundError, OSError):
-            path.unlink()
+        """Remove a file if it exists."""
+        path.unlink(missing_ok=True)
 
     @staticmethod
     def _is_process_running(pid: int) -> bool:
