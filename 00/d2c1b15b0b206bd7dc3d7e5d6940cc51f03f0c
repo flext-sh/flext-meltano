@@ -1,0 +1,14 @@
+tests/unit/test_singer_sdk_adapter.py
+  h_9db9d35f50cf33 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "00d2c1b15b0b206bd7dc3d7e5d6940cc51f03f0c",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
