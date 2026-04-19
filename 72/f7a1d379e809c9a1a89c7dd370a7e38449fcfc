@@ -1,0 +1,116 @@
+tests/unit/test_api.py
+  2a008a39b1ce7c77 20
+src/flext_meltano/_models/discovery.py
+  2a008a39b1ce7c77 19-20,24,68-69,71
+  c2ddf1f7072fae82 6
+tests/unit/test_tap_abstractions.py
+  h_9db9d35f50cf33 429,431
+src/flext_meltano/_models/instances_data.py
+  2a008a39b1ce7c77 91-92,111,118
+  c2ddf1f7072fae82 6
+tests/unit/test_cli_small_managers.py
+  h_9db9d35f50cf33 69,80
+tests/unit/test_services.py
+  2a008a39b1ce7c77 9
+src/flext_meltano/services/singer_catalog.py
+  2a008a39b1ce7c77 49-51
+src/flext_meltano/_models/results.py
+  c2ddf1f7072fae82 6
+  2a008a39b1ce7c77 19-20,45
+src/flext_meltano/settings.py
+  h_9db9d35f50cf33 66
+  2a008a39b1ce7c77 168
+tests/unit/test_executors.py
+  h_9db9d35f50cf33 154,305
+src/flext_meltano/_models/projects_plugin.py
+  2a008a39b1ce7c77 18-19,33,36,39
+  c2ddf1f7072fae82 5
+src/flext_meltano/_models/transformations.py
+  c2ddf1f7072fae82 5
+  2a008a39b1ce7c77 18-19,28,31,35,38,156,160
+src/flext_meltano/_models/context.py
+  c2ddf1f7072fae82 6
+  2a008a39b1ce7c77 19-20,59-60,91
+src/flext_meltano/_models/projects.py
+  c2ddf1f7072fae82 7
+  2a008a39b1ce7c77 20-21,27,42-43,45,62-63,71-72
+src/flext_meltano/base.py
+  h_9db9d35f50cf33 31
+src/flext_meltano/cli.py
+  h_9db9d35f50cf33 10,31-32,38
+  2a008a39b1ce7c77 34-37
+tests/unit/test_models.py
+  h_9db9d35f50cf33 108
+src/flext_meltano/_models/singer.py
+  c2ddf1f7072fae82 5,18
+  2a008a39b1ce7c77 36,40,71-72,80
+src/flext_meltano/_models/core.py
+  2a008a39b1ce7c77 55
+src/flext_meltano/services/executor.py
+  2a008a39b1ce7c77 145
+src/flext_meltano/__version__.py
+  h_9db9d35f50cf33 14,23
+src/flext_meltano/_models/sources.py
+  2a008a39b1ce7c77 22-23,31,75-76,80,128-129,137
+src/flext_meltano/services/executor_base.py
+  h_9db9d35f50cf33 45-46
+pyproject.toml
+  h_9db9d35f50cf33 394
+src/flext_meltano/__init__.py
+  2a008a39b1ce7c77 67-69,99,212-214,242
+src/flext_meltano/_models/payloads_data.py
+  c2ddf1f7072fae82 7
+  2a008a39b1ce7c77 20-21,30,83-84,94
+src/flext_meltano/_models/instances.py
+  2a008a39b1ce7c77 19-20,25,28,69
+  c2ddf1f7072fae82 6
+src/flext_meltano/_models/payloads.py
+  2a008a39b1ce7c77 18-19,25,30-31,36,41-42,48,60-61,66
+  c2ddf1f7072fae82 5
+src/flext_meltano/services/abstractions_base.py
+  h_9db9d35f50cf33 29-30
+src/flext_meltano/_models/singer_catalog.py
+  2a008a39b1ce7c77 20-23,28-29,49,115-116,124
+  c2ddf1f7072fae82 7
+src/flext_meltano/_models/results_pipeline.py
+  2a008a39b1ce7c77 18-19,45
+  c2ddf1f7072fae82 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "72f7a1d379e809c9a1a89c7dd370a7e38449fcfc",
+  "prompts": {
+    "2a008a39b1ce7c77": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "234d2634-32e6-47bf-99b1-de4c2dbf1d3c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 326,
+      "total_deletions": 124,
+      "accepted_lines": 290,
+      "overriden_lines": 4
+    },
+    "c2ddf1f7072fae82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f88112c-8a58-4dbb-a64c-e1e7cf9155e2",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 14,
+      "total_deletions": 13,
+      "accepted_lines": 14,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
