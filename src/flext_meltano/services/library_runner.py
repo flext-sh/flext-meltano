@@ -37,7 +37,7 @@ class FlextMeltanoLibraryRunner(
         tap_name: str,
         target_name: str,
         dbt_models: t.StrSequence | None = None,
-        settings: t.RecursiveContainerMapping | None = None,
+        settings: Mapping[str, t.Container] | None = None,
     ) -> p.Result[t.MutableRecursiveContainerMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
@@ -101,7 +101,7 @@ class FlextMeltanoLibraryRunner(
         self,
         tap: p.Meltano.SingerTap,
         target: p.Meltano.SingerTarget,
-        settings: t.RecursiveContainerMapping | None = None,
+        settings: Mapping[str, t.Container] | None = None,
     ) -> p.Result[t.MutableRecursiveContainerMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:

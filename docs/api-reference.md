@@ -93,7 +93,7 @@ class FlextMeltanoService(s):
 
         Args:
             project_root: Path to Meltano project root directory
-            settings: Service configuration t.RecursiveContainer
+            settings: Service configuration t.Container
         """
 ```
 
@@ -144,7 +144,7 @@ def install_plugin(
 
 ```python
 def execute_tap(
-    self, tap_name: str, settings: t.Dict | None = None, state: t.Dict | None = None
+    self, tap_name: str, settings: m.Dict | None = None, state: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.TapExecutionResult]:
     """Execute a Singer tap with configuration and state.
 
@@ -164,7 +164,7 @@ def execute_tap(
 
 ```python
 def execute_target(
-    self, target_name: str, records: Sequence[t.Dict], settings: t.Dict | None = None
+    self, target_name: str, records: Sequence[m.Dict], settings: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.TargetExecutionResult]:
     """Execute a Singer target with records.
 
@@ -198,7 +198,7 @@ class FlextMeltanoAdapter(s):
 
 ```python
 def run_pipeline(
-    self, tap_name: str, target_name: str, settings: t.Dict | None = None
+    self, tap_name: str, target_name: str, settings: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.PipelineResult]:
     """Execute complete ELT pipeline from tap to target.
 
@@ -303,7 +303,7 @@ class FlextSingerTap(s):
     """Singer tap implementation with discovery, sync, and state management."""
 
     def __init__(
-        self, tap_name: str, settings: t.Dict, state: t.Dict | None = None
+        self, tap_name: str, settings: m.Dict, state: m.Dict | None = None
     ) -> None:
         """Initialize Singer tap.
 
@@ -342,7 +342,7 @@ def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
 
 ```python
 def sync(
-    self, streams: t.StringList | None = None, state: t.Dict | None = None
+    self, streams: t.StringList | None = None, state: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.SyncResult]:
     """Execute tap synchronization.
 
@@ -376,7 +376,7 @@ def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
 class FlextSingerTarget(s):
     """Singer target implementation with batch processing and error handling."""
 
-    def __init__(self, target_name: str, settings: t.Dict) -> None:
+    def __init__(self, target_name: str, settings: m.Dict) -> None:
         """Initialize Singer target."""
 ```
 
@@ -388,7 +388,7 @@ class FlextSingerTarget(s):
 
 ```python
 def load_records(
-    self, records: Sequence[t.Dict]
+    self, records: Sequence[m.Dict]
 ) -> p.Result[FlextMeltanoModels.LoadResult]:
     """Load records into the target.
 
@@ -838,7 +838,7 @@ def project_config(self) -> FlextMeltanoModels.ProjectConfig:
 
 ```python
 @property
-def plugin_configs(self) -> Mapping[str, t.Dict]:
+def plugin_configs(self) -> Mapping[str, m.Dict]:
     """Get plugin-specific configurations."""
 ```
 
@@ -886,7 +886,7 @@ class PluginInfo(FlextBaseModel):
     variant: str
     pip_url: str | None = None
     executable: str | None = None
-    settings: t.Dict | None = None
+    settings: m.Dict | None = None
     version: str | None = None
 ```
 
@@ -921,7 +921,7 @@ class TapExecutionResult(FlextBaseModel):
     records_extracted: int = 0
     streams_discovered: int = 0
     execution_time: float = 0.0
-    state: t.Dict | None = None
+    state: m.Dict | None = None
     error: str | None = None
 ```
 
@@ -950,7 +950,7 @@ class PipelineResult(FlextBaseModel):
     success: bool
     tap_result: TapExecutionResult | None = None
     target_result: TargetExecutionResult | None = None
-    transformer_result: t.Dict | None = None
+    transformer_result: m.Dict | None = None
     execution_time: float = 0.0
     error: str | None = None
 ```

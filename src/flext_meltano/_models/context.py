@@ -19,7 +19,7 @@ class FlextMeltanoModelsContext:
         _flext_enforcement_exempt: ClassVar[bool] = True
 
         project_root: Annotated[str, u.Field(description="Project root path")]
-        elt_context: t.RecursiveContainerMapping = u.Field(
+        elt_context: Mapping[str, t.Container] = u.Field(
             default_factory=dict, description="ELT execution context"
         )
         extractor_name: Annotated[str, u.Field(description="Extractor name")]
@@ -27,7 +27,7 @@ class FlextMeltanoModelsContext:
         execution_completed: Annotated[
             bool, u.Field(default=False, description="Execution completion flag")
         ] = False
-        execution_result: t.RecursiveContainerMapping = u.Field(
+        execution_result: Mapping[str, t.Container] = u.Field(
             default_factory=dict, description="Execution result payload"
         )
 
@@ -35,13 +35,13 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_mapping_payloads(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.RecursiveContainerMapping:
+        ) -> Mapping[str, t.Container]:
             """Normalize mapping-like payloads into dictionaries."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty: t.RecursiveContainerMapping = {}
+                    empty: Mapping[str, t.Container] = {}
                     return empty
 
         @u.field_validator(
@@ -61,7 +61,7 @@ class FlextMeltanoModelsContext:
         project_root: Annotated[
             str, u.Field(default=c.IDENTIFIER_UNKNOWN, description="Project root path")
         ] = c.IDENTIFIER_UNKNOWN
-        execution_result: t.RecursiveContainerMapping = u.Field(
+        execution_result: Mapping[str, t.Container] = u.Field(
             default_factory=dict, description="Execution result payload"
         )
 
@@ -69,13 +69,13 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_execution_result(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.RecursiveContainerMapping:
+        ) -> Mapping[str, t.Container]:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty: t.RecursiveContainerMapping = {}
+                    empty: Mapping[str, t.Container] = {}
                     return empty
 
         @u.field_validator("project_root", mode="before")

@@ -127,12 +127,12 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
         self.output.print_message("Target commands: run, test")
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute CLI service."""
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "status": c.Meltano.StreamStatus.COMPLETED,
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
 
 def main() -> int:

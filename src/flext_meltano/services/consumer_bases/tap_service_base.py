@@ -48,7 +48,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextSettings | t.RecursiveContainerMapping | None = None,
+        settings: FlextSettings | Mapping[str, t.Container] | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for tap facades."""
         super().__init__(settings=settings)
@@ -63,7 +63,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     @abstractmethod
     def create_tap_instance(
         self,
-        settings: t.RecursiveContainerMapping | None = None,
+        settings: Mapping[str, t.Container] | None = None,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -151,9 +151,9 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         return self._tap_instance
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute tap service — returns status."""
-        return r[t.RecursiveContainerMapping].ok({
+        return r[Mapping[str, t.Container]].ok({
             "service": self.tap_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "tap",

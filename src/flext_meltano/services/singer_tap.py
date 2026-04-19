@@ -77,8 +77,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: t.RecursiveContainerMapping,
-        stream_config: t.RecursiveContainerMapping | None = None,
+        connection_config: Mapping[str, t.Container],
+        stream_config: Mapping[str, t.Container] | None = None,
         tap_version: str = "1.0.0",
     ) -> p.Result[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Annotated
 
 from flext_cli import m, u
@@ -15,8 +15,8 @@ class FlextMeltanoModelsCore:
 
     @staticmethod
     def protect_sensitive_config(
-        value: t.RecursiveContainerMapping,
-    ) -> t.RecursiveContainerMapping:
+        value: Mapping[str, t.Container],
+    ) -> Mapping[str, t.Container]:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 

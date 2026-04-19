@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar, Literal
 
@@ -20,7 +20,7 @@ class FlextMeltanoModelsSingerCatalog:
         _flext_enforcement_exempt: ClassVar[bool] = True
 
         breadcrumb: t.StrSequence = u.Field(default_factory=tuple)
-        metadata: t.RecursiveContainerMapping = u.Field(default_factory=dict)
+        metadata: Mapping[str, t.Container] = u.Field(default_factory=dict)
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
@@ -121,7 +121,7 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, u.Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: t.RecursiveContainerMapping = u.Field(default_factory=dict)
+        state: Mapping[str, t.Container] = u.Field(default_factory=dict)
         duration_seconds: Annotated[
             t.NonNegativeFloat, u.Field(description="Execution duration")
         ]

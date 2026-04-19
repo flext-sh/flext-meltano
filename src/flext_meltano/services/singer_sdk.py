@@ -28,7 +28,7 @@ class FlextMeltanoSingerTapAdapter:
         self._tap = tap
 
     @property
-    def settings(self) -> t.RecursiveContainerMapping:
+    def settings(self) -> Mapping[str, t.Container]:
         """Expose the tap configuration through the internal contract."""
         config_source = getattr(self._tap, "config", None)
         empty_source: Mapping[str, t.ValueOrModel] = {}
@@ -41,13 +41,13 @@ class FlextMeltanoSingerTapAdapter:
                 if isinstance(settings_source, Mapping)
                 else empty_source
             )
-        normalized: dict[str, t.RecursiveContainer] = {}
+        normalized: dict[str, t.Container] = {}
         for key, value in source.items():
             normalized[str(key)] = self._normalize_recursive(value)
         return normalized
 
     @staticmethod
-    def _normalize_recursive(value: t.ValueOrModel) -> t.RecursiveContainer:
+    def _normalize_recursive(value: t.ValueOrModel) -> t.Container:
         """Normalize Singer config values into recursive container contracts."""
         if isinstance(value, t.CONTAINER_TYPES):
             return value

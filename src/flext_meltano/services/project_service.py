@@ -119,7 +119,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         params = params_r.value
         try:
             temp_path = Path(tempfile.mkdtemp(prefix=str(params["prefix"])))
-            settings: t.RecursiveContainerMapping = {
+            settings: Mapping[str, t.Container] = {
                 "version": c.Meltano.PLUGIN_CONFIG_VERSION,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                 "project_id": str(params["project_id"]),
@@ -128,9 +128,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                         "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                         "settings": {
                             "plugins": {
-                                "extractors": list[t.RecursiveContainerMapping](),
-                                "loaders": list[t.RecursiveContainerMapping](),
-                                "transformers": list[t.RecursiveContainerMapping](),
+                                "extractors": list[Mapping[str, t.Container]](),
+                                "loaders": list[Mapping[str, t.Container]](),
+                                "transformers": list[Mapping[str, t.Container]](),
                             },
                         },
                     },
@@ -160,17 +160,17 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def build_service_execution_payload(
         service_type: str,
         meltano_config: p.Settings,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Build normalized execution payload for service health responses."""
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "status": c.Meltano.OperationStatus.READY,
             "service_type": service_type,
             "settings": meltano_config.model_dump(),
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
             "flext_meltano_project_service", self.settings
@@ -180,7 +180,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return result
         error_msg = result.error or "Project service execution failed"
         self.logger.error(error_msg)
-        return r[t.RecursiveContainerMapping].fail(error_msg)
+        return r[Mapping[str, t.Container]].fail(error_msg)
 
     def initialize_project(self, project_root: Path) -> p.Result[t.Meltano.DbtProject]:
         """Initialize Meltano project using railway pattern validation chain."""

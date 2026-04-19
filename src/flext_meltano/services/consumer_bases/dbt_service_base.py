@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
@@ -47,7 +47,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextSettings | t.RecursiveContainerMapping | None = None,
+        settings: FlextSettings | Mapping[str, t.Container] | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(settings=settings)
@@ -61,7 +61,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     @property
     @abstractmethod
-    def connection_profile(self) -> t.RecursiveContainerMapping:
+    def connection_profile(self) -> Mapping[str, t.Container]:
         """Dbt connection profile for this project.
 
         Consumer implements with domain-specific connection settings
@@ -229,9 +229,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             return r[Sequence[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute dbt service — returns status."""
-        return r[t.RecursiveContainerMapping].ok({
+        return r[Mapping[str, t.Container]].ok({
             "service": self.dbt_project_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "dbt",

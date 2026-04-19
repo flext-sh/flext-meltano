@@ -20,7 +20,7 @@ from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase(s[t.RecursiveContainerMapping]):
+class FlextMeltanoServiceBase(s[Mapping[str, t.Container]]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -63,7 +63,7 @@ class FlextMeltanoServiceBase(s[t.RecursiveContainerMapping]):
 
     def __init__(
         self,
-        settings: FlextSettings | t.RecursiveContainerMapping | None = None,
+        settings: FlextSettings | Mapping[str, t.Container] | None = None,
         *,
         settings_type: type[FlextSettings] | None = None,
         initial_context: p.Context | None = None,
@@ -83,7 +83,7 @@ class FlextMeltanoServiceBase(s[t.RecursiveContainerMapping]):
     ) -> None:
         """Accept canonical settings input and pass typed runtime state forward."""
         runtime_settings = settings if isinstance(settings, FlextSettings) else None
-        normalized_overrides: t.RecursiveContainerMapping | None = None
+        normalized_overrides: Mapping[str, t.Container] | None = None
         if isinstance(settings, Mapping) and runtime_settings is None:
             normalized_overrides = {str(key): value for key, value in settings.items()}
         super().__init__(

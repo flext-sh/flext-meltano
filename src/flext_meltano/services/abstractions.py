@@ -31,14 +31,14 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def build_tap_instance(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> t.RecursiveContainerMapping:
+    ) -> Mapping[str, t.Container]:
         """Build tap instance representation."""
         return {"tap_id": tap_instance.tap_id, "tap_type": tap_instance.tap_type}
 
     def discover_streams(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Discover available streams via ``meltano select --list``."""
         try:
             cmd_result = self._run_meltano(
@@ -50,10 +50,10 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 ],
             )
             if cmd_result.failure:
-                return r[t.RecursiveContainerMapping].fail(
+                return r[Mapping[str, t.Container]].fail(
                     cmd_result.error or "Stream discovery failed",
                 )
-            stream_defs: list[t.RecursiveContainerMapping] = []
+            stream_defs: list[Mapping[str, t.Container]] = []
             for line in cmd_result.value.splitlines():
                 name = line.strip()
                 if name and not name.startswith("["):
@@ -64,19 +64,19 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                             stream_schema={"type": "object", "properties": {}},
                             source_type=tap_instance.tap_type,
                         )
-            payload: t.RecursiveContainerMapping = {"streams": stream_defs}
-            return r[t.RecursiveContainerMapping].ok(payload)
+            payload: Mapping[str, t.Container] = {"streams": stream_defs}
+            return r[Mapping[str, t.Container]].ok(payload)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover streams: {e}"
             self.logger.exception(error_msg)
-            return r[t.RecursiveContainerMapping].fail(error_msg)
+            return r[Mapping[str, t.Container]].fail(error_msg)
 
     def sync_stream(
         self,
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,
         target_config: m.Meltano.TargetConfig | None = None,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Sync a single stream via ``meltano elt`` with stream selection."""
         try:
             loader_name = (
@@ -97,26 +97,26 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 if cmd_result.success
                 else c.Meltano.StreamStatus.FAILED
             )
-            result: t.RecursiveContainerMapping = {
+            result: Mapping[str, t.Container] = {
                 "stream_name": stream_name,
                 "status": status,
                 "target_loaded": target_config is not None,
             }
             if cmd_result.failure:
-                return r[t.RecursiveContainerMapping].fail(
+                return r[Mapping[str, t.Container]].fail(
                     cmd_result.error or "Stream sync failed"
                 )
-            return r[t.RecursiveContainerMapping].ok(result)
+            return r[Mapping[str, t.Container]].ok(result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to sync stream {stream_name}: {e}"
             self.logger.exception(error_msg)
-            return r[t.RecursiveContainerMapping].fail(error_msg)
+            return r[Mapping[str, t.Container]].fail(error_msg)
 
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: t.RecursiveContainerMapping,
-        stream_config: t.RecursiveContainerMapping | None = None,
+        connection_config: Mapping[str, t.Container],
+        stream_config: Mapping[str, t.Container] | None = None,
     ) -> p.Result[m.Meltano.TapInstance]:
         """Create a TapInstance from configuration."""
         try:
@@ -137,15 +137,15 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def generate_catalog(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Generate Singer catalog by discovering streams from the tap."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
-            return r[t.RecursiveContainerMapping].fail(
+            return r[Mapping[str, t.Container]].fail(
                 discovery.error or "Catalog generation failed"
             )
         raw = discovery.value
-        streams: list[t.RecursiveContainerMapping] = []
+        streams: list[Mapping[str, t.Container]] = []
         for s in self._extract_raw_streams(raw):
             name = str(s.get("stream_name", ""))
             if name in self._stream_registry:
@@ -154,28 +154,28 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 )
                 if entry_r.success:
                     streams.append(entry_r.value)
-        catalog: t.RecursiveContainerMapping = {"version": 1, "streams": streams}
-        return r[t.RecursiveContainerMapping].ok(catalog)
+        catalog: Mapping[str, t.Container] = {"version": 1, "streams": streams}
+        return r[Mapping[str, t.Container]].ok(catalog)
 
     def fetch_stream_by_name(
         self,
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Get stream definition by name."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
-            return r[t.RecursiveContainerMapping].fail(
+            return r[Mapping[str, t.Container]].fail(
                 discovery.error or "Discovery failed"
             )
         for stream in self._extract_raw_streams(discovery.value):
             if stream.get("stream_name") == stream_name:
-                result_stream: t.RecursiveContainerMapping = {
+                result_stream: Mapping[str, t.Container] = {
                     **stream,
                     "name": stream_name,
                 }
-                return r[t.RecursiveContainerMapping].ok(result_stream)
-        return r[t.RecursiveContainerMapping].fail(f"Stream '{stream_name}' not found")
+                return r[Mapping[str, t.Container]].ok(result_stream)
+        return r[Mapping[str, t.Container]].fail(f"Stream '{stream_name}' not found")
 
     def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
         """List stream names available in tap instance."""
@@ -189,8 +189,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     @staticmethod
     def _extract_raw_streams(
-        raw: t.RecursiveContainerMapping,
-    ) -> list[t.RecursiveContainerMapping]:
+        raw: Mapping[str, t.Container],
+    ) -> list[Mapping[str, t.Container]]:
         """Extract stream dicts from a discovery result mapping."""
         if isinstance(raw, dict):
             raw_val = raw.get("streams")

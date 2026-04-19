@@ -77,64 +77,64 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, settings: t.RecursiveContainerMapping | None = None
-    ) -> p.Result[t.RecursiveContainerMapping]:
+        environment_name: str, settings: Mapping[str, t.Container] | None = None
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Configure environment."""
         if not environment_name:
-            return r[t.RecursiveContainerMapping].fail("Environment name is required")
+            return r[Mapping[str, t.Container]].fail("Environment name is required")
         if environment_name not in c.Meltano.ENVIRONMENTS_VALID:
-            return r[t.RecursiveContainerMapping].fail(
+            return r[Mapping[str, t.Container]].fail(
                 "Invalid environment: "
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "environment": environment_name,
             "configuration": settings or {},
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
     @staticmethod
     def configure_pipeline(
         source_name: str,
         sink_name: str,
-        _config: t.RecursiveContainerMapping | None = None,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+        _config: Mapping[str, t.Container] | None = None,
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Configure generic data pipeline."""
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
     @staticmethod
     def install_component(
         component_type: str,
         component_name: str,
-        settings: t.RecursiveContainerMapping | None = None,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+        settings: Mapping[str, t.Container] | None = None,
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
-            return r[t.RecursiveContainerMapping].fail(
+            return r[Mapping[str, t.Container]].fail(
                 "Component type and name are required"
             )
         if component_type not in c.Meltano.COMPONENT_TYPES_VALID:
-            return r[t.RecursiveContainerMapping].fail(
+            return r[Mapping[str, t.Container]].fail(
                 f"Invalid component type: {component_type}"
             )
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,
             "component_type": component_type,
             "configuration": settings or {},
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
     @staticmethod
     def validate_service_config(
-        settings: t.RecursiveContainerMapping,
+        settings: Mapping[str, t.Container],
     ) -> p.Result[bool]:
         """Validate service configuration dictionary."""
         if not u.guard(settings, dict):
@@ -142,19 +142,19 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         return r[bool].ok(value=True)
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute service with railway pattern."""
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "status": c.CommonStatus.ACTIVE,
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "handlers": list(c.Meltano.HANDLER_ALL),
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
-    def fetch_default_config(self) -> p.Result[t.RecursiveContainerMapping]:
+    def fetch_default_config(self) -> p.Result[Mapping[str, t.Container]]:
         """Get default configuration from current settings."""
-        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
+        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
 
     def fetch_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""

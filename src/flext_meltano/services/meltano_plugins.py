@@ -59,9 +59,9 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         )
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute the pipeline component service."""
-        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
+        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
 
     def _build_plugin_addition_result(
         self,
@@ -91,7 +91,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         plugin_name: str,
     ) -> p.Result[bool]:
         """Execute the actual plugin addition using abstraction layer."""
-        plugin_config: t.RecursiveContainerMapping = {
+        plugin_config: Mapping[str, t.Container] = {
             "project_root": str(project.root_dir),
             "plugin_type": plugin_type_str,
             "plugin_name": plugin_name,

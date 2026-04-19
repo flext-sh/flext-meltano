@@ -334,7 +334,7 @@ import pytest
 
 
 @pytest.fixture
-def typed_fixture() -> t.Dict:
+def typed_fixture() -> m.Dict:
     """Properly typed fixture with clear return type."""
     return {"key": "value", "count": 42, "items": ["a", "b", "c"]}
 

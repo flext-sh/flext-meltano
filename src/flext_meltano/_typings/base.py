@@ -23,22 +23,22 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[u.TypeAdapter[t.RecursiveContainerMapping]] = (
-        u.TypeAdapter(t.RecursiveContainerMapping)
+    CONTAINER_MAP_ADAPTER: ClassVar[u.TypeAdapter[Mapping[str, t.Container]]] = (
+        u.TypeAdapter(Mapping[str, t.Container])
     )
     CONTAINER_MAP_LIST_ADAPTER: ClassVar[
-        u.TypeAdapter[list[t.RecursiveContainerMapping]]
-    ] = u.TypeAdapter(list[t.RecursiveContainerMapping])
+        u.TypeAdapter[list[Mapping[str, t.Container]]]
+    ] = u.TypeAdapter(list[Mapping[str, t.Container]])
     INTEGER_ADAPTER: ClassVar[u.TypeAdapter[t.IntegerValue]] = u.TypeAdapter(
         t.IntegerValue
     )
 
     type ValidatorInput = (
-        t.RecursiveContainerMapping
-        | Mapping[str, t.RecursiveContainerMapping | None]
-        | Sequence[t.RecursiveContainerMapping | None]
-        | tuple[t.RecursiveContainerMapping | None, ...]
-        | set[t.RecursiveContainerMapping | None]
+        Mapping[str, t.Container]
+        | Mapping[str, Mapping[str, t.Container] | None]
+        | Sequence[Mapping[str, t.Container] | None]
+        | tuple[Mapping[str, t.Container] | None, ...]
+        | set[Mapping[str, t.Container] | None]
         | None
     )
 
@@ -57,7 +57,7 @@ class FlextMeltanoTypingsBase:
 
     type FileConfigDict = Mapping[
         str,
-        t.RecursiveContainer | t.StrSequence,
+        t.Container | t.StrSequence,
     ]
     type PathDict = Mapping[str, str | Path]
 

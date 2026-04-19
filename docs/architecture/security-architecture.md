@@ -261,7 +261,7 @@ class AccessRequest:
     subject: User
     action: str  # 'read', 'write', 'execute', 'delete'
     resource: str  # 'pipeline:123', 'source:github', etc.
-    context: Dict[str, t.RecursiveContainer]  # environment, time, location, etc.
+    context: Dict[str, t.Container]  # environment, time, location, etc.
 
 
 class ABACPolicy:
@@ -297,9 +297,7 @@ class SessionManager:
         self.redis = redis_client
         self.session_timeout = session_timeout
 
-    def create_session(
-        self, user_id: str, metadata: Dict[str, t.RecursiveContainer]
-    ) -> str:
+    def create_session(self, user_id: str, metadata: Dict[str, t.Container]) -> str:
         """Create new user session."""
         session_id = self._generate_secure_session_id()
         session_data = {
@@ -320,7 +318,7 @@ class SessionManager:
 
     def validate_session(
         self, session_id: str, ip_address: str
-    ) -> Optional[Dict[str, t.RecursiveContainer]]:
+    ) -> Optional[Dict[str, t.Container]]:
         """Validate session and update activity."""
         session_key = f"session:{session_id}"
         session_data = self.redis.get(session_key)
@@ -489,7 +487,7 @@ class DataClassification:
     retention_period_days: int = 2555  # 7 years default
     audit_required: bool = False
 
-    def get_handling_requirements(self) -> Dict[str, t.RecursiveContainer]:
+    def get_handling_requirements(self) -> Dict[str, t.Container]:
         """Get data handling requirements based on classification."""
         requirements = {
             "public": {
@@ -763,7 +761,7 @@ class SecurityAuditor:
     def log_security_event(
         self,
         event_type: str,
-        details: Dict[str, t.RecursiveContainer],
+        details: Dict[str, t.Container],
         severity: str = "INFO",
     ) -> None:
         """Log security event with structured data."""
@@ -849,7 +847,7 @@ class DataPrivacyController:
 
         return r.fail(ValidationError("Invalid request type"))
 
-    def _collect_user_data(self, user_id: str) -> Dict[str, t.RecursiveContainer]:
+    def _collect_user_data(self, user_id: str) -> Dict[str, t.Container]:
         """Collect all user data for export."""
         return {
             'personal_data': self.data_store.get_user_profile(user_id),

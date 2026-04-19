@@ -120,7 +120,7 @@ PYTHONPATH=src poetry run python -c "import sys; print('Basic import works')"
 **Root Cause Analysis:**
 
 - flext-meltano models inherit from `FlextModels.BaseModel`
-- Confirmed error: `AttributeError: type t.RecursiveContainer 'FlextModels' has no attribute 'BaseModel'`
+- Confirmed error: `AttributeError: type t.Container 'FlextModels' has no attribute 'BaseModel'`
 - flext-core v1.0.0 changed BaseModel implementation or removed it
 - Import fails during test collection: `class TapRunParams(FlextModels.BaseModel)`
 

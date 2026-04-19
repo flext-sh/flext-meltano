@@ -40,7 +40,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Execute a Meltano runtime command.
 
         Args:
@@ -58,16 +58,16 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
                 cmd.append(f"--{k}={v}")
         command_result = executor.execute_meltano_command(cmd)
         if command_result.failure:
-            return r[t.RecursiveContainerMapping].fail(
+            return r[Mapping[str, t.Container]].fail(
                 command_result.error or "Command failed",
             )
         command_execution = command_result.value
-        result: t.RecursiveContainerMapping = {
+        result: Mapping[str, t.Container] = {
             "command": command,
             "output": command_execution.output,
             "error": command_execution.error,
         }
-        return r[t.RecursiveContainerMapping].ok(result)
+        return r[Mapping[str, t.Container]].ok(result)
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
@@ -75,9 +75,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return FlextMeltanoExecutorBase.fetch_version()
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute bridge service returning current settings."""
-        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
+        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
 
 
 __all__: list[str] = ["FlextMeltanoBridge"]

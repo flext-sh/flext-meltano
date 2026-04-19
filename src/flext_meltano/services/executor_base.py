@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path
@@ -50,7 +50,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | t.RecursiveContainerMapping | None = None,
+        settings: FlextMeltanoSettings | Mapping[str, t.Container] | None = None,
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
@@ -193,16 +193,16 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ]
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute the Meltano executor service."""
-        config_data: t.RecursiveContainerMapping = {
+        config_data: Mapping[str, t.Container] = {
             "status": c.Meltano.OperationStatus.READY,
             "executor_type": "flext_meltano_executor",
             "execution_timestamp": str(time.time()),
             "settings": self.settings.model_dump(),
         }
         self.logger.info("FlextMeltanoExecutor executed successfully")
-        return r[t.RecursiveContainerMapping].ok(config_data)
+        return r[Mapping[str, t.Container]].ok(config_data)
 
     def execute_meltano_command(
         self,
@@ -325,7 +325,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-        _config: t.RecursiveContainerMapping | None = None,
+        _config: Mapping[str, t.Container] | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:

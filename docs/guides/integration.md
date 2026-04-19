@@ -128,7 +128,7 @@ class FlextOracleTargetService(s):
         super().__init__()
         self._target_abstractions = FlextMeltanoTargetAbstractions()
 
-    def load_to_oracle(self, records: list, settings: dict) -> p.Result[t.Dict]:
+    def load_to_oracle(self, records: list, settings: dict) -> p.Result[m.Dict]:
         """Load records to Oracle using flext-meltano abstractions."""
         return self._target_abstractions.load_data("target-oracle", records)
 ```
@@ -172,7 +172,7 @@ class FlextOracleDbtService(s):
         super().__init__()
         self._dbt_service = FlextMeltanoDbtService()
 
-    def run_oracle_models(self, models: t.StringList) -> p.Result[t.Dict]:
+    def run_oracle_models(self, models: t.StringList) -> p.Result[m.Dict]:
         """Execute Oracle-specific dbt models."""
         # Note: Current implementation returns placeholder data
         return self._dbt_service.execute_dbt_operation()
@@ -221,7 +221,7 @@ class EnterpriseELTService(s):
 
     def execute_elt_pipeline(
         self, tap_name: str, target_name: str, dbt_models: t.StringList = None
-    ) -> p.Result[t.Dict]:
+    ) -> p.Result[m.Dict]:
         """Execute complete ELT pipeline."""
 
         # 1. Extract and Load using Meltano
@@ -236,7 +236,7 @@ class EnterpriseELTService(s):
             if transform_result.failure:
                 return transform_result
 
-        return r[t.Dict].ok({
+        return r[m.Dict].ok({
             "pipeline": pipeline_result.unwrap(),
             "models_executed": dbt_models or [],
         })
@@ -434,7 +434,7 @@ settings = builder.build_pipeline_config(tap_settings, target_settings)
 # Consistent r patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
 if result.failure:
-    return r[t.Dict].fail(f"Integration failed: {result.error}")
+    return r[m.Dict].fail(f"Integration failed: {result.error}")
 ```
 
 ### Quality Standards

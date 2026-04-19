@@ -77,7 +77,7 @@ class FlextMeltanoModelsSourcesParams:
 
         stream_name: Annotated[str, u.Field(description="Name of the stream")]
         stream_schema: Annotated[
-            t.RecursiveContainerMapping,
+            Mapping[str, t.Container],
             u.Field(description="JSON schema for the stream"),
         ]
         source_type: Annotated[
@@ -120,15 +120,15 @@ class FlextMeltanoModelsSourcesParams:
 
         @u.field_serializer("stream_schema")
         def serialize_stream_schema(
-            self, value: t.RecursiveContainerMapping
-        ) -> t.RecursiveContainerMapping:
+            self, value: Mapping[str, t.Container]
+        ) -> Mapping[str, t.Container]:
             """Normalize stream schema structure."""
             result: t.MutableRecursiveContainerMapping = dict(value)
             if "properties" not in result:
                 empty: t.MutableRecursiveContainerMapping = {}
                 result["properties"] = empty
             if "type" not in result:
-                result["type"] = "t.RecursiveContainer"
+                result["type"] = "t.Container"
             return result
 
         @u.model_validator(mode="after")

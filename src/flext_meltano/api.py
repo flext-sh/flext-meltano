@@ -90,16 +90,16 @@ class FlextMeltano(
     Dbt = dbt
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute Meltano service with railway pattern."""
-        payload: t.RecursiveContainerMapping = {
+        payload: Mapping[str, t.Container] = {
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,
             "timestamp": u.generate_iso_timestamp(),
             "handlers": list(c.Meltano.HANDLER_ALL),
         }
-        return r[t.RecursiveContainerMapping].ok(payload)
+        return r[Mapping[str, t.Container]].ok(payload)
 
 
 meltano = FlextMeltano.fetch_instance()

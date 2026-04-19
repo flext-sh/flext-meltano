@@ -187,7 +187,7 @@ from examples import c, t
 from flext_meltano import meltano
 
 
-def demonstrate_pattern() -> t.RecursiveContainerMapping:
+def demonstrate_pattern() -> Mapping[str, t.Container]:
     """Demonstrate specific pattern with clear documentation.
 
     Returns:

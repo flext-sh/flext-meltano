@@ -33,13 +33,13 @@ class FlextMeltanoModelsPayloadsData:
         @classmethod
         def normalize_schema(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.RecursiveContainerMapping:
+        ) -> Mapping[str, t.Container]:
             """Normalize mapping input before JSON validation."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty_schema: t.RecursiveContainerMapping = {}
+                    empty_schema: Mapping[str, t.Container] = {}
                     return empty_schema
 
     class JsonRecordBatchPayload(m.ArbitraryTypesModel):

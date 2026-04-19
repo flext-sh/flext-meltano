@@ -266,8 +266,8 @@ def install_plugin(
 ```python
 def execute_tap(
     tap_name: str,
-    settings: t.Dict,
-    state: t.Dict | None = None,
+    settings: m.Dict,
+    state: m.Dict | None = None,
     streams: t.StringList | None = None,
 ) -> p.Result[TapExecutionResult]:
     """Execute Singer tap with configuration.
@@ -287,7 +287,7 @@ def execute_tap(
 
 ```python
 def execute_target(
-    target_name: str, records: Sequence[t.Dict], settings: t.Dict
+    target_name: str, records: Sequence[m.Dict], settings: m.Dict
 ) -> p.Result[TargetExecutionResult]:
     """Execute Singer target with records.
 

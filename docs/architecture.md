@@ -274,8 +274,8 @@ class TapConfig(m.BaseModel):
     """Type-safe tap configuration model."""
 
     tap_type: str
-    connection_config: t.Dict
-    stream_config: t.Dict | None = None
+    connection_config: m.Dict
+    stream_config: m.Dict | None = None
     version: str | None = None
 
 
@@ -283,7 +283,7 @@ class StreamDefinition(m.BaseModel):
     """Type-safe stream definition model."""
 
     stream_name: str
-    stream_schema: t.Dict
+    stream_schema: m.Dict
     tap_type: str
     status: str = "discovered"
     records_extracted: int = 0
@@ -296,23 +296,23 @@ class StreamDefinition(m.BaseModel):
 ```python
 # All operations return r[T] for railway-oriented programming
 def process_elt_pipeline(
-    tap_config: TapConfig, target_config: t.Dict
-) -> p.Result[t.Dict]:
+    tap_config: TapConfig, target_config: m.Dict
+) -> p.Result[m.Dict]:
     """Process ELT pipeline with comprehensive error handling."""
 
     # Validation phase
     validation_result = validate_configuration(tap_config)
     if validation_result.failure:
-        return r[t.Dict].fail(
+        return r[m.Dict].fail(
             f"Configuration validation failed: {validation_result.error}"
         )
 
     # Execution phase
     execution_result = execute_pipeline(tap_config, target_config)
     if execution_result.failure:
-        return r[t.Dict].fail(f"Pipeline execution failed: {execution_result.error}")
+        return r[m.Dict].fail(f"Pipeline execution failed: {execution_result.error}")
 
-    return r[t.Dict].ok(execution_result.unwrap())
+    return r[m.Dict].ok(execution_result.unwrap())
 ```
 
 ### **Exception Hierarchy**

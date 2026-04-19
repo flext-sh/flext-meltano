@@ -40,9 +40,9 @@ class _FailingTap(_SuccessfulTap):
             @override
             def main(
                 self,
-                *args: t.RecursiveContainer,
-                **kwargs: t.RecursiveContainer,
-            ) -> t.RecursiveContainer:
+                *args: t.Container,
+                **kwargs: t.Container,
+            ) -> t.Container:
                 raise SystemExit(3)
 
         return _FailingCommand("tap-fail")

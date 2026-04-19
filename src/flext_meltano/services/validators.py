@@ -82,9 +82,9 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].fail(f"Transformation validation failed: {error}")
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute validators service — returns current settings."""
-        return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
+        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
 
 
 __all__: list[str] = ["FlextMeltanoValidators"]

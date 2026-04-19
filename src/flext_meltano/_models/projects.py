@@ -68,8 +68,8 @@ class FlextMeltanoModelsProjects:
         default_environment: Annotated[
             str, u.Field(default="dev", description="Default environment name")
         ] = "dev"
-        plugins: t.RecursiveContainerMapping = u.Field(default_factory=dict)
-        environments: t.RecursiveContainerMapping = u.Field(default_factory=dict)
+        plugins: Mapping[str, t.Container] = u.Field(default_factory=dict)
+        environments: Mapping[str, t.Container] = u.Field(default_factory=dict)
 
         @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:

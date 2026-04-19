@@ -126,7 +126,7 @@ validate_configuration() -> p.Result[bool]
 class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
-    def __init__(self, tap_name: str, settings: t.Dict, state: t.Dict | None = None)
+    def __init__(self, tap_name: str, settings: m.Dict, state: m.Dict | None = None)
     async def discover(self) -> p.Result[Catalog]
     async def sync(self, streams: t.StringList | None = None) -> p.Result[SyncResult]
 ```
@@ -137,8 +137,8 @@ class FlextSingerTap(s):
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, settings: t.Dict)
-    async def load_records(self, records: Sequence[t.Dict]) -> p.Result[LoadResult]
+    def __init__(self, target_name: str, settings: m.Dict)
+    async def load_records(self, records: Sequence[m.Dict]) -> p.Result[LoadResult]
     async def flush(self) -> p.Result[FlushResult]
 ```
 

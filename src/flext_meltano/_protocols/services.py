@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
 
@@ -55,7 +55,7 @@ class FlextMeltanoProtocolsServices:
             self,
             tap_name: str,
             target_name: str,
-            _config: t.RecursiveContainerMapping | None = None,
+            _config: Mapping[str, t.Container] | None = None,
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...

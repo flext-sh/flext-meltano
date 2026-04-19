@@ -107,7 +107,7 @@ from flext_core import t
 from flext_core import u
 
 
-def process_data(data: dict) -> p.Result[Optional[t.Dict]]:
+def process_data(data: dict) -> p.Result[Optional[m.Dict]]:
     # Implementation
     pass
 ```
@@ -255,7 +255,7 @@ def risky_operation():
 
 
 # ✅ Correct
-def safe_operation() -> p.Result[t.Dict]:
+def safe_operation() -> p.Result[m.Dict]:
     try:
         # operation
         return r.ok(data)
@@ -298,7 +298,7 @@ from flext_core import u
 
 
 class FlextMeltanoUtilityService(s):
-    def do_something(self) -> p.Result[t.Dict]:
+    def do_something(self) -> p.Result[m.Dict]:
         # Implementation with proper error handling
         pass
 ```

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
@@ -166,9 +166,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         return r[None].ok(None)
 
     @override
-    def execute(self) -> p.Result[t.RecursiveContainerMapping]:
+    def execute(self) -> p.Result[Mapping[str, t.Container]]:
         """Execute target service — returns status."""
-        return r[t.RecursiveContainerMapping].ok({
+        return r[Mapping[str, t.Container]].ok({
             "service": self.target_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "target",

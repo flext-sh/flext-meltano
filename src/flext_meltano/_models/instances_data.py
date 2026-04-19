@@ -24,7 +24,7 @@ class FlextMeltanoModelsInstancesData:
 
         sink_type: Annotated[str, u.Field(description="Sink type identifier")]
         connection_config: Annotated[
-            t.RecursiveContainerMapping,
+            Mapping[str, t.Container],
             u.Field(description="Connection configuration dictionary"),
         ]
         batch_size: Annotated[
@@ -68,8 +68,8 @@ class FlextMeltanoModelsInstancesData:
 
         @u.field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: t.RecursiveContainerMapping
-        ) -> t.RecursiveContainerMapping:
+            self, value: Mapping[str, t.Container]
+        ) -> Mapping[str, t.Container]:
             """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 

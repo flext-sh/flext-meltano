@@ -17,8 +17,8 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def coerce_container_mapping(
-        value: t.RecursiveContainer | None,
-    ) -> t.RecursiveContainerMapping | None:
+        value: t.Container | None,
+    ) -> Mapping[str, t.Container] | None:
         """Normalize runtime objects to canonical container mappings when possible."""
         if not isinstance(value, Mapping):
             return None
@@ -29,8 +29,8 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def coerce_container_mapping_list(
-        value: t.RecursiveContainer | None,
-    ) -> list[t.RecursiveContainerMapping] | None:
+        value: t.Container | None,
+    ) -> list[Mapping[str, t.Container]] | None:
         """Normalize runtime objects to canonical mapping lists when possible."""
         if not isinstance(value, list):
             return None
@@ -179,7 +179,7 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def build_discovered_plugin(
         raw_type: str,
-        raw_plugin: t.RecursiveContainerMapping,
+        raw_plugin: Mapping[str, t.Container],
     ) -> t.StrMapping | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape."""
         name_val = raw_plugin.get("name", "")
@@ -189,7 +189,7 @@ class FlextMeltanoUtilitiesRuntime:
         ns_val = raw_plugin.get("namespace", "")
         pip_val = raw_plugin.get("pip_url", "")
         variant_val = raw_plugin.get("variant", "")
-        plugin_data: t.RecursiveContainerMapping = {
+        plugin_data: Mapping[str, t.Container] = {
             "name": plugin_name,
             "type": FlextMeltanoUtilitiesRuntime.normalize_plugin_group(raw_type)
             or u.to_str(raw_type),
@@ -206,7 +206,7 @@ class FlextMeltanoUtilitiesRuntime:
         raw_plugin: ProjectPlugin,
     ) -> t.StrMapping | None:
         """Normalize a Meltano project plugin object into discovery payload shape."""
-        plugin_mapping: t.RecursiveContainerMapping = {
+        plugin_mapping: Mapping[str, t.Container] = {
             "name": raw_plugin.name,
             "namespace": raw_plugin.namespace,
             "pip_url": raw_plugin.pip_url,
@@ -265,7 +265,7 @@ class FlextMeltanoUtilitiesRuntime:
         plugin_type: str,
         *,
         default_variant: str = "",
-        variants: t.RecursiveContainerMapping | None = None,
+        variants: Mapping[str, t.Container] | None = None,
         description: str = "",
         logo_url: str = "",
     ) -> t.StrMapping:
@@ -294,12 +294,12 @@ class FlextMeltanoUtilitiesRuntime:
     def build_command_execution_payload(
         command_result: m.Meltano.CommandExecutionResult,
         *,
-        extra_fields: t.RecursiveContainerMapping | None = None,
+        extra_fields: Mapping[str, t.Container] | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> t.RecursiveContainerMapping:
+    ) -> Mapping[str, t.Container]:
         """Build a standard command payload for services over Meltano runtime."""
         payload: t.MutableRecursiveContainerMapping = {
             "success": command_result.success,

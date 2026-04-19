@@ -21,7 +21,7 @@ class FlextMeltanoModelsDiscovery:
         default_variant: Annotated[
             str, u.Field(default="", description="Plugin default variant")
         ] = ""
-        variants: t.RecursiveContainerMapping = u.Field(default_factory=dict)
+        variants: Mapping[str, t.Container] = u.Field(default_factory=dict)
         logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
         description: Annotated[
             str, u.Field(default="", description="Plugin description")
@@ -37,13 +37,13 @@ class FlextMeltanoModelsDiscovery:
         @classmethod
         def normalize_variants(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.RecursiveContainerMapping:
+        ) -> Mapping[str, t.Container]:
             """Normalize variant maps from external payloads."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty: t.RecursiveContainerMapping = {}
+                    empty: Mapping[str, t.Container] = {}
                     return empty
 
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
@@ -75,11 +75,11 @@ class FlextMeltanoModelsDiscovery:
         @classmethod
         def normalize_plugins(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.RecursiveContainerMapping:
+        ) -> Mapping[str, t.Container]:
             """Normalize plugin catalog mapping."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty: t.RecursiveContainerMapping = {}
+                    empty: Mapping[str, t.Container] = {}
                     return empty
