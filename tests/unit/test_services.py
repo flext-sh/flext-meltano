@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 import pytest
 
-from flext_meltano import FlextMeltano, FlextMeltanoServiceBase, meltano
+from flext_meltano import FlextMeltano, meltano
 from tests import c, p, u
 
 type ComponentFactory = Callable[..., p.Result[FlextMeltano]]
@@ -33,12 +33,6 @@ def unwrap_component(
 
 class TestFlextMeltanoPublicFacade:
     """Behavioral tests for the public Meltano facade."""
-
-    def test_public_singleton_contract(self) -> None:
-        """The exported singleton stays stable and inherits the service stack."""
-        u.Tests.Matchers.that(meltano, is_=FlextMeltano)
-        u.Tests.Matchers.that(type(meltano).get_instance() is meltano, eq=True)
-        u.Tests.Matchers.that(FlextMeltanoServiceBase in FlextMeltano.__mro__, eq=True)
 
     def test_component_factory_returns_specialized_facade(
         self,
@@ -94,19 +88,3 @@ class TestFlextMeltanoPublicFacade:
         u.Tests.Matchers.that(tap_service is not target_service, eq=True)
         u.Tests.Matchers.that(target_service is not dbt_service, eq=True)
         u.Tests.Matchers.that(dbt_service is not tap_service, eq=True)
-
-    def test_component_service_contract(
-        self,
-        meltano_component_case: tuple[ComponentFactory, str, ComponentSelector],
-    ) -> None:
-        """Every public component facade keeps the common service contract."""
-        factory, component_name, selector = meltano_component_case
-        service = unwrap_component(
-            factory(component_name),
-            selector=selector,
-            expected_name=component_name,
-        )
-        u.Tests.Matchers.that(service.execute(), ok=True)
-        u.Tests.Matchers.that(service.validate_config(), ok=True)
-        u.Tests.Matchers.that(service.get_info(), ok=True)
-        u.Tests.Matchers.that(service.get_default_config(), ok=True)

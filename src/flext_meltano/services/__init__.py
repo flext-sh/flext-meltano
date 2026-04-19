@@ -23,10 +23,11 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".bridge": ("FlextMeltanoBridge",),
             ".cli_managers": (
                 "FlextMeltanoCommandRouter",
-                "FlextMeltanoDbtManager",
-                "FlextMeltanoPipelineManager",
-                "FlextMeltanoPluginManager",
                 "FlextMeltanoSingerManager",
+            ),
+            ".cli_small_managers": (
+                "FlextMeltanoDbtManager",
+                "FlextMeltanoPluginManager",
                 "FlextMeltanoStatusManager",
             ),
             ".consumer_bases.dbt_service_base": ("FlextMeltanoDbtServiceBase",),
@@ -42,6 +43,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".meltano_plugins": ("FlextMeltanoComponentService",),
             ".meltano_project_sdk": ("FlextMeltanoProjectManager",),
             ".pipeline_lifecycle": ("FlextMeltanoPipelineLifecycleOperations",),
+            ".pipeline_mgr": ("FlextMeltanoPipelineManager",),
             ".pipeline_ops": (
                 "FlextMeltanoPipelineCrudOperations",
                 "FlextMeltanoPipelinePaths",

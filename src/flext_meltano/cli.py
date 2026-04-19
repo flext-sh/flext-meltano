@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from typing import override
+from typing import Annotated, override
 
 from flext_cli import cli, r, u
 
@@ -28,11 +28,14 @@ from flext_meltano import (
 class FlextMeltanoCLI(FlextMeltanoServiceBase):
     """SOLID-compliant CLI for FLEXT Meltano operations."""
 
-    service_name: str = u.Field(
-        "FlextMeltanoCLI",
-        description="Canonical Meltano CLI service name.",
-        validate_default=True,
-    )
+    service_name: Annotated[
+        t.NonEmptyStr,
+        u.Field(
+            default="FlextMeltanoCLI",
+            description="Canonical Meltano CLI service name.",
+            validate_default=True,
+        ),
+    ] = "FlextMeltanoCLI"
     _output: p.Meltano.Output = u.PrivateAttr()
     _pipeline_manager: p.Meltano.CLIManager = u.PrivateAttr()
     _singer_manager: p.Meltano.SingerManager = u.PrivateAttr()

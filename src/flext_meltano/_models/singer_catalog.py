@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, ClassVar, Literal
 
 from flext_cli import m, u
 
@@ -17,15 +17,15 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
-        breadcrumb: t.StrSequence = u.Field(
-            default_factory=list, description="Singer metadata breadcrumb path"
-        )
-        metadata: t.RecursiveContainerMapping = u.Field(
-            default_factory=dict, description="Singer metadata properties"
-        )
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
+        breadcrumb: t.StrSequence = u.Field(default_factory=tuple)
+        metadata: t.RecursiveContainerMapping = u.Field(default_factory=dict)
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
+
+        _flext_enforcement_exempt: ClassVar[bool] = True
 
         tap_stream_id: Annotated[str, u.Field(description="Tap stream identifier")]
         stream: Annotated[str, u.Field(description="Singer stream name")]
@@ -46,9 +46,7 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer stream metadata blocks",
             )
         )
-        key_properties: t.StrSequence = u.Field(
-            default_factory=list, description="Primary key columns for this stream"
-        )
+        key_properties: t.StrSequence = u.Field(default_factory=tuple)
         replication_key: Annotated[
             str | None,
             u.Field(
@@ -114,6 +112,8 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerSyncResult(m.Entity):
         """Result of a Singer sync operation."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         records_processed: Annotated[
             t.NonNegativeInt, u.Field(description="Number of records processed")
         ]
@@ -121,9 +121,7 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, u.Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: t.RecursiveContainerMapping = u.Field(
-            default_factory=dict, description="Final state payload"
-        )
+        state: t.RecursiveContainerMapping = u.Field(default_factory=dict)
         duration_seconds: Annotated[
             t.NonNegativeFloat, u.Field(description="Execution duration")
         ]

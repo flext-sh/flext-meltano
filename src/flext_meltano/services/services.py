@@ -152,11 +152,11 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         }
         return r[t.RecursiveContainerMapping].ok(payload)
 
-    def get_default_config(self) -> p.Result[t.RecursiveContainerMapping]:
+    def fetch_default_config(self) -> p.Result[t.RecursiveContainerMapping]:
         """Get default configuration from current settings."""
         return r[t.RecursiveContainerMapping].ok(self.settings.model_dump())
 
-    def get_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
+    def fetch_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""
         return r[t.Meltano.OptionalScalarMap].ok({
             "name": c.Meltano.METADATA_APPLICATION_NAME,

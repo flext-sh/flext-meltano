@@ -151,7 +151,7 @@ class TestFlextMeltanoExecutorComplete:
 
     def test_get_version_static(self) -> None:
         """Test get_version static method returns r[str]."""
-        result = FlextMeltanoExecutor.get_version()
+        result = FlextMeltanoExecutor.fetch_version()
         assert isinstance(result, r)
         assert result.success
         assert isinstance(result.value, str)
@@ -302,7 +302,7 @@ class TestFlextMeltanoExecutorComplete:
         """Test version error path using mock."""
         with mock.patch.object(
             FlextMeltanoExecutor,
-            "get_version",
+            "fetch_version",
             return_value=r[str].fail("Version command failed"),
         ):
             version_result = FlextMeltanoExecutor().version()

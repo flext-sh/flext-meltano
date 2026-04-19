@@ -26,13 +26,13 @@ class _DbtOperationService(Protocol):
 class _PluginOperationService(Protocol):
     def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]: ...
 
-    def get_plugin_info(self, plugin_name: str) -> p.Result[str]: ...
+    def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]: ...
 
     def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]: ...
 
 
 class _StatusOperationService(Protocol):
-    def get_version(self) -> p.Result[str]: ...
+    def fetch_version(self) -> p.Result[str]: ...
 
     def run_health_check(self) -> p.Result[str]: ...
 
@@ -49,7 +49,7 @@ class _FlextMeltanoCliDbtService(FlextMeltanoDbtRunnerMixin):
         """Initialize DBT CLI helper with configured project root."""
         super().__init__()
         if self.settings.project_root != Path():
-            self.set_dbt_project_root(self.settings.project_root)
+            self.configure_dbt_project_root(self.settings.project_root)
 
     @override
     def execute(self) -> p.Result[t.RecursiveContainerMapping]:
@@ -128,7 +128,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             output.stdout.strip() or f"Installed {plugin_type}:{plugin_name}"
         )
 
-    def get_plugin_info(self, plugin_name: str) -> p.Result[str]:
+    def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]:
         """Return deterministic plugin information for one installed plugin."""
 
         def _select_plugin(
@@ -150,13 +150,13 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             return r[str].fail(f"Plugin '{plugin_name}' not found")
 
         return self._load_project().flat_map(
-            lambda _: self.get_sdk_plugins(None).flat_map(_select_plugin)
+            lambda _: self.fetch_sdk_plugins(None).flat_map(_select_plugin)
         )
 
     def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]:
         """List installed plugins from the active Meltano project."""
         return self._load_project().flat_map(
-            lambda _: self.get_sdk_plugins(plugin_type).map(self._format_plugin_rows)
+            lambda _: self.fetch_sdk_plugins(plugin_type).map(self._format_plugin_rows)
         )
 
 
@@ -189,7 +189,7 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
             )
         return r[str].ok((output.stdout or output.stderr).strip())
 
-    def get_version(self) -> p.Result[str]:
+    def fetch_version(self) -> p.Result[str]:
         """Return Meltano version as a string."""
         return self._run_version_command()
 
@@ -308,7 +308,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
             case "info":
                 if not args:
                     return r[str].fail("Plugin info requires a plugin name")
-                return self._service.get_plugin_info(args[0])
+                return self._service.fetch_plugin_info(args[0])
             case c.Meltano.ExecutorCommand.INSTALL:
                 if len(args) < _PLUGIN_INSTALL_ARG_COUNT:
                     return r[str].fail(
@@ -343,7 +343,7 @@ class FlextMeltanoStatusManager:
     def handle_version_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle version command."""
         _ = args
-        return self._service.get_version()
+        return self._service.fetch_version()
 
     def _execute_status_operation(
         self, operation: str, args: t.StrSequence

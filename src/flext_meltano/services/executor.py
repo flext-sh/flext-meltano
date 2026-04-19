@@ -142,7 +142,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
     def version(self) -> p.Result[t.RecursiveContainerMapping]:
         """Get version information from meltano."""
-        return self.get_version().map(
+        return self.fetch_version().map(
             lambda ver: {
                 "status": c.Meltano.OperationStatus.SUCCESS,
                 "command": c.Meltano.ExecutorCommand.VERSION,

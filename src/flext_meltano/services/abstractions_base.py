@@ -26,8 +26,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
     _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
-    service_name: str = u.Field(
-        "FlextMeltanoAbstractions",
+    service_name: t.NonEmptyStr = u.Field(
+        default="FlextMeltanoAbstractions",
         description="Canonical Meltano abstractions service name.",
         validate_default=True,
     )
@@ -88,7 +88,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                     return Path(mapping_value)
         return None
 
-    def get_plugins_of_type(
+    def fetch_plugins_of_type(
         self,
         _project: t.ValueOrModel | t.RecursiveContainerMapping | None,
         plugin_type: str,
@@ -96,7 +96,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """List installed project plugins of *plugin_type* via Meltano runtime."""
         try:
             cwd = self._resolve_project_root(_project)
-            plugins_result = FlextMeltanoExecutorBase().get_project_plugins(
+            plugins_result = FlextMeltanoExecutorBase().fetch_project_plugins(
                 plugin_type=u.Meltano.normalize_plugin_group(plugin_type),
                 _cwd=cwd,
             )
@@ -169,7 +169,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             error_msg = f"Failed to load pipeline project: {e}"
             return r[Path].fail(error_msg)
 
-    def get_project_root(self) -> p.Result[Path]:
+    def fetch_project_root(self) -> p.Result[Path]:
         """Get the root directory from settings."""
         project_root = self.settings.project_root
         if project_root == Path():
@@ -204,7 +204,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         }
         return r[t.RecursiveContainerMapping].ok(entry)
 
-    def get_stream_config(
+    def fetch_stream_config(
         self,
         settings: m.Meltano.TapConfig,
         stream_name: str,
@@ -216,10 +216,10 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 return val
         return {}
 
-    def get_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
+    def fetch_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
         """Get tap type from instance."""
         return tap_instance.tap_type
 
-    def get_registered_streams(self) -> t.StrSequence:
+    def fetch_registered_streams(self) -> t.StrSequence:
         """Get list of registered stream names."""
         return [*self._stream_registry.keys()]

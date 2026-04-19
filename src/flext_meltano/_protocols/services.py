@@ -35,7 +35,7 @@ class FlextMeltanoProtocolsServices:
             """Execute a Meltano runtime command."""
             ...
 
-        def get_project_plugins(
+        def fetch_project_plugins(
             self,
             plugin_type: str | None = None,
             _cwd: Path | None = None,

@@ -42,8 +42,8 @@ from flext_meltano import (
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    service_name: str = u.Field(
-        "FlextMeltanoExecutor",
+    service_name: t.NonEmptyStr = u.Field(
+        default="FlextMeltanoExecutor",
         description="Canonical Meltano executor service name.",
         validate_default=True,
     )
@@ -74,7 +74,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         return u.Meltano.resolve_project_root(self.settings) or Path.cwd()
 
     @staticmethod
-    def get_version() -> p.Result[str]:
+    def fetch_version() -> p.Result[str]:
         """Get version information from the imported Meltano package."""
         return u.try_(
             lambda: meltano.__version__,
@@ -152,7 +152,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             ),
         ).map_error(lambda e: f"Failed to load Meltano project: {e}")
 
-    def get_project_plugins(
+    def fetch_project_plugins(
         self,
         plugin_type: str | None = None,
         _cwd: Path | None = None,

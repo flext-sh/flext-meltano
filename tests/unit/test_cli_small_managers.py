@@ -66,7 +66,7 @@ class _StubPluginService:
         self.calls.append(("install", (plugin_type, plugin_name)))
         return r[str].ok(f"installed:{plugin_type}:{plugin_name}")
 
-    def get_plugin_info(self, plugin_name: str) -> p.Result[str]:
+    def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]:
         self.calls.append(("info", (plugin_name,)))
         return r[str].ok(f"info:{plugin_name}")
 
@@ -77,7 +77,7 @@ class _StubPluginService:
 
 
 class _StubStatusService:
-    def get_version(self) -> p.Result[str]:
+    def fetch_version(self) -> p.Result[str]:
         return r[str].ok("3.9.1")
 
     def run_health_check(self) -> p.Result[str]:

@@ -26,7 +26,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def discover_installed_plugins() -> p.Result[t.StrSequence]:
         """Discover installed Meltano plugins from the active project runtime."""
         executor = FlextMeltanoExecutorBase()
-        plugins_result = executor.get_project_plugins()
+        plugins_result = executor.fetch_project_plugins()
         if plugins_result.failure:
             return r[t.StrSequence].fail(
                 plugins_result.error or "Plugin discovery failed",
@@ -70,9 +70,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return r[t.RecursiveContainerMapping].ok(result)
 
     @staticmethod
-    def get_version() -> p.Result[str]:
+    def fetch_version() -> p.Result[str]:
         """Get Meltano version from the imported library."""
-        return FlextMeltanoExecutorBase.get_version()
+        return FlextMeltanoExecutorBase.fetch_version()
 
     @override
     def execute(self) -> p.Result[t.RecursiveContainerMapping]:

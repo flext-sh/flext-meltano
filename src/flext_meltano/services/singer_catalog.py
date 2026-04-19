@@ -46,7 +46,9 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to discover: {e}")
 
-    def get_stream_schema(self, stream_name: str) -> p.Result[t.ContainerValueMapping]:
+    def fetch_stream_schema(
+        self, stream_name: str
+    ) -> p.Result[t.ContainerValueMapping]:
         """Get schema for a specific stream from cached catalog."""
         try:
             for entry in self._singer_catalog.streams:
@@ -120,7 +122,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to select streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 
-    def set_singer_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:
+    def configure_singer_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:
         """Set catalog data directly."""
         self._singer_catalog = catalog
 

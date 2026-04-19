@@ -105,7 +105,7 @@ class TestFlextMeltanoModels:
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tm.that(stream.stream_name, eq="users")
-        tm.that(stream.stream_schema["type"], eq="t.RecursiveContainer")
+        tm.that(stream.stream_schema["type"], eq="object")
         tm.that(stream.status, eq="initialized")
         tm.that(stream.records_loaded, eq=0)
         tm.that(stream.batches_processed, eq=0)

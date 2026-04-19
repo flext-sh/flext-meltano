@@ -157,7 +157,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         catalog: t.RecursiveContainerMapping = {"version": 1, "streams": streams}
         return r[t.RecursiveContainerMapping].ok(catalog)
 
-    def get_stream_by_name(
+    def fetch_stream_by_name(
         self,
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,

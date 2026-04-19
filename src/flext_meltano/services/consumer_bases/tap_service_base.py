@@ -54,7 +54,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         super().__init__(settings=settings)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def fetch_instance(cls) -> Self:
         """Return the shared facade instance."""
         if cls._instance is None:
             cls._instance = cls()

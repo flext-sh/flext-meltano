@@ -64,10 +64,11 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.bridge import FlextMeltanoBridge
     from flext_meltano.services.cli_managers import (
         FlextMeltanoCommandRouter,
-        FlextMeltanoDbtManager,
-        FlextMeltanoPipelineManager,
-        FlextMeltanoPluginManager,
         FlextMeltanoSingerManager,
+    )
+    from flext_meltano.services.cli_small_managers import (
+        FlextMeltanoDbtManager,
+        FlextMeltanoPluginManager,
         FlextMeltanoStatusManager,
     )
     from flext_meltano.services.consumer_bases.dbt_service_base import (
@@ -95,6 +96,7 @@ if _t.TYPE_CHECKING:
     from flext_meltano.services.pipeline_lifecycle import (
         FlextMeltanoPipelineLifecycleOperations,
     )
+    from flext_meltano.services.pipeline_mgr import FlextMeltanoPipelineManager
     from flext_meltano.services.pipeline_ops import (
         FlextMeltanoPipelineCrudOperations,
         FlextMeltanoPipelinePaths,
@@ -207,10 +209,11 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".services.bridge": ("FlextMeltanoBridge",),
             ".services.cli_managers": (
                 "FlextMeltanoCommandRouter",
-                "FlextMeltanoDbtManager",
-                "FlextMeltanoPipelineManager",
-                "FlextMeltanoPluginManager",
                 "FlextMeltanoSingerManager",
+            ),
+            ".services.cli_small_managers": (
+                "FlextMeltanoDbtManager",
+                "FlextMeltanoPluginManager",
                 "FlextMeltanoStatusManager",
             ),
             ".services.consumer_bases.dbt_service_base": (
@@ -236,6 +239,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".services.pipeline_lifecycle": (
                 "FlextMeltanoPipelineLifecycleOperations",
             ),
+            ".services.pipeline_mgr": ("FlextMeltanoPipelineManager",),
             ".services.pipeline_ops": (
                 "FlextMeltanoPipelineCrudOperations",
                 "FlextMeltanoPipelinePaths",

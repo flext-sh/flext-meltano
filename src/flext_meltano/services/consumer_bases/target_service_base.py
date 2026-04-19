@@ -44,7 +44,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     _instance: ClassVar[Self | None] = None
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def fetch_instance(cls) -> Self:
         """Return the shared facade instance."""
         if cls._instance is None:
             cls._instance = cls()
@@ -80,7 +80,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # Sink management
     # ------------------------------------------------------------------
 
-    def get_or_create_sink(
+    def fetch_or_create_sink(
         self,
         stream_name: str,
         schema: t.FlatContainerMapping,
@@ -123,7 +123,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         schema: t.FlatContainerMapping,
     ) -> p.Result[bool]:
         """Process a single Singer RECORD message."""
-        sink_result = self.get_or_create_sink(stream_name, schema)
+        sink_result = self.fetch_or_create_sink(stream_name, schema)
         if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:

@@ -11,10 +11,6 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from flext_meltano import (
-    FlextMeltanoDbtManager,
-    FlextMeltanoPipelineManager,
-    FlextMeltanoPluginManager,
-    FlextMeltanoStatusManager,
     c,
     p,
     r,
@@ -127,9 +123,5 @@ class FlextMeltanoSingerManager:
 
 __all__: list[str] = [
     "FlextMeltanoCommandRouter",
-    "FlextMeltanoDbtManager",
-    "FlextMeltanoPipelineManager",
-    "FlextMeltanoPluginManager",
     "FlextMeltanoSingerManager",
-    "FlextMeltanoStatusManager",
 ]

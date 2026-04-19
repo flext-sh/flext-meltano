@@ -27,7 +27,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     _sdk_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
     _sdk_project: Project | None = u.PrivateAttr(default_factory=lambda: None)
 
-    def get_sdk_plugins(
+    def fetch_sdk_plugins(
         self,
         plugin_type: str | None = None,
     ) -> p.Result[Sequence[t.Meltano.PluginDefinition]]:

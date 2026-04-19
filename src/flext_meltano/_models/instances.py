@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Annotated, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 
@@ -16,14 +16,16 @@ class FlextMeltanoModelsInstances:
     class DataSinkDefinition(m.Entity):
         """Generic data sink definition for pipeline operations."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         sink_name: Annotated[str, u.Field(description="Name of the sink")]
         sink_type: Annotated[str, u.Field(description="Type of the sink")]
         settings: Annotated[
             t.ConfigurationMapping, u.Field(description="Sink configuration")
-        ] = u.Field(default_factory=dict, description="Sink configuration")
+        ] = u.Field(default_factory=dict)
         sink_schema: Annotated[
             t.FlatContainerMapping, u.Field(description="Sink schema")
-        ] = u.Field(default_factory=dict, description="Sink schema")
+        ] = u.Field(default_factory=dict)
         status: Annotated[
             str,
             u.Field(
@@ -64,7 +66,7 @@ class FlextMeltanoModelsInstances:
         ]
         key_properties: Annotated[
             t.StrSequence, u.Field(description="Primary key properties for the stream")
-        ] = u.Field(default_factory=list, description="Primary key properties")
+        ] = u.Field(default_factory=tuple)
         replication_method: Annotated[
             str, u.Field(default="FULL_TABLE", description="Replication method")
         ] = "FULL_TABLE"

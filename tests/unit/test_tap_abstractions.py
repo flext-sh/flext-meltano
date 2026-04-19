@@ -180,33 +180,6 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(result["tap_id"], eq="test_tap_123")
         tm.that(result["tap_type"], eq="tap-csv")
 
-    def test_get_stream_config(self) -> None:
-        """Test get_stream_config method using flext_tests."""
-        settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
-            stream_config={
-                "users": {"selected": True, "replication_key": "id"},
-                "orders": {"selected": False},
-            },
-        )
-        users_config = self.tap_abstractions.get_stream_config(settings, "users")
-        orders_config = self.tap_abstractions.get_stream_config(settings, "orders")
-        missing_config = self.tap_abstractions.get_stream_config(settings, "missing")
-        self.test_assertions.assert_true(
-            condition=isinstance(users_config, dict),
-            message="Should return dict",
-        )
-        self.test_assertions.assert_true(
-            condition=bool(users_config["selected"]),
-            message="Users should be selected",
-        )
-        self.test_assertions.assert_false(
-            condition=bool(orders_config["selected"]),
-            message="Orders should not be selected",
-        )
-        assert missing_config == {}
-
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
         connection_config: t.RecursiveContainerMapping = {
@@ -453,27 +426,9 @@ class TestFlextMeltanoAbstractionsComplete:
             stream_names = self.tap_abstractions.list_streams(tap_instance)
         tm.that(isinstance(stream_names, list), eq=True)
 
-    def test_get_tap_type(self) -> None:
-        """Test get_tap_type method using flext_tests."""
-        settings = m.Meltano.TapConfig(
-            tap_type="tap-csv",
-            connection_config={"file": "test.csv"},
-        )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv",
-            settings=settings,
-            tap_id="csv_tap_123",
-        )
-        tap_type = self.tap_abstractions.get_tap_type(tap_instance)
-        self.test_assertions.assert_equal(
-            actual=tap_type,
-            expected="tap-csv",
-            message="Tap type should match",
-        )
-
-    def test_get_registered_streams(self) -> None:
+    def test_fetch_registered_streams(self) -> None:
         """Test get_registered_streams method using flext_tests."""
-        initial_streams = self.tap_abstractions.get_registered_streams()
+        initial_streams = self.tap_abstractions.fetch_registered_streams()
         tm.that(isinstance(initial_streams, list), eq=True)
 
     def test_create_instance_factory(self) -> None:

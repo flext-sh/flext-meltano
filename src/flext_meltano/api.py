@@ -65,7 +65,7 @@ class FlextMeltano(
     _instance: ClassVar[FlextMeltano | None] = None
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def fetch_instance(cls) -> Self:
         """Return the shared Meltano facade instance."""
         instance = cls._instance
         if instance is None or not isinstance(instance, cls):
@@ -102,7 +102,7 @@ class FlextMeltano(
         return r[t.RecursiveContainerMapping].ok(payload)
 
 
-meltano = FlextMeltano.get_instance()
+meltano = FlextMeltano.fetch_instance()
 
 
 __all__: list[str] = ["FlextMeltano", "meltano"]

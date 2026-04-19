@@ -30,7 +30,6 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         """Focused adapter for Meltano project management following SOLID principles."""
 
         @classmethod
-        @override
         def _get_service_config_type(cls) -> type[FlextSettings]:
             return FlextMeltanoSettings
 
@@ -61,11 +60,11 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         @override
         def execute(self) -> p.Result[t.RecursiveContainerMapping]:
             """Execute default project operation."""
-            return self.get_version()
+            return self.fetch_version()
 
-        def get_version(self) -> p.Result[t.RecursiveContainerMapping]:
+        def fetch_version(self) -> p.Result[t.RecursiveContainerMapping]:
             """Get Meltano version information using native API."""
-            version_result = FlextMeltanoExecutorBase.get_version()
+            version_result = FlextMeltanoExecutorBase.fetch_version()
             if version_result.failure:
                 return r[t.RecursiveContainerMapping].fail(
                     version_result.error or "Failed to get Meltano version",
@@ -92,7 +91,6 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
         """Focused adapter for Meltano plugin management following SOLID principles."""
 
         @classmethod
-        @override
         def _get_service_config_type(cls) -> type[FlextSettings]:
             return FlextMeltanoSettings
 
@@ -104,7 +102,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
             try:
                 executor = FlextMeltanoExecutorBase()
                 project_root = u.Meltano.resolve_project_root(self.settings)
-                plugins_result = executor.get_project_plugins(
+                plugins_result = executor.fetch_project_plugins(
                     plugin_type=plugin_type,
                     _cwd=project_root,
                 )

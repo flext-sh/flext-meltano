@@ -27,7 +27,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         default_factory=m.Meltano.SingerStateMessage,
     )
 
-    def get_bookmark(self, stream_name: str, bookmark_key: str) -> p.Result[str]:
+    def fetch_bookmark(self, stream_name: str, bookmark_key: str) -> p.Result[str]:
         """Get current bookmark value for a stream."""
         try:
             stream_state = self._singer_state.value.get(stream_name)

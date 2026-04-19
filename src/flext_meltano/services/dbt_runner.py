@@ -106,7 +106,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
         cmd = self._build_dbt_command("docs", extra_args=["generate"])
         return self._run_dbt_subprocess(cmd, "docs generate")
 
-    def set_dbt_project_root(self, root: Path) -> None:
+    def configure_dbt_project_root(self, root: Path) -> None:
         """Set the dbt project root directory."""
         self._dbt_runner_project_root = root
 

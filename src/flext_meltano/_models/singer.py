@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Literal, Self
+from typing import Annotated, ClassVar, Literal, Self
 
 from flext_cli import m, u
 
@@ -14,6 +14,8 @@ class FlextMeltanoModelsSinger:
 
     class SingerSchemaMessage(m.ArbitraryTypesModel):
         """Canonical Singer SCHEMA message model."""
+
+        _flext_enforcement_exempt: ClassVar[bool] = True
 
         type: Annotated[
             Literal["SCHEMA"],
@@ -31,14 +33,11 @@ class FlextMeltanoModelsSinger:
         ]
         key_properties: Annotated[
             t.StrSequence, u.Field(description="Singer stream key properties")
-        ] = u.Field(default_factory=list, description="Singer stream key properties")
+        ] = u.Field(default_factory=tuple)
         bookmark_properties: Annotated[
             t.StrSequence,
             u.Field(description="Singer bookmark columns for incremental replication"),
-        ] = u.Field(
-            default_factory=list,
-            description="Singer bookmark columns for incremental replication",
-        )
+        ] = u.Field(default_factory=tuple)
 
     class SingerRecordMessage(m.ArbitraryTypesModel):
         """Canonical Singer RECORD message model."""
@@ -69,6 +68,8 @@ class FlextMeltanoModelsSinger:
     class SingerStateMessage(m.ArbitraryTypesModel):
         """Canonical Singer STATE message model."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         type: Annotated[
             Literal["STATE"],
             u.Field(default="STATE", description="Singer message discriminator"),
@@ -76,7 +77,7 @@ class FlextMeltanoModelsSinger:
         value: Annotated[
             t.MutableRecursiveContainerMapping,
             u.Field(description="Singer state bookmark payload"),
-        ] = u.Field(default_factory=dict, description="Singer state bookmark payload")
+        ] = u.Field(default_factory=dict)
 
     class SingerActivateVersionMessage(m.ArbitraryTypesModel):
         """Canonical Singer ACTIVATE_VERSION message model.

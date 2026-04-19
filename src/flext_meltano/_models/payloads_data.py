@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from flext_cli import m, u
 
@@ -17,6 +17,8 @@ class FlextMeltanoModelsPayloadsData:
     class JsonSchemaPayload(m.ArbitraryTypesModel):
         """Typed schema payload used by API extract flow."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         schema_definition: Annotated[
             t.FlatContainerMapping,
             u.Field(
@@ -25,7 +27,7 @@ class FlextMeltanoModelsPayloadsData:
                 validation_alias="schema",
                 description="Schema-like JSON payload",
             ),
-        ] = u.Field(default_factory=dict, description="Schema-like JSON payload")
+        ] = u.Field(default_factory=dict)
 
         @u.field_validator("schema_definition", mode="before")
         @classmethod
@@ -78,6 +80,8 @@ class FlextMeltanoModelsPayloadsData:
     class ConfigMappingPayload(m.ArbitraryTypesModel):
         """Normalized mapping payload with string keys."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         values: Annotated[
             Mapping[
                 str,
@@ -87,7 +91,7 @@ class FlextMeltanoModelsPayloadsData:
                 | None,
             ],
             u.Field(description="Normalized mapping values"),
-        ] = u.Field(default_factory=dict, description="Normalized mapping values")
+        ] = u.Field(default_factory=dict)
 
         @u.field_validator("values", mode="before")
         @classmethod

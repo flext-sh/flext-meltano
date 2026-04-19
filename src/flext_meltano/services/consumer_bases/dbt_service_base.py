@@ -53,7 +53,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         super().__init__(settings=settings)
 
     @classmethod
-    def get_instance(cls) -> Self:
+    def fetch_instance(cls) -> Self:
         """Return the shared facade instance."""
         if cls._instance is None:
             cls._instance = cls()
@@ -170,7 +170,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     # Project management
     # ------------------------------------------------------------------
 
-    def set_project_root(self, root: Path) -> p.Result[None]:
+    def configure_project_root(self, root: Path) -> p.Result[None]:
         """Set dbt project root directory."""
         if not root.exists():
             return r[None].fail(str(root))
@@ -205,7 +205,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         except (ValueError, TypeError, KeyError, OSError) as exc:
             return r[t.Meltano.DbtManifestData].fail(str(exc))
 
-    def get_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
+    def fetch_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
         if manifest_result.failure:

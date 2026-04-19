@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Annotated, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 
@@ -15,6 +15,8 @@ class FlextMeltanoModelsResults:
 
     class ExecutionResult(m.TimestampedModel):
         """Generic execution result tracking with validation."""
+
+        _flext_enforcement_exempt: ClassVar[bool] = True
 
         operation: Annotated[str, u.Field(description="Operation performed")]
         status: Annotated[str, u.Field(description="Execution status")]
@@ -40,7 +42,7 @@ class FlextMeltanoModelsResults:
         ] = None
         metadata: Annotated[
             t.ConfigurationMapping, u.Field(description="Additional execution metadata")
-        ] = u.Field(default_factory=dict, description="Additional execution metadata")
+        ] = u.Field(default_factory=dict)
 
         @u.computed_field()
         @property

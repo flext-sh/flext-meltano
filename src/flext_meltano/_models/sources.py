@@ -19,6 +19,8 @@ class FlextMeltanoModelsSources:
     class TapConfig(m.Entity):
         """Generic tap configuration for data extraction."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         tap_type: Annotated[str, u.Field(description="Type of the tap")]
         connection_config: Annotated[
             t.RecursiveContainerMapping, u.Field(description="Connection configuration")
@@ -26,7 +28,7 @@ class FlextMeltanoModelsSources:
         stream_config: Annotated[
             t.RecursiveContainerMapping,
             u.Field(description="Stream-specific configuration"),
-        ] = u.Field(default_factory=dict, description="Stream-specific configuration")
+        ] = u.Field(default_factory=dict)
         tap_version: Annotated[str, u.Field(description="Tap version")] = "latest"
 
         @u.computed_field()
@@ -70,10 +72,12 @@ class FlextMeltanoModelsSources:
     class TargetConfig(m.Entity):
         """Generic target configuration for data loading."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         target_type: Annotated[str, u.Field(description="Type of the target")]
         connection_config: Annotated[
             t.RecursiveContainerMapping, u.Field(description="Connection configuration")
-        ] = u.Field(default_factory=dict, description="Connection configuration")
+        ] = u.Field(default_factory=dict)
         batch_size: Annotated[
             int | None, u.Field(default=None, description="Batch size for data loading")
         ] = None
@@ -121,6 +125,8 @@ class FlextMeltanoModelsSources:
     class DataSourceConfig(m.Entity):
         """Generic data source configuration with validation."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         source_type: Annotated[str, u.Field(description="Type of the data source")]
         connection_config: Annotated[
             t.RecursiveContainerMapping, u.Field(description="Connection configuration")
@@ -128,7 +134,7 @@ class FlextMeltanoModelsSources:
         stream_config: Annotated[
             t.RecursiveContainerMapping,
             u.Field(description="Stream-specific configuration"),
-        ] = u.Field(default_factory=dict, description="Stream-specific configuration")
+        ] = u.Field(default_factory=dict)
         source_version: Annotated[
             str, u.Field(default="latest", description="Source version")
         ] = "latest"

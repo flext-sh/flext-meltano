@@ -63,7 +63,7 @@ class FlextMeltanoSettings(FlextSettings):
             validation_alias=MELTANO_LOG_LEVEL_ENV,
             description="Meltano logging level",
         ),
-    ]
+    ] = c.LogLevel.INFO
     meltano_version: Annotated[
         str,
         u.Field(default=MELTANO_VERSION, description="Required Meltano version"),
@@ -165,7 +165,7 @@ class FlextMeltanoSettings(FlextSettings):
         }
 
     @classmethod
-    def get_version(cls) -> str:
+    def fetch_version(cls) -> str:
         """Return package semantic version."""
         return c.Meltano.FLEXT_MELTANO_VERSION
 

@@ -114,7 +114,7 @@ class TestFlextMeltanoLibraryRunner:
     def test_adapter_version(self) -> None:
         """Test that FlextMeltanoAdapter.ProjectAdapter can get version."""
         adapter = FlextMeltanoAdapter.ProjectAdapter()
-        result = adapter.get_version()
+        result = adapter.fetch_version()
         tm.ok(result)
         tm.that(result.value, none=False)
         tm.that(str(result.value.get("version", "")), none=False)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 
@@ -14,6 +14,8 @@ class FlextMeltanoModelsProjectsPlugin:
 
     class PluginModel(m.TimestampedModel):
         """Generic plugin configuration for pipeline operations."""
+
+        _flext_enforcement_exempt: ClassVar[bool] = True
 
         name: Annotated[t.NonEmptyStr, u.Field(description="Plugin name")]
         namespace: Annotated[str, u.Field(description="Plugin namespace")]
@@ -28,13 +30,13 @@ class FlextMeltanoModelsProjectsPlugin:
         ] = "standard"
         settings: Annotated[
             t.RecursiveContainerMapping, u.Field(description="Plugin settings")
-        ] = u.Field(default_factory=dict, description="Plugin settings")
+        ] = u.Field(default_factory=dict)
         capabilities: Annotated[
             t.StrSequence, u.Field(description="Plugin capabilities")
-        ] = u.Field(default_factory=list, description="Plugin capabilities")
+        ] = u.Field(default_factory=tuple)
         config_files: Annotated[
             t.StrSequence, u.Field(description="Plugin configuration files")
-        ] = u.Field(default_factory=list, description="Plugin configuration files")
+        ] = u.Field(default_factory=tuple)
 
         @u.computed_field()
         @property

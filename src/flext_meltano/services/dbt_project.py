@@ -28,7 +28,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         default_factory=lambda: None,
     )
 
-    def get_dbt_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
+    def fetch_dbt_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""
         try:
             model_nodes_result = self._get_dbt_manifest_nodes("model")
@@ -55,7 +55,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 f"Failed to get models: {e}"
             )
 
-    def get_dbt_tests(self) -> p.Result[Sequence[t.AttributeMapping]]:
+    def fetch_dbt_tests(self) -> p.Result[Sequence[t.AttributeMapping]]:
         """Get all tests from manifest."""
         try:
             test_nodes_result = self._get_dbt_manifest_nodes("test")
@@ -160,10 +160,10 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             tests_count = 0
             manifest_result = self.load_dbt_manifest()
             if manifest_result.success:
-                models_result = self.get_dbt_models()
+                models_result = self.fetch_dbt_models()
                 if models_result.success:
                     models_count = len(models_result.value)
-                tests_result = self.get_dbt_tests()
+                tests_result = self.fetch_dbt_tests()
                 if tests_result.success:
                     tests_count = len(tests_result.value)
             info = m.Meltano.DbtProjectInfo(

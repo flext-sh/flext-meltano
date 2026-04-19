@@ -26,7 +26,6 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
     """Focused adapter for Meltano pipeline execution following SOLID principles."""
 
     @classmethod
-    @override
     def _get_service_config_type(cls) -> type[FlextSettings]:
         return FlextMeltanoSettings
 
@@ -84,7 +83,6 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
 class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
     """Focused adapter for DBT operations following SOLID principles."""
 
-    @override
     @classmethod
     def _get_service_config_type(cls) -> type[FlextSettings]:
         return FlextMeltanoSettings

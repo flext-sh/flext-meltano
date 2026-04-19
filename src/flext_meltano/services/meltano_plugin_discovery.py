@@ -100,7 +100,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 working_project = temp_project
             plugins: MutableSequence[t.StrMapping] = []
             abstractions = FlextMeltanoAbstractions()
-            extractors_result = abstractions.get_plugins_of_type(
+            extractors_result = abstractions.fetch_plugins_of_type(
                 working_project,
                 c.Meltano.PluginType.EXTRACTORS.value,
             )
@@ -111,7 +111,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     if idx >= max_extractors:
                         break
                     plugins.append(self._build_plugin_info(k, v, "extractor"))
-            loaders_result = abstractions.get_plugins_of_type(
+            loaders_result = abstractions.fetch_plugins_of_type(
                 working_project,
                 c.Meltano.PluginType.LOADERS.value,
             )
@@ -127,7 +127,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             self.logger.exception(error_msg, error=str(e))
             return r[Sequence[t.StrMapping]].fail(error_msg)
 
-    def get_plugin_info(
+    def fetch_plugin_info(
         self, plugin_name: str, plugin_type: str
     ) -> p.Result[t.StrMapping]:
         """Get detailed information about specific plugin."""
@@ -146,7 +146,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     "Temporary project does not satisfy Project"
                 )
             abstractions = FlextMeltanoAbstractions()
-            plugins_result = abstractions.get_plugins_of_type(
+            plugins_result = abstractions.fetch_plugins_of_type(
                 temp_project,
                 plugin_type,
             )

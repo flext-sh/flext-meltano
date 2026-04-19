@@ -17,7 +17,7 @@ class TestFlextMeltanoApiFacade:
 
     def test_public_facade_contract(self) -> None:
         """The public singleton stays callable and stable."""
-        u.Tests.Matchers.that(type(meltano).get_instance() is meltano, eq=True)
+        u.Tests.Matchers.that(type(meltano).fetch_instance() is meltano, eq=True)
         u.Tests.Matchers.that(callable(meltano.Tap), eq=True)
         u.Tests.Matchers.that(callable(meltano.Target), eq=True)
         u.Tests.Matchers.that(callable(meltano.Dbt), eq=True)

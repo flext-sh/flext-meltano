@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from flext_cli import m, u
 
@@ -16,12 +16,12 @@ class FlextMeltanoModelsDiscovery:
     class PluginDiscoverySource(m.FlexibleModel):
         """Normalized raw plugin discovery payload from external sources."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         default_variant: Annotated[
             str, u.Field(default="", description="Plugin default variant")
         ] = ""
-        variants: t.RecursiveContainerMapping = u.Field(
-            default_factory=dict, description="Available plugin variants"
-        )
+        variants: t.RecursiveContainerMapping = u.Field(default_factory=dict)
         logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
         description: Annotated[
             str, u.Field(default="", description="Plugin description")
@@ -65,8 +65,10 @@ class FlextMeltanoModelsDiscovery:
     class PluginDiscoveryCatalog(m.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
-            u.Field(default_factory=dict, description="Discovered plugins catalog")
+            u.Field(default_factory=dict)
         )
 
         @u.field_validator("plugins", mode="before")

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 
@@ -15,6 +15,8 @@ class FlextMeltanoModelsTransformations:
     class DbtProjectModel(m.Entity):
         """Generic DBT project configuration with validation."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         name: Annotated[str, u.Field(description="DBT project name")]
         profile: Annotated[str, u.Field(description="DBT profile name")]
         dbt_version: Annotated[
@@ -23,17 +25,17 @@ class FlextMeltanoModelsTransformations:
         settings: Annotated[
             t.RecursiveContainerMapping,
             u.Field(description="DBT project configuration"),
-        ] = u.Field(default_factory=dict, description="DBT project configuration")
+        ] = u.Field(default_factory=dict)
         models: Annotated[
             t.RecursiveContainerMapping, u.Field(description="DBT models configuration")
-        ] = u.Field(default_factory=dict, description="DBT models configuration")
+        ] = u.Field(default_factory=dict)
         sources: Annotated[
             t.RecursiveContainerMapping,
             u.Field(description="DBT sources configuration"),
-        ] = u.Field(default_factory=dict, description="DBT sources configuration")
+        ] = u.Field(default_factory=dict)
         tests: Annotated[
             t.RecursiveContainerMapping, u.Field(description="DBT tests configuration")
-        ] = u.Field(default_factory=dict, description="DBT tests configuration")
+        ] = u.Field(default_factory=dict)
 
         @u.model_validator(mode="after")
         def validate_dbt_project(self) -> Self:
@@ -151,11 +153,11 @@ class FlextMeltanoModelsTransformations:
         models: Annotated[
             t.StrSequence,
             u.Field(description="Models to execute"),
-        ] = u.Field(default_factory=list, description="Models to execute")
+        ] = u.Field(default_factory=tuple)
         exclude: Annotated[
             t.StrSequence,
             u.Field(description="Models to exclude"),
-        ] = u.Field(default_factory=list, description="Models to exclude")
+        ] = u.Field(default_factory=tuple)
         full_refresh: Annotated[
             bool,
             u.Field(default=False, description="Full refresh execution"),

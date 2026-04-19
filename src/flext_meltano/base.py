@@ -28,7 +28,7 @@ class FlextMeltanoServiceBase(s[t.RecursiveContainerMapping]):
     """
 
     settings_type: Annotated[
-        type[FlextSettings] | None,
+        type | None,
         u.Field(description="Settings class for Meltano service initialization"),
     ] = FlextMeltanoSettings
 

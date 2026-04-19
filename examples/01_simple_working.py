@@ -18,7 +18,7 @@ logger = u.fetch_logger(__name__)
 
 def simple_api_example() -> None:
     """Example using the public Meltano facade."""
-    version_result = meltano.get_version()
+    version_result = meltano.fetch_version()
     if version_result.success:
         logger.info("Meltano version: %s", version_result.value)
     discovery_result = meltano.discover_installed_plugins()

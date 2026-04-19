@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Annotated, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 
@@ -17,14 +17,14 @@ class FlextMeltanoModelsProjects:
     class DbtManifestNode(m.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         name: Annotated[str | None, u.Field(default=None, description="Node name")]
         path: Annotated[str | None, u.Field(default=None, description="Node path")]
         description: Annotated[
             str | None, u.Field(default=None, description="Node description")
         ] = None
-        fqn: t.StrSequence = u.Field(
-            default_factory=list, description="Fully qualified name parts"
-        )
+        fqn: t.StrSequence = u.Field(default_factory=tuple)
         resource_type: Annotated[
             str,
             u.Field(default="", description="Node resource type (model, test, etc.)"),
@@ -39,8 +39,10 @@ class FlextMeltanoModelsProjects:
     class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = u.Field(
-            default_factory=dict, description="Manifest nodes keyed by node_id"
+            default_factory=dict
         )
 
         def get_nodes_by_type(
@@ -57,6 +59,8 @@ class FlextMeltanoModelsProjects:
     class MeltanoProjectModel(m.Entity):
         """Generic Meltano project configuration with validation."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         project_id: Annotated[str, u.Field(description="Unique project identifier")]
         project_version: Annotated[
             str, u.Field(default="1", description="Project version")
@@ -64,12 +68,8 @@ class FlextMeltanoModelsProjects:
         default_environment: Annotated[
             str, u.Field(default="dev", description="Default environment name")
         ] = "dev"
-        plugins: t.RecursiveContainerMapping = u.Field(
-            default_factory=dict, description="Plugin configurations"
-        )
-        environments: t.RecursiveContainerMapping = u.Field(
-            default_factory=dict, description="Environment configurations"
-        )
+        plugins: t.RecursiveContainerMapping = u.Field(default_factory=dict)
+        environments: t.RecursiveContainerMapping = u.Field(default_factory=dict)
 
         @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Annotated, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 
@@ -88,6 +88,8 @@ class FlextMeltanoModelsInstancesData:
     class DataSourceInstance(m.Entity):
         """Generic data source instance for pipeline operations."""
 
+        _flext_enforcement_exempt: ClassVar[bool] = True
+
         source_type: Annotated[str, u.Field(description="Type of the data source")]
         settings: Annotated[
             FlextMeltanoModelsSources.DataSourceConfig,
@@ -106,14 +108,14 @@ class FlextMeltanoModelsInstancesData:
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             u.Field(description="Discovered streams"),
-        ] = u.Field(default_factory=dict, description="Discovered streams")
+        ] = u.Field(default_factory=dict)
         discovered: Annotated[
             bool,
             u.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
             t.ConfigurationMapping, u.Field(description="Additional metadata")
-        ] = u.Field(default_factory=dict, description="Additional metadata")
+        ] = u.Field(default_factory=dict)
         source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
         @u.computed_field()
