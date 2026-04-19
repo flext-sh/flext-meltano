@@ -228,7 +228,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     def __init__(
         self,
         cli: p.Meltano.DbtCli,
-            service: p.Meltano.DbtOperationService | None = None,
+        service: p.Meltano.DbtOperationService | None = None,
     ) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
@@ -263,7 +263,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     def __init__(
         self,
         cli: p.Meltano.PluginCli,
-            service: p.Meltano.PluginOperationService | None = None,
+        service: p.Meltano.PluginOperationService | None = None,
     ) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
@@ -304,7 +304,7 @@ class FlextMeltanoStatusManager:
     def __init__(
         self,
         cli: p.Meltano.StatusCli,
-            service: p.Meltano.StatusOperationService | None = None,
+        service: p.Meltano.StatusOperationService | None = None,
     ) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()

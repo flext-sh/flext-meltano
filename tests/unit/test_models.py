@@ -55,7 +55,9 @@ class TestFlextMeltanoModels:
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         invalid_config = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(e.ValidationError, match="Input should be a valid dictionary"):
+        with pytest.raises(
+            e.ValidationError, match="Input should be a valid dictionary"
+        ):
             m.Meltano.TapConfig(
                 tap_type="tap-postgres",
                 connection_config=invalid_config,
@@ -140,7 +142,9 @@ class TestFlextMeltanoModels:
 
     def test_stream_info_validation_invalid_schema_type(self) -> None:
         invalid_schema = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(e.ValidationError, match="Input should be a valid dictionary"):
+        with pytest.raises(
+            e.ValidationError, match="Input should be a valid dictionary"
+        ):
             m.Meltano.StreamInfo(
                 stream_name="users",
                 stream_schema=invalid_schema,
@@ -182,7 +186,9 @@ class TestFlextMeltanoModels:
 
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
         invalid_plugins = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(e.ValidationError, match="Input should be a valid dictionary"):
+        with pytest.raises(
+            e.ValidationError, match="Input should be a valid dictionary"
+        ):
             m.Meltano.MeltanoProjectModel(
                 project_id="test-project",
                 plugins=invalid_plugins,
@@ -282,7 +288,9 @@ class TestFlextMeltanoModels:
 
     def test_dbt_project_validation_invalid_config_type(self) -> None:
         invalid_config = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(e.ValidationError, match="Input should be a valid dictionary"):
+        with pytest.raises(
+            e.ValidationError, match="Input should be a valid dictionary"
+        ):
             m.Meltano.DbtProjectModel(
                 name="test-project",
                 profile="default",

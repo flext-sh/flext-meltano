@@ -22,7 +22,7 @@ class FlextMeltanoSingerTapAdapter:
 
     def __init__(
         self,
-            tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend,
+        tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend,
     ) -> None:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap

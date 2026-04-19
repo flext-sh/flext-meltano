@@ -244,7 +244,9 @@ class FlextMeltanoProtocolsSinger:
             """Expose the raw tap configuration."""
             ...
 
-        def discover_streams(self) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+        def discover_streams(
+            self,
+        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
             """Return the tap streams."""
             ...
 
@@ -265,7 +267,9 @@ class FlextMeltanoProtocolsSinger:
             """Expose tap settings mapping."""
             ...
 
-        def discover_streams(self) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+        def discover_streams(
+            self,
+        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
             """Return the tap streams."""
             ...
 
