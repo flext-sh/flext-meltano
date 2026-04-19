@@ -1,0 +1,26 @@
+src/flext_meltano/services/cli_small_managers.py
+  h_9db9d35f50cf33 8
+src/flext_meltano/services/singer_sdk.py
+  h_9db9d35f50cf33 25
+tests/unit/test_execution_result.py
+  h_9db9d35f50cf33 27
+tests/unit/test_typings.py
+  h_9db9d35f50cf33 40-44
+src/flext_meltano/_protocols/singer.py
+  h_9db9d35f50cf33 10,13,233-274
+src/flext_meltano/_typings/singer.py
+  h_9db9d35f50cf33 14,20-21
+src/flext_meltano/_protocols/services.py
+  h_9db9d35f50cf33 178-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "43e985443515d9f124e44485cbc094b0f928e7cd",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
