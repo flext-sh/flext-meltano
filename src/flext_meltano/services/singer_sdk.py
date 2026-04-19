@@ -7,9 +7,7 @@ so that mypy recognizes them as valid types for subclassing.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Protocol
 
-import click
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record
 from singer_sdk.streams import Stream
@@ -19,56 +17,12 @@ from singer_sdk.target_base import Target
 from flext_meltano import m, p, t
 
 
-class _SingerTapSdkBackend(Protocol):
-    """Raw Singer SDK tap surface consumed by the FLEXT bridge."""
-
-    @classmethod
-    def get_singer_command(cls) -> click.Command:
-        """Return the Singer SDK command bound to the tap type."""
-        ...
-
-    @property
-    def config(self) -> Mapping[str, t.ValueOrModel]:
-        """Expose the raw tap configuration."""
-        ...
-
-    def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
-        """Return the tap streams."""
-        ...
-
-    def sync_all(self) -> None:
-        """Run a full Singer sync."""
-        ...
-
-
-class _SingerTapSettingsBackend(Protocol):
-    """Legacy tap backend contract exposing ``settings`` only."""
-
-    @classmethod
-    def get_singer_command(cls) -> click.Command:
-        """Return the Singer SDK command bound to the tap type."""
-        ...
-
-    @property
-    def settings(self) -> Mapping[str, t.ValueOrModel]:
-        """Expose tap settings mapping."""
-        ...
-
-    def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
-        """Return the tap streams."""
-        ...
-
-    def sync_all(self) -> None:
-        """Run a full Singer sync."""
-        ...
-
-
 class FlextMeltanoSingerTapAdapter:
     """Bridge a Singer SDK tap instance into FLEXT's internal runtime contract."""
 
     def __init__(
         self,
-        tap: _SingerTapSdkBackend | _SingerTapSettingsBackend,
+            tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend,
     ) -> None:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap

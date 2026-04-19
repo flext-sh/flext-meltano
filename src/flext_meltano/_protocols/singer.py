@@ -7,9 +7,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
 
+import click
 from flext_cli import p
 
 from flext_meltano import t
@@ -228,4 +229,46 @@ class FlextMeltanoProtocolsSinger:
 
         def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[None]:
             """Handle a STATE message."""
+            ...
+
+    class SingerTapSdkBackend(Protocol):
+        """Raw Singer SDK tap surface consumed by the FLEXT bridge."""
+
+        @classmethod
+        def get_singer_command(cls) -> click.Command:
+            """Return the Singer SDK command bound to the tap type."""
+            ...
+
+        @property
+        def config(self) -> Mapping[str, t.ValueOrModel]:
+            """Expose the raw tap configuration."""
+            ...
+
+        def discover_streams(self) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+            """Return the tap streams."""
+            ...
+
+        def sync_all(self) -> None:
+            """Run a full Singer sync."""
+            ...
+
+    class SingerTapSettingsBackend(Protocol):
+        """Legacy tap backend contract exposing ``settings`` only."""
+
+        @classmethod
+        def get_singer_command(cls) -> click.Command:
+            """Return the Singer SDK command bound to the tap type."""
+            ...
+
+        @property
+        def settings(self) -> Mapping[str, t.ValueOrModel]:
+            """Expose tap settings mapping."""
+            ...
+
+        def discover_streams(self) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+            """Return the tap streams."""
+            ...
+
+        def sync_all(self) -> None:
+            """Run a full Singer sync."""
             ...

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Protocol, override
+from typing import override
 
 from flext_meltano import (
     FlextMeltanoDbtRunnerMixin,
@@ -17,27 +17,6 @@ from flext_meltano import (
     t,
     u,
 )
-
-
-class _DbtOperationService(Protocol):
-    def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]: ...
-
-
-class _PluginOperationService(Protocol):
-    def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]: ...
-
-    def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]: ...
-
-    def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]: ...
-
-
-class _StatusOperationService(Protocol):
-    def fetch_version(self) -> p.Result[str]: ...
-
-    def run_health_check(self) -> p.Result[str]: ...
-
-    def show_status(self) -> p.Result[str]: ...
-
 
 _PLUGIN_INSTALL_ARG_COUNT = 2
 
@@ -249,7 +228,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     def __init__(
         self,
         cli: p.Meltano.DbtCli,
-        service: _DbtOperationService | None = None,
+            service: p.Meltano.DbtOperationService | None = None,
     ) -> None:
         """Initialize DBT manager with CLI reference."""
         super().__init__()
@@ -284,7 +263,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     def __init__(
         self,
         cli: p.Meltano.PluginCli,
-        service: _PluginOperationService | None = None,
+            service: p.Meltano.PluginOperationService | None = None,
     ) -> None:
         """Initialize plugin manager with CLI reference."""
         super().__init__()
@@ -325,7 +304,7 @@ class FlextMeltanoStatusManager:
     def __init__(
         self,
         cli: p.Meltano.StatusCli,
-        service: _StatusOperationService | None = None,
+            service: p.Meltano.StatusOperationService | None = None,
     ) -> None:
         """Initialize status manager with CLI reference."""
         super().__init__()

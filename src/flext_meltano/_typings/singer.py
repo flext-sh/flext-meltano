@@ -11,15 +11,14 @@ from collections.abc import Mapping, Sequence
 
 from flext_cli import t
 
-from flext_meltano import FlextMeltanoModelsSingerSdk, c
+from flext_meltano import c
 
 
 class FlextMeltanoTypingsSinger:
     """Singer protocol type definitions.
 
-    All aliases are FLAT namespace with ``Singer`` prefix.
-    External library wrappers (singer_sdk.typing) are kept to prevent
-    direct imports by consumer projects.
+    Singer contracts belong to ``t.Meltano`` and must avoid compatibility
+    wrappers that mirror model-layer objects.
     """
 
     type SingerCatalogEntry = Mapping[
@@ -32,18 +31,3 @@ class FlextMeltanoTypingsSinger:
     ]
 
     SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-
-    # Singer SDK typing wrappers stay behind the Meltano model boundary.
-    SingerArrayType = FlextMeltanoModelsSingerSdk.SingerArrayType
-    SingerBooleanType = FlextMeltanoModelsSingerSdk.SingerBooleanType
-    SingerCustomType = FlextMeltanoModelsSingerSdk.SingerCustomType
-    SingerDateTimeType = FlextMeltanoModelsSingerSdk.SingerDateTimeType
-    SingerDateType = FlextMeltanoModelsSingerSdk.SingerDateType
-    SingerDurationType = FlextMeltanoModelsSingerSdk.SingerDurationType
-    SingerIntegerType = FlextMeltanoModelsSingerSdk.SingerIntegerType
-    SingerNumberType = FlextMeltanoModelsSingerSdk.SingerNumberType
-    SingerObjectType = FlextMeltanoModelsSingerSdk.SingerObjectType
-    SingerPropertiesList = FlextMeltanoModelsSingerSdk.SingerPropertiesList
-    SingerProperty = FlextMeltanoModelsSingerSdk.SingerProperty
-    SingerStringType = FlextMeltanoModelsSingerSdk.SingerStringType
-    SingerTimeType = FlextMeltanoModelsSingerSdk.SingerTimeType

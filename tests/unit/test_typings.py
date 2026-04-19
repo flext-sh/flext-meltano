@@ -37,9 +37,11 @@ class TestFlextMeltanoTypes:
         """Test Singer types are flat with ``Singer`` prefix."""
 
     def test_singer_sdk_typing_wrappers(self) -> None:
-        """Test Singer SDK typing wrappers prevent direct imports."""
-        assert t.Meltano.SingerProperty is m.Meltano.SingerProperty
-        assert t.Meltano.SingerStringType is m.Meltano.SingerStringType
+        """Test runtime Singer SDK wrappers stay out of ``t.Meltano``."""
+        assert m.Meltano.SingerProperty is not None
+        assert m.Meltano.SingerStringType is not None
+        assert not hasattr(t.Meltano, "SingerProperty")
+        assert not hasattr(t.Meltano, "SingerStringType")
 
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""

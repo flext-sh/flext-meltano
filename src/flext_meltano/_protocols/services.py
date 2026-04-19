@@ -175,3 +175,43 @@ class FlextMeltanoProtocolsServices:
         def show_target_help(self) -> None:
             """Show target help."""
             ...
+
+    @runtime_checkable
+    class DbtOperationService(Protocol):
+        """Protocol for DBT operation backends used by CLI managers."""
+
+        def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]:
+            """Execute a DBT sub-command."""
+            ...
+
+    @runtime_checkable
+    class PluginOperationService(Protocol):
+        """Protocol for plugin operation backends used by CLI managers."""
+
+        def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
+            """Install a Meltano plugin."""
+            ...
+
+        def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]:
+            """Fetch info for a named plugin."""
+            ...
+
+        def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]:
+            """List installed plugins."""
+            ...
+
+    @runtime_checkable
+    class StatusOperationService(Protocol):
+        """Protocol for status operation backends used by CLI managers."""
+
+        def fetch_version(self) -> p.Result[str]:
+            """Return the current Meltano version."""
+            ...
+
+        def run_health_check(self) -> p.Result[str]:
+            """Run a health check and return a summary."""
+            ...
+
+        def show_status(self) -> p.Result[str]:
+            """Show current project status."""
+            ...
