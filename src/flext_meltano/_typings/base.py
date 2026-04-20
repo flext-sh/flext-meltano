@@ -32,8 +32,17 @@ class FlextMeltanoTypingsBase:
     CONTAINER_MAP_LIST_ADAPTER: ClassVar[
         u.TypeAdapter[list[Mapping[str, t.Container]]]
     ] = u.TypeAdapter(list[Mapping[str, t.Container]])
+    STRING_ADAPTER: ClassVar[u.TypeAdapter[t.TextValue]] = u.TypeAdapter(
+        t.TextValue,
+    )
     INTEGER_ADAPTER: ClassVar[u.TypeAdapter[t.IntegerValue]] = u.TypeAdapter(
         t.IntegerValue
+    )
+    STR_MAPPING_ADAPTER: ClassVar[u.TypeAdapter[t.StrMapping]] = u.TypeAdapter(
+        t.StrMapping,
+    )
+    STR_SEQUENCE_ADAPTER: ClassVar[u.TypeAdapter[t.StrSequence]] = u.TypeAdapter(
+        t.StrSequence,
     )
 
     type ValidatorInput = (
