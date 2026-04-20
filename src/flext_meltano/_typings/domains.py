@@ -28,7 +28,7 @@ class FlextMeltanoTypingsDomains:
     type NestedStrMapping = Mapping[str, t.StrMapping]
     type DbtManifestData = Mapping[
         str,
-        Mapping[str, t.ContainerValue] | None,
+        Mapping[str, t.Container] | None,
     ]
     type DbtProject = Mapping[str, str | bool | t.StrSequence]
     type PublicFactory[TService] = Callable[..., r[TService]]

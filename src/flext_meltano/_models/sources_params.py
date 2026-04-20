@@ -126,9 +126,9 @@ class FlextMeltanoModelsSourcesParams:
             self, value: Mapping[str, t.Container]
         ) -> Mapping[str, t.Container]:
             """Normalize stream schema structure."""
-            result: t.MutableRecursiveContainerMapping = dict(value)
+            result: t.MutableFlatContainerMapping = dict(value)
             if "properties" not in result:
-                empty: t.MutableRecursiveContainerMapping = {}
+                empty: t.MutableFlatContainerMapping = {}
                 result["properties"] = empty
             if "type" not in result:
                 result["type"] = "t.Container"

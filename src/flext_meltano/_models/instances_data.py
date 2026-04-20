@@ -99,7 +99,7 @@ class FlextMeltanoModelsInstancesData:
             u.Field(description="Source configuration"),
         ]
         adapter: Annotated[
-            t.ContainerValue | None,
+            t.Container | None,
             u.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[
@@ -186,7 +186,7 @@ class FlextMeltanoModelsInstancesData:
             description="Sink configuration"
         )
         adapter: Annotated[
-            t.ContainerValue | None,
+            t.Container | None,
             u.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[

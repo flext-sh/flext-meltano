@@ -37,7 +37,7 @@ class FlextMeltanoModelsCore:
                 return any(checks)
             return False
 
-        protected: t.MutableRecursiveContainerMapping = {}
+        protected: t.MutableFlatContainerMapping = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
         return protected

@@ -304,7 +304,7 @@ class FlextMeltanoUtilitiesRuntime:
         duration_field: str | None = "execution_time",
     ) -> Mapping[str, t.Container]:
         """Build a standard command payload for services over Meltano runtime."""
-        payload: t.MutableRecursiveContainerMapping = {
+        payload: t.MutableFlatContainerMapping = {
             "success": command_result.success,
             "output": u.to_str(command_result.output),
             "error": u.to_str(command_result.error),

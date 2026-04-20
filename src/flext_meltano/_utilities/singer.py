@@ -87,7 +87,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def emit_state(
-        value: t.MutableRecursiveContainerMapping,
+        value: t.MutableFlatContainerMapping,
     ) -> p.Result[str]:
         """Emit a Singer STATE message as JSON line to stdout.
 

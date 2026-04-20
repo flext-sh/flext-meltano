@@ -199,7 +199,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         stream: m.Meltano.StreamDefinition,
     ) -> p.Result[Mapping[str, t.Container]]:
         """Create Singer catalog entry from stream definition."""
-        entry: t.MutableRecursiveContainerMapping = {
+        entry: t.MutableFlatContainerMapping = {
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": stream.stream_schema,

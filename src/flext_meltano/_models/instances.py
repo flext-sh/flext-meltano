@@ -147,7 +147,7 @@ class FlextMeltanoModelsInstances:
             u.Field(description="Tap configuration"),
         ]
         adapter: Annotated[
-            t.ContainerValue | None,
+            t.Container | None,
             u.Field(default=None, description="Tap adapter instance"),
         ] = None
         streams: Sequence[FlextMeltanoModelsInstances.StreamInfo] = u.Field(

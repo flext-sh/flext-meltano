@@ -131,7 +131,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            record_dict: dict[str, t.ContainerValue] = {
+            record_dict: dict[str, t.Container] = {
                 str(k): (str(v) if isinstance(v, Path) else v)
                 for k, v in record.items()
             }
