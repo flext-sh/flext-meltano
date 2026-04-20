@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import os
 import signal
-from collections.abc import Mapping, Sequence
+from collections.abc import (
+    Mapping,
+    Sequence,
+)
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 

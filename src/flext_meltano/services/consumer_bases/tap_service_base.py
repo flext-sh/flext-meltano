@@ -15,6 +15,9 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
+from collections.abc import (
+    Mapping,
+)
 from typing import Annotated, ClassVar, Self, override
 
 from flext_core import FlextSettings

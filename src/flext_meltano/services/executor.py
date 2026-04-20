@@ -6,6 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import (
+    Mapping,
+)
+
 from meltano.core.error import ProjectNotFound
 
 from flext_meltano import (

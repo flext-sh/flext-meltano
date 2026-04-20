@@ -8,7 +8,10 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import (
+    Mapping,
+    Sequence,
+)
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path

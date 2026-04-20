@@ -11,7 +11,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Sequence
+from collections.abc import (
+    Sequence,
+)
 from pathlib import Path
 from unittest import mock
 

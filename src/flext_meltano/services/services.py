@@ -6,6 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import (
+    Mapping,
+)
 from typing import Self, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u

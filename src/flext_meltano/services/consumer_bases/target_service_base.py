@@ -11,7 +11,11 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import (
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 

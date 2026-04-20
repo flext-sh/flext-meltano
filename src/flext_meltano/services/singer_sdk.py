@@ -6,7 +6,10 @@ so that mypy recognizes them as valid types for subclassing.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import (
+    Mapping,
+    Sequence,
+)
 
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record

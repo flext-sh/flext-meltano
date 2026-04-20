@@ -7,6 +7,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import (
+    Mapping,
+)
 from typing import Annotated, override
 
 from flext_cli import cli, r, u

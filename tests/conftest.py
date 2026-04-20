@@ -12,7 +12,12 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Callable, Generator, Sequence
+from collections.abc import (
+    Callable,
+    Generator,
+    Mapping,
+    Sequence,
+)
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import (
+    Mapping,
+)
 from typing import Annotated, ClassVar
 
 from flext_cli import m, u

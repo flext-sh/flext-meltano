@@ -7,6 +7,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
+from collections.abc import (
+    Mapping,
+)
 from pathlib import Path
 from typing import override
 

@@ -9,6 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import (
+    Mapping,
+)
 from typing import Self
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
