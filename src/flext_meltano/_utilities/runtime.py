@@ -9,10 +9,10 @@ from collections.abc import (
 from pathlib import Path
 
 from flext_infra import u
-from meltano.core.plugin.base import PluginType as MeltanoPluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 
 from flext_meltano import c, m, p, t
+from meltano.core.plugin.base import PluginType as MeltanoPluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class FlextMeltanoUtilitiesRuntime:

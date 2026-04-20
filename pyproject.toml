@@ -172,7 +172,35 @@ omit = [ "*/dependency_injector/providers.pyx" ]
 
 # [MANAGED] deptry
 [tool.deptry]
-known_first_party = [ "flext_core", "flext_meltano" ]
+known_first_party = [
+  "alembic",
+  "dbt-adapters",
+  "dbt-common",
+  "dbt-core",
+  "duckdb",
+  "fastapi",
+  "flext-core",
+  "flext_meltano",
+  "httpx",
+  "injectable",
+  "jinja2",
+  "meltano",
+  "pandas",
+  "prometheus-client",
+  "pydantic",
+  "pydantic-core",
+  "pydantic-settings",
+  "python-dotenv",
+  "pyyaml",
+  "referencing",
+  "requests",
+  "setuptools",
+  "singer-sdk",
+  "sqlalchemy",
+  "structlog",
+  "uvicorn",
+  "wrapt",
+]
 pep621_dev_dependency_groups = [ "dev" ]
 
 [tool.flext.docs]
@@ -502,7 +530,35 @@ select = [ "ALL" ]
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false
-known-first-party = [ "flext_core", "flext_meltano" ]
+known-first-party = [
+  "alembic",
+  "dbt-adapters",
+  "dbt-common",
+  "dbt-core",
+  "duckdb",
+  "fastapi",
+  "flext-core",
+  "flext_meltano",
+  "httpx",
+  "injectable",
+  "jinja2",
+  "meltano",
+  "pandas",
+  "prometheus-client",
+  "pydantic",
+  "pydantic-core",
+  "pydantic-settings",
+  "python-dotenv",
+  "pyyaml",
+  "referencing",
+  "requests",
+  "setuptools",
+  "singer-sdk",
+  "sqlalchemy",
+  "structlog",
+  "uvicorn",
+  "wrapt",
+]
 split-on-trailing-comma = true
 
 [tool.ruff.lint.per-file-ignores]

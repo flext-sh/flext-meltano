@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextSettings
+
 from flext_meltano import (
     FlextMeltanoExecutorBase,
     FlextMeltanoServiceBase,

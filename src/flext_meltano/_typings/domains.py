@@ -14,7 +14,6 @@ from collections.abc import (
 from typing import Literal
 
 from flext_cli import t
-
 from flext_core import r
 
 

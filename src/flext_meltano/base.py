@@ -18,8 +18,8 @@ from types import ModuleType
 from typing import Annotated, override
 
 from flext_cli import u
-
 from flext_core import FlextSettings, s
+
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 

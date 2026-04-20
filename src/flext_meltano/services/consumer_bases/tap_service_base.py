@@ -21,6 +21,7 @@ from collections.abc import (
 from typing import Annotated, ClassVar, Self, override
 
 from flext_core import FlextSettings
+
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
