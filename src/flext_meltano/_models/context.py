@@ -21,7 +21,7 @@ class FlextMeltanoModelsContext:
         _flext_enforcement_exempt: ClassVar[bool] = True
 
         project_root: Annotated[str, u.Field(description="Project root path")]
-        elt_context: Mapping[str, t.Container] = u.Field(
+        elt_context: t.Cli.JsonMapping = u.Field(
             default_factory=dict, description="ELT execution context"
         )
         extractor_name: Annotated[str, u.Field(description="Extractor name")]
@@ -29,7 +29,7 @@ class FlextMeltanoModelsContext:
         execution_completed: Annotated[
             bool, u.Field(default=False, description="Execution completion flag")
         ] = False
-        execution_result: Mapping[str, t.Container] = u.Field(
+        execution_result: t.Cli.JsonMapping = u.Field(
             default_factory=dict, description="Execution result payload"
         )
 
@@ -37,14 +37,13 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_mapping_payloads(
             cls, value: t.Meltano.ValidatorInput
-        ) -> Mapping[str, t.Container]:
+        ) -> t.Cli.JsonMapping:
             """Normalize mapping-like payloads into dictionaries."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
-                    empty: Mapping[str, t.Container] = {}
-                    return empty
+                    return {}
 
         @u.field_validator(
             "project_root", "extractor_name", "loader_name", mode="before"
@@ -63,7 +62,7 @@ class FlextMeltanoModelsContext:
         project_root: Annotated[
             str, u.Field(default=c.IDENTIFIER_UNKNOWN, description="Project root path")
         ] = c.IDENTIFIER_UNKNOWN
-        execution_result: Mapping[str, t.Container] = u.Field(
+        execution_result: t.Cli.JsonMapping = u.Field(
             default_factory=dict, description="Execution result payload"
         )
 
@@ -71,14 +70,13 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_execution_result(
             cls, value: t.Meltano.ValidatorInput
-        ) -> Mapping[str, t.Container]:
+        ) -> t.Cli.JsonMapping:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
-                    empty: Mapping[str, t.Container] = {}
-                    return empty
+                    return {}
 
         @u.field_validator("project_root", mode="before")
         @classmethod

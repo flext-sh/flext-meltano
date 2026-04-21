@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import Self
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
@@ -80,8 +77,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: Mapping[str, t.Container],
-        stream_config: Mapping[str, t.Container] | None = None,
+        connection_config: t.Cli.JsonMapping,
+        stream_config: t.Cli.JsonMapping | None = None,
         tap_version: str = "1.0.0",
     ) -> p.Result[m.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""

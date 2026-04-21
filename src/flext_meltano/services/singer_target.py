@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
@@ -55,7 +52,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
     def create_flext_target(
         self,
-        sink_config: m.Meltano.DataSinkConfig | Mapping[str, t.Container],
+        sink_config: m.Meltano.DataSinkConfig | t.Cli.JsonMapping,
     ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
@@ -99,9 +96,9 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def validate_sink_config(
         self, sink_config: m.Meltano.DataSinkConfig

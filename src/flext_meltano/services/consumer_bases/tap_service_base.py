@@ -15,9 +15,6 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from collections.abc import (
-    Mapping,
-)
 from typing import Annotated, ClassVar, Self, override
 
 from flext_core import FlextSettings
@@ -52,7 +49,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextSettings | Mapping[str, t.Container] | None = None,
+        settings: FlextSettings | t.Cli.JsonMapping | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for tap facades."""
         super().__init__(settings=settings)
@@ -67,7 +64,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     @abstractmethod
     def create_tap_instance(
         self,
-        settings: Mapping[str, t.Container] | None = None,
+        settings: t.Cli.JsonMapping | None = None,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -155,9 +152,9 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         return self._tap_instance
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute tap service — returns status."""
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.Cli.JsonMapping].ok({
             "service": self.tap_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "tap",

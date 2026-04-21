@@ -55,9 +55,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             )
         return r[str].ok(completed.output.strip())
 
-    def add_plugin_by_config(
-        self, plugin_config: Mapping[str, t.Container]
-    ) -> p.Result[bool]:
+    def add_plugin_by_config(self, plugin_config: t.Cli.JsonMapping) -> p.Result[bool]:
         """Add a plugin to the Meltano project via ``meltano add``."""
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
@@ -76,24 +74,20 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _resolve_project_root(
-        project: t.ValueOrModel | Mapping[str, t.Container] | None,
+        project: t.ValueOrModel | t.Cli.JsonMapping | None,
     ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
-        project_mapping = u.Meltano.coerce_container_mapping(
-            project if isinstance(project, Mapping) else None,
-        )
-        if project_mapping is not None:
+        if isinstance(project, Mapping):
+            project_mapping = t.Cli.JSON_MAPPING_ADAPTER.validate_python(project)
             for key in ("root_dir", "root"):
                 mapping_value = project_mapping.get(key)
-                if isinstance(mapping_value, Path):
-                    return mapping_value
                 if isinstance(mapping_value, str) and mapping_value:
                     return Path(mapping_value)
         return None
 
     def fetch_plugins_of_type(
         self,
-        _project: t.ValueOrModel | Mapping[str, t.Container] | None,
+        _project: t.ValueOrModel | t.Cli.JsonMapping | None,
         plugin_type: str,
     ) -> p.Result[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""
@@ -124,14 +118,14 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def execute_singer_pipeline(
         self,
-        elt_context: Mapping[str, t.Container],
-        extractor_plugin: Mapping[str, t.Container] | None,
-        loader_plugin: Mapping[str, t.Container] | None,
+        elt_context: t.Cli.JsonMapping,
+        extractor_plugin: t.Cli.JsonMapping | None,
+        loader_plugin: t.Cli.JsonMapping | None,
     ) -> p.Result[t.HeaderMapping]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
         try:
-            extractor_mapping = u.Meltano.coerce_container_mapping(extractor_plugin)
-            loader_mapping = u.Meltano.coerce_container_mapping(loader_plugin)
+            extractor_mapping = extractor_plugin
+            loader_mapping = loader_plugin
             extractor_name = str(
                 elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN)
                 if extractor_mapping is None
@@ -183,40 +177,41 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail(f"Failed to get project root: {e}")
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute abstractions service and return real configuration state."""
         project_root = u.Meltano.resolve_project_root(self.settings)
-        payload: Mapping[str, t.Container] = {
+        payload: t.Cli.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
             "project_root": str(project_root) if project_root is not None else "",
             "environment": self.settings.environment,
             "meltano_version": self.settings.meltano_version,
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Cli.JsonMapping].ok(payload)
 
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Create Singer catalog entry from stream definition."""
-        entry: t.MutableFlatContainerMapping = {
+        schema_payload = u.Meltano.normalize_runtime_json_mapping(stream.stream_schema)
+        entry: dict[str, t.Cli.JsonValue] = {
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
-            "schema": stream.stream_schema,
-            "metadata": list[Mapping[str, t.Container]](),
+            "schema": {str(key): value for key, value in schema_payload.items()},
+            "metadata": [],
         }
-        return r[Mapping[str, t.Container]].ok(entry)
+        return r[t.Cli.JsonMapping].ok(entry)
 
     def fetch_stream_config(
         self,
         settings: m.Meltano.TapConfig,
         stream_name: str,
-    ) -> Mapping[str, t.Container]:
+    ) -> t.Cli.JsonMapping:
         """Get configuration for a specific stream."""
         if settings.stream_config and stream_name in settings.stream_config:
             val = settings.stream_config[stream_name]
-            if isinstance(val, dict):
-                return val
+            if isinstance(val, Mapping):
+                return t.Cli.JSON_MAPPING_ADAPTER.validate_python(val)
         return {}
 
     def fetch_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:

@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from collections.abc import (
     Mapping,
-    MutableMapping,
     MutableSequence,
     Sequence,
 )
@@ -65,7 +64,10 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
-            info = {"project_root": str(root), "state": "initialized"}
+            info = {
+                "project_root": str(root),
+                "state": c.Meltano.ProjectSdkState.INITIALIZED,
+            }
             self.logger.info("Meltano project initialized", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
@@ -83,7 +85,10 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
-            info = {"project_root": str(root), "state": "loaded"}
+            info = {
+                "project_root": str(root),
+                "state": c.Meltano.ProjectSdkState.LOADED,
+            }
             self.logger.info("Meltano project loaded", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
@@ -111,10 +116,10 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     continue
                 if plugin_type is not None and plugin_kind != plugin_type:
                     continue
-                plugin_def: MutableMapping[
-                    str,
-                    str | t.StrSequence | Mapping[str, t.Scalar | None],
-                ] = {"name": name, "type": plugin_kind}
+                plugin_def: dict[str, t.Cli.JsonValue] = {
+                    "name": name,
+                    "type": plugin_kind,
+                }
                 try:
                     variant_raw = plugin.variant
                 except AttributeError:
@@ -123,7 +128,14 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     {"value": variant_raw},
                 ).value
                 if variant_normalized is not None:
-                    plugin_def["variant"] = variant_normalized
+                    plugin_def["variant"] = (
+                        {str(key): value for key, value in variant_normalized.items()}
+                        if isinstance(variant_normalized, Mapping)
+                        else list(variant_normalized)
+                        if isinstance(variant_normalized, Sequence)
+                        and not isinstance(variant_normalized, str)
+                        else variant_normalized
+                    )
                 plugins.append(plugin_def)
         except (TypeError, AttributeError) as e:
             self.logger.warning("Failed to extract plugins", error=str(e))

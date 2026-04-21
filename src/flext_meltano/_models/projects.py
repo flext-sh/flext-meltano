@@ -69,10 +69,14 @@ class FlextMeltanoModelsProjects:
             str, u.Field(default="1", description="Project version")
         ] = "1"
         default_environment: Annotated[
-            str, u.Field(default="dev", description="Default environment name")
-        ] = "dev"
-        plugins: Mapping[str, t.Container] = u.Field(default_factory=dict)
-        environments: Mapping[str, t.Container] = u.Field(default_factory=dict)
+            c.Meltano.ProjectEnvironment,
+            u.Field(
+                default=c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
+                description="Default environment name",
+            ),
+        ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
+        plugins: t.Cli.JsonMapping = u.Field(default_factory=dict)
+        environments: t.Cli.JsonMapping = u.Field(default_factory=dict)
 
         @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:
@@ -96,13 +100,17 @@ class FlextMeltanoModelsProjects:
         ] = 1
         project_id: Annotated[str, u.Field(description="Project ID required")]
         default_environment: Annotated[
-            str, u.Field(default="dev", description="Default environment")
-        ] = "dev"
+            c.Meltano.ProjectEnvironment,
+            u.Field(
+                default=c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
+                description="Default environment",
+            ),
+        ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
         project_root: Path = u.Field(
             default_factory=Path.cwd, description="Project root directory"
         )
-        environments: t.StrSequence = u.Field(
-            default_factory=lambda: ["dev", "staging", "prod"],
+        environments: Sequence[c.Meltano.ProjectEnvironment] = u.Field(
+            default_factory=lambda: c.Meltano.METADATA_DEFAULT_ENVIRONMENTS,
             description="Available environments",
         )
 
@@ -116,29 +124,31 @@ class FlextMeltanoModelsProjects:
         @property
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
-            prod_environments = {"prod", "production", "live"}
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
             ]
-            prod_envs_list: t.StrSequence = list(prod_environments)
+            prod_envs_list: t.StrSequence = list(
+                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS
+            )
             return any(u.in_(env, prod_envs_list) for env in normalized_envs)
 
         @u.computed_field()
         @property
         def project_maturity(self) -> str:
             """Project maturity assessment."""
-            prod_envs = {"prod", "production", "live"}
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
             ]
-            prod_envs_list: t.StrSequence = list(prod_envs)
+            prod_envs_list: t.StrSequence = list(
+                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS
+            )
             has_prod = any(u.in_(env, prod_envs_list) for env in normalized_envs)
             env_count = u.count(self.environments)
             if has_prod and env_count >= c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT:
-                return "mature"
+                return c.Meltano.ProjectMaturity.MATURE
             if env_count >= c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT:
-                return "developing"
-            return "basic"
+                return c.Meltano.ProjectMaturity.DEVELOPING
+            return c.Meltano.ProjectMaturity.BASIC
 
         @u.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:

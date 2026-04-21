@@ -6,9 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import override
 
 from flext_core import FlextSettings
@@ -34,9 +31,9 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
         return FlextMeltanoSettings
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute default pipeline operation."""
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.Cli.JsonMapping].ok({
             "status": c.Meltano.OperationStatus.READY,
         })
 
@@ -44,15 +41,13 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Execute ELT pipeline using Meltano runtime."""
         try:
             if not tap_name.startswith(c.Meltano.PREFIX_TAP):
-                return r[Mapping[str, t.Container]].fail(
-                    f"Invalid tap name format: {tap_name}"
-                )
+                return r[t.Cli.JsonMapping].fail(f"Invalid tap name format: {tap_name}")
             if not target_name.startswith(c.Meltano.PREFIX_TARGET):
-                return r[Mapping[str, t.Container]].fail(
+                return r[t.Cli.JsonMapping].fail(
                     f"Invalid target name format: {target_name}"
                 )
             executor = FlextMeltanoExecutorBase()
@@ -62,24 +57,24 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                 _cwd=project_root,
             )
             if execution_result.failure:
-                return r[Mapping[str, t.Container]].fail(
+                return r[t.Cli.JsonMapping].fail(
                     execution_result.error or "Pipeline execution failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
-            pipeline_result: Mapping[str, t.Container] = {
+            pipeline_result: dict[str, t.Cli.JsonValue] = {
                 "status": c.Meltano.StreamStatus.COMPLETED
                 if command_result.success
                 else c.Meltano.StreamStatus.FAILED,
                 "execution_duration": command_result.execution_time,
                 "tap": tap_name,
                 "target": target_name,
-                "command": command_result.command,
+                "command": list(command_result.command),
                 "output": command_result.output,
                 "error": command_result.error,
             }
-            return r[Mapping[str, t.Container]].ok(pipeline_result)
+            return r[t.Cli.JsonMapping].ok(pipeline_result)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[Mapping[str, t.Container]].fail(f"Pipeline execution failed: {ex}")
+            return r[t.Cli.JsonMapping].fail(f"Pipeline execution failed: {ex}")
 
 
 class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
@@ -90,11 +85,11 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
         return FlextMeltanoSettings
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute default DBT operation."""
         return self.execute_dbt_operation()
 
-    def execute_dbt_operation(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute_dbt_operation(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute DBT operation via Meltano runtime."""
         try:
             executor = FlextMeltanoExecutorBase()
@@ -103,27 +98,27 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
                 [
                     c.Meltano.CMD_INVOKE,
                     c.Meltano.PLUGIN_DBT_DEFAULT_NAME,
-                    c.Meltano.DBT_COMMAND_RUN,
+                    c.Meltano.DbtCommand.RUN,
                 ],
                 _cwd=project_root,
             )
             if execution_result.failure:
-                return r[Mapping[str, t.Container]].fail(
+                return r[t.Cli.JsonMapping].fail(
                     execution_result.error or "DBT operation failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
-            dbt_result: Mapping[str, t.Container] = {
+            dbt_result: dict[str, t.Cli.JsonValue] = {
                 "status": c.Meltano.StreamStatus.COMPLETED
                 if command_result.success
                 else c.Meltano.StreamStatus.FAILED,
                 "execution_time": command_result.execution_time,
-                "command": command_result.command,
+                "command": list(command_result.command),
                 "output": command_result.output,
                 "error": command_result.error,
             }
-            return r[Mapping[str, t.Container]].ok(dbt_result)
+            return r[t.Cli.JsonMapping].ok(dbt_result)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[Mapping[str, t.Container]].fail(f"DBT operation failed: {ex}")
+            return r[t.Cli.JsonMapping].fail(f"DBT operation failed: {ex}")
 
 
 __all__: list[str] = ["FlextMeltanoDbtAdapter", "FlextMeltanoPipelineAdapter"]

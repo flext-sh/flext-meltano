@@ -10,11 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
-from types import ModuleType
 from typing import Annotated, override
 
 from flext_cli import u
@@ -23,7 +18,7 @@ from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase(s[Mapping[str, t.Container]]):
+class FlextMeltanoServiceBase(s[t.Cli.JsonMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -66,18 +61,9 @@ class FlextMeltanoServiceBase(s[Mapping[str, t.Container]]):
 
     def __init__(
         self,
-        settings: FlextSettings | Mapping[str, t.Container] | None = None,
+        settings: FlextSettings | t.Cli.JsonMapping | None = None,
         *,
-        settings_type: type[FlextSettings] | None = None,
         initial_context: p.Context | None = None,
-        _subproject: str | None = None,
-        _services: Mapping[str, t.RegisterableService] | None = None,
-        _factories: Mapping[str, t.FactoryCallable] | None = None,
-        _resources: Mapping[str, t.ResourceCallable] | None = None,
-        _container_overrides: t.ScalarMapping | None = None,
-        _wire_modules: Sequence[ModuleType] | None = None,
-        _wire_packages: t.StrSequence | None = None,
-        _wire_classes: Sequence[type] | None = None,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
         source_name: str | None = None,
@@ -85,14 +71,15 @@ class FlextMeltanoServiceBase(s[Mapping[str, t.Container]]):
         transformation_name: str | None = None,
     ) -> None:
         """Accept canonical settings input and pass typed runtime state forward."""
-        runtime_settings = settings if isinstance(settings, FlextSettings) else None
-        normalized_overrides: Mapping[str, t.Container] | None = None
-        if isinstance(settings, Mapping) and runtime_settings is None:
-            normalized_overrides = {str(key): value for key, value in settings.items()}
+        runtime_settings = (
+            settings
+            if isinstance(settings, FlextSettings)
+            else FlextMeltanoSettings.model_validate(settings)
+            if settings is not None
+            else None
+        )
         super().__init__(
-            settings=runtime_settings,
-            settings_type=settings_type or FlextMeltanoSettings,
-            settings_overrides=normalized_overrides,
+            runtime_settings=runtime_settings,
             initial_context=initial_context,
         )
         if service_name is not None:
@@ -106,14 +93,20 @@ class FlextMeltanoServiceBase(s[Mapping[str, t.Container]]):
         if transformation_name is not None:
             self.transformation_name = transformation_name
 
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+        """Execute the service using the canonical JSON payload contract."""
+        raise NotImplementedError
+
     @property
     @override
     def settings(self) -> FlextMeltanoSettings:
         """Return the typed Meltano settings namespace."""
         settings = super().settings
         if not isinstance(settings, FlextMeltanoSettings):
-            msg = "Meltano service runtime settings must be FlextMeltanoSettings"
-            raise TypeError(msg)
+            return FlextSettings.fetch_global().fetch_namespace(
+                "meltano",
+                FlextMeltanoSettings,
+            )
         return settings
 
 

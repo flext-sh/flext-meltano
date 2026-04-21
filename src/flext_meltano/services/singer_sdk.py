@@ -31,7 +31,7 @@ class FlextMeltanoSingerTapAdapter:
         self._tap = tap
 
     @property
-    def settings(self) -> Mapping[str, t.Container]:
+    def settings(self) -> t.Cli.JsonMapping:
         """Expose the tap configuration through the internal contract."""
         config_source = getattr(self._tap, "config", None)
         empty_source: Mapping[str, t.ValueOrModel] = {}
@@ -44,16 +44,14 @@ class FlextMeltanoSingerTapAdapter:
                 if isinstance(settings_source, Mapping)
                 else empty_source
             )
-        normalized: dict[str, t.Container] = {}
+        normalized: dict[str, t.Cli.JsonValue] = {}
         for key, value in source.items():
             normalized[str(key)] = self._normalize_recursive(value)
         return normalized
 
     @staticmethod
-    def _normalize_recursive(value: t.ValueOrModel) -> t.Container:
-        """Normalize Singer config values into recursive container contracts."""
-        if isinstance(value, t.CONTAINER_TYPES):
-            return value
+    def _normalize_recursive(value: t.ValueOrModel) -> t.Cli.JsonValue:
+        """Normalize Singer config values into canonical CLI JSON values."""
         if value is None:
             return None
         if isinstance(value, m.BaseModel):
@@ -74,7 +72,7 @@ class FlextMeltanoSingerTapAdapter:
                 FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
                 for sequence_value in value
             ]
-        return str(value)
+        return t.Cli.JSON_VALUE_ADAPTER.validate_python(value)
 
     def run_cli(
         self,

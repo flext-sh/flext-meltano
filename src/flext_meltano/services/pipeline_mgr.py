@@ -57,7 +57,7 @@ class FlextMeltanoPipelineManager(
                 "Pipeline creation requires pipeline name and JSON configuration",
             )
         pipeline_name = _args[0]
-        config_payload: Mapping[str, t.Container] | None = None
+        config_payload: t.Cli.JsonMapping | None = None
         if len(_args) >= c.Meltano.CLI_DEFAULT_MIN_ARGS_WITH_CONFIG:
             try:
                 config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(

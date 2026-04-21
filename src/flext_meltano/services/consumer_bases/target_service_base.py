@@ -12,7 +12,6 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from collections.abc import (
-    Mapping,
     MutableMapping,
     Sequence,
 )
@@ -170,9 +169,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         return r[None].ok(None)
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute target service — returns status."""
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.Cli.JsonMapping].ok({
             "service": self.target_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "target",

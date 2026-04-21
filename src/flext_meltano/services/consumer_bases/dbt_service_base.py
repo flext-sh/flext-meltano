@@ -13,7 +13,6 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from pathlib import Path
@@ -43,14 +42,14 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     dbt_project_name: Annotated[
         t.NonEmptyStr,
         u.Field(description="Canonical dbt project name"),
-    ] = "dbt"
+    ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
     _instance: ClassVar[Self | None] = None
 
     def __init__(
         self,
-        settings: FlextSettings | Mapping[str, t.Container] | None = None,
+        settings: FlextSettings | t.Cli.JsonMapping | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(settings=settings)
@@ -64,7 +63,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     @property
     @abstractmethod
-    def connection_profile(self) -> Mapping[str, t.Container]:
+    def connection_profile(self) -> t.Cli.JsonMapping:
         """Dbt connection profile for this project.
 
         Consumer implements with domain-specific connection settings
@@ -84,16 +83,16 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 return 0
             subcommand = command_args[0]
             match subcommand:
-                case "run":
+                case c.Meltano.DbtCommand.RUN:
                     models = command_args[1:] if len(command_args) > 1 else None
                     result = self.run_models(models)
-                case "test":
+                case c.Meltano.DbtCommand.TEST:
                     models = command_args[1:] if len(command_args) > 1 else None
                     result = self.run_tests(models)
-                case "compile":
+                case c.Meltano.DbtCommand.COMPILE:
                     models = command_args[1:] if len(command_args) > 1 else None
                     result = self.compile_models(models)
-                case "docs":
+                case c.Meltano.DbtCommand.DOCS:
                     result = self.generate_docs()
                 case _:
                     result = r[str].fail(str(subcommand))
@@ -120,11 +119,14 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         extra_args: t.StrSequence | None = None,
     ) -> t.StrSequence:
         """Build dbt CLI command."""
-        cmd: list[str] = ["dbt", subcommand]
+        cmd: list[str] = [c.Meltano.DBT_BINARY, subcommand]
         if self._dbt_project_root:
-            cmd.extend(["--projects-dir", str(self._dbt_project_root)])
+            cmd.extend([
+                c.Meltano.DbtOption.PROJECTS_DIR,
+                str(self._dbt_project_root),
+            ])
         if models:
-            cmd.extend(["--models", *models])
+            cmd.extend([c.Meltano.DbtOption.MODELS, *models])
         if extra_args:
             cmd.extend(extra_args)
         return cmd
@@ -150,23 +152,33 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def run_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Run dbt models."""
-        return self._run_dbt_cmd(self._build_dbt_cmd("run", models=models), "run")
+        return self._run_dbt_cmd(
+            self._build_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models),
+            c.Meltano.DbtCommand.RUN,
+        )
 
     def run_tests(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Run dbt tests."""
-        return self._run_dbt_cmd(self._build_dbt_cmd("test", models=models), "test")
+        return self._run_dbt_cmd(
+            self._build_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models),
+            c.Meltano.DbtCommand.TEST,
+        )
 
     def compile_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Compile dbt models."""
         return self._run_dbt_cmd(
-            self._build_dbt_cmd("compile", models=models), "compile"
+            self._build_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models),
+            c.Meltano.DbtCommand.COMPILE,
         )
 
     def generate_docs(self) -> p.Result[str]:
         """Generate dbt documentation."""
         return self._run_dbt_cmd(
-            self._build_dbt_cmd("docs", extra_args=["generate"]),
-            "docs generate",
+            self._build_dbt_cmd(
+                c.Meltano.DbtCommand.DOCS,
+                extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
+            ),
+            f"{c.Meltano.DbtCommand.DOCS} {c.Meltano.DbtCommand.GENERATE}",
         )
 
     # ------------------------------------------------------------------
@@ -225,19 +237,19 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                     "fqn": str(node.fqn_string),
                 }
                 for node in manifest.nodes.values()
-                if node.resource_type == "model"
+                if node.resource_type == c.Meltano.DbtResourceType.MODEL
             ]
             return r[Sequence[t.Meltano.OptionalScalarMap]].ok(models)
         except (ValueError, TypeError, KeyError) as exc:
             return r[Sequence[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute dbt service — returns status."""
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.Cli.JsonMapping].ok({
             "service": self.dbt_project_name,
             "status": c.CommonStatus.ACTIVE.value,
-            "type": "dbt",
+            "type": c.Meltano.ServiceType.DBT,
         })
 
 

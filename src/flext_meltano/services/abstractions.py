@@ -34,14 +34,14 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def build_tap_instance(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> Mapping[str, t.Container]:
+    ) -> t.Cli.JsonMapping:
         """Build tap instance representation."""
         return {"tap_id": tap_instance.tap_id, "tap_type": tap_instance.tap_type}
 
     def discover_streams(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Discover available streams via ``meltano select --list``."""
         try:
             cmd_result = self._run_meltano(
@@ -53,10 +53,10 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 ],
             )
             if cmd_result.failure:
-                return r[Mapping[str, t.Container]].fail(
+                return r[t.Cli.JsonMapping].fail(
                     cmd_result.error or "Stream discovery failed",
                 )
-            stream_defs: list[Mapping[str, t.Container]] = []
+            stream_defs: list[t.Cli.JsonValue] = []
             for line in cmd_result.value.splitlines():
                 name = line.strip()
                 if name and not name.startswith("["):
@@ -67,19 +67,19 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                             stream_schema={"type": "object", "properties": {}},
                             source_type=tap_instance.tap_type,
                         )
-            payload: Mapping[str, t.Container] = {"streams": stream_defs}
-            return r[Mapping[str, t.Container]].ok(payload)
+            payload: dict[str, t.Cli.JsonValue] = {"streams": stream_defs}
+            return r[t.Cli.JsonMapping].ok(payload)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover streams: {e}"
             self.logger.exception(error_msg)
-            return r[Mapping[str, t.Container]].fail(error_msg)
+            return r[t.Cli.JsonMapping].fail(error_msg)
 
     def sync_stream(
         self,
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,
         target_config: m.Meltano.TargetConfig | None = None,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Sync a single stream via ``meltano elt`` with stream selection."""
         try:
             loader_name = (
@@ -100,26 +100,26 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 if cmd_result.success
                 else c.Meltano.StreamStatus.FAILED
             )
-            result: Mapping[str, t.Container] = {
+            result: dict[str, t.Cli.JsonValue] = {
                 "stream_name": stream_name,
                 "status": status,
                 "target_loaded": target_config is not None,
             }
             if cmd_result.failure:
-                return r[Mapping[str, t.Container]].fail(
+                return r[t.Cli.JsonMapping].fail(
                     cmd_result.error or "Stream sync failed"
                 )
-            return r[Mapping[str, t.Container]].ok(result)
+            return r[t.Cli.JsonMapping].ok(result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to sync stream {stream_name}: {e}"
             self.logger.exception(error_msg)
-            return r[Mapping[str, t.Container]].fail(error_msg)
+            return r[t.Cli.JsonMapping].fail(error_msg)
 
     def create_tap_from_config(
         self,
         tap_type: str,
-        connection_config: Mapping[str, t.Container],
-        stream_config: Mapping[str, t.Container] | None = None,
+        connection_config: t.Cli.JsonMapping,
+        stream_config: t.Cli.JsonMapping | None = None,
     ) -> p.Result[m.Meltano.TapInstance]:
         """Create a TapInstance from configuration."""
         try:
@@ -140,15 +140,15 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def generate_catalog(
         self,
         tap_instance: m.Meltano.TapInstance,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Generate Singer catalog by discovering streams from the tap."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
-            return r[Mapping[str, t.Container]].fail(
+            return r[t.Cli.JsonMapping].fail(
                 discovery.error or "Catalog generation failed"
             )
         raw = discovery.value
-        streams: list[Mapping[str, t.Container]] = []
+        streams: list[t.Cli.JsonValue] = []
         for s in self._extract_raw_streams(raw):
             name = str(s.get("stream_name", ""))
             if name in self._stream_registry:
@@ -156,29 +156,29 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     self._stream_registry[name],
                 )
                 if entry_r.success:
-                    streams.append(entry_r.value)
-        catalog: Mapping[str, t.Container] = {"version": 1, "streams": streams}
-        return r[Mapping[str, t.Container]].ok(catalog)
+                    streams.append({
+                        str(key): value for key, value in entry_r.value.items()
+                    })
+        catalog: dict[str, t.Cli.JsonValue] = {"version": 1, "streams": streams}
+        return r[t.Cli.JsonMapping].ok(catalog)
 
     def fetch_stream_by_name(
         self,
         tap_instance: m.Meltano.TapInstance,
         stream_name: str,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Get stream definition by name."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
-            return r[Mapping[str, t.Container]].fail(
-                discovery.error or "Discovery failed"
-            )
+            return r[t.Cli.JsonMapping].fail(discovery.error or "Discovery failed")
         for stream in self._extract_raw_streams(discovery.value):
             if stream.get("stream_name") == stream_name:
-                result_stream: Mapping[str, t.Container] = {
+                result_stream: dict[str, t.Cli.JsonValue] = {
                     **stream,
                     "name": stream_name,
                 }
-                return r[Mapping[str, t.Container]].ok(result_stream)
-        return r[Mapping[str, t.Container]].fail(f"Stream '{stream_name}' not found")
+                return r[t.Cli.JsonMapping].ok(result_stream)
+        return r[t.Cli.JsonMapping].fail(f"Stream '{stream_name}' not found")
 
     def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
         """List stream names available in tap instance."""
@@ -192,13 +192,18 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     @staticmethod
     def _extract_raw_streams(
-        raw: Mapping[str, t.Container],
-    ) -> list[Mapping[str, t.Container]]:
+        raw: t.Cli.JsonMapping,
+    ) -> list[dict[str, t.Cli.JsonValue]]:
         """Extract stream dicts from a discovery result mapping."""
-        if isinstance(raw, dict):
-            raw_val = raw.get("streams")
-            if isinstance(raw_val, list):
-                return [s for s in raw_val if isinstance(s, dict)]
+        raw_val = raw.get("streams")
+        if isinstance(raw_val, list):
+            streams: list[dict[str, t.Cli.JsonValue]] = []
+            for stream in raw_val:
+                if not isinstance(stream, Mapping):
+                    continue
+                validated = t.Cli.JSON_MAPPING_ADAPTER.validate_python(stream)
+                streams.append({str(key): value for key, value in validated.items()})
+            return streams
         return []
 
 

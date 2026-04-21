@@ -7,24 +7,21 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from collections.abc import (
-    Mapping,
-)
 from typing import Annotated, override
 
 from flext_cli import cli, r, u
 
 from flext_meltano import (
     FlextMeltanoCommandRouter,
-    FlextMeltanoConstants as c,
     FlextMeltanoDbtManager,
     FlextMeltanoPipelineManager,
     FlextMeltanoPluginManager,
     FlextMeltanoServiceBase,
     FlextMeltanoSingerManager,
     FlextMeltanoStatusManager,
-    FlextMeltanoTypes as t,
+    c,
     p,
+    t,
 )
 
 
@@ -130,12 +127,12 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
         self.output.print_message("Target commands: run, test")
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute CLI service."""
-        payload: Mapping[str, t.Container] = {
+        payload: t.Cli.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Cli.JsonMapping].ok(payload)
 
 
 def main() -> int:

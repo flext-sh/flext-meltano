@@ -10,12 +10,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import override
 
-from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, p, r, t
+from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, p, r, t, u
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):
@@ -43,7 +40,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Execute a Meltano runtime command.
 
         Args:
@@ -55,22 +52,19 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
         """
         executor = FlextMeltanoExecutorBase()
-        cmd = [command]
-        if args:
-            for k, v in args.items():
-                cmd.append(f"--{k}={v}")
+        cmd = u.Meltano.build_bridge_command_args(command, args)
         command_result = executor.execute_meltano_command(cmd)
         if command_result.failure:
-            return r[Mapping[str, t.Container]].fail(
+            return r[t.Cli.JsonMapping].fail(
                 command_result.error or "Command failed",
             )
         command_execution = command_result.value
-        result: Mapping[str, t.Container] = {
-            "command": command,
-            "output": command_execution.output,
-            "error": command_execution.error,
-        }
-        return r[Mapping[str, t.Container]].ok(result)
+        result = u.Meltano.build_command_execution_payload(
+            command_execution,
+            extra_fields={"command": command},
+            duration_field=None,
+        )
+        return r[t.Cli.JsonMapping].ok(result)
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
@@ -78,9 +72,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return FlextMeltanoExecutorBase.fetch_version()
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute bridge service returning current settings."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
 
 __all__: list[str] = ["FlextMeltanoBridge"]

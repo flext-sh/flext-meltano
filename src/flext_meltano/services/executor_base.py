@@ -9,7 +9,6 @@ from __future__ import annotations
 import os
 import time
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from contextlib import redirect_stderr, redirect_stdout, suppress
@@ -53,7 +52,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | Mapping[str, t.Container] | None = None,
+        settings: FlextMeltanoSettings | t.Cli.JsonMapping | None = None,
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
@@ -100,8 +99,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         if isinstance(raw_exit_code, int):
             return raw_exit_code
         try:
-            return t.Meltano.INTEGER_ADAPTER.validate_python(raw_exit_code)
-        except c.ValidationError:
+            return int(raw_exit_code)
+        except ValueError:
             return 1
 
     def _project_search_root(self, _cwd: Path | None = None) -> Path | None:
@@ -196,16 +195,16 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ]
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute the Meltano executor service."""
-        config_data: Mapping[str, t.Container] = {
+        config_data: t.Cli.JsonMapping = {
             "status": c.Meltano.OperationStatus.READY,
             "executor_type": "flext_meltano_executor",
             "execution_timestamp": str(time.time()),
-            "settings": self.settings.model_dump(),
+            "settings": self.settings.model_dump(mode="json"),
         }
         self.logger.info("FlextMeltanoExecutor executed successfully")
-        return r[Mapping[str, t.Container]].ok(config_data)
+        return r[t.Cli.JsonMapping].ok(config_data)
 
     def execute_meltano_command(
         self,
@@ -328,7 +327,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-        _config: Mapping[str, t.Container] | None = None,
+        _config: t.Cli.JsonMapping | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:

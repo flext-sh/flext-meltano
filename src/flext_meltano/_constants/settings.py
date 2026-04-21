@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
-from enum import StrEnum, unique
+from collections.abc import Mapping
+from types import MappingProxyType
 from typing import Final
+
+from flext_core import c as core_c
+
+from flext_meltano import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsSettings:
@@ -27,40 +32,60 @@ class FlextMeltanoConstantsSettings:
     SERVICE_MAX_NAME_LENGTH: Final[int] = 50
     SERVICE_VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
 
-    @unique
-    class MeltanoProjectType(StrEnum):
-        """Meltano project type enumeration."""
-
-        LIBRARY = "library"
-        APPLICATION = "application"
-        SERVICE = "service"
-        MELTANO_PROJECT = "meltano-project"
-        ELT_PIPELINE = "elt-pipeline"
-        DATA_PIPELINE = "data-pipeline"
-        ETL_SERVICE = "etl-service"
-        SINGER_TAP = "singer-tap"
-        SINGER_TARGET = "singer-target"
-        DBT_PROJECT = "dbt-project"
-        DATA_INTEGRATION = "data-integration"
-        PIPELINE_ORCHESTRATOR = "pipeline-orchestrator"
-        DATA_EXTRACTOR = "data-extractor"
-        DATA_LOADER = "data-loader"
-        TRANSFORMATION_SERVICE = "transformation-service"
-
     # Environments
-    ENVIRONMENTS_VALID: Final[frozenset[str]] = frozenset({
-        "development",
-        "staging",
-        "production",
-        "testing",
+    ENVIRONMENTS_VALID: Final[frozenset[FlextMeltanoConstantsEnums.Environment]] = (
+        frozenset({
+            FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
+            FlextMeltanoConstantsEnums.Environment.STAGING,
+            FlextMeltanoConstantsEnums.Environment.PRODUCTION,
+            FlextMeltanoConstantsEnums.Environment.TESTING,
+        })
+    )
+    SETTINGS_ENVIRONMENTS: Final[tuple[FlextMeltanoConstantsEnums.Environment, ...]] = (
+        FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
+        FlextMeltanoConstantsEnums.Environment.TESTING,
+        FlextMeltanoConstantsEnums.Environment.PRODUCTION,
+    )
+    ENVIRONMENT_ALIASES: Final[Mapping[str, FlextMeltanoConstantsEnums.Environment]] = (
+        MappingProxyType({
+            FlextMeltanoConstantsEnums.EnvironmentAlias.DEV: (
+                FlextMeltanoConstantsEnums.Environment.DEVELOPMENT
+            ),
+            FlextMeltanoConstantsEnums.EnvironmentAlias.TEST: (
+                FlextMeltanoConstantsEnums.Environment.TESTING
+            ),
+            FlextMeltanoConstantsEnums.EnvironmentAlias.PROD: (
+                FlextMeltanoConstantsEnums.Environment.PRODUCTION
+            ),
+        })
+    )
+    ENVIRONMENT_RUNTIME_ALIASES: Final[Mapping[str, str]] = MappingProxyType({
+        FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
+            FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
+        ),
+        FlextMeltanoConstantsEnums.Environment.TESTING.value: (
+            FlextMeltanoConstantsEnums.EnvironmentAlias.TEST
+        ),
+        FlextMeltanoConstantsEnums.Environment.PRODUCTION.value: (
+            FlextMeltanoConstantsEnums.ProjectEnvironment.PROD
+        ),
+    })
+    PRODUCTION_ENVIRONMENT_MARKERS: Final[
+        frozenset[FlextMeltanoConstantsEnums.ProductionEnvironmentToken]
+    ] = frozenset({
+        FlextMeltanoConstantsEnums.ProductionEnvironmentToken.PROD,
+        FlextMeltanoConstantsEnums.ProductionEnvironmentToken.PRODUCTION,
+        FlextMeltanoConstantsEnums.ProductionEnvironmentToken.LIVE,
     })
 
     # ComponentTypes
-    COMPONENT_TYPES_VALID: Final[frozenset[str]] = frozenset({
-        "sources",
-        "sinks",
-        "transformers",
-        "orchestrators",
+    COMPONENT_TYPES_VALID: Final[
+        frozenset[FlextMeltanoConstantsEnums.ComponentType]
+    ] = frozenset({
+        FlextMeltanoConstantsEnums.ComponentType.SOURCES,
+        FlextMeltanoConstantsEnums.ComponentType.SINKS,
+        FlextMeltanoConstantsEnums.ComponentType.TRANSFORMERS,
+        FlextMeltanoConstantsEnums.ComponentType.ORCHESTRATORS,
     })
 
     # Defaults
@@ -77,29 +102,113 @@ class FlextMeltanoConstantsSettings:
     CLI_DEFAULT_PIPELINE_PID_FILE: Final[str] = "pipeline.pid"
 
     # Capabilities
-    CAPABILITY_DBT: Final[tuple[str, ...]] = ("run", "test", "docs", "seed")
-    CAPABILITY_SINGER: Final[tuple[str, ...]] = ("discover", "sync", "validate")
+    SUPPORTED_PLUGIN_TYPES: Final[tuple[FlextMeltanoConstantsEnums.PluginType, ...]] = (
+        FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
+        FlextMeltanoConstantsEnums.PluginType.LOADERS,
+        FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+    )
+    PLUGIN_GROUP_ALIASES: Final[Mapping[str, FlextMeltanoConstantsEnums.PluginType]] = (
+        MappingProxyType({
+            "extractor": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
+            FlextMeltanoConstantsEnums.PluginType.EXTRACTORS: (
+                FlextMeltanoConstantsEnums.PluginType.EXTRACTORS
+            ),
+            "tap": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
+            "loader": FlextMeltanoConstantsEnums.PluginType.LOADERS,
+            FlextMeltanoConstantsEnums.PluginType.LOADERS: (
+                FlextMeltanoConstantsEnums.PluginType.LOADERS
+            ),
+            "target": FlextMeltanoConstantsEnums.PluginType.LOADERS,
+            "transformer": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+            "transformers": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+            FlextMeltanoConstantsEnums.PluginType.TRANSFORMS: (
+                FlextMeltanoConstantsEnums.PluginType.TRANSFORMS
+            ),
+            "dbt": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+        })
+    )
+    PLUGIN_DISCOVERY_LABELS: Final[
+        Mapping[
+            FlextMeltanoConstantsEnums.PluginType,
+            FlextMeltanoConstantsEnums.PluginDiscoveryLabel,
+        ]
+    ] = MappingProxyType({
+        FlextMeltanoConstantsEnums.PluginType.EXTRACTORS: (
+            FlextMeltanoConstantsEnums.PluginDiscoveryLabel.EXTRACTOR
+        ),
+        FlextMeltanoConstantsEnums.PluginType.LOADERS: (
+            FlextMeltanoConstantsEnums.PluginDiscoveryLabel.LOADER
+        ),
+        FlextMeltanoConstantsEnums.PluginType.TRANSFORMS: (
+            FlextMeltanoConstantsEnums.PluginDiscoveryLabel.TRANSFORMER
+        ),
+    })
+    CAPABILITY_DBT: Final[tuple[FlextMeltanoConstantsEnums.DbtCapability, ...]] = (
+        FlextMeltanoConstantsEnums.DbtCapability.RUN,
+        FlextMeltanoConstantsEnums.DbtCapability.TEST,
+        FlextMeltanoConstantsEnums.DbtCapability.DOCS,
+        FlextMeltanoConstantsEnums.DbtCapability.SEED,
+    )
+    DBT_COMMANDS: Final[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
+        FlextMeltanoConstantsEnums.DbtCommand.RUN,
+        FlextMeltanoConstantsEnums.DbtCommand.TEST,
+        FlextMeltanoConstantsEnums.DbtCommand.BUILD,
+        FlextMeltanoConstantsEnums.DbtCommand.COMPILE,
+        FlextMeltanoConstantsEnums.DbtCommand.DOCS,
+    )
+    DBT_DEFAULT_DOCS_ARGS: Final[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
+        FlextMeltanoConstantsEnums.DbtCommand.GENERATE,
+    )
+    DBT_DEFAULT_PATHS: Final[frozenset[FlextMeltanoConstantsEnums.DbtPathName]] = (
+        frozenset({
+            FlextMeltanoConstantsEnums.DbtPathName.MODELS,
+            FlextMeltanoConstantsEnums.DbtPathName.ANALYSIS,
+            FlextMeltanoConstantsEnums.DbtPathName.TESTS,
+            FlextMeltanoConstantsEnums.DbtPathName.SEEDS,
+            FlextMeltanoConstantsEnums.DbtPathName.MACROS,
+        })
+    )
+    CAPABILITY_SINGER: Final[
+        tuple[FlextMeltanoConstantsEnums.SingerCapability, ...]
+    ] = (
+        FlextMeltanoConstantsEnums.SingerCapability.DISCOVER,
+        FlextMeltanoConstantsEnums.SingerCapability.SYNC,
+        FlextMeltanoConstantsEnums.SingerCapability.VALIDATE,
+    )
+    SUPPORTED_LOG_LEVELS: Final[tuple[core_c.LogLevel, ...]] = (
+        core_c.LogLevel.DEBUG,
+        core_c.LogLevel.INFO,
+        core_c.LogLevel.WARNING,
+        core_c.LogLevel.ERROR,
+        core_c.LogLevel.CRITICAL,
+    )
 
     # Operations
-    OPERATION_ALL: Final[tuple[str, ...]] = (
-        "pipeline",
-        "plugin",
-        "dbt",
-        "environment",
+    OPERATION_ALL: Final[tuple[FlextMeltanoConstantsEnums.OperationScope, ...]] = (
+        FlextMeltanoConstantsEnums.OperationScope.PIPELINE,
+        FlextMeltanoConstantsEnums.OperationScope.PLUGIN,
+        FlextMeltanoConstantsEnums.OperationScope.DBT,
+        FlextMeltanoConstantsEnums.OperationScope.ENVIRONMENT,
     )
-    OPERATION_DISPATCH: Final[tuple[str, ...]] = (
-        "create_pipeline",
-        "execute_pipeline",
-        "install_plugin",
-        "list_plugins",
-        "configure_environment",
-        "run_dbt_models",
-        "test_dbt_models",
-        "run_elt_pipeline",
+    OPERATION_DISPATCH: Final[
+        tuple[FlextMeltanoConstantsEnums.DispatchOperation, ...]
+    ] = (
+        FlextMeltanoConstantsEnums.DispatchOperation.CREATE_PIPELINE,
+        FlextMeltanoConstantsEnums.DispatchOperation.EXECUTE_PIPELINE,
+        FlextMeltanoConstantsEnums.DispatchOperation.INSTALL_PLUGIN,
+        FlextMeltanoConstantsEnums.DispatchOperation.LIST_PLUGINS,
+        FlextMeltanoConstantsEnums.DispatchOperation.CONFIGURE_ENVIRONMENT,
+        FlextMeltanoConstantsEnums.DispatchOperation.RUN_DBT_MODELS,
+        FlextMeltanoConstantsEnums.DispatchOperation.TEST_DBT_MODELS,
+        FlextMeltanoConstantsEnums.DispatchOperation.RUN_ELT_PIPELINE,
     )
 
     # Handlers
-    HANDLER_ALL: Final[tuple[str, ...]] = ("source", "sink", "pipeline")
+    HANDLER_ALL: Final[tuple[FlextMeltanoConstantsEnums.HandlerType, ...]] = (
+        FlextMeltanoConstantsEnums.HandlerType.SOURCE,
+        FlextMeltanoConstantsEnums.HandlerType.SINK,
+        FlextMeltanoConstantsEnums.HandlerType.PIPELINE,
+    )
 
     # MockValues
     MOCK_EXECUTION_DURATION: Final[float] = 0.5
@@ -111,13 +220,15 @@ class FlextMeltanoConstantsSettings:
     # FilePaths
     FILE_PATH_DBT_OUTPUT_DIR: Final[str] = "target"
     FILE_PATH_DBT_DOCS_INDEX: Final[str] = "index.html"
-    FILE_PATH_STANDARD_DIRS: Final[tuple[str, ...]] = (
-        "extract",
-        "load",
-        "transform",
-        "analyze",
-        "notebook",
-        "orchestrate",
+    FILE_PATH_STANDARD_DIRS: Final[
+        tuple[FlextMeltanoConstantsEnums.PipelineDirectory, ...]
+    ] = (
+        FlextMeltanoConstantsEnums.PipelineDirectory.EXTRACT,
+        FlextMeltanoConstantsEnums.PipelineDirectory.LOAD,
+        FlextMeltanoConstantsEnums.PipelineDirectory.TRANSFORM,
+        FlextMeltanoConstantsEnums.PipelineDirectory.ANALYZE,
+        FlextMeltanoConstantsEnums.PipelineDirectory.NOTEBOOK,
+        FlextMeltanoConstantsEnums.PipelineDirectory.ORCHESTRATE,
     )
 
     # BatchDefaults

@@ -8,7 +8,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from pathlib import Path
@@ -58,7 +57,7 @@ class FlextMeltanoProtocolsServices:
             self,
             tap_name: str,
             target_name: str,
-            _config: Mapping[str, t.Container] | None = None,
+            _config: t.Cli.JsonMapping | None = None,
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
@@ -72,19 +71,19 @@ class FlextMeltanoProtocolsServices:
             ...
 
     @runtime_checkable
-    class ServiceCall(p.Service[t.Container], Protocol):
+    class ServiceCall(p.Service[t.Cli.JsonMapping], Protocol):
         """Service call protocol extending Service."""
 
         def call(
             self,
             operation: str,
             payload: t.ConfigurationMapping,
-        ) -> p.Result[t.Container]:
+        ) -> p.Result[t.Cli.JsonMapping]:
             """Execute service call with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.Container]:
+        def execute(self) -> p.Result[t.Cli.JsonMapping]:
             """Execute service operation (implements Service)."""
             ...
 

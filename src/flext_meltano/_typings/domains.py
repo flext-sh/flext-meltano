@@ -10,11 +10,13 @@ from __future__ import annotations
 from collections.abc import (
     Callable,
     Mapping,
+    Sequence,
 )
-from typing import Literal
 
 from flext_cli import t
 from flext_core import r
+
+from flext_meltano import c
 
 
 class FlextMeltanoTypingsDomains:
@@ -25,10 +27,9 @@ class FlextMeltanoTypingsDomains:
     """
 
     type NestedStrMapping = Mapping[str, t.StrMapping]
-    type DbtManifestData = Mapping[
-        str,
-        Mapping[str, t.Container] | None,
-    ]
-    type DbtProject = Mapping[str, str | bool | t.StrSequence]
+    type EnvironmentInput = c.Meltano.Environment | c.Meltano.EnvironmentAlias
+    type ProjectEnvironmentNames = Sequence[c.Meltano.ProjectEnvironment]
+    type ServicePayload = t.Cli.JsonMapping
+    type DbtManifestData = t.Cli.JsonMapping
+    type DbtProject = t.Cli.JsonMapping
     type PublicFactory[TService] = Callable[..., r[TService]]
-    type PublicFactoryName = Literal["Tap", "Target", "Dbt"]

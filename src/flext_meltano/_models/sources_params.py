@@ -80,7 +80,7 @@ class FlextMeltanoModelsSourcesParams:
 
         stream_name: Annotated[str, u.Field(description="Name of the stream")]
         stream_schema: Annotated[
-            Mapping[str, t.Container],
+            t.Cli.JsonMapping,
             u.Field(description="JSON schema for the stream"),
         ]
         source_type: Annotated[
@@ -123,15 +123,15 @@ class FlextMeltanoModelsSourcesParams:
 
         @u.field_serializer("stream_schema")
         def serialize_stream_schema(
-            self, value: Mapping[str, t.Container]
-        ) -> Mapping[str, t.Container]:
+            self, value: Mapping[str, t.Cli.JsonValue]
+        ) -> t.Cli.JsonMapping:
             """Normalize stream schema structure."""
-            result: t.MutableFlatContainerMapping = dict(value)
+            result: dict[str, t.Cli.JsonValue] = dict(value)
             if "properties" not in result:
-                empty: t.MutableFlatContainerMapping = {}
-                result["properties"] = empty
+                empty_properties: dict[str, t.Cli.JsonValue] = {}
+                result["properties"] = empty_properties
             if "type" not in result:
-                result["type"] = "t.Container"
+                result["type"] = c.Meltano.SchemaKey.OBJECT
             return result
 
         @u.model_validator(mode="after")

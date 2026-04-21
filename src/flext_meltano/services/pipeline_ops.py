@@ -7,9 +7,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import os
-from collections.abc import (
-    Mapping,
-)
 from pathlib import Path
 
 from flext_cli import cli
@@ -30,7 +27,7 @@ class FlextMeltanoPipelinePaths:
         configured_root = os.environ.get(
             FlextMeltanoPipelinePaths._PIPELINES_ROOT_ENV,
         )
-        normalized_root = u.to_str(configured_root).strip()
+        normalized_root = (configured_root or "").strip()
         if u.chk(normalized_root, empty=False):
             return Path(normalized_root).expanduser().resolve()
         return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
@@ -63,7 +60,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     @staticmethod
     def create_pipeline(
         pipeline_name: str,
-        settings: Mapping[str, t.Container] | None,
+        settings: t.Cli.JsonMapping | None,
     ) -> p.Result[str]:
         """Create a new Meltano pipeline with the given configuration."""
         if not pipeline_name.strip():

@@ -6,6 +6,8 @@ from typing import Final
 
 from flext_core import c
 
+from flext_meltano import FlextMeltanoConstantsEnums
+
 
 class FlextMeltanoConstantsBase:
     """Base meltano constants: metadata, versions, paths, network, plugins.
@@ -17,9 +19,14 @@ class FlextMeltanoConstantsBase:
     PROJECT_PREFIX: Final[str] = "flext-meltano"
     PROJECT_NAME: Final[str] = "FLEXT Meltano"
     FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"
-    PROJECT_FILE_DBT: Final[str] = "dbt_project.yml"
-    COMMAND_RUN_DBT: Final[str] = "dbt run"
-    COMMAND_TEST: Final[str] = "dbt test"
+    DBT_BINARY: Final[str] = "dbt"
+    PROJECT_FILE_DBT: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.PROJECT
+    COMMAND_RUN_DBT: Final[str] = (
+        f"{DBT_BINARY} {FlextMeltanoConstantsEnums.DbtCommand.RUN}"
+    )
+    COMMAND_TEST: Final[str] = (
+        f"{DBT_BINARY} {FlextMeltanoConstantsEnums.DbtCommand.TEST}"
+    )
     DEFAULT_VARIANT: Final[str] = "meltano"
 
     # Metadata
@@ -30,7 +37,13 @@ class FlextMeltanoConstantsBase:
     METADATA_APPLICATION_AUTHOR: Final[str] = "FLEXT Team"
     METADATA_APPLICATION_LICENSE: Final[str] = "MIT"
     METADATA_CREATED_BY: Final[str] = "flext-pipeline"
-    METADATA_DEFAULT_ENVIRONMENTS: Final[tuple[str, ...]] = ("dev", "staging", "prod")
+    METADATA_DEFAULT_ENVIRONMENTS: Final[
+        tuple[FlextMeltanoConstantsEnums.ProjectEnvironment, ...]
+    ] = (
+        FlextMeltanoConstantsEnums.ProjectEnvironment.DEV,
+        FlextMeltanoConstantsEnums.ProjectEnvironment.STAGING,
+        FlextMeltanoConstantsEnums.ProjectEnvironment.PROD,
+    )
 
     # Versions
     VERSION_MELTANO_REQUIRED: Final[str] = "3.9.1"
@@ -41,8 +54,9 @@ class FlextMeltanoConstantsBase:
     VERSION_REQUIRED_DBT: Final[str] = VERSION_DBT_REQUIRED
 
     # Paths
-    PATH_PROJECT_FILE: Final[str] = "meltano.yml"
     PATH_MELTANO_PROJECT_FILE: Final[str] = "meltano.yml"
+    PATH_PROJECT_FILE: Final[str] = PATH_MELTANO_PROJECT_FILE
+    PATH_CONFIG_DIR: Final[str] = ".meltano"
     PATH_STATE_DIR: Final[str] = ".pipeline"
     PATH_LOGS_DIR: Final[str] = "logs"
     PATH_OUTPUT_DIR: Final[str] = "output"
@@ -95,10 +109,18 @@ class FlextMeltanoConstantsBase:
     PREFIX_TAP: Final[str] = "tap"
     PREFIX_TARGET: Final[str] = "target"
     PREFIX_DBT: Final[str] = "dbt"
-    PUBLIC_FACTORY_TAP: Final[str] = "Tap"
-    PUBLIC_FACTORY_TARGET: Final[str] = "Target"
-    PUBLIC_FACTORY_DBT: Final[str] = "Dbt"
-    PUBLIC_FACTORY_NAMES: Final[frozenset[str]] = frozenset({
+    PUBLIC_FACTORY_TAP: Final[FlextMeltanoConstantsEnums.PublicFactoryName] = (
+        FlextMeltanoConstantsEnums.PublicFactoryName.TAP
+    )
+    PUBLIC_FACTORY_TARGET: Final[FlextMeltanoConstantsEnums.PublicFactoryName] = (
+        FlextMeltanoConstantsEnums.PublicFactoryName.TARGET
+    )
+    PUBLIC_FACTORY_DBT: Final[FlextMeltanoConstantsEnums.PublicFactoryName] = (
+        FlextMeltanoConstantsEnums.PublicFactoryName.DBT
+    )
+    PUBLIC_FACTORY_NAMES: Final[
+        frozenset[FlextMeltanoConstantsEnums.PublicFactoryName]
+    ] = frozenset({
         PUBLIC_FACTORY_TAP,
         PUBLIC_FACTORY_TARGET,
         PUBLIC_FACTORY_DBT,
@@ -121,11 +143,21 @@ class FlextMeltanoConstantsBase:
     )
 
     # Singer
-    SINGER_MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
-    SINGER_MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
-    SINGER_MESSAGE_TYPE_STATE: Final[str] = "STATE"
-    SINGER_MESSAGE_TYPE_ACTIVATE_VERSION: Final[str] = "ACTIVATE_VERSION"
-    SINGER_MESSAGE_TYPE_METRIC: Final[str] = "METRIC"
+    SINGER_MESSAGE_TYPE_RECORD: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.RECORD
+    )
+    SINGER_MESSAGE_TYPE_SCHEMA: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.SCHEMA
+    )
+    SINGER_MESSAGE_TYPE_STATE: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.STATE
+    )
+    SINGER_MESSAGE_TYPE_ACTIVATE_VERSION: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.ACTIVATE_VERSION
+    )
+    SINGER_MESSAGE_TYPE_METRIC: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.METRIC
+    )
 
     SINGER_SAFE_EXCEPTIONS: Final[tuple[type[Exception], ...]] = (
         ValueError,
@@ -139,13 +171,13 @@ class FlextMeltanoConstantsBase:
     )
 
     # Dbt
-    DBT_PROJECT_FILE: Final[str] = "dbt_project.yml"
-    DBT_PROFILES_FILE: Final[str] = "profiles.yml"
-    DBT_MANIFEST_FILE: Final[str] = "manifest.json"
-    DBT_COMMAND_RUN: Final[str] = "run"
-    DBT_COMMAND_TEST: Final[str] = "test"
-    DBT_COMMAND_BUILD: Final[str] = "build"
-    DBT_COMMAND_COMPILE: Final[str] = "compile"
+    DBT_PROJECT_FILE: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.PROJECT
+    DBT_PROFILES_FILE: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.PROFILES
+    DBT_MANIFEST_FILE: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.MANIFEST
+    DBT_COMMAND_RUN: Final[str] = FlextMeltanoConstantsEnums.DbtCommand.RUN
+    DBT_COMMAND_TEST: Final[str] = FlextMeltanoConstantsEnums.DbtCommand.TEST
+    DBT_COMMAND_BUILD: Final[str] = FlextMeltanoConstantsEnums.DbtCommand.BUILD
+    DBT_COMMAND_COMPILE: Final[str] = FlextMeltanoConstantsEnums.DbtCommand.COMPILE
     DBT_FRESHNESS_ERROR_AFTER_HOURS: Final[int] = 24
     DBT_FRESHNESS_WARN_AFTER_HOURS: Final[int] = 12
     DBT_MATERIALIZATION_TABLE: Final[str] = "table"

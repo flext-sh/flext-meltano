@@ -26,71 +26,71 @@ class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(p.Service[Mapping[str, t.Container]], Protocol):
+    class Tap(p.Service[t.Cli.JsonMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> p.Result[Mapping[str, t.Container]]:
+        def discover(self) -> p.Result[t.Cli.JsonMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[Mapping[str, t.Container]]:
+        def execute(self) -> p.Result[t.Cli.JsonMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
             self,
             catalog: t.FlatContainerMapping,
-        ) -> p.Result[Mapping[str, t.Container]]:
+        ) -> p.Result[t.Cli.JsonMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(p.Service[Mapping[str, t.Container]], Protocol):
+    class Target(p.Service[t.Cli.JsonMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[Mapping[str, t.Container]]:
+        def execute(self) -> p.Result[t.Cli.JsonMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
             self,
             records: Sequence[t.Meltano.OptionalScalarMap],
-        ) -> p.Result[Mapping[str, t.Container]]:
+        ) -> p.Result[t.Cli.JsonMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
             self,
             record: t.Meltano.OptionalScalarMap,
-        ) -> p.Result[Mapping[str, t.Container]]:
+        ) -> p.Result[t.Cli.JsonMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
     class DbtRunner(
-        p.Service[Mapping[str, t.Container]],
+        p.Service[t.Cli.JsonMapping],
         Protocol,
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[Mapping[str, t.Container]]:
+        def execute(self) -> p.Result[t.Cli.JsonMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
         def run(
             self,
             models: t.StrSequence,
-        ) -> p.Result[Mapping[str, t.Container]]:
+        ) -> p.Result[t.Cli.JsonMapping]:
             """Run DBT models with r."""
             ...
 
         def test(
             self,
             models: t.StrSequence,
-        ) -> p.Result[Mapping[str, t.Container]]:
+        ) -> p.Result[t.Cli.JsonMapping]:
             """Test DBT models with r."""
             ...
 
@@ -108,7 +108,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def settings(self) -> Mapping[str, t.Container]:
+        def settings(self) -> t.Cli.JsonMapping:
             """Tap configuration."""
             ...
 
@@ -172,7 +172,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        settings: Mapping[str, t.Container]
+        settings: t.Cli.JsonMapping
 
         def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.

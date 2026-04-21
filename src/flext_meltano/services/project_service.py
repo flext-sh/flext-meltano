@@ -7,9 +7,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import (
-    Mapping,
-)
 from pathlib import Path
 from typing import override
 
@@ -122,7 +119,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         params = params_r.value
         try:
             temp_path = Path(tempfile.mkdtemp(prefix=str(params["prefix"])))
-            settings: Mapping[str, t.Container] = {
+            settings: t.Cli.JsonMapping = {
                 "version": c.Meltano.PLUGIN_CONFIG_VERSION,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                 "project_id": str(params["project_id"]),
@@ -131,9 +128,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                         "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                         "settings": {
                             "plugins": {
-                                "extractors": list[Mapping[str, t.Container]](),
-                                "loaders": list[Mapping[str, t.Container]](),
-                                "transformers": list[Mapping[str, t.Container]](),
+                                "extractors": [],
+                                "loaders": [],
+                                "transformers": [],
                             },
                         },
                     },
@@ -163,17 +160,20 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def build_service_execution_payload(
         service_type: str,
         meltano_config: p.Settings,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Build normalized execution payload for service health responses."""
-        payload: Mapping[str, t.Container] = {
+        settings_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+            meltano_config.model_dump(),
+        )
+        payload: dict[str, t.Cli.JsonValue] = {
             "status": c.Meltano.OperationStatus.READY,
             "service_type": service_type,
-            "settings": meltano_config.model_dump(),
+            "settings": {str(key): value for key, value in settings_payload.items()},
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Cli.JsonMapping].ok(payload)
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
             "flext_meltano_project_service", self.settings
@@ -183,7 +183,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return result
         error_msg = result.error or "Project service execution failed"
         self.logger.error(error_msg)
-        return r[Mapping[str, t.Container]].fail(error_msg)
+        return r[t.Cli.JsonMapping].fail(error_msg)
 
     def initialize_project(self, project_root: Path) -> p.Result[t.Meltano.DbtProject]:
         """Initialize Meltano project using railway pattern validation chain."""

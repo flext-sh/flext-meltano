@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 import json
-from collections.abc import (
-    Callable,
-    Mapping,
-    Sequence,
-)
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import override
 
 from flext_meltano import (
     FlextMeltanoDbtRunnerMixin,
+    FlextMeltanoExecutorBase,
     FlextMeltanoProjectManager,
     FlextMeltanoServiceBase,
     c,
@@ -35,9 +32,9 @@ class _FlextMeltanoCliDbtService(FlextMeltanoDbtRunnerMixin):
             self.configure_dbt_project_root(self.settings.project_root)
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Return current CLI DBT helper state."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]:
         """Execute a DBT subcommand using the runner mixin."""
@@ -53,9 +50,9 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
     """Provide project-scoped plugin operations for CLI routing."""
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Return current CLI plugin helper state."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def _resolve_project_root(self) -> Path:
         """Resolve the project root used for plugin operations."""
@@ -90,25 +87,23 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
 
     def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         """Install a Meltano plugin using the real Meltano CLI."""
-        command_result = u.Cli.run_raw(
-            [
-                c.Meltano.CMD_BINARY,
-                c.Meltano.CMD_ADD,
-                plugin_type,
-                plugin_name,
-            ],
-            cwd=self._resolve_project_root(),
+        command_result = FlextMeltanoExecutorBase().execute_meltano_command(
+            [c.Meltano.CMD_ADD, plugin_type, plugin_name],
             timeout=c.Meltano.PLUGIN_INSTALLATION_TIMEOUT,
+            _cwd=self._resolve_project_root(),
         )
         if command_result.failure:
             return r[str].fail(command_result.error or "Plugin installation failed")
         output = command_result.value
-        if output.exit_code != 0:
+        if not output.success:
             return r[str].fail(
-                output.stderr or output.stdout or "Plugin installation failed"
+                u.Meltano.command_failure_message(
+                    output,
+                    default="Plugin installation failed",
+                )
             )
         return r[str].ok(
-            output.stdout.strip() or f"Installed {plugin_type}:{plugin_name}"
+            output.output.strip() or f"Installed {plugin_type}:{plugin_name}"
         )
 
     def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]:
@@ -147,9 +142,9 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
     """Provide status and version operations for the CLI manager."""
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Return current CLI status helper state."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def _resolve_project_root(self) -> Path | None:
         """Return a project root when one is configured."""
@@ -158,19 +153,22 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
         return self.settings.project_root
 
     def _run_version_command(self) -> p.Result[str]:
-        """Execute the real Meltano version command."""
-        command_result = u.Cli.run_raw(
-            [c.Meltano.CMD_BINARY, c.Meltano.CMD_VERSION_OPTION],
-            cwd=self._resolve_project_root(),
+        """Execute the canonical Meltano version command through the executor DSL."""
+        command_result = FlextMeltanoExecutorBase().execute_meltano_command(
+            [c.Meltano.ExecutorCommand.VERSION],
+            _cwd=self._resolve_project_root(),
         )
         if command_result.failure:
             return r[str].fail(command_result.error or "Version command failed")
         output = command_result.value
-        if output.exit_code != 0:
+        if not output.success:
             return r[str].fail(
-                output.stderr or output.stdout or "Version command failed"
+                u.Meltano.command_failure_message(
+                    output,
+                    default="Version command failed",
+                )
             )
-        return r[str].ok((output.stdout or output.stderr).strip())
+        return r[str].ok((output.output or output.error).strip())
 
     def fetch_version(self) -> p.Result[str]:
         """Return Meltano version as a string."""
@@ -249,14 +247,7 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
     def _execute_dbt_operation(
         self, operation: str, args: t.StrSequence
     ) -> p.Result[str]:
-        supported_operations = {
-            c.Meltano.DBT_COMMAND_RUN,
-            c.Meltano.DBT_COMMAND_TEST,
-            c.Meltano.DBT_COMMAND_BUILD,
-            c.Meltano.DBT_COMMAND_COMPILE,
-            "docs",
-        }
-        if operation not in supported_operations:
+        if operation not in c.Meltano.DBT_COMMANDS:
             return self._unsupported_operation("DBT", operation)
         return self._service.run_operation(operation, args)
 

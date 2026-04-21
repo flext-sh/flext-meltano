@@ -6,12 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import Self, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
 
 
 class FlextMeltanoService(FlextMeltanoServiceBase):
@@ -80,91 +77,107 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, settings: Mapping[str, t.Container] | None = None
-    ) -> p.Result[Mapping[str, t.Container]]:
+        environment_name: str, settings: t.Cli.JsonMapping | None = None
+    ) -> p.Result[t.Meltano.ServicePayload]:
         """Configure environment."""
         if not environment_name:
-            return r[Mapping[str, t.Container]].fail("Environment name is required")
-        if environment_name not in c.Meltano.ENVIRONMENTS_VALID:
-            return r[Mapping[str, t.Container]].fail(
+            return r[t.Meltano.ServicePayload].fail("Environment name is required")
+        normalized_environment = str(
+            c.Meltano.ENVIRONMENT_ALIASES.get(
+                environment_name.strip().lower(),
+                environment_name.strip().lower(),
+            )
+        )
+        if normalized_environment not in c.Meltano.ENVIRONMENTS_VALID:
+            return r[t.Meltano.ServicePayload].fail(
                 "Invalid environment: "
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        payload: Mapping[str, t.Container] = {
+        configuration: dict[str, t.Cli.JsonValue] = (
+            {str(key): value for key, value in settings.items()}
+            if settings is not None
+            else {}
+        )
+        payload: dict[str, t.Cli.JsonValue] = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
-            "environment": environment_name,
-            "configuration": settings or {},
+            "environment": normalized_environment,
+            "configuration": configuration,
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Meltano.ServicePayload].ok(payload)
 
     @staticmethod
     def configure_pipeline(
         source_name: str,
         sink_name: str,
-        _config: Mapping[str, t.Container] | None = None,
-    ) -> p.Result[Mapping[str, t.Container]]:
+        _config: t.Cli.JsonMapping | None = None,
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Configure generic data pipeline."""
-        payload: Mapping[str, t.Container] = {
+        payload: t.Cli.JsonMapping = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Cli.JsonMapping].ok(payload)
 
     @staticmethod
     def install_component(
         component_type: str,
         component_name: str,
-        settings: Mapping[str, t.Container] | None = None,
-    ) -> p.Result[Mapping[str, t.Container]]:
+        settings: t.Cli.JsonMapping | None = None,
+    ) -> p.Result[t.Meltano.ServicePayload]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
-            return r[Mapping[str, t.Container]].fail(
+            return r[t.Meltano.ServicePayload].fail(
                 "Component type and name are required"
             )
         if component_type not in c.Meltano.COMPONENT_TYPES_VALID:
-            return r[Mapping[str, t.Container]].fail(
+            return r[t.Meltano.ServicePayload].fail(
                 f"Invalid component type: {component_type}"
             )
-        payload: Mapping[str, t.Container] = {
+        configuration: dict[str, t.Cli.JsonValue] = (
+            {str(key): value for key, value in settings.items()}
+            if settings is not None
+            else {}
+        )
+        payload: dict[str, t.Cli.JsonValue] = {
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,
             "component_type": component_type,
-            "configuration": settings or {},
+            "configuration": configuration,
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Meltano.ServicePayload].ok(payload)
 
     @staticmethod
     def validate_service_config(
-        settings: Mapping[str, t.Container],
+        settings: t.Cli.JsonMapping,
     ) -> p.Result[bool]:
         """Validate service configuration dictionary."""
-        if not u.guard(settings, dict):
+        if not isinstance(settings, dict):
             return r[bool].fail("Configuration must be a dictionary")
         return r[bool].ok(value=True)
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute service with railway pattern."""
-        payload: Mapping[str, t.Container] = {
+        payload: t.Cli.JsonMapping = {
             "status": c.CommonStatus.ACTIVE,
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "handlers": list(c.Meltano.HANDLER_ALL),
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Cli.JsonMapping].ok(payload)
 
-    def fetch_default_config(self) -> p.Result[Mapping[str, t.Container]]:
+    def fetch_default_config(self) -> p.Result[t.Cli.JsonMapping]:
         """Get default configuration from current settings."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def fetch_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""
         return r[t.Meltano.OptionalScalarMap].ok({
             "name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
-            "type": "pipeline_service",
+            "type": c.Meltano.ServiceType.PIPELINE,
             "description": c.Meltano.METADATA_APPLICATION_DESCRIPTION,
         })
 

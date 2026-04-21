@@ -32,13 +32,13 @@ class FlextMeltanoDbtTransformationRunner:
             args: MutableSequence[str] = []
             if models:
                 args.extend([c.Meltano.CMD_MODELS_OPTION, *models])
-            result = executor.execute_dbt_command(c.Meltano.DBT_COMMAND_RUN, args)
+            result = executor.execute_dbt_command(c.Meltano.DbtCommand.RUN, args)
             if result.failure:
                 return r[t.MutableFlatContainerMapping].fail(
                     result.error or "DBT transformation failed",
                 )
             execution_result = result.value
-            payload = u.Meltano.build_command_execution_payload(
+            dbt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={
                     "models_run": u.join(models, separator=",") if models else "all",
@@ -47,10 +47,6 @@ class FlextMeltanoDbtTransformationRunner:
                 },
                 duration_field="execution_time",
             )
-            dbt_result: t.MutableFlatContainerMapping = {
-                str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
-                for k, v in payload.items()
-            }
             return r[t.MutableFlatContainerMapping].ok(dbt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"DBT transformation failed: {e}"

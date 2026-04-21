@@ -6,9 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from pathlib import Path
 from typing import override
 
@@ -85,9 +82,9 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             return r[bool].fail(f"Transformation validation failed: {error}")
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute validators service — returns current settings."""
-        return r[Mapping[str, t.Container]].ok(self.settings.model_dump())
+        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
 
 __all__: list[str] = ["FlextMeltanoValidators"]

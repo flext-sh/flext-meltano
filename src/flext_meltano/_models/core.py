@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from typing import Annotated
@@ -18,8 +17,8 @@ class FlextMeltanoModelsCore:
 
     @staticmethod
     def protect_sensitive_config(
-        value: Mapping[str, t.Container],
-    ) -> Mapping[str, t.Container]:
+        value: t.Cli.JsonMapping,
+    ) -> t.Cli.JsonMapping:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -37,10 +36,10 @@ class FlextMeltanoModelsCore:
                 return any(checks)
             return False
 
-        protected: t.MutableFlatContainerMapping = {}
+        protected: dict[str, t.Container] = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
-        return protected
+        return t.Cli.JSON_MAPPING_ADAPTER.validate_python(protected)
 
     @staticmethod
     def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:

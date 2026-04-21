@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
@@ -32,7 +29,7 @@ class FlextMeltanoModelsProjectsPlugin:
             str, u.Field(default="standard", description="Plugin variant")
         ] = "standard"
         settings: Annotated[
-            Mapping[str, t.Container], u.Field(description="Plugin settings")
+            t.Cli.JsonMapping, u.Field(description="Plugin settings")
         ] = u.Field(default_factory=dict)
         capabilities: Annotated[
             t.StrSequence, u.Field(description="Plugin capabilities")

@@ -33,7 +33,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     def fetch_dbt_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""
         try:
-            model_nodes_result = self._get_dbt_manifest_nodes("model")
+            model_nodes_result = self._get_dbt_manifest_nodes(
+                c.Meltano.DbtResourceType.MODEL
+            )
             if model_nodes_result.failure:
                 return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
                     model_nodes_result.error or "Unknown error",
@@ -60,7 +62,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     def fetch_dbt_tests(self) -> p.Result[Sequence[t.AttributeMapping]]:
         """Get all tests from manifest."""
         try:
-            test_nodes_result = self._get_dbt_manifest_nodes("test")
+            test_nodes_result = self._get_dbt_manifest_nodes(
+                c.Meltano.DbtResourceType.TEST
+            )
             if test_nodes_result.failure:
                 return r[Sequence[t.AttributeMapping]].fail(
                     test_nodes_result.error or "Unknown error",

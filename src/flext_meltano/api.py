@@ -8,9 +8,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import ClassVar, Self, override
 
 from flext_cli import r
@@ -20,7 +17,6 @@ from flext_meltano import (
     FlextMeltanoAdapter,
     FlextMeltanoBridge,
     FlextMeltanoComponentService,
-    FlextMeltanoConstants as c,
     FlextMeltanoDbtProjectMixin,
     FlextMeltanoDbtRunnerMixin,
     FlextMeltanoExecutor,
@@ -33,10 +29,11 @@ from flext_meltano import (
     FlextMeltanoSingerStateMixin,
     FlextMeltanoTapAbstractions,
     FlextMeltanoTargetAbstractions,
-    FlextMeltanoTypes as t,
-    FlextMeltanoUtilities as u,
     FlextMeltanoValidators,
+    c,
     p,
+    t,
+    u,
 )
 
 
@@ -93,16 +90,16 @@ class FlextMeltano(
     Dbt = dbt
 
     @override
-    def execute(self) -> p.Result[Mapping[str, t.Container]]:
+    def execute(self) -> p.Result[t.Cli.JsonMapping]:
         """Execute Meltano service with railway pattern."""
-        payload: Mapping[str, t.Container] = {
+        payload: t.Cli.JsonMapping = {
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,
             "timestamp": u.generate_iso_timestamp(),
             "handlers": list(c.Meltano.HANDLER_ALL),
         }
-        return r[Mapping[str, t.Container]].ok(payload)
+        return r[t.Cli.JsonMapping].ok(payload)
 
 
 meltano = FlextMeltano.fetch_instance()

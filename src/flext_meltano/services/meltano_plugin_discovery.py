@@ -29,7 +29,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     """Mixin providing plugin discovery and info retrieval."""
 
     @staticmethod
-    def _is_meltano_project(value: Mapping[str, t.Container] | None) -> bool:
+    def _is_meltano_project(value: t.Meltano.DbtProject | None) -> bool:
         """Type guard for protocol-compatible Meltano project objects."""
         if value is None:
             return False
@@ -79,12 +79,12 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
     def discover_plugins(
         self,
-        project: t.ValueOrModel | None = None,
+        project: t.ValueOrModel | t.Meltano.DbtProject | None = None,
     ) -> p.Result[Sequence[t.StrMapping]]:
         """Discover plugins from Meltano Hub using native API."""
         try:
             self.logger.info("Discovering Meltano plugins")
-            working_project: t.ValueOrModel
+            working_project: t.ValueOrModel | t.Meltano.DbtProject
             if project:
                 working_project = project
             else:

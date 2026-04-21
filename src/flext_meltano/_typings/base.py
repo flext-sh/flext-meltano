@@ -12,9 +12,8 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import ClassVar
 
-from flext_cli import t, u
+from flext_cli import t
 
 from flext_meltano import c
 
@@ -26,53 +25,23 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[u.TypeAdapter[Mapping[str, t.Container]]] = (
-        u.TypeAdapter(Mapping[str, t.Container])
-    )
-    CONTAINER_MAP_LIST_ADAPTER: ClassVar[
-        u.TypeAdapter[list[Mapping[str, t.Container]]]
-    ] = u.TypeAdapter(list[Mapping[str, t.Container]])
-    STRING_ADAPTER: ClassVar[u.TypeAdapter[t.TextValue]] = u.TypeAdapter(
-        t.TextValue,
-    )
-    INTEGER_ADAPTER: ClassVar[u.TypeAdapter[t.IntegerValue]] = u.TypeAdapter(
-        t.IntegerValue
-    )
-    STR_MAPPING_ADAPTER: ClassVar[u.TypeAdapter[t.StrMapping]] = u.TypeAdapter(
-        t.StrMapping,
-    )
-    STR_SEQUENCE_ADAPTER: ClassVar[u.TypeAdapter[t.StrSequence]] = u.TypeAdapter(
-        t.StrSequence,
-    )
+    type JsonValue = t.Cli.JsonValue
+    type JsonMapping = t.Cli.JsonMapping
+    type JsonMappingList = Sequence[t.Cli.JsonMapping]
+    type ValidatorInput = t.Cli.JsonValue | t.ValueOrModel | None
 
-    type ValidatorInput = (
-        Mapping[str, t.Container]
-        | Mapping[str, Mapping[str, t.Container] | None]
-        | Sequence[Mapping[str, t.Container] | None]
-        | tuple[Mapping[str, t.Container] | None, ...]
-        | set[Mapping[str, t.Container] | None]
-        | None
-    )
-
-    type PluginDefinition = Mapping[
-        str,
-        str | t.StrSequence | Mapping[str, t.Scalar | None],
-    ]
+    type PluginDefinition = t.Cli.JsonMapping
     type PluginCatalog = Mapping[
-        str,
-        Sequence[FlextMeltanoTypingsBase.PluginDefinition],
+        str, Sequence[FlextMeltanoTypingsBase.PluginDefinition]
     ]
     PluginType = c.Meltano.PluginType
 
-    type VariantValue = str | t.StrSequence | t.ScalarMapping | None
+    type VariantValue = str | t.StrSequence | t.Cli.JsonMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""
 
-    type FileConfigDict = Mapping[
-        str,
-        t.Container | t.StrSequence,
-    ]
+    type FileConfigDict = t.Cli.JsonMapping
     type PathDict = Mapping[str, str | Path]
 
     type OptionalScalarMap = Mapping[str, t.Scalar | None]
 
-    type CliProcessResult = Mapping[str, t.Scalar | t.StrSequence]
+    type CliProcessResult = t.Cli.JsonMapping

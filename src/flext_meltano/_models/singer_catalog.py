@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from pathlib import Path
-from typing import Annotated, ClassVar, Literal
+from typing import Annotated, ClassVar
 
 from flext_cli import m, u
 
-from flext_meltano import t
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsSingerCatalog:
@@ -23,7 +22,7 @@ class FlextMeltanoModelsSingerCatalog:
         _flext_enforcement_exempt: ClassVar[bool] = True
 
         breadcrumb: t.StrSequence = u.Field(default_factory=tuple)
-        metadata: Mapping[str, t.Container] = u.Field(default_factory=dict)
+        metadata: t.Cli.JsonMapping = u.Field(default_factory=dict)
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
@@ -35,9 +34,9 @@ class FlextMeltanoModelsSingerCatalog:
         schema_definition: Annotated[
             t.ContainerValueMapping,
             u.Field(
-                alias="schema",
-                serialization_alias="schema",
-                validation_alias="schema",
+                alias=c.Meltano.SchemaKey.SCHEMA,
+                serialization_alias=c.Meltano.SchemaKey.SCHEMA,
+                validation_alias=c.Meltano.SchemaKey.SCHEMA,
                 description="Singer stream schema payload",
             ),
         ]
@@ -57,7 +56,7 @@ class FlextMeltanoModelsSingerCatalog:
             ),
         ] = None
         replication_method: Annotated[
-            Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None,
+            c.Meltano.SingerReplicationMethod | None,
             u.Field(default=None, description="Replication method for this stream"),
         ] = None
         is_view: Annotated[
@@ -79,11 +78,12 @@ class FlextMeltanoModelsSingerCatalog:
         """Singer catalog response model."""
 
         type: Annotated[
-            Literal["CATALOG"],
+            c.Meltano.SingerMessageType,
             u.Field(
-                default="CATALOG", description="Singer catalog message discriminator"
+                default=c.Meltano.SingerMessageType.CATALOG,
+                description="Singer catalog message discriminator",
             ),
-        ] = "CATALOG"
+        ] = c.Meltano.SingerMessageType.CATALOG
         streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = u.Field(
             default_factory=lambda: list[
                 FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
@@ -124,7 +124,7 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, u.Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: Mapping[str, t.Container] = u.Field(default_factory=dict)
+        state: t.Cli.JsonMapping = u.Field(default_factory=dict)
         duration_seconds: Annotated[
             t.NonNegativeFloat, u.Field(description="Execution duration")
         ]

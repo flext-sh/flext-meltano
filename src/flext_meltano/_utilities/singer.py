@@ -133,7 +133,7 @@ class FlextMeltanoUtilitiesSinger:
                 raw = orjson.loads(stripped)
                 msg_type = raw.get("type", "")
 
-                if msg_type == c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA:
+                if msg_type == c.Meltano.SingerMessageType.SCHEMA:
                     schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
                     result = handler.handle_schema(schema_msg)
                     if result.failure:
@@ -142,7 +142,7 @@ class FlextMeltanoUtilitiesSinger:
                             f"{result.error}"
                         )
 
-                elif msg_type == c.Meltano.SINGER_MESSAGE_TYPE_RECORD:
+                elif msg_type == c.Meltano.SingerMessageType.RECORD:
                     record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
                     result = handler.handle_record(record_msg)
                     if result.failure:
@@ -151,7 +151,7 @@ class FlextMeltanoUtilitiesSinger:
                             f"{result.error}"
                         )
 
-                elif msg_type == c.Meltano.SINGER_MESSAGE_TYPE_STATE:
+                elif msg_type == c.Meltano.SingerMessageType.STATE:
                     state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
                     result = handler.handle_state(state_msg)
                     if result.failure:
@@ -194,7 +194,9 @@ class FlextMeltanoUtilitiesSinger:
                     "selected": is_selected,
                     "replication-key": replication_key or "",
                     "replication-method": (
-                        "INCREMENTAL" if replication_key else "FULL_TABLE"
+                        c.Meltano.SingerReplicationMethod.INCREMENTAL
+                        if replication_key
+                        else c.Meltano.SingerReplicationMethod.FULL_TABLE
                     ),
                 },
             )
@@ -205,9 +207,11 @@ class FlextMeltanoUtilitiesSinger:
                 "key_properties": list(key_properties),
                 "metadata": [metadata_entry],
                 "replication_key": replication_key,
-                "replication_method": "INCREMENTAL"
-                if replication_key
-                else "FULL_TABLE",
+                "replication_method": (
+                    c.Meltano.SingerReplicationMethod.INCREMENTAL
+                    if replication_key
+                    else c.Meltano.SingerReplicationMethod.FULL_TABLE
+                ),
             })
             return r[m.Meltano.SingerCatalogEntry].ok(entry)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:

@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
@@ -26,18 +23,18 @@ class FlextMeltanoModelsTransformations:
             str, u.Field(default="1.0.0", description="DBT project version")
         ] = "1.0.0"
         settings: Annotated[
-            Mapping[str, t.Container],
+            t.Cli.JsonMapping,
             u.Field(description="DBT project configuration"),
         ] = u.Field(default_factory=dict)
         models: Annotated[
-            Mapping[str, t.Container], u.Field(description="DBT models configuration")
+            t.Cli.JsonMapping, u.Field(description="DBT models configuration")
         ] = u.Field(default_factory=dict)
         sources: Annotated[
-            Mapping[str, t.Container],
+            t.Cli.JsonMapping,
             u.Field(description="DBT sources configuration"),
         ] = u.Field(default_factory=dict)
         tests: Annotated[
-            Mapping[str, t.Container], u.Field(description="DBT tests configuration")
+            t.Cli.JsonMapping, u.Field(description="DBT tests configuration")
         ] = u.Field(default_factory=dict)
 
         @u.model_validator(mode="after")
@@ -63,35 +60,35 @@ class FlextMeltanoModelsTransformations:
             t.StrSequence,
             u.Field(description="Model paths"),
         ] = u.Field(
-            default_factory=lambda: ["models"],
+            default_factory=lambda: [c.Meltano.DbtPathName.MODELS],
             description="Model paths",
         )
         analysis_paths: Annotated[
             t.StrSequence,
             u.Field(description="Analysis paths"),
         ] = u.Field(
-            default_factory=lambda: ["analysis"],
+            default_factory=lambda: [c.Meltano.DbtPathName.ANALYSIS],
             description="Analysis paths",
         )
         test_paths: Annotated[
             t.StrSequence,
             u.Field(description="Test paths"),
         ] = u.Field(
-            default_factory=lambda: ["tests"],
+            default_factory=lambda: [c.Meltano.DbtPathName.TESTS],
             description="Test paths",
         )
         seed_paths: Annotated[
             t.StrSequence,
             u.Field(description="Seed paths"),
         ] = u.Field(
-            default_factory=lambda: ["seeds"],
+            default_factory=lambda: [c.Meltano.DbtPathName.SEEDS],
             description="Seed paths",
         )
         macro_paths: Annotated[
             t.StrSequence,
             u.Field(description="Macro paths"),
         ] = u.Field(
-            default_factory=lambda: ["macros"],
+            default_factory=lambda: [c.Meltano.DbtPathName.MACROS],
             description="Macro paths",
         )
 
@@ -99,7 +96,6 @@ class FlextMeltanoModelsTransformations:
         @property
         def has_custom_paths(self) -> bool:
             """Check if project has custom paths."""
-            default_paths = {"models", "analysis", "tests", "seeds", "macros"}
             all_paths = {
                 *self.model_paths,
                 *self.analysis_paths,
@@ -107,7 +103,7 @@ class FlextMeltanoModelsTransformations:
                 *self.seed_paths,
                 *self.macro_paths,
             }
-            return bool(all_paths - default_paths)
+            return bool(all_paths - c.Meltano.DBT_DEFAULT_PATHS)
 
         @u.computed_field()
         @property
@@ -122,10 +118,10 @@ class FlextMeltanoModelsTransformations:
                 + u.count(self.macro_paths)
             )
             if total_path_count <= c.Meltano.VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS:
-                return "simple"
+                return c.Meltano.ProjectStructureComplexity.SIMPLE
             if total_path_count <= c.Meltano.VALIDATION_STRUCTURE_MODERATE_MAX_PATHS:
-                return "moderate"
-            return "complex"
+                return c.Meltano.ProjectStructureComplexity.MODERATE
+            return c.Meltano.ProjectStructureComplexity.COMPLEX
 
         @u.computed_field()
         @property

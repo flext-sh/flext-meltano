@@ -6,9 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from pathlib import Path
 
 from flext_meltano import (
@@ -40,7 +37,7 @@ class FlextMeltanoLibraryRunner(
         tap_name: str,
         target_name: str,
         dbt_models: t.StrSequence | None = None,
-        settings: Mapping[str, t.Container] | None = None,
+        settings: t.Cli.JsonMapping | None = None,
     ) -> p.Result[t.MutableFlatContainerMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
@@ -58,7 +55,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
-            payload = u.Meltano.build_command_execution_payload(
+            elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={
                     "tap_name": tap_name,
@@ -66,10 +63,6 @@ class FlextMeltanoLibraryRunner(
                 },
                 duration_field="execution_time",
             )
-            elt_result: t.MutableFlatContainerMapping = {
-                str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
-                for k, v in payload.items()
-            }
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
                 if dbt_result.failure:
@@ -104,7 +97,7 @@ class FlextMeltanoLibraryRunner(
         self,
         tap: p.Meltano.SingerTap,
         target: p.Meltano.SingerTarget,
-        settings: Mapping[str, t.Container] | None = None,
+        settings: t.Cli.JsonMapping | None = None,
     ) -> p.Result[t.MutableFlatContainerMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:
@@ -121,7 +114,7 @@ class FlextMeltanoLibraryRunner(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
-            payload = u.Meltano.build_command_execution_payload(
+            elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={
                     "tap_name": tap.name,
@@ -129,10 +122,6 @@ class FlextMeltanoLibraryRunner(
                 },
                 duration_field="execution_time",
             )
-            elt_result: t.MutableFlatContainerMapping = {
-                str(k): str(v) if not isinstance(v, (str, int, float, bool)) else v
-                for k, v in payload.items()
-            }
             return r[t.MutableFlatContainerMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"ELT pipeline execution failed: {e}"

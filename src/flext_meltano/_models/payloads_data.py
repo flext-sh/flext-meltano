@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import (
     Mapping,
-    MutableMapping,
     MutableSequence,
     Sequence,
 )
@@ -13,7 +12,7 @@ from typing import Annotated, ClassVar
 
 from flext_cli import m, u
 
-from flext_meltano import t
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsPayloadsData:
@@ -27,25 +26,22 @@ class FlextMeltanoModelsPayloadsData:
         schema_definition: Annotated[
             t.FlatContainerMapping,
             u.Field(
-                alias="schema",
-                serialization_alias="schema",
-                validation_alias="schema",
+                alias=c.Meltano.SchemaKey.SCHEMA,
+                serialization_alias=c.Meltano.SchemaKey.SCHEMA,
+                validation_alias=c.Meltano.SchemaKey.SCHEMA,
                 description="Schema-like JSON payload",
             ),
         ] = u.Field(default_factory=dict)
 
         @u.field_validator("schema_definition", mode="before")
         @classmethod
-        def normalize_schema(
-            cls, value: t.Meltano.ValidatorInput
-        ) -> Mapping[str, t.Container]:
+        def normalize_schema(cls, value: t.Meltano.ValidatorInput) -> t.Cli.JsonMapping:
             """Normalize mapping input before JSON validation."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
-                    empty_schema: Mapping[str, t.Container] = {}
-                    return empty_schema
+                    return {}
 
     class JsonRecordBatchPayload(m.ArbitraryTypesModel):
         """Typed record batch payload used by API load flow."""
@@ -88,13 +84,7 @@ class FlextMeltanoModelsPayloadsData:
         _flext_enforcement_exempt: ClassVar[bool] = True
 
         values: Annotated[
-            Mapping[
-                str,
-                t.Scalar
-                | Sequence[t.Scalar | None]
-                | Mapping[str, t.Scalar | None]
-                | None,
-            ],
+            t.Cli.JsonMapping,
             u.Field(description="Normalized mapping values"),
         ] = u.Field(default_factory=dict)
 
@@ -103,35 +93,11 @@ class FlextMeltanoModelsPayloadsData:
         def normalize_values(
             cls,
             value: t.Meltano.ValidatorInput,
-        ) -> Mapping[
-            str,
-            t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
-        ]:
-            """Normalize mapping-like payloads to Mapping[str, value]."""
+        ) -> t.Cli.JsonMapping:
+            """Normalize mapping-like payloads through the canonical CLI JSON adapter."""
             if not isinstance(value, Mapping):
                 return {}
-            result: MutableMapping[
-                str,
-                t.Scalar
-                | Sequence[t.Scalar | None]
-                | Mapping[str, t.Scalar | None]
-                | None,
-            ] = {}
-            for key, item in value.items():
-                if u.scalar(item) or item is None:
-                    result[str(key)] = item
-                elif isinstance(item, list):
-                    result[str(key)] = [
-                        v if u.scalar(v) or v is None else str(v) for v in item
-                    ]
-                elif isinstance(item, Mapping):
-                    result[str(key)] = {
-                        str(k): v if u.scalar(v) or v is None else str(v)
-                        for k, v in item.items()
-                    }
-                else:
-                    result[str(key)] = str(item)
-            return result
+            return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
@@ -180,8 +146,8 @@ class FlextMeltanoModelsPayloadsData:
         def normalize_variant(
             cls,
             value: str | t.Meltano.ValidatorInput,
-        ) -> str | t.StrSequence | t.ScalarMapping | None:
-            """Normalize variant_raw into typed union."""
+        ) -> t.Meltano.VariantValue:
+            """Normalize variant payload through the canonical CLI JSON adapter."""
             match value:
                 case None:
                     return None
@@ -190,14 +156,6 @@ class FlextMeltanoModelsPayloadsData:
                 case list() | tuple():
                     return [str(item) for item in value]
                 case Mapping():
-                    result: t.MutableConfigurationMapping = {}
-                    for k, v in value.items():
-                        if u.primitive(v):
-                            result[str(k)] = v
-                        elif v is None:
-                            result[str(k)] = ""
-                        elif isinstance(v, (list, dict)):
-                            result[str(k)] = str(v)
-                    return result
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
                     return str(value)
