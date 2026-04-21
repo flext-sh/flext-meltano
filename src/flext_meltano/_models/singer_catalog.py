@@ -6,7 +6,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_cli import m, u
 
@@ -19,15 +19,11 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         breadcrumb: t.StrSequence = u.Field(default_factory=tuple)
         metadata: t.Cli.JsonMapping = u.Field(default_factory=dict)
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         tap_stream_id: Annotated[str, u.Field(description="Tap stream identifier")]
         stream: Annotated[str, u.Field(description="Singer stream name")]
@@ -114,8 +110,6 @@ class FlextMeltanoModelsSingerCatalog:
 
     class SingerSyncResult(m.Entity):
         """Result of a Singer sync operation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         records_processed: Annotated[
             t.NonNegativeInt, u.Field(description="Number of records processed")

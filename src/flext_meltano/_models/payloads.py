@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_cli import m, u
 
@@ -15,8 +15,6 @@ class FlextMeltanoModelsPayloads:
     class CreatePipelinePayload(m.ArbitraryTypesModel):
         """Payload for create_pipeline operation."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         tap_name: Annotated[t.NonEmptyStr, u.Field(description="Singer tap name")]
         target_name: Annotated[str, u.Field(description="Singer target name")]
         settings: Annotated[
@@ -27,8 +25,6 @@ class FlextMeltanoModelsPayloads:
     class ExecutePipelinePayload(m.ArbitraryTypesModel):
         """Payload for execute_pipeline operation."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         pipeline_id: Annotated[str, u.Field(description="Pipeline identifier")]
         settings: Annotated[
             t.Cli.JsonMapping,
@@ -37,8 +33,6 @@ class FlextMeltanoModelsPayloads:
 
     class InstallPluginPayload(m.ArbitraryTypesModel):
         """Payload for install_plugin operation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         plugin_type: Annotated[t.NonEmptyStr, u.Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, u.Field(description="Plugin name")]
@@ -56,8 +50,6 @@ class FlextMeltanoModelsPayloads:
 
     class ConfigureEnvironmentPayload(m.ArbitraryTypesModel):
         """Payload for configure_environment operation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         environment_name: Annotated[str, u.Field(description="Environment name")]
         settings: Annotated[

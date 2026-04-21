@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import (
     Mapping,
 )
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_cli import m, u
 
@@ -17,8 +17,6 @@ class FlextMeltanoModelsContext:
 
     class PipelineExecutionContext(m.FlexibleModel):
         """Typed context envelope for ELT pipeline execution."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         project_root: Annotated[str, u.Field(description="Project root path")]
         elt_context: t.Cli.JsonMapping = u.Field(
@@ -57,8 +55,6 @@ class FlextMeltanoModelsContext:
     class PipelineResultContext(m.FlexibleModel):
         """Typed subset for extracting final pipeline result fields."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         project_root: Annotated[
             str, u.Field(default=c.IDENTIFIER_UNKNOWN, description="Project root path")
         ] = c.IDENTIFIER_UNKNOWN
@@ -87,8 +83,6 @@ class FlextMeltanoModelsContext:
 
     class PipelineExecutionScalarMap(m.FlexibleModel):
         """Scalar-only pipeline execution values normalized to strings."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         values: t.StrMapping = u.Field(
             default_factory=dict,

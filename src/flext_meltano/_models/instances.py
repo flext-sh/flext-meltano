@@ -6,7 +6,7 @@ from collections.abc import (
     Mapping,
     Sequence,
 )
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
@@ -18,8 +18,6 @@ class FlextMeltanoModelsInstances:
 
     class DataSinkDefinition(m.Entity):
         """Generic data sink definition for pipeline operations."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         sink_name: Annotated[str, u.Field(description="Name of the sink")]
         sink_type: Annotated[str, u.Field(description="Type of the sink")]

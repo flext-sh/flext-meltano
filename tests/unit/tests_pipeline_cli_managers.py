@@ -4,10 +4,6 @@ from __future__ import annotations
 
 import os
 import signal
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -28,11 +24,8 @@ class TestFlextMeltanoPipelineCliManagers:
         self,
         tmp_path: Path,
     ) -> None:
-        command: Sequence[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
-        settings: Mapping[
-            str,
-            t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
-        ] = {
+        command: list[t.Cli.JsonValue] = ["run", "tap-demo", "target-demo"]
+        settings: t.Cli.JsonMapping = {
             "command": command,
             "schedule": "daily",
         }
@@ -64,11 +57,8 @@ class TestFlextMeltanoPipelineCliManagers:
         self,
         tmp_path: Path,
     ) -> None:
-        command: Sequence[t.Scalar | None] = ["run", "tap-demo", "target-demo"]
-        settings: Mapping[
-            str,
-            t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
-        ] = {"command": command}
+        command: list[t.Cli.JsonValue] = ["run", "tap-demo", "target-demo"]
+        settings: t.Cli.JsonMapping = {"command": command}
         mock_cmd_result = m.Meltano.CommandExecutionResult(
             command=["run", "tap-demo", "target-demo"],
             success=True,

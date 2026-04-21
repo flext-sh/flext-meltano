@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
@@ -14,8 +14,6 @@ class FlextMeltanoModelsSinger:
 
     class SingerSchemaMessage(m.ArbitraryTypesModel):
         """Canonical Singer SCHEMA message model."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         type: Annotated[
             c.Meltano.SingerMessageType,
@@ -73,8 +71,6 @@ class FlextMeltanoModelsSinger:
 
     class SingerStateMessage(m.ArbitraryTypesModel):
         """Canonical Singer STATE message model."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         type: Annotated[
             c.Meltano.SingerMessageType,

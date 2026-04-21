@@ -7,7 +7,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
@@ -19,8 +19,6 @@ class FlextMeltanoModelsProjects:
 
     class DbtManifestNode(m.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         name: Annotated[str | None, u.Field(default=None, description="Node name")]
         path: Annotated[str | None, u.Field(default=None, description="Node path")]
@@ -42,8 +40,6 @@ class FlextMeltanoModelsProjects:
     class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = u.Field(
             default_factory=dict
         )
@@ -61,8 +57,6 @@ class FlextMeltanoModelsProjects:
 
     class MeltanoProjectModel(m.Entity):
         """Generic Meltano project configuration with validation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         project_id: Annotated[str, u.Field(description="Unique project identifier")]
         project_version: Annotated[

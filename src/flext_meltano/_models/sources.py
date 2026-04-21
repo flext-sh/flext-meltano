@@ -19,8 +19,6 @@ class FlextMeltanoModelsSources:
     class TapConfig(m.Entity):
         """Generic tap configuration for data extraction."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         tap_type: Annotated[str, u.Field(description="Type of the tap")]
         connection_config: Annotated[
             t.Cli.JsonMapping, u.Field(description="Connection configuration")
@@ -72,8 +70,6 @@ class FlextMeltanoModelsSources:
     class TargetConfig(m.Entity):
         """Generic target configuration for data loading."""
 
-        _flext_enforcement_exempt: ClassVar[bool] = True
-
         target_type: Annotated[str, u.Field(description="Type of the target")]
         connection_config: Annotated[
             t.Cli.JsonMapping, u.Field(description="Connection configuration")
@@ -124,8 +120,6 @@ class FlextMeltanoModelsSources:
 
     class DataSourceConfig(m.Entity):
         """Generic data source configuration with validation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         source_type: Annotated[str, u.Field(description="Type of the data source")]
         connection_config: Annotated[

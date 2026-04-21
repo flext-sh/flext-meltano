@@ -6,7 +6,7 @@ from collections.abc import (
     Mapping,
     Sequence,
 )
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
@@ -90,8 +90,6 @@ class FlextMeltanoModelsInstancesData:
 
     class DataSourceInstance(m.Entity):
         """Generic data source instance for pipeline operations."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         source_type: Annotated[str, u.Field(description="Type of the data source")]
         settings: Annotated[

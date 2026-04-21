@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
@@ -14,8 +14,6 @@ class FlextMeltanoModelsResultsPipeline:
 
     class PipelineResult(m.TimestampedModel):
         """Generic pipeline execution result with complete validation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         pipeline_id: Annotated[str, u.Field(description="Pipeline identifier")]
         source_result: Annotated[

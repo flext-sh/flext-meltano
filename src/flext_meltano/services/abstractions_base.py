@@ -198,7 +198,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": {str(key): value for key, value in schema_payload.items()},
-            "metadata": [],
+            "metadata": list[t.Cli.JsonValue](),
         }
         return r[t.Cli.JsonMapping].ok(entry)
 

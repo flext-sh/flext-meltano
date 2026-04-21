@@ -8,7 +8,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_cli import m, u
 
@@ -20,8 +20,6 @@ class FlextMeltanoModelsPayloadsData:
 
     class JsonSchemaPayload(m.ArbitraryTypesModel):
         """Typed schema payload used by API extract flow."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         schema_definition: Annotated[
             t.FlatContainerMapping,
@@ -80,8 +78,6 @@ class FlextMeltanoModelsPayloadsData:
 
     class ConfigMappingPayload(m.ArbitraryTypesModel):
         """Normalized mapping payload with string keys."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         values: Annotated[
             t.Cli.JsonMapping,

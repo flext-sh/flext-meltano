@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, ClassVar, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
@@ -14,8 +14,6 @@ class FlextMeltanoModelsTransformations:
 
     class DbtProjectModel(m.Entity):
         """Generic DBT project configuration with validation."""
-
-        _flext_enforcement_exempt: ClassVar[bool] = True
 
         name: Annotated[str, u.Field(description="DBT project name")]
         profile: Annotated[str, u.Field(description="DBT profile name")]

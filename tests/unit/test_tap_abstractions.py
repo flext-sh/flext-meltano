@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import tempfile
-from collections.abc import (
-    Mapping,
-)
 from unittest.mock import patch
 
 import pytest
@@ -76,7 +73,7 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_stream_definition_validation(self) -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
-        stream_schema: Mapping[str, t.Container] = {
+        stream_schema: t.Cli.JsonMapping = {
             "type": "object",
             "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
         }
@@ -185,7 +182,7 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_create_tap_from_config_success(self) -> None:
         """Test create_tap_from_config success using flext_tests."""
-        connection_config: Mapping[str, t.Container] = {
+        connection_config: t.Cli.JsonMapping = {
             "host": "localhost",
             "port": 5432,
             "database": "test_db",
@@ -496,11 +493,11 @@ class TestFlextMeltanoAbstractionsComplete:
 
     def test_complete_tap_workflow(self) -> None:
         """Test complete tap workflow using flext_tests."""
-        connection_config: Mapping[str, t.Container] = {
+        connection_config: t.Cli.JsonMapping = {
             "host": "localhost",
             "database": "test_db",
         }
-        stream_config: Mapping[str, t.Container] = {"users": {"selected": True}}
+        stream_config: t.Cli.JsonMapping = {"users": {"selected": True}}
         create_result = self.tap_abstractions.create_tap_from_config(
             tap_type="tap-postgres",
             connection_config=connection_config,
