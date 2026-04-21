@@ -74,7 +74,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def _resolve_project_root(
-        project: t.ValueOrModel | t.Cli.JsonMapping | None,
+        project: t.RuntimeData | t.Cli.JsonMapping | None,
     ) -> Path | None:
         """Extract a project root path from supported project-like objects."""
         if isinstance(project, Mapping):
@@ -87,7 +87,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def fetch_plugins_of_type(
         self,
-        _project: t.ValueOrModel | t.Cli.JsonMapping | None,
+        _project: t.RuntimeData | t.Cli.JsonMapping | None,
         plugin_type: str,
     ) -> p.Result[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime."""

@@ -28,7 +28,7 @@ class FlextMeltanoTypingsBase:
     type JsonValue = t.Cli.JsonValue
     type JsonMapping = t.Cli.JsonMapping
     type JsonMappingList = Sequence[t.Cli.JsonMapping]
-    type ValidatorInput = t.Cli.JsonValue | t.ValueOrModel | None
+    type ValidatorInput = t.Cli.JsonValue | t.RuntimeData | None
 
     type PluginDefinition = t.Cli.JsonMapping
     type PluginCatalog = Mapping[
