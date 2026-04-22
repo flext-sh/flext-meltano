@@ -8,6 +8,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
@@ -29,7 +30,7 @@ class FlextMeltanoModelsPayloadsData:
                 validation_alias=c.Meltano.SchemaKey.SCHEMA,
                 description="Schema-like JSON payload",
             ),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.field_validator("schema_definition", mode="before")
         @classmethod
@@ -37,9 +38,12 @@ class FlextMeltanoModelsPayloadsData:
             """Normalize mapping input before JSON validation."""
             match value:
                 case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return MappingProxyType({
+                        str(key): item for key, item in normalized.items()
+                    })
                 case _:
-                    return {}
+                    return MappingProxyType({})
 
     class JsonRecordBatchPayload(m.ArbitraryTypesModel):
         """Typed record batch payload used by API load flow."""
@@ -82,7 +86,7 @@ class FlextMeltanoModelsPayloadsData:
         values: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Normalized mapping values"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.field_validator("values", mode="before")
         @classmethod
@@ -92,8 +96,11 @@ class FlextMeltanoModelsPayloadsData:
         ) -> t.Cli.JsonMapping:
             """Normalize mapping-like payloads through the canonical CLI JSON adapter."""
             if not isinstance(value, Mapping):
-                return {}
-            return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                return MappingProxyType({})
+            normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+            return MappingProxyType({
+                str(key): item for key, item in normalized.items()
+            })
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
@@ -123,7 +130,8 @@ class FlextMeltanoModelsPayloadsData:
             """Normalize dict content via yaml_dump_str, pass str through."""
             match value:
                 case Mapping():
-                    return u.Cli.yaml_dump_str(dict(value))
+                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return u.Cli.yaml_dump_str(normalized)
                 case None:
                     return ""
                 case _:

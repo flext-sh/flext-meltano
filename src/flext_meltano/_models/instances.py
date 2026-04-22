@@ -6,6 +6,7 @@ from collections.abc import (
     Mapping,
     Sequence,
 )
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -23,10 +24,10 @@ class FlextMeltanoModelsInstances:
         sink_type: Annotated[str, u.Field(description="Type of the sink")]
         settings: Annotated[
             t.ConfigurationMapping, u.Field(description="Sink configuration")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         sink_schema: Annotated[
             t.FlatContainerMapping, u.Field(description="Sink schema")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         status: Annotated[
             str,
             u.Field(

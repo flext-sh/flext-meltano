@@ -50,7 +50,9 @@ class FlextMeltanoSingerTapAdapter:
         return normalized
 
     @staticmethod
-    def _normalize_recursive(value: t.RuntimeData) -> t.Cli.JsonValue:
+    def _normalize_recursive(
+        value: t.RuntimeData | t.Cli.JsonValue,
+    ) -> t.Cli.JsonValue:
         """Normalize Singer config values into canonical CLI JSON values."""
         if value is None:
             return None

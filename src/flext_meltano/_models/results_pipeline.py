@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -40,7 +41,7 @@ class FlextMeltanoModelsResultsPipeline:
         ] = 0
         pipeline_metadata: Annotated[
             t.ConfigurationMapping, u.Field(description="Pipeline execution metadata")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.computed_field()
         @property

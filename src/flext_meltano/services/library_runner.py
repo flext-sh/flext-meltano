@@ -38,7 +38,7 @@ class FlextMeltanoLibraryRunner(
         target_name: str,
         dbt_models: t.StrSequence | None = None,
         settings: t.Cli.JsonMapping | None = None,
-    ) -> p.Result[t.MutableFlatContainerMapping]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
         try:
             self.logger.info(
@@ -51,7 +51,7 @@ class FlextMeltanoLibraryRunner(
                 tap_name, target_name, settings
             )
             if result.failure:
-                return r[t.MutableFlatContainerMapping].fail(
+                return r[t.Cli.JsonMapping].fail(
                     result.error or "EL pipeline execution failed",
                 )
             execution_result = result.value
@@ -74,17 +74,17 @@ class FlextMeltanoLibraryRunner(
                         dbt_models,
                         separator=",",
                     )
-            return r[t.MutableFlatContainerMapping].ok(elt_result)
+            return r[t.Cli.JsonMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MutableFlatContainerMapping].fail(error_msg)
+            return r[t.Cli.JsonMapping].fail(error_msg)
 
     def run_dbt_transformation(
         self,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> p.Result[t.MutableFlatContainerMapping]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Run DBT transformation using the configured Meltano executor."""
         return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
             executor=self._elt_executor,
@@ -98,7 +98,7 @@ class FlextMeltanoLibraryRunner(
         tap: p.Meltano.SingerTap,
         target: p.Meltano.SingerTarget,
         settings: t.Cli.JsonMapping | None = None,
-    ) -> p.Result[t.MutableFlatContainerMapping]:
+    ) -> p.Result[t.Cli.JsonMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:
             self.logger.info(
@@ -110,7 +110,7 @@ class FlextMeltanoLibraryRunner(
                 tap.name, target.name, settings
             )
             if result.failure:
-                return r[t.MutableFlatContainerMapping].fail(
+                return r[t.Cli.JsonMapping].fail(
                     result.error or "Pipeline execution failed",
                 )
             execution_result = result.value
@@ -122,11 +122,11 @@ class FlextMeltanoLibraryRunner(
                 },
                 duration_field="execution_time",
             )
-            return r[t.MutableFlatContainerMapping].ok(elt_result)
+            return r[t.Cli.JsonMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)
-            return r[t.MutableFlatContainerMapping].fail(error_msg)
+            return r[t.Cli.JsonMapping].fail(error_msg)
 
 
 __all__: list[str] = ["FlextMeltanoLibraryRunner"]

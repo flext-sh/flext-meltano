@@ -7,6 +7,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -25,7 +26,10 @@ class FlextMeltanoModelsProjects:
         description: Annotated[
             str | None, u.Field(default=None, description="Node description")
         ] = None
-        fqn: t.StrSequence = u.Field(default_factory=tuple)
+        fqn: t.StrSequence = u.Field(
+            default_factory=tuple,
+            description="Fully qualified dbt node path segments",
+        )
         resource_type: Annotated[
             str,
             u.Field(default="", description="Node resource type (model, test, etc.)"),
@@ -41,19 +45,9 @@ class FlextMeltanoModelsProjects:
         """Parsed dbt manifest with typed nodes."""
 
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = u.Field(
-            default_factory=dict
+            default_factory=lambda: MappingProxyType({}),
+            description="dbt manifest nodes keyed by unique node id",
         )
-
-        def get_nodes_by_type(
-            self,
-            resource_type: str,
-        ) -> Sequence[FlextMeltanoModelsProjects.DbtManifestNode]:
-            """Get all nodes of a specific resource type."""
-            return [
-                node
-                for node in self.nodes.values()
-                if node.resource_type == resource_type
-            ]
 
     class MeltanoProjectModel(m.Entity):
         """Generic Meltano project configuration with validation."""
@@ -69,8 +63,14 @@ class FlextMeltanoModelsProjects:
                 description="Default environment name",
             ),
         ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
-        plugins: t.Cli.JsonMapping = u.Field(default_factory=dict)
-        environments: t.Cli.JsonMapping = u.Field(default_factory=dict)
+        plugins: t.Cli.JsonMapping = u.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Configured Meltano plugins grouped by plugin category",
+        )
+        environments: t.Cli.JsonMapping = u.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Meltano environment definitions keyed by environment name",
+        )
 
         @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:

@@ -46,6 +46,15 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
         class Tests:
             """Meltano tests namespace."""
 
+            class Docker:
+                """Docker integration test constants."""
+
+                HOST: Final[str] = "localhost"
+                POSTGRES_PORT: Final[int] = 5433
+                REDIS_PORT: Final[int] = 6380
+                MELTANO_PORT: Final[int] = 3389
+                COMPOSE_FILE: Final[str] = "docker-compose.test.yml"
+
             class Paths:
                 """Test path constants."""
 

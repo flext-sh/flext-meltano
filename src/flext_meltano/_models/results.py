@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -40,7 +41,7 @@ class FlextMeltanoModelsResults:
         ] = None
         metadata: Annotated[
             t.ConfigurationMapping, u.Field(description="Additional execution metadata")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.computed_field()
         @property

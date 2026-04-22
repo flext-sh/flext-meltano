@@ -201,7 +201,7 @@ class FlextMeltanoSettings(FlextSettings):
         """Create settings from a project root path."""
         try:
             instance: Self = cls(project_root=str(project_root))
-            success: p.Result[Self] = r[Self](value=instance, success=True)
+            success: p.Result[Self] = r[Self].ok(instance)
             return success
         except ValueError as error:
             failure: p.Result[Self] = r[Self].fail(str(error))

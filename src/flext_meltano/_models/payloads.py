@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
@@ -20,7 +21,7 @@ class FlextMeltanoModelsPayloads:
         settings: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Pipeline settings"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
     class ExecutePipelinePayload(m.ArbitraryTypesModel):
         """Payload for execute_pipeline operation."""
@@ -29,7 +30,7 @@ class FlextMeltanoModelsPayloads:
         settings: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Execution settings"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
     class InstallPluginPayload(m.ArbitraryTypesModel):
         """Payload for install_plugin operation."""
@@ -39,7 +40,7 @@ class FlextMeltanoModelsPayloads:
         settings: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Plugin settings"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
     class ListPluginsPayload(m.ArbitraryTypesModel):
         """Payload for list_plugins operation."""
@@ -55,7 +56,7 @@ class FlextMeltanoModelsPayloads:
         settings: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Environment settings"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
     class RunDbtModelsPayload(m.ArbitraryTypesModel):
         """Payload for run/test dbt models operation."""

@@ -13,30 +13,29 @@ import pytest
 import redis
 from flext_tests import tk
 
+from tests import c
+
 
 class TestDockerIntegration:
     """Docker-based integration tests."""
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_postgres_service_available(self, postgres_service: str | None) -> None:
+    def test_postgres_service_available(self, postgres_service: str) -> None:
         """Test that PostgreSQL service is available and responsive."""
-        if postgres_service is None:
-            pytest.skip("PostgreSQL service not available")
-        assert isinstance(postgres_service, str)
-        assert postgres_service.startswith("localhost:")
-        assert ":5433" in postgres_service
+        assert postgres_service == (
+            f"{c.Meltano.Tests.Docker.HOST}:{c.Meltano.Tests.Docker.POSTGRES_PORT}"
+        )
         try:
             conn = psycopg2.connect(
-                host="localhost",
-                port=5433,
+                host=c.Meltano.Tests.Docker.HOST,
+                port=c.Meltano.Tests.Docker.POSTGRES_PORT,
                 database="flext_test",
                 user="test",
                 password="test",
                 connect_timeout=5,
             )
             conn.close()
-            assert True
         except Exception as e:
             err_msg = str(e).lower()
             if (
@@ -49,37 +48,42 @@ class TestDockerIntegration:
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_redis_service_available(self, redis_service: str | None) -> None:
+    def test_redis_service_available(self, redis_service: str) -> None:
         """Test that Redis service is available and responsive."""
-        if redis_service is None:
-            pytest.skip("Redis service not available")
-        assert isinstance(redis_service, str)
-        assert redis_service.startswith("localhost:")
-        assert ":6380" in redis_service
+        assert redis_service == (
+            f"{c.Meltano.Tests.Docker.HOST}:{c.Meltano.Tests.Docker.REDIS_PORT}"
+        )
         try:
-            r = redis.Redis(host="localhost", port=6380, db=0)
+            r = redis.Redis(
+                host=c.Meltano.Tests.Docker.HOST,
+                port=c.Meltano.Tests.Docker.REDIS_PORT,
+                db=0,
+            )
             r.ping()
             r.close()
-            assert True
         except Exception as e:
             pytest.fail(f"Failed to connect to Redis: {e}")
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_meltano_service_available(self, meltano_service: str | None) -> None:
+    def test_meltano_service_available(self, meltano_service: str) -> None:
         """Test that Meltano service is available."""
-        if meltano_service is None:
-            pytest.skip("Meltano service not available")
-        assert isinstance(meltano_service, str)
-        assert meltano_service.startswith("localhost:")
-        assert ":" in meltano_service and meltano_service.split(":")[-1].isdigit()
+        assert meltano_service == (
+            f"{c.Meltano.Tests.Docker.HOST}:{c.Meltano.Tests.Docker.MELTANO_PORT}"
+        )
 
     @pytest.mark.docker
     @pytest.mark.integration
     def test_docker_services_health(self, docker_services: tk) -> None:
         """Test overall Docker services health."""
-        postgres_ready = docker_services.wait_for_port_ready("localhost", 5433)
-        redis_ready = docker_services.wait_for_port_ready("localhost", 6380)
+        postgres_ready = docker_services.wait_for_port_ready(
+            c.Meltano.Tests.Docker.HOST,
+            c.Meltano.Tests.Docker.POSTGRES_PORT,
+        )
+        redis_ready = docker_services.wait_for_port_ready(
+            c.Meltano.Tests.Docker.HOST,
+            c.Meltano.Tests.Docker.REDIS_PORT,
+        )
         if postgres_ready.failure or not postgres_ready.value:
             pytest.skip("PostgreSQL service not available")
         if redis_ready.failure or not redis_ready.value:
@@ -90,31 +94,35 @@ class TestDockerIntegration:
     @pytest.mark.slow
     def test_container_lifecycle(self, docker_manager: tk) -> None:
         """Test complete container lifecycle management."""
-        start_result = docker_manager.start_compose_stack("docker-compose.test.yml")
+        start_result = docker_manager.start_compose_stack(
+            c.Meltano.Tests.Docker.COMPOSE_FILE,
+        )
         assert start_result.success
         should_assert_stop = True
         try:
-            postgres_ready = docker_manager.wait_for_port_ready("localhost", 5433)
+            postgres_ready = docker_manager.wait_for_port_ready(
+                c.Meltano.Tests.Docker.HOST,
+                c.Meltano.Tests.Docker.POSTGRES_PORT,
+            )
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
                 pytest.skip("PostgreSQL service not available")
         finally:
-            stop_result = docker_manager.compose_down("docker-compose.test.yml")
+            stop_result = docker_manager.compose_down(
+                c.Meltano.Tests.Docker.COMPOSE_FILE,
+            )
             if should_assert_stop:
                 assert stop_result.success
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_postgres_database_operations(self, postgres_service: str | None) -> None:
+    def test_postgres_database_operations(self, postgres_service: str) -> None:
         """Test actual database operations with PostgreSQL."""
-        if postgres_service is None:
-            pytest.skip("PostgreSQL service not available")
-        assert isinstance(postgres_service, str)
         conn = None
         try:
             conn = psycopg2.connect(
-                host="localhost",
-                port=5433,
+                host=c.Meltano.Tests.Docker.HOST,
+                port=c.Meltano.Tests.Docker.POSTGRES_PORT,
                 database="flext_test",
                 user="test",
                 password="test",
@@ -154,14 +162,15 @@ class TestDockerIntegration:
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_redis_operations(self, redis_service: str | None) -> None:
+    def test_redis_operations(self, redis_service: str) -> None:
         """Test actual Redis operations."""
-        if redis_service is None:
-            pytest.skip("Redis service not available")
-        assert isinstance(redis_service, str)
         r = None
         try:
-            r = redis.Redis(host="localhost", port=6380, db=0)
+            r = redis.Redis(
+                host=c.Meltano.Tests.Docker.HOST,
+                port=c.Meltano.Tests.Docker.REDIS_PORT,
+                db=0,
+            )
             r.set("test_key", "test_value")
             value = r.get("test_key")
             assert value == b"test_value"

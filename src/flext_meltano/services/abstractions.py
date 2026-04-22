@@ -21,7 +21,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def create_abstractions_instance(cls) -> p.Result[Self]:
         """Factory method for creating a FlextMeltanoAbstractions instance."""
         instance: Self = cls()
-        return r[Self](value=instance, success=True)
+        return r[Self].ok(instance)
 
     # -- Tap-specific operations (discovery, sync, catalog) --
 

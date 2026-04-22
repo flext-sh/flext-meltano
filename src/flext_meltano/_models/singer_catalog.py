@@ -6,6 +6,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
@@ -19,8 +20,14 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
-        breadcrumb: t.StrSequence = u.Field(default_factory=tuple)
-        metadata: t.Cli.JsonMapping = u.Field(default_factory=dict)
+        breadcrumb: t.StrSequence = u.Field(
+            default_factory=tuple,
+            description="Singer metadata breadcrumb path segments",
+        )
+        metadata: t.Cli.JsonMapping = u.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Singer metadata payload associated with the breadcrumb",
+        )
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
@@ -44,7 +51,10 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer stream metadata blocks",
             )
         )
-        key_properties: t.StrSequence = u.Field(default_factory=tuple)
+        key_properties: t.StrSequence = u.Field(
+            default_factory=tuple,
+            description="Singer key property names for the stream",
+        )
         replication_key: Annotated[
             str | None,
             u.Field(
@@ -118,7 +128,10 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, u.Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: t.Cli.JsonMapping = u.Field(default_factory=dict)
+        state: t.Cli.JsonMapping = u.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Singer state payload captured after sync execution",
+        )
         duration_seconds: Annotated[
             t.NonNegativeFloat, u.Field(description="Execution duration")
         ]

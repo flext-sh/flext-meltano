@@ -100,7 +100,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 self.logger.warning(
                     "dbt command failed",
                     subcommand=subcommand,
-                    error=result.error,
+                    error=result.error or "",
                 )
                 return 1
             return 0

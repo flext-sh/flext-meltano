@@ -6,6 +6,7 @@ from collections.abc import (
     Mapping,
     Sequence,
 )
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -109,14 +110,14 @@ class FlextMeltanoModelsInstancesData:
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             u.Field(description="Discovered streams"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         discovered: Annotated[
             bool,
             u.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
             t.ConfigurationMapping, u.Field(description="Additional metadata")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
         @u.computed_field()

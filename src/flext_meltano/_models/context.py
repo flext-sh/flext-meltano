@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import (
     Mapping,
 )
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
@@ -20,7 +21,8 @@ class FlextMeltanoModelsContext:
 
         project_root: Annotated[str, u.Field(description="Project root path")]
         elt_context: t.Cli.JsonMapping = u.Field(
-            default_factory=dict, description="ELT execution context"
+            default_factory=lambda: MappingProxyType({}),
+            description="ELT execution context",
         )
         extractor_name: Annotated[str, u.Field(description="Extractor name")]
         loader_name: Annotated[t.NonEmptyStr, u.Field(description="Loader name")]
@@ -28,7 +30,8 @@ class FlextMeltanoModelsContext:
             bool, u.Field(default=False, description="Execution completion flag")
         ] = False
         execution_result: t.Cli.JsonMapping = u.Field(
-            default_factory=dict, description="Execution result payload"
+            default_factory=lambda: MappingProxyType({}),
+            description="Execution result payload",
         )
 
         @u.field_validator("elt_context", "execution_result", mode="before")
@@ -39,9 +42,12 @@ class FlextMeltanoModelsContext:
             """Normalize mapping-like payloads into dictionaries."""
             match value:
                 case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return MappingProxyType({
+                        str(key): item for key, item in normalized.items()
+                    })
                 case _:
-                    return {}
+                    return MappingProxyType({})
 
         @u.field_validator(
             "project_root", "extractor_name", "loader_name", mode="before"
@@ -59,7 +65,8 @@ class FlextMeltanoModelsContext:
             str, u.Field(default=c.IDENTIFIER_UNKNOWN, description="Project root path")
         ] = c.IDENTIFIER_UNKNOWN
         execution_result: t.Cli.JsonMapping = u.Field(
-            default_factory=dict, description="Execution result payload"
+            default_factory=lambda: MappingProxyType({}),
+            description="Execution result payload",
         )
 
         @u.field_validator("execution_result", mode="before")
@@ -70,9 +77,12 @@ class FlextMeltanoModelsContext:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return MappingProxyType({
+                        str(key): item for key, item in normalized.items()
+                    })
                 case _:
-                    return {}
+                    return MappingProxyType({})
 
         @u.field_validator("project_root", mode="before")
         @classmethod
@@ -85,7 +95,7 @@ class FlextMeltanoModelsContext:
         """Scalar-only pipeline execution values normalized to strings."""
 
         values: t.StrMapping = u.Field(
-            default_factory=dict,
+            default_factory=lambda: MappingProxyType({}),
             description="Execution values filtered to scalar strings",
         )
 
@@ -95,13 +105,13 @@ class FlextMeltanoModelsContext:
             """Keep scalar execution values and stringify them."""
             match value:
                 case Mapping():
-                    return {
+                    return MappingProxyType({
                         str(key): str(item)
                         for key, item in value.items()
                         if u.matches_type(item, (str, int, bool, float))
-                    }
+                    })
                 case _:
-                    return {}
+                    return MappingProxyType({})
 
     class PluginComponentConfig(m.Entity):
         """Validated plugin component configuration for pipeline validators."""

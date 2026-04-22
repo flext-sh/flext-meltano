@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -28,7 +29,7 @@ class FlextMeltanoModelsProjectsPlugin:
         ] = "standard"
         settings: Annotated[
             t.Cli.JsonMapping, u.Field(description="Plugin settings")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         capabilities: Annotated[
             t.StrSequence, u.Field(description="Plugin capabilities")
         ] = u.Field(default_factory=tuple)

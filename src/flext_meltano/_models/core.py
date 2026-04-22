@@ -36,7 +36,7 @@ class FlextMeltanoModelsCore:
                 return any(checks)
             return False
 
-        protected: dict[str, t.Container] = {}
+        protected: dict[str, t.Cli.JsonValue] = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
         return t.Cli.JSON_MAPPING_ADAPTER.validate_python(protected)

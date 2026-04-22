@@ -24,7 +24,7 @@ import pytest
 from flext_tests import tk
 
 from flext_meltano import FlextMeltano, meltano
-from tests import p, u
+from tests import c, p, u
 
 if TYPE_CHECKING:
     from tests import t
@@ -370,41 +370,49 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
 @pytest.fixture
 def docker_services(docker_manager: tk) -> Generator[tk]:
     """Function-scoped Docker services fixture."""
-    result = docker_manager.start_compose_stack("docker-compose.test.yml")
+    result = docker_manager.start_compose_stack(c.Meltano.Tests.Docker.COMPOSE_FILE)
     if result.failure:
         pytest.skip(f"Docker stack unavailable: {result.error}")
     yield docker_manager
-    _ = docker_manager.compose_down("docker-compose.test.yml")
+    _ = docker_manager.compose_down(c.Meltano.Tests.Docker.COMPOSE_FILE)
+
+
+def require_docker_service(docker_services: tk, port: int, service_name: str) -> str:
+    """Return a ready Docker service endpoint or skip the test."""
+    ready = docker_services.wait_for_port_ready(c.Meltano.Tests.Docker.HOST, port)
+    if ready.failure or not ready.value:
+        pytest.skip(f"{service_name} service not available")
+    return f"{c.Meltano.Tests.Docker.HOST}:{port}"
 
 
 @pytest.fixture
-def postgres_service(docker_services: tk) -> Generator[str | None]:
+def postgres_service(docker_services: tk) -> str:
     """PostgreSQL service fixture."""
-    ready = docker_services.wait_for_port_ready("localhost", 5433)
-    if ready.failure or not ready.value:
-        yield None
-        return
-    yield "localhost:5433"
+    return require_docker_service(
+        docker_services,
+        c.Meltano.Tests.Docker.POSTGRES_PORT,
+        "PostgreSQL",
+    )
 
 
 @pytest.fixture
-def redis_service(docker_services: tk) -> Generator[str | None]:
+def redis_service(docker_services: tk) -> str:
     """Redis service fixture."""
-    ready = docker_services.wait_for_port_ready("localhost", 6380)
-    if ready.failure or not ready.value:
-        yield None
-        return
-    yield "localhost:6380"
+    return require_docker_service(
+        docker_services,
+        c.Meltano.Tests.Docker.REDIS_PORT,
+        "Redis",
+    )
 
 
 @pytest.fixture
-def meltano_service(docker_services: tk) -> Generator[str | None]:
+def meltano_service(docker_services: tk) -> str:
     """Meltano service fixture."""
-    ready = docker_services.wait_for_port_ready("localhost", 3389)
-    if ready.failure or not ready.value:
-        yield None
-        return
-    yield "localhost:3389"
+    return require_docker_service(
+        docker_services,
+        c.Meltano.Tests.Docker.MELTANO_PORT,
+        "Meltano",
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:

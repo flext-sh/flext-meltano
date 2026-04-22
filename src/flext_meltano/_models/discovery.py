@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import (
     Mapping,
 )
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
@@ -21,7 +22,10 @@ class FlextMeltanoModelsDiscovery:
         default_variant: Annotated[
             str, u.Field(default="", description="Plugin default variant")
         ] = ""
-        variants: t.Cli.JsonMapping = u.Field(default_factory=dict)
+        variants: t.Cli.JsonMapping = u.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Available plugin variants keyed by variant name",
+        )
         logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
         description: Annotated[
             str, u.Field(default="", description="Plugin description")
@@ -41,9 +45,12 @@ class FlextMeltanoModelsDiscovery:
             """Normalize variant maps from external payloads."""
             match value:
                 case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return MappingProxyType({
+                        str(key): item for key, item in normalized.items()
+                    })
                 case _:
-                    return {}
+                    return MappingProxyType({})
 
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
@@ -65,7 +72,10 @@ class FlextMeltanoModelsDiscovery:
         """Typed plugin discovery catalog keyed by plugin name."""
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
-            u.Field(default_factory=dict)
+            u.Field(
+                default_factory=lambda: MappingProxyType({}),
+                description="Plugin discovery entries keyed by plugin name",
+            )
         )
 
         @u.field_validator("plugins", mode="before")
@@ -76,6 +86,9 @@ class FlextMeltanoModelsDiscovery:
             """Normalize plugin catalog mapping."""
             match value:
                 case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                    return MappingProxyType({
+                        str(key): item for key, item in normalized.items()
+                    })
                 case _:
-                    return {}
+                    return MappingProxyType({})

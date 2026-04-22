@@ -48,7 +48,7 @@ class FlextMeltanoUtilitiesRuntime:
     @classmethod
     def normalize_runtime_json_mapping(
         cls,
-        source: Mapping[str, t.RuntimeData],
+        source: Mapping[str, t.RuntimeData | t.Cli.JsonValue],
     ) -> t.Cli.JsonMapping:
         """Normalize runtime mappings to the canonical Pydantic JSON contract."""
         return t.Cli.JSON_MAPPING_ADAPTER.validate_python(
@@ -327,18 +327,19 @@ class FlextMeltanoUtilitiesRuntime:
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> t.MutableFlatContainerMapping:
+    ) -> dict[str, t.Cli.JsonValue]:
         """Build one mutable execution payload for callers that append fields."""
-        return dict(
-            FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
+        return {
+            str(key): value
+            for key, value in FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
                 command_result,
                 extra_fields=extra_fields,
                 success_status=success_status,
                 failure_status=failure_status,
                 status_field=status_field,
                 duration_field=duration_field,
-            )
-        )
+            ).items()
+        }
 
     @staticmethod
     def command_failure_message(

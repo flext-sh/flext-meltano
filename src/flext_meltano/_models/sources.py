@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
@@ -26,7 +27,7 @@ class FlextMeltanoModelsSources:
         stream_config: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Stream-specific configuration"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         tap_version: Annotated[str, u.Field(description="Tap version")] = "latest"
 
         @u.computed_field()
@@ -73,7 +74,7 @@ class FlextMeltanoModelsSources:
         target_type: Annotated[str, u.Field(description="Type of the target")]
         connection_config: Annotated[
             t.Cli.JsonMapping, u.Field(description="Connection configuration")
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         batch_size: Annotated[
             int | None, u.Field(default=None, description="Batch size for data loading")
         ] = None
@@ -128,7 +129,7 @@ class FlextMeltanoModelsSources:
         stream_config: Annotated[
             t.Cli.JsonMapping,
             u.Field(description="Stream-specific configuration"),
-        ] = u.Field(default_factory=dict)
+        ] = u.Field(default_factory=lambda: MappingProxyType({}))
         source_version: Annotated[
             str, u.Field(default="latest", description="Source version")
         ] = "latest"
