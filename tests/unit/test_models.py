@@ -25,7 +25,7 @@ class TestFlextMeltanoModels:
         )
         tm.that(settings.tap_type, eq="tap-postgres")
         tm.that(settings.connection_config, eq={"host": "localhost"})
-        tm.that(settings.stream_config, eq={})
+        tm.that(settings.stream_config, empty=True)
         tm.that(settings.tap_version, eq="latest")
 
     def test_tap_config_with_full_data(self) -> None:
@@ -66,7 +66,7 @@ class TestFlextMeltanoModels:
     def test_target_config_with_minimal_data(self) -> None:
         settings = m.Meltano.TargetConfig(target_type="target-csv")
         tm.that(settings.target_type, eq="target-csv")
-        tm.that(settings.connection_config, eq={})
+        tm.that(settings.connection_config, empty=True)
         tm.that(settings.batch_size, none=True)
         tm.that(settings.batch_wait_limit, none=True)
 
@@ -156,8 +156,8 @@ class TestFlextMeltanoModels:
         tm.that(project.project_id, eq="test-project")
         tm.that(project.project_version, eq="1")
         tm.that(project.default_environment, eq="dev")
-        tm.that(project.plugins, eq={})
-        tm.that(project.environments, eq={})
+        tm.that(project.plugins, empty=True)
+        tm.that(project.environments, empty=True)
 
     def test_meltano_project_with_full_data(self) -> None:
         project = m.Meltano.MeltanoProjectModel(
@@ -205,9 +205,9 @@ class TestFlextMeltanoModels:
         tm.that(plugin.variant, eq="standard")
         tm.that(plugin.pip_url, eq="tap-postgres")
         tm.that(plugin.executable, none=True)
-        tm.that(plugin.capabilities, eq=[])
-        tm.that(plugin.settings, eq={})
-        tm.that(plugin.config_files, eq=[])
+        tm.that(plugin.capabilities, empty=True)
+        tm.that(plugin.settings, empty=True)
+        tm.that(plugin.config_files, empty=True)
 
     def test_plugin_model_with_full_data(self) -> None:
         plugin = m.Meltano.PluginModel(
@@ -255,10 +255,10 @@ class TestFlextMeltanoModels:
         tm.that(dbt_project.name, eq="analytics")
         tm.that(dbt_project.profile, eq="default")
         tm.that(dbt_project.dbt_version, eq="1.0.0")
-        tm.that(dbt_project.settings, eq={})
-        tm.that(dbt_project.models, eq={})
-        tm.that(dbt_project.sources, eq={})
-        tm.that(dbt_project.tests, eq={})
+        tm.that(dbt_project.settings, empty=True)
+        tm.that(dbt_project.models, empty=True)
+        tm.that(dbt_project.sources, empty=True)
+        tm.that(dbt_project.tests, empty=True)
 
     def test_dbt_project_with_full_data(self) -> None:
         dbt_project = m.Meltano.DbtProjectModel(

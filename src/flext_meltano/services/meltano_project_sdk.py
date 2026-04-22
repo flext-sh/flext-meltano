@@ -16,8 +16,9 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 from meltano.core.project import Project
+
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):

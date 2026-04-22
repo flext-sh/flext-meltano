@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from meltano.core.error import ProjectNotFound
+
 from flext_meltano import (
     FlextMeltanoCLI,
     FlextMeltanoExecutorBase,
@@ -16,7 +18,6 @@ from flext_meltano import (
     t,
     u,
 )
-from meltano.core.error import ProjectNotFound
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):

@@ -87,7 +87,7 @@ class TestFlextMeltanoExecutionResult:
             error="No command provided",
             execution_time=0.0,
         )
-        tm.that(result.command, eq=[])
+        tm.that(result.command, empty=True)
         tm.that(result.success is False, eq=True)
         tm.that(result.exit_code, eq=-1)
         tm.that(result.output, eq="")

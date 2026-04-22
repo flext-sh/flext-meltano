@@ -16,19 +16,8 @@ from io import StringIO
 from pathlib import Path
 from typing import override
 
-from click import Abort, ClickException
-
 import meltano
-from flext_meltano import (
-    FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
-    c,
-    m,
-    p,
-    r,
-    t,
-    u,
-)
+from click import Abort, ClickException
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -39,6 +28,17 @@ from meltano.core.project_init_service import (
     ProjectInitServiceError,
 )
 from sqlalchemy.exc import SQLAlchemyError
+
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
