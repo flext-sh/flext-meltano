@@ -24,8 +24,8 @@ class TestFlextMeltanoPipelineCliManagers:
         self,
         tmp_path: Path,
     ) -> None:
-        command: list[t.Cli.JsonValue] = ["run", "tap-demo", "target-demo"]
-        settings: t.Cli.JsonMapping = {
+        command: list[t.JsonValue] = ["run", "tap-demo", "target-demo"]
+        settings: t.JsonMapping = {
             "command": command,
             "schedule": "daily",
         }
@@ -57,8 +57,8 @@ class TestFlextMeltanoPipelineCliManagers:
         self,
         tmp_path: Path,
     ) -> None:
-        command: list[t.Cli.JsonValue] = ["run", "tap-demo", "target-demo"]
-        settings: t.Cli.JsonMapping = {"command": command}
+        command: list[t.JsonValue] = ["run", "tap-demo", "target-demo"]
+        settings: t.JsonMapping = {"command": command}
         mock_cmd_result = m.Meltano.CommandExecutionResult(
             command=["run", "tap-demo", "target-demo"],
             success=True,

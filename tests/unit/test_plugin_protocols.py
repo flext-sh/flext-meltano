@@ -11,10 +11,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
-
 from flext_tests import tm
 
 from tests import t
@@ -36,7 +32,7 @@ class TestFlextMeltanoPluginProtocols:
 
     def test_plugin_configuration_resolves_to_mapping(self) -> None:
         """PluginConfiguration type alias resolves to a Mapping-compatible type."""
-        plugin_cfg: Mapping[str, t.Container] = {
+        plugin_cfg = {
             "host": "localhost",
             "port": "5432",
             "database": "analytics",
@@ -57,7 +53,7 @@ class TestFlextMeltanoPluginProtocols:
         """Each plugin type alias is a distinct named type."""
         names = {
             str(t.Meltano.PluginDefinition),
-            str(Mapping[str, t.Container]),
+            str(t.JsonMapping),
             str(t.Meltano.PluginCatalog),
         }
         tm.that(len(names), eq=3)
@@ -65,5 +61,5 @@ class TestFlextMeltanoPluginProtocols:
     def test_meltano_namespace_contains_all_plugin_types(self) -> None:
         """t.Meltano namespace exposes all three plugin type aliases."""
         tm.that(str(t.Meltano.PluginDefinition), none=False)
-        tm.that(str(Mapping[str, t.Container]), none=False)
+        tm.that(str(t.JsonMapping), none=False)
         tm.that(str(t.Meltano.PluginCatalog), none=False)

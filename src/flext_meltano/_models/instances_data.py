@@ -28,7 +28,7 @@ class FlextMeltanoModelsInstancesData:
 
         sink_type: Annotated[str, u.Field(description="Sink type identifier")]
         connection_config: Annotated[
-            t.Cli.JsonMapping,
+            t.JsonMapping,
             u.Field(description="Connection configuration dictionary"),
         ]
         batch_size: Annotated[
@@ -71,9 +71,7 @@ class FlextMeltanoModelsInstancesData:
             return f"{self.sink_type}:batch_{self.batch_size}"
 
         @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            self, value: t.Cli.JsonMapping
-        ) -> t.Cli.JsonMapping:
+        def serialize_connection_config(self, value: t.JsonMapping) -> t.JsonMapping:
             """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -98,7 +96,7 @@ class FlextMeltanoModelsInstancesData:
             u.Field(description="Source configuration"),
         ]
         adapter: Annotated[
-            t.Container | None,
+            t.JsonValue | None,
             u.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[
@@ -185,7 +183,7 @@ class FlextMeltanoModelsInstancesData:
             description="Sink configuration"
         )
         adapter: Annotated[
-            t.Container | None,
+            t.JsonValue | None,
             u.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[

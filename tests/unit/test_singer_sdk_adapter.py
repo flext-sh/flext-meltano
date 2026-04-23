@@ -42,9 +42,9 @@ class _FailingTap(_SuccessfulTap):
             @override
             def main(
                 self,
-                *args: t.Container,
-                **kwargs: t.Container,
-            ) -> t.Container:
+                *args: t.JsonValue,
+                **kwargs: t.JsonValue,
+            ) -> t.JsonValue:
                 raise SystemExit(3)
 
         return _FailingCommand("tap-fail")

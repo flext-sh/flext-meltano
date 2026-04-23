@@ -81,7 +81,7 @@ pre-commit install
 
 ```bash
 # Run quality gates to verify setup
-make validate
+make val
 
 # Check individual components
 make lint-all
@@ -134,7 +134,7 @@ Follow FLEXT development standards:
 make check
 
 # Full validation (before push)
-make validate
+make val
 ```
 
 ### 4. Commit Changes
@@ -292,7 +292,7 @@ make type-check
 make security
 
 # All quality checks
-make validate
+make val
 ```
 
 ## Adding New Projects

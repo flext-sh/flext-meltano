@@ -127,12 +127,12 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
         self.output.print_message("Target commands: run, test")
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute CLI service."""
-        payload: t.Cli.JsonMapping = {
+        payload: t.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
         }
-        return r[t.Cli.JsonMapping].ok(payload)
+        return r[t.JsonMapping].ok(payload)
 
 
 def main() -> int:

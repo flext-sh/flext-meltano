@@ -21,7 +21,7 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def coerce_container_mapping(
         value: t.Meltano.JsonValue | t.RuntimeData | None,
-    ) -> t.Cli.JsonMapping | None:
+    ) -> t.JsonMapping | None:
         """Validate runtime objects against the canonical JSON mapping contract."""
         normalized = u.Cli.json_as_mapping(value)
         return normalized or None
@@ -29,7 +29,7 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def coerce_container_mapping_list(
         value: t.Meltano.JsonValue | t.RuntimeData | None,
-    ) -> list[t.Cli.JsonMapping] | None:
+    ) -> list[t.JsonMapping] | None:
         """Validate runtime objects against a list of canonical JSON mappings."""
         normalized = u.Cli.json_as_mapping_list(value)
         return list(normalized) if normalized else None
@@ -48,8 +48,8 @@ class FlextMeltanoUtilitiesRuntime:
     @classmethod
     def normalize_runtime_json_mapping(
         cls,
-        source: Mapping[str, t.RuntimeData | t.Cli.JsonValue],
-    ) -> t.Cli.JsonMapping:
+        source: Mapping[str, t.RuntimeData | t.JsonValue],
+    ) -> t.JsonMapping:
         """Normalize runtime mappings to the canonical Pydantic JSON contract."""
         return t.Cli.JSON_MAPPING_ADAPTER.validate_python(
             u.to_jsonable_python(source),
@@ -177,7 +177,7 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def build_discovered_plugin(
         raw_type: str,
-        raw_plugin: t.Cli.JsonMapping,
+        raw_plugin: t.JsonMapping,
     ) -> t.StrMapping | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape."""
         name_val = raw_plugin.get("name", "")
@@ -187,7 +187,7 @@ class FlextMeltanoUtilitiesRuntime:
         ns_val = raw_plugin.get("namespace", "")
         pip_val = raw_plugin.get("pip_url", "")
         variant_val = raw_plugin.get("variant", "")
-        plugin_data: t.Cli.JsonMapping = {
+        plugin_data: t.JsonMapping = {
             "name": plugin_name,
             "type": FlextMeltanoUtilitiesRuntime.normalize_plugin_group(raw_type)
             or u.to_str(raw_type),
@@ -204,7 +204,7 @@ class FlextMeltanoUtilitiesRuntime:
         raw_plugin: ProjectPlugin,
     ) -> t.StrMapping | None:
         """Normalize a Meltano project plugin object into discovery payload shape."""
-        plugin_mapping: t.Cli.JsonMapping = {
+        plugin_mapping: t.JsonMapping = {
             "name": raw_plugin.name,
             "namespace": raw_plugin.namespace,
             "pip_url": raw_plugin.pip_url,
@@ -263,7 +263,7 @@ class FlextMeltanoUtilitiesRuntime:
         plugin_type: str,
         *,
         default_variant: str = "",
-        variants: t.Cli.JsonMapping | None = None,
+        variants: t.JsonMapping | None = None,
         description: str = "",
         logo_url: str = "",
     ) -> t.StrMapping:
@@ -292,14 +292,14 @@ class FlextMeltanoUtilitiesRuntime:
     def build_command_execution_payload(
         command_result: m.Meltano.CommandExecutionResult,
         *,
-        extra_fields: t.Cli.JsonMapping | None = None,
+        extra_fields: t.JsonMapping | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> t.Cli.JsonMapping:
+    ) -> t.JsonMapping:
         """Build a standard command payload for services over Meltano runtime."""
-        payload: t.MutableFlatContainerMapping = {
+        payload: t.MutableJsonMapping = {
             "success": command_result.success,
             "output": u.to_str(command_result.output),
             "error": u.to_str(command_result.error),
@@ -322,12 +322,12 @@ class FlextMeltanoUtilitiesRuntime:
     def build_mutable_command_execution_payload(
         command_result: m.Meltano.CommandExecutionResult,
         *,
-        extra_fields: t.Cli.JsonMapping | None = None,
+        extra_fields: t.JsonMapping | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> dict[str, t.Cli.JsonValue]:
+    ) -> dict[str, t.JsonValue]:
         """Build one mutable execution payload for callers that append fields."""
         return {
             str(key): value

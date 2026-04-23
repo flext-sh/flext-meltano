@@ -77,7 +77,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, settings: t.Cli.JsonMapping | None = None
+        environment_name: str, settings: t.JsonMapping | None = None
     ) -> p.Result[t.Meltano.ServicePayload]:
         """Configure environment."""
         if not environment_name:
@@ -94,12 +94,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        configuration: dict[str, t.Cli.JsonValue] = (
+        configuration: dict[str, t.JsonValue] = (
             {str(key): value for key, value in settings.items()}
             if settings is not None
             else {}
         )
-        payload: dict[str, t.Cli.JsonValue] = {
+        payload: dict[str, t.JsonValue] = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "environment": normalized_environment,
             "configuration": configuration,
@@ -110,21 +110,21 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     def configure_pipeline(
         source_name: str,
         sink_name: str,
-        _config: t.Cli.JsonMapping | None = None,
-    ) -> p.Result[t.Cli.JsonMapping]:
+        _config: t.JsonMapping | None = None,
+    ) -> p.Result[t.JsonMapping]:
         """Configure generic data pipeline."""
-        payload: t.Cli.JsonMapping = {
+        payload: t.JsonMapping = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
         }
-        return r[t.Cli.JsonMapping].ok(payload)
+        return r[t.JsonMapping].ok(payload)
 
     @staticmethod
     def install_component(
         component_type: str,
         component_name: str,
-        settings: t.Cli.JsonMapping | None = None,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[t.Meltano.ServicePayload]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
@@ -135,12 +135,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.ServicePayload].fail(
                 f"Invalid component type: {component_type}"
             )
-        configuration: dict[str, t.Cli.JsonValue] = (
+        configuration: dict[str, t.JsonValue] = (
             {str(key): value for key, value in settings.items()}
             if settings is not None
             else {}
         )
-        payload: dict[str, t.Cli.JsonValue] = {
+        payload: dict[str, t.JsonValue] = {
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,
             "component_type": component_type,
@@ -150,7 +150,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def validate_service_config(
-        settings: t.Cli.JsonMapping,
+        settings: t.JsonMapping,
     ) -> p.Result[bool]:
         """Validate service configuration dictionary."""
         if not isinstance(settings, dict):
@@ -158,19 +158,19 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         return r[bool].ok(value=True)
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute service with railway pattern."""
-        payload: t.Cli.JsonMapping = {
+        payload: t.JsonMapping = {
             "status": c.CommonStatus.ACTIVE,
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "handlers": list(c.Meltano.HANDLER_ALL),
         }
-        return r[t.Cli.JsonMapping].ok(payload)
+        return r[t.JsonMapping].ok(payload)
 
-    def fetch_default_config(self) -> p.Result[t.Cli.JsonMapping]:
+    def fetch_default_config(self) -> p.Result[t.JsonMapping]:
         """Get default configuration from current settings."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def fetch_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""

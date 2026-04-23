@@ -25,23 +25,23 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    type JsonValue = t.Cli.JsonValue
-    type JsonMapping = t.Cli.JsonMapping
-    type JsonMappingList = Sequence[t.Cli.JsonMapping]
-    type ValidatorInput = t.Cli.JsonValue | t.RuntimeData | None
+    JsonValue = t.JsonValue
+    type JsonMapping = t.JsonMapping
+    type JsonMappingList = Sequence[t.JsonMapping]
+    type ValidatorInput = t.JsonValue | t.RuntimeData | None
 
-    type PluginDefinition = t.Cli.JsonMapping
+    type PluginDefinition = t.JsonMapping
     type PluginCatalog = Mapping[
         str, Sequence[FlextMeltanoTypingsBase.PluginDefinition]
     ]
     PluginType = c.Meltano.PluginType
 
-    type VariantValue = str | t.StrSequence | t.Cli.JsonMapping | None
+    type VariantValue = str | t.StrSequence | t.JsonMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""
 
-    type FileConfigDict = t.Cli.JsonMapping
+    type FileConfigDict = t.JsonMapping
     type PathDict = Mapping[str, str | Path]
 
     type OptionalScalarMap = Mapping[str, t.Scalar | None]
 
-    type CliProcessResult = t.Cli.JsonMapping
+    type CliProcessResult = t.JsonMapping

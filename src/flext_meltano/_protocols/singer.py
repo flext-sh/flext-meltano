@@ -26,71 +26,71 @@ class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(p.Service[t.Cli.JsonMapping], Protocol):
+    class Tap(p.Service[t.JsonMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> p.Result[t.Cli.JsonMapping]:
+        def discover(self) -> p.Result[t.JsonMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.Cli.JsonMapping]:
+        def execute(self) -> p.Result[t.JsonMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
             self,
-            catalog: t.FlatContainerMapping,
-        ) -> p.Result[t.Cli.JsonMapping]:
+            catalog: t.JsonMapping,
+        ) -> p.Result[t.JsonMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(p.Service[t.Cli.JsonMapping], Protocol):
+    class Target(p.Service[t.JsonMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.Cli.JsonMapping]:
+        def execute(self) -> p.Result[t.JsonMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
             self,
             records: Sequence[t.Meltano.OptionalScalarMap],
-        ) -> p.Result[t.Cli.JsonMapping]:
+        ) -> p.Result[t.JsonMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
             self,
             record: t.Meltano.OptionalScalarMap,
-        ) -> p.Result[t.Cli.JsonMapping]:
+        ) -> p.Result[t.JsonMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
     class DbtRunner(
-        p.Service[t.Cli.JsonMapping],
+        p.Service[t.JsonMapping],
         Protocol,
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.Cli.JsonMapping]:
+        def execute(self) -> p.Result[t.JsonMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
         def run(
             self,
             models: t.StrSequence,
-        ) -> p.Result[t.Cli.JsonMapping]:
+        ) -> p.Result[t.JsonMapping]:
             """Run DBT models with r."""
             ...
 
         def test(
             self,
             models: t.StrSequence,
-        ) -> p.Result[t.Cli.JsonMapping]:
+        ) -> p.Result[t.JsonMapping]:
             """Test DBT models with r."""
             ...
 
@@ -108,7 +108,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def settings(self) -> t.Cli.JsonMapping:
+        def settings(self) -> t.JsonMapping:
             """Tap configuration."""
             ...
 
@@ -172,7 +172,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        settings: t.Cli.JsonMapping
+        settings: t.JsonMapping
 
         def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
@@ -193,20 +193,20 @@ class FlextMeltanoProtocolsSinger:
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
 
-        Context/Record types use ``t.MutableContainerValueMapping`` — the canonical
+        Context/Record types use ``t.MutableJsonMapping`` — the canonical
         bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, JsonValue]``.
         """
 
-        def start_drain(self) -> t.MutableContainerValueMapping: ...
+        def start_drain(self) -> t.MutableJsonMapping: ...
 
-        def process_batch(self, context: t.MutableContainerValueMapping) -> None: ...
+        def process_batch(self, context: t.MutableJsonMapping) -> None: ...
 
         def mark_drained(self) -> None: ...
 
         def process_record(
             self,
-            record: t.MutableContainerValueMapping,
-            context: t.MutableContainerValueMapping,
+            record: t.MutableJsonMapping,
+            context: t.MutableJsonMapping,
         ) -> None: ...
 
     @runtime_checkable

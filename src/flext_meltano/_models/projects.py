@@ -63,11 +63,11 @@ class FlextMeltanoModelsProjects:
                 description="Default environment name",
             ),
         ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
-        plugins: t.Cli.JsonMapping = u.Field(
+        plugins: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Configured Meltano plugins grouped by plugin category",
         )
-        environments: t.Cli.JsonMapping = u.Field(
+        environments: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Meltano environment definitions keyed by environment name",
         )

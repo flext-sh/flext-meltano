@@ -336,7 +336,7 @@ class MeltanoAdapter:
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap implementation with ecosystem integration."""
 
-    def __init__(self, settings: Mapping[str, t.Container] = None, **kwargs):
+    def __init__(self, settings: t.JsonMapping = None, **kwargs):
         super().__init__(settings, **kwargs)
         # FLEXT logging integration
         self.logger = FlextLogger.get_logger(self.__class__.__name__)
@@ -800,7 +800,7 @@ class CircuitBreakerIntegration:
 
     def execute_with_circuit_breaker(
         self, operation: Callable
-    ) -> p.Result[t.Container]:
+    ) -> p.Result[t.JsonValue]:
         """Execute operation with circuit breaker protection."""
 
         if self.state == CircuitState.OPEN:

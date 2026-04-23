@@ -22,7 +22,7 @@ class TestFlextMeltanoCliModelConversion:
     """Behavioral tests for Meltano CLI model conversion."""
 
     def test_tap_run_params_minimal(self) -> None:
-        cli_args: t.Cli.JsonMapping = {
+        cli_args: t.JsonMapping = {
             "tap_name": "tap-postgres",
             "discover": False,
         }
@@ -34,7 +34,7 @@ class TestFlextMeltanoCliModelConversion:
         tm.that(model.discover is False, eq=True)
 
     def test_tap_run_params_with_config(self) -> None:
-        cli_args: t.Cli.JsonMapping = {
+        cli_args: t.JsonMapping = {
             "tap_name": "tap-postgres",
             "config_file": "/path/to/settings.json",
             "discover": False,
@@ -45,7 +45,7 @@ class TestFlextMeltanoCliModelConversion:
         tm.that(model.config_file, eq="/path/to/settings.json")
 
     def test_tap_run_params_discover_mode(self) -> None:
-        cli_args: t.Cli.JsonMapping = {
+        cli_args: t.JsonMapping = {
             "tap_name": "tap-postgres",
             "discover": True,
         }
@@ -55,7 +55,7 @@ class TestFlextMeltanoCliModelConversion:
         tm.that(model.discover is True, eq=True)
 
     def test_tap_run_params_all_fields(self) -> None:
-        cli_args: t.Cli.JsonMapping = {
+        cli_args: t.JsonMapping = {
             "tap_name": "tap-postgres",
             "config_file": "/settings.json",
             "catalog_file": "/catalog.json",

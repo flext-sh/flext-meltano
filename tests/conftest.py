@@ -119,7 +119,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 
 @pytest.fixture
-def meltano_yml_config() -> t.Cli.JsonMapping:
+def meltano_yml_config() -> t.JsonMapping:
     """Sample pipeline.yml configuration for testing."""
     return {
         "version": 1,
@@ -180,8 +180,8 @@ def meltano_yml_config() -> t.Cli.JsonMapping:
 @pytest.fixture
 def meltano_project(
     test_meltano_project_dir: Path,
-    meltano_yml_config: t.Cli.JsonMapping,
-) -> dict[str, str | Path | t.Cli.JsonMapping]:
+    meltano_yml_config: t.JsonMapping,
+) -> dict[str, str | Path | t.JsonMapping]:
     """Meltano project for testing."""
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
@@ -196,7 +196,7 @@ def meltano_project(
 
 
 @pytest.fixture
-def tap_csv_config() -> t.Cli.JsonMapping:
+def tap_csv_config() -> t.JsonMapping:
     """Tap CSV configuration for testing."""
     return {
         "files": [
@@ -211,7 +211,7 @@ def tap_csv_config() -> t.Cli.JsonMapping:
 
 
 @pytest.fixture
-def target_csv_config() -> t.Cli.JsonMapping:
+def target_csv_config() -> t.JsonMapping:
     """Target CSV configuration for testing."""
     return {"destination_path": "output", "file_format": "csv", "delimiter": ","}
 
@@ -246,7 +246,7 @@ def meltano_invoke_args() -> t.StrSequence:
 
 
 @pytest.fixture
-def singer_schema() -> t.Cli.JsonMapping:
+def singer_schema() -> t.JsonMapping:
     """Sample Singer schema for testing."""
     return {
         "type": "SCHEMA",
@@ -265,7 +265,7 @@ def singer_schema() -> t.Cli.JsonMapping:
 
 
 @pytest.fixture
-def singer_records() -> Sequence[t.Cli.JsonMapping]:
+def singer_records() -> Sequence[t.JsonMapping]:
     """Sample Singer records for testing."""
     return [
         {
@@ -292,7 +292,7 @@ def singer_records() -> Sequence[t.Cli.JsonMapping]:
 
 
 @pytest.fixture
-def singer_state() -> t.Cli.JsonMapping:
+def singer_state() -> t.JsonMapping:
     """Sample Singer state for testing."""
     return {
         "type": "STATE",
@@ -308,7 +308,7 @@ def singer_state() -> t.Cli.JsonMapping:
 
 
 @pytest.fixture
-def pipeline_execution_config() -> t.Cli.JsonMapping:
+def pipeline_execution_config() -> t.JsonMapping:
     """Pipeline execution configuration for testing."""
     return {
         "extractor": "tap-csv",
@@ -321,7 +321,7 @@ def pipeline_execution_config() -> t.Cli.JsonMapping:
 
 
 @pytest.fixture
-def test_environment_config() -> t.Cli.JsonMapping:
+def test_environment_config() -> t.JsonMapping:
     """Test environment configuration."""
     return {
         "name": "test",
@@ -333,7 +333,7 @@ def test_environment_config() -> t.Cli.JsonMapping:
 
 
 @pytest.fixture
-def sample_schedule_config() -> t.Cli.JsonMapping:
+def sample_schedule_config() -> t.JsonMapping:
     """Sample schedule configuration."""
     return {
         "name": "daily-sync",
@@ -346,7 +346,7 @@ def sample_schedule_config() -> t.Cli.JsonMapping:
 
 
 @pytest.fixture
-def job_run_config() -> t.Cli.JsonMapping:
+def job_run_config() -> t.JsonMapping:
     """Job run configuration for testing."""
     return {
         "job_id": "test-job-123",
@@ -433,22 +433,22 @@ class MockMeltanoService:
 
     @staticmethod
     def create_project(
-        _config: t.Cli.JsonMapping,
-    ) -> t.Cli.JsonMapping:
+        _config: t.JsonMapping,
+    ) -> t.JsonMapping:
         return {"project_id": "test-project", "status": "created"}
 
     @staticmethod
     def install_plugin(
         _plugin_type: str,
         plugin_name: str,
-    ) -> t.Cli.JsonMapping:
+    ) -> t.JsonMapping:
         return {"plugin": plugin_name, "status": "installed"}
 
     @staticmethod
     def run_pipeline(
         _extractor: str,
         _loader: str,
-    ) -> t.Cli.JsonMapping:
+    ) -> t.JsonMapping:
         return {"execution_id": "test-execution", "status": "running"}
 
 
@@ -461,12 +461,12 @@ def mock_meltano_service() -> MockMeltanoService:
 class MockSingerTap:
     """Mock Singer tap."""
 
-    def __init__(self, settings: t.Cli.JsonMapping) -> None:
+    def __init__(self, settings: t.JsonMapping) -> None:
         """Initialize the instance."""
         super().__init__()
         self.settings = settings
 
-    def discover(self) -> t.Cli.JsonMapping:
+    def discover(self) -> t.JsonMapping:
         _ = self.settings
         return {
             "streams": [
@@ -480,7 +480,7 @@ class MockSingerTap:
             ]
         }
 
-    def extract(self) -> Sequence[t.Cli.JsonMapping]:
+    def extract(self) -> Sequence[t.JsonMapping]:
         _ = self.settings
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -494,15 +494,15 @@ def mock_singer_tap() -> type[MockSingerTap]:
 class MockSingerTarget:
     """Mock Singer target."""
 
-    def __init__(self, settings: t.Cli.JsonMapping) -> None:
+    def __init__(self, settings: t.JsonMapping) -> None:
         """Initialize the instance."""
         super().__init__()
         self.settings = settings
 
     def load(
         self,
-        records: Sequence[t.Cli.JsonMapping],
-    ) -> t.Cli.JsonMapping:
+        records: Sequence[t.JsonMapping],
+    ) -> t.JsonMapping:
         _ = self.settings
         return {"records_loaded": len(records), "status": "success"}
 

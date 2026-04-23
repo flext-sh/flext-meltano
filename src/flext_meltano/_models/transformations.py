@@ -22,18 +22,18 @@ class FlextMeltanoModelsTransformations:
             str, u.Field(default="1.0.0", description="DBT project version")
         ] = "1.0.0"
         settings: Annotated[
-            t.Cli.JsonMapping,
+            t.JsonMapping,
             u.Field(description="DBT project configuration"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         models: Annotated[
-            t.Cli.JsonMapping, u.Field(description="DBT models configuration")
+            t.JsonMapping, u.Field(description="DBT models configuration")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         sources: Annotated[
-            t.Cli.JsonMapping,
+            t.JsonMapping,
             u.Field(description="DBT sources configuration"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         tests: Annotated[
-            t.Cli.JsonMapping, u.Field(description="DBT tests configuration")
+            t.JsonMapping, u.Field(description="DBT tests configuration")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.model_validator(mode="after")

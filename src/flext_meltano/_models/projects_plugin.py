@@ -27,9 +27,9 @@ class FlextMeltanoModelsProjectsPlugin:
         variant: Annotated[
             str, u.Field(default="standard", description="Plugin variant")
         ] = "standard"
-        settings: Annotated[
-            t.Cli.JsonMapping, u.Field(description="Plugin settings")
-        ] = u.Field(default_factory=lambda: MappingProxyType({}))
+        settings: Annotated[t.JsonMapping, u.Field(description="Plugin settings")] = (
+            u.Field(default_factory=lambda: MappingProxyType({}))
+        )
         capabilities: Annotated[
             t.StrSequence, u.Field(description="Plugin capabilities")
         ] = u.Field(default_factory=tuple)

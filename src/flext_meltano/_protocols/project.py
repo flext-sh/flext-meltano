@@ -25,7 +25,7 @@ class FlextMeltanoProtocolsProject:
     class Project(Protocol):
         """Meltano Project protocol for type-safe project operations.
 
-        Represents the interface for a Meltano project t.Container that can be
+        Represents the interface for a Meltano project t.JsonValue that can be
         passed to plugin discovery, pipeline execution, and other operations.
         """
 

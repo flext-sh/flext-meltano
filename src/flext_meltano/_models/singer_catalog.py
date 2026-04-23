@@ -24,7 +24,7 @@ class FlextMeltanoModelsSingerCatalog:
             default_factory=tuple,
             description="Singer metadata breadcrumb path segments",
         )
-        metadata: t.Cli.JsonMapping = u.Field(
+        metadata: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Singer metadata payload associated with the breadcrumb",
         )
@@ -35,7 +35,7 @@ class FlextMeltanoModelsSingerCatalog:
         tap_stream_id: Annotated[str, u.Field(description="Tap stream identifier")]
         stream: Annotated[str, u.Field(description="Singer stream name")]
         schema_definition: Annotated[
-            t.ContainerValueMapping,
+            t.JsonMapping,
             u.Field(
                 alias=c.Meltano.SchemaKey.SCHEMA,
                 serialization_alias=c.Meltano.SchemaKey.SCHEMA,
@@ -128,7 +128,7 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, u.Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: t.Cli.JsonMapping = u.Field(
+        state: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Singer state payload captured after sync execution",
         )

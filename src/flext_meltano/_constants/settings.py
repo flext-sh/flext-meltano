@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import (
+    Mapping,
+)
 from types import MappingProxyType
 from typing import Final
 
-from flext_core import c as core_c
+from flext_core import c, t
 
 from flext_meltano import FlextMeltanoConstantsEnums
 
@@ -59,7 +61,7 @@ class FlextMeltanoConstantsSettings:
             ),
         })
     )
-    ENVIRONMENT_RUNTIME_ALIASES: Final[Mapping[str, str]] = MappingProxyType({
+    ENVIRONMENT_RUNTIME_ALIASES: Final[t.StrMapping] = MappingProxyType({
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
         ),
@@ -175,12 +177,12 @@ class FlextMeltanoConstantsSettings:
         FlextMeltanoConstantsEnums.SingerCapability.SYNC,
         FlextMeltanoConstantsEnums.SingerCapability.VALIDATE,
     )
-    SUPPORTED_LOG_LEVELS: Final[tuple[core_c.LogLevel, ...]] = (
-        core_c.LogLevel.DEBUG,
-        core_c.LogLevel.INFO,
-        core_c.LogLevel.WARNING,
-        core_c.LogLevel.ERROR,
-        core_c.LogLevel.CRITICAL,
+    SUPPORTED_LOG_LEVELS: Final[tuple[c.LogLevel, ...]] = (
+        c.LogLevel.DEBUG,
+        c.LogLevel.INFO,
+        c.LogLevel.WARNING,
+        c.LogLevel.ERROR,
+        c.LogLevel.CRITICAL,
     )
 
     # Operations

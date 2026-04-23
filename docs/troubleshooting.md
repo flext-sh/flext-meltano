@@ -320,7 +320,7 @@ poetry --version
 poetry show flext-core flext-meltano
 
 # Error details
-make validate 2>&1 | head -50
+make val 2>&1 | head -50
 ```
 
 ### **Support Channels**
@@ -338,7 +338,7 @@ Before reporting issues:
 - [ ] Verified correct virtual environment is active
 - [ ] Ran `poetry install --with dev,test`
 - [ ] Checked for direct import violations
-- [ ] Ran `make validate` to identify issues
+- [ ] Ran `make val` to identify issues
 - [ ] Reviewed error messages carefully
 - [ ] Checked documentation for similar issues
 

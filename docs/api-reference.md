@@ -93,7 +93,7 @@ class FlextMeltanoService(s):
 
         Args:
             project_root: Path to Meltano project root directory
-            settings: Service configuration t.Container
+            settings: Service configuration t.JsonValue
         """
 ```
 

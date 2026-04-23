@@ -55,7 +55,7 @@ class TestFlextMeltanoTargetAbstractionsComplete:
         timestamp = u.generate_iso_timestamp()
         tm.that(timestamp, is_=str)
         tm.that(timestamp, has="T")
-        test_data: t.Cli.JsonMapping = {
+        test_data: t.JsonMapping = {
             "level1": {"level2": {"level3": "found_value"}},
         }
         # Navigate nested dict structure using typed accessors

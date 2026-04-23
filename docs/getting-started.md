@@ -160,7 +160,7 @@ ______________________________________________________________________
 
 ```bash
 # Run before any commit
-make validate           # Complete validation pipeline
+make val           # Complete validation pipeline
 make lint               # Code linting
 make type-check         # Type safety validation
 make test               # Test execution

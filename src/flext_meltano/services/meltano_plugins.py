@@ -59,9 +59,9 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         )
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the pipeline component service."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def _build_plugin_addition_result(
         self,
@@ -91,7 +91,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         plugin_name: str,
     ) -> p.Result[bool]:
         """Execute the actual plugin addition using abstraction layer."""
-        plugin_config: t.Cli.JsonMapping = {
+        plugin_config: t.JsonMapping = {
             "project_root": str(project.root_dir),
             "plugin_type": plugin_type_str,
             "plugin_name": plugin_name,

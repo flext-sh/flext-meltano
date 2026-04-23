@@ -34,15 +34,13 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def _validate_project_creation_params(
         project_name: str,
         project_dir: Path,
-    ) -> p.Result[t.FlatContainerMapping]:
+    ) -> p.Result[t.JsonMapping]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return r[t.FlatContainerMapping].fail("Project name cannot be empty")
+            return r[t.JsonMapping].fail("Project name cannot be empty")
         if not project_dir.exists():
-            return r[t.FlatContainerMapping].fail(
-                f"Parent directory not found: {project_dir}"
-            )
-        return r[t.FlatContainerMapping].ok({
+            return r[t.JsonMapping].fail(f"Parent directory not found: {project_dir}")
+        return r[t.JsonMapping].ok({
             "name": project_name.strip(),
             "parent_dir": project_dir,
         })
@@ -119,7 +117,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         params = params_r.value
         try:
             temp_path = Path(tempfile.mkdtemp(prefix=str(params["prefix"])))
-            settings: t.Cli.JsonMapping = {
+            settings: t.JsonMapping = {
                 "version": c.Meltano.PLUGIN_CONFIG_VERSION,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                 "project_id": str(params["project_id"]),
@@ -128,9 +126,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                         "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                         "settings": {
                             "plugins": {
-                                "extractors": list[t.Cli.JsonValue](),
-                                "loaders": list[t.Cli.JsonValue](),
-                                "transformers": list[t.Cli.JsonValue](),
+                                "extractors": list[t.JsonValue](),
+                                "loaders": list[t.JsonValue](),
+                                "transformers": list[t.JsonValue](),
                             },
                         },
                     },
@@ -160,20 +158,20 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def build_service_execution_payload(
         service_type: str,
         meltano_config: p.Settings,
-    ) -> p.Result[t.Cli.JsonMapping]:
+    ) -> p.Result[t.JsonMapping]:
         """Build normalized execution payload for service health responses."""
         settings_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
             meltano_config.model_dump(),
         )
-        payload: dict[str, t.Cli.JsonValue] = {
+        payload: dict[str, t.JsonValue] = {
             "status": c.Meltano.OperationStatus.READY,
             "service_type": service_type,
             "settings": {str(key): value for key, value in settings_payload.items()},
         }
-        return r[t.Cli.JsonMapping].ok(payload)
+        return r[t.JsonMapping].ok(payload)
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
             "flext_meltano_project_service", self.settings
@@ -183,7 +181,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return result
         error_msg = result.error or "Project service execution failed"
         self.logger.error(error_msg)
-        return r[t.Cli.JsonMapping].fail(error_msg)
+        return r[t.JsonMapping].fail(error_msg)
 
     def initialize_project(self, project_root: Path) -> p.Result[t.Meltano.DbtProject]:
         """Initialize Meltano project using railway pattern validation chain."""

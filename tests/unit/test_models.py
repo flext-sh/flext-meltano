@@ -54,7 +54,7 @@ class TestFlextMeltanoModels:
             m.Meltano.TapConfig(tap_type="", connection_config={"host": "localhost"})
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
-        invalid_config = cast("t.Cli.JsonMapping", "invalid")
+        invalid_config = cast("t.JsonMapping", "invalid")
         with pytest.raises(
             e.ValidationError, match="Input should be a valid dictionary"
         ):
@@ -185,7 +185,7 @@ class TestFlextMeltanoModels:
             m.Meltano.MeltanoProjectModel(project_id="")
 
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
-        invalid_plugins = cast("t.Cli.JsonMapping", "invalid")
+        invalid_plugins = cast("t.JsonMapping", "invalid")
         with pytest.raises(
             e.ValidationError, match="Input should be a valid dictionary"
         ):
@@ -287,7 +287,7 @@ class TestFlextMeltanoModels:
             m.Meltano.DbtProjectModel(name="test-project", profile="")
 
     def test_dbt_project_validation_invalid_config_type(self) -> None:
-        invalid_config = cast("t.Cli.JsonMapping", "invalid")
+        invalid_config = cast("t.JsonMapping", "invalid")
         with pytest.raises(
             e.ValidationError, match="Input should be a valid dictionary"
         ):

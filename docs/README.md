@@ -108,7 +108,7 @@ ______________________________________________________________________
 All development must pass these quality gates:
 
 ```bash
-make validate           # Complete validation pipeline
+make val           # Complete validation pipeline
 make lint               # Ruff linting with zero tolerance
 make type-check         # MyPy strict mode validation
 make test               # Test suite execution

@@ -60,7 +60,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
     @staticmethod
     def create_pipeline(
         pipeline_name: str,
-        settings: t.Cli.JsonMapping | None,
+        settings: t.JsonMapping | None,
     ) -> p.Result[str]:
         """Create a new Meltano pipeline with the given configuration."""
         if not pipeline_name.strip():

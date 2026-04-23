@@ -18,7 +18,7 @@ from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase(s[t.Cli.JsonMapping]):
+class FlextMeltanoServiceBase(s[t.JsonMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -61,7 +61,7 @@ class FlextMeltanoServiceBase(s[t.Cli.JsonMapping]):
 
     def __init__(
         self,
-        settings: FlextSettings | t.Cli.JsonMapping | None = None,
+        settings: FlextSettings | t.JsonMapping | None = None,
         *,
         initial_context: p.Context | None = None,
         service_name: t.NonEmptyStr | None = None,
@@ -93,7 +93,7 @@ class FlextMeltanoServiceBase(s[t.Cli.JsonMapping]):
         if transformation_name is not None:
             self.transformation_name = transformation_name
 
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the service using the canonical JSON payload contract."""
         raise NotImplementedError
 

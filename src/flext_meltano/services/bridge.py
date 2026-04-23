@@ -40,7 +40,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     def execute_bridge_command(
         command: str,
         args: t.ConfigurationMapping | None = None,
-    ) -> p.Result[t.Cli.JsonMapping]:
+    ) -> p.Result[t.JsonMapping]:
         """Execute a Meltano runtime command.
 
         Args:
@@ -55,7 +55,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         cmd = u.Meltano.build_bridge_command_args(command, args)
         command_result = executor.execute_meltano_command(cmd)
         if command_result.failure:
-            return r[t.Cli.JsonMapping].fail(
+            return r[t.JsonMapping].fail(
                 command_result.error or "Command failed",
             )
         command_execution = command_result.value
@@ -64,7 +64,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             extra_fields={"command": command},
             duration_field=None,
         )
-        return r[t.Cli.JsonMapping].ok(result)
+        return r[t.JsonMapping].ok(result)
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
@@ -72,9 +72,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         return FlextMeltanoExecutorBase.fetch_version()
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute bridge service returning current settings."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
 
 __all__: list[str] = ["FlextMeltanoBridge"]

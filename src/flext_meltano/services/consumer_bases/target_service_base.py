@@ -57,7 +57,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     def create_sink(
         self,
         stream_name: str,
-        schema: t.FlatContainerMapping,
+        schema: t.JsonMapping,
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -86,7 +86,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     def fetch_or_create_sink(
         self,
         stream_name: str,
-        schema: t.FlatContainerMapping,
+        schema: t.JsonMapping,
     ) -> p.Result[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream."""
         try:
@@ -122,19 +122,19 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     def process_record(
         self,
         stream_name: str,
-        record: t.FlatContainerMapping,
-        schema: t.FlatContainerMapping,
+        record: t.JsonMapping,
+        schema: t.JsonMapping,
     ) -> p.Result[bool]:
         """Process a single Singer RECORD message."""
         sink_result = self.fetch_or_create_sink(stream_name, schema)
         if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            record_dict: dict[str, t.Container] = {
+            record_dict: dict[str, t.JsonValue] = {
                 str(k): (str(v) if isinstance(v, Path) else v)
                 for k, v in record.items()
             }
-            empty_context: t.MutableContainerValueMapping = {}
+            empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as exc:
@@ -143,8 +143,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     def process_batch(
         self,
         stream_name: str,
-        records: Sequence[t.FlatContainerMapping],
-        schema: t.FlatContainerMapping,
+        records: Sequence[t.JsonMapping],
+        schema: t.JsonMapping,
     ) -> p.Result[int]:
         """Process a batch of records."""
         processed = 0
@@ -169,9 +169,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         return r[None].ok(None)
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute target service — returns status."""
-        return r[t.Cli.JsonMapping].ok({
+        return r[t.JsonMapping].ok({
             "service": self.target_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "target",

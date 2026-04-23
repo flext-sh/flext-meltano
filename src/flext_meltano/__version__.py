@@ -11,18 +11,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from importlib.metadata import PackageMetadata, metadata
 
-from flext_core import FlextVersion
+from flext_core import FlextVersion, t
 
 
 class FlextMeltanoVersion(FlextVersion):
     """flext-meltano version — MRO-derived from FlextVersion."""
 
-    _metadata: PackageMetadata | Mapping[str, str] = metadata("flext-meltano")
+    _metadata: PackageMetadata | t.StrMapping = metadata("flext-meltano")
 
 
 __version__ = FlextMeltanoVersion.__version__

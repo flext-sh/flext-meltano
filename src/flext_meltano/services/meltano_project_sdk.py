@@ -117,7 +117,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     continue
                 if plugin_type is not None and plugin_kind != plugin_type:
                     continue
-                plugin_def: dict[str, t.Cli.JsonValue] = {
+                plugin_def: dict[str, t.JsonValue] = {
                     "name": name,
                     "type": plugin_kind,
                 }

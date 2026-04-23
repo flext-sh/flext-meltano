@@ -23,7 +23,7 @@ class FlextMeltanoModelsPayloadsData:
         """Typed schema payload used by API extract flow."""
 
         schema_definition: Annotated[
-            t.FlatContainerMapping,
+            t.JsonMapping,
             u.Field(
                 alias=c.Meltano.SchemaKey.SCHEMA,
                 serialization_alias=c.Meltano.SchemaKey.SCHEMA,
@@ -34,7 +34,7 @@ class FlextMeltanoModelsPayloadsData:
 
         @u.field_validator("schema_definition", mode="before")
         @classmethod
-        def normalize_schema(cls, value: t.Meltano.ValidatorInput) -> t.Cli.JsonMapping:
+        def normalize_schema(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
             """Normalize mapping input before JSON validation."""
             match value:
                 case Mapping():
@@ -49,10 +49,10 @@ class FlextMeltanoModelsPayloadsData:
         """Typed record batch payload used by API load flow."""
 
         records: Annotated[
-            Sequence[t.FlatContainerMapping],
+            Sequence[t.JsonMapping],
             u.Field(description="Normalized record payloads"),
         ] = u.Field(
-            default_factory=lambda: list[t.FlatContainerMapping](),
+            default_factory=lambda: list[t.JsonMapping](),
             description="Normalized record payloads",
         )
 
@@ -61,15 +61,15 @@ class FlextMeltanoModelsPayloadsData:
         def normalize_records(
             cls,
             value: t.Meltano.ValidatorInput,
-        ) -> Sequence[t.FlatContainerMapping] | t.StrSequence:
+        ) -> Sequence[t.JsonMapping] | t.StrSequence:
             """Normalize mixed record input into dict records."""
             match value:
                 case list() | tuple():
-                    records: MutableSequence[t.FlatContainerMapping] = []
+                    records: MutableSequence[t.JsonMapping] = []
                     for record in value:
                         match record:
                             case Mapping():
-                                record_dict: t.MutableFlatContainerMapping = {}
+                                record_dict: t.MutableJsonMapping = {}
                                 for key, item in record.items():
                                     if u.primitive(item):
                                         record_dict[str(key)] = item
@@ -84,7 +84,7 @@ class FlextMeltanoModelsPayloadsData:
         """Normalized mapping payload with string keys."""
 
         values: Annotated[
-            t.Cli.JsonMapping,
+            t.JsonMapping,
             u.Field(description="Normalized mapping values"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
@@ -93,7 +93,7 @@ class FlextMeltanoModelsPayloadsData:
         def normalize_values(
             cls,
             value: t.Meltano.ValidatorInput,
-        ) -> t.Cli.JsonMapping:
+        ) -> t.JsonMapping:
             """Normalize mapping-like payloads through the canonical CLI JSON adapter."""
             if not isinstance(value, Mapping):
                 return MappingProxyType({})

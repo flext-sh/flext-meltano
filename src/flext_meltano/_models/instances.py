@@ -25,9 +25,9 @@ class FlextMeltanoModelsInstances:
         settings: Annotated[
             t.ConfigurationMapping, u.Field(description="Sink configuration")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
-        sink_schema: Annotated[
-            t.FlatContainerMapping, u.Field(description="Sink schema")
-        ] = u.Field(default_factory=lambda: MappingProxyType({}))
+        sink_schema: Annotated[t.JsonMapping, u.Field(description="Sink schema")] = (
+            u.Field(default_factory=lambda: MappingProxyType({}))
+        )
         status: Annotated[
             str,
             u.Field(
@@ -146,7 +146,7 @@ class FlextMeltanoModelsInstances:
             u.Field(description="Tap configuration"),
         ]
         adapter: Annotated[
-            t.Container | None,
+            t.JsonValue | None,
             u.Field(default=None, description="Tap adapter instance"),
         ] = None
         streams: Sequence[FlextMeltanoModelsInstances.StreamInfo] = u.Field(

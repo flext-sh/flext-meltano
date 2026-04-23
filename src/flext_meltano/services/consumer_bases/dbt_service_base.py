@@ -49,7 +49,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextSettings | t.Cli.JsonMapping | None = None,
+        settings: FlextSettings | t.JsonMapping | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(settings=settings)
@@ -63,7 +63,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     @property
     @abstractmethod
-    def connection_profile(self) -> t.Cli.JsonMapping:
+    def connection_profile(self) -> t.JsonMapping:
         """Dbt connection profile for this project.
 
         Consumer implements with domain-specific connection settings
@@ -244,9 +244,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             return r[Sequence[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute dbt service — returns status."""
-        return r[t.Cli.JsonMapping].ok({
+        return r[t.JsonMapping].ok({
             "service": self.dbt_project_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": c.Meltano.ServiceType.DBT,

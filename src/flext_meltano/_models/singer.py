@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping
+from collections.abc import (
+    MutableMapping,
+)
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -25,7 +27,7 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.SCHEMA
         stream: Annotated[t.NonEmptyStr, u.Field(description="Singer stream name")]
         schema_definition: Annotated[
-            t.ContainerValueMapping,
+            t.JsonMapping,
             u.Field(
                 alias=c.Meltano.SchemaKey.SCHEMA,
                 serialization_alias=c.Meltano.SchemaKey.SCHEMA,
@@ -52,9 +54,7 @@ class FlextMeltanoModelsSinger:
             ),
         ] = c.Meltano.SingerMessageType.RECORD
         stream: Annotated[str, u.Field(description="Singer stream name")]
-        record: Annotated[
-            t.ContainerValueMapping, u.Field(description="Singer record payload")
-        ]
+        record: Annotated[t.JsonMapping, u.Field(description="Singer record payload")]
         time_extracted: Annotated[
             str | None,
             u.Field(
@@ -81,7 +81,7 @@ class FlextMeltanoModelsSinger:
             ),
         ] = c.Meltano.SingerMessageType.STATE
         value: Annotated[
-            MutableMapping[str, t.Cli.JsonValue],
+            MutableMapping[str, t.JsonValue],
             u.Field(description="Singer state bookmark payload"),
         ] = u.Field(default_factory=dict)
 

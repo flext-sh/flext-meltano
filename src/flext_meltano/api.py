@@ -90,16 +90,16 @@ class FlextMeltano(
     Dbt = dbt
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute Meltano service with railway pattern."""
-        payload: t.Cli.JsonMapping = {
+        payload: t.JsonMapping = {
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,
             "timestamp": u.generate_iso_timestamp(),
             "handlers": list(c.Meltano.HANDLER_ALL),
         }
-        return r[t.Cli.JsonMapping].ok(payload)
+        return r[t.JsonMapping].ok(payload)
 
 
 meltano = FlextMeltano.fetch_instance()

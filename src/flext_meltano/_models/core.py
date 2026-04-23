@@ -9,7 +9,7 @@ from typing import Annotated
 
 from flext_cli import m, u
 
-from flext_meltano import p, t
+from flext_meltano import r, t
 
 
 class FlextMeltanoModelsCore:
@@ -17,8 +17,8 @@ class FlextMeltanoModelsCore:
 
     @staticmethod
     def protect_sensitive_config(
-        value: t.Cli.JsonMapping,
-    ) -> t.Cli.JsonMapping:
+        value: t.JsonMapping,
+    ) -> t.JsonMapping:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -27,7 +27,7 @@ class FlextMeltanoModelsCore:
             sensitive_keys_list: t.StrSequence = list(sensitive_keys)
             checks_result = u.process(
                 sensitive_keys_list,
-                lambda s: p.Result[bool].ok(s in normalized),
+                lambda s: r[bool].ok(s in normalized),
             )
             checks = FlextMeltanoModelsCore.BooleanListValue.model_validate({
                 "items": checks_result.unwrap_or([]),
@@ -36,7 +36,7 @@ class FlextMeltanoModelsCore:
                 return any(checks)
             return False
 
-        protected: dict[str, t.Cli.JsonValue] = {}
+        protected: dict[str, t.JsonValue] = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
         return t.Cli.JSON_MAPPING_ADAPTER.validate_python(protected)
@@ -62,16 +62,23 @@ class FlextMeltanoModelsCore:
             """Convert sequence-like values into string lists."""
             if isinstance(value, (list, tuple, set)):
                 return [str(item) for item in value if item is not None]
-            return []
+            empty_items: list[str] = []
+            return empty_items
 
     class BooleanListValue(m.ArbitraryTypesModel):
         """Validated boolean list wrapper for process output."""
+
+        @staticmethod
+        def default_items() -> list[bool]:
+            """Return an explicitly typed empty boolean list for Pydantic defaults."""
+            empty_items: list[bool] = []
+            return empty_items
 
         items: Annotated[
             Sequence[bool],
             u.Field(description="Normalized list of boolean values"),
         ] = u.Field(
-            default_factory=lambda: list[bool](),
+            default_factory=default_items,
             description="Normalized boolean values",
         )
 

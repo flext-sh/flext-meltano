@@ -22,10 +22,10 @@ class FlextMeltanoModelsSources:
 
         tap_type: Annotated[str, u.Field(description="Type of the tap")]
         connection_config: Annotated[
-            t.Cli.JsonMapping, u.Field(description="Connection configuration")
+            t.JsonMapping, u.Field(description="Connection configuration")
         ]
         stream_config: Annotated[
-            t.Cli.JsonMapping,
+            t.JsonMapping,
             u.Field(description="Stream-specific configuration"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         tap_version: Annotated[str, u.Field(description="Tap version")] = "latest"
@@ -51,9 +51,7 @@ class FlextMeltanoModelsSources:
             return f"{self.tap_type}:{self.tap_version}"
 
         @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            self, value: t.Cli.JsonMapping
-        ) -> t.Cli.JsonMapping:
+        def serialize_connection_config(self, value: t.JsonMapping) -> t.JsonMapping:
             """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -73,7 +71,7 @@ class FlextMeltanoModelsSources:
 
         target_type: Annotated[str, u.Field(description="Type of the target")]
         connection_config: Annotated[
-            t.Cli.JsonMapping, u.Field(description="Connection configuration")
+            t.JsonMapping, u.Field(description="Connection configuration")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         batch_size: Annotated[
             int | None, u.Field(default=None, description="Batch size for data loading")
@@ -105,9 +103,7 @@ class FlextMeltanoModelsSources:
             return f"{self.target_type}:{self.target_version}"
 
         @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            self, value: t.Cli.JsonMapping
-        ) -> t.Cli.JsonMapping:
+        def serialize_connection_config(self, value: t.JsonMapping) -> t.JsonMapping:
             """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -124,10 +120,10 @@ class FlextMeltanoModelsSources:
 
         source_type: Annotated[str, u.Field(description="Type of the data source")]
         connection_config: Annotated[
-            t.Cli.JsonMapping, u.Field(description="Connection configuration")
+            t.JsonMapping, u.Field(description="Connection configuration")
         ]
         stream_config: Annotated[
-            t.Cli.JsonMapping,
+            t.JsonMapping,
             u.Field(description="Stream-specific configuration"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         source_version: Annotated[
@@ -155,9 +151,7 @@ class FlextMeltanoModelsSources:
             return f"{self.source_type}:{self.source_version}"
 
         @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            self, value: t.Cli.JsonMapping
-        ) -> t.Cli.JsonMapping:
+        def serialize_connection_config(self, value: t.JsonMapping) -> t.JsonMapping:
             """Serialize connection settings with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 

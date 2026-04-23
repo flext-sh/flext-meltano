@@ -215,7 +215,7 @@ class PipelineState:
     """Pipeline execution state with bookmarks."""
 
     pipeline_id: str
-    bookmarks: Dict[str, t.Container]  # Singer bookmark format
+    bookmarks: Dict[str, t.JsonValue]  # Singer bookmark format
     last_updated: datetime
     version: int
 
@@ -613,7 +613,7 @@ class DataPartitioner:
             key = record.get(partition_key, "default")
             partitions[key].append(record)
 
-        return Mapping[str, t.Container](partitions)
+        return t.JsonMapping(partitions)
 ```
 
 #### 3. **Caching Strategy**

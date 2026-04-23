@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable, Sequence
+from collections.abc import (
+    Callable,
+    Sequence,
+)
 from pathlib import Path
 from typing import override
 
@@ -32,9 +35,9 @@ class _FlextMeltanoCliDbtService(FlextMeltanoDbtRunnerMixin):
             self.configure_dbt_project_root(self.settings.project_root)
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Return current CLI DBT helper state."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]:
         """Execute a DBT subcommand using the runner mixin."""
@@ -50,9 +53,9 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
     """Provide project-scoped plugin operations for CLI routing."""
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Return current CLI plugin helper state."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def _resolve_project_root(self) -> Path:
         """Resolve the project root used for plugin operations."""
@@ -142,9 +145,9 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
     """Provide status and version operations for the CLI manager."""
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Return current CLI status helper state."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def _resolve_project_root(self) -> Path | None:
         """Return a project root when one is configured."""

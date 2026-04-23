@@ -52,7 +52,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
 
     def create_flext_target(
         self,
-        sink_config: m.Meltano.DataSinkConfig | t.Cli.JsonMapping,
+        sink_config: m.Meltano.DataSinkConfig | t.JsonMapping,
     ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
@@ -96,9 +96,9 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[t.Cli.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def validate_sink_config(
         self, sink_config: m.Meltano.DataSinkConfig

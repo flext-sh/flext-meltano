@@ -26,7 +26,7 @@ class FlextMeltanoDbtTransformationRunner:
         logger: p.Logger,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> p.Result[t.Cli.JsonMapping]:
+    ) -> p.Result[t.JsonMapping]:
         """Run DBT ``run`` and normalize output into transformation contract."""
         try:
             args: MutableSequence[str] = []
@@ -34,7 +34,7 @@ class FlextMeltanoDbtTransformationRunner:
                 args.extend([c.Meltano.CMD_MODELS_OPTION, *models])
             result = executor.execute_dbt_command(c.Meltano.DbtCommand.RUN, args)
             if result.failure:
-                return r[t.Cli.JsonMapping].fail(
+                return r[t.JsonMapping].fail(
                     result.error or "DBT transformation failed",
                 )
             execution_result = result.value
@@ -47,11 +47,11 @@ class FlextMeltanoDbtTransformationRunner:
                 },
                 duration_field="execution_time",
             )
-            return r[t.Cli.JsonMapping].ok(dbt_result)
+            return r[t.JsonMapping].ok(dbt_result)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"DBT transformation failed: {e}"
             logger.exception(error_msg)
-            return r[t.Cli.JsonMapping].fail(error_msg)
+            return r[t.JsonMapping].fail(error_msg)
 
 
 __all__: list[str] = ["FlextMeltanoDbtTransformationRunner"]

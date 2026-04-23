@@ -49,7 +49,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextSettings | t.Cli.JsonMapping | None = None,
+        settings: FlextSettings | t.JsonMapping | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for tap facades."""
         super().__init__(settings=settings)
@@ -64,7 +64,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     @abstractmethod
     def create_tap_instance(
         self,
-        settings: t.Cli.JsonMapping | None = None,
+        settings: t.JsonMapping | None = None,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -152,9 +152,9 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         return self._tap_instance
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute tap service — returns status."""
-        return r[t.Cli.JsonMapping].ok({
+        return r[t.JsonMapping].ok({
             "service": self.tap_name,
             "status": c.CommonStatus.ACTIVE.value,
             "type": "tap",

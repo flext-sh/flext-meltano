@@ -22,7 +22,7 @@ class FlextMeltanoModelsDiscovery:
         default_variant: Annotated[
             str, u.Field(default="", description="Plugin default variant")
         ] = ""
-        variants: t.Cli.JsonMapping = u.Field(
+        variants: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Available plugin variants keyed by variant name",
         )
@@ -39,9 +39,7 @@ class FlextMeltanoModelsDiscovery:
 
         @u.field_validator("variants", mode="before")
         @classmethod
-        def normalize_variants(
-            cls, value: t.Meltano.ValidatorInput
-        ) -> t.Cli.JsonMapping:
+        def normalize_variants(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
             """Normalize variant maps from external payloads."""
             match value:
                 case Mapping():
@@ -80,9 +78,7 @@ class FlextMeltanoModelsDiscovery:
 
         @u.field_validator("plugins", mode="before")
         @classmethod
-        def normalize_plugins(
-            cls, value: t.Meltano.ValidatorInput
-        ) -> t.Cli.JsonMapping:
+        def normalize_plugins(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
             """Normalize plugin catalog mapping."""
             match value:
                 case Mapping():

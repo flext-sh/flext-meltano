@@ -29,7 +29,7 @@ class FlextMeltanoTypingsDomains:
     type NestedStrMapping = Mapping[str, t.StrMapping]
     type EnvironmentInput = c.Meltano.Environment | c.Meltano.EnvironmentAlias
     type ProjectEnvironmentNames = Sequence[c.Meltano.ProjectEnvironment]
-    type ServicePayload = t.Cli.JsonMapping
-    type DbtManifestData = t.Cli.JsonMapping
-    type DbtProject = t.Cli.JsonMapping
+    type ServicePayload = t.JsonMapping
+    type DbtManifestData = t.JsonMapping
+    type DbtProject = t.JsonMapping
     type PublicFactory[TService] = Callable[..., r[TService]]

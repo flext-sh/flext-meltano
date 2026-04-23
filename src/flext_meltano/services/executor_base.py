@@ -52,7 +52,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | t.Cli.JsonMapping | None = None,
+        settings: FlextMeltanoSettings | t.JsonMapping | None = None,
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
@@ -195,16 +195,16 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ]
 
     @override
-    def execute(self) -> p.Result[t.Cli.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the Meltano executor service."""
-        config_data: t.Cli.JsonMapping = {
+        config_data: t.JsonMapping = {
             "status": c.Meltano.OperationStatus.READY,
             "executor_type": "flext_meltano_executor",
             "execution_timestamp": str(time.time()),
             "settings": self.settings.model_dump(mode="json"),
         }
         self.logger.info("FlextMeltanoExecutor executed successfully")
-        return r[t.Cli.JsonMapping].ok(config_data)
+        return r[t.JsonMapping].ok(config_data)
 
     def execute_meltano_command(
         self,
@@ -327,7 +327,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-        _config: t.Cli.JsonMapping | None = None,
+        _config: t.JsonMapping | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:

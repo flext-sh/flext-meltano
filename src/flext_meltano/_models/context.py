@@ -20,7 +20,7 @@ class FlextMeltanoModelsContext:
         """Typed context envelope for ELT pipeline execution."""
 
         project_root: Annotated[str, u.Field(description="Project root path")]
-        elt_context: t.Cli.JsonMapping = u.Field(
+        elt_context: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="ELT execution context",
         )
@@ -29,7 +29,7 @@ class FlextMeltanoModelsContext:
         execution_completed: Annotated[
             bool, u.Field(default=False, description="Execution completion flag")
         ] = False
-        execution_result: t.Cli.JsonMapping = u.Field(
+        execution_result: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Execution result payload",
         )
@@ -38,7 +38,7 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_mapping_payloads(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.Cli.JsonMapping:
+        ) -> t.JsonMapping:
             """Normalize mapping-like payloads into dictionaries."""
             match value:
                 case Mapping():
@@ -64,7 +64,7 @@ class FlextMeltanoModelsContext:
         project_root: Annotated[
             str, u.Field(default=c.IDENTIFIER_UNKNOWN, description="Project root path")
         ] = c.IDENTIFIER_UNKNOWN
-        execution_result: t.Cli.JsonMapping = u.Field(
+        execution_result: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="Execution result payload",
         )
@@ -73,7 +73,7 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_execution_result(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.Cli.JsonMapping:
+        ) -> t.JsonMapping:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
