@@ -1,0 +1,156 @@
+src/flext_meltano/_models/instances_data.py
+  h_9db9d35f50cf33 31
+docs/architecture/system-context.md
+  h_9db9d35f50cf33 339,803
+src/flext_meltano/services/meltano_project_sdk.py
+  h_9db9d35f50cf33 120
+src/flext_meltano/cli.py
+  h_9db9d35f50cf33 130,132,135
+src/flext_meltano/_protocols/singer.py
+  h_9db9d35f50cf33 29,32,37,43-44,49,53,60,67,73,79,86,93,111,175,196,200,202,208-209
+src/flext_meltano/_protocols/project.py
+  h_9db9d35f50cf33 28
+tests/unit/test_library_runner.py
+  h_9db9d35f50cf33 61
+docs/architecture/data-architecture.md
+  h_9db9d35f50cf33 218,616
+src/flext_meltano/services/adapters.py
+  h_9db9d35f50cf33 41,48,51,59,62,66,70,74,80,82,99,109,122,124,127,132,134
+src/flext_meltano/services/executor.py
+  h_9db9d35f50cf33 28,55,67,70,74,89,103,106,109,112,117,130,141,158,170,194
+src/flext_meltano/_models/payloads.py
+  h_9db9d35f50cf33 22,31,41,57,68,81
+src/flext_meltano/_models/discovery.py
+  h_9db9d35f50cf33 25
+src/flext_meltano/_models/sources.py
+  h_9db9d35f50cf33 25,28
+src/flext_meltano/services/pipeline_ops.py
+  h_9db9d35f50cf33 63
+src/flext_meltano/services/singer_tap.py
+  h_9db9d35f50cf33 80-81
+src/flext_meltano/_models/sources_params.py
+  h_9db9d35f50cf33 83,127
+tests/unit/test_models.py
+  h_9db9d35f50cf33 57,188,290
+src/flext_meltano/services/pipeline_mgr.py
+  h_9db9d35f50cf33 60
+src/flext_meltano/_models/projects_plugin.py
+  h_9db9d35f50cf33 31
+src/flext_meltano/services/meltano_dbt_transformation.py
+  h_9db9d35f50cf33 29,37,50,54
+docs/guides/phase_4_implementation_plan.md
+  h_9db9d35f50cf33 123,572
+src/flext_meltano/_models/projects.py
+  h_9db9d35f50cf33 66,70
+src/flext_meltano/services/consumer_bases/dbt_service_base.py
+  h_9db9d35f50cf33 52,66,247,249
+src/flext_meltano/services/library_runner.py
+  h_9db9d35f50cf33 40-41,54,77,81,87,100-101,113,125,129
+docs/testing.md
+  h_9db9d35f50cf33 87,174
+src/flext_meltano/services/validators.py
+  h_9db9d35f50cf33 85,87
+src/flext_meltano/services/consumer_bases/tap_service_base.py
+  h_9db9d35f50cf33 52,67,155,157
+src/flext_meltano/_typings/domains.py
+  h_9db9d35f50cf33 32-34
+docs/api-reference.md
+  h_9db9d35f50cf33 96
+src/flext_meltano/services/abstractions.py
+  h_9db9d35f50cf33 37,44,56,71,75,82,109,147,169
+src/flext_meltano/services/singer_sdk.py
+  h_9db9d35f50cf33 34
+docs/architecture/adr/README.md
+  h_9db9d35f50cf33 94
+src/flext_meltano/base.py
+  h_9db9d35f50cf33 21,64,96
+src/flext_meltano/services/cli_small_managers.py
+  h_9db9d35f50cf33 6,8-9,38,40,56,58,148,150
+src/flext_meltano/services/bridge.py
+  h_9db9d35f50cf33 43,58,67,75,77
+src/flext_meltano/services/consumer_bases/target_service_base.py
+  h_9db9d35f50cf33 60,89,125-126,133,137,146-147,172,174
+src/flext_meltano/_typings/base.py
+  h_9db9d35f50cf33 29-30,33,39,42,47
+src/flext_meltano/_utilities/singer.py
+  h_9db9d35f50cf33 12-14,28,61,93,170
+src/flext_meltano/__version__.py
+  h_9db9d35f50cf33 16,22
+src/flext_meltano/services/adapter_extensions.py
+  h_9db9d35f50cf33 34,36,44,48,50,60,75,77,88,92,106,119,121
+src/flext_meltano/_models/singer.py
+  h_9db9d35f50cf33 5-7,30,57,84
+src/flext_meltano/services/meltano_plugins.py
+  h_9db9d35f50cf33 62,64,94
+src/flext_meltano/_utilities/runtime.py
+  h_9db9d35f50cf33 24,32,52,180,190,207,266,295,300,302,325
+src/flext_meltano/_models/payloads_data.py
+  h_9db9d35f50cf33 26,37,52,55,64,68,72,87,96
+examples/README.md
+  h_9db9d35f50cf33 190
+src/flext_meltano/_models/singer_catalog.py
+  h_9db9d35f50cf33 27,38,131
+src/flext_meltano/_models/core.py
+  h_9db9d35f50cf33 12,20-21,30,65-66,71-76,81
+docs/guides/implementation_status.md
+  h_9db9d35f50cf33 94
+tests/unit/test_singer_sdk_adapter.py
+  h_9db9d35f50cf33 45-47
+tests/unit/test_tap_abstractions.py
+  h_9db9d35f50cf33 76,185,496,500
+src/flext_meltano/_protocols/plugin.py
+  h_9db9d35f50cf33 29,47,49,53
+docs/guides/testing.md
+  h_9db9d35f50cf33 528
+src/flext_meltano/_models/transformations.py
+  h_9db9d35f50cf33 25,29,32,36
+tests/unit/test_cli_integration.py
+  h_9db9d35f50cf33 25,37,48,58
+src/flext_meltano/_models/instances.py
+  h_9db9d35f50cf33 29,149
+docs/architecture/security-architecture.md
+  h_9db9d35f50cf33 264,300,321,490,764,850
+docs/architecture/quality-attributes.md
+  h_9db9d35f50cf33 222,2586,2965,2974,3051-3052,3058,3067,3075,3119,3150,3181,3240,3446,3509,3563,3786,3803-3804,3822-3824
+src/flext_meltano/services/services.py
+  h_9db9d35f50cf33 80,113-114,116,121,127,153,161,163,169,171,173
+examples/01_simple_working.py
+  h_9db9d35f50cf33 38,40,42
+tests/unit/test_target_abstractions.py
+  h_9db9d35f50cf33 58
+src/flext_meltano/_protocols/services.py
+  h_9db9d35f50cf33 60,74,81,86
+src/flext_meltano/services/abstractions_base.py
+  h_9db9d35f50cf33 58,77,90,121-123,180,183,189,194,196,202,208
+src/flext_meltano/services/project_service.py
+  h_9db9d35f50cf33 37,40,42-43,120,161,171,174,184
+tests/conftest.py
+  h_9db9d35f50cf33 122,183-184,199,214,249,268,295,311,324,336,349,436-437,444,451,464,469,483,497,504-505
+src/flext_meltano/api.py
+  h_9db9d35f50cf33 93,95,102
+src/flext_meltano/services/singer_target.py
+  h_9db9d35f50cf33 55,99,101
+docs/guides/troubleshooting.md
+  h_9db9d35f50cf33 52,61-63,141,155,675,678
+src/flext_meltano/_constants/settings.py
+  h_9db9d35f50cf33 5-7,11,64,180-185
+tests/unit/tests_pipeline_cli_managers.py
+  h_9db9d35f50cf33 28,61
+src/flext_meltano/services/singer_catalog.py
+  h_9db9d35f50cf33 49,55-56
+src/flext_meltano/_models/context.py
+  h_9db9d35f50cf33 23,32,41,67,76
+src/flext_meltano/services/executor_base.py
+  h_9db9d35f50cf33 55,198,200,207,330
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "ffd0f76935b4af6d4ebda8bb10ff7de5a6204a26",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
