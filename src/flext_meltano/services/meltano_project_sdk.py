@@ -34,23 +34,21 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     def fetch_sdk_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> p.Result[Sequence[t.Meltano.PluginDefinition]]:
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Get plugins from the SDK project, optionally filtered by type."""
         try:
             if not self._sdk_project:
-                return r[Sequence[t.Meltano.PluginDefinition]].fail("No project loaded")
+                return r[Sequence[t.JsonMapping]].fail("No project loaded")
             plugins = self._extract_sdk_plugins(plugin_type)
             self.logger.info(
                 "Plugins retrieved",
                 count=u.count(plugins),
                 type=plugin_type or "",
             )
-            return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
+            return r[Sequence[t.JsonMapping]].ok(plugins)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[Sequence[t.Meltano.PluginDefinition]].fail(
-                f"Failed to get plugins: {e}"
-            )
+            return r[Sequence[t.JsonMapping]].fail(f"Failed to get plugins: {e}")
 
     def initialize_sdk_project(
         self, root: Path
@@ -99,9 +97,9 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     def _extract_sdk_plugins(
         self,
         plugin_type: str | None,
-    ) -> Sequence[t.Meltano.PluginDefinition]:
+    ) -> Sequence[t.JsonMapping]:
         """Extract plugins from SDK project, optionally filtered by type."""
-        plugins: MutableSequence[t.Meltano.PluginDefinition] = []
+        plugins: MutableSequence[t.JsonMapping] = []
         if self._sdk_project is None:
             return plugins
         try:

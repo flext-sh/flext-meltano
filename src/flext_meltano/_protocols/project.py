@@ -37,7 +37,7 @@ class FlextMeltanoProtocolsProject:
         def find_plugins(
             self,
             plugin_type: str,
-        ) -> Sequence[t.Meltano.PluginDefinition]:
+        ) -> Sequence[t.JsonMapping]:
             """Find plugins of specified type."""
             ...
 

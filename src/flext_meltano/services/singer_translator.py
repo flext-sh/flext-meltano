@@ -27,10 +27,10 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         command: t.StrSequence,
         input_data: str | None = None,
         timeout: int = c.Meltano.BATCH_DEFAULT_COMMAND_TIMEOUT,
-    ) -> p.Result[t.Meltano.CliProcessResult]:
+    ) -> p.Result[t.JsonMapping]:
         """Execute Singer SDK command and capture output."""
         if not command:
-            return r[t.Meltano.CliProcessResult].fail(
+            return r[t.JsonMapping].fail(
                 "Invalid command: must be non-empty list",
             )
         process_input = input_data.encode() if input_data else None
@@ -38,19 +38,17 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
             list(command), timeout=timeout, input_data=process_input
         )
         if cmd_result.failure:
-            return r[t.Meltano.CliProcessResult].fail(
-                cmd_result.error or "Command failed"
-            )
+            return r[t.JsonMapping].fail(cmd_result.error or "Command failed")
         out = cmd_result.value
-        output_dict: t.Meltano.CliProcessResult = {
+        output_dict: t.JsonMapping = {
             "stdout": out.stdout,
             "stderr": out.stderr,
             "returncode": out.exit_code,
         }
         if out.exit_code != 0:
             stderr_msg = out.stderr or "Command execution failed"
-            return r[t.Meltano.CliProcessResult].fail(stderr_msg)
-        return r[t.Meltano.CliProcessResult].ok(output_dict)
+            return r[t.JsonMapping].fail(stderr_msg)
+        return r[t.JsonMapping].ok(output_dict)
 
     @staticmethod
     def translate_dbt_run(

@@ -20,7 +20,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def coerce_container_mapping(
-        value: t.Meltano.JsonValue | t.RuntimeData | None,
+        value: t.JsonValue | t.JsonPayload | None,
     ) -> t.JsonMapping | None:
         """Validate runtime objects against the canonical JSON mapping contract."""
         normalized = u.Cli.json_as_mapping(value)
@@ -28,7 +28,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def coerce_container_mapping_list(
-        value: t.Meltano.JsonValue | t.RuntimeData | None,
+        value: t.JsonValue | t.JsonPayload | None,
     ) -> list[t.JsonMapping] | None:
         """Validate runtime objects against a list of canonical JSON mappings."""
         normalized = u.Cli.json_as_mapping_list(value)
@@ -36,7 +36,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def normalize_runtime_json_value(
-        value: t.RuntimeData | None,
+        value: t.JsonPayload | None,
     ) -> t.JsonValue | None:
         """Normalize runtime values to the canonical Pydantic JSON contract."""
         if value is None:
@@ -48,7 +48,7 @@ class FlextMeltanoUtilitiesRuntime:
     @classmethod
     def normalize_runtime_json_mapping(
         cls,
-        source: Mapping[str, t.RuntimeData | t.JsonValue],
+        source: Mapping[str, t.JsonPayload | t.JsonValue],
     ) -> t.JsonMapping:
         """Normalize runtime mappings to the canonical Pydantic JSON contract."""
         return t.Cli.JSON_MAPPING_ADAPTER.validate_python(
@@ -104,7 +104,7 @@ class FlextMeltanoUtilitiesRuntime:
         }
 
     @staticmethod
-    def resolve_project_root(settings: t.RuntimeData | p.Settings) -> Path | None:
+    def resolve_project_root(settings: t.JsonPayload | p.Settings) -> Path | None:
         """Extract and normalize project_root from a settings-like object."""
         if isinstance(settings, Mapping):
             raw = settings.get("project_root")

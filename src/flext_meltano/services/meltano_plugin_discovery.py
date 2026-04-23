@@ -79,12 +79,12 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
     def discover_plugins(
         self,
-        project: t.RuntimeData | t.Meltano.DbtProject | None = None,
+        project: t.JsonPayload | t.Meltano.DbtProject | None = None,
     ) -> p.Result[Sequence[t.StrMapping]]:
         """Discover plugins from Meltano Hub using native API."""
         try:
             self.logger.info("Discovering Meltano plugins")
-            working_project: t.RuntimeData | t.Meltano.DbtProject
+            working_project: t.JsonPayload | t.Meltano.DbtProject
             if project:
                 working_project = project
             else:

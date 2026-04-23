@@ -34,7 +34,7 @@ class FlextMeltanoSingerTapAdapter:
     def settings(self) -> t.JsonMapping:
         """Expose the tap configuration through the internal contract."""
         config_source = getattr(self._tap, "config", None)
-        empty_source: Mapping[str, t.RuntimeData] = {}
+        empty_source: Mapping[str, t.JsonPayload] = {}
         if isinstance(config_source, Mapping):
             source = config_source
         else:
@@ -51,7 +51,7 @@ class FlextMeltanoSingerTapAdapter:
 
     @staticmethod
     def _normalize_recursive(
-        value: t.RuntimeData | t.JsonValue,
+        value: t.JsonPayload | t.JsonValue,
     ) -> t.JsonValue:
         """Normalize Singer config values into canonical CLI JSON values."""
         if value is None:

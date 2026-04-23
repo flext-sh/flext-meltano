@@ -69,7 +69,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
 
     @staticmethod
     def _format_plugin_rows(
-        plugins: Sequence[t.Meltano.PluginDefinition],
+        plugins: Sequence[t.JsonMapping],
     ) -> str:
         """Render SDK plugin definitions as deterministic JSON."""
         items: list[dict[str, str]] = []
@@ -113,7 +113,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
         """Return deterministic plugin information for one installed plugin."""
 
         def _select_plugin(
-            plugins: Sequence[t.Meltano.PluginDefinition],
+            plugins: Sequence[t.JsonMapping],
         ) -> p.Result[str]:
             for plugin in plugins:
                 current_name = str(plugin.get("name", "")).strip()

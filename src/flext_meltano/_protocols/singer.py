@@ -243,7 +243,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         @property
-        def config(self) -> Mapping[str, t.RuntimeData]:
+        def config(self) -> Mapping[str, t.JsonPayload]:
             """Expose the raw tap configuration."""
             ...
 
@@ -266,7 +266,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         @property
-        def settings(self) -> Mapping[str, t.RuntimeData]:
+        def settings(self) -> Mapping[str, t.JsonPayload]:
             """Expose tap settings mapping."""
             ...
 

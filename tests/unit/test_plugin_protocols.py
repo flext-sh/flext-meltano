@@ -1,7 +1,7 @@
 """Test module for flext-meltano plugin type definitions.
 
-Tests the canonical t.Meltano.PluginDefinition, t.Meltano.PluginCatalog,
-and t.Meltano.PluginCatalog types following FLEXT standards.
+Tests the canonical t.JsonMapping and t.Meltano.PluginCatalog contracts
+following FLEXT standards.
 Validates actual type alias semantics, not just existence.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -17,12 +17,11 @@ from tests import t
 
 
 class TestFlextMeltanoPluginProtocols:
-    """Test canonical Meltano plugin type definitions via t.Meltano namespace."""
+    """Test canonical Meltano plugin contracts via public typing namespaces."""
 
     def test_plugin_definition_resolves_to_mapping(self) -> None:
-        """PluginDefinition type alias resolves to a Mapping-compatible type."""
-        # PluginDefinition should be usable as a type annotation
-        plugin_def: t.Meltano.PluginDefinition = {
+        """Plugin definitions use the canonical JSON mapping contract."""
+        plugin_def: t.JsonMapping = {
             "name": "tap-postgres",
             "namespace": "tap_postgres",
             "pip_url": "git+https://github.com/example/tap-postgres.git",
@@ -50,16 +49,15 @@ class TestFlextMeltanoPluginProtocols:
         tm.that("streams" in catalog, eq=True)
 
     def test_type_aliases_are_distinct(self) -> None:
-        """Each plugin type alias is a distinct named type."""
+        """Plugin catalog remains distinct from the canonical JSON mapping contract."""
         names = {
-            str(t.Meltano.PluginDefinition),
             str(t.JsonMapping),
             str(t.Meltano.PluginCatalog),
         }
-        tm.that(len(names), eq=3)
+        tm.that(len(names), eq=2)
 
     def test_meltano_namespace_contains_all_plugin_types(self) -> None:
-        """t.Meltano namespace exposes all three plugin type aliases."""
-        tm.that(str(t.Meltano.PluginDefinition), none=False)
+        """t.Meltano keeps only the composed plugin catalog contract."""
         tm.that(str(t.JsonMapping), none=False)
         tm.that(str(t.Meltano.PluginCatalog), none=False)
+        assert not hasattr(t.Meltano, "PluginDefinition")
