@@ -336,7 +336,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
             if config is not None:
                 command.extend(
-                    f"--{u.to_str(key).strip()}={u.to_str(value)}"
+                    f"--{u.to_str(key).strip()}={u.to_str(str(value))}"
                     for key, value in config.items()
                 )
             return self.execute_meltano_command(

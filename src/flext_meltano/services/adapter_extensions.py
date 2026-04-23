@@ -61,6 +61,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                     execution_result.error or "Pipeline execution failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
+            command_list: list[t.JsonValue] = list(command_result.command)
             pipeline_result: dict[str, t.JsonValue] = {
                 "status": c.Meltano.StreamStatus.COMPLETED
                 if command_result.success
@@ -68,7 +69,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
                 "execution_duration": command_result.execution_time,
                 "tap": tap_name,
                 "target": target_name,
-                "command": list(command_result.command),
+                "command": command_list,
                 "output": command_result.output,
                 "error": command_result.error,
             }
@@ -107,12 +108,13 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
                     execution_result.error or "DBT operation failed"
                 )
             command_result: m.Meltano.CommandExecutionResult = execution_result.value
+            dbt_command_list: list[t.JsonValue] = list(command_result.command)
             dbt_result: dict[str, t.JsonValue] = {
                 "status": c.Meltano.StreamStatus.COMPLETED
                 if command_result.success
                 else c.Meltano.StreamStatus.FAILED,
                 "execution_time": command_result.execution_time,
-                "command": list(command_result.command),
+                "command": dbt_command_list,
                 "output": command_result.output,
                 "error": command_result.error,
             }

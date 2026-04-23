@@ -92,12 +92,15 @@ class FlextMeltano(
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute Meltano service with railway pattern."""
-        payload: t.JsonMapping = {
+        handlers_payload: list[t.JsonValue] = [
+            handler.value for handler in c.Meltano.HANDLER_ALL
+        ]
+        payload: dict[str, t.JsonValue] = {
             "service_name": self.service_name,
             "version": self.service_version,
             "status": c.CommonStatus.ACTIVE.value,
             "timestamp": u.generate_iso_timestamp(),
-            "handlers": list(c.Meltano.HANDLER_ALL),
+            "handlers": handlers_payload,
         }
         return r[t.JsonMapping].ok(payload)
 

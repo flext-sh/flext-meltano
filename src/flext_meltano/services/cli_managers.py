@@ -96,27 +96,23 @@ class FlextMeltanoSingerManager:
         if u.Meltano.is_help_request(args):
             self.cli.show_tap_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
-        return self._execute_tap_operation(args[0], args[1:])
+        return self._execute_tap_operation(args[0])
 
     def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle target command."""
         if u.Meltano.is_help_request(args):
             self.cli.show_target_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
-        return self._execute_target_operation(args[0], args[1:])
+        return self._execute_target_operation(args[0])
 
-    def _execute_tap_operation(
-        self, operation: str, args: t.StrSequence
-    ) -> p.Result[str]:
+    def _execute_tap_operation(self, operation: str) -> p.Result[str]:
         self.logger.info(
             "Tap operation '%s' is not supported by the current CLI manager",
             operation,
         )
         return r[str].fail(f"Tap operation '{operation}' is not supported")
 
-    def _execute_target_operation(
-        self, operation: str, args: t.StrSequence
-    ) -> p.Result[str]:
+    def _execute_target_operation(self, operation: str) -> p.Result[str]:
         self.logger.info(
             "Target operation '%s' is not supported by the current CLI manager",
             operation,

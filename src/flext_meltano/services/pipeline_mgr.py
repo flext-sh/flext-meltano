@@ -6,11 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Callable,
-    Mapping,
-)
-
 from flext_meltano import (
     FlextMeltanoPipelineCrudOperations,
     FlextMeltanoPipelineLifecycleOperations,
@@ -45,10 +40,7 @@ class FlextMeltanoPipelineManager(
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand = args[0]
         subcommand_args = args[1:]
-        handler_result = self._get_pipeline_handler(subcommand)
-        if handler_result.failure:
-            return r[str].fail(handler_result.error)
-        return handler_result.value(subcommand_args)
+        return self._dispatch_pipeline(subcommand, subcommand_args)
 
     def _create_pipeline(self, args: t.StrSequence) -> p.Result[str]:
         """Create new pipeline."""
@@ -84,25 +76,27 @@ class FlextMeltanoPipelineManager(
             return r[str].fail(result.error)
         return r[str].ok(result.value)
 
-    def _get_pipeline_handler(
+    def _dispatch_pipeline(
         self,
         subcommand: str,
-    ) -> p.Result[Callable[[t.StrSequence], p.Result[str]]]:
-        """Get pipeline operation handler."""
-        operation_map: Mapping[str, Callable[[t.StrSequence], p.Result[str]]] = {
-            c.Meltano.PipelineCommand.CREATE: self._create_pipeline,
-            c.Meltano.PipelineCommand.RUN: self._run_pipeline,
-            c.Meltano.PipelineCommand.LIST: self._list_pipelines,
-            c.Meltano.PipelineCommand.STATUS: self._get_pipeline_status,
-            c.Meltano.PipelineCommand.STOP: self._stop_pipeline,
-            c.Meltano.PipelineCommand.DELETE: self._delete_pipeline,
-        }
-        handler = operation_map.get(subcommand)
-        if handler is None:
-            return r[Callable[[t.StrSequence], p.Result[str]]].fail(
-                f"Unknown pipeline command: {subcommand}",
-            )
-        return r[Callable[[t.StrSequence], p.Result[str]]].ok(handler)
+        args: t.StrSequence,
+    ) -> p.Result[str]:
+        """Dispatch pipeline operation to the matching handler."""
+        match subcommand:
+            case c.Meltano.PipelineCommand.CREATE:
+                return self._create_pipeline(args)
+            case c.Meltano.PipelineCommand.RUN:
+                return self._run_pipeline(args)
+            case c.Meltano.PipelineCommand.LIST:
+                return self._list_pipelines()
+            case c.Meltano.PipelineCommand.STATUS:
+                return self._get_pipeline_status(args)
+            case c.Meltano.PipelineCommand.STOP:
+                return self._stop_pipeline(args)
+            case c.Meltano.PipelineCommand.DELETE:
+                return self._delete_pipeline(args)
+            case _:
+                return r[str].fail(f"Unknown pipeline command: {subcommand}")
 
     def _get_pipeline_status(self, args: t.StrSequence) -> p.Result[str]:
         """Get pipeline status."""
@@ -118,7 +112,7 @@ class FlextMeltanoPipelineManager(
         )
         return r[str].ok(status_result.value)
 
-    def _list_pipelines(self, args: t.StrSequence) -> p.Result[str]:
+    def _list_pipelines(self) -> p.Result[str]:
         """List pipelines."""
         result = FlextMeltanoPipelineManager.list_pipelines()
         if result.failure:

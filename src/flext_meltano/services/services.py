@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t
 
 
 class FlextMeltanoService(FlextMeltanoServiceBase):
@@ -31,16 +31,22 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 "transformation_name": None,
             }
             service_kwargs[field_name] = component_name
-            return r[Self].ok(
-                cls(
-                    settings=settings,
-                    service_name=f"{component_name}_service",
-                    service_version=c.Meltano.DEFAULT_SERVICE_VERSION,
-                    source_name=service_kwargs["source_name"],
-                    sink_name=service_kwargs["sink_name"],
-                    transformation_name=service_kwargs["transformation_name"],
-                )
+            instance = cls(
+                service_name=f"{component_name}_service",
+                service_version=c.Meltano.DEFAULT_SERVICE_VERSION,
+                source_name=service_kwargs["source_name"],
+                sink_name=service_kwargs["sink_name"],
+                transformation_name=service_kwargs["transformation_name"],
             )
+            if settings is not None:
+                instance = instance.model_copy(
+                    update={
+                        "runtime_settings": FlextMeltanoSettings.model_validate(
+                            settings
+                        )
+                    },
+                )
+            return r[Self].ok(instance)
         except c.Meltano.OPERATION_ERRORS as ex:
             return r[Self].fail(
                 f"Failed to create {component_label} '{component_name}': {ex}"
@@ -49,11 +55,17 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @classmethod
     def create_sink_service(cls, sink_name: str, **config: t.Scalar) -> p.Result[Self]:
         """Create data sink service."""
+        settings_payload: dict[str, t.JsonValue] = {}
+        for k, v in config.items():
+            if isinstance(v, (str, int, float, bool)) or v is None:
+                settings_payload[k] = v
+            else:
+                settings_payload[k] = str(v)
         return cls._create_specialized_service(
             sink_name,
             field_name="sink_name",
             component_label="sink service",
-            settings=dict(config),
+            settings=settings_payload,
         )
 
     @classmethod
@@ -61,11 +73,17 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         cls, source_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
         """Create data source service."""
+        settings_payload: dict[str, t.JsonValue] = {}
+        for k, v in config.items():
+            if isinstance(v, (str, int, float, bool)) or v is None:
+                settings_payload[k] = v
+            else:
+                settings_payload[k] = str(v)
         return cls._create_specialized_service(
             source_name,
             field_name="source_name",
             component_label="source service",
-            settings=dict(config),
+            settings=settings_payload,
         )
 
     @classmethod
@@ -73,11 +91,17 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         cls, transformation_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
         """Create transformation service."""
+        settings_payload: dict[str, t.JsonValue] = {}
+        for k, v in config.items():
+            if isinstance(v, (str, int, float, bool)) or v is None:
+                settings_payload[k] = v
+            else:
+                settings_payload[k] = str(v)
         return cls._create_specialized_service(
             transformation_name,
             field_name="transformation_name",
             component_label="transformation service",
-            settings=dict(config),
+            settings=settings_payload,
         )
 
     @staticmethod
@@ -170,11 +194,14 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute service with railway pattern."""
-        payload: t.JsonMapping = {
+        handlers_payload: list[t.JsonValue] = [
+            handler.value for handler in c.Meltano.HANDLER_ALL
+        ]
+        payload: dict[str, t.JsonValue] = {
             "status": c.CommonStatus.ACTIVE,
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
-            "handlers": list(c.Meltano.HANDLER_ALL),
+            "handlers": handlers_payload,
         }
         return r[t.JsonMapping].ok(payload)
 

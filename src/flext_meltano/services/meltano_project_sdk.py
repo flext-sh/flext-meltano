@@ -127,14 +127,18 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     {"value": variant_raw},
                 ).value
                 if variant_normalized is not None:
-                    plugin_def["variant"] = (
-                        {str(key): value for key, value in variant_normalized.items()}
-                        if isinstance(variant_normalized, Mapping)
-                        else list(variant_normalized)
-                        if isinstance(variant_normalized, Sequence)
-                        and not isinstance(variant_normalized, str)
-                        else variant_normalized
-                    )
+                    variant_value: t.JsonValue
+                    if isinstance(variant_normalized, Mapping):
+                        variant_value = {
+                            str(key): value for key, value in variant_normalized.items()
+                        }
+                    elif isinstance(variant_normalized, Sequence) and not isinstance(
+                        variant_normalized, str
+                    ):
+                        variant_value = [v for v in variant_normalized]  # noqa: C416
+                    else:
+                        variant_value = variant_normalized
+                    plugin_def["variant"] = variant_value
                 plugins.append(plugin_def)
         except (TypeError, AttributeError) as e:
             self.logger.warning("Failed to extract plugins", error=str(e))

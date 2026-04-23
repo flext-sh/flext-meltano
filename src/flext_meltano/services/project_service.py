@@ -40,10 +40,11 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             return r[t.JsonMapping].fail("Project name cannot be empty")
         if not project_dir.exists():
             return r[t.JsonMapping].fail(f"Parent directory not found: {project_dir}")
-        return r[t.JsonMapping].ok({
+        validation_payload: dict[str, t.JsonValue] = {
             "name": project_name.strip(),
-            "parent_dir": project_dir,
-        })
+            "parent_dir": str(project_dir),
+        }
+        return r[t.JsonMapping].ok(validation_payload)
 
     @staticmethod
     def _validate_project_parameters(
