@@ -21,6 +21,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         *,
         field_name: str,
         component_label: str,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[Self]:
         """Create a specialized Meltano service using a shared utility path."""
         try:
@@ -32,6 +33,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             service_kwargs[field_name] = component_name
             return r[Self].ok(
                 cls(
+                    settings=settings,
                     service_name=f"{component_name}_service",
                     service_version=c.Meltano.DEFAULT_SERVICE_VERSION,
                     source_name=service_kwargs["source_name"],
@@ -45,34 +47,37 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             )
 
     @classmethod
-    def create_sink_service(cls, sink_name: str, **_config: t.Scalar) -> p.Result[Self]:
+    def create_sink_service(cls, sink_name: str, **config: t.Scalar) -> p.Result[Self]:
         """Create data sink service."""
         return cls._create_specialized_service(
             sink_name,
             field_name="sink_name",
             component_label="sink service",
+            settings=dict(config),
         )
 
     @classmethod
     def create_source_service(
-        cls, source_name: str, **_config: t.Scalar
+        cls, source_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
         """Create data source service."""
         return cls._create_specialized_service(
             source_name,
             field_name="source_name",
             component_label="source service",
+            settings=dict(config),
         )
 
     @classmethod
     def create_transformation_service(
-        cls, transformation_name: str, **_config: t.Scalar
+        cls, transformation_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
         """Create transformation service."""
         return cls._create_specialized_service(
             transformation_name,
             field_name="transformation_name",
             component_label="transformation service",
+            settings=dict(config),
         )
 
     @staticmethod
@@ -110,13 +115,18 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     def configure_pipeline(
         source_name: str,
         sink_name: str,
-        _config: t.JsonMapping | None = None,
+        config: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Configure generic data pipeline."""
         payload: t.JsonMapping = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
+            "configuration": (
+                {str(key): value for key, value in config.items()}
+                if config is not None
+                else {}
+            ),
         }
         return r[t.JsonMapping].ok(payload)
 

@@ -433,7 +433,7 @@ class MockMeltanoService:
 
     @staticmethod
     def create_project(
-        _config: t.JsonMapping,
+        config: t.JsonMapping,
     ) -> t.JsonMapping:
         return {"project_id": "test-project", "status": "created"}
 

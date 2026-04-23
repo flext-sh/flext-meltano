@@ -327,12 +327,20 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         tap_name: str,
         target_name: str,
-        _config: t.JsonMapping | None = None,
+        config: t.JsonMapping | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         try:
+            command = list(
+                u.Meltano.build_pipeline_runtime_command(tap_name, target_name)
+            )
+            if config is not None:
+                command.extend(
+                    f"--{u.to_str(key).strip()}={u.to_str(value)}"
+                    for key, value in config.items()
+                )
             return self.execute_meltano_command(
-                u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
+                command,
             )
         except c.Meltano.OPERATION_ERRORS as e:
             return r[m.Meltano.CommandExecutionResult].fail(str(e))
