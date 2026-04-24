@@ -361,16 +361,22 @@ class FlextMeltanoUtilitiesRuntime:
         """Normalize Meltano project plugin groups to public discovery labels."""
         normalized = FlextMeltanoUtilitiesRuntime.normalize_plugin_group(plugin_type)
         if normalized == c.Meltano.PluginType.EXTRACTORS.value:
-            return c.Meltano.PLUGIN_DISCOVERY_LABELS[
-                c.Meltano.PluginType.EXTRACTORS
-            ].value
+            return str(
+                c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                    c.Meltano.PluginType.EXTRACTORS
+                ].value
+            )
         if normalized == c.Meltano.PluginType.LOADERS.value:
-            return c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.LOADERS].value
+            return str(
+                c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.LOADERS].value
+            )
         if (
             normalized == c.Meltano.PluginType.TRANSFORMS.value
             or plugin_name.startswith(c.Meltano.PREFIX_DBT)
         ):
-            return c.Meltano.PLUGIN_DISCOVERY_LABELS[
-                c.Meltano.PluginType.TRANSFORMS
-            ].value
+            return str(
+                c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                    c.Meltano.PluginType.TRANSFORMS
+                ].value
+            )
         return normalized or plugin_type

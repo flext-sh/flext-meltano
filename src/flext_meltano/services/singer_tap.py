@@ -21,7 +21,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     def create_tap_source_instance(cls) -> p.Result[Self]:
         """Create a tap abstractions instance wrapped in Result."""
         instance: Self = cls()
-        return r[Self].ok(instance)
+        ok_result: p.Result[Self] = r.ok(instance)
+        return ok_result
 
     def create_source_instance(
         self,

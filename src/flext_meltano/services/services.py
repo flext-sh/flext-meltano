@@ -46,11 +46,13 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                         )
                     },
                 )
-            return r[Self].ok(instance)
+            ok_result: p.Result[Self] = r.ok(instance)
+            return ok_result
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[Self].fail(
-                f"Failed to create {component_label} '{component_name}': {ex}"
+            fail_result: p.Result[Self] = r.fail(
+                f"Failed to create {component_label} '{component_name}': {ex}",
             )
+            return fail_result
 
     @classmethod
     def create_sink_service(cls, sink_name: str, **config: t.Scalar) -> p.Result[Self]:

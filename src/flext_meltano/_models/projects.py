@@ -139,10 +139,10 @@ class FlextMeltanoModelsProjects:
             has_prod = any(u.in_(env, prod_envs_list) for env in normalized_envs)
             env_count = u.count(self.environments)
             if has_prod and env_count >= c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT:
-                return c.Meltano.ProjectMaturity.MATURE
+                return str(c.Meltano.ProjectMaturity.MATURE)
             if env_count >= c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT:
-                return c.Meltano.ProjectMaturity.DEVELOPING
-            return c.Meltano.ProjectMaturity.BASIC
+                return str(c.Meltano.ProjectMaturity.DEVELOPING)
+            return str(c.Meltano.ProjectMaturity.BASIC)
 
         @u.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:

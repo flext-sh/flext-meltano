@@ -80,7 +80,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         try:
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
-            return tap.run_cli(command_args, self.tap_name)
+            return int(tap.run_cli(command_args, self.tap_name))
         except (ValueError, TypeError, OSError, RuntimeError) as exc:
             self.logger.exception("Tap CLI failed", error=str(exc))
             return 1

@@ -94,7 +94,7 @@ class FlextMeltanoCLI(FlextMeltanoServiceBase):
     def main(self, args: t.StrSequence | None = None) -> int:
         """Main CLI entry point."""
         command_args = sys.argv[1:] if args is None else args
-        return self.command_router.route_command(command_args)
+        return int(self.command_router.route_command(command_args))
 
     def show_banner(self) -> None:
         """Show CLI banner."""

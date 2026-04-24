@@ -105,7 +105,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def _project_search_root(self, _cwd: Path | None = None) -> Path | None:
         """Resolve the project root used for project-scoped Meltano operations."""
-        configured_root = u.Meltano.resolve_project_root(self.settings)
+        configured_root: Path | None = u.Meltano.resolve_project_root(self.settings)
         if configured_root is not None:
             return configured_root
         if _cwd is not None:

@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import ClassVar, Self, override
 
 from flext_cli import r
@@ -85,9 +86,9 @@ class FlextMeltano(
         """Create a specialized DBT facade instance through the public API."""
         return type(self).create_transformation_service(name, **settings)
 
-    Tap = tap
-    Target = target
-    Dbt = dbt
+    Tap: ClassVar[Callable[..., p.Result[Self]]] = tap
+    Target: ClassVar[Callable[..., p.Result[Self]]] = target
+    Dbt: ClassVar[Callable[..., p.Result[Self]]] = dbt
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

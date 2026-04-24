@@ -117,10 +117,10 @@ class FlextMeltanoModelsTransformations:
                 + u.count(self.macro_paths)
             )
             if total_path_count <= c.Meltano.VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS:
-                return c.Meltano.ProjectStructureComplexity.SIMPLE
+                return str(c.Meltano.ProjectStructureComplexity.SIMPLE)
             if total_path_count <= c.Meltano.VALIDATION_STRUCTURE_MODERATE_MAX_PATHS:
-                return c.Meltano.ProjectStructureComplexity.MODERATE
-            return c.Meltano.ProjectStructureComplexity.COMPLEX
+                return str(c.Meltano.ProjectStructureComplexity.MODERATE)
+            return str(c.Meltano.ProjectStructureComplexity.COMPLEX)
 
         @u.computed_field()
         @property
@@ -192,7 +192,7 @@ class FlextMeltanoModelsTransformations:
         @property
         def is_parallel_execution(self) -> bool:
             """Check if execution uses multiple threads."""
-            return self.threads > 1
+            return bool(self.threads > 1)
 
         @u.computed_field()
         @property

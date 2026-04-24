@@ -164,22 +164,22 @@ class FlextMeltanoSettings(FlextSettings):
     @classmethod
     def fetch_version(cls) -> str:
         """Return package semantic version."""
-        return c.Meltano.FLEXT_MELTANO_VERSION
+        return str(c.Meltano.FLEXT_MELTANO_VERSION)
 
     @classmethod
     def get_name(cls) -> str:
         """Return package distribution name."""
-        return c.Meltano.PROJECT_PREFIX
+        return str(c.Meltano.PROJECT_PREFIX)
 
     @classmethod
     def get_default_timeout(cls) -> int:
         """Return default command timeout in seconds."""
-        return c.Meltano.NETWORK_DEFAULT_TIMEOUT
+        return int(c.Meltano.NETWORK_DEFAULT_TIMEOUT)
 
     @classmethod
     def get_default_batch_size(cls) -> int:
         """Return default batch size for operations."""
-        return c.Meltano.BATCH_DEFAULT_DEFAULT_BATCH_SIZE
+        return int(c.Meltano.BATCH_DEFAULT_DEFAULT_BATCH_SIZE)
 
     @classmethod
     def get_supported_plugin_types(cls) -> t.StrSequence:
@@ -200,9 +200,9 @@ class FlextMeltanoSettings(FlextSettings):
     def create_from_project_root(cls, project_root: Path) -> p.Result[Self]:
         """Create settings from a project root path."""
         try:
-            instance: Self = cls(project_root=str(project_root))
-            success: p.Result[Self] = r[Self].ok(instance)
-            return success
+            instance: Self = cls(project_root=Path(project_root))
+            ok_result: p.Result[Self] = r.ok(instance)
+            return ok_result
         except ValueError as error:
             failure: p.Result[Self] = r[Self].fail(str(error))
             return failure

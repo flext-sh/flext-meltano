@@ -131,7 +131,7 @@ class FlextMeltanoModelsPayloadsData:
             match value:
                 case Mapping():
                     normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return u.Cli.yaml_dump_str(normalized)
+                    return str(u.Cli.yaml_dump_str(normalized))
                 case None:
                     return ""
                 case _:

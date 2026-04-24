@@ -106,7 +106,7 @@ class FlextMeltanoModelsInstances:
         @property
         def has_processed_data(self) -> bool:
             """Check if stream has processed data."""
-            return self.records_loaded > 0 or self.batches_processed > 0
+            return bool(self.records_loaded > 0 or self.batches_processed > 0)
 
         @u.computed_field()
         @property
@@ -116,12 +116,12 @@ class FlextMeltanoModelsInstances:
                 self.status == c.Meltano.StreamStatus.COMPLETED
                 and self.records_loaded > 0
             ):
-                return c.Meltano.StreamStatus.SUCCESS
+                return str(c.Meltano.StreamStatus.SUCCESS)
             if self.status == c.Meltano.StreamStatus.ERROR:
-                return c.Meltano.StreamStatus.FAILED
+                return str(c.Meltano.StreamStatus.FAILED)
             if self.records_loaded > 0:
-                return c.Meltano.StreamStatus.IN_PROGRESS
-            return c.Meltano.StreamStatus.PENDING
+                return str(c.Meltano.StreamStatus.IN_PROGRESS)
+            return str(c.Meltano.StreamStatus.PENDING)
 
         @u.model_validator(mode="after")
         def validate_stream_info(self) -> Self:

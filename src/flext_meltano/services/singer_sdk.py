@@ -91,7 +91,8 @@ class FlextMeltanoSingerTapAdapter:
 
     def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
         """Delegate stream discovery to the raw Singer tap."""
-        return self._tap.discover_streams()
+        streams: Sequence[p.Meltano.SingerStreamInfo] = self._tap.discover_streams()
+        return streams
 
     def sync_all(self) -> None:
         """Delegate sync execution to the raw Singer tap."""

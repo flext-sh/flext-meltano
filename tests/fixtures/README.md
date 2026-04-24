@@ -112,7 +112,7 @@ fixtures/
 
 ### **Fixture Loading Patterns**
 
-```python
+```text
 # Standard pytest fixture usage
 import pytest
 from tests import (
@@ -137,7 +137,7 @@ def test_environment(meltano_test_project, test_database_connection):
 
 ### **Sample Data Categories**
 
-```python
+```text
 # CSV data fixtures
 @pytest.fixture
 def sample_users_csv():
@@ -167,7 +167,7 @@ def sample_api_responses():
 
 ### **Schema Fixtures**
 
-```python
+```text
 # Singer schema fixtures
 @pytest.fixture
 def user_schema_fixture():
@@ -188,7 +188,7 @@ def user_schema_fixture():
 
 ### **Meltano Project Fixtures**
 
-```python
+```text
 # Complete Meltano project fixture
 @pytest.fixture
 def meltano_test_project(tmp_path):
@@ -225,7 +225,7 @@ def meltano_test_project(tmp_path):
 
 ### **Service Configuration Fixtures**
 
-```python
+```text
 # Service configuration templates
 @pytest.fixture
 def flext_meltano_config():
@@ -242,7 +242,7 @@ def flext_meltano_config():
 
 ### **Mock Service Implementations**
 
-```python
+```text
 # Mock Meltano CLI responses
 class MockMeltanoCLI:
     """Mock Meltano CLI for unit testing."""
@@ -270,7 +270,7 @@ def mock_meltano_cli():
 
 ### **Database Mock Fixtures**
 
-```python
+```text
 # Mock database connections
 @pytest.fixture
 def mock_database_connection():
@@ -297,7 +297,7 @@ def mock_database_connection():
 
 ### **Fixture Optimization**
 
-```python
+```text
 # Optimized fixture with caching
 @pytest.fixture(scope="session")
 def expensive_fixture():
@@ -326,7 +326,7 @@ def cached_data(expensive_fixture):
 
 ### **Code Quality**
 
-```python
+```text
 # Quality standards for fixture implementation
 from typing import Dict, Iterator
 
@@ -357,7 +357,7 @@ def documented_fixture() -> Iterator[str]:
 
 ### **Fixture Discovery**
 
-```python
+```text
 # Fixture registration and discovery
 def pytest_configure(settings):
     """Register custom fixtures."""
@@ -385,7 +385,7 @@ pytest tests/ --setup-show          # Show fixture setup/teardown
 
 ### **Basic Fixture Usage**
 
-```python
+```text
 # Using data fixtures in tests
 def test_csv_processing(sample_users_csv):
     """Test CSV processing with sample data."""
@@ -410,7 +410,7 @@ def test_meltano_integration(meltano_test_project, flext_meltano_config):
 
 ### **Advanced Fixture Composition**
 
-```python
+```text
 # Composing multiple fixtures
 @pytest.fixture
 def complete_test_environment(
