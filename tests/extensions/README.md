@@ -137,7 +137,7 @@ pytest tests/extensions/ -m "compliance" -v
 
 ### **Custom Component Testing**
 
-```python
+```text
 # Custom extension component testing
 import pytest
 from flext_meltano import CustomTapExtension
@@ -167,7 +167,7 @@ def test_custom_tap_extension():
 
 ### **Oracle OIC Extension Testing**
 
-```python
+```text
 # Oracle Integration Cloud extension testing
 @pytest.mark.extension
 @pytest.mark.oracle_oic
@@ -189,7 +189,7 @@ from tests import OracleOicExtension
 
 ### **Compliance Extension Testing**
 
-```python
+```text
 # Compliance and regulatory extension testing
 @pytest.mark.extension
 @pytest.mark.compliance
@@ -213,7 +213,7 @@ from tests import ComplianceExtension
 
 ### **Test Categories and Markers**
 
-```python
+```text
 # Extension test markers for organization
 @pytest.mark.extension         # All extension tests
 @pytest.mark.oracle_oic        # Oracle OIC specific tests
@@ -236,7 +236,7 @@ pytest tests/extensions/ --timeout=1800  # 30 minute timeout for complex extensi
 
 ### **Extension-Specific Fixtures**
 
-```python
+```text
 # Extension test fixtures
 @pytest.fixture
 def oracle_oic_test_environment():
@@ -264,7 +264,7 @@ def custom_tap_configuration():
 
 ### **Enterprise Data Fixtures**
 
-```python
+```text
 # Enterprise-specific test data
 @pytest.fixture
 def enterprise_compliance_dataset():
@@ -281,7 +281,7 @@ def enterprise_compliance_dataset():
 
 ### **Custom Extension Implementation**
 
-```python
+```text
 # Enterprise extension implementation pattern
 from abc import ABC, abstractmethod
 from typing import Dict, Optional

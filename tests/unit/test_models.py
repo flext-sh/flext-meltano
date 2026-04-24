@@ -12,7 +12,7 @@ from typing import cast
 import pytest
 from flext_tests import tm
 
-from tests import e, m, t
+from tests import c, m, t
 
 
 class TestFlextMeltanoModels:
@@ -50,13 +50,13 @@ class TestFlextMeltanoModels:
         tm.that(settings.tap_version, eq="1.0.0")
 
     def test_tap_config_validation_empty_tap_type(self) -> None:
-        with pytest.raises(e.ValidationError, match="tap_type cannot be empty"):
+        with pytest.raises(c.ValidationError, match="tap_type cannot be empty"):
             m.Meltano.TapConfig(tap_type="", connection_config={"host": "localhost"})
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         invalid_config = cast("t.JsonMapping", "invalid")
         with pytest.raises(
-            e.ValidationError, match="Input should be a valid dictionary"
+            c.ValidationError, match="Input should be a valid dictionary"
         ):
             m.Meltano.TapConfig(
                 tap_type="tap-postgres",
@@ -90,11 +90,11 @@ class TestFlextMeltanoModels:
             tm.that(abs(settings.batch_wait_limit - 30.0), lt=1e-9)
 
     def test_target_config_validation_empty_target_type(self) -> None:
-        with pytest.raises(e.ValidationError, match="target_type cannot be empty"):
+        with pytest.raises(c.ValidationError, match="target_type cannot be empty"):
             m.Meltano.TargetConfig(target_type="")
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
-        with pytest.raises(e.ValidationError, match="Input should be a valid integer"):
+        with pytest.raises(c.ValidationError, match="Input should be a valid integer"):
             m.Meltano.TargetConfig(
                 target_type="target-csv", batch_size=cast("int", "invalid")
             )
@@ -131,7 +131,7 @@ class TestFlextMeltanoModels:
 
     def test_stream_info_validation_empty_stream_name(self) -> None:
         with pytest.raises(
-            e.ValidationError,
+            c.ValidationError,
             match="String should have at least 1 character",
         ):
             m.Meltano.StreamInfo(
@@ -143,7 +143,7 @@ class TestFlextMeltanoModels:
     def test_stream_info_validation_invalid_schema_type(self) -> None:
         invalid_schema = cast("t.ScalarMapping", "invalid")
         with pytest.raises(
-            e.ValidationError, match="Input should be a valid dictionary"
+            c.ValidationError, match="Input should be a valid dictionary"
         ):
             m.Meltano.StreamInfo(
                 stream_name="users",
@@ -163,7 +163,7 @@ class TestFlextMeltanoModels:
         project = m.Meltano.MeltanoProjectModel(
             project_id="analytics-project",
             project_version="2.0",
-            default_environment="production",
+            default_environment="prod",
             plugins={
                 "extractors": "tap-postgres",
                 "loaders": "target-csv",
@@ -175,19 +175,19 @@ class TestFlextMeltanoModels:
         )
         tm.that(project.project_id, eq="analytics-project")
         tm.that(project.project_version, eq="2.0")
-        tm.that(project.default_environment, eq="production")
+        tm.that(project.default_environment, eq="prod")
         tm.that(project.plugins, has="extractors")
         tm.that(project.environments, has="dev")
         tm.that(project.environments, has="prod")
 
     def test_meltano_project_validation_empty_project_id(self) -> None:
-        with pytest.raises(e.ValidationError, match="project_id cannot be empty"):
+        with pytest.raises(c.ValidationError, match="project_id cannot be empty"):
             m.Meltano.MeltanoProjectModel(project_id="")
 
     def test_meltano_project_validation_invalid_plugins_type(self) -> None:
         invalid_plugins = cast("t.JsonMapping", "invalid")
         with pytest.raises(
-            e.ValidationError, match="Input should be a valid dictionary"
+            c.ValidationError, match="Input should be a valid dictionary"
         ):
             m.Meltano.MeltanoProjectModel(
                 project_id="test-project",
@@ -233,13 +233,13 @@ class TestFlextMeltanoModels:
 
     def test_plugin_model_validation_empty_name(self) -> None:
         with pytest.raises(
-            e.ValidationError,
+            c.ValidationError,
             match="String should have at least 1 character",
         ):
             m.Meltano.PluginModel(name="", namespace="")
 
     def test_plugin_model_validation_invalid_capabilities_type(self) -> None:
-        with pytest.raises(e.ValidationError, match="not allowed as a Sequence value"):
+        with pytest.raises(c.ValidationError, match="not allowed as a Sequence value"):
             m.Meltano.PluginModel(
                 name="tap-postgres",
                 namespace="tap-postgres",
@@ -279,17 +279,17 @@ class TestFlextMeltanoModels:
         tm.that(dbt_project.tests, has="unit")
 
     def test_dbt_project_validation_empty_name(self) -> None:
-        with pytest.raises(e.ValidationError, match="name cannot be empty"):
+        with pytest.raises(c.ValidationError, match="name cannot be empty"):
             m.Meltano.DbtProjectModel(name="", profile="default")
 
     def test_dbt_project_validation_empty_profile(self) -> None:
-        with pytest.raises(e.ValidationError, match="profile cannot be empty"):
+        with pytest.raises(c.ValidationError, match="profile cannot be empty"):
             m.Meltano.DbtProjectModel(name="test-project", profile="")
 
     def test_dbt_project_validation_invalid_config_type(self) -> None:
         invalid_config = cast("t.JsonMapping", "invalid")
         with pytest.raises(
-            e.ValidationError, match="Input should be a valid dictionary"
+            c.ValidationError, match="Input should be a valid dictionary"
         ):
             m.Meltano.DbtProjectModel(
                 name="test-project",
