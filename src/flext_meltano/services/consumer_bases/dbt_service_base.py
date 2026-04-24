@@ -250,7 +250,7 @@ class FlextMeltanoDbtServiceBase[TSettings: FlextSettings = FlextSettings](
         """Execute dbt service — returns status."""
         return r[t.JsonMapping].ok({
             "service": self.dbt_project_name,
-            "status": c.CommonStatus.ACTIVE.value,
+            "status": "active",
             "type": c.Meltano.ServiceType.DBT,
         })
 

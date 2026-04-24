@@ -19,7 +19,7 @@ from typing import Annotated, ClassVar, Self, override
 
 from flext_core import FlextSettings
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, p, r, t, u
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
@@ -156,7 +156,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         """Execute tap service — returns status."""
         return r[t.JsonMapping].ok({
             "service": self.tap_name,
-            "status": c.CommonStatus.ACTIVE.value,
+            "status": "active",
             "type": "tap",
         })
 

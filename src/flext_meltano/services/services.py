@@ -200,7 +200,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             handler.value for handler in c.Meltano.HANDLER_ALL
         ]
         payload: dict[str, t.JsonValue] = {
-            "status": c.CommonStatus.ACTIVE,
+            "status": "active",
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,
             "handlers": handlers_payload,

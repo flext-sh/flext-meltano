@@ -99,7 +99,7 @@ class FlextMeltano(
         payload: dict[str, t.JsonValue] = {
             "service_name": self.service_name,
             "version": self.service_version,
-            "status": c.CommonStatus.ACTIVE.value,
+            "status": "active",
             "timestamp": u.generate_iso_timestamp(),
             "handlers": handlers_payload,
         }

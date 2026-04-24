@@ -24,9 +24,6 @@ class _ExecutionResultJson(m.BaseModel):
     timestamp: str
 
 
-_JSON_ADAPTER: m.TypeAdapter[_ExecutionResultJson] = m.TypeAdapter(_ExecutionResultJson)
-
-
 class TestFlextMeltanoExecutionResult:
     """Test FlextMeltanoExecutionResult class functionality."""
 
@@ -170,7 +167,7 @@ class TestFlextMeltanoExecutionResult:
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
             json_str = result.model_dump_json()
-            parsed = _JSON_ADAPTER.validate_json(json_str)
+            parsed = m.TypeAdapter(_ExecutionResultJson).validate_json(json_str)
             tm.that(parsed.command, eq=command)
             tm.that(parsed.success is True, eq=True)
             tm.that(parsed.exit_code, eq=0)
@@ -195,7 +192,7 @@ class TestFlextMeltanoExecutionResult:
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
             json_str = result.model_dump_json()
-            parsed = _JSON_ADAPTER.validate_json(json_str)
+            parsed = m.TypeAdapter(_ExecutionResultJson).validate_json(json_str)
             tm.that(parsed.command, eq=command)
             tm.that(parsed.success is False, eq=True)
             tm.that(parsed.exit_code, eq=2)
@@ -220,7 +217,7 @@ class TestFlextMeltanoExecutionResult:
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
             json_str = result.model_dump_json()
-            parsed = _JSON_ADAPTER.validate_json(json_str)
+            parsed = m.TypeAdapter(_ExecutionResultJson).validate_json(json_str)
             tm.that(parsed.command, eq=command)
             tm.that(parsed.success is True, eq=True)
             tm.that(parsed.exit_code, eq=0)

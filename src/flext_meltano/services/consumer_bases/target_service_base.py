@@ -173,7 +173,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         """Execute target service — returns status."""
         return r[t.JsonMapping].ok({
             "service": self.target_name,
-            "status": c.CommonStatus.ACTIVE.value,
+            "status": "active",
             "type": "target",
             "active_sinks": len(self._sinks),
         })
