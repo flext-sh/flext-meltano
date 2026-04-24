@@ -362,9 +362,7 @@ class FlextMeltanoUtilitiesRuntime:
         normalized = FlextMeltanoUtilitiesRuntime.normalize_plugin_group(plugin_type)
         if normalized == c.Meltano.PluginType.EXTRACTORS.value:
             return str(
-                c.Meltano.PLUGIN_DISCOVERY_LABELS[
-                    c.Meltano.PluginType.EXTRACTORS
-                ].value
+                c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.EXTRACTORS].value
             )
         if normalized == c.Meltano.PluginType.LOADERS.value:
             return str(
@@ -375,8 +373,6 @@ class FlextMeltanoUtilitiesRuntime:
             or plugin_name.startswith(c.Meltano.PREFIX_DBT)
         ):
             return str(
-                c.Meltano.PLUGIN_DISCOVERY_LABELS[
-                    c.Meltano.PluginType.TRANSFORMS
-                ].value
+                c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.TRANSFORMS].value
             )
         return normalized or plugin_type
