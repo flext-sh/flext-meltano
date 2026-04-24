@@ -133,6 +133,10 @@ install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__: list[str] = [
     "MockMeltanoService",
+    "MockSingerTap",
+    "MockSingerTarget",
+    "TestDockerIntegration",
+    "TestFlextMeltanoPipelineCliManagers",
     "TestsFlextMeltanoApi",
     "TestsFlextMeltanoCliIntegration",
     "TestsFlextMeltanoCliSmallManagers",
