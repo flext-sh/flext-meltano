@@ -230,6 +230,7 @@ project-excludes = [
   "**/*_pb2_grpc*.py",
   "**/.venv/**",
   "**/__pycache__",
+  "**/__pyrefly_virtual__/**",
   "**/node_modules",
   "**/typings/**",
   "**/vendor/**",
@@ -340,6 +341,7 @@ exclude = [
   "**/.venv",
   "**/.venv/**",
   "**/__pycache__",
+  "**/__pyrefly_virtual__/**",
   "**/dist-packages",
   "**/dist-packages/**",
   "**/node_modules",
@@ -423,6 +425,7 @@ python_files = [ "*_test.py", "*_tests.py", "test_*.py" ]
 # [MANAGED] ruff
 [tool.ruff]
 exclude = [
+  "**/__pyrefly_virtual__/**",
   ".git",
   ".mypy_cache",
   ".pytest_cache",
