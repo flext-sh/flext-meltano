@@ -26,7 +26,7 @@ def unwrap_component(
     """Assert and unwrap a public Meltano component facade."""
     u.Tests.Matchers.that(result, ok=True)
     assert result.success
-    service = result.value
+    service: FlextMeltano = result.unwrap()
     u.Tests.Matchers.that(service, is_=FlextMeltano)
     u.Tests.Matchers.that(selector(service), eq=expected_name)
     u.Tests.Matchers.that(service.service_version, eq=c.Meltano.DEFAULT_SERVICE_VERSION)

@@ -7,30 +7,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
-
-from flext_cli import t
-
 from flext_meltano import c
 
 
 class FlextMeltanoTypingsSinger:
     """Singer protocol type definitions.
 
-    Singer contracts belong to ``t.Meltano`` and must avoid compatibility
-    wrappers that mirror model-layer objects.
+    Singer catalog contracts live in ``m.Meltano``.
+    ``t.Meltano`` only keeps non-model runtime typing surfaces.
     """
-
-    type SingerCatalogEntry = Mapping[
-        str,
-        str | Mapping[str, t.Scalar | None],
-    ]
-    type SingerStreamCatalog = Mapping[
-        str,
-        Sequence[FlextMeltanoTypingsSinger.SingerCatalogEntry],
-    ]
 
     SingerReplicationMethod = c.Meltano.SingerReplicationMethod

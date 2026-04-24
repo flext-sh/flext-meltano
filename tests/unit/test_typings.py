@@ -47,7 +47,7 @@ class TestFlextMeltanoTypes:
         """Test that type annotations are properly defined."""
         plugin_definition = t.JsonMapping
         tm.that(str(plugin_definition), none=False)
-        singer_catalog = t.Meltano.SingerCatalogEntry
+        singer_catalog = m.Meltano.SingerCatalogEntry
         tm.that(str(singer_catalog), none=False)
 
     def test_no_nested_namespaces(self) -> None:
@@ -80,6 +80,9 @@ class TestFlextMeltanoTypes:
             "PluginDefinition",
             "FileConfigDict",
             "CliProcessResult",
+            "SingerCatalogEntry",
+            "SingerStreamCatalog",
+            "PluginCatalog",
         ]
         for alias_name in removed_duplicates:
             assert not hasattr(t.Meltano, alias_name)
@@ -105,6 +108,6 @@ class TestFlextMeltanoTypes:
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
         plugin_definition = t.JsonMapping
-        singer_catalog = t.Meltano.SingerCatalogEntry
+        singer_catalog = m.Meltano.SingerCatalogEntry
         tm.that(str(plugin_definition), none=False)
         tm.that(str(singer_catalog), none=False)

@@ -1,8 +1,8 @@
-"""Test module for flext-meltano plugin type definitions.
+"""Test module for flext-meltano Singer catalog contracts.
 
-Tests the canonical t.JsonMapping and t.Meltano.PluginCatalog contracts
-following FLEXT standards.
-Validates actual type alias semantics, not just existence.
+Tests the canonical t.JsonMapping contract plus m.Meltano Singer catalog
+models following FLEXT standards.
+Validates that legacy typing aliases stay removed.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from flext_tests import tm
 
-from tests import t
+from tests import m, t
 
 
 class TestFlextMeltanoPluginProtocols:
@@ -39,25 +39,29 @@ class TestFlextMeltanoPluginProtocols:
         tm.that(plugin_cfg["host"], eq="localhost")
         tm.that(len(plugin_cfg) >= 3, eq=True)
 
-    def test_plugin_catalog_resolves_to_mapping(self) -> None:
-        """PluginCatalog type alias resolves to a Mapping-compatible type."""
-        catalog: t.Meltano.PluginCatalog = {
+    def test_singer_catalog_model_validates_catalog_payload(self) -> None:
+        """Singer catalog payloads validate through m.Meltano models."""
+        catalog = m.Meltano.SingerCatalog.model_validate({
             "streams": [
-                {"stream": "users", "tap_stream_id": "users"},
+                {"stream": "users", "tap_stream_id": "users", "schema": {}},
             ],
-        }
-        tm.that("streams" in catalog, eq=True)
+        })
+        tm.that(catalog.streams[0].stream, eq="users")
+        tm.that(catalog.streams[0].tap_stream_id, eq="users")
 
-    def test_type_aliases_are_distinct(self) -> None:
-        """Plugin catalog remains distinct from the canonical JSON mapping contract."""
+    def test_model_contract_is_distinct(self) -> None:
+        """Singer catalog models stay distinct from the JSON mapping contract."""
         names = {
             str(t.JsonMapping),
-            str(t.Meltano.PluginCatalog),
+            str(m.Meltano.SingerCatalog),
         }
         tm.that(len(names), eq=2)
 
-    def test_meltano_namespace_contains_all_plugin_types(self) -> None:
-        """t.Meltano keeps only the composed plugin catalog contract."""
+    def test_meltano_namespace_removes_legacy_singer_aliases(self) -> None:
+        """t.Meltano exposes no legacy Singer typing aliases."""
         tm.that(str(t.JsonMapping), none=False)
-        tm.that(str(t.Meltano.PluginCatalog), none=False)
+        tm.that(str(m.Meltano.SingerCatalog), none=False)
+        assert not hasattr(t.Meltano, "SingerCatalogEntry")
+        assert not hasattr(t.Meltano, "SingerStreamCatalog")
+        assert not hasattr(t.Meltano, "PluginCatalog")
         assert not hasattr(t.Meltano, "PluginDefinition")

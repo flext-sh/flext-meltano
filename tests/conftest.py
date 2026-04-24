@@ -18,7 +18,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import tk
@@ -39,27 +39,6 @@ type MeltanoComponentCase = tuple[
 ]
 
 
-class MockCliResult:
-    """Mock CLI invocation result."""
-
-    def __init__(self, exit_code: int = 0, output: str = "") -> None:
-        """Initialize the instance."""
-        self.exit_code = exit_code
-        self.output = output
-
-
-class CliRunner(Protocol):
-    """Protocol for CLI runner interface.
-
-    Canonical definition lives in ``TestsFlextMeltanoProtocols.Meltano.Tests.CliRunner``.
-    Re-exported here for backward compatibility with auto-generated ``tests/__init__.py``.
-    """
-
-    def invoke(self, *args: t.Scalar, **kwargs: t.Scalar) -> MockCliResult:
-        """Invoke CLI command."""
-        ...
-
-
 def select_source_name(service: FlextMeltano) -> str | None:
     """Select the source name from a specialized Tap facade."""
     return service.source_name
@@ -75,6 +54,15 @@ def select_transformation_name(service: FlextMeltano) -> str | None:
     return service.transformation_name
 
 
+MELTANO_COMPONENT_CASES: tuple[MeltanoComponentCase, ...] = (
+    (meltano.Tap, "tap-csv", select_source_name),
+    (meltano.Target, "target-jsonl", select_sink_name),
+    (meltano.Dbt, "analytics", select_transformation_name),
+)
+
+MELTANO_COMPONENT_IDS: tuple[str, ...] = ("tap", "target", "dbt")
+
+
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
     """Set test environment variables."""
@@ -88,16 +76,14 @@ def set_test_environment() -> Generator[None]:
 
 
 @pytest.fixture(
-    params=[
-        (meltano.Tap, "tap-csv", select_source_name),
-        (meltano.Target, "target-jsonl", select_sink_name),
-        (meltano.Dbt, "analytics", select_transformation_name),
-    ],
-    ids=["tap", "target", "dbt"],
+    params=tuple(range(len(MELTANO_COMPONENT_CASES))),
+    ids=MELTANO_COMPONENT_IDS,
 )
 def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCase:
     """Canonical public Meltano component factories with expected selectors."""
-    return request.param
+    case_index = request.param
+    assert isinstance(case_index, int)
+    return MELTANO_COMPONENT_CASES[case_index]
 
 
 @pytest.fixture(
@@ -220,23 +206,6 @@ def target_csv_config() -> t.JsonMapping:
 def sample_csv_data() -> str:
     """Sample CSV data for testing."""
     return "id,name,email,created_at\n1,John Doe,john@example.com,2023-01-01\n2,Jane Smith,jane@example.com,2023-01-02\n3,Bob Johnson,bob@example.com,2023-01-03"
-
-
-class MockCliRunner:
-    """Mock CLI runner."""
-
-    @staticmethod
-    def invoke(*args: t.Scalar, **kwargs: t.Scalar) -> MockCliResult:
-        """Mock invoke method."""
-        _ = args
-        _ = kwargs
-        return MockCliResult()
-
-
-@pytest.fixture
-def meltano_cli_runner() -> MockCliRunner:
-    """Meltano CLI runner for testing using flext-cli patterns."""
-    return MockCliRunner()
 
 
 @pytest.fixture
