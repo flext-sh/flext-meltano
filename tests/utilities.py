@@ -10,14 +10,16 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsUtilities
 
+from flext_meltano import FlextMeltanoUtilities
 
-class TestsFlextMeltanoUtilities(FlextTestsUtilities):
+
+class TestsFlextMeltanoUtilities(FlextTestsUtilities, FlextMeltanoUtilities):
     """Test utilities for flext-meltano."""
 
-    class Meltano:
+    class Meltano(FlextMeltanoUtilities.Meltano):
         """Meltano-specific utilities."""
 
-        class Tests:
+        class Tests(FlextTestsUtilities.Tests):
             """Meltano test utilities."""
 
 

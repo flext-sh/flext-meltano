@@ -10,6 +10,12 @@ from flext_meltano import FlextMeltanoProtocols
 class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
     """Test protocols facade for flext-meltano."""
 
+    class Meltano(FlextMeltanoProtocols.Meltano):
+        """Meltano test protocols namespace."""
+
+        class Tests(FlextTestsProtocols.Tests):
+            """Meltano-specific test protocols."""
+
 
 p = TestsFlextMeltanoProtocols
 __all__: list[str] = ["TestsFlextMeltanoProtocols", "p"]

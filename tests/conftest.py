@@ -339,19 +339,19 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
 @pytest.fixture
 def docker_services(docker_manager: tk) -> Generator[tk]:
     """Function-scoped Docker services fixture."""
-    result = docker_manager.start_compose_stack(c.Meltano.Tests.Docker.COMPOSE_FILE)
+    result = docker_manager.start_compose_stack(c.Meltano.Tests.COMPOSE_FILE)
     if result.failure:
         pytest.skip(f"Docker stack unavailable: {result.error}")
     yield docker_manager
-    _ = docker_manager.compose_down(c.Meltano.Tests.Docker.COMPOSE_FILE)
+    _ = docker_manager.compose_down(c.Meltano.Tests.COMPOSE_FILE)
 
 
 def require_docker_service(docker_services: tk, port: int, service_name: str) -> str:
     """Return a ready Docker service endpoint or skip the test."""
-    ready = docker_services.wait_for_port_ready(c.Meltano.Tests.Docker.HOST, port)
+    ready = docker_services.wait_for_port_ready(c.Meltano.Tests.HOST, port)
     if ready.failure or not ready.value:
         pytest.skip(f"{service_name} service not available")
-    return f"{c.Meltano.Tests.Docker.HOST}:{port}"
+    return f"{c.Meltano.Tests.HOST}:{port}"
 
 
 @pytest.fixture
@@ -359,7 +359,7 @@ def postgres_service(docker_services: tk) -> str:
     """PostgreSQL service fixture."""
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.Docker.POSTGRES_PORT,
+        c.Meltano.Tests.POSTGRES_PORT,
         "PostgreSQL",
     )
 
@@ -369,7 +369,7 @@ def redis_service(docker_services: tk) -> str:
     """Redis service fixture."""
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.Docker.REDIS_PORT,
+        c.Meltano.Tests.REDIS_PORT,
         "Redis",
     )
 
@@ -379,7 +379,7 @@ def meltano_service(docker_services: tk) -> str:
     """Meltano service fixture."""
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.Docker.MELTANO_PORT,
+        c.Meltano.Tests.MELTANO_PORT,
         "Meltano",
     )
 

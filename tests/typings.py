@@ -17,6 +17,12 @@ from flext_meltano import FlextMeltanoTypes
 class TestsFlextMeltanoTypes(FlextTestsTypes, FlextMeltanoTypes):
     """Test type aliases for flext-meltano."""
 
+    class Meltano(FlextMeltanoTypes.Meltano):
+        """Meltano test types namespace."""
+
+        class Tests(FlextTestsTypes.Tests):
+            """Meltano-specific test type aliases."""
+
 
 t = TestsFlextMeltanoTypes
 __all__: list[str] = ["TestsFlextMeltanoTypes", "t"]

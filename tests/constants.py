@@ -43,24 +43,17 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     class Meltano(FlextMeltanoConstants.Meltano):
         """Meltano domain namespace."""
 
-        class Tests:
+        class Tests(FlextTestsConstants.Tests):
             """Meltano tests namespace."""
 
-            class Docker:
-                """Docker integration test constants."""
-
-                HOST: Final[str] = "localhost"
-                POSTGRES_PORT: Final[int] = 5433
-                REDIS_PORT: Final[int] = 6380
-                MELTANO_PORT: Final[int] = 3389
-                COMPOSE_FILE: Final[str] = "docker-compose.test.yml"
-
-            class Paths:
-                """Test path constants."""
-
-                TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
-                TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
-                TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
+            HOST: Final[str] = "localhost"
+            POSTGRES_PORT: Final[int] = 5433
+            REDIS_PORT: Final[int] = 6380
+            MELTANO_PORT: Final[int] = 3389
+            COMPOSE_FILE: Final[str] = "docker-compose.test.yml"
+            TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
+            TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
+            TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
 
 c = TestsFlextMeltanoConstants

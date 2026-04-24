@@ -24,12 +24,12 @@ class TestDockerIntegration:
     def test_postgres_service_available(self, postgres_service: str) -> None:
         """Test that PostgreSQL service is available and responsive."""
         assert postgres_service == (
-            f"{c.Meltano.Tests.Docker.HOST}:{c.Meltano.Tests.Docker.POSTGRES_PORT}"
+            f"{c.Meltano.Tests.HOST}:{c.Meltano.Tests.POSTGRES_PORT}"
         )
         try:
             conn = psycopg2.connect(
-                host=c.Meltano.Tests.Docker.HOST,
-                port=c.Meltano.Tests.Docker.POSTGRES_PORT,
+                host=c.Meltano.Tests.HOST,
+                port=c.Meltano.Tests.POSTGRES_PORT,
                 database="flext_test",
                 user="test",
                 password="test",
@@ -50,13 +50,11 @@ class TestDockerIntegration:
     @pytest.mark.integration
     def test_redis_service_available(self, redis_service: str) -> None:
         """Test that Redis service is available and responsive."""
-        assert redis_service == (
-            f"{c.Meltano.Tests.Docker.HOST}:{c.Meltano.Tests.Docker.REDIS_PORT}"
-        )
+        assert redis_service == (f"{c.Meltano.Tests.HOST}:{c.Meltano.Tests.REDIS_PORT}")
         try:
             r = redis.Redis(
-                host=c.Meltano.Tests.Docker.HOST,
-                port=c.Meltano.Tests.Docker.REDIS_PORT,
+                host=c.Meltano.Tests.HOST,
+                port=c.Meltano.Tests.REDIS_PORT,
                 db=0,
             )
             r.ping()
@@ -69,7 +67,7 @@ class TestDockerIntegration:
     def test_meltano_service_available(self, meltano_service: str) -> None:
         """Test that Meltano service is available."""
         assert meltano_service == (
-            f"{c.Meltano.Tests.Docker.HOST}:{c.Meltano.Tests.Docker.MELTANO_PORT}"
+            f"{c.Meltano.Tests.HOST}:{c.Meltano.Tests.MELTANO_PORT}"
         )
 
     @pytest.mark.docker
@@ -77,12 +75,12 @@ class TestDockerIntegration:
     def test_docker_services_health(self, docker_services: tk) -> None:
         """Test overall Docker services health."""
         postgres_ready = docker_services.wait_for_port_ready(
-            c.Meltano.Tests.Docker.HOST,
-            c.Meltano.Tests.Docker.POSTGRES_PORT,
+            c.Meltano.Tests.HOST,
+            c.Meltano.Tests.POSTGRES_PORT,
         )
         redis_ready = docker_services.wait_for_port_ready(
-            c.Meltano.Tests.Docker.HOST,
-            c.Meltano.Tests.Docker.REDIS_PORT,
+            c.Meltano.Tests.HOST,
+            c.Meltano.Tests.REDIS_PORT,
         )
         if postgres_ready.failure or not postgres_ready.value:
             pytest.skip("PostgreSQL service not available")
@@ -95,21 +93,21 @@ class TestDockerIntegration:
     def test_container_lifecycle(self, docker_manager: tk) -> None:
         """Test complete container lifecycle management."""
         start_result = docker_manager.start_compose_stack(
-            c.Meltano.Tests.Docker.COMPOSE_FILE,
+            c.Meltano.Tests.COMPOSE_FILE,
         )
         assert start_result.success
         should_assert_stop = True
         try:
             postgres_ready = docker_manager.wait_for_port_ready(
-                c.Meltano.Tests.Docker.HOST,
-                c.Meltano.Tests.Docker.POSTGRES_PORT,
+                c.Meltano.Tests.HOST,
+                c.Meltano.Tests.POSTGRES_PORT,
             )
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
                 pytest.skip("PostgreSQL service not available")
         finally:
             stop_result = docker_manager.compose_down(
-                c.Meltano.Tests.Docker.COMPOSE_FILE,
+                c.Meltano.Tests.COMPOSE_FILE,
             )
             if should_assert_stop:
                 assert stop_result.success
@@ -121,8 +119,8 @@ class TestDockerIntegration:
         conn = None
         try:
             conn = psycopg2.connect(
-                host=c.Meltano.Tests.Docker.HOST,
-                port=c.Meltano.Tests.Docker.POSTGRES_PORT,
+                host=c.Meltano.Tests.HOST,
+                port=c.Meltano.Tests.POSTGRES_PORT,
                 database="flext_test",
                 user="test",
                 password="test",
@@ -167,8 +165,8 @@ class TestDockerIntegration:
         r = None
         try:
             r = redis.Redis(
-                host=c.Meltano.Tests.Docker.HOST,
-                port=c.Meltano.Tests.Docker.REDIS_PORT,
+                host=c.Meltano.Tests.HOST,
+                port=c.Meltano.Tests.REDIS_PORT,
                 db=0,
             )
             r.set("test_key", "test_value")
