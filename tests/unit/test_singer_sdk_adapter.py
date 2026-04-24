@@ -49,7 +49,7 @@ class _FailingTap(_SuccessfulTap):
                 windows_expand_args: bool = True,
                 **extra: t.JsonValue,
             ) -> t.JsonValue:
-                del (
+                _ = (
                     args,
                     prog_name,
                     complete_var,
