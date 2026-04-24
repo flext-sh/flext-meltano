@@ -158,8 +158,21 @@ class FlextMeltanoModelsPayloadsData:
                 case str():
                     return value
                 case list() | tuple():
-                    return [str(item) for item in value]
+                    return tuple(str(item) for item in value)
                 case Mapping():
                     return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
                     return str(value)
+
+        @u.computed_field(return_type=t.JsonValue | None)
+        def json_value(self) -> t.JsonValue | None:
+            """Expose the normalized variant as a canonical JSON-compatible value."""
+            match self.value:
+                case None:
+                    return None
+                case str() as normalized:
+                    return normalized
+                case Mapping() as normalized:
+                    return {str(key): value for key, value in normalized.items()}
+                case _:
+                    return [str(item) for item in self.value]

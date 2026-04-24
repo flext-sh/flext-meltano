@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     MutableSequence,
     Sequence,
 )
@@ -123,22 +122,12 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                     variant_raw = plugin.variant
                 except AttributeError:
                     variant_raw = None
-                variant_normalized = m.Meltano.VariantPayload.model_validate(
+                variant_payload = m.Meltano.VariantPayload.model_validate(
                     {"value": variant_raw},
-                ).value
-                if variant_normalized is not None:
-                    variant_value: t.JsonValue
-                    if isinstance(variant_normalized, Mapping):
-                        variant_value = {
-                            str(key): value for key, value in variant_normalized.items()
-                        }
-                    elif isinstance(variant_normalized, Sequence) and not isinstance(
-                        variant_normalized, str
-                    ):
-                        variant_value = [v for v in variant_normalized]  # noqa: C416
-                    else:
-                        variant_value = variant_normalized
-                    plugin_def["variant"] = variant_value
+                )
+                json_variant = variant_payload.json_value()
+                if json_variant is not None:
+                    plugin_def["variant"] = json_variant
                 plugins.append(plugin_def)
         except (TypeError, AttributeError) as e:
             self.logger.warning("Failed to extract plugins", error=str(e))

@@ -42,9 +42,21 @@ class _FailingTap(_SuccessfulTap):
             @override
             def main(
                 self,
-                *args: t.JsonValue,
-                **kwargs: t.JsonValue,
+                args: Sequence[str] | None = None,
+                prog_name: str | None = None,
+                complete_var: str | None = None,
+                standalone_mode: bool = True,
+                windows_expand_args: bool = True,
+                **extra: t.JsonValue,
             ) -> t.JsonValue:
+                del (
+                    args,
+                    prog_name,
+                    complete_var,
+                    standalone_mode,
+                    windows_expand_args,
+                    extra,
+                )
                 raise SystemExit(3)
 
         return _FailingCommand("tap-fail")
