@@ -15,7 +15,7 @@ from flext_tests import tm
 from tests import c
 
 
-class Testc:
+class TestsFlextMeltanoConstantsUnit:
     """Unit test suite for c.Meltano."""
 
     def test_meltano_namespace(self) -> None:

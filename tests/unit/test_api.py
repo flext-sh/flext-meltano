@@ -12,7 +12,7 @@ from tests import c, u
 pytestmark = pytest.mark.unit
 
 
-class TestFlextMeltanoApiFacade:
+class TestsFlextMeltanoApi:
     """Behavioral test suite for the public Meltano facade."""
 
     def test_public_facade_contract(self) -> None:

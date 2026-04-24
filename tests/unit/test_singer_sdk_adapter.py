@@ -62,7 +62,7 @@ class _FailingTap(_SuccessfulTap):
         return _FailingCommand("tap-fail")
 
 
-class TestFlextMeltanoSingerSdkAdapter:
+class TestsFlextMeltanoSingerSdkAdapter:
     """Test suite for the Singer SDK tap adapter bridge."""
 
     def test_adapter_exposes_config_and_streams(self) -> None:

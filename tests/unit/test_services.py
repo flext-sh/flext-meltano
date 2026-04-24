@@ -33,9 +33,7 @@ def unwrap_component(
     return service
 
 
-class TestFlextMeltanoPublicFacade:
-    """Behavioral tests for the public Meltano facade."""
-
+class TestsFlextMeltanoServices:
     def test_component_factory_returns_specialized_facade(
         self,
         meltano_component_case: tuple[ComponentFactory, str, ComponentSelector],

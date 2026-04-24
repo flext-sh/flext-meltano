@@ -24,7 +24,7 @@ class _ExecutionResultJson(m.BaseModel):
     timestamp: str
 
 
-class TestFlextMeltanoExecutionResult:
+class TestsFlextMeltanoExecutionResult:
     """Test FlextMeltanoExecutionResult class functionality."""
 
     TEST_EXECUTION_TIME_SUCCESS: float = 1.5

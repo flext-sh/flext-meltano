@@ -21,27 +21,25 @@ if _t.TYPE_CHECKING:
     from tests.models import TestsFlextMeltanoModels, m
     from tests.protocols import TestsFlextMeltanoProtocols, p
     from tests.typings import TestsFlextMeltanoTypes, t
-    from tests.unit.test_api import TestFlextMeltanoApiFacade
-    from tests.unit.test_cli_integration import TestFlextMeltanoCliModelConversion
-    from tests.unit.test_cli_small_managers import TestFlextMeltanoCliSmallManagers
-    from tests.unit.test_constants import Testc
-    from tests.unit.test_execution_result import TestFlextMeltanoExecutionResult
-    from tests.unit.test_executors import TestFlextMeltanoExecutorComplete
-    from tests.unit.test_library_runner import TestFlextMeltanoLibraryRunner
-    from tests.unit.test_models import TestFlextMeltanoModels
-    from tests.unit.test_plugin_protocols import TestFlextMeltanoPluginProtocols
-    from tests.unit.test_services import TestFlextMeltanoPublicFacade
+    from tests.unit.test_api import TestsFlextMeltanoApi
+    from tests.unit.test_cli_integration import TestsFlextMeltanoCliIntegration
+    from tests.unit.test_cli_small_managers import TestsFlextMeltanoCliSmallManagers
+    from tests.unit.test_constants import TestsFlextMeltanoConstantsUnit
+    from tests.unit.test_execution_result import TestsFlextMeltanoExecutionResult
+    from tests.unit.test_executors import TestsFlextMeltanoExecutors
+    from tests.unit.test_library_runner import TestsFlextMeltanoLibraryRunner
+    from tests.unit.test_models import TestsFlextMeltanoModelsUnit
+    from tests.unit.test_plugin_protocols import TestsFlextMeltanoPluginProtocols
+    from tests.unit.test_services import TestsFlextMeltanoServices
     from tests.unit.test_singer_cli_translator import (
-        TestFlextMeltanoSingerCliTranslator,
+        TestsFlextMeltanoSingerCliTranslator,
     )
-    from tests.unit.test_singer_sdk_adapter import TestFlextMeltanoSingerSdkAdapter
-    from tests.unit.test_singer_types import TestFlextSingerTypes
-    from tests.unit.test_tap_abstractions import TestFlextMeltanoAbstractionsComplete
-    from tests.unit.test_target_abstractions import (
-        TestFlextMeltanoTargetAbstractionsComplete,
-    )
-    from tests.unit.test_typings import TestFlextMeltanoTypes
-    from tests.unit.test_validators import TestFlextMeltanoValidatorsComprehensive
+    from tests.unit.test_singer_sdk_adapter import TestsFlextMeltanoSingerSdkAdapter
+    from tests.unit.test_singer_types import TestsFlextMeltanoSingerTypes
+    from tests.unit.test_tap_abstractions import TestsFlextMeltanoTapAbstractions
+    from tests.unit.test_target_abstractions import TestsFlextMeltanoTargetAbstractions
+    from tests.unit.test_typings import TestsFlextMeltanoTypingsUnit
+    from tests.unit.test_validators import TestsFlextMeltanoValidators
     from tests.unit.tests_pipeline_cli_managers import (
         TestFlextMeltanoPipelineCliManagers,
     )
@@ -75,27 +73,25 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextMeltanoTypes",
                 "t",
             ),
-            ".unit.test_api": ("TestFlextMeltanoApiFacade",),
-            ".unit.test_cli_integration": ("TestFlextMeltanoCliModelConversion",),
-            ".unit.test_cli_small_managers": ("TestFlextMeltanoCliSmallManagers",),
-            ".unit.test_constants": ("Testc",),
-            ".unit.test_execution_result": ("TestFlextMeltanoExecutionResult",),
-            ".unit.test_executors": ("TestFlextMeltanoExecutorComplete",),
-            ".unit.test_library_runner": ("TestFlextMeltanoLibraryRunner",),
-            ".unit.test_models": ("TestFlextMeltanoModels",),
-            ".unit.test_plugin_protocols": ("TestFlextMeltanoPluginProtocols",),
-            ".unit.test_services": ("TestFlextMeltanoPublicFacade",),
+            ".unit.test_api": ("TestsFlextMeltanoApi",),
+            ".unit.test_cli_integration": ("TestsFlextMeltanoCliIntegration",),
+            ".unit.test_cli_small_managers": ("TestsFlextMeltanoCliSmallManagers",),
+            ".unit.test_constants": ("TestsFlextMeltanoConstantsUnit",),
+            ".unit.test_execution_result": ("TestsFlextMeltanoExecutionResult",),
+            ".unit.test_executors": ("TestsFlextMeltanoExecutors",),
+            ".unit.test_library_runner": ("TestsFlextMeltanoLibraryRunner",),
+            ".unit.test_models": ("TestsFlextMeltanoModelsUnit",),
+            ".unit.test_plugin_protocols": ("TestsFlextMeltanoPluginProtocols",),
+            ".unit.test_services": ("TestsFlextMeltanoServices",),
             ".unit.test_singer_cli_translator": (
-                "TestFlextMeltanoSingerCliTranslator",
+                "TestsFlextMeltanoSingerCliTranslator",
             ),
-            ".unit.test_singer_sdk_adapter": ("TestFlextMeltanoSingerSdkAdapter",),
-            ".unit.test_singer_types": ("TestFlextSingerTypes",),
-            ".unit.test_tap_abstractions": ("TestFlextMeltanoAbstractionsComplete",),
-            ".unit.test_target_abstractions": (
-                "TestFlextMeltanoTargetAbstractionsComplete",
-            ),
-            ".unit.test_typings": ("TestFlextMeltanoTypes",),
-            ".unit.test_validators": ("TestFlextMeltanoValidatorsComprehensive",),
+            ".unit.test_singer_sdk_adapter": ("TestsFlextMeltanoSingerSdkAdapter",),
+            ".unit.test_singer_types": ("TestsFlextMeltanoSingerTypes",),
+            ".unit.test_tap_abstractions": ("TestsFlextMeltanoTapAbstractions",),
+            ".unit.test_target_abstractions": ("TestsFlextMeltanoTargetAbstractions",),
+            ".unit.test_typings": ("TestsFlextMeltanoTypingsUnit",),
+            ".unit.test_validators": ("TestsFlextMeltanoValidators",),
             ".unit.tests_pipeline_cli_managers": (
                 "TestFlextMeltanoPipelineCliManagers",
             ),
@@ -137,32 +133,28 @@ install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__: list[str] = [
     "MockMeltanoService",
-    "MockSingerTap",
-    "MockSingerTarget",
-    "TestDockerIntegration",
-    "TestFlextMeltanoAbstractionsComplete",
-    "TestFlextMeltanoApiFacade",
-    "TestFlextMeltanoCliModelConversion",
-    "TestFlextMeltanoCliSmallManagers",
-    "TestFlextMeltanoExecutionResult",
-    "TestFlextMeltanoExecutorComplete",
-    "TestFlextMeltanoLibraryRunner",
-    "TestFlextMeltanoModels",
-    "TestFlextMeltanoPipelineCliManagers",
-    "TestFlextMeltanoPluginProtocols",
-    "TestFlextMeltanoPublicFacade",
-    "TestFlextMeltanoSingerCliTranslator",
-    "TestFlextMeltanoSingerSdkAdapter",
-    "TestFlextMeltanoTargetAbstractionsComplete",
-    "TestFlextMeltanoTypes",
-    "TestFlextMeltanoValidatorsComprehensive",
-    "TestFlextSingerTypes",
-    "Testc",
+    "TestsFlextMeltanoApi",
+    "TestsFlextMeltanoCliIntegration",
+    "TestsFlextMeltanoCliSmallManagers",
     "TestsFlextMeltanoConstants",
+    "TestsFlextMeltanoConstantsUnit",
+    "TestsFlextMeltanoExecutionResult",
+    "TestsFlextMeltanoExecutors",
+    "TestsFlextMeltanoLibraryRunner",
     "TestsFlextMeltanoModels",
+    "TestsFlextMeltanoModelsUnit",
+    "TestsFlextMeltanoPluginProtocols",
     "TestsFlextMeltanoProtocols",
+    "TestsFlextMeltanoServices",
+    "TestsFlextMeltanoSingerCliTranslator",
+    "TestsFlextMeltanoSingerSdkAdapter",
+    "TestsFlextMeltanoSingerTypes",
+    "TestsFlextMeltanoTapAbstractions",
+    "TestsFlextMeltanoTargetAbstractions",
     "TestsFlextMeltanoTypes",
+    "TestsFlextMeltanoTypingsUnit",
     "TestsFlextMeltanoUtilities",
+    "TestsFlextMeltanoValidators",
     "c",
     "d",
     "e",

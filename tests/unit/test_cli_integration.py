@@ -18,7 +18,7 @@ from flext_tests import tm
 from tests import m, t, u
 
 
-class TestFlextMeltanoCliModelConversion:
+class TestsFlextMeltanoCliIntegration:
     """Behavioral tests for Meltano CLI model conversion."""
 
     def test_tap_run_params_minimal(self) -> None:

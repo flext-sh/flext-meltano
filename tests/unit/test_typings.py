@@ -15,7 +15,7 @@ from flext_tests import tm
 from tests import m, t
 
 
-class TestFlextMeltanoTypes:
+class TestsFlextMeltanoTypingsUnit:
     """Unit test suite for FlextMeltanoTypes — flat namespace validation."""
 
     def test_meltano_namespace_exists(self) -> None:

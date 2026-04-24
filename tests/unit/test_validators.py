@@ -20,7 +20,7 @@ from flext_meltano import FlextMeltanoValidators
 from tests import r, t
 
 
-class TestFlextMeltanoValidatorsComprehensive:
+class TestsFlextMeltanoValidators:
     """Comprehensive tests for FlextMeltanoValidators with 100% coverage."""
 
     def test_validate_plugin_config_valid(self) -> None:

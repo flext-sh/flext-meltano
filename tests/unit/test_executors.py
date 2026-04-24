@@ -23,7 +23,7 @@ from tests import r, t, u
 logger = u.fetch_logger(__name__)
 
 
-class TestFlextMeltanoExecutorComplete:
+class TestsFlextMeltanoExecutors:
     """Complete test suite for FlextMeltanoExecutor."""
 
     executor: FlextMeltanoExecutor

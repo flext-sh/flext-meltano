@@ -41,9 +41,7 @@ class _TestAssertions:
             tm.that(container, has=item)
 
 
-class TestFlextMeltanoAbstractionsComplete:
-    """Complete test suite for FlextMeltanoAbstractions."""
-
+class TestsFlextMeltanoTapAbstractions:
     tap_abstractions: FlextMeltanoAbstractions
     test_assertions: _TestAssertions
 

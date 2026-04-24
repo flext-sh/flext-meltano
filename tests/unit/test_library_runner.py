@@ -26,7 +26,7 @@ from flext_meltano import (
 from tests import p, r
 
 
-class TestFlextMeltanoLibraryRunner:
+class TestsFlextMeltanoLibraryRunner:
     """Test FlextMeltanoLibraryRunner and related project adapter behavior."""
 
     def test_initialization(self) -> None:

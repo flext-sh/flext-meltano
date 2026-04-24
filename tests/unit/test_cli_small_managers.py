@@ -87,7 +87,7 @@ class _StubStatusService:
         return r[str].ok('{"status": "ready"}')
 
 
-class TestFlextMeltanoCliSmallManagers:
+class TestsFlextMeltanoCliSmallManagers:
     """Unit tests for small Meltano CLI managers."""
 
     def test_dbt_manager_routes_supported_operation_to_service(

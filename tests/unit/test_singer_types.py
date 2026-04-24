@@ -13,7 +13,7 @@ from __future__ import annotations
 from tests import t
 
 
-class TestFlextSingerTypes:
+class TestsFlextMeltanoSingerTypes:
     """Test suite for t with real functionality."""
 
     singer_types: t

@@ -15,7 +15,7 @@ from flext_tests import tm
 from tests import c, m, t
 
 
-class TestFlextMeltanoModels:
+class TestsFlextMeltanoModelsUnit:
     """Canonical tests for Meltano model validation and composition."""
 
     def test_tap_config_with_minimal_data(self) -> None:

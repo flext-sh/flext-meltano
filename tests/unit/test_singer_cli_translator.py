@@ -21,7 +21,7 @@ from flext_meltano import FlextMeltanoSingerCliTranslator
 from tests import m, r
 
 
-class TestFlextMeltanoSingerCliTranslator:
+class TestsFlextMeltanoSingerCliTranslator:
     """Behavioral tests for the Singer CLI translator."""
 
     _MOCK_TARGET = "flext_meltano.services.singer_translator.u.Cli.run_raw"

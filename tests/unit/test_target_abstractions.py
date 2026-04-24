@@ -19,7 +19,7 @@ from tests import r, t, u
 logger = u.fetch_logger(__name__)
 
 
-class TestFlextMeltanoTargetAbstractionsComplete:
+class TestsFlextMeltanoTargetAbstractions:
     """Complete test suite for FlextMeltanoTargetAbstractions."""
 
     target_abstractions: FlextMeltanoTargetAbstractions | None = None

@@ -16,7 +16,7 @@ from flext_tests import tm
 from tests import m, t
 
 
-class TestFlextMeltanoPluginProtocols:
+class TestsFlextMeltanoPluginProtocols:
     """Test canonical Meltano plugin contracts via public typing namespaces."""
 
     def test_plugin_definition_resolves_to_mapping(self) -> None:
