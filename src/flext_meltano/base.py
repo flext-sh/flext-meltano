@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Annotated, cast, override
+from typing import Annotated, override
 
 from flext_cli import u
 from flext_core import FlextSettings, s
@@ -18,9 +18,7 @@ from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, p, t
 
 
-class FlextMeltanoServiceBase[TSettings: FlextSettings = FlextMeltanoSettings](
-    s[t.JsonMapping]
-):
+class FlextMeltanoServiceBase(s[t.JsonMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
@@ -101,10 +99,11 @@ class FlextMeltanoServiceBase[TSettings: FlextSettings = FlextMeltanoSettings](
 
     @property
     @override
-    def settings(self) -> TSettings:
+    def settings(self) -> FlextMeltanoSettings:
         """Return the typed Meltano settings namespace."""
-        settings = super().settings
-        return cast("TSettings", settings)
+        return FlextSettings.fetch_global().fetch_namespace(
+            "meltano", FlextMeltanoSettings
+        )
 
 
 s = FlextMeltanoServiceBase

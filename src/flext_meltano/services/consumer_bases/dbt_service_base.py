@@ -24,9 +24,7 @@ from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
-class FlextMeltanoDbtServiceBase[TSettings: FlextSettings = FlextSettings](
-    FlextMeltanoServiceBase[TSettings]
-):
+class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     """Base for all FLEXT dbt service projects.
 
     Subclasses MUST define:

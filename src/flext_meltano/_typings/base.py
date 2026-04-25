@@ -13,15 +13,11 @@ from collections.abc import (
 
 from flext_cli import t
 
-from flext_meltano import c
-
 
 class FlextMeltanoTypingsBase:
     """Base Meltano type aliases and plugin type definitions."""
 
     type ValidatorInput = t.JsonValue | t.JsonPayload | None
-
-    PluginType = c.Meltano.PluginType
 
     type VariantValue = str | t.StrSequence | t.JsonMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""

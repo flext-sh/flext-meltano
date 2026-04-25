@@ -8,12 +8,12 @@ Access pattern: u.Meltano.emit_schema(), u.Meltano.process_stdin(), etc.
 
 from __future__ import annotations
 
+import json
 import sys
 from collections.abc import (
     MutableMapping,
 )
 
-import orjson
 from flext_cli import r
 
 from flext_meltano import c, m, p, t
@@ -133,7 +133,7 @@ class FlextMeltanoUtilitiesSinger:
                 if not stripped:
                     continue
 
-                raw = orjson.loads(stripped)
+                raw = json.loads(stripped)
                 msg_type = raw.get("type", "")
 
                 if msg_type == c.Meltano.SingerMessageType.SCHEMA:

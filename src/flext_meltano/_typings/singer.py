@@ -7,8 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import c
-
 
 class FlextMeltanoTypingsSinger:
     """Singer protocol type definitions.
@@ -16,5 +14,3 @@ class FlextMeltanoTypingsSinger:
     Singer catalog contracts live in ``m.Meltano``.
     ``t.Meltano`` only keeps non-model runtime typing surfaces.
     """
-
-    SingerReplicationMethod = c.Meltano.SingerReplicationMethod
