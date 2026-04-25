@@ -9,8 +9,6 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from flext_cli import cli
-
 from flext_meltano import FlextMeltanoExecutorBase, c, m, p, r, t, u
 
 
@@ -98,14 +96,14 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         configured_command: t.StrSequence | None = None
         config_path = FlextMeltanoPipelinePaths.pipeline_config_path(pipeline_name)
         if config_path.exists():
-            config_mapping_result = cli.read_json_model(
-                config_path, m.Meltano.ConfigMappingPayload
-            )
-            if config_mapping_result.failure:
-                return r[str].fail(
-                    f"Failed to read pipeline '{pipeline_name}' configuration: {config_mapping_result.error}",
+            try:
+                config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
+                    config_path.read_text(encoding=c.Cli.ENCODING_DEFAULT),
                 )
-            config_mapping = config_mapping_result.value
+            except (OSError, ValueError) as exc:
+                return r[str].fail(
+                    f"Failed to read pipeline '{pipeline_name}' configuration: {exc}",
+                )
             validated_payload = config_mapping.values
             command_value = validated_payload.get("command")
             if isinstance(command_value, list):

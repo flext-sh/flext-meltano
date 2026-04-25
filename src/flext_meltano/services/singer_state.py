@@ -50,12 +50,9 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         """Load state from file or return in-memory state."""
         try:
             if state_file and state_file.exists():
-                load_result = cli.read_json_model(
-                    state_file, m.Meltano.SingerStateMessage
+                self._singer_state = m.Meltano.SingerStateMessage.model_validate_json(
+                    state_file.read_text(encoding=c.Cli.ENCODING_DEFAULT),
                 )
-                if load_result.failure:
-                    return r[m.Meltano.SingerStateMessage].fail(str(load_result.error))
-                self._singer_state = load_result.value
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),
@@ -70,11 +67,11 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         """Save state to file."""
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
-            write_result = cli.write_text_file(
+            write_result = cli.atomic_write_text_file(
                 state_file, self._singer_state.model_dump_json(indent=2)
             )
             if write_result.failure:
-                return r[None].fail(str(write_result.error))
+                return r[None].fail(write_result.error or "state write failed")
             self.logger.info("State saved to file", file=str(state_file))
             return r[None].ok(None)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:

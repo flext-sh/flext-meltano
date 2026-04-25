@@ -18,7 +18,6 @@ from collections.abc import (
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
-from flext_cli import cli
 from flext_core import FlextSettings
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
@@ -209,10 +208,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             if not path.exists():
                 return r[t.Meltano.DbtManifestData].fail(str(path))
 
-            parsed_result = cli.read_json_model(path, m.Meltano.DbtManifest)
-            if parsed_result.failure:
-                return r[t.Meltano.DbtManifestData].fail(str(parsed_result.error))
-            parsed = parsed_result.value
+            parsed = m.Meltano.DbtManifest.model_validate_json(
+                path.read_text(encoding=c.Cli.ENCODING_DEFAULT),
+            )
             manifest_data: t.Meltano.DbtManifestData = {
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }
