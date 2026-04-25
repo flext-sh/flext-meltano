@@ -3,15 +3,15 @@
 # flext-meltano API Overview
 
 - Package: `flext_meltano`
-- Version: `0.12.0-dev`
+- Version: ``
 - Description: FLEXT Meltano - Enterprise Data Integration Platform
 - Project class: `platform`
 - Keywords: `data-integration`, `enterprise`, `etl`, `flext`, `meltano`, `typed`
-- Main facades: `FlextMeltano`, `FlextMeltanoCLI`, `FlextMeltanoConstants`, `FlextMeltanoModels`, `FlextMeltanoProtocols`, `FlextMeltanoServiceBase`, `FlextMeltanoSettings`, `FlextMeltanoTypes` (+1 more)
+- Main facades: `FlextMeltanoUtilities`, `FlextMeltanoLibraryRunner`, `FlextMeltanoPluginDiscoveryMixin`, `FlextMeltanoDbtServiceBase`, `FlextMeltanoModelsProjectsPlugin`, `FlextMeltanoModelsTransformations`, `FlextMeltanoDbtAdapter`, `FlextMeltanoPipelineLifecycleOperations` (+71 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextMeltano`, `FlextMeltanoCLI`, `FlextMeltanoConstants`, `FlextMeltanoModels`, `FlextMeltanoProtocols`, `FlextMeltanoServiceBase`, `FlextMeltanoSettings`, `FlextMeltanoTypes`, `FlextMeltanoUtilities`, `main` (+1 more)
-- Exported module shortcuts: `api`, `base`, `cli`, `constants`, `models`, `protocols`, `settings`, `typings` (+1 more)
-- Generated module pages: `9`
+- Public symbol exports: `FlextMeltanoUtilities`, `FlextMeltanoLibraryRunner`, `FlextMeltanoPluginDiscoveryMixin`, `FlextMeltanoDbtServiceBase`, `FlextMeltanoModelsProjectsPlugin`, `FlextMeltanoModelsTransformations`, `Tap`, `FlextMeltanoDbtAdapter`, `FlextMeltanoPipelineLifecycleOperations`, `FlextMeltanoModels` (+77 more)
+- Exported module shortcuts: _none_
+- Generated module pages: `41`
 
 ## Next Pages
 
