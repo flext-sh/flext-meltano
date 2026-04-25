@@ -16,7 +16,7 @@ from flext_tests import tk
 from tests import c
 
 
-class TestDockerIntegration:
+class TestsFlextMeltanoDockerIntegration:
     """Docker-based integration tests."""
 
     @pytest.mark.docker
