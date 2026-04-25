@@ -208,9 +208,12 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
             if not path.exists():
                 return r[t.Meltano.DbtManifestData].fail(str(path))
 
-            parsed = m.Meltano.DbtManifest.model_validate_json(
-                path.read_text(encoding=c.Cli.ENCODING_DEFAULT),
-            )
+            parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
+            if parsed_result.failure:
+                return r[t.Meltano.DbtManifestData].fail(
+                    parsed_result.error or "manifest read failed"
+                )
+            parsed = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }

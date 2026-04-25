@@ -50,9 +50,14 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         """Load state from file or return in-memory state."""
         try:
             if state_file and state_file.exists():
-                self._singer_state = m.Meltano.SingerStateMessage.model_validate_json(
-                    state_file.read_text(encoding=c.Cli.ENCODING_DEFAULT),
+                load_result = u.Cli.files_read_json_model(
+                    state_file, m.Meltano.SingerStateMessage
                 )
+                if load_result.failure:
+                    return r[m.Meltano.SingerStateMessage].fail(
+                        load_result.error or "state read failed"
+                    )
+                self._singer_state = load_result.value
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),

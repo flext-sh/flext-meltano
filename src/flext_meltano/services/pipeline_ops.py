@@ -96,15 +96,14 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         configured_command: t.StrSequence | None = None
         config_path = FlextMeltanoPipelinePaths.pipeline_config_path(pipeline_name)
         if config_path.exists():
-            try:
-                config_mapping = m.Meltano.ConfigMappingPayload.model_validate_json(
-                    config_path.read_text(encoding=c.Cli.ENCODING_DEFAULT),
-                )
-            except (OSError, ValueError) as exc:
+            config_result = u.Cli.files_read_json_model(
+                config_path, m.Meltano.ConfigMappingPayload
+            )
+            if config_result.failure:
                 return r[str].fail(
-                    f"Failed to read pipeline '{pipeline_name}' configuration: {exc}",
+                    f"Failed to read pipeline '{pipeline_name}' configuration: {config_result.error}",
                 )
-            validated_payload = config_mapping.values
+            validated_payload = config_result.value.values
             command_value = validated_payload.get("command")
             if isinstance(command_value, list):
                 configured_command = m.Meltano.StringListValue.model_validate({

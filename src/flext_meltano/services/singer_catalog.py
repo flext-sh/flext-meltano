@@ -66,9 +66,14 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                     f"Catalog file not found: {catalog_file}"
                 )
 
-            self._singer_catalog = m.Meltano.SingerCatalog.model_validate_json(
-                catalog_file.read_text(encoding=c.Cli.ENCODING_DEFAULT),
+            load_result = u.Cli.files_read_json_model(
+                catalog_file, m.Meltano.SingerCatalog
             )
+            if load_result.failure:
+                return r[m.Meltano.SingerCatalog].fail(
+                    load_result.error or "catalog read failed"
+                )
+            self._singer_catalog = load_result.value
             self.logger.info(
                 "Catalog loaded from file",
                 file=str(catalog_file),

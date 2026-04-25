@@ -7,9 +7,9 @@
 - Description: FLEXT Meltano - Enterprise Data Integration Platform
 - Project class: `platform`
 - Keywords: `data-integration`, `enterprise`, `etl`, `flext`, `meltano`, `typed`
-- Main facades: `FlextMeltanoUtilities`, `FlextMeltanoLibraryRunner`, `FlextMeltanoPluginDiscoveryMixin`, `FlextMeltanoDbtServiceBase`, `FlextMeltanoModelsProjectsPlugin`, `FlextMeltanoModelsTransformations`, `FlextMeltanoDbtAdapter`, `FlextMeltanoPipelineLifecycleOperations` (+71 more)
+- Main facades: `FlextMeltanoExecutor`, `FlextMeltanoProtocolsProject`, `FlextMeltanoTypingsSinger`, `FlextMeltanoConstantsSettings`, `FlextMeltanoBridge`, `FlextMeltanoModelsSourcesParams`, `FlextMeltanoPipelineManager`, `FlextMeltanoTapServiceBase` (+71 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextMeltanoUtilities`, `FlextMeltanoLibraryRunner`, `FlextMeltanoPluginDiscoveryMixin`, `FlextMeltanoDbtServiceBase`, `FlextMeltanoModelsProjectsPlugin`, `FlextMeltanoModelsTransformations`, `Tap`, `FlextMeltanoDbtAdapter`, `FlextMeltanoPipelineLifecycleOperations`, `FlextMeltanoModels` (+77 more)
+- Public symbol exports: `FlextMeltanoExecutor`, `FlextMeltanoProtocolsProject`, `Context`, `FlextMeltanoTypingsSinger`, `FlextMeltanoConstantsSettings`, `FlextMeltanoBridge`, `FlextMeltanoModelsSourcesParams`, `FlextMeltanoPipelineManager`, `FlextMeltanoTapServiceBase`, `FlextMeltanoModelsSinger` (+77 more)
 - Exported module shortcuts: _none_
 - Generated module pages: `41`
 
