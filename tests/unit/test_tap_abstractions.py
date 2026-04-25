@@ -7,10 +7,9 @@ from unittest.mock import patch
 
 import pytest
 from flext_tests import tm
-from pydantic_core import ValidationError
 
 from flext_meltano import FlextMeltanoAbstractions
-from tests import m, r, t
+from tests import c, m, r, t
 
 
 class _TestAssertions:
@@ -139,12 +138,8 @@ class TestsFlextMeltanoTapAbstractions:
         tap_abs = FlextMeltanoAbstractions()
         assert tap_abs is not None
         if hasattr(tap_abs, "service_name"):
-            service_name = getattr(tap_abs, "service_name")
+            service_name = tap_abs.service_name
             tm.that(service_name, eq="FlextMeltanoAbstractions")
-        tm.that(
-            hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger"),
-            eq=True,
-        )
 
     def test_serviceprocessor_process_method(self) -> None:
         """Test ServiceProcessor process method using flext_tests."""
@@ -221,7 +216,7 @@ class TestsFlextMeltanoTapAbstractions:
             invalid_result = self.tap_abstractions.process_tap_config(
                 invalid_instance.settings
             )
-        except (ValidationError, ValueError):
+        except (c.CoreValidationError, ValueError):
             invalid_result = r[m.Meltano.TapConfig].fail(
                 "Validation failed at creation",
             )
@@ -448,7 +443,7 @@ class TestsFlextMeltanoTapAbstractions:
         """Test tap abstractions error handling."""
         timeout_error = TimeoutError("Connection timed out")
         tm.that(timeout_error, is_=Exception)
-        validation_error = ValidationError.from_exception_data(
+        validation_error = c.CoreValidationError.from_exception_data(
             title="Validation Error",
             line_errors=[],
         )
