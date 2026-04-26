@@ -19,7 +19,7 @@ This section is generated from public exports and real docstrings.
 
 ## Surface Summary
 
-- Primary facades: `FlextMeltanoExecutor`, `FlextMeltanoProtocolsProject`, `FlextMeltanoTypingsSinger`, `FlextMeltanoConstantsSettings`, `FlextMeltanoBridge`, `FlextMeltanoModelsSourcesParams` (+73 more)
+- Primary facades: `FlextMeltanoStatusManager`, `FlextMeltanoExecutorBase`, `FlextMeltanoPipelineCrudOperations`, `FlextMeltanoUtilitiesRuntime`, `FlextMeltanoTapAbstractions`, `FlextMeltanoPipelineLifecycleOperations` (+73 more)
 - Generated module pages: `41`
 
 - [Back to project docs](../index.md)
