@@ -9,7 +9,6 @@ from types import MappingProxyType
 from typing import Final
 
 from flext_core import c, t
-
 from flext_meltano import FlextMeltanoConstantsEnums
 
 

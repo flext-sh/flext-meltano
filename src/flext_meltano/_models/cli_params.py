@@ -121,22 +121,6 @@ class FlextMeltanoModelsCliParams:
             u.Field(default=False, description="Run with full refresh"),
         ] = False
 
-    class CliPluginInstallParams(m.Entity):
-        """Generic parameters for plugin installation."""
-
-        plugin_type: Annotated[
-            str,
-            u.Field(description="Type of plugin (source, sink, transformer)"),
-        ]
-        plugin_name: Annotated[
-            str,
-            u.Field(description="Name of the plugin to install"),
-        ]
-        variant: Annotated[
-            str | None,
-            u.Field(default=None, description="Specific plugin variant"),
-        ] = None
-
     class PipelineRunParams(m.Entity):
         """Parameters for pipeline run operations."""
 

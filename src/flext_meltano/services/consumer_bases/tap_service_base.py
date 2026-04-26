@@ -18,7 +18,6 @@ from abc import abstractmethod
 from typing import Annotated, ClassVar, Self, override
 
 from flext_core import FlextSettings
-
 from flext_meltano import FlextMeltanoServiceBase, p, r, t, u
 
 

@@ -6,10 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
+from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoExecutorBase, c, m, p, r, t, u
+from flext_meltano.settings import FlextMeltanoSettings
 
 
 class FlextMeltanoPipelinePaths:
@@ -21,14 +22,13 @@ class FlextMeltanoPipelinePaths:
 
     @staticmethod
     def pipelines_root_dir() -> Path:
-        """Resolve pipelines root from current environment state."""
-        configured_root = os.environ.get(
-            FlextMeltanoPipelinePaths._PIPELINES_ROOT_ENV,
+        """Resolve pipelines root from settings."""
+        return (
+            FlextSettings
+            .fetch_global()
+            .fetch_namespace("meltano", FlextMeltanoSettings)
+            .pipelines_dir
         )
-        normalized_root = (configured_root or "").strip()
-        if u.chk(normalized_root, empty=False):
-            return Path(normalized_root).expanduser().resolve()
-        return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
 
     @staticmethod
     def pipeline_dir(pipeline_name: str) -> Path:

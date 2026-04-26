@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
 from flext_core import FlextSettings
-
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
