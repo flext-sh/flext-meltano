@@ -11,7 +11,6 @@ from meltano.core.error import ProjectNotFound
 from flext_meltano import (
     FlextMeltanoCLI,
     FlextMeltanoExecutorBase,
-    FlextMeltanoSettings,
     c,
     p,
     r,
@@ -22,26 +21,6 @@ from flext_meltano import (
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     """Core executor providing Meltano command execution with error handling."""
-
-    def __init__(
-        self,
-        settings: FlextMeltanoSettings | t.JsonMapping | None = None,
-        *,
-        service_name: t.NonEmptyStr | None = None,
-        service_version: t.NonEmptyStr | None = None,
-        source_name: str | None = None,
-        sink_name: str | None = None,
-        transformation_name: str | None = None,
-    ) -> None:
-        """Expose the canonical settings bootstrap on the concrete executor."""
-        super().__init__(
-            settings=settings,
-            service_name=service_name,
-            service_version=service_version,
-            source_name=source_name,
-            sink_name=sink_name,
-            transformation_name=transformation_name,
-        )
 
     @staticmethod
     def create_flext_cli() -> p.Result[FlextMeltanoCLI]:
