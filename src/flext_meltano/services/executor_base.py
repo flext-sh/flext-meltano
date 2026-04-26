@@ -31,7 +31,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
     c,
     m,
     p,
@@ -49,26 +48,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         description="Canonical Meltano executor service name.",
         validate_default=True,
     )
-
-    def __init__(
-        self,
-        settings: FlextMeltanoSettings | t.JsonMapping | None = None,
-        *,
-        service_name: t.NonEmptyStr | None = None,
-        service_version: t.NonEmptyStr | None = None,
-        source_name: str | None = None,
-        sink_name: str | None = None,
-        transformation_name: str | None = None,
-    ) -> None:
-        """Expose a minimal typed constructor for executor callers."""
-        super().__init__(
-            settings=settings,
-            service_name=service_name,
-            service_version=service_version,
-            source_name=source_name,
-            sink_name=sink_name,
-            transformation_name=transformation_name,
-        )
 
     @property
     def project_root(self) -> Path:
