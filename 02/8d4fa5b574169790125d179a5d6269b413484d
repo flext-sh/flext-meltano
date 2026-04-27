@@ -1,0 +1,28 @@
+src/flext_meltano/services/services.py
+  fb2546f80ae92e5c 9,25,27-39,41-45,50-51,54,56,62-66,71,78-82,87,94-98,103
+src/flext_meltano/services/executor.py
+  fb2546f80ae92e5c 14,26-44
+src/flext_meltano/services/executor_base.py
+  fb2546f80ae92e5c 34,47-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "028d4fa5b574169790125d179a5d6269b413484d",
+  "prompts": {
+    "fb2546f80ae92e5c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "47401c67-c23f-4bc6-8b20-da4d6af4540d",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 111,
+      "total_deletions": 72,
+      "accepted_lines": 90,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/64bce081fe3f092802bdab716a93d10a656e23c0a1d4808aae9ac603dbfca173"
+    }
+  }
+}
