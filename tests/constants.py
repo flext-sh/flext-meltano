@@ -13,6 +13,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from enum import StrEnum, unique
+from pathlib import Path
+from types import MappingProxyType
 from typing import Final
 
 from flext_tests import FlextTestsConstants
@@ -46,13 +50,27 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
         class Tests(FlextTestsConstants.Tests):
             """Meltano tests namespace."""
 
-            HOST: Final[str] = "localhost"
-            POSTGRES_PORT: Final[int] = 5433
-            REDIS_PORT: Final[int] = 6380
-            MELTANO_PORT: Final[int] = 3389
+            @unique
+            class _DockerService(StrEnum):
+                """Docker service identifiers used by the local test stack."""
+
+                POSTGRES = "postgres"
+                REDIS = "redis"
+                MELTANO = "meltano"
+
+            HOST: Final[str] = FlextMeltanoConstants.LOCALHOST
+            SERVICE_PORTS: Final[Mapping[_DockerService, int]] = MappingProxyType({
+                _DockerService.POSTGRES: 5433,
+                _DockerService.REDIS: 6380,
+                _DockerService.MELTANO: 3389,
+            })
+            POSTGRES_PORT: Final[int] = SERVICE_PORTS[_DockerService.POSTGRES]
+            REDIS_PORT: Final[int] = SERVICE_PORTS[_DockerService.REDIS]
+            MELTANO_PORT: Final[int] = SERVICE_PORTS[_DockerService.MELTANO]
             COMPOSE_FILE: Final[str] = "docker-compose.test.yml"
-            TEST_INPUT_DIR: Final[str] = "tests/fixtures/data/input"
-            TEST_OUTPUT_DIR: Final[str] = "tests/fixtures/data/output"
+            FIXTURES_DATA_DIR: Final[Path] = Path("tests/fixtures/data")
+            TEST_INPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "input").as_posix()
+            TEST_OUTPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "output").as_posix()
             TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
 

@@ -8,7 +8,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import override
+from typing import Final, override
 
 from flext_meltano import (
     FlextMeltanoDbtRunnerMixin,
@@ -21,8 +21,6 @@ from flext_meltano import (
     t,
     u,
 )
-
-_PLUGIN_INSTALL_ARG_COUNT = 2
 
 
 class _FlextMeltanoCliDbtService(FlextMeltanoDbtRunnerMixin):
@@ -258,6 +256,8 @@ class FlextMeltanoDbtManager(_FlextMeltanoSimpleCommandManager):
 class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
     """Handle plugin CLI commands."""
 
+    _PLUGIN_INSTALL_ARG_COUNT: Final[int] = c.Meltano.PLUGIN_INSTALL_ARG_COUNT
+
     def __init__(
         self,
         cli: p.Meltano.PluginCli,
@@ -287,7 +287,7 @@ class FlextMeltanoPluginManager(_FlextMeltanoSimpleCommandManager):
                     return r[str].fail("Plugin info requires a plugin name")
                 return self._service.fetch_plugin_info(args[0])
             case c.Meltano.ExecutorCommand.INSTALL:
-                if len(args) < _PLUGIN_INSTALL_ARG_COUNT:
+                if len(args) < self._PLUGIN_INSTALL_ARG_COUNT:
                     return r[str].fail(
                         "Plugin install requires <plugin_type> <plugin_name>",
                     )

@@ -99,6 +99,8 @@ class FlextMeltanoConstantsBase:
     DB_PORT_HIGH_MEMORY_THRESHOLD: Final[int] = 1073741824
 
     # Plugin
+    PLUGIN_INSTALL_ARG_COUNT: Final[int] = 2
+    "Expected number of arguments for plugin install command."
     PLUGIN_CONFIG_VERSION: Final[int] = 1
     PLUGIN_DBT_DEFAULT_NAME: Final[str] = "dbt-postgres"
     PLUGIN_DISCOVERY_FILENAME: Final[str] = "catalog.json"
