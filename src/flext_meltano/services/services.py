@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Self, override
 
 from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t
@@ -21,89 +22,85 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         *,
         field_name: str,
         component_label: str,
-        settings: t.JsonMapping | None = None,
+        settings: Mapping[str, object] | None = None,
     ) -> p.Result[Self]:
-        """Create a specialized Meltano service using a shared utility path."""
+        """Create a specialized Meltano service.
+
+        Pydantic v2 owns every validation step:
+        - ``cls.model_validate(payload)`` validates the construction payload
+          and raises ``ValidationError`` for unknown ``field_name``;
+        - ``FlextMeltanoSettings.model_validate(settings)`` validates the
+          runtime settings payload (per-field coercion + type narrowing).
+
+        ``settings`` is typed as ``Mapping[str, object]`` because the
+        downstream Pydantic validator handles every concrete value type —
+        keeps the signature broad enough for both ``Scalar`` and ``JsonValue``
+        callers without manual coercion at the boundary.
+        """
         try:
-            service_kwargs: t.MutableOptionalStrMapping = {
-                "source_name": None,
-                "sink_name": None,
-                "transformation_name": None,
-            }
-            service_kwargs[field_name] = component_name
-            instance = cls(
-                service_name=f"{component_name}_service",
-                service_version=c.Meltano.DEFAULT_SERVICE_VERSION,
-                source_name=service_kwargs["source_name"],
-                sink_name=service_kwargs["sink_name"],
-                transformation_name=service_kwargs["transformation_name"],
-            )
+            instance = cls.model_validate({
+                "service_name": f"{component_name}_service",
+                "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
+                field_name: component_name,
+            })
             if settings is not None:
                 instance = instance.model_copy(
                     update={
                         "runtime_settings": FlextMeltanoSettings.model_validate(
-                            settings
-                        )
+                            settings,
+                        ),
                     },
                 )
-            ok_result: p.Result[Self] = r.ok(instance)
-            return ok_result
+            return r.ok(instance)
         except c.Meltano.OPERATION_ERRORS as ex:
-            fail_result: p.Result[Self] = r.fail(
+            return r.fail(
                 f"Failed to create {component_label} '{component_name}': {ex}",
             )
-            return fail_result
 
     @classmethod
     def create_sink_service(cls, sink_name: str, **config: t.Scalar) -> p.Result[Self]:
-        """Create data sink service."""
-        settings_payload: dict[str, t.JsonValue] = {}
-        for k, v in config.items():
-            if isinstance(v, (str, int, float, bool)) or v is None:
-                settings_payload[k] = v
-            else:
-                settings_payload[k] = str(v)
+        """Create data sink service.
+
+        Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
+        inside ``_create_specialized_service``.
+        """
         return cls._create_specialized_service(
             sink_name,
             field_name="sink_name",
             component_label="sink service",
-            settings=settings_payload,
+            settings=dict(config) if config else None,
         )
 
     @classmethod
     def create_source_service(
         cls, source_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
-        """Create data source service."""
-        settings_payload: dict[str, t.JsonValue] = {}
-        for k, v in config.items():
-            if isinstance(v, (str, int, float, bool)) or v is None:
-                settings_payload[k] = v
-            else:
-                settings_payload[k] = str(v)
+        """Create data source service.
+
+        Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
+        inside ``_create_specialized_service``.
+        """
         return cls._create_specialized_service(
             source_name,
             field_name="source_name",
             component_label="source service",
-            settings=settings_payload,
+            settings=dict(config) if config else None,
         )
 
     @classmethod
     def create_transformation_service(
         cls, transformation_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
-        """Create transformation service."""
-        settings_payload: dict[str, t.JsonValue] = {}
-        for k, v in config.items():
-            if isinstance(v, (str, int, float, bool)) or v is None:
-                settings_payload[k] = v
-            else:
-                settings_payload[k] = str(v)
+        """Create transformation service.
+
+        Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
+        inside ``_create_specialized_service``.
+        """
         return cls._create_specialized_service(
             transformation_name,
             field_name="transformation_name",
             component_label="transformation service",
-            settings=settings_payload,
+            settings=dict(config) if config else None,
         )
 
     @staticmethod

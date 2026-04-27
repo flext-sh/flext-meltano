@@ -31,6 +31,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
     c,
     m,
     p,
@@ -43,11 +44,29 @@ from flext_meltano import (
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    service_name: t.NonEmptyStr = u.Field(
-        default="FlextMeltanoExecutor",
-        description="Canonical Meltano executor service name.",
-        validate_default=True,
-    )
+    def __init__(
+        self,
+        settings: FlextMeltanoSettings | t.JsonMapping | None = None,
+        *,
+        service_name: t.NonEmptyStr | None = None,
+        service_version: t.NonEmptyStr | None = None,
+        source_name: str | None = None,
+        sink_name: str | None = None,
+        transformation_name: str | None = None,
+    ) -> None:
+        """Bootstrap executor with canonical Meltano service kwargs.
+
+        Mirrors :class:`FlextMeltanoServiceBase.__init__` so static analysers see
+        ``settings`` as a valid kwarg through Pydantic-regenerated subclass init.
+        """
+        super().__init__(
+            settings=settings,
+            service_name=service_name or "FlextMeltanoExecutor",
+            service_version=service_version,
+            source_name=source_name,
+            sink_name=sink_name,
+            transformation_name=transformation_name,
+        )
 
     @property
     def project_root(self) -> Path:
