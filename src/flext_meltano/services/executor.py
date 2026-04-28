@@ -25,7 +25,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | t.JsonMapping | None = None,
+        settings: FlextMeltanoSettings | None = None,
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,

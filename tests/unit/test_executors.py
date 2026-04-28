@@ -17,7 +17,7 @@ from collections.abc import (
 from pathlib import Path
 from unittest import mock
 
-from flext_meltano import FlextMeltanoExecutor
+from flext_meltano import FlextMeltanoExecutor, FlextMeltanoSettings
 from tests import r, t, u
 
 logger = u.fetch_logger(__name__)
@@ -40,7 +40,7 @@ class TestsFlextMeltanoExecutors:
     def test_executor_with_custom_project_root(self) -> None:
         """Test executor with custom configuration."""
         with tempfile.TemporaryDirectory() as temp_dir:
-            settings = {"project_root": temp_dir}
+            settings = FlextMeltanoSettings.model_validate({"project_root": temp_dir})
             executor = FlextMeltanoExecutor(settings=settings)
             assert executor is not None
 
@@ -119,7 +119,9 @@ class TestsFlextMeltanoExecutors:
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.success
             executor = FlextMeltanoExecutor(
-                settings={"project_root": str(project_root)}
+                settings=FlextMeltanoSettings.model_validate({
+                    "project_root": str(project_root)
+                })
             )
             result = executor.run_pipeline_command("tap-csv", "target-jsonl")
         assert isinstance(result, r)
@@ -222,7 +224,9 @@ class TestsFlextMeltanoExecutors:
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.success
             executor = FlextMeltanoExecutor(
-                settings={"project_root": str(project_root)}
+                settings=FlextMeltanoSettings.model_validate({
+                    "project_root": str(project_root)
+                })
             )
             result = executor.execute_pipeline("tap-csv", "target-jsonl")
         assert isinstance(result, r)
@@ -237,7 +241,9 @@ class TestsFlextMeltanoExecutors:
             init_result = FlextMeltanoExecutor.initialize_project_root(project_root)
             assert init_result.success
             executor = FlextMeltanoExecutor(
-                settings={"project_root": str(project_root)}
+                settings=FlextMeltanoSettings.model_validate({
+                    "project_root": str(project_root)
+                })
             )
             result = executor.execute_dbt_command("run")
         assert isinstance(result, r)
@@ -248,7 +254,11 @@ class TestsFlextMeltanoExecutors:
     def test_error_handling_with_invalid_project_root(self) -> None:
         """Test error handling with invalid configuration."""
         invalid_path = Path("/nonexistent/invalid/path")
-        executor = FlextMeltanoExecutor(settings={"project_root": str(invalid_path)})
+        executor = FlextMeltanoExecutor(
+            settings=FlextMeltanoSettings.model_validate({
+                "project_root": str(invalid_path)
+            })
+        )
         result = executor.version()
         assert isinstance(result, r)
         assert result.success

@@ -31,7 +31,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
     c,
     m,
     p,
@@ -46,7 +45,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | t.JsonMapping | None = None,
+        settings: p.Settings | None = None,
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
@@ -60,9 +59,9 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         ``settings`` as a valid kwarg through Pydantic-regenerated subclass init.
         """
         super().__init__(
-            settings=settings,
+            runtime_settings=settings,
             service_name=service_name or "FlextMeltanoExecutor",
-            service_version=service_version,
+            service_version=service_version or c.Meltano.DEFAULT_SERVICE_VERSION,
             source_name=source_name,
             sink_name=sink_name,
             transformation_name=transformation_name,

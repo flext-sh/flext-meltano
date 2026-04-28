@@ -18,8 +18,15 @@ from collections.abc import (
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
-from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
@@ -47,10 +54,10 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        settings: FlextSettings | t.JsonMapping | None = None,
+        settings: p.Settings | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
-        super().__init__(settings=settings)
+        super().__init__(runtime_settings=settings)
 
     @classmethod
     def fetch_instance(cls) -> Self:

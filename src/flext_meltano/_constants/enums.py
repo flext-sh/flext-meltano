@@ -5,6 +5,8 @@ from __future__ import annotations
 from enum import StrEnum, unique
 from typing import Final
 
+from flext_core import c
+
 
 class FlextMeltanoConstantsEnums:
     """Meltano domain enumerations."""
@@ -55,19 +57,19 @@ class FlextMeltanoConstantsEnums:
     class OperationStatus(StrEnum):
         """Operation execution lifecycle status values."""
 
-        PENDING = "pending"
-        RUNNING = "running"
-        SUCCESS = "success"
-        ERROR = "error"
+        PENDING = c.Status.PENDING.value
+        RUNNING = c.Status.RUNNING.value
+        SUCCESS = c.Status.SUCCESS.value
+        ERROR = c.HealthStatus.ERROR.value
         TIMEOUT = "timeout"
-        CANCELLED = "cancelled"
+        CANCELLED = c.Status.CANCELLED.value
         CONFIGURED = "configured"
         INSTALLED = "installed"
         CREATED = "created"
         READY = "ready"
         AVAILABLE = "available"
         EXECUTED = "executed"
-        HEALTHY = "healthy"
+        HEALTHY = c.HealthStatus.HEALTHY.value
         OK = "OK"
         PASSED = "passed"
         PROCESSED = "processed"
@@ -300,14 +302,14 @@ class FlextMeltanoConstantsEnums:
     class StreamStatus(StrEnum):
         """Meltano stream statuses — single source of truth."""
 
-        COMPLETED = "completed"
-        ERROR = "error"
-        SUCCESS = "success"
-        FAILED = "failed"
+        COMPLETED = c.Status.COMPLETED.value
+        ERROR = c.HealthStatus.ERROR.value
+        SUCCESS = c.Status.SUCCESS.value
+        FAILED = c.Status.FAILED.value
         IN_PROGRESS = "in_progress"
-        PENDING = "pending"
+        PENDING = c.Status.PENDING.value
         INITIALIZED = "initialized"
-        PROCESSING = "processing"
+        PROCESSING = c.Status.PROCESSING.value
         DISCOVERED = "discovered"
         SELECTED = "selected"
         EXTRACTING = "extracting"

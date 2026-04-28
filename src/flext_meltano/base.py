@@ -10,7 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Annotated, override
+from collections.abc import Mapping
+from typing import Annotated, Self, override
 
 from flext_cli import u
 
@@ -59,44 +60,34 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
         ),
     ] = None
 
-    def __init__(
-        self,
-        settings: FlextSettings | t.JsonMapping | None = None,
-        *,
-        initial_context: p.Context | None = None,
-        service_name: t.NonEmptyStr | None = None,
-        service_version: t.NonEmptyStr | None = None,
-        source_name: str | None = None,
-        sink_name: str | None = None,
-        transformation_name: str | None = None,
-    ) -> None:
-        """Accept canonical settings input and pass typed runtime state forward."""
-        runtime_settings = (
+    @u.model_validator(mode="before")
+    @classmethod
+    def _normalize_settings_alias(
+        cls,
+        data: Mapping[str, t.JsonPayload | p.Base | type | None] | Self,
+    ) -> Mapping[str, t.JsonPayload | p.Base | type | None] | Self:
+        """Accept ``settings`` as an alias for ``runtime_settings``."""
+        if isinstance(data, cls) or not isinstance(data, Mapping):
+            return data
+        normalized: dict[str, t.JsonPayload | p.Base | type | None] = dict(data)
+        settings = normalized.pop("settings", None)
+        for field_name in ("service_name", "service_version"):
+            if normalized.get(field_name) is None:
+                normalized.pop(field_name, None)
+        if settings is None or "runtime_settings" in normalized:
+            return normalized
+        normalized["runtime_settings"] = (
             settings
             if isinstance(settings, FlextSettings)
             else FlextMeltanoSettings.model_validate(settings)
-            if settings is not None
-            else None
         )
-        super().__init__(
-            runtime_settings=runtime_settings,
-            initial_context=initial_context,
-        )
-        if service_name is not None:
-            self.service_name = service_name
-        if service_version is not None:
-            self.service_version = service_version
-        if source_name is not None:
-            self.source_name = source_name
-        if sink_name is not None:
-            self.sink_name = sink_name
-        if transformation_name is not None:
-            self.transformation_name = transformation_name
+        return normalized
 
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the service using the canonical JSON payload contract."""
         raise NotImplementedError
 
+    @override
     @property
     @override
     def settings(self) -> FlextMeltanoSettings:
