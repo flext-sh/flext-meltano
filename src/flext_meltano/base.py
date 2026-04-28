@@ -14,6 +14,7 @@ from collections.abc import Mapping
 from typing import Annotated, Self, override
 
 from flext_cli import u
+from pydantic import BaseModel
 
 from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, p, t
@@ -76,11 +77,18 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
                 normalized.pop(field_name, None)
         if settings is None or "runtime_settings" in normalized:
             return normalized
-        normalized["runtime_settings"] = (
-            settings
-            if isinstance(settings, FlextSettings)
-            else FlextMeltanoSettings.model_validate(settings)
-        )
+        if isinstance(settings, FlextSettings):
+            normalized["runtime_settings"] = settings
+        elif isinstance(settings, Mapping):
+            normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
+                settings
+            )
+        elif isinstance(settings, BaseModel):
+            normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
+                settings.model_dump()
+            )
+        else:
+            normalized["runtime_settings"] = FlextMeltanoSettings()
         return normalized
 
     def execute(self) -> p.Result[t.JsonMapping]:

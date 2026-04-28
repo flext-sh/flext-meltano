@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import Self, override
 
 from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t
@@ -22,7 +21,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         *,
         field_name: str,
         component_label: str,
-        settings: Mapping[str, object] | None = None,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[Self]:
         """Create a specialized Meltano service.
 
@@ -123,9 +122,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
         configuration: dict[str, t.JsonValue] = (
-            {str(key): value for key, value in settings.items()}
-            if settings is not None
-            else {}
+            dict(settings.items()) if settings is not None else {}
         )
         payload: dict[str, t.JsonValue] = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
@@ -145,11 +142,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
-            "configuration": (
-                {str(key): value for key, value in config.items()}
-                if config is not None
-                else {}
-            ),
+            "configuration": (dict(config.items()) if config is not None else {}),
         }
         return r[t.JsonMapping].ok(payload)
 
@@ -169,9 +162,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"Invalid component type: {component_type}"
             )
         configuration: dict[str, t.JsonValue] = (
-            {str(key): value for key, value in settings.items()}
-            if settings is not None
-            else {}
+            dict(settings.items()) if settings is not None else {}
         )
         payload: dict[str, t.JsonValue] = {
             "status": c.Meltano.OperationStatus.INSTALLED,

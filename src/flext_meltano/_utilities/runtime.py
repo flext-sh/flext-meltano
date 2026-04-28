@@ -19,43 +19,6 @@ class FlextMeltanoUtilitiesRuntime:
     """Runtime-focused helpers for in-process Meltano execution."""
 
     @staticmethod
-    def coerce_container_mapping(
-        value: t.JsonValue | t.JsonPayload | None,
-    ) -> t.JsonMapping | None:
-        """Validate runtime objects against the canonical JSON mapping contract."""
-        normalized = u.Cli.json_as_mapping(value)
-        return normalized or None
-
-    @staticmethod
-    def coerce_container_mapping_list(
-        value: t.JsonValue | t.JsonPayload | None,
-    ) -> list[t.JsonMapping] | None:
-        """Validate runtime objects against a list of canonical JSON mappings."""
-        normalized = u.Cli.json_as_mapping_list(value)
-        return list(normalized) if normalized else None
-
-    @staticmethod
-    def normalize_runtime_json_value(
-        value: t.JsonPayload | None,
-    ) -> t.JsonValue | None:
-        """Normalize runtime values to the canonical Pydantic JSON contract."""
-        if value is None:
-            return None
-        return t.Cli.JSON_VALUE_ADAPTER.validate_python(
-            u.to_jsonable_python(value),
-        )
-
-    @classmethod
-    def normalize_runtime_json_mapping(
-        cls,
-        source: Mapping[str, t.JsonPayload | t.JsonValue],
-    ) -> t.JsonMapping:
-        """Normalize runtime mappings to the canonical Pydantic JSON contract."""
-        return t.Cli.JSON_MAPPING_ADAPTER.validate_python(
-            u.to_jsonable_python(source),
-        )
-
-    @staticmethod
     def _normalized_parts(values: t.StrSequence) -> t.StrSequence:
         """Normalize a sequence of CLI-like values to stripped non-empty strings."""
         stripped_values = u.map(
