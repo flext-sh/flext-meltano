@@ -1,0 +1,16 @@
+src/flext_meltano/_models/payloads_data.py
+  h_9db9d35f50cf33 144,153,161,163
+src/flext_meltano/services/services.py
+  h_9db9d35f50cf33 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "40bda4e1272fc263f9b5df6317182a35e698af3d",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
