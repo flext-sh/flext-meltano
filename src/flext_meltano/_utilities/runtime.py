@@ -95,7 +95,7 @@ class FlextMeltanoUtilitiesRuntime:
             case="lower",
         ).strip()
         runtime_alias = c.Meltano.ENVIRONMENT_RUNTIME_ALIASES.get(normalized)
-        return str(runtime_alias) if runtime_alias is not None else normalized
+        return runtime_alias if runtime_alias is not None else normalized
 
     @staticmethod
     def build_pipeline_runtime_command(
@@ -158,8 +158,11 @@ class FlextMeltanoUtilitiesRuntime:
             "pip_url": str(pip_val).strip() if pip_val is not None else "",
             "variant": str(variant_val).strip() if variant_val is not None else "",
         }
-        filtered = u.filter(plugin_data, lambda value: u.chk(value, empty=False))
-        return {str(key): str(value) for key, value in filtered.items()}
+        return {
+            key: str(value)
+            for key, value in plugin_data.items()
+            if u.chk(value, empty=False)
+        }
 
     @staticmethod
     def build_discovered_project_plugin(
@@ -275,7 +278,7 @@ class FlextMeltanoUtilitiesRuntime:
                 failure_status=failure_status,
             )
         if duration_field is not None:
-            payload[duration_field] = float(command_result.execution_time)
+            payload[duration_field] = command_result.execution_time
         source_payload = (
             payload if extra_fields is None else {**payload, **extra_fields}
         )
@@ -292,9 +295,8 @@ class FlextMeltanoUtilitiesRuntime:
         duration_field: str | None = "execution_time",
     ) -> dict[str, t.JsonValue]:
         """Build one mutable execution payload for callers that append fields."""
-        return {
-            str(key): value
-            for key, value in FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
+        return dict(
+            FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
                 command_result,
                 extra_fields=extra_fields,
                 success_status=success_status,
@@ -302,7 +304,7 @@ class FlextMeltanoUtilitiesRuntime:
                 status_field=status_field,
                 duration_field=duration_field,
             ).items()
-        }
+        )
 
     @staticmethod
     def command_failure_message(
@@ -324,18 +326,16 @@ class FlextMeltanoUtilitiesRuntime:
         """Normalize Meltano project plugin groups to public discovery labels."""
         normalized = FlextMeltanoUtilitiesRuntime.normalize_plugin_group(plugin_type)
         if normalized == c.Meltano.PluginType.EXTRACTORS.value:
-            return str(
-                c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.EXTRACTORS].value
-            )
+            return c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                c.Meltano.PluginType.EXTRACTORS
+            ].value
         if normalized == c.Meltano.PluginType.LOADERS.value:
-            return str(
-                c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.LOADERS].value
-            )
+            return c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.LOADERS].value
         if (
             normalized == c.Meltano.PluginType.TRANSFORMS.value
             or plugin_name.startswith(c.Meltano.PREFIX_DBT)
         ):
-            return str(
-                c.Meltano.PLUGIN_DISCOVERY_LABELS[c.Meltano.PluginType.TRANSFORMS].value
-            )
+            return c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                c.Meltano.PluginType.TRANSFORMS
+            ].value
         return normalized or plugin_type

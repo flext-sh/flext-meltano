@@ -45,7 +45,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             )
         )
         if run_result.failure:
-            error_msg = str(run_result.error or "Unknown error")
+            error_msg = run_result.error or "Unknown error"
             return r[str].fail(f"Meltano command failed: {error_msg}")
         completed: m.Meltano.CommandExecutionResult = run_result.value
         if completed.exit_code != 0:
@@ -103,7 +103,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 )
             plugins: dict[str, t.StrMapping] = {}
             for plugin in plugins_result.value:
-                plugin_name = str(plugin.get("name", ""))
+                plugin_name = plugin.get("name", "")
                 if not plugin_name:
                     continue
                 plugins[plugin_name] = {

@@ -49,7 +49,7 @@ class FlextMeltanoModelsResults:
             """Execution rate (records/second)."""
             if not self.duration_seconds or self.duration_seconds <= 0:
                 return 0.0
-            return float(self.records_processed / self.duration_seconds)
+            return self.records_processed / self.duration_seconds
 
         @u.computed_field()
         @property

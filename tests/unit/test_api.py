@@ -53,7 +53,7 @@ class TestsFlextMeltanoApi:
         assert result.success
         payload = result.value
         u.Tests.Matchers.that(payload, is_=dict)
-        project_path = Path(str(payload["project_path"]))
+        project_path = Path(payload["project_path"])
         u.Tests.Matchers.that(
             (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists(),
             eq=True,

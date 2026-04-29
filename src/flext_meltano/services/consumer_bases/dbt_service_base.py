@@ -100,7 +100,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 case c.Meltano.DbtCommand.DOCS:
                     result = self.generate_docs()
                 case _:
-                    result = r[str].fail(str(subcommand))
+                    result = r[str].fail(subcommand)
             if result.failure:
                 self.logger.warning(
                     "dbt command failed",
@@ -240,8 +240,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 {
                     "name": str(node.name),
                     "path": str(node.path),
-                    "description": str(node.description or ""),
-                    "fqn": str(node.fqn_string),
+                    "description": node.description or "",
+                    "fqn": node.fqn_string,
                 }
                 for node in manifest.nodes.values()
                 if node.resource_type == c.Meltano.DbtResourceType.MODEL

@@ -42,10 +42,10 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 {
                     "name": str(node.name),
                     "path": str(node.path),
-                    "description": str(node.description)
+                    "description": node.description
                     if node.description is not None
                     else "",
-                    "fqn": str(node.fqn_string),
+                    "fqn": node.fqn_string,
                 }
                 for node in model_nodes_result.value
             ]
@@ -71,10 +71,10 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 {
                     "name": str(node.name),
                     "path": str(node.path),
-                    "description": str(node.description)
+                    "description": node.description
                     if node.description is not None
                     else "",
-                    "fqn": str(node.fqn_string),
+                    "fqn": node.fqn_string,
                 }
                 for node in test_nodes_result.value
             ]
@@ -172,7 +172,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                     tests_count = len(tests_result.value)
             info = m.Meltano.DbtProjectInfo(
                 root=root,
-                name=str(root.name),
+                name=root.name,
                 dbt_version=None,
                 models_count=models_count,
                 tests_count=tests_count,

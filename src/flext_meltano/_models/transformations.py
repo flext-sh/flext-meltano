@@ -192,7 +192,7 @@ class FlextMeltanoModelsTransformations:
         @property
         def is_parallel_execution(self) -> bool:
             """Check if execution uses multiple threads."""
-            return bool(self.threads > 1)
+            return self.threads > 1
 
         @u.computed_field()
         @property

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t
+from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t, u
 
 
 class FlextMeltanoService(FlextMeltanoServiceBase):
@@ -63,11 +63,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
         inside ``_create_specialized_service``.
         """
+        settings_payload: dict[str, t.JsonValue] | None = (
+            {key: u.normalize_to_json_value(value) for key, value in config.items()}
+            if config
+            else None
+        )
         return cls._create_specialized_service(
             sink_name,
             field_name="sink_name",
             component_label="sink service",
-            settings=dict(config) if config else None,
+            settings=settings_payload,
         )
 
     @classmethod
@@ -79,11 +84,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
         inside ``_create_specialized_service``.
         """
+        settings_payload: dict[str, t.JsonValue] | None = (
+            {key: u.normalize_to_json_value(value) for key, value in config.items()}
+            if config
+            else None
+        )
         return cls._create_specialized_service(
             source_name,
             field_name="source_name",
             component_label="source service",
-            settings=dict(config) if config else None,
+            settings=settings_payload,
         )
 
     @classmethod
@@ -95,11 +105,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
         inside ``_create_specialized_service``.
         """
+        settings_payload: dict[str, t.JsonValue] | None = (
+            {key: u.normalize_to_json_value(value) for key, value in config.items()}
+            if config
+            else None
+        )
         return cls._create_specialized_service(
             transformation_name,
             field_name="transformation_name",
             component_label="transformation service",
-            settings=dict(config) if config else None,
+            settings=settings_payload,
         )
 
     @staticmethod

@@ -320,4 +320,4 @@ class TestsFlextMeltanoExecutors:
             version_result = FlextMeltanoExecutor().version()
             assert version_result.failure
             if version_result.error is not None:
-                assert "Version command failed" in str(version_result.error)
+                assert "Version command failed" in version_result.error

@@ -110,8 +110,8 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                     )
                 plugins: list[t.JsonValue] = []
                 for plugin in plugins_result.value:
-                    plugin_name = str(plugin.get("name", ""))
-                    plugin_group = str(plugin.get("type", ""))
+                    plugin_name = plugin.get("name", "")
+                    plugin_group = plugin.get("type", "")
                     if not plugin_name:
                         continue
                     plugins.append({

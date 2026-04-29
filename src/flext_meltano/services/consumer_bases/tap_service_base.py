@@ -78,7 +78,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         try:
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
-            return int(tap.run_cli(command_args, self.tap_name))
+            return tap.run_cli(command_args, self.tap_name)
         except (ValueError, TypeError, OSError, RuntimeError) as exc:
             self.logger.exception("Tap CLI failed", error=str(exc))
             return 1
@@ -92,7 +92,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         try:
             tap = self._get_or_create_tap()
             streams = tap.discover_streams()
-            stream_names: t.StrSequence = [str(s.name) for s in streams]
+            stream_names: t.StrSequence = [s.name for s in streams]
             self.logger.info(
                 "Streams discovered",
                 tap=self.tap_name,

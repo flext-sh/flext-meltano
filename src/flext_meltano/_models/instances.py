@@ -106,7 +106,7 @@ class FlextMeltanoModelsInstances:
         @property
         def has_processed_data(self) -> bool:
             """Check if stream has processed data."""
-            return bool(self.records_loaded > 0 or self.batches_processed > 0)
+            return self.records_loaded > 0 or self.batches_processed > 0
 
         @u.computed_field()
         @property

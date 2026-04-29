@@ -330,25 +330,32 @@ def job_run_config() -> t.JsonMapping:
 def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
     """Docker manager fixture for Docker-based tests."""
     temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
-    manager = tk(workspace_root=Path(__file__).resolve().parents[1])
-    manager._state_file = temp_dir / "flext_tests_docker_state.json"
-    manager._dirty_containers.clear()
+    manager = tk.stack(
+        c.Meltano.Tests.COMPOSE_FILE,
+        container_name=c.Meltano.Tests.PRIMARY_CONTAINER_NAME,
+        service=c.Meltano.Tests.PRIMARY_SERVICE,
+        host=c.Meltano.Tests.HOST,
+        port=c.Meltano.Tests.MELTANO_PORT,
+        workspace_root=Path(__file__).resolve().parents[1],
+    )
+    manager.state_file_path = temp_dir / "flext_tests_docker_state.json"
+    manager.dirty_container_names.clear()
     return manager
 
 
 @pytest.fixture
 def docker_services(docker_manager: tk) -> Generator[tk]:
     """Function-scoped Docker services fixture."""
-    result = docker_manager.start_compose_stack(c.Meltano.Tests.COMPOSE_FILE)
+    result = docker_manager.execute()
     if result.failure:
         pytest.skip(f"Docker stack unavailable: {result.error}")
     yield docker_manager
-    _ = docker_manager.compose_down(c.Meltano.Tests.COMPOSE_FILE)
+    _ = docker_manager.down()
 
 
 def require_docker_service(docker_services: tk, port: int, service_name: str) -> str:
     """Return a ready Docker service endpoint or skip the test."""
-    ready = docker_services.wait_for_port_ready(c.Meltano.Tests.HOST, port)
+    ready = docker_services.ready(port=port)
     if ready.failure or not ready.value:
         pytest.skip(f"{service_name} service not available")
     return f"{c.Meltano.Tests.HOST}:{port}"

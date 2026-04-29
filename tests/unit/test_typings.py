@@ -98,9 +98,9 @@ class TestsFlextMeltanoTypingsUnit:
             "tap_stream_id": "users",
             "schema": {"type": "object"},
         }
-        tm.that(str(plugin_def["name"]), eq="tap-users")
+        tm.that(plugin_def["name"], eq="tap-users")
         tm.that(list(plugin_def["variants"]), is_=list)
-        tm.that(str(catalog["tap_stream_id"]), eq="users")
+        tm.that(catalog["tap_stream_id"], eq="users")
         schema_val = catalog["schema"]
         assert isinstance(schema_val, dict)
         tm.that(schema_val, is_=dict)

@@ -39,9 +39,7 @@ class FlextMeltanoModelsPayloadsData:
             match value:
                 case Mapping():
                     normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return MappingProxyType({
-                        str(key): item for key, item in normalized.items()
-                    })
+                    return MappingProxyType(dict(normalized.items()))
                 case _:
                     return MappingProxyType({})
 
@@ -72,7 +70,7 @@ class FlextMeltanoModelsPayloadsData:
                                 record_dict: t.MutableJsonMapping = {}
                                 for key, item in record.items():
                                     if u.primitive(item):
-                                        record_dict[str(key)] = item
+                                        record_dict[key] = item
                                 records.append(record_dict)
                             case _:
                                 continue
@@ -98,9 +96,7 @@ class FlextMeltanoModelsPayloadsData:
             if not isinstance(value, Mapping):
                 return MappingProxyType({})
             normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-            return MappingProxyType({
-                str(key): item for key, item in normalized.items()
-            })
+            return MappingProxyType(dict(normalized.items()))
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
@@ -131,7 +127,7 @@ class FlextMeltanoModelsPayloadsData:
             match value:
                 case Mapping():
                     normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return str(u.Cli.yaml_dump_str(normalized))
+                    return u.Cli.yaml_dump_str(normalized)
                 case None:
                     return ""
                 case _:

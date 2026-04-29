@@ -32,7 +32,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
                 plugins_result.error or "Plugin discovery failed",
             )
         plugin_names = [
-            str(p.get("name", "")) for p in plugins_result.value if p.get("name")
+            p.get("name", "") for p in plugins_result.value if p.get("name")
         ]
         return r[t.StrSequence].ok(plugin_names)
 

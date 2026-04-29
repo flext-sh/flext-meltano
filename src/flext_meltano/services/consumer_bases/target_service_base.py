@@ -15,7 +15,6 @@ from collections.abc import (
     MutableMapping,
     Sequence,
 )
-from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
@@ -130,10 +129,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            record_dict: dict[str, t.JsonValue] = {
-                str(k): (str(v) if isinstance(v, Path) else v)
-                for k, v in record.items()
-            }
+            record_dict: dict[str, t.JsonValue] = dict(record.items())
             empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)

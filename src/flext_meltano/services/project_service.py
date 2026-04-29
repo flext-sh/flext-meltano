@@ -117,11 +117,11 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         params = params_r.value
         try:
-            temp_path = Path(tempfile.mkdtemp(prefix=str(params["prefix"])))
+            temp_path = Path(tempfile.mkdtemp(prefix=params["prefix"]))
             settings: t.JsonMapping = {
                 "version": c.Meltano.PLUGIN_CONFIG_VERSION,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
-                "project_id": str(params["project_id"]),
+                "project_id": params["project_id"],
                 "environments": [
                     {
                         "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
@@ -167,7 +167,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         payload: dict[str, t.JsonValue] = {
             "status": c.Meltano.OperationStatus.READY,
             "service_type": service_type,
-            "settings": {str(key): value for key, value in settings_payload.items()},
+            "settings": dict(settings_payload.items()),
         }
         return r[t.JsonMapping].ok(payload)
 

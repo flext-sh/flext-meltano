@@ -74,14 +74,8 @@ class TestsFlextMeltanoDockerIntegration:
     @pytest.mark.integration
     def test_docker_services_health(self, docker_services: tk) -> None:
         """Test overall Docker services health."""
-        postgres_ready = docker_services.wait_for_port_ready(
-            c.Meltano.Tests.HOST,
-            c.Meltano.Tests.POSTGRES_PORT,
-        )
-        redis_ready = docker_services.wait_for_port_ready(
-            c.Meltano.Tests.HOST,
-            c.Meltano.Tests.REDIS_PORT,
-        )
+        postgres_ready = docker_services.ready(port=c.Meltano.Tests.POSTGRES_PORT)
+        redis_ready = docker_services.ready(port=c.Meltano.Tests.REDIS_PORT)
         if postgres_ready.failure or not postgres_ready.value:
             pytest.skip("PostgreSQL service not available")
         if redis_ready.failure or not redis_ready.value:
@@ -92,23 +86,16 @@ class TestsFlextMeltanoDockerIntegration:
     @pytest.mark.slow
     def test_container_lifecycle(self, docker_manager: tk) -> None:
         """Test complete container lifecycle management."""
-        start_result = docker_manager.start_compose_stack(
-            c.Meltano.Tests.COMPOSE_FILE,
-        )
+        start_result = docker_manager.execute()
         assert start_result.success
         should_assert_stop = True
         try:
-            postgres_ready = docker_manager.wait_for_port_ready(
-                c.Meltano.Tests.HOST,
-                c.Meltano.Tests.POSTGRES_PORT,
-            )
+            postgres_ready = docker_manager.ready(port=c.Meltano.Tests.POSTGRES_PORT)
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
                 pytest.skip("PostgreSQL service not available")
         finally:
-            stop_result = docker_manager.compose_down(
-                c.Meltano.Tests.COMPOSE_FILE,
-            )
+            stop_result = docker_manager.down()
             if should_assert_stop:
                 assert stop_result.success
 

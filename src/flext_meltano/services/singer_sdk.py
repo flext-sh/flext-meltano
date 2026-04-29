@@ -59,14 +59,12 @@ class FlextMeltanoSingerTapAdapter:
         if isinstance(value, m.BaseModel):
             normalized_model = value.model_dump(mode="json")
             return {
-                str(key): FlextMeltanoSingerTapAdapter._normalize_recursive(model_value)
+                key: FlextMeltanoSingerTapAdapter._normalize_recursive(model_value)
                 for key, model_value in normalized_model.items()
             }
         if isinstance(value, Mapping):
             return {
-                str(key): FlextMeltanoSingerTapAdapter._normalize_recursive(
-                    mapping_value
-                )
+                key: FlextMeltanoSingerTapAdapter._normalize_recursive(mapping_value)
                 for key, mapping_value in value.items()
             }
         if isinstance(value, Sequence) and not isinstance(value, str):

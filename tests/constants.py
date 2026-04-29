@@ -68,6 +68,8 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
             REDIS_PORT: Final[int] = SERVICE_PORTS[_DockerService.REDIS]
             MELTANO_PORT: Final[int] = SERVICE_PORTS[_DockerService.MELTANO]
             COMPOSE_FILE: Final[str] = "docker-compose.test.yml"
+            PRIMARY_SERVICE: Final[str] = _DockerService.MELTANO
+            PRIMARY_CONTAINER_NAME: Final[str] = "flext-test-meltano"
             FIXTURES_DATA_DIR: Final[Path] = Path("tests/fixtures/data")
             TEST_INPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "input").as_posix()
             TEST_OUTPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "output").as_posix()

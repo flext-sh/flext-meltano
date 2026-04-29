@@ -91,7 +91,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             cmd_args = [
                 c.Meltano.CMD_ELT,
                 tap_instance.tap_type,
-                str(loader_name),
+                loader_name,
                 c.Meltano.CMD_SELECT_OPTION,
                 stream_name,
             ]
@@ -153,9 +153,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     self._stream_registry[name],
                 )
                 if entry_r.success:
-                    streams.append({
-                        str(key): value for key, value in entry_r.value.items()
-                    })
+                    streams.append(dict(entry_r.value.items()))
         catalog: dict[str, t.JsonValue] = {"version": 1, "streams": streams}
         return r[t.JsonMapping].ok(catalog)
 
@@ -199,7 +197,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 if not isinstance(stream, Mapping):
                     continue
                 validated = t.Cli.JSON_MAPPING_ADAPTER.validate_python(stream)
-                streams.append({str(key): value for key, value in validated.items()})
+                streams.append(dict(validated.items()))
             return streams
         return []
 

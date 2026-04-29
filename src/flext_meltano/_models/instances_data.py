@@ -46,7 +46,7 @@ class FlextMeltanoModelsInstancesData:
         @property
         def max_records_capacity(self) -> int:
             """Maximum records capacity."""
-            return int(self.batch_size * self.max_batches)
+            return self.batch_size * self.max_batches
 
         @u.computed_field()
         @property

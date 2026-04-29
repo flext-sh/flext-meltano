@@ -44,9 +44,7 @@ class FlextMeltanoModelsDiscovery:
             match value:
                 case Mapping():
                     normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return MappingProxyType({
-                        str(key): item for key, item in normalized.items()
-                    })
+                    return MappingProxyType(dict(normalized.items()))
                 case _:
                     return MappingProxyType({})
 
@@ -83,8 +81,6 @@ class FlextMeltanoModelsDiscovery:
             match value:
                 case Mapping():
                     normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return MappingProxyType({
-                        str(key): item for key, item in normalized.items()
-                    })
+                    return MappingProxyType(dict(normalized.items()))
                 case _:
                     return MappingProxyType({})
