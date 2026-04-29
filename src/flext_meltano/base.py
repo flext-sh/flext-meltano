@@ -96,7 +96,6 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
         """Execute the service using the canonical JSON payload contract."""
         raise NotImplementedError
 
-    @override
     @property
     @override
     def settings(self) -> FlextMeltanoSettings:

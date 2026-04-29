@@ -50,14 +50,6 @@ class FlextMeltanoSettings(FlextSettings):
             description="Active Meltano runtime environment",
         ),
     ]
-    log_level: Annotated[
-        c.LogLevel,
-        u.Field(
-            default=c.LogLevel.INFO,
-            validation_alias=c.Meltano.ENV_VAR_LOG_LEVEL,
-            description="Meltano logging level",
-        ),
-    ] = c.LogLevel.INFO
     meltano_version: Annotated[
         str,
         u.Field(
@@ -116,15 +108,6 @@ class FlextMeltanoSettings(FlextSettings):
             raise ValueError(msg)
         return normalized
 
-    @u.field_validator("log_level")
-    @classmethod
-    def _validate_log_level(cls, value: c.LogLevel | str) -> c.LogLevel:
-        normalized = str(value).strip().upper()
-        if normalized not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
-            msg = "Invalid log_level"
-            raise ValueError(msg)
-        return c.LogLevel(normalized)
-
     def get_project_file(self) -> p.Result[Path]:
         """Return the canonical pipeline file path."""
         return r[Path].ok(self.project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE)
@@ -134,7 +117,7 @@ class FlextMeltanoSettings(FlextSettings):
         return r[Path].ok((self.project_root / self.config_dir).resolve())
 
     def get_absolute_logs_dir(self) -> p.Result[Path]:
-        """Return absolute logs directory path."""
+        """Return absolute Meltano logs directory path."""
         return r[Path].ok((self.project_root / self.logs_dir).resolve())
 
     def get_absolute_venv_dir(self) -> Path:

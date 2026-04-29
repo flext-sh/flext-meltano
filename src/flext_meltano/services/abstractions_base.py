@@ -179,10 +179,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute abstractions service and return real configuration state."""
-        project_root = u.Meltano.resolve_project_root(self.settings)
         payload: t.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
-            "project_root": str(project_root) if project_root is not None else "",
+            "project_root": str(self.settings.project_root),
             "environment": self.settings.environment,
             "meltano_version": self.settings.meltano_version,
         }
