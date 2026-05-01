@@ -67,7 +67,7 @@ class FlextMeltanoModelsDiscovery:
     class PluginDiscoveryCatalog(m.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
-        plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
+        plugins: t.MappingKV[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
             u.Field(
                 default_factory=lambda: MappingProxyType({}),
                 description="Plugin discovery entries keyed by plugin name",

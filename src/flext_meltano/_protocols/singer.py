@@ -7,10 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
 from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
 
 import click
@@ -56,7 +52,7 @@ class FlextMeltanoProtocolsSinger:
 
         def handle_batch(
             self,
-            records: Sequence[t.Meltano.OptionalScalarMap],
+            records: t.SequenceOf[t.Meltano.OptionalScalarMap],
         ) -> p.Result[t.JsonMapping]:
             """Handle a batch of records with r."""
             ...
@@ -122,7 +118,7 @@ class FlextMeltanoProtocolsSinger:
 
         def discover_streams(
             self,
-        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+        ) -> t.SequenceOf[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
             """Discover available streams."""
             ...
 
@@ -148,7 +144,7 @@ class FlextMeltanoProtocolsSinger:
         def get_records(
             self,
             stream_name: str,
-        ) -> Sequence[m.Meltano.SingerRecordMessage]:
+        ) -> t.SequenceOf[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
 
@@ -174,7 +170,7 @@ class FlextMeltanoProtocolsSinger:
         name: str
         settings: t.JsonMapping
 
-        def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
+        def consume(self, records: t.SequenceOf[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
 
             Args:
@@ -243,13 +239,13 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         @property
-        def config(self) -> Mapping[str, t.JsonPayload]:
+        def config(self) -> t.MappingKV[str, t.JsonPayload]:
             """Expose the raw tap configuration."""
             ...
 
         def discover_streams(
             self,
-        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+        ) -> t.SequenceOf[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
             """Return the tap streams."""
             ...
 
@@ -266,13 +262,13 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         @property
-        def settings(self) -> Mapping[str, t.JsonPayload]:
+        def settings(self) -> t.MappingKV[str, t.JsonPayload]:
             """Expose tap settings mapping."""
             ...
 
         def discover_streams(
             self,
-        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+        ) -> t.SequenceOf[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
             """Return the tap streams."""
             ...
 

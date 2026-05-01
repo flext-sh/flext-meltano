@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableSequence,
-)
 from pathlib import Path
 
 from flext_meltano import c, p, r, t, u
@@ -29,7 +26,7 @@ class FlextMeltanoDbtTransformationRunner:
     ) -> p.Result[t.JsonMapping]:
         """Run DBT ``run`` and normalize output into transformation contract."""
         try:
-            args: MutableSequence[str] = []
+            args: t.MutableSequenceOf[str] = []
             if models:
                 args.extend([c.Meltano.CMD_MODELS_OPTION, *models])
             result = executor.execute_dbt_command(c.Meltano.DbtCommand.RUN, args)

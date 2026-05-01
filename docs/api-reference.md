@@ -164,7 +164,10 @@ def execute_tap(
 
 ```python
 def execute_target(
-    self, target_name: str, records: Sequence[m.Dict], settings: m.Dict | None = None
+    self,
+    target_name: str,
+    records: t.SequenceOf[m.Dict],
+    settings: m.Dict | None = None,
 ) -> p.Result[FlextMeltanoModels.TargetExecutionResult]:
     """Execute a Singer target with records.
 
@@ -278,7 +281,7 @@ def execute_pipeline_advanced(
 
 ```python
 def execute_parallel_pipelines(
-    self, pipelines: Sequence[FlextMeltanoModels.PipelineConfig]
+    self, pipelines: t.SequenceOf[FlextMeltanoModels.PipelineConfig]
 ) -> p.Result[Sequence[FlextMeltanoModels.PipelineResult]]:
     """Execute multiple pipelines in parallel.
 
@@ -388,7 +391,7 @@ class FlextSingerTarget(s):
 
 ```python
 def load_records(
-    self, records: Sequence[m.Dict]
+    self, records: t.SequenceOf[m.Dict]
 ) -> p.Result[FlextMeltanoModels.LoadResult]:
     """Load records into the target.
 
@@ -664,7 +667,7 @@ class FlextMeltanoExecutor(s):
 
 ```python
 def execute_parallel_pipelines(
-    self, pipelines: Sequence[FlextMeltanoModels.PipelineConfig]
+    self, pipelines: t.SequenceOf[FlextMeltanoModels.PipelineConfig]
 ) -> p.Result[Sequence[FlextMeltanoModels.PipelineResult]]:
     """Execute multiple pipelines in parallel.
 
@@ -803,7 +806,7 @@ def meltano_yml_path(self) -> Path:
 
 ```python
 @property
-def plugins(self) -> Sequence[FlextMeltanoModels.PluginInfo]:
+def plugins(self) -> t.SequenceOf[FlextMeltanoModels.PluginInfo]:
     """Get list of configured plugins."""
 ```
 
@@ -838,7 +841,7 @@ def project_config(self) -> FlextMeltanoModels.ProjectConfig:
 
 ```python
 @property
-def plugin_configs(self) -> Mapping[str, m.Dict]:
+def plugin_configs(self) -> t.MappingKV[str, m.Dict]:
     """Get plugin-specific configurations."""
 ```
 
@@ -848,7 +851,7 @@ def plugin_configs(self) -> Mapping[str, m.Dict]:
 
 ```python
 @property
-def pipeline_configs(self) -> Mapping[str, FlextMeltanoModels.PipelineConfig]:
+def pipeline_configs(self) -> t.MappingKV[str, FlextMeltanoModels.PipelineConfig]:
     """Get pipeline execution configurations."""
 ```
 

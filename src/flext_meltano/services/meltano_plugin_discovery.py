@@ -6,12 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    MutableSequence,
-    Sequence,
-)
-
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoProjectService,
@@ -54,7 +48,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
     @staticmethod
     def _extract_plugin_info(
-        plugins_data: Mapping[str, t.StrMapping],
+        plugins_data: t.MappingKV[str, t.StrMapping],
         plugin_name: str,
         plugin_type: str,
     ) -> p.Result[t.StrMapping]:
@@ -80,7 +74,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     def discover_plugins(
         self,
         project: t.JsonPayload | t.Meltano.DbtProject | None = None,
-    ) -> p.Result[Sequence[t.StrMapping]]:
+    ) -> p.Result[t.SequenceOf[t.StrMapping]]:
         """Discover plugins from Meltano Hub using native API."""
         try:
             self.logger.info("Discovering Meltano plugins")
@@ -92,17 +86,17 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                     FlextMeltanoProjectService().create_temporary_project()
                 )
                 if temp_project_result.failure:
-                    return r[Sequence[t.StrMapping]].fail(
+                    return r[t.SequenceOf[t.StrMapping]].fail(
                         temp_project_result.error
                         or "Failed to create temporary project",
                     )
                 temp_project = temp_project_result.value
                 if not self._is_meltano_project(temp_project):
-                    return r[Sequence[t.StrMapping]].fail(
+                    return r[t.SequenceOf[t.StrMapping]].fail(
                         "Temporary project does not satisfy Project",
                     )
                 working_project = temp_project
-            plugins: MutableSequence[t.StrMapping] = []
+            plugins: t.MutableSequenceOf[t.StrMapping] = []
             abstractions = FlextMeltanoAbstractions()
             extractors_result = abstractions.fetch_plugins_of_type(
                 working_project,
@@ -125,11 +119,11 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                         break
                     plugins.append(self._build_plugin_info(k, v, "loader"))
             self.logger.info("Discovered plugins", count=u.count(plugins))
-            return r[Sequence[t.StrMapping]].ok(plugins)
+            return r[t.SequenceOf[t.StrMapping]].ok(plugins)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
-            return r[Sequence[t.StrMapping]].fail(error_msg)
+            return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
 
     def fetch_plugin_info(
         self, plugin_name: str, plugin_type: str

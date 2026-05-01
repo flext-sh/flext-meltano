@@ -9,10 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableSequence,
-    Sequence,
-)
 from pathlib import Path
 
 from meltano.core.project import Project
@@ -33,21 +29,21 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     def fetch_sdk_plugins(
         self,
         plugin_type: str | None = None,
-    ) -> p.Result[Sequence[t.JsonMapping]]:
+    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Get plugins from the SDK project, optionally filtered by type."""
         try:
             if not self._sdk_project:
-                return r[Sequence[t.JsonMapping]].fail("No project loaded")
+                return r[t.SequenceOf[t.JsonMapping]].fail("No project loaded")
             plugins = self._extract_sdk_plugins(plugin_type)
             self.logger.info(
                 "Plugins retrieved",
                 count=u.count(plugins),
                 type=plugin_type or "",
             )
-            return r[Sequence[t.JsonMapping]].ok(plugins)
+            return r[t.SequenceOf[t.JsonMapping]].ok(plugins)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[Sequence[t.JsonMapping]].fail(f"Failed to get plugins: {e}")
+            return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to get plugins: {e}")
 
     def initialize_sdk_project(
         self, root: Path
@@ -96,9 +92,9 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     def _extract_sdk_plugins(
         self,
         plugin_type: str | None,
-    ) -> Sequence[t.JsonMapping]:
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Extract plugins from SDK project, optionally filtered by type."""
-        plugins: MutableSequence[t.JsonMapping] = []
+        plugins: t.MutableSequenceOf[t.JsonMapping] = []
         if self._sdk_project is None:
             return plugins
         try:

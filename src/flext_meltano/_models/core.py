@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from typing import Annotated
 
 from flext_cli import m, u
@@ -75,7 +72,7 @@ class FlextMeltanoModelsCore:
             return empty_items
 
         items: Annotated[
-            Sequence[bool],
+            t.SequenceOf[bool],
             u.Field(description="Normalized list of boolean values"),
         ] = u.Field(
             default_factory=default_items,
@@ -84,7 +81,7 @@ class FlextMeltanoModelsCore:
 
         @u.field_validator("items", mode="before")
         @classmethod
-        def normalize_items(cls, value: t.Meltano.ValidatorInput) -> Sequence[bool]:
+        def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.SequenceOf[bool]:
             """Convert sequence-like values into booleans."""
             if isinstance(value, (list, tuple, set)):
                 return [bool(item) for item in value]

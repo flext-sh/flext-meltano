@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import (
     Mapping,
-    Sequence,
 )
 from pathlib import Path
 
@@ -183,7 +182,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def discover_project_plugins(
-        current_plugins: Mapping[MeltanoPluginType, Sequence[ProjectPlugin]],
+        current_plugins: t.MappingKV[MeltanoPluginType, t.SequenceOf[ProjectPlugin]],
         *,
         selected_type: str | None = None,
     ) -> list[t.StrMapping]:
@@ -207,7 +206,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def extract_plugin_names(
-        plugins: Sequence[t.StrMapping],
+        plugins: t.SequenceOf[t.StrMapping],
     ) -> t.StrSequence:
         """Extract non-empty plugin names from normalized plugin mappings."""
         return list(

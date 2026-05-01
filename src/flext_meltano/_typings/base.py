@@ -7,10 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
-
 from flext_cli import t
 
 
@@ -19,4 +15,4 @@ class FlextMeltanoTypingsBase:
 
     type ValidatorInput = t.JsonValue | t.JsonPayload | None
 
-    type OptionalScalarMap = Mapping[str, t.Scalar | None]
+    type OptionalScalarMap = t.MappingKV[str, t.Scalar | None]

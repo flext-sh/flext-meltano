@@ -15,7 +15,6 @@ import tempfile
 from collections.abc import (
     Callable,
     Generator,
-    Sequence,
 )
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -234,7 +233,7 @@ def singer_schema() -> t.JsonMapping:
 
 
 @pytest.fixture
-def singer_records() -> Sequence[t.JsonMapping]:
+def singer_records() -> t.SequenceOf[t.JsonMapping]:
     """Sample Singer records for testing."""
     return [
         {
@@ -456,7 +455,7 @@ class MockSingerTap:
             ]
         }
 
-    def extract(self) -> Sequence[t.JsonMapping]:
+    def extract(self) -> t.SequenceOf[t.JsonMapping]:
         _ = self.settings
         return [{"type": "RECORD", "stream": "test_entity", "record": {}}]
 
@@ -477,7 +476,7 @@ class MockSingerTarget:
 
     def load(
         self,
-        records: Sequence[t.JsonMapping],
+        records: t.SequenceOf[t.JsonMapping],
     ) -> t.JsonMapping:
         _ = self.settings
         return {"records_loaded": len(records), "status": "success"}

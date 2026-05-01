@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
 from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated, Self
@@ -44,7 +40,7 @@ class FlextMeltanoModelsProjects:
     class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
-        nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = u.Field(
+        nodes: t.MappingKV[str, FlextMeltanoModelsProjects.DbtManifestNode] = u.Field(
             default_factory=lambda: MappingProxyType({}),
             description="dbt manifest nodes keyed by unique node id",
         )
@@ -103,7 +99,7 @@ class FlextMeltanoModelsProjects:
         project_root: Path = u.Field(
             default_factory=Path.cwd, description="Project root directory"
         )
-        environments: Sequence[c.Meltano.ProjectEnvironment] = u.Field(
+        environments: t.SequenceOf[c.Meltano.ProjectEnvironment] = u.Field(
             default_factory=lambda: c.Meltano.METADATA_DEFAULT_ENVIRONMENTS,
             description="Available environments",
         )

@@ -31,7 +31,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         - ``FlextMeltanoSettings.model_validate(settings)`` validates the
           runtime settings payload (per-field coercion + type narrowing).
 
-        ``settings`` is typed as ``Mapping[str, object]`` because the
+        ``settings`` is typed as ``t.MappingKV[str, object]`` because the
         downstream Pydantic validator handles every concrete value type —
         keeps the signature broad enough for both ``Scalar`` and ``JsonValue``
         callers without manual coercion at the boundary.

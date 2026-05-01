@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
@@ -28,17 +25,17 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         default_factory=lambda: None,
     )
 
-    def fetch_dbt_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
+    def fetch_dbt_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""
         try:
             model_nodes_result = self._get_dbt_manifest_nodes(
                 c.Meltano.DbtResourceType.MODEL
             )
             if model_nodes_result.failure:
-                return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
+                return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
                     model_nodes_result.error or "Unknown error",
                 )
-            models: Sequence[t.Meltano.OptionalScalarMap] = [
+            models: t.SequenceOf[t.Meltano.OptionalScalarMap] = [
                 {
                     "name": str(node.name),
                     "path": str(node.path),
@@ -50,24 +47,24 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 for node in model_nodes_result.value
             ]
             self.logger.info("Models retrieved", count=len(models))
-            return r[Sequence[t.Meltano.OptionalScalarMap]].ok(models)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
         except c.Meltano.OPERATION_ERRORS as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
                 f"Failed to get models: {e}"
             )
 
-    def fetch_dbt_tests(self) -> p.Result[Sequence[t.AttributeMapping]]:
+    def fetch_dbt_tests(self) -> p.Result[t.SequenceOf[t.AttributeMapping]]:
         """Get all tests from manifest."""
         try:
             test_nodes_result = self._get_dbt_manifest_nodes(
                 c.Meltano.DbtResourceType.TEST
             )
             if test_nodes_result.failure:
-                return r[Sequence[t.AttributeMapping]].fail(
+                return r[t.SequenceOf[t.AttributeMapping]].fail(
                     test_nodes_result.error or "Unknown error",
                 )
-            tests: Sequence[t.AttributeMapping] = [
+            tests: t.SequenceOf[t.AttributeMapping] = [
                 {
                     "name": str(node.name),
                     "path": str(node.path),
@@ -79,24 +76,24 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 for node in test_nodes_result.value
             ]
             self.logger.info("Tests retrieved", count=len(tests))
-            return r[Sequence[t.AttributeMapping]].ok(tests)
+            return r[t.SequenceOf[t.AttributeMapping]].ok(tests)
         except (c.ValidationError, OSError, ValueError, TypeError) as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return r[Sequence[t.AttributeMapping]].fail(f"Failed to get tests: {e}")
+            return r[t.SequenceOf[t.AttributeMapping]].fail(f"Failed to get tests: {e}")
 
     def _get_dbt_manifest_nodes(
         self,
         resource_type: str,
-    ) -> p.Result[Sequence[m.Meltano.DbtManifestNode]]:
+    ) -> p.Result[t.SequenceOf[m.Meltano.DbtManifestNode]]:
         try:
             if not self._dbt_manifest:
                 manifest_result = self.load_dbt_manifest()
                 if manifest_result.failure:
-                    return r[Sequence[m.Meltano.DbtManifestNode]].fail(
+                    return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
                         manifest_result.error or "Unknown error",
                     )
             if not self._dbt_manifest:
-                return r[Sequence[m.Meltano.DbtManifestNode]].ok([])
+                return r[t.SequenceOf[m.Meltano.DbtManifestNode]].ok([])
             manifest_model = m.Meltano.DbtManifest.model_validate(self._dbt_manifest)
             parsed_nodes = [
                 m.Meltano.DbtManifestNode.model_validate(node)
@@ -105,9 +102,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             filtered_nodes = [
                 node for node in parsed_nodes if node.resource_type == resource_type
             ]
-            return r[Sequence[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
+            return r[t.SequenceOf[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
         except (c.ValidationError, OSError, ValueError, TypeError) as e:
-            return r[Sequence[m.Meltano.DbtManifestNode]].fail(
+            return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
                 f"Failed to read manifest nodes: {e}"
             )
 

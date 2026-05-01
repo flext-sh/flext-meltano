@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from typing import override
 
 import click
@@ -27,7 +24,7 @@ class _SuccessfulTap:
     def get_singer_command(cls) -> click.Command:
         return click.Command("tap-ok")
 
-    def discover_streams(self) -> Sequence[_StreamInfo]:
+    def discover_streams(self) -> t.SequenceOf[_StreamInfo]:
         return [_StreamInfo("users")]
 
     def sync_all(self) -> None:
@@ -42,7 +39,7 @@ class _FailingTap(_SuccessfulTap):
             @override
             def main(
                 self,
-                args: Sequence[str] | None = None,
+                args: t.SequenceOf[str] | None = None,
                 prog_name: str | None = None,
                 complete_var: str | None = None,
                 standalone_mode: bool = True,

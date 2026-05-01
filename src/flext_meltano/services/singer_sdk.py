@@ -34,7 +34,7 @@ class FlextMeltanoSingerTapAdapter:
     def settings(self) -> t.JsonMapping:
         """Expose the tap configuration through the internal contract."""
         config_source = getattr(self._tap, "config", None)
-        empty_source: Mapping[str, t.JsonPayload] = {}
+        empty_source: t.MappingKV[str, t.JsonPayload] = {}
         if isinstance(config_source, Mapping):
             source = config_source
         else:
@@ -87,9 +87,9 @@ class FlextMeltanoSingerTapAdapter:
         except SystemExit as exc:
             return exc.code if isinstance(exc.code, int) else 1
 
-    def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
+    def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
         """Delegate stream discovery to the raw Singer tap."""
-        streams: Sequence[p.Meltano.SingerStreamInfo] = self._tap.discover_streams()
+        streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap.discover_streams()
         return streams
 
     def sync_all(self) -> None:

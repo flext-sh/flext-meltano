@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from collections.abc import (
     Callable,
-    Mapping,
 )
 
 from flext_meltano import (
@@ -53,7 +52,7 @@ class FlextMeltanoCommandRouter:
         command: str,
     ) -> p.Result[Callable[[t.StrSequence], p.Result[str]]]:
         """Get command handler for given command."""
-        command_map: Mapping[str, Callable[[t.StrSequence], p.Result[str]]] = {
+        command_map: t.MappingKV[str, Callable[[t.StrSequence], p.Result[str]]] = {
             c.Meltano.CliCommand.PIPELINE: self.cli.pipeline_manager.handle_command,
             c.Meltano.CliCommand.TAP: self.cli.singer_manager.handle_tap_command,
             c.Meltano.CliCommand.TARGET: self.cli.singer_manager.handle_target_command,

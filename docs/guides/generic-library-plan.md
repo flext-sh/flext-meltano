@@ -287,7 +287,7 @@ def execute_tap(
 
 ```python
 def execute_target(
-    target_name: str, records: Sequence[m.Dict], settings: m.Dict
+    target_name: str, records: t.SequenceOf[m.Dict], settings: m.Dict
 ) -> p.Result[TargetExecutionResult]:
     """Execute Singer target with records.
 

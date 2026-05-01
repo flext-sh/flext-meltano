@@ -7,10 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
-
 from flext_cli import t
 
 from flext_meltano import c
@@ -19,7 +15,7 @@ from flext_meltano import c
 class FlextMeltanoTypingsDomains:
     """Domain-specific type definitions for Meltano subsystems."""
 
-    type NestedStrMapping = Mapping[str, t.StrMapping]
+    type NestedStrMapping = t.MappingKV[str, t.StrMapping]
     type EnvironmentInput = c.Meltano.Environment | c.Meltano.EnvironmentAlias
     type ServicePayload = t.JsonMapping
     type DbtManifestData = t.JsonMapping

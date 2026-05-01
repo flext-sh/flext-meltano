@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     MutableMapping,
 )
 from pathlib import Path
@@ -106,11 +105,11 @@ class FlextMeltanoModelsResultsDbt:
             """ISO timestamp of when the result was generated."""
             return u.generate_iso_timestamp()
 
-        def to_dict(self) -> Mapping[str, t.Scalar | t.StrSequence]:
+        def to_dict(self) -> t.MappingKV[str, t.Scalar | t.StrSequence]:
             """Convert to dictionary representation.
 
             Returns:
-            Mapping[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
+            t.MappingKV[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
 
             """
             dumped: MutableMapping[str, t.Scalar | t.StrSequence] = {}

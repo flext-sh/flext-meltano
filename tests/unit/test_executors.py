@@ -11,9 +11,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from unittest import mock
 
@@ -284,7 +281,7 @@ class TestsFlextMeltanoExecutors:
 
     def test_command_routing_edge_cases(self) -> None:
         """Test command routing edge cases."""
-        edge_case_commands: Sequence[tuple[str, t.StrSequence]] = [
+        edge_case_commands: t.SequenceOf[tuple[str, t.StrSequence]] = [
             ("nonexistent", []),
             ("version", ["extra", "args"]),
         ]

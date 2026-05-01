@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
 from types import MappingProxyType
 from typing import Annotated, Self
 
@@ -106,7 +102,7 @@ class FlextMeltanoModelsInstancesData:
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
-            Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
+            t.MappingKV[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             u.Field(description="Discovered streams"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         discovered: Annotated[
@@ -132,9 +128,9 @@ class FlextMeltanoModelsInstancesData:
         @property
         def is_ready_for_extraction(self) -> bool:
             """Check if source is ready for data extraction."""
-            streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
-                list(self.streams.values())
-            )
+            streams_list: t.SequenceOf[
+                FlextMeltanoModelsSourcesParams.StreamDefinition
+            ] = list(self.streams.values())
             return (
                 self.discovered
                 and u.count(streams_list) > 0
@@ -151,9 +147,9 @@ class FlextMeltanoModelsInstancesData:
         @property
         def total_records_extracted(self) -> int:
             """Total records extracted across all streams."""
-            streams_list: Sequence[FlextMeltanoModelsSourcesParams.StreamDefinition] = (
-                list(self.streams.values())
-            )
+            streams_list: t.SequenceOf[
+                FlextMeltanoModelsSourcesParams.StreamDefinition
+            ] = list(self.streams.values())
             result = u.agg(streams_list, "records_extracted", fn=sum)
             match result:
                 case int():

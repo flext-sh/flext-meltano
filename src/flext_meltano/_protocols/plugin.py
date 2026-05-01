@@ -7,9 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from typing import Protocol, runtime_checkable
 
 from flext_meltano import t
@@ -46,10 +43,10 @@ class FlextMeltanoProtocolsPlugin:
         tap_stream_id: str
         schema: t.JsonMapping
 
-        def get_records(self) -> Sequence[t.JsonMapping]:
+        def get_records(self) -> t.SequenceOf[t.JsonMapping]:
             """Get records from the stream. # INTERFACE."""
             ...
 
-        def sync_records(self) -> Sequence[t.JsonMapping]:
+        def sync_records(self) -> t.SequenceOf[t.JsonMapping]:
             """Sync records from the stream. # INTERFACE."""
             ...

@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from types import MappingProxyType
 from typing import Final
 
@@ -47,19 +44,19 @@ class FlextMeltanoConstantsSettings:
         FlextMeltanoConstantsEnums.Environment.TESTING,
         FlextMeltanoConstantsEnums.Environment.PRODUCTION,
     )
-    ENVIRONMENT_ALIASES: Final[Mapping[str, FlextMeltanoConstantsEnums.Environment]] = (
-        MappingProxyType({
-            FlextMeltanoConstantsEnums.EnvironmentAlias.DEV: (
-                FlextMeltanoConstantsEnums.Environment.DEVELOPMENT
-            ),
-            FlextMeltanoConstantsEnums.EnvironmentAlias.TEST: (
-                FlextMeltanoConstantsEnums.Environment.TESTING
-            ),
-            FlextMeltanoConstantsEnums.EnvironmentAlias.PROD: (
-                FlextMeltanoConstantsEnums.Environment.PRODUCTION
-            ),
-        })
-    )
+    ENVIRONMENT_ALIASES: Final[
+        t.MappingKV[str, FlextMeltanoConstantsEnums.Environment]
+    ] = MappingProxyType({
+        FlextMeltanoConstantsEnums.EnvironmentAlias.DEV: (
+            FlextMeltanoConstantsEnums.Environment.DEVELOPMENT
+        ),
+        FlextMeltanoConstantsEnums.EnvironmentAlias.TEST: (
+            FlextMeltanoConstantsEnums.Environment.TESTING
+        ),
+        FlextMeltanoConstantsEnums.EnvironmentAlias.PROD: (
+            FlextMeltanoConstantsEnums.Environment.PRODUCTION
+        ),
+    })
     ENVIRONMENT_RUNTIME_ALIASES: Final[t.StrMapping] = MappingProxyType({
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
@@ -108,28 +105,28 @@ class FlextMeltanoConstantsSettings:
         FlextMeltanoConstantsEnums.PluginType.LOADERS,
         FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
     )
-    PLUGIN_GROUP_ALIASES: Final[Mapping[str, FlextMeltanoConstantsEnums.PluginType]] = (
-        MappingProxyType({
-            "extractor": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
-            FlextMeltanoConstantsEnums.PluginType.EXTRACTORS: (
-                FlextMeltanoConstantsEnums.PluginType.EXTRACTORS
-            ),
-            "tap": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
-            "loader": FlextMeltanoConstantsEnums.PluginType.LOADERS,
-            FlextMeltanoConstantsEnums.PluginType.LOADERS: (
-                FlextMeltanoConstantsEnums.PluginType.LOADERS
-            ),
-            "target": FlextMeltanoConstantsEnums.PluginType.LOADERS,
-            "transformer": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
-            "transformers": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
-            FlextMeltanoConstantsEnums.PluginType.TRANSFORMS: (
-                FlextMeltanoConstantsEnums.PluginType.TRANSFORMS
-            ),
-            "dbt": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
-        })
-    )
+    PLUGIN_GROUP_ALIASES: Final[
+        t.MappingKV[str, FlextMeltanoConstantsEnums.PluginType]
+    ] = MappingProxyType({
+        "extractor": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
+        FlextMeltanoConstantsEnums.PluginType.EXTRACTORS: (
+            FlextMeltanoConstantsEnums.PluginType.EXTRACTORS
+        ),
+        "tap": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
+        "loader": FlextMeltanoConstantsEnums.PluginType.LOADERS,
+        FlextMeltanoConstantsEnums.PluginType.LOADERS: (
+            FlextMeltanoConstantsEnums.PluginType.LOADERS
+        ),
+        "target": FlextMeltanoConstantsEnums.PluginType.LOADERS,
+        "transformer": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+        "transformers": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+        FlextMeltanoConstantsEnums.PluginType.TRANSFORMS: (
+            FlextMeltanoConstantsEnums.PluginType.TRANSFORMS
+        ),
+        "dbt": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
+    })
     PLUGIN_DISCOVERY_LABELS: Final[
-        Mapping[
+        t.MappingKV[
             FlextMeltanoConstantsEnums.PluginType,
             FlextMeltanoConstantsEnums.PluginDiscoveryLabel,
         ]

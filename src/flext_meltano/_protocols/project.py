@@ -7,9 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
@@ -37,7 +34,7 @@ class FlextMeltanoProtocolsProject:
         def find_plugins(
             self,
             plugin_type: str,
-        ) -> Sequence[t.JsonMapping]:
+        ) -> t.SequenceOf[t.JsonMapping]:
             """Find plugins of specified type."""
             ...
 

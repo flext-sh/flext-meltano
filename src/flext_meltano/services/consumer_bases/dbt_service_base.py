@@ -12,9 +12,6 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
@@ -227,16 +224,16 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         except (ValueError, TypeError, KeyError, OSError) as exc:
             return r[t.Meltano.DbtManifestData].fail(str(exc))
 
-    def fetch_models(self) -> p.Result[Sequence[t.Meltano.OptionalScalarMap]]:
+    def fetch_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
         if manifest_result.failure:
-            return r[Sequence[t.Meltano.OptionalScalarMap]].fail(
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
                 manifest_result.error or "Manifest load failed"
             )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
-            models: Sequence[t.Meltano.OptionalScalarMap] = [
+            models: t.SequenceOf[t.Meltano.OptionalScalarMap] = [
                 {
                     "name": str(node.name),
                     "path": str(node.path),
@@ -246,9 +243,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 for node in manifest.nodes.values()
                 if node.resource_type == c.Meltano.DbtResourceType.MODEL
             ]
-            return r[Sequence[t.Meltano.OptionalScalarMap]].ok(models)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
         except (ValueError, TypeError, KeyError) as exc:
-            return r[Sequence[t.Meltano.OptionalScalarMap]].fail(str(exc))
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

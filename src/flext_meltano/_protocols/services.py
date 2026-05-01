@@ -7,9 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
 
@@ -41,7 +38,7 @@ class FlextMeltanoProtocolsServices:
             self,
             plugin_type: str | None = None,
             _cwd: Path | None = None,
-        ) -> p.Result[Sequence[t.StrMapping]]:
+        ) -> p.Result[t.SequenceOf[t.StrMapping]]:
             """Return project-scoped plugin definitions."""
             ...
 

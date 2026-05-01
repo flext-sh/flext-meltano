@@ -8,9 +8,6 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import (
-    Sequence,
-)
 from contextlib import redirect_stderr, redirect_stdout, suppress
 from io import StringIO
 from pathlib import Path
@@ -155,11 +152,11 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         self,
         plugin_type: str | None = None,
         _cwd: Path | None = None,
-    ) -> p.Result[Sequence[t.StrMapping]]:
+    ) -> p.Result[t.SequenceOf[t.StrMapping]]:
         """Return project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.failure:
-            return r[Sequence[t.StrMapping]].fail(
+            return r[t.SequenceOf[t.StrMapping]].fail(
                 project_result.error or "Failed to load Meltano project",
             )
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
@@ -168,7 +165,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             current_plugins_raw,
             selected_type=selected_type,
         )
-        return r[Sequence[t.StrMapping]].ok(discovered)
+        return r[t.SequenceOf[t.StrMapping]].ok(discovered)
 
     def _runtime_environment_args(self, _cwd: Path | None = None) -> t.StrSequence:
         """Select a runtime environment explicitly to avoid leaking test env vars."""

@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -123,7 +120,7 @@ class FlextMeltanoModelsSourcesParams:
 
         @u.field_serializer("stream_schema")
         def serialize_stream_schema(
-            self, value: Mapping[str, t.JsonValue]
+            self, value: t.MappingKV[str, t.JsonValue]
         ) -> t.JsonMapping:
             """Normalize stream schema structure."""
             result: dict[str, t.JsonValue] = dict(value)

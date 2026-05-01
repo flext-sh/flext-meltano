@@ -9,10 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableSequence,
-)
-
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 
@@ -55,7 +51,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         params: m.Meltano.CliTransformationParams,
     ) -> p.Result[t.StrSequence]:
         """Convert TransformationParams to dbt CLI command."""
-        command: MutableSequence[str] = [
+        command: t.MutableSequenceOf[str] = [
             c.Meltano.DBT_BINARY,
             c.Meltano.DbtCommand.RUN,
             c.Meltano.DbtOption.PROJECTS_DIR,
@@ -76,14 +72,14 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         params: m.Meltano.CliPipelineParams,
     ) -> p.Result[tuple[t.StrSequence, t.StrSequence]]:
         """Convert PipelineParams to source and sink CLI commands."""
-        source_command: MutableSequence[str] = [params.source_name]
+        source_command: t.MutableSequenceOf[str] = [params.source_name]
         if params.source_config:
             source_command.extend(["--config", params.source_config])
         if params.catalog_file:
             source_command.extend(["--catalog", params.catalog_file])
         if params.state_file:
             source_command.extend(["--state", params.state_file])
-        sink_command: MutableSequence[str] = [params.sink_name]
+        sink_command: t.MutableSequenceOf[str] = [params.sink_name]
         if params.sink_config:
             sink_command.extend(["--config", params.sink_config])
         return r[tuple[t.StrSequence, t.StrSequence]].ok((source_command, sink_command))
@@ -93,7 +89,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         params: m.Meltano.CliDataSourceParams,
     ) -> p.Result[t.StrSequence]:
         """Convert DataSourceParams to Singer SDK source CLI command."""
-        command: MutableSequence[str] = [params.source_name]
+        command: t.MutableSequenceOf[str] = [params.source_name]
         if params.discover:
             command.append(c.Meltano.SingerCliOption.DISCOVER)
             return r[t.StrSequence].ok(command)
@@ -115,7 +111,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         params: m.Meltano.CliDataSinkParams,
     ) -> p.Result[t.StrSequence]:
         """Convert DataSinkParams to Singer SDK sink CLI command."""
-        command: MutableSequence[str] = [params.sink_name]
+        command: t.MutableSequenceOf[str] = [params.sink_name]
         if params.config_file:
             command.extend([c.Meltano.SingerCliOption.CONFIG, params.config_file])
         if params.input_file:

@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated
@@ -43,13 +40,13 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer stream schema payload",
             ),
         ]
-        metadata: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata] = (
-            u.Field(
-                default_factory=lambda: list[
-                    FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
-                ](),
-                description="Singer stream metadata blocks",
-            )
+        metadata: t.SequenceOf[
+            FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
+        ] = u.Field(
+            default_factory=lambda: list[
+                FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
+            ](),
+            description="Singer stream metadata blocks",
         )
         key_properties: t.StrSequence = u.Field(
             default_factory=tuple,
@@ -90,11 +87,13 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer catalog message discriminator",
             ),
         ] = c.Meltano.SingerMessageType.CATALOG
-        streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = u.Field(
-            default_factory=lambda: list[
-                FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
-            ](),
-            description="Singer catalog stream entries",
+        streams: t.SequenceOf[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = (
+            u.Field(
+                default_factory=lambda: list[
+                    FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
+                ](),
+                description="Singer catalog stream entries",
+            )
         )
 
     class SingerPipelineConfig(m.Entity):

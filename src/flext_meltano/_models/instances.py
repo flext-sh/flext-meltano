@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
 from types import MappingProxyType
 from typing import Annotated, Self
 
@@ -63,7 +59,7 @@ class FlextMeltanoModelsInstances:
             t.NonEmptyStr, u.Field(description="Stream name identifier")
         ]
         stream_schema: Annotated[
-            Mapping[str, t.Scalar | t.ScalarMapping],
+            t.MappingKV[str, t.Scalar | t.ScalarMapping],
             u.Field(description="Stream schema definition"),
         ]
         key_properties: Annotated[
@@ -149,7 +145,7 @@ class FlextMeltanoModelsInstances:
             t.JsonValue | None,
             u.Field(default=None, description="Tap adapter instance"),
         ] = None
-        streams: Sequence[FlextMeltanoModelsInstances.StreamInfo] = u.Field(
+        streams: t.SequenceOf[FlextMeltanoModelsInstances.StreamInfo] = u.Field(
             default_factory=lambda: list[FlextMeltanoModelsInstances.StreamInfo](),
             description="Available streams",
         )
@@ -162,7 +158,9 @@ class FlextMeltanoModelsInstances:
 
         @u.computed_field()
         @property
-        def active_streams(self) -> Sequence[FlextMeltanoModelsInstances.StreamInfo]:
+        def active_streams(
+            self,
+        ) -> t.SequenceOf[FlextMeltanoModelsInstances.StreamInfo]:
             """Active streams for extraction."""
             return [s for s in self.streams if s.status in c.Meltano.ACTIVE_STATUSES]
 

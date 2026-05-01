@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableSequence,
-)
 from pathlib import Path
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
@@ -30,9 +27,9 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
         subcommand: str,
         models: t.StrSequence | None = None,
         extra_args: t.StrSequence | None = None,
-    ) -> MutableSequence[str]:
+    ) -> t.MutableSequenceOf[str]:
         """Build dbt CLI command with standard arguments."""
-        cmd: MutableSequence[str] = [c.Meltano.DBT_BINARY, subcommand]
+        cmd: t.MutableSequenceOf[str] = [c.Meltano.DBT_BINARY, subcommand]
         if self._dbt_runner_project_root:
             cmd.extend([
                 c.Meltano.DbtOption.PROJECTS_DIR,
@@ -46,7 +43,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
     def _run_dbt_subprocess(
         self,
-        cmd: MutableSequence[str],
+        cmd: t.MutableSequenceOf[str],
         operation: str,
     ) -> p.Result[str]:
         """Execute a dbt command via subprocess."""

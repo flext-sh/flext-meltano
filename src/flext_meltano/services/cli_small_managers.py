@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from collections.abc import (
     Callable,
-    Sequence,
 )
 from pathlib import Path
 from typing import Final, override
@@ -67,7 +66,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
 
     @staticmethod
     def _format_plugin_rows(
-        plugins: Sequence[t.JsonMapping],
+        plugins: t.SequenceOf[t.JsonMapping],
     ) -> str:
         """Render SDK plugin definitions as deterministic JSON."""
         items: list[dict[str, str]] = []
@@ -111,7 +110,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
         """Return deterministic plugin information for one installed plugin."""
 
         def _select_plugin(
-            plugins: Sequence[t.JsonMapping],
+            plugins: t.SequenceOf[t.JsonMapping],
         ) -> p.Result[str]:
             for plugin in plugins:
                 current_name = str(plugin.get("name", "")).strip()

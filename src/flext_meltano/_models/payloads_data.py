@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from collections.abc import (
     Mapping,
-    MutableSequence,
-    Sequence,
 )
 from pathlib import Path
 from types import MappingProxyType
@@ -47,7 +45,7 @@ class FlextMeltanoModelsPayloadsData:
         """Typed record batch payload used by API load flow."""
 
         records: Annotated[
-            Sequence[t.JsonMapping],
+            t.SequenceOf[t.JsonMapping],
             u.Field(description="Normalized record payloads"),
         ] = u.Field(
             default_factory=lambda: list[t.JsonMapping](),
@@ -59,11 +57,11 @@ class FlextMeltanoModelsPayloadsData:
         def normalize_records(
             cls,
             value: t.Meltano.ValidatorInput,
-        ) -> Sequence[t.JsonMapping] | t.StrSequence:
+        ) -> t.SequenceOf[t.JsonMapping] | t.StrSequence:
             """Normalize mixed record input into dict records."""
             match value:
                 case list() | tuple():
-                    records: MutableSequence[t.JsonMapping] = []
+                    records: t.MutableSequenceOf[t.JsonMapping] = []
                     for record in value:
                         match record:
                             case Mapping():

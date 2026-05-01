@@ -13,7 +13,6 @@ import sys
 from abc import abstractmethod
 from collections.abc import (
     MutableMapping,
-    Sequence,
 )
 from typing import Annotated, ClassVar, Self, override
 
@@ -139,7 +138,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     def process_batch(
         self,
         stream_name: str,
-        records: Sequence[t.JsonMapping],
+        records: t.SequenceOf[t.JsonMapping],
         schema: t.JsonMapping,
     ) -> p.Result[int]:
         """Process a batch of records."""

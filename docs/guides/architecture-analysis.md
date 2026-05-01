@@ -138,7 +138,7 @@ class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
     def __init__(self, target_name: str, settings: m.Dict)
-    async def load_records(self, records: Sequence[m.Dict]) -> p.Result[LoadResult]
+    async def load_records(self, records: t.SequenceOf[m.Dict]) -> p.Result[LoadResult]
     async def flush(self) -> p.Result[FlushResult]
 ```
 
@@ -341,7 +341,7 @@ class FlextMeltanoWorkerPool:
         self.max_workers = max_workers
         self.worker_pool = []
 
-    async def execute_pipeline_parallel(self, pipelines: Sequence[PipelineConfig]):
+    async def execute_pipeline_parallel(self, pipelines: t.SequenceOf[PipelineConfig]):
         # Distribute pipelines across workers
         # Monitor worker health and redistribute load
         # Handle worker failures and recovery
