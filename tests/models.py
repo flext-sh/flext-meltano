@@ -1,6 +1,6 @@
 """Test models for flext-meltano.
 
-Provides test-specific models extending TestsFlextModels and FlextMeltanoModels
+Provides test-specific models extending TestsFlextModels and m
 with proper hierarchy composition.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -9,18 +9,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_infra import FlextInfraModels
 from flext_tests import FlextTestsModels
 
-from flext_meltano import FlextMeltanoModels
+from flext_meltano import m
 
 
-class TestsFlextMeltanoModels(FlextTestsModels, FlextInfraModels, FlextMeltanoModels):
-    """Test models - composition of TestsFlextModels + FlextMeltanoModels.
+class TestsFlextMeltanoModels(FlextTestsModels, m):
+    """Test models - composition of TestsFlextModels + m.
 
     Hierarchy:
     - TestsFlextModels: Generic test utilities from flext-tests
-    - FlextMeltanoModels: Domain models from flext-meltano
+    - m: Domain models from flext-meltano
     - TestsFlextMeltanoModels: Composition + namespace .Tests
 
     Access patterns:
@@ -28,7 +27,7 @@ class TestsFlextMeltanoModels(FlextTestsModels, FlextInfraModels, FlextMeltanoMo
     - m.Meltano.* - Production domain models (inherited)
     """
 
-    class Meltano(FlextMeltanoModels.Meltano):
+    class Meltano(m.Meltano):
         """Meltano domain models test namespace."""
 
         class Tests(FlextTestsModels.Tests):

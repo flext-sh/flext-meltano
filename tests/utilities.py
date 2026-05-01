@@ -10,13 +10,13 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsUtilities
 
-from flext_meltano import FlextMeltanoUtilities
+from flext_meltano import u
 
 
-class TestsFlextMeltanoUtilities(FlextTestsUtilities, FlextMeltanoUtilities):
+class TestsFlextMeltanoUtilities(FlextTestsUtilities, u):
     """Test utilities for flext-meltano."""
 
-    class Meltano(FlextMeltanoUtilities.Meltano):
+    class Meltano(u.Meltano):
         """Meltano-specific utilities."""
 
         class Tests(FlextTestsUtilities.Tests):

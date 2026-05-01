@@ -5,7 +5,7 @@ constants using COMPOSITION INHERITANCE.
 
 Inheritance hierarchy:
 - FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
-- FlextMeltanoConstants (production) - Provides .Meltano.* namespace
+- c (production) - Provides .Meltano.* namespace
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -13,7 +13,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from enum import StrEnum, unique
 from pathlib import Path
 from types import MappingProxyType
@@ -21,14 +20,14 @@ from typing import Final
 
 from flext_tests import FlextTestsConstants
 
-from flext_meltano import FlextMeltanoConstants
+from flext_meltano import c, t
 
 
-class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
+class TestsFlextMeltanoConstants(FlextTestsConstants, c):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
     MANDATORY: Inherits from FlextTestsConstants for test infrastructure (.Tests.*).
-    Access project constants via inner class inheriting from FlextMeltanoConstants.Meltano.
+    Access project constants via inner class inheriting from c.Meltano.
 
     Access patterns:
     - c.Tests.* (container testing)
@@ -38,13 +37,13 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     - c.Paths.* (project-specific test data)
 
     Rules:
-    - NEVER duplicate constants from FlextTestsConstants or FlextMeltanoConstants
+    - NEVER duplicate constants from FlextTestsConstants or c
     - Only flext-meltano-specific test constants allowed (not generic for other projects)
     - All generic constants come from FlextTestsConstants
-    - All production constants come from FlextMeltanoConstants
+    - All production constants come from c
     """
 
-    class Meltano(FlextMeltanoConstants.Meltano):
+    class Meltano(c.Meltano):
         """Meltano domain namespace."""
 
         class Tests(FlextTestsConstants.Tests):
@@ -58,8 +57,8 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
                 REDIS = "redis"
                 MELTANO = "meltano"
 
-            HOST: Final[str] = FlextMeltanoConstants.LOCALHOST
-            SERVICE_PORTS: Final[Mapping[_DockerService, int]] = MappingProxyType({
+            HOST: Final[str] = c.LOCALHOST
+            SERVICE_PORTS: Final[t.MappingKV[_DockerService, int]] = MappingProxyType({
                 _DockerService.POSTGRES: 5433,
                 _DockerService.REDIS: 6380,
                 _DockerService.MELTANO: 3389,
