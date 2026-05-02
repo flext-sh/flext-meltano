@@ -244,7 +244,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 if node.resource_type == c.Meltano.DbtResourceType.MODEL
             ]
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
-        except (ValueError, TypeError, KeyError) as exc:
+        except c.EXC_MAPPING_TYPE as exc:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(str(exc))
 
     @override
