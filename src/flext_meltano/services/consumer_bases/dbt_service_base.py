@@ -149,7 +149,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 return r[str].fail(out.stderr or operation)
             self.logger.info("dbt command completed", operation=operation)
             return r[str].ok(out.stdout)
-        except (ValueError, TypeError, OSError, RuntimeError) as exc:
+        except c.EXC_OS_RUNTIME_TYPE as exc:
             return r[str].fail(str(exc))
 
     def run_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
