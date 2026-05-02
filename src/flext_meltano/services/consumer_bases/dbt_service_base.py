@@ -221,7 +221,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }
             return r[t.Meltano.DbtManifestData].ok(manifest_data)
-        except (ValueError, TypeError, KeyError, OSError) as exc:
+        except c.EXC_KEY_OS_TYPE_VALUE as exc:
             return r[t.Meltano.DbtManifestData].fail(str(exc))
 
     def fetch_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
