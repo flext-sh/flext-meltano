@@ -106,7 +106,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 )
                 return 1
             return 0
-        except (ValueError, TypeError, OSError, RuntimeError) as exc:
+        except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("dbt CLI failed", error=str(exc))
             return 1
 

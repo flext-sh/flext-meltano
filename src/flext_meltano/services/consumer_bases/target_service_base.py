@@ -73,7 +73,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
             _ = command_args
             self.logger.info("Target CLI started", target=self.target_name)
             return 0
-        except (ValueError, TypeError, OSError, RuntimeError) as exc:
+        except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("Target CLI failed", error=str(exc))
             return 1
 

@@ -17,7 +17,7 @@ import sys
 from abc import abstractmethod
 from typing import Annotated, ClassVar, Self, override
 
-from flext_meltano import FlextMeltanoServiceBase, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
@@ -79,7 +79,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
             return tap.run_cli(command_args, self.tap_name)
-        except (ValueError, TypeError, OSError, RuntimeError) as exc:
+        except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("Tap CLI failed", error=str(exc))
             return 1
 
