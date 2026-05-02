@@ -51,7 +51,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
             )
         try:
             pid = int(pid_path.read_text(encoding=c.Cli.ENCODING_DEFAULT).strip())
-        except (ValueError, OSError) as exc:
+        except c.EXC_OS_VALUE as exc:
             return r[tuple[int, Path]].fail(
                 f"Failed to read PID for pipeline '{pipeline_name}': {exc}",
             )
