@@ -120,7 +120,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
                     })
                 return r[t.JsonMapping].ok({"plugins": plugins})
             except c.Meltano.OPERATION_ERRORS as ex:
-                return r[t.JsonMapping].fail(f"Plugin discovery failed: {ex}")
+                return r[t.JsonMapping].fail_op("Plugin discovery", ex)
 
         @override
         def execute(self) -> p.Result[t.JsonMapping]:

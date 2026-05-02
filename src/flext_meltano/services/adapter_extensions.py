@@ -74,7 +74,7 @@ class FlextMeltanoPipelineAdapter(FlextMeltanoServiceBase):
             }
             return r[t.JsonMapping].ok(pipeline_result)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[t.JsonMapping].fail(f"Pipeline execution failed: {ex}")
+            return r[t.JsonMapping].fail_op("Pipeline execution", ex)
 
 
 class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
@@ -119,7 +119,7 @@ class FlextMeltanoDbtAdapter(FlextMeltanoServiceBase):
             }
             return r[t.JsonMapping].ok(dbt_result)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r[t.JsonMapping].fail(f"DBT operation failed: {ex}")
+            return r[t.JsonMapping].fail_op("DBT operation", ex)
 
 
 __all__: list[str] = ["FlextMeltanoDbtAdapter", "FlextMeltanoPipelineAdapter"]

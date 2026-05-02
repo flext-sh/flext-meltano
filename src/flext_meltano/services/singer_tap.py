@@ -71,8 +71,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
-            return r[m.Meltano.DataSourceInstance].fail(
-                f"Source instance creation failed: {e}"
+            return r[m.Meltano.DataSourceInstance].fail_op(
+                "Source instance creation", e
             )
 
     def create_tap_from_config(
@@ -133,7 +133,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             self.logger.exception(
                 "Source configuration processing failed", error=str(e)
             )
-            return r[bool].fail(f"Source configuration processing failed: {e}")
+            return r[bool].fail_op("Source configuration processing", e)
 
     def validate_stream_schema(
         self, stream_def: m.Meltano.StreamDefinition
@@ -150,7 +150,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Schema validation failed", error=str(e))
-            return r[bool].fail(f"Schema validation failed: {e}")
+            return r[bool].fail_op("Schema validation", e)
 
 
 __all__: list[str] = ["FlextMeltanoTapAbstractions", "FlextMeltanoTapSourceMixin"]

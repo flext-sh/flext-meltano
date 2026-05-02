@@ -142,7 +142,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                     dump_result.error or "YAML dump failed"
                 )
         except OSError as e:
-            return r[t.Meltano.DbtProject].fail(f"Temp project creation failed: {e}")
+            return r[t.Meltano.DbtProject].fail_op("Temp project creation", e)
 
         inst_r = self._initialize_project_instance(temp_path)
         if inst_r.failure:

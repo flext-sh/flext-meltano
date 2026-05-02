@@ -158,11 +158,11 @@ class FlextMeltanoUtilitiesSinger:
                     state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
                     result = handler.handle_state(state_msg)
                     if result.failure:
-                        return r[None].fail(f"STATE handler failed: {result.error}")
+                        return r[None].fail_op("STATE handler", result.error)
 
             return r[None].ok(None)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
-            return r[None].fail(f"Stdin processing failed: {e}")
+            return r[None].fail_op("Stdin processing", e)
 
     @staticmethod
     def build_catalog_entry(

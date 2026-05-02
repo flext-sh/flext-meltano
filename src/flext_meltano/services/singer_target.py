@@ -46,9 +46,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             return r[m.Meltano.DataSinkDefinition].ok(sink_def)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Sink configuration failed", error=str(e))
-            return r[m.Meltano.DataSinkDefinition].fail(
-                f"Sink configuration failed: {e}",
-            )
+            return r[m.Meltano.DataSinkDefinition].fail_op("Sink configuration", e)
 
     def create_flext_target(
         self,
@@ -91,9 +89,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             return r[m.Meltano.DataSinkInstance].ok(sink_instance)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
-            return r[m.Meltano.DataSinkInstance].fail(
-                f"Sink instance creation failed: {e}",
-            )
+            return r[m.Meltano.DataSinkInstance].fail_op("Sink instance creation", e)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
@@ -117,7 +113,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 "Target configuration validation failed",
                 error=str(e),
             )
-            return r[bool].fail(f"Target configuration validation failed: {e}")
+            return r[bool].fail_op("Target configuration validation", e)
 
 
 __all__: list[str] = ["FlextMeltanoTargetAbstractions"]

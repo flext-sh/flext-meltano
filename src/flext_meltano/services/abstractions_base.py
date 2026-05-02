@@ -46,7 +46,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         )
         if run_result.failure:
             error_msg = run_result.error or "Unknown error"
-            return r[str].fail(f"Meltano command failed: {error_msg}")
+            return r[str].fail_op("Meltano command", error_msg)
         completed: m.Meltano.CommandExecutionResult = run_result.value
         if completed.exit_code != 0:
             stderr_out = completed.error.strip() or completed.output.strip()

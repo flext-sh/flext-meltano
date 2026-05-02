@@ -194,9 +194,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             OSError,
             RuntimeError,
         ) as exc:
-            return r[t.JsonMapping].fail(
-                f"Command routing failed: {exc}",
-            )
+            return r[t.JsonMapping].fail_op("Command routing", exc)
 
 
 __all__: list[str] = ["FlextMeltanoExecutor"]

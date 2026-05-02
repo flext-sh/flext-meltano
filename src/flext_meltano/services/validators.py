@@ -24,7 +24,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             m.Meltano.PluginComponentConfig.model_validate(settings)
             return r[bool].ok(value=True)
         except c.ValidationError as error:
-            return r[bool].fail(f"Plugin settings validation failed: {error}")
+            return r[bool].fail_op("Plugin settings validation", error)
 
     @classmethod
     def validate_pipeline_project_business_rules(
@@ -36,7 +36,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             m.Meltano.PipelineProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
         except c.ValidationError as error:
-            return r[bool].fail(f"Project validation failed: {error}")
+            return r[bool].fail_op("Project validation", error)
 
     @classmethod
     def validate_pipeline_project_structure(cls, project_path: Path) -> p.Result[bool]:
@@ -79,7 +79,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
             m.Meltano.TransformationProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
         except c.ValidationError as error:
-            return r[bool].fail(f"Transformation validation failed: {error}")
+            return r[bool].fail_op("Transformation validation", error)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

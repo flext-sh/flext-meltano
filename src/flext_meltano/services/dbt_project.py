@@ -129,8 +129,8 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 manifest_path, m.Meltano.DbtManifest
             )
             if parsed_result.failure:
-                return r[t.Meltano.DbtManifestData].fail(
-                    f"Manifest reading failed: {parsed_result.error}"
+                return r[t.Meltano.DbtManifestData].fail_op(
+                    "Manifest reading", parsed_result.error
                 )
             parsed_manifest = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
