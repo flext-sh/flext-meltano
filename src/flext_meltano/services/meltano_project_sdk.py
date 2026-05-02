@@ -125,7 +125,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 if json_variant is not None:
                     plugin_def["variant"] = json_variant
                 plugins.append(plugin_def)
-        except (TypeError, AttributeError) as e:
+        except c.EXC_ATTR_TYPE as e:
             self.logger.warning("Failed to extract plugins", error=str(e))
         return plugins
 

@@ -99,14 +99,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
                 count=len(stream_names),
             )
             return r[t.StrSequence].ok(stream_names)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-        ) as exc:
+        except c.EXC_BROAD_RUNTIME_OS as exc:
             self.logger.exception("Discovery failed", error=str(exc))
             return r[t.StrSequence].fail(str(exc))
 
@@ -116,14 +109,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
             tap = self._get_or_create_tap()
             tap.sync_all()
             return r[str].ok(self.tap_name)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-        ) as exc:
+        except c.EXC_BROAD_RUNTIME_OS as exc:
             self.logger.exception("Sync failed", error=str(exc))
             return r[str].fail(str(exc))
 
