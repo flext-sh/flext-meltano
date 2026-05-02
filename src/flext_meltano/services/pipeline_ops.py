@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextSettings
+from flext_core import FlextSettings, e
 from flext_meltano import FlextMeltanoExecutorBase, c, m, p, r, t, u
 from flext_meltano.settings import FlextMeltanoSettings
 
@@ -92,7 +92,7 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         """Execute a Meltano pipeline."""
         pipeline_dir = FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
-            return r[str].fail(f"Pipeline '{pipeline_name}' not found")
+            return e.fail_not_found("Pipeline", pipeline_name, result_type=r[str])
         configured_command: t.StrSequence | None = None
         config_path = FlextMeltanoPipelinePaths.pipeline_config_path(pipeline_name)
         if config_path.exists():

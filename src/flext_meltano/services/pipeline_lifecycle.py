@@ -12,7 +12,7 @@ import signal
 import time
 from pathlib import Path
 
-from flext_meltano import FlextMeltanoPipelinePaths, c, p, r
+from flext_meltano import FlextMeltanoPipelinePaths, c, e, p, r
 
 
 class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
@@ -38,7 +38,7 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         """Validate pipeline directory exists and return it."""
         pipeline_dir = FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
         if not pipeline_dir.exists() or not pipeline_dir.is_dir():
-            return r[Path].fail(f"Pipeline '{pipeline_name}' not found")
+            return e.fail_not_found("Pipeline", pipeline_name, result_type=r[Path])
         return r[Path].ok(pipeline_dir)
 
     @staticmethod

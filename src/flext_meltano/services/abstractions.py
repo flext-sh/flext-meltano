@@ -11,7 +11,7 @@ from collections.abc import (
 )
 from typing import Self
 
-from flext_meltano import FlextMeltanoAbstractionsBase, c, m, p, r, t
+from flext_meltano import FlextMeltanoAbstractionsBase, c, e, m, p, r, t
 
 
 class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
@@ -173,7 +173,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     "name": stream_name,
                 }
                 return r[t.JsonMapping].ok(result_stream)
-        return r[t.JsonMapping].fail(f"Stream '{stream_name}' not found")
+        return e.fail_not_found("Stream", stream_name, result_type=r[t.JsonMapping])
 
     def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
         """List stream names available in tap instance."""

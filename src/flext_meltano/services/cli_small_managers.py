@@ -15,6 +15,7 @@ from flext_meltano import (
     FlextMeltanoProjectManager,
     FlextMeltanoServiceBase,
     c,
+    e,
     p,
     r,
     t,
@@ -125,7 +126,7 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
                 if variant:
                     payload["variant"] = variant
                 return r[str].ok(json.dumps(payload, sort_keys=True))
-            return r[str].fail(f"Plugin '{plugin_name}' not found")
+            return e.fail_not_found("Plugin", plugin_name, result_type=r[str])
 
         return self._load_project().flat_map(
             lambda _: self.fetch_sdk_plugins(None).flat_map(_select_plugin)
