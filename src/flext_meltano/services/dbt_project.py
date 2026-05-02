@@ -77,7 +77,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             ]
             self.logger.info("Tests retrieved", count=len(tests))
             return r[t.SequenceOf[t.AttributeMapping]].ok(tests)
-        except (c.ValidationError, OSError, ValueError, TypeError) as e:
+        except c.EXC_OS_VALIDATION as e:
             self.logger.exception("Failed to get tests", error=str(e))
             return r[t.SequenceOf[t.AttributeMapping]].fail(f"Failed to get tests: {e}")
 
@@ -103,7 +103,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 node for node in parsed_nodes if node.resource_type == resource_type
             ]
             return r[t.SequenceOf[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
-        except (c.ValidationError, OSError, ValueError, TypeError) as e:
+        except c.EXC_OS_VALIDATION as e:
             return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
                 f"Failed to read manifest nodes: {e}"
             )
@@ -139,13 +139,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             self._dbt_manifest = manifest_data
             self.logger.info("DBT manifest loaded", file=str(manifest_path))
             return r[t.Meltano.DbtManifestData].ok(self._dbt_manifest)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-        ) as e:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             self.logger.exception("Failed to load manifest", error=str(e))
             return r[t.Meltano.DbtManifestData].fail(f"Failed to load manifest: {e}")
 
@@ -181,13 +175,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 tests=tests_count,
             )
             return r[m.Meltano.DbtProjectInfo].ok(info)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-        ) as e:
+        except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
             return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
