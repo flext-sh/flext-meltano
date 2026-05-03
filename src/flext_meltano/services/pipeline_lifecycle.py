@@ -95,23 +95,26 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         if not FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
             pid_path.unlink(missing_ok=True)
             return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+        error: str | None = None
         try:
             os.kill(pid, signal.SIGTERM)
         except ProcessLookupError:
             pid_path.unlink(missing_ok=True)
-            return r[str].fail(f"Pipeline '{pipeline_name}' is not running")
+            error = f"Pipeline '{pipeline_name}' is not running"
         except OSError as exc:
-            return r[str].fail(f"Failed to stop pipeline '{pipeline_name}': {exc}")
-        deadline = time.monotonic() + timeout_seconds
-        while time.monotonic() < deadline:
-            if not FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
-                pid_path.unlink(missing_ok=True)
-                return r[str].ok("stopped")
-            time.sleep(0.1)
-        return r[str].fail(
-            f"Pipeline '{pipeline_name}' did not stop within"
-            f" {timeout_seconds:.1f} seconds",
-        )
+            error = f"Failed to stop pipeline '{pipeline_name}': {exc}"
+        else:
+            deadline = time.monotonic() + timeout_seconds
+            while time.monotonic() < deadline:
+                if not FlextMeltanoPipelineLifecycleOperations._is_process_running(pid):
+                    pid_path.unlink(missing_ok=True)
+                    return r[str].ok("stopped")
+                time.sleep(0.1)
+            error = (
+                f"Pipeline '{pipeline_name}' did not stop within"
+                f" {timeout_seconds:.1f} seconds"
+            )
+        return r[str].fail(error or "Unknown error")
 
     @staticmethod
     def delete_pipeline(pipeline_name: str) -> p.Result[str]:
@@ -125,16 +128,19 @@ class FlextMeltanoPipelineLifecycleOperations(FlextMeltanoPipelinePaths):
         status_result = FlextMeltanoPipelineLifecycleOperations.get_pipeline_status(
             pipeline_name,
         )
+        error: str | None = None
         if status_result.failure:
-            return r[str].fail(status_result.error)
-        if status_result.value == c.Meltano.OperationStatus.RUNNING.value:
-            return r[str].fail(
-                f"Pipeline '{pipeline_name}' is running. Stop it before deletion",
-            )
-        try:
-            shutil.rmtree(pipeline_dir)
-        except OSError as exc:
-            return r[str].fail(f"Failed to delete pipeline '{pipeline_name}': {exc}")
-        if pipeline_dir.exists():
-            return r[str].fail(f"Pipeline '{pipeline_name}' deletion was not confirmed")
-        return r[str].ok("deleted")
+            error = status_result.error
+        elif status_result.value == c.Meltano.OperationStatus.RUNNING.value:
+            error = f"Pipeline '{pipeline_name}' is running. Stop it before deletion"
+        else:
+            try:
+                shutil.rmtree(pipeline_dir)
+            except OSError as exc:
+                error = f"Failed to delete pipeline '{pipeline_name}': {exc}"
+            else:
+                if pipeline_dir.exists():
+                    error = f"Pipeline '{pipeline_name}' deletion was not confirmed"
+                else:
+                    return r[str].ok("deleted")
+        return r[str].fail(error or "Unknown error")

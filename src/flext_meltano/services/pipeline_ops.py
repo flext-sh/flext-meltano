@@ -61,10 +61,16 @@ class FlextMeltanoPipelineCrudOperations(FlextMeltanoPipelinePaths):
         settings: t.JsonMapping | None,
     ) -> p.Result[str]:
         """Create a new Meltano pipeline with the given configuration."""
-        if not pipeline_name.strip():
-            return r[str].fail("Pipeline creation requires a non-empty pipeline name")
-        if settings is None:
-            return r[str].fail("Pipeline creation not configured")
+        validations: list[tuple[bool, str]] = [
+            (
+                not pipeline_name.strip(),
+                "Pipeline creation requires a non-empty pipeline name",
+            ),
+            (settings is None, "Pipeline creation not configured"),
+        ]
+        for failed, msg in validations:
+            if failed:
+                return r[str].fail(msg)
         pipeline_dir = FlextMeltanoPipelinePaths.pipeline_dir(pipeline_name)
         if pipeline_dir.exists():
             return r[str].fail(f"Pipeline '{pipeline_name}' already exists")
