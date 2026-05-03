@@ -19,16 +19,10 @@ class FlextMeltanoConstantsSettings:
     LOGGING_DEFAULT_LEVEL: Final[str] = "INFO"
     LOGGING_INCLUDE_TRANSFORM_NAME: Final[bool] = True
     LOGGING_INCLUDE_RECORD_COUNT: Final[bool] = True
-    LOGGING_LOG_FORMAT: Final[str] = (
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_WARNING: Final[int] = 5000
     LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
 
     # Service
     SERVICE_MIN_NAME_LENGTH: Final[int] = 3
-    SERVICE_MAX_NAME_LENGTH: Final[int] = 50
-    SERVICE_VALID_NAME_PATTERN: Final[str] = "^[a-zA-Z0-9_-]+$"
 
     # Environments
     ENVIRONMENTS_VALID: Final[frozenset[FlextMeltanoConstantsEnums.Environment]] = (
@@ -90,8 +84,6 @@ class FlextMeltanoConstantsSettings:
     DEFAULT_SERVICE_VERSION: Final[str] = "0.9.9"
     DEFAULT_API_VERSION: Final[str] = "0.9.0"
     DEFAULT_TIMEOUT_SECONDS: Final[int] = 300
-    DEFAULT_TEST_MULTIPLIER: Final[int] = 3
-    DEFAULT_MOCK_RECORD_COUNT: Final[int] = 3
 
     # CliDefaults
     CLI_DEFAULT_MIN_ARGS_WITH_CONFIG: Final[int] = 2
@@ -141,12 +133,6 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.PluginDiscoveryLabel.TRANSFORMER
         ),
     })
-    CAPABILITY_DBT: Final[tuple[FlextMeltanoConstantsEnums.DbtCapability, ...]] = (
-        FlextMeltanoConstantsEnums.DbtCapability.RUN,
-        FlextMeltanoConstantsEnums.DbtCapability.TEST,
-        FlextMeltanoConstantsEnums.DbtCapability.DOCS,
-        FlextMeltanoConstantsEnums.DbtCapability.SEED,
-    )
     DBT_COMMANDS: Final[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
         FlextMeltanoConstantsEnums.DbtCommand.RUN,
         FlextMeltanoConstantsEnums.DbtCommand.TEST,
@@ -166,13 +152,6 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.DbtPathName.MACROS,
         })
     )
-    CAPABILITY_SINGER: Final[
-        tuple[FlextMeltanoConstantsEnums.SingerCapability, ...]
-    ] = (
-        FlextMeltanoConstantsEnums.SingerCapability.DISCOVER,
-        FlextMeltanoConstantsEnums.SingerCapability.SYNC,
-        FlextMeltanoConstantsEnums.SingerCapability.VALIDATE,
-    )
     SUPPORTED_LOG_LEVELS: Final[tuple[c.LogLevel, ...]] = (
         c.LogLevel.DEBUG,
         c.LogLevel.INFO,
@@ -182,24 +161,6 @@ class FlextMeltanoConstantsSettings:
     )
 
     # Operations
-    OPERATION_ALL: Final[tuple[FlextMeltanoConstantsEnums.OperationScope, ...]] = (
-        FlextMeltanoConstantsEnums.OperationScope.PIPELINE,
-        FlextMeltanoConstantsEnums.OperationScope.PLUGIN,
-        FlextMeltanoConstantsEnums.OperationScope.DBT,
-        FlextMeltanoConstantsEnums.OperationScope.ENVIRONMENT,
-    )
-    OPERATION_DISPATCH: Final[
-        tuple[FlextMeltanoConstantsEnums.DispatchOperation, ...]
-    ] = (
-        FlextMeltanoConstantsEnums.DispatchOperation.CREATE_PIPELINE,
-        FlextMeltanoConstantsEnums.DispatchOperation.EXECUTE_PIPELINE,
-        FlextMeltanoConstantsEnums.DispatchOperation.INSTALL_PLUGIN,
-        FlextMeltanoConstantsEnums.DispatchOperation.LIST_PLUGINS,
-        FlextMeltanoConstantsEnums.DispatchOperation.CONFIGURE_ENVIRONMENT,
-        FlextMeltanoConstantsEnums.DispatchOperation.RUN_DBT_MODELS,
-        FlextMeltanoConstantsEnums.DispatchOperation.TEST_DBT_MODELS,
-        FlextMeltanoConstantsEnums.DispatchOperation.RUN_ELT_PIPELINE,
-    )
 
     # Handlers
     HANDLER_ALL: Final[tuple[FlextMeltanoConstantsEnums.HandlerType, ...]] = (
@@ -209,15 +170,9 @@ class FlextMeltanoConstantsSettings:
     )
 
     # MockValues
-    MOCK_EXECUTION_DURATION: Final[float] = 0.5
-    MOCK_STAGE_DURATIONS: Final[tuple[float, ...]] = (0.3, 0.2)
-    MOCK_DBT_EXECUTION_TIME: Final[float] = 45.2
-    MOCK_DEFAULT_MOCK_INT: Final[int] = 1
-    MOCK_DEFAULT_MOCK_FLOAT: Final[float] = 1.0
 
     # FilePaths
     FILE_PATH_DBT_OUTPUT_DIR: Final[str] = "target"
-    FILE_PATH_DBT_DOCS_INDEX: Final[str] = "index.html"
     FILE_PATH_STANDARD_DIRS: Final[
         tuple[FlextMeltanoConstantsEnums.PipelineDirectory, ...]
     ] = (
