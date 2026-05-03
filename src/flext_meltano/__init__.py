@@ -34,7 +34,6 @@ if _t.TYPE_CHECKING:
     from flext_meltano._models.instances import FlextMeltanoModelsInstances
     from flext_meltano._models.instances_data import FlextMeltanoModelsInstancesData
     from flext_meltano._models.logging_config import FlextMeltanoModelsLogging
-    from flext_meltano._models.payloads import FlextMeltanoModelsPayloads
     from flext_meltano._models.payloads_data import FlextMeltanoModelsPayloadsData
     from flext_meltano._models.projects import FlextMeltanoModelsProjects
     from flext_meltano._models.projects_plugin import FlextMeltanoModelsProjectsPlugin
@@ -164,7 +163,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "._models.instances": ("FlextMeltanoModelsInstances",),
             "._models.instances_data": ("FlextMeltanoModelsInstancesData",),
             "._models.logging_config": ("FlextMeltanoModelsLogging",),
-            "._models.payloads": ("FlextMeltanoModelsPayloads",),
             "._models.payloads_data": ("FlextMeltanoModelsPayloadsData",),
             "._models.projects": ("FlextMeltanoModelsProjects",),
             "._models.projects_plugin": ("FlextMeltanoModelsProjectsPlugin",),
@@ -348,7 +346,6 @@ __all__: list[str] = [
     "FlextMeltanoModelsInstances",
     "FlextMeltanoModelsInstancesData",
     "FlextMeltanoModelsLogging",
-    "FlextMeltanoModelsPayloads",
     "FlextMeltanoModelsPayloadsData",
     "FlextMeltanoModelsProjects",
     "FlextMeltanoModelsProjectsPlugin",
