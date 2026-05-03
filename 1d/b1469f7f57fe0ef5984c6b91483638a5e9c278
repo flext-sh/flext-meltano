@@ -1,0 +1,29 @@
+src/flext_meltano/services/pipeline_mgr.py
+  59721e408c0da1b2 13,60-62,65,67-69,75,103-108,112-114,122-123,130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "1db1469f7f57fe0ef5984c6b91483638a5e9c278",
+  "prompts": {
+    "59721e408c0da1b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "556b2347-c380-4f70-8574-35960061b3be",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 35,
+      "total_deletions": 49,
+      "accepted_lines": 23,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/e8f9518d89457b8297a8307fe8cd5c2c7ab2ecaf543fb77cbaa33dd7448dd6b6"
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
