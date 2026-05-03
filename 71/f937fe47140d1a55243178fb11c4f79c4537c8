@@ -1,0 +1,29 @@
+src/flext_meltano/_utilities/singer.py
+  59721e408c0da1b2 19,55-58,90-93,114-115,147-150,157-160,167-169,172-173,228-232
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "71f937fe47140d1a55243178fb11c4f79c4537c8",
+  "prompts": {
+    "59721e408c0da1b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "556b2347-c380-4f70-8574-35960061b3be",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 29,
+      "total_deletions": 19,
+      "accepted_lines": 29,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/a2d3be340357de0f2eb73db5c336d621ebf44642562bf40032ddde25ff4d69d3"
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
