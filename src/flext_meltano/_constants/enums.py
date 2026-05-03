@@ -37,87 +37,86 @@ class FlextMeltanoConstantsEnums:
     class OperationStatus(StrEnum):
         """Operation execution lifecycle status values."""
 
-        PENDING = c.Status.PENDING.value
-        RUNNING = c.Status.RUNNING.value
-        SUCCESS = c.Status.SUCCESS.value
-        ERROR = c.HealthStatus.ERROR.value
-        TIMEOUT = "timeout"
+        AVAILABLE = "available"
         CANCELLED = c.Status.CANCELLED.value
         CONFIGURED = "configured"
-        INSTALLED = "installed"
         CREATED = "created"
-        READY = "ready"
-        AVAILABLE = "available"
+        ERROR = c.HealthStatus.ERROR.value
         EXECUTED = "executed"
         HEALTHY = c.HealthStatus.HEALTHY.value
+        INSTALLED = "installed"
         OK = "OK"
         PASSED = "passed"
-        PROCESSED = "processed"
+        PENDING = c.Status.PENDING.value
+        READY = "ready"
+        RUNNING = c.Status.RUNNING.value
+        SUCCESS = c.Status.SUCCESS.value
+        TIMEOUT = "timeout"
 
     @unique
     class Environment(StrEnum):
         """Deployment environments for Meltano pipelines."""
 
         DEVELOPMENT = "development"
-        STAGING = "staging"
-        PRODUCTION = "production"
-        TESTING = "testing"
         LOCAL = "local"
+        PRODUCTION = "production"
+        STAGING = "staging"
+        TESTING = "testing"
 
     @unique
     class ProjectEnvironment(StrEnum):
         """Canonical environment names used in generated Meltano projects."""
 
         DEV = "dev"
-        STAGING = "staging"
         PROD = "prod"
+        STAGING = "staging"
 
     @unique
     class EnvironmentAlias(StrEnum):
         """Short environment aliases accepted by settings helpers."""
 
         DEV = "dev"
-        TEST = "test"
         PROD = "prod"
+        TEST = "test"
 
     @unique
     class ComponentType(StrEnum):
         """Supported service component groups."""
 
-        SOURCES = "sources"
-        SINKS = "sinks"
-        TRANSFORMERS = "transformers"
         ORCHESTRATORS = "orchestrators"
+        SINKS = "sinks"
+        SOURCES = "sources"
+        TRANSFORMERS = "transformers"
 
     @unique
     class DbtCapability(StrEnum):
         """dbt operations exposed by the Meltano service layer."""
 
-        RUN = "run"
-        TEST = "test"
         DOCS = "docs"
+        RUN = "run"
         SEED = "seed"
+        TEST = "test"
 
     @unique
     class DbtCommand(StrEnum):
         """dbt CLI commands used across Meltano integrations."""
 
-        RUN = "run"
-        TEST = "test"
         BUILD = "build"
         COMPILE = "compile"
         DOCS = "docs"
         GENERATE = "generate"
+        RUN = "run"
+        TEST = "test"
 
     @unique
     class DbtOption(StrEnum):
         """dbt CLI options used by Meltano runners."""
 
-        PROJECTS_DIR = "--projects-dir"
-        MODELS = "--models"
-        SELECT = "--select"
         EXCLUDE = "--exclude"
         FULL_REFRESH = "--full-refresh"
+        MODELS = "--models"
+        PROJECTS_DIR = "--projects-dir"
+        SELECT = "--select"
 
     @unique
     class DbtResourceType(StrEnum):
@@ -141,7 +140,6 @@ class FlextMeltanoConstantsEnums:
         """Canonical dbt file names."""
 
         PROJECT = "dbt_project.yml"
-        PROFILES = "profiles.yml"
         MANIFEST = "manifest.json"
 
     @unique
@@ -171,7 +169,6 @@ class FlextMeltanoConstantsEnums:
         SCHEMA = "SCHEMA"
         STATE = "STATE"
         ACTIVATE_VERSION = "ACTIVATE_VERSION"
-        METRIC = "METRIC"
         CATALOG = "CATALOG"
 
     @unique
@@ -186,15 +183,6 @@ class FlextMeltanoConstantsEnums:
     @unique
     class DispatchOperation(StrEnum):
         """High-level API operations dispatched by the service layer."""
-
-        CREATE_PIPELINE = "create_pipeline"
-        EXECUTE_PIPELINE = "execute_pipeline"
-        INSTALL_PLUGIN = "install_plugin"
-        LIST_PLUGINS = "list_plugins"
-        CONFIGURE_ENVIRONMENT = "configure_environment"
-        RUN_DBT_MODELS = "run_dbt_models"
-        TEST_DBT_MODELS = "test_dbt_models"
-        RUN_ELT_PIPELINE = "run_elt_pipeline"
 
     @unique
     class HandlerType(StrEnum):
@@ -331,7 +319,6 @@ class FlextMeltanoConstantsEnums:
         RUN = "run"
         INSTALL = "install"
         LIST = "list"
-        INVOKE = "invoke"
         SELECT = "select"
 
     @unique
