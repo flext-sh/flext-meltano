@@ -346,6 +346,7 @@ __all__: list[str] = [
     "FlextMeltanoModelsSources",
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
+    "FlextMeltanoPipelineCrudOperations",
     "FlextMeltanoPipelineLifecycleOperations",
     "FlextMeltanoPipelineManager",
     "FlextMeltanoPipelinePaths",
