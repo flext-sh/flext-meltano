@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated
 
@@ -95,42 +94,3 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer catalog stream entries",
             )
         )
-
-    class SingerPipelineConfig(m.Entity):
-        """Configuration for a Singer ELT pipeline."""
-
-        tap_config_path: Annotated[
-            Path | None, u.Field(default=None, description="Path to tap configuration")
-        ] = None
-        target_config_path: Annotated[
-            Path | None,
-            u.Field(default=None, description="Path to target configuration"),
-        ] = None
-        catalog_path: Annotated[
-            Path | None, u.Field(default=None, description="Path to catalog file")
-        ] = None
-        state_path: Annotated[
-            Path | None, u.Field(default=None, description="Path to state file")
-        ] = None
-        selected_streams: Annotated[
-            t.StrSequence | None,
-            u.Field(default=None, description="Specific streams to sync"),
-        ] = None
-
-    class SingerSyncResult(m.Entity):
-        """Result of a Singer sync operation."""
-
-        records_processed: Annotated[
-            t.NonNegativeInt, u.Field(description="Number of records processed")
-        ]
-        records_written: Annotated[
-            t.NonNegativeInt, u.Field(description="Number of records written")
-        ]
-        errors: Annotated[t.NonNegativeInt, u.Field(description="Number of errors")]
-        state: t.JsonMapping = u.Field(
-            default_factory=lambda: MappingProxyType({}),
-            description="Singer state payload captured after sync execution",
-        )
-        duration_seconds: Annotated[
-            t.NonNegativeFloat, u.Field(description="Execution duration")
-        ]

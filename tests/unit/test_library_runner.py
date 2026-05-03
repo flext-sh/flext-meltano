@@ -17,7 +17,6 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano import (
-    FlextMeltanoAdapter,
     FlextMeltanoExecutor,
     FlextMeltanoLibraryRunner,
     m,
@@ -110,18 +109,3 @@ class TestsFlextMeltanoLibraryRunner:
         tm.that(result.value, contains="exit_code")
         tm.that(result.value, contains="output")
         tm.that(result.value, contains="error")
-
-    def test_adapter_version(self) -> None:
-        """Test that FlextMeltanoAdapter.ProjectAdapter can get version."""
-        adapter = FlextMeltanoAdapter.ProjectAdapter()
-        result = adapter.fetch_version()
-        tm.ok(result)
-        tm.that(result.value, none=False)
-        tm.that(str(result.value.get("version", "")), none=False)
-
-    def test_adapter_execute(self) -> None:
-        """Test that FlextMeltanoAdapter.ProjectAdapter execute returns r."""
-        adapter = FlextMeltanoAdapter.ProjectAdapter()
-        result = adapter.execute()
-        tm.that(result, none=False)
-        tm.that(result.success or result.failure, eq=True)

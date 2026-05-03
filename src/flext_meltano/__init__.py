@@ -36,7 +36,6 @@ if _t.TYPE_CHECKING:
     from flext_meltano._models.logging_config import FlextMeltanoModelsLogging
     from flext_meltano._models.payloads_data import FlextMeltanoModelsPayloadsData
     from flext_meltano._models.projects import FlextMeltanoModelsProjects
-    from flext_meltano._models.projects_plugin import FlextMeltanoModelsProjectsPlugin
     from flext_meltano._models.results import FlextMeltanoModelsResults
     from flext_meltano._models.results_dbt import FlextMeltanoModelsResultsDbt
     from flext_meltano._models.results_pipeline import FlextMeltanoModelsResultsPipeline
@@ -64,10 +63,6 @@ if _t.TYPE_CHECKING:
     from flext_meltano.protocols import FlextMeltanoProtocols, p
     from flext_meltano.services.abstractions import FlextMeltanoAbstractions
     from flext_meltano.services.abstractions_base import FlextMeltanoAbstractionsBase
-    from flext_meltano.services.adapter_extensions import (
-        FlextMeltanoDbtAdapter,
-        FlextMeltanoPipelineAdapter,
-    )
     from flext_meltano.services.adapters import FlextMeltanoAdapter
     from flext_meltano.services.bridge import FlextMeltanoBridge
     from flext_meltano.services.cli_managers import (
@@ -165,7 +160,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             "._models.logging_config": ("FlextMeltanoModelsLogging",),
             "._models.payloads_data": ("FlextMeltanoModelsPayloadsData",),
             "._models.projects": ("FlextMeltanoModelsProjects",),
-            "._models.projects_plugin": ("FlextMeltanoModelsProjectsPlugin",),
             "._models.results": ("FlextMeltanoModelsResults",),
             "._models.results_dbt": ("FlextMeltanoModelsResultsDbt",),
             "._models.results_pipeline": ("FlextMeltanoModelsResultsPipeline",),
@@ -208,10 +202,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ),
             ".services.abstractions": ("FlextMeltanoAbstractions",),
             ".services.abstractions_base": ("FlextMeltanoAbstractionsBase",),
-            ".services.adapter_extensions": (
-                "FlextMeltanoDbtAdapter",
-                "FlextMeltanoPipelineAdapter",
-            ),
             ".services.adapters": ("FlextMeltanoAdapter",),
             ".services.bridge": ("FlextMeltanoBridge",),
             ".services.cli_managers": (
@@ -329,7 +319,6 @@ __all__: list[str] = [
     "FlextMeltanoConstantsBase",
     "FlextMeltanoConstantsEnums",
     "FlextMeltanoConstantsSettings",
-    "FlextMeltanoDbtAdapter",
     "FlextMeltanoDbtManager",
     "FlextMeltanoDbtProjectMixin",
     "FlextMeltanoDbtRunnerMixin",
@@ -348,7 +337,6 @@ __all__: list[str] = [
     "FlextMeltanoModelsLogging",
     "FlextMeltanoModelsPayloadsData",
     "FlextMeltanoModelsProjects",
-    "FlextMeltanoModelsProjectsPlugin",
     "FlextMeltanoModelsResults",
     "FlextMeltanoModelsResultsDbt",
     "FlextMeltanoModelsResultsPipeline",
@@ -358,8 +346,6 @@ __all__: list[str] = [
     "FlextMeltanoModelsSources",
     "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
-    "FlextMeltanoPipelineAdapter",
-    "FlextMeltanoPipelineCrudOperations",
     "FlextMeltanoPipelineLifecycleOperations",
     "FlextMeltanoPipelineManager",
     "FlextMeltanoPipelinePaths",

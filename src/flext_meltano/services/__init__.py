@@ -15,10 +15,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         {
             ".abstractions": ("FlextMeltanoAbstractions",),
             ".abstractions_base": ("FlextMeltanoAbstractionsBase",),
-            ".adapter_extensions": (
-                "FlextMeltanoDbtAdapter",
-                "FlextMeltanoPipelineAdapter",
-            ),
             ".adapters": ("FlextMeltanoAdapter",),
             ".bridge": ("FlextMeltanoBridge",),
             ".cli_managers": (

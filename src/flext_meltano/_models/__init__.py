@@ -16,7 +16,6 @@ _LAZY_IMPORTS = build_lazy_import_map(
         ".logging_config": ("FlextMeltanoModelsLogging",),
         ".payloads_data": ("FlextMeltanoModelsPayloadsData",),
         ".projects": ("FlextMeltanoModelsProjects",),
-        ".projects_plugin": ("FlextMeltanoModelsProjectsPlugin",),
         ".results": ("FlextMeltanoModelsResults",),
         ".results_dbt": ("FlextMeltanoModelsResultsDbt",),
         ".results_pipeline": ("FlextMeltanoModelsResultsPipeline",),

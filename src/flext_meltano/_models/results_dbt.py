@@ -31,60 +31,6 @@ class FlextMeltanoModelsResultsDbt:
             t.NonNegativeInt, u.Field(default=0, description="Number of tests")
         ] = 0
 
-    class DbtRunResult(m.ArbitraryTypesModel):
-        """Result of a DBT model run operation."""
-
-        success: Annotated[
-            bool, u.Field(default=True, description="Whether the run was successful")
-        ] = True
-        models_run: Annotated[
-            t.NonNegativeInt,
-            u.Field(default=0, description="Number of models executed"),
-        ] = 0
-        status: Annotated[
-            str,
-            u.Field(
-                default="completed", description="Run status (completed, failed, etc.)"
-            ),
-        ] = "completed"
-        error_message: Annotated[
-            str | None, u.Field(default=None, description="Error message if run failed")
-        ] = None
-        execution_time_seconds: Annotated[
-            float | None,
-            u.Field(default=None, description="Total execution time in seconds"),
-        ] = None
-
-    class DbtTestResult(m.ArbitraryTypesModel):
-        """Result of a DBT test operation."""
-
-        success: Annotated[
-            bool, u.Field(default=True, description="Whether tests passed")
-        ] = True
-        tests_run: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of tests executed")
-        ] = 0
-        tests_passed: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of tests passed")
-        ] = 0
-        tests_failed: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of tests failed")
-        ] = 0
-        status: Annotated[
-            str,
-            u.Field(
-                default="completed", description="Test status (completed, failed, etc.)"
-            ),
-        ] = "completed"
-        error_message: Annotated[
-            str | None,
-            u.Field(default=None, description="Error message if tests failed"),
-        ] = None
-        execution_time_seconds: Annotated[
-            float | None,
-            u.Field(default=None, description="Total execution time in seconds"),
-        ] = None
-
     class CommandExecutionResult(m.ArbitraryTypesModel):
         """Execution result model for Meltano command operations following flext-core patterns."""
 

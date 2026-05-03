@@ -45,37 +45,6 @@ class FlextMeltanoModelsProjects:
             description="dbt manifest nodes keyed by unique node id",
         )
 
-    class MeltanoProjectModel(m.Entity):
-        """Generic Meltano project configuration with validation."""
-
-        project_id: Annotated[str, u.Field(description="Unique project identifier")]
-        project_version: Annotated[
-            str, u.Field(default="1", description="Project version")
-        ] = "1"
-        default_environment: Annotated[
-            c.Meltano.ProjectEnvironment,
-            u.Field(
-                default=c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
-                description="Default environment name",
-            ),
-        ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
-        plugins: t.JsonMapping = u.Field(
-            default_factory=lambda: MappingProxyType({}),
-            description="Configured Meltano plugins grouped by plugin category",
-        )
-        environments: t.JsonMapping = u.Field(
-            default_factory=lambda: MappingProxyType({}),
-            description="Meltano environment definitions keyed by environment name",
-        )
-
-        @u.model_validator(mode="after")
-        def validate_meltano_project(self) -> Self:
-            """Validate Meltano project configuration consistency."""
-            if not self.project_id or not self.project_id.strip():
-                msg = "project_id cannot be empty"
-                raise ValueError(msg)
-            return self
-
     class PipelineProjectModel(m.Entity):
         """Generic pipeline project configuration with validation."""
 

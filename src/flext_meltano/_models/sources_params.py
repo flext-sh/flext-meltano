@@ -12,27 +12,6 @@ from flext_meltano import c, t
 class FlextMeltanoModelsSourcesParams:
     """Run parameters and stream definition models."""
 
-    class DbtRunParams(m.Entity):
-        """Generic parameters for dbt run operations."""
-
-        project_dir: Annotated[str, u.Field(description="dbt project directory")]
-        models: Annotated[
-            str | None, u.Field(default=None, description="Models to run")
-        ] = None
-        select: Annotated[
-            str | None, u.Field(default=None, description="Selection syntax")
-        ] = None
-        exclude: Annotated[
-            str | None, u.Field(default=None, description="Exclusion syntax")
-        ] = None
-        full_refresh: Annotated[
-            bool, u.Field(default=False, description="Full refresh flag")
-        ] = False
-        vars: Annotated[
-            t.ConfigurationMapping | None,
-            u.Field(default=None, description="dbt variables"),
-        ] = None
-
     class TapRunParams(m.Entity):
         """Generic parameters for tap run operations."""
 
@@ -53,23 +32,6 @@ class FlextMeltanoModelsSourcesParams:
         properties_file: Annotated[
             str | None,
             u.Field(default=None, description="Path to Singer properties file"),
-        ] = None
-
-    class TargetRunParams(m.Entity):
-        """Generic parameters for target run operations."""
-
-        target_name: Annotated[str, u.Field(description="Name of the target to run")]
-        config_file: Annotated[
-            str | None,
-            u.Field(default=None, description="Path to target configuration file"),
-        ] = None
-        input_file: Annotated[
-            str | None,
-            u.Field(default=None, description="Input file path for target loading"),
-        ] = None
-        batch_size: Annotated[
-            t.BatchSize | None,
-            u.Field(default=None, description="Batch size for target operations"),
         ] = None
 
     class StreamDefinition(m.Entity):
