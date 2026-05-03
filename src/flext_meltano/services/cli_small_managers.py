@@ -88,23 +88,20 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
 
     def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         """Install a Meltano plugin using the real Meltano CLI."""
-        command_result = FlextMeltanoExecutorBase().execute_meltano_command(
+        return FlextMeltanoExecutorBase().execute_meltano_command(
             [c.Meltano.CMD_ADD, plugin_type, plugin_name],
             timeout=c.Meltano.PLUGIN_INSTALLATION_TIMEOUT,
             _cwd=self._resolve_project_root(),
-        )
-        if command_result.failure:
-            return r[str].fail(command_result.error or "Plugin installation failed")
-        output = command_result.value
-        if not output.success:
-            return r[str].fail(
+        ).flat_map(
+            lambda output: r[str].ok(
+                output.output.strip() or f"Installed {plugin_type}:{plugin_name}"
+            )
+            if output.success
+            else r[str].fail(
                 u.Meltano.command_failure_message(
-                    output,
-                    default="Plugin installation failed",
+                    output, default="Plugin installation failed"
                 )
             )
-        return r[str].ok(
-            output.output.strip() or f"Installed {plugin_type}:{plugin_name}"
         )
 
     def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]:
@@ -155,21 +152,18 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
 
     def _run_version_command(self) -> p.Result[str]:
         """Execute the canonical Meltano version command through the executor DSL."""
-        command_result = FlextMeltanoExecutorBase().execute_meltano_command(
+        return FlextMeltanoExecutorBase().execute_meltano_command(
             [c.Meltano.ExecutorCommand.VERSION],
             _cwd=self._resolve_project_root(),
-        )
-        if command_result.failure:
-            return r[str].fail(command_result.error or "Version command failed")
-        output = command_result.value
-        if not output.success:
-            return r[str].fail(
+        ).flat_map(
+            lambda output: r[str].ok((output.output or output.error).strip())
+            if output.success
+            else r[str].fail(
                 u.Meltano.command_failure_message(
-                    output,
-                    default="Version command failed",
+                    output, default="Version command failed"
                 )
             )
-        return r[str].ok((output.output or output.error).strip())
+        )
 
     def fetch_version(self) -> p.Result[str]:
         """Return Meltano version as a string."""
