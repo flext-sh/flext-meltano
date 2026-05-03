@@ -38,9 +38,13 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     ) -> p.Result[t.JsonMapping]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
-            return e.fail_validation("Project name cannot be empty", result_type=r[t.JsonMapping])
+            return e.fail_validation(
+                "Project name cannot be empty", result_type=r[t.JsonMapping]
+            )
         if not project_dir.exists():
-            return e.fail_not_found("Parent directory", str(project_dir), result_type=r[t.JsonMapping])
+            return e.fail_not_found(
+                "Parent directory", str(project_dir), result_type=r[t.JsonMapping]
+            )
         return r[t.JsonMapping].ok({
             "name": project_name.strip(),
             "parent_dir": str(project_dir),
@@ -52,7 +56,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     ) -> p.Result[t.StrMapping]:
         """Validate temporary project creation parameters."""
         if not prefix or not prefix.strip():
-            return e.fail_validation("Project prefix cannot be empty", result_type=r[t.StrMapping])
+            return e.fail_validation(
+                "Project prefix cannot be empty", result_type=r[t.StrMapping]
+            )
         return r[t.StrMapping].ok({
             "project_id": project_id or "flext-meltano-project",
             "prefix": prefix.strip(),
@@ -62,7 +68,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def _validate_project_path(project_root: Path) -> p.Result[Path]:
         """Validate project directory exists."""
         if not project_root.exists():
-            return e.fail_not_found("Project directory", str(project_root), result_type=r[Path])
+            return e.fail_not_found(
+                "Project directory", str(project_root), result_type=r[Path]
+            )
         return r[Path].ok(project_root)
 
     @staticmethod
@@ -101,7 +109,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
             u.write_file(config_file, config_content)
         except OSError as exc:
-            return e.fail_operation("create project files", exc, result_type=r[t.StrMapping])
+            return e.fail_operation(
+                "create project files", exc, result_type=r[t.StrMapping]
+            )
 
         return self._build_creation_result(project_name, project_path)
 

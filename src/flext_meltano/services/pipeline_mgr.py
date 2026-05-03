@@ -102,9 +102,7 @@ class FlextMeltanoPipelineManager(
             return r[str].fail("Pipeline status requires pipeline name")
         result = FlextMeltanoPipelineManager.get_pipeline_status(args[0])
         if result.success:
-            self.logger.info(
-                "Pipeline status", pipeline=args[0], status=result.value
-            )
+            self.logger.info("Pipeline status", pipeline=args[0], status=result.value)
         return result
 
     def _list_pipelines(self) -> p.Result[str]:
@@ -119,9 +117,7 @@ class FlextMeltanoPipelineManager(
             return r[str].fail("Pipeline execution requires pipeline name")
         pipeline_name = args[0]
         command_args = args[1:] if len(args) > 1 else None
-        return FlextMeltanoPipelineManager.execute_pipeline(
-            pipeline_name, command_args
-        )
+        return FlextMeltanoPipelineManager.execute_pipeline(pipeline_name, command_args)
 
     def _stop_pipeline(self, args: t.StrSequence) -> p.Result[str]:
         """Stop pipeline."""
