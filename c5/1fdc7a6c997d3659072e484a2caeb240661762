@@ -1,0 +1,29 @@
+src/flext_meltano/services/cli_small_managers.py
+  59721e408c0da1b2 91,95-100,102,155,158-161,163,166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "c51fdc7a6c997d3659072e484a2caeb240661762",
+  "prompts": {
+    "59721e408c0da1b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "556b2347-c380-4f70-8574-35960061b3be",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 21,
+      "accepted_lines": 15,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/33d6353a5228fd352bc12d39aa6f74d80aa337d60502c14696450e1c6f803271"
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
