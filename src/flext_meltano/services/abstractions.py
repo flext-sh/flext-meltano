@@ -70,10 +70,11 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                         )
             payload: dict[str, t.JsonValue] = {"streams": stream_defs}
             return r[t.JsonMapping].ok(payload)
-        except c.Meltano.OPERATION_ERRORS as e:
-            error_msg = f"Failed to discover streams: {e}"
-            self.logger.exception(error_msg)
-            return r[t.JsonMapping].fail(error_msg)
+        except c.Meltano.OPERATION_ERRORS as exc:
+            self.logger.exception("Failed to discover streams", error=str(exc))
+            return e.fail_operation(
+                "discover streams", exc, result_type=r[t.JsonMapping]
+            )
 
     def sync_stream(
         self,
@@ -109,10 +110,13 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             if cmd_result.failure:
                 return r[t.JsonMapping].fail(cmd_result.error or "Stream sync failed")
             return r[t.JsonMapping].ok(result)
-        except c.Meltano.OPERATION_ERRORS as e:
-            error_msg = f"Failed to sync stream {stream_name}: {e}"
-            self.logger.exception(error_msg)
-            return r[t.JsonMapping].fail(error_msg)
+        except c.Meltano.OPERATION_ERRORS as exc:
+            self.logger.exception(
+                "Failed to sync stream", stream=stream_name, error=str(exc)
+            )
+            return e.fail_operation(
+                f"sync stream {stream_name}", exc, result_type=r[t.JsonMapping]
+            )
 
     def create_tap_from_config(
         self,
@@ -133,8 +137,10 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 tap_id=f"{tap_type}_auto",
             )
             return r[m.Meltano.TapInstance].ok(instance)
-        except c.Meltano.OPERATION_ERRORS as e:
-            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {e}")
+        except c.Meltano.OPERATION_ERRORS as exc:
+            return e.fail_operation(
+                "create tap", exc, result_type=r[m.Meltano.TapInstance]
+            )
 
     def generate_catalog(
         self,
