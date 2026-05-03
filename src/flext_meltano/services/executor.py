@@ -159,32 +159,34 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     ) -> p.Result[t.JsonMapping]:
         """Route command to appropriate handler."""
         try:
-            if command == c.Meltano.ExecutorCommand.VERSION:
-                return self.version()
-            if command == c.Meltano.ExecutorCommand.HELP:
-                return self.help()
-            if command == c.Meltano.ExecutorCommand.HEALTH:
-                return self.health()
-            full_command: list[str] = [command, *args]
-            result = self.execute_meltano_command(full_command)
-            if result.failure:
-                return r[t.JsonMapping].fail(
-                    result.error or f"Command '{command}' failed",
-                )
-            args_payload: list[t.JsonValue] = list(args)
-            extra_fields: dict[str, t.JsonValue] = {
-                "command": command,
-                "action": command,
-                "args": args_payload,
-            }
-            return result.map(
-                lambda cmd_result: u.Meltano.build_command_execution_payload(
-                    cmd_result,
-                    extra_fields=extra_fields,
-                    success_status=c.Meltano.OperationStatus.EXECUTED,
-                    duration_field=None,
-                ),
-            )
+            match command:
+                case c.Meltano.ExecutorCommand.VERSION:
+                    return self.version()
+                case c.Meltano.ExecutorCommand.HELP:
+                    return self.help()
+                case c.Meltano.ExecutorCommand.HEALTH:
+                    return self.health()
+                case _:
+                    full_command: list[str] = [command, *args]
+                    result = self.execute_meltano_command(full_command)
+                    if result.failure:
+                        return r[t.JsonMapping].fail(
+                            result.error or f"Command '{command}' failed",
+                        )
+                    args_payload: list[t.JsonValue] = list(args)
+                    extra_fields: dict[str, t.JsonValue] = {
+                        "command": command,
+                        "action": command,
+                        "args": args_payload,
+                    }
+                    return result.map(
+                        lambda cmd_result: u.Meltano.build_command_execution_payload(
+                            cmd_result,
+                            extra_fields=extra_fields,
+                            success_status=c.Meltano.OperationStatus.EXECUTED,
+                            duration_field=None,
+                        ),
+                    )
         except (
             ProjectNotFound,
             ValueError,
