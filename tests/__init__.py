@@ -15,7 +15,6 @@ if _t.TYPE_CHECKING:
     from flext_tests import td, tf, tk, tm, tv
 
     from flext_meltano import d, e, h, r, s, x
-    from tests.conftest import MockMeltanoService, MockSingerTap, MockSingerTarget
     from tests.constants import TestsFlextMeltanoConstants, c
     from tests.integration.test_docker_integration import (
         TestsFlextMeltanoDockerIntegration,
@@ -53,11 +52,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
-            ".conftest": (
-                "MockMeltanoService",
-                "MockSingerTap",
-                "MockSingerTarget",
-            ),
             ".constants": (
                 "TestsFlextMeltanoConstants",
                 "c",
@@ -146,9 +140,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__: list[str] = [
-    "MockMeltanoService",
-    "MockSingerTap",
-    "MockSingerTarget",
     "TestFlextMeltanoPipelineCliManagers",
     "TestsFlextMeltanoApi",
     "TestsFlextMeltanoCliIntegration",
