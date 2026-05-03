@@ -66,20 +66,18 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                     f"Catalog file not found: {catalog_file}"
                 )
 
-            load_result = u.Cli.files_read_json_model(
-                catalog_file, m.Meltano.SingerCatalog
-            )
-            if load_result.failure:
-                return r[m.Meltano.SingerCatalog].fail(
-                    load_result.error or "catalog read failed"
+            def _store(catalog: m.Meltano.SingerCatalog) -> m.Meltano.SingerCatalog:
+                self._singer_catalog = catalog
+                self.logger.info(
+                    "Catalog loaded from file",
+                    file=str(catalog_file),
+                    stream_count=len(catalog.streams),
                 )
-            self._singer_catalog = load_result.value
-            self.logger.info(
-                "Catalog loaded from file",
-                file=str(catalog_file),
-                stream_count=len(self._singer_catalog.streams),
-            )
-            return r[m.Meltano.SingerCatalog].ok(self._singer_catalog)
+                return catalog
+
+            return u.Cli.files_read_json_model(
+                catalog_file, m.Meltano.SingerCatalog
+            ).map(_store)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
@@ -88,7 +86,6 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         """Save catalog to JSON file."""
         try:
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
-
             write_result = cli.atomic_write_text_file(
                 catalog_file,
                 self._singer_catalog.model_dump_json(indent=2, by_alias=True),

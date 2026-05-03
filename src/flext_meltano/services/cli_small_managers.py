@@ -88,18 +88,25 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
 
     def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         """Install a Meltano plugin using the real Meltano CLI."""
-        return FlextMeltanoExecutorBase().execute_meltano_command(
-            [c.Meltano.CMD_ADD, plugin_type, plugin_name],
-            timeout=c.Meltano.PLUGIN_INSTALLATION_TIMEOUT,
-            _cwd=self._resolve_project_root(),
-        ).flat_map(
-            lambda output: r[str].ok(
-                output.output.strip() or f"Installed {plugin_type}:{plugin_name}"
+        return (
+            FlextMeltanoExecutorBase()
+            .execute_meltano_command(
+                [c.Meltano.CMD_ADD, plugin_type, plugin_name],
+                timeout=c.Meltano.PLUGIN_INSTALLATION_TIMEOUT,
+                _cwd=self._resolve_project_root(),
             )
-            if output.success
-            else r[str].fail(
-                u.Meltano.command_failure_message(
-                    output, default="Plugin installation failed"
+            .flat_map(
+                lambda output: (
+                    r[str].ok(
+                        output.output.strip()
+                        or f"Installed {plugin_type}:{plugin_name}"
+                    )
+                    if output.success
+                    else r[str].fail(
+                        u.Meltano.command_failure_message(
+                            output, default="Plugin installation failed"
+                        )
+                    )
                 )
             )
         )
@@ -152,15 +159,21 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
 
     def _run_version_command(self) -> p.Result[str]:
         """Execute the canonical Meltano version command through the executor DSL."""
-        return FlextMeltanoExecutorBase().execute_meltano_command(
-            [c.Meltano.ExecutorCommand.VERSION],
-            _cwd=self._resolve_project_root(),
-        ).flat_map(
-            lambda output: r[str].ok((output.output or output.error).strip())
-            if output.success
-            else r[str].fail(
-                u.Meltano.command_failure_message(
-                    output, default="Version command failed"
+        return (
+            FlextMeltanoExecutorBase()
+            .execute_meltano_command(
+                [c.Meltano.ExecutorCommand.VERSION],
+                _cwd=self._resolve_project_root(),
+            )
+            .flat_map(
+                lambda output: (
+                    r[str].ok((output.output or output.error).strip())
+                    if output.success
+                    else r[str].fail(
+                        u.Meltano.command_failure_message(
+                            output, default="Version command failed"
+                        )
+                    )
                 )
             )
         )
