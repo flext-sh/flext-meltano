@@ -1,0 +1,29 @@
+src/flext_meltano/services/singer_state.py
+  59721e408c0da1b2 16,35,37-40,43-47,49-51,74-78,91-93,120-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "22b43b1300c8311ea53aa10acb9f045b3600b423",
+  "prompts": {
+    "59721e408c0da1b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "556b2347-c380-4f70-8574-35960061b3be",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 28,
+      "total_deletions": 19,
+      "accepted_lines": 25,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/50bb634f0a88a909c4038ee5beb2aed224fc3b9eb5bf24f049560c9304d89a3a"
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
