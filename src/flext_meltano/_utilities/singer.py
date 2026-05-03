@@ -16,7 +16,7 @@ from collections.abc import (
 
 from flext_cli import r
 
-from flext_meltano import c, m, p, t
+from flext_meltano import c, e, m, p, t
 
 
 class FlextMeltanoUtilitiesSinger:
@@ -52,8 +52,10 @@ class FlextMeltanoUtilitiesSinger:
             sys.stdout.write(line + "\n")
             sys.stdout.flush()
             return r[str].ok(line)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
-            return r[str].fail(f"Failed to emit SCHEMA for {stream_name}: {e}")
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
+            return e.fail_operation(
+                f"emit SCHEMA for {stream_name}", exc, result_type=r[str]
+            )
 
     @staticmethod
     def emit_record(
@@ -85,8 +87,10 @@ class FlextMeltanoUtilitiesSinger:
             sys.stdout.write(line + "\n")
             sys.stdout.flush()
             return r[str].ok(line)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
-            return r[str].fail(f"Failed to emit RECORD for {stream_name}: {e}")
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
+            return e.fail_operation(
+                f"emit RECORD for {stream_name}", exc, result_type=r[str]
+            )
 
     @staticmethod
     def emit_state(
@@ -107,8 +111,8 @@ class FlextMeltanoUtilitiesSinger:
             sys.stdout.write(line + "\n")
             sys.stdout.flush()
             return r[str].ok(line)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
-            return r[str].fail(f"Failed to emit STATE: {e}")
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
+            return e.fail_operation("emit STATE", exc, result_type=r[str])
 
     @staticmethod
     def process_stdin(
@@ -140,29 +144,33 @@ class FlextMeltanoUtilitiesSinger:
                     schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
                     result = handler.handle_schema(schema_msg)
                     if result.failure:
-                        return r[None].fail(
-                            f"SCHEMA handler failed for {schema_msg.stream}: "
-                            f"{result.error}"
+                        return e.fail_operation(
+                            f"SCHEMA handler for {schema_msg.stream}",
+                            result.error,
+                            result_type=r[None],
                         )
 
                 elif msg_type == c.Meltano.SingerMessageType.RECORD:
                     record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
                     result = handler.handle_record(record_msg)
                     if result.failure:
-                        return r[None].fail(
-                            f"RECORD handler failed for {record_msg.stream}: "
-                            f"{result.error}"
+                        return e.fail_operation(
+                            f"RECORD handler for {record_msg.stream}",
+                            result.error,
+                            result_type=r[None],
                         )
 
                 elif msg_type == c.Meltano.SingerMessageType.STATE:
                     state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
                     result = handler.handle_state(state_msg)
                     if result.failure:
-                        return r[None].fail_op("STATE handler", result.error)
+                        return e.fail_operation(
+                            "STATE handler", result.error, result_type=r[None]
+                        )
 
             return r[None].ok(None)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
-            return r[None].fail_op("Stdin processing", e)
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
+            return e.fail_operation("Stdin processing", exc, result_type=r[None])
 
     @staticmethod
     def build_catalog_entry(
@@ -217,7 +225,9 @@ class FlextMeltanoUtilitiesSinger:
                 ),
             })
             return r[m.Meltano.SingerCatalogEntry].ok(entry)
-        except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
-            return r[m.Meltano.SingerCatalogEntry].fail(
-                f"Failed to build catalog entry for {stream_name}: {e}"
+        except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
+            return e.fail_operation(
+                f"build catalog entry for {stream_name}",
+                exc,
+                result_type=r[m.Meltano.SingerCatalogEntry],
             )
