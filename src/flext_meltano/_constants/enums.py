@@ -12,26 +12,6 @@ class FlextMeltanoConstantsEnums:
     """Meltano domain enumerations."""
 
     @unique
-    class MeltanoProjectType(StrEnum):
-        """Meltano project type enumeration."""
-
-        LIBRARY = "library"
-        APPLICATION = "application"
-        SERVICE = "service"
-        MELTANO_PROJECT = "meltano-project"
-        ELT_PIPELINE = "elt-pipeline"
-        DATA_PIPELINE = "data-pipeline"
-        ETL_SERVICE = "etl-service"
-        SINGER_TAP = "singer-tap"
-        SINGER_TARGET = "singer-target"
-        DBT_PROJECT = "dbt-project"
-        DATA_INTEGRATION = "data-integration"
-        PIPELINE_ORCHESTRATOR = "pipeline-orchestrator"
-        DATA_EXTRACTOR = "data-extractor"
-        DATA_LOADER = "data-loader"
-        TRANSFORMATION_SERVICE = "transformation-service"
-
-    @unique
     class PluginType(StrEnum):
         """Supported Meltano plugin categories.
 
@@ -73,15 +53,6 @@ class FlextMeltanoConstantsEnums:
         OK = "OK"
         PASSED = "passed"
         PROCESSED = "processed"
-
-    @unique
-    class RunMode(StrEnum):
-        """Execution modes for Meltano operations."""
-
-        FULL = "full"
-        INCREMENTAL = "incremental"
-        DRY_RUN = "dry_run"
-        TEST = "test"
 
     @unique
     class Environment(StrEnum):
@@ -362,14 +333,6 @@ class FlextMeltanoConstantsEnums:
         LIST = "list"
         INVOKE = "invoke"
         SELECT = "select"
-
-    @unique
-    class SingerMetadataKey(StrEnum):
-        """Singer catalog metadata field names."""
-
-        TABLE_KEY_PROPERTIES = "table-key-properties"
-        FORCED_REPLICATION_METHOD = "forced-replication-method"
-        VALID_REPLICATION_KEYS = "valid-replication-keys"
 
     @unique
     class SchemaKey(StrEnum):
