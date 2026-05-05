@@ -153,22 +153,26 @@ class FlextMeltanoSettings(FlextSettingsBase):
     @classmethod
     def fetch_version(cls) -> str:
         """Return package semantic version."""
-        return c.Meltano.FLEXT_MELTANO_VERSION
+        version: str = c.Meltano.FLEXT_MELTANO_VERSION
+        return version
 
     @classmethod
     def get_name(cls) -> str:
         """Return package distribution name."""
-        return c.Meltano.PROJECT_PREFIX
+        name: str = c.Meltano.PROJECT_PREFIX
+        return name
 
     @classmethod
     def get_default_timeout(cls) -> int:
         """Return default command timeout in seconds."""
-        return c.Meltano.NETWORK_DEFAULT_TIMEOUT
+        timeout: int = c.Meltano.NETWORK_DEFAULT_TIMEOUT
+        return timeout
 
     @classmethod
     def get_default_batch_size(cls) -> int:
         """Return default batch size for operations."""
-        return c.Meltano.BATCH_DEFAULT_DEFAULT_BATCH_SIZE
+        batch_size: int = c.Meltano.BATCH_DEFAULT_DEFAULT_BATCH_SIZE
+        return batch_size
 
     @classmethod
     def get_supported_plugin_types(cls) -> t.StrSequence:

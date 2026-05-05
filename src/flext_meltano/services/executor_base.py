@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import override
 
 import meltano
-from click import Abort, ClickException
+from flext_cli import c as cli_c
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -256,8 +256,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             except SystemExit as e:
                 exit_code = self._normalize_exit_code(e.code)
             except (
-                Abort,
-                ClickException,
+                cli_c.Cli.CliAbortError,
+                cli_c.Cli.CliCommandError,
                 CliError,
                 EmptyMeltanoFileException,
                 MeltanoError,

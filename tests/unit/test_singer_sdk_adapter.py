@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import override
 
-import click
+from flext_cli import t as cli_t
 
 from flext_meltano import FlextMeltanoSingerTapAdapter
 from tests import t
+
+_SingerCommand: type = cli_t.Cli.ExternalCli
 
 
 class _StreamInfo:
@@ -21,8 +23,8 @@ class _SuccessfulTap:
         self.synced = False
 
     @classmethod
-    def get_singer_command(cls) -> click.Command:
-        return click.Command("tap-ok")
+    def get_singer_command(cls) -> _SingerCommand:
+        return _SingerCommand("tap-ok")
 
     def discover_streams(self) -> t.SequenceOf[_StreamInfo]:
         return [_StreamInfo("users")]
@@ -34,8 +36,8 @@ class _SuccessfulTap:
 class _FailingTap(_SuccessfulTap):
     @classmethod
     @override
-    def get_singer_command(cls) -> click.Command:
-        class _FailingCommand(click.Command):
+    def get_singer_command(cls) -> _SingerCommand:
+        class _FailingCommand(_SingerCommand):
             @override
             def main(
                 self,

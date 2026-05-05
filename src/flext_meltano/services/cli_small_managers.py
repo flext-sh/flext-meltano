@@ -83,7 +83,8 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
             if variant:
                 item["variant"] = variant
             items.append(item)
-        return u.Cli.json_dumps(items, sort_keys=True).unwrap()
+        rendered: str = u.Cli.json_dumps(items, sort_keys=True).unwrap()
+        return rendered
 
     def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         """Install a Meltano plugin using the real Meltano CLI."""

@@ -9,8 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
 
-import click
-from flext_cli import p
+from flext_cli import p, t as cli_t
 
 from flext_meltano import t
 
@@ -239,7 +238,7 @@ class FlextMeltanoProtocolsSinger:
         """Raw Singer SDK tap surface consumed by the FLEXT bridge."""
 
         @classmethod
-        def get_singer_command(cls) -> click.Command:
+        def get_singer_command(cls) -> cli_t.Cli.ExternalCli:
             """Return the Singer SDK command bound to the tap type."""
             ...
 
@@ -263,7 +262,7 @@ class FlextMeltanoProtocolsSinger:
         """Legacy tap backend contract exposing ``settings`` only."""
 
         @classmethod
-        def get_singer_command(cls) -> click.Command:
+        def get_singer_command(cls) -> cli_t.Cli.ExternalCli:
             """Return the Singer SDK command bound to the tap type."""
             ...
 

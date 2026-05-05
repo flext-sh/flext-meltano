@@ -61,7 +61,8 @@ class FlextMeltanoModelsSourcesParams:
         @property
         def has_data(self) -> bool:
             """Check if stream has extracted data."""
-            return self.records_extracted > 0
+            has: bool = self.records_extracted > 0
+            return has
 
         @u.computed_field()
         @property
