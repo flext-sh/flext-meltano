@@ -13,7 +13,7 @@ from __future__ import annotations
 import sys
 from abc import abstractmethod
 from pathlib import Path
-from typing import Annotated, ClassVar, Self, override
+from typing import Annotated, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
@@ -47,7 +47,6 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
-    _instance: ClassVar[Self | None] = None
 
     def __init__(
         self,
@@ -55,13 +54,6 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
     ) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(runtime_settings=settings)
-
-    @classmethod
-    def fetch_instance(cls) -> Self:
-        """Return the shared facade instance."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
 
     @property
     @abstractmethod

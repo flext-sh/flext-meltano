@@ -63,17 +63,6 @@ class FlextMeltano(
 ):
     """MRO facade over all Meltano services. All operations return r[T]."""
 
-    _instance: ClassVar[FlextMeltano | None] = None
-
-    @classmethod
-    def fetch_instance(cls) -> Self:
-        """Return the shared Meltano facade instance."""
-        instance = cls._instance
-        if instance is None or not isinstance(instance, cls):
-            instance = cls()
-            cls._instance = instance
-        return instance
-
     def tap(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
         """Create a specialized Tap facade instance through the public API."""
         return type(self).create_source_service(name, **settings)
@@ -106,7 +95,7 @@ class FlextMeltano(
         return r[t.JsonMapping].ok(payload)
 
 
-meltano = FlextMeltano.fetch_instance()
+meltano = FlextMeltano.fetch_global()
 
 
 __all__: list[str] = ["FlextMeltano", "meltano"]

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import sys
 from abc import abstractmethod
-from typing import Annotated, ClassVar, Self, override
+from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
@@ -43,7 +43,6 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
         default_factory=lambda: None
     )
-    _instance: ClassVar[Self | None] = None
 
     def __init__(
         self,
@@ -51,13 +50,6 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     ) -> None:
         """Expose the canonical settings bootstrap for tap facades."""
         super().__init__(runtime_settings=settings)
-
-    @classmethod
-    def fetch_instance(cls) -> Self:
-        """Return the shared facade instance."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
 
     @abstractmethod
     def create_tap_instance(

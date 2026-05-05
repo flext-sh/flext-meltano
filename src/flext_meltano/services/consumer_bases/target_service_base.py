@@ -14,7 +14,7 @@ from abc import abstractmethod
 from collections.abc import (
     MutableMapping,
 )
-from typing import Annotated, ClassVar, Self, override
+from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
@@ -42,14 +42,6 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
         default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
-    _instance: ClassVar[Self | None] = None
-
-    @classmethod
-    def fetch_instance(cls) -> Self:
-        """Return the shared facade instance."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
 
     @abstractmethod
     def create_sink(
