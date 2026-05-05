@@ -24,7 +24,8 @@ class _SuccessfulTap:
 
     @classmethod
     def get_singer_command(cls) -> _SingerCommand:
-        return _SingerCommand("tap-ok")
+        command: _SingerCommand = _SingerCommand("tap-ok")
+        return command
 
     def discover_streams(self) -> t.SequenceOf[_StreamInfo]:
         return [_StreamInfo("users")]
