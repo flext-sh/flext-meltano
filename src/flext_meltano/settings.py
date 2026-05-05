@@ -7,12 +7,11 @@ from typing import Annotated, ClassVar, Self
 
 from flext_cli import r, u
 
-from flext_core import FlextSettings
+from flext_core import FlextSettingsBase
 from flext_meltano import c, m, p, t
 
 
-@FlextSettings.auto_register("meltano")
-class FlextMeltanoSettings(FlextSettings):
+class FlextMeltanoSettings(FlextSettingsBase):
     """Runtime settings for Meltano orchestration services."""
 
     model_config: ClassVar[m.SettingsConfigDict] = m.SettingsConfigDict(
@@ -48,6 +47,13 @@ class FlextMeltanoSettings(FlextSettings):
             default=c.Meltano.SETTINGS_ENVIRONMENTS[0],
             validation_alias=c.Meltano.ENV_VAR_ENVIRONMENT,
             description="Active Meltano runtime environment",
+        ),
+    ]
+    log_level: Annotated[
+        c.LogLevel,
+        u.Field(
+            default=c.LogLevel.INFO,
+            description="Meltano runtime log level",
         ),
     ]
     meltano_version: Annotated[

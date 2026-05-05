@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import (
     Callable,
 )
@@ -70,21 +69,21 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
         plugins: t.SequenceOf[t.JsonMapping],
     ) -> str:
         """Render SDK plugin definitions as deterministic JSON."""
-        items: list[dict[str, str]] = []
+        items: list[t.JsonValue] = []
         for plugin in plugins:
             plugin_name = str(plugin.get("name", "")).strip()
             if not plugin_name:
                 continue
             plugin_type = str(plugin.get("type", "")).strip()
             variant = str(plugin.get("variant", "")).strip()
-            item: dict[str, str] = {
+            item: dict[str, t.JsonValue] = {
                 "name": plugin_name,
                 "type": plugin_type,
             }
             if variant:
                 item["variant"] = variant
             items.append(item)
-        return json.dumps(items, sort_keys=True)
+        return u.Cli.json_dumps(items, sort_keys=True).unwrap()
 
     def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
         """Install a Meltano plugin using the real Meltano CLI."""
@@ -129,7 +128,10 @@ class _FlextMeltanoCliPluginService(FlextMeltanoProjectManager):
                 }
                 if variant:
                     payload["variant"] = variant
-                return r[str].ok(json.dumps(payload, sort_keys=True))
+                payload_json: dict[str, t.JsonValue] = dict(payload)
+                return r[str].ok(
+                    u.Cli.json_dumps(payload_json, sort_keys=True).unwrap()
+                )
             return e.fail_not_found("Plugin", plugin_name, result_type=r[str])
 
         return self._load_project().flat_map(
@@ -185,24 +187,24 @@ class _FlextMeltanoCliStatusService(FlextMeltanoServiceBase):
     def run_health_check(self) -> p.Result[str]:
         """Use the version command as a real runtime health probe."""
         return self._run_version_command().map(
-            lambda version_output: json.dumps(
+            lambda version_output: u.Cli.json_dumps(
                 {
                     "status": c.Meltano.OperationStatus.HEALTHY,
                     "version": version_output,
                 },
                 sort_keys=True,
-            )
+            ).unwrap()
         )
 
     def show_status(self) -> p.Result[str]:
         """Render configured Meltano status data."""
-        payload = {
+        payload: dict[str, t.JsonValue] = {
             "environment": self.settings.environment,
             "meltano_version": self.settings.meltano_version,
             "project_root": str(self._resolve_project_root() or Path.cwd()),
-            "status": c.Meltano.OperationStatus.READY,
+            "status": c.Meltano.OperationStatus.READY.value,
         }
-        return r[str].ok(json.dumps(payload, sort_keys=True))
+        return r[str].ok(u.Cli.json_dumps(payload, sort_keys=True).unwrap())
 
 
 class _FlextMeltanoSimpleCommandManager:
