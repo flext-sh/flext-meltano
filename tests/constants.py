@@ -16,11 +16,14 @@ from __future__ import annotations
 from enum import StrEnum, unique
 from pathlib import Path
 from types import MappingProxyType
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from flext_tests import FlextTestsConstants
 
-from flext_meltano import c, t
+from flext_meltano import c
+
+if TYPE_CHECKING:
+    from tests import t
 
 
 class TestsFlextMeltanoConstants(FlextTestsConstants, c):
@@ -73,6 +76,34 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
             TEST_INPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "input").as_posix()
             TEST_OUTPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "output").as_posix()
             TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
+
+            @unique
+            class _SingerSdkAdapterValue(StrEnum):
+                """Deterministic values for Singer SDK adapter tests."""
+
+                SETTINGS_KEY = "tap"
+                SETTINGS_VALUE = "ok"
+                STREAM_USERS = "users"
+                SUCCESS_COMMAND = "tap-ok"
+                FAILURE_COMMAND = "tap-fail"
+
+            SINGER_SDK_ADAPTER_SETTINGS: Final[t.MappingKV[str, str]] = (
+                MappingProxyType({
+                    _SingerSdkAdapterValue.SETTINGS_KEY: (
+                        _SingerSdkAdapterValue.SETTINGS_VALUE
+                    ),
+                })
+            )
+            SINGER_SDK_ADAPTER_STREAM_USERS: Final[str] = (
+                _SingerSdkAdapterValue.STREAM_USERS
+            )
+            SINGER_SDK_ADAPTER_SUCCESS_COMMAND: Final[str] = (
+                _SingerSdkAdapterValue.SUCCESS_COMMAND
+            )
+            SINGER_SDK_ADAPTER_FAILURE_COMMAND: Final[str] = (
+                _SingerSdkAdapterValue.FAILURE_COMMAND
+            )
+            SINGER_SDK_ADAPTER_FAILURE_EXIT_CODE: Final[int] = 3
 
 
 c = TestsFlextMeltanoConstants

@@ -12,51 +12,21 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import (
-    Callable,
-    Generator,
-)
+from collections.abc import Generator
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import tk
 
-from flext_meltano import FlextMeltano, meltano
-from tests import c, p, u
+from tests import c, t, u
 
-if TYPE_CHECKING:
-    from tests import t
-
-
-type MeltanoComponentFactory = Callable[..., p.Result[FlextMeltano]]
-type MeltanoComponentSelector = Callable[[FlextMeltano], str | None]
-type MeltanoComponentCase = tuple[
-    MeltanoComponentFactory,
-    str,
-    MeltanoComponentSelector,
-]
-
-
-def select_source_name(service: FlextMeltano) -> str | None:
-    """Select the source name from a specialized Tap facade."""
-    return service.source_name
-
-
-def select_sink_name(service: FlextMeltano) -> str | None:
-    """Select the sink name from a specialized Target facade."""
-    return service.sink_name
-
-
-def select_transformation_name(service: FlextMeltano) -> str | None:
-    """Select the transformation name from a specialized DBT facade."""
-    return service.transformation_name
+type MeltanoComponentCase = tuple[str, str, str]
 
 
 MELTANO_COMPONENT_CASES: tuple[MeltanoComponentCase, ...] = (
-    (meltano.Tap, "tap-csv", select_source_name),
-    (meltano.Target, "target-jsonl", select_sink_name),
-    (meltano.Dbt, "analytics", select_transformation_name),
+    ("tap", "tap-csv", "source_name"),
+    ("target", "target-jsonl", "sink_name"),
+    ("dbt", "analytics", "transformation_name"),
 )
 
 MELTANO_COMPONENT_IDS: tuple[str, ...] = ("tap", "target", "dbt")
@@ -201,11 +171,11 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
     """Docker manager fixture for Docker-based tests."""
     temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
     manager = tk.stack(
-        c.Meltano.Tests.COMPOSE_FILE,
-        container_name=c.Meltano.Tests.PRIMARY_CONTAINER_NAME,
-        service=c.Meltano.Tests.PRIMARY_SERVICE,
-        host=c.Meltano.Tests.HOST,
-        port=c.Meltano.Tests.MELTANO_PORT,
+        "docker-compose.test.yml",
+        container_name="flext-test-meltano",
+        service="meltano",
+        host=c.LOCALHOST,
+        port=3389,
         workspace_root=Path(__file__).resolve().parents[1],
     )
     manager.state_file_path = temp_dir / "flext_tests_docker_state.json"
@@ -228,7 +198,7 @@ def require_docker_service(docker_services: tk, port: int, service_name: str) ->
     ready = docker_services.ready(port=port)
     if ready.failure or not ready.value:
         pytest.skip(f"{service_name} service not available")
-    return f"{c.Meltano.Tests.HOST}:{port}"
+    return f"{c.LOCALHOST}:{port}"
 
 
 @pytest.fixture
@@ -236,7 +206,7 @@ def postgres_service(docker_services: tk) -> str:
     """PostgreSQL service fixture."""
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.POSTGRES_PORT,
+        5433,
         "PostgreSQL",
     )
 
@@ -246,7 +216,7 @@ def redis_service(docker_services: tk) -> str:
     """Redis service fixture."""
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.REDIS_PORT,
+        6380,
         "Redis",
     )
 
@@ -256,7 +226,7 @@ def meltano_service(docker_services: tk) -> str:
     """Meltano service fixture."""
     return require_docker_service(
         docker_services,
-        c.Meltano.Tests.MELTANO_PORT,
+        3389,
         "Meltano",
     )
 

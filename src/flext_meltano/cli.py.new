@@ -67,20 +67,15 @@ class FlextMeltanoCLI(FlextMeltano):
                     if command_args
                     else None
                 )
-                return (
-                    self
-                    .discover_plugins()
-                    .map(
-                        lambda plugins: [
-                            dict(plugin.items())
-                            for plugin in plugins
-                            if plugin_type is None or plugin.get("type") == plugin_type
-                        ]
-                    )
-                    .flat_map(
-                        lambda payload: u.Cli.json_dumps(
-                            list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload))
-                        )
+                return self.discover_plugins().map(
+                    lambda plugins: [
+                        dict(plugin.items())
+                        for plugin in plugins
+                        if plugin_type is None or plugin.get("type") == plugin_type
+                    ]
+                ).flat_map(
+                    lambda payload: u.Cli.json_dumps(
+                        list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload))
                     )
                 )
             case "info":

@@ -1,67 +1,52 @@
-"""Test module for flext-meltano target abstractions.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Real tests for the flat public target abstraction surface."""
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
-
-import pytest
-from flext_tests import tm
-
-from flext_meltano import FlextMeltanoTargetAbstractions
-from tests import r, t, u
-
-logger = u.fetch_logger(__name__)
+from flext_meltano import meltano
+from tests import m, u
 
 
 class TestsFlextMeltanoTargetAbstractions:
-    """Complete test suite for FlextMeltanoTargetAbstractions."""
+    """Validate target-related behavior through the current public facade."""
 
-    target_abstractions: FlextMeltanoTargetAbstractions | None = None
+    def test_target_factory_returns_bound_service(self) -> None:
+        """The flat target factory should bind the returned facade to the sink name."""
+        result = meltano.target("target-jsonl")
 
-    def setup_method(self) -> None:
-        """Setup for each test."""
-        self.target_abstractions = FlextMeltanoTargetAbstractions()
+        assert result.success
+        assert result.value.source_name is None
+        assert result.value.sink_name == "target-jsonl"
+        assert result.value.transformation_name is None
 
-    def test_target_abstractions_initialization(self) -> None:
-        """Test FlextMeltanoTargetAbstractions initialization."""
-        target_abs = FlextMeltanoTargetAbstractions()
-        tm.that(target_abs, none=False)
+    def test_configure_sink_returns_sink_definition(self) -> None:
+        """The facade should convert a sink config into a configured sink definition."""
+        sink_config = m.Meltano.DataSinkConfig(
+            sink_type="target-jsonl",
+            connection_config={"path": "output.jsonl"},
+        )
 
-    def test_create_flext_target_config(self) -> None:
-        """Test target configuration creation."""
-        tm.that(self.target_abstractions, none=False)
-        if not hasattr(self.target_abstractions, "configure_sink"):
-            pytest.skip("configure_sink not available")
+        result = meltano.configure_sink(sink_config)
 
-    def test_create_flext_target(self) -> None:
-        """Test target creation."""
+        assert result.success
+        assert result.value.sink_name == "target-jsonl_sink"
+        assert result.value.sink_type == "target-jsonl"
+        assert result.value.settings["path"] == "output.jsonl"
 
-    def test_target_error_handling(self) -> None:
-        """Test target error handling."""
-        tm.that(self.target_abstractions, none=False)
-        if self.target_abstractions is None:
-            return
-        result = self.target_abstractions.execute()
-        tm.that(result, is_=r)
+    def test_create_flext_target_from_mapping(self) -> None:
+        """The facade should create a sink instance from a plain mapping payload."""
+        result = meltano.create_flext_target({
+            "sink_type": "target-jsonl",
+            "connection_config": {"path": "output.jsonl"},
+        })
 
-    def test_utility_helper_methods(self) -> None:
-        """Test utility helper methods using flext-core."""
+        assert result.success
+        assert result.value.sink_type == "target-jsonl"
+        assert result.value.settings.sink_type == "target-jsonl"
+        assert result.value.settings.connection_config["path"] == "output.jsonl"
+
+    def test_utility_helper_methods_remain_available(self) -> None:
+        """The test utility layer remains usable for current flat target flows."""
         timestamp = u.generate_iso_timestamp()
-        tm.that(timestamp, is_=str)
-        tm.that(timestamp, has="T")
-        test_data: t.JsonMapping = {
-            "level1": {"level2": {"level3": "found_value"}},
-        }
-        # Navigate nested dict structure using typed accessors
-        level1_val = test_data["level1"]
-        assert isinstance(level1_val, Mapping)
-        level2_val = level1_val["level2"]
-        assert isinstance(level2_val, Mapping)
-        result_val = level2_val["level3"]
-        tm.that(result_val, eq="found_value")
+
+        assert isinstance(timestamp, str)
+        assert "T" in timestamp

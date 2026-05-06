@@ -1,156 +1,93 @@
-"""Unit tests for small Meltano CLI managers."""
+"""Real-execution tests for small Meltano CLI command handlers."""
 
 from __future__ import annotations
 
+import re
+
+import pytest
 from flext_tests import tm
 
-from flext_meltano import (
-    FlextMeltanoDbtManager,
-    FlextMeltanoPluginManager,
-    FlextMeltanoSingerManager,
-    FlextMeltanoStatusManager,
-)
-from tests import p, r, t
-
-
-class _StubDbtCli:
-    def __init__(self) -> None:
-        self.help_called = False
-
-    def show_dbt_help(self) -> None:
-        self.help_called = True
-
-
-class _StubPluginCli:
-    def __init__(self) -> None:
-        self.help_called = False
-
-    def show_plugin_help(self) -> None:
-        self.help_called = True
-
-
-class _StubSingerCli:
-    def __init__(self) -> None:
-        self.tap_help_called = False
-        self.target_help_called = False
-
-    def show_tap_help(self) -> None:
-        self.tap_help_called = True
-
-    def show_target_help(self) -> None:
-        self.target_help_called = True
-
-
-class _StubStatusCli:
-    def __init__(self) -> None:
-        self.help_called = False
-
-    def show_status_help(self) -> None:
-        self.help_called = True
-
-
-class _StubDbtService:
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, list[str]]] = []
-
-    def run_operation(self, operation: str, args: t.StrSequence) -> p.Result[str]:
-        self.calls.append((operation, list(args)))
-        return r[str].ok(f"dbt:{operation}")
-
-
-class _StubPluginService:
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, tuple[str, ...]]] = []
-
-    def install_plugin(self, plugin_type: str, plugin_name: str) -> p.Result[str]:
-        self.calls.append(("install", (plugin_type, plugin_name)))
-        return r[str].ok(f"installed:{plugin_type}:{plugin_name}")
-
-    def fetch_plugin_info(self, plugin_name: str) -> p.Result[str]:
-        self.calls.append(("info", (plugin_name,)))
-        return r[str].ok(f"info:{plugin_name}")
-
-    def list_plugins(self, plugin_type: str | None = None) -> p.Result[str]:
-        plugin_value = "" if plugin_type is None else plugin_type
-        self.calls.append(("list", (plugin_value,)))
-        return r[str].ok("[]")
-
-
-class _StubStatusService:
-    def fetch_version(self) -> p.Result[str]:
-        return r[str].ok("3.9.1")
-
-    def run_health_check(self) -> p.Result[str]:
-        return r[str].ok('{"status": "healthy"}')
-
-    def show_status(self) -> p.Result[str]:
-        return r[str].ok('{"status": "ready"}')
+from flext_meltano.cli import FlextMeltanoCLI, cli
+from tests import c, t, u
 
 
 class TestsFlextMeltanoCliSmallManagers:
-    """Unit tests for small Meltano CLI managers."""
+    """Exercise the public CLI handlers without mocks or monkeypatching."""
 
-    def test_dbt_manager_routes_supported_operation_to_service(
-        self,
-    ) -> None:
-        cli = _StubDbtCli()
-        service = _StubDbtService()
-        manager = FlextMeltanoDbtManager(cli, service=service)
-
-        result = manager.handle_command(["run", "--models", "orders"])
+    def test_version_command_returns_real_version_string(self) -> None:
+        result = FlextMeltanoCLI.fetch_global().handle_version_command([])
 
         tm.ok(result)
-        tm.that(result.value, eq="dbt:run")
-        tm.that(service.calls, eq=[("run", ["--models", "orders"])])
+        tm.that("." in result.value, eq=True)
 
-    def test_dbt_manager_fails_for_unsupported_operation(self) -> None:
-        manager = FlextMeltanoDbtManager(_StubDbtCli(), service=_StubDbtService())
+    def test_status_commands_return_json_payloads(self) -> None:
+        cli_instance = FlextMeltanoCLI.fetch_global()
 
-        result = manager.handle_command(["seed"])
-
-        tm.fail(result)
-        tm.that(str(result.error), has="not supported")
-
-    def test_plugin_manager_routes_list_and_install(self) -> None:
-        cli = _StubPluginCli()
-        service = _StubPluginService()
-        manager = FlextMeltanoPluginManager(cli, service=service)
-
-        list_result = manager.handle_command(["list", "extractors"])
-        install_result = manager.handle_command(["install", "extractors", "tap-demo"])
-
-        tm.ok(list_result)
-        tm.ok(install_result)
-        tm.that(
-            service.calls,
-            eq=[("list", ("extractors",)), ("install", ("extractors", "tap-demo"))],
-        )
-
-    def test_status_manager_routes_show_health_and_version(self) -> None:
-        manager = FlextMeltanoStatusManager(
-            _StubStatusCli(), service=_StubStatusService()
-        )
-
-        show_result = manager.handle_command(["show"])
-        health_result = manager.handle_command(["health"])
-        version_result = manager.handle_version_command([])
+        show_result = cli_instance.handle_status_command(["show"])
+        health_result = cli_instance.handle_status_command([
+            c.Meltano.ExecutorCommand.HEALTH
+        ])
 
         tm.ok(show_result)
         tm.ok(health_result)
-        tm.ok(version_result)
-        tm.that(show_result.value, has='"ready"')
-        tm.that(health_result.value, has='"healthy"')
-        tm.that(version_result.value, eq="3.9.1")
 
-    def test_singer_manager_returns_failure_for_placeholder_tap_and_target_ops(
-        self,
-    ) -> None:
-        manager = FlextMeltanoSingerManager(_StubSingerCli())
+        show_json = u.Cli.json_loads(show_result.value)
+        health_json = u.Cli.json_loads(health_result.value)
 
-        tap_result = manager.handle_tap_command(["run", "tap-demo"])
-        target_result = manager.handle_target_command(["run", "target-demo"])
+        tm.ok(show_json)
+        tm.ok(health_json)
+
+        show_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(show_json.value)
+        health_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(health_json.value)
+
+        tm.that(show_payload.get("status"), eq=c.Meltano.OperationStatus.READY)
+        tm.that("status" in health_payload, eq=True)
+
+    def test_tap_and_target_commands_fail_for_unsupported_operations(self) -> None:
+        cli_instance = FlextMeltanoCLI.fetch_global()
+
+        tap_result = cli_instance.handle_tap_command(["run", "tap-demo"])
+        target_result = cli_instance.handle_target_command(["run", "target-demo"])
 
         tm.fail(tap_result)
         tm.fail(target_result)
         tm.that(str(tap_result.error), has="not supported")
         tm.that(str(target_result.error), has="not supported")
+
+    def test_plugin_commands_enforce_real_argument_contracts(self) -> None:
+        cli_instance = FlextMeltanoCLI.fetch_global()
+
+        info_result = cli_instance.handle_plugin_command(["info"])
+        install_result = cli_instance.handle_plugin_command([
+            c.Meltano.ExecutorCommand.INSTALL,
+            "extractors",
+            "tap-demo",
+        ])
+
+        tm.fail(info_result)
+        tm.fail(install_result)
+        tm.that(str(info_result.error), has="requires")
+        tm.that(str(install_result.error), has="not supported")
+
+    def test_dbt_help_path_returns_help_sentinel(self) -> None:
+        result = FlextMeltanoCLI.fetch_global().handle_dbt_command([
+            c.Meltano.CMD_HELP_OPTION
+        ])
+
+        tm.ok(result)
+        tm.that(result.value, eq=c.Meltano.ExecutorCommand.HELP)
+
+    def test_route_command_prints_real_version_output(
+        self,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        version_result = cli.handle_version_command([])
+
+        tm.ok(version_result)
+
+        exit_code = cli.route_command([c.Meltano.CliCommand.VERSION])
+        captured = capsys.readouterr()
+        normalized_output = re.sub(r"\x1b\[[0-9;]*m", "", captured.out)
+
+        tm.that(exit_code, eq=0)
+        tm.that(normalized_output, has=version_result.value)

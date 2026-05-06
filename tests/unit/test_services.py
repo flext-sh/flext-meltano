@@ -2,89 +2,97 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Callable,
-)
-
 import pytest
+from flext_tests import tm
 
-from flext_meltano import FlextMeltano, meltano
-from tests import c, p, u
-
-type ComponentFactory = Callable[..., p.Result[FlextMeltano]]
-type ComponentSelector = Callable[[FlextMeltano], str | None]
+from flext_meltano import meltano
+from tests import c
 
 pytestmark = pytest.mark.unit
-
-
-def unwrap_component(
-    result: p.Result[FlextMeltano],
-    *,
-    selector: ComponentSelector,
-    expected_name: str,
-) -> FlextMeltano:
-    """Assert and unwrap a public Meltano component facade."""
-    u.Tests.Matchers.that(result, ok=True)
-    assert result.success
-    service: FlextMeltano = result.unwrap()
-    u.Tests.Matchers.that(service, is_=FlextMeltano)
-    u.Tests.Matchers.that(selector(service), eq=expected_name)
-    u.Tests.Matchers.that(service.service_version, eq=c.Meltano.DEFAULT_SERVICE_VERSION)
-    return service
 
 
 class TestsFlextMeltanoServices:
     def test_component_factory_returns_specialized_facade(
         self,
-        meltano_component_case: tuple[ComponentFactory, str, ComponentSelector],
+        meltano_component_case: tuple[str, str, str],
     ) -> None:
         """Each public factory returns a specialized facade with the right name."""
-        factory, component_name, selector = meltano_component_case
-        unwrap_component(
-            factory(component_name),
-            selector=selector,
-            expected_name=component_name,
-        )
+        component_kind, component_name, attribute_name = meltano_component_case
+        match component_kind:
+            case "tap":
+                result = meltano.tap(component_name)
+            case "target":
+                result = meltano.target(component_name)
+            case "dbt":
+                result = meltano.dbt(component_name)
+            case _:
+                raise ValueError(
+                    f"Unsupported Meltano component kind: {component_kind}"
+                )
+        tm.that(result, ok=True)
+        assert result.success
+        service = result.value
+        tm.that(service, none=False)
+        tm.that(getattr(service, attribute_name), eq=component_name)
+        tm.that(service.service_version, eq=c.Meltano.DEFAULT_SERVICE_VERSION)
 
     @pytest.mark.parametrize(
-        ("factory", "component_name"),
+        ("component_kind", "component_name"),
         [
-            (meltano.Tap, "tap-postgres"),
-            (meltano.Target, "target-postgres"),
-            (meltano.Dbt, "warehouse"),
+            ("tap", "tap-postgres"),
+            ("target", "target-postgres"),
+            ("dbt", "warehouse"),
         ],
         ids=["tap", "target", "dbt"],
     )
     def test_component_factory_accepts_direct_config(
         self,
-        factory: ComponentFactory,
+        component_kind: str,
         component_name: str,
     ) -> None:
         """Component factories accept direct settings without wrappers."""
-        result = factory(component_name, host="localhost", database="testdb")
-        u.Tests.Matchers.that(result, ok=True)
+        match component_kind:
+            case "tap":
+                result = meltano.tap(
+                    component_name, host="localhost", database="testdb"
+                )
+            case "target":
+                result = meltano.target(
+                    component_name,
+                    host="localhost",
+                    database="testdb",
+                )
+            case "dbt":
+                result = meltano.dbt(
+                    component_name, host="localhost", database="testdb"
+                )
+            case _:
+                raise ValueError(
+                    f"Unsupported Meltano component kind: {component_kind}"
+                )
+        tm.that(result, ok=True)
         assert result.success
         service = result.value
-        u.Tests.Matchers.that(service, is_=FlextMeltano)
-        u.Tests.Matchers.that(service.service_name, eq=f"{component_name}_service")
+        tm.that(service, none=False)
+        tm.that(service.service_name, eq=f"{component_name}_service")
 
     def test_component_factories_return_distinct_instances(self) -> None:
         """Public component factories never alias the same specialized facade."""
-        tap_service = unwrap_component(
-            meltano.Tap("tap-a"),
-            selector=lambda service: service.source_name,
-            expected_name="tap-a",
-        )
-        target_service = unwrap_component(
-            meltano.Target("target-a"),
-            selector=lambda service: service.sink_name,
-            expected_name="target-a",
-        )
-        dbt_service = unwrap_component(
-            meltano.Dbt("dbt-a"),
-            selector=lambda service: service.transformation_name,
-            expected_name="dbt-a",
-        )
-        u.Tests.Matchers.that(tap_service is not target_service, eq=True)
-        u.Tests.Matchers.that(target_service is not dbt_service, eq=True)
-        u.Tests.Matchers.that(dbt_service is not tap_service, eq=True)
+        tap_result = meltano.tap("tap-a")
+        target_result = meltano.target("target-a")
+        dbt_result = meltano.dbt("dbt-a")
+        tm.that(tap_result, ok=True)
+        tm.that(target_result, ok=True)
+        tm.that(dbt_result, ok=True)
+        assert tap_result.success
+        assert target_result.success
+        assert dbt_result.success
+        tap_service = tap_result.value
+        target_service = target_result.value
+        dbt_service = dbt_result.value
+        tm.that(tap_service.source_name, eq="tap-a")
+        tm.that(target_service.sink_name, eq="target-a")
+        tm.that(dbt_service.transformation_name, eq="dbt-a")
+        tm.that(tap_service is not target_service, eq=True)
+        tm.that(target_service is not dbt_service, eq=True)
+        tm.that(dbt_service is not tap_service, eq=True)

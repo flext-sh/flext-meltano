@@ -11,12 +11,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 import pytest
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoValidators
+from flext_meltano import meltano
 from tests import r, t
 
 
@@ -30,12 +28,12 @@ class TestsFlextMeltanoValidators:
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.ok(result)
 
     def test_validate_plugin_config_missing_fields(self) -> None:
         settings: t.ScalarMapping = {"name": "tap-csv"}
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.fail(result)
 
@@ -46,7 +44,7 @@ class TestsFlextMeltanoValidators:
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.fail(result)
 
@@ -57,45 +55,39 @@ class TestsFlextMeltanoValidators:
             "pip_url": "pipelinewise-tap-csv",
             "executable": "tap-csv",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.fail(result)
 
     def test_validate_plugin_config_non_dict(self) -> None:
         """Test plugin settings validation with non-dict input."""
-        result = FlextMeltanoValidators.validate_plugin_config({"name": "test"})
+        result = meltano.validate_plugin_config({"name": "test"})
         tm.that(result, is_=r)
 
     def test_validate_plugin_config_none(self) -> None:
         """Test plugin settings validation with empty input."""
-        result = FlextMeltanoValidators.validate_plugin_config({})
+        result = meltano.validate_plugin_config({})
         tm.that(result, is_=r)
 
     def test_validate_meltano_config_valid(self) -> None:
         settings: t.ScalarMapping = {"version": 1, "project_id": "test-project"}
-        result = FlextMeltanoValidators.validate_pipeline_project_business_rules(
-            settings
-        )
+        result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
 
     def test_validate_meltano_config_missing_version(self) -> None:
         settings: t.ScalarMapping = {"project_id": "test-project"}
-        result = FlextMeltanoValidators.validate_pipeline_project_business_rules(
-            settings
-        )
+        result = meltano.validate_pipeline_project_business_rules(settings)
         tm.that(result.failure or result.success, eq=True)
 
     def test_validate_meltano_config_invalid_version(self) -> None:
         settings: t.ScalarMapping = {"schema_version": 2, "project_id": "test-project"}
-        result = FlextMeltanoValidators.validate_pipeline_project_business_rules(
-            settings
-        )
+        result = meltano.validate_pipeline_project_business_rules(settings)
         tm.fail(result)
         tm.fail(result)
 
     def test_validate_meltano_config_empty_project_id(self) -> None:
         """Test basic validator instantiation."""
-        validator = FlextMeltanoValidators()
+        validator = meltano
         assert validator is not None
 
     def test_validate_dbt_config_valid(self) -> None:
@@ -105,14 +97,14 @@ class TestsFlextMeltanoValidators:
             "transformation_version": "1.0.0",
             "profile": "analytics_profile",
         }
-        result = FlextMeltanoValidators.validate_transformation_business_rules(
+        result = meltano.validate_transformation_business_rules(
             dbt_config,
         )
         tm.ok(result)
 
     def test_validate_dbt_config_missing_required(self) -> None:
         dbt_config: t.ScalarMapping = {"name": "analytics"}
-        result = FlextMeltanoValidators.validate_transformation_business_rules(
+        result = meltano.validate_transformation_business_rules(
             dbt_config,
         )
         tm.fail(result)
@@ -126,9 +118,8 @@ class TestsFlextMeltanoValidators:
         self,
         invalid_config: t.Scalar | t.ScalarMapping | t.ScalarList | None,
     ) -> None:
-        result = FlextMeltanoValidators.validate_plugin_config(
-            cast("t.ScalarMapping", invalid_config),
-        )
+        validator = getattr(meltano, "validate_plugin_config")
+        result = validator(invalid_config)
         tm.fail(result)
         tm.fail(result)
 
@@ -155,16 +146,14 @@ class TestsFlextMeltanoValidators:
             "pip_url": "pipelinewise-target-postgres",
             "executable": "target-postgres",
         }
-        meltano_result = (
-            FlextMeltanoValidators.validate_pipeline_project_business_rules(
-                meltano_config,
-            )
+        meltano_result = meltano.validate_pipeline_project_business_rules(
+            meltano_config,
         )
-        dbt_result = FlextMeltanoValidators.validate_transformation_business_rules(
+        dbt_result = meltano.validate_transformation_business_rules(
             dbt_config,
         )
-        tap_result = FlextMeltanoValidators.validate_plugin_config(tap_config)
-        target_result = FlextMeltanoValidators.validate_plugin_config(target_config)
+        tap_result = meltano.validate_plugin_config(tap_config)
+        target_result = meltano.validate_plugin_config(target_config)
         tm.ok(meltano_result)
         tm.ok(dbt_result)
         tm.ok(tap_result)
@@ -172,22 +161,22 @@ class TestsFlextMeltanoValidators:
 
     def test_validator_architecture_compliance(self) -> None:
         tm.that(
-            hasattr(FlextMeltanoValidators, "validate_pipeline_project_business_rules"),
+            hasattr(meltano, "validate_pipeline_project_business_rules"),
             eq=True,
         )
         tm.that(
-            hasattr(FlextMeltanoValidators, "validate_transformation_business_rules"),
+            hasattr(meltano, "validate_transformation_business_rules"),
             eq=True,
         )
-        tm.that(not hasattr(FlextMeltanoValidators, "safe_json_stringify"), eq=True)
-        tm.that(not hasattr(FlextMeltanoValidators, "Text"), eq=True)
+        tm.that(not hasattr(meltano, "safe_json_stringify"), eq=True)
+        tm.that(not hasattr(meltano, "Text"), eq=True)
         settings: t.ScalarMapping = {
             "name": "test-plugin",
             "namespace": "test_ns",
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.ok(result)
 
     def test_validate_plugin_name_empty(self) -> None:
@@ -197,7 +186,7 @@ class TestsFlextMeltanoValidators:
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.that(result.error, none=False)
         if result.error is not None:
@@ -210,7 +199,7 @@ class TestsFlextMeltanoValidators:
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.that(result.error, none=False)
         if result.error is not None:
@@ -223,7 +212,7 @@ class TestsFlextMeltanoValidators:
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.that(result.error, none=False)
         tm.that(result.error, none=False)
@@ -240,7 +229,7 @@ class TestsFlextMeltanoValidators:
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.that(result.error, none=False)
         tm.that(result.error, none=False)
@@ -257,7 +246,7 @@ class TestsFlextMeltanoValidators:
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.ok(result)
 
     def test_validate_tap_plugin_name_valid(self) -> None:
@@ -267,5 +256,5 @@ class TestsFlextMeltanoValidators:
             "pip_url": "test",
             "executable": "test",
         }
-        result = FlextMeltanoValidators.validate_plugin_config(settings)
+        result = meltano.validate_plugin_config(settings)
         tm.ok(result)

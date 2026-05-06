@@ -1,15 +1,8 @@
-"""Singer SDK bridge — canonical re-exports for consumer projects.
-
-Direct re-exports from singer_sdk (allowed in flext-meltano/src/)
-so that mypy recognizes them as valid types for subclassing.
-"""
+"""Singer SDK bridge for FLEXT tap service runtimes."""
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    Sequence,
-)
+from collections.abc import Mapping, Sequence
 
 from singer_sdk import Sink
 from singer_sdk.helpers.types import Context, Record
@@ -21,7 +14,7 @@ from flext_meltano import m, p, t
 
 
 class FlextMeltanoSingerTapAdapter:
-    """Bridge a Singer SDK tap instance into FLEXT's internal runtime contract."""
+    """Bridge a Singer SDK tap instance into the internal Meltano tap contract."""
 
     def __init__(
         self,
@@ -32,7 +25,7 @@ class FlextMeltanoSingerTapAdapter:
 
     @property
     def settings(self) -> t.JsonMapping:
-        """Expose the tap configuration through the internal contract."""
+        """Expose tap configuration through the internal runtime contract."""
         config_source = getattr(self._tap, "config", None)
         empty_source: t.MappingKV[str, t.JsonPayload] = {}
         if isinstance(config_source, Mapping):
@@ -44,7 +37,7 @@ class FlextMeltanoSingerTapAdapter:
                 if isinstance(settings_source, Mapping)
                 else empty_source
             )
-        normalized: dict[str, t.JsonValue] = {}
+        normalized: t.JsonDict = {}
         for key, value in source.items():
             normalized[str(key)] = self._normalize_recursive(value)
         return normalized
@@ -67,7 +60,7 @@ class FlextMeltanoSingerTapAdapter:
                 key: FlextMeltanoSingerTapAdapter._normalize_recursive(mapping_value)
                 for key, mapping_value in value.items()
             }
-        if isinstance(value, Sequence) and not isinstance(value, str):
+        if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
             return [
                 FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
                 for sequence_value in value
@@ -97,7 +90,7 @@ class FlextMeltanoSingerTapAdapter:
         self._tap.sync_all()
 
 
-__all__: t.StrSequence = [
+__all__: list[str] = [
     "Context",
     "FlextMeltanoSingerTapAdapter",
     "Record",

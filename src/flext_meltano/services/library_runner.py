@@ -9,7 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_meltano import (
-    FlextMeltanoDbtTransformationRunner,
     FlextMeltanoExecutor,
     FlextMeltanoServiceBase,
     c,
@@ -20,9 +19,7 @@ from flext_meltano import (
 )
 
 
-class FlextMeltanoLibraryRunner(
-    FlextMeltanoDbtTransformationRunner, FlextMeltanoServiceBase
-):
+class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
     """Unified library runner mixin for MRO composition on FlextMeltano.
 
     Provides ELT pipeline execution and DBT transformation orchestration.
@@ -86,11 +83,25 @@ class FlextMeltanoLibraryRunner(
         project_dir: Path | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Run DBT transformation using the configured Meltano executor."""
-        return FlextMeltanoDbtTransformationRunner.execute_dbt_transformation(
-            executor=self._elt_executor,
-            logger=self.logger,
-            models=models,
-            project_dir=project_dir,
+        executor = (
+            FlextMeltanoExecutor(
+                settings=self.settings.model_copy(update={"project_root": project_dir})
+            )
+            if project_dir is not None
+            else self._elt_executor
+        )
+        return executor.execute_dbt_command(
+            c.Meltano.DbtCommand.RUN,
+            models,
+        ).map(
+            lambda execution_result: u.Meltano.build_mutable_command_execution_payload(
+                execution_result,
+                extra_fields={
+                    "models": u.join(models or [], separator=",") if models else "",
+                    "project_dir": str(project_dir) if project_dir else "",
+                },
+                duration_field="execution_time",
+            )
         )
 
     def run_elt_pipeline(

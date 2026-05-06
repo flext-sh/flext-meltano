@@ -22,8 +22,8 @@ class FlextMeltanoConstantsEnums:
 
         EXTRACTORS = "extractors"
         LOADERS = "loaders"
-        TRANSFORMS = "transforms"
         ORCHESTRATORS = "orchestrators"
+        TRANSFORMS = "transforms"
 
     @unique
     class SingerReplicationMethod(StrEnum):
@@ -129,18 +129,18 @@ class FlextMeltanoConstantsEnums:
     class DbtPathName(StrEnum):
         """Canonical dbt project path names."""
 
-        MODELS = "models"
         ANALYSIS = "analysis"
-        TESTS = "tests"
-        SEEDS = "seeds"
         MACROS = "macros"
+        MODELS = "models"
+        SEEDS = "seeds"
+        TESTS = "tests"
 
     @unique
     class DbtFileName(StrEnum):
         """Canonical dbt file names."""
 
-        PROJECT = "dbt_project.yml"
         MANIFEST = "manifest.json"
+        PROJECT = "dbt_project.yml"
 
     @unique
     class SingerCapability(StrEnum):
@@ -154,31 +154,31 @@ class FlextMeltanoConstantsEnums:
     class SingerCliOption(StrEnum):
         """Singer CLI options shared by tap and target translators."""
 
-        CONFIG = "--config"
         CATALOG = "--catalog"
-        STATE = "--state"
-        PROPERTIES = "--properties"
-        INPUT = "--input"
+        CONFIG = "--config"
         DISCOVER = "--discover"
+        INPUT = "--input"
+        PROPERTIES = "--properties"
+        STATE = "--state"
 
     @unique
     class SingerMessageType(StrEnum):
         """Singer protocol message kinds."""
 
+        ACTIVATE_VERSION = "ACTIVATE_VERSION"
+        CATALOG = "CATALOG"
         RECORD = "RECORD"
         SCHEMA = "SCHEMA"
         STATE = "STATE"
-        ACTIVATE_VERSION = "ACTIVATE_VERSION"
-        CATALOG = "CATALOG"
 
     @unique
     class OperationScope(StrEnum):
         """Top-level operational areas managed by the Meltano API."""
 
-        PIPELINE = "pipeline"
-        PLUGIN = "plugin"
         DBT = "dbt"
         ENVIRONMENT = "environment"
+        PIPELINE = "pipeline"
+        PLUGIN = "plugin"
 
     @unique
     class DispatchOperation(StrEnum):
@@ -188,35 +188,35 @@ class FlextMeltanoConstantsEnums:
     class HandlerType(StrEnum):
         """Named handler groups exposed by the public API."""
 
-        SOURCE = "source"
-        SINK = "sink"
         PIPELINE = "pipeline"
+        SINK = "sink"
+        SOURCE = "source"
 
     @unique
     class PipelineDirectory(StrEnum):
         """Standard directory layout for generated Meltano projects."""
 
+        ANALYZE = "analyze"
         EXTRACT = "extract"
         LOAD = "load"
-        TRANSFORM = "transform"
-        ANALYZE = "analyze"
         NOTEBOOK = "notebook"
         ORCHESTRATE = "orchestrate"
+        TRANSFORM = "transform"
 
     @unique
     class ServiceType(StrEnum):
         """Service identity tokens reported by Meltano service metadata."""
 
-        PIPELINE = "pipeline_service"
         DBT = "dbt"
+        PIPELINE = "pipeline_service"
 
     @unique
     class PublicFactoryName(StrEnum):
         """Public factory names exposed by Meltano runtime helpers."""
 
+        DBT = "Dbt"
         TAP = "Tap"
         TARGET = "Target"
-        DBT = "Dbt"
 
     @unique
     class PluginDiscoveryLabel(StrEnum):
@@ -238,9 +238,9 @@ class FlextMeltanoConstantsEnums:
     class ProjectStructureComplexity(StrEnum):
         """Complexity levels inferred from dbt path customization."""
 
-        SIMPLE = "simple"
-        MODERATE = "moderate"
         COMPLEX = "complex"
+        MODERATE = "moderate"
+        SIMPLE = "simple"
 
     @unique
     class ProjectSdkState(StrEnum):
@@ -253,25 +253,25 @@ class FlextMeltanoConstantsEnums:
     class ProductionEnvironmentToken(StrEnum):
         """Tokens that indicate production-like runtime presence."""
 
+        LIVE = "live"
         PROD = "prod"
         PRODUCTION = "production"
-        LIVE = "live"
 
     @unique
     class StreamStatus(StrEnum):
         """Meltano stream statuses — single source of truth."""
 
         COMPLETED = c.Status.COMPLETED.value
+        DISCOVERED = "discovered"
         ERROR = c.HealthStatus.ERROR.value
-        SUCCESS = c.Status.SUCCESS.value
+        EXTRACTING = "extracting"
         FAILED = c.Status.FAILED.value
         IN_PROGRESS = "in_progress"
-        PENDING = c.Status.PENDING.value
         INITIALIZED = "initialized"
+        PENDING = c.Status.PENDING.value
         PROCESSING = c.Status.PROCESSING.value
-        DISCOVERED = "discovered"
         SELECTED = "selected"
-        EXTRACTING = "extracting"
+        SUCCESS = c.Status.SUCCESS.value
 
     VALID_STATUSES: Final[frozenset[StreamStatus]] = frozenset({
         StreamStatus.INITIALIZED,
@@ -290,45 +290,59 @@ class FlextMeltanoConstantsEnums:
         """Pipeline CLI subcommands."""
 
         CREATE = "create"
-        RUN = "run"
+        DELETE = "delete"
         LIST = "list"
+        RUN = "run"
         STATUS = "status"
         STOP = "stop"
-        DELETE = "delete"
 
     @unique
     class CliCommand(StrEnum):
         """Top-level CLI command routing identifiers."""
 
-        PIPELINE = "pipeline"
-        TAP = "tap"
-        TARGET = "target"
         DBT = "dbt"
+        PIPELINE = "pipeline"
         PLUGIN = "plugin"
         STATUS = "status"
+        TAP = "tap"
+        TARGET = "target"
         VERSION = "version"
 
     @unique
     class ExecutorCommand(StrEnum):
         """Executor available commands."""
 
-        VERSION = "version"
-        HELP = "help"
         HEALTH = "health"
-        PIPELINE = "pipeline"
-        RUN = "run"
+        HELP = "help"
         INSTALL = "install"
         LIST = "list"
+        PIPELINE = "pipeline"
+        RUN = "run"
         SELECT = "select"
+        VERSION = "version"
+
+    @unique
+    class PayloadKey(StrEnum):
+        """Payload field names emitted by Meltano service helpers."""
+
+        NAME = "name"
+        STATUS = "status"
+        STREAM_NAME = "stream_name"
+        STREAMS = "streams"
+        TAP_ID = "tap_id"
+        TAP_STREAM_ID = "tap_stream_id"
+        TAP_TYPE = "tap_type"
+        TARGET_LOADED = "target_loaded"
+        VERSION = "version"
 
     @unique
     class SchemaKey(StrEnum):
         """JSON Schema structure field names."""
 
-        SCHEMA = "schema"
-        TYPE = "type"
-        PROPERTIES = "properties"
-        OBJECT = "object"
         INTEGER = "integer"
-        STRING = "string"
         NUMBER = "number"
+        OBJECT = "object"
+        PROPERTIES = "properties"
+        SCHEMA = "schema"
+        STRING = "string"
+        TYPE = "type"

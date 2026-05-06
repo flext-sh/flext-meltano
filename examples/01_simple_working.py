@@ -31,9 +31,9 @@ def simple_api_example() -> None:
 
 def simple_component_example() -> None:
     """Example using canonical component factories."""
-    tap_result = meltano.Tap("tap-csv")
-    target_result = meltano.Target("target-jsonl")
-    dbt_result = meltano.Dbt("analytics")
+    tap_result = meltano.tap("tap-csv")
+    target_result = meltano.target("target-jsonl")
+    dbt_result = meltano.dbt("analytics")
     if tap_result.success:
         logger.info(f"Tap source: {tap_result.value.source_name}")
     if target_result.success:

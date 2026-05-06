@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-)
 from typing import Annotated, ClassVar
 
 from flext_cli import m, u
@@ -83,7 +80,7 @@ class FlextMeltanoModelsSinger:
             ),
         ] = c.Meltano.SingerMessageType.STATE
         value: Annotated[
-            MutableMapping[str, t.JsonValue],
+            t.MutableJsonMapping,
             u.Field(description="Singer state bookmark payload"),
         ] = u.Field(default_factory=dict)
 

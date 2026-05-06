@@ -16,9 +16,9 @@ class ExamplesFlextMeltanoConstants(FlextMeltanoConstants):
         class Examples:
             """Examples-only constants."""
 
+            SAMPLE_DBT: Final[str] = "analytics"
             SAMPLE_TAP: Final[str] = "tap-csv"
             SAMPLE_TARGET: Final[str] = "target-jsonl"
-            SAMPLE_DBT: Final[str] = "analytics"
 
 
 c = ExamplesFlextMeltanoConstants

@@ -1,111 +1,39 @@
-"""Tests for FlextMeltanoLibraryRunner - Library integration patterns.
-
-Tests the library runner from meltano/runner.py which provides ELT pipeline
-execution and DBT transformation support. Methods that were removed (fake
-stubs like get_dbt_runner, get_singer_manager) have been cleaned from tests.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
-"""
+"""Real-execution tests for the public Meltano library-runner facade."""
 
 from __future__ import annotations
 
-from unittest.mock import patch
-
-import pytest
-from flext_tests import tm
-
-from flext_meltano import (
-    FlextMeltanoExecutor,
-    FlextMeltanoLibraryRunner,
-    m,
-    t,
-)
-from tests import p, r
+from flext_meltano import meltano
 
 
 class TestsFlextMeltanoLibraryRunner:
-    """Test FlextMeltanoLibraryRunner and related project adapter behavior."""
+    """Exercise the library-runner mixin through the public Meltano facade."""
 
-    def test_initialization(self) -> None:
-        """Test library runner initialization."""
-        runner = FlextMeltanoLibraryRunner()
-        tm.that(runner, none=False)
+    def test_public_facade_exposes_library_runner_methods(self) -> None:
+        """The root API exposes the library-runner operations directly."""
+        assert callable(meltano.execute_complete_elt_pipeline)
+        assert callable(meltano.run_dbt_transformation)
+        assert callable(meltano.run_elt_pipeline)
 
-    def test_execute_raises_not_implemented(self) -> None:
-        """Test execute raises NotImplementedError when not overridden."""
-        runner = FlextMeltanoLibraryRunner()
-        with pytest.raises(NotImplementedError):
-            runner.execute()
-
-    @staticmethod
-    def _mock_cmd_result(
-        command: list[str],
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        return r[m.Meltano.CommandExecutionResult].ok(
-            m.Meltano.CommandExecutionResult(
-                command=command,
-                success=True,
-                exit_code=0,
-                output="ok",
-                error="",
-                execution_time=0.1,
-            ),
+    def test_execute_complete_elt_pipeline_returns_real_payload(self) -> None:
+        """Complete ELT execution returns the current public command payload shape."""
+        result = meltano.execute_complete_elt_pipeline(
+            tap_name="tap-csv",
+            target_name="target-jsonl",
         )
 
-    @staticmethod
-    def _mock_execute_command(
-        command: t.StrSequence,
-        **_: t.JsonValue,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        return TestsFlextMeltanoLibraryRunner._mock_cmd_result(list(command))
+        assert result.success
+        assert result.value["tap_name"] == "tap-csv"
+        assert result.value["target_name"] == "target-jsonl"
+        assert isinstance(result.value["exit_code"], int)
+        assert "output" in result.value
+        assert "error" in result.value
 
-    def test_execute_complete_elt_pipeline(self) -> None:
-        """Test complete E-L-T pipeline execution delegates to Meltano runtime."""
-        runner = FlextMeltanoLibraryRunner()
-        with patch.object(
-            FlextMeltanoExecutor,
-            "execute_meltano_command",
-            side_effect=self._mock_execute_command,
-        ):
-            result = runner.execute_complete_elt_pipeline(
-                tap_name="tap-csv",
-                target_name="target-jsonl",
-            )
-        tm.ok(result)
-        tm.that(result.value, contains="exit_code")
-        tm.that(result.value, contains="output")
-        tm.that(result.value, contains="error")
+    def test_run_dbt_transformation_returns_real_payload(self) -> None:
+        """DBT transformation execution returns the current public command payload shape."""
+        result = meltano.run_dbt_transformation(models=["model1"])
 
-    def test_execute_complete_elt_pipeline_result_shape(self) -> None:
-        """Test pipeline result has expected keys when successful."""
-        runner = FlextMeltanoLibraryRunner()
-        with patch.object(
-            FlextMeltanoExecutor,
-            "execute_meltano_command",
-            side_effect=self._mock_execute_command,
-        ):
-            result = runner.execute_complete_elt_pipeline(
-                tap_name="tap-csv",
-                target_name="target-jsonl",
-            )
-        tm.that(result.success or result.failure, eq=True)
-        if result.success:
-            tm.that(result.value, is_=dict)
-            tm.that(result.value, contains="tap_name")
-            tm.that(result.value, contains="target_name")
-
-    def test_run_dbt_transformation(self) -> None:
-        """Test DBT transformation delegates to Meltano runtime."""
-        runner = FlextMeltanoLibraryRunner()
-        with patch.object(
-            FlextMeltanoExecutor,
-            "execute_meltano_command",
-            side_effect=self._mock_execute_command,
-        ):
-            result = runner.run_dbt_transformation(models=["model1"])
-        tm.ok(result)
-        tm.that(result.value, contains="exit_code")
-        tm.that(result.value, contains="output")
-        tm.that(result.value, contains="error")
+        assert result.success
+        assert isinstance(result.value["exit_code"], int)
+        assert "output" in result.value
+        assert "error" in result.value
+        assert "models" in result.value

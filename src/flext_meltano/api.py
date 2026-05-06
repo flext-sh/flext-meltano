@@ -1,15 +1,8 @@
-"""Public API facade for flext-meltano.
-
-MRO facade over Meltano services. All operations return r[T].
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Public API facade for flext-meltano."""
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import ClassVar, Self, override
+from typing import Self, override
 
 from flext_cli import r
 
@@ -39,26 +32,22 @@ from flext_meltano import (
 
 
 class FlextMeltano(
-    # Singer domain
-    FlextMeltanoSingerCatalogMixin,
-    FlextMeltanoSingerStateMixin,
-    FlextMeltanoTapAbstractions,
-    FlextMeltanoTargetAbstractions,
-    FlextMeltanoSingerCliTranslator,
-    # DBT domain
-    FlextMeltanoDbtProjectMixin,
-    FlextMeltanoDbtRunnerMixin,
-    # Meltano SDK + component management
-    FlextMeltanoComponentService,
-    FlextMeltanoProjectManager,
-    FlextMeltanoLibraryRunner,
-    # Meltano runtime
     FlextMeltanoAbstractions,
     FlextMeltanoAdapter,
     FlextMeltanoBridge,
+    FlextMeltanoComponentService,
+    FlextMeltanoDbtProjectMixin,
+    FlextMeltanoDbtRunnerMixin,
     FlextMeltanoExecutor,
+    FlextMeltanoLibraryRunner,
+    FlextMeltanoProjectManager,
     FlextMeltanoProjectService,
     FlextMeltanoService,
+    FlextMeltanoSingerCatalogMixin,
+    FlextMeltanoSingerCliTranslator,
+    FlextMeltanoSingerStateMixin,
+    FlextMeltanoTapAbstractions,
+    FlextMeltanoTargetAbstractions,
     FlextMeltanoValidators,
 ):
     """MRO facade over all Meltano services. All operations return r[T]."""
@@ -75,17 +64,13 @@ class FlextMeltano(
         """Create a specialized DBT facade instance through the public API."""
         return type(self).create_transformation_service(name, **settings)
 
-    Tap: ClassVar[Callable[..., p.Result[Self]]] = tap
-    Target: ClassVar[Callable[..., p.Result[Self]]] = target
-    Dbt: ClassVar[Callable[..., p.Result[Self]]] = dbt
-
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute Meltano service with railway pattern."""
         handlers_payload: list[t.JsonValue] = [
             handler.value for handler in c.Meltano.HANDLER_ALL
         ]
-        payload: dict[str, t.JsonValue] = {
+        payload: t.JsonDict = {
             "service_name": self.service_name,
             "version": self.service_version,
             "status": "active",

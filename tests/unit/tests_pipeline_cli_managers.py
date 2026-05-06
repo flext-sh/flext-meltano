@@ -1,244 +1,185 @@
-"""Unit tests for pipeline CLI managers."""
+"""Real-execution tests for the flat Meltano pipeline CLI handler."""
 
 from __future__ import annotations
 
+import multiprocessing
 import os
-import signal
+import time
+from multiprocessing.process import BaseProcess
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
+from flext_cli import cli as flext_cli
 from flext_tests import tm
 
-from flext_meltano import FlextMeltanoExecutor, FlextMeltanoPipelineManager
-from tests import m, r, t
+from flext_meltano import cli
+from tests import c, m, u
 
 
 class TestFlextMeltanoPipelineCliManagers:
-    """Unit tests for pipeline CLI managers."""
+    """Exercise pipeline lifecycle commands through the flat public CLI."""
 
     @staticmethod
-    def _set_pipelines_root(tmp_path: Path) -> t.StrMapping:
-        return {"FLEXT_MELTANO_PIPELINES_DIR": str(tmp_path / "pipelines")}
+    def _activate_pipelines_root(tmp_path: Path) -> str | None:
+        previous_root = os.environ.get(c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV)
+        os.environ[c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV] = str(
+            tmp_path / "pipelines"
+        )
+        return previous_root
 
-    def test_create_pipeline_creates_directory_and_configuration(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        command: list[t.JsonValue] = ["run", "tap-demo", "target-demo"]
-        settings: t.JsonMapping = {
-            "command": command,
-            "schedule": "daily",
-        }
+    @staticmethod
+    def _restore_pipelines_root(previous_root: str | None) -> None:
+        if previous_root is None:
+            os.environ.pop(c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV, None)
+            return
+        os.environ[c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV] = previous_root
 
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            result = FlextMeltanoPipelineManager.create_pipeline(
-                "daily-pipeline", settings
-            )
+    @staticmethod
+    def _spawn_sleep_process() -> BaseProcess:
+        process = multiprocessing.get_context("spawn").Process(
+            target=time.sleep,
+            args=(30,),
+        )
+        process.start()
+        deadline = time.monotonic() + 5
+        while not process.is_alive() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        return process
+
+    @staticmethod
+    def _stop_process(process: BaseProcess) -> None:
+        if not process.is_alive():
+            return
+        process.terminate()
+        process.join(timeout=5)
+        if process.is_alive():
+            process.kill()
+            process.join(timeout=5)
+
+    def test_pipeline_help_request_returns_help_sentinel(self) -> None:
+        """Pipeline help stays on the flat public CLI contract."""
+        result = cli.handle_pipeline_command([c.Meltano.CMD_HELP_OPTION])
 
         tm.ok(result)
-        pipeline_dir = tmp_path / "pipelines" / "daily-pipeline"
-        tm.that(pipeline_dir.is_dir(), eq=True)
-        stored = m.Meltano.ConfigMappingPayload.model_validate_json(
-            (pipeline_dir / "pipeline.json").read_text(encoding="utf-8"),
-        )
-        tm.that(stored.values, eq=settings)
+        tm.that(result.value, eq=c.Meltano.ExecutorCommand.HELP)
 
-    def test_create_pipeline_fails_without_configuration(
+    def test_pipeline_create_list_run_and_delete_use_real_storage(
         self,
         tmp_path: Path,
     ) -> None:
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            result = FlextMeltanoPipelineManager.create_pipeline("daily-pipeline", None)
-
-        tm.fail(result)
-        tm.that(result.error, eq="Pipeline creation not configured")
-
-    def test_execute_pipeline_runs_real_subprocess_contract(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        command: list[t.JsonValue] = ["run", "tap-demo", "target-demo"]
-        settings: t.JsonMapping = {"command": command}
-        mock_cmd_result = m.Meltano.CommandExecutionResult(
-            command=["run", "tap-demo", "target-demo"],
-            success=True,
-            exit_code=0,
-            output="pipeline ok",
-            error="",
-            execution_time=0.1,
+        """Pipeline lifecycle commands persist and execute through real helpers."""
+        previous_root = self._activate_pipelines_root(tmp_path)
+        pipeline_name = "daily-pipeline"
+        config_json_result = u.Cli.json_dumps({"command": ["help"]})
+        config_path = (
+            tmp_path
+            / "pipelines"
+            / pipeline_name
+            / c.Meltano.CLI_DEFAULT_PIPELINE_CONFIG_FILE
         )
 
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            create_result = FlextMeltanoPipelineManager.create_pipeline(
-                "exec-pipeline", settings
-            )
-            tm.ok(create_result)
-            with patch.object(
-                FlextMeltanoExecutor,
-                "execute_meltano_command",
-                return_value=r[m.Meltano.CommandExecutionResult].ok(mock_cmd_result),
-            ) as run_mock:
-                result = FlextMeltanoPipelineManager.execute_pipeline("exec-pipeline")
+        try:
+            tm.ok(config_json_result)
+            create_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.CREATE,
+                pipeline_name,
+                config_json_result.value,
+            ])
+            list_result = cli.handle_pipeline_command([c.Meltano.PipelineCommand.LIST])
+            status_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.STATUS,
+                pipeline_name,
+            ])
+            run_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.RUN,
+                pipeline_name,
+            ])
+            stored_result = flext_cli.read_json_file(config_path)
+            delete_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.DELETE,
+                pipeline_name,
+            ])
+        finally:
+            self._restore_pipelines_root(previous_root)
 
-        tm.ok(result)
-        run_mock.assert_called_once()
-        call_args = run_mock.call_args
-        tm.that(call_args[0][0], eq=["run", "tap-demo", "target-demo"])
-        tm.that(call_args[1]["_cwd"], eq=tmp_path / "pipelines" / "exec-pipeline")
-
-    def test_execute_pipeline_fails_when_pipeline_execution_is_not_configured(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            create_result = FlextMeltanoPipelineManager.create_pipeline(
-                "noexec-pipeline",
-                {"schedule": "daily"},
-            )
-            tm.ok(create_result)
-            result = FlextMeltanoPipelineManager.execute_pipeline("noexec-pipeline")
-
-        tm.fail(result)
-        tm.that(result.error, eq="Pipeline execution not configured")
-
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            tm.ok(
-                FlextMeltanoPipelineManager.create_pipeline(
-                    "b-pipeline",
-                    {"command": ["run", "tap-a", "target-a"]},
-                ),
-            )
-            tm.ok(
-                FlextMeltanoPipelineManager.create_pipeline(
-                    "a-pipeline",
-                    {"command": ["run", "tap-b", "target-b"]},
-                ),
-            )
-            list_result = FlextMeltanoPipelineManager.list_pipelines()
-
+        tm.ok(create_result)
         tm.ok(list_result)
-        tm.that(list_result.value, has="a-pipeline")
-        tm.that(list_result.value, has="b-pipeline")
+        tm.ok(status_result)
+        tm.ok(run_result)
+        tm.ok(stored_result)
+        tm.ok(delete_result)
 
-    def test_get_pipeline_status_checks_process_state(
+        stored_payload = m.Meltano.ConfigMappingPayload.model_validate({
+            "values": stored_result.value
+        })
+
+        tm.that(list_result.value, has=pipeline_name)
+        tm.that(status_result.value, eq="stopped")
+        tm.that(run_result.value.lower(), has="usage:")
+        tm.that(stored_payload.values, eq={"command": ["help"]})
+        tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
+
+    def test_pipeline_create_requires_runtime_configuration(
         self,
         tmp_path: Path,
     ) -> None:
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            tm.ok(
-                FlextMeltanoPipelineManager.create_pipeline(
-                    "status-pipeline",
-                    {"command": ["run", "tap", "target"]},
-                ),
-            )
-            pid_file = tmp_path / "pipelines" / "status-pipeline" / "pipeline.pid"
-            pid_file.write_text("1234", encoding="utf-8")
-            with patch(
-                "flext_meltano.services._pipeline_lifecycle.os.kill",
-                return_value=None,
-            ):
-                running_result = FlextMeltanoPipelineManager.get_pipeline_status(
-                    "status-pipeline",
-                )
-            with patch(
-                "flext_meltano.services._pipeline_lifecycle.os.kill",
-                side_effect=ProcessLookupError,
-            ):
-                stopped_result = FlextMeltanoPipelineManager.get_pipeline_status(
-                    "status-pipeline",
-                )
+        """Pipeline creation without JSON config fails on the real handler path."""
+        previous_root = self._activate_pipelines_root(tmp_path)
 
-        tm.ok(running_result)
-        tm.that(running_result.value, eq="running")
-        tm.ok(stopped_result)
-        tm.that(stopped_result.value, eq="stopped")
-        tm.that(not pid_file.exists(), eq=True)
+        try:
+            result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.CREATE,
+                "missing-config",
+            ])
+        finally:
+            self._restore_pipelines_root(previous_root)
 
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            tm.ok(
-                FlextMeltanoPipelineManager.create_pipeline(
-                    "status-pipeline-2",
-                    {"command": ["run", "tap", "target"]},
-                ),
-            )
-            pid_file = tmp_path / "pipelines" / "status-pipeline-2" / "pipeline.pid"
-            pid_file.write_text("5678", encoding="utf-8")
-            terminated = {"value": False}
+        tm.fail(result)
+        tm.that(str(result.error), has="not configured")
 
-            def fake_kill(pid: int, sig: int) -> None:
-                tm.that(pid, eq=5678)
-                if sig == 0:
-                    if terminated["value"]:
-                        raise ProcessLookupError
-                    return
-                if sig == signal.SIGTERM:
-                    terminated["value"] = True
-                    return
-                error_message = "Unexpected signal"
-                raise AssertionError(error_message)
+    def test_pipeline_status_and_stop_use_real_pid_files(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Status and stop commands inspect a real background process pid file."""
+        previous_root = self._activate_pipelines_root(tmp_path)
+        pipeline_name = "status-pipeline"
+        config_json_result = u.Cli.json_dumps({"command": ["help"]})
+        pid_path = (
+            tmp_path
+            / "pipelines"
+            / pipeline_name
+            / c.Meltano.CLI_DEFAULT_PIPELINE_PID_FILE
+        )
+        process = self._spawn_sleep_process()
 
-            with patch(
-                "flext_meltano.services._pipeline_lifecycle.os.kill",
-                side_effect=fake_kill,
-            ):
-                stop_result = FlextMeltanoPipelineManager.stop_pipeline(
-                    "status-pipeline-2",
-                )
+        try:
+            tm.ok(config_json_result)
+            create_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.CREATE,
+                pipeline_name,
+                config_json_result.value,
+            ])
+            tm.ok(create_result)
+
+            ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
+            tm.ok(ensure_pid_dir_result)
+            write_pid_result = u.Cli.files_write_text(pid_path, str(process.pid))
+            tm.ok(write_pid_result)
+
+            running_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.STATUS,
+                pipeline_name,
+            ])
+            stop_result = cli.handle_pipeline_command([
+                c.Meltano.PipelineCommand.STOP,
+                pipeline_name,
+            ])
+        finally:
+            self._stop_process(process)
+            self._restore_pipelines_root(previous_root)
 
         tm.ok(running_result)
         tm.ok(stop_result)
+        tm.that(running_result.value, eq="running")
         tm.that(stop_result.value, eq="stopped")
-        tm.that(not pid_file.exists(), eq=True)
-
-    def test_delete_pipeline_removes_configuration_directory(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            tm.ok(
-                FlextMeltanoPipelineManager.create_pipeline(
-                    "daily-pipeline",
-                    {"command": ["run", "tap", "target"]},
-                ),
-            )
-            result = FlextMeltanoPipelineManager.delete_pipeline("daily-pipeline")
-
-        tm.ok(result)
-        tm.that(not (tmp_path / "pipelines" / "daily-pipeline").exists(), eq=True)
-
-    def test_pipeline_manager_lifecycle_commands_delegate_to_real_operations(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        manager = FlextMeltanoPipelineManager(MagicMock())
-        config_json = m.Meltano.ConfigMappingPayload(
-            values={"command": ["run", "tap-demo", "target-demo"]},
-        ).model_dump_json()
-        mock_cmd_result = m.Meltano.CommandExecutionResult(
-            command=["run", "tap-demo", "target-demo"],
-            success=True,
-            exit_code=0,
-            output="ok",
-            error="",
-            execution_time=0.1,
-        )
-
-        with patch.dict(os.environ, self._set_pipelines_root(tmp_path), clear=False):
-            create_result = manager.handle_command([
-                "create",
-                "lifecycle-pipeline",
-                config_json,
-            ])
-            tm.ok(create_result)
-            with patch.object(
-                FlextMeltanoExecutor,
-                "execute_meltano_command",
-                return_value=r[m.Meltano.CommandExecutionResult].ok(mock_cmd_result),
-            ):
-                run_result = manager.handle_command(["run", "lifecycle-pipeline"])
-            list_result = manager.handle_command(["list"])
-            delete_result = manager.handle_command(["delete", "lifecycle-pipeline"])
-
-        tm.ok(run_result)
-        tm.ok(list_result)
-        tm.ok(delete_result)
+        tm.that(pid_path.exists(), eq=False)

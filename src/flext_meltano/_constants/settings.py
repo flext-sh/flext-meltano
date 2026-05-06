@@ -17,8 +17,8 @@ class FlextMeltanoConstantsSettings:
 
     # Logging
     LOGGING_DEFAULT_LEVEL: Final[str] = "INFO"
-    LOGGING_INCLUDE_TRANSFORM_NAME: Final[bool] = True
     LOGGING_INCLUDE_RECORD_COUNT: Final[bool] = True
+    LOGGING_INCLUDE_TRANSFORM_NAME: Final[bool] = True
     LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
 
     # Service
@@ -185,5 +185,5 @@ class FlextMeltanoConstantsSettings:
     )
 
     # BatchDefaults
-    BATCH_DEFAULT_DEFAULT_BATCH_SIZE: Final[int] = 1000
     BATCH_DEFAULT_COMMAND_TIMEOUT: Final[int] = 300
+    BATCH_DEFAULT_DEFAULT_BATCH_SIZE: Final[int] = 1000

@@ -63,7 +63,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
         inside ``_create_specialized_service``.
         """
-        settings_payload: dict[str, t.JsonValue] | None = (
+        settings_payload: t.JsonDict | None = (
             {key: u.normalize_to_json_value(value) for key, value in config.items()}
             if config
             else None
@@ -84,7 +84,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
         inside ``_create_specialized_service``.
         """
-        settings_payload: dict[str, t.JsonValue] | None = (
+        settings_payload: t.JsonDict | None = (
             {key: u.normalize_to_json_value(value) for key, value in config.items()}
             if config
             else None
@@ -105,7 +105,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
         inside ``_create_specialized_service``.
         """
-        settings_payload: dict[str, t.JsonValue] | None = (
+        settings_payload: t.JsonDict | None = (
             {key: u.normalize_to_json_value(value) for key, value in config.items()}
             if config
             else None
@@ -136,10 +136,10 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        configuration: dict[str, t.JsonValue] = (
+        configuration: t.JsonDict = (
             dict(settings.items()) if settings is not None else {}
         )
-        payload: dict[str, t.JsonValue] = {
+        payload: t.JsonDict = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "environment": normalized_environment,
             "configuration": configuration,
@@ -176,10 +176,10 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.ServicePayload].fail(
                 f"Invalid component type: {component_type}"
             )
-        configuration: dict[str, t.JsonValue] = (
+        configuration: t.JsonDict = (
             dict(settings.items()) if settings is not None else {}
         )
-        payload: dict[str, t.JsonValue] = {
+        payload: t.JsonDict = {
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,
             "component_type": component_type,
@@ -202,7 +202,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         handlers_payload: list[t.JsonValue] = [
             handler.value for handler in c.Meltano.HANDLER_ALL
         ]
-        payload: dict[str, t.JsonValue] = {
+        payload: t.JsonDict = {
             "status": "active",
             "service_name": c.Meltano.METADATA_APPLICATION_NAME,
             "version": c.Meltano.FLEXT_MELTANO_VERSION,

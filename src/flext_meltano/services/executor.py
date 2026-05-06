@@ -9,7 +9,6 @@ from __future__ import annotations
 from meltano.core.error import ProjectNotFound
 
 from flext_meltano import (
-    FlextMeltanoCLI,
     FlextMeltanoExecutorBase,
     FlextMeltanoSettings,
     c,
@@ -44,20 +43,12 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         )
 
     @staticmethod
-    def create_flext_cli() -> p.Result[FlextMeltanoCLI]:
-        """Create the concrete Meltano CLI facade."""
-        return u.try_(
-            lambda: FlextMeltanoCLI(),
-            catch=c.Meltano.OPERATION_ERRORS,
-        ).map_error(lambda e: f"Failed to create CLI: {e}")
-
-    @staticmethod
     def create_cli_runner(args: t.StrSequence) -> p.Result[t.JsonMapping]:
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
             args_payload: list[t.JsonValue] = list(args)
-            ready_payload: dict[str, t.JsonValue] = {
+            ready_payload: t.JsonDict = {
                 "status": c.Meltano.OperationStatus.READY,
                 "command_type": "cli_runner",
                 "args": args_payload,
@@ -174,7 +165,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                             result.error or f"Command '{command}' failed",
                         )
                     args_payload: list[t.JsonValue] = list(args)
-                    extra_fields: dict[str, t.JsonValue] = {
+                    extra_fields: t.JsonDict = {
                         "command": command,
                         "action": command,
                         "args": args_payload,

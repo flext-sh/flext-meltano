@@ -292,7 +292,7 @@ class FlextMeltanoUtilitiesRuntime:
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> dict[str, t.JsonValue]:
+    ) -> t.JsonDict:
         """Build one mutable execution payload for callers that append fields."""
         return dict(
             FlextMeltanoUtilitiesRuntime.build_command_execution_payload(

@@ -9,9 +9,6 @@ Access pattern: u.Meltano.emit_schema(), u.Meltano.process_stdin(), etc.
 from __future__ import annotations
 
 import sys
-from collections.abc import (
-    MutableMapping,
-)
 
 from flext_cli import r, u as cli_u
 
@@ -93,7 +90,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def emit_state(
-        value: MutableMapping[str, t.JsonValue],
+        value: t.MutableJsonMapping,
     ) -> p.Result[str]:
         """Emit a Singer STATE message as JSON line to stdout.
 

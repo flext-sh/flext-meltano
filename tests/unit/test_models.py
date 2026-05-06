@@ -7,12 +7,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 import pytest
 from flext_tests import tm
 
-from tests import c, m, t
+from tests import c, m
 
 
 class TestsFlextMeltanoModelsUnit:
@@ -54,14 +52,13 @@ class TestsFlextMeltanoModelsUnit:
             m.Meltano.TapConfig(tap_type="", connection_config={"host": "localhost"})
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
-        invalid_config = cast("t.JsonMapping", "invalid")
         with pytest.raises(
             c.ValidationError, match="Input should be a valid dictionary"
         ):
-            m.Meltano.TapConfig(
-                tap_type="tap-postgres",
-                connection_config=invalid_config,
-            )
+            m.Meltano.TapConfig.model_validate({
+                "tap_type": "tap-postgres",
+                "connection_config": "invalid",
+            })
 
     def test_target_config_with_minimal_data(self) -> None:
         settings = m.Meltano.TargetConfig(target_type="target-csv")
@@ -95,9 +92,10 @@ class TestsFlextMeltanoModelsUnit:
 
     def test_target_config_validation_invalid_batch_size_type(self) -> None:
         with pytest.raises(c.ValidationError, match="Input should be a valid integer"):
-            m.Meltano.TargetConfig(
-                target_type="target-csv", batch_size=cast("int", "invalid")
-            )
+            m.Meltano.TargetConfig.model_validate({
+                "target_type": "target-csv",
+                "batch_size": "invalid",
+            })
 
     def test_stream_info_with_minimal_data(self) -> None:
         stream = m.Meltano.StreamInfo(
@@ -141,15 +139,14 @@ class TestsFlextMeltanoModelsUnit:
             )
 
     def test_stream_info_validation_invalid_schema_type(self) -> None:
-        invalid_schema = cast("t.ScalarMapping", "invalid")
         with pytest.raises(
             c.ValidationError, match="Input should be a valid dictionary"
         ):
-            m.Meltano.StreamInfo(
-                stream_name="users",
-                stream_schema=invalid_schema,
-                stream_created_at="2025-01-01T00:00:00Z",
-            )
+            m.Meltano.StreamInfo.model_validate({
+                "stream_name": "users",
+                "stream_schema": "invalid",
+                "stream_created_at": "2025-01-01T00:00:00Z",
+            })
 
     def test_tap_and_target_config_integration(self) -> None:
         tap_config = m.Meltano.TapConfig(

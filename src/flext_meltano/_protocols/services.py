@@ -85,6 +85,35 @@ class FlextMeltanoProtocolsServices:
             ...
 
     @runtime_checkable
+    class ComponentFacade(p.Service[t.JsonMapping], Protocol):
+        """Public specialized Meltano component facade returned by root factories."""
+
+        @property
+        def service_name(self) -> str:
+            """Canonical service name for the specialized facade."""
+            ...
+
+        @property
+        def service_version(self) -> str:
+            """Canonical service version for the specialized facade."""
+            ...
+
+        @property
+        def source_name(self) -> str | None:
+            """Source component name when the facade represents a tap."""
+            ...
+
+        @property
+        def sink_name(self) -> str | None:
+            """Sink component name when the facade represents a target."""
+            ...
+
+        @property
+        def transformation_name(self) -> str | None:
+            """Transformation component name when the facade represents DBT."""
+            ...
+
+    @runtime_checkable
     class Output(Protocol):
         """Protocol for CLI output with print_message method."""
 
@@ -132,20 +161,37 @@ class FlextMeltanoProtocolsServices:
     class CLI(Protocol):
         """CLI protocol for manager composition - avoids circular imports."""
 
-        @property
-        def pipeline_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
+        def handle_pipeline_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level pipeline commands."""
+            ...
 
-        @property
-        def singer_manager(self) -> FlextMeltanoProtocolsServices.SingerManager: ...
+        def handle_tap_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level tap commands."""
+            ...
 
-        @property
-        def dbt_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
+        def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level target commands."""
+            ...
 
-        @property
-        def plugin_manager(self) -> FlextMeltanoProtocolsServices.CLIManager: ...
+        def handle_dbt_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level DBT commands."""
+            ...
 
-        @property
-        def status_manager(self) -> FlextMeltanoProtocolsServices.StatusManager: ...
+        def handle_plugin_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level plugin commands."""
+            ...
+
+        def handle_status_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level status commands."""
+            ...
+
+        def handle_version_command(self, args: t.StrSequence) -> p.Result[str]:
+            """Handle top-level version commands."""
+            ...
+
+        def print_message(self, message: str, style: str | None = None) -> None:
+            """Render one CLI message through the configured output surface."""
+            ...
 
         def show_banner(self) -> None:
             """Show CLI banner."""

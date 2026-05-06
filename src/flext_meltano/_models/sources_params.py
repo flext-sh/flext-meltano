@@ -82,13 +82,11 @@ class FlextMeltanoModelsSourcesParams:
                     return 0
 
         @u.field_serializer("stream_schema")
-        def serialize_stream_schema(
-            self, value: t.MappingKV[str, t.JsonValue]
-        ) -> t.JsonMapping:
+        def serialize_stream_schema(self, value: t.JsonMapping) -> t.JsonMapping:
             """Normalize stream schema structure."""
-            result: dict[str, t.JsonValue] = dict(value)
+            result: t.JsonDict = dict(value)
             if "properties" not in result:
-                empty_properties: dict[str, t.JsonValue] = {}
+                empty_properties: t.JsonDict = {}
                 result["properties"] = empty_properties
             if "type" not in result:
                 result["type"] = c.Meltano.SchemaKey.OBJECT
