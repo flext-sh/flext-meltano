@@ -190,15 +190,15 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> p.Result[t.JsonMapping]:
+    ) -> p.Result[m.Meltano.SingerCatalogEntry]:
         """Create Singer catalog entry from stream definition."""
-        entry: t.JsonMapping = t.Cli.JSON_MAPPING_ADAPTER.validate_python({
+        entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
             "schema": stream.stream_schema,
-            "metadata": list[t.JsonValue](),
+            "metadata": (),
         })
-        return r[t.JsonMapping].ok(entry)
+        return r[m.Meltano.SingerCatalogEntry].ok(entry)
 
     def fetch_stream_config(
         self,

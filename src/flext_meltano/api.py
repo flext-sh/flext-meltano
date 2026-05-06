@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Self, override
 
 from flext_cli import r
-
 from flext_meltano import (
     FlextMeltanoAbstractions,
     FlextMeltanoAdapter,

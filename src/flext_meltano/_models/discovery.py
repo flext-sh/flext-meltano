@@ -9,7 +9,6 @@ from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
-
 from flext_meltano import t
 
 
@@ -43,8 +42,8 @@ class FlextMeltanoModelsDiscovery:
             """Normalize variant maps from external payloads."""
             match value:
                 case Mapping():
-                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return MappingProxyType(dict(normalized.items()))
+                    normalized = t.json_dict_adapter().validate_python(value)
+                    return MappingProxyType(normalized)
                 case _:
                     return MappingProxyType({})
 
@@ -80,7 +79,7 @@ class FlextMeltanoModelsDiscovery:
             """Normalize plugin catalog mapping."""
             match value:
                 case Mapping():
-                    normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                    return MappingProxyType(dict(normalized.items()))
+                    normalized = t.json_dict_adapter().validate_python(value)
+                    return MappingProxyType(normalized)
                 case _:
                     return MappingProxyType({})

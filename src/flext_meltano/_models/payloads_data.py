@@ -10,7 +10,6 @@ from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
-
 from flext_meltano import t
 
 
@@ -34,8 +33,8 @@ class FlextMeltanoModelsPayloadsData:
             """Normalize mapping-like payloads through the canonical CLI JSON adapter."""
             if not isinstance(value, Mapping):
                 return MappingProxyType({})
-            normalized = t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-            return MappingProxyType(dict(normalized.items()))
+            normalized = t.json_dict_adapter().validate_python(value)
+            return MappingProxyType(normalized)
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
@@ -75,7 +74,7 @@ class FlextMeltanoModelsPayloadsData:
                 case list() | tuple():
                     return [str(item) for item in value]
                 case Mapping():
-                    return dict(t.Cli.JSON_MAPPING_ADAPTER.validate_python(value))
+                    return t.json_dict_adapter().validate_python(value)
                 case _:
                     return str(value)
 

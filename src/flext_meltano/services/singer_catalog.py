@@ -12,7 +12,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_cli import cli
-
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 

@@ -136,9 +136,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 f"{environment_name}. "
                 f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
             )
-        configuration: t.JsonDict = (
-            dict(settings.items()) if settings is not None else {}
-        )
+        configuration = t.json_dict_adapter().validate_python(settings or {})
         payload: t.JsonDict = {
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "environment": normalized_environment,
@@ -157,7 +155,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             "status": c.Meltano.OperationStatus.CONFIGURED,
             "source": source_name,
             "sink": sink_name,
-            "configuration": (dict(config.items()) if config is not None else {}),
+            "configuration": t.json_dict_adapter().validate_python(config or {}),
         }
         return r[t.JsonMapping].ok(payload)
 
@@ -176,9 +174,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.ServicePayload].fail(
                 f"Invalid component type: {component_type}"
             )
-        configuration: t.JsonDict = (
-            dict(settings.items()) if settings is not None else {}
-        )
+        configuration = t.json_dict_adapter().validate_python(settings or {})
         payload: t.JsonDict = {
             "status": c.Meltano.OperationStatus.INSTALLED,
             "component_name": component_name,

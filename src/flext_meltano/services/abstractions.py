@@ -6,9 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import Self
 
 from flext_meltano import FlextMeltanoAbstractionsBase, c, e, m, p, r, t
@@ -177,7 +174,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 discovery.error or c.Meltano.ERROR_CATALOG_GENERATION_FAILED
             )
         raw = discovery.value
-        streams: list[t.JsonValue] = []
+        streams: list[m.Meltano.SingerCatalogEntry] = []
         for s in self._extract_raw_streams(raw):
             name = str(s.get(c.Meltano.PayloadKey.STREAM_NAME, c.DEFAULT_EMPTY_STRING))
             if name in self._stream_registry:
@@ -185,10 +182,14 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     self._stream_registry[name],
                 )
                 if entry_r.success:
-                    streams.append(dict(entry_r.value.items()))
+                    streams.append(entry_r.value)
+        catalog_model = m.Meltano.SingerCatalog(streams=streams)
+        catalog_payload = t.json_dict_adapter().validate_python(
+            catalog_model.model_dump(mode="json", by_alias=True),
+        )
         catalog: t.JsonDict = {
             c.Meltano.PayloadKey.VERSION: c.Meltano.PAYLOAD_SINGER_CATALOG_VERSION,
-            c.Meltano.PayloadKey.STREAMS: streams,
+            c.Meltano.PayloadKey.STREAMS: catalog_payload[c.Meltano.PayloadKey.STREAMS],
         }
         return r[t.JsonMapping].ok(catalog)
 
@@ -229,18 +230,11 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     @staticmethod
     def _extract_raw_streams(
         raw: t.JsonMapping,
-    ) -> list[dict[str, t.JsonValue]]:
+    ) -> t.SequenceOf[t.JsonDict]:
         """Extract stream dicts from a discovery result mapping."""
-        raw_val = raw.get(c.Meltano.PayloadKey.STREAMS)
-        if isinstance(raw_val, list):
-            streams: list[dict[str, t.JsonValue]] = []
-            for stream in raw_val:
-                if not isinstance(stream, Mapping):
-                    continue
-                validated = t.Cli.JSON_MAPPING_ADAPTER.validate_python(stream)
-                streams.append(dict(validated.items()))
-            return streams
-        return []
+        return t.json_dict_sequence_adapter().validate_python(
+            raw.get(c.Meltano.PayloadKey.STREAMS, []),
+        )
 
 
 __all__: list[str] = ["FlextMeltanoAbstractions"]

@@ -14,7 +14,6 @@ from collections.abc import Mapping
 from typing import Annotated, Self, override
 
 from flext_cli import u
-
 from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
@@ -102,9 +101,7 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
         if isinstance(self.runtime_settings, FlextMeltanoSettings):
             return self.runtime_settings
         try:
-            return FlextSettings.fetch_global().fetch_namespace(
-                "meltano", FlextMeltanoSettings
-            )
+            return FlextMeltanoSettings.fetch_global()
         except ValueError:
             with FlextMeltanoSettings.singleton_disabled():
                 return FlextMeltanoSettings()

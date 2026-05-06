@@ -7,7 +7,6 @@ from collections.abc import Callable
 from typing import Annotated
 
 from flext_cli import cli as flext_cli_output
-
 from flext_meltano import FlextMeltano, c, p, r, t, u
 from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
 
@@ -72,7 +71,7 @@ class FlextMeltanoCLI(FlextMeltano):
                     .discover_plugins()
                     .map(
                         lambda plugins: [
-                            dict(plugin.items())
+                            t.json_dict_adapter().validate_python(plugin)
                             for plugin in plugins
                             if plugin_type is None or plugin.get("type") == plugin_type
                         ]
@@ -102,11 +101,7 @@ class FlextMeltanoCLI(FlextMeltano):
                     plugin_type,
                 ).flat_map(
                     lambda payload: u.Cli.json_dumps(
-                        dict(
-                            t.Cli.JSON_MAPPING_ADAPTER.validate_python(
-                                dict(payload.items())
-                            )
-                        )
+                        t.json_dict_adapter().validate_python(payload),
                     )
                 )
             case c.Meltano.ExecutorCommand.INSTALL:
@@ -122,11 +117,15 @@ class FlextMeltanoCLI(FlextMeltano):
         match args[0]:
             case "show":
                 return self.run_cli([]).flat_map(
-                    lambda payload: u.Cli.json_dumps(dict(payload.items()))
+                    lambda payload: u.Cli.json_dumps(
+                        t.json_dict_adapter().validate_python(payload),
+                    )
                 )
             case c.Meltano.ExecutorCommand.HEALTH:
                 return self.health().flat_map(
-                    lambda payload: u.Cli.json_dumps(dict(payload.items()))
+                    lambda payload: u.Cli.json_dumps(
+                        t.json_dict_adapter().validate_python(payload),
+                    )
                 )
             case _:
                 return r[str].fail(f"Unknown status command: {args[0]}")

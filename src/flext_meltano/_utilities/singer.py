@@ -11,7 +11,6 @@ from __future__ import annotations
 import sys
 
 from flext_cli import r, u as cli_u
-
 from flext_meltano import c, e, m, p, t
 
 

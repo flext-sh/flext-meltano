@@ -8,9 +8,9 @@ import time
 from multiprocessing.process import BaseProcess
 from pathlib import Path
 
-from flext_cli import cli as flext_cli
 from flext_tests import tm
 
+from flext_cli import cli as flext_cli
 from flext_meltano import cli
 from tests import c, m, u
 

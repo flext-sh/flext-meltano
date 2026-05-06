@@ -29,7 +29,7 @@ MELTANO_COMPONENT_CASES: tuple[MeltanoComponentCase, ...] = (
     ("dbt", "analytics", "transformation_name"),
 )
 
-MELTANO_COMPONENT_IDS: tuple[str, ...] = ("tap", "target", "dbt")
+MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
 
 
 @pytest.fixture(autouse=True)

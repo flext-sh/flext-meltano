@@ -120,7 +120,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            record_dict: t.JsonDict = dict(record.items())
+            record_dict = t.json_dict_adapter().validate_python(record)
             empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)

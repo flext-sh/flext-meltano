@@ -179,7 +179,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         payload: t.JsonDict = {
             "status": c.Meltano.OperationStatus.READY,
             "service_type": service_type,
-            "settings": dict(settings_payload.items()),
+            "settings": t.json_dict_adapter().validate_python(settings_payload),
         }
         return r[t.JsonMapping].ok(payload)
 

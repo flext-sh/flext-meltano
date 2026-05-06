@@ -8,7 +8,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_cli import t
-
 from flext_meltano import c
 
 
