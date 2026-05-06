@@ -1,0 +1,151 @@
+tests/unit/test_services.py
+  h_9db9d35f50cf33 6,8-9,17,20-30,32-37,40,42-44,50,54-60,63-71,73,76-77,81-98
+tests/unit/test_api.py
+  h_9db9d35f50cf33 8,11,21-25,32-37,44,57,60,62,72-73,77,83,87-88,92,98
+src/flext_meltano/_models/singer.py
+  h_5cf852cc46bf92 83
+src/flext_meltano/services/services.py
+  s_552d8e4891a938::t_b4b6b24805de85 66,87,108
+  s_552d8e4891a938::t_b8c5430c97edbf 139,142,179,182,205
+tests/unit/test_singer_sdk_adapter.py
+  h_9db9d35f50cf33 1,5,9,11-22,24-36
+src/flext_meltano/constants.py
+  h_9db9d35f50cf33 26
+tests/unit/test_validators.py
+  h_9db9d35f50cf33 17,31,36,47,58,64,69,74,79,84,90,100,107,121-122,149,152,155-156,164,168,171-172,179,189,202,215,232,249,259
+src/flext_meltano/services/executor_base.py
+  h_9db9d35f50cf33 17,31,71-76,108-113,183-187,189,275-276,343-349,352-354,358-369,371-378,380-392,394-409,411-424
+examples/constants.py
+  h_5cf852cc46bf92 19
+src/flext_meltano/_constants/enums.py
+  h_5cf852cc46bf92 26,134-136,143,158,160-162,168-169,180-181,192-193,199,204,211,217,242-243,256,265,267,271,274,293,295,304,307-308,316,319-320,322,325-336,344-348
+examples/01_simple_working.py
+  h_9db9d35f50cf33 34-36
+tests/integration/test_docker_integration.py
+  h_9db9d35f50cf33 26,29-30,51,54-55,67,73-74,89,105-106,151-152
+src/flext_meltano/base.py
+  h_9db9d35f50cf33 102-104,107-110
+tests/unit/test_library_runner.py
+  h_9db9d35f50cf33 1,5,9,11-21,24-39
+src/flext_meltano/services/meltano_project_sdk.py
+  s_552d8e4891a938::t_b8c5430c97edbf 113
+src/flext_meltano/services/project_service.py
+  s_552d8e4891a938::t_b8c5430c97edbf 179
+src/flext_meltano/services/singer_sdk.py
+  h_5cf852cc46bf92 1,5,17,28,63,93
+  s_552d8e4891a938::t_b8c5430c97edbf 40
+src/flext_meltano/services/consumer_bases/target_service_base.py
+  s_552d8e4891a938::t_b8c5430c97edbf 123
+tests/unit/test_tap_abstractions.py
+  h_9db9d35f50cf33 1,5-6,10,12-13,16-21,25,27-30,32-33,36,41-42,45,47-48,50-52,54-58,60-61,64-68,70-72,74-77
+src/flext_meltano/_protocols/singer.py
+  h_9db9d35f50cf33 12,241,265
+src/flext_meltano/_models/sources_params.py
+  s_552d8e4891a938::t_b8c5430c97edbf 87,89
+  s_552d8e4891a938::t_bbaa7e0d68ee6b 85
+src/flext_meltano/_utilities/singer.py
+  h_5cf852cc46bf92 93
+tests/unit/test_models.py
+  h_9db9d35f50cf33 13,58-61,95-98,145-149
+src/flext_meltano/_constants/base.py
+  h_5cf852cc46bf92 20-22,28,74-87,91,99-100,102-104,109,139,142,148,150-153
+  h_9db9d35f50cf33 70-73
+tests/unit/tests_pipeline_cli_managers.py
+  s_9d9d62e5c21e3b::t_92f9f3b5009cf7 38
+src/flext_meltano/services/executor.py
+  s_552d8e4891a938::t_b8c5430c97edbf 51,168
+src/flext_meltano/_utilities/runtime.py
+  s_552d8e4891a938::t_e2f0d219eb6a1d 295
+src/flext_meltano/services/abstractions.py
+  s_552d8e4891a938::t_b8c5430c97edbf 80,83-86,88-90,119-122,125-127,131-133,136-138,146,154,159,164-166,176-178,182,189-192,203-205,207-208
+src/flext_meltano/_constants/settings.py
+  h_5cf852cc46bf92 21,189
+src/flext_meltano/cli.py
+  h_9db9d35f50cf33 1,6-7,9,11-12,15-16,27-164,167-171,174-175,178-179,182-183,186-187,190-191,194-204,209-212,215
+src/flext_meltano/_protocols/services.py
+  h_9db9d35f50cf33 88-115,164-166,168-170,172-173,176-177,180-181,183-185,187-189,192-194
+src/flext_meltano/pipeline_mgr.py
+  h_9db9d35f50cf33 1,5-7,10,12-23,26-27,29-42,44,46-58,60-66,68-69,72,74-75,78-122,124-132,135-141,143,145,147-152,154-155,157-166,168-176,179,181,183-188,190,192-201,203,205-268,270-346
+tests/unit/test_executors.py
+  h_9db9d35f50cf33 1,7-8,12,15-16,18-20,25-28,30-34,37-39,42-49,51-104,106-108,110-111,113,115-129
+pyproject.toml
+  s_5a9c2b140a8456::t_febe34fcd81318 176,551-589,593
+src/flext_meltano/services/library_runner.py
+  h_9db9d35f50cf33 86-87,89-104
+  ee53baefb7cad0fc 22,88
+tests/unit/test_cli_small_managers.py
+  h_9db9d35f50cf33 1,5,7-8,10-11,14-15,17-18,20-21,23-24,26-29,31-32,34-35,37-38,40-41,43-44,46-47,49-50,52-55,57-58,60-65,67-70,72-75,77-78,80,82,84,88-90
+src/flext_meltano/_models/core.py
+  s_552d8e4891a938::t_b8c5430c97edbf 36
+tests/constants.py
+  ee53baefb7cad0fc 19
+  h_9db9d35f50cf33 23,25-26,80-107
+tests/models.py
+  ee53baefb7cad0fc 17
+  h_9db9d35f50cf33 12-13,43-100
+src/flext_meltano/cli.py.new
+  h_9db9d35f50cf33 1-210
+tests/unit/test_singer_cli_translator.py
+  h_9db9d35f50cf33 1,20,30,40,50,61,72,83,99,111,118,130,140,160,172,188,204,219,232,262,269,289,309,329,348,384,400,416,427,439,454
+tests/unit/test_target_abstractions.py
+  h_9db9d35f50cf33 1,5-6,10-25,27-41,43-48,50,52
+tests/conftest.py
+  h_9db9d35f50cf33 23,27-29,174-178,201,209,219,229
+  ee53baefb7cad0fc 21
+src/flext_meltano/api.py
+  s_552d8e4891a938::t_b8c5430c97edbf 73
+  h_9db9d35f50cf33 1,5,38-40,42-43,46-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "9c70b77d7b697a8bf825e9d7ac50467df5a3fcf2",
+  "prompts": {
+    "ee53baefb7cad0fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6f1f4a05-4b57-4b6c-b7d8-374c863c4493",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "total_additions": 12,
+      "total_deletions": 22,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_5cf852cc46bf92": {
+      "author": "FLEXT Bot <team@flext.sh>"
+    },
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  },
+  "sessions": {
+    "s_552d8e4891a938": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "35c0040b-2ae9-466e-90aa-7721509e1e19",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_5a9c2b140a8456": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019dfddc-86ee-79a0-b5bf-0433a8110b6a",
+        "model": "gpt-5.5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_9d9d62e5c21e3b": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "63eb5d55-7a19-4f9c-a0a0-a59de054c32b",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    }
+  }
+}
