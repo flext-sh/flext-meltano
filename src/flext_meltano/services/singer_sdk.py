@@ -60,7 +60,7 @@ class FlextMeltanoSingerTapAdapter:
                 key: FlextMeltanoSingerTapAdapter._normalize_recursive(mapping_value)
                 for key, mapping_value in value.items()
             }
-        if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        if isinstance(value, Sequence) and not isinstance(value, t.STR_BYTES_TYPES):
             return [
                 FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
                 for sequence_value in value

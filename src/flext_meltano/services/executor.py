@@ -47,7 +47,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
-            args_payload: list[t.JsonValue] = list(args)
+            args_payload: t.JsonValueList = list(args)
             ready_payload: t.JsonDict = {
                 "status": c.Meltano.OperationStatus.READY,
                 "command_type": "cli_runner",
@@ -164,7 +164,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                         return r[t.JsonMapping].fail(
                             result.error or f"Command '{command}' failed",
                         )
-                    args_payload: list[t.JsonValue] = list(args)
+                    args_payload: t.JsonValueList = list(args)
                     extra_fields: t.JsonDict = {
                         "command": command,
                         "action": command,

@@ -137,9 +137,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                         "name": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                         "settings": {
                             "plugins": {
-                                "extractors": list[t.JsonValue](),
-                                "loaders": list[t.JsonValue](),
-                                "transformers": list[t.JsonValue](),
+                                "extractors": [],
+                                "loaders": [],
+                                "transformers": [],
                             },
                         },
                     },

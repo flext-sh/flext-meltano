@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -73,28 +74,36 @@ class FlextMeltanoModelsSourcesParams:
         @property
         def schema_properties_count(self) -> int:
             """Number of schema properties."""
-            properties = self.stream_schema.get("properties", {})
-            match properties:
-                case dict():
-                    return len(properties)
-                case _:
-                    return 0
+            properties = self.stream_schema[c.Meltano.SchemaKey.PROPERTIES]
+            return len(properties) if isinstance(properties, Mapping) else 0
 
-        @u.field_serializer("stream_schema")
-        def serialize_stream_schema(self, value: t.JsonMapping) -> t.JsonMapping:
-            """Normalize stream schema structure."""
-            result: t.JsonDict = dict(value)
-            if "properties" not in result:
-                empty_properties: t.JsonDict = {}
-                result["properties"] = empty_properties
-            if "type" not in result:
-                result["type"] = c.Meltano.SchemaKey.OBJECT
-            return result
+        @u.field_validator("stream_schema", mode="before")
+        @classmethod
+        def normalize_stream_schema(
+            cls,
+            value: t.Meltano.ValidatorInput,
+        ) -> t.JsonMapping:
+            """Normalize stream schema once at model boundary."""
+            schema = t.json_dict_adapter().validate_python(value)
+            properties_raw = schema.get(c.Meltano.SchemaKey.PROPERTIES, {})
+            properties = (
+                t.json_dict_adapter().validate_python(properties_raw)
+                if isinstance(properties_raw, Mapping)
+                else {}
+            )
+            return {
+                **schema,
+                c.Meltano.SchemaKey.PROPERTIES: properties,
+                c.Meltano.SchemaKey.TYPE: schema.get(
+                    c.Meltano.SchemaKey.TYPE,
+                    c.Meltano.SchemaKey.OBJECT,
+                ),
+            }
 
         @u.model_validator(mode="after")
         def validate_stream_definition(self) -> Self:
             """Validate stream definition consistency."""
-            if "properties" not in self.stream_schema:
+            if c.Meltano.SchemaKey.PROPERTIES not in self.stream_schema:
                 msg = "Stream schema must contain properties"
                 raise ValueError(msg)
             valid_statuses = c.Meltano.ACTIVE_STATUSES | {

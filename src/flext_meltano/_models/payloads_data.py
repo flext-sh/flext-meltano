@@ -24,18 +24,6 @@ class FlextMeltanoModelsPayloadsData:
             u.Field(description="Normalized mapping values"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
-        @u.field_validator("values", mode="before")
-        @classmethod
-        def normalize_values(
-            cls,
-            value: t.Meltano.ValidatorInput,
-        ) -> t.JsonMapping:
-            """Normalize mapping-like payloads through the canonical CLI JSON adapter."""
-            if not isinstance(value, Mapping):
-                return MappingProxyType({})
-            normalized = t.json_dict_adapter().validate_python(value)
-            return MappingProxyType(normalized)
-
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
 
@@ -65,7 +53,7 @@ class FlextMeltanoModelsPayloadsData:
             cls,
             value: str | t.Meltano.ValidatorInput,
         ) -> t.JsonValue | None:
-            """Normalize variant payload through the canonical CLI JSON adapter."""
+            """Normalize variant payload through canonical Pydantic models."""
             match value:
                 case None:
                     return None
@@ -74,7 +62,7 @@ class FlextMeltanoModelsPayloadsData:
                 case list() | tuple():
                     return [str(item) for item in value]
                 case Mapping():
-                    return t.json_dict_adapter().validate_python(value)
+                    return t.json_value_adapter().validate_python(value)
                 case _:
                     return str(value)
 

@@ -57,7 +57,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 return r[t.JsonMapping].fail(
                     cmd_result.error or c.Meltano.ERROR_STREAM_DISCOVERY_FAILED,
                 )
-            stream_defs: list[t.JsonValue] = []
+            stream_defs: t.JsonValueList = []
             for line in cmd_result.value.splitlines():
                 name = line.strip()
                 if name and not name.startswith("["):

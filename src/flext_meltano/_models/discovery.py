@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from types import MappingProxyType
 from typing import Annotated
 
@@ -36,17 +33,6 @@ class FlextMeltanoModelsDiscovery:
             """Normalize optional string fields from external payloads."""
             return "" if value is None else str(value)
 
-        @u.field_validator("variants", mode="before")
-        @classmethod
-        def normalize_variants(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
-            """Normalize variant maps from external payloads."""
-            match value:
-                case Mapping():
-                    normalized = t.json_dict_adapter().validate_python(value)
-                    return MappingProxyType(normalized)
-                case _:
-                    return MappingProxyType({})
-
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
 
@@ -72,14 +58,3 @@ class FlextMeltanoModelsDiscovery:
                 description="Plugin discovery entries keyed by plugin name",
             )
         )
-
-        @u.field_validator("plugins", mode="before")
-        @classmethod
-        def normalize_plugins(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
-            """Normalize plugin catalog mapping."""
-            match value:
-                case Mapping():
-                    normalized = t.json_dict_adapter().validate_python(value)
-                    return MappingProxyType(normalized)
-                case _:
-                    return MappingProxyType({})
