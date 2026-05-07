@@ -1,0 +1,49 @@
+src/flext_meltano/api.py
+  s_5a9c2b140a8456::t_27e6f0d0e5f5e3 69
+src/flext_meltano/services/abstractions.py
+  s_5a9c2b140a8456::t_27e6f0d0e5f5e3 60
+src/flext_meltano/_models/sources_params.py
+  h_5cf852cc46bf92 5,77-78,80-84,86-101,106
+src/flext_meltano/services/executor.py
+  s_5a9c2b140a8456::t_27e6f0d0e5f5e3 50,167
+src/flext_meltano/services/singer_sdk.py
+  s_b15aa8dbf80823::t_107a5431174902 63
+src/flext_meltano/services/services.py
+  s_5a9c2b140a8456::t_27e6f0d0e5f5e3 198
+src/flext_meltano/pipeline_mgr.py
+  s_b15aa8dbf80823::t_5dc908795a1f53 113
+src/flext_meltano/_models/payloads_data.py
+  h_5cf852cc46bf92 56,65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "88836035a193fac4200ea965d6c1642120c4e81a",
+  "prompts": {},
+  "humans": {
+    "h_5cf852cc46bf92": {
+      "author": "FLEXT Bot <team@flext.sh>"
+    },
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  },
+  "sessions": {
+    "s_5a9c2b140a8456": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019dfddc-86ee-79a0-b5bf-0433a8110b6a",
+        "model": "gpt-5.5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_b15aa8dbf80823": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d896ab0f-dd16-4dca-9ad4-b3d924a501e7",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    }
+  }
+}
