@@ -7,6 +7,7 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 _LAZY_IMPORTS = build_lazy_import_map(
     {
+        ".fixtures": ("fixtures",),
         ".test_api": ("TestsFlextMeltanoApi",),
         ".test_cli_integration": ("TestsFlextMeltanoCliIntegration",),
         ".test_cli_small_managers": ("TestsFlextMeltanoCliSmallManagers",),

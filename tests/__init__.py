@@ -14,13 +14,15 @@ from flext_core.lazy import (
 if _t.TYPE_CHECKING:
     from flext_tests import td, tf, tk, tm, tv
 
-    from flext_meltano import d, e, h, r, s, x
+    from flext_meltano import d, e, h, r, x
+    from tests.base import TestsFlextMeltanoServiceBase, s
     from tests.constants import TestsFlextMeltanoConstants, c
     from tests.integration.test_docker_integration import (
         TestsFlextMeltanoDockerIntegration,
     )
     from tests.models import TestsFlextMeltanoModels, m
     from tests.protocols import TestsFlextMeltanoProtocols, p
+    from tests.settings import TestsFlextMeltanoSettings
     from tests.typings import TestsFlextMeltanoTypes, t
     from tests.unit.test_api import TestsFlextMeltanoApi
     from tests.unit.test_cli_integration import TestsFlextMeltanoCliIntegration
@@ -52,6 +54,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
+            ".base": (
+                "TestsFlextMeltanoServiceBase",
+                "s",
+            ),
             ".constants": (
                 "TestsFlextMeltanoConstants",
                 "c",
@@ -67,6 +73,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextMeltanoProtocols",
                 "p",
             ),
+            ".settings": ("TestsFlextMeltanoSettings",),
             ".typings": (
                 "TestsFlextMeltanoTypes",
                 "t",
@@ -102,7 +109,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "e",
                 "h",
                 "r",
-                "s",
                 "x",
             ),
             "flext_tests": (
@@ -154,7 +160,9 @@ __all__: list[str] = [
     "TestsFlextMeltanoModelsUnit",
     "TestsFlextMeltanoPluginProtocols",
     "TestsFlextMeltanoProtocols",
+    "TestsFlextMeltanoServiceBase",
     "TestsFlextMeltanoServices",
+    "TestsFlextMeltanoSettings",
     "TestsFlextMeltanoSingerCliTranslator",
     "TestsFlextMeltanoSingerSdkAdapter",
     "TestsFlextMeltanoSingerTypes",
