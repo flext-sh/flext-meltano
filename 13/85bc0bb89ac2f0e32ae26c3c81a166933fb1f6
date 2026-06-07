@@ -1,0 +1,90 @@
+docs/guides/testing.md
+  s_73cbfc60e45e37::t_25274923661020 700
+  s_73cbfc60e45e37::t_f5d09212ec049a 76,128,176,219,292,333,357,396,439,471,517,588,611,638,658
+src/flext_meltano/_constants/base.py
+  s_73cbfc60e45e37::t_9fdaf12f5239f7 99-100
+docs/guides/getting-started.md
+  s_73cbfc60e45e37::t_25274923661020 278
+  s_73cbfc60e45e37::t_f5d09212ec049a 101,133,154,207
+docs/architecture/adr/002-clean-architecture-ddd.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 63,73,178,186,195,203
+docs/api-reference.md
+  s_73cbfc60e45e37::t_25274923661020 1056
+  s_73cbfc60e45e37::t_f5d09212ec049a 83,106,126,145,165,188,202,222,235,253,264,282,304,326,346,365,378,392,410,423,440,454,467,486,504,523,534,550,569,591,602,620,639,657,668,686,711,722,740,758,776,787,797,807,821,832,842,852,868,883,900,919,935,949,969,980,989,998,1009,1033
+src/flext_meltano/cli.py
+  s_73cbfc60e45e37::t_1625093b5b4532 86-87
+  s_ec83492d4209e5::t_f2acb46c646d5d 60-68,70-83,88-109
+docs/guides/maintenance-guide.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 455
+  s_73cbfc60e45e37::t_25274923661020 477
+docs/architecture.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 60,75,92,105,118,194,206,219,228,243,272,296,320
+docs/guides/architecture-analysis.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 83,125,136,225,259,269,282,290,337
+docs/guides/troubleshooting.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 88,118,139,148,175,196,210,225,255,291,315,325,348,372,408,430,442,453,490,558,619,642,722,733,771,784
+  s_73cbfc60e45e37::t_25274923661020 300,380,527,795
+  s_73cbfc60e45e37::t_de5743b051aa8e 367
+docs/architecture/security-architecture.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 213,256,292,400,450,479,603,747,817,871,1006,1040,1081,1156
+docs/architecture/data-architecture.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 213,231,247,270,335,456,545,582,602,621,651
+docs/testing.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 264,291,317
+docs/guides/phase_4_implementation_plan.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 480,516
+docs/architecture/architecture-guide.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 384
+docs/getting-started.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 72,103,115
+docs/guides/configuration.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 106,144,164,178,231,264,308,344,380,417,455
+src/flext_meltano/_constants/enums.py
+  s_73cbfc60e45e37::t_f838641b864116 317
+docs/guides/development.md
+  s_73cbfc60e45e37::t_25274923661020 434
+  s_73cbfc60e45e37::t_f5d09212ec049a 152,169,189,228,313,406
+docs/guides/generic-library-plan.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 85,126,183,200,214,228,246,266,288,308,322
+docs/guides/integration.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 54,100,144,191,263,394,424,433
+examples/README.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 169
+docs/configuration.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 136,173,190,204,277,294,319,381,399,416,427,442
+  s_73cbfc60e45e37::t_25274923661020 462
+docs/architecture/adr/001-railway-oriented-programming.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 64,75,150,169,183
+docs/architecture/system-context.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 262,288,335,382,412,568,615,757,790,847,902
+docs/architecture/quality-attributes.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 213,279,356,443,662,828,952,1144,1250,1324,1406,1720,1965,2407,2582,2957,3044,3110,3390,3434,3478,3549,3621,3776,3843
+docs/troubleshooting.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 45,86,247,270
+docs/architecture/adr/003-singer-protocol-abstraction.md
+  s_73cbfc60e45e37::t_f5d09212ec049a 56,65,75,144,164,189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "1385bc0bb89ac2f0e32ae26c3c81a166933fb1f6",
+  "prompts": {},
+  "sessions": {
+    "s_73cbfc60e45e37": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80f2c44c-f1f2-49a0-8035-ccac60ac602b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    },
+    "s_ec83492d4209e5": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019e97b7-d073-7711-a0a1-e7daf811f073",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
