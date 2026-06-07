@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from types import MappingProxyType
 from typing import Annotated, Self
 
@@ -20,7 +20,7 @@ class FlextMeltanoModelsResults:
         status: Annotated[str, u.Field(description="Execution status")]
         start_time: Annotated[datetime, u.Field(description="Execution start time")] = (
             u.Field(
-                default_factory=lambda: datetime.now(tz=UTC),
+                default_factory=lambda: u.now(),
                 description="Execution start time",
             )
         )
