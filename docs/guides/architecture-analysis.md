@@ -80,7 +80,7 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 **Key Methods:**
 
-```python
+```python notest
 # Plugin operations
 discover_plugins() -> p.Result[Sequence[PluginInfo]]
 install_plugin(name: str, version: str | None) -> p.Result[PluginInstallResult]
@@ -122,7 +122,7 @@ validate_configuration() -> p.Result[bool]
 
 **FlextSingerTap Architecture:**
 
-```python
+```python notest
 class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
@@ -133,7 +133,7 @@ class FlextSingerTap(s):
 
 **FlextSingerTarget Architecture:**
 
-```python
+```python notest
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
@@ -222,7 +222,7 @@ class FlextSingerTarget(s):
 
 #### flext-core Integration
 
-```python
+```python notest
 # Foundation patterns
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -256,7 +256,7 @@ if result.failure:
 
 #### flext-cli Integration
 
-```python
+```python notest
 # CLI command integration
 from flext_cli import cli
 
@@ -266,7 +266,7 @@ cli.register_command("pipeline", PipelineCommandHandler())
 
 #### flext-quality Integration
 
-```python
+```python notest
 # Quality gate integration
 from flext_quality import FlextQualityGates
 
@@ -279,7 +279,7 @@ gates.register_pipeline_validator("meltano", MeltanoPipelineValidator())
 
 #### Meltano CLI Integration
 
-```python
+```python notest
 # Direct CLI execution
 adapter = FlextMeltanoAdapter()
 result = adapter.execute_cli_command(["meltano", "run", "tap-csv", "target-jsonl"])
@@ -287,7 +287,7 @@ result = adapter.execute_cli_command(["meltano", "run", "tap-csv", "target-jsonl
 
 #### Singer Protocol Integration
 
-```python
+```python notest
 # Native Singer protocol usage
 tap = FlextSingerTap("tap-gitlab", settings={"api_url": "https://gitlab.com"})
 catalog = tap.discover().unwrap()
@@ -334,7 +334,7 @@ sync_result = tap.sync(catalog.streams[:5]).unwrap()
 
 #### Multi-Worker Architecture
 
-```python
+```python notest
 # Worker pool management
 class FlextMeltanoWorkerPool:
     def __init__(self, max_workers: int = 4):

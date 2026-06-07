@@ -477,7 +477,7 @@ ______________________________________________________________________
 
 #### **r Testing Pattern**
 
-```python
+```python notest
 def test_operation_returns_flext_result():
     """Test that operations return r instances."""
     service = FlextMeltanoService()
@@ -513,7 +513,7 @@ def test_operation_failure_path():
 
 #### **Mock Integration Pattern**
 
-```python
+```python notest
 @pytest.fixture
 def mock_meltano_adapter():
     """Provide mocked Meltano adapter."""

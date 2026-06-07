@@ -61,7 +61,7 @@ Implement railway-oriented programming using `r[T]` from flext-core, ensuring co
 
 **Composability**: Operations can be chained safely without exception handling clutter
 
-```python
+```python notest
 result = (
     service
     .discover_plugins()
@@ -72,7 +72,7 @@ result = (
 
 **Type Safety**: Error types are preserved through the entire flow
 
-```python
+```python notest
 def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
     return r.ok(PipelineResult(...))
@@ -147,7 +147,7 @@ def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
 
 ### Error Type Hierarchy
 
-```python
+```python notest
 class FlextMeltanoError(Exception):
     """Base error for all FLEXT-Meltano operations."""
 
@@ -166,7 +166,7 @@ class PipelineError(FlextMeltanoError):
 
 ### Railway Pattern Usage
 
-```python
+```python notest
 def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult]:
     return (
         validate_config(settings)
@@ -180,7 +180,7 @@ def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult
 
 ### Testing Error Scenarios
 
-```python
+```python notest
 def test_pipeline_failure_handling():
     # Given
     invalid_config = PipelineConfig(invalid_param="test")

@@ -51,7 +51,7 @@ ______________________________________________________________________
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-```python
+```python notest
 # Example: flext-tap-oracle integration
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -97,7 +97,7 @@ class FlextOracleTapService(s):
 
 \__Standard pattern for flext-target-_ projects\_\*:
 
-```python
+```python notest
 # Example: flext-target-oracle integration
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -141,7 +141,7 @@ ______________________________________________________________________
 
 \__Standard pattern for flext-dbt-_ projects\_\*:
 
-```python
+```python notest
 # Example: flext-dbt-oracle integration
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -188,7 +188,7 @@ ______________________________________________________________________
 
 **Full ELT workflow using flext-meltano foundation**:
 
-```python
+```python notest
 from flext_core import FlextBus
 from flext_core import FlextSettings
 from flext_core import FlextConstants
@@ -260,7 +260,7 @@ python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
 
 **JSON API Response Pattern**:
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
@@ -391,7 +391,7 @@ ______________________________________________________________________
 
 **1. Dependency Injection**:
 
-```python
+```python notest
 from flext_core import FlextBus
 from flext_core import FlextSettings
 from flext_core import FlextConstants
@@ -421,7 +421,7 @@ container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
 
 **2. Configuration Management**:
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoSettingsBuilders
 
 builder = FlextMeltanoSettingsBuilders()
@@ -430,7 +430,7 @@ settings = builder.build_pipeline_config(tap_settings, target_settings)
 
 **3. Error Handling**:
 
-```python
+```python notest
 # Consistent r patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
 if result.failure:

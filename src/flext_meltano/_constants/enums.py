@@ -314,6 +314,7 @@ class FlextMeltanoConstantsEnums:
 
         HEALTH = "health"
         HELP = "help"
+        INFO = "info"
         INSTALL = "install"
         LIST = "list"
         PIPELINE = "pipeline"

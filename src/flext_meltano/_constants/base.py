@@ -96,8 +96,8 @@ class FlextMeltanoConstantsBase:
     PLUGIN_CONFIG_VERSION: Final[int] = 1
     PLUGIN_DBT_DEFAULT_NAME: Final[str] = "dbt-postgres"
     PLUGIN_INSTALLATION_TIMEOUT: Final[int] = 300
-    PLUGIN_INSTALL_ARG_COUNT: Final[int] = 2
-    "Expected number of arguments for plugin install command."
+    PLUGIN_INFO_ARG_COUNT: Final[int] = 2
+    "Expected number of arguments (plugin type and name) for plugin info command."
     PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
     PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
     PREFIX_DBT: Final[str] = "dbt"

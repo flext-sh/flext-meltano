@@ -210,7 +210,7 @@ end note
 
 #### 1. Caching Strategy
 
-```python
+```python notest
 class MultiLevelCache:
     """Multi-level caching for optimal performance."""
 
@@ -276,7 +276,7 @@ class MultiLevelCache:
 
 #### 2. Connection Pooling
 
-```python
+```python notest
 class ConnectionPoolManager:
     """Intelligent connection pooling for external services."""
 
@@ -353,7 +353,7 @@ class ConnectionPoolManager:
 
 #### 3. Async Processing
 
-```python
+```python notest
 class AsyncPipelineExecutor:
     """Asynchronous pipeline execution with concurrency control."""
 
@@ -440,7 +440,7 @@ class AsyncPipelineExecutor:
 
 ### Performance Monitoring
 
-```python
+```python notest
 class PerformanceMonitor:
     """Comprehensive performance monitoring and alerting."""
 
@@ -659,7 +659,7 @@ end note
 
 #### 1. Horizontal Scaling
 
-```python
+```python notest
 class HorizontalScaler:
     """Horizontal scaling management for API and worker services."""
 
@@ -825,7 +825,7 @@ class HorizontalScaler:
 
 #### 2. Data Scaling
 
-```python
+```python notest
 class DataScaler:
     """Data layer scaling with sharding and replication."""
 
@@ -949,7 +949,7 @@ class DataScaler:
 
 #### 3. Functional Scaling
 
-```python
+```python notest
 class FunctionalDecomposer:
     """Service decomposition for functional scaling."""
 
@@ -1141,7 +1141,7 @@ end note
 
 #### 1. Railway-Oriented Error Handling
 
-```python
+```python notest
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
@@ -1247,7 +1247,7 @@ class RailwayExecutor:
 
 #### 2. Circuit Breaker Pattern
 
-```python
+```python notest
 class CircuitBreaker:
     """Circuit breaker implementation for external service protection."""
 
@@ -1321,7 +1321,7 @@ class CircuitBreaker:
 
 #### 3. Retry with Exponential Backoff
 
-```python
+```python notest
 class RetryExecutor:
     """Retry executor with exponential backoff and jitter."""
 
@@ -1403,7 +1403,7 @@ class RetryExecutor:
 
 ### Reliability Monitoring
 
-```python
+```python notest
 class ReliabilityMonitor:
     """Monitor system reliability and trigger alerts."""
 
@@ -1717,7 +1717,7 @@ end note
 
 #### 1. Multi-AZ Deployment Strategy
 
-```python
+```python notest
 class AvailabilityManager:
     """Manage high availability and failover across multiple availability zones."""
 
@@ -1962,7 +1962,7 @@ class AvailabilityManager:
 
 #### 2. Disaster Recovery Implementation
 
-```python
+```python notest
 class DisasterRecoveryManager:
     """Comprehensive disaster recovery management."""
 
@@ -2404,7 +2404,7 @@ end note
 
 #### 1. Pre-commit Quality Gates
 
-```python
+```python notest
 class QualityGate:
     """Automated quality gates for code commits."""
 
@@ -2579,7 +2579,7 @@ class QualityGate:
 
 #### 2. Automated Code Review
 
-```python
+```python notest
 class AutomatedCodeReview:
     """Automated code review system."""
 
@@ -2954,7 +2954,7 @@ end note
 
 #### 1. API Response Design
 
-```python
+```python notest
 class APIResponse:
     """Consistent API response format."""
 
@@ -3041,7 +3041,7 @@ class APIResponse:
 
 #### 2. Progressive Disclosure
 
-```python
+```python notest
 class APIResource:
     """API resource with progressive disclosure."""
 
@@ -3107,7 +3107,7 @@ class APIResource:
 
 #### 3. Contextual Help System
 
-```python
+```python notest
 class APIHelpSystem:
     """Contextual help and guidance system."""
 
@@ -3387,7 +3387,7 @@ end note
 
 #### 1. Dependency Injection for Testing
 
-```python
+```python notest
 class TestableService:
     """Service designed for testability with dependency injection."""
 
@@ -3431,7 +3431,7 @@ class TestableService:
 
 #### 2. Test Data Builders
 
-```python
+```python notest
 class TestDataBuilder:
     """Fluent builder for test data creation."""
 
@@ -3475,7 +3475,7 @@ def test_entity_processing():
 
 #### 3. Test Fixtures and Context Managers
 
-```python
+```python notest
 @pytest.fixture
 def test_database():
     """Database fixture for testing."""
@@ -3546,7 +3546,7 @@ def test_complex_pipeline_operation():
 
 #### 4. Property-Based Testing
 
-```python
+```python notest
 from hypothesis import given, strategies as st
 
 
@@ -3618,7 +3618,7 @@ class PropertyBasedTests:
 
 #### 5. Contract Testing
 
-```python
+```python notest
 from pact import Consumer, Provider
 
 
@@ -3773,7 +3773,7 @@ jobs:
 
 #### 2. Test Data Management
 
-```python
+```python notest
 class TestDataManager:
     """Centralized test data management."""
 
@@ -3840,7 +3840,7 @@ class TestDataManager:
 
 #### 3. Test Result Analysis
 
-```python
+```python notest
 class TestResultAnalyzer:
     """Analyze test results for insights and improvements."""
 

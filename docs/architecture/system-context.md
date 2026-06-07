@@ -259,7 +259,7 @@ flext_meltano --> redis: Caching & queues
 
 #### FLEXT-Core Integration
 
-```python
+```python notest
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
     r,  # Railway-oriented error handling
@@ -285,7 +285,7 @@ class FlextMeltanoService(s):
 
 #### Meltano CLI Integration
 
-```python
+```python notest
 class MeltanoAdapter:
     """Meltano CLI integration with proper error handling."""
 
@@ -332,7 +332,7 @@ class MeltanoAdapter:
 
 #### Singer SDK Integration
 
-```python
+```python notest
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap implementation with ecosystem integration."""
 
@@ -379,7 +379,7 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 
 #### Adapter Pattern for External Systems
 
-```python
+```python notest
 # External system integration via adapters
 class ExternalSystemAdapter(Protocol):
     """Protocol for external system adapters."""
@@ -409,7 +409,7 @@ class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
 
 #### Plugin Architecture for Extensibility
 
-```python
+```python notest
 class PluginManager:
     """Plugin management system for ecosystem extensibility."""
 
@@ -565,7 +565,7 @@ end note
 
 All FLEXT projects follow consistent integration patterns:
 
-```python
+```python notest
 # Standard FLEXT project structure
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -612,7 +612,7 @@ class MyFLEXTProject(s):
 
 #### Plugin Ecosystem Integration
 
-```python
+```python notest
 class FLEXTPluginRegistry:
     """Central plugin registry for ecosystem coordination."""
 
@@ -754,7 +754,7 @@ ______________________________________________________________________
 
 #### Request-Response Pattern
 
-```python
+```python notest
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
@@ -787,7 +787,7 @@ class SynchronousIntegration:
 
 #### Circuit Breaker Pattern
 
-```python
+```python notest
 class CircuitBreakerIntegration:
     """Circuit breaker pattern for external system integration."""
 
@@ -844,7 +844,7 @@ class CircuitBreakerIntegration:
 
 #### Event-Driven Pattern
 
-```python
+```python notest
 class EventDrivenIntegration:
     """Event-driven integration for asynchronous operations."""
 
@@ -899,7 +899,7 @@ class EventDrivenIntegration:
 
 #### Message Queue Integration
 
-```python
+```python notest
 class MessageQueueIntegration:
     """Message queue integration for reliable asynchronous communication."""
 

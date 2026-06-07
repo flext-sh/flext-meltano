@@ -452,7 +452,7 @@ make docs
 
 Extend the system with custom validation rules:
 
-```python
+```python notest
 # scripts/custom_validators.py
 from docs_maintenance import DocumentationAuditor
 
@@ -474,7 +474,7 @@ class CustomFlextValidator(DocumentationAuditor):
 
 Programmatic access to quality data:
 
-```python
+```python notest
 from docs_maintenance import DocumentationAuditor
 
 auditor = DocumentationAuditor()

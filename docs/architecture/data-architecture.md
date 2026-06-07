@@ -210,7 +210,7 @@ external --> intermediate: Data extraction
 
 #### 1. **State Management**
 
-```python
+```python notest
 class PipelineState:
     """Pipeline execution state with bookmarks."""
 
@@ -228,7 +228,7 @@ class PipelineState:
 
 #### 2. **Data Buffering**
 
-```python
+```python notest
 class RecordBuffer:
     """In-memory buffer for batch processing."""
 
@@ -244,7 +244,7 @@ class RecordBuffer:
 
 #### 3. **Error Handling Storage**
 
-```python
+```python notest
 class ErrorStore:
     """Storage for failed records and error context."""
 
@@ -267,7 +267,7 @@ ______________________________________________________________________
 
 #### Pipeline Configuration Model
 
-```python
+```python notest
 @dataclass
 class PipelineConfig:
     """Pipeline configuration with validation."""
@@ -332,7 +332,7 @@ class PipelineConfig:
 
 #### Schema Validation
 
-```python
+```python notest
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
@@ -453,7 +453,7 @@ ______________________________________________________________________
 
 ### Data Quality Metrics
 
-```python
+```python notest
 class DataQualityMetrics:
     """Track data quality throughout pipeline."""
 
@@ -542,7 +542,7 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 
 ### Data Retention Policies
 
-```python
+```python notest
 @dataclass
 class RetentionPolicy:
     """Data retention policy configuration."""
@@ -579,7 +579,7 @@ ______________________________________________________________________
 
 #### 1. **Horizontal Scaling**
 
-```python
+```python notest
 class PipelineScaler:
     """Dynamic pipeline scaling based on workload."""
 
@@ -599,7 +599,7 @@ class PipelineScaler:
 
 #### 2. **Data Partitioning**
 
-```python
+```python notest
 class DataPartitioner:
     """Intelligent data partitioning for parallel processing."""
 
@@ -618,7 +618,7 @@ class DataPartitioner:
 
 #### 3. **Caching Strategy**
 
-```python
+```python notest
 class PipelineCache:
     """Multi-level caching for performance optimization."""
 
@@ -648,7 +648,7 @@ class PipelineCache:
 
 #### Alerting Rules
 
-```python
+```python notest
 @dataclass
 class AlertRule:
     """Monitoring alert configuration."""

@@ -60,7 +60,7 @@ Implement Clean Architecture with Domain-Driven Design, establishing clear bound
 
 **Testability**: Business logic can be tested without external dependencies
 
-```python
+```python notest
 # Domain logic testable in isolation
 def test_pipeline_validation():
     validator = PipelineValidator()
@@ -70,7 +70,7 @@ def test_pipeline_validation():
 
 **Maintainability**: Changes to external systems don't affect business logic
 
-```python
+```python notest
 # Adapter pattern allows external system changes
 class MeltanoAdapter:
     def run_tap(self, settings) -> p.Result[TapResult]:
@@ -175,7 +175,7 @@ src/flext_meltano/
 
 **API Layer → Application Layer**
 
-```python
+```python notest
 # api.py
 def create_pipeline(settings: dict) -> p.Result[Pipeline]:
     return FlextMeltanoService().create_pipeline(settings)
@@ -183,7 +183,7 @@ def create_pipeline(settings: dict) -> p.Result[Pipeline]:
 
 **Application Layer → Domain Layer**
 
-```python
+```python notest
 # services.py
 def create_pipeline(self, settings: dict) -> p.Result[Pipeline]:
     validated_config = self.config_validator.validate(settings)
@@ -192,7 +192,7 @@ def create_pipeline(self, settings: dict) -> p.Result[Pipeline]:
 
 **Application Layer → Infrastructure Layer**
 
-```python
+```python notest
 # services.py
 def execute_pipeline(self, pipeline: Pipeline) -> p.Result[ExecutionResult]:
     return self.meltano_adapter.run_pipeline(pipeline)
@@ -200,7 +200,7 @@ def execute_pipeline(self, pipeline: Pipeline) -> p.Result[ExecutionResult]:
 
 ### Dependency Injection
 
-```python
+```python notest
 # Service initialization with dependencies
 @dataclass
 class FlextMeltanoService:

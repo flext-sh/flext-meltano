@@ -69,7 +69,7 @@ ______________________________________________________________________
 
 ### **Basic Service Usage**
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoService
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -100,7 +100,7 @@ print("flext-meltano service initialized")
 
 ### **Singer Protocol Operations**
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoTapAbstractions
 
 # Initialize tap abstractions
@@ -112,7 +112,7 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 
 ### **r Pattern**
 
-```python
+```python notest
 from flext_core import FlextBus
 from flext_core import FlextSettings
 from flext_core import FlextConstants

@@ -80,7 +80,7 @@ ______________________________________________________________________
 
 **Primary service for Meltano project management and plugin operations**
 
-```python
+```python notest
 class FlextMeltanoService(s):
     """Main orchestration service for Meltano project operations."""
 
@@ -103,7 +103,7 @@ class FlextMeltanoService(s):
 
 **Discover available Meltano plugins in the project**
 
-```python
+```python notest
 def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
     """Discover all available plugins in the project.
 
@@ -123,7 +123,7 @@ def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
 
 **Install a Meltano plugin**
 
-```python
+```python notest
 def install_plugin(
     self, plugin_name: str, version: str | None = None
 ) -> p.Result[FlextMeltanoModels.PluginInstallResult]:
@@ -142,7 +142,7 @@ def install_plugin(
 
 **Execute a Singer tap**
 
-```python
+```python notest
 def execute_tap(
     self, tap_name: str, settings: m.Dict | None = None, state: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.TapExecutionResult]:
@@ -162,7 +162,7 @@ def execute_tap(
 
 **Execute a Singer target**
 
-```python
+```python notest
 def execute_target(
     self,
     target_name: str,
@@ -185,7 +185,7 @@ def execute_target(
 
 **Meltano CLI integration and execution adapter**
 
-```python
+```python notest
 class FlextMeltanoAdapter(s):
     """Adapter for Meltano CLI integration and execution."""
 
@@ -199,7 +199,7 @@ class FlextMeltanoAdapter(s):
 
 **Execute complete ELT pipeline**
 
-```python
+```python notest
 def run_pipeline(
     self, tap_name: str, target_name: str, settings: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.PipelineResult]:
@@ -219,7 +219,7 @@ def run_pipeline(
 
 **Validate Meltano project configuration**
 
-```python
+```python notest
 def validate_project(self) -> p.Result[FlextMeltanoModels.ProjectValidation]:
     """Validate Meltano project configuration and structure.
 
@@ -232,7 +232,7 @@ def validate_project(self) -> p.Result[FlextMeltanoModels.ProjectValidation]:
 
 **List available Meltano plugins**
 
-```python
+```python notest
 def list_plugins(
     self, plugin_type: str | None = None
 ) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
@@ -250,7 +250,7 @@ def list_plugins(
 
 **Advanced pipeline execution engine**
 
-```python
+```python notest
 class FlextMeltanoExecutor(s):
     """Advanced pipeline execution engine with orchestration."""
 ```
@@ -261,7 +261,7 @@ class FlextMeltanoExecutor(s):
 
 **Execute pipeline with advanced options**
 
-```python
+```python notest
 def execute_pipeline_advanced(
     self, options: FlextMeltanoModels.PipelineOptions
 ) -> p.Result[FlextMeltanoModels.PipelineResult]:
@@ -279,7 +279,7 @@ def execute_pipeline_advanced(
 
 **Execute multiple pipelines in parallel**
 
-```python
+```python notest
 def execute_parallel_pipelines(
     self, pipelines: t.SequenceOf[FlextMeltanoModels.PipelineConfig]
 ) -> p.Result[Sequence[FlextMeltanoModels.PipelineResult]]:
@@ -301,7 +301,7 @@ ______________________________________________________________________
 
 **Singer tap implementation with enterprise features**
 
-```python
+```python notest
 class FlextSingerTap(s):
     """Singer tap implementation with discovery, sync, and state management."""
 
@@ -323,7 +323,7 @@ class FlextSingerTap(s):
 
 **Discover Singer catalog for the tap**
 
-```python
+```python notest
 def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
     """Discover Singer catalog for the tap.
 
@@ -343,7 +343,7 @@ def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
 
 **Execute tap synchronization**
 
-```python
+```python notest
 def sync(
     self, streams: t.StringList | None = None, state: m.Dict | None = None
 ) -> p.Result[FlextMeltanoModels.SyncResult]:
@@ -362,7 +362,7 @@ def sync(
 
 **Validate tap configuration**
 
-```python
+```python notest
 def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
     """Validate tap configuration.
 
@@ -375,7 +375,7 @@ def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
 
 **Singer target implementation with batch processing**
 
-```python
+```python notest
 class FlextSingerTarget(s):
     """Singer target implementation with batch processing and error handling."""
 
@@ -389,7 +389,7 @@ class FlextSingerTarget(s):
 
 **Load records into the target**
 
-```python
+```python notest
 def load_records(
     self, records: t.SequenceOf[m.Dict]
 ) -> p.Result[FlextMeltanoModels.LoadResult]:
@@ -407,7 +407,7 @@ def load_records(
 
 **Flush any buffered records**
 
-```python
+```python notest
 def flush(self) -> p.Result[FlextMeltanoModels.FlushResult]:
     """Flush any buffered records to the target.
 
@@ -420,7 +420,7 @@ def flush(self) -> p.Result[FlextMeltanoModels.FlushResult]:
 
 **Validate target configuration**
 
-```python
+```python notest
 def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
     """Validate target configuration.
 
@@ -437,7 +437,7 @@ ______________________________________________________________________
 
 **Plugin lifecycle management and operations**
 
-```python
+```python notest
 class FlextPluginService(s):
     """Service for plugin lifecycle management and operations."""
 
@@ -451,7 +451,7 @@ class FlextPluginService(s):
 
 **Discover all plugins in the project**
 
-```python
+```python notest
 def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
     """Discover all plugins in the project.
 
@@ -464,7 +464,7 @@ def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
 
 **Install a plugin**
 
-```python
+```python notest
 def install_plugin(
     self, plugin_name: str, version: str | None = None
 ) -> p.Result[FlextMeltanoModels.PluginInstallResult]:
@@ -483,7 +483,7 @@ def install_plugin(
 
 **Uninstall a plugin**
 
-```python
+```python notest
 def uninstall_plugin(
     self, plugin_name: str
 ) -> p.Result[FlextMeltanoModels.PluginUninstallResult]:
@@ -501,7 +501,7 @@ def uninstall_plugin(
 
 **Update a plugin to latest or specific version**
 
-```python
+```python notest
 def update_plugin(
     self, plugin_name: str, version: str | None = None
 ) -> p.Result[FlextMeltanoModels.PluginUpdateResult]:
@@ -520,7 +520,7 @@ def update_plugin(
 
 **Plugin registry and discovery system**
 
-```python
+```python notest
 class FlextPluginRegistry(s):
     """Plugin registry for plugin discovery and management."""
 ```
@@ -531,7 +531,7 @@ class FlextPluginRegistry(s):
 
 **Register a plugin in the registry**
 
-```python
+```python notest
 def register_plugin(self, plugin_info: FlextMeltanoModels.PluginInfo) -> p.Result[bool]:
     """Register a plugin in the registry.
 
@@ -547,7 +547,7 @@ def register_plugin(self, plugin_info: FlextMeltanoModels.PluginInfo) -> p.Resul
 
 **Find a plugin by name and type**
 
-```python
+```python notest
 def find_plugin(
     self, plugin_name: str, plugin_type: str | None = None
 ) -> p.Result[FlextMeltanoModels.PluginInfo | None]:
@@ -566,7 +566,7 @@ def find_plugin(
 
 **List plugins by type**
 
-```python
+```python notest
 def list_plugins_by_type(
     self, plugin_type: str
 ) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
@@ -588,7 +588,7 @@ ______________________________________________________________________
 
 **Pipeline orchestration and execution service**
 
-```python
+```python notest
 class FlextMeltanoService(s):
     """Service for pipeline orchestration and execution."""
 ```
@@ -599,7 +599,7 @@ class FlextMeltanoService(s):
 
 **Create a new pipeline configuration**
 
-```python
+```python notest
 def create_pipeline(
     self, settings: FlextMeltanoModels.PipelineConfig
 ) -> p.Result[FlextMeltanoModels.Pipeline]:
@@ -617,7 +617,7 @@ def create_pipeline(
 
 **Execute a configured pipeline**
 
-```python
+```python notest
 def execute_pipeline(
     self, pipeline_name: str, options: FlextMeltanoModels.PipelineOptions | None = None
 ) -> p.Result[FlextMeltanoModels.PipelineResult]:
@@ -636,7 +636,7 @@ def execute_pipeline(
 
 **Monitor pipeline execution**
 
-```python
+```python notest
 def monitor_pipeline(
     self, pipeline_id: str
 ) -> p.Result[FlextMeltanoModels.PipelineStatus]:
@@ -654,7 +654,7 @@ def monitor_pipeline(
 
 **Advanced pipeline execution engine**
 
-```python
+```python notest
 class FlextMeltanoExecutor(s):
     """Advanced pipeline execution engine with orchestration."""
 ```
@@ -665,7 +665,7 @@ class FlextMeltanoExecutor(s):
 
 **Execute multiple pipelines in parallel**
 
-```python
+```python notest
 def execute_parallel_pipelines(
     self, pipelines: t.SequenceOf[FlextMeltanoModels.PipelineConfig]
 ) -> p.Result[Sequence[FlextMeltanoModels.PipelineResult]]:
@@ -683,7 +683,7 @@ def execute_parallel_pipelines(
 
 **Execute pipeline based on condition**
 
-```python
+```python notest
 def execute_conditional_pipeline(
     self,
     condition: FlextMeltanoModels.Condition,
@@ -708,7 +708,7 @@ ______________________________________________________________________
 
 **Meltano project management service**
 
-```python
+```python notest
 class FlextProjectService(s):
     """Service for Meltano project management."""
 ```
@@ -719,7 +719,7 @@ class FlextProjectService(s):
 
 **Create a new Meltano project**
 
-```python
+```python notest
 def create_project(
     self, project_config: FlextMeltanoModels.ProjectConfig
 ) -> p.Result[FlextMeltanoModels.Project]:
@@ -737,7 +737,7 @@ def create_project(
 
 **Validate Meltano project structure**
 
-```python
+```python notest
 def validate_project(
     self, project_root: Path | str
 ) -> p.Result[FlextMeltanoModels.ProjectValidation]:
@@ -755,7 +755,7 @@ def validate_project(
 
 **Get project information and metadata**
 
-```python
+```python notest
 def get_project_info(
     self, project_root: Path | str
 ) -> p.Result[FlextMeltanoModels.ProjectInfo]:
@@ -773,7 +773,7 @@ def get_project_info(
 
 **Meltano project representation**
 
-```python
+```python notest
 class FlextMeltanoProject:
     """Representation of a Meltano project."""
 ```
@@ -784,7 +784,7 @@ class FlextMeltanoProject:
 
 **Project root directory path**
 
-```python
+```python notest
 @property
 def root_path(self) -> Path:
     """Get project root directory path."""
@@ -794,7 +794,7 @@ def root_path(self) -> Path:
 
 **Path to meltano.yml configuration file**
 
-```python
+```python notest
 @property
 def meltano_yml_path(self) -> Path:
     """Get path to meltano.yml configuration file."""
@@ -804,7 +804,7 @@ def meltano_yml_path(self) -> Path:
 
 **List of configured plugins**
 
-```python
+```python notest
 @property
 def plugins(self) -> t.SequenceOf[FlextMeltanoModels.PluginInfo]:
     """Get list of configured plugins."""
@@ -818,7 +818,7 @@ ______________________________________________________________________
 
 **Meltano configuration management**
 
-```python
+```python notest
 class FlextMeltanoSettings(FlextSettings):
     """Meltano-specific configuration management."""
 ```
@@ -829,7 +829,7 @@ class FlextMeltanoSettings(FlextSettings):
 
 **Project-level configuration**
 
-```python
+```python notest
 @property
 def project_config(self) -> FlextMeltanoModels.ProjectConfig:
     """Get project-level configuration."""
@@ -839,7 +839,7 @@ def project_config(self) -> FlextMeltanoModels.ProjectConfig:
 
 **Plugin-specific configurations**
 
-```python
+```python notest
 @property
 def plugin_configs(self) -> t.MappingKV[str, m.Dict]:
     """Get plugin-specific configurations."""
@@ -849,7 +849,7 @@ def plugin_configs(self) -> t.MappingKV[str, m.Dict]:
 
 **Pipeline execution configurations**
 
-```python
+```python notest
 @property
 def pipeline_configs(self) -> t.MappingKV[str, FlextMeltanoModels.PipelineConfig]:
     """Get pipeline execution configurations."""
@@ -865,7 +865,7 @@ ______________________________________________________________________
 
 **Main configuration model**
 
-```python
+```python notest
 class Config(FlextBaseModel):
     """Main configuration model for FLEXT-Meltano."""
 
@@ -880,7 +880,7 @@ class Config(FlextBaseModel):
 
 **Plugin information model**
 
-```python
+```python notest
 class PluginInfo(FlextBaseModel):
     """Plugin information model."""
 
@@ -897,7 +897,7 @@ class PluginInfo(FlextBaseModel):
 
 **Pipeline configuration model**
 
-```python
+```python notest
 class PipelineConfig(FlextBaseModel):
     """Pipeline configuration model."""
 
@@ -916,7 +916,7 @@ class PipelineConfig(FlextBaseModel):
 
 **Tap execution result model**
 
-```python
+```python notest
 class TapExecutionResult(FlextBaseModel):
     """Tap execution result model."""
 
@@ -932,7 +932,7 @@ class TapExecutionResult(FlextBaseModel):
 
 **Target execution result model**
 
-```python
+```python notest
 class TargetExecutionResult(FlextBaseModel):
     """Target execution result model."""
 
@@ -946,7 +946,7 @@ class TargetExecutionResult(FlextBaseModel):
 
 **Pipeline execution result model**
 
-```python
+```python notest
 class PipelineResult(FlextBaseModel):
     """Pipeline execution result model."""
 
@@ -966,7 +966,7 @@ ______________________________________________________________________
 
 **Base exception for FLEXT-Meltano**
 
-```python
+```python notest
 class FlextMeltanoException(FlextException):
     """Base exception for FLEXT-Meltano errors."""
 ```
@@ -977,7 +977,7 @@ class FlextMeltanoException(FlextException):
 
 **Plugin-related errors**
 
-```python
+```python notest
 class FlextMeltanoPluginException(FlextMeltanoException):
     """Exception raised for plugin-related errors."""
 ```
@@ -986,7 +986,7 @@ class FlextMeltanoPluginException(FlextMeltanoException):
 
 **Pipeline execution errors**
 
-```python
+```python notest
 class FlextMeltanoPipelineException(FlextMeltanoException):
     """Exception raised for pipeline execution errors."""
 ```
@@ -995,7 +995,7 @@ class FlextMeltanoPipelineException(FlextMeltanoException):
 
 **Configuration-related errors**
 
-```python
+```python notest
 class FlextMeltanoConfigurationException(FlextMeltanoException):
     """Exception raised for configuration errors."""
 ```
@@ -1006,7 +1006,7 @@ ______________________________________________________________________
 
 ### Basic Pipeline Execution
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoService
 
 # Initialize service
@@ -1030,7 +1030,7 @@ if tap_result.success:
 
 ### Advanced Pipeline Orchestration
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoExecutor
 
 # Initialize executor
@@ -1053,7 +1053,7 @@ if result.success:
 
 ### Plugin Management
 
-```python
+```python notest
 from flext_meltano import FlextPluginService
 
 # Initialize plugin service

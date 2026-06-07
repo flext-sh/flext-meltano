@@ -166,7 +166,7 @@ Each example file must include:
 
 ### Code Quality Standards
 
-```python
+```python notest
 """Example module following enterprise documentation standards.
 
 **Purpose**: Clear description of what this example demonstrates

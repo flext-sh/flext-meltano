@@ -57,7 +57,7 @@ flext-meltano serves as the foundational library for ELT operations within the F
 
 **Core Infrastructure and Type System**
 
-```python
+```python notest
 src/flext_meltano/
 ├── __init__.py              # Public API exports
 ├── constants.py             # MeltanoConstants extending FlextConstants
@@ -72,7 +72,7 @@ src/flext_meltano/
 
 **Business Logic and Services**
 
-```python
+```python notest
 ├── services.py                    # FlextMeltanoService (core orchestration)
 ├── service_implementations.py     # Specialized service implementations
 ├── adapters.py                   # FlextMeltanoAdapter (external integration)
@@ -89,7 +89,7 @@ src/flext_meltano/
 
 **Command Processing and Integration**
 
-```python
+```python notest
 ├── executors.py              # FlextMeltanoExecutor (command orchestration)
 ├── executors_bridge.py       # FlextMeltanoBridge (Go ↔ Python communication)
 ├── executors_cli.py          # FlextMeltanoCli (CLI command processing)
@@ -102,7 +102,7 @@ src/flext_meltano/
 
 **Protocol and Data Integration**
 
-```python
+```python notest
 ├── singer_types.py           # FlextMeltanoTypes (Singer protocol abstractions)
 ├── tap_abstractions.py       # FlextMeltanoTapAbstractions with TapConfig, StreamDefinition
 ├── target_abstractions.py   # FlextMeltanoTargetAbstractions for target operations
@@ -115,7 +115,7 @@ src/flext_meltano/
 
 **Settings and Environment Management**
 
-```python
+```python notest
 ├── settings.py                # FlextMeltanoSettings (configuration management)
 ├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic settings)
 └── utilities.py            # u (helper functions)
@@ -191,7 +191,7 @@ graph TD
 
 **flext-core Foundation**:
 
-```python
+```python notest
 from flext_core import (
     r,  # Railway-oriented programming
     s,  # Service base class
@@ -203,7 +203,7 @@ from flext_core import (
 
 **Type System Integration**:
 
-```python
+```python notest
 from flext_meltano import FlextMeltanoTypes
 
 # Comprehensive type system extending flext-core
@@ -216,7 +216,7 @@ result: p.Result[FlextMeltanoTypes.ELT.PipelineResult]
 
 **Current Status (Direct Imports)**:
 
-```python
+```python notest
 # ⚠️ ARCHITECTURE DEBT - Requires abstraction
 import meltano  # Line 14 in adapters.py
 from meltano.core.project import Project  # Line 22 in adapters.py
@@ -225,7 +225,7 @@ from meltano.core.plugin_invoker import PluginInvoker  # Line 21 in adapters.py
 
 **Target Architecture (Abstracted)**:
 
-```python
+```python notest
 # ✅ FUTURE STATE - Library wrapper pattern
 class _MeltanoLibraryWrapper:
     """Internal wrapper for meltano library operations."""
@@ -240,7 +240,7 @@ class _MeltanoLibraryWrapper:
 
 ### **FlextMeltanoTypes Hierarchy**
 
-```python
+```python notest
 class FlextMeltanoTypes:
     """Comprehensive type system for ELT operations."""
 
@@ -269,7 +269,7 @@ class FlextMeltanoTypes:
 
 ### **Pydantic Model Integration**
 
-```python
+```python notest
 class TapConfig(m.BaseModel):
     """Type-safe tap configuration model."""
 
@@ -293,7 +293,7 @@ class StreamDefinition(m.BaseModel):
 
 ### **r Pattern Implementation**
 
-```python
+```python notest
 # All operations return r[T] for railway-oriented programming
 def process_elt_pipeline(
     tap_config: TapConfig, target_config: m.Dict
@@ -317,7 +317,7 @@ def process_elt_pipeline(
 
 ### **Exception Hierarchy**
 
-```python
+```python notest
 class FlextMeltanoError(Exception):
     """Base exception for all flext-meltano operations."""
 

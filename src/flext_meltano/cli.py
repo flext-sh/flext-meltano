@@ -57,57 +57,56 @@ class FlextMeltanoCLI(FlextMeltano):
         """Handle top-level plugin commands through the public CLI."""
         if not args or u.Meltano.is_help_request(args):
             self.show_plugin_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
-        command, command_args = args[0], args[1:]
-        match command:
-            case c.Meltano.ExecutorCommand.LIST:
-                plugin_type = (
-                    u.Meltano.normalize_plugin_group(command_args[0])
-                    if command_args
-                    else None
-                )
-                return (
-                    self
-                    .discover_plugins()
-                    .map(
-                        lambda plugins: [
-                            t.json_dict_adapter().validate_python(plugin)
-                            for plugin in plugins
-                            if plugin_type is None or plugin.get("type") == plugin_type
-                        ]
+            result = r[str].ok(c.Meltano.ExecutorCommand.HELP)
+        else:
+            command, command_args = args[0], args[1:]
+            match command:
+                case c.Meltano.ExecutorCommand.LIST:
+                    plugin_type = (
+                        u.Meltano.normalize_plugin_group(command_args[0])
+                        if command_args
+                        else None
                     )
-                    .flat_map(
-                        lambda payload: u.Cli.json_dumps(
-                            list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload))
+                    result = (
+                        self.discover_plugins()
+                        .map(
+                            lambda plugins: [
+                                t.json_dict_adapter().validate_python(plugin)
+                                for plugin in plugins
+                                if plugin_type is None
+                                or plugin.get("type") == plugin_type
+                            ]
+                        )
+                        .flat_map(
+                            lambda payload: u.Cli.json_dumps(
+                                list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload))
+                            )
                         )
                     )
-                )
-            case "info":
-                if not command_args:
-                    return r[str].fail(
-                        "Plugin info requires plugin type and plugin name"
-                    )
-                plugin_type_arg = command_args[0]
-                plugin_name_args = command_args[1:]
-                if not plugin_name_args:
-                    return r[str].fail(
-                        "Plugin info requires plugin type and plugin name"
-                    )
-                plugin_type = u.Meltano.normalize_plugin_group(plugin_type_arg)
-                if plugin_type is None:
-                    return r[str].fail("Plugin info requires a valid plugin type")
-                return self.fetch_plugin_info(
-                    plugin_name_args[0],
-                    plugin_type,
-                ).flat_map(
-                    lambda payload: u.Cli.json_dumps(
-                        t.json_dict_adapter().validate_python(payload),
-                    )
-                )
-            case c.Meltano.ExecutorCommand.INSTALL:
-                return r[str].fail("Plugin install is not supported by this CLI")
-            case _:
-                return r[str].fail(f"Unknown plugin command: {command}")
+                case c.Meltano.ExecutorCommand.INFO:
+                    if len(command_args) < c.Meltano.PLUGIN_INFO_ARG_COUNT:
+                        result = r[str].fail(
+                            "Plugin info requires plugin type and plugin name"
+                        )
+                    else:
+                        plugin_type = u.Meltano.normalize_plugin_group(command_args[0])
+                        result = (
+                            r[str].fail("Plugin info requires a valid plugin type")
+                            if plugin_type is None
+                            else self.fetch_plugin_info(
+                                command_args[1],
+                                plugin_type,
+                            ).flat_map(
+                                lambda payload: u.Cli.json_dumps(
+                                    t.json_dict_adapter().validate_python(payload),
+                                )
+                            )
+                        )
+                case c.Meltano.ExecutorCommand.INSTALL:
+                    result = r[str].fail("Plugin install is not supported by this CLI")
+                case _:
+                    result = r[str].fail(f"Unknown plugin command: {command}")
+        return result
 
     def handle_status_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle top-level status commands through the public CLI."""
