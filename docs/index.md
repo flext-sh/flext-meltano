@@ -2,7 +2,7 @@
 
 # flext-meltano Documentation
 
-- Version: `unknown`
+- Version: `0.12.0-dev`
 - Project class: `platform`
 - Package: `flext_meltano`
 - Description: FLEXT Meltano - Enterprise Data Integration Platform
