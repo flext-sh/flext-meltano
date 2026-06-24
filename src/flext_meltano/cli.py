@@ -68,7 +68,8 @@ class FlextMeltanoCLI(FlextMeltano):
                         else None
                     )
                     result = (
-                        self.discover_plugins()
+                        self
+                        .discover_plugins()
                         .map(
                             lambda plugins: [
                                 t.json_dict_adapter().validate_python(plugin)
