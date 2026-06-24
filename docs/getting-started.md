@@ -1,25 +1,5 @@
 # Getting Started with flext-meltano
 
-<!-- TOC START -->
-- [🎯 Overview](#overview)
-- [📋 Prerequisites](#prerequisites)
-  - [**Environment Requirements**](#environment-requirements)
-  - [**FLEXT Ecosystem Setup**](#flext-ecosystem-setup)
-- [⚡ Quick Installation](#quick-installation)
-- [🚀 First Steps](#first-steps)
-  - [**Basic Service Usage**](#basic-service-usage)
-  - [**Singer Protocol Operations**](#singer-protocol-operations)
-  - [**r Pattern**](#r-pattern)
-- [🔧 Development Workflow](#development-workflow)
-  - [**Quality Gates**](#quality-gates)
-  - [**Common Commands**](#common-commands)
-- [📚 Next Steps](#next-steps)
-- [⚠️ Important Notes](#important-notes)
-  - [**Architecture Compliance**](#architecture-compliance)
-  - [**Current Status**](#current-status)
-- [Related Documentation](#related-documentation)
-<!-- TOC END -->
-
 **ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer integration.
 
 ______________________________________________________________________
@@ -69,7 +49,7 @@ ______________________________________________________________________
 
 ### **Basic Service Usage**
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoService
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -100,7 +80,7 @@ print("flext-meltano service initialized")
 
 ### **Singer Protocol Operations**
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoTapAbstractions
 
 # Initialize tap abstractions
@@ -112,7 +92,7 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 
 ### **r Pattern**
 
-```python notest
+```python
 from flext_core import FlextBus
 from flext_core import FlextSettings
 from flext_core import FlextConstants

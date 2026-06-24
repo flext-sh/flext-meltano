@@ -1,30 +1,5 @@
 # Troubleshooting flext-meltano
 
-<!-- TOC START -->
-- [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
-  - [**Direct Import Violations**](#direct-import-violations)
-- [🔧 Development Issues](#development-issues)
-  - [**Import Errors**](#import-errors)
-  - [**Type Check Failures**](#type-check-failures)
-  - [**Test Failures**](#test-failures)
-- [📦 Dependency Issues](#dependency-issues)
-  - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
-  - [**Virtual Environment Issues**](#virtual-environment-issues)
-- [🧪 Testing Issues](#testing-issues)
-  - [**Coverage Issues**](#coverage-issues)
-  - [**Slow Tests**](#slow-tests)
-- [🔍 Quality Gate Failures](#quality-gate-failures)
-  - [**Linting Errors**](#linting-errors)
-  - [**Security Issues**](#security-issues)
-- [🚫 Common Mistakes](#common-mistakes)
-  - [**r Pattern Violations**](#r-pattern-violations)
-  - [**Service Pattern Violations**](#service-pattern-violations)
-- [🆘 Getting Help](#getting-help)
-  - [**Debug Information**](#debug-information)
-  - [**Support Channels**](#support-channels)
-- [📋 Debugging Checklist](#debugging-checklist)
-<!-- TOC END -->
-
 **Common issues and solutions** for flext-meltano development and usage.
 
 ______________________________________________________________________
@@ -42,7 +17,7 @@ grep -r "import meltano\|from meltano" src/
 
 **Solution**: Use flext-meltano abstractions only
 
-```python notest
+```python
 # ❌ Incorrect
 from meltano.core.project import Project
 
@@ -83,7 +58,7 @@ make type-check
 
 **Solution**: Fix type annotations
 
-```python notest
+```python
 # Ensure proper type hints
 from typing import Optional
 from flext_core import FlextBus
@@ -244,7 +219,7 @@ ______________________________________________________________________
 
 **Problem**: Not using r for error handling
 
-```python notest
+```python
 # ❌ Incorrect
 def risky_operation():
     try:
@@ -267,7 +242,7 @@ def safe_operation() -> p.Result[m.Dict]:
 
 **Problem**: Not following flext-core service patterns
 
-```python notest
+```python
 # ❌ Incorrect
 class UtilityClass:
     @staticmethod

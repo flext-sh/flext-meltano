@@ -1,55 +1,5 @@
 # Documentation Maintenance Guide
 
-<!-- TOC START -->
-- [🎯 Overview](#overview)
-- [🏗️ Architecture](#architecture)
-  - [Core Components](#core-components)
-  - [Key Features](#key-features)
-- [🚀 Quick Start](#quick-start)
-  - [1. Run Comprehensive Audit](#1-run-comprehensive-audit)
-  - [2. View Quality Reports](#2-view-quality-reports)
-  - [3. Set Up Quality Gates](#3-set-up-quality-gates)
-- [📋 Quality Metrics](#quality-metrics)
-  - [Overall Quality Score (0-100)](#overall-quality-score-0-100)
-  - [Issue Classification](#issue-classification)
-- [🔧 Maintenance Commands](#maintenance-commands)
-  - [Quality Assessment](#quality-assessment)
-  - [Automation & CI/CD](#automation-cicd)
-  - [Maintenance Tasks](#maintenance-tasks)
-- [📊 Quality Thresholds](#quality-thresholds)
-  - [Default Configuration](#default-configuration)
-  - [CI/CD Quality Gates](#cicd-quality-gates)
-- [🔍 Issue Resolution Guide](#issue-resolution-guide)
-  - [Common Issues & Solutions](#common-issues-solutions)
-- [H2: Section](#h2-section)
-  - [H3: Subsection](#h3-subsection)
-- [H2: Another Section](#h2-another-section)
-- [⚙️ Configuration](#configuration)
-  - [Maintenance Configuration](#maintenance-configuration)
-  - [Custom Rules](#custom-rules)
-- [🔄 Automation Features](#automation-features)
-  - [Scheduled Audits](#scheduled-audits)
-  - [Pre-commit Hooks](#pre-commit-hooks)
-  - [CI/CD Integration](#cicd-integration)
-- [📈 Monitoring & Analytics](#monitoring-analytics)
-  - [Quality Trends](#quality-trends)
-  - [Metrics Dashboard](#metrics-dashboard)
-- [🚨 Troubleshooting](#troubleshooting)
-  - [Audit Failures](#audit-failures)
-  - [Link Validation Issues](#link-validation-issues)
-  - [Git Hook Issues](#git-hook-issues)
-- [📚 Best Practices](#best-practices)
-  - [Content Creation](#content-creation)
-  - [Quality Maintenance](#quality-maintenance)
-  - [Link Management](#link-management)
-- [🎯 Advanced Features](#advanced-features)
-  - [Custom Validators](#custom-validators)
-  - [Integration APIs](#integration-apis)
-- [📞 Support & Resources](#support-resources)
-  - [Getting Help](#getting-help)
-  - [Related Documentation](#related-documentation)
-<!-- TOC END -->
-
 **FLEXT-Meltano Documentation Quality Assurance & Maintenance Framework**
 
 ## 🎯 Overview
@@ -452,7 +402,7 @@ make docs
 
 Extend the system with custom validation rules:
 
-```python notest
+```python
 # scripts/custom_validators.py
 from docs_maintenance import DocumentationAuditor
 
@@ -474,7 +424,7 @@ class CustomFlextValidator(DocumentationAuditor):
 
 Programmatic access to quality data:
 
-```python notest
+```python
 from docs_maintenance import DocumentationAuditor
 
 auditor = DocumentationAuditor()

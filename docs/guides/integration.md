@@ -1,31 +1,5 @@
 # flext-meltano Integration Patterns
 
-<!-- TOC START -->
-- [🎯 ELT Foundation Role](#elt-foundation-role)
-- [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
-  - [Tap Implementation Pattern](#tap-implementation-pattern)
-  - [Target Implementation Pattern](#target-implementation-pattern)
-- [🛠️ dbt Integration Patterns](#dbt-integration-patterns)
-  - [dbt Project Foundation](#dbt-project-foundation)
-- [🚀 Complete ELT Pipeline Integration](#complete-elt-pipeline-integration)
-  - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
-- [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
-  - [Go ↔ Python Integration](#go-python-integration)
-- [📊 Integration Matrix](#integration-matrix)
-  - [FLEXT Project Integration Status](#flext-project-integration-status)
-  - [Integration Requirements](#integration-requirements)
-- [🌍 Environment Integration](#environment-integration)
-  - [FLEXT Workspace Setup](#flext-workspace-setup)
-  - [Consumer Project Dependencies](#consumer-project-dependencies)
-- [⚠️ Integration Limitations](#integration-limitations)
-  - [Current Constraints](#current-constraints)
-  - [Workaround Strategies](#workaround-strategies)
-  - [Resolution Timeline](#resolution-timeline)
-- [🔧 Integration Best Practices](#integration-best-practices)
-  - [Design Patterns](#design-patterns)
-  - [Quality Standards](#quality-standards)
-<!-- TOC END -->
-
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
 > **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration patterns. Full ecosystem compatibility requires abstraction layer.
@@ -51,7 +25,7 @@ ______________________________________________________________________
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-```python notest
+```python
 # Example: flext-tap-oracle integration
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -97,7 +71,7 @@ class FlextOracleTapService(s):
 
 \__Standard pattern for flext-target-_ projects\_\*:
 
-```python notest
+```python
 # Example: flext-target-oracle integration
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -141,7 +115,7 @@ ______________________________________________________________________
 
 \__Standard pattern for flext-dbt-_ projects\_\*:
 
-```python notest
+```python
 # Example: flext-dbt-oracle integration
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -188,7 +162,7 @@ ______________________________________________________________________
 
 **Full ELT workflow using flext-meltano foundation**:
 
-```python notest
+```python
 from flext_core import FlextBus
 from flext_core import FlextSettings
 from flext_core import FlextConstants
@@ -260,7 +234,7 @@ python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
 
 **JSON API Response Pattern**:
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
@@ -391,7 +365,7 @@ ______________________________________________________________________
 
 **1. Dependency Injection**:
 
-```python notest
+```python
 from flext_core import FlextBus
 from flext_core import FlextSettings
 from flext_core import FlextConstants
@@ -421,7 +395,7 @@ container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
 
 **2. Configuration Management**:
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettingsBuilders
 
 builder = FlextMeltanoSettingsBuilders()
@@ -430,7 +404,7 @@ settings = builder.build_pipeline_config(tap_settings, target_settings)
 
 **3. Error Handling**:
 
-```python notest
+```python
 # Consistent r patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
 if result.failure:

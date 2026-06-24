@@ -1,28 +1,5 @@
 # FLEXT-Meltano Architecture Analysis
 
-<!-- TOC START -->
-- [Table of Contents](#table-of-contents)
-- [System Overview](#system-overview)
-  - [Architecture Philosophy](#architecture-philosophy)
-  - [Design Principles](#design-principles)
-- [Core Architecture](#core-architecture)
-  - [Service Layer Architecture](#service-layer-architecture)
-  - [Protocol Implementation Architecture](#protocol-implementation-architecture)
-  - [Plugin Architecture](#plugin-architecture)
-- [Component Analysis](#component-analysis)
-  - [Service Components](#service-components)
-  - [Protocol Components](#protocol-components)
-- [Integration Patterns](#integration-patterns)
-  - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
-  - [External System Integration](#external-system-integration)
-- [Performance Considerations](#performance-considerations)
-  - [Execution Optimization](#execution-optimization)
-  - [Monitoring and Observability](#monitoring-and-observability)
-- [Scalability Design](#scalability-design)
-  - [Horizontal Scalability](#horizontal-scalability)
-  - [Data Scalability](#data-scalability)
-<!-- TOC END -->
-
 **Category**: Architecture | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2026-04-14
 
 Comprehensive architecture analysis for FLEXT-Meltano, the enterprise Meltano integration framework providing Singer protocol implementation and data pipeline orchestration.
@@ -80,7 +57,7 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 **Key Methods:**
 
-```python notest
+```python
 # Plugin operations
 discover_plugins() -> p.Result[Sequence[PluginInfo]]
 install_plugin(name: str, version: str | None) -> p.Result[PluginInstallResult]
@@ -122,7 +99,7 @@ validate_configuration() -> p.Result[bool]
 
 **FlextSingerTap Architecture:**
 
-```python notest
+```python
 class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
@@ -133,7 +110,7 @@ class FlextSingerTap(s):
 
 **FlextSingerTarget Architecture:**
 
-```python notest
+```python
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
@@ -222,7 +199,7 @@ class FlextSingerTarget(s):
 
 #### flext-core Integration
 
-```python notest
+```python
 # Foundation patterns
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -256,7 +233,7 @@ if result.failure:
 
 #### flext-cli Integration
 
-```python notest
+```python
 # CLI command integration
 from flext_cli import cli
 
@@ -266,7 +243,7 @@ cli.register_command("pipeline", PipelineCommandHandler())
 
 #### flext-quality Integration
 
-```python notest
+```python
 # Quality gate integration
 from flext_quality import FlextQualityGates
 
@@ -279,7 +256,7 @@ gates.register_pipeline_validator("meltano", MeltanoPipelineValidator())
 
 #### Meltano CLI Integration
 
-```python notest
+```python
 # Direct CLI execution
 adapter = FlextMeltanoAdapter()
 result = adapter.execute_cli_command(["meltano", "run", "tap-csv", "target-jsonl"])
@@ -287,7 +264,7 @@ result = adapter.execute_cli_command(["meltano", "run", "tap-csv", "target-jsonl
 
 #### Singer Protocol Integration
 
-```python notest
+```python
 # Native Singer protocol usage
 tap = FlextSingerTap("tap-gitlab", settings={"api_url": "https://gitlab.com"})
 catalog = tap.discover().unwrap()
@@ -334,7 +311,7 @@ sync_result = tap.sync(catalog.streams[:5]).unwrap()
 
 #### Multi-Worker Architecture
 
-```python notest
+```python
 # Worker pool management
 class FlextMeltanoWorkerPool:
     def __init__(self, max_workers: int = 4):

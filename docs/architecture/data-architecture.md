@@ -1,38 +1,5 @@
 # Data Architecture Documentation
 
-<!-- TOC START -->
-- [📋 Table of Contents](#table-of-contents)
-- [🏗️ Data Flow Architecture](#data-flow-architecture)
-  - [High-Level Data Flow](#high-level-data-flow)
-  - [Data Flow Patterns](#data-flow-patterns)
-  - [Data Transformation Stages](#data-transformation-stages)
-- [💾 Data Storage Strategy](#data-storage-strategy)
-  - [Storage Layer Architecture](#storage-layer-architecture)
-  - [Storage Technologies](#storage-technologies)
-  - [Data Persistence Patterns](#data-persistence-patterns)
-- [📊 Data Models and Schemas](#data-models-and-schemas)
-  - [Core Data Models](#core-data-models)
-  - [Data Validation Rules](#data-validation-rules)
-- [🔄 Data Processing Pipeline](#data-processing-pipeline)
-  - [Pipeline Execution Flow](#pipeline-execution-flow)
-  - [Processing Stages](#processing-stages)
-- [🛡️ Data Quality and Validation](#data-quality-and-validation)
-  - [Quality Gates](#quality-gates)
-  - [Data Quality Metrics](#data-quality-metrics)
-  - [Error Handling Strategies](#error-handling-strategies)
-- [🎯 Data Governance](#data-governance)
-  - [Data Lineage Tracking](#data-lineage-tracking)
-  - [Data Classification and Security](#data-classification-and-security)
-  - [Data Retention Policies](#data-retention-policies)
-- [⚡ Performance and Scalability](#performance-and-scalability)
-  - [Performance Characteristics](#performance-characteristics)
-  - [Scalability Patterns](#scalability-patterns)
-  - [Monitoring and Observability](#monitoring-and-observability)
-- [📈 Architecture Evolution](#architecture-evolution)
-  - [Current Limitations](#current-limitations)
-  - [Future Enhancements](#future-enhancements)
-<!-- TOC END -->
-
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
@@ -210,7 +177,7 @@ external --> intermediate: Data extraction
 
 #### 1. **State Management**
 
-```python notest
+```python
 class PipelineState:
     """Pipeline execution state with bookmarks."""
 
@@ -228,7 +195,7 @@ class PipelineState:
 
 #### 2. **Data Buffering**
 
-```python notest
+```python
 class RecordBuffer:
     """In-memory buffer for batch processing."""
 
@@ -244,7 +211,7 @@ class RecordBuffer:
 
 #### 3. **Error Handling Storage**
 
-```python notest
+```python
 class ErrorStore:
     """Storage for failed records and error context."""
 
@@ -267,7 +234,7 @@ ______________________________________________________________________
 
 #### Pipeline Configuration Model
 
-```python notest
+```python
 @dataclass
 class PipelineConfig:
     """Pipeline configuration with validation."""
@@ -332,7 +299,7 @@ class PipelineConfig:
 
 #### Schema Validation
 
-```python notest
+```python
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
@@ -453,7 +420,7 @@ ______________________________________________________________________
 
 ### Data Quality Metrics
 
-```python notest
+```python
 class DataQualityMetrics:
     """Track data quality throughout pipeline."""
 
@@ -542,7 +509,7 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 
 ### Data Retention Policies
 
-```python notest
+```python
 @dataclass
 class RetentionPolicy:
     """Data retention policy configuration."""
@@ -579,7 +546,7 @@ ______________________________________________________________________
 
 #### 1. **Horizontal Scaling**
 
-```python notest
+```python
 class PipelineScaler:
     """Dynamic pipeline scaling based on workload."""
 
@@ -599,7 +566,7 @@ class PipelineScaler:
 
 #### 2. **Data Partitioning**
 
-```python notest
+```python
 class DataPartitioner:
     """Intelligent data partitioning for parallel processing."""
 
@@ -618,7 +585,7 @@ class DataPartitioner:
 
 #### 3. **Caching Strategy**
 
-```python notest
+```python
 class PipelineCache:
     """Multi-level caching for performance optimization."""
 
@@ -648,7 +615,7 @@ class PipelineCache:
 
 #### Alerting Rules
 
-```python notest
+```python
 @dataclass
 class AlertRule:
     """Monitoring alert configuration."""

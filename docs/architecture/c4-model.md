@@ -1,35 +1,5 @@
 # C4 Model Architecture Documentation
 
-<!-- TOC START -->
-- [📋 Table of Contents](#table-of-contents)
-- [🎯 Context Diagram (Level 1)](#context-diagram-level-1)
-  - [System Purpose](#system-purpose)
-  - [Key Relationships](#key-relationships)
-- [🏗️ Container Diagram (Level 2)](#container-diagram-level-2)
-  - [Container Overview](#container-overview)
-  - [Container Responsibilities](#container-responsibilities)
-- [🔧 Component Diagram (Level 3)](#component-diagram-level-3)
-  - [Service Layer Components](#service-layer-components)
-  - [Adapter Layer Components](#adapter-layer-components)
-  - [Component Interactions](#component-interactions)
-- [💻 Code Diagram (Level 4)](#code-diagram-level-4)
-  - [Service Layer Code Structure](#service-layer-code-structure)
-  - [Key Classes and Interfaces](#key-classes-and-interfaces)
-- [📋 Architecture Decision Records](#architecture-decision-records)
-  - [ADR-001: Railway-Oriented Programming with r[T]](#adr-001-railway-oriented-programming-with-rt)
-  - [ADR-002: Clean Architecture with Domain-Driven Design](#adr-002-clean-architecture-with-domain-driven-design)
-  - [ADR-003: Singer Protocol Abstraction Layer](#adr-003-singer-protocol-abstraction-layer)
-- [🏆 Quality Attributes](#quality-attributes)
-  - [Performance](#performance)
-  - [Reliability](#reliability)
-  - [Security](#security)
-  - [Maintainability](#maintainability)
-  - [Usability](#usability)
-- [🔄 Evolution & Technical Debt](#evolution-technical-debt)
-  - [Current Architecture Health](#current-architecture-health)
-  - [Future Evolution Considerations](#future-evolution-considerations)
-<!-- TOC END -->
-
 **FLEXT-Meltano Enterprise Data Integration Platform**
 
 **Framework**: C4 Model | **Version**: 1.0 | **Last Updated**: 2026-04-14

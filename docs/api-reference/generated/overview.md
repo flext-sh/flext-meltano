@@ -3,15 +3,15 @@
 # flext-meltano API Overview
 
 - Package: `flext_meltano`
-- Version: ``
+- Version: `0.12.0-dev`
 - Description: FLEXT Meltano - Enterprise Data Integration Platform
 - Project class: `platform`
 - Keywords: `data-integration`, `enterprise`, `etl`, `flext`, `meltano`, `typed`
-- Main facades: `FlextMeltanoStatusManager`, `FlextMeltanoExecutorBase`, `FlextMeltanoPipelineCrudOperations`, `FlextMeltanoUtilitiesRuntime`, `FlextMeltanoTapAbstractions`, `FlextMeltanoPipelineLifecycleOperations`, `FlextMeltanoDbtProjectMixin`, `FlextMeltanoAdapter` (+71 more)
+- Main facades: _none_
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextMeltanoStatusManager`, `FlextMeltanoExecutorBase`, `main`, `FlextMeltanoPipelineCrudOperations`, `FlextMeltanoUtilitiesRuntime`, `FlextMeltanoTapAbstractions`, `FlextMeltanoPipelineLifecycleOperations`, `FlextMeltanoDbtProjectMixin`, `FlextMeltanoAdapter`, `FlextMeltanoModelsContext` (+77 more)
-- Exported module shortcuts: _none_
-- Generated module pages: `41`
+- Public symbol exports: `FlextMeltanoSettings`, `FlextMeltanoSingerCliTranslator`, `FlextMeltanoModelsDiscovery`, `FlextMeltanoTargetAbstractions`, `FlextMeltanoDbtRunnerMixin`, `FlextMeltanoModelsPayloadsData`, `FlextMeltanoTypes`, `FlextMeltanoTypingsSinger`, `Tap`, `FlextMeltanoUtilitiesRuntime` (+64 more)
+- Exported module shortcuts: `cli`
+- Generated module pages: `34`
 
 ## Next Pages
 

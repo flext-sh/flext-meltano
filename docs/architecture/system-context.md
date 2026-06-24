@@ -1,41 +1,5 @@
 # System Context Documentation
 
-<!-- TOC START -->
-- [📋 Table of Contents](#table-of-contents)
-- [🎯 System Purpose and Scope](#system-purpose-and-scope)
-  - [Primary Purpose](#primary-purpose)
-  - [Mission Statement](#mission-statement)
-  - [System Scope](#system-scope)
-  - [Success Criteria](#success-criteria)
-- [👥 Stakeholder Analysis](#stakeholder-analysis)
-  - [Primary Stakeholders](#primary-stakeholders)
-  - [Stakeholder Requirements](#stakeholder-requirements)
-  - [Stakeholder Value Proposition](#stakeholder-value-proposition)
-- [🔗 External System Integration](#external-system-integration)
-  - [Core Integration Points](#core-integration-points)
-  - [Integration Architecture](#integration-architecture)
-  - [Integration Patterns](#integration-patterns)
-- [🌐 Ecosystem Architecture](#ecosystem-architecture)
-  - [FLEXT Ecosystem Structure](#flext-ecosystem-structure)
-  - [Ecosystem Integration Patterns](#ecosystem-integration-patterns)
-- [🔲 System Boundaries](#system-boundaries)
-  - [Functional Boundaries](#functional-boundaries)
-  - [Security Boundaries](#security-boundaries)
-  - [Integration Boundaries](#integration-boundaries)
-- [🔄 Integration Patterns](#integration-patterns)
-  - [Synchronous Integration Patterns](#synchronous-integration-patterns)
-  - [Asynchronous Integration Patterns](#asynchronous-integration-patterns)
-- [🚀 Deployment Contexts](#deployment-contexts)
-  - [Development Context](#development-context)
-  - [Staging Context](#staging-context)
-  - [Production Context](#production-context)
-  - [Deployment Pattern Comparison](#deployment-pattern-comparison)
-- [📊 System Context Summary](#system-context-summary)
-  - [Key Architectural Characteristics](#key-architectural-characteristics)
-  - [System Qualities](#system-qualities)
-  - [Integration Philosophy](#integration-philosophy)
-<!-- TOC END -->
-
 **FLEXT-Meltano Ecosystem Integration and System Context**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
@@ -259,7 +223,7 @@ flext_meltano --> redis: Caching & queues
 
 #### FLEXT-Core Integration
 
-```python notest
+```python
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
     r,  # Railway-oriented error handling
@@ -285,7 +249,7 @@ class FlextMeltanoService(s):
 
 #### Meltano CLI Integration
 
-```python notest
+```python
 class MeltanoAdapter:
     """Meltano CLI integration with proper error handling."""
 
@@ -332,7 +296,7 @@ class MeltanoAdapter:
 
 #### Singer SDK Integration
 
-```python notest
+```python
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap implementation with ecosystem integration."""
 
@@ -379,7 +343,7 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 
 #### Adapter Pattern for External Systems
 
-```python notest
+```python
 # External system integration via adapters
 class ExternalSystemAdapter(Protocol):
     """Protocol for external system adapters."""
@@ -409,7 +373,7 @@ class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
 
 #### Plugin Architecture for Extensibility
 
-```python notest
+```python
 class PluginManager:
     """Plugin management system for ecosystem extensibility."""
 
@@ -565,7 +529,7 @@ end note
 
 All FLEXT projects follow consistent integration patterns:
 
-```python notest
+```python
 # Standard FLEXT project structure
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -612,7 +576,7 @@ class MyFLEXTProject(s):
 
 #### Plugin Ecosystem Integration
 
-```python notest
+```python
 class FLEXTPluginRegistry:
     """Central plugin registry for ecosystem coordination."""
 
@@ -754,7 +718,7 @@ ______________________________________________________________________
 
 #### Request-Response Pattern
 
-```python notest
+```python
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
@@ -787,7 +751,7 @@ class SynchronousIntegration:
 
 #### Circuit Breaker Pattern
 
-```python notest
+```python
 class CircuitBreakerIntegration:
     """Circuit breaker pattern for external system integration."""
 
@@ -844,7 +808,7 @@ class CircuitBreakerIntegration:
 
 #### Event-Driven Pattern
 
-```python notest
+```python
 class EventDrivenIntegration:
     """Event-driven integration for asynchronous operations."""
 
@@ -899,7 +863,7 @@ class EventDrivenIntegration:
 
 #### Message Queue Integration
 
-```python notest
+```python
 class MessageQueueIntegration:
     """Message queue integration for reliable asynchronous communication."""
 

@@ -1,40 +1,5 @@
 # FLEXT-Meltano Testing Plan & Status
 
-<!-- TOC START -->
-- [🎯 Testing Infrastructure Status](#testing-infrastructure-status)
-  - [**CURRENT STATUS: 🚧 VERIFIED BLOCKED** - Test Execution Confirmed Prevented by Critical Issues](#current-status-verified-blocked-test-execution-confirmed-prevented-by-critical-issues)
-- [📊 Current Testing Infrastructure Assessment](#current-testing-infrastructure-assessment)
-  - [✅ **COMPLETED TESTING COMPONENTS (95%)**](#completed-testing-components-95)
-  - [❌ **VERIFIED BLOCKED TESTING COMPONENTS (5%)**](#verified-blocked-testing-components-5)
-- [🧪 Test Categories & Implementation Status](#test-categories-implementation-status)
-  - [**UNIT TESTS (20 Files - 95% Complete, 0% Executable)**](#unit-tests-20-files-95-complete-0-executable)
-  - [**INTEGRATION TESTS (Directory Exists - 80% Complete, 0% Executable)**](#integration-tests-directory-exists-80-complete-0-executable)
-  - [**END-TO-END TESTS (Directory Exists - 70% Complete, 0% Executable)**](#end-to-end-tests-directory-exists-70-complete-0-executable)
-- [🚨 **CRITICAL BLOCKERS RESOLUTION PLAN**](#critical-blockers-resolution-plan)
-  - [**Blocker 1: Missing flext-tests Dependency (VERIFIED)**](#blocker-1-missing-flext-tests-dependency-verified)
-  - [**Blocker 2: FlextModels.BaseModel Inheritance Issues (VERIFIED)**](#blocker-2-flextmodelsbasemodel-inheritance-issues-verified)
-  - [**Blocker 3: Test Environment Configuration**](#blocker-3-test-environment-configuration)
-- [📋 **TEST EXECUTION & VALIDATION PLAN**](#test-execution-validation-plan)
-  - [**Phase 1: Infrastructure Resolution (Week 1)**](#phase-1-infrastructure-resolution-week-1)
-  - [**Phase 2: Coverage Achievement (Week 2-3)**](#phase-2-coverage-achievement-week-2-3)
-  - [**Phase 3: Quality Assurance (Week 4)**](#phase-3-quality-assurance-week-4)
-- [🧪 **TEST PATTERNS & BEST PRACTICES**](#test-patterns-best-practices)
-  - [**Railway-Oriented Testing Patterns**](#railway-oriented-testing-patterns)
-  - [**Mock Integration Patterns**](#mock-integration-patterns)
-  - [**Fixture Best Practices**](#fixture-best-practices)
-- [📊 **TEST METRICS & MONITORING**](#test-metrics-monitoring)
-  - [**Coverage Dashboard Configuration**](#coverage-dashboard-configuration)
-  - [**Test Execution Metrics**](#test-execution-metrics)
-- [🚀 **POST-RESOLUTION TESTING ROADMAP**](#post-resolution-testing-roadmap)
-  - [**Immediate Goals (Post-Blocker Resolution)**](#immediate-goals-post-blocker-resolution)
-  - [**Long-Term Testing Strategy**](#long-term-testing-strategy)
-- [📈 **SUCCESS METRICS**](#success-metrics)
-  - [**Completion Criteria**](#completion-criteria)
-  - [**Quality Gate Status**](#quality-gate-status)
-- [Quality Gate: **CI/CD Integration**](#quality-gate-cicd-integration)
-- [🎯 **CONCLUSION**](#conclusion)
-<!-- TOC END -->
-
 **Category**: Quality Assurance | **Status**: Blocked | **Version**: 0.9.0 | **Last Updated**: 2026-04-14
 
 ## 🎯 Testing Infrastructure Status
@@ -261,7 +226,7 @@ ______________________________________________________________________
 
 ### **Railway-Oriented Testing Patterns**
 
-```python notest
+```python
 # ✅ CORRECT - Test r patterns
 def test_operation_success():
     """Test successful operation returns Ok result."""
@@ -288,7 +253,7 @@ def test_operation_failure():
 
 ### **Mock Integration Patterns**
 
-```python notest
+```python
 # ✅ CORRECT - Proper mocking for isolation
 from unittest.mock import Mock, patch
 import pytest
@@ -314,7 +279,7 @@ def test_service_with_meltano_integration(mock_meltano_adapter):
 
 ### **Fixture Best Practices**
 
-```python notest
+```python
 # ✅ CORRECT - Reusable test fixtures
 @pytest.fixture
 def sample_config():

@@ -1,52 +1,5 @@
 # Quality Attributes Documentation
 
-<!-- TOC START -->
-- [📋 Table of Contents](#table-of-contents)
-- [🎯 Quality Attributes Overview](#quality-attributes-overview)
-  - [Architectural Quality Goals](#architectural-quality-goals)
-  - [Quality Attribute Scenarios](#quality-attribute-scenarios)
-- [⚡ Performance](#performance)
-  - [Performance Architecture](#performance-architecture)
-  - [Performance Characteristics](#performance-characteristics)
-  - [Performance Optimization Strategies](#performance-optimization-strategies)
-  - [Performance Monitoring](#performance-monitoring)
-- [📈 Scalability](#scalability)
-  - [Scalability Architecture](#scalability-architecture)
-  - [Scaling Strategies](#scaling-strategies)
-- [🛡️ Reliability](#reliability)
-  - [Reliability Architecture](#reliability-architecture)
-  - [Reliability Patterns](#reliability-patterns)
-  - [Reliability Monitoring](#reliability-monitoring)
-- [⏱️ Availability](#availability)
-  - [Availability Architecture](#availability-architecture)
-  - [Availability Targets](#availability-targets)
-  - [High Availability Implementation](#high-availability-implementation)
-- [🔧 Maintainability](#maintainability)
-  - [Maintainability Architecture](#maintainability-architecture)
-  - [Maintainability Metrics](#maintainability-metrics)
-  - [Code Quality Automation](#code-quality-automation)
-- [🎨 Usability](#usability)
-  - [API Design Principles](#api-design-principles)
-  - [Usability Metrics](#usability-metrics)
-  - [User Experience Optimization](#user-experience-optimization)
-- [🧪 Testability](#testability)
-  - [Testing Architecture](#testing-architecture)
-  - [Testability Patterns](#testability-patterns)
-  - [Test Quality Metrics](#test-quality-metrics)
-  - [Testing Automation](#testing-automation)
-- [🔄 Cross-Cutting Concerns](#cross-cutting-concerns)
-  - [Logging Architecture](#logging-architecture)
-  - [Monitoring and Observability](#monitoring-and-observability)
-  - [Configuration Management](#configuration-management)
-  - [Caching Strategy](#caching-strategy)
-  - [Internationalization (i18n)](#internationalization-i18n)
-- [📈 Architecture Evolution](#architecture-evolution)
-  - [Current Architecture Assessment](#current-architecture-assessment)
-  - [Architecture Roadmap](#architecture-roadmap)
-  - [Technical Debt Management](#technical-debt-management)
-  - [Risk Mitigation](#risk-mitigation)
-<!-- TOC END -->
-
 **FLEXT-Meltano Quality Attributes and Cross-Cutting Concerns**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
@@ -210,7 +163,7 @@ end note
 
 #### 1. Caching Strategy
 
-```python notest
+```python
 class MultiLevelCache:
     """Multi-level caching for optimal performance."""
 
@@ -276,7 +229,7 @@ class MultiLevelCache:
 
 #### 2. Connection Pooling
 
-```python notest
+```python
 class ConnectionPoolManager:
     """Intelligent connection pooling for external services."""
 
@@ -353,7 +306,7 @@ class ConnectionPoolManager:
 
 #### 3. Async Processing
 
-```python notest
+```python
 class AsyncPipelineExecutor:
     """Asynchronous pipeline execution with concurrency control."""
 
@@ -440,7 +393,7 @@ class AsyncPipelineExecutor:
 
 ### Performance Monitoring
 
-```python notest
+```python
 class PerformanceMonitor:
     """Comprehensive performance monitoring and alerting."""
 
@@ -659,7 +612,7 @@ end note
 
 #### 1. Horizontal Scaling
 
-```python notest
+```python
 class HorizontalScaler:
     """Horizontal scaling management for API and worker services."""
 
@@ -825,7 +778,7 @@ class HorizontalScaler:
 
 #### 2. Data Scaling
 
-```python notest
+```python
 class DataScaler:
     """Data layer scaling with sharding and replication."""
 
@@ -949,7 +902,7 @@ class DataScaler:
 
 #### 3. Functional Scaling
 
-```python notest
+```python
 class FunctionalDecomposer:
     """Service decomposition for functional scaling."""
 
@@ -1141,7 +1094,7 @@ end note
 
 #### 1. Railway-Oriented Error Handling
 
-```python notest
+```python
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
@@ -1247,7 +1200,7 @@ class RailwayExecutor:
 
 #### 2. Circuit Breaker Pattern
 
-```python notest
+```python
 class CircuitBreaker:
     """Circuit breaker implementation for external service protection."""
 
@@ -1321,7 +1274,7 @@ class CircuitBreaker:
 
 #### 3. Retry with Exponential Backoff
 
-```python notest
+```python
 class RetryExecutor:
     """Retry executor with exponential backoff and jitter."""
 
@@ -1403,7 +1356,7 @@ class RetryExecutor:
 
 ### Reliability Monitoring
 
-```python notest
+```python
 class ReliabilityMonitor:
     """Monitor system reliability and trigger alerts."""
 
@@ -1717,7 +1670,7 @@ end note
 
 #### 1. Multi-AZ Deployment Strategy
 
-```python notest
+```python
 class AvailabilityManager:
     """Manage high availability and failover across multiple availability zones."""
 
@@ -1962,7 +1915,7 @@ class AvailabilityManager:
 
 #### 2. Disaster Recovery Implementation
 
-```python notest
+```python
 class DisasterRecoveryManager:
     """Comprehensive disaster recovery management."""
 
@@ -2404,7 +2357,7 @@ end note
 
 #### 1. Pre-commit Quality Gates
 
-```python notest
+```python
 class QualityGate:
     """Automated quality gates for code commits."""
 
@@ -2579,7 +2532,7 @@ class QualityGate:
 
 #### 2. Automated Code Review
 
-```python notest
+```python
 class AutomatedCodeReview:
     """Automated code review system."""
 
@@ -2954,7 +2907,7 @@ end note
 
 #### 1. API Response Design
 
-```python notest
+```python
 class APIResponse:
     """Consistent API response format."""
 
@@ -3041,7 +2994,7 @@ class APIResponse:
 
 #### 2. Progressive Disclosure
 
-```python notest
+```python
 class APIResource:
     """API resource with progressive disclosure."""
 
@@ -3107,7 +3060,7 @@ class APIResource:
 
 #### 3. Contextual Help System
 
-```python notest
+```python
 class APIHelpSystem:
     """Contextual help and guidance system."""
 
@@ -3387,7 +3340,7 @@ end note
 
 #### 1. Dependency Injection for Testing
 
-```python notest
+```python
 class TestableService:
     """Service designed for testability with dependency injection."""
 
@@ -3431,7 +3384,7 @@ class TestableService:
 
 #### 2. Test Data Builders
 
-```python notest
+```python
 class TestDataBuilder:
     """Fluent builder for test data creation."""
 
@@ -3475,7 +3428,7 @@ def test_entity_processing():
 
 #### 3. Test Fixtures and Context Managers
 
-```python notest
+```python
 @pytest.fixture
 def test_database():
     """Database fixture for testing."""
@@ -3546,7 +3499,7 @@ def test_complex_pipeline_operation():
 
 #### 4. Property-Based Testing
 
-```python notest
+```python
 from hypothesis import given, strategies as st
 
 
@@ -3618,7 +3571,7 @@ class PropertyBasedTests:
 
 #### 5. Contract Testing
 
-```python notest
+```python
 from pact import Consumer, Provider
 
 
@@ -3773,7 +3726,7 @@ jobs:
 
 #### 2. Test Data Management
 
-```python notest
+```python
 class TestDataManager:
     """Centralized test data management."""
 
@@ -3840,7 +3793,7 @@ class TestDataManager:
 
 #### 3. Test Result Analysis
 
-```python notest
+```python
 class TestResultAnalyzer:
     """Analyze test results for insights and improvements."""
 

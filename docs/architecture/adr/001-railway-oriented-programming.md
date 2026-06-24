@@ -1,29 +1,5 @@
 # ADR-001: Railway-Oriented Programming with r[T]
 
-<!-- TOC START -->
-- [Context](#context)
-- [Decision](#decision)
-- [Rationale](#rationale)
-  - [Why Railway-Oriented Programming](#why-railway-oriented-programming)
-  - [Why r[T] from flext-core](#why-rt-from-flext-core)
-- [Consequences](#consequences)
-  - [Positive](#positive)
-  - [Negative](#negative)
-  - [Risks](#risks)
-  - [Mitigation Strategies](#mitigation-strategies)
-- [Alternatives Considered](#alternatives-considered)
-  - [1. Traditional Exception Handling](#1-traditional-exception-handling)
-  - [2. Custom Result Type](#2-custom-result-type)
-  - [3. Async Exception Handling](#3-async-exception-handling)
-  - [4. Callback-Based Error Handling](#4-callback-based-error-handling)
-- [Implementation Details](#implementation-details)
-  - [Error Type Hierarchy](#error-type-hierarchy)
-  - [Railway Pattern Usage](#railway-pattern-usage)
-  - [Testing Error Scenarios](#testing-error-scenarios)
-- [Related ADRs](#related-adrs)
-- [Notes](#notes)
-<!-- TOC END -->
-
 **Status**: Accepted | **Date**: 2025-01-15 | **Category**: 🏗️ Architecture
 
 ## Context
@@ -61,7 +37,7 @@ Implement railway-oriented programming using `r[T]` from flext-core, ensuring co
 
 **Composability**: Operations can be chained safely without exception handling clutter
 
-```python notest
+```python
 result = (
     service
     .discover_plugins()
@@ -72,7 +48,7 @@ result = (
 
 **Type Safety**: Error types are preserved through the entire flow
 
-```python notest
+```python
 def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
     return r.ok(PipelineResult(...))
@@ -147,7 +123,7 @@ def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
 
 ### Error Type Hierarchy
 
-```python notest
+```python
 class FlextMeltanoError(Exception):
     """Base error for all FLEXT-Meltano operations."""
 
@@ -166,7 +142,7 @@ class PipelineError(FlextMeltanoError):
 
 ### Railway Pattern Usage
 
-```python notest
+```python
 def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult]:
     return (
         validate_config(settings)
@@ -180,7 +156,7 @@ def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult
 
 ### Testing Error Scenarios
 
-```python notest
+```python
 def test_pipeline_failure_handling():
     # Given
     invalid_config = PipelineConfig(invalid_param="test")

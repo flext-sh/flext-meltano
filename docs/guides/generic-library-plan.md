@@ -1,32 +1,5 @@
 # FLEXT-Meltano Generic Library Implementation Plan
 
-<!-- TOC START -->
-- [Table of Contents](#table-of-contents)
-- [Current State Analysis](#current-state-analysis)
-  - [Current Architecture Issues](#current-architecture-issues)
-  - [Generic Library Requirements](#generic-library-requirements)
-- [Implementation Strategy](#implementation-strategy)
-  - [Phase 1: CLI Abstraction Layer (✅ Complete)](#phase-1-cli-abstraction-layer-complete)
-  - [Phase 2: Singer Protocol Independence (🚧 In Progress)](#phase-2-singer-protocol-independence-in-progress)
-  - [Phase 3: Generic Plugin Registry (📋 Planned)](#phase-3-generic-plugin-registry-planned)
-- [Architecture Transformation](#architecture-transformation)
-  - [Before: CLI-Centric Architecture](#before-cli-centric-architecture)
-  - [After: Generic Library Architecture](#after-generic-library-architecture)
-  - [Service Architecture](#service-architecture)
-- [API Design](#api-design)
-  - [Generic Plugin Interface](#generic-plugin-interface)
-  - [Singer Protocol API](#singer-protocol-api)
-  - [Pipeline Orchestration API](#pipeline-orchestration-api)
-- [Migration Plan](#migration-plan)
-  - [Backward Compatibility Strategy](#backward-compatibility-strategy)
-  - [Testing Strategy](#testing-strategy)
-  - [Rollout Strategy](#rollout-strategy)
-- [Benefits of Generic Architecture](#benefits-of-generic-architecture)
-  - [For Library Users](#for-library-users)
-  - [For Plugin Developers](#for-plugin-developers)
-  - [For Enterprise Integration](#for-enterprise-integration)
-<!-- TOC END -->
-
 **Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2026-04-14
 
 Implementation plan for transforming FLEXT-Meltano into a **generic, reusable library** following the same patterns as FLEXT-LDIF, with complete abstraction from CLI dependencies and external Meltano tooling.
@@ -82,7 +55,7 @@ Implementation plan for transforming FLEXT-Meltano into a **generic, reusable li
 
 **Key Components:**
 
-```python notest
+```python
 # CLI abstraction
 adapter = FlextMeltanoAdapter()
 result = adapter.run_pipeline("tap-csv", "target-jsonl")  # No CLI knowledge needed
@@ -123,7 +96,7 @@ validation = project_service.validate_project("/path/to/project")
 
 **Implementation:**
 
-```python notest
+```python
 # Generic plugin registry
 registry = FlextPluginRegistry()
 plugins = registry.discover_plugins()  # No Meltano dependency
@@ -180,7 +153,7 @@ tap_info = registry.find_plugin("tap-gitlab")
 
 **Generic Operations:**
 
-```python notest
+```python
 # Plugin operations (no CLI dependency)
 service = FlextMeltanoService()
 plugins = service.discover_plugins()
@@ -197,7 +170,7 @@ target_result = service.execute_target(
 
 **Self-Contained Plugin Management:**
 
-```python notest
+```python
 # Independent plugin registry
 plugin_service = FlextPluginService()
 registry = plugin_service.get_plugin_registry()
@@ -211,7 +184,7 @@ settings = tap_plugin.validate_configuration(user_config)
 
 **Direct Singer Protocol Handling:**
 
-```python notest
+```python
 # Protocol-based execution
 singer_service = FlextSingerService()
 tap = singer_service.create_tap("tap-gitlab", settings)
@@ -225,7 +198,7 @@ sync_result = tap.sync(selected_streams)
 
 #### Plugin Discovery API
 
-```python notest
+```python
 # Generic plugin discovery
 def discover_plugins(
     plugin_type: str | None = None, source: PluginSource = PluginSource.AUTO
@@ -243,7 +216,7 @@ def discover_plugins(
 
 #### Plugin Installation API
 
-```python notest
+```python
 def install_plugin(
     plugin_name: str, version: str | None = None, source: str | None = None
 ) -> p.Result[PluginInstallResult]:
@@ -263,7 +236,7 @@ def install_plugin(
 
 #### Tap Execution API
 
-```python notest
+```python
 def execute_tap(
     tap_name: str,
     settings: m.Dict,
@@ -285,7 +258,7 @@ def execute_tap(
 
 #### Target Execution API
 
-```python notest
+```python
 def execute_target(
     target_name: str, records: t.SequenceOf[m.Dict], settings: m.Dict
 ) -> p.Result[TargetExecutionResult]:
@@ -305,7 +278,7 @@ def execute_target(
 
 #### Pipeline Configuration API
 
-```python notest
+```python
 def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
     """Create pipeline configuration.
 
@@ -319,7 +292,7 @@ def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
 
 #### Pipeline Execution API
 
-```python notest
+```python
 def execute_pipeline(
     pipeline: Pipeline | str, options: PipelineOptions | None = None
 ) -> p.Result[PipelineResult]:

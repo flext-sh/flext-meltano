@@ -1,8 +1,8 @@
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
-# flext_meltano.services.adapter_extensions
+# flext_meltano.pipeline_mgr
 
-::: flext_meltano.services.adapter_extensions
+::: flext_meltano.pipeline_mgr
     options:
       show_root_heading: true
       show_root_full_path: false

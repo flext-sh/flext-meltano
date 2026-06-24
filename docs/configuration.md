@@ -1,44 +1,5 @@
 # flext-meltano Configuration
 
-<!-- TOC START -->
-- [🎯 Configuration Overview](#configuration-overview)
-- [📋 Environment Setup](#environment-setup)
-  - [Required Environment Variables](#required-environment-variables)
-  - [Virtual Environment Setup](#virtual-environment-setup)
-- [⚙️ Meltano Project Configuration](#meltano-project-configuration)
-  - [Basic meltano.yml Structure](#basic-meltanoyml-structure)
-  - [Configuration Validation](#configuration-validation)
-- [🔌 Singer Plugin Configuration](#singer-plugin-configuration)
-  - [Tap Configuration](#tap-configuration)
-  - [Target Configuration](#target-configuration)
-  - [Singer Catalog Configuration](#singer-catalog-configuration)
-- [🛠️ dbt Configuration](#dbt-configuration)
-  - [dbt Project Structure](#dbt-project-structure)
-  - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbtprojectyml)
-  - [dbt Service Configuration](#dbt-service-configuration)
-- [🏗️ Pipeline Configuration](#pipeline-configuration)
-  - [Complete ELT Pipeline](#complete-elt-pipeline)
-  - [Configuration Validation](#configuration-validation)
-- [🌍 Environment Management](#environment-management)
-  - [Development Environment](#development-environment)
-  - [Production Environment](#production-environment)
-  - [Environment Switching](#environment-switching)
-- [🔧 Configuration File Management](#configuration-file-management)
-  - [Reading Configuration Files](#reading-configuration-files)
-  - [Writing Configuration Files](#writing-configuration-files)
-  - [Configuration Backup](#configuration-backup)
-- [🔍 Configuration Validation](#configuration-validation)
-  - [Schema Validation](#schema-validation)
-  - [Runtime Validation](#runtime-validation)
-- [🚨 Current Limitations](#current-limitations)
-  - [Architecture Compliance Issues](#architecture-compliance-issues)
-  - [Configuration Restrictions](#configuration-restrictions)
-  - [Workarounds](#workarounds)
-- [🔄 Configuration Migration](#configuration-migration)
-  - [Resolution Timeline](#resolution-timeline)
-  - [Migration Planning](#migration-planning)
-<!-- TOC END -->
-
 **Configuration management for FLEXT ecosystem ELT foundation library**
 
 > **⚠️ COMPLIANCE NOTE**: Current configuration patterns require abstraction layer for full FLEXT compliance due to direct meltano.core usage.
@@ -133,7 +94,7 @@ transforms:
 
 ### Configuration Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettings
 from flext_core import FlextBus
 from flext_core import FlextSettings
@@ -170,7 +131,7 @@ ______________________________________________________________________
 
 ### Tap Configuration
 
-```python notest
+```python
 from flext_meltano import TapConfig, FlextMeltanoSettingsBuilders
 
 # Create tap configuration
@@ -187,7 +148,7 @@ pipeline_config = builder.build_tap_config(tap_config.dict())
 
 ### Target Configuration
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettingsBuilders
 
 target_settings = {
@@ -201,7 +162,7 @@ target_config = builder.build_target_config(target_settings)
 
 ### Singer Catalog Configuration
 
-```python notest
+```python
 from flext_meltano import StreamDefinition
 
 # Define stream configuration
@@ -274,7 +235,7 @@ models:
 
 ### dbt Service Configuration
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoDbtService
 
 # Note: Current implementation is placeholder
@@ -291,7 +252,7 @@ ______________________________________________________________________
 
 ### Complete ELT Pipeline
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoService, FlextMeltanoSettingsBuilders
 
 # Build complete pipeline configuration
@@ -316,7 +277,7 @@ execution_result = service.execute()
 
 ### Configuration Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoValidators
 
 validators = FlextMeltanoValidators()
@@ -378,7 +339,7 @@ environments:
 
 ### Environment Switching
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettings
 
 settings = FlextMeltanoSettings()
@@ -396,7 +357,7 @@ ______________________________________________________________________
 
 ### Reading Configuration Files
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoFileManagers
 
 file_manager = FlextMeltanoFileManagers()
@@ -413,7 +374,7 @@ dbt_profiles = file_manager.read_dbt_profiles()
 
 ### Writing Configuration Files
 
-```python notest
+```python
 # Write Singer catalog
 catalog_data = {
     "streams": [{"tap_stream_id": "users", "schema": {...}, "metadata": [...]}]
@@ -424,7 +385,7 @@ write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.j
 
 ### Configuration Backup
 
-```python notest
+```python
 # Backup critical configuration files
 backup_result = file_manager.backup_project_files()
 
@@ -439,7 +400,7 @@ ______________________________________________________________________
 
 ### Schema Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoValidators
 
 validators = FlextMeltanoValidators()
@@ -459,7 +420,7 @@ model_validation = validators.validate_dbt_models([
 
 ### Runtime Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoExecutor
 
 executor = FlextMeltanoExecutor()
