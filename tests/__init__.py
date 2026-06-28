@@ -12,41 +12,83 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_tests import td, tf, tk, tm, tv
+    from flext_tests import td as td, tf as tf, tk as tk, tv as tv
 
-    from flext_meltano import d, e, h, r, x
-    from tests.base import TestsFlextMeltanoServiceBase, s
-    from tests.constants import TestsFlextMeltanoConstants, c
+    from flext_meltano import d as d, e as e, h as h, r as r, x as x
+    from tests.base import (
+        TestsFlextMeltanoServiceBase as TestsFlextMeltanoServiceBase,
+        s as s,
+    )
+    from tests.constants import (
+        TestsFlextMeltanoConstants as TestsFlextMeltanoConstants,
+        c as c,
+    )
     from tests.integration.test_docker_integration import (
-        TestsFlextMeltanoDockerIntegration,
+        TestsFlextMeltanoDockerIntegration as TestsFlextMeltanoDockerIntegration,
     )
-    from tests.models import TestsFlextMeltanoModels, m
-    from tests.protocols import TestsFlextMeltanoProtocols, p
-    from tests.settings import TestsFlextMeltanoSettings
-    from tests.typings import TestsFlextMeltanoTypes, t
-    from tests.unit.test_api import TestsFlextMeltanoApi
-    from tests.unit.test_cli_integration import TestsFlextMeltanoCliIntegration
-    from tests.unit.test_cli_small_managers import TestsFlextMeltanoCliSmallManagers
-    from tests.unit.test_constants import TestsFlextMeltanoConstantsUnit
-    from tests.unit.test_execution_result import TestsFlextMeltanoExecutionResult
-    from tests.unit.test_executors import TestsFlextMeltanoExecutors
-    from tests.unit.test_library_runner import TestsFlextMeltanoLibraryRunner
-    from tests.unit.test_models import TestsFlextMeltanoModelsUnit
-    from tests.unit.test_plugin_protocols import TestsFlextMeltanoPluginProtocols
-    from tests.unit.test_services import TestsFlextMeltanoServices
+    from tests.models import TestsFlextMeltanoModels as TestsFlextMeltanoModels, m as m
+    from tests.protocols import (
+        TestsFlextMeltanoProtocols as TestsFlextMeltanoProtocols,
+        p as p,
+    )
+    from tests.settings import TestsFlextMeltanoSettings as TestsFlextMeltanoSettings
+    from tests.typings import TestsFlextMeltanoTypes as TestsFlextMeltanoTypes, t as t
+    from tests.unit.test_api import TestsFlextMeltanoApi as TestsFlextMeltanoApi
+    from tests.unit.test_cli_integration import (
+        TestsFlextMeltanoCliIntegration as TestsFlextMeltanoCliIntegration,
+    )
+    from tests.unit.test_cli_small_managers import (
+        TestsFlextMeltanoCliSmallManagers as TestsFlextMeltanoCliSmallManagers,
+    )
+    from tests.unit.test_constants import (
+        TestsFlextMeltanoConstantsUnit as TestsFlextMeltanoConstantsUnit,
+    )
+    from tests.unit.test_execution_result import (
+        TestsFlextMeltanoExecutionResult as TestsFlextMeltanoExecutionResult,
+    )
+    from tests.unit.test_executors import (
+        TestsFlextMeltanoExecutors as TestsFlextMeltanoExecutors,
+    )
+    from tests.unit.test_library_runner import (
+        TestsFlextMeltanoLibraryRunner as TestsFlextMeltanoLibraryRunner,
+    )
+    from tests.unit.test_models import (
+        TestsFlextMeltanoModelsUnit as TestsFlextMeltanoModelsUnit,
+    )
+    from tests.unit.test_plugin_protocols import (
+        TestsFlextMeltanoPluginProtocols as TestsFlextMeltanoPluginProtocols,
+    )
+    from tests.unit.test_services import (
+        TestsFlextMeltanoServices as TestsFlextMeltanoServices,
+    )
     from tests.unit.test_singer_cli_translator import (
-        TestsFlextMeltanoSingerCliTranslator,
+        TestsFlextMeltanoSingerCliTranslator as TestsFlextMeltanoSingerCliTranslator,
     )
-    from tests.unit.test_singer_sdk_adapter import TestsFlextMeltanoSingerSdkAdapter
-    from tests.unit.test_singer_types import TestsFlextMeltanoSingerTypes
-    from tests.unit.test_tap_abstractions import TestsFlextMeltanoTapAbstractions
-    from tests.unit.test_target_abstractions import TestsFlextMeltanoTargetAbstractions
-    from tests.unit.test_typings import TestsFlextMeltanoTypingsUnit
-    from tests.unit.test_validators import TestsFlextMeltanoValidators
+    from tests.unit.test_singer_sdk_adapter import (
+        TestsFlextMeltanoSingerSdkAdapter as TestsFlextMeltanoSingerSdkAdapter,
+    )
+    from tests.unit.test_singer_types import (
+        TestsFlextMeltanoSingerTypes as TestsFlextMeltanoSingerTypes,
+    )
+    from tests.unit.test_tap_abstractions import (
+        TestsFlextMeltanoTapAbstractions as TestsFlextMeltanoTapAbstractions,
+    )
+    from tests.unit.test_target_abstractions import (
+        TestsFlextMeltanoTargetAbstractions as TestsFlextMeltanoTargetAbstractions,
+    )
+    from tests.unit.test_typings import (
+        TestsFlextMeltanoTypingsUnit as TestsFlextMeltanoTypingsUnit,
+    )
+    from tests.unit.test_validators import (
+        TestsFlextMeltanoValidators as TestsFlextMeltanoValidators,
+    )
     from tests.unit.tests_pipeline_cli_managers import (
-        TestFlextMeltanoPipelineCliManagers,
+        TestFlextMeltanoPipelineCliManagers as TestFlextMeltanoPipelineCliManagers,
     )
-    from tests.utilities import TestsFlextMeltanoUtilities, u
+    from tests.utilities import (
+        TestsFlextMeltanoUtilities as TestsFlextMeltanoUtilities,
+        u as u,
+    )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".integration",
@@ -115,7 +157,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "td",
                 "tf",
                 "tk",
-                "tm",
                 "tv",
             ),
         },
@@ -184,7 +225,6 @@ __all__: list[str] = [
     "td",
     "tf",
     "tk",
-    "tm",
     "tv",
     "u",
     "x",
