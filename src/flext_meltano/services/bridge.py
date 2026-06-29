@@ -12,7 +12,8 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, p, r, t, u
+from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):

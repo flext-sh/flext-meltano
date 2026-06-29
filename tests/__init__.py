@@ -3,92 +3,12 @@
 
 from __future__ import annotations
 
-import typing as _t
-
 from flext_core.lazy import (
     build_lazy_import_map,
     install_lazy_exports,
     merge_lazy_imports,
 )
 
-if _t.TYPE_CHECKING:
-    from flext_tests import td as td, tf as tf, tk as tk, tm as tm, tv as tv
-
-    from flext_meltano import d as d, e as e, h as h, r as r, x as x
-    from tests.base import (
-        TestsFlextMeltanoServiceBase as TestsFlextMeltanoServiceBase,
-        s as s,
-    )
-    from tests.constants import (
-        TestsFlextMeltanoConstants as TestsFlextMeltanoConstants,
-        c as c,
-    )
-    from tests.integration.test_docker_integration import (
-        TestsFlextMeltanoDockerIntegration as TestsFlextMeltanoDockerIntegration,
-    )
-    from tests.models import TestsFlextMeltanoModels as TestsFlextMeltanoModels, m as m
-    from tests.protocols import (
-        TestsFlextMeltanoProtocols as TestsFlextMeltanoProtocols,
-        p as p,
-    )
-    from tests.settings import TestsFlextMeltanoSettings as TestsFlextMeltanoSettings
-    from tests.typings import TestsFlextMeltanoTypes as TestsFlextMeltanoTypes, t as t
-    from tests.unit.test_api import TestsFlextMeltanoApi as TestsFlextMeltanoApi
-    from tests.unit.test_cli_integration import (
-        TestsFlextMeltanoCliIntegration as TestsFlextMeltanoCliIntegration,
-    )
-    from tests.unit.test_cli_small_managers import (
-        TestsFlextMeltanoCliSmallManagers as TestsFlextMeltanoCliSmallManagers,
-    )
-    from tests.unit.test_constants import (
-        TestsFlextMeltanoConstantsUnit as TestsFlextMeltanoConstantsUnit,
-    )
-    from tests.unit.test_execution_result import (
-        TestsFlextMeltanoExecutionResult as TestsFlextMeltanoExecutionResult,
-    )
-    from tests.unit.test_executors import (
-        TestsFlextMeltanoExecutors as TestsFlextMeltanoExecutors,
-    )
-    from tests.unit.test_library_runner import (
-        TestsFlextMeltanoLibraryRunner as TestsFlextMeltanoLibraryRunner,
-    )
-    from tests.unit.test_models import (
-        TestsFlextMeltanoModelsUnit as TestsFlextMeltanoModelsUnit,
-    )
-    from tests.unit.test_plugin_protocols import (
-        TestsFlextMeltanoPluginProtocols as TestsFlextMeltanoPluginProtocols,
-    )
-    from tests.unit.test_services import (
-        TestsFlextMeltanoServices as TestsFlextMeltanoServices,
-    )
-    from tests.unit.test_singer_cli_translator import (
-        TestsFlextMeltanoSingerCliTranslator as TestsFlextMeltanoSingerCliTranslator,
-    )
-    from tests.unit.test_singer_sdk_adapter import (
-        TestsFlextMeltanoSingerSdkAdapter as TestsFlextMeltanoSingerSdkAdapter,
-    )
-    from tests.unit.test_singer_types import (
-        TestsFlextMeltanoSingerTypes as TestsFlextMeltanoSingerTypes,
-    )
-    from tests.unit.test_tap_abstractions import (
-        TestsFlextMeltanoTapAbstractions as TestsFlextMeltanoTapAbstractions,
-    )
-    from tests.unit.test_target_abstractions import (
-        TestsFlextMeltanoTargetAbstractions as TestsFlextMeltanoTargetAbstractions,
-    )
-    from tests.unit.test_typings import (
-        TestsFlextMeltanoTypingsUnit as TestsFlextMeltanoTypingsUnit,
-    )
-    from tests.unit.test_validators import (
-        TestsFlextMeltanoValidators as TestsFlextMeltanoValidators,
-    )
-    from tests.unit.tests_pipeline_cli_managers import (
-        TestFlextMeltanoPipelineCliManagers as TestFlextMeltanoPipelineCliManagers,
-    )
-    from tests.utilities import (
-        TestsFlextMeltanoUtilities as TestsFlextMeltanoUtilities,
-        u as u,
-    )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".integration",
@@ -100,10 +20,12 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextMeltanoServiceBase",
                 "s",
             ),
+            ".conftest": ("conftest",),
             ".constants": (
                 "TestsFlextMeltanoConstants",
                 "c",
             ),
+            ".integration": ("integration",),
             ".integration.test_docker_integration": (
                 "TestsFlextMeltanoDockerIntegration",
             ),
@@ -120,6 +42,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextMeltanoTypes",
                 "t",
             ),
+            ".unit": ("unit",),
             ".unit.test_api": ("TestsFlextMeltanoApi",),
             ".unit.test_cli_integration": ("TestsFlextMeltanoCliIntegration",),
             ".unit.test_cli_small_managers": ("TestsFlextMeltanoCliSmallManagers",),
@@ -146,19 +69,17 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextMeltanoUtilities",
                 "u",
             ),
-            "flext_meltano": (
+            "flext_tests": (
                 "d",
                 "e",
                 "h",
                 "r",
-                "x",
-            ),
-            "flext_tests": (
                 "td",
                 "tf",
                 "tk",
                 "tm",
                 "tv",
+                "x",
             ),
         },
     ),
@@ -185,49 +106,9 @@ _LAZY_IMPORTS = merge_lazy_imports(
 )
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
-
-__all__: list[str] = [
-    "TestFlextMeltanoPipelineCliManagers",
-    "TestsFlextMeltanoApi",
-    "TestsFlextMeltanoCliIntegration",
-    "TestsFlextMeltanoCliSmallManagers",
-    "TestsFlextMeltanoConstants",
-    "TestsFlextMeltanoConstantsUnit",
-    "TestsFlextMeltanoDockerIntegration",
-    "TestsFlextMeltanoExecutionResult",
-    "TestsFlextMeltanoExecutors",
-    "TestsFlextMeltanoLibraryRunner",
-    "TestsFlextMeltanoModels",
-    "TestsFlextMeltanoModelsUnit",
-    "TestsFlextMeltanoPluginProtocols",
-    "TestsFlextMeltanoProtocols",
-    "TestsFlextMeltanoServiceBase",
-    "TestsFlextMeltanoServices",
-    "TestsFlextMeltanoSettings",
-    "TestsFlextMeltanoSingerCliTranslator",
-    "TestsFlextMeltanoSingerSdkAdapter",
-    "TestsFlextMeltanoSingerTypes",
-    "TestsFlextMeltanoTapAbstractions",
-    "TestsFlextMeltanoTargetAbstractions",
-    "TestsFlextMeltanoTypes",
-    "TestsFlextMeltanoTypingsUnit",
-    "TestsFlextMeltanoUtilities",
-    "TestsFlextMeltanoValidators",
-    "c",
-    "d",
-    "e",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "td",
-    "tf",
-    "tk",
-    "tm",
-    "tv",
-    "u",
-    "x",
-]
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)

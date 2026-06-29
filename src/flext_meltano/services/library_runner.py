@@ -8,15 +8,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_meltano import (
-    FlextMeltanoExecutor,
-    FlextMeltanoServiceBase,
-    c,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+from flext_meltano.services.executor import FlextMeltanoExecutor
 
 
 class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):

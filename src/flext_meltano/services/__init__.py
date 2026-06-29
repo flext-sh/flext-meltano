@@ -17,6 +17,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".abstractions_base": ("FlextMeltanoAbstractionsBase",),
             ".adapters": ("FlextMeltanoAdapter",),
             ".bridge": ("FlextMeltanoBridge",),
+            ".consumer_bases": ("consumer_bases",),
             ".consumer_bases.dbt_service_base": ("FlextMeltanoDbtServiceBase",),
             ".consumer_bases.tap_service_base": ("FlextMeltanoTapServiceBase",),
             ".consumer_bases.target_service_base": ("FlextMeltanoTargetServiceBase",),
@@ -73,4 +74,9 @@ _LAZY_IMPORTS = merge_lazy_imports(
 )
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)

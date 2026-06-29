@@ -7,11 +7,16 @@ from collections.abc import (
 )
 from pathlib import Path
 
+from typing import TYPE_CHECKING
+
 from flext_infra import u
 from meltano.core.plugin.base import PluginType as MeltanoPluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 
-from flext_meltano import c, m, p, t
+from flext_meltano import c, m, t
+
+if TYPE_CHECKING:
+    from flext_meltano import p
 
 
 class FlextMeltanoUtilitiesRuntime:

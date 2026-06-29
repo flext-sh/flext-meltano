@@ -13,16 +13,8 @@ from collections.abc import (
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_meltano import (
-    FlextMeltanoExecutorBase,
-    FlextMeltanoServiceBase,
-    c,
-    m,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):

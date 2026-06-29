@@ -10,17 +10,9 @@ import tempfile
 from pathlib import Path
 from typing import override
 
-from flext_meltano import (
-    FlextMeltanoAbstractions,
-    FlextMeltanoServiceBase,
-    FlextMeltanoValidators,
-    c,
-    e,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoServiceBase, c, e, p, r, t, u
+from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+from flext_meltano.services.validators import FlextMeltanoValidators
 
 
 class FlextMeltanoProjectService(FlextMeltanoServiceBase):

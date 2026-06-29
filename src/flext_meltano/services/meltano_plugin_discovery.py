@@ -6,17 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import (
-    FlextMeltanoAbstractions,
-    FlextMeltanoProjectService,
-    FlextMeltanoServiceBase,
-    c,
-    m,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+from flext_meltano.services.project_service import FlextMeltanoProjectService
 
 
 class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
