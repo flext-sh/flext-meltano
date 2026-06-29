@@ -6,9 +6,11 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from flext_tests import tk
+from flext_tests import tf, tk
 
-from tests import c, t, tf, u
+from tests.constants import c
+from tests.typings import t
+from tests.utilities import u
 
 type MeltanoComponentCase = tuple[str, str, str]
 

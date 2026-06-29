@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from flext_meltano import meltano
-from tests import m, u
+from tests.models import m
+from tests.utilities import u
 
 
 class TestsFlextMeltanoTargetAbstractions:

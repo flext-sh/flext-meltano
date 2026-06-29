@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from flext_meltano import meltano
-from tests import m
+from tests.models import m
 
 
 class TestsFlextMeltanoTapAbstractions:

@@ -13,7 +13,7 @@ import pytest
 import redis
 from flext_tests import tk
 
-from tests import c
+from tests.constants import c
 
 
 class TestsFlextMeltanoDockerIntegration:

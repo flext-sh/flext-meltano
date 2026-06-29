@@ -10,7 +10,9 @@ from typing import override
 
 from flext_meltano import c, p, r, t
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.meltano_plugin_discovery import FlextMeltanoPluginDiscoveryMixin
+from flext_meltano.services.meltano_plugin_discovery import (
+    FlextMeltanoPluginDiscoveryMixin,
+)
 
 
 class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):

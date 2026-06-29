@@ -14,7 +14,9 @@ from typing import override
 from flext_tests import FlextTestsModels
 
 from flext_meltano import m
-from tests import c, p, t
+from tests.constants import c
+from tests.protocols import p
+from tests.typings import t
 
 
 class TestsFlextMeltanoModels(FlextTestsModels, m):

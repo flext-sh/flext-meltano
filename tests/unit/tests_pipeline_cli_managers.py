@@ -12,7 +12,9 @@ from flext_tests import tm
 
 from flext_cli import cli as flext_cli
 from flext_meltano import cli
-from tests import c, m, u
+from tests.constants import c
+from tests.models import m
+from tests.utilities import u
 
 
 class TestFlextMeltanoPipelineCliManagers:

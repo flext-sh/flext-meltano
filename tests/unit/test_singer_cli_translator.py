@@ -15,10 +15,10 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from flext_tests import tm
+from flext_tests import r, tm
 
 from flext_meltano import meltano
-from tests import m, r
+from tests.models import m
 
 
 class TestsFlextMeltanoSingerCliTranslator:

@@ -6,7 +6,7 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano import meltano
-from tests import c
+from tests.constants import c
 
 pytestmark = pytest.mark.unit
 

@@ -8,7 +8,9 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano.cli import FlextMeltanoCLI, cli
-from tests import c, t, u
+from tests.constants import c
+from tests.typings import t
+from tests.utilities import u
 
 
 class TestsFlextMeltanoCliSmallManagers:

@@ -8,7 +8,17 @@ from contextlib import suppress
 from pathlib import Path
 
 from flext_cli import cli as flext_cli
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, e, m, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    e,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services.executor import FlextMeltanoExecutor
 
 

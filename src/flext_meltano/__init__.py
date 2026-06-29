@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import typing as _t
+from typing import TYPE_CHECKING
 
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 from flext_meltano.__version__ import (
@@ -17,7 +17,7 @@ from flext_meltano.__version__ import (
     __version_info__,
 )
 
-if _t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from flext_cli import d as d, e as e, h as h, r as r, s as s, x as x
     from flext_meltano.api import FlextMeltano as FlextMeltano, meltano as meltano
     from flext_meltano.base import FlextMeltanoServiceBase as FlextMeltanoServiceBase
