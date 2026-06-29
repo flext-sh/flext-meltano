@@ -31,21 +31,21 @@ class FlextMeltanoCLI(FlextMeltano):
         """Handle top-level tap commands through the public CLI."""
         if not args or u.Meltano.is_help_request(args):
             self.show_tap_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         return r[str].fail(f"Tap operation '{args[0]}' is not supported")
 
     def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle top-level target commands through the public CLI."""
         if not args or u.Meltano.is_help_request(args):
             self.show_target_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         return r[str].fail(f"Target operation '{args[0]}' is not supported")
 
     def handle_dbt_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle top-level DBT commands through the public CLI."""
         if not args or u.Meltano.is_help_request(args):
             self.show_dbt_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         result = self.execute_dbt_command(args[0], args[1:])
         if result.failure:
             return r[str].fail(result.error or "DBT command failed")
@@ -57,7 +57,7 @@ class FlextMeltanoCLI(FlextMeltano):
         """Handle top-level plugin commands through the public CLI."""
         if not args or u.Meltano.is_help_request(args):
             self.show_plugin_help()
-            result = r[str].ok(c.Meltano.ExecutorCommand.HELP)
+            result = r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         else:
             command, command_args = args[0], args[1:]
             match command:
@@ -113,7 +113,7 @@ class FlextMeltanoCLI(FlextMeltano):
         """Handle top-level status commands through the public CLI."""
         if not args or u.Meltano.is_help_request(args):
             self.show_status_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP)
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         match args[0]:
             case "show":
                 return self.run_cli([]).flat_map(
@@ -158,7 +158,7 @@ class FlextMeltanoCLI(FlextMeltano):
         if result.failure:
             self.print_message(str(result.error))
             return 1
-        if result.value != c.Meltano.ExecutorCommand.HELP:
+        if result.value != c.Meltano.ExecutorCommand.HELP.value:
             self.print_message(result.value)
         return 0
 
