@@ -425,18 +425,18 @@ docs: ## Build docs
 
 test: ## Run pytest only
 	$(Q)_files=""; \
-		if [ -n "$(FILES)" ]; then _files="$(FILES)"; fi; \
-		if [ -n "$(FILE)" ]; then \
-			if [ -n "$$_files" ]; then _files="$$_files $(FILE)"; \
-			else _files="$(FILE)"; fi; \
-		fi; \
-		_pytest_run="$(TESTS_DIR)"; \
-		if [ -n "$$_files" ]; then _pytest_run="$$_files"; fi; \
-		_all_pytest_args="$(PYTEST_ARGS)"; \
-		if [ -n "$(MATCH)" ]; then _all_pytest_args="$$_all_pytest_args -k $(MATCH)"; fi; \
-		if [ "$(FAIL_FAST)" = "1" ]; then _all_pytest_args="$$_all_pytest_args -x"; fi; \
-		if [ "$(VERBOSE)" = "1" ]; then _all_pytest_args="$$_all_pytest_args -vv -s"; fi; \
-		run_id=$$(date -u +%Y%m%dT%H%M%SZ)-$$$$; \
+	if [ -n "$(FILES)" ]; then _files="$(FILES)"; fi; \
+	if [ -n "$(FILE)" ]; then \
+		if [ -n "$$_files" ]; then _files="$$_files $(FILE)"; \
+		else _files="$(FILE)"; fi; \
+	fi; \
+	_pytest_run="$(TESTS_DIR)"; \
+	if [ -n "$$_files" ]; then _pytest_run="$$_files"; fi; \
+	_all_pytest_args="$(PYTEST_ARGS)"; \
+	if [ -n "$(MATCH)" ]; then _all_pytest_args="$$_all_pytest_args -k $(MATCH)"; fi; \
+	if [ "$(FAIL_FAST)" = "1" ]; then _all_pytest_args="$$_all_pytest_args -x"; fi; \
+	if [ "$(VERBOSE)" = "1" ]; then _all_pytest_args="$$_all_pytest_args -vv -s"; fi; \
+	run_id=$$(date -u +%Y%m%dT%H%M%SZ)-$$$$; \
 	report_dir="$(PYTEST_REPORTS_DIR)/$$run_id"; \
 	mkdir -p "$$report_dir"; \
 	log_file="$$report_dir/pytest.log"; \
