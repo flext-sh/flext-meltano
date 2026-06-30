@@ -151,11 +151,11 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
     """Docker manager fixture for Docker-based tests."""
     temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
     manager = tk.stack(
-        "docker-compose.test.yml",
+        c.Meltano.Tests.COMPOSE_FILE,
         container_name="flext-test-meltano",
-        service="meltano",
-        host=c.LOCALHOST,
-        port=3389,
+        service=c.Meltano.Tests.PRIMARY_SERVICE,
+        host=c.Meltano.Tests.HOST,
+        port=c.Meltano.Tests.MELTANO_PORT,
         workspace_root=Path(__file__).resolve().parents[2],
     )
     manager.state_file_path = temp_dir / "flext_tests_docker_state.json"
@@ -178,7 +178,7 @@ def require_docker_service(docker_services: tk, port: int, service_name: str) ->
     ready = docker_services.ready(port=port)
     if ready.failure or not ready.value:
         pytest.skip(f"{service_name} service not available")
-    return f"{c.LOCALHOST}:{port}"
+    return f"{c.Meltano.Tests.HOST}:{port}"
 
 
 @pytest.fixture
@@ -186,7 +186,7 @@ def postgres_service(docker_services: tk) -> str:
     """PostgreSQL service fixture."""
     return require_docker_service(
         docker_services,
-        5433,
+        c.Meltano.Tests.POSTGRES_PORT,
         "PostgreSQL",
     )
 
@@ -196,7 +196,7 @@ def redis_service(docker_services: tk) -> str:
     """Redis service fixture."""
     return require_docker_service(
         docker_services,
-        6380,
+        c.Meltano.Tests.REDIS_PORT,
         "Redis",
     )
 
@@ -204,8 +204,16 @@ def redis_service(docker_services: tk) -> str:
 @pytest.fixture
 def meltano_service(docker_services: tk) -> str:
     """Meltano service fixture."""
-    return require_docker_service(
-        docker_services,
-        3389,
-        "Meltano",
+    info = docker_services.fetch_container_info(c.Meltano.Tests.PRIMARY_CONTAINER_NAME)
+    if info.failure:
+        pytest.skip(f"Meltano container unavailable: {info.error}")
+    host_port = info.value.ports.get(f"{c.Meltano.Tests.MELTANO_PORT}/tcp")
+    if host_port is None:
+        pytest.skip("Meltano service host port is not published")
+    ready = docker_services.wait_for_port_ready(
+        c.Meltano.Tests.HOST,
+        int(host_port),
     )
+    if ready.failure or not ready.value:
+        pytest.skip("Meltano service not available")
+    return f"{c.Meltano.Tests.HOST}:{host_port}"

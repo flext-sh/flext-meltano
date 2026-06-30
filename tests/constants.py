@@ -64,7 +64,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
             SERVICE_PORTS: Final[t.MappingKV[_DockerService, int]] = MappingProxyType({
                 _DockerService.POSTGRES: 5433,
                 _DockerService.REDIS: 6380,
-                _DockerService.MELTANO: 3389,
+                _DockerService.MELTANO: 3000,
             })
             POSTGRES_PORT: Final[int] = SERVICE_PORTS[_DockerService.POSTGRES]
             REDIS_PORT: Final[int] = SERVICE_PORTS[_DockerService.REDIS]
