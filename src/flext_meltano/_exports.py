@@ -6,23 +6,14 @@ from __future__ import annotations
 from flext_core.lazy import merge_lazy_imports
 from flext_meltano._exports_lazy_part_01 import FLEXT_MELTANO_LAZY_IMPORTS_PART_01
 from flext_meltano._exports_lazy_part_02 import FLEXT_MELTANO_LAZY_IMPORTS_PART_02
-from flext_meltano._exports_lazy_part_03 import FLEXT_MELTANO_LAZY_IMPORTS_PART_03
 
 _LOCAL_LAZY_IMPORTS = {
     **FLEXT_MELTANO_LAZY_IMPORTS_PART_01,
     **FLEXT_MELTANO_LAZY_IMPORTS_PART_02,
-    **FLEXT_MELTANO_LAZY_IMPORTS_PART_03,
 }
 
 FLEXT_MELTANO_LAZY_IMPORTS = merge_lazy_imports(
-    (
-        "._constants",
-        "._models",
-        "._protocols",
-        "._typings",
-        "._utilities",
-        ".services",
-    ),
+    (".services",),
     _LOCAL_LAZY_IMPORTS,
     exclude_names=(
         "cleanup_submodule_namespace",
