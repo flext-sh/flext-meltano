@@ -74,19 +74,20 @@ class FlextMeltanoModelsResultsPipeline:
                 completed += 1
             return (completed / total_stages) * 100
 
+        def _stage_succeeded(
+            self,
+            result: FlextMeltanoModelsResults.ExecutionResult | None,
+            success: c.Meltano.OperationStatus,
+        ) -> bool:
+            return result is not None and result.status == success and result.error_message is None
+
         def _all_stages_successful(self) -> bool:
             """Check if all stages completed successfully."""
-            s = c.Meltano.OperationStatus.SUCCESS
-            return bool(
-                self.source_result
-                and self.source_result.status == s
-                and self.source_result.error_message is None
-                and self.sink_result
-                and self.sink_result.status == s
-                and self.sink_result.error_message is None
-                and self.transformation_result
-                and self.transformation_result.status == s
-                and self.transformation_result.error_message is None,
+            success = c.Meltano.OperationStatus.SUCCESS
+            return (
+                self._stage_succeeded(self.source_result, success)
+                and self._stage_succeeded(self.sink_result, success)
+                and self._stage_succeeded(self.transformation_result, success)
             )
 
         @u.computed_field()

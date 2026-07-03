@@ -53,6 +53,17 @@ class TestsFlextMeltanoDockerIntegration:
         conn.commit()
 
     @staticmethod
+    def _is_transient_postgres_error(err_msg: str) -> bool:
+        """Return True for known transient PostgreSQL connection errors."""
+        return (
+            "connection" in err_msg
+            or "closed" in err_msg
+            or "refused" in err_msg
+            or "timeout" in err_msg
+            or "starting up" in err_msg
+        )
+
+    @staticmethod
     def _connect_redis() -> redis.Redis[bytes]:
         """Create a Redis test client."""
         return redis.Redis(
@@ -162,13 +173,7 @@ class TestsFlextMeltanoDockerIntegration:
             self._assert_postgres_operations(conn)
         except Exception as e:
             err_msg = str(e).lower()
-            if (
-                "connection" in err_msg
-                or "closed" in err_msg
-                or "refused" in err_msg
-                or ("timeout" in err_msg)
-                or ("starting up" in err_msg)
-            ):
+            if self._is_transient_postgres_error(err_msg):
                 pytest.skip(f"PostgreSQL not ready for operations: {e}")
             pytest.fail(f"Database operation failed: {e}")
         finally:
