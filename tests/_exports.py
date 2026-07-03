@@ -4,12 +4,8 @@
 from __future__ import annotations
 
 from flext_core.lazy import merge_lazy_imports
-from flext_meltano.tests._exports_lazy_part_01 import (
-    TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_01,
-)
-from flext_meltano.tests._exports_lazy_part_02 import (
-    TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_02,
-)
+from tests._exports_lazy_part_01 import TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_01
+from tests._exports_lazy_part_02 import TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_02
 
 _LOCAL_LAZY_IMPORTS = {
     **TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_01,
@@ -41,7 +37,7 @@ TESTS_FLEXT_MELTANO_LAZY_IMPORTS = merge_lazy_imports(
         "pytest_terminal_summary",
         "pytest_warning_recorded",
     ),
-    module_name="flext_meltano.tests",
+    module_name="tests",
 )
 
 __all__: list[str] = ["TESTS_FLEXT_MELTANO_LAZY_IMPORTS"]

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_core import c
 from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+from flext_meltano.constants import c
 
 
 class FlextMeltanoConstantsBase:

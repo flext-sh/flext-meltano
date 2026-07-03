@@ -38,6 +38,13 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_02 = build_lazy_import_map(
             "FlextMeltanoUtilities",
             "u",
         ),
+        "flext_core": (
+            "d",
+            "e",
+            "h",
+            "r",
+            "x",
+        ),
     },
 )
 

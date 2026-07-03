@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from flext_core.lazy import install_lazy_exports
-from flext_meltano.tests._exports import TESTS_FLEXT_MELTANO_LAZY_IMPORTS
+from tests._exports import TESTS_FLEXT_MELTANO_LAZY_IMPORTS
 
 _LAZY_IMPORTS = TESTS_FLEXT_MELTANO_LAZY_IMPORTS
 

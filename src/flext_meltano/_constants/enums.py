@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import StrEnum, unique
 from typing import Final
 
-from flext_core import c
+from flext_meltano.constants import c
 
 
 class FlextMeltanoConstantsEnums:
