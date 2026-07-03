@@ -79,7 +79,11 @@ class FlextMeltanoModelsResultsPipeline:
             result: FlextMeltanoModelsResults.ExecutionResult | None,
             success: c.Meltano.OperationStatus,
         ) -> bool:
-            return result is not None and result.status == success and result.error_message is None
+            return (
+                result is not None
+                and result.status == success
+                and result.error_message is None
+            )
 
         def _all_stages_successful(self) -> bool:
             """Check if all stages completed successfully."""

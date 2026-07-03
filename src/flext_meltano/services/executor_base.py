@@ -404,7 +404,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 ),
                 handlers,
             ),
-            workspace_root=self.project_root,
+            context=cli.stage_context(workspace_root=self.project_root),
         )
         if pipeline_result.failure:
             return r[m.Meltano.CommandExecutionResult].fail(

@@ -6,7 +6,7 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from flext_tests import tf, tk
+from flext_tests import m, tf, tk
 
 from tests.constants import c
 from tests.typings import t
@@ -152,10 +152,12 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
     temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
     manager = tk.stack(
         c.Meltano.Tests.COMPOSE_FILE,
-        container_name="flext-test-meltano",
-        service=c.Meltano.Tests.PRIMARY_SERVICE,
-        host=c.Meltano.Tests.HOST,
-        port=c.Meltano.Tests.MELTANO_PORT,
+        target=m.Tests.ContainerConfig(
+            container_name="flext-test-meltano",
+            service=c.Meltano.Tests.PRIMARY_SERVICE,
+            host=c.Meltano.Tests.HOST,
+            port=c.Meltano.Tests.MELTANO_PORT,
+        ),
         workspace_root=Path(__file__).resolve().parents[2],
     )
     manager.state_file_path = temp_dir / "flext_tests_docker_state.json"
