@@ -30,15 +30,6 @@ class _ExecutionResultJson(m.BaseModel):
 class TestsFlextMeltanoExecutionResult:
     """Test FlextMeltanoExecutionResult class functionality."""
 
-    TEST_EXECUTION_TIME_FAILURE: float = 0.5
-    TEST_EXECUTION_TIME_DICT_SUCCESS: float = 0.2
-    TEST_EXECUTION_TIME_DICT_FAILURE: float = 0.1
-    TEST_EXECUTION_TIME_JSON_SUCCESS: float = 2.0
-    TEST_EXECUTION_TIME_JSON_FAILURE: float = 0.3
-    TEST_EXECUTION_TIME_JSON_ERROR: float = 5.5
-    TEST_EXECUTION_TIME_HOUR: float = 3600.5
-    TEST_COMMAND_COUNT: int = 2
-
     def test_initialization_with_all_parameters(self) -> None:
         """Test initialization with all parameters."""
         command = ["meltano", "run", "tap-postgres", "target-csv"]
@@ -73,7 +64,7 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result.exit_code, eq=1)
         tm.that(result.output, eq="")
         tm.that(result.error, eq="Plugin not found")
-        tm.that(result.execution_time, eq=self.TEST_EXECUTION_TIME_FAILURE)
+        tm.that(result.execution_time, eq=_constants.TEST_EXECUTION_TIME_FAILURE)
 
     def test_initialization_with_empty_command(self) -> None:
         """Test initialization with empty command."""
@@ -117,7 +108,7 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(
                 (
                     result_dict["execution_time"]
-                    == self.TEST_EXECUTION_TIME_DICT_SUCCESS
+                    == _constants.TEST_EXECUTION_TIME_DICT_SUCCESS
                 ),
                 eq=True,
             )
@@ -147,7 +138,7 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(
                 (
                     result_dict["execution_time"]
-                    == self.TEST_EXECUTION_TIME_DICT_FAILURE
+                    == _constants.TEST_EXECUTION_TIME_DICT_FAILURE
                 ),
                 eq=True,
             )
@@ -175,7 +166,7 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.exit_code, eq=0)
             tm.that(parsed.output, eq='{"streams": []}')
             tm.that(parsed.error, eq="")
-            tm.that(parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_SUCCESS)
+            tm.that(parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_SUCCESS)
             tm.that(parsed.timestamp, eq="2025-01-01T12:02:00Z")
 
     def test_model_dump_json_failure(self) -> None:
@@ -200,7 +191,7 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.exit_code, eq=2)
             tm.that(parsed.output, eq="")
             tm.that(parsed.error, eq="Configuration error: invalid settings")
-            tm.that(parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_FAILURE)
+            tm.that(parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_FAILURE)
             tm.that(parsed.timestamp, eq="2025-01-01T12:03:00Z")
 
     def test_model_dump_json_with_complex_command(self) -> None:
@@ -225,7 +216,7 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.exit_code, eq=0)
             tm.that(parsed.output, eq="Pipeline completed successfully")
             tm.that(parsed.error, eq="")
-            tm.that(parsed.execution_time, eq=self.TEST_EXECUTION_TIME_JSON_ERROR)
+            tm.that(parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_ERROR)
             tm.that(parsed.timestamp, eq="2025-01-01T12:04:00Z")
 
     def test_execution_result_with_special_characters(self) -> None:
@@ -262,6 +253,6 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=3600.5,
         )
         result_dict = result.to_dict()
-        tm.that(result_dict["execution_time"], eq=self.TEST_EXECUTION_TIME_HOUR)
+        tm.that(result_dict["execution_time"], eq=_constants.TEST_EXECUTION_TIME_HOUR)
         tm.that(result_dict["success"] is True, eq=True)
         tm.that(result_dict["command"], eq=command)
