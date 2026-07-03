@@ -166,7 +166,9 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.exit_code, eq=0)
             tm.that(parsed.output, eq='{"streams": []}')
             tm.that(parsed.error, eq="")
-            tm.that(parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_SUCCESS)
+            tm.that(
+                parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_SUCCESS
+            )
             tm.that(parsed.timestamp, eq="2025-01-01T12:02:00Z")
 
     def test_model_dump_json_failure(self) -> None:
@@ -191,7 +193,9 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.exit_code, eq=2)
             tm.that(parsed.output, eq="")
             tm.that(parsed.error, eq="Configuration error: invalid settings")
-            tm.that(parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_FAILURE)
+            tm.that(
+                parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_FAILURE
+            )
             tm.that(parsed.timestamp, eq="2025-01-01T12:03:00Z")
 
     def test_model_dump_json_with_complex_command(self) -> None:

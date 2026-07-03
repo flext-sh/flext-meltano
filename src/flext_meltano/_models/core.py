@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Annotated
 
 from flext_cli import m, u
-from flext_meltano import r, t
+from flext_core import r
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsCore:

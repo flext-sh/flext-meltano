@@ -5,9 +5,9 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Final
 
+from flext_cli import t
 from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 from flext_meltano.constants import c
-from flext_meltano.typings import t
 
 
 class FlextMeltanoConstantsSettings:
