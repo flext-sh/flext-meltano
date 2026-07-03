@@ -92,7 +92,7 @@ pytest --lf                # Run only last failed tests
 
 ### Test Configuration
 
-```python
+```text
 # conftest.py - Global test configuration
 pytest_plugins = [
     "tests.fixtures.database",
@@ -167,7 +167,7 @@ Each test file must include:
 
 ### Test Implementation Standards
 
-```python
+```text
 """Test module following enterprise standards.
 
 **Test Category**: Integration/Unit/E2E

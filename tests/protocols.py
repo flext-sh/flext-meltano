@@ -1,37 +1,21 @@
-"""Test protocol definitions for flext-meltano.
-
-Provides TestsFlextMeltanoProtocols, combining FlextTestsProtocols with
-FlextMeltanoProtocols for test-specific protocol definitions.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Test protocols facade via MRO composition."""
 
 from __future__ import annotations
 
 from flext_tests import FlextTestsProtocols
 
-from flext_meltano import FlextMeltanoProtocols
+from flext_meltano import p
 
 
-class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
-    """Test protocols combining FlextTestsProtocols and FlextMeltanoProtocols.
+class TestsFlextMeltanoProtocols(FlextTestsProtocols, p):
+    """Test protocols facade for flext-meltano."""
 
-    Provides access to:
-    - p.Tests.Docker.* (from FlextTestsProtocols)
-    - p.Tests.Factory.* (from FlextTestsProtocols)
-    - p.Meltano.* (from FlextMeltanoProtocols)
-    """
+    class Meltano(p.Meltano):
+        """Meltano test protocols namespace."""
 
-    class Meltano(FlextMeltanoProtocols.Meltano):
-        """Meltano-specific test protocols."""
-
-        class Tests:
-            """Project-specific test protocols.
-
-            Extends FlextTestsProtocols.Tests with Meltano-specific protocols.
-            """
+        class Tests(FlextTestsProtocols.Tests):
+            """Meltano-specific test protocols."""
 
 
 p = TestsFlextMeltanoProtocols
-__all__ = ["TestsFlextMeltanoProtocols", "p"]
+__all__: list[str] = ["TestsFlextMeltanoProtocols", "p"]

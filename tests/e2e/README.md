@@ -182,7 +182,7 @@ export FLEXT_ENABLE_METRICS=true
 
 ### **Complete Workflow Testing**
 
-```python
+```text
 # Complete end-to-end workflow test
 import pytest
 from flext_meltano import FlextMeltanoBridge
@@ -216,7 +216,7 @@ def test_complete_data_pipeline_e2e():
 
 ### **Production Scenario Testing**
 
-```python
+```text
 # Production-like scenario testing
 @pytest.mark.e2e
 @pytest.mark.production
@@ -240,7 +240,7 @@ def test_production_scale_pipeline():
 
 ### **Error Recovery Testing**
 
-```python
+```text
 # Complete error recovery workflow
 @pytest.mark.e2e
 @pytest.mark.error_recovery
@@ -292,7 +292,7 @@ make test                              # Coverage thresholds in pyproject.toml
 
 ### **Data Lifecycle Management**
 
-```python
+```text
 # E2E test data lifecycle
 @pytest.fixture(scope="session")
 def e2e_test_environment():
@@ -322,7 +322,7 @@ def e2e_test_environment():
 
 ### **Production Readiness Validation**
 
-```python
+```text
 # Production readiness validation
 @pytest.mark.e2e
 @pytest.mark.production_readiness
@@ -367,6 +367,6 @@ ______________________________________________________________________
 ______________________________________________________________________
 
 **Status**: Active Development — End-to-end testing framework functional; stabilization in progress · 1.0.0 Release Preparation
-**Version**: 0.9.9 RC-enterprise
+**Version**: 0.12.0-dev RC-enterprise
 **Last Updated**: 2025-08-02
 **Maintainer**: FLEXT Development Team

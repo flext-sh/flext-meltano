@@ -3,149 +3,210 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, Self
 
-from flext_core import FlextSettings, c, r, t
-from pydantic import Field, field_validator
+from flext_core import FlextSettingsBase
+from flext_meltano import c, m, p, r, t, u
 
 
-class FlextMeltanoSettings(FlextSettings):
+class FlextMeltanoSettings(FlextSettingsBase):
     """Runtime settings for Meltano orchestration services."""
 
-    MELTANO_VERSION: ClassVar[str] = "3.9.1"
-    SINGER_SDK_VERSION: ClassVar[str] = "0.48.0"
-    DBT_VERSION: ClassVar[str] = "1.10.5"
-    PROJECT_FILE: ClassVar[str] = "pipeline.yml"
-    STATE_DIR: ClassVar[str] = ".pipeline"
-    VENV_DIR: ClassVar[str] = ".meltano/python"
-    MELTANO_PROJECT_ROOT_ENV: ClassVar[str] = "MELTANO_PROJECT_ROOT"
-    MELTANO_ENVIRONMENT_ENV: ClassVar[str] = "MELTANO_ENVIRONMENT"
-    MELTANO_LOG_LEVEL_ENV: ClassVar[str] = "MELTANO_LOG_LEVEL"
+    model_config: ClassVar[m.SettingsConfigDict] = m.SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_",
+        extra="ignore",
+    )
 
-    class ConfigBuilders:
-        """Namespace for configuration builder utilities."""
+    project_root: Annotated[
+        Path,
+        u.Field(
+            default=Path(),
+            validation_alias=c.Meltano.ENV_VAR_PROJECT_ROOT,
+            description="Root directory of the Meltano project",
+        ),
+    ]
+    config_dir: Annotated[
+        Path,
+        u.Field(
+            default=Path(c.Meltano.PATH_CONFIG_DIR),
+            description="Meltano configuration directory",
+        ),
+    ]
+    logs_dir: Annotated[
+        Path,
+        u.Field(
+            default=Path(c.Meltano.PATH_LOGS_DIR),
+            description="Meltano logs directory",
+        ),
+    ]
+    environment: Annotated[
+        str,
+        u.Field(
+            default=c.Meltano.SETTINGS_ENVIRONMENTS[0],
+            validation_alias=c.Meltano.ENV_VAR_ENVIRONMENT,
+            description="Active Meltano runtime environment",
+        ),
+    ]
+    log_level: Annotated[
+        c.LogLevel,
+        u.Field(
+            default=c.LogLevel.INFO,
+            description="Meltano runtime log level",
+        ),
+    ]
+    meltano_version: Annotated[
+        str,
+        u.Field(
+            default=c.Meltano.VERSION_MELTANO_REQUIRED,
+            description="Required Meltano version",
+        ),
+    ]
+    singer_sdk_version: Annotated[
+        str,
+        u.Field(
+            default=c.Meltano.VERSION_SINGER_SDK_REQUIRED,
+            description="Required Singer SDK version",
+        ),
+    ]
+    dbt_version: Annotated[
+        str,
+        u.Field(
+            default=c.Meltano.VERSION_DBT_REQUIRED,
+            description="Required dbt version",
+        ),
+    ]
+    pipelines_dir: Annotated[
+        Path,
+        u.Field(
+            default=Path(),
+            validation_alias=c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV,
+            description="Root directory for pipeline configurations",
+        ),
+    ]
 
-    project_root: Annotated[Path, Field(default=Path())]
-    config_dir: Annotated[Path, Field(default=Path(".meltano"))]
-    logs_dir: Annotated[Path, Field(default=Path("logs"))]
-    environment: Annotated[str, Field(default="development")]
-    log_level: Annotated[c.Settings.LogLevel, Field(default=c.Settings.LogLevel.INFO)]
-    meltano_version: Annotated[str, Field(default=MELTANO_VERSION)]
-    singer_sdk_version: Annotated[str, Field(default=SINGER_SDK_VERSION)]
-    dbt_version: Annotated[str, Field(default=DBT_VERSION)]
+    @u.field_validator("pipelines_dir", mode="before")
+    @classmethod
+    def _coerce_pipelines_dir(cls, value: t.Scalar) -> Path:
+        text = str(value).strip()
+        if text:
+            return Path(text).expanduser().resolve()
+        return (Path.cwd() / ".flext-meltano" / "pipelines").resolve()
 
-    @field_validator("project_root", mode="before")
+    @u.field_validator("project_root", mode="before")
     @classmethod
     def _coerce_project_root(cls, value: t.Scalar) -> Path:
         return Path(str(value)).resolve()
 
-    @field_validator("config_dir", "logs_dir", mode="before")
+    @u.field_validator("config_dir", "logs_dir", mode="before")
     @classmethod
     def _coerce_path(cls, value: t.Scalar) -> Path:
         return Path(str(value))
 
-    @field_validator("environment")
+    @u.field_validator("environment")
     @classmethod
     def _validate_environment(cls, value: str) -> str:
         normalized = value.strip().lower()
-        if normalized not in {"development", "testing", "production"}:
+        normalized = str(c.Meltano.ENVIRONMENT_ALIASES.get(normalized, normalized))
+        if normalized not in c.Meltano.SETTINGS_ENVIRONMENTS:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)
         return normalized
 
-    @field_validator("log_level")
-    @classmethod
-    def _validate_log_level(cls, value: str) -> str:
-        normalized = value.strip().upper()
-        if normalized not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
-            msg = "Invalid log_level"
-            raise ValueError(msg)
-        return normalized
-
-    def get_project_file(self) -> r[Path]:
+    def get_project_file(self) -> p.Result[Path]:
         """Return the canonical pipeline file path."""
-        return r[Path].ok(self.project_root / self.PROJECT_FILE)
+        return r[Path].ok(self.project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE)
 
-    def get_absolute_config_dir(self) -> r[Path]:
-        """Return absolute Meltano config directory path."""
+    def get_absolute_config_dir(self) -> p.Result[Path]:
+        """Return absolute Meltano settings directory path."""
         return r[Path].ok((self.project_root / self.config_dir).resolve())
 
-    def get_absolute_logs_dir(self) -> r[Path]:
-        """Return absolute logs directory path."""
+    def get_absolute_logs_dir(self) -> p.Result[Path]:
+        """Return absolute Meltano logs directory path."""
         return r[Path].ok((self.project_root / self.logs_dir).resolve())
 
     def get_absolute_venv_dir(self) -> Path:
         """Return absolute Meltano virtualenv directory."""
-        return (self.project_root / ".meltano" / "python").resolve()
+        return (self.project_root / Path(c.Meltano.PATH_VENV_DIR)).resolve()
 
-    def validate_project_structure(self) -> r[bool]:
+    def validate_project_structure(self) -> p.Result[bool]:
         """Validate required project structure artifacts."""
-        pipeline_file = self.project_root / self.PROJECT_FILE
-        if not pipeline_file.exists():
-            return r[bool].fail(f"{self.PROJECT_FILE} not found in {self.project_root}")
-        return r[bool].ok(True)
+        if not self.project_root.exists() or not self.project_root.is_dir():
+            return r[bool].fail(f"Project path {self.project_root} does not exist")
+        if not (self.project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists():
+            return r[bool].fail(
+                "Project path "
+                f"{self.project_root} does not contain "
+                f"{c.Meltano.PATH_MELTANO_PROJECT_FILE}"
+            )
+        return r[bool].ok(value=True)
 
-    def get_environment_variables(self) -> dict[str, str]:
+    def get_environment_variables(self) -> t.StrMapping:
         """Build runtime environment variables for Meltano commands."""
         return {
-            self.MELTANO_PROJECT_ROOT_ENV: str(self.project_root),
-            self.MELTANO_ENVIRONMENT_ENV: self.environment,
-            self.MELTANO_LOG_LEVEL_ENV: self.log_level,
+            c.Meltano.ENV_VAR_PROJECT_ROOT: str(self.project_root),
+            c.Meltano.ENV_VAR_ENVIRONMENT: self.environment,
+            c.Meltano.ENV_VAR_LOG_LEVEL: self.log_level.value,
         }
 
     @classmethod
-    def get_version(cls) -> str:
+    def fetch_version(cls) -> str:
         """Return package semantic version."""
-        return "0.9.0"
+        version: str = c.Meltano.FLEXT_MELTANO_VERSION
+        return version
 
     @classmethod
     def get_name(cls) -> str:
         """Return package distribution name."""
-        return "flext-meltano"
+        name: str = c.Meltano.PROJECT_PREFIX
+        return name
 
     @classmethod
     def get_default_timeout(cls) -> int:
         """Return default command timeout in seconds."""
-        return 30
+        timeout: int = c.Meltano.NETWORK_DEFAULT_TIMEOUT
+        return timeout
 
     @classmethod
     def get_default_batch_size(cls) -> int:
         """Return default batch size for operations."""
-        return 1000
+        batch_size: int = c.Meltano.BATCH_DEFAULT_DEFAULT_BATCH_SIZE
+        return batch_size
 
     @classmethod
-    def get_supported_plugin_types(cls) -> list[str]:
+    def get_supported_plugin_types(cls) -> t.StrSequence:
         """Return supported Meltano plugin categories."""
-        return ["extractors", "loaders", "transforms"]
+        return list(c.Meltano.SUPPORTED_PLUGIN_TYPES)
 
     @classmethod
-    def get_supported_environments(cls) -> list[str]:
+    def get_supported_environments(cls) -> t.StrSequence:
         """Return list of valid deployment environment names."""
-        return ["development", "testing", "production"]
+        return list(c.Meltano.SETTINGS_ENVIRONMENTS)
 
     @classmethod
-    def get_supported_log_levels(cls) -> list[str]:
+    def get_supported_log_levels(cls) -> t.StrSequence:
         """Return supported logging levels."""
-        return ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        return [level.value for level in c.Meltano.SUPPORTED_LOG_LEVELS]
 
     @classmethod
-    def create_from_project_root(cls, project_root: Path) -> r[FlextMeltanoSettings]:
+    def create_from_project_root(cls, project_root: Path) -> p.Result[Self]:
         """Create settings from a project root path."""
         try:
-            return r[FlextMeltanoSettings].ok(
-                FlextMeltanoSettings(project_root=project_root)
-            )
+            instance: Self = cls(project_root=Path(project_root))
+            ok_result: p.Result[Self] = r.ok(instance)
+            return ok_result
         except ValueError as error:
-            return r[FlextMeltanoSettings].fail(str(error))
+            failure: p.Result[Self] = r[Self].fail(str(error))
+            return failure
 
     @classmethod
-    def create_for_environment(cls, env_type: str) -> FlextMeltanoSettings:
+    def create_for_environment(cls, env_type: t.Meltano.EnvironmentInput) -> Self:
         """Create settings for a named runtime environment."""
         normalized = env_type.strip().lower()
-        if normalized not in {"development", "testing", "production"}:
+        normalized = str(c.Meltano.ENVIRONMENT_ALIASES.get(normalized, normalized))
+        if normalized not in c.Meltano.SETTINGS_ENVIRONMENTS:
             msg = "Environment must be one of: development, testing, production"
             raise ValueError(msg)
         return cls(environment=normalized)
 
 
-__all__ = ["FlextMeltanoSettings"]
+__all__: list[str] = ["FlextMeltanoSettings"]

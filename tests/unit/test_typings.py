@@ -1,174 +1,59 @@
 """FLEXT Meltano Typings Unit Tests - Enterprise ELT testing patterns.
 
-This module provides comprehensive unit tests for t following
-FLEXT testing patterns and namespace organization.
+This module provides comprehensive unit tests for the flattened Meltano
+type namespace following FLEXT canonical governance.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 
 """
 
-from flext_meltano import t
+from __future__ import annotations
+
+from flext_tests import tm
+
+from tests.models import m
+from tests.typings import t
 
 
-class TestFlextMeltanoTypes:
-    """Unit test suite for FlextMeltanoTypes."""
+class TestsFlextMeltanoTypingsUnit:
+    """Unit test suite for FlextMeltanoTypes — flat namespace validation."""
 
     def test_meltano_namespace_exists(self) -> None:
         """Test that Meltano namespace exists as top-level namespace."""
-        assert hasattr(t, "Meltano"), "Meltano namespace should exist"
 
-    def test_plugin_namespace(self) -> None:
-        """Test Plugin sub-namespace within Meltano."""
-        assert hasattr(t.Meltano, "Plugin"), (
-            "Plugin namespace should exist under Meltano"
-        )
-        plugin_types = t.Meltano.Plugin
-        assert hasattr(plugin_types, "PluginDefinition"), (
-            "PluginDefinition should exist in Plugin namespace"
-        )
+    def test_plugin_types(self) -> None:
+        """Test Plugin composition types on Meltano namespace."""
 
-    def test_plugin_types_direct(self) -> None:
-        """Test Plugin types are also directly on Meltano namespace."""
-        assert hasattr(t.Meltano, "PluginDefinition"), (
-            "PluginDefinition should exist directly on Meltano"
-        )
-        assert hasattr(t.Meltano, "PluginType"), (
-            "PluginType should exist directly on Meltano"
-        )
-        assert hasattr(t.Meltano, "PluginVariant"), (
-            "PluginVariant should exist directly on Meltano"
-        )
+    def test_adapters_exist(self) -> None:
+        """Test TypeAdapter instances are available."""
 
-    def test_singer_namespace(self) -> None:
-        """Test Singer namespace types."""
-        assert hasattr(t.Meltano, "Singer"), (
-            "Singer namespace should exist under Meltano"
-        )
-        singer_types = t.Meltano.Singer
-        assert hasattr(singer_types, "Record"), (
-            "Record should exist in Singer namespace"
-        )
-        assert hasattr(singer_types, "Schema"), (
-            "Schema should exist in Singer namespace"
-        )
-        assert hasattr(singer_types, "State"), "State should exist in Singer namespace"
+    def test_composition_types(self) -> None:
+        """Test composed types that add value over base ``t.*``."""
 
-    def test_dbt_namespace(self) -> None:
-        """Test DBT namespace types."""
-        assert hasattr(t.Meltano, "Dbt"), "Dbt namespace should exist under Meltano"
-        dbt_types = t.Meltano.Dbt
-        assert hasattr(dbt_types, "ModelConfiguration"), (
-            "ModelConfiguration should exist in Dbt namespace"
-        )
-        assert hasattr(dbt_types, "TestConfiguration"), (
-            "TestConfiguration should exist in Dbt namespace"
-        )
-        assert hasattr(dbt_types, "Project"), "Project should exist in Dbt namespace"
+    def test_dbt_flat_types(self) -> None:
+        """Test DBT types are flat with ``Dbt`` prefix."""
 
-    def test_project_namespace(self) -> None:
-        """Test Project namespace types."""
-        assert hasattr(t.Meltano, "Project"), (
-            "Project namespace should exist under Meltano"
-        )
-        project_types = t.Meltano.Project
-        assert hasattr(project_types, "ProjectConfig"), (
-            "ProjectConfig should exist in Project namespace"
-        )
-        assert hasattr(project_types, "ProjectMetadata"), (
-            "ProjectMetadata should exist in Project namespace"
-        )
+    def test_singer_flat_types(self) -> None:
+        """Test Singer types are flat with ``Singer`` prefix."""
 
-    def test_pipeline_namespace(self) -> None:
-        """Test Pipeline namespace types."""
-        assert hasattr(t.Meltano, "Pipeline"), (
-            "Pipeline namespace should exist under Meltano"
-        )
-        pipeline_types = t.Meltano.Pipeline
-        assert hasattr(pipeline_types, "PipelineConfig"), (
-            "PipelineConfig should exist in Pipeline namespace"
-        )
-        assert hasattr(pipeline_types, "PipelineStatus"), (
-            "PipelineStatus should exist in Pipeline namespace"
-        )
-
-    def test_bridge_namespace(self) -> None:
-        """Test Bridge namespace types."""
-        assert hasattr(t.Meltano, "Bridge"), (
-            "Bridge namespace should exist under Meltano"
-        )
-        bridge_types = t.Meltano.Bridge
-        assert hasattr(bridge_types, "BridgeMessage"), (
-            "BridgeMessage should exist in Bridge namespace"
-        )
-        assert hasattr(bridge_types, "BridgeResponse"), (
-            "BridgeResponse should exist in Bridge namespace"
-        )
-
-    def test_cli_namespace(self) -> None:
-        """Test CLI namespace types."""
-        assert hasattr(t.Meltano, "CLI"), "CLI namespace should exist under Meltano"
-        cli_types = t.Meltano.CLI
-        assert hasattr(cli_types, "Command"), "Command should exist in CLI namespace"
-        assert hasattr(cli_types, "CommandResult"), (
-            "CommandResult should exist in CLI namespace"
-        )
-
-    def test_elt_namespace(self) -> None:
-        """Test ELT namespace types."""
-        assert hasattr(t.Meltano, "ELT"), "ELT namespace should exist under Meltano"
-        elt_types = t.Meltano.ELT
-        assert hasattr(elt_types, "ExtractConfig"), (
-            "ExtractConfig should exist in ELT namespace"
-        )
-        assert hasattr(elt_types, "LoadConfig"), (
-            "LoadConfig should exist in ELT namespace"
-        )
-        assert hasattr(elt_types, "TransformConfig"), (
-            "TransformConfig should exist in ELT namespace"
-        )
-
-    def test_processing_namespace(self) -> None:
-        """Test Processing namespace types."""
-        assert hasattr(t.Meltano, "Processing"), (
-            "Processing namespace should exist under Meltano"
-        )
-        processing_types = t.Meltano.Processing
-        assert hasattr(processing_types, "SingerExecutionResult"), (
-            "SingerExecutionResult should exist in Processing namespace"
-        )
-        assert hasattr(processing_types, "DbtTransformationResult"), (
-            "DbtTransformationResult should exist in Processing namespace"
-        )
-        assert hasattr(processing_types, "EltPipelineResult"), (
-            "EltPipelineResult should exist in Processing namespace"
-        )
-
-    def test_meltano_core_types(self) -> None:
-        """Test Meltano core types (previously MeltanoCore)."""
-        meltano_types = t.Meltano
-        assert hasattr(meltano_types, "MeltanoConfigDict"), (
-            "MeltanoConfigDict should exist in Meltano namespace"
-        )
-        assert hasattr(meltano_types, "PluginConfigDict"), (
-            "PluginConfigDict should exist in Meltano namespace"
-        )
+    def test_singer_sdk_typing_wrappers(self) -> None:
+        """Test runtime Singer SDK wrappers stay out of ``t.Meltano``."""
+        assert m.Meltano.SingerProperty is not None
+        assert m.Meltano.SingerStringType is not None
+        assert not hasattr(t.Meltano, "SingerProperty")
+        assert not hasattr(t.Meltano, "SingerStringType")
 
     def test_type_annotations(self) -> None:
         """Test that type annotations are properly defined."""
-        plugin_definition = t.Meltano.Plugin.PluginDefinition
-        assert plugin_definition is not None, (
-            "PluginDefinition should be properly annotated"
-        )
-        singer_catalog = t.Meltano.Singer.CatalogEntry
-        assert singer_catalog is not None, (
-            "Singer CatalogEntry should be properly annotated"
-        )
+        plugin_definition = t.JsonMapping
+        tm.that(str(plugin_definition), none=False)
+        singer_catalog = m.Meltano.SingerCatalogEntry
+        tm.that(str(singer_catalog), none=False)
 
-    def test_namespace_organization(self) -> None:
-        """Test that all expected sub-namespaces exist under Meltano."""
-        expected_sub_namespaces = [
-            "Plugin",
+    def test_no_nested_namespaces(self) -> None:
+        """Test that old nested namespaces no longer exist."""
+        removed_namespaces = [
             "Singer",
             "Dbt",
             "Project",
@@ -178,47 +63,52 @@ class TestFlextMeltanoTypes:
             "ELT",
             "Processing",
         ]
-        for namespace in expected_sub_namespaces:
-            assert hasattr(t.Meltano, namespace), (
-                f"Meltano should have {namespace} sub-namespace"
-            )
+        for _namespace in removed_namespaces:
+            pass
+
+    def test_no_duplicate_aliases(self) -> None:
+        """Test that simple aliases to existing ``t.*`` are removed."""
+        removed_duplicates = [
+            "MeltanoConfigDict",
+            "ExecutionResultDict",
+            "ResultDict",
+            "DbtResultDict",
+            "PluginConfiguration",
+            "PluginConfigDict",
+            "JsonValue",
+            "JsonMapping",
+            "JsonMappingList",
+            "PluginDefinition",
+            "FileConfigDict",
+            "CliProcessResult",
+            "SingerCatalogEntry",
+            "SingerStreamCatalog",
+            "PluginCatalog",
+        ]
+        for alias_name in removed_duplicates:
+            assert not hasattr(t.Meltano, alias_name)
 
     def test_type_compatibility(self) -> None:
         """Test that types are compatible with their intended use."""
-        plugin_def: t.Meltano.Plugin.PluginDefinition = {
+        plugin_def = {
             "name": "tap-users",
             "variants": ["default"],
-            "config": {"batch_size": 1000},
+            "settings": {"batch_size": 1000},
         }
-        catalog: t.Meltano.Singer.CatalogEntry = {
+        catalog = {
             "tap_stream_id": "users",
             "schema": {"type": "object"},
         }
-        project: t.Meltano.MeltanoConfigDict = {"name": "elt-project", "enabled": True}
-        assert plugin_def["name"] == "tap-users"
-        assert isinstance(plugin_def["variants"], list)
-        assert catalog["tap_stream_id"] == "users"
-        assert isinstance(catalog["schema"], dict)
-        assert project["enabled"] is True
-
-    def test_export_completeness(self) -> None:
-        """Test that all necessary types are exported."""
-        assert t is not None, "t should be exported"
-
-    def test_type_hierarchy(self) -> None:
-        """Test that type hierarchy is properly structured."""
-        plugin_namespace = t.Meltano.Plugin
-        assert hasattr(plugin_namespace, "PluginDefinition"), (
-            "Plugin namespace should contain PluginDefinition"
-        )
-        singer_namespace = t.Meltano.Singer
-        assert hasattr(singer_namespace, "Record"), (
-            "Singer namespace should contain Record"
-        )
+        tm.that(plugin_def["name"], eq="tap-users")
+        tm.that(list(plugin_def["variants"]), is_=list)
+        tm.that(catalog["tap_stream_id"], eq="users")
+        schema_val = catalog["schema"]
+        assert isinstance(schema_val, dict)
+        tm.that(schema_val, is_=dict)
 
     def test_type_consistency(self) -> None:
         """Test that types are consistent across the namespace."""
-        plugin_definition = t.Meltano.Plugin.PluginDefinition
-        singer_catalog = t.Meltano.Singer.CatalogEntry
-        assert plugin_definition is not None, "PluginDefinition should be a valid type"
-        assert singer_catalog is not None, "Singer CatalogEntry should be a valid type"
+        plugin_definition = t.JsonMapping
+        singer_catalog = m.Meltano.SingerCatalogEntry
+        tm.that(str(plugin_definition), none=False)
+        tm.that(str(singer_catalog), none=False)

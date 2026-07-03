@@ -10,50 +10,70 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextLogger
+from examples.constants import c
+from examples.utilities import u
+from flext_meltano import meltano
 
-from flext_meltano import FlextMeltanoBridge, FlextMeltanoExecutor, FlextMeltanoSettings
-
-logger = FlextLogger(__name__)
-
-
-def simple_bridge_example() -> None:
-    """Example using real MeltanoBridge functionality."""
-    bridge = FlextMeltanoBridge()
-    version_result = bridge.get_version()
-    if version_result.is_success:
-        logger.info(f"Meltano version: {version_result.value}")
-    discovery_result = bridge.discover_plugins()
-    if discovery_result.is_success:
-        plugins = discovery_result.value
-        logger.info(f"Found {len(plugins)} available plugins")
+logger = u.fetch_logger(__name__)
 
 
-def simple_executor_example() -> None:
-    """Example using real FlextMeltanoExecutor functionality."""
-    executor = FlextMeltanoExecutor(config={})
-    result = executor.execute_command(["meltano", "version"])
-    if result.is_success:
-        logger.info(f"Executor result: {result.value}")
+def simple_api_example() -> None:
+    """Example using the public Meltano facade."""
+    version_result = meltano.fetch_version()
+    if version_result.success:
+        logger.info("Meltano version: %s", version_result.value)
+    discovery_result = meltano.discover_installed_plugins()
+    if discovery_result.success:
+        logger.info(
+            "Found %s installed plugins",
+            len(discovery_result.value),
+        )
+
+
+def simple_component_example() -> None:
+    """Example using canonical component factories."""
+    tap_result = meltano.tap("tap-csv")
+    target_result = meltano.target("target-jsonl")
+    dbt_result = meltano.dbt("analytics")
+    if tap_result.success:
+        logger.info(f"Tap source: {tap_result.value.source_name}")
+    if target_result.success:
+        logger.info(f"Target sink: {target_result.value.sink_name}")
+    if dbt_result.success:
+        logger.info(f"DBT transformation: {dbt_result.value.transformation_name}")
+
+
+def simple_runtime_example() -> None:
+    """Example using the public runtime command surface."""
+    result = meltano.execute_meltano_command([
+        c.Meltano.CMD_BINARY,
+        c.Meltano.ExecutorCommand.VERSION,
+    ])
+    if result.success:
+        logger.info(
+            "Runtime command result: %s",
+            result.value.model_dump(mode="python"),
+        )
 
 
 def simple_config_example() -> None:
-    """Example using real FlextMeltanoSettings functionality."""
-    config = FlextMeltanoSettings()
-    logger.info("Config created: %s", config)
-    if config is not None:
-        logger.info(f"Environment: {getattr(config, 'environment', 'unknown')}")
-    else:
-        logger.info("Environment: config is None")
+    """Example using typed settings through the public facade."""
+    logger.info(
+        "Config created: %s",
+        meltano.settings.model_dump(mode="python"),
+    )
+    logger.info("Environment: %s", meltano.settings.environment)
 
 
 if __name__ == "__main__":
     logger.info("=== FLEXT Meltano Simple Working Examples ===")
     try:
-        simple_bridge_example()
+        simple_api_example()
         logger.info("")
-        simple_executor_example()
+        simple_component_example()
+        logger.info("")
+        simple_runtime_example()
         logger.info("")
         simple_config_example()
-    except Exception:
+    except (ValueError, RuntimeError, OSError):
         logger.exception("Error executing examples")

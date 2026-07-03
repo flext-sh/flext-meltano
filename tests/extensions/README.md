@@ -137,7 +137,7 @@ pytest tests/extensions/ -m "compliance" -v
 
 ### **Custom Component Testing**
 
-```python
+```text
 # Custom extension component testing
 import pytest
 from flext_meltano import CustomTapExtension
@@ -150,7 +150,7 @@ def test_custom_tap_extension():
 
     # Initialize custom extension
     custom_tap = CustomTapExtension(
-        config={
+        settings={
             "source_system": "enterprise_erp",
             "api_endpoint": "https://erp.company.com/api",
         }
@@ -167,14 +167,14 @@ def test_custom_tap_extension():
 
 ### **Oracle OIC Extension Testing**
 
-```python
+```text
 # Oracle Integration Cloud extension testing
 @pytest.mark.extension
 @pytest.mark.oracle_oic
 def test_oracle_oic_extension():
     """Test Oracle Integration Cloud specialized extension."""
 
-from tests.extensions.oracle_oic import OracleOicExtension
+from tests import OracleOicExtension
 
     # Test OIC-specific functionality
     oic_extension = OracleOicExtension()
@@ -189,14 +189,14 @@ from tests.extensions.oracle_oic import OracleOicExtension
 
 ### **Compliance Extension Testing**
 
-```python
+```text
 # Compliance and regulatory extension testing
 @pytest.mark.extension
 @pytest.mark.compliance
 def test_compliance_extension():
     """Test regulatory compliance extension functionality."""
 
-from tests.extensions.compliance import ComplianceExtension
+from tests import ComplianceExtension
 
     compliance = ComplianceExtension()
 
@@ -213,7 +213,7 @@ from tests.extensions.compliance import ComplianceExtension
 
 ### **Test Categories and Markers**
 
-```python
+```text
 # Extension test markers for organization
 @pytest.mark.extension         # All extension tests
 @pytest.mark.oracle_oic        # Oracle OIC specific tests
@@ -236,7 +236,7 @@ pytest tests/extensions/ --timeout=1800  # 30 minute timeout for complex extensi
 
 ### **Extension-Specific Fixtures**
 
-```python
+```text
 # Extension test fixtures
 @pytest.fixture
 def oracle_oic_test_environment():
@@ -253,7 +253,7 @@ def custom_tap_configuration():
     """Custom tap configuration fixture."""
     return {
         "tap_name": "tap-enterprise-erp",
-        "config": {
+        "settings": {
             "api_url": "https://test-erp.company.com/api",
             "batch_size": 1000,
             "timeout": 30,
@@ -264,7 +264,7 @@ def custom_tap_configuration():
 
 ### **Enterprise Data Fixtures**
 
-```python
+```text
 # Enterprise-specific test data
 @pytest.fixture
 def enterprise_compliance_dataset():
@@ -281,7 +281,7 @@ def enterprise_compliance_dataset():
 
 ### **Custom Extension Implementation**
 
-```python
+```text
 # Enterprise extension implementation pattern
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
@@ -292,9 +292,9 @@ from flext_meltano import FlextMeltanoBase
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
 
-    def __init__(self, config: t.Dict) -> None:
+    def __init__(self, settings: m.Dict) -> None:
         """Initialize enterprise extension with configuration."""
-        super().__init__(config)
+        super().__init__(settings)
         self.validate_enterprise_config()
 
     @abstractmethod
@@ -342,6 +342,6 @@ ______________________________________________________________________
 ______________________________________________________________________
 
 **Status**: Active Development — Extension testing framework functional; stabilization in progress · 1.0.0 Release Preparation
-**Version**: 0.9.9 RC-enterprise
+**Version**: 0.12.0-dev RC-enterprise
 **Last Updated**: 2025-08-02
 **Maintainer**: FLEXT Development Team

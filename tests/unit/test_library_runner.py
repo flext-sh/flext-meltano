@@ -1,126 +1,39 @@
-"""Tests for FlextMeltanoLibraryRunner - Advanced library integration patterns.
+"""Real-execution tests for the public Meltano library-runner facade."""
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
+from __future__ import annotations
 
-"""
-
-from flext_meltano import FlextMeltanoLibraryRunner, r, t
-from flext_meltano.adapters import FlextMeltanoAdapter
+from flext_meltano import meltano
 
 
-class TestFlextDbtProgrammaticRunner:
-    """Test FlextDbtProgrammaticRunner functionality."""
+class TestsFlextMeltanoLibraryRunner:
+    """Exercise the library-runner mixin through the public Meltano facade."""
 
-    def test_get_dbt_runner(self) -> None:
-        """Test getting dbt runner instance returns r."""
-        library_runner = FlextMeltanoLibraryRunner()
-        dbt_runner_result = library_runner.get_dbt_runner()
-        assert dbt_runner_result.is_success
-        assert dbt_runner_result.value is not None
-        assert dbt_runner_result.value.get("type") == "dbt_runner"
-        assert dbt_runner_result.value.get("status") == "available"
+    def test_public_facade_exposes_library_runner_methods(self) -> None:
+        """The root API exposes the library-runner operations directly."""
+        assert callable(meltano.execute_complete_elt_pipeline)
+        assert callable(meltano.run_dbt_transformation)
+        assert callable(meltano.run_elt_pipeline)
 
-    def test_dbt_runner_capabilities(self) -> None:
-        """Test dbt runner has expected capabilities."""
-        library_runner = FlextMeltanoLibraryRunner()
-        dbt_runner_result = library_runner.get_dbt_runner()
-        assert dbt_runner_result.is_success
-        capabilities = dbt_runner_result.value.get("capabilities", [])
-        assert isinstance(capabilities, list)
-        assert "run" in capabilities
-        assert "test" in capabilities
-
-
-class TestFlextSingerProtocolManager:
-    """Test FlextSingerProtocolManager functionality."""
-
-    def test_get_singer_manager(self) -> None:
-        """Test getting Singer manager instance returns r."""
-        library_runner = FlextMeltanoLibraryRunner()
-        singer_manager_result = library_runner.get_singer_manager()
-        assert singer_manager_result.is_success
-        assert singer_manager_result.value is not None
-        assert singer_manager_result.value.get("type") == "singer_manager"
-        assert singer_manager_result.value.get("status") == "available"
-
-    def test_singer_manager_capabilities(self) -> None:
-        """Test Singer manager has expected capabilities."""
-        library_runner = FlextMeltanoLibraryRunner()
-        singer_manager_result = library_runner.get_singer_manager()
-        assert singer_manager_result.is_success
-        capabilities = singer_manager_result.value.get("capabilities", [])
-        assert isinstance(capabilities, list)
-        assert "discover" in capabilities
-        assert "sync" in capabilities
-
-
-class TestFlextMeltanoLibraryRunner:
-    """Test FlextMeltanoLibraryRunner functionality."""
-
-    def test_initialization(self) -> None:
-        """Test library runner initialization."""
-        runner = FlextMeltanoLibraryRunner()
-        dbt_runner_result = runner.get_dbt_runner()
-        assert dbt_runner_result.is_success
-        assert dbt_runner_result.value is not None
-        singer_manager_result = runner.get_singer_manager()
-        assert singer_manager_result.is_success
-        assert singer_manager_result.value is not None
-
-    def test_get_dbt_runner(self) -> None:
-        """Test getting dbt runner instance."""
-        runner = FlextMeltanoLibraryRunner()
-        dbt_runner_result = runner.get_dbt_runner()
-        assert dbt_runner_result.is_success
-        assert dbt_runner_result.value is not None
-        assert dbt_runner_result.value.get("type") == "dbt_runner"
-
-    def test_get_singer_manager(self) -> None:
-        """Test getting Singer manager instance."""
-        runner = FlextMeltanoLibraryRunner()
-        singer_manager_result = runner.get_singer_manager()
-        assert singer_manager_result.is_success
-        assert singer_manager_result.value is not None
-        assert singer_manager_result.value.get("type") == "singer_manager"
-
-    def test_get_abstractions(self) -> None:
-        """Test getting abstractions instance."""
-        runner = FlextMeltanoLibraryRunner()
-        singer_manager_result = runner.get_singer_manager()
-        assert singer_manager_result.is_success
-
-    def test_execute_complete_elt_pipeline_mock(self) -> None:
-        """Test complete E-L-T pipeline execution with mocked dependencies."""
-        runner = FlextMeltanoLibraryRunner()
-        result: r[t.Meltano.Processing.EltPipelineResult] = (
-            runner.execute_complete_elt_pipeline(
-                tap_name="tap-csv", target_name="target-jsonl"
-            )
+    def test_execute_complete_elt_pipeline_returns_real_payload(self) -> None:
+        """Complete ELT execution returns the current public command payload shape."""
+        result = meltano.execute_complete_elt_pipeline(
+            tap_name="tap-csv",
+            target_name="target-jsonl",
         )
-        assert result.is_success
-        pipeline_data: t.Meltano.Processing.EltPipelineResult = result.value
-        assert isinstance(pipeline_data, dict)
-        assert "success" in pipeline_data
-        assert "tap_name" in pipeline_data
-        assert "target_name" in pipeline_data
-        assert "execution_time" in pipeline_data
 
+        assert result.success
+        assert result.value["tap_name"] == "tap-csv"
+        assert result.value["target_name"] == "target-jsonl"
+        assert isinstance(result.value["exit_code"], int)
+        assert "output" in result.value
+        assert "error" in result.value
 
-class TestProjectAdapterIntegration:
-    """Test integration of FlextMeltanoAdapter.FlextMeltanoAdapter.ProjectAdapter."""
+    def test_run_dbt_transformation_returns_real_payload(self) -> None:
+        """DBT transformation execution returns the current public command payload shape."""
+        result = meltano.run_dbt_transformation(models=["model1"])
 
-    def test_adapter_version(self) -> None:
-        """Test that FlextMeltanoAdapter.ProjectAdapter can get version."""
-        adapter = FlextMeltanoAdapter.ProjectAdapter()
-        result = adapter.get_version()
-        assert result.is_success
-        assert result.value is not None
-        assert "version" in result.value
-
-    def test_adapter_execute(self) -> None:
-        """Test that FlextMeltanoAdapter.ProjectAdapter execute returns r."""
-        adapter = FlextMeltanoAdapter.ProjectAdapter()
-        result = adapter.execute()
-        assert hasattr(result, "is_success")
-        assert hasattr(result, "is_failure")
+        assert result.success
+        assert isinstance(result.value["exit_code"], int)
+        assert "output" in result.value
+        assert "error" in result.value
+        assert "models" in result.value

@@ -1,7 +1,8 @@
-"""Test module for flext-meltano plugin protocols - UNIFIED patterns only.
+"""Test module for flext-meltano Singer catalog contracts.
 
-Tests the FlextMeltanoPluginProtocols unified class following FLEXT standards.
-NO ALIASES, NO BACKWARD COMPATIBILITY - Direct API testing only.
+Tests the canonical t.JsonMapping contract plus m.Meltano Singer catalog
+models following FLEXT standards.
+Validates that legacy typing aliases stay removed.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,122 +11,58 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import unittest
-from unittest import TestCase
+from flext_tests import tm
 
-import flext_meltano.singer.protocols as protocols_module
-from flext_meltano.singer.protocols import FlextMeltanoPluginProtocols
-
-
-class TestFlextMeltanoPluginProtocolsUnified(TestCase):
-    """Test FlextMeltanoPluginProtocols unified class - NO ALIASES."""
-
-    def test_unified_class_exists(self) -> None:
-        """Test FlextMeltanoPluginProtocols unified class exists."""
-        assert hasattr(FlextMeltanoPluginProtocols, "__name__")
-        assert FlextMeltanoPluginProtocols.__name__ == "FlextMeltanoPluginProtocols"
-
-    def test_unified_class_has_core_plugin_types(self) -> None:
-        """Test FlextMeltanoPluginProtocols has core plugin type definitions."""
-        expected_core_types = ["TapPlugin", "TargetPlugin", "DbtPlugin"]
-        for plugin_type in expected_core_types:
-            assert hasattr(FlextMeltanoPluginProtocols, plugin_type), (
-                f"FlextMeltanoPluginProtocols missing core type: {plugin_type}"
-            )
-
-    def test_unified_class_has_service_protocols(self) -> None:
-        """Test FlextMeltanoPluginProtocols has service protocol definitions."""
-        expected_service_protocols = [
-            "TapService",
-            "TargetService",
-            "DbtService",
-        ]
-        for service_protocol in expected_service_protocols:
-            assert hasattr(FlextMeltanoPluginProtocols, service_protocol), (
-                f"FlextMeltanoPluginProtocols missing service protocol: {service_protocol}"
-            )
-
-    def test_tap_plugin_protocol_definition(self) -> None:
-        """Test TapPlugin protocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TapPlugin
-        assert protocol is not None
-
-    def test_target_plugin_protocol_definition(self) -> None:
-        """Test TargetPlugin protocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TargetPlugin
-        assert protocol is not None
-
-    def test_dbt_plugin_protocol_definition(self) -> None:
-        """Test DbtPlugin protocol definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.DbtPlugin
-        assert protocol is not None
-
-    def test_tap_service_protocol_definition(self) -> None:
-        """Test TapService definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TapService
-        assert protocol is not None
-
-    def test_target_service_protocol_definition(self) -> None:
-        """Test TargetService definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.TargetService
-        assert protocol is not None
-
-    def test_dbt_service_protocol_definition(self) -> None:
-        """Test DbtService definition is valid."""
-        protocol = FlextMeltanoPluginProtocols.DbtService
-        assert protocol is not None
-
-    def test_no_aliases_exist(self) -> None:
-        """Test that NO aliases exist - direct API access only."""
-        no_alias_attributes = [
-            "FlextMeltanoTapPlugin",
-            "FlextTargetPlugin",
-            "FlextDbtPlugin",
-            "TapService",
-            "TargetService",
-            "DbtService",
-        ]
-        for alias in no_alias_attributes:
-            assert not hasattr(FlextMeltanoPluginProtocols, alias), (
-                f"VIOLATION: Found eliminated alias {alias} - should not exist"
-            )
-
-    def test_unified_class_structure(self) -> None:
-        """Test unified class has proper structure."""
-        assert hasattr(FlextMeltanoPluginProtocols, "__module__")
-        assert (
-            FlextMeltanoPluginProtocols.__module__ == "flext_meltano.singer.protocols"
-        )
-
-    def test_direct_api_access_only(self) -> None:
-        """Test that only direct API access works - NO module-level aliases."""
-        assert FlextMeltanoPluginProtocols is not None
-        assert hasattr(FlextMeltanoPluginProtocols, "__name__")
-
-    def test_class_documentation_exists(self) -> None:
-        """Test unified class has proper documentation."""
-        assert FlextMeltanoPluginProtocols.__doc__ is not None
-        assert protocols_module.__doc__ is not None
-
-    def test_module_exports_only_unified_class(self) -> None:
-        """Test module exports only the unified class - NO ALIASES."""
-        all_exports = getattr(protocols_module, "__all__", [])
-        assert "FlextMeltanoPluginProtocols" in all_exports
-        forbidden_exports = [
-            "FlextMeltanoTapPlugin",
-            "FlextTargetPlugin",
-            "FlextDbtPlugin",
-            "TapService",
-            "TargetService",
-            "TapService",
-            "TargetService",
-            "DbtService",
-        ]
-        for forbidden in forbidden_exports:
-            assert forbidden not in all_exports, (
-                f"VIOLATION: Found forbidden alias export: {forbidden}"
-            )
+from tests.models import m
+from tests.typings import t
 
 
-if __name__ == "__main__":
-    unittest.main()
+class TestsFlextMeltanoPluginProtocols:
+    """Test canonical Meltano plugin contracts via public typing namespaces."""
+
+    def test_plugin_definition_resolves_to_mapping(self) -> None:
+        """Plugin definitions use the canonical JSON mapping contract."""
+        plugin_def: t.JsonMapping = {
+            "name": "tap-postgres",
+            "namespace": "tap_postgres",
+            "pip_url": "git+https://github.com/example/tap-postgres.git",
+        }
+        tm.that(plugin_def["name"], eq="tap-postgres")
+        tm.that(len(plugin_def), eq=3)
+
+    def test_plugin_configuration_resolves_to_mapping(self) -> None:
+        """PluginConfiguration type alias resolves to a Mapping-compatible type."""
+        plugin_cfg = {
+            "host": "localhost",
+            "port": "5432",
+            "database": "analytics",
+        }
+        tm.that(plugin_cfg["host"], eq="localhost")
+        tm.that(len(plugin_cfg) >= 3, eq=True)
+
+    def test_singer_catalog_model_validates_catalog_payload(self) -> None:
+        """Singer catalog payloads validate through m.Meltano models."""
+        catalog = m.Meltano.SingerCatalog.model_validate({
+            "streams": [
+                {"stream": "users", "tap_stream_id": "users", "schema": {}},
+            ],
+        })
+        tm.that(catalog.streams[0].stream, eq="users")
+        tm.that(catalog.streams[0].tap_stream_id, eq="users")
+
+    def test_model_contract_is_distinct(self) -> None:
+        """Singer catalog models stay distinct from the JSON mapping contract."""
+        names = {
+            str(t.JsonMapping),
+            str(m.Meltano.SingerCatalog),
+        }
+        tm.that(len(names), eq=2)
+
+    def test_meltano_namespace_removes_legacy_singer_aliases(self) -> None:
+        """t.Meltano exposes no legacy Singer typing aliases."""
+        tm.that(str(t.JsonMapping), none=False)
+        tm.that(str(m.Meltano.SingerCatalog), none=False)
+        assert not hasattr(t.Meltano, "SingerCatalogEntry")
+        assert not hasattr(t.Meltano, "SingerStreamCatalog")
+        assert not hasattr(t.Meltano, "PluginCatalog")
+        assert not hasattr(t.Meltano, "PluginDefinition")

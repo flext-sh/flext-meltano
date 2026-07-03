@@ -1,186 +1,85 @@
-"""ELT pipeline integration library for FLEXT.
-
-Provides programmatic APIs for singer-sdk, meltano-sdk, and dbt-core integration.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Flext Meltano package."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from flext_core.lazy import install_lazy_exports
+from flext_meltano.__version__ import (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
+)
+from flext_meltano._exports import FLEXT_MELTANO_LAZY_IMPORTS
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+_LAZY_IMPORTS = FLEXT_MELTANO_LAZY_IMPORTS
 
-if TYPE_CHECKING:
-    from flext_core import (
-        FlextDecorators as d,
-        FlextExceptions as e,
-        FlextHandlers as h,
-        r,
-        s,
-        x,
-    )
 
-    from flext_meltano.__version__ import __version__, __version_info__
-    from flext_meltano.adapters import FlextMeltanoAdapter
-    from flext_meltano.api import FlextMeltano
-    from flext_meltano.bridge import FlextMeltanoBridge
-    from flext_meltano.cli_managers import (
-        FlextMeltanoPluginManager,
-        FlextMeltanoSingerManager,
-        FlextMeltanoStatusManager,
-    )
-    from flext_meltano.constants import (
-        FlextMeltanoConstants,
-        FlextMeltanoConstants as c,
-    )
-    from flext_meltano.dbt import (
-        FlextMeltanoDbtProjectManager,
-        FlextMeltanoDbtRunner,
-        FlextMeltanoDbtService,
-    )
-    from flext_meltano.executor import FlextMeltanoExecutor
-    from flext_meltano.file_managers import FlextMeltanoFileManagers
-    from flext_meltano.library_runner import FlextMeltanoLibraryRunner
-    from flext_meltano.meltano import (
-        FlextMeltanoMeltanoService,
-        FlextMeltanoProjectManager,
-    )
-    from flext_meltano.models import FlextMeltanoModels, FlextMeltanoModels as m
-    from flext_meltano.protocols import (
-        FlextMeltanoProtocols,
-        FlextMeltanoProtocols as p,
-    )
-    from flext_meltano.services import FlextMeltanoService
-    from flext_meltano.settings import FlextMeltanoSettings
-    from flext_meltano.singer.catalog import FlextMeltanoCatalogManager
-    from flext_meltano.singer.service import FlextMeltanoSingerService
-    from flext_meltano.singer.state import FlextMeltanoStateManager
-    from flext_meltano.singer.tap import (
-        FlextMeltanoTapAbstractions,
-    )
-    from flext_meltano.singer.target import (
-        FlextMeltanoTargetAbstractions,
-    )
-    from flext_meltano.typings import FlextMeltanoTypes, FlextMeltanoTypes as t
-    from flext_meltano.utilities import (
-        FlextMeltanoUtilities,
-        FlextMeltanoUtilities as u,
-    )
-    from flext_meltano.validators import FlextMeltanoValidators
+_EAGER_EXPORTS = (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
+)
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
-_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextMeltano": ("flext_meltano.api", "FlextMeltano"),
-    "FlextMeltanoAdapter": ("flext_meltano.adapters", "FlextMeltanoAdapter"),
-    "FlextMeltanoBridge": ("flext_meltano.bridge", "FlextMeltanoBridge"),
-    "FlextMeltanoCatalogManager": (
-        "flext_meltano.singer.catalog",
-        "FlextMeltanoCatalogManager",
-    ),
-    "FlextMeltanoConstants": ("flext_meltano.constants", "FlextMeltanoConstants"),
-    "FlextMeltanoDbtProjectManager": (
-        "flext_meltano.dbt",
-        "FlextMeltanoDbtProjectManager",
-    ),
-    "FlextMeltanoDbtRunner": ("flext_meltano.dbt", "FlextMeltanoDbtRunner"),
-    "FlextMeltanoDbtService": ("flext_meltano.dbt", "FlextMeltanoDbtService"),
-    "FlextMeltanoExecutor": ("flext_meltano.executor", "FlextMeltanoExecutor"),
-    "FlextMeltanoFileManagers": (
-        "flext_meltano.file_managers",
-        "FlextMeltanoFileManagers",
-    ),
-    "FlextMeltanoLibraryRunner": (
-        "flext_meltano.library_runner",
-        "FlextMeltanoLibraryRunner",
-    ),
-    "FlextMeltanoMeltanoService": (
-        "flext_meltano.meltano",
-        "FlextMeltanoMeltanoService",
-    ),
-    "FlextMeltanoModels": ("flext_meltano.models", "FlextMeltanoModels"),
-    "FlextMeltanoPluginManager": (
-        "flext_meltano.cli_managers",
-        "FlextMeltanoPluginManager",
-    ),
-    "FlextMeltanoProjectManager": (
-        "flext_meltano.meltano",
-        "FlextMeltanoProjectManager",
-    ),
-    "FlextMeltanoProtocols": ("flext_meltano.protocols", "FlextMeltanoProtocols"),
-    "FlextMeltanoService": ("flext_meltano.services", "FlextMeltanoService"),
-    "FlextMeltanoSettings": ("flext_meltano.settings", "FlextMeltanoSettings"),
-    "FlextMeltanoSingerManager": (
-        "flext_meltano.cli_managers",
-        "FlextMeltanoSingerManager",
-    ),
-    "FlextMeltanoSingerService": (
-        "flext_meltano.singer.service",
-        "FlextMeltanoSingerService",
-    ),
-    "FlextMeltanoStateManager": (
-        "flext_meltano.singer.state",
-        "FlextMeltanoStateManager",
-    ),
-    "FlextMeltanoStatusManager": (
-        "flext_meltano.cli_managers",
-        "FlextMeltanoStatusManager",
-    ),
-    "FlextMeltanoTapAbstractions": (
-        "flext_meltano.singer.tap",
-        "FlextMeltanoTapAbstractions",
-    ),
-    "FlextMeltanoTargetAbstractions": (
-        "flext_meltano.singer.target",
-        "FlextMeltanoTargetAbstractions",
-    ),
-    "FlextMeltanoTypes": ("flext_meltano.typings", "FlextMeltanoTypes"),
-    "FlextMeltanoUtilities": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
-    "FlextMeltanoValidators": ("flext_meltano.validators", "FlextMeltanoValidators"),
-    "__version__": ("flext_meltano.__version__", "__version__"),
-    "__version_info__": ("flext_meltano.__version__", "__version_info__"),
-    "c": ("flext_meltano.constants", "FlextMeltanoConstants"),
-    "d": ("flext_core", "FlextDecorators"),
-    "e": ("flext_core", "FlextExceptions"),
-    "h": ("flext_core", "FlextHandlers"),
-    "m": ("flext_meltano.models", "FlextMeltanoModels"),
-    "p": ("flext_meltano.protocols", "FlextMeltanoProtocols"),
-    "r": ("flext_core", "r"),
-    "s": ("flext_core", "s"),
-    "t": ("flext_meltano.typings", "FlextMeltanoTypes"),
-    "u": ("flext_meltano.utilities", "FlextMeltanoUtilities"),
-    "x": ("flext_core", "x"),
-}
 
-__all__ = [
+_PUBLIC_EXPORTS: tuple[str, ...] = (
+    "Context",
     "FlextMeltano",
+    "FlextMeltanoAbstractions",
+    "FlextMeltanoAbstractionsBase",
     "FlextMeltanoAdapter",
     "FlextMeltanoBridge",
-    "FlextMeltanoCatalogManager",
+    "FlextMeltanoCLI",
+    "FlextMeltanoComponentService",
     "FlextMeltanoConstants",
-    "FlextMeltanoDbtProjectManager",
-    "FlextMeltanoDbtRunner",
-    "FlextMeltanoDbtService",
+    "FlextMeltanoDbtProjectMixin",
+    "FlextMeltanoDbtRunnerMixin",
+    "FlextMeltanoDbtServiceBase",
     "FlextMeltanoExecutor",
-    "FlextMeltanoFileManagers",
+    "FlextMeltanoExecutorBase",
     "FlextMeltanoLibraryRunner",
-    "FlextMeltanoMeltanoService",
     "FlextMeltanoModels",
-    "FlextMeltanoPluginManager",
+    "FlextMeltanoPluginDiscoveryMixin",
     "FlextMeltanoProjectManager",
+    "FlextMeltanoProjectService",
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
+    "FlextMeltanoServiceBase",
     "FlextMeltanoSettings",
-    "FlextMeltanoSingerManager",
-    "FlextMeltanoSingerService",
-    "FlextMeltanoStateManager",
-    "FlextMeltanoStatusManager",
+    "FlextMeltanoSingerCatalogMixin",
+    "FlextMeltanoSingerCliTranslator",
+    "FlextMeltanoSingerStateMixin",
+    "FlextMeltanoSingerTapAdapter",
     "FlextMeltanoTapAbstractions",
+    "FlextMeltanoTapServiceBase",
+    "FlextMeltanoTapSourceMixin",
     "FlextMeltanoTargetAbstractions",
+    "FlextMeltanoTargetServiceBase",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
+    "Record",
+    "Sink",
+    "Stream",
+    "Tap",
+    "Target",
+    "cli",
+    "meltano",
+    "__author__",
+    "__author_email__",
+    "__description__",
+    "__license__",
+    "__title__",
+    "__url__",
     "__version__",
     "__version_info__",
     "c",
@@ -188,25 +87,19 @@ __all__ = [
     "e",
     "h",
     "m",
+    "main",
     "p",
     "r",
     "s",
     "t",
     "u",
     "x",
-]
+)
 
 
-def __getattr__(
-    name: str,
-) -> Any:  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
-    """Lazy-load module attributes on first access (PEP 562)."""
-    return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-
-
-def __dir__() -> list[str]:
-    """Return list of available attributes for dir() and autocomplete."""
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    public_exports=_PUBLIC_EXPORTS,
+)

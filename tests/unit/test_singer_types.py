@@ -8,11 +8,15 @@ SPDX-License-Identifier: MIT
 
 """
 
-from flext_meltano import t
+from __future__ import annotations
+
+from tests.typings import t
 
 
-class TestFlextSingerTypes:
+class TestsFlextMeltanoSingerTypes:
     """Test suite for t with real functionality."""
+
+    singer_types: t
 
     def setup_method(self) -> None:
         """Setup for each test."""
@@ -22,12 +26,8 @@ class TestFlextSingerTypes:
         """Test t initialization."""
         singer_types = t()
         assert singer_types is not None
-        assert hasattr(singer_types, "Meltano")
-        assert hasattr(singer_types.Meltano, "PluginDefinition")
 
     def test_singer_types_basic_functionality(self) -> None:
         """Test basic singer types functionality."""
         singer_types = t()
         assert singer_types is not None
-        assert hasattr(singer_types, "Meltano")
-        assert hasattr(singer_types.Meltano, "PluginDefinition")

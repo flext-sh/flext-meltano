@@ -1,11 +1,17 @@
-"""FLEXT Meltano Tests - Test infrastructure and utilities.
-
-Provides TestsFlextMeltano classes extending FlextTests and FlextMeltano for comprehensive testing.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Tests package."""
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from flext_core.lazy import install_lazy_exports
+from tests._exports import TESTS_FLEXT_MELTANO_LAZY_IMPORTS
+
+_LAZY_IMPORTS = TESTS_FLEXT_MELTANO_LAZY_IMPORTS
+
+
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)

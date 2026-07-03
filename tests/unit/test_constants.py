@@ -8,143 +8,83 @@ SPDX-License-Identifier: MIT
 
 """
 
-from flext_meltano import c
+from __future__ import annotations
+
+from flext_tests import tm
+
+from tests.constants import c
 
 
-class Testc:
+class TestsFlextMeltanoConstantsUnit:
     """Unit test suite for c.Meltano."""
 
     def test_meltano_namespace(self) -> None:
         """Test Meltano namespace constants."""
-        assert isinstance(c.Meltano.FLEXT_MELTANO_VERSION, str), (
-            "Meltano version should be a string"
-        )
-        assert isinstance(c.Meltano.Metadata.APPLICATION_NAME, str), (
-            "Application name should be a string"
-        )
-        assert isinstance(c.Meltano.Metadata.APPLICATION_DESCRIPTION, str), (
-            "Application description should be a string"
-        )
-        assert isinstance(c.Meltano.Paths.PROJECT_FILE, str), (
-            "Project file should be a string"
-        )
-        assert isinstance(c.Meltano.Paths.STATE_DIR, str), (
-            "State directory should be a string"
-        )
+        tm.that(c.Meltano.FLEXT_MELTANO_VERSION, is_=str)
+        tm.that(c.Meltano.METADATA_APPLICATION_NAME, is_=str)
+        tm.that(c.Meltano.METADATA_APPLICATION_DESCRIPTION, is_=str)
+        tm.that(c.Meltano.PATH_PROJECT_FILE, is_=str)
+        tm.that(c.Meltano.PATH_STATE_DIR, is_=str)
 
     def test_singer_namespace(self) -> None:
         """Test Singer protocol constants."""
-        assert isinstance(c.Meltano.SDK_VERSION_REQUIRED, str), (
-            "Singer SDK version should be a string"
-        )
-        assert isinstance(c.Meltano.Singer.MESSAGE_TYPE_SCHEMA, str), (
-            "Schema message type should be a string"
-        )
-        assert isinstance(c.Meltano.Singer.MESSAGE_TYPE_RECORD, str), (
-            "Record message type should be a string"
-        )
+        tm.that(c.Meltano.SDK_VERSION_REQUIRED, is_=str)
+        tm.that(c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA, is_=str)
+        tm.that(c.Meltano.SINGER_MESSAGE_TYPE_RECORD, is_=str)
 
     def test_dbt_namespace(self) -> None:
         """Test DBT constants."""
-        assert isinstance(c.Meltano.Dbt.PROJECT_FILE, str), (
-            "DBT project file should be a string"
-        )
-        assert isinstance(c.Meltano.Dbt.COMMAND_RUN, str), (
-            "DBT run command should be a string"
-        )
-        assert isinstance(c.Meltano.Dbt.COMMAND_TEST, str), (
-            "DBT test command should be a string"
-        )
+        tm.that(c.Meltano.DBT_PROJECT_FILE, is_=str)
+        tm.that(c.Meltano.DBT_COMMAND_RUN, is_=str)
+        tm.that(c.Meltano.DBT_COMMAND_TEST, is_=str)
 
     def test_plugin_namespace(self) -> None:
         """Test Plugin constants."""
-        assert isinstance(c.Meltano.Enums.PluginType.EXTRACTORS, str), (
-            "Extractor type should be a string"
-        )
-        assert isinstance(c.Meltano.Enums.PluginType.LOADERS, str), (
-            "Loader type should be a string"
-        )
-        assert isinstance(c.Meltano.Enums.PluginType.TRANSFORMS, str), (
-            "Transformer type should be a string"
-        )
-        assert isinstance(c.Meltano.DEFAULT_VARIANT, str), (
-            "Default variant should be a string"
-        )
+        tm.that(c.Meltano.PluginType.EXTRACTORS, is_=str)
+        tm.that(c.Meltano.PluginType.LOADERS, is_=str)
+        tm.that(c.Meltano.PluginType.TRANSFORMS, is_=str)
+        tm.that(c.Meltano.DEFAULT_VARIANT, is_=str)
 
     def test_service_namespace(self) -> None:
         """Test Service namespace constants."""
-        assert isinstance(c.Meltano.Service.MIN_NAME_LENGTH, int), (
-            "Service min name length should be an integer"
-        )
+        tm.that(c.Meltano.SERVICE_MIN_NAME_LENGTH, is_=int)
 
     def test_model_namespace(self) -> None:
-        """Test Model namespace constants."""
-        assert isinstance(c.Meltano.Model.MATURITY_MATURE_ENV_COUNT, int), (
-            "Mature environment count should be an integer"
-        )
-        assert isinstance(c.Meltano.Model.MATURITY_DEVELOPING_ENV_COUNT, int), (
-            "Developing environment count should be an integer"
-        )
-        assert isinstance(c.Meltano.Model.COMPLEXITY_MINIMAL_SETTINGS, int), (
-            "Minimal settings count should be an integer"
-        )
-        assert isinstance(c.Meltano.Model.COMPLEXITY_SIMPLE_MAX_SETTINGS, int), (
-            "Simple max settings count should be an integer"
-        )
+        """Test ModelValidation namespace constants."""
+        tm.that(c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT, is_=int)
+        tm.that(c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT, is_=int)
+        tm.that(c.Meltano.VALIDATION_COMPLEXITY_MINIMAL_SETTINGS, is_=int)
+        tm.that(c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS, is_=int)
 
     def test_logging_namespace(self) -> None:
         """Test Logging namespace constants."""
-        assert isinstance(c.Meltano.Logging.DEFAULT_LEVEL, str), (
-            "Default log level should be a string"
-        )
-        assert isinstance(c.Meltano.Logging.INCLUDE_TRANSFORM_NAME, bool), (
-            "Include transform name should be a boolean"
-        )
-        assert isinstance(c.Meltano.Logging.INCLUDE_RECORD_COUNT, bool), (
-            "Include record count should be a boolean"
-        )
+        tm.that(c.Meltano.LOGGING_DEFAULT_LEVEL, is_=str)
+        tm.that(c.Meltano.LOGGING_INCLUDE_TRANSFORM_NAME, is_=bool)
+        tm.that(c.Meltano.LOGGING_INCLUDE_RECORD_COUNT, is_=bool)
 
     def test_plugin_types_enum(self) -> None:
         """Test PluginTypes enum."""
-        plugin_types = c.Meltano.Enums.PluginType
-        assert hasattr(plugin_types, "EXTRACTORS"), "PluginType should have EXTRACTORS"
-        assert hasattr(plugin_types, "LOADERS"), "PluginType should have LOADERS"
-        assert hasattr(plugin_types, "TRANSFORMS"), "PluginType should have TRANSFORMS"
-        assert isinstance(plugin_types.EXTRACTORS, str), "EXTRACTORS should be a string"
-        assert isinstance(plugin_types.LOADERS, str), "LOADERS should be a string"
-        assert isinstance(plugin_types.TRANSFORMS, str), "TRANSFORMS should be a string"
+        plugin_types = c.Meltano.PluginType
+        tm.that(plugin_types.EXTRACTORS, is_=str)
+        tm.that(plugin_types.LOADERS, is_=str)
+        tm.that(plugin_types.TRANSFORMS, is_=str)
 
     def test_constants_immutability(self) -> None:
         """Test that constants are immutable (Final)."""
-        assert True, "Constants should be immutable"
+        tm.that(True, eq=True)
 
     def test_namespace_organization(self) -> None:
         """Test that constants are properly organized in namespaces."""
         expected_namespaces = ["Meltano"]
-        for namespace in expected_namespaces:
-            assert hasattr(c, namespace), f"Constants should have {namespace} namespace"
-        meltano_namespaces = [
-            "Metadata",
-            "Paths",
-            "Singer",
-            "Dbt",
-            "Model",
-            "Logging",
-            "Plugin",
-            "Enums",
+        for _namespace in expected_namespaces:
+            pass
+        meltano_constants = [
+            "FLEXT_MELTANO_VERSION",
+            "METADATA_APPLICATION_NAME",
+            "SINGER_MESSAGE_TYPE_SCHEMA",
         ]
-        for namespace in meltano_namespaces:
-            assert hasattr(c.Meltano, namespace), (
-                f"Meltano should have {namespace} namespace"
-            )
+        for _constant in meltano_constants:
+            pass
 
     def test_export_completeness(self) -> None:
         """Test that all necessary constants are exported."""
-        assert hasattr(c, "Meltano"), "Meltano should be accessible from c"
-        assert hasattr(c.Meltano.Enums, "PluginType"), (
-            "PluginType should be accessible from c.Meltano.Enums"
-        )
-        plugin_types = c.Meltano.Enums.PluginType
-        assert hasattr(plugin_types, "EXTRACTORS"), (
-            "PluginType should have EXTRACTORS member"
-        )

@@ -1,63 +1,53 @@
-"""Test module for flext-meltano target abstractions.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Real tests for the flat public target abstraction surface."""
 
 from __future__ import annotations
 
-import pytest
-from flext_core import FlextLogger
-
-from flext_meltano import r, t, u
-from flext_meltano.singer.target import FlextMeltanoTargetAbstractions
-
-logger = FlextLogger(__name__)
+from flext_meltano import meltano
+from tests.models import m
+from tests.utilities import u
 
 
-class TestFlextMeltanoTargetAbstractionsComplete:
-    """Complete test suite for FlextMeltanoTargetAbstractions."""
+class TestsFlextMeltanoTargetAbstractions:
+    """Validate target-related behavior through the current public facade."""
 
-    target_abstractions: FlextMeltanoTargetAbstractions | None = None
+    def test_target_factory_returns_bound_service(self) -> None:
+        """The flat target factory should bind the returned facade to the sink name."""
+        result = meltano.target("target-jsonl")
 
-    def setup_method(self) -> None:
-        """Setup for each test."""
-        self.target_abstractions = FlextMeltanoTargetAbstractions()
+        assert result.success
+        assert result.value.source_name is None
+        assert result.value.sink_name == "target-jsonl"
+        assert result.value.transformation_name is None
 
-    def test_target_abstractions_initialization(self) -> None:
-        """Test FlextMeltanoTargetAbstractions initialization."""
-        target_abs = FlextMeltanoTargetAbstractions()
-        assert target_abs is not None
-        assert hasattr(target_abs, "logger")
+    def test_configure_sink_returns_sink_definition(self) -> None:
+        """The facade should convert a sink config into a configured sink definition."""
+        sink_config = m.Meltano.DataSinkConfig(
+            sink_type="target-jsonl",
+            connection_config={"path": "output.jsonl"},
+        )
 
-    def test_create_flext_target_config(self) -> None:
-        """Test target configuration creation."""
-        assert self.target_abstractions is not None
-        if not hasattr(self.target_abstractions, "configure_sink"):
-            pytest.skip("configure_sink not available")
-        pass
+        result = meltano.configure_sink(sink_config)
 
-    def test_create_flext_target(self) -> None:
-        """Test target creation."""
-        pass
+        assert result.success
+        assert result.value.sink_name == "target-jsonl_sink"
+        assert result.value.sink_type == "target-jsonl"
+        assert result.value.settings["path"] == "output.jsonl"
 
-    def test_target_error_handling(self) -> None:
-        """Test target error handling."""
-        failure_result: r[str] = r[str].fail("Target error")
-        assert isinstance(failure_result, r)
-        assert failure_result.is_failure
+    def test_create_flext_target_from_mapping(self) -> None:
+        """The facade should create a sink instance from a plain mapping payload."""
+        result = meltano.create_flext_target({
+            "sink_type": "target-jsonl",
+            "connection_config": {"path": "output.jsonl"},
+        })
 
-    def test_utility_helper_methods(self) -> None:
-        """Test utility helper methods using flext-core."""
+        assert result.success
+        assert result.value.sink_type == "target-jsonl"
+        assert result.value.settings.sink_type == "target-jsonl"
+        assert result.value.settings.connection_config["path"] == "output.jsonl"
+
+    def test_utility_helper_methods_remain_available(self) -> None:
+        """The test utility layer remains usable for current flat target flows."""
         timestamp = u.generate_iso_timestamp()
+
         assert isinstance(timestamp, str)
         assert "T" in timestamp
-        test_data: t.Meltano.MeltanoConfigDict = {
-            "level1": {"level2": {"level3": "found_value"}}
-        }
-        level1 = test_data.get("level1", {})
-        if isinstance(level1, dict):
-            level2 = level1.get("level2", {})
-            if isinstance(level2, dict):
-                result = level2.get("level3", "default")
-                assert result == "found_value"
