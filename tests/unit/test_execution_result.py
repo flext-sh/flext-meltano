@@ -14,6 +14,8 @@ from flext_tests import tm
 from tests.models import m
 from tests.typings import t
 
+from . import _constants
+
 
 class _ExecutionResultJson(m.BaseModel):
     command: t.StrSequence
@@ -28,7 +30,6 @@ class _ExecutionResultJson(m.BaseModel):
 class TestsFlextMeltanoExecutionResult:
     """Test FlextMeltanoExecutionResult class functionality."""
 
-    TEST_EXECUTION_TIME_SUCCESS: float = 1.5
     TEST_EXECUTION_TIME_FAILURE: float = 0.5
     TEST_EXECUTION_TIME_DICT_SUCCESS: float = 0.2
     TEST_EXECUTION_TIME_DICT_FAILURE: float = 0.1
@@ -54,7 +55,7 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result.exit_code, eq=0)
         tm.that(result.output, eq="Successfully executed")
         tm.that(result.error, eq="")
-        tm.that(result.execution_time, eq=self.TEST_EXECUTION_TIME_SUCCESS)
+        tm.that(result.execution_time, eq=_constants.TEST_EXECUTION_TIME_SUCCESS)
 
     def test_initialization_with_failure(self) -> None:
         """Test initialization with failure scenario."""
