@@ -14,13 +14,13 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
-class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
+class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     """Base for all FLEXT tap service projects.
 
     Subclasses MUST define:

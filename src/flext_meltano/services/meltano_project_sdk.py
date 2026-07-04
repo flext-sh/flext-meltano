@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from meltano.core.project import Project
+from meltano.core.project_plugins_service import ProjectPluginsService
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
@@ -115,7 +116,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
 
     @staticmethod
     def _sdk_plugin_definitions(
-        sdk_plugins_service: t.AnyObject,
+        sdk_plugins_service: ProjectPluginsService,
         plugin_type: str | None,
     ) -> t.SequenceOf[t.JsonMapping]:
         """Plugin definitions returned by the Meltano SDK service."""

@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import (
     MutableMapping,
 )
@@ -19,7 +19,7 @@ from typing import Annotated, override
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
-class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
+class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """Base for all FLEXT target service projects.
 
     Subclasses MUST define:

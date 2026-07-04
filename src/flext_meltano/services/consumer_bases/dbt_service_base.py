@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Annotated, override
 
@@ -26,7 +26,7 @@ from flext_meltano import (
 )
 
 
-class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
+class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     """Base for all FLEXT dbt service projects.
 
     Subclasses MUST define:

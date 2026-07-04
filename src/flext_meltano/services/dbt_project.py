@@ -117,22 +117,24 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         self, manifest_path: Path | None = None
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load DBT manifest from file."""
+        resolved_manifest_path = manifest_path
 
         def _run_load_dbt_manifest() -> p.Result[t.Meltano.DbtManifestData]:
-            if manifest_path is None:
+            manifest_path_local = resolved_manifest_path
+            if manifest_path_local is None:
                 if self._dbt_project_root is None:
                     return r[t.Meltano.DbtManifestData].fail("No project loaded")
-                manifest_path = (
+                manifest_path_local = (
                     self._dbt_project_root
                     / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
                     / c.Meltano.DBT_MANIFEST_FILE
                 )
-            if not manifest_path.exists():
+            if not manifest_path_local.exists():
                 return r[t.Meltano.DbtManifestData].fail(
-                    f"Manifest not found: {manifest_path}"
+                    f"Manifest not found: {manifest_path_local}"
                 )
             parsed_result = u.Cli.files_read_json_model(
-                manifest_path, m.Meltano.DbtManifest
+                manifest_path_local, m.Meltano.DbtManifest
             )
             if parsed_result.failure:
                 return r[t.Meltano.DbtManifestData].fail_op(
