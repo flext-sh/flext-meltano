@@ -30,7 +30,8 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Execute complete ELT pipeline with optional DBT transformations."""
-        try:
+
+        def _run_execute_complete_elt_pipeline() -> p.Result[t.JsonMapping]:
             self.logger.info(
                 "Starting complete ELT pipeline",
                 tap_name=tap_name,
@@ -65,6 +66,9 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                         separator=",",
                     )
             return r[t.JsonMapping].ok(elt_result)
+
+        try:
+            return _run_execute_complete_elt_pipeline()
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Complete ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)

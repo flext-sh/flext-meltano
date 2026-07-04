@@ -121,7 +121,8 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         self, plugin_name: str, plugin_type: str
     ) -> p.Result[t.StrMapping]:
         """Get detailed information about specific plugin."""
-        try:
+
+        def _run_fetch_plugin_info() -> p.Result[t.StrMapping]:
             temp_project_result = FlextMeltanoProjectService().create_temporary_project(
                 project_id="temp-info-project",
                 prefix="flext_plugin_info_",
@@ -147,6 +148,9 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             return self._extract_plugin_info(
                 plugins_result.value, plugin_name, plugin_type
             )
+
+        try:
+            return _run_fetch_plugin_info()
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugin info: {e}"
             self.logger.exception(error_msg)

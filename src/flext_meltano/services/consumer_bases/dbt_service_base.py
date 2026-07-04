@@ -70,6 +70,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
         """Main CLI entry point for dbt project."""
+
         def _run_cli_main() -> int:
             command_args = list(args) if args else sys.argv[1:]
             if not command_args:
@@ -98,6 +99,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 )
                 return 1
             return 0
+
         try:
             return _run_cli_main()
         except c.EXC_OS_RUNTIME_TYPE as exc:
@@ -129,6 +131,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def _run_dbt_cmd(self, cmd: t.StrSequence, operation: str) -> p.Result[str]:
         """Execute a dbt command via subprocess."""
+
         def _run__run_dbt_cmd() -> p.Result[str]:
             self.logger.info(
                 "Running dbt command",
@@ -143,6 +146,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 return r[str].fail(out.stderr or operation)
             self.logger.info("dbt command completed", operation=operation)
             return r[str].ok(out.stdout)
+
         try:
             return _run__run_dbt_cmd()
         except c.EXC_OS_RUNTIME_TYPE as exc:
@@ -194,6 +198,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         self, manifest_path: Path | None = None
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
+
         def _run_load_manifest() -> p.Result[t.Meltano.DbtManifestData]:
             path = manifest_path
             if path is None:
@@ -217,6 +222,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }
             return r[t.Meltano.DbtManifestData].ok(manifest_data)
+
         try:
             return _run_load_manifest()
         except c.EXC_KEY_OS_TYPE_VALUE as exc:

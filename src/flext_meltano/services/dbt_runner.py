@@ -47,6 +47,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
         operation: str,
     ) -> p.Result[str]:
         """Execute a dbt command via subprocess."""
+
         def _run__run_dbt_subprocess() -> p.Result[str]:
             self.logger.info(
                 "Running dbt operation",
@@ -68,6 +69,7 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
                 return r[str].fail(stderr_msg)
             self.logger.info("dbt operation completed", operation=operation)
             return r[str].ok(out.stdout)
+
         try:
             return _run__run_dbt_subprocess()
         except c.EXC_OS_RUNTIME_TYPE as e:

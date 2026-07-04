@@ -142,7 +142,8 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         args: t.StrSequence,
     ) -> p.Result[t.JsonMapping]:
         """Route command to appropriate handler."""
-        try:
+
+        def _run__route_command() -> p.Result[t.JsonMapping]:
             match command:
                 case c.Meltano.ExecutorCommand.VERSION:
                     return self.version()
@@ -171,6 +172,9 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                             duration_field=None,
                         ),
                     )
+
+        try:
+            return _run__route_command()
         except (
             ProjectNotFound,
             ValueError,

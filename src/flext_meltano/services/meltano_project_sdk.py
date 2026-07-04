@@ -49,7 +49,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         self, root: Path
     ) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Initialize a new Meltano project via SDK."""
-        try:
+
+        def _run_initialize_sdk_project() -> p.Result[t.Meltano.OptionalScalarMap]:
             try:
                 root.mkdir(parents=True, exist_ok=True)
             except OSError as e:
@@ -64,6 +65,9 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             }
             self.logger.info("Meltano project initialized", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
+
+        try:
+            return _run_initialize_sdk_project()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.OptionalScalarMap].fail(
