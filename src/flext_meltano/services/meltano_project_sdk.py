@@ -106,31 +106,43 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         except AttributeError:
             return plugins
         try:
-            for plugin in sdk_plugins_service.plugins():
-                try:
-                    name = plugin.name
-                    plugin_kind = plugin.type
-                except AttributeError:
-                    continue
-                if plugin_type is not None and plugin_kind != plugin_type:
-                    continue
-                plugin_def: t.JsonDict = {
-                    "name": name,
-                    "type": plugin_kind,
-                }
-                try:
-                    variant_raw = plugin.variant
-                except AttributeError:
-                    variant_raw = None
-                variant_payload = m.Meltano.VariantPayload.model_validate(
-                    {"value": variant_raw},
-                )
-                json_variant = variant_payload.json_value()
-                if json_variant is not None:
-                    plugin_def["variant"] = json_variant
-                plugins.append(plugin_def)
+            plugins.extend(
+                self._sdk_plugin_definitions(sdk_plugins_service, plugin_type)
+            )
         except c.EXC_ATTR_TYPE as e:
             self.logger.warning("Failed to extract plugins", error=str(e))
+        return plugins
+
+    @staticmethod
+    def _sdk_plugin_definitions(
+        sdk_plugins_service: t.AnyObject,
+        plugin_type: str | None,
+    ) -> t.SequenceOf[t.JsonMapping]:
+        """Plugin definitions returned by the Meltano SDK service."""
+        plugins: t.MutableSequenceOf[t.JsonMapping] = []
+        for plugin in sdk_plugins_service.plugins():
+            try:
+                name = plugin.name
+                plugin_kind = plugin.type
+            except AttributeError:
+                continue
+            if plugin_type is not None and plugin_kind != plugin_type:
+                continue
+            plugin_def: t.JsonDict = {
+                "name": name,
+                "type": plugin_kind,
+            }
+            try:
+                variant_raw = plugin.variant
+            except AttributeError:
+                variant_raw = None
+            variant_payload = m.Meltano.VariantPayload.model_validate(
+                {"value": variant_raw},
+            )
+            json_variant = variant_payload.json_value()
+            if json_variant is not None:
+                plugin_def["variant"] = json_variant
+            plugins.append(plugin_def)
         return plugins
 
 

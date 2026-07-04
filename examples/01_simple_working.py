@@ -65,15 +65,20 @@ def simple_config_example() -> None:
     logger.info("Environment: %s", meltano.settings.environment)
 
 
+def run_examples() -> None:
+    """Run all examples in display order."""
+    simple_api_example()
+    logger.info("")
+    simple_component_example()
+    logger.info("")
+    simple_runtime_example()
+    logger.info("")
+    simple_config_example()
+
+
 if __name__ == "__main__":
     logger.info("=== FLEXT Meltano Simple Working Examples ===")
     try:
-        simple_api_example()
-        logger.info("")
-        simple_component_example()
-        logger.info("")
-        simple_runtime_example()
-        logger.info("")
-        simple_config_example()
+        run_examples()
     except (ValueError, RuntimeError, OSError):
         logger.exception("Error executing examples")

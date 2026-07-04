@@ -83,29 +83,34 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         project_path = parent / name
 
         try:
-            project_path.mkdir(parents=True, exist_ok=True)
-            for d in [*c.Meltano.FILE_PATH_STANDARD_DIRS, c.Meltano.PATH_OUTPUT_DIR]:
-                (project_path / d).mkdir(parents=True, exist_ok=True)
-                (project_path / d / ".gitkeep").touch()
-
-            environments = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
-            config_content = (
-                f"version: {c.Meltano.PLUGIN_CONFIG_VERSION}\n"
-                f"default_environment: {environments[0]}\n"
-                f"project_id: {name}\n"
-                "environments:\n"
-                f"- name: {environments[0]}\n"
-                f"- name: {environments[1]}\n"
-                f"- name: {environments[2]}\n"
-            )
-            config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
-            u.write_file(config_file, config_content)
+            self._write_project_files(project_path, name)
         except OSError as exc:
             return e.fail_operation(
                 "create project files", exc, result_type=r[t.StrMapping]
             )
 
         return self._build_creation_result(project_name, project_path)
+
+    @staticmethod
+    def _write_project_files(project_path: Path, name: str) -> None:
+        """Create project directories and base Meltano config."""
+        project_path.mkdir(parents=True, exist_ok=True)
+        for d in [*c.Meltano.FILE_PATH_STANDARD_DIRS, c.Meltano.PATH_OUTPUT_DIR]:
+            (project_path / d).mkdir(parents=True, exist_ok=True)
+            (project_path / d / ".gitkeep").touch()
+
+        environments = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
+        config_content = (
+            f"version: {c.Meltano.PLUGIN_CONFIG_VERSION}\n"
+            f"default_environment: {environments[0]}\n"
+            f"project_id: {name}\n"
+            "environments:\n"
+            f"- name: {environments[0]}\n"
+            f"- name: {environments[1]}\n"
+            f"- name: {environments[2]}\n"
+        )
+        config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
+        u.write_file(config_file, config_content)
 
     def create_temporary_project(
         self,

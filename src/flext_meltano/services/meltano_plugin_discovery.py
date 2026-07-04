@@ -69,53 +69,57 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     ) -> p.Result[t.SequenceOf[t.StrMapping]]:
         """Discover plugins from Meltano Hub using native API."""
         try:
-            self.logger.info("Discovering Meltano plugins")
-            working_project: t.JsonPayload | t.Meltano.DbtProject
-            if project:
-                working_project = project
-            else:
-                temp_project_result = (
-                    FlextMeltanoProjectService().create_temporary_project()
-                )
-                if temp_project_result.failure:
-                    return r[t.SequenceOf[t.StrMapping]].fail(
-                        temp_project_result.error
-                        or "Failed to create temporary project",
-                    )
-                temp_project = temp_project_result.value
-                if not self._is_meltano_project(temp_project):
-                    return r[t.SequenceOf[t.StrMapping]].fail(
-                        "Temporary project does not satisfy Project",
-                    )
-                working_project = temp_project
-            plugins: t.MutableSequenceOf[t.StrMapping] = []
-            abstractions = FlextMeltanoAbstractions()
-            extractors_result = abstractions.fetch_plugins_of_type(
-                working_project,
-                c.Meltano.PluginType.EXTRACTORS.value,
-            )
-            max_extractors = 10
-            max_loaders = 5
-            if extractors_result.success:
-                for idx, (k, v) in enumerate(extractors_result.value.items()):
-                    if idx >= max_extractors:
-                        break
-                    plugins.append(self._build_plugin_info(k, v, "extractor"))
-            loaders_result = abstractions.fetch_plugins_of_type(
-                working_project,
-                c.Meltano.PluginType.LOADERS.value,
-            )
-            if loaders_result.success:
-                for idx, (k, v) in enumerate(loaders_result.value.items()):
-                    if idx >= max_loaders:
-                        break
-                    plugins.append(self._build_plugin_info(k, v, "loader"))
-            self.logger.info("Discovered plugins", count=u.count(plugins))
-            return r[t.SequenceOf[t.StrMapping]].ok(plugins)
+            return self._discover_plugins(project)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to discover plugins: {e}"
             self.logger.exception(error_msg, error=str(e))
             return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
+
+    def _discover_plugins(
+        self,
+        project: t.JsonPayload | t.Meltano.DbtProject | None,
+    ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+        """Discover plugins without owning the exception boundary."""
+        self.logger.info("Discovering Meltano plugins")
+        working_project: t.JsonPayload | t.Meltano.DbtProject
+        if project:
+            working_project = project
+        else:
+            temp_project_result = FlextMeltanoProjectService().create_temporary_project()
+            if temp_project_result.failure:
+                return r[t.SequenceOf[t.StrMapping]].fail(
+                    temp_project_result.error or "Failed to create temporary project",
+                )
+            temp_project = temp_project_result.value
+            if not self._is_meltano_project(temp_project):
+                return r[t.SequenceOf[t.StrMapping]].fail(
+                    "Temporary project does not satisfy Project",
+                )
+            working_project = temp_project
+        plugins: t.MutableSequenceOf[t.StrMapping] = []
+        abstractions = FlextMeltanoAbstractions()
+        extractors_result = abstractions.fetch_plugins_of_type(
+            working_project,
+            c.Meltano.PluginType.EXTRACTORS.value,
+        )
+        max_extractors = 10
+        max_loaders = 5
+        if extractors_result.success:
+            for idx, (k, v) in enumerate(extractors_result.value.items()):
+                if idx >= max_extractors:
+                    break
+                plugins.append(self._build_plugin_info(k, v, "extractor"))
+        loaders_result = abstractions.fetch_plugins_of_type(
+            working_project,
+            c.Meltano.PluginType.LOADERS.value,
+        )
+        if loaders_result.success:
+            for idx, (k, v) in enumerate(loaders_result.value.items()):
+                if idx >= max_loaders:
+                    break
+                plugins.append(self._build_plugin_info(k, v, "loader"))
+        self.logger.info("Discovered plugins", count=u.count(plugins))
+        return r[t.SequenceOf[t.StrMapping]].ok(plugins)
 
     def fetch_plugin_info(
         self, plugin_name: str, plugin_type: str
