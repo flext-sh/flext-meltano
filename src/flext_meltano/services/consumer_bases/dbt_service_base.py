@@ -70,7 +70,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
         """Main CLI entry point for dbt project."""
-        try:
+
+        def _run_cli_main() -> int:
             command_args = list(args) if args else sys.argv[1:]
             if not command_args:
                 self.logger.info("dbt CLI: no arguments, showing help")
@@ -98,6 +99,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 )
                 return 1
             return 0
+
+        try:
+            return _run_cli_main()
         except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("dbt CLI failed", error=str(exc))
             return 1
@@ -127,7 +131,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
 
     def _run_dbt_cmd(self, cmd: t.StrSequence, operation: str) -> p.Result[str]:
         """Execute a dbt command via subprocess."""
-        try:
+
+        def _run__run_dbt_cmd() -> p.Result[str]:
             self.logger.info(
                 "Running dbt command",
                 operation=operation,
@@ -141,6 +146,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 return r[str].fail(out.stderr or operation)
             self.logger.info("dbt command completed", operation=operation)
             return r[str].ok(out.stdout)
+
+        try:
+            return _run__run_dbt_cmd()
         except c.EXC_OS_RUNTIME_TYPE as exc:
             return r[str].fail(str(exc))
 
@@ -190,7 +198,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
         self, manifest_path: Path | None = None
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
-        try:
+
+        def _run_load_manifest() -> p.Result[t.Meltano.DbtManifestData]:
             path = manifest_path
             if path is None:
                 if self._dbt_project_root is None:
@@ -213,6 +222,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase):
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
             }
             return r[t.Meltano.DbtManifestData].ok(manifest_data)
+
+        try:
+            return _run_load_manifest()
         except c.EXC_KEY_OS_TYPE_VALUE as exc:
             return r[t.Meltano.DbtManifestData].fail(str(exc))
 

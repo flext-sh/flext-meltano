@@ -115,7 +115,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         loader_plugin: t.JsonMapping | None,
     ) -> p.Result[t.HeaderMapping]:
         """Execute a Singer ELT pipeline via ``meltano elt``."""
-        try:
+
+        def _run_execute_singer_pipeline() -> p.Result[t.HeaderMapping]:
             extractor_mapping = extractor_plugin
             loader_mapping = loader_plugin
             extractor_name = str(
@@ -142,6 +143,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 "records_processed": 0,
             }
             return r[t.HeaderMapping].ok(result)
+
+        try:
+            return _run_execute_singer_pipeline()
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to execute singer pipeline: {e}"
             return r[t.HeaderMapping].fail(error_msg)

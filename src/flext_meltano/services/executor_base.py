@@ -227,7 +227,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return r[m.Meltano.CommandExecutionResult].fail(
                 "Command timeout must be greater than zero",
             )
-        try:
+
+        def _run_execute_meltano_command() -> p.Result[
+            m.Meltano.CommandExecutionResult
+        ]:
             start_time = time.monotonic()
             normalized_command: list[str] = list(
                 u.Meltano.normalize_runtime_command(command),
@@ -307,6 +310,9 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 execution_time=execution_time,
             )
             return r[m.Meltano.CommandExecutionResult].ok(result)
+
+        try:
+            return _run_execute_meltano_command()
         except (
             ValueError,
             TypeError,

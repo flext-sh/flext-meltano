@@ -102,7 +102,8 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         bookmark_value: str,
     ) -> p.Result[None]:
         """Update bookmark for a stream."""
-        try:
+
+        def _run_update_bookmark() -> p.Result[None]:
             self._singer_state.value.setdefault(stream_name, {})
             stream_bookmarks = self._singer_state.value[stream_name]
             match stream_bookmarks:
@@ -116,6 +117,9 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                     )
             self.logger.debug("Bookmark updated", stream=stream_name, key=bookmark_key)
             return r[None].ok(None)
+
+        try:
+            return _run_update_bookmark()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to update bookmark", error=str(exc))
             return e.fail_operation("update bookmark", exc, result_type=r[None])
