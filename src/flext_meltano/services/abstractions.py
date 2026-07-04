@@ -45,7 +45,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         tap_instance: m.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
         """Discover available streams via ``meltano select --list``."""
-        try:
+        def _run_discover_streams() -> p.Result[t.JsonMapping]:
             cmd_result = self._run_meltano(
                 [
                     c.Meltano.CMD_SELECT,
@@ -77,6 +77,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                         )
             payload: t.JsonDict = {c.Meltano.PayloadKey.STREAMS: stream_defs}
             return r[t.JsonMapping].ok(payload)
+        try:
+            return _run_discover_streams()
         except c.Meltano.OPERATION_ERRORS as exc:
             self.logger.exception(
                 c.Meltano.LOG_MESSAGE_DISCOVER_STREAMS_FAILED,
@@ -95,7 +97,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         target_config: m.Meltano.TargetConfig | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Sync a single stream via ``meltano elt`` with stream selection."""
-        try:
+        def _run_sync_stream() -> p.Result[t.JsonMapping]:
             loader_name = (
                 target_config.target_type
                 if target_config is not None
@@ -124,6 +126,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                     cmd_result.error or c.Meltano.ERROR_STREAM_SYNC_FAILED
                 )
             return r[t.JsonMapping].ok(result)
+        try:
+            return _run_sync_stream()
         except c.Meltano.OPERATION_ERRORS as exc:
             self.logger.exception(
                 c.Meltano.LOG_MESSAGE_SYNC_STREAM_FAILED,
