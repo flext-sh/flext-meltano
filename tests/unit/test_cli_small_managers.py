@@ -2,39 +2,60 @@
 
 from __future__ import annotations
 
-import re
-
 import pytest
 from flext_tests import tm
 
-from flext_meltano.cli import FlextMeltanoCLI, cli
+from flext_cli import cli
+from flext_meltano.cli import FlextMeltanoCli
 from tests.constants import c
 from tests.typings import t
 from tests.utilities import u
 
 
 class TestsFlextMeltanoCliSmallManagers:
-    """Exercise the public CLI handlers without mocks or monkeypatching."""
+    """Exercise the public CLI handlers through a Typer CliRunner."""
 
-    def test_version_command_returns_real_version_string(self) -> None:
-        result = FlextMeltanoCLI.fetch_global().handle_version_command([])
+    @pytest.fixture
+    def runner(self) -> t.Cli.TyperRunner:
+        """Provide a fresh CliRunner for each test."""
+        runner_result = cli.create_cli_runner()
+        tm.ok(runner_result)
+        return runner_result.value
 
-        tm.ok(result)
-        tm.that("." in result.value, eq=True)
+    @pytest.fixture
+    def app(self) -> t.Cli.CliApp:
+        """Provide the compiled Typer application under test."""
+        return FlextMeltanoCli()._app
 
-    def test_status_commands_return_json_payloads(self) -> None:
-        cli_instance = FlextMeltanoCLI.fetch_global()
+    def test_version_command_returns_real_version_string(
+        self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
+    ) -> None:
+        result = runner.invoke(app, [c.Meltano.CliCommand.VERSION])
 
-        show_result = cli_instance.handle_status_command(["show"])
-        health_result = cli_instance.handle_status_command([
-            c.Meltano.ExecutorCommand.HEALTH
+        tm.that(result.exit_code, eq=0)
+        tm.that("." in result.output, eq=True)
+
+    def test_status_commands_return_json_payloads(
+        self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
+    ) -> None:
+        show_result = runner.invoke(app, [
+            c.Meltano.CliCommand.STATUS,
+            "show",
+        ])
+        health_result = runner.invoke(app, [
+            c.Meltano.CliCommand.STATUS,
+            c.Meltano.ExecutorCommand.HEALTH,
         ])
 
-        tm.ok(show_result)
-        tm.ok(health_result)
+        tm.that(show_result.exit_code, eq=0)
+        tm.that(health_result.exit_code, eq=0)
 
-        show_json = u.Cli.json_loads(show_result.value)
-        health_json = u.Cli.json_loads(health_result.value)
+        show_json = u.Cli.json_loads(show_result.output)
+        health_json = u.Cli.json_loads(health_result.output)
 
         tm.ok(show_json)
         tm.ok(health_json)
@@ -45,51 +66,68 @@ class TestsFlextMeltanoCliSmallManagers:
         tm.that(show_payload.get("status"), eq=c.Meltano.OperationStatus.READY)
         tm.that("status" in health_payload, eq=True)
 
-    def test_tap_and_target_commands_fail_for_unsupported_operations(self) -> None:
-        cli_instance = FlextMeltanoCLI.fetch_global()
+    def test_tap_and_target_commands_fail_for_unsupported_operations(
+        self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
+    ) -> None:
+        tap_result = runner.invoke(app, [
+            c.Meltano.CliCommand.TAP,
+            "--operation",
+            "run",
+            "--args",
+            "tap-demo",
+        ])
+        target_result = runner.invoke(app, [
+            c.Meltano.CliCommand.TARGET,
+            "--operation",
+            "run",
+            "--args",
+            "target-demo",
+        ])
 
-        tap_result = cli_instance.handle_tap_command(["run", "tap-demo"])
-        target_result = cli_instance.handle_target_command(["run", "target-demo"])
+        tm.that(tap_result.exit_code, eq=1)
+        tm.that(target_result.exit_code, eq=1)
+        tm.that(tap_result.output, has="not supported")
+        tm.that(target_result.output, has="not supported")
 
-        tm.fail(tap_result)
-        tm.fail(target_result)
-        tm.that(str(tap_result.error), has="not supported")
-        tm.that(str(target_result.error), has="not supported")
-
-    def test_plugin_commands_enforce_real_argument_contracts(self) -> None:
-        cli_instance = FlextMeltanoCLI.fetch_global()
-
-        info_result = cli_instance.handle_plugin_command(["info"])
-        install_result = cli_instance.handle_plugin_command([
+    def test_plugin_commands_enforce_real_argument_contracts(
+        self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
+    ) -> None:
+        info_result = runner.invoke(app, [
+            c.Meltano.CliCommand.PLUGIN,
+            c.Meltano.ExecutorCommand.INFO,
+        ])
+        install_result = runner.invoke(app, [
+            c.Meltano.CliCommand.PLUGIN,
             c.Meltano.ExecutorCommand.INSTALL,
-            "extractors",
+            "--plugin-name",
             "tap-demo",
         ])
 
-        tm.fail(info_result)
-        tm.fail(install_result)
-        tm.that(str(info_result.error), has="requires")
-        tm.that(str(install_result.error), has="not supported")
+        tm.that(info_result.exit_code, eq=1)
+        tm.that(install_result.exit_code, eq=1)
+        tm.that(info_result.output, has="required")
+        tm.that(install_result.output, has="not supported")
 
-    def test_dbt_help_path_returns_help_sentinel(self) -> None:
-        result = FlextMeltanoCLI.fetch_global().handle_dbt_command([
-            c.Meltano.CMD_HELP_OPTION
-        ])
+    def test_dbt_help_path_returns_help_output(
+        self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
+    ) -> None:
+        result = runner.invoke(app, [c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION])
 
-        tm.ok(result)
-        tm.that(result.value, eq=c.Meltano.ExecutorCommand.HELP)
+        tm.that(result.exit_code, eq=0)
+        tm.that(result.output, has="DBT")
 
     def test_route_command_prints_real_version_output(
         self,
-        capsys: pytest.CaptureFixture[str],
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
     ) -> None:
-        version_result = cli.handle_version_command([])
+        result = runner.invoke(app, [c.Meltano.CliCommand.VERSION])
 
-        tm.ok(version_result)
-
-        exit_code = cli.route_command([c.Meltano.CliCommand.VERSION])
-        captured = capsys.readouterr()
-        normalized_output = re.sub(r"\x1b\[[0-9;]*m", "", captured.out)
-
-        tm.that(exit_code, eq=0)
-        tm.that(normalized_output, has=version_result.value)
+        tm.that(result.exit_code, eq=0)
+        tm.that(result.output, has=".")

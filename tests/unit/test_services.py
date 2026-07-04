@@ -27,7 +27,7 @@ class TestsFlextMeltanoServices:
                 result = meltano.dbt(component_name)
             case _:
                 raise ValueError(
-                    f"Unsupported Meltano component kind: {component_kind}"
+                    f"Unsupported Meltano component kind: {component_kind}",
                 )
         tm.that(result, ok=True)
         assert result.success
@@ -54,7 +54,9 @@ class TestsFlextMeltanoServices:
         match component_kind:
             case "tap":
                 result = meltano.tap(
-                    component_name, host="localhost", database="testdb"
+                    component_name,
+                    host="localhost",
+                    database="testdb",
                 )
             case "target":
                 result = meltano.target(
@@ -64,11 +66,13 @@ class TestsFlextMeltanoServices:
                 )
             case "dbt":
                 result = meltano.dbt(
-                    component_name, host="localhost", database="testdb"
+                    component_name,
+                    host="localhost",
+                    database="testdb",
                 )
             case _:
                 raise ValueError(
-                    f"Unsupported Meltano component kind: {component_kind}"
+                    f"Unsupported Meltano component kind: {component_kind}",
                 )
         tm.that(result, ok=True)
         assert result.success

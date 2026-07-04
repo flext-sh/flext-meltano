@@ -123,7 +123,8 @@ class TestsFlextMeltanoSingerCliTranslator:
         )
         tm.ok(result)
         tm.that(
-            result.value, eq=["target-postgres", "--config", "/path/to/settings.json"]
+            result.value,
+            eq=["target-postgres", "--config", "/path/to/settings.json"],
         )
 
     def test_translate_target_run_with_input(self) -> None:
@@ -211,7 +212,8 @@ class TestsFlextMeltanoSingerCliTranslator:
         tm.ok(result)
         source_command, sink_command = result.value
         tm.that(
-            source_command, eq=["tap-postgres", "--catalog", "/path/to/catalog.json"]
+            source_command,
+            eq=["tap-postgres", "--catalog", "/path/to/catalog.json"],
         )
         tm.that(sink_command, eq=["target-postgres"])
 

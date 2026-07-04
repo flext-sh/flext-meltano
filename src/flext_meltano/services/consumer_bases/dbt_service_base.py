@@ -12,8 +12,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Annotated, override
+from typing import TYPE_CHECKING, Annotated, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
@@ -24,6 +23,9 @@ from flext_meltano import (
     t,
     u,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
@@ -195,7 +197,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return r[None].ok(None)
 
     def load_manifest(
-        self, manifest_path: Path | None = None
+        self,
+        manifest_path: Path | None = None,
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
 
@@ -215,7 +218,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
             if parsed_result.failure:
                 return r[t.Meltano.DbtManifestData].fail(
-                    parsed_result.error or "manifest read failed"
+                    parsed_result.error or "manifest read failed",
                 )
             parsed = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
@@ -233,7 +236,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         manifest_result = self.load_manifest()
         if manifest_result.failure:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                manifest_result.error or "Manifest load failed"
+                manifest_result.error or "Manifest load failed",
             )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)

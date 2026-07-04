@@ -77,7 +77,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @classmethod
     def create_source_service(
-        cls, source_name: str, **config: t.Scalar
+        cls,
+        source_name: str,
+        **config: t.Scalar,
     ) -> p.Result[Self]:
         """Create data source service.
 
@@ -98,7 +100,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @classmethod
     def create_transformation_service(
-        cls, transformation_name: str, **config: t.Scalar
+        cls,
+        transformation_name: str,
+        **config: t.Scalar,
     ) -> p.Result[Self]:
         """Create transformation service.
 
@@ -119,7 +123,8 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_environment(
-        environment_name: str, settings: t.JsonMapping | None = None
+        environment_name: str,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[t.Meltano.ServicePayload]:
         """Configure environment."""
         if not environment_name:
@@ -128,13 +133,13 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             c.Meltano.ENVIRONMENT_ALIASES.get(
                 environment_name.strip().lower(),
                 environment_name.strip().lower(),
-            )
+            ),
         )
         if normalized_environment not in c.Meltano.ENVIRONMENTS_VALID:
             return r[t.Meltano.ServicePayload].fail(
                 "Invalid environment: "
                 f"{environment_name}. "
-                f"Valid: {c.Meltano.ENVIRONMENTS_VALID}"
+                f"Valid: {c.Meltano.ENVIRONMENTS_VALID}",
             )
         configuration = t.json_dict_adapter().validate_python(settings or {})
         payload: t.JsonDict = {
@@ -168,11 +173,11 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         """Install pipeline component with validation."""
         if not component_type or not component_name:
             return r[t.Meltano.ServicePayload].fail(
-                "Component type and name are required"
+                "Component type and name are required",
             )
         if component_type not in c.Meltano.COMPONENT_TYPES_VALID:
             return r[t.Meltano.ServicePayload].fail(
-                f"Invalid component type: {component_type}"
+                f"Invalid component type: {component_type}",
             )
         configuration = t.json_dict_adapter().validate_python(settings or {})
         payload: t.JsonDict = {

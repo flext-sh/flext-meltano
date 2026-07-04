@@ -136,7 +136,7 @@ class FlextMeltanoSettings(FlextSettingsBase):
             return r[bool].fail(
                 "Project path "
                 f"{self.project_root} does not contain "
-                f"{c.Meltano.PATH_MELTANO_PROJECT_FILE}"
+                f"{c.Meltano.PATH_MELTANO_PROJECT_FILE}",
             )
         return r[bool].ok(value=True)
 

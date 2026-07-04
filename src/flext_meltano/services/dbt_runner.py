@@ -9,9 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
@@ -74,7 +77,9 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             return _run__run_dbt_subprocess()
         except c.EXC_OS_RUNTIME_TYPE as e:
             self.logger.exception(
-                "dbt operation failed", operation=operation, error=str(e)
+                "dbt operation failed",
+                operation=operation,
+                error=str(e),
             )
             return r[str].fail(f"dbt {operation} failed: {e}")
 

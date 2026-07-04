@@ -8,6 +8,9 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
+    from flext_meltano._models.cli_inputs import (
+        FlextMeltanoModelsCliInputs as FlextMeltanoModelsCliInputs,
+    )
     from flext_meltano._models.cli_params import (
         FlextMeltanoModelsCliParams as FlextMeltanoModelsCliParams,
     )
@@ -64,6 +67,7 @@ if TYPE_CHECKING:
     )
 _LAZY_IMPORTS = build_lazy_import_map(
     {
+        ".cli_inputs": ("FlextMeltanoModelsCliInputs",),
         ".cli_params": ("FlextMeltanoModelsCliParams",),
         ".context": ("FlextMeltanoModelsContext",),
         ".core": ("FlextMeltanoModelsCore",),

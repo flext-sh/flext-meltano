@@ -9,10 +9,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_cli import cli
 from flext_meltano import FlextMeltanoServiceBase, c, e, m, p, r, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
@@ -57,11 +60,12 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         try:
             if state_file and state_file.exists():
                 load_result = u.Cli.files_read_json_model(
-                    state_file, m.Meltano.SingerStateMessage
+                    state_file,
+                    m.Meltano.SingerStateMessage,
                 )
                 if load_result.failure:
                     return r[m.Meltano.SingerStateMessage].fail(
-                        load_result.error or "state read failed"
+                        load_result.error or "state read failed",
                     )
                 self._singer_state = load_result.value
                 self.logger.info(
@@ -73,7 +77,9 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to load state", error=str(exc))
             return e.fail_operation(
-                "load state", exc, result_type=r[m.Meltano.SingerStateMessage]
+                "load state",
+                exc,
+                result_type=r[m.Meltano.SingerStateMessage],
             )
 
     def save_state(self, state_file: Path) -> p.Result[None]:
@@ -81,7 +87,8 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
             write_result = cli.atomic_write_text_file(
-                state_file, self._singer_state.model_dump_json(indent=2)
+                state_file,
+                self._singer_state.model_dump_json(indent=2),
             )
             if write_result.failure:
                 return r[None].fail(write_result.error or "state write failed")

@@ -31,7 +31,9 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
             )
         process_input = input_data.encode() if input_data else None
         cmd_result = u.Cli.run_raw(
-            list(command), timeout=timeout, input_data=process_input
+            list(command),
+            timeout=timeout,
+            input_data=process_input,
         )
         if cmd_result.failure:
             return r[t.JsonMapping].fail(cmd_result.error or "Command failed")

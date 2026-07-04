@@ -7,14 +7,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 from flext_tests import tm
 
 from tests.models import m
-from tests.typings import t
 
 from . import _constants
+
+if TYPE_CHECKING:
+    from tests.typings import t
 
 
 class _ExecutionResultJson(m.BaseModel):
@@ -96,7 +99,7 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=0.2,
         )
         with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp"
+            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:00:00Z"
             result_dict = result.to_dict()
@@ -126,7 +129,7 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=0.1,
         )
         with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp"
+            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:01:00Z"
             result_dict = result.to_dict()
@@ -156,7 +159,7 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=2.0,
         )
         with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp"
+            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:02:00Z"
             json_str = result.model_dump_json()
@@ -167,7 +170,8 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.output, eq='{"streams": []}')
             tm.that(parsed.error, eq="")
             tm.that(
-                parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_SUCCESS
+                parsed.execution_time,
+                eq=_constants.TEST_EXECUTION_TIME_JSON_SUCCESS,
             )
             tm.that(parsed.timestamp, eq="2025-01-01T12:02:00Z")
 
@@ -183,7 +187,7 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=0.3,
         )
         with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp"
+            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:03:00Z"
             json_str = result.model_dump_json()
@@ -194,7 +198,8 @@ class TestsFlextMeltanoExecutionResult:
             tm.that(parsed.output, eq="")
             tm.that(parsed.error, eq="Configuration error: invalid settings")
             tm.that(
-                parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_FAILURE
+                parsed.execution_time,
+                eq=_constants.TEST_EXECUTION_TIME_JSON_FAILURE,
             )
             tm.that(parsed.timestamp, eq="2025-01-01T12:03:00Z")
 
@@ -210,7 +215,7 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=5.5,
         )
         with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp"
+            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
         ) as mock_timestamp:
             mock_timestamp.return_value = "2025-01-01T12:04:00Z"
             json_str = result.model_dump_json()

@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-)
-from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from flext_cli import m, u
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableMapping,
+    )
+    from pathlib import Path
+
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsResultsDbt:
@@ -21,27 +24,32 @@ class FlextMeltanoModelsResultsDbt:
         root: Annotated[Path, u.Field(description="Project root directory")]
         name: Annotated[str, u.Field(description="Project name")]
         dbt_version: Annotated[
-            str | None, u.Field(default=None, description="DBT version")
+            str | None,
+            u.Field(default=None, description="DBT version"),
         ] = None
         models_count: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of models")
+            t.NonNegativeInt,
+            u.Field(default=0, description="Number of models"),
         ] = 0
         tests_count: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of tests")
+            t.NonNegativeInt,
+            u.Field(default=0, description="Number of tests"),
         ] = 0
 
     class CommandExecutionResult(m.ArbitraryTypesModel):
         """Execution result model for Meltano command operations following flext-core patterns."""
 
         command: Annotated[
-            t.StrSequence, u.Field(description="Command that was executed")
+            t.StrSequence,
+            u.Field(description="Command that was executed"),
         ]
         success: Annotated[bool, u.Field(description="Whether the command succeeded")]
         exit_code: Annotated[int, u.Field(description="Process exit code")]
         output: Annotated[str, u.Field(description="Standard output")]
         error: Annotated[str, u.Field(description="Standard error")]
         execution_time: Annotated[
-            t.NonNegativeFloat, u.Field(description="Execution time in seconds")
+            t.NonNegativeFloat,
+            u.Field(description="Execution time in seconds"),
         ]
 
         @u.computed_field()

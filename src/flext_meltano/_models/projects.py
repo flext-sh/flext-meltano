@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import MappingProxyType
-from typing import Annotated, Self
+from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsProjects:
@@ -20,7 +22,8 @@ class FlextMeltanoModelsProjects:
         name: Annotated[str | None, u.Field(default=None, description="Node name")]
         path: Annotated[str | None, u.Field(default=None, description="Node path")]
         description: Annotated[
-            str | None, u.Field(default=None, description="Node description")
+            str | None,
+            u.Field(default=None, description="Node description"),
         ] = None
         fqn: t.StrSequence = u.Field(
             default_factory=tuple,
@@ -66,7 +69,8 @@ class FlextMeltanoModelsProjects:
             ),
         ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
         project_root: Path = u.Field(
-            default_factory=Path.cwd, description="Project root directory"
+            default_factory=Path.cwd,
+            description="Project root directory",
         )
         environments: t.SequenceOf[c.Meltano.ProjectEnvironment] = u.Field(
             default_factory=lambda: c.Meltano.METADATA_DEFAULT_ENVIRONMENTS,
@@ -87,7 +91,7 @@ class FlextMeltanoModelsProjects:
                 u.normalize(env, case="lower") for env in self.environments
             ]
             prod_envs_list: t.StrSequence = list(
-                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS
+                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS,
             )
             return any(u.in_(env, prod_envs_list) for env in normalized_envs)
 
@@ -99,7 +103,7 @@ class FlextMeltanoModelsProjects:
                 u.normalize(env, case="lower") for env in self.environments
             ]
             prod_envs_list: t.StrSequence = list(
-                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS
+                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS,
             )
             has_prod = any(u.in_(env, prod_envs_list) for env in normalized_envs)
             env_count = u.count(self.environments)

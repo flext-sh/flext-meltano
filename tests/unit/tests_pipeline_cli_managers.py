@@ -1,4 +1,4 @@
-"""Real-execution tests for the flat Meltano pipeline CLI handler."""
+"""Real-execution tests for the Meltano pipeline CLI commands."""
 
 from __future__ import annotations
 
@@ -8,17 +8,31 @@ import time
 from multiprocessing.process import BaseProcess
 from pathlib import Path
 
+import pytest
 from flext_tests import tm
 
 from flext_cli import cli as flext_cli
-from flext_meltano import cli
+from flext_meltano.cli import FlextMeltanoCli
 from tests.constants import c
 from tests.models import m
+from tests.typings import t
 from tests.utilities import u
 
 
 class TestFlextMeltanoPipelineCliManagers:
-    """Exercise pipeline lifecycle commands through the flat public CLI."""
+    """Exercise pipeline lifecycle commands through the model-driven CLI."""
+
+    @pytest.fixture
+    def runner(self) -> t.Cli.TyperRunner:
+        """Provide a fresh CliRunner for each test."""
+        runner_result = flext_cli.create_cli_runner()
+        tm.ok(runner_result)
+        return runner_result.value
+
+    @pytest.fixture
+    def app(self) -> t.Cli.CliApp:
+        """Provide the compiled Typer application under test."""
+        return FlextMeltanoCli()._app
 
     @staticmethod
     def _activate_pipelines_root(tmp_path: Path) -> str | None:
@@ -57,15 +71,29 @@ class TestFlextMeltanoPipelineCliManagers:
             process.kill()
             process.join(timeout=5)
 
-    def test_pipeline_help_request_returns_help_sentinel(self) -> None:
-        """Pipeline help stays on the flat public CLI contract."""
-        result = cli.handle_pipeline_command([c.Meltano.CMD_HELP_OPTION])
+    def test_pipeline_help_request_lists_subcommands(
+        self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
+    ) -> None:
+        """Pipeline help exposes the model-driven subcommands."""
+        result = runner.invoke(app, [
+            c.Meltano.CliCommand.PIPELINE,
+            c.Meltano.CMD_HELP_OPTION,
+        ])
 
-        tm.ok(result)
-        tm.that(result.value, eq=c.Meltano.ExecutorCommand.HELP)
+        tm.that(result.exit_code, eq=0)
+        tm.that(result.output, has=c.Meltano.PipelineCommand.CREATE)
+        tm.that(result.output, has=c.Meltano.PipelineCommand.RUN)
+        tm.that(result.output, has=c.Meltano.PipelineCommand.LIST)
+        tm.that(result.output, has=c.Meltano.PipelineCommand.STATUS)
+        tm.that(result.output, has=c.Meltano.PipelineCommand.STOP)
+        tm.that(result.output, has=c.Meltano.PipelineCommand.DELETE)
 
     def test_pipeline_create_list_run_and_delete_use_real_storage(
         self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
         tmp_path: Path,
     ) -> None:
         """Pipeline lifecycle commands persist and execute through real helpers."""
@@ -81,65 +109,83 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = cli.handle_pipeline_command([
+            create_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
+                "--pipeline-name",
                 pipeline_name,
+                "--config-json",
                 config_json_result.value,
             ])
-            list_result = cli.handle_pipeline_command([c.Meltano.PipelineCommand.LIST])
-            status_result = cli.handle_pipeline_command([
+            list_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.PipelineCommand.LIST,
+            ])
+            status_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.STATUS,
+                "--pipeline-name",
                 pipeline_name,
             ])
-            run_result = cli.handle_pipeline_command([
+            run_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.RUN,
+                "--pipeline-name",
                 pipeline_name,
             ])
             stored_result = flext_cli.read_json_file(config_path)
-            delete_result = cli.handle_pipeline_command([
+            delete_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.DELETE,
+                "--pipeline-name",
                 pipeline_name,
             ])
         finally:
             self._restore_pipelines_root(previous_root)
 
-        tm.ok(create_result)
-        tm.ok(list_result)
-        tm.ok(status_result)
-        tm.ok(run_result)
+        tm.that(create_result.exit_code, eq=0)
+        tm.that(list_result.exit_code, eq=0)
+        tm.that(status_result.exit_code, eq=0)
+        tm.that(run_result.exit_code, eq=0)
         tm.ok(stored_result)
-        tm.ok(delete_result)
+        tm.that(delete_result.exit_code, eq=0)
 
         stored_payload = m.Meltano.ConfigMappingPayload.model_validate({
             "values": stored_result.value
         })
 
-        tm.that(list_result.value, has=pipeline_name)
-        tm.that(status_result.value, eq="stopped")
-        tm.that(run_result.value.lower(), has="usage:")
+        tm.that(list_result.output, has=pipeline_name)
+        tm.that(status_result.output, has="stopped")
+        tm.that(run_result.output.lower(), has="usage:")
         tm.that(stored_payload.values, eq={"command": ["help"]})
         tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
 
     def test_pipeline_create_requires_runtime_configuration(
         self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
         tmp_path: Path,
     ) -> None:
         """Pipeline creation without JSON config fails on the real handler path."""
         previous_root = self._activate_pipelines_root(tmp_path)
 
         try:
-            result = cli.handle_pipeline_command([
+            result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
+                "--pipeline-name",
                 "missing-config",
             ])
         finally:
             self._restore_pipelines_root(previous_root)
 
-        tm.fail(result)
-        tm.that(str(result.error), has="not configured")
+        tm.that(result.exit_code, eq=1)
+        tm.that(result.output, has="not configured")
 
     def test_pipeline_status_and_stop_use_real_pid_files(
         self,
+        runner: t.Cli.TyperRunner,
+        app: t.Cli.CliApp,
         tmp_path: Path,
     ) -> None:
         """Status and stop commands inspect a real background process pid file."""
@@ -156,32 +202,39 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = cli.handle_pipeline_command([
+            create_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
+                "--pipeline-name",
                 pipeline_name,
+                "--config-json",
                 config_json_result.value,
             ])
-            tm.ok(create_result)
+            tm.that(create_result.exit_code, eq=0)
 
             ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
             tm.ok(ensure_pid_dir_result)
             write_pid_result = u.Cli.files_write_text(pid_path, str(process.pid))
             tm.ok(write_pid_result)
 
-            running_result = cli.handle_pipeline_command([
+            running_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.STATUS,
+                "--pipeline-name",
                 pipeline_name,
             ])
-            stop_result = cli.handle_pipeline_command([
+            stop_result = runner.invoke(app, [
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.STOP,
+                "--pipeline-name",
                 pipeline_name,
             ])
         finally:
             self._stop_process(process)
             self._restore_pipelines_root(previous_root)
 
-        tm.ok(running_result)
-        tm.ok(stop_result)
-        tm.that(running_result.value, eq="running")
-        tm.that(stop_result.value, eq="stopped")
+        tm.that(running_result.exit_code, eq=0)
+        tm.that(stop_result.exit_code, eq=0)
+        tm.that(running_result.output, has="running")
+        tm.that(stop_result.output, has="stopped")
         tm.that(pid_path.exists(), eq=False)

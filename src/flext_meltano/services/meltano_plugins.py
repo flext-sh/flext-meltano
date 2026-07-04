@@ -28,7 +28,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         valid_types = [pt.value for pt in c.Meltano.PluginType]
         if plugin_type not in valid_types:
             return r[str].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
         return r[str].ok(plugin_type)
 
@@ -44,7 +44,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
             ._log_plugin_addition_start(plugin_name, plugin_type)
             .flat_map(lambda _: self._validate_plugin_type(plugin_type))
             .flat_map(
-                lambda pt: self._execute_plugin_addition(project, pt, plugin_name)
+                lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
             )
             .flat_map(
                 lambda result: self._build_plugin_addition_result(
@@ -100,7 +100,9 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[bool].ok(value=True)
 
     def _log_plugin_addition_start(
-        self, plugin_name: str, plugin_type: str
+        self,
+        plugin_name: str,
+        plugin_type: str,
     ) -> p.Result[None]:
         """Log plugin addition start."""
         self.logger.info(

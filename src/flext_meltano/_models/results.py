@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from types import MappingProxyType
-from typing import Annotated, Self
+from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsResults:
@@ -21,12 +24,13 @@ class FlextMeltanoModelsResults:
         status: Annotated[str, u.Field(description="Execution status")]
         start_time: Annotated[datetime, u.Field(description="Execution start time")] = (
             u.Field(
-                default_factory=lambda: u.now(),
+                default_factory=u.now,
                 description="Execution start time",
             )
         )
         end_time: Annotated[
-            datetime | None, u.Field(default=None, description="Execution end time")
+            datetime | None,
+            u.Field(default=None, description="Execution end time"),
         ] = None
         duration_seconds: Annotated[
             float | None,
@@ -37,10 +41,12 @@ class FlextMeltanoModelsResults:
             u.Field(default=0, description="Number of records processed"),
         ] = 0
         error_message: Annotated[
-            str | None, u.Field(default=None, description="Error message if failed")
+            str | None,
+            u.Field(default=None, description="Error message if failed"),
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping, u.Field(description="Additional execution metadata")
+            t.ConfigurationMapping,
+            u.Field(description="Additional execution metadata"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.computed_field()

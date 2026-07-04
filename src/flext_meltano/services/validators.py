@@ -6,10 +6,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
@@ -17,7 +19,8 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_component_rules(
-        cls, settings: t.ConfigurationMapping
+        cls,
+        settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
         """Validate pipeline component business rules with model validation."""
         try:

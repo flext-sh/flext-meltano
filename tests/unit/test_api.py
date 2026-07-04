@@ -52,7 +52,8 @@ class TestsFlextMeltanoApi:
     ) -> None:
         """Project creation persists the canonical Meltano project file."""
         result = meltano.create_project(
-            project_name="config_test", project_dir=tmp_path
+            project_name="config_test",
+            project_dir=tmp_path,
         )
         tm.that(result, ok=True)
         assert result.success
@@ -83,7 +84,7 @@ class TestsFlextMeltanoApi:
             meltano.install_component(
                 component_type="invalid_type",
                 component_name="tap-csv",
-            )
+            ),
         )
         tm.that(error.lower(), has=["invalid"])
 
@@ -98,7 +99,7 @@ class TestsFlextMeltanoApi:
             meltano.create_project(
                 project_name="test",
                 project_dir=Path("/nonexistent/impossible/path/that/cannot/exist"),
-            )
+            ),
         )
         tm.that(
             error.lower(),

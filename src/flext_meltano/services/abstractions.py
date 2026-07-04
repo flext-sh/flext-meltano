@@ -25,7 +25,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     # -- Tap-specific operations (discovery, sync, catalog) --
 
     def process_tap_config(
-        self, settings: m.Meltano.TapConfig
+        self,
+        settings: m.Meltano.TapConfig,
     ) -> p.Result[m.Meltano.TapConfig]:
         """Validate and return tap configuration."""
         return r[m.Meltano.TapConfig].ok(settings)
@@ -126,7 +127,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             }
             if cmd_result.failure:
                 return r[t.JsonMapping].fail(
-                    cmd_result.error or c.Meltano.ERROR_STREAM_SYNC_FAILED
+                    cmd_result.error or c.Meltano.ERROR_STREAM_SYNC_FAILED,
                 )
             return r[t.JsonMapping].ok(result)
 
@@ -180,7 +181,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
             return r[t.JsonMapping].fail(
-                discovery.error or c.Meltano.ERROR_CATALOG_GENERATION_FAILED
+                discovery.error or c.Meltano.ERROR_CATALOG_GENERATION_FAILED,
             )
         raw = discovery.value
         streams: list[m.Meltano.SingerCatalogEntry] = []
@@ -211,7 +212,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
             return r[t.JsonMapping].fail(
-                discovery.error or c.Meltano.ERROR_DISCOVERY_FAILED
+                discovery.error or c.Meltano.ERROR_DISCOVERY_FAILED,
             )
         for stream in self._extract_raw_streams(discovery.value):
             if stream.get(c.Meltano.PayloadKey.STREAM_NAME) == stream_name:

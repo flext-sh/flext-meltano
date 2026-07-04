@@ -9,10 +9,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_cli import cli
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
@@ -27,7 +30,8 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     )
 
     def discover_catalog_streams(
-        self, tap: p.Meltano.SingerTap
+        self,
+        tap: p.Meltano.SingerTap,
     ) -> p.Result[m.Meltano.SingerCatalog]:
         """Discover streams from a Singer tap instance.
 
@@ -62,7 +66,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         try:
             if not catalog_file.exists():
                 return r[m.Meltano.SingerCatalog].fail(
-                    f"Catalog file not found: {catalog_file}"
+                    f"Catalog file not found: {catalog_file}",
                 )
 
             def _store(catalog: m.Meltano.SingerCatalog) -> m.Meltano.SingerCatalog:
@@ -75,7 +79,8 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 return catalog
 
             return u.Cli.files_read_json_model(
-                catalog_file, m.Meltano.SingerCatalog
+                catalog_file,
+                m.Meltano.SingerCatalog,
             ).map(_store)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load catalog", error=str(e))
@@ -98,7 +103,8 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             return r[None].fail(f"Failed to save catalog: {e}")
 
     def select_streams(
-        self, stream_names: t.StrSequence
+        self,
+        stream_names: t.StrSequence,
     ) -> p.Result[m.Meltano.SingerCatalog]:
         """Select specific streams from cached catalog."""
         try:

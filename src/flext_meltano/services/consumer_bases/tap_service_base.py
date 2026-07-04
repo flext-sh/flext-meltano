@@ -41,7 +41,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     ] = "tap"
 
     _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
-        default_factory=lambda: None
+        default_factory=lambda: None,
     )
 
     def __init__(

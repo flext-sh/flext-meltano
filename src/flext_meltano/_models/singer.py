@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Annotated, ClassVar
+from typing import TYPE_CHECKING, Annotated, ClassVar
 
 from flext_cli import m, u
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsSinger:
@@ -35,7 +37,8 @@ class FlextMeltanoModelsSinger:
             ),
         ]
         key_properties: Annotated[
-            t.StrSequence, u.Field(description="Singer stream key properties")
+            t.StrSequence,
+            u.Field(description="Singer stream key properties"),
         ] = u.Field(default_factory=tuple)
         bookmark_properties: Annotated[
             t.StrSequence,
@@ -101,5 +104,6 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.ACTIVATE_VERSION
         stream: Annotated[str, u.Field(description="Singer stream name")]
         version: Annotated[
-            t.PositiveInt, u.Field(description="Stream version to activate")
+            t.PositiveInt,
+            u.Field(description="Stream version to activate"),
         ]

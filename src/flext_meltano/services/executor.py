@@ -68,7 +68,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 "command_type": "health",
                 "health": "OK" if cmd_result.success else "DEGRADED",
                 "exit_code": cmd_result.exit_code,
-            }
+            },
         )
 
     def help(self) -> p.Result[t.JsonMapping]:
@@ -82,7 +82,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 "command": c.Meltano.ExecutorCommand.HELP,
                 "command_type": c.Meltano.ExecutorCommand.HELP,
                 "help": cmd_result.output,
-            }
+            },
         )
 
     def run(self, args: t.StrSequence) -> p.Result[t.JsonMapping]:
@@ -133,7 +133,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 "version": ver,
                 "success": True,
                 "cli_type": "flext_meltano",
-            }
+            },
         )
 
     def _route_command(

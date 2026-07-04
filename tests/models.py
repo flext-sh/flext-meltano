@@ -9,14 +9,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from flext_tests import FlextTestsModels
 
 from flext_meltano import m
 from tests.constants import c
-from tests.protocols import p
 from tests.typings import t
+
+if TYPE_CHECKING:
+    from tests.protocols import p
 
 
 class TestsFlextMeltanoModels(FlextTestsModels, m):

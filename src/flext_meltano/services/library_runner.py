@@ -6,10 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 from flext_meltano.services.executor import FlextMeltanoExecutor
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
@@ -39,7 +42,9 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 dbt_models=str(dbt_models or []),
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings
+                tap_name,
+                target_name,
+                settings,
             )
             if result.failure:
                 return r[t.JsonMapping].fail(
@@ -82,7 +87,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         """Run DBT transformation using the configured Meltano executor."""
         executor = (
             FlextMeltanoExecutor(
-                settings=self.settings.model_copy(update={"project_root": project_dir})
+                settings=self.settings.model_copy(update={"project_root": project_dir}),
             )
             if project_dir is not None
             else self._elt_executor
@@ -98,7 +103,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                     "project_dir": str(project_dir) if project_dir else "",
                 },
                 duration_field="execution_time",
-            )
+            ),
         )
 
     def run_elt_pipeline(
@@ -115,7 +120,9 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 target_name=target.name,
             )
             result = self._elt_executor.execute_pipeline(
-                tap.name, target.name, settings
+                tap.name,
+                target.name,
+                settings,
             )
             if result.failure:
                 return r[t.JsonMapping].fail(

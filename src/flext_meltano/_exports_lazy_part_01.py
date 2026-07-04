@@ -9,7 +9,7 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
     {
         ".api": ("FlextMeltano",),
         ".base": ("FlextMeltanoServiceBase",),
-        ".cli": ("FlextMeltanoCLI",),
+        ".cli": ("FlextMeltanoCli",),
         ".constants": ("FlextMeltanoConstants",),
         ".models": ("FlextMeltanoModels",),
         ".protocols": ("FlextMeltanoProtocols",),

@@ -9,9 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
@@ -29,7 +32,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         """Get all models from manifest."""
         try:
             model_nodes_result = self._get_dbt_manifest_nodes(
-                c.Meltano.DbtResourceType.MODEL
+                c.Meltano.DbtResourceType.MODEL,
             )
             if model_nodes_result.failure:
                 return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
@@ -51,14 +54,14 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         except c.Meltano.OPERATION_ERRORS as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                f"Failed to get models: {e}"
+                f"Failed to get models: {e}",
             )
 
     def fetch_dbt_tests(self) -> p.Result[t.SequenceOf[t.AttributeMapping]]:
         """Get all tests from manifest."""
         try:
             test_nodes_result = self._get_dbt_manifest_nodes(
-                c.Meltano.DbtResourceType.TEST
+                c.Meltano.DbtResourceType.TEST,
             )
             if test_nodes_result.failure:
                 return r[t.SequenceOf[t.AttributeMapping]].fail(
@@ -110,11 +113,12 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             return _run__get_dbt_manifest_nodes()
         except c.EXC_OS_VALIDATION as e:
             return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
-                f"Failed to read manifest nodes: {e}"
+                f"Failed to read manifest nodes: {e}",
             )
 
     def load_dbt_manifest(
-        self, manifest_path: Path | None = None
+        self,
+        manifest_path: Path | None = None,
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load DBT manifest from file."""
         resolved_manifest_path = manifest_path
@@ -131,14 +135,16 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 )
             if not manifest_path_local.exists():
                 return r[t.Meltano.DbtManifestData].fail(
-                    f"Manifest not found: {manifest_path_local}"
+                    f"Manifest not found: {manifest_path_local}",
                 )
             parsed_result = u.Cli.files_read_json_model(
-                manifest_path_local, m.Meltano.DbtManifest
+                manifest_path_local,
+                m.Meltano.DbtManifest,
             )
             if parsed_result.failure:
                 return r[t.Meltano.DbtManifestData].fail_op(
-                    "Manifest reading", parsed_result.error
+                    "Manifest reading",
+                    parsed_result.error,
                 )
             parsed_manifest = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
@@ -160,7 +166,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         def _run_load_dbt_project() -> p.Result[m.Meltano.DbtProjectInfo]:
             if not root.exists():
                 return r[m.Meltano.DbtProjectInfo].fail(
-                    f"DBT project directory not found: {root}"
+                    f"DBT project directory not found: {root}",
                 )
             self._dbt_project_root = root
             models_count = 0

@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_cli import FlextCliModels
+from flext_meltano._models.cli_inputs import FlextMeltanoModelsCliInputs
 from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
 from flext_meltano._models.context import FlextMeltanoModelsContext
 from flext_meltano._models.core import FlextMeltanoModelsCore
@@ -38,6 +39,7 @@ class FlextMeltanoModels(FlextCliModels):
     class Meltano(
         FlextMeltanoModelsCore,
         FlextMeltanoModelsLogging,
+        FlextMeltanoModelsCliInputs,
         FlextMeltanoModelsCliParams,
         FlextMeltanoModelsSourcesParams,
         FlextMeltanoModelsSources,

@@ -55,7 +55,8 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     transformation_name: Annotated[
         str | None,
         u.Field(
-            default=None, description="Optional transformation specialization name"
+            default=None,
+            description="Optional transformation specialization name",
         ),
     ] = None
 
@@ -79,11 +80,11 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
             normalized["runtime_settings"] = settings
         elif isinstance(settings, Mapping):
             normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
-                settings
+                settings,
             )
         elif isinstance(settings, m.BaseModel):
             normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
-                settings.model_dump()
+                settings.model_dump(),
             )
         else:
             normalized["runtime_settings"] = FlextMeltanoSettings()

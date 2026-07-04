@@ -51,7 +51,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         plugin_value = plugins_dict.get(plugin_name)
         if plugin_value is None:
             return r[t.StrMapping].fail(
-                f"Plugin '{plugin_name}' not found in {plugin_type}"
+                f"Plugin '{plugin_name}' not found in {plugin_type}",
             )
         plugin_info = u.Meltano.build_plugin_discovery_item(
             plugin_name,
@@ -124,7 +124,9 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         return r[t.SequenceOf[t.StrMapping]].ok(plugins)
 
     def fetch_plugin_info(
-        self, plugin_name: str, plugin_type: str
+        self,
+        plugin_name: str,
+        plugin_type: str,
     ) -> p.Result[t.StrMapping]:
         """Get detailed information about specific plugin."""
 
@@ -140,7 +142,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             temp_project = temp_project_result.value
             if not self._is_meltano_project(temp_project):
                 return r[t.StrMapping].fail(
-                    "Temporary project does not satisfy Project"
+                    "Temporary project does not satisfy Project",
                 )
             abstractions = FlextMeltanoAbstractions()
             plugins_result = abstractions.fetch_plugins_of_type(
@@ -149,10 +151,12 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
             )
             if plugins_result.failure:
                 return r[t.StrMapping].fail(
-                    plugins_result.error or "Failed to get plugins"
+                    plugins_result.error or "Failed to get plugins",
                 )
             return self._extract_plugin_info(
-                plugins_result.value, plugin_name, plugin_type
+                plugins_result.value,
+                plugin_name,
+                plugin_type,
             )
 
         try:

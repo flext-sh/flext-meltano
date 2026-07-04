@@ -8,12 +8,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import psycopg2
 import pytest
 import redis
-from flext_tests import tk
 
 from tests.constants import c
+
+if TYPE_CHECKING:
+    from flext_tests import tk
 
 
 class TestsFlextMeltanoDockerIntegration:

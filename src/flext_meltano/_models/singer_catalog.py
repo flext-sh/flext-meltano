@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from flext_cli import m, u
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsSingerCatalog:
@@ -42,9 +44,7 @@ class FlextMeltanoModelsSingerCatalog:
         metadata: t.SequenceOf[
             FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
         ] = u.Field(
-            default_factory=lambda: list[
-                FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
-            ](),
+            default_factory=list[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata],
             description="Singer stream metadata blocks",
         )
         key_properties: t.StrSequence = u.Field(
@@ -54,7 +54,8 @@ class FlextMeltanoModelsSingerCatalog:
         replication_key: Annotated[
             str | None,
             u.Field(
-                default=None, description="Column used for incremental replication"
+                default=None,
+                description="Column used for incremental replication",
             ),
         ] = None
         replication_method: Annotated[
@@ -66,10 +67,12 @@ class FlextMeltanoModelsSingerCatalog:
             u.Field(default=None, description="Whether this stream is a database view"),
         ] = None
         table_name: Annotated[
-            str | None, u.Field(default=None, description="Source table name")
+            str | None,
+            u.Field(default=None, description="Source table name"),
         ] = None
         database_name: Annotated[
-            str | None, u.Field(default=None, description="Source database name")
+            str | None,
+            u.Field(default=None, description="Source database name"),
         ] = None
         row_count: Annotated[
             int | None,
@@ -88,9 +91,9 @@ class FlextMeltanoModelsSingerCatalog:
         ] = c.Meltano.SingerMessageType.CATALOG
         streams: t.SequenceOf[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = (
             u.Field(
-                default_factory=lambda: list[
+                default_factory=list[
                     FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
-                ](),
+                ],
                 description="Singer catalog stream entries",
             )
         )

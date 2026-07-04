@@ -29,10 +29,10 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
     def __init__(
         self,
-        cli: p.Meltano.PipelineCli,
+        cli: p.Meltano.PipelineCli | None = None,
         settings: p.Settings | None = None,
     ) -> None:
-        """Initialize the pipeline manager with a CLI reference."""
+        """Initialize the pipeline manager with an optional CLI reference."""
         resolved_settings = (
             settings if settings is not None else type(self).fetch_fresh_settings()
         )
@@ -53,7 +53,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             with FlextMeltanoSettings.singleton_disabled():
                 return FlextMeltanoSettings()
         return FlextMeltanoSettings.model_validate({
-            c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV: configured_root
+            c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV: configured_root,
         })
 
     def _pipelines_root(self) -> Path:
@@ -89,7 +89,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             )
         try:
             config_mapping = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": config_result.value
+                "values": config_result.value,
             })
         except ValueError as exc:
             return e.fail_validation(
@@ -113,7 +113,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
             return r[t.StrSequence].fail("Pipeline execution not configured")
         command = m.Meltano.StringListValue.model_validate({
-            "items": command_value
+            "items": command_value,
         }).items
         return r[t.StrSequence].ok([
             *command,
@@ -151,7 +151,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             return r[str].fail("Pipeline creation not configured")
         try:
             config_mapping = m.Meltano.ConfigMappingPayload.model_validate({
-                "values": config_payload
+                "values": config_payload,
             })
         except ValueError as exc:
             return e.fail_validation(
@@ -186,7 +186,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         command_result = self._pipeline_command(name_result.value, args)
         if command_result.failure:
             return r[str].fail(
-                command_result.error or "Pipeline execution not configured"
+                command_result.error or "Pipeline execution not configured",
             )
         execution_result = FlextMeltanoExecutor(
             settings=self.settings,
@@ -254,7 +254,8 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle pipeline command using composition."""
         if not args or u.Meltano.is_help_request(args):
-            self._cli.show_pipeline_help()
+            if self._cli is not None:
+                self._cli.show_pipeline_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -273,11 +274,11 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             if loaded_config_result.failure:
                 return r[str].fail(
                     loaded_config_result.error
-                    or "pipeline configuration JSON could not be parsed"
+                    or "pipeline configuration JSON could not be parsed",
                 )
             try:
                 config_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": loaded_config_result.value
+                    "values": loaded_config_result.value,
                 }).values
             except ValueError as exc:
                 return e.fail_validation(
@@ -324,7 +325,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     def _list_pipelines(self) -> p.Result[str]:
         """List pipelines as one CLI-renderable string."""
         return self.list_pipelines().map(
-            lambda pipelines: ", ".join(pipelines) or "none"
+            lambda pipelines: ", ".join(pipelines) or "none",
         )
 
     def _run_pipeline(self, args: t.StrSequence) -> p.Result[str]:

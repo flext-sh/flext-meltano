@@ -60,7 +60,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 )
             except c.EXC_ATTR_KEY_TYPE_VALUE as e:
                 return r[m.Meltano.DataSinkInstance].fail(
-                    f"Invalid target settings: {e}"
+                    f"Invalid target settings: {e}",
                 )
         else:
             settings = sink_config
@@ -97,7 +97,8 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
         return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
 
     def validate_sink_config(
-        self, sink_config: m.Meltano.DataSinkConfig
+        self,
+        sink_config: m.Meltano.DataSinkConfig,
     ) -> p.Result[bool]:
         """Validate a sink configuration."""
         try:

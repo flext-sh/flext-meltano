@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated, Self
+from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_cli import m, u
-from flext_meltano._models.results import FlextMeltanoModelsResults
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano._models.results import FlextMeltanoModelsResults
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsResultsPipeline:
@@ -38,10 +40,12 @@ class FlextMeltanoModelsResultsPipeline:
             ),
         ] = c.Meltano.OperationStatus.PENDING
         total_records: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Total records processed")
+            t.NonNegativeInt,
+            u.Field(default=0, description="Total records processed"),
         ] = 0
         pipeline_metadata: Annotated[
-            t.ConfigurationMapping, u.Field(description="Pipeline execution metadata")
+            t.ConfigurationMapping,
+            u.Field(description="Pipeline execution metadata"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.computed_field()

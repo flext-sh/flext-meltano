@@ -9,12 +9,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
@@ -47,7 +51,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to get plugins: {e}")
 
     def initialize_sdk_project(
-        self, root: Path
+        self,
+        root: Path,
     ) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Initialize a new Meltano project via SDK."""
 
@@ -72,7 +77,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.OptionalScalarMap].fail(
-                f"Failed to initialize project: {e}"
+                f"Failed to initialize project: {e}",
             )
 
     def load_sdk_project(self, root: Path) -> p.Result[t.Meltano.OptionalScalarMap]:
@@ -108,7 +113,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return plugins
         try:
             plugins.extend(
-                self._sdk_plugin_definitions(sdk_plugins_service, plugin_type)
+                self._sdk_plugin_definitions(sdk_plugins_service, plugin_type),
             )
         except c.EXC_ATTR_TYPE as e:
             self.logger.warning("Failed to extract plugins", error=str(e))

@@ -28,7 +28,8 @@ class FlextMeltanoModelsPayloadsData:
         """Path normalization payload for runtime path conversions."""
 
         value: Annotated[Path, u.Field(description="Normalized path")] = u.Field(
-            default_factory=Path, description="Normalized path"
+            default_factory=Path,
+            description="Normalized path",
         )
 
         @u.field_validator("value", mode="before")

@@ -355,7 +355,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             nonlocal prepared_command
             try:
                 command = list(
-                    u.Meltano.build_pipeline_runtime_command(tap_name, target_name)
+                    u.Meltano.build_pipeline_runtime_command(tap_name, target_name),
                 )
                 if config is not None:
                     command.extend(

@@ -54,7 +54,8 @@ class TestsFlextMeltanoModelsUnit:
 
     def test_tap_config_validation_invalid_connection_config_type(self) -> None:
         with pytest.raises(
-            c.ValidationError, match="Input should be a valid dictionary"
+            c.ValidationError,
+            match="Input should be a valid dictionary",
         ):
             m.Meltano.TapConfig.model_validate({
                 "tap_type": "tap-postgres",
@@ -141,7 +142,8 @@ class TestsFlextMeltanoModelsUnit:
 
     def test_stream_info_validation_invalid_schema_type(self) -> None:
         with pytest.raises(
-            c.ValidationError, match="Input should be a valid dictionary"
+            c.ValidationError,
+            match="Input should be a valid dictionary",
         ):
             m.Meltano.StreamInfo.model_validate({
                 "stream_name": "users",

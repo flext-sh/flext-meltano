@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated, ClassVar, Self
+from typing import TYPE_CHECKING, Annotated, ClassVar, Self
 
 from flext_cli import m, u
 from flext_meltano._models.core import FlextMeltanoModelsCore
 from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsSources:
@@ -23,7 +25,8 @@ class FlextMeltanoModelsSources:
 
         tap_type: Annotated[str, u.Field(description="Type of the tap")]
         connection_config: Annotated[
-            t.JsonMapping, u.Field(description="Connection configuration")
+            t.JsonMapping,
+            u.Field(description="Connection configuration"),
         ]
         stream_config: Annotated[
             t.JsonMapping,
@@ -36,7 +39,7 @@ class FlextMeltanoModelsSources:
         def config_size(self) -> int:
             """Total number of configuration parameters."""
             return u.count(list(self.connection_config.keys())) + u.count(
-                list(self.stream_config.keys())
+                list(self.stream_config.keys()),
             )
 
         @u.computed_field()
@@ -72,17 +75,20 @@ class FlextMeltanoModelsSources:
 
         target_type: Annotated[str, u.Field(description="Type of the target")]
         connection_config: Annotated[
-            t.JsonMapping, u.Field(description="Connection configuration")
+            t.JsonMapping,
+            u.Field(description="Connection configuration"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         batch_size: Annotated[
-            int | None, u.Field(default=None, description="Batch size for data loading")
+            int | None,
+            u.Field(default=None, description="Batch size for data loading"),
         ] = None
         batch_wait_limit: Annotated[
             float | None,
             u.Field(default=None, description="Batch wait limit in seconds"),
         ] = None
         target_version: Annotated[
-            str, u.Field(default="latest", description="Target version")
+            str,
+            u.Field(default="latest", description="Target version"),
         ] = "latest"
 
         @u.computed_field()
@@ -121,14 +127,16 @@ class FlextMeltanoModelsSources:
 
         source_type: Annotated[str, u.Field(description="Type of the data source")]
         connection_config: Annotated[
-            t.JsonMapping, u.Field(description="Connection configuration")
+            t.JsonMapping,
+            u.Field(description="Connection configuration"),
         ]
         stream_config: Annotated[
             t.JsonMapping,
             u.Field(description="Stream-specific configuration"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         source_version: Annotated[
-            str, u.Field(default="latest", description="Source version")
+            str,
+            u.Field(default="latest", description="Source version"),
         ] = "latest"
 
         @u.computed_field()
@@ -136,7 +144,7 @@ class FlextMeltanoModelsSources:
         def config_size(self) -> int:
             """Total number of configuration parameters."""
             return u.count(list(self.connection_config.keys())) + u.count(
-                list(self.stream_config.keys())
+                list(self.stream_config.keys()),
             )
 
         @u.computed_field()

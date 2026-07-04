@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_meltano import meltano
-from flext_meltano.cli import cli
+from flext_meltano.cli import FlextMeltanoCli
 
 
 class TestsFlextMeltanoExecutors:
@@ -118,12 +118,9 @@ class TestsFlextMeltanoExecutors:
         """Executor project_root remains a concrete filesystem path."""
         assert isinstance(meltano.project_root, Path)
 
-    def test_cli_uses_flat_public_handlers(self) -> None:
-        """The public CLI exposes only the flat handler surface exercised by tests."""
-        assert callable(cli.handle_pipeline_command)
-        assert callable(cli.handle_tap_command)
-        assert callable(cli.handle_target_command)
-        assert callable(cli.handle_dbt_command)
-        assert callable(cli.handle_plugin_command)
-        assert callable(cli.handle_status_command)
-        assert callable(cli.handle_version_command)
+    def test_cli_uses_model_driven_surface(self) -> None:
+        """The public CLI exposes the model-driven Typer application surface."""
+        cli_instance = FlextMeltanoCli()
+
+        assert callable(cli_instance.run)
+        assert cli_instance._app is not None

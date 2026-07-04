@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from flext_cli import m, u
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsDiscovery:
@@ -16,7 +18,8 @@ class FlextMeltanoModelsDiscovery:
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
-            str, u.Field(default="", description="Plugin default variant")
+            str,
+            u.Field(default="", description="Plugin default variant"),
         ] = ""
         variants: t.JsonMapping = u.Field(
             default_factory=lambda: MappingProxyType({}),
@@ -24,7 +27,8 @@ class FlextMeltanoModelsDiscovery:
         )
         logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, u.Field(default="", description="Plugin description")
+            str,
+            u.Field(default="", description="Plugin description"),
         ] = ""
 
         @u.field_validator("default_variant", "logo_url", "description", mode="before")
@@ -39,14 +43,17 @@ class FlextMeltanoModelsDiscovery:
         name: Annotated[t.NonEmptyStr, u.Field(description="Plugin name")]
         type: Annotated[t.NonEmptyStr, u.Field(description="Plugin type")]
         default_variant: Annotated[
-            str, u.Field(default="", description="Default plugin variant")
+            str,
+            u.Field(default="", description="Default plugin variant"),
         ] = ""
         variants: Annotated[
-            str, u.Field(default="", description="Comma-separated variants")
+            str,
+            u.Field(default="", description="Comma-separated variants"),
         ] = ""
         logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, u.Field(default="", description="Plugin description")
+            str,
+            u.Field(default="", description="Plugin description"),
         ] = ""
 
     class PluginDiscoveryCatalog(m.FlexibleModel):

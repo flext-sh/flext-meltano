@@ -18,17 +18,20 @@ class FlextMeltanoModelsSourcesParams:
 
         tap_name: Annotated[str, u.Field(description="Name of the tap to run")]
         discover: Annotated[
-            bool, u.Field(default=False, description="Run tap in discover mode")
+            bool,
+            u.Field(default=False, description="Run tap in discover mode"),
         ] = False
         config_file: Annotated[
             str | None,
             u.Field(default=None, description="Path to tap configuration file"),
         ] = None
         catalog_file: Annotated[
-            str | None, u.Field(default=None, description="Path to Singer catalog file")
+            str | None,
+            u.Field(default=None, description="Path to Singer catalog file"),
         ] = None
         state_file: Annotated[
-            str | None, u.Field(default=None, description="Path to Singer state file")
+            str | None,
+            u.Field(default=None, description="Path to Singer state file"),
         ] = None
         properties_file: Annotated[
             str | None,
@@ -44,7 +47,8 @@ class FlextMeltanoModelsSourcesParams:
             u.Field(description="JSON schema for the stream"),
         ]
         source_type: Annotated[
-            str, u.Field(description="Type of source this stream belongs to")
+            str,
+            u.Field(description="Type of source this stream belongs to"),
         ]
         status: Annotated[
             str,

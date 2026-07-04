@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Annotated, Self
+from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano._models.core import FlextMeltanoModelsCore
-from flext_meltano._models.sources import FlextMeltanoModelsSources
-from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from flext_meltano._models.sources import FlextMeltanoModelsSources
+    from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
+    from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsInstancesData:
@@ -27,7 +29,8 @@ class FlextMeltanoModelsInstancesData:
         batch_size: Annotated[
             t.BatchSize,
             u.Field(
-                default=c.DEFAULT_SIZE, description="Batch size for record processing"
+                default=c.DEFAULT_SIZE,
+                description="Batch size for record processing",
             ),
         ] = c.DEFAULT_SIZE
         max_batches: Annotated[
@@ -96,7 +99,8 @@ class FlextMeltanoModelsInstancesData:
         status: Annotated[
             str,
             u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
@@ -108,7 +112,8 @@ class FlextMeltanoModelsInstancesData:
             u.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
-            t.ConfigurationMapping, u.Field(description="Additional metadata")
+            t.ConfigurationMapping,
+            u.Field(description="Additional metadata"),
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
@@ -170,11 +175,12 @@ class FlextMeltanoModelsInstancesData:
         """Generic data sink instance for pipeline operations."""
 
         sink_id: Annotated[
-            str | None, u.Field(default=None, description="Unique sink identifier")
+            str | None,
+            u.Field(default=None, description="Unique sink identifier"),
         ] = None
         sink_type: Annotated[str, u.Field(description="Type of the data sink")]
         settings: FlextMeltanoModelsInstancesData.DataSinkConfig = u.Field(
-            description="Sink configuration"
+            description="Sink configuration",
         )
         adapter: Annotated[
             t.JsonValue | None,
@@ -183,11 +189,13 @@ class FlextMeltanoModelsInstancesData:
         status: Annotated[
             str,
             u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[
-            t.BatchSize, u.Field(default=1000, description="Batch processing size")
+            t.BatchSize,
+            u.Field(default=1000, description="Batch processing size"),
         ] = 1000
         sink_count: Annotated[
             t.NonNegativeInt,

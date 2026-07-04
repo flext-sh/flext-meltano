@@ -217,13 +217,15 @@ class FlextMeltanoProtocolsSinger:
         """
 
         def handle_schema(
-            self, message: m.Meltano.SingerSchemaMessage
+            self,
+            message: m.Meltano.SingerSchemaMessage,
         ) -> p.Result[None]:
             """Handle a SCHEMA message."""
             ...
 
         def handle_record(
-            self, message: m.Meltano.SingerRecordMessage
+            self,
+            message: m.Meltano.SingerRecordMessage,
         ) -> p.Result[None]:
             """Handle a RECORD message."""
             ...

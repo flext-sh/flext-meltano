@@ -15,7 +15,6 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_02 = build_lazy_import_map(
         ".api": ("meltano",),
         ".base": ("s",),
         ".cli": (
-            "cli",
             "main",
         ),
         ".constants": ("c",),
