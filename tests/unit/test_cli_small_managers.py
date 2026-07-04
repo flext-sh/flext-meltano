@@ -42,14 +42,20 @@ class TestsFlextMeltanoCliSmallManagers:
         runner: t.Cli.TyperRunner,
         app: t.Cli.CliApp,
     ) -> None:
-        show_result = runner.invoke(app, [
-            c.Meltano.CliCommand.STATUS,
-            "show",
-        ])
-        health_result = runner.invoke(app, [
-            c.Meltano.CliCommand.STATUS,
-            c.Meltano.ExecutorCommand.HEALTH,
-        ])
+        show_result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.STATUS,
+                "show",
+            ],
+        )
+        health_result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.STATUS,
+                c.Meltano.ExecutorCommand.HEALTH,
+            ],
+        )
 
         tm.that(show_result.exit_code, eq=0)
         tm.that(health_result.exit_code, eq=0)
@@ -71,20 +77,26 @@ class TestsFlextMeltanoCliSmallManagers:
         runner: t.Cli.TyperRunner,
         app: t.Cli.CliApp,
     ) -> None:
-        tap_result = runner.invoke(app, [
-            c.Meltano.CliCommand.TAP,
-            "--operation",
-            "run",
-            "--args",
-            "tap-demo",
-        ])
-        target_result = runner.invoke(app, [
-            c.Meltano.CliCommand.TARGET,
-            "--operation",
-            "run",
-            "--args",
-            "target-demo",
-        ])
+        tap_result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.TAP,
+                "--operation",
+                "run",
+                "--args",
+                "tap-demo",
+            ],
+        )
+        target_result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.TARGET,
+                "--operation",
+                "run",
+                "--args",
+                "target-demo",
+            ],
+        )
 
         tm.that(tap_result.exit_code, eq=1)
         tm.that(target_result.exit_code, eq=1)
@@ -96,16 +108,22 @@ class TestsFlextMeltanoCliSmallManagers:
         runner: t.Cli.TyperRunner,
         app: t.Cli.CliApp,
     ) -> None:
-        info_result = runner.invoke(app, [
-            c.Meltano.CliCommand.PLUGIN,
-            c.Meltano.ExecutorCommand.INFO,
-        ])
-        install_result = runner.invoke(app, [
-            c.Meltano.CliCommand.PLUGIN,
-            c.Meltano.ExecutorCommand.INSTALL,
-            "--plugin-name",
-            "tap-demo",
-        ])
+        info_result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.PLUGIN,
+                c.Meltano.ExecutorCommand.INFO,
+            ],
+        )
+        install_result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.PLUGIN,
+                c.Meltano.ExecutorCommand.INSTALL,
+                "--plugin-name",
+                "tap-demo",
+            ],
+        )
 
         tm.that(info_result.exit_code, eq=1)
         tm.that(install_result.exit_code, eq=1)
@@ -117,7 +135,9 @@ class TestsFlextMeltanoCliSmallManagers:
         runner: t.Cli.TyperRunner,
         app: t.Cli.CliApp,
     ) -> None:
-        result = runner.invoke(app, [c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION])
+        result = runner.invoke(
+            app, [c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION]
+        )
 
         tm.that(result.exit_code, eq=0)
         tm.that(result.output, has="DBT")

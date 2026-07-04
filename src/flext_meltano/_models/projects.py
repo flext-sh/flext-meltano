@@ -4,13 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano.constants import FlextMeltanoConstants as c
-
-if TYPE_CHECKING:
-    from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsProjects:

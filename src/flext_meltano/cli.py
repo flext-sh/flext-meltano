@@ -179,13 +179,13 @@ class FlextMeltanoCli:
             else None
         )
         return (
-            self._service.discover_plugins()
+            self._service
+            .discover_plugins()
             .map(
                 lambda plugins: [
                     t.json_dict_adapter().validate_python(plugin)
                     for plugin in plugins
-                    if plugin_type is None
-                    or plugin.get("type") == plugin_type
+                    if plugin_type is None or plugin.get("type") == plugin_type
                 ]
             )
             .flat_map(

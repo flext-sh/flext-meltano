@@ -77,10 +77,13 @@ class TestFlextMeltanoPipelineCliManagers:
         app: t.Cli.CliApp,
     ) -> None:
         """Pipeline help exposes the model-driven subcommands."""
-        result = runner.invoke(app, [
-            c.Meltano.CliCommand.PIPELINE,
-            c.Meltano.CMD_HELP_OPTION,
-        ])
+        result = runner.invoke(
+            app,
+            [
+                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.CMD_HELP_OPTION,
+            ],
+        )
 
         tm.that(result.exit_code, eq=0)
         tm.that(result.output, has=c.Meltano.PipelineCommand.CREATE)
@@ -109,37 +112,52 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.CREATE,
-                "--pipeline-name",
-                pipeline_name,
-                "--config-json",
-                config_json_result.value,
-            ])
-            list_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.LIST,
-            ])
-            status_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.STATUS,
-                "--pipeline-name",
-                pipeline_name,
-            ])
-            run_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.RUN,
-                "--pipeline-name",
-                pipeline_name,
-            ])
+            create_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.CREATE,
+                    "--pipeline-name",
+                    pipeline_name,
+                    "--config-json",
+                    config_json_result.value,
+                ],
+            )
+            list_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.LIST,
+                ],
+            )
+            status_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.STATUS,
+                    "--pipeline-name",
+                    pipeline_name,
+                ],
+            )
+            run_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.RUN,
+                    "--pipeline-name",
+                    pipeline_name,
+                ],
+            )
             stored_result = flext_cli.read_json_file(config_path)
-            delete_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.DELETE,
-                "--pipeline-name",
-                pipeline_name,
-            ])
+            delete_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.DELETE,
+                    "--pipeline-name",
+                    pipeline_name,
+                ],
+            )
         finally:
             self._restore_pipelines_root(previous_root)
 
@@ -170,12 +188,15 @@ class TestFlextMeltanoPipelineCliManagers:
         previous_root = self._activate_pipelines_root(tmp_path)
 
         try:
-            result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.CREATE,
-                "--pipeline-name",
-                "missing-config",
-            ])
+            result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.CREATE,
+                    "--pipeline-name",
+                    "missing-config",
+                ],
+            )
         finally:
             self._restore_pipelines_root(previous_root)
 
@@ -202,14 +223,17 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.CREATE,
-                "--pipeline-name",
-                pipeline_name,
-                "--config-json",
-                config_json_result.value,
-            ])
+            create_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.CREATE,
+                    "--pipeline-name",
+                    pipeline_name,
+                    "--config-json",
+                    config_json_result.value,
+                ],
+            )
             tm.that(create_result.exit_code, eq=0)
 
             ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
@@ -217,18 +241,24 @@ class TestFlextMeltanoPipelineCliManagers:
             write_pid_result = u.Cli.files_write_text(pid_path, str(process.pid))
             tm.ok(write_pid_result)
 
-            running_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.STATUS,
-                "--pipeline-name",
-                pipeline_name,
-            ])
-            stop_result = runner.invoke(app, [
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.STOP,
-                "--pipeline-name",
-                pipeline_name,
-            ])
+            running_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.STATUS,
+                    "--pipeline-name",
+                    pipeline_name,
+                ],
+            )
+            stop_result = runner.invoke(
+                app,
+                [
+                    c.Meltano.CliCommand.PIPELINE,
+                    c.Meltano.PipelineCommand.STOP,
+                    "--pipeline-name",
+                    pipeline_name,
+                ],
+            )
         finally:
             self._stop_process(process)
             self._restore_pipelines_root(previous_root)

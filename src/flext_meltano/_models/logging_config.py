@@ -2,12 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from flext_cli import m, u
-
-if TYPE_CHECKING:
-    from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsLogging:

@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated, ClassVar, Self
+from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
 from flext_meltano._models.core import FlextMeltanoModelsCore
 from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
-
-if TYPE_CHECKING:
-    from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano.typings import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsSources:
