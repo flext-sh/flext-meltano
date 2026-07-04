@@ -85,7 +85,9 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
         if project:
             working_project = project
         else:
-            temp_project_result = FlextMeltanoProjectService().create_temporary_project()
+            temp_project_result = (
+                FlextMeltanoProjectService().create_temporary_project()
+            )
             if temp_project_result.failure:
                 return r[t.SequenceOf[t.StrMapping]].fail(
                     temp_project_result.error or "Failed to create temporary project",
