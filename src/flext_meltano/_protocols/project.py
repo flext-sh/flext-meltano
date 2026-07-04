@@ -27,7 +27,7 @@ class FlextMeltanoProtocolsProject:
 
         @property
         def root_dir(self) -> Path:
-            """Get project root directory."""
+            """The project root directory."""
             ...
 
         def find_plugins(

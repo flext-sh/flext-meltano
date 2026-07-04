@@ -97,7 +97,7 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     @property
     @override
     def settings(self) -> FlextMeltanoSettings:
-        """Return the typed Meltano settings namespace."""
+        """The typed Meltano settings namespace."""
         if isinstance(self.runtime_settings, FlextMeltanoSettings):
             return self.runtime_settings
         try:

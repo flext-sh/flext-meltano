@@ -67,7 +67,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     @property
     def project_root(self) -> Path:
-        """Get project root directory - delegates to settings."""
+        """The project root directory - delegates to settings."""
         active_settings = (
             self.runtime_settings
             if isinstance(self.runtime_settings, FlextMeltanoSettings)
@@ -77,7 +77,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
-        """Get version information from the imported Meltano package."""
+        """The version information from the imported Meltano package."""
         return u.try_(
             lambda: meltano.__version__,
             catch=(
@@ -164,7 +164,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         plugin_type: str | None = None,
         _cwd: Path | None = None,
     ) -> p.Result[t.SequenceOf[t.StrMapping]]:
-        """Return project-scoped plugin definitions from Meltano runtime state."""
+        """The project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.failure:
             return r[t.SequenceOf[t.StrMapping]].fail(
