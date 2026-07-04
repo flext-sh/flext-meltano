@@ -77,9 +77,7 @@ from flext_meltano.services.singer_catalog import (
     FlextMeltanoSingerCatalogMixin as FlextMeltanoSingerCatalogMixin,
 )
 from flext_meltano.services.singer_sdk import (
-    Context as Context,
     FlextMeltanoSingerTapAdapter as FlextMeltanoSingerTapAdapter,
-    Record as Record,
     Sink as Sink,
     Stream as Stream,
     Tap as Tap,
@@ -109,7 +107,6 @@ from flext_meltano.utilities import (
 )
 
 __all__ = (
-    "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAbstractionsBase",
@@ -144,7 +141,6 @@ __all__ = (
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
-    "Record",
     "Sink",
     "Stream",
     "Tap",

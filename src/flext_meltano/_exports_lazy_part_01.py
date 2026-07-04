@@ -33,10 +33,7 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
         ".services.project_service": ("FlextMeltanoProjectService",),
         ".services.services": ("FlextMeltanoService",),
         ".services.singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
-        ".services.singer_sdk": (
-            "Context",
-            "FlextMeltanoSingerTapAdapter",
-        ),
+        ".services.singer_sdk": ("FlextMeltanoSingerTapAdapter",),
         ".services.singer_state": ("FlextMeltanoSingerStateMixin",),
         ".services.singer_tap": (
             "FlextMeltanoTapAbstractions",

@@ -65,9 +65,7 @@ if TYPE_CHECKING:
         FlextMeltanoSingerCatalogMixin as FlextMeltanoSingerCatalogMixin,
     )
     from flext_meltano.services.singer_sdk import (
-        Context as Context,
         FlextMeltanoSingerTapAdapter as FlextMeltanoSingerTapAdapter,
-        Record as Record,
         Sink as Sink,
         Stream as Stream,
         Tap as Tap,
@@ -113,9 +111,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".services": ("FlextMeltanoService",),
             ".singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
             ".singer_sdk": (
-                "Context",
                 "FlextMeltanoSingerTapAdapter",
-                "Record",
                 "Sink",
                 "Stream",
                 "Tap",

@@ -75,6 +75,7 @@ class FlextMeltano(
 
 
 meltano = FlextMeltano.fetch_global()
+"""Shared FlextMeltano facade instance."""
 
 
 __all__: list[str] = ["FlextMeltano", "meltano"]

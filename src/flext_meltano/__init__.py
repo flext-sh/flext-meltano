@@ -32,7 +32,6 @@ _EAGER_EXPORTS = (
 
 
 _PUBLIC_EXPORTS: tuple[str, ...] = (
-    "Context",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAbstractionsBase",
@@ -67,7 +66,6 @@ _PUBLIC_EXPORTS: tuple[str, ...] = (
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
-    "Record",
     "Sink",
     "Stream",
     "Tap",

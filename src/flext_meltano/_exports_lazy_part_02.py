@@ -23,7 +23,6 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_02 = build_lazy_import_map(
         ".protocols": ("p",),
         ".services": ("services",),
         ".services.singer_sdk": (
-            "Record",
             "Sink",
             "Stream",
             "Tap",
