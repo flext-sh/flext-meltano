@@ -1,4 +1,4 @@
-version: 1
+requires_meltano: ">=3.9.1"
 default_environment: dev
 project_id: .
 environments:

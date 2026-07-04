@@ -70,7 +70,7 @@ class TestsFlextMeltanoValidators:
         tm.that(result, is_=r)
 
     def test_validate_meltano_config_valid(self) -> None:
-        settings: t.ScalarMapping = {"version": 1, "project_id": "test-project"}
+        settings: t.ScalarMapping = {"schema_version": 1, "project_id": "test-project"}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
 
@@ -125,7 +125,7 @@ class TestsFlextMeltanoValidators:
 
     def test_complex_validation_scenario(self) -> None:
         meltano_config: t.ScalarMapping = {
-            "version": 1,
+            "schema_version": 1,
             "project_id": "integration-test",
         }
         dbt_config: t.ScalarMapping = {

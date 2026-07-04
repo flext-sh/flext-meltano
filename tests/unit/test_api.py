@@ -63,6 +63,11 @@ class TestsFlextMeltanoApi:
             (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists(),
             eq=True,
         )
+        config_text = (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).read_text(
+            encoding="utf-8",
+        )
+        tm.that(config_text, has="requires_meltano")
+        tm.that("version:" in config_text, eq=False)
 
     def test_validate_project_missing_path_fails(
         self,

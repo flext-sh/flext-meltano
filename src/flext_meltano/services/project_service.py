@@ -101,7 +101,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         environments = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
         config_content = (
-            f"version: {c.Meltano.PLUGIN_CONFIG_VERSION}\n"
+            f"requires_meltano: {c.Meltano.VERSION_MELTANO_REQUIREMENT}\n"
             f"default_environment: {environments[0]}\n"
             f"project_id: {name}\n"
             "environments:\n"
@@ -126,7 +126,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         try:
             temp_path = Path(tempfile.mkdtemp(prefix=params["prefix"]))
             settings: t.JsonMapping = {
-                "version": c.Meltano.PLUGIN_CONFIG_VERSION,
+                "requires_meltano": c.Meltano.VERSION_MELTANO_REQUIREMENT,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                 "project_id": params["project_id"],
                 "environments": [

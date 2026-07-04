@@ -57,7 +57,7 @@ def test_meltano_project_dir() -> Generator[Path]:
 def meltano_yml_config() -> t.JsonMapping:
     """Sample pipeline.yml configuration for testing."""
     return {
-        "version": 1,
+        "requires_meltano": c.Meltano.VERSION_MELTANO_REQUIREMENT,
         "default_environment": "test",
         "project_id": "test-project",
         "environments": [
