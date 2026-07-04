@@ -157,7 +157,7 @@ class FlextMeltanoModelsInstances:
             u.Field(default=None, description="Tap adapter instance"),
         ] = None
         streams: t.SequenceOf[FlextMeltanoModelsInstances.StreamInfo] = u.Field(
-            default_factory=list[FlextMeltanoModelsInstances.StreamInfo],
+            default_factory=tuple,
             description="Available streams",
         )
         status: Annotated[

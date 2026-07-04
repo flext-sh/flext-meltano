@@ -44,7 +44,7 @@ class FlextMeltanoModelsSingerCatalog:
         metadata: t.SequenceOf[
             FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
         ] = u.Field(
-            default_factory=list[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata],
+            default_factory=tuple,
             description="Singer stream metadata blocks",
         )
         key_properties: t.StrSequence = u.Field(
@@ -91,9 +91,7 @@ class FlextMeltanoModelsSingerCatalog:
         ] = c.Meltano.SingerMessageType.CATALOG
         streams: t.SequenceOf[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = (
             u.Field(
-                default_factory=list[
-                    FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
-                ],
+                default_factory=tuple,
                 description="Singer catalog stream entries",
             )
         )
