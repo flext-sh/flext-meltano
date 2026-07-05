@@ -155,9 +155,7 @@ class TestsFlextMeltanoDockerIntegration:
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_redis_round_trips_string_and_list_values(
-        self, redis_service: str
-    ) -> None:
+    def test_redis_round_trips_string_and_list_values(self, redis_service: str) -> None:
         """Values written to Redis are read back unchanged (real round-trip)."""
         client: redis.Redis[bytes] | None = None
         try:

@@ -89,9 +89,7 @@ class TestsFlextMeltanoConstantsUnit:
             ("LOGGING_INCLUDE_RECORD_COUNT", True),
         ],
     )
-    def test_logging_flag_exposes_expected_value(
-        self, name: str, value: bool
-    ) -> None:
+    def test_logging_flag_exposes_expected_value(self, name: str, value: bool) -> None:
         """Logging feature flags expose their documented boolean default."""
         assert getattr(c.Meltano, name) is value
 
@@ -139,8 +137,7 @@ class TestsFlextMeltanoConstantsUnit:
     def test_singer_schema_and_record_are_distinct(self) -> None:
         """Schema and record message identifiers are not interchangeable."""
         assert (
-            c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA
-            != c.Meltano.SINGER_MESSAGE_TYPE_RECORD
+            c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA != c.Meltano.SINGER_MESSAGE_TYPE_RECORD
         )
 
     def test_dbt_run_and_test_commands_are_distinct(self) -> None:

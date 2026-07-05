@@ -45,7 +45,14 @@ class TestsFlextMeltanoExecutionResult:
                 "",
                 1.5,
             ),
-            (["meltano", "run", "invalid-plugin"], False, 1, "", "Plugin not found", 0.5),
+            (
+                ["meltano", "run", "invalid-plugin"],
+                False,
+                1,
+                "",
+                "Plugin not found",
+                0.5,
+            ),
             ([], False, -1, "", "No command provided", 0.0),
         ],
     )
@@ -197,7 +204,9 @@ class TestsFlextMeltanoExecutionResult:
 
     def test_special_characters_survive_serialization(self) -> None:
         """Newlines and quotes in output/error are preserved verbatim."""
-        error = "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
+        error = (
+            "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
+        )
         result = m.Meltano.CommandExecutionResult(
             command=["meltano", "run", "tap-postgres"],
             success=False,
