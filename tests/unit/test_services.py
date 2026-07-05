@@ -100,3 +100,27 @@ class TestsFlextMeltanoServices:
         tm.that(tap_service is not target_service, eq=True)
         tm.that(target_service is not dbt_service, eq=True)
         tm.that(dbt_service is not tap_service, eq=True)
+
+    def test_execute_returns_active_status_payload(self) -> None:
+        """execute() reports an active service payload keyed to the facade state."""
+        result = meltano.execute()
+        tm.that(result, ok=True)
+        assert result.success
+        payload = result.value
+        tm.that(payload["status"], eq="active")
+        tm.that(payload["service_name"], eq=meltano.service_name)
+        tm.that(payload["version"], eq=meltano.service_version)
+        tm.that("timestamp" in payload, eq=True)
+        tm.that("handlers" in payload, eq=True)
+
+    def test_execute_is_idempotent_across_calls(self) -> None:
+        """Repeated execute() calls yield the same stable public contract."""
+        first = meltano.execute()
+        second = meltano.execute()
+        tm.that(first, ok=True)
+        tm.that(second, ok=True)
+        assert first.success
+        assert second.success
+        tm.that(first.value["service_name"], eq=second.value["service_name"])
+        tm.that(first.value["version"], eq=second.value["version"])
+        tm.that(first.value["handlers"], eq=second.value["handlers"])

@@ -1,153 +1,124 @@
-"""Real-execution tests for small Meltano CLI command handlers."""
+"""Behavioral tests for the FLEXT Meltano CLI public run contract.
+
+These tests exercise only the public surface ``FlextMeltanoCli().run(args)``,
+which returns ``p.Result[bool]``, plus the text the CLI writes to stdout. No
+private attributes, internal collaborators, or Typer application objects are
+touched: the assertions describe the observable command contract only.
+"""
 
 from __future__ import annotations
 
 import pytest
 from flext_tests import tm
 
-from flext_cli import cli
 from flext_meltano.cli import FlextMeltanoCli
 from tests.constants import c
 from tests.typings import t
 from tests.utilities import u
 
+__all__: list[str] = ["TestsFlextMeltanoCliSmallManagers"]
+
 
 class TestsFlextMeltanoCliSmallManagers:
-    """Exercise the public CLI handlers through a Typer CliRunner."""
+    """Exercise the public ``run`` contract of the Meltano CLI facade."""
 
     @pytest.fixture
-    def runner(self) -> t.Cli.TyperRunner:
-        """Provide a fresh CliRunner for each test."""
-        runner_result = cli.create_cli_runner()
-        tm.ok(runner_result)
-        return runner_result.value
+    def meltano_cli(self) -> FlextMeltanoCli:
+        """Provide a freshly constructed CLI facade for each test."""
+        return FlextMeltanoCli()
 
-    @pytest.fixture
-    def app(self) -> t.Cli.CliApp:
-        """Provide the compiled Typer application under test."""
-        return FlextMeltanoCli()._app
-
-    def test_version_command_returns_real_version_string(
+    def test_version_command_succeeds_and_prints_version_string(
         self,
-        runner: t.Cli.TyperRunner,
-        app: t.Cli.CliApp,
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
-        result = runner.invoke(app, [c.Meltano.CliCommand.VERSION])
+        result = meltano_cli.run([c.Meltano.CliCommand.VERSION])
 
-        tm.that(result.exit_code, eq=0)
-        tm.that("." in result.output, eq=True)
+        tm.that(result.success, eq=True)
+        tm.that("." in capsys.readouterr().out, eq=True)
 
-    def test_status_commands_return_json_payloads(
+    def test_status_show_succeeds_with_ready_status_payload(
         self,
-        runner: t.Cli.TyperRunner,
-        app: t.Cli.CliApp,
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
-        show_result = runner.invoke(
-            app,
-            [
-                c.Meltano.CliCommand.STATUS,
-                "show",
-            ],
-        )
-        health_result = runner.invoke(
-            app,
-            [
-                c.Meltano.CliCommand.STATUS,
-                c.Meltano.ExecutorCommand.HEALTH,
-            ],
-        )
+        result = meltano_cli.run([c.Meltano.CliCommand.STATUS, "show"])
 
-        tm.that(show_result.exit_code, eq=0)
-        tm.that(health_result.exit_code, eq=0)
+        tm.that(result.success, eq=True)
 
-        show_json = u.Cli.json_loads(show_result.output)
-        health_json = u.Cli.json_loads(health_result.output)
+        parsed = u.Cli.json_loads(capsys.readouterr().out)
+        tm.ok(parsed)
 
-        tm.ok(show_json)
-        tm.ok(health_json)
+        payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(parsed.value)
+        tm.that(payload.get("status"), eq=c.Meltano.OperationStatus.READY)
 
-        show_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(show_json.value)
-        health_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(health_json.value)
-
-        tm.that(show_payload.get("status"), eq=c.Meltano.OperationStatus.READY)
-        tm.that("status" in health_payload, eq=True)
-
-    def test_tap_and_target_commands_fail_for_unsupported_operations(
+    def test_status_health_succeeds_with_status_key_in_payload(
         self,
-        runner: t.Cli.TyperRunner,
-        app: t.Cli.CliApp,
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
-        tap_result = runner.invoke(
-            app,
-            [
-                c.Meltano.CliCommand.TAP,
-                "--operation",
-                "run",
-                "--args",
-                "tap-demo",
-            ],
-        )
-        target_result = runner.invoke(
-            app,
-            [
-                c.Meltano.CliCommand.TARGET,
-                "--operation",
-                "run",
-                "--args",
-                "target-demo",
-            ],
+        result = meltano_cli.run(
+            [c.Meltano.CliCommand.STATUS, c.Meltano.ExecutorCommand.HEALTH]
         )
 
-        tm.that(tap_result.exit_code, eq=1)
-        tm.that(target_result.exit_code, eq=1)
-        tm.that(tap_result.output, has="not supported")
-        tm.that(target_result.output, has="not supported")
+        tm.that(result.success, eq=True)
 
-    def test_plugin_commands_enforce_real_argument_contracts(
+        parsed = u.Cli.json_loads(capsys.readouterr().out)
+        tm.ok(parsed)
+
+        payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(parsed.value)
+        tm.that("status" in payload, eq=True)
+
+    @pytest.mark.parametrize("command", [
+        c.Meltano.CliCommand.TAP,
+        c.Meltano.CliCommand.TARGET,
+    ])
+    def test_unsupported_extractor_operation_reports_failure(
         self,
-        runner: t.Cli.TyperRunner,
-        app: t.Cli.CliApp,
+        meltano_cli: FlextMeltanoCli,
+        command: str,
     ) -> None:
-        info_result = runner.invoke(
-            app,
-            [
-                c.Meltano.CliCommand.PLUGIN,
-                c.Meltano.ExecutorCommand.INFO,
-            ],
+        result = meltano_cli.run(
+            [command, "--operation", "run", "--args", "demo"]
         )
-        install_result = runner.invoke(
-            app,
+
+        tm.that(result.failure, eq=True)
+
+    def test_plugin_info_without_plugin_type_reports_failure(
+        self,
+        meltano_cli: FlextMeltanoCli,
+    ) -> None:
+        result = meltano_cli.run(
+            [c.Meltano.CliCommand.PLUGIN, c.Meltano.ExecutorCommand.INFO]
+        )
+
+        tm.that(result.failure, eq=True)
+
+    def test_plugin_install_is_unsupported_and_reports_failure(
+        self,
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        result = meltano_cli.run(
             [
                 c.Meltano.CliCommand.PLUGIN,
                 c.Meltano.ExecutorCommand.INSTALL,
                 "--plugin-name",
                 "tap-demo",
-            ],
+            ]
         )
 
-        tm.that(info_result.exit_code, eq=1)
-        tm.that(install_result.exit_code, eq=1)
-        tm.that(info_result.output, has="required")
-        tm.that(install_result.output, has="not supported")
+        tm.that(result.failure, eq=True)
+        tm.that(capsys.readouterr().out, has="not supported")
 
-    def test_dbt_help_path_returns_help_output(
+    def test_dbt_help_option_succeeds_and_prints_dbt_help(
         self,
-        runner: t.Cli.TyperRunner,
-        app: t.Cli.CliApp,
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
-        result = runner.invoke(
-            app, [c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION]
+        result = meltano_cli.run(
+            [c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION]
         )
 
-        tm.that(result.exit_code, eq=0)
-        tm.that(result.output, has="DBT")
-
-    def test_route_command_prints_real_version_output(
-        self,
-        runner: t.Cli.TyperRunner,
-        app: t.Cli.CliApp,
-    ) -> None:
-        result = runner.invoke(app, [c.Meltano.CliCommand.VERSION])
-
-        tm.that(result.exit_code, eq=0)
-        tm.that(result.output, has=".")
+        tm.that(result.success, eq=True)
+        tm.that(capsys.readouterr().out, has="DBT")

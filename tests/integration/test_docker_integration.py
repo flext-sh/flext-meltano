@@ -1,6 +1,10 @@
 """Docker integration tests for FLEXT Meltano.
 
-Tests that use real Docker containers for comprehensive integration testing.
+Behavioral integration tests that exercise the observable contract of the
+Docker test stack (`tk`) and the real PostgreSQL/Redis services it brings up.
+Assertions target public behavior only: fixture endpoints, the `r[T]` outcome
+of stack operations (`execute`/`down`/`ready`), and real data round-trips
+through each service. No stack internals are inspected.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -19,13 +23,15 @@ from tests.constants import c
 if TYPE_CHECKING:
     from flext_tests import tk
 
+__all__ = ["TestsFlextMeltanoDockerIntegration"]
+
 
 class TestsFlextMeltanoDockerIntegration:
-    """Docker-based integration tests."""
+    """Behavioral Docker-based integration tests."""
 
     @staticmethod
     def _connect_postgres() -> psycopg2.extensions.connection:
-        """Create a PostgreSQL test connection."""
+        """Open a PostgreSQL connection to the test service."""
         return psycopg2.connect(
             host=c.Meltano.Tests.HOST,
             port=c.Meltano.Tests.POSTGRES_PORT,
@@ -36,29 +42,17 @@ class TestsFlextMeltanoDockerIntegration:
         )
 
     @staticmethod
-    def _assert_postgres_operations(conn: psycopg2.extensions.connection) -> None:
-        """Assert canonical PostgreSQL create/insert/select/drop flow."""
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "\n                    CREATE TABLE IF NOT EXISTS test_table (\n                        id SERIAL PRIMARY KEY,\n                        name VARCHAR(100),\n                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n                    )\n                ",
-            )
-            cursor.execute(
-                "INSERT INTO test_table (name) VALUES (%s)",
-                ("test_record",),
-            )
-            cursor.execute(
-                "SELECT id, name FROM test_table WHERE name = %s",
-                ("test_record",),
-            )
-            result = cursor.fetchone()
-            assert result is not None
-            assert result[1] == "test_record"
-            cursor.execute("DROP TABLE test_table")
-        conn.commit()
+    def _connect_redis() -> redis.Redis[bytes]:
+        """Open a Redis client to the test service."""
+        return redis.Redis(
+            host=c.Meltano.Tests.HOST,
+            port=c.Meltano.Tests.REDIS_PORT,
+            db=0,
+        )
 
     @staticmethod
     def _is_transient_postgres_error(err_msg: str) -> bool:
-        """Return True for known transient PostgreSQL connection errors."""
+        """Return True for known transient PostgreSQL startup/connection errors."""
         return (
             "connection" in err_msg
             or "closed" in err_msg
@@ -67,133 +61,115 @@ class TestsFlextMeltanoDockerIntegration:
             or "starting up" in err_msg
         )
 
-    @staticmethod
-    def _connect_redis() -> redis.Redis[bytes]:
-        """Create a Redis test client."""
-        return redis.Redis(
-            host=c.Meltano.Tests.HOST,
-            port=c.Meltano.Tests.REDIS_PORT,
-            db=0,
-        )
-
-    @staticmethod
-    def _assert_redis_operations(client: redis.Redis[bytes]) -> None:
-        """Assert canonical Redis set/list/delete flow."""
-        client.set("test_key", "test_value")
-        value = client.get("test_key")
-        assert value == b"test_value"
-        client.lpush("test_list", "item1")
-        client.lpush("test_list", "item2")
-        length = client.llen("test_list")
-        assert length == 2
-        client.delete("test_key")
-        client.delete("test_list")
-
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_postgres_service_available(self, postgres_service: str) -> None:
-        """Test that PostgreSQL service is available and responsive."""
+    def test_postgres_service_endpoint_is_published(
+        self, postgres_service: str
+    ) -> None:
+        """PostgreSQL fixture yields the published host:port endpoint."""
         assert postgres_service == f"{c.LOCALHOST}:{c.Meltano.Tests.POSTGRES_PORT}"
-        try:
-            conn = psycopg2.connect(
-                host=c.Meltano.Tests.HOST,
-                port=c.Meltano.Tests.POSTGRES_PORT,
-                database="flext_test",
-                user="test",
-                password="test",
-                connect_timeout=5,
-            )
-            conn.close()
-        except Exception as e:
-            err_msg = str(e).lower()
-            if (
-                "starting up" in err_msg
-                or "connection refused" in err_msg
-                or "timeout" in err_msg
-            ):
-                pytest.skip(f"PostgreSQL not ready: {e}")
-            pytest.fail(f"Failed to connect to PostgreSQL: {e}")
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_redis_service_available(self, redis_service: str) -> None:
-        """Test that Redis service is available and responsive."""
+    def test_redis_service_endpoint_is_published(self, redis_service: str) -> None:
+        """Redis fixture yields the published host:port endpoint."""
         assert redis_service == f"{c.LOCALHOST}:{c.Meltano.Tests.REDIS_PORT}"
-        try:
-            r = redis.Redis(
-                host=c.Meltano.Tests.HOST,
-                port=c.Meltano.Tests.REDIS_PORT,
-                db=0,
-            )
-            r.ping()
-            r.close()
-        except Exception as e:
-            pytest.fail(f"Failed to connect to Redis: {e}")
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_meltano_service_available(self, meltano_service: str) -> None:
-        """Test that Meltano service is available."""
+    def test_meltano_service_endpoint_has_valid_port(
+        self, meltano_service: str
+    ) -> None:
+        """Meltano fixture yields an endpoint on the test host with a real port."""
         host, _, port = meltano_service.partition(":")
         assert host == c.Meltano.Tests.HOST
         assert int(port) > 0
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_docker_services_health(self, docker_services: tk) -> None:
-        """Test overall Docker services health."""
+    def test_ready_probe_returns_boolean_result_for_each_service(
+        self, docker_services: tk
+    ) -> None:
+        """`ready` yields an ``r[bool]`` per service port (observable contract)."""
         postgres_ready = docker_services.ready(port=c.Meltano.Tests.POSTGRES_PORT)
         redis_ready = docker_services.ready(port=c.Meltano.Tests.REDIS_PORT)
-        if postgres_ready.failure or not postgres_ready.value:
-            pytest.skip("PostgreSQL service not available")
-        if redis_ready.failure or not redis_ready.value:
-            pytest.skip("Redis service not available")
+        if postgres_ready.failure or redis_ready.failure:
+            pytest.skip("Docker readiness probe unavailable")
+        assert isinstance(postgres_ready.value, bool)
+        assert isinstance(redis_ready.value, bool)
+        if not (postgres_ready.value and redis_ready.value):
+            pytest.skip("Docker services not fully ready")
 
     @pytest.mark.docker
     @pytest.mark.integration
     @pytest.mark.slow
-    def test_container_lifecycle(self, docker_manager: tk) -> None:
-        """Test complete container lifecycle management."""
+    def test_manual_stack_lifecycle_starts_and_stops_successfully(
+        self, docker_manager: tk
+    ) -> None:
+        """`execute` then `down` each yield a successful ``r[T]`` outcome."""
         start_result = docker_manager.execute()
-        assert start_result.success
+        assert start_result.success, start_result.error
         should_assert_stop = True
         try:
             postgres_ready = docker_manager.ready(port=c.Meltano.Tests.POSTGRES_PORT)
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
                 pytest.skip("PostgreSQL service not available")
+            assert isinstance(postgres_ready.value, bool)
         finally:
             stop_result = docker_manager.down()
             if should_assert_stop:
-                assert stop_result.success
+                assert stop_result.success, stop_result.error
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_postgres_database_operations(self, postgres_service: str) -> None:
-        """Test actual database operations with PostgreSQL."""
-        conn = None
+    def test_postgres_round_trips_inserted_row(self, postgres_service: str) -> None:
+        """A row written to PostgreSQL is read back unchanged (real round-trip)."""
+        conn: psycopg2.extensions.connection | None = None
         try:
             conn = self._connect_postgres()
-            self._assert_postgres_operations(conn)
-        except Exception as e:
-            err_msg = str(e).lower()
-            if self._is_transient_postgres_error(err_msg):
-                pytest.skip(f"PostgreSQL not ready for operations: {e}")
-            pytest.fail(f"Database operation failed: {e}")
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS test_table ("
+                    "id SERIAL PRIMARY KEY, name VARCHAR(100), "
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+                )
+                cursor.execute(
+                    "INSERT INTO test_table (name) VALUES (%s)", ("test_record",)
+                )
+                cursor.execute(
+                    "SELECT id, name FROM test_table WHERE name = %s", ("test_record",)
+                )
+                result = cursor.fetchone()
+                assert result is not None
+                assert result[1] == "test_record"
+                cursor.execute("DROP TABLE test_table")
+            conn.commit()
+        except psycopg2.Error as exc:
+            if self._is_transient_postgres_error(str(exc).lower()):
+                pytest.skip(f"PostgreSQL not ready for operations: {exc}")
+            raise
         finally:
-            if conn:
+            if conn is not None:
                 conn.close()
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_redis_operations(self, redis_service: str) -> None:
-        """Test actual Redis operations."""
-        r = None
+    def test_redis_round_trips_string_and_list_values(
+        self, redis_service: str
+    ) -> None:
+        """Values written to Redis are read back unchanged (real round-trip)."""
+        client: redis.Redis[bytes] | None = None
         try:
-            r = self._connect_redis()
-            self._assert_redis_operations(r)
-        except Exception as e:
-            pytest.fail(f"Redis operation failed: {e}")
+            client = self._connect_redis()
+            client.set("test_key", "test_value")
+            assert client.get("test_key") == b"test_value"
+            client.lpush("test_list", "item1")
+            client.lpush("test_list", "item2")
+            assert client.llen("test_list") == 2
+            client.delete("test_key")
+            client.delete("test_list")
+            assert client.get("test_key") is None
         finally:
-            if r:
-                r.close()
+            if client is not None:
+                client.close()

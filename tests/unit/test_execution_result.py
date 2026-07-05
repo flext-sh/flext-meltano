@@ -1,4 +1,4 @@
-"""Comprehensive tests for FlextMeltanoExecutionResult module.
+"""Behavioral tests for FlextMeltanoExecutionResult module.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -7,21 +7,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
-from unittest.mock import patch
 
+import pytest
 from flext_tests import tm
 
 from tests.models import m
 
-from . import _constants
-
 if TYPE_CHECKING:
     from tests.typings import t
 
+_ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
+
 
 class _ExecutionResultJson(m.BaseModel):
-    command: t.StrSequence
+    command: list[str]
     success: bool
     exit_code: int
     output: str
@@ -31,237 +32,196 @@ class _ExecutionResultJson(m.BaseModel):
 
 
 class TestsFlextMeltanoExecutionResult:
-    """Test FlextMeltanoExecutionResult class functionality."""
+    """Behavioral contract of ``m.Meltano.CommandExecutionResult``."""
 
-    def test_initialization_with_all_parameters(self) -> None:
-        """Test initialization with all parameters."""
-        command = ["meltano", "run", "tap-postgres", "target-csv"]
+    @pytest.mark.parametrize(
+        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        [
+            (
+                ["meltano", "run", "tap-postgres", "target-csv"],
+                True,
+                0,
+                "Successfully executed",
+                "",
+                1.5,
+            ),
+            (["meltano", "run", "invalid-plugin"], False, 1, "", "Plugin not found", 0.5),
+            ([], False, -1, "", "No command provided", 0.0),
+        ],
+    )
+    def test_public_fields_reflect_constructor_arguments(
+        self,
+        command: t.StrSequence,
+        *,
+        success: bool,
+        exit_code: int,
+        output: str,
+        error: str,
+        execution_time: float,
+    ) -> None:
+        """Public fields expose exactly the values supplied at construction."""
         result = m.Meltano.CommandExecutionResult(
             command=command,
-            success=True,
-            exit_code=0,
-            output="Successfully executed",
-            error="",
-            execution_time=1.5,
+            success=success,
+            exit_code=exit_code,
+            output=output,
+            error=error,
+            execution_time=execution_time,
         )
-        tm.that(result.command, eq=command)
-        tm.that(result.success is True, eq=True)
-        tm.that(result.exit_code, eq=0)
-        tm.that(result.output, eq="Successfully executed")
-        tm.that(result.error, eq="")
-        tm.that(result.execution_time, eq=_constants.TEST_EXECUTION_TIME_SUCCESS)
+        tm.that(list(result.command), eq=list(command))
+        tm.that(result.success, eq=success)
+        tm.that(result.exit_code, eq=exit_code)
+        tm.that(result.output, eq=output)
+        tm.that(result.error, eq=error)
+        tm.that(abs(result.execution_time - execution_time), lt=1e-9)
 
-    def test_initialization_with_failure(self) -> None:
-        """Test initialization with failure scenario."""
-        command = ["meltano", "run", "invalid-plugin"]
+    def test_timestamp_is_populated_iso_string(self) -> None:
+        """The computed ``timestamp`` field is a non-empty ISO-8601 string."""
         result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=False,
-            exit_code=1,
-            output="",
-            error="Plugin not found",
-            execution_time=0.5,
-        )
-        tm.that(result.command, eq=command)
-        tm.that(result.success is False, eq=True)
-        tm.that(result.exit_code, eq=1)
-        tm.that(result.output, eq="")
-        tm.that(result.error, eq="Plugin not found")
-        tm.that(result.execution_time, eq=_constants.TEST_EXECUTION_TIME_FAILURE)
-
-    def test_initialization_with_empty_command(self) -> None:
-        """Test initialization with empty command."""
-        command: t.StrSequence = []
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=False,
-            exit_code=-1,
-            output="",
-            error="No command provided",
-            execution_time=0.0,
-        )
-        tm.that(result.command, empty=True)
-        tm.that(result.success is False, eq=True)
-        tm.that(result.exit_code, eq=-1)
-        tm.that(result.output, eq="")
-        tm.that(result.error, eq="No command provided")
-        tm.that(abs(result.execution_time - 0.0), lt=1e-9)
-
-    def test_to_dict_success(self) -> None:
-        """Test to_dict method with successful execution."""
-        command = ["meltano", "version"]
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
+            command=["meltano", "version"],
             success=True,
             exit_code=0,
             output="meltano, version 1.0.0",
             error="",
             execution_time=0.2,
         )
-        with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
-        ) as mock_timestamp:
-            mock_timestamp.return_value = "2025-01-01T12:00:00Z"
-            result_dict = result.to_dict()
-            tm.that(result_dict["command"], eq=command)
-            tm.that(result_dict["success"] is True, eq=True)
-            tm.that(result_dict["exit_code"], eq=0)
-            tm.that(result_dict["output"], eq="meltano, version 1.0.0")
-            tm.that(result_dict["error"], eq="")
-            tm.that(
-                (
-                    result_dict["execution_time"]
-                    == _constants.TEST_EXECUTION_TIME_DICT_SUCCESS
-                ),
-                eq=True,
-            )
-            tm.that(result_dict["timestamp"], eq="2025-01-01T12:00:00Z")
+        tm.that(result.timestamp, match=_ISO_TIMESTAMP.pattern)
 
-    def test_to_dict_failure(self) -> None:
-        """Test to_dict method with failed execution."""
-        command = ["meltano", "run", "invalid"]
+    @pytest.mark.parametrize(
+        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        [
+            (["meltano", "version"], True, 0, "meltano, version 1.0.0", "", 0.2),
+            (
+                ["meltano", "run", "invalid"],
+                False,
+                1,
+                "",
+                "Plugin 'invalid' not found",
+                0.1,
+            ),
+            (
+                ["meltano", "run", "tap-large-database", "target-warehouse"],
+                True,
+                0,
+                "Large dataset processed successfully",
+                "",
+                3600.5,
+            ),
+        ],
+    )
+    def test_to_dict_carries_full_public_contract(
+        self,
+        command: t.StrSequence,
+        *,
+        success: bool,
+        exit_code: int,
+        output: str,
+        error: str,
+        execution_time: float,
+    ) -> None:
+        """``to_dict`` mirrors every public field plus an ISO timestamp."""
         result = m.Meltano.CommandExecutionResult(
             command=command,
+            success=success,
+            exit_code=exit_code,
+            output=output,
+            error=error,
+            execution_time=execution_time,
+        )
+        result_dict = result.to_dict()
+        tm.that(result_dict["command"], eq=command)
+        tm.that(result_dict["success"], eq=success)
+        tm.that(result_dict["exit_code"], eq=exit_code)
+        tm.that(result_dict["output"], eq=output)
+        tm.that(result_dict["error"], eq=error)
+        tm.that(result_dict["execution_time"], eq=execution_time)
+        tm.that(str(result_dict["timestamp"]), match=_ISO_TIMESTAMP.pattern)
+
+    @pytest.mark.parametrize(
+        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        [
+            (
+                ["meltano", "invoke", "tap-postgres", "discover"],
+                True,
+                0,
+                '{"streams": []}',
+                "",
+                2.0,
+            ),
+            (
+                ["meltano", "settings", "invalid-plugin"],
+                False,
+                2,
+                "",
+                "Configuration error: invalid settings",
+                0.3,
+            ),
+            (
+                ["meltano", "run", "--full-refresh", "tap-postgres", "target-csv"],
+                True,
+                0,
+                "Pipeline completed successfully",
+                "",
+                5.5,
+            ),
+        ],
+    )
+    def test_model_dump_json_round_trips_through_public_schema(
+        self,
+        command: t.StrSequence,
+        *,
+        success: bool,
+        exit_code: int,
+        output: str,
+        error: str,
+        execution_time: float,
+    ) -> None:
+        """Serialized JSON validates back into the documented public shape."""
+        result = m.Meltano.CommandExecutionResult(
+            command=command,
+            success=success,
+            exit_code=exit_code,
+            output=output,
+            error=error,
+            execution_time=execution_time,
+        )
+        json_str = result.model_dump_json()
+        parsed = _ExecutionResultJson.model_validate_json(json_str)
+        tm.that(list(parsed.command), eq=list(command))
+        tm.that(parsed.success, eq=success)
+        tm.that(parsed.exit_code, eq=exit_code)
+        tm.that(parsed.output, eq=output)
+        tm.that(parsed.error, eq=error)
+        tm.that(abs(parsed.execution_time - execution_time), lt=1e-9)
+        tm.that(parsed.timestamp, match=_ISO_TIMESTAMP.pattern)
+
+    def test_special_characters_survive_serialization(self) -> None:
+        """Newlines and quotes in output/error are preserved verbatim."""
+        error = "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
+        result = m.Meltano.CommandExecutionResult(
+            command=["meltano", "run", "tap-postgres"],
             success=False,
             exit_code=1,
             output="",
-            error="Plugin 'invalid' not found",
-            execution_time=0.1,
-        )
-        with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
-        ) as mock_timestamp:
-            mock_timestamp.return_value = "2025-01-01T12:01:00Z"
-            result_dict = result.to_dict()
-            tm.that(result_dict["command"], eq=command)
-            tm.that(result_dict["success"] is False, eq=True)
-            tm.that(result_dict["exit_code"], eq=1)
-            tm.that(result_dict["output"], eq="")
-            tm.that(result_dict["error"], eq="Plugin 'invalid' not found")
-            tm.that(
-                (
-                    result_dict["execution_time"]
-                    == _constants.TEST_EXECUTION_TIME_DICT_FAILURE
-                ),
-                eq=True,
-            )
-            tm.that(result_dict["timestamp"], eq="2025-01-01T12:01:00Z")
-
-    def test_model_dump_json_success(self) -> None:
-        """Test model_dump_json with successful execution."""
-        command = ["meltano", "invoke", "tap-postgres", "discover"]
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=True,
-            exit_code=0,
-            output='{"streams": []}',
-            error="",
-            execution_time=2.0,
-        )
-        with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
-        ) as mock_timestamp:
-            mock_timestamp.return_value = "2025-01-01T12:02:00Z"
-            json_str = result.model_dump_json()
-            parsed = m.TypeAdapter(_ExecutionResultJson).validate_json(json_str)
-            tm.that(parsed.command, eq=command)
-            tm.that(parsed.success is True, eq=True)
-            tm.that(parsed.exit_code, eq=0)
-            tm.that(parsed.output, eq='{"streams": []}')
-            tm.that(parsed.error, eq="")
-            tm.that(
-                parsed.execution_time,
-                eq=_constants.TEST_EXECUTION_TIME_JSON_SUCCESS,
-            )
-            tm.that(parsed.timestamp, eq="2025-01-01T12:02:00Z")
-
-    def test_model_dump_json_failure(self) -> None:
-        """Test model_dump_json with failed execution."""
-        command = ["meltano", "settings", "invalid-plugin"]
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=False,
-            exit_code=2,
-            output="",
-            error="Configuration error: invalid settings",
-            execution_time=0.3,
-        )
-        with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
-        ) as mock_timestamp:
-            mock_timestamp.return_value = "2025-01-01T12:03:00Z"
-            json_str = result.model_dump_json()
-            parsed = m.TypeAdapter(_ExecutionResultJson).validate_json(json_str)
-            tm.that(parsed.command, eq=command)
-            tm.that(parsed.success is False, eq=True)
-            tm.that(parsed.exit_code, eq=2)
-            tm.that(parsed.output, eq="")
-            tm.that(parsed.error, eq="Configuration error: invalid settings")
-            tm.that(
-                parsed.execution_time,
-                eq=_constants.TEST_EXECUTION_TIME_JSON_FAILURE,
-            )
-            tm.that(parsed.timestamp, eq="2025-01-01T12:03:00Z")
-
-    def test_model_dump_json_with_complex_command(self) -> None:
-        """Test model_dump_json with complex command arguments."""
-        command = ["meltano", "run", "--full-refresh", "tap-postgres", "target-csv"]
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=True,
-            exit_code=0,
-            output="Pipeline completed successfully",
-            error="",
-            execution_time=5.5,
-        )
-        with patch(
-            "flext_meltano._models.results_dbt.u.generate_iso_timestamp",
-        ) as mock_timestamp:
-            mock_timestamp.return_value = "2025-01-01T12:04:00Z"
-            json_str = result.model_dump_json()
-            parsed = m.TypeAdapter(_ExecutionResultJson).validate_json(json_str)
-            tm.that(parsed.command, eq=command)
-            tm.that(parsed.success is True, eq=True)
-            tm.that(parsed.exit_code, eq=0)
-            tm.that(parsed.output, eq="Pipeline completed successfully")
-            tm.that(parsed.error, eq="")
-            tm.that(parsed.execution_time, eq=_constants.TEST_EXECUTION_TIME_JSON_ERROR)
-            tm.that(parsed.timestamp, eq="2025-01-01T12:04:00Z")
-
-    def test_execution_result_with_special_characters(self) -> None:
-        """Test execution result with special characters in output and error."""
-        command = ["meltano", "run", "tap-postgres"]
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=False,
-            exit_code=1,
-            output="",
-            error="Error: Connection failed to host 'localhost:5432'\nCheck your credentials!",
+            error=error,
             execution_time=1.2,
         )
         result_dict = result.to_dict()
-        tm.that(
-            (
-                result_dict["error"]
-                == "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
-            ),
-            eq=True,
-        )
-        tm.that(result_dict["command"], eq=command)
-        tm.that(result_dict["success"] is False, eq=True)
+        tm.that(result_dict["error"], eq=error)
+        tm.that(result_dict["command"], eq=["meltano", "run", "tap-postgres"])
+        tm.that(result_dict["success"], eq=False)
 
-    def test_execution_result_with_long_execution_time(self) -> None:
-        """Test execution result with long execution time."""
-        command = ["meltano", "run", "tap-large-database", "target-warehouse"]
-        result = m.Meltano.CommandExecutionResult(
-            command=command,
-            success=True,
-            exit_code=0,
-            output="Large dataset processed successfully",
-            error="",
-            execution_time=3600.5,
-        )
-        result_dict = result.to_dict()
-        tm.that(result_dict["execution_time"], eq=_constants.TEST_EXECUTION_TIME_HOUR)
-        tm.that(result_dict["success"] is True, eq=True)
-        tm.that(result_dict["command"], eq=command)
+    def test_negative_execution_time_is_rejected(self) -> None:
+        """The non-negative execution-time invariant is enforced on construction."""
+        with pytest.raises(m.ValidationError):
+            m.Meltano.CommandExecutionResult(
+                command=["meltano", "run"],
+                success=True,
+                exit_code=0,
+                output="",
+                error="",
+                execution_time=-1.0,
+            )
+
+
+__all__: list[str] = ["TestsFlextMeltanoExecutionResult"]

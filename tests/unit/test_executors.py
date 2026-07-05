@@ -118,9 +118,11 @@ class TestsFlextMeltanoExecutors:
         """Executor project_root remains a concrete filesystem path."""
         assert isinstance(meltano.project_root, Path)
 
-    def test_cli_uses_model_driven_surface(self) -> None:
-        """The public CLI exposes the model-driven Typer application surface."""
+    def test_cli_run_version_returns_successful_result(self) -> None:
+        """The public CLI runs the version command and returns a successful result."""
         cli_instance = FlextMeltanoCli()
 
-        assert callable(cli_instance.run)
-        assert cli_instance._app is not None
+        result = cli_instance.run(["version"])
+
+        assert result.success
+        assert result.value is True
