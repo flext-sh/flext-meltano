@@ -25,12 +25,12 @@ from flext_meltano.services.executor import FlextMeltanoExecutor
 class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     """Pipeline manager for FLEXT Meltano CLI."""
 
-    _cli: p.Meltano.PipelineCli = u.PrivateAttr()
+    _cli: p.Meltano.PipelineCli | None = u.PrivateAttr(default=None)
 
     def __init__(
         self,
         cli: p.Meltano.PipelineCli | None = None,
-        settings: p.Settings | None = None,
+        settings: FlextMeltanoSettings | None = None,
     ) -> None:
         """Initialize the pipeline manager with an optional CLI reference."""
         resolved_settings = (

@@ -19,7 +19,7 @@ class FlextMeltanoCli:
     def __init__(self) -> None:
         """Initialize the CLI with service and pipeline manager facades."""
         self._service = FlextMeltano.fetch_global()
-        self._pipeline_mgr = FlextMeltanoPipelineManager(self._service)
+        self._pipeline_mgr = FlextMeltanoPipelineManager()
         self._app = cli.create_app_with_common_params(
             name=self.app_name,
             help_text=self.app_help,

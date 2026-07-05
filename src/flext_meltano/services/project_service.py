@@ -10,7 +10,16 @@ import tempfile
 from pathlib import Path
 from typing import override
 
-from flext_meltano import FlextMeltanoServiceBase, c, e, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    e,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.validators import FlextMeltanoValidators
 
@@ -180,7 +189,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     @staticmethod
     def build_service_execution_payload(
         service_type: str,
-        meltano_config: p.Settings,
+        meltano_config: FlextMeltanoSettings,
     ) -> p.Result[t.JsonMapping]:
         """Build normalized execution payload for service health responses."""
         settings_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(

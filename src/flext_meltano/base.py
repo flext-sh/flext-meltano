@@ -31,6 +31,15 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
         default=FlextMeltanoSettings,
     )
 
+    def __init__(
+        self,
+        *,
+        runtime_settings: FlextMeltanoSettings | None = None,
+        **model_data: t.GuardInput | p.Settings | p.Context | t.SettingsClass | None,
+    ) -> None:
+        """Initialize with explicit Meltano settings and model fields."""
+        super().__init__(runtime_settings=runtime_settings, **model_data)
+
     service_name: Annotated[
         t.NonEmptyStr,
         u.Field(

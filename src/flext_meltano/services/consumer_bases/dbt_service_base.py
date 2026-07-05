@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Annotated, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
     c,
     m,
     p,
@@ -52,7 +53,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     def __init__(
         self,
-        settings: p.Settings | None = None,
+        settings: FlextMeltanoSettings | None = None,
     ) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(runtime_settings=settings)
