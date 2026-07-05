@@ -42,6 +42,7 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
         ".services.singer_target": ("FlextMeltanoTargetAbstractions",),
         ".services.singer_translator": ("FlextMeltanoSingerCliTranslator",),
         ".settings": ("FlextMeltanoSettings",),
+        ".typings": ("FlextMeltanoTypes",),
     },
 )
 

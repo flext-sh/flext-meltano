@@ -26,15 +26,12 @@ FLEXT_MELTANO_LAZY_IMPORTS_PART_02 = build_lazy_import_map(
             "Target",
         ),
         ".services.validators": ("FlextMeltanoValidators",),
-        ".typings": (
-            "FlextMeltanoTypes",
-            "t",
-        ),
+        ".typings": ("t",),
         ".utilities": (
             "FlextMeltanoUtilities",
             "u",
         ),
-        "flext_core": (
+        "flext_core._root_typing_parts": (
             "d",
             "e",
             "h",
