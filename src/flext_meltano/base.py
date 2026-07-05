@@ -13,6 +13,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated, Self, override
 
+from pydantic import PrivateAttr
+
 from flext_cli import u
 from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
@@ -25,10 +27,9 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     `execute` method from s.
     """
 
-    settings_type: Annotated[
-        type | None,
-        u.Field(description="Settings class for Meltano service initialization"),
-    ] = FlextMeltanoSettings
+    _settings_type: t.SettingsClass | None = PrivateAttr(
+        default=FlextMeltanoSettings,
+    )
 
     service_name: Annotated[
         t.NonEmptyStr,
