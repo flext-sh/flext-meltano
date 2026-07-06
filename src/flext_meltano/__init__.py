@@ -23,7 +23,7 @@ from flext_meltano.__version__ import (
 
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, x
-    from flext_meltano.api import FlextMeltano
+    from flext_meltano.api import FlextMeltano, meltano
     from flext_meltano.base import FlextMeltanoServiceBase, s
     from flext_meltano.cli import FlextMeltanoCli, main
     from flext_meltano.constants import FlextMeltanoConstants, c
