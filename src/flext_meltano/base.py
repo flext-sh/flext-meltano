@@ -119,4 +119,4 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
 
 
 s = FlextMeltanoServiceBase
-__all__: list[str] = ["FlextMeltanoServiceBase"]
+__all__: list[str] = ["FlextMeltanoServiceBase", "s"]

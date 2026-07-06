@@ -19,13 +19,7 @@ from flext_meltano.__version__ import (
 from flext_meltano._exports import FLEXT_MELTANO_LAZY_IMPORTS
 
 if TYPE_CHECKING:
-    from flext_core._root_typing_parts.facades import (
-        d as d,
-        e as e,
-        h as h,
-        r as r,
-        x as x,
-    )
+    from flext_cli import d as d, e as e, h as h, r as r, x as x
     from flext_meltano.api import FlextMeltano as FlextMeltano, meltano as meltano
     from flext_meltano.base import (
         FlextMeltanoServiceBase as FlextMeltanoServiceBase,
