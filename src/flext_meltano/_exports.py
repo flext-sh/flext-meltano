@@ -3,14 +3,93 @@
 
 from __future__ import annotations
 
-from flext_core.lazy import merge_lazy_imports
-from flext_meltano._exports_lazy_part_01 import FLEXT_MELTANO_LAZY_IMPORTS_PART_01
-from flext_meltano._exports_lazy_part_02 import FLEXT_MELTANO_LAZY_IMPORTS_PART_02
+from flext_core.lazy import build_lazy_import_map, merge_lazy_imports
 
-_LOCAL_LAZY_IMPORTS = {
-    **FLEXT_MELTANO_LAZY_IMPORTS_PART_01,
-    **FLEXT_MELTANO_LAZY_IMPORTS_PART_02,
-}
+_LOCAL_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        "._constants": ("_constants",),
+        "._models": ("_models",),
+        "._protocols": ("_protocols",),
+        "._typings": ("_typings",),
+        "._utilities": ("_utilities",),
+        ".api": (
+            "FlextMeltano",
+            "meltano",
+        ),
+        ".base": (
+            "FlextMeltanoServiceBase",
+            "s",
+        ),
+        ".cli": (
+            "FlextMeltanoCli",
+            "main",
+        ),
+        ".constants": (
+            "FlextMeltanoConstants",
+            "c",
+        ),
+        ".models": (
+            "FlextMeltanoModels",
+            "m",
+        ),
+        ".protocols": (
+            "FlextMeltanoProtocols",
+            "p",
+        ),
+        ".services": ("services",),
+        ".services.abstractions": ("FlextMeltanoAbstractions",),
+        ".services.abstractions_base": ("FlextMeltanoAbstractionsBase",),
+        ".services.adapters": ("FlextMeltanoAdapter",),
+        ".services.bridge": ("FlextMeltanoBridge",),
+        ".services.consumer_bases.dbt_service_base": ("FlextMeltanoDbtServiceBase",),
+        ".services.consumer_bases.tap_service_base": ("FlextMeltanoTapServiceBase",),
+        ".services.consumer_bases.target_service_base": (
+            "FlextMeltanoTargetServiceBase",
+        ),
+        ".services.dbt_project": ("FlextMeltanoDbtProjectMixin",),
+        ".services.dbt_runner": ("FlextMeltanoDbtRunnerMixin",),
+        ".services.executor": ("FlextMeltanoExecutor",),
+        ".services.executor_base": ("FlextMeltanoExecutorBase",),
+        ".services.library_runner": ("FlextMeltanoLibraryRunner",),
+        ".services.meltano_plugin_discovery": ("FlextMeltanoPluginDiscoveryMixin",),
+        ".services.meltano_plugins": ("FlextMeltanoComponentService",),
+        ".services.meltano_project_sdk": ("FlextMeltanoProjectManager",),
+        ".services.project_service": ("FlextMeltanoProjectService",),
+        ".services.services": ("FlextMeltanoService",),
+        ".services.singer_catalog": ("FlextMeltanoSingerCatalogMixin",),
+        ".services.singer_sdk": (
+            "FlextMeltanoSingerTapAdapter",
+            "Sink",
+            "Stream",
+            "Tap",
+            "Target",
+        ),
+        ".services.singer_state": ("FlextMeltanoSingerStateMixin",),
+        ".services.singer_tap": (
+            "FlextMeltanoTapAbstractions",
+            "FlextMeltanoTapSourceMixin",
+        ),
+        ".services.singer_target": ("FlextMeltanoTargetAbstractions",),
+        ".services.singer_translator": ("FlextMeltanoSingerCliTranslator",),
+        ".services.validators": ("FlextMeltanoValidators",),
+        ".settings": ("FlextMeltanoSettings",),
+        ".typings": (
+            "FlextMeltanoTypes",
+            "t",
+        ),
+        ".utilities": (
+            "FlextMeltanoUtilities",
+            "u",
+        ),
+        "flext_core._root_typing_parts.facades": (
+            "d",
+            "e",
+            "h",
+            "r",
+            "x",
+        ),
+    },
+)
 
 FLEXT_MELTANO_LAZY_IMPORTS = merge_lazy_imports(
     (".services",),

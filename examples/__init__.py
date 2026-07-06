@@ -28,7 +28,7 @@ if TYPE_CHECKING:
         ExamplesFlextMeltanoUtilities as ExamplesFlextMeltanoUtilities,
         u as u,
     )
-    from flext_core._root_typing_parts import (
+    from flext_core._root_typing_parts.facades import (
         d as d,
         e as e,
         h as h,
@@ -58,7 +58,7 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "ExamplesFlextMeltanoUtilities",
             "u",
         ),
-        "flext_core._root_typing_parts": (
+        "flext_core._root_typing_parts.facades": (
             "d",
             "e",
             "h",

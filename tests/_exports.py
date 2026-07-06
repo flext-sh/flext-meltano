@@ -3,14 +3,71 @@
 
 from __future__ import annotations
 
-from flext_core.lazy import merge_lazy_imports
-from tests._exports_lazy_part_01 import TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_01
-from tests._exports_lazy_part_02 import TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_02
+from flext_core.lazy import build_lazy_import_map, merge_lazy_imports
 
-_LOCAL_LAZY_IMPORTS = {
-    **TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_01,
-    **TESTS_FLEXT_MELTANO_LAZY_IMPORTS_PART_02,
-}
+_LOCAL_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".base": (
+            "TestsFlextMeltanoServiceBase",
+            "s",
+        ),
+        ".conftest": ("conftest",),
+        ".constants": (
+            "TestsFlextMeltanoConstants",
+            "c",
+        ),
+        ".integration": ("integration",),
+        ".integration.test_docker_integration": ("TestsFlextMeltanoDockerIntegration",),
+        ".models": (
+            "TestsFlextMeltanoModels",
+            "m",
+        ),
+        ".protocols": (
+            "TestsFlextMeltanoProtocols",
+            "p",
+        ),
+        ".settings": ("TestsFlextMeltanoSettings",),
+        ".typings": (
+            "TestsFlextMeltanoTypes",
+            "t",
+        ),
+        ".unit": ("unit",),
+        ".unit.test_api": ("TestsFlextMeltanoApi",),
+        ".unit.test_cli_integration": ("TestsFlextMeltanoCliIntegration",),
+        ".unit.test_cli_small_managers": ("TestsFlextMeltanoCliSmallManagers",),
+        ".unit.test_constants": ("TestsFlextMeltanoConstantsUnit",),
+        ".unit.test_execution_result": ("TestsFlextMeltanoExecutionResult",),
+        ".unit.test_executors": ("TestsFlextMeltanoExecutors",),
+        ".unit.test_library_runner": ("TestsFlextMeltanoLibraryRunner",),
+        ".unit.test_models": ("TestsFlextMeltanoModelsUnit",),
+        ".unit.test_plugin_protocols": ("TestsFlextMeltanoPluginProtocols",),
+        ".unit.test_services": ("TestsFlextMeltanoServices",),
+        ".unit.test_singer_cli_translator": ("TestsFlextMeltanoSingerCliTranslator",),
+        ".unit.test_singer_sdk_adapter": ("TestsFlextMeltanoSingerSdkAdapter",),
+        ".unit.test_singer_types": ("TestsFlextMeltanoSingerTypes",),
+        ".unit.test_tap_abstractions": ("TestsFlextMeltanoTapAbstractions",),
+        ".unit.test_target_abstractions": ("TestsFlextMeltanoTargetAbstractions",),
+        ".unit.test_typings": ("TestsFlextMeltanoTypingsUnit",),
+        ".unit.test_validators": ("TestsFlextMeltanoValidators",),
+        ".unit.tests_pipeline_cli_managers": ("TestFlextMeltanoPipelineCliManagers",),
+        ".utilities": (
+            "TestsFlextMeltanoUtilities",
+            "u",
+        ),
+        "flext_tests": (
+            "d",
+            "e",
+            "h",
+            "r",
+            "td",
+            "tf",
+            "tk",
+            "tm",
+            "tv",
+            "x",
+        ),
+    },
+)
 
 TESTS_FLEXT_MELTANO_LAZY_IMPORTS = merge_lazy_imports(
     (
