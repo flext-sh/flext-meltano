@@ -9,13 +9,13 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_meltano.services.consumer_bases.dbt_service_base import (
-        FlextMeltanoDbtServiceBase as FlextMeltanoDbtServiceBase,
+        FlextMeltanoDbtServiceBase,
     )
     from flext_meltano.services.consumer_bases.tap_service_base import (
-        FlextMeltanoTapServiceBase as FlextMeltanoTapServiceBase,
+        FlextMeltanoTapServiceBase,
     )
     from flext_meltano.services.consumer_bases.target_service_base import (
-        FlextMeltanoTargetServiceBase as FlextMeltanoTargetServiceBase,
+        FlextMeltanoTargetServiceBase,
     )
 _LAZY_IMPORTS = build_lazy_import_map(
     {
