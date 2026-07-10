@@ -88,7 +88,7 @@ class FlextMeltanoSettings(FlextSettings):
         @field_validator("pipelines_dir", mode="before")
         @classmethod
         def _coerce_pipelines_dir(cls, value: str | None) -> str:
-            text = str(value).strip() if value is not None else ""
+            text = value.strip() if value is not None else ""
             if text:
                 return str(Path(text).expanduser().resolve())
             return str((Path.cwd() / ".flext-meltano" / "pipelines").resolve())
@@ -96,12 +96,12 @@ class FlextMeltanoSettings(FlextSettings):
         @field_validator("project_root", mode="before")
         @classmethod
         def _coerce_project_root(cls, value: str | None) -> str:
-            return str(Path(str(value)).resolve()) if value else ""
+            return str(Path(value).resolve()) if value else ""
 
         @field_validator("config_dir", "logs_dir", mode="before")
         @classmethod
         def _coerce_path(cls, value: str | None) -> str:
-            return str(value) if value else ""
+            return value or ""
 
         @field_validator("environment")
         @classmethod

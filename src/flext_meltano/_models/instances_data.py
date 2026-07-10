@@ -163,7 +163,7 @@ class FlextMeltanoModelsInstancesData:
         @u.model_validator(mode="after")
         def validate_source_instance(self) -> Self:
             """Validate source instance consistency."""
-            if settings.source_type != self.source_type:
+            if self.settings.source_type != self.source_type:
                 msg = "Source type must match between instance and settings"
                 raise ValueError(msg)
             if self.discovered and not self.streams:

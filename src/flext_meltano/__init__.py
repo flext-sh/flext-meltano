@@ -23,6 +23,14 @@ from flext_meltano.__version__ import (
 
 if TYPE_CHECKING:
     from flext_cli import d as d, e as e, h as h, r as r, x as x
+    from flext_meltano._config import (
+        FlextMeltanoConfig as FlextMeltanoConfig,
+        config as config,
+    )
+    from flext_meltano._settings import (
+        FlextMeltanoSettings as FlextMeltanoSettings,
+        settings as settings,
+    )
     from flext_meltano.api import FlextMeltano as FlextMeltano, meltano as meltano
     from flext_meltano.base import (
         FlextMeltanoServiceBase as FlextMeltanoServiceBase,
@@ -122,6 +130,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     (".services",),
     build_lazy_import_map(
         {
+            "._config": ("FlextMeltanoConfig", "config"),
             "._settings": ("FlextMeltanoSettings", "settings"),
             ".api": (
                 "FlextMeltano",
@@ -275,6 +284,7 @@ __all__: tuple[str, ...] = (
     "__version__",
     "__version_info__",
     "c",
+    "config",
     "d",
     "e",
     "h",

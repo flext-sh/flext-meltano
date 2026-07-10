@@ -12,6 +12,7 @@ from flext_meltano import (
     FlextMeltanoServiceBase,
     p,
     r,
+    settings,
     t,
 )
 

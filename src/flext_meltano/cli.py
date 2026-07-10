@@ -23,7 +23,6 @@ class FlextMeltanoCli:
         self._app = cli.create_app_with_common_params(
             name=self.app_name,
             help_text=self.app_help,
-            settings=cli.settings,
         )
         self._register_commands()
 

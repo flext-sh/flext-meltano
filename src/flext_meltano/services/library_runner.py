@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, settings, t, u
 from flext_meltano.services.executor import FlextMeltanoExecutor
 
 if TYPE_CHECKING:

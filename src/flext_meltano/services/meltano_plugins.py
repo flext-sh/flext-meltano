@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import c, p, r, t
+from flext_meltano import c, p, r, settings, t
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.meltano_plugin_discovery import (
     FlextMeltanoPluginDiscoveryMixin,

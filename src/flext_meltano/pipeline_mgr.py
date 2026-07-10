@@ -16,6 +16,7 @@ from flext_meltano import (
     m,
     p,
     r,
+    settings,
     t,
     u,
 )
@@ -57,7 +58,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         })
 
     def _pipelines_root(self) -> Path:
-        return settings.Meltano.pipelines_dir
+        return Path(settings.Meltano.pipelines_dir)
 
     def _pipeline_dir(self, pipeline_name: str) -> Path:
         return self._pipelines_root() / pipeline_name

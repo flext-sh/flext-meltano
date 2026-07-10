@@ -17,6 +17,7 @@ from flext_meltano import (
     e,
     p,
     r,
+    settings,
     t,
     u,
 )

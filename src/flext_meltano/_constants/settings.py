@@ -5,8 +5,8 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Final
 
-from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 from flext_cli import c
+from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 
 if TYPE_CHECKING:
     from flext_cli import t

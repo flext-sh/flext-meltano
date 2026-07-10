@@ -8,7 +8,16 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    p,
+    r,
+    settings,
+    t,
+    u,
+)
 
 
 class FlextMeltanoService(FlextMeltanoServiceBase):

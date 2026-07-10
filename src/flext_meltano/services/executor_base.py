@@ -33,6 +33,7 @@ from flext_meltano import (
     m,
     p,
     r,
+    settings,
     t,
     u,
 )
