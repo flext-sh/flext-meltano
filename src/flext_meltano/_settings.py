@@ -50,7 +50,9 @@ class FlextMeltanoSettings(FlextSettings):
             str,
             Field(default=".meltano", description="Meltano configuration directory"),
         ]
-        logs_dir: Annotated[str, Field(default="logs", description="Meltano logs directory")]
+        logs_dir: Annotated[
+            str, Field(default="logs", description="Meltano logs directory")
+        ]
         environment: Annotated[
             str,
             Field(
@@ -59,7 +61,9 @@ class FlextMeltanoSettings(FlextSettings):
                 description="Active Meltano runtime environment",
             ),
         ]
-        log_level: Annotated[str, Field(default="INFO", description="Meltano runtime log level")]
+        log_level: Annotated[
+            str, Field(default="INFO", description="Meltano runtime log level")
+        ]
         meltano_version: Annotated[
             str,
             Field(default="3.9.1", description="Required Meltano version"),

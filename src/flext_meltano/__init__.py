@@ -228,8 +228,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
 
 
 __all__: tuple[str, ...] = (
-    "FlextMeltanoSettings",
-    "settings",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAbstractionsBase",
@@ -251,6 +249,7 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
     "FlextMeltanoServiceBase",
+    "FlextMeltanoSettings",
     "FlextMeltanoSingerCatalogMixin",
     "FlextMeltanoSingerCliTranslator",
     "FlextMeltanoSingerStateMixin",
@@ -285,6 +284,7 @@ __all__: tuple[str, ...] = (
     "p",
     "r",
     "s",
+    "settings",
     "t",
     "u",
     "x",
