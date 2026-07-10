@@ -14,7 +14,10 @@ from pathlib import Path
 from typing import ClassVar, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano._settings import FlextMeltanoSettings
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
+
+settings = FlextMeltanoSettings.fetch_global()
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
@@ -29,7 +32,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success."""
-        cwd = u.Meltano.resolve_project_root(self.settings)
+        cwd = settings.Meltano.project_root
         run_result: p.Result[m.Meltano.CommandExecutionResult] = (
             FlextMeltanoExecutorBase().execute_meltano_command(
                 list(args),
@@ -164,7 +167,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def fetch_project_root(self) -> p.Result[Path]:
         """Get the root directory from settings."""
-        project_root = self.settings.project_root
+        project_root = settings.Meltano.project_root
         if project_root == Path():
             return r[Path].fail("No project root configured in settings")
         try:
@@ -177,9 +180,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         """Execute abstractions service and return real configuration state."""
         payload: t.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
-            "project_root": str(self.settings.project_root),
-            "environment": self.settings.environment,
-            "meltano_version": self.settings.meltano_version,
+            "project_root": str(settings.Meltano.project_root),
+            "environment": settings.Meltano.environment,
+            "meltano_version": settings.Meltano.meltano_version,
         }
         return r[t.JsonMapping].ok(payload)
 

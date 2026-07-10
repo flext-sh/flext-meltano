@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flext_tests.settings import FlextTestsSettings
+from flext_tests._settings import FlextTestsSettings
 
 from flext_meltano import FlextMeltanoSettings
 

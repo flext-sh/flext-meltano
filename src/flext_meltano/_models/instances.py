@@ -38,7 +38,7 @@ class FlextMeltanoModelsInstances:
         @property
         def config_keys_count(self) -> int:
             """Number of settings keys."""
-            return u.count(list(self.settings.keys()))
+            return u.count(list(settings.keys()))
 
         @u.model_validator(mode="after")
         def validate_sink_definition(self) -> Self:

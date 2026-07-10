@@ -87,7 +87,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute validators service — returns current settings."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 
 __all__: list[str] = ["FlextMeltanoValidators"]

@@ -57,7 +57,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         })
 
     def _pipelines_root(self) -> Path:
-        return self.settings.pipelines_dir
+        return settings.Meltano.pipelines_dir
 
     def _pipeline_dir(self, pipeline_name: str) -> Path:
         return self._pipelines_root() / pipeline_name
@@ -189,7 +189,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
                 command_result.error or "Pipeline execution not configured",
             )
         execution_result = FlextMeltanoExecutor(
-            settings=self.settings,
+            settings=settings,
         ).execute_meltano_command(command_result.value)
         if execution_result.failure:
             return r[str].fail(execution_result.error or "Pipeline execution failed")

@@ -213,7 +213,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     def fetch_default_config(self) -> p.Result[t.JsonMapping]:
         """Get default configuration from current settings."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def fetch_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""
@@ -226,7 +226,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     def validate_config(self) -> p.Result[bool]:
         """Validate current service configuration."""
-        return self.validate_service_config(self.settings.model_dump())
+        return self.validate_service_config(settings.model_dump())
 
 
 __all__: list[str] = ["FlextMeltanoService"]

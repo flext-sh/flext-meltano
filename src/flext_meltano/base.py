@@ -97,25 +97,13 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
                 settings.model_dump(),
             )
         else:
-            normalized["runtime_settings"] = FlextMeltanoSettings()
+            normalized["runtime_settings"] = FlextMeltanoSettings.fetch_global()
         return normalized
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the service using the canonical JSON payload contract."""
         raise NotImplementedError
-
-    @property
-    @override
-    def settings(self) -> FlextMeltanoSettings:
-        """The typed Meltano settings namespace."""
-        if isinstance(self.runtime_settings, FlextMeltanoSettings):
-            return self.runtime_settings
-        try:
-            return FlextMeltanoSettings.fetch_global()
-        except ValueError:
-            with FlextMeltanoSettings.singleton_disabled():
-                return FlextMeltanoSettings()
 
 
 s = FlextMeltanoServiceBase

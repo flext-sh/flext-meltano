@@ -17,7 +17,6 @@ class TestsFlextMeltanoServiceBase(tests_s):
     @override
     def fetch_settings(cls) -> TestsFlextMeltanoSettings:
         """Return the typed Meltano+Tests settings singleton."""
-        return TestsFlextMeltanoSettings.fetch_global()
 
     @classmethod
     @override

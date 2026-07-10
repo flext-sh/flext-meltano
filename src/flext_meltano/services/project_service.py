@@ -207,7 +207,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
             "flext_meltano_project_service",
-            self.settings,
+            settings,
         )
         if result.success:
             self.logger.info("FlextMeltanoProjectService executed successfully")

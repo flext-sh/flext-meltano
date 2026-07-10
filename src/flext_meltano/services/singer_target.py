@@ -94,7 +94,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute sink abstraction operations (implements Service)."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def validate_sink_config(
         self,

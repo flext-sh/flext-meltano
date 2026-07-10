@@ -87,7 +87,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         """Run DBT transformation using the configured Meltano executor."""
         executor = (
             FlextMeltanoExecutor(
-                settings=self.settings.model_copy(update={"project_root": project_dir}),
+                settings=settings.model_copy(update={"project_root": project_dir}),
             )
             if project_dir is not None
             else self._elt_executor

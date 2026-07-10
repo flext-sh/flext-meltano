@@ -71,7 +71,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         active_settings = (
             self.runtime_settings
             if isinstance(self.runtime_settings, FlextMeltanoSettings)
-            else self.settings
+            else settings
         )
         return u.Meltano.resolve_project_root(active_settings) or Path.cwd()
 
@@ -108,7 +108,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         active_settings = (
             self.runtime_settings
             if isinstance(self.runtime_settings, FlextMeltanoSettings)
-            else self.settings
+            else settings
         )
         configured_root: Path | None = u.Meltano.resolve_project_root(active_settings)
         if configured_root is not None:
@@ -183,10 +183,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         active_settings = (
             self.runtime_settings
             if isinstance(self.runtime_settings, FlextMeltanoSettings)
-            else self.settings
+            else settings
         )
         selected_environment = u.Meltano.normalize_environment_name(
-            active_settings.environment,
+            active_settings.Meltano.environment,
         )
         if not selected_environment:
             return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
@@ -211,7 +211,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             "status": c.Meltano.OperationStatus.READY,
             "executor_type": "flext_meltano_executor",
             "execution_timestamp": str(time.time()),
-            "settings": self.settings.model_dump(mode="json"),
+            "settings": settings.model_dump(mode="json"),
         }
         self.logger.info("FlextMeltanoExecutor executed successfully")
         return r[t.JsonMapping].ok(config_data)

@@ -113,7 +113,6 @@ if TYPE_CHECKING:
     from flext_meltano.services.validators import (
         FlextMeltanoValidators as FlextMeltanoValidators,
     )
-    from flext_meltano.settings import FlextMeltanoSettings as FlextMeltanoSettings
     from flext_meltano.typings import FlextMeltanoTypes as FlextMeltanoTypes, t as t
     from flext_meltano.utilities import (
         FlextMeltanoUtilities as FlextMeltanoUtilities,
@@ -123,6 +122,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     (".services",),
     build_lazy_import_map(
         {
+            "._settings": ("FlextMeltanoSettings", "settings"),
             ".api": (
                 "FlextMeltano",
                 "meltano",
@@ -186,7 +186,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".services.singer_target": ("FlextMeltanoTargetAbstractions",),
             ".services.singer_translator": ("FlextMeltanoSingerCliTranslator",),
             ".services.validators": ("FlextMeltanoValidators",),
-            ".settings": ("FlextMeltanoSettings",),
             ".typings": (
                 "FlextMeltanoTypes",
                 "t",
@@ -229,6 +228,8 @@ _LAZY_IMPORTS = merge_lazy_imports(
 
 
 __all__: tuple[str, ...] = (
+    "FlextMeltanoSettings",
+    "settings",
     "FlextMeltano",
     "FlextMeltanoAbstractions",
     "FlextMeltanoAbstractionsBase",
@@ -250,7 +251,6 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoProtocols",
     "FlextMeltanoService",
     "FlextMeltanoServiceBase",
-    "FlextMeltanoSettings",
     "FlextMeltanoSingerCatalogMixin",
     "FlextMeltanoSingerCliTranslator",
     "FlextMeltanoSingerStateMixin",
