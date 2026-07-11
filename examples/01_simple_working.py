@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from examples.constants import c
 from examples.utilities import u
-from flext_meltano import meltano
+from flext_meltano import FlextMeltanoSettings, meltano
 
 logger = u.fetch_logger(__name__)
 
@@ -58,11 +58,13 @@ def simple_runtime_example() -> None:
 
 def simple_config_example() -> None:
     """Example using typed settings through the public facade."""
+    typed_settings = FlextMeltanoSettings.fetch_global()
     logger.info(
-        "Config created: %s",
-        meltano.settings.model_dump(mode="python"),
+        "Config created: project_root=%s, config_dir=%s",
+        typed_settings.Meltano.project_root,
+        typed_settings.Meltano.config_dir,
     )
-    logger.info("Environment: %s", meltano.settings.environment)
+    logger.info("Environment: %s", typed_settings.Meltano.environment)
 
 
 def run_examples() -> None:
