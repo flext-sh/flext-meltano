@@ -88,6 +88,21 @@ class FlextMeltanoProtocolsSinger:
             """Test DBT models with r."""
             ...
 
+    # NOTE (multi-agent): mro-rn88 ADR-006 thin-driver — typed dbt connection profile.
+    @runtime_checkable
+    class DbtConnectionProfile(p.HasModelDump, Protocol):
+        """Typed dbt connection profile contract (any FlextModel satisfies it)."""
+
+        @property
+        def type(self) -> str:
+            """Dbt adapter type identifier."""
+            ...
+
+        @property
+        def project(self) -> str:
+            """Dbt project name owning this profile."""
+            ...
+
     @runtime_checkable
     class SingerStreamInfo(Protocol):
         """Minimal protocol for stream objects returned by discover_streams."""

@@ -34,7 +34,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     Subclasses MUST define:
     - ``dbt_project_name``: canonical dbt project name
-    - ``connection_profile``: returns dbt connection profile dict
+    - ``connection_profile``: returns the typed dbt connection profile model
 
     This base provides via MRO:
     - dbt command execution (``run_models``, ``run_tests``, ``compile_models``)
@@ -60,11 +60,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     @property
     @abstractmethod
-    def connection_profile(self) -> t.JsonMapping:
-        """Dbt connection profile for this project.
+    def connection_profile(self) -> p.Meltano.DbtConnectionProfile:
+        """Return the typed dbt connection profile model for this project.
 
-        Consumer implements with domain-specific connection settings
-        (e.g. Oracle DSN, LDAP bind DN, etc.).
+        Consumer returns its own domain ``m.<Ns>.DbtConnectionProfile`` model
+        satisfying the protocol — a typed model, never a dict.
         """
 
     # ------------------------------------------------------------------
