@@ -12,13 +12,23 @@ from unittest.mock import Mock
 
 import pytest
 
-from flext_meltano import meltano, p, t
+from flext_meltano import m, meltano, p, t
 
 # Keys every command-execution payload must expose per the public contract
 # (u.Meltano.build_command_execution_payload): status/success/output/error/
 # exit_code plus the execution_time duration field.
 _BASE_PAYLOAD_KEYS: tuple[str, ...] = (
     "status",
+    "success",
+    "output",
+    "error",
+    "exit_code",
+    "execution_time",
+)
+
+# Attributes the typed CommandExecutionResult exposes per the public contract.
+_COMMAND_RESULT_ATTRIBUTES: tuple[str, ...] = (
+    "command",
     "success",
     "output",
     "error",
@@ -39,8 +49,8 @@ class TestsFlextMeltanoLibraryRunner:
         )
 
     @pytest.fixture(scope="class")
-    def dbt_result(self) -> p.Result[t.JsonMapping]:
-        """Run one DBT transformation once and share its outcome."""
+    def dbt_result(self) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Run one DBT transformation once and share its typed outcome."""
         return meltano.run_dbt_transformation(models=["model1"])
 
     @pytest.fixture(scope="class")
@@ -106,28 +116,26 @@ class TestsFlextMeltanoLibraryRunner:
 
     def test_run_dbt_transformation_succeeds(
         self,
-        dbt_result: p.Result[t.JsonMapping],
+        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
     ) -> None:
         """A DBT transformation reports a successful ``r[T]`` outcome."""
         assert dbt_result.success
 
-    @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
-    def test_dbt_payload_exposes_base_command_keys(
+    @pytest.mark.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
+    def test_dbt_result_exposes_command_execution_fields(
         self,
-        dbt_result: p.Result[t.JsonMapping],
-        key: str,
+        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
+        attribute: str,
     ) -> None:
-        """The DBT payload carries every documented command-execution field."""
-        assert key in dbt_result.unwrap()
+        """The typed CommandExecutionResult carries every documented field."""
+        assert hasattr(dbt_result.unwrap(), attribute)
 
-    def test_dbt_payload_reports_requested_models(
+    def test_dbt_result_command_targets_requested_models(
         self,
-        dbt_result: p.Result[t.JsonMapping],
+        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
     ) -> None:
-        """The DBT payload reports the models joined into its ``models`` field."""
-        payload = dbt_result.unwrap()
-        assert "models" in payload
-        assert payload["models"] == "model1"
+        """The executed dbt command carries the requested model name."""
+        assert "model1" in dbt_result.unwrap().command
 
     def test_run_elt_pipeline_succeeds_and_echoes_identity(
         self,

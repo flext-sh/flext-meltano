@@ -14,6 +14,10 @@ from flext_meltano.services.executor import FlextMeltanoExecutor
 if TYPE_CHECKING:
     from pathlib import Path
 
+    # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return; runtime
+    # import not needed (from __future__ import annotations makes the annotation lazy).
+    from flext_meltano import m
+
 
 class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
     """Unified library runner mixin for MRO composition on FlextMeltano.
@@ -83,8 +87,15 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         self,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> p.Result[t.JsonMapping]:
-        """Run DBT transformation using the configured Meltano executor."""
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Run DBT transformation using the configured Meltano executor.
+
+        Returns the executor's typed CommandExecutionResult directly (SSOT). Callers
+        read its fields (success/output/error/exit_code/execution_time) — no dict
+        degradation (# NOTE multi-agent, bead mro-wfc8.3: was r[t.JsonMapping] via
+        build_mutable_command_execution_payload; that flattened the typed model to a
+        dict whose models_run/execution_method keys never existed).
+        """
         executor = (
             FlextMeltanoExecutor(
                 settings=settings.model_copy(update={"project_root": project_dir}),
@@ -95,15 +106,6 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         return executor.execute_dbt_command(
             c.Meltano.DbtCommand.RUN,
             models,
-        ).map(
-            lambda execution_result: u.Meltano.build_mutable_command_execution_payload(
-                execution_result,
-                extra_fields={
-                    "models": u.join(models or [], separator=",") if models else "",
-                    "project_dir": str(project_dir) if project_dir else "",
-                },
-                duration_field="execution_time",
-            ),
         )
 
     def run_elt_pipeline(
