@@ -11,7 +11,7 @@
 - Keywords: `data-integration`, `enterprise`, `etl`, `flext`, `meltano`, `typed`
 - Main facades: _none_
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextMeltanoDbtRunnerMixin`, `Tap`, `FlextMeltanoTapSourceMixin`, `FlextMeltanoTargetServiceBase`, `FlextMeltanoProjectService`, `FlextMeltanoPluginDiscoveryMixin`, `FlextMeltanoSingerStateMixin`, `FlextMeltanoSingerTapAdapter`, `FlextMeltanoAdapter`, `main` (+32 more)
+- Public symbol exports: `FlextMeltanoBridge`, `FlextMeltanoComponentService`, `FlextMeltanoModels`, `meltano`, `Target`, `FlextMeltanoUtilities`, `FlextMeltanoDbtServiceBase`, `config`, `FlextMeltanoTapServiceBase`, `FlextMeltanoCli` (+32 more)
 - Exported module shortcuts: _none_
 - Generated module pages: `32`
 
