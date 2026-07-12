@@ -72,7 +72,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point for dbt project."""
+        """Run the main CLI entry point for dbt project."""
 
         def _run_cli_main() -> int:
             command_args = list(args) if args else sys.argv[1:]

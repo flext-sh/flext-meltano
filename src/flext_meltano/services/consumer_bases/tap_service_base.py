@@ -66,7 +66,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point through the internal Singer bridge."""
+        """Run the main CLI entry point through the internal Singer bridge."""
         try:
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]

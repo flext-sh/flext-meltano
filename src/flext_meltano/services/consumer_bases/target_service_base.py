@@ -61,7 +61,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point for target."""
+        """Run the main CLI entry point for target."""
         try:
             command_args = list(args) if args else sys.argv[1:]
             _ = command_args

@@ -78,7 +78,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
-        """The version information from the imported Meltano package."""
+        """Return the version information from the imported Meltano package."""
         return u.try_(
             lambda: meltano.__version__,
             catch=(
@@ -165,7 +165,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         plugin_type: str | None = None,
         _cwd: Path | None = None,
     ) -> p.Result[t.SequenceOf[t.StrMapping]]:
-        """The project-scoped plugin definitions from Meltano runtime state."""
+        """Return the project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.failure:
             return r[t.SequenceOf[t.StrMapping]].fail(

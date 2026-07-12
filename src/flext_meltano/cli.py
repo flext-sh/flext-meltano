@@ -325,7 +325,7 @@ class FlextMeltanoCli:
 
 
 def main() -> int:
-    """Main entry point for FLEXT Meltano CLI."""
+    """Run the FLEXT Meltano CLI main entry point."""
     result = FlextMeltanoCli().run(sys.argv[1:])
     return 0 if result.success else 1
 

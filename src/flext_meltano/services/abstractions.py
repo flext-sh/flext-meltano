@@ -17,7 +17,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     @classmethod
     def create_abstractions_instance(cls) -> p.Result[Self]:
-        """Factory method for creating a FlextMeltanoAbstractions instance."""
+        """Create a FlextMeltanoAbstractions instance."""
         instance: Self = cls()
         ok_result: p.Result[Self] = r.ok(instance)
         return ok_result
