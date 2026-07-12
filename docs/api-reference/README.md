@@ -20,6 +20,6 @@ This section is generated from public exports and real docstrings.
 ## Surface Summary
 
 - Primary facades: _none_
-- Generated module pages: `34`
+- Generated module pages: `32`
 
 - [Back to project docs](../index.md)
