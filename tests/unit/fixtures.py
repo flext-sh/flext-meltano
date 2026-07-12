@@ -44,7 +44,7 @@ def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCa
     ids=["version", "service-name", "status", "handlers"],
 )
 def meltano_execute_field(request: pytest.FixtureRequest) -> str:
-    """Expected fields exposed by the public execute payload."""
+    """Return an expected field exposed by the public execute payload."""
     return str(request.param)
 
 

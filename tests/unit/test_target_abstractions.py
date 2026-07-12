@@ -20,7 +20,7 @@ class TestsFlextMeltanoTargetAbstractions:
 
     @pytest.fixture
     def sink_config(self) -> m.Meltano.DataSinkConfig:
-        """A valid data-sink configuration modelled via the public m.* facade."""
+        """Return a valid data-sink configuration modelled via the public m.* facade."""
         return m.Meltano.DataSinkConfig(
             sink_type="target-jsonl",
             connection_config={"path": "output.jsonl"},
