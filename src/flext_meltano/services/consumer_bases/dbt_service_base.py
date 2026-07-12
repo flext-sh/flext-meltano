@@ -24,6 +24,7 @@ from flext_meltano import (
     t,
     u,
 )
+from flext_meltano.services.executor import FlextMeltanoExecutor
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -50,6 +51,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
+    _executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
+        default_factory=FlextMeltanoExecutor,
+    )
 
     def __init__(
         self,
@@ -93,7 +97,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
                 case c.Meltano.DbtCommand.DOCS:
                     result = self.generate_docs()
                 case _:
-                    result = r[str].fail(subcommand)
+                    result = r[m.Meltano.CommandExecutionResult].fail(subcommand)
             if result.failure:
                 self.logger.warning(
                     "dbt command failed",
@@ -113,77 +117,47 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # dbt command execution
     # ------------------------------------------------------------------
 
-    def _build_dbt_cmd(
+    def _run_dbt_cmd(
         self,
         subcommand: str,
         models: t.StrSequence | None = None,
         extra_args: t.StrSequence | None = None,
-    ) -> t.StrSequence:
-        """Build dbt CLI command."""
-        cmd: list[str] = [c.Meltano.DBT_BINARY, subcommand]
-        if self._dbt_project_root:
-            cmd.extend([
-                c.Meltano.DbtOption.PROJECTS_DIR,
-                str(self._dbt_project_root),
-            ])
-        if models:
-            cmd.extend([c.Meltano.DbtOption.MODELS, *models])
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Execute a dbt command via the canonical typed executor (SSOT)."""
+        # NOTE (multi-agent, bead mro-wfc8.3.9): delegate to the single typed
+        # executor (FlextMeltanoExecutorBase.execute_dbt_command) — no parallel
+        # u.Cli.run_raw path, no str degradation. Returns CommandExecutionResult.
+        args: list[str] = list(models) if models else []
         if extra_args:
-            cmd.extend(extra_args)
-        return cmd
+            args.extend(extra_args)
+        return self._executor.execute_dbt_command(subcommand, args or None)
 
-    def _run_dbt_cmd(self, cmd: t.StrSequence, operation: str) -> p.Result[str]:
-        """Execute a dbt command via subprocess."""
-
-        def _run__run_dbt_cmd() -> p.Result[str]:
-            self.logger.info(
-                "Running dbt command",
-                operation=operation,
-                command=" ".join(cmd),
-            )
-            result = u.Cli.run_raw(list(cmd))
-            if result.failure:
-                return r[str].fail(result.error or operation)
-            out = result.value
-            if out.exit_code != 0:
-                return r[str].fail(out.stderr or operation)
-            self.logger.info("dbt command completed", operation=operation)
-            return r[str].ok(out.stdout)
-
-        try:
-            return _run__run_dbt_cmd()
-        except c.EXC_OS_RUNTIME_TYPE as exc:
-            return r[str].fail(str(exc))
-
-    def run_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
+    def run_models(
+        self,
+        models: t.StrSequence | None = None,
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt models."""
-        return self._run_dbt_cmd(
-            self._build_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models),
-            c.Meltano.DbtCommand.RUN,
-        )
+        return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
 
-    def run_tests(self, models: t.StrSequence | None = None) -> p.Result[str]:
+    def run_tests(
+        self,
+        models: t.StrSequence | None = None,
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt tests."""
-        return self._run_dbt_cmd(
-            self._build_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models),
-            c.Meltano.DbtCommand.TEST,
-        )
+        return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
 
-    def compile_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
+    def compile_models(
+        self,
+        models: t.StrSequence | None = None,
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Compile dbt models."""
-        return self._run_dbt_cmd(
-            self._build_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models),
-            c.Meltano.DbtCommand.COMPILE,
-        )
+        return self._run_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models)
 
-    def generate_docs(self) -> p.Result[str]:
+    def generate_docs(self) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Generate dbt documentation."""
         return self._run_dbt_cmd(
-            self._build_dbt_cmd(
-                c.Meltano.DbtCommand.DOCS,
-                extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
-            ),
-            f"{c.Meltano.DbtCommand.DOCS} {c.Meltano.DbtCommand.GENERATE}",
+            c.Meltano.DbtCommand.DOCS,
+            extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
         )
 
     # ------------------------------------------------------------------
