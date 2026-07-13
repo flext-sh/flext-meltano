@@ -10,15 +10,17 @@ from typing import TYPE_CHECKING
 
 from flext_infra import u
 
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import (
+    FlextMeltanoConstants as c,
+    FlextMeltanoModels as m,
+    FlextMeltanoTypes as t,
+)
 
 if TYPE_CHECKING:
     from meltano.core.plugin.base import PluginType as MeltanoPluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
-    from flext_meltano.protocols import FlextMeltanoProtocols as p
+    from flext_meltano import FlextMeltanoProtocols as p
 
 
 class FlextMeltanoUtilitiesRuntime:

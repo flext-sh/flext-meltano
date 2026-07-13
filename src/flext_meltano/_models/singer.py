@@ -5,8 +5,7 @@ from __future__ import annotations
 from typing import Annotated, ClassVar
 
 from flext_cli import m, u
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsSinger:

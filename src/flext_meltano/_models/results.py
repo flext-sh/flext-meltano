@@ -6,8 +6,7 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_cli import m, u
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
 
 if TYPE_CHECKING:
     from datetime import datetime

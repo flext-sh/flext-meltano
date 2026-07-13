@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_cli import t
-from flext_meltano.constants import FlextMeltanoConstants as c
+from flext_meltano import FlextMeltanoConstants as c
 
 
 class FlextMeltanoTypingsDomains:

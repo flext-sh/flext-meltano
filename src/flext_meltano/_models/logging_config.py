@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from flext_cli import m, u
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsLogging:
