@@ -29,9 +29,9 @@ classifiers = [
 ]
 dependencies = [
   "alembic>=1.18.4",
-  "dbt-adapters @ git+https://github.com/flext-sh/dbt-adapters.git@flext/relax-deps#subdirectory=dbt-adapters",
-  "dbt-common @ git+https://github.com/flext-sh/dbt-common.git@flext/relax-deps",
-  "dbt-core @ git+https://github.com/flext-sh/dbt-core.git@flext/relax-deps#subdirectory=core",
+  "dbt-adapters>=1.24.4",
+  "dbt-common>=1.38.0",
+  "dbt-core>=1.11.12",
   "duckdb>=1.5.2",
   "fastapi>=0.136.1",
   "flext-cli",
@@ -39,7 +39,7 @@ dependencies = [
   "httpx>=0.28.1",
   "injectable>=4.0.1",
   "jinja2>=3.1.6",
-  "meltano @ git+https://github.com/flext-sh/meltano.git@flext/relax-deps",
+  "meltano>=4.2.1",
   "pandas>=3.0.2",
   "prometheus-client>=0.25.0",
   "pydantic-core>=2.46.3",
