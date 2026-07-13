@@ -92,18 +92,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             ),
         ).map_error(lambda e: f"Failed to get version: {e}")
 
-    @staticmethod
-    def _normalize_exit_code(raw_exit_code: int | str | None) -> int:
-        """Normalize runtime exit codes into integers."""
-        if raw_exit_code is None:
-            return 0
-        if isinstance(raw_exit_code, int):
-            return raw_exit_code
-        try:
-            return int(raw_exit_code)
-        except ValueError:
-            return 1
-
     def _project_search_root(self, _cwd: Path | None = None) -> Path | None:
         """Resolve the project root used for project-scoped Meltano operations."""
         active_settings = (
@@ -268,16 +256,15 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             try:
                 Project.deactivate()
                 with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
-                    meltano_cli.main(
+                    command_result = cli.execute_external_command(
+                        meltano_cli,
                         args=runtime_args,
                         prog_name=c.Meltano.CMD_BINARY,
-                        standalone_mode=False,
                     )
-            except SystemExit as e:
-                exit_code = self._normalize_exit_code(e.code)
+                if command_result.failure:
+                    exit_code = 1
+                    runtime_error = command_result.error or "Meltano CLI command failed"
             except (
-                c.Cli.CliAbortError,
-                c.Cli.CliCommandError,
                 CliError,
                 EmptyMeltanoFileException,
                 MeltanoError,

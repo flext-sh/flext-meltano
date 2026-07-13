@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_cli import p
 from flext_meltano import t
@@ -27,7 +27,6 @@ class FlextMeltanoProtocolsSinger:
             """Discover catalog with r."""
             ...
 
-        @override
         def execute(self) -> p.Result[t.JsonMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
@@ -43,7 +42,6 @@ class FlextMeltanoProtocolsSinger:
     class Target(p.Service[t.JsonMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
-        @override
         def execute(self) -> p.Result[t.JsonMapping]:
             """Execute the target loading (implements Service)."""
             ...
@@ -69,7 +67,6 @@ class FlextMeltanoProtocolsSinger:
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
-        @override
         def execute(self) -> p.Result[t.JsonMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
@@ -254,7 +251,7 @@ class FlextMeltanoProtocolsSinger:
         """Raw Singer SDK tap surface consumed by the FLEXT bridge."""
 
         @classmethod
-        def get_singer_command(cls) -> t.Cli.ExternalCli:
+        def get_singer_command(cls) -> p.Cli.ExternalCommand:
             """Return the Singer SDK command bound to the tap type."""
             ...
 
@@ -278,7 +275,7 @@ class FlextMeltanoProtocolsSinger:
         """Legacy tap backend contract exposing ``settings`` only."""
 
         @classmethod
-        def get_singer_command(cls) -> t.Cli.ExternalCli:
+        def get_singer_command(cls) -> p.Cli.ExternalCommand:
             """Return the Singer SDK command bound to the tap type."""
             ...
 
