@@ -12,9 +12,7 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano.cli import FlextMeltanoCli
-from tests.constants import c
-from tests.typings import t
-from tests.utilities import u
+from tests import c, t, u
 
 __all__: list[str] = ["TestsFlextMeltanoCliSmallManagers"]
 

@@ -20,7 +20,7 @@ from flext_tests import tm
 from flext_meltano import meltano
 
 if TYPE_CHECKING:
-    from tests.typings import t
+    from tests import t
 
 
 class TestsFlextMeltanoValidators:

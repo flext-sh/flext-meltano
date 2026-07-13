@@ -23,7 +23,7 @@ from flext_tests import FlextTestsConstants
 from flext_meltano import c
 
 if TYPE_CHECKING:
-    from tests.typings import t
+    from tests import t
 
 
 class TestsFlextMeltanoConstants(FlextTestsConstants, c):

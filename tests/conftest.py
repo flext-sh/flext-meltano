@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tests.utilities import u
+from tests import u
 
 if TYPE_CHECKING:
     from collections.abc import Generator

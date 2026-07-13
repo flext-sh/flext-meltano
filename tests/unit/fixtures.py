@@ -6,15 +6,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import m, tf, tk
+from flext_tests import m, tf, tk, tm
 
-from tests.constants import c
-from tests.utilities import u
+from tests import c, u
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from tests.typings import t
+    from tests import t
 
 type MeltanoComponentCase = tuple[str, str, str]
 
@@ -35,7 +34,7 @@ MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
 def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCase:
     """Canonical public Meltano component factories with expected selectors."""
     case_index = request.param
-    assert isinstance(case_index, int)
+    tm.that(case_index, is_=int)
     return MELTANO_COMPONENT_CASES[case_index]
 
 

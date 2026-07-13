@@ -22,11 +22,10 @@ from typing import TYPE_CHECKING
 import pytest
 from flext_tests import tm
 
-from tests.models import m
-from tests.utilities import u
+from tests import m, u
 
 if TYPE_CHECKING:
-    from tests.typings import t
+    from tests import t
 
 
 class TestsFlextMeltanoCliIntegration:

@@ -15,9 +15,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
+from flext_tests import tm
 
-from tests.models import m
-from tests.typings import t
+from tests import m, t
 
 __all__: list[str] = ["TestsFlextMeltanoTypingsUnit"]
 
@@ -32,7 +32,7 @@ class TestsFlextMeltanoTypingsUnit:
     ) -> None:
         """DBT types are exposed flat (``Dbt`` prefix) directly on ``t.Meltano``."""
         assert hasattr(t.Meltano, dbt_type_name)
-        assert getattr(t.Meltano, dbt_type_name) is not None
+        tm.that(getattr(t.Meltano, dbt_type_name), none=False)
 
     @pytest.mark.parametrize(
         "composition_type_name",
@@ -60,7 +60,7 @@ class TestsFlextMeltanoTypingsUnit:
             t.Meltano.ValidatorInput,
             t.Meltano.EnvironmentInput,
         }
-        assert len(composed) == 5
+        tm.that(len(composed), eq=5)
 
     @pytest.mark.parametrize(
         "legacy_namespace",
@@ -117,7 +117,7 @@ class TestsFlextMeltanoTypingsUnit:
         wrapper_name: str,
     ) -> None:
         """Runtime Singer SDK wrappers are exposed via ``m.Meltano``, never ``t.Meltano``."""
-        assert getattr(m.Meltano, wrapper_name) is not None
+        tm.that(getattr(m.Meltano, wrapper_name), none=False)
         assert not hasattr(t.Meltano, wrapper_name)
 
     def test_singer_catalog_entry_is_exposed_as_domain_model(self) -> None:
@@ -128,8 +128,8 @@ class TestsFlextMeltanoTypingsUnit:
             "schema": {"type": "object"},
         })
 
-        assert isinstance(m.Meltano.SingerCatalogEntry, type)
-        assert "tap_stream_id" in entry.model_dump()
+        tm.that(m.Meltano.SingerCatalogEntry, is_=type)
+        tm.that(entry.model_dump(), has="tap_stream_id")
 
     def test_singer_catalog_entry_constructs_and_exposes_public_state(self) -> None:
         """A valid Singer catalog entry constructs and exposes its fields publicly."""
@@ -139,8 +139,8 @@ class TestsFlextMeltanoTypingsUnit:
             "schema": {"type": "object"},
         })
 
-        assert entry.tap_stream_id == "users"
-        assert entry.stream == "users"
+        tm.that(entry.tap_stream_id, eq="users")
+        tm.that(entry.stream, eq="users")
 
     def test_singer_catalog_entry_model_dump_round_trips(self) -> None:
         """``model_dump`` output re-validates to an equal public state (idempotence)."""
@@ -153,8 +153,8 @@ class TestsFlextMeltanoTypingsUnit:
         dumped = entry.model_dump(by_alias=True)
         restored = m.Meltano.SingerCatalogEntry.model_validate(dumped)
 
-        assert restored.model_dump(by_alias=True) == dumped
-        assert restored.tap_stream_id == entry.tap_stream_id
+        tm.that(restored.model_dump(by_alias=True), eq=dumped)
+        tm.that(restored.tap_stream_id, eq=entry.tap_stream_id)
 
     def test_singer_catalog_entry_rejects_missing_required_fields(self) -> None:
         """Constructing without required fields raises a validation error (error path)."""

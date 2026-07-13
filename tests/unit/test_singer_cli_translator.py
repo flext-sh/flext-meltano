@@ -23,7 +23,7 @@ import pytest
 from flext_tests import r, tm
 
 from flext_meltano import meltano
-from tests.models import m
+from tests import m
 
 _MOCK_TARGET = "flext_meltano.services.singer_translator.u.Cli.run_raw"
 

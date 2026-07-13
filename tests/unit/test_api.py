@@ -8,7 +8,7 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano import meltano
-from tests.constants import c
+from tests import c
 
 pytestmark = pytest.mark.unit
 
@@ -31,7 +31,7 @@ class TestsFlextMeltanoApi:
         """The public execute payload exposes the canonical fields."""
         result = meltano.execute()
         tm.ok(result)
-        assert result.success
+        tm.ok(result)
         payload = result.value
         tm.that(payload, is_=dict)
         tm.that(payload, contains=meltano_execute_field)
@@ -56,7 +56,7 @@ class TestsFlextMeltanoApi:
             project_dir=tmp_path,
         )
         tm.that(result, ok=True)
-        assert result.success
+        tm.ok(result)
         payload = result.value
         tm.that(payload, is_=dict)
         project_path = Path(payload["project_path"])

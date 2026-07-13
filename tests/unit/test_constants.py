@@ -16,8 +16,9 @@ from __future__ import annotations
 from enum import StrEnum
 
 import pytest
+from flext_tests import tm
 
-from tests.constants import c
+from tests import c
 
 __all__: list[str] = ["TestsFlextMeltanoConstantsUnit"]
 
@@ -45,7 +46,7 @@ class TestsFlextMeltanoConstantsUnit:
         self, name: str, expected: str
     ) -> None:
         """String constants expose their exact documented public value."""
-        assert getattr(c.Meltano, name) == expected
+        tm.that(getattr(c.Meltano, name), eq=expected)
 
     @pytest.mark.parametrize(
         ("name", "expected"),
@@ -62,9 +63,9 @@ class TestsFlextMeltanoConstantsUnit:
     ) -> None:
         """Enum-backed identifiers behave as their StrEnum string value."""
         value = getattr(c.Meltano, name)
-        assert isinstance(value, StrEnum)
-        assert value == expected
-        assert str(value) == expected
+        tm.that(value, is_=StrEnum)
+        tm.that(value, eq=expected)
+        tm.that(str(value), eq=expected)
 
     @pytest.mark.parametrize(
         ("name", "expected"),
@@ -80,7 +81,7 @@ class TestsFlextMeltanoConstantsUnit:
         self, name: str, expected: int
     ) -> None:
         """Numeric thresholds expose their exact documented value."""
-        assert getattr(c.Meltano, name) == expected
+        tm.that(getattr(c.Meltano, name), eq=expected)
 
     @pytest.mark.parametrize(
         ("name", "value"),
@@ -121,18 +122,18 @@ class TestsFlextMeltanoConstantsUnit:
     ) -> None:
         """Each PluginType member maps to its documented plugin folder name."""
         value = getattr(c.Meltano.PluginType, member)
-        assert isinstance(value, StrEnum)
-        assert value == expected
+        tm.that(value, is_=StrEnum)
+        tm.that(value, eq=expected)
 
     def test_plugin_type_members_are_unique(self) -> None:
         """PluginType values form a distinct, collision-free set."""
         values = [member.value for member in c.Meltano.PluginType]
-        assert len(values) == len(set(values))
+        tm.that(len(values), eq=len(set(values)))
 
     def test_default_variant_is_a_known_reference(self) -> None:
         """DEFAULT_VARIANT is a non-empty identifier callers can rely on."""
         assert c.Meltano.DEFAULT_VARIANT
-        assert c.Meltano.DEFAULT_VARIANT.strip() == c.Meltano.DEFAULT_VARIANT
+        tm.that(c.Meltano.DEFAULT_VARIANT.strip(), eq=c.Meltano.DEFAULT_VARIANT)
 
     def test_singer_schema_and_record_are_distinct(self) -> None:
         """Schema and record message identifiers are not interchangeable."""
@@ -142,7 +143,7 @@ class TestsFlextMeltanoConstantsUnit:
 
     def test_dbt_run_and_test_commands_are_distinct(self) -> None:
         """DBT run and test commands resolve to different invocations."""
-        assert c.Meltano.DBT_COMMAND_RUN != c.Meltano.DBT_COMMAND_TEST
+        tm.that(c.Meltano.DBT_COMMAND_RUN, ne=c.Meltano.DBT_COMMAND_TEST)
 
     def test_plugin_type_enum_is_immutable(self) -> None:
         """PluginType members cannot be reassigned through the public enum."""

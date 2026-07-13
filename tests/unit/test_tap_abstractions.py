@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from flext_tests import tm
+
 from flext_meltano import meltano
-from tests.models import m
+from tests import m
 
 
 class TestsFlextMeltanoTapAbstractions:
@@ -24,10 +26,10 @@ class TestsFlextMeltanoTapAbstractions:
 
         result = meltano.process_tap_config(settings)
 
-        assert result.success
-        assert result.value.tap_type == "tap-postgres"
-        assert result.value.tap_version == "v1.2.0"
-        assert result.value.stream_config["users"] == "selected"
+        tm.ok(result)
+        tm.that(result.value.tap_type, eq="tap-postgres")
+        tm.that(result.value.tap_version, eq="v1.2.0")
+        tm.that(result.value.stream_config["users"], eq="selected")
 
     def test_build_tap_instance_returns_public_mapping(self) -> None:
         """The facade should expose the tap instance through the public mapping shape."""
@@ -44,8 +46,8 @@ class TestsFlextMeltanoTapAbstractions:
 
         payload = meltano.build_tap_instance(tap_instance)
 
-        assert payload["tap_id"] == "tap_csv_123"
-        assert payload["tap_type"] == "tap-csv"
+        tm.that(payload["tap_id"], eq="tap_csv_123")
+        tm.that(payload["tap_type"], eq="tap-csv")
 
     def test_create_tap_from_config_builds_tap_instance(self) -> None:
         """The facade should build a tap instance directly from raw config."""
@@ -61,17 +63,17 @@ class TestsFlextMeltanoTapAbstractions:
             tap_version="1.2.3",
         )
 
-        assert result.success
-        assert result.value.tap_type == "tap-postgres"
-        assert result.value.tap_id == "tap-postgres_auto"
-        assert result.value.settings.tap_version == "1.2.3"
-        assert result.value.settings.stream_config["users"] == "selected"
+        tm.ok(result)
+        tm.that(result.value.tap_type, eq="tap-postgres")
+        tm.that(result.value.tap_id, eq="tap-postgres_auto")
+        tm.that(result.value.settings.tap_version, eq="1.2.3")
+        tm.that(result.value.settings.stream_config["users"], eq="selected")
 
     def test_tap_factory_returns_bound_service(self) -> None:
         """The flat tap factory should bind the returned facade to the source name."""
         result = meltano.tap("tap-csv")
 
-        assert result.success
-        assert result.value.source_name == "tap-csv"
-        assert result.value.sink_name is None
-        assert result.value.transformation_name is None
+        tm.ok(result)
+        tm.that(result.value.source_name, eq="tap-csv")
+        tm.that(result.value.sink_name, none=True)
+        tm.that(result.value.transformation_name, none=True)

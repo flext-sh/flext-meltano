@@ -6,7 +6,7 @@ import pytest
 from flext_tests import tm
 
 from flext_meltano import meltano
-from tests.constants import c
+from tests import c
 
 pytestmark = pytest.mark.unit
 
@@ -30,7 +30,7 @@ class TestsFlextMeltanoServices:
                     f"Unsupported Meltano component kind: {component_kind}",
                 )
         tm.that(result, ok=True)
-        assert result.success
+        tm.ok(result)
         service = result.value
         tm.that(service, none=False)
         tm.that(getattr(service, attribute_name), eq=component_name)
@@ -75,7 +75,7 @@ class TestsFlextMeltanoServices:
                     f"Unsupported Meltano component kind: {component_kind}",
                 )
         tm.that(result, ok=True)
-        assert result.success
+        tm.ok(result)
         service = result.value
         tm.that(service, none=False)
         tm.that(service.service_name, eq=f"{component_name}_service")
@@ -88,9 +88,9 @@ class TestsFlextMeltanoServices:
         tm.that(tap_result, ok=True)
         tm.that(target_result, ok=True)
         tm.that(dbt_result, ok=True)
-        assert tap_result.success
-        assert target_result.success
-        assert dbt_result.success
+        tm.ok(tap_result)
+        tm.ok(target_result)
+        tm.ok(dbt_result)
         tap_service = tap_result.value
         target_service = target_result.value
         dbt_service = dbt_result.value
@@ -105,7 +105,7 @@ class TestsFlextMeltanoServices:
         """execute() reports an active service payload keyed to the facade state."""
         result = meltano.execute()
         tm.that(result, ok=True)
-        assert result.success
+        tm.ok(result)
         payload = result.value
         tm.that(payload["status"], eq="active")
         tm.that(payload["service_name"], eq=meltano.service_name)
@@ -119,8 +119,8 @@ class TestsFlextMeltanoServices:
         second = meltano.execute()
         tm.that(first, ok=True)
         tm.that(second, ok=True)
-        assert first.success
-        assert second.success
+        tm.ok(first)
+        tm.ok(second)
         tm.that(first.value["service_name"], eq=second.value["service_name"])
         tm.that(first.value["version"], eq=second.value["version"])
         tm.that(first.value["handlers"], eq=second.value["handlers"])

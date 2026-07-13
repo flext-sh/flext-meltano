@@ -17,8 +17,9 @@ from typing import TYPE_CHECKING
 import psycopg2
 import pytest
 import redis
+from flext_tests import tm
 
-from tests.constants import c
+from tests import c
 
 if TYPE_CHECKING:
     from flext_tests import tk
@@ -67,13 +68,13 @@ class TestsFlextMeltanoDockerIntegration:
         self, postgres_service: str
     ) -> None:
         """PostgreSQL fixture yields the published host:port endpoint."""
-        assert postgres_service == f"{c.LOCALHOST}:{c.Meltano.Tests.POSTGRES_PORT}"
+        tm.that(postgres_service, eq=f"{c.LOCALHOST}:{c.Meltano.Tests.POSTGRES_PORT}")
 
     @pytest.mark.docker
     @pytest.mark.integration
     def test_redis_service_endpoint_is_published(self, redis_service: str) -> None:
         """Redis fixture yields the published host:port endpoint."""
-        assert redis_service == f"{c.LOCALHOST}:{c.Meltano.Tests.REDIS_PORT}"
+        tm.that(redis_service, eq=f"{c.LOCALHOST}:{c.Meltano.Tests.REDIS_PORT}")
 
     @pytest.mark.docker
     @pytest.mark.integration
@@ -82,7 +83,7 @@ class TestsFlextMeltanoDockerIntegration:
     ) -> None:
         """Meltano fixture yields an endpoint on the test host with a real port."""
         host, _, port = meltano_service.partition(":")
-        assert host == c.Meltano.Tests.HOST
+        tm.that(host, eq=c.Meltano.Tests.HOST)
         assert int(port) > 0
 
     @pytest.mark.docker
@@ -95,8 +96,8 @@ class TestsFlextMeltanoDockerIntegration:
         redis_ready = docker_services.ready(port=c.Meltano.Tests.REDIS_PORT)
         if postgres_ready.failure or redis_ready.failure:
             pytest.skip("Docker readiness probe unavailable")
-        assert isinstance(postgres_ready.value, bool)
-        assert isinstance(redis_ready.value, bool)
+        tm.that(postgres_ready.value, is_=bool)
+        tm.that(redis_ready.value, is_=bool)
         if not (postgres_ready.value and redis_ready.value):
             pytest.skip("Docker services not fully ready")
 
@@ -108,18 +109,18 @@ class TestsFlextMeltanoDockerIntegration:
     ) -> None:
         """`execute` then `down` each yield a successful ``r[T]`` outcome."""
         start_result = docker_manager.execute()
-        assert start_result.success, start_result.error
+        tm.ok(start_result)
         should_assert_stop = True
         try:
             postgres_ready = docker_manager.ready(port=c.Meltano.Tests.POSTGRES_PORT)
             if postgres_ready.failure or not postgres_ready.value:
                 should_assert_stop = False
                 pytest.skip("PostgreSQL service not available")
-            assert isinstance(postgres_ready.value, bool)
+            tm.that(postgres_ready.value, is_=bool)
         finally:
             stop_result = docker_manager.down()
             if should_assert_stop:
-                assert stop_result.success, stop_result.error
+                tm.ok(stop_result)
 
     @pytest.mark.docker
     @pytest.mark.integration
@@ -141,8 +142,8 @@ class TestsFlextMeltanoDockerIntegration:
                     "SELECT id, name FROM test_table WHERE name = %s", ("test_record",)
                 )
                 result = cursor.fetchone()
-                assert result is not None
-                assert result[1] == "test_record"
+                tm.that(result, none=False)
+                tm.that(result[1], eq="test_record")
                 cursor.execute("DROP TABLE test_table")
             conn.commit()
         except psycopg2.Error as exc:
@@ -161,13 +162,13 @@ class TestsFlextMeltanoDockerIntegration:
         try:
             client = self._connect_redis()
             client.set("test_key", "test_value")
-            assert client.get("test_key") == b"test_value"
+            tm.that(client.get("test_key"), eq=b"test_value")
             client.lpush("test_list", "item1")
             client.lpush("test_list", "item2")
-            assert client.llen("test_list") == 2
+            tm.that(client.llen("test_list"), eq=2)
             client.delete("test_key")
             client.delete("test_list")
-            assert client.get("test_key") is None
+            tm.that(client.get("test_key"), none=True)
         finally:
             if client is not None:
                 client.close()

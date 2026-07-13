@@ -15,9 +15,7 @@ from __future__ import annotations
 import pytest
 from flext_tests import tm
 
-from tests.constants import c
-from tests.models import m
-from tests.typings import t
+from tests import c, m, t
 
 
 class TestsFlextMeltanoPluginProtocols:
@@ -174,7 +172,7 @@ class TestsFlextMeltanoPluginProtocols:
         reported = {
             str(part) for error in excinfo.value.errors() for part in error["loc"]
         }
-        assert omitted in reported
+        tm.that(reported, has=omitted)
 
     # --- plugin definition mapping contract -----------------------------
 

@@ -9,10 +9,10 @@ model state, never private attributes or internal collaborators.
 from __future__ import annotations
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import meltano
-from tests.models import m
-from tests.typings import t
+from tests import m, t
 
 
 class TestsFlextMeltanoTargetAbstractions:
@@ -32,11 +32,11 @@ class TestsFlextMeltanoTargetAbstractions:
         """target() returns a success bound to the sink name, source/xform unset."""
         result = meltano.target("target-jsonl")
 
-        assert result.success
+        tm.ok(result)
         service = result.value
-        assert service.sink_name == "target-jsonl"
-        assert service.source_name is None
-        assert service.transformation_name is None
+        tm.that(service.sink_name, eq="target-jsonl")
+        tm.that(service.source_name, none=True)
+        tm.that(service.transformation_name, none=True)
 
     @pytest.mark.parametrize(
         "sink_name",
@@ -46,8 +46,8 @@ class TestsFlextMeltanoTargetAbstractions:
         """target() binds exactly the requested sink name for any target kind."""
         result = meltano.target(sink_name)
 
-        assert result.success
-        assert result.value.sink_name == sink_name
+        tm.ok(result)
+        tm.that(result.value.sink_name, eq=sink_name)
 
     def test_configure_sink_derives_definition_from_config(
         self,
@@ -56,12 +56,12 @@ class TestsFlextMeltanoTargetAbstractions:
         """configure_sink() maps a config to a configured DataSinkDefinition."""
         result = meltano.configure_sink(sink_config)
 
-        assert result.success
+        tm.ok(result)
         definition = result.value
-        assert definition.sink_name == "target-jsonl_sink"
-        assert definition.sink_type == "target-jsonl"
-        assert definition.settings["path"] == "output.jsonl"
-        assert definition.status == "configured"
+        tm.that(definition.sink_name, eq="target-jsonl_sink")
+        tm.that(definition.sink_type, eq="target-jsonl")
+        tm.that(definition.settings["path"], eq="output.jsonl")
+        tm.that(definition.status, eq="configured")
 
     def test_configure_sink_is_deterministic_for_equal_input(
         self,
@@ -71,12 +71,12 @@ class TestsFlextMeltanoTargetAbstractions:
         first = meltano.configure_sink(sink_config)
         second = meltano.configure_sink(sink_config)
 
-        assert first.success
-        assert second.success
-        assert first.value.sink_name == second.value.sink_name
-        assert first.value.sink_type == second.value.sink_type
-        assert first.value.settings == second.value.settings
-        assert first.value.status == second.value.status
+        tm.ok(first)
+        tm.ok(second)
+        tm.that(first.value.sink_name, eq=second.value.sink_name)
+        tm.that(first.value.sink_type, eq=second.value.sink_type)
+        tm.that(first.value.settings, eq=second.value.settings)
+        tm.that(first.value.status, eq=second.value.status)
 
     def test_create_flext_target_from_mapping_builds_sink_instance(self) -> None:
         """create_flext_target() accepts a plain mapping and builds a sink instance."""
@@ -87,11 +87,11 @@ class TestsFlextMeltanoTargetAbstractions:
 
         result = meltano.create_flext_target(payload)
 
-        assert result.success
+        tm.ok(result)
         instance = result.value
-        assert instance.sink_type == "target-jsonl"
-        assert instance.settings.sink_type == "target-jsonl"
-        assert instance.settings.connection_config["path"] == "output.jsonl"
+        tm.that(instance.sink_type, eq="target-jsonl")
+        tm.that(instance.settings.sink_type, eq="target-jsonl")
+        tm.that(instance.settings.connection_config["path"], eq="output.jsonl")
 
     def test_create_flext_target_accepts_config_model_directly(
         self,
@@ -100,16 +100,16 @@ class TestsFlextMeltanoTargetAbstractions:
         """create_flext_target() passes an existing config model straight through."""
         result = meltano.create_flext_target(sink_config)
 
-        assert result.success
-        assert result.value.settings == sink_config
+        tm.ok(result)
+        tm.that(result.value.settings, eq=sink_config)
 
     def test_create_flext_target_rejects_mapping_missing_sink_type(self) -> None:
         """create_flext_target() fails with a descriptive error on invalid input."""
         result = meltano.create_flext_target({"connection_config": {"path": "x"}})
 
-        assert not result.success
-        assert result.error is not None
-        assert "Invalid target settings" in result.error
+        tm.fail(result)
+        tm.that(result.error, none=False)
+        tm.that(result.error, has="Invalid target settings")
 
     def test_create_sink_instance_matches_create_flext_target(
         self,
@@ -119,11 +119,11 @@ class TestsFlextMeltanoTargetAbstractions:
         via_instance = meltano.create_sink_instance(sink_config)
         via_target = meltano.create_flext_target(sink_config)
 
-        assert via_instance.success
-        assert via_target.success
-        assert via_instance.value.sink_type == via_target.value.sink_type
-        assert via_instance.value.settings == via_target.value.settings
-        assert via_instance.value.status == via_target.value.status
+        tm.ok(via_instance)
+        tm.ok(via_target)
+        tm.that(via_instance.value.sink_type, eq=via_target.value.sink_type)
+        tm.that(via_instance.value.settings, eq=via_target.value.settings)
+        tm.that(via_instance.value.status, eq=via_target.value.status)
 
     def test_validate_sink_config_accepts_valid_config(
         self,
@@ -132,8 +132,8 @@ class TestsFlextMeltanoTargetAbstractions:
         """validate_sink_config() reports success for a well-formed config."""
         result = meltano.validate_sink_config(sink_config)
 
-        assert result.success
-        assert result.value is True
+        tm.ok(result)
+        tm.that(result.value, eq=True)
 
 
 __all__: list[str] = ["TestsFlextMeltanoTargetAbstractions"]

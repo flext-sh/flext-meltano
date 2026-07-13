@@ -13,11 +13,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import FlextTestsTypes
+from flext_tests import FlextTestsTypes, tm
 
 from flext_meltano import FlextMeltanoTypes
 from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
-from tests.typings import TestsFlextMeltanoTypes, t
+from tests import TestsFlextMeltanoTypes, t
 
 __all__: list[str] = ["TestsFlextMeltanoSingerTypes"]
 
@@ -65,8 +65,8 @@ class TestsFlextMeltanoSingerTypes:
     ) -> None:
         """Each type alias is a PEP 695 alias resolving to its contracted target."""
         alias = getattr(t.Meltano, alias_name)
-        assert type(alias).__name__ == "TypeAliasType"
-        assert value_fragment in str(alias.__value__)
+        tm.that(type(alias).__name__, eq="TypeAliasType")
+        tm.that(str(alias.__value__), has=value_fragment)
 
     @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])
     def test_type_alias_access_is_idempotent(self, alias_name: str) -> None:

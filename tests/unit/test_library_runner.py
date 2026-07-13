@@ -11,6 +11,7 @@ from __future__ import annotations
 from unittest.mock import Mock
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import m, meltano, p, t
 
@@ -78,8 +79,8 @@ class TestsFlextMeltanoLibraryRunner:
         elt_result: p.Result[t.JsonMapping],
     ) -> None:
         """A complete ELT run reports a successful ``r[T]`` outcome."""
-        assert elt_result.success
-        assert elt_result.failure is False
+        tm.ok(elt_result)
+        tm.that(elt_result.failure, eq=False)
 
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
     def test_elt_payload_exposes_base_command_keys(
@@ -88,7 +89,7 @@ class TestsFlextMeltanoLibraryRunner:
         key: str,
     ) -> None:
         """The ELT payload carries every documented command-execution field."""
-        assert key in elt_result.unwrap()
+        tm.that(elt_result.unwrap(), has=key)
 
     def test_elt_payload_echoes_pipeline_identity(
         self,
@@ -96,15 +97,15 @@ class TestsFlextMeltanoLibraryRunner:
     ) -> None:
         """The ELT payload echoes the requested tap and target identity."""
         payload = elt_result.unwrap()
-        assert payload["tap_name"] == "tap-csv"
-        assert payload["target_name"] == "target-jsonl"
+        tm.that(payload["tap_name"], eq="tap-csv")
+        tm.that(payload["target_name"], eq="target-jsonl")
 
     def test_elt_payload_exit_code_is_int(
         self,
         elt_result: p.Result[t.JsonMapping],
     ) -> None:
         """Exit code is delivered as an integer, ready for callers to branch."""
-        assert isinstance(elt_result.unwrap()["exit_code"], int)
+        tm.that(elt_result.unwrap()["exit_code"], is_=int)
 
     def test_elt_result_supports_result_combinators(
         self,
@@ -112,14 +113,14 @@ class TestsFlextMeltanoLibraryRunner:
     ) -> None:
         """The outcome is a real ``r[T]`` value that chains via ``map``."""
         exit_code = elt_result.map(lambda payload: payload["exit_code"]).unwrap()
-        assert isinstance(exit_code, int)
+        tm.that(exit_code, is_=int)
 
     def test_run_dbt_transformation_succeeds(
         self,
         dbt_result: p.Result[m.Meltano.CommandExecutionResult],
     ) -> None:
         """A DBT transformation reports a successful ``r[T]`` outcome."""
-        assert dbt_result.success
+        tm.ok(dbt_result)
 
     @pytest.mark.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
     def test_dbt_result_exposes_command_execution_fields(
@@ -135,17 +136,17 @@ class TestsFlextMeltanoLibraryRunner:
         dbt_result: p.Result[m.Meltano.CommandExecutionResult],
     ) -> None:
         """The executed dbt command carries the requested model name."""
-        assert "model1" in dbt_result.unwrap().command
+        tm.that(dbt_result.unwrap().command, has="model1")
 
     def test_run_elt_pipeline_succeeds_and_echoes_identity(
         self,
         elt_pipeline_result: p.Result[t.JsonMapping],
     ) -> None:
         """A tap-to-target ELT run succeeds and echoes tap/target names."""
-        assert elt_pipeline_result.success
+        tm.ok(elt_pipeline_result)
         payload = elt_pipeline_result.unwrap()
-        assert payload["tap_name"] == "tap-csv"
-        assert payload["target_name"] == "target-jsonl"
+        tm.that(payload["tap_name"], eq="tap-csv")
+        tm.that(payload["target_name"], eq="target-jsonl")
 
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
     def test_elt_pipeline_payload_exposes_base_command_keys(
@@ -154,7 +155,7 @@ class TestsFlextMeltanoLibraryRunner:
         key: str,
     ) -> None:
         """The tap-to-target payload carries every documented command field."""
-        assert key in elt_pipeline_result.unwrap()
+        tm.that(elt_pipeline_result.unwrap(), has=key)
 
 
 __all__: list[str] = ["TestsFlextMeltanoLibraryRunner"]
