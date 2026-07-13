@@ -13,8 +13,6 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated, Self, override
 
-from pydantic import PrivateAttr
-
 from flext_cli import u
 from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
@@ -27,18 +25,15 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     `execute` method from s.
     """
 
-    _settings_type: t.SettingsClass | None = PrivateAttr(
+    # NOTE (multi-agent): mro-i6nq.12 — FlextMixins.settings_type is now a native
+    # Pydantic field; inject the Meltano default by overriding the field default
+    # (replaces the orphaned _settings_type PrivateAttr + redundant __init__ that only
+    # forwarded the now-native runtime_settings kwarg).
+    settings_type: t.SettingsClass | None = u.Field(
         default=FlextMeltanoSettings,
+        exclude=True,
+        description="Default FlextMeltanoSettings class for Meltano services.",
     )
-
-    def __init__(
-        self,
-        *,
-        runtime_settings: FlextMeltanoSettings | None = None,
-        **model_data: t.GuardInput | p.Settings | p.Context | t.SettingsClass | None,
-    ) -> None:
-        """Initialize with explicit Meltano settings and model fields."""
-        super().__init__(runtime_settings=runtime_settings, **model_data)
 
     service_name: Annotated[
         t.NonEmptyStr,
