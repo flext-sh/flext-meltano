@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
-from flext_cli import m, u
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
+from flext_cli import m, t, u
 
 
 class FlextMeltanoModelsCliInputs:
@@ -35,10 +32,12 @@ class FlextMeltanoModelsCliInputs:
             str,
             u.Field(description="Name of the pipeline to run"),
         ]
+        # mro-wkii.17 (codex): keep the runtime annotation resolvable so the
+        # model-driven CLI preserves the optional immutable sequence default.
         args: Annotated[
-            Sequence[str],
+            t.StrSequence,
             u.Field(
-                default_factory=list,
+                default_factory=tuple,
                 description="Extra arguments forwarded to the pipeline command",
             ),
         ]
@@ -99,9 +98,9 @@ class FlextMeltanoModelsCliInputs:
             u.Field(description="DBT subcommand (run, test, compile, docs)"),
         ]
         args: Annotated[
-            Sequence[str],
+            t.StrSequence,
             u.Field(
-                default_factory=list,
+                default_factory=tuple,
                 description="Extra arguments forwarded to DBT",
             ),
         ]
@@ -117,9 +116,9 @@ class FlextMeltanoModelsCliInputs:
             ),
         ] = None
         args: Annotated[
-            Sequence[str],
+            t.StrSequence,
             u.Field(
-                default_factory=list,
+                default_factory=tuple,
                 description="Extra arguments forwarded to the tap operation",
             ),
         ]
@@ -135,9 +134,9 @@ class FlextMeltanoModelsCliInputs:
             ),
         ] = None
         args: Annotated[
-            Sequence[str],
+            t.StrSequence,
             u.Field(
-                default_factory=list,
+                default_factory=tuple,
                 description="Extra arguments forwarded to the target operation",
             ),
         ]

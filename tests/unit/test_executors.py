@@ -39,9 +39,7 @@ class TestsFlextMeltanoExecutors:
         """Empty public run requests fail with the documented validation message."""
         result = meltano.run([])
 
-        tm.fail(result)
-        tm.that(result.error, none=False)
-        tm.that(result.error.lower(), has="cannot be empty")
+        tm.fail(result, has="cannot be empty")
 
     def test_health_version_help_and_execute_surfaces(self) -> None:
         """Health, version, help, and execute expose stable public payloads."""
@@ -105,9 +103,7 @@ class TestsFlextMeltanoExecutors:
         """Executor runtime commands fail fast on an empty command sequence."""
         result = meltano.execute_meltano_command([])
 
-        tm.fail(result)
-        tm.that(result.error, none=False)
-        tm.that(result.error.lower(), has="empty")
+        tm.fail(result, has="empty")
 
     def test_multiple_version_calls_are_repeatable(self) -> None:
         """Repeated version queries stay stable across multiple real calls."""
