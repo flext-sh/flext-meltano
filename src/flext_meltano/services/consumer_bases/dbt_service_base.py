@@ -65,7 +65,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     @property
     @abstractmethod
     def connection_profile(self) -> p.Meltano.DbtConnectionProfile:
-        """Return the typed dbt connection profile model for this project.
+        """The typed dbt connection profile model for this project.
 
         Consumer returns its own domain ``m.<Ns>.DbtConnectionProfile`` model
         satisfying the protocol — a typed model, never a dict.

@@ -28,5 +28,7 @@ class FlextMeltanoProtocols(p):
         """Meltano ELT domain-specific protocols."""
 
 
+# mro-wkii.17 (Codex): make the canonical facade rebind visible to Mypy.
+del p
 p = FlextMeltanoProtocols
 __all__: list[str] = ["FlextMeltanoProtocols", "p"]
