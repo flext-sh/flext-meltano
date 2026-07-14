@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     from flext_meltano.models import FlextMeltanoModels as FlextMeltanoModels, m as m
     from flext_meltano.protocols import (
         FlextMeltanoProtocols as FlextMeltanoProtocols,
-        p as p,
+        p,
     )
     from flext_meltano.services.abstractions import (
         FlextMeltanoAbstractions as FlextMeltanoAbstractions,
@@ -124,7 +124,7 @@ if TYPE_CHECKING:
     from flext_meltano.typings import FlextMeltanoTypes as FlextMeltanoTypes, t as t
     from flext_meltano.utilities import (
         FlextMeltanoUtilities as FlextMeltanoUtilities,
-        u as u,
+        u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (".services",),
