@@ -54,11 +54,19 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             with FlextMeltanoSettings.singleton_disabled():
                 return FlextMeltanoSettings()
         return FlextMeltanoSettings.model_validate({
-            c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV: configured_root,
+            "Meltano": {
+                c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV: configured_root,
+            },
         })
 
     def _pipelines_root(self) -> Path:
-        return Path(settings.Meltano.pipelines_dir)
+        # mro-wkii.17 (codex): use the validated snapshot injected at the CLI
+        # boundary; the module singleton may predate an external env change.
+        runtime_settings = self.runtime_settings
+        if not isinstance(runtime_settings, FlextMeltanoSettings):
+            msg = "Pipeline manager requires FlextMeltanoSettings"
+            raise TypeError(msg)
+        return Path(runtime_settings.Meltano.pipelines_dir)
 
     def _pipeline_dir(self, pipeline_name: str) -> Path:
         return self._pipelines_root() / pipeline_name

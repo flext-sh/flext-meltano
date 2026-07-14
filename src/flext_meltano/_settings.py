@@ -80,6 +80,9 @@ class FlextMeltanoSettings(FlextSettings):
             str,
             Field(
                 default="",
+                # mro-wkii.17 (codex): validate the default so direct singleton
+                # access always exposes the canonical resolved pipeline root.
+                validate_default=True,
                 validation_alias="FLEXT_MELTANO_PIPELINES_DIR",
                 description="Root directory for pipeline configurations",
             ),
