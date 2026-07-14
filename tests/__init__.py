@@ -19,12 +19,12 @@ if TYPE_CHECKING:
     from tests.models import TestsFlextMeltanoModels as TestsFlextMeltanoModels, m as m
     from tests.protocols import (
         TestsFlextMeltanoProtocols as TestsFlextMeltanoProtocols,
-        p as p,
+        p,
     )
     from tests.typings import TestsFlextMeltanoTypes as TestsFlextMeltanoTypes, t as t
     from tests.utilities import (
         TestsFlextMeltanoUtilities as TestsFlextMeltanoUtilities,
-        u as u,
+        u,
     )
 
 _LAZY_IMPORTS = build_lazy_import_map(
