@@ -127,25 +127,20 @@ class TestsFlextMeltanoDockerIntegration:
     def test_postgres_round_trips_inserted_row(self, postgres_service: str) -> None:
         """A row written to PostgreSQL is read back unchanged (real round-trip)."""
         conn: psycopg2.extensions.connection | None = None
+        result = None
         try:
             conn = self._connect_postgres()
-            with conn.cursor() as cursor:
+            with conn, conn.cursor() as cursor:
                 cursor.execute(
                     "CREATE TABLE IF NOT EXISTS test_table ("
                     "id SERIAL PRIMARY KEY, name VARCHAR(100), "
-                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-                )
-                cursor.execute(
-                    "INSERT INTO test_table (name) VALUES (%s)", ("test_record",)
-                )
-                cursor.execute(
-                    "SELECT id, name FROM test_table WHERE name = %s", ("test_record",)
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
+                    "INSERT INTO test_table (name) VALUES (%s);"
+                    "SELECT id, name FROM test_table WHERE name = %s",
+                    ("test_record", "test_record"),
                 )
                 result = cursor.fetchone()
-                tm.that(result, none=False)
-                tm.that(result[1], eq="test_record")
                 cursor.execute("DROP TABLE test_table")
-            conn.commit()
         except psycopg2.Error as exc:
             if self._is_transient_postgres_error(str(exc).lower()):
                 pytest.skip(f"PostgreSQL not ready for operations: {exc}")
@@ -153,6 +148,9 @@ class TestsFlextMeltanoDockerIntegration:
         finally:
             if conn is not None:
                 conn.close()
+        if result is None:
+            pytest.fail("PostgreSQL round-trip returned no row")
+        tm.that(result[1], eq="test_record")
 
     @pytest.mark.docker
     @pytest.mark.integration

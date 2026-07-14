@@ -253,8 +253,8 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
             prior_cwd = Path.cwd()
             runtime_error = ""
+            Project.deactivate()
             try:
-                Project.deactivate()
                 with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
                     command_result = cli.execute_external_command(
                         meltano_cli,
