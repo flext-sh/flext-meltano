@@ -8,15 +8,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import tm
 
-from tests import m
-
-if TYPE_CHECKING:
-    from tests import t
+from tests import m, t
 
 _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
 

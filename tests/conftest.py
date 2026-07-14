@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Generator
 
 import pytest
 
 from tests import u
-
-if TYPE_CHECKING:
-    from collections.abc import Generator
 
 pytest_plugins = ["tests.unit.fixtures"]
 

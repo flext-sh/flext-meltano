@@ -9,18 +9,15 @@ Access pattern: u.Meltano.emit_schema(), u.Meltano.process_stdin(), etc.
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
 
 from flext_cli import r, u as cli_u
 from flext_core import e
 from flext_meltano import (
     FlextMeltanoConstants as c,
     FlextMeltanoModels as m,
+    FlextMeltanoProtocols as p,
     FlextMeltanoTypes as t,
 )
-
-if TYPE_CHECKING:
-    from flext_meltano import FlextMeltanoProtocols as p
 
 
 class FlextMeltanoUtilitiesSinger:

@@ -3,15 +3,13 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
 from flext_meltano._models.core import FlextMeltanoModelsCore
-
-if TYPE_CHECKING:
-    from flext_meltano._models.sources import FlextMeltanoModelsSources
-    from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
+from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
 
 class FlextMeltanoModelsInstancesData:
@@ -162,9 +160,6 @@ class FlextMeltanoModelsInstancesData:
         @u.model_validator(mode="after")
         def validate_source_instance(self) -> Self:
             """Validate source instance consistency."""
-            if self.settings.source_type != self.source_type:
-                msg = "Source type must match between instance and settings"
-                raise ValueError(msg)
             if self.discovered and not self.streams:
                 msg = "Discovered source must have at least one stream"
                 raise ValueError(msg)

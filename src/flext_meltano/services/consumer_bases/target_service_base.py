@@ -11,14 +11,12 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Annotated, override
+from collections.abc import (
+    MutableMapping,
+)
+from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-    )
 
 
 class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):

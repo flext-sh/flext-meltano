@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated
+from collections.abc import (
+    MutableMapping,
+)
+from pathlib import Path
+from typing import Annotated
 
 from flext_cli import m, u
 from flext_meltano import FlextMeltanoTypes as t
-
-if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-    )
-    from pathlib import Path
 
 
 class FlextMeltanoModelsResultsDbt:

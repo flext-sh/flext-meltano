@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
-
-if TYPE_CHECKING:
-    from flext_meltano._models.results import FlextMeltanoModelsResults
+from flext_meltano._models.results import FlextMeltanoModelsResults
 
 
 class FlextMeltanoModelsResultsPipeline:

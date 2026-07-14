@@ -6,12 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, override
+from pathlib import Path
+from typing import override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, settings, t, u
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
