@@ -159,3 +159,29 @@ class FlextMeltanoModelsSourcesParams:
             t.SequenceOf[FlextMeltanoModelsSourcesParams.StreamSpec],
             u.Field(description="Declarative stream specs for this tap"),
         ]
+
+    class FetchRequest(m.BaseModel):
+        """Typed transport from ``flext-meltano`` to a consumer record fetcher.
+
+        Standardized so every ``flext-(tap|target|dbt)-*`` consumer receives one
+        model at the boundary instead of loose args — the config is unpacked once
+        by ``flext-meltano`` and passed through without further round trips.
+        """
+
+        stream_name: Annotated[str, u.Field(description="Stream being fetched")]
+        config: Annotated[
+            t.JsonMapping,
+            u.Field(description="Validated tap runtime config (settings transport)"),
+        ]
+
+    class FetchResult(m.BaseModel):
+        """Typed transport of fetched records back to ``flext-meltano``.
+
+        Records stay in the Singer-native ``JsonMapping`` shape (the wire format)
+        so they flow straight to output with no dump/revalidate round trip.
+        """
+
+        records: Annotated[
+            t.SequenceOf[t.JsonMapping],
+            u.Field(default=(), description="Records for the requested stream"),
+        ] = ()

@@ -147,16 +147,16 @@ class FlextMeltanoProtocolsSinger:
 
         A declarative consumer tap implements this so ``flext-meltano`` can build
         a real Singer tap without the consumer importing ``singer_sdk``. The
-        consumer resolves records for ``stream_name`` from the validated tap
-        ``config`` using its own domain library (e.g. ``flext-ldap``).
+        consumer resolves records from the typed ``m.Meltano.FetchRequest`` using
+        its own domain library (e.g. ``flext-ldap``) and returns a typed
+        ``m.Meltano.FetchResult`` — one packed transport per boundary crossing.
         """
 
         def fetch(
             self,
-            stream_name: str,
-            config: t.JsonMapping,
-        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Return the records for ``stream_name`` given the tap config."""
+            request: m.Meltano.FetchRequest,
+        ) -> p.Result[m.Meltano.FetchResult]:
+            """Return the records for one stream given the typed fetch request."""
             ...
 
     @runtime_checkable

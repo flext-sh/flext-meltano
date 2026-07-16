@@ -96,8 +96,12 @@ class FlextMeltanoDeclarativeTap:
                 context: Mapping[str, object] | None,
             ) -> Iterable[t.JsonMapping]:
                 _ = context
-                result = fetcher.fetch(self.name, self._config)
-                return list(result.value) if result.success else []
+                request = m.Meltano.FetchRequest(
+                    stream_name=self.name,
+                    config=self._config,
+                )
+                result = fetcher.fetch(request)
+                return list(result.value.records) if result.success else []
 
         class _DeclarativeTap(Tap):
             """A Singer tap that discovers the declared streams."""
