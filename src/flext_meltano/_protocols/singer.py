@@ -150,18 +150,18 @@ class FlextMeltanoProtocolsSinger:
         name: str
         state: m.Meltano.SingerStateMessage
 
-        def discover(self) -> m.Meltano.SingerCatalog:
+        def discover(self) -> p.Meltano.SingerCatalog:
             """Discover available streams and schemas."""
             ...
 
         def get_records(
             self,
             stream_name: str,
-        ) -> t.SequenceOf[m.Meltano.SingerRecordMessage]:
+        ) -> t.SequenceOf[p.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
 
-        def get_state(self) -> m.Meltano.SingerStateMessage:
+        def get_state(self) -> p.Meltano.SingerStateMessage:
             """Get current state."""
             ...
 
@@ -184,7 +184,7 @@ class FlextMeltanoProtocolsSinger:
         name: str
         settings: t.JsonMapping
 
-        def consume(self, records: t.SequenceOf[m.Meltano.SingerRecordMessage]) -> int:
+        def consume(self, records: t.SequenceOf[p.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
 
             Args:

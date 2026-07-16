@@ -10,7 +10,7 @@ from pathlib import Path
 
 # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return; runtime
 # import not needed (from __future__ import annotations makes the annotation lazy).
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, settings, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, settings, t, u
 from flext_meltano.services.executor import FlextMeltanoExecutor
 
 
@@ -82,7 +82,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         self,
         models: t.StrSequence | None = None,
         project_dir: Path | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run DBT transformation using the configured Meltano executor.
 
         Returns the executor's typed CommandExecutionResult directly (SSOT). Callers

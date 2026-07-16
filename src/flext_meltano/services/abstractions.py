@@ -27,9 +27,9 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
     def process_tap_config(
         self,
         settings: m.Meltano.TapConfig,
-    ) -> p.Result[m.Meltano.TapConfig]:
+    ) -> p.Result[p.Meltano.TapConfig]:
         """Validate and return tap configuration."""
-        return r[m.Meltano.TapConfig].ok(settings)
+        return r[p.Meltano.TapConfig].ok(settings)
 
     def build_tap_instance(
         self,
@@ -151,7 +151,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         connection_config: t.JsonMapping,
         stream_config: t.JsonMapping | None = None,
         tap_version: str = "1.0.0",
-    ) -> p.Result[m.Meltano.TapInstance]:
+    ) -> p.Result[p.Meltano.TapInstance]:
         """Create a TapInstance from configuration."""
         try:
             tap_cfg = m.Meltano.TapConfig(
@@ -165,12 +165,12 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 settings=tap_cfg,
                 tap_id=(f"{tap_type}_{c.Meltano.PAYLOAD_TAP_ID_AUTO_SUFFIX}"),
             )
-            return r[m.Meltano.TapInstance].ok(instance)
+            return r[p.Meltano.TapInstance].ok(instance)
         except c.Meltano.OPERATION_ERRORS as exc:
             return e.fail_operation(
                 c.Meltano.OPERATION_CREATE_TAP,
                 exc,
-                result_type=r[m.Meltano.TapInstance],
+                result_type=r[p.Meltano.TapInstance],
             )
 
     def generate_catalog(
@@ -184,7 +184,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 discovery.error or c.Meltano.ERROR_CATALOG_GENERATION_FAILED,
             )
         raw = discovery.value
-        streams: list[m.Meltano.SingerCatalogEntry] = []
+        streams: list[p.Meltano.SingerCatalogEntry] = []
         for s in self._extract_raw_streams(raw):
             name = str(s.get(c.Meltano.PayloadKey.STREAM_NAME, c.DEFAULT_EMPTY_STRING))
             if name in self._stream_registry:

@@ -210,10 +210,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         command: t.StrSequence,
         timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
         _cwd: Path | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a Meltano runtime command in-process and capture its output."""
         if timeout <= 0:
-            return r[m.Meltano.CommandExecutionResult].fail(
+            return r[p.Meltano.CommandExecutionResult].fail(
                 "Command timeout must be greater than zero",
             )
 
@@ -225,7 +225,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 u.Meltano.normalize_runtime_command(command),
             )
             if not normalized_command:
-                return r[m.Meltano.CommandExecutionResult].fail(
+                return r[p.Meltano.CommandExecutionResult].fail(
                     "Command cannot be empty",
                 )
             needs_project_context = normalized_command[0] not in {
@@ -297,7 +297,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 error=error_output,
                 execution_time=execution_time,
             )
-            return r[m.Meltano.CommandExecutionResult].ok(result)
+            return r[p.Meltano.CommandExecutionResult].ok(result)
 
         try:
             return _run_execute_meltano_command()
@@ -312,34 +312,34 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             SQLAlchemyError,
         ) as e:
             self.logger.exception("Command execution failed", error=str(e))
-            return r[m.Meltano.CommandExecutionResult].fail(str(e))
+            return r[p.Meltano.CommandExecutionResult].fail(str(e))
 
     def execute_dbt_command(
         self,
         dbt_command: str,
         args: t.StrSequence | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a DBT command."""
         try:
             return self.execute_meltano_command(
                 u.Meltano.build_dbt_runtime_command(dbt_command, args),
             )
         except c.Meltano.OPERATION_ERRORS as e:
-            return r[m.Meltano.CommandExecutionResult].fail(str(e))
+            return r[p.Meltano.CommandExecutionResult].fail(str(e))
 
     def execute_pipeline(
         self,
         tap_name: str,
         target_name: str,
         config: t.JsonMapping | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         prepared_command: t.StrSequence | None = None
         completed_result: m.Meltano.CommandExecutionResult | None = None
 
         def resolve_command_stage(
             _context: m.Cli.PipelineStageContext,
-        ) -> p.Result[m.Cli.PipelineStageResult]:
+        ) -> p.Result[p.Cli.PipelineStageResult]:
             nonlocal prepared_command
             try:
                 command = list(
@@ -351,7 +351,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                         for key, value in config.items()
                     )
             except c.Meltano.OPERATION_ERRORS as e:
-                return r[m.Cli.PipelineStageResult].fail(str(e))
+                return r[p.Cli.PipelineStageResult].fail(str(e))
             command_output = t.Cli.JSON_MAPPING_ADAPTER.validate_python({
                 c.Meltano.PIPELINE_SHARED_KEY_COMMAND: command,
             })
@@ -365,15 +365,15 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
         def execute_command_stage(
             _context: m.Cli.PipelineStageContext,
-        ) -> p.Result[m.Cli.PipelineStageResult]:
+        ) -> p.Result[p.Cli.PipelineStageResult]:
             nonlocal completed_result
             if prepared_command is None:
-                return r[m.Cli.PipelineStageResult].fail(
+                return r[p.Cli.PipelineStageResult].fail(
                     "Pipeline command not prepared",
                 )
             execution_result = self.execute_meltano_command(prepared_command)
             if execution_result.failure:
-                return r[m.Cli.PipelineStageResult].fail(
+                return r[p.Cli.PipelineStageResult].fail(
                     execution_result.error or "Failed to execute pipeline command",
                 )
             completed = execution_result.value
@@ -401,18 +401,18 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             context=cli.stage_context(workspace_root=self.project_root),
         )
         if pipeline_result.failure:
-            return r[m.Meltano.CommandExecutionResult].fail(
+            return r[p.Meltano.CommandExecutionResult].fail(
                 pipeline_result.error or "Failed to run Meltano pipeline",
             )
         if not pipeline_result.value.success:
             failed_stage = next(iter(pipeline_result.value.failed_stages), None)
-            return r[m.Meltano.CommandExecutionResult].fail(
+            return r[p.Meltano.CommandExecutionResult].fail(
                 failed_stage.error
                 if failed_stage is not None and failed_stage.error is not None
                 else "Failed to run Meltano pipeline",
             )
         if completed_result is None:
-            return r[m.Meltano.CommandExecutionResult].fail(
+            return r[p.Meltano.CommandExecutionResult].fail(
                 "Pipeline execution result missing",
             )
-        return r[m.Meltano.CommandExecutionResult].ok(completed_result)
+        return r[p.Meltano.CommandExecutionResult].ok(completed_result)

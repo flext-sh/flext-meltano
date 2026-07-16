@@ -95,7 +95,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
                 case c.Meltano.DbtCommand.DOCS:
                     result = self.generate_docs()
                 case _:
-                    result = r[m.Meltano.CommandExecutionResult].fail(subcommand)
+                    result = r[p.Meltano.CommandExecutionResult].fail(subcommand)
             if result.failure:
                 self.logger.warning(
                     "dbt command failed",
@@ -120,7 +120,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         subcommand: str,
         models: t.StrSequence | None = None,
         extra_args: t.StrSequence | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a dbt command via the canonical typed executor (SSOT)."""
         # NOTE (multi-agent, bead mro-wfc8.3.9): delegate to the single typed
         # executor (FlextMeltanoExecutorBase.execute_dbt_command) — no parallel
@@ -133,25 +133,25 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     def run_models(
         self,
         models: t.StrSequence | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run dbt models."""
         return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
 
     def run_tests(
         self,
         models: t.StrSequence | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Run dbt tests."""
         return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
 
     def compile_models(
         self,
         models: t.StrSequence | None = None,
-    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+    ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Compile dbt models."""
         return self._run_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models)
 
-    def generate_docs(self) -> p.Result[m.Meltano.CommandExecutionResult]:
+    def generate_docs(self) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Generate dbt documentation."""
         return self._run_dbt_cmd(
             c.Meltano.DbtCommand.DOCS,

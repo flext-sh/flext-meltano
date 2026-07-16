@@ -230,7 +230,7 @@ class FlextMeltanoUtilitiesSinger:
         replication_key: str | None = None,
         *,
         is_selected: bool = True,
-    ) -> p.Result[m.Meltano.SingerCatalogEntry]:
+    ) -> p.Result[p.Meltano.SingerCatalogEntry]:
         """Build a Singer catalog entry from stream metadata.
 
         Generic catalog construction that domain-specific projects
@@ -245,7 +245,7 @@ class FlextMeltanoUtilitiesSinger:
             is_selected: Whether the stream is selected for sync.
 
         Returns:
-            r[m.Meltano.SingerCatalogEntry] on success.
+            r[p.Meltano.SingerCatalogEntry] on success.
 
         """
         try:
@@ -274,10 +274,10 @@ class FlextMeltanoUtilitiesSinger:
                     else c.Meltano.SingerReplicationMethod.FULL_TABLE
                 ),
             })
-            return r[m.Meltano.SingerCatalogEntry].ok(entry)
+            return r[p.Meltano.SingerCatalogEntry].ok(entry)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation(
                 f"build catalog entry for {stream_name}",
                 exc,
-                result_type=r[m.Meltano.SingerCatalogEntry],
+                result_type=r[p.Meltano.SingerCatalogEntry],
             )

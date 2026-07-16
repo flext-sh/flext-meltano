@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
-from flext_meltano import m, t
+from flext_meltano import t
 
 
 class FlextMeltanoProtocolsServices:
@@ -26,7 +26,7 @@ class FlextMeltanoProtocolsServices:
             command: t.StrSequence,
             timeout: int = ...,
             _cwd: Path | None = None,
-        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[p.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
@@ -42,7 +42,7 @@ class FlextMeltanoProtocolsServices:
             self,
             dbt_command: str,
             args: t.StrSequence | None = None,
-        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[p.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 
@@ -51,7 +51,7 @@ class FlextMeltanoProtocolsServices:
             tap_name: str,
             target_name: str,
             config: t.JsonMapping | None = None,
-        ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[p.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
 

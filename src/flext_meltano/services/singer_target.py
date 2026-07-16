@@ -25,7 +25,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     def configure_sink(
         self,
         sink_config: m.Meltano.DataSinkConfig,
-    ) -> p.Result[m.Meltano.DataSinkDefinition]:
+    ) -> p.Result[p.Meltano.DataSinkDefinition]:
         """Configure a sink for a sink configuration."""
         try:
             self.logger.info(
@@ -43,15 +43,15 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 "Sink configured successfully",
                 sink_name=sink_def.sink_name,
             )
-            return r[m.Meltano.DataSinkDefinition].ok(sink_def)
+            return r[p.Meltano.DataSinkDefinition].ok(sink_def)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Sink configuration failed", error=str(e))
-            return r[m.Meltano.DataSinkDefinition].fail_op("Sink configuration", e)
+            return r[p.Meltano.DataSinkDefinition].fail_op("Sink configuration", e)
 
     def create_flext_target(
         self,
         sink_config: m.Meltano.DataSinkConfig | t.JsonMapping,
-    ) -> p.Result[m.Meltano.DataSinkInstance]:
+    ) -> p.Result[p.Meltano.DataSinkInstance]:
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
             try:
@@ -59,7 +59,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                     m.Meltano.DataSinkConfig.model_validate(sink_config)
                 )
             except c.EXC_ATTR_KEY_TYPE_VALUE as e:
-                return r[m.Meltano.DataSinkInstance].fail(
+                return r[p.Meltano.DataSinkInstance].fail(
                     f"Invalid target settings: {e}",
                 )
         else:
@@ -69,7 +69,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     def create_sink_instance(
         self,
         sink_config: m.Meltano.DataSinkConfig,
-    ) -> p.Result[m.Meltano.DataSinkInstance]:
+    ) -> p.Result[p.Meltano.DataSinkInstance]:
         """Create a sink instance from configuration."""
         try:
             self.logger.info(
@@ -86,10 +86,10 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 "Sink instance created successfully",
                 sink_name=sink_instance.settings.sink_type,
             )
-            return r[m.Meltano.DataSinkInstance].ok(sink_instance)
+            return r[p.Meltano.DataSinkInstance].ok(sink_instance)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Sink instance creation failed", error=str(e))
-            return r[m.Meltano.DataSinkInstance].fail_op("Sink instance creation", e)
+            return r[p.Meltano.DataSinkInstance].fail_op("Sink instance creation", e)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

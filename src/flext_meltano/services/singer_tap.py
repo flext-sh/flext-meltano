@@ -29,10 +29,10 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         source_config: m.Meltano.DataSourceConfig
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
-    ) -> p.Result[m.Meltano.DataSourceInstance]:
+    ) -> p.Result[p.Meltano.DataSourceInstance]:
         """Create a source instance from configuration via isinstance narrowing."""
 
-        def _run_create_source_instance() -> p.Result[m.Meltano.DataSourceInstance]:
+        def _run_create_source_instance() -> p.Result[p.Meltano.DataSourceInstance]:
             if isinstance(source_config, m.Meltano.DataSourceConfig):
                 source_type = source_config.source_type
                 source_id = f"{source_type}:{source_type}"
@@ -70,13 +70,13 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "Source instance created successfully",
                 source_name=source_type,
             )
-            return r[m.Meltano.DataSourceInstance].ok(source_instance)
+            return r[p.Meltano.DataSourceInstance].ok(source_instance)
 
         try:
             return _run_create_source_instance()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
-            return r[m.Meltano.DataSourceInstance].fail_op(
+            return r[p.Meltano.DataSourceInstance].fail_op(
                 "Source instance creation",
                 e,
             )
@@ -87,7 +87,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         connection_config: t.JsonMapping,
         stream_config: t.JsonMapping | None = None,
         tap_version: str = "1.0.0",
-    ) -> p.Result[m.Meltano.TapInstance]:
+    ) -> p.Result[p.Meltano.TapInstance]:
         """Create a tap instance from raw configuration data."""
         try:
             settings = m.Meltano.TapConfig.model_validate({
@@ -105,7 +105,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 ),
             )
         except c.Meltano.OPERATION_ERRORS as exc:
-            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
+            return r[p.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
 
 
 class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServiceBase):

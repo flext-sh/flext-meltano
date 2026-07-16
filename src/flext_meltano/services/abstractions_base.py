@@ -33,7 +33,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success."""
         cwd = Path(settings.Meltano.project_root)
-        run_result: p.Result[m.Meltano.CommandExecutionResult] = (
+        run_result: p.Result[p.Meltano.CommandExecutionResult] = (
             FlextMeltanoExecutorBase().execute_meltano_command(
                 list(args),
                 _cwd=cwd,
@@ -189,7 +189,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _create_catalog_entry_from_stream(
         self,
         stream: m.Meltano.StreamDefinition,
-    ) -> p.Result[m.Meltano.SingerCatalogEntry]:
+    ) -> p.Result[p.Meltano.SingerCatalogEntry]:
         """Create Singer catalog entry from stream definition."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": stream.stream_name,
@@ -197,7 +197,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             "schema": stream.stream_schema,
             "metadata": (),
         })
-        return r[m.Meltano.SingerCatalogEntry].ok(entry)
+        return r[p.Meltano.SingerCatalogEntry].ok(entry)
 
     def fetch_stream_config(
         self,

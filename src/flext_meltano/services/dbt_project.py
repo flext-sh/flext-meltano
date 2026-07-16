@@ -84,18 +84,18 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
     def _get_dbt_manifest_nodes(
         self,
         resource_type: str,
-    ) -> p.Result[t.SequenceOf[m.Meltano.DbtManifestNode]]:
+    ) -> p.Result[t.SequenceOf[p.Meltano.DbtManifestNode]]:
         def _run__get_dbt_manifest_nodes() -> p.Result[
-            t.SequenceOf[m.Meltano.DbtManifestNode]
+            t.SequenceOf[p.Meltano.DbtManifestNode]
         ]:
             if not self._dbt_manifest:
                 manifest_result = self.load_dbt_manifest()
                 if manifest_result.failure:
-                    return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
+                    return r[t.SequenceOf[p.Meltano.DbtManifestNode]].fail(
                         manifest_result.error or "Unknown error",
                     )
             if not self._dbt_manifest:
-                return r[t.SequenceOf[m.Meltano.DbtManifestNode]].ok([])
+                return r[t.SequenceOf[p.Meltano.DbtManifestNode]].ok([])
             manifest_model = m.Meltano.DbtManifest.model_validate(self._dbt_manifest)
             parsed_nodes = [
                 m.Meltano.DbtManifestNode.model_validate(node)
@@ -104,12 +104,12 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             filtered_nodes = [
                 node for node in parsed_nodes if node.resource_type == resource_type
             ]
-            return r[t.SequenceOf[m.Meltano.DbtManifestNode]].ok(filtered_nodes)
+            return r[t.SequenceOf[p.Meltano.DbtManifestNode]].ok(filtered_nodes)
 
         try:
             return _run__get_dbt_manifest_nodes()
         except c.EXC_OS_VALIDATION as e:
-            return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
+            return r[t.SequenceOf[p.Meltano.DbtManifestNode]].fail(
                 f"Failed to read manifest nodes: {e}",
             )
 
@@ -157,12 +157,12 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to load manifest", error=str(e))
             return r[t.Meltano.DbtManifestData].fail(f"Failed to load manifest: {e}")
 
-    def load_dbt_project(self, root: Path) -> p.Result[m.Meltano.DbtProjectInfo]:
+    def load_dbt_project(self, root: Path) -> p.Result[p.Meltano.DbtProjectInfo]:
         """Load a DBT project and discover models/tests from manifest."""
 
-        def _run_load_dbt_project() -> p.Result[m.Meltano.DbtProjectInfo]:
+        def _run_load_dbt_project() -> p.Result[p.Meltano.DbtProjectInfo]:
             if not root.exists():
-                return r[m.Meltano.DbtProjectInfo].fail(
+                return r[p.Meltano.DbtProjectInfo].fail(
                     f"DBT project directory not found: {root}",
                 )
             self._dbt_project_root = root
@@ -189,13 +189,13 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 models=models_count,
                 tests=tests_count,
             )
-            return r[m.Meltano.DbtProjectInfo].ok(info)
+            return r[p.Meltano.DbtProjectInfo].ok(info)
 
         try:
             return _run_load_dbt_project()
         except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
+            return r[p.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}")
 
 
 __all__: list[str] = ["FlextMeltanoDbtProjectMixin"]

@@ -52,7 +52,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     def load_state(
         self,
         state_file: Path | None = None,
-    ) -> p.Result[m.Meltano.SingerStateMessage]:
+    ) -> p.Result[p.Meltano.SingerStateMessage]:
         """Load state from file or return in-memory state."""
         try:
             if state_file and state_file.exists():
@@ -61,7 +61,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                     m.Meltano.SingerStateMessage,
                 )
                 if load_result.failure:
-                    return r[m.Meltano.SingerStateMessage].fail(
+                    return r[p.Meltano.SingerStateMessage].fail(
                         load_result.error or "state read failed",
                     )
                 self._singer_state = load_result.value
@@ -70,13 +70,13 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                     file=str(state_file),
                     entries=len(self._singer_state.value),
                 )
-            return r[m.Meltano.SingerStateMessage].ok(self._singer_state)
+            return r[p.Meltano.SingerStateMessage].ok(self._singer_state)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to load state", error=str(exc))
             return e.fail_operation(
                 "load state",
                 exc,
-                result_type=r[m.Meltano.SingerStateMessage],
+                result_type=r[p.Meltano.SingerStateMessage],
             )
 
     def save_state(self, state_file: Path) -> p.Result[None]:
@@ -95,7 +95,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to save state", error=str(exc))
             return e.fail_operation("save state", exc, result_type=r[None])
 
-    def to_state_message(self) -> m.Meltano.SingerStateMessage:
+    def to_state_message(self) -> p.Meltano.SingerStateMessage:
         """Return current state as SingerStateMessage."""
         return self._singer_state
 
