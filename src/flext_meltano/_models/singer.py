@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Annotated, ClassVar
 
-from flext_cli import m, p, u
-from flext_meltano import c, p, t
+from flext_cli import m, u
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsSinger:
@@ -14,7 +14,7 @@ class FlextMeltanoModelsSinger:
     class SingerSchemaMessage(m.ArbitraryTypesModel):
         """Canonical Singer SCHEMA message model."""
 
-        model_config: ClassVar[p.ConfigDict] = m.ConfigDict(populate_by_name=True)
+        model_config: ClassVar[t.ConfigDict] = m.ConfigDict(populate_by_name=True)
 
         type: Annotated[
             c.Meltano.SingerMessageType,
