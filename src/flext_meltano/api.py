@@ -9,6 +9,7 @@ from flext_meltano import c, p, t, u
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.adapters import FlextMeltanoAdapter
 from flext_meltano.services.bridge import FlextMeltanoBridge
+from flext_meltano.services.consumer_bases.facade import FlextMeltanoConsumerBases
 from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
 from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
 from flext_meltano.services.executor import FlextMeltanoExecutor
@@ -30,6 +31,7 @@ class FlextMeltano(
     FlextMeltanoAdapter,
     FlextMeltanoBridge,
     FlextMeltanoComponentService,
+    FlextMeltanoConsumerBases,
     FlextMeltanoDbtProjectMixin,
     FlextMeltanoDbtRunnerMixin,
     FlextMeltanoExecutor,
