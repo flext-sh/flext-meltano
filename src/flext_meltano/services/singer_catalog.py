@@ -75,7 +75,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 )
                 return catalog
 
-            return u.Cli.files_read_json_model(
+            return u.Cli.json_read_files_model(
                 catalog_file,
                 m.Meltano.SingerCatalog,
             ).map(_store)

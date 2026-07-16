@@ -134,7 +134,7 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
                 return r[t.Meltano.DbtManifestData].fail(
                     f"Manifest not found: {manifest_path_local}",
                 )
-            parsed_result = u.Cli.files_read_json_model(
+            parsed_result = u.Cli.json_read_files_model(
                 manifest_path_local,
                 m.Meltano.DbtManifest,
             )

@@ -91,7 +91,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         return r[str].ok(normalized_name)
 
     def _load_pipeline_config(self, pipeline_name: str) -> p.Result[t.JsonMapping]:
-        config_result = flext_cli.read_json_file(self._config_path(pipeline_name))
+        config_result = flext_cli.json_read_file(self._config_path(pipeline_name))
         if config_result.failure:
             return r[t.JsonMapping].fail(
                 config_result.error or "Pipeline configuration could not be read",
@@ -173,7 +173,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             return r[str].fail(
                 ensure_result.error or "Unable to create pipeline directory",
             )
-        write_result = flext_cli.write_json_file(
+        write_result = flext_cli.json_write_file(
             self._config_path(name_result.value),
             config_mapping.values,
         )

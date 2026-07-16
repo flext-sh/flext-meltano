@@ -188,7 +188,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             if not path.exists():
                 return r[t.Meltano.DbtManifestData].fail(str(path))
 
-            parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
+            parsed_result = u.Cli.json_read_files_model(path, m.Meltano.DbtManifest)
             if parsed_result.failure:
                 return r[t.Meltano.DbtManifestData].fail(
                     parsed_result.error or "manifest read failed",

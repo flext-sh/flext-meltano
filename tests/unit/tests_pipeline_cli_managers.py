@@ -130,7 +130,7 @@ class TestFlextMeltanoPipelineCliManagers:
                 pipeline_name,
             ])
             run_output = capsys.readouterr().out
-            stored_result = flext_cli.read_json_file(config_path)
+            stored_result = flext_cli.json_read_file(config_path)
             delete_result = meltano_cli.run([
                 c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.DELETE,
