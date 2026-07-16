@@ -118,3 +118,44 @@ class FlextMeltanoModelsSourcesParams:
                 msg = f"Status must be one of: {', '.join(valid_statuses)}"
                 raise ValueError(msg)
             return self
+
+    class StreamSpec(m.BaseModel):
+        """Declarative Singer stream contract supplied by a consumer tap.
+
+        Pure data: the consumer declares each stream's identity, JSON schema and
+        keys; ``flext-meltano`` builds the real Singer stream and delegates record
+        fetching to the consumer's ``p.Meltano.RecordFetcher``. Consumers never
+        import ``singer_sdk``.
+        """
+
+        name: Annotated[str, u.Field(description="Singer stream identifier")]
+        json_schema: Annotated[
+            t.JsonMapping,
+            u.Field(description="Singer stream JSON schema"),
+        ]
+        primary_keys: Annotated[
+            t.StrSequence,
+            u.Field(default=(), description="Record primary key properties"),
+        ] = ()
+        replication_key: Annotated[
+            str | None,
+            u.Field(default=None, description="Incremental replication key"),
+        ] = None
+
+    class TapSpec(m.BaseModel):
+        """Declarative Singer tap contract supplied by a consumer tap.
+
+        Bundles the tap identity, its Singer ``config_jsonschema`` and the ordered
+        set of ``StreamSpec`` streams. ``flext-meltano`` turns this into a real
+        ``singer_sdk`` tap with a working flat Singer CLI.
+        """
+
+        tap_name: Annotated[str, u.Field(description="Canonical Singer tap name")]
+        config_jsonschema: Annotated[
+            t.JsonMapping,
+            u.Field(description="Singer tap config JSON schema"),
+        ]
+        streams: Annotated[
+            t.SequenceOf[FlextMeltanoModelsSourcesParams.StreamSpec],
+            u.Field(description="Declarative stream specs for this tap"),
+        ]

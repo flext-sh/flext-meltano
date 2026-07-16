@@ -17,7 +17,17 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
+from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
@@ -127,6 +137,20 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
         if self._tap_instance is None:
             self._tap_instance = self.create_tap_instance()
         return self._tap_instance
+
+    @staticmethod
+    def build_declarative_tap(
+        spec: m.Meltano.TapSpec,
+        fetcher: p.Meltano.RecordFetcher,
+    ) -> p.Meltano.SingerTapInstance:
+        """Build a flat-CLI Singer tap from declarative specs (no singer_sdk here).
+
+        Declarative consumer taps override ``create_tap_instance`` with a single
+        call to this helper, passing their ``m.Meltano.TapSpec`` and a
+        ``p.Meltano.RecordFetcher``. ``flext-meltano`` owns every ``singer_sdk``
+        detail behind ``FlextMeltanoDeclarativeTap``.
+        """
+        return FlextMeltanoDeclarativeTap.build(spec, fetcher)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
