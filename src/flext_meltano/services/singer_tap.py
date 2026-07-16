@@ -26,7 +26,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
 
     def create_source_instance(
         self,
-        source_config: m.Meltano.DataSourceConfig
+        source_config: p.Meltano.DataSourceConfig
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
     ) -> p.Result[p.Meltano.DataSourceInstance]:
@@ -98,7 +98,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "domain_events": [],
             })
             return self.create_source_instance(settings).map(
-                lambda inst: m.Meltano.TapInstance(
+                lambda inst: p.Meltano.TapInstance(
                     tap_type=inst.source_type,
                     settings=settings,
                     tap_id=inst.source_id,
@@ -119,7 +119,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
 
     def process_source(
         self,
-        items: m.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
+        items: p.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
     ) -> p.Result[bool]:
         """Process a source configuration for validation via isinstance narrowing."""
 
@@ -149,7 +149,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
 
     def validate_stream_schema(
         self,
-        stream_def: m.Meltano.StreamDefinition,
+        stream_def: p.Meltano.StreamDefinition,
     ) -> p.Result[bool]:
         """Validate a stream definition's schema."""
         try:

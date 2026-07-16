@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
-from flext_meltano import m, t
+from flext_meltano import p, t
 
 
 class FlextMeltanoProtocolsSinger:
@@ -148,7 +148,7 @@ class FlextMeltanoProtocolsSinger:
 
         streams: t.StrSequence
         name: str
-        state: m.Meltano.SingerStateMessage
+        state: p.Meltano.SingerStateMessage
 
         def discover(self) -> p.Meltano.SingerCatalog:
             """Discover available streams and schemas."""
@@ -167,8 +167,8 @@ class FlextMeltanoProtocolsSinger:
 
         def sync(
             self,
-            catalog: m.Meltano.SingerCatalog,
-            state: m.Meltano.SingerStateMessage,
+            catalog: p.Meltano.SingerCatalog,
+            state: p.Meltano.SingerStateMessage,
         ) -> None:
             """Synchronize data from source to stdout."""
             ...
@@ -230,19 +230,19 @@ class FlextMeltanoProtocolsSinger:
 
         def handle_schema(
             self,
-            message: m.Meltano.SingerSchemaMessage,
+            message: p.Meltano.SingerSchemaMessage,
         ) -> p.Result[None]:
             """Handle a SCHEMA message."""
             ...
 
         def handle_record(
             self,
-            message: m.Meltano.SingerRecordMessage,
+            message: p.Meltano.SingerRecordMessage,
         ) -> p.Result[None]:
             """Handle a RECORD message."""
             ...
 
-        def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[None]:
+        def handle_state(self, message: p.Meltano.SingerStateMessage) -> p.Result[None]:
             """Handle a STATE message."""
             ...
 

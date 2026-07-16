@@ -292,7 +292,7 @@ from flext_meltano import FlextMeltanoBase
 class EnterpriseExtension(FlextMeltanoBase, ABC):
     """Base class for enterprise extensions."""
 
-    def __init__(self, settings: m.Dict) -> None:
+    def __init__(self, settings: p.Dict) -> None:
         """Initialize enterprise extension with configuration."""
         super().__init__(settings)
         self.validate_enterprise_config()

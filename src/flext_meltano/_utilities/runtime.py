@@ -260,7 +260,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_command_execution_payload(
-        command_result: m.Meltano.CommandExecutionResult,
+        command_result: p.Meltano.CommandExecutionResult,
         *,
         extra_fields: t.JsonMapping | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
@@ -290,7 +290,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_mutable_command_execution_payload(
-        command_result: m.Meltano.CommandExecutionResult,
+        command_result: p.Meltano.CommandExecutionResult,
         *,
         extra_fields: t.JsonMapping | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
@@ -312,7 +312,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def command_failure_message(
-        command_result: m.Meltano.CommandExecutionResult,
+        command_result: p.Meltano.CommandExecutionResult,
         *,
         default: str,
     ) -> str:

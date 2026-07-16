@@ -51,7 +51,7 @@ class TestsFlextMeltanoTargetAbstractions:
 
     def test_configure_sink_derives_definition_from_config(
         self,
-        sink_config: m.Meltano.DataSinkConfig,
+        sink_config: p.Meltano.DataSinkConfig,
     ) -> None:
         """configure_sink() maps a config to a configured DataSinkDefinition."""
         result = meltano.configure_sink(sink_config)
@@ -65,7 +65,7 @@ class TestsFlextMeltanoTargetAbstractions:
 
     def test_configure_sink_is_deterministic_for_equal_input(
         self,
-        sink_config: m.Meltano.DataSinkConfig,
+        sink_config: p.Meltano.DataSinkConfig,
     ) -> None:
         """configure_sink() yields the same public definition for equal input."""
         first = meltano.configure_sink(sink_config)
@@ -95,7 +95,7 @@ class TestsFlextMeltanoTargetAbstractions:
 
     def test_create_flext_target_accepts_config_model_directly(
         self,
-        sink_config: m.Meltano.DataSinkConfig,
+        sink_config: p.Meltano.DataSinkConfig,
     ) -> None:
         """create_flext_target() passes an existing config model straight through."""
         result = meltano.create_flext_target(sink_config)
@@ -113,7 +113,7 @@ class TestsFlextMeltanoTargetAbstractions:
 
     def test_create_sink_instance_matches_create_flext_target(
         self,
-        sink_config: m.Meltano.DataSinkConfig,
+        sink_config: p.Meltano.DataSinkConfig,
     ) -> None:
         """create_sink_instance() and create_flext_target() agree for a model input."""
         via_instance = meltano.create_sink_instance(sink_config)
@@ -127,7 +127,7 @@ class TestsFlextMeltanoTargetAbstractions:
 
     def test_validate_sink_config_accepts_valid_config(
         self,
-        sink_config: m.Meltano.DataSinkConfig,
+        sink_config: p.Meltano.DataSinkConfig,
     ) -> None:
         """validate_sink_config() reports success for a well-formed config."""
         result = meltano.validate_sink_config(sink_config)

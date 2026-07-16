@@ -22,7 +22,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     syncs with proper error handling and r patterns.
     """
 
-    _singer_state: m.Meltano.SingerStateMessage = u.PrivateAttr(
+    _singer_state: p.Meltano.SingerStateMessage = u.PrivateAttr(
         default_factory=m.Meltano.SingerStateMessage,
     )
 

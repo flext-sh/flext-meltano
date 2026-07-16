@@ -102,7 +102,7 @@ class TestsFlextMeltanoSingerCliTranslator:
     )
     def test_translate_tap_run_builds_expected_command(
         self,
-        params: m.Meltano.CliDataSourceParams,
+        params: p.Meltano.CliDataSourceParams,
         expected: list[str],
     ) -> None:
         result = meltano.translate_tap_run(params)
@@ -167,7 +167,7 @@ class TestsFlextMeltanoSingerCliTranslator:
     )
     def test_translate_target_run_builds_expected_command(
         self,
-        params: m.Meltano.CliDataSinkParams,
+        params: p.Meltano.CliDataSinkParams,
         expected: list[str],
     ) -> None:
         result = meltano.translate_target_run(params)
@@ -254,7 +254,7 @@ class TestsFlextMeltanoSingerCliTranslator:
     )
     def test_translate_pipeline_run_builds_source_and_sink_commands(
         self,
-        params: m.Meltano.CliPipelineParams,
+        params: p.Meltano.CliPipelineParams,
         expected_source: list[str],
         expected_sink: list[str],
     ) -> None:
@@ -361,7 +361,7 @@ class TestsFlextMeltanoSingerCliTranslator:
     )
     def test_translate_dbt_run_builds_expected_command(
         self,
-        params: m.Meltano.CliTransformationParams,
+        params: p.Meltano.CliTransformationParams,
         expected: list[str],
     ) -> None:
         result = meltano.translate_dbt_run(params)

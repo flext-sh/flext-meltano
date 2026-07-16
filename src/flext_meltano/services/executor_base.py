@@ -335,10 +335,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     ) -> p.Result[p.Meltano.CommandExecutionResult]:
         """Execute a complete ELT pipeline."""
         prepared_command: t.StrSequence | None = None
-        completed_result: m.Meltano.CommandExecutionResult | None = None
+        completed_result: p.Meltano.CommandExecutionResult | None = None
 
         def resolve_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[p.Cli.PipelineStageResult]:
             nonlocal prepared_command
             try:
@@ -364,7 +364,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
 
         def execute_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[p.Cli.PipelineStageResult]:
             nonlocal completed_result
             if prepared_command is None:

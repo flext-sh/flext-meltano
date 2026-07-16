@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 
 class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
@@ -50,7 +50,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
     @staticmethod
     def translate_dbt_run(
-        params: m.Meltano.CliTransformationParams,
+        params: p.Meltano.CliTransformationParams,
     ) -> p.Result[t.StrSequence]:
         """Convert TransformationParams to dbt CLI command."""
         command: t.MutableSequenceOf[str] = [
@@ -71,7 +71,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
     @staticmethod
     def translate_pipeline_run(
-        params: m.Meltano.CliPipelineParams,
+        params: p.Meltano.CliPipelineParams,
     ) -> p.Result[tuple[t.StrSequence, t.StrSequence]]:
         """Convert PipelineParams to source and sink CLI commands."""
         source_command: t.MutableSequenceOf[str] = [params.source_name]
@@ -88,7 +88,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
     @staticmethod
     def translate_tap_run(
-        params: m.Meltano.CliDataSourceParams,
+        params: p.Meltano.CliDataSourceParams,
     ) -> p.Result[t.StrSequence]:
         """Convert DataSourceParams to Singer SDK source CLI command."""
         command: t.MutableSequenceOf[str] = [params.source_name]
@@ -110,7 +110,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
 
     @staticmethod
     def translate_target_run(
-        params: m.Meltano.CliDataSinkParams,
+        params: p.Meltano.CliDataSinkParams,
     ) -> p.Result[t.StrSequence]:
         """Convert DataSinkParams to Singer SDK sink CLI command."""
         command: t.MutableSequenceOf[str] = [params.sink_name]

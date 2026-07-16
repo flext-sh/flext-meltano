@@ -26,14 +26,14 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     def process_tap_config(
         self,
-        settings: m.Meltano.TapConfig,
+        settings: p.Meltano.TapConfig,
     ) -> p.Result[p.Meltano.TapConfig]:
         """Validate and return tap configuration."""
         return r[p.Meltano.TapConfig].ok(settings)
 
     def build_tap_instance(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        tap_instance: p.Meltano.TapInstance,
     ) -> t.JsonMapping:
         """Build tap instance representation."""
         return {
@@ -43,7 +43,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     def discover_streams(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        tap_instance: p.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
         """Discover available streams via ``meltano select --list``."""
 
@@ -95,9 +95,9 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     def sync_stream(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        tap_instance: p.Meltano.TapInstance,
         stream_name: str,
-        target_config: m.Meltano.TargetConfig | None = None,
+        target_config: p.Meltano.TargetConfig | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Sync a single stream via ``meltano elt`` with stream selection."""
 
@@ -175,7 +175,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     def generate_catalog(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        tap_instance: p.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
         """Generate Singer catalog by discovering streams from the tap."""
         discovery = self.discover_streams(tap_instance)
@@ -205,7 +205,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     def fetch_stream_by_name(
         self,
-        tap_instance: m.Meltano.TapInstance,
+        tap_instance: p.Meltano.TapInstance,
         stream_name: str,
     ) -> p.Result[t.JsonMapping]:
         """Get stream definition by name."""
@@ -227,7 +227,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             result_type=r[t.JsonMapping],
         )
 
-    def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
+    def list_streams(self, tap_instance: p.Meltano.TapInstance) -> t.StrSequence:
         """List stream names available in tap instance."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:

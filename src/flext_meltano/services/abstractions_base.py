@@ -42,7 +42,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         if run_result.failure:
             error_msg = run_result.error or "Unknown error"
             return r[str].fail_op("Meltano command", error_msg)
-        completed: m.Meltano.CommandExecutionResult = run_result.value
+        completed: p.Meltano.CommandExecutionResult = run_result.value
         if completed.exit_code != 0:
             stderr_out = completed.error.strip() or completed.output.strip()
             return r[str].fail(
@@ -188,7 +188,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def _create_catalog_entry_from_stream(
         self,
-        stream: m.Meltano.StreamDefinition,
+        stream: p.Meltano.StreamDefinition,
     ) -> p.Result[p.Meltano.SingerCatalogEntry]:
         """Create Singer catalog entry from stream definition."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
@@ -201,7 +201,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def fetch_stream_config(
         self,
-        settings: m.Meltano.TapConfig,
+        settings: p.Meltano.TapConfig,
         stream_name: str,
     ) -> t.JsonMapping:
         """Get configuration for a specific stream."""
@@ -211,7 +211,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 return t.Cli.JSON_MAPPING_ADAPTER.validate_python(val)
         return {}
 
-    def fetch_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
+    def fetch_tap_type(self, tap_instance: p.Meltano.TapInstance) -> str:
         """Get tap type from instance."""
         return tap_instance.tap_type
 

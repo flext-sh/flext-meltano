@@ -7,7 +7,7 @@ Base classes (Tap, Sink, Stream, Target) are re-exported as-is via assignment
 so consumers can subclass them. Type aliases (Context, Record) are also
 direct assignments to preserve identity with singer_sdk originals.
 
-Access pattern: m.Meltano.SingerTapBase, m.Meltano.SingerTargetBase, etc.
+Access pattern: p.Meltano.SingerTapBase, m.Meltano.SingerTargetBase, etc.
 """
 
 from __future__ import annotations

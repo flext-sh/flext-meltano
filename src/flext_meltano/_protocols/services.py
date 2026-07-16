@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
-from flext_meltano import t
+from flext_meltano import p, t
 
 
 class FlextMeltanoProtocolsServices:

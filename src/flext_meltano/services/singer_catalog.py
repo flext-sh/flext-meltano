@@ -22,7 +22,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     Internal state ``_singer_catalog`` is initialized as empty catalog.
     """
 
-    _singer_catalog: m.Meltano.SingerCatalog = u.PrivateAttr(
+    _singer_catalog: p.Meltano.SingerCatalog = u.PrivateAttr(
         default_factory=m.Meltano.SingerCatalog,
     )
 
@@ -66,7 +66,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                     f"Catalog file not found: {catalog_file}",
                 )
 
-            def _store(catalog: m.Meltano.SingerCatalog) -> p.Meltano.SingerCatalog:
+            def _store(catalog: p.Meltano.SingerCatalog) -> p.Meltano.SingerCatalog:
                 self._singer_catalog = catalog
                 self.logger.info(
                     "Catalog loaded from file",
@@ -121,7 +121,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to select streams", error=str(e))
             return r[p.Meltano.SingerCatalog].fail(f"Failed to select: {e}")
 
-    def configure_singer_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:
+    def configure_singer_catalog(self, catalog: p.Meltano.SingerCatalog) -> None:
         """Set catalog data directly."""
         self._singer_catalog = catalog
 
