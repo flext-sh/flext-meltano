@@ -83,7 +83,7 @@ class FlextMeltanoModelsProjects:
         @u.computed_field()
         @property
         def has_production_environment(self) -> bool:
-            """Check if production environment exists."""
+            """Whether production environment exists."""
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
             ]

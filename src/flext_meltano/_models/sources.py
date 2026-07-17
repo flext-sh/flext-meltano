@@ -43,7 +43,7 @@ class FlextMeltanoModelsSources:
         @u.computed_field()
         @property
         def has_stream_config(self) -> bool:
-            """Check if stream configuration is present."""
+            """Whether stream configuration is present."""
             return bool(self.stream_config)
 
         @u.computed_field()
@@ -98,7 +98,7 @@ class FlextMeltanoModelsSources:
         @u.computed_field()
         @property
         def has_connection_config(self) -> bool:
-            """Check if connection configuration is present."""
+            """Whether connection configuration is present."""
             return bool(self.connection_config)
 
         @u.computed_field()
@@ -148,7 +148,7 @@ class FlextMeltanoModelsSources:
         @u.computed_field()
         @property
         def has_stream_config(self) -> bool:
-            """Check if stream configuration is present."""
+            """Whether stream configuration is present."""
             return bool(self.stream_config)
 
         @u.computed_field()

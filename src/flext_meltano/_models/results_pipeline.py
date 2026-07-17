@@ -99,7 +99,7 @@ class FlextMeltanoModelsResultsPipeline:
         @u.computed_field()
         @property
         def is_fully_successful(self) -> bool:
-            """Check if all stages completed successfully."""
+            """Whether all stages completed successfully."""
             return self._all_stages_successful()
 
         @u.computed_field()

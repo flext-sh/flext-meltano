@@ -127,7 +127,7 @@ class FlextMeltanoModelsInstancesData:
         @u.computed_field()
         @property
         def is_ready_for_extraction(self) -> bool:
-            """Check if source is ready for data extraction."""
+            """Whether source is ready for data extraction."""
             streams_list: t.SequenceOf[
                 FlextMeltanoModelsSourcesParams.StreamDefinition
             ] = list(self.streams.values())
@@ -199,7 +199,7 @@ class FlextMeltanoModelsInstancesData:
         @u.computed_field()
         @property
         def is_ready(self) -> bool:
-            """Check if sink is ready for processing."""
+            """Whether sink is ready for processing."""
             return (
                 self.status == c.Meltano.OperationStatus.CONFIGURED.value
                 and self.adapter is not None

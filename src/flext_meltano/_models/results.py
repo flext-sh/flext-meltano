@@ -57,13 +57,13 @@ class FlextMeltanoModelsResults:
         @u.computed_field()
         @property
         def is_completed(self) -> bool:
-            """Check if execution is completed."""
+            """Whether execution is completed."""
             return self.end_time is not None
 
         @u.computed_field()
         @property
         def is_successful(self) -> bool:
-            """Check if execution was successful."""
+            """Whether execution was successful."""
             return (
                 self.status == c.Meltano.OperationStatus.SUCCESS
                 and self.error_message is None

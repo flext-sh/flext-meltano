@@ -64,14 +64,14 @@ class FlextMeltanoModelsSourcesParams:
         @u.computed_field()
         @property
         def has_data(self) -> bool:
-            """Check if stream has extracted data."""
+            """Whether stream has extracted data."""
             has: bool = self.records_extracted > 0
             return has
 
         @u.computed_field()
         @property
         def is_active(self) -> bool:
-            """Check if stream is active."""
+            """Whether stream is active."""
             return self.status in c.Meltano.ACTIVE_STATUSES
 
         @u.computed_field()

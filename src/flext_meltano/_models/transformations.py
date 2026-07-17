@@ -56,7 +56,7 @@ class FlextMeltanoModelsTransformations:
         @u.computed_field()
         @property
         def has_custom_paths(self) -> bool:
-            """Check if project has custom paths."""
+            """Whether project has custom paths."""
             all_paths = {
                 *self.model_paths,
                 *self.analysis_paths,
