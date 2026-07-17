@@ -110,20 +110,20 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
 
     def run_elt_pipeline(
         self,
-        tap: p.Meltano.SingerTap,
-        target: p.Meltano.SingerTarget,
+        tap_name: str,
+        target_name: str,
         settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Run a complete ELT pipeline from tap to target."""
         try:
             self.logger.info(
                 "Starting ELT pipeline",
-                tap_name=tap.name,
-                target_name=target.name,
+                tap_name=tap_name,
+                target_name=target_name,
             )
             result = self._elt_executor.execute_pipeline(
-                tap.name,
-                target.name,
+                tap_name,
+                target_name,
                 settings,
             )
             if result.failure:
@@ -134,8 +134,8 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={
-                    "tap_name": tap.name,
-                    "target_name": target.name,
+                    "tap_name": tap_name,
+                    "target_name": target_name,
                 },
                 duration_field="execution_time",
             )

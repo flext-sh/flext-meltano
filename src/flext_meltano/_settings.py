@@ -72,10 +72,6 @@ class FlextMeltanoSettings(FlextSettings):
             str,
             Field(default="0.48.0", description="Required Singer SDK version"),
         ]
-        dbt_version: Annotated[
-            str,
-            Field(default="1.10.5", description="Required dbt version"),
-        ]
         pipelines_dir: Annotated[
             str,
             Field(

@@ -8,8 +8,6 @@ payload shape. No private attributes, collaborators, or internals are touched.
 
 from __future__ import annotations
 
-from unittest.mock import Mock
-
 import pytest
 from flext_tests import tm
 
@@ -42,7 +40,8 @@ class TestsFlextMeltanoLibraryRunner:
     """Assert the public library-runner contract via the ``meltano`` facade."""
 
     @pytest.fixture(scope="class")
-    def elt_result(self) -> p.Result[t.JsonMapping]:
+    @staticmethod
+    def elt_result() -> p.Result[t.JsonMapping]:
         """Run one complete ELT pipeline once and share its outcome."""
         return meltano.execute_complete_elt_pipeline(
             tap_name="tap-csv",
@@ -50,23 +49,16 @@ class TestsFlextMeltanoLibraryRunner:
         )
 
     @pytest.fixture(scope="class")
-    def dbt_result(self) -> p.Result[m.Meltano.CommandExecutionResult]:
+    @staticmethod
+    def dbt_result() -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run one DBT transformation once and share its typed outcome."""
         return meltano.run_dbt_transformation(models=["model1"])
 
     @pytest.fixture(scope="class")
-    def elt_pipeline_result(self) -> p.Result[t.JsonMapping]:
-        """Run one tap-to-target ELT pipeline once and share its outcome.
-
-        Singer tap/target are genuine external plugin boundaries, so a
-        ``Mock(spec=...)`` carrying only the public ``name`` used by the
-        contract is the correct seam here.
-        """
-        tap = Mock(spec=p.Meltano.SingerTap)
-        tap.name = "tap-csv"
-        target = Mock(spec=p.Meltano.SingerTarget)
-        target.name = "target-jsonl"
-        return meltano.run_elt_pipeline(tap, target)
+    @staticmethod
+    def elt_pipeline_result() -> p.Result[t.JsonMapping]:
+        """Run one tap-to-target ELT pipeline once and share its outcome."""
+        return meltano.run_elt_pipeline("tap-csv", "target-jsonl")
 
     def test_facade_exposes_library_runner_operations(self) -> None:
         """The public facade exposes the three library-runner operations."""
