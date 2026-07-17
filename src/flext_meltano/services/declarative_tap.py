@@ -86,8 +86,9 @@ class FlextMeltanoDeclarativeTap:
                     schema=dict(stream_spec.json_schema),
                     name=stream_spec.name,
                 )
-                self.primary_keys = list(stream_spec.primary_keys)
-                self.replication_key = stream_spec.replication_key
+                # Assign singer_sdk Stream's backing fields directly (its property setters do the same); a bare `self.<prop> =` reads as an untagged member override that cannot take @override.
+                self._primary_keys: t.StrSequence = list(stream_spec.primary_keys)
+                self._replication_key: str | None = stream_spec.replication_key
                 self._config: t.JsonMapping = config
 
             @override
