@@ -11,14 +11,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, override
+from typing import override
 
 from singer_sdk import Stream, Tap
 
 from flext_meltano import m, p, t
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
 
 
 class FlextMeltanoDeclarativeTap:
@@ -66,7 +63,7 @@ class FlextMeltanoDeclarativeTap:
     @classmethod
     def build(
         cls,
-        spec: m.Meltano.TapSpec,
+        spec: p.Meltano.TapSpec,
         fetcher: p.Meltano.RecordFetcher,
     ) -> p.Meltano.SingerTapInstance:
         """Return a Singer tap instance driven by ``spec`` and ``fetcher``."""
@@ -78,7 +75,7 @@ class FlextMeltanoDeclarativeTap:
             def __init__(
                 self,
                 tap: Tap,
-                stream_spec: m.Meltano.StreamSpec,
+                stream_spec: p.Meltano.StreamSpec,
                 config: t.JsonMapping,
             ) -> None:
                 super().__init__(
@@ -93,15 +90,19 @@ class FlextMeltanoDeclarativeTap:
             @override
             def get_records(
                 self,
-                context: Mapping[str, object] | None,
-            ) -> Iterable[t.JsonMapping]:
+                context: t.JsonMapping | None,
+            ) -> t.IterableOf[t.JsonDict]:
                 _ = context
                 request = m.Meltano.FetchRequest(
                     stream_name=self.name,
                     config=self._config,
                 )
                 result = fetcher.fetch(request)
-                return list(result.value.records) if result.success else []
+                return (
+                    [dict(record) for record in result.value.records]
+                    if result.success
+                    else []
+                )
 
         class _DeclarativeTap(Tap):
             """A Singer tap that discovers the declared streams."""

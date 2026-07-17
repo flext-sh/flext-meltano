@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Protocol, override, runtime_checkable
 
-from flext_meltano import m, p, t
+from flext_meltano import p, t
 
 
 class FlextMeltanoProtocolsSinger:
@@ -150,8 +150,8 @@ class FlextMeltanoProtocolsSinger:
 
         def fetch(
             self,
-            request: m.Meltano.FetchRequest,
-        ) -> p.Result[m.Meltano.FetchResult]:
+            request: p.Meltano.FetchRequest,
+        ) -> p.Result[p.Meltano.FetchResult]:
             """Return the records for one stream given the typed fetch request."""
             ...
 

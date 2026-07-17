@@ -6,7 +6,7 @@ from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from flext_meltano import c, settings, t
+from flext_meltano import c, t
 from flext_meltano._models.sources import FlextMeltanoModelsSources
 
 
@@ -37,7 +37,8 @@ class FlextMeltanoModelsInstances:
         @property
         def config_keys_count(self) -> int:
             """Number of settings keys."""
-            return u.count(list(settings.keys()))
+            # mro-wkii.17.26.24: the count belongs to this sink definition.
+            return u.count(list(self.settings.keys()))
 
         @u.model_validator(mode="after")
         def validate_sink_definition(self) -> Self:

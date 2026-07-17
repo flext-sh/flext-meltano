@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from flext_cli import p
 from flext_meltano._protocols.cli import FlextMeltanoProtocolsBase
+from flext_meltano._protocols.models import FlextMeltanoProtocolsModels
 from flext_meltano._protocols.plugin import FlextMeltanoProtocolsPlugin
 from flext_meltano._protocols.project import FlextMeltanoProtocolsProject
 from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
@@ -19,6 +20,8 @@ class FlextMeltanoProtocols(p):
     """Unified Meltano protocols extending FlextCliProtocols."""
 
     class Meltano(
+        # mro-wkii.17.26.24: structural model contracts own p-only annotations.
+        FlextMeltanoProtocolsModels,
         FlextMeltanoProtocolsPlugin,
         FlextMeltanoProtocolsProject,
         FlextMeltanoProtocolsServices,

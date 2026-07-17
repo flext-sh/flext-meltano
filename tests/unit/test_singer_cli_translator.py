@@ -7,8 +7,8 @@ as exposed through the ``meltano`` facade:
 - ``execute_singer_command`` returns an ``r[T]`` describing success/failure and
   the observable output mapping (``stdout``/``stderr``/``returncode``).
 
-Only the genuine subprocess boundary (``u.Cli.run_raw``) is mocked; the
-translator itself is always driven through its public API.
+The genuine subprocess boundary is exercised with the active Python interpreter;
+the translator is always driven through its public API.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -17,15 +17,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+import sys
 
 import pytest
-from flext_tests import r, tm
+from flext_tests import tm
 
-from flext_meltano import meltano
+from flext_meltano import meltano, p
 from tests import m
-
-_MOCK_TARGET = "flext_meltano.services.singer_translator.u.Cli.run_raw"
 
 
 class TestsFlextMeltanoSingerCliTranslator:
@@ -377,91 +375,66 @@ class TestsFlextMeltanoSingerCliTranslator:
         tm.fail(result)
         tm.that(str(result.error), has="non-empty")
 
-    @patch(_MOCK_TARGET)
-    def test_execute_singer_command_success_returns_output_mapping(
-        self,
-        mock_run_raw: MagicMock,
-    ) -> None:
-        mock_run_raw.return_value = r[p.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(
-                stdout="Success output",
-                stderr="",
-                exit_code=0,
-            ),
-        )
+    def test_execute_singer_command_success_returns_output_mapping(self) -> None:
         result = meltano.execute_singer_command(
-            ["tap-postgres", "--config", "settings.json"],
+            [sys.executable, "-c", "print('Success output')"],
         )
         tm.ok(result)
         output = result.value
-        tm.that(output["stdout"], eq="Success output")
+        tm.that(str(output["stdout"]).strip(), eq="Success output")
         tm.that(output["stderr"], eq="")
         tm.that(output["returncode"], eq=0)
 
-    @patch(_MOCK_TARGET)
-    def test_execute_singer_command_encodes_input_for_subprocess(
-        self,
-        mock_run_raw: MagicMock,
-    ) -> None:
-        mock_run_raw.return_value = r[p.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(stdout="Success", stderr="", exit_code=0),
-        )
+    def test_execute_singer_command_encodes_input_for_subprocess(self) -> None:
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = meltano.execute_singer_command(
-            ["target-postgres"],
+            [
+                sys.executable,
+                "-c",
+                "import sys; print(sys.stdin.buffer.read().decode())",
+            ],
             input_data=input_data,
         )
         tm.ok(result)
-        # Contract at the process boundary: text input is handed to the
-        # subprocess as encoded bytes, and the command is passed through.
-        tm.that(mock_run_raw.call_args.kwargs["input_data"], eq=input_data.encode())
-        tm.that(list(mock_run_raw.call_args.args[0]), eq=["target-postgres"])
+        tm.that(str(result.value["stdout"]).strip(), eq=input_data)
 
-    @patch(_MOCK_TARGET)
-    def test_execute_singer_command_nonzero_exit_is_failure(
-        self,
-        mock_run_raw: MagicMock,
-    ) -> None:
-        mock_run_raw.return_value = r[p.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(
-                stdout="",
-                stderr="Error: Connection failed",
-                exit_code=1,
-            ),
-        )
-        result = meltano.execute_singer_command(["tap-postgres"])
+    def test_execute_singer_command_nonzero_exit_is_failure(self) -> None:
+        result = meltano.execute_singer_command([
+            sys.executable,
+            "-c",
+            "import sys; print('Error: Connection failed', file=sys.stderr); raise SystemExit(1)",
+        ])
         tm.fail(result)
         tm.that(str(result.error), has="Connection failed")
 
     @pytest.mark.parametrize(
-        ("run_raw_error", "expected_fragments"),
+        ("command", "timeout", "expected_fragments"),
         [
             pytest.param(
-                "timeout 10s: tap-postgres",
+                [
+                    sys.executable,
+                    "-c",
+                    "import time; time.sleep(2)",
+                ],
+                1,
                 ["timeout"],
                 id="timeout",
             ),
             pytest.param(
-                "execution error: tap-nonexistent not found",
-                ["tap-nonexistent", "not found"],
+                ["flext-meltano-command-that-does-not-exist"],
+                10,
+                ["flext-meltano-command-that-does-not-exist"],
                 id="not-found",
-            ),
-            pytest.param(
-                "execution error: Unexpected error",
-                ["Unexpected error"],
-                id="generic-error",
             ),
         ],
     )
-    @patch(_MOCK_TARGET)
     def test_execute_singer_command_propagates_boundary_failure(
         self,
-        mock_run_raw: MagicMock,
-        run_raw_error: str,
+        command: list[str],
+        timeout: int,
         expected_fragments: list[str],
     ) -> None:
-        mock_run_raw.return_value = r[p.Cli.CommandOutput].fail(run_raw_error)
-        result = meltano.execute_singer_command(["tap-postgres"], timeout=10)
+        result = meltano.execute_singer_command(command, timeout=timeout)
         tm.fail(result)
         for fragment in expected_fragments:
             tm.that(str(result.error), has=fragment)

@@ -27,8 +27,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
     def create_source_instance(
         self,
         source_config: p.Meltano.DataSourceConfig
-        | m.Meltano.TapConfig
-        | m.Meltano.TapInstance,
+        | p.Meltano.TapConfig
+        | p.Meltano.TapInstance,
     ) -> p.Result[p.Meltano.DataSourceInstance]:
         """Create a source instance from configuration via isinstance narrowing."""
 
@@ -46,7 +46,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                     "stream_config": source_config.stream_config or {},
                     "source_version": source_config.tap_version,
                 })
-            else:
+            elif isinstance(source_config, m.Meltano.TapInstance):
                 source_type = source_config.tap_type
                 source_id = f"{source_type}:{source_config.tap_id}"
                 settings = m.Meltano.DataSourceConfig.model_validate({
@@ -55,6 +55,10 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                     "stream_config": source_config.settings.stream_config or {},
                     "source_version": source_config.settings.tap_version,
                 })
+            else:
+                return r[p.Meltano.DataSourceInstance].fail(
+                    "Source configuration has an unsupported type"
+                )
             self.logger.info(
                 "Creating source instance",
                 source_name=source_type,
@@ -98,7 +102,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "domain_events": [],
             })
             return self.create_source_instance(settings).map(
-                lambda inst: p.Meltano.TapInstance(
+                # p is structural-only; runtime values come from the model facade.
+                lambda inst: m.Meltano.TapInstance(
                     tap_type=inst.source_type,
                     settings=settings,
                     tap_id=inst.source_id,
@@ -119,17 +124,17 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
 
     def process_source(
         self,
-        items: p.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
+        items: p.Meltano.DataSourceConfig | p.Meltano.TapConfig | p.Meltano.TapInstance,
     ) -> p.Result[bool]:
         """Process a source configuration for validation via isinstance narrowing."""
 
         def _run_process_source() -> p.Result[bool]:
             if isinstance(items, m.Meltano.DataSourceConfig):
                 source_type = items.source_type
-            elif isinstance(items, m.Meltano.TapConfig):
+            elif isinstance(items, (m.Meltano.TapConfig, m.Meltano.TapInstance)):
                 source_type = items.tap_type
             else:
-                source_type = items.tap_type
+                return r[bool].fail("Source configuration has an unsupported type")
             self.logger.debug(
                 "Processing source configuration",
                 source_name=source_type,

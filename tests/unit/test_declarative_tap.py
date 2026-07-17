@@ -21,16 +21,16 @@ class TestsFlextMeltanoDeclarativeTap:
 
         def fetch(
             self,
-            request: m.Meltano.FetchRequest,
-        ) -> p.Result[m.Meltano.FetchResult]:
+            request: p.Meltano.FetchRequest,
+        ) -> p.Result[p.Meltano.FetchResult]:
             base_dn = request.config.get("base_dn", "")
             record: t.JsonMapping = {"dn": f"cn={request.stream_name},{base_dn}"}
-            return r[m.Meltano.FetchResult].ok(
+            return r[p.Meltano.FetchResult].ok(
                 m.Meltano.FetchResult(records=[record]),
             )
 
     @staticmethod
-    def _spec() -> m.Meltano.TapSpec:
+    def _spec() -> p.Meltano.TapSpec:
         stream = m.Meltano.StreamSpec(
             name="users",
             json_schema={

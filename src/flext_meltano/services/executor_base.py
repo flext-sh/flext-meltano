@@ -218,7 +218,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
 
         def _run_execute_meltano_command() -> p.Result[
-            m.Meltano.CommandExecutionResult
+            p.Meltano.CommandExecutionResult
         ]:
             start_time = time.monotonic()
             normalized_command: list[str] = list(

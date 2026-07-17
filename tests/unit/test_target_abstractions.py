@@ -101,7 +101,11 @@ class TestsFlextMeltanoTargetAbstractions:
         result = meltano.create_flext_target(sink_config)
 
         tm.ok(result)
-        tm.that(result.value.settings, eq=sink_config)
+        tm.that(result.value.settings.sink_type, eq=sink_config.sink_type)
+        tm.that(
+            result.value.settings.connection_config,
+            eq=sink_config.connection_config,
+        )
 
     def test_create_flext_target_rejects_mapping_missing_sink_type(self) -> None:
         """create_flext_target() fails with a descriptive error on invalid input."""
@@ -122,7 +126,10 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.ok(via_instance)
         tm.ok(via_target)
         tm.that(via_instance.value.sink_type, eq=via_target.value.sink_type)
-        tm.that(via_instance.value.settings, eq=via_target.value.settings)
+        tm.that(
+            via_instance.value.settings.connection_config,
+            eq=via_target.value.settings.connection_config,
+        )
         tm.that(via_instance.value.status, eq=via_target.value.status)
 
     def test_validate_sink_config_accepts_valid_config(

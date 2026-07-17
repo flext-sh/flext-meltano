@@ -23,7 +23,7 @@ settings = FlextMeltanoSettings.fetch_global()
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
 
-    _stream_registry: ClassVar[MutableMapping[str, m.Meltano.StreamDefinition]] = {}
+    _stream_registry: ClassVar[MutableMapping[str, p.Meltano.StreamDefinition]] = {}
     service_name: t.NonEmptyStr = u.Field(
         default="FlextMeltanoAbstractions",
         description="Canonical Meltano abstractions service name.",

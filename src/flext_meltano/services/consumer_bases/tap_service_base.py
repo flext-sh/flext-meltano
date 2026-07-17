@@ -21,7 +21,6 @@ from flext_meltano import (
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
     c,
-    m,
     p,
     r,
     t,
@@ -140,7 +139,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
     @staticmethod
     def build_declarative_tap(
-        spec: m.Meltano.TapSpec,
+        spec: p.Meltano.TapSpec,
         fetcher: p.Meltano.RecordFetcher,
     ) -> p.Meltano.SingerTapInstance:
         """Build a flat-CLI Singer tap from declarative specs (no singer_sdk here).

@@ -38,7 +38,6 @@ class FlextMeltanoConstantsBase:
     VERSION_MELTANO_REQUIRED: Final[str] = "3.9.1"
     VERSION_MELTANO_REQUIREMENT: Final[str] = f">={VERSION_MELTANO_REQUIRED}"
     VERSION_SINGER_SDK_REQUIRED: Final[str] = "0.48.0"
-    VERSION_DBT_REQUIRED: Final[str] = "1.10.5"
 
     SDK_VERSION_REQUIRED: Final[str] = VERSION_SINGER_SDK_REQUIRED
 
