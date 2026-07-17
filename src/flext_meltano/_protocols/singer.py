@@ -138,6 +138,24 @@ class FlextMeltanoProtocolsSinger:
             ...
 
     @runtime_checkable
+    class RecordFetcher(Protocol):
+        """Consumer contract that yields records for one declarative stream.
+
+        A declarative consumer tap implements this so ``flext-meltano`` can build
+        a real Singer tap without the consumer importing ``singer_sdk``. The
+        consumer resolves records from the typed ``m.Meltano.FetchRequest`` using
+        its own domain library (e.g. ``flext-ldap``) and returns a typed
+        ``m.Meltano.FetchResult`` — one packed transport per boundary crossing.
+        """
+
+        def fetch(
+            self,
+            request: m.Meltano.FetchRequest,
+        ) -> p.Result[m.Meltano.FetchResult]:
+            """Return the records for one stream given the typed fetch request."""
+            ...
+
+    @runtime_checkable
     class SingerTap(Protocol):
         """Singer Tap protocol definition for data extraction.
 
