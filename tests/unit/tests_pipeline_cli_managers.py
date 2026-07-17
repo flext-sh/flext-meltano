@@ -5,8 +5,7 @@ from __future__ import annotations
 import multiprocessing
 import os
 import time
-from multiprocessing.process import BaseProcess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import tm
@@ -14,6 +13,10 @@ from flext_tests import tm
 from flext_cli import cli as flext_cli
 from flext_meltano.cli import FlextMeltanoCli
 from tests import c, m, u
+
+if TYPE_CHECKING:
+    from multiprocessing.process import BaseProcess
+    from pathlib import Path
 
 
 class TestFlextMeltanoPipelineCliManagers:

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from collections.abc import Generator
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import m, tf, tk, tm
 
 from tests import c, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 type MeltanoComponentCase = tuple[str, str, str]
 

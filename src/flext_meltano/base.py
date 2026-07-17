@@ -69,12 +69,12 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     @classmethod
     def _normalize_settings_alias(
         cls,
-        data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self,
-    ) -> t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self:
+        data: t.MappingKV[str, t.JsonPayload | p.ModelBase | type | None] | Self,
+    ) -> t.MappingKV[str, t.JsonPayload | p.ModelBase | type | None] | Self:
         """Accept ``settings`` as an alias for ``runtime_settings``."""
         if isinstance(data, cls) or not isinstance(data, Mapping):
             return data
-        normalized: dict[str, t.JsonPayload | p.Base | type | None] = dict(data)
+        normalized: dict[str, t.JsonPayload | p.ModelBase | type | None] = dict(data)
         settings = normalized.pop("settings", None)
         for field_name in ("service_name", "service_version"):
             if normalized.get(field_name) is None:

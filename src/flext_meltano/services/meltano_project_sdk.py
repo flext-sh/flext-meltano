@@ -9,12 +9,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):

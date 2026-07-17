@@ -10,8 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from examples.constants import c
-from examples.utilities import u
+from examples import c, u
 from flext_meltano import FlextMeltanoSettings, meltano
 
 logger = u.fetch_logger(__name__)

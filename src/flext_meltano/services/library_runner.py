@@ -6,11 +6,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 # p owns the typed dbt contract; concrete values are constructed behind the executor.
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, settings, t, u
 from flext_meltano.services.executor import FlextMeltanoExecutor
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):

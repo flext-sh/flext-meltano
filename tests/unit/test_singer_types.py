@@ -37,7 +37,7 @@ class TestsFlextMeltanoSingerTypes:
     """Behavioral contract for the Meltano Singer typing namespace."""
 
     def test_t_is_the_public_tests_meltano_types_facade(self) -> None:
-        """``t`` exported from tests.typings IS the test types facade class."""
+        """``t`` exported from tests IS the test types facade class."""
         assert t is TestsFlextMeltanoTypes
 
     def test_facade_composes_meltano_and_tests_type_surfaces(self) -> None:

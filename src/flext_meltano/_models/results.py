@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from types import MappingProxyType
-from typing import Annotated, Self
+from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_cli import m, u
 from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class FlextMeltanoModelsResults:

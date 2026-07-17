@@ -20,7 +20,7 @@ from flext_meltano.__version__ import (
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, x
 
-    from ._config import config
+    from ._config import FlextMeltanoConfig, config
     from ._settings import FlextMeltanoSettings, settings
     from .api import FlextMeltano, meltano
     from .base import FlextMeltanoServiceBase, s
@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from .constants import FlextMeltanoConstants, FlextMeltanoConstants as c
     from .models import FlextMeltanoModels, FlextMeltanoModels as m
     from .protocols import FlextMeltanoProtocols, FlextMeltanoProtocols as p
+    from .services.consumer_bases.dbt_service_base import FlextMeltanoDbtServiceBase
     from .typings import FlextMeltanoTypes, FlextMeltanoTypes as t
     from .utilities import FlextMeltanoUtilities, FlextMeltanoUtilities as u
 
@@ -52,6 +53,8 @@ if TYPE_CHECKING:
         main,
         FlextMeltanoCli,
         config,
+        FlextMeltanoConfig,
+        FlextMeltanoDbtServiceBase,
         FlextMeltanoSettings,
         settings,
         FlextMeltano,
@@ -60,7 +63,10 @@ if TYPE_CHECKING:
 
 
 _LAZY_MODULES: dict[str, tuple[str, ...]] = {
-    "._config": ("config",),
+    "._config": (
+        "FlextMeltanoConfig",
+        "config",
+    ),
     "._settings": (
         "FlextMeltanoSettings",
         "settings",
@@ -73,6 +79,7 @@ _LAZY_MODULES: dict[str, tuple[str, ...]] = {
         "FlextMeltanoServiceBase",
         "s",
     ),
+    ".services.consumer_bases.dbt_service_base": ("FlextMeltanoDbtServiceBase",),
     ".cli": (
         "FlextMeltanoCli",
         "main",
@@ -156,7 +163,9 @@ _DIRECT_IMPORTS: tuple[str, ...] = (
 __all__: tuple[str, ...] = (
     "FlextMeltano",
     "FlextMeltanoCli",
+    "FlextMeltanoConfig",
     "FlextMeltanoConstants",
+    "FlextMeltanoDbtServiceBase",
     "FlextMeltanoModels",
     "FlextMeltanoProtocols",
     "FlextMeltanoServiceBase",

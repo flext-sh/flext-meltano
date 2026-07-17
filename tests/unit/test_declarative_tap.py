@@ -5,12 +5,15 @@ from __future__ import annotations
 import contextlib
 import io
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_tests import tm
 
 from flext_meltano import m, p, r, t
 from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestsFlextMeltanoDeclarativeTap:

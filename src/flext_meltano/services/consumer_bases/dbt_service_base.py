@@ -12,8 +12,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Annotated, override
+from typing import TYPE_CHECKING, Annotated, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
@@ -26,6 +25,9 @@ from flext_meltano import (
     u,
 )
 from flext_meltano.services.executor import FlextMeltanoExecutor
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
