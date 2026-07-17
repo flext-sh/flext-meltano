@@ -70,7 +70,7 @@ class TestFlextMeltanoPipelineCliManagers:
     ) -> None:
         """Pipeline help exposes the model-driven subcommands."""
         result = meltano_cli.run([
-            c.Meltano.CliCommand.PIPELINE,
+            c.Meltano.Command.PIPELINE,
             c.Meltano.CMD_HELP_OPTION,
         ])
         output = capsys.readouterr().out
@@ -103,7 +103,7 @@ class TestFlextMeltanoPipelineCliManagers:
         try:
             tm.ok(config_json_result)
             create_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
                 "--pipeline-name",
                 pipeline_name,
@@ -112,19 +112,19 @@ class TestFlextMeltanoPipelineCliManagers:
             ])
             capsys.readouterr()
             list_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.LIST,
             ])
             list_output = capsys.readouterr().out
             status_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.STATUS,
                 "--pipeline-name",
                 pipeline_name,
             ])
             status_output = capsys.readouterr().out
             run_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.RUN,
                 "--pipeline-name",
                 pipeline_name,
@@ -132,7 +132,7 @@ class TestFlextMeltanoPipelineCliManagers:
             run_output = capsys.readouterr().out
             stored_result = flext_cli.json_read_file(config_path)
             delete_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.DELETE,
                 "--pipeline-name",
                 pipeline_name,
@@ -169,7 +169,7 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
                 "--pipeline-name",
                 "missing-config",
@@ -202,7 +202,7 @@ class TestFlextMeltanoPipelineCliManagers:
         try:
             tm.ok(config_json_result)
             create_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
                 "--pipeline-name",
                 pipeline_name,
@@ -218,14 +218,14 @@ class TestFlextMeltanoPipelineCliManagers:
             tm.ok(write_pid_result)
 
             running_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.STATUS,
                 "--pipeline-name",
                 pipeline_name,
             ])
             running_output = capsys.readouterr().out
             stop_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.Command.PIPELINE,
                 c.Meltano.PipelineCommand.STOP,
                 "--pipeline-name",
                 pipeline_name,

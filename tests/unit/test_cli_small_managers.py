@@ -30,7 +30,7 @@ class TestsFlextMeltanoCliSmallManagers:
         meltano_cli: FlextMeltanoCli,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        result = meltano_cli.run([c.Meltano.CliCommand.VERSION])
+        result = meltano_cli.run([c.Meltano.Command.VERSION])
 
         tm.that(result.success, eq=True)
         tm.that("." in capsys.readouterr().out, eq=True)
@@ -40,7 +40,7 @@ class TestsFlextMeltanoCliSmallManagers:
         meltano_cli: FlextMeltanoCli,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        result = meltano_cli.run([c.Meltano.CliCommand.STATUS, "show"])
+        result = meltano_cli.run([c.Meltano.Command.STATUS, "show"])
 
         tm.that(result.success, eq=True)
 
@@ -56,7 +56,7 @@ class TestsFlextMeltanoCliSmallManagers:
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         result = meltano_cli.run([
-            c.Meltano.CliCommand.STATUS,
+            c.Meltano.Command.STATUS,
             c.Meltano.ExecutorCommand.HEALTH,
         ])
 
@@ -71,8 +71,8 @@ class TestsFlextMeltanoCliSmallManagers:
     @pytest.mark.parametrize(
         "command",
         [
-            c.Meltano.CliCommand.TAP,
-            c.Meltano.CliCommand.TARGET,
+            c.Meltano.Command.TAP,
+            c.Meltano.Command.TARGET,
         ],
     )
     def test_unsupported_extractor_operation_reports_failure(
@@ -89,7 +89,7 @@ class TestsFlextMeltanoCliSmallManagers:
         meltano_cli: FlextMeltanoCli,
     ) -> None:
         result = meltano_cli.run([
-            c.Meltano.CliCommand.PLUGIN,
+            c.Meltano.Command.PLUGIN,
             c.Meltano.ExecutorCommand.INFO,
         ])
 
@@ -101,7 +101,7 @@ class TestsFlextMeltanoCliSmallManagers:
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         result = meltano_cli.run([
-            c.Meltano.CliCommand.PLUGIN,
+            c.Meltano.Command.PLUGIN,
             c.Meltano.ExecutorCommand.INSTALL,
             "--plugin-name",
             "tap-demo",
@@ -115,7 +115,7 @@ class TestsFlextMeltanoCliSmallManagers:
         meltano_cli: FlextMeltanoCli,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
-        result = meltano_cli.run([c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION])
+        result = meltano_cli.run([c.Meltano.Command.DBT, c.Meltano.CMD_HELP_OPTION])
 
         tm.that(result.success, eq=True)
         tm.that(capsys.readouterr().out, has="DBT")

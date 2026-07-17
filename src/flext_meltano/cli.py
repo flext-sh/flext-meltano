@@ -42,7 +42,7 @@ class FlextMeltanoCli:
     def _register_version_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.VERSION,
+            name=c.Meltano.Command.VERSION,
             help_text="Show the FLEXT Meltano version",
             model_cls=m.Meltano.VersionInput,
             handler=self._handle_version,
@@ -53,7 +53,7 @@ class FlextMeltanoCli:
 
     def _register_status_commands(self) -> None:
         status_group = cli.create_group(
-            name=c.Meltano.CliCommand.STATUS,
+            name=c.Meltano.Command.STATUS,
             help_text="Meltano status operations",
         )
         cli.register_result_command(
@@ -70,7 +70,7 @@ class FlextMeltanoCli:
             model_cls=m.Meltano.StatusHealthInput,
             handler=self._handle_status_health,
         )
-        cli.add_group(self._app, name=c.Meltano.CliCommand.STATUS, group=status_group)
+        cli.add_group(self._app, name=c.Meltano.Command.STATUS, group=status_group)
 
     def _handle_status_show(self, _model: p.Meltano.StatusShowInput) -> p.Result[str]:
         return self._service.run_cli([]).flat_map(
@@ -92,7 +92,7 @@ class FlextMeltanoCli:
     def _register_tap_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.TAP,
+            name=c.Meltano.Command.TAP,
             help_text="Tap operations",
             model_cls=m.Meltano.TapInput,
             handler=self._handle_tap,
@@ -106,7 +106,7 @@ class FlextMeltanoCli:
     def _register_target_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.TARGET,
+            name=c.Meltano.Command.TARGET,
             help_text="Target operations",
             model_cls=m.Meltano.TargetInput,
             handler=self._handle_target,
@@ -120,7 +120,7 @@ class FlextMeltanoCli:
     def _register_dbt_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.DBT,
+            name=c.Meltano.Command.DBT,
             help_text="Run DBT subcommands",
             model_cls=m.Meltano.DbtInput,
             handler=self._handle_dbt,
@@ -138,7 +138,7 @@ class FlextMeltanoCli:
 
     def _register_plugin_commands(self) -> None:
         plugin_group = cli.create_group(
-            name=c.Meltano.CliCommand.PLUGIN,
+            name=c.Meltano.Command.PLUGIN,
             help_text="Meltano plugin operations",
         )
         cli.register_result_command(
@@ -164,7 +164,7 @@ class FlextMeltanoCli:
         )
         cli.add_group(
             self._app,
-            name=c.Meltano.CliCommand.PLUGIN,
+            name=c.Meltano.Command.PLUGIN,
             group=plugin_group,
         )
 
@@ -218,7 +218,7 @@ class FlextMeltanoCli:
 
     def _register_pipeline_commands(self) -> None:
         pipeline_group = cli.create_group(
-            name=c.Meltano.CliCommand.PIPELINE,
+            name=c.Meltano.Command.PIPELINE,
             help_text="Pipeline operations",
         )
         cli.register_result_command(
@@ -265,7 +265,7 @@ class FlextMeltanoCli:
         )
         cli.add_group(
             self._app,
-            name=c.Meltano.CliCommand.PIPELINE,
+            name=c.Meltano.Command.PIPELINE,
             group=pipeline_group,
         )
 

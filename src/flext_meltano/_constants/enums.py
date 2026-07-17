@@ -297,7 +297,7 @@ class FlextMeltanoConstantsEnums:
         STOP = "stop"
 
     @unique
-    class CliCommand(StrEnum):
+    class Command(StrEnum):
         """Top-level CLI command routing identifiers."""
 
         DBT = "dbt"
