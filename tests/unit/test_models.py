@@ -116,8 +116,9 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(settings.target_type, eq="target-postgres")
         tm.that(settings.connection_config["database"], eq="analytics")
         tm.that(settings.batch_size, eq=1000)
-        tm.that(settings.batch_wait_limit, none=False)
-        tm.that(abs(settings.batch_wait_limit - 30.0), lt=1e-9)
+        batch_wait_limit = settings.batch_wait_limit
+        assert batch_wait_limit is not None
+        tm.that(abs(batch_wait_limit - 30.0), lt=1e-9)
 
     def test_target_config_computed_fields_derive_from_state(self) -> None:
         settings = m.Meltano.TargetConfig(
