@@ -17,7 +17,7 @@ class FlextMeltanoProtocolsServices:
     """Service, CLI, and Manager protocol definitions."""
 
     @runtime_checkable
-    class MeltanoExecutor(Protocol):
+    class Executor(Protocol):
         """Protocol for Meltano command execution."""
 
         def execute_meltano_command(

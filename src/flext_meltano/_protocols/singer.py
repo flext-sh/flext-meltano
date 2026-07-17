@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Protocol, override, runtime_checkable
 
-from flext_meltano import p, t
+from flext_meltano import m, p, t
 
 
 class FlextMeltanoProtocolsSinger:

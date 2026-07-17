@@ -20,7 +20,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
     Provides ELT pipeline execution and DBT transformation orchestration.
     """
 
-    _elt_executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
+    _elt_executor: p.Meltano.Executor = u.PrivateAttr(
         default_factory=FlextMeltanoExecutor,
     )
 

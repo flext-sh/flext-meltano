@@ -49,7 +49,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
-    _executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
+    _executor: p.Meltano.Executor = u.PrivateAttr(
         default_factory=FlextMeltanoExecutor,
     )
 
