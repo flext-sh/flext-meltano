@@ -24,7 +24,10 @@ class TestsFlextMeltanoDeclarativeTap:
             request: m.Meltano.FetchRequest,
         ) -> p.Result[m.Meltano.FetchResult]:
             base_dn = request.config.get("base_dn", "")
-            record: t.JsonMapping = {"dn": f"cn={request.stream_name},{base_dn}"}
+            record: t.JsonMapping = {
+                "dn": f"cn={request.stream_name},{base_dn}",
+                "updated_at": "2026-07-17T00:00:00Z",
+            }
             return r[m.Meltano.FetchResult].ok(
                 m.Meltano.FetchResult(records=[record]),
             )
@@ -35,9 +38,13 @@ class TestsFlextMeltanoDeclarativeTap:
             name="users",
             json_schema={
                 "type": "object",
-                "properties": {"dn": {"type": "string"}},
+                "properties": {
+                    "dn": {"type": "string"},
+                    "updated_at": {"type": "string", "format": "date-time"},
+                },
             },
             primary_keys=("dn",),
+            replication_key="updated_at",
         )
         return m.Meltano.TapSpec(
             tap_name="tap-sample",
@@ -65,9 +72,40 @@ class TestsFlextMeltanoDeclarativeTap:
             )
 
         catalog = json.loads(buffer.getvalue())
-        stream_ids = [entry["tap_stream_id"] for entry in catalog["streams"]]
+        stream = catalog["streams"][0]
         tm.that(exit_code, eq=0)
-        tm.that(stream_ids, has="users")
+        tm.that(stream["tap_stream_id"], eq="users")
+        tm.that(stream["key_properties"], eq=["dn"])
+        tm.that(stream["replication_key"], eq="updated_at")
+
+    def test_sync_emits_fetched_record(self, tmp_path: Path) -> None:
+        """A flat ``--config`` run emits the fetcher's validated Singer record."""
+        instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
+        config_path = tmp_path / "config.json"
+        config_path.write_text(json.dumps({"base_dn": "dc=example"}))
+
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            exit_code = instance.run_cli(
+                ["--config", str(config_path)],
+                "tap-sample",
+            )
+
+        messages: list[t.JsonMapping] = [
+            t.json_dict_adapter().validate_json(line)
+            for line in buffer.getvalue().splitlines()
+        ]
+        records = [
+            message["record"] for message in messages if message.get("type") == "RECORD"
+        ]
+        tm.that(exit_code, eq=0)
+        tm.that(
+            records,
+            has={
+                "dn": "cn=users,dc=example",
+                "updated_at": "2026-07-17T00:00:00Z",
+            },
+        )
 
 
 __all__: list[str] = ["TestsFlextMeltanoDeclarativeTap"]
