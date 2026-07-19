@@ -76,7 +76,7 @@ class FlextMeltano(
         return r[t.JsonMapping].ok(payload)
 
 
-meltano = FlextMeltano.fetch_global()
+meltano: FlextMeltano = FlextMeltano.fetch_global()
 """Shared FlextMeltano facade instance."""
 
 

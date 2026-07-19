@@ -11,11 +11,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from singer_sdk import Stream, Tap
 
 from flext_meltano import m, p, t
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class FlextMeltanoDeclarativeTap:
@@ -83,26 +86,48 @@ class FlextMeltanoDeclarativeTap:
                     schema=dict(stream_spec.json_schema),
                     name=stream_spec.name,
                 )
-                self.primary_keys = list(stream_spec.primary_keys)
-                self.replication_key = stream_spec.replication_key
+                self._declared_primary_keys: t.StrSequence = stream_spec.primary_keys
+                self._declared_replication_key: str | None = stream_spec.replication_key
                 self._config: t.JsonMapping = config
+
+            @property
+            @override
+            def primary_keys(self) -> t.StrSequence:
+                """Keys declared by the canonical stream specification."""
+                return self._declared_primary_keys
+
+            @primary_keys.setter
+            @override
+            def primary_keys(self, new_value: t.StrSequence) -> None:
+                """Accept Singer catalog key selection through its public contract."""
+                self._declared_primary_keys = new_value
+
+            @property
+            @override
+            def replication_key(self) -> str | None:
+                """Replication key from the canonical stream specification."""
+                return self._declared_replication_key
+
+            @replication_key.setter
+            @override
+            def replication_key(self, new_value: str | None) -> None:
+                """Accept Singer catalog replication selection through its contract."""
+                self._declared_replication_key = new_value
 
             @override
             def get_records(
                 self,
-                context: t.JsonMapping | None,
-            ) -> t.IterableOf[t.JsonDict]:
+                context: m.Meltano.SingerContext | None,
+            ) -> Iterable[m.Meltano.SingerRecord]:
                 _ = context
                 request = m.Meltano.FetchRequest(
                     stream_name=self.name,
                     config=self._config,
                 )
                 result = fetcher.fetch(request)
-                return (
-                    [dict(record) for record in result.value.records]
-                    if result.success
-                    else []
-                )
+                if result.failure:
+                    return []
+                return [dict(record) for record in result.value.records]
 
         class _DeclarativeTap(Tap):
             """A Singer tap that discovers the declared streams."""
