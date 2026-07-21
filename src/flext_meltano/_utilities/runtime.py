@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
+from collections.abc import Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from flext_infra import u
-
 from flext_meltano import (
     FlextMeltanoConstants as c,
     FlextMeltanoModels as m,

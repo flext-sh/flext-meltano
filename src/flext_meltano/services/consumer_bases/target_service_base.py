@@ -16,9 +16,7 @@ from typing import TYPE_CHECKING, Annotated, override
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-    )
+    from collections.abc import MutableMapping
 
 
 class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):

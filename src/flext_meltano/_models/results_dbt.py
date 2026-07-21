@@ -7,9 +7,7 @@ from typing import TYPE_CHECKING, Annotated
 from flext_cli import m, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-    )
+    from collections.abc import MutableMapping
     from pathlib import Path
 
     from flext_meltano import FlextMeltanoTypes as t
