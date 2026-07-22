@@ -7,10 +7,9 @@ import io
 import json
 from pathlib import Path
 
-from flext_tests import tm
-
 from flext_meltano import m, p, r, t
 from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
+from flext_tests import tm
 
 
 class TestsFlextMeltanoDeclarativeTap:
@@ -20,17 +19,14 @@ class TestsFlextMeltanoDeclarativeTap:
         """A record fetcher that echoes one record derived from the config."""
 
         def fetch(
-            self,
-            request: m.Meltano.FetchRequest,
+            self, request: m.Meltano.FetchRequest
         ) -> p.Result[m.Meltano.FetchResult]:
             base_dn = request.config.get("base_dn", "")
             record: t.JsonMapping = {
                 "dn": f"cn={request.stream_name},{base_dn}",
                 "updated_at": "2026-07-17T00:00:00Z",
             }
-            return r[m.Meltano.FetchResult].ok(
-                m.Meltano.FetchResult(records=[record]),
-            )
+            return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=[record]))
 
     @staticmethod
     def _spec() -> m.Meltano.TapSpec:
@@ -55,10 +51,7 @@ class TestsFlextMeltanoDeclarativeTap:
             streams=(stream,),
         )
 
-    def test_discover_emits_catalog_with_declared_stream(
-        self,
-        tmp_path: Path,
-    ) -> None:
+    def test_discover_emits_catalog_with_declared_stream(self, tmp_path: Path) -> None:
         """A flat ``--config --discover`` run emits the declared stream catalog."""
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
@@ -67,8 +60,7 @@ class TestsFlextMeltanoDeclarativeTap:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(
-                ["--config", str(config_path), "--discover"],
-                "tap-sample",
+                ["--config", str(config_path), "--discover"], "tap-sample"
             )
 
         catalog = json.loads(buffer.getvalue())
@@ -86,10 +78,7 @@ class TestsFlextMeltanoDeclarativeTap:
 
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
-            exit_code = instance.run_cli(
-                ["--config", str(config_path)],
-                "tap-sample",
-            )
+            exit_code = instance.run_cli(["--config", str(config_path)], "tap-sample")
 
         messages: list[t.JsonMapping] = [
             t.json_dict_adapter().validate_json(line)
@@ -101,10 +90,7 @@ class TestsFlextMeltanoDeclarativeTap:
         tm.that(exit_code, eq=0)
         tm.that(
             records,
-            has={
-                "dn": "cn=users,dc=example",
-                "updated_at": "2026-07-17T00:00:00Z",
-            },
+            has={"dn": "cn=users,dc=example", "updated_at": "2026-07-17T00:00:00Z"},
         )
 
 

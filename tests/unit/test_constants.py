@@ -16,8 +16,8 @@ from __future__ import annotations
 from enum import StrEnum
 
 import pytest
-from flext_tests import tm
 
+from flext_tests import tm
 from tests import c
 
 __all__: list[str] = ["TestsFlextMeltanoConstantsUnit"]

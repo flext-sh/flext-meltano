@@ -30,9 +30,7 @@ class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration; fields under ``settings.Meltano.*``."""
 
     model_config = SettingsConfigDict(
-        env_prefix="FLEXT_MELTANO_",
-        env_nested_delimiter="__",
-        extra="ignore",
+        env_prefix="FLEXT_MELTANO_", env_nested_delimiter="__", extra="ignore"
     )
 
     class _Meltano(BaseModel):
@@ -65,12 +63,10 @@ class FlextMeltanoSettings(FlextSettings):
             str, Field(default="INFO", description="Meltano runtime log level")
         ]
         meltano_version: Annotated[
-            str,
-            Field(default="3.9.1", description="Required Meltano version"),
+            str, Field(default="3.9.1", description="Required Meltano version")
         ]
         singer_sdk_version: Annotated[
-            str,
-            Field(default="0.48.0", description="Required Singer SDK version"),
+            str, Field(default="0.48.0", description="Required Singer SDK version")
         ]
         pipelines_dir: Annotated[
             str,
@@ -116,8 +112,7 @@ class FlextMeltanoSettings(FlextSettings):
         Meltano: _Meltano
     else:
         Meltano: _Meltano = Field(
-            default_factory=_Meltano,
-            description="Namespaced Meltano settings.",
+            default_factory=_Meltano, description="Namespaced Meltano settings."
         )
 
 

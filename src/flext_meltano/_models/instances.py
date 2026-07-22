@@ -19,8 +19,7 @@ class FlextMeltanoModelsInstances:
         sink_name: Annotated[str, u.Field(description="Name of the sink")]
         sink_type: Annotated[str, u.Field(description="Type of the sink")]
         settings: Annotated[
-            t.ConfigurationMapping,
-            u.Field(description="Sink configuration"),
+            t.ConfigurationMapping, u.Field(description="Sink configuration")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         sink_schema: Annotated[t.JsonMapping, u.Field(description="Sink schema")] = (
             u.Field(default_factory=lambda: MappingProxyType({}))
@@ -28,8 +27,7 @@ class FlextMeltanoModelsInstances:
         status: Annotated[
             str,
             u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED,
-                description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
@@ -58,20 +56,17 @@ class FlextMeltanoModelsInstances:
         """Generic stream information for data pipeline operations."""
 
         stream_name: Annotated[
-            t.NonEmptyStr,
-            u.Field(description="Stream name identifier"),
+            t.NonEmptyStr, u.Field(description="Stream name identifier")
         ]
         stream_schema: Annotated[
             t.MappingKV[str, t.Scalar | t.ScalarMapping],
             u.Field(description="Stream schema definition"),
         ]
         key_properties: Annotated[
-            t.StrSequence,
-            u.Field(description="Primary key properties for the stream"),
+            t.StrSequence, u.Field(description="Primary key properties for the stream")
         ] = u.Field(default_factory=tuple)
         replication_method: Annotated[
-            str,
-            u.Field(default="FULL_TABLE", description="Replication method"),
+            str, u.Field(default="FULL_TABLE", description="Replication method")
         ] = "FULL_TABLE"
         replication_key: Annotated[
             str | None,
@@ -85,8 +80,7 @@ class FlextMeltanoModelsInstances:
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         records_loaded: Annotated[
-            t.NonNegativeInt,
-            u.Field(default=0, description="Number of records loaded"),
+            t.NonNegativeInt, u.Field(default=0, description="Number of records loaded")
         ] = 0
         batches_processed: Annotated[
             t.NonNegativeInt,
@@ -141,8 +135,7 @@ class FlextMeltanoModelsInstances:
         """Generic tap instance for data extraction."""
 
         tap_id: Annotated[
-            str | None,
-            u.Field(default=None, description="Unique tap identifier"),
+            str | None, u.Field(default=None, description="Unique tap identifier")
         ] = None
         tap_type: Annotated[str, u.Field(description="Type of the tap")]
         settings: Annotated[
@@ -154,14 +147,12 @@ class FlextMeltanoModelsInstances:
             u.Field(default=None, description="Tap adapter instance"),
         ] = None
         streams: t.SequenceOf[FlextMeltanoModelsInstances.StreamInfo] = u.Field(
-            default_factory=tuple,
-            description="Available streams",
+            default_factory=tuple, description="Available streams"
         )
         status: Annotated[
             str,
             u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED,
-                description="Tap status",
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status"
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 

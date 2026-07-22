@@ -759,10 +759,7 @@ class SecurityAuditor:
         }
 
     def log_security_event(
-        self,
-        event_type: str,
-        details: Dict[str, t.JsonValue],
-        severity: str = "INFO",
+        self, event_type: str, details: Dict[str, t.JsonValue], severity: str = "INFO"
     ) -> None:
         """Log security event with structured data."""
 

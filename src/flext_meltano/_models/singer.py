@@ -34,8 +34,7 @@ class FlextMeltanoModelsSinger:
             ),
         ]
         key_properties: Annotated[
-            t.StrSequence,
-            u.Field(description="Singer stream key properties"),
+            t.StrSequence, u.Field(description="Singer stream key properties")
         ] = u.Field(default_factory=tuple)
         bookmark_properties: Annotated[
             t.StrSequence,
@@ -80,8 +79,7 @@ class FlextMeltanoModelsSinger:
             ),
         ] = c.Meltano.SingerMessageType.STATE
         value: Annotated[
-            t.MutableJsonMapping,
-            u.Field(description="Singer state bookmark payload"),
+            t.MutableJsonMapping, u.Field(description="Singer state bookmark payload")
         ] = u.Field(default_factory=dict)
 
     class SingerActivateVersionMessage(m.ArbitraryTypesModel):
@@ -101,6 +99,5 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.ACTIVATE_VERSION
         stream: Annotated[str, u.Field(description="Singer stream name")]
         version: Annotated[
-            t.PositiveInt,
-            u.Field(description="Stream version to activate"),
+            t.PositiveInt, u.Field(description="Stream version to activate")
         ]

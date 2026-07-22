@@ -23,20 +23,13 @@ if TYPE_CHECKING:
     from flext_meltano._protocols.singer import (
         FlextMeltanoProtocolsSinger as FlextMeltanoProtocolsSinger,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".cli": ("FlextMeltanoProtocolsBase",),
-        ".plugin": ("FlextMeltanoProtocolsPlugin",),
-        ".project": ("FlextMeltanoProtocolsProject",),
-        ".services": ("FlextMeltanoProtocolsServices",),
-        ".singer": ("FlextMeltanoProtocolsSinger",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".cli": ("FlextMeltanoProtocolsBase",),
+    ".plugin": ("FlextMeltanoProtocolsPlugin",),
+    ".project": ("FlextMeltanoProtocolsProject",),
+    ".services": ("FlextMeltanoProtocolsServices",),
+    ".singer": ("FlextMeltanoProtocolsSinger",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

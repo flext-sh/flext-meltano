@@ -17,18 +17,11 @@ if TYPE_CHECKING:
     from flext_meltano._constants.settings import (
         FlextMeltanoConstantsSettings as FlextMeltanoConstantsSettings,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".base": ("FlextMeltanoConstantsBase",),
-        ".enums": ("FlextMeltanoConstantsEnums",),
-        ".settings": ("FlextMeltanoConstantsSettings",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".base": ("FlextMeltanoConstantsBase",),
+    ".enums": ("FlextMeltanoConstantsEnums",),
+    ".settings": ("FlextMeltanoConstantsSettings",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

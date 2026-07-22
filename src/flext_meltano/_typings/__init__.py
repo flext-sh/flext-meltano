@@ -17,18 +17,11 @@ if TYPE_CHECKING:
     from flext_meltano._typings.singer import (
         FlextMeltanoTypingsSinger as FlextMeltanoTypingsSinger,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".base": ("FlextMeltanoTypingsBase",),
-        ".domains": ("FlextMeltanoTypingsDomains",),
-        ".singer": ("FlextMeltanoTypingsSinger",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".base": ("FlextMeltanoTypingsBase",),
+    ".domains": ("FlextMeltanoTypingsDomains",),
+    ".singer": ("FlextMeltanoTypingsSinger",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

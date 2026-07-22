@@ -20,9 +20,9 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 import pytest
-from flext_tests import r, tm
 
 from flext_meltano import meltano
+from flext_tests import r, tm
 from tests import m
 
 _MOCK_TARGET = "flext_meltano.services.singer_translator.u.Cli.run_raw"
@@ -39,16 +39,14 @@ class TestsFlextMeltanoSingerCliTranslator:
         [
             pytest.param(
                 m.Meltano.CliDataSourceParams(
-                    source_name="tap-postgres",
-                    discover=False,
+                    source_name="tap-postgres", discover=False
                 ),
                 ["tap-postgres"],
                 id="minimal",
             ),
             pytest.param(
                 m.Meltano.CliDataSourceParams(
-                    source_name="tap-postgres",
-                    discover=True,
+                    source_name="tap-postgres", discover=True
                 ),
                 ["tap-postgres", "--discover"],
                 id="discover",
@@ -101,9 +99,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_tap_run_builds_expected_command(
-        self,
-        params: m.Meltano.CliDataSourceParams,
-        expected: list[str],
+        self, params: m.Meltano.CliDataSourceParams, expected: list[str]
     ) -> None:
         result = meltano.translate_tap_run(params)
         tm.ok(result)
@@ -134,16 +130,14 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliDataSinkParams(
-                    sink_name="target-postgres",
-                    config_file="/path/to/settings.json",
+                    sink_name="target-postgres", config_file="/path/to/settings.json"
                 ),
                 ["target-postgres", "--config", "/path/to/settings.json"],
                 id="config",
             ),
             pytest.param(
                 m.Meltano.CliDataSinkParams(
-                    sink_name="target-postgres",
-                    input_file="/path/to/input.jsonl",
+                    sink_name="target-postgres", input_file="/path/to/input.jsonl"
                 ),
                 ["target-postgres", "--input", "/path/to/input.jsonl"],
                 id="input",
@@ -166,9 +160,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_target_run_builds_expected_command(
-        self,
-        params: m.Meltano.CliDataSinkParams,
-        expected: list[str],
+        self, params: m.Meltano.CliDataSinkParams, expected: list[str]
     ) -> None:
         result = meltano.translate_target_run(params)
         tm.ok(result)
@@ -182,8 +174,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         [
             pytest.param(
                 m.Meltano.CliPipelineParams(
-                    source_name="tap-postgres",
-                    sink_name="target-postgres",
+                    source_name="tap-postgres", sink_name="target-postgres"
                 ),
                 ["tap-postgres"],
                 ["target-postgres"],
@@ -277,8 +268,7 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    models="users orders",
+                    project_dir="/dbt/project", models="users orders"
                 ),
                 [
                     "dbt",
@@ -292,8 +282,7 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    select="tag:daily",
+                    project_dir="/dbt/project", select="tag:daily"
                 ),
                 [
                     "dbt",
@@ -307,8 +296,7 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    exclude="tag:deprecated",
+                    project_dir="/dbt/project", exclude="tag:deprecated"
                 ),
                 [
                     "dbt",
@@ -322,16 +310,9 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    full_refresh=True,
+                    project_dir="/dbt/project", full_refresh=True
                 ),
-                [
-                    "dbt",
-                    "run",
-                    "--projects-dir",
-                    "/dbt/project",
-                    "--full-refresh",
-                ],
+                ["dbt", "run", "--projects-dir", "/dbt/project", "--full-refresh"],
                 id="full-refresh",
             ),
             pytest.param(
@@ -360,9 +341,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_dbt_run_builds_expected_command(
-        self,
-        params: m.Meltano.CliTransformationParams,
-        expected: list[str],
+        self, params: m.Meltano.CliTransformationParams, expected: list[str]
     ) -> None:
         result = meltano.translate_dbt_run(params)
         tm.ok(result)
@@ -379,19 +358,16 @@ class TestsFlextMeltanoSingerCliTranslator:
 
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_success_returns_output_mapping(
-        self,
-        mock_run_raw: MagicMock,
+        self, mock_run_raw: MagicMock
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(
-                stdout="Success output",
-                stderr="",
-                exit_code=0,
-            ),
+            m.Cli.CommandOutput(stdout="Success output", stderr="", exit_code=0)
         )
-        result = meltano.execute_singer_command(
-            ["tap-postgres", "--config", "settings.json"],
-        )
+        result = meltano.execute_singer_command([
+            "tap-postgres",
+            "--config",
+            "settings.json",
+        ])
         tm.ok(result)
         output = result.value
         tm.that(output["stdout"], eq="Success output")
@@ -400,16 +376,14 @@ class TestsFlextMeltanoSingerCliTranslator:
 
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_encodes_input_for_subprocess(
-        self,
-        mock_run_raw: MagicMock,
+        self, mock_run_raw: MagicMock
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(stdout="Success", stderr="", exit_code=0),
+            m.Cli.CommandOutput(stdout="Success", stderr="", exit_code=0)
         )
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = meltano.execute_singer_command(
-            ["target-postgres"],
-            input_data=input_data,
+            ["target-postgres"], input_data=input_data
         )
         tm.ok(result)
         # Contract at the process boundary: text input is handed to the
@@ -419,15 +393,12 @@ class TestsFlextMeltanoSingerCliTranslator:
 
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_nonzero_exit_is_failure(
-        self,
-        mock_run_raw: MagicMock,
+        self, mock_run_raw: MagicMock
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
             m.Cli.CommandOutput(
-                stdout="",
-                stderr="Error: Connection failed",
-                exit_code=1,
-            ),
+                stdout="", stderr="Error: Connection failed", exit_code=1
+            )
         )
         result = meltano.execute_singer_command(["tap-postgres"])
         tm.fail(result)
@@ -436,11 +407,7 @@ class TestsFlextMeltanoSingerCliTranslator:
     @pytest.mark.parametrize(
         ("run_raw_error", "expected_fragments"),
         [
-            pytest.param(
-                "timeout 10s: tap-postgres",
-                ["timeout"],
-                id="timeout",
-            ),
+            pytest.param("timeout 10s: tap-postgres", ["timeout"], id="timeout"),
             pytest.param(
                 "execution error: tap-nonexistent not found",
                 ["tap-nonexistent", "not found"],
@@ -455,10 +422,7 @@ class TestsFlextMeltanoSingerCliTranslator:
     )
     @patch(_MOCK_TARGET)
     def test_execute_singer_command_propagates_boundary_failure(
-        self,
-        mock_run_raw: MagicMock,
-        run_raw_error: str,
-        expected_fragments: list[str],
+        self, mock_run_raw: MagicMock, run_raw_error: str, expected_fragments: list[str]
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].fail(run_raw_error)
         result = meltano.execute_singer_command(["tap-postgres"], timeout=10)

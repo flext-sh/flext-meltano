@@ -8,8 +8,8 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import tm
 
+from flext_tests import tm
 from tests import c, m
 
 __all__ = ["TestsFlextMeltanoModelsUnit"]
@@ -22,8 +22,7 @@ class TestsFlextMeltanoModelsUnit:
 
     def test_tap_config_exposes_defaults_for_optional_fields(self) -> None:
         settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
+            tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
         tm.that(settings.tap_type, eq="tap-postgres")
         tm.that(settings.connection_config, eq={"host": "localhost"})
@@ -62,8 +61,7 @@ class TestsFlextMeltanoModelsUnit:
 
     def test_tap_config_has_stream_config_false_when_absent(self) -> None:
         settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
+            tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
         tm.that(settings.has_stream_config, eq=False)
         tm.that(settings.config_size, eq=1)
@@ -72,14 +70,12 @@ class TestsFlextMeltanoModelsUnit:
     def test_tap_config_rejects_blank_tap_type(self, blank_tap_type: str) -> None:
         with pytest.raises(c.ValidationError, match="tap_type cannot be empty"):
             m.Meltano.TapConfig(
-                tap_type=blank_tap_type,
-                connection_config={"host": "localhost"},
+                tap_type=blank_tap_type, connection_config={"host": "localhost"}
             )
 
     def test_tap_config_rejects_empty_connection_config(self) -> None:
         with pytest.raises(
-            c.ValidationError,
-            match="Connection configuration cannot be empty",
+            c.ValidationError, match="Connection configuration cannot be empty"
         ):
             m.Meltano.TapConfig(tap_type="tap-postgres", connection_config={})
 
@@ -205,12 +201,7 @@ class TestsFlextMeltanoModelsUnit:
                 1,
                 str(c.Meltano.StreamStatus.SUCCESS),
             ),
-            (
-                c.Meltano.StreamStatus.ERROR,
-                0,
-                0,
-                str(c.Meltano.StreamStatus.FAILED),
-            ),
+            (c.Meltano.StreamStatus.ERROR, 0, 0, str(c.Meltano.StreamStatus.FAILED)),
             (
                 c.Meltano.StreamStatus.PROCESSING,
                 3,
@@ -226,11 +217,7 @@ class TestsFlextMeltanoModelsUnit:
         ],
     )
     def test_stream_info_processing_status_reflects_progress(
-        self,
-        status: str,
-        records_loaded: int,
-        batches_processed: int,
-        expected: str,
+        self, status: str, records_loaded: int, batches_processed: int, expected: str
     ) -> None:
         stream = m.Meltano.StreamInfo(
             stream_name="users",
@@ -252,8 +239,7 @@ class TestsFlextMeltanoModelsUnit:
 
     def test_stream_info_rejects_records_without_batches(self) -> None:
         with pytest.raises(
-            c.ValidationError,
-            match="Records loaded but no batches processed",
+            c.ValidationError, match="Records loaded but no batches processed"
         ):
             m.Meltano.StreamInfo(
                 stream_name="users",

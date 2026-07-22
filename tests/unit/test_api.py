@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from flext_tests import tm
 
 from flext_meltano import meltano
+from flext_tests import tm
 from tests import c
 
 pytestmark = pytest.mark.unit
@@ -24,10 +24,7 @@ class TestsFlextMeltanoApi:
         tm.that(callable(meltano.dbt), eq=True)
         tm.that(meltano.service_name, none=False, empty=False)
 
-    def test_execute_returns_success_payload(
-        self,
-        meltano_execute_field: str,
-    ) -> None:
+    def test_execute_returns_success_payload(self, meltano_execute_field: str) -> None:
         """The public execute payload exposes the canonical fields."""
         result = meltano.execute()
         tm.ok(result)
@@ -36,44 +33,30 @@ class TestsFlextMeltanoApi:
         tm.that(payload, is_=dict)
         tm.that(payload, contains=meltano_execute_field)
 
-    def test_create_project_rejects_empty_name(
-        self,
-        tmp_path: Path,
-    ) -> None:
+    def test_create_project_rejects_empty_name(self, tmp_path: Path) -> None:
         """Project creation fails fast on invalid input."""
         tm.fail(
-            meltano.create_project(project_name="", project_dir=tmp_path),
-            has="empty",
+            meltano.create_project(project_name="", project_dir=tmp_path), has="empty"
         )
 
-    def test_create_project_writes_meltano_project_file(
-        self,
-        tmp_path: Path,
-    ) -> None:
+    def test_create_project_writes_meltano_project_file(self, tmp_path: Path) -> None:
         """Project creation persists the canonical Meltano project file."""
         result = meltano.create_project(
-            project_name="config_test",
-            project_dir=tmp_path,
+            project_name="config_test", project_dir=tmp_path
         )
         tm.that(result, ok=True)
         tm.ok(result)
         payload = result.value
         tm.that(payload, is_=dict)
         project_path = Path(payload["project_path"])
-        tm.that(
-            (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists(),
-            eq=True,
-        )
+        tm.that((project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).exists(), eq=True)
         config_text = (project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE).read_text(
-            encoding="utf-8",
+            encoding="utf-8"
         )
         tm.that(config_text, has="requires_meltano")
         tm.that("version:" in config_text, eq=False)
 
-    def test_validate_project_missing_path_fails(
-        self,
-        tmp_path: Path,
-    ) -> None:
+    def test_validate_project_missing_path_fails(self, tmp_path: Path) -> None:
         """Validation fails on a missing project path."""
         error = tm.fail(meltano.validate_project(tmp_path / "missing"))
         tm.that(error.lower(), has=["project"])
@@ -82,9 +65,8 @@ class TestsFlextMeltanoApi:
         """Component installation enforces canonical Meltano component types."""
         error = tm.fail(
             meltano.install_component(
-                component_type="invalid_type",
-                component_name="tap-csv",
-            ),
+                component_type="invalid_type", component_name="tap-csv"
+            )
         )
         tm.that(error.lower(), has=["invalid"])
 
@@ -99,9 +81,6 @@ class TestsFlextMeltanoApi:
             meltano.create_project(
                 project_name="test",
                 project_dir=Path("/nonexistent/impossible/path/that/cannot/exist"),
-            ),
+            )
         )
-        tm.that(
-            error.lower(),
-            match=r"(failed|permission|not found|project creation)",
-        )
+        tm.that(error.lower(), match=r"(failed|permission|not found|project creation)")

@@ -26,35 +26,25 @@ class FlextMeltanoProtocolsServices:
         """Protocol for Meltano command execution."""
 
         def execute_meltano_command(
-            self,
-            command: t.StrSequence,
-            timeout: int = ...,
-            _cwd: Path | None = None,
+            self, command: t.StrSequence, timeout: int = ..., _cwd: Path | None = None
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
         def fetch_project_plugins(
-            self,
-            plugin_type: str | None = None,
-            _cwd: Path | None = None,
+            self, plugin_type: str | None = None, _cwd: Path | None = None
         ) -> p.Result[t.SequenceOf[t.StrMapping]]:
             """Return project-scoped plugin definitions."""
             ...
 
         def execute_dbt_command(
-            self,
-            dbt_command: str,
-            args: t.StrSequence | None = None,
+            self, dbt_command: str, args: t.StrSequence | None = None
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 
         def execute_pipeline(
-            self,
-            tap_name: str,
-            target_name: str,
-            config: t.JsonMapping | None = None,
+            self, tap_name: str, target_name: str, config: t.JsonMapping | None = None
         ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
@@ -72,9 +62,7 @@ class FlextMeltanoProtocolsServices:
         """Service call protocol extending Service."""
 
         def call(
-            self,
-            operation: str,
-            payload: t.ConfigurationMapping,
+            self, operation: str, payload: t.ConfigurationMapping
         ) -> p.Result[t.JsonMapping]:
             """Execute service call with r."""
             ...

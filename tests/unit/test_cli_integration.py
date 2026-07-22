@@ -20,8 +20,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import tm
 
+from flext_tests import tm
 from tests import m, u
 
 if TYPE_CHECKING:
@@ -59,8 +59,7 @@ class TestsFlextMeltanoCliIntegration:
         tm.that(model.discover, eq=discover)
 
     @pytest.mark.parametrize(
-        "field_name",
-        ["config_file", "catalog_file", "state_file", "properties_file"],
+        "field_name", ["config_file", "catalog_file", "state_file", "properties_file"]
     )
     def test_each_optional_path_field_round_trips(self, *, field_name: str) -> None:
         cli_args: t.JsonMapping = {
@@ -97,7 +96,7 @@ class TestsFlextMeltanoCliIntegration:
 
         first = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
         second = tm.ok(
-            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, first.model_dump()),
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, first.model_dump())
         )
 
         tm.that(second.model_dump(), eq=first.model_dump())

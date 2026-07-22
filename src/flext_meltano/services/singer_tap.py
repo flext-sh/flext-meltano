@@ -67,8 +67,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 source_id=source_id,
             )
             self.logger.info(
-                "Source instance created successfully",
-                source_name=source_type,
+                "Source instance created successfully", source_name=source_type
             )
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
 
@@ -77,8 +76,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail_op(
-                "Source instance creation",
-                e,
+                "Source instance creation", e
             )
 
     def create_tap_from_config(
@@ -99,10 +97,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             })
             return self.create_source_instance(settings).map(
                 lambda inst: m.Meltano.TapInstance(
-                    tap_type=inst.source_type,
-                    settings=settings,
-                    tap_id=inst.source_id,
-                ),
+                    tap_type=inst.source_type, settings=settings, tap_id=inst.source_id
+                )
             )
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
@@ -131,8 +127,7 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             else:
                 source_type = items.tap_type
             self.logger.debug(
-                "Processing source configuration",
-                source_name=source_type,
+                "Processing source configuration", source_name=source_type
             )
             if not source_type:
                 return r[bool].fail("Source configuration must have a type")
@@ -142,20 +137,17 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             return _run_process_source()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception(
-                "Source configuration processing failed",
-                error=str(e),
+                "Source configuration processing failed", error=str(e)
             )
             return r[bool].fail_op("Source configuration processing", e)
 
     def validate_stream_schema(
-        self,
-        stream_def: m.Meltano.StreamDefinition,
+        self, stream_def: m.Meltano.StreamDefinition
     ) -> p.Result[bool]:
         """Validate a stream definition's schema."""
         try:
             self.logger.debug(
-                "Validating stream schema",
-                stream_name=stream_def.stream_name,
+                "Validating stream schema", stream_name=stream_def.stream_name
             )
             if not stream_def.stream_schema:
                 return r[bool].fail("Stream schema cannot be empty")

@@ -26,14 +26,10 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
     ) -> p.Result[t.JsonMapping]:
         """Execute Singer SDK command and capture output."""
         if not command:
-            return r[t.JsonMapping].fail(
-                "Invalid command: must be non-empty list",
-            )
+            return r[t.JsonMapping].fail("Invalid command: must be non-empty list")
         process_input = input_data.encode() if input_data else None
         cmd_result = u.Cli.run_raw(
-            list(command),
-            timeout=timeout,
-            input_data=process_input,
+            list(command), timeout=timeout, input_data=process_input
         )
         if cmd_result.failure:
             return r[t.JsonMapping].fail(cmd_result.error or "Command failed")
@@ -102,10 +98,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
         if params.state_file:
             command.extend([c.Meltano.SingerCliOption.STATE, params.state_file])
         if params.catalog_file:
-            command.extend([
-                c.Meltano.SingerCliOption.PROPERTIES,
-                params.catalog_file,
-            ])
+            command.extend([c.Meltano.SingerCliOption.PROPERTIES, params.catalog_file])
         return r[t.StrSequence].ok(command)
 
     @staticmethod

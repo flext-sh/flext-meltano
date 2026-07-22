@@ -46,19 +46,15 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     dbt_project_name: Annotated[
-        t.NonEmptyStr,
-        u.Field(description="Canonical dbt project name"),
+        t.NonEmptyStr, u.Field(description="Canonical dbt project name")
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
     _executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
-        default_factory=FlextMeltanoExecutor,
+        default_factory=FlextMeltanoExecutor
     )
 
-    def __init__(
-        self,
-        settings: FlextMeltanoSettings | None = None,
-    ) -> None:
+    def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(runtime_settings=settings)
 
@@ -133,22 +129,19 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return self._executor.execute_dbt_command(subcommand, args or None)
 
     def run_models(
-        self,
-        models: t.StrSequence | None = None,
+        self, models: t.StrSequence | None = None
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt models."""
         return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
 
     def run_tests(
-        self,
-        models: t.StrSequence | None = None,
+        self, models: t.StrSequence | None = None
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt tests."""
         return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
 
     def compile_models(
-        self,
-        models: t.StrSequence | None = None,
+        self, models: t.StrSequence | None = None
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Compile dbt models."""
         return self._run_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models)
@@ -156,8 +149,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     def generate_docs(self) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Generate dbt documentation."""
         return self._run_dbt_cmd(
-            c.Meltano.DbtCommand.DOCS,
-            extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
+            c.Meltano.DbtCommand.DOCS, extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS)
         )
 
     # ------------------------------------------------------------------
@@ -172,8 +164,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return r[None].ok(None)
 
     def load_manifest(
-        self,
-        manifest_path: Path | None = None,
+        self, manifest_path: Path | None = None
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
 
@@ -193,11 +184,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
             if parsed_result.failure:
                 return r[t.Meltano.DbtManifestData].fail(
-                    parsed_result.error or "manifest read failed",
+                    parsed_result.error or "manifest read failed"
                 )
             parsed = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
-                "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
+                "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()}
             }
             return r[t.Meltano.DbtManifestData].ok(manifest_data)
 
@@ -211,7 +202,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         manifest_result = self.load_manifest()
         if manifest_result.failure:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                manifest_result.error or "Manifest load failed",
+                manifest_result.error or "Manifest load failed"
             )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)

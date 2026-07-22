@@ -17,8 +17,8 @@ from typing import TYPE_CHECKING
 import psycopg2
 import pytest
 import redis
-from flext_tests import tm
 
+from flext_tests import tm
 from tests import c
 
 if TYPE_CHECKING:
@@ -46,9 +46,7 @@ class TestsFlextMeltanoDockerIntegration:
     def _connect_redis() -> redis.Redis[bytes]:
         """Open a Redis client to the test service."""
         return redis.Redis(
-            host=c.Meltano.Tests.HOST,
-            port=c.Meltano.Tests.REDIS_PORT,
-            db=0,
+            host=c.Meltano.Tests.HOST, port=c.Meltano.Tests.REDIS_PORT, db=0
         )
 
     @staticmethod

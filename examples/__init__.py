@@ -29,43 +29,14 @@ if TYPE_CHECKING:
         u,
     )
     from flext_meltano import d as d, e as e, h as h, r as r, s as s, x as x
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".constants": (
-            "ExamplesFlextMeltanoConstants",
-            "c",
-        ),
-        ".models": (
-            "ExamplesFlextMeltanoModels",
-            "m",
-        ),
-        ".protocols": (
-            "ExamplesFlextMeltanoProtocols",
-            "p",
-        ),
-        ".typings": (
-            "ExamplesFlextMeltanoTypes",
-            "t",
-        ),
-        ".utilities": (
-            "ExamplesFlextMeltanoUtilities",
-            "u",
-        ),
-        "flext_meltano": (
-            "d",
-            "e",
-            "h",
-            "r",
-            "s",
-            "x",
-        ),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".constants": ("ExamplesFlextMeltanoConstants", "c"),
+    ".models": ("ExamplesFlextMeltanoModels", "m"),
+    ".protocols": ("ExamplesFlextMeltanoProtocols", "p"),
+    ".typings": ("ExamplesFlextMeltanoTypes", "t"),
+    ".utilities": ("ExamplesFlextMeltanoUtilities", "u"),
+    "flext_meltano": ("d", "e", "h", "r", "s", "x"),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

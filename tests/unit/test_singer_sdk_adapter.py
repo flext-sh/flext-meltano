@@ -9,10 +9,10 @@ absence of side effects on the shared singleton. No private state is inspected.
 from __future__ import annotations
 
 import pytest
-from flext_tests import tm
 
 from flext_meltano import meltano
 from flext_meltano.api import FlextMeltano
+from flext_tests import tm
 
 __all__ = ["TestsFlextMeltanoSingerSdkAdapter"]
 
@@ -59,10 +59,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
         ],
     )
     def test_factory_derives_service_name_from_component_name(
-        self,
-        factory: str,
-        name: str,
-        role_field: str,
+        self, factory: str, name: str, role_field: str
     ) -> None:
         """Each factory derives ``<name>_service`` as the public service name."""
         result = getattr(meltano, factory)(name)
@@ -80,10 +77,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
         ],
     )
     def test_factory_role_field_survives_public_model_dump(
-        self,
-        factory: str,
-        name: str,
-        role_field: str,
+        self, factory: str, name: str, role_field: str
     ) -> None:
         """The bound role and the two cleared roles appear in the public dump."""
         facade = getattr(meltano, factory)(name).unwrap()
@@ -122,16 +116,10 @@ class TestsFlextMeltanoSingerSdkAdapter:
 
     @pytest.mark.parametrize(
         ("factory", "name"),
-        [
-            ("tap", "tap-csv"),
-            ("target", "target-jsonl"),
-            ("dbt", "analytics"),
-        ],
+        [("tap", "tap-csv"), ("target", "target-jsonl"), ("dbt", "analytics")],
     )
     def test_factory_is_idempotent_across_repeated_calls(
-        self,
-        factory: str,
-        name: str,
+        self, factory: str, name: str
     ) -> None:
         """Repeated calls yield equal public state on distinct instances."""
         first = getattr(meltano, factory)(name).unwrap()

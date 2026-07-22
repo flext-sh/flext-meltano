@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from flext_tests import tm
 
 from flext_meltano import meltano
+from flext_tests import tm
 from tests import c
 
 pytestmark = pytest.mark.unit
@@ -13,8 +13,7 @@ pytestmark = pytest.mark.unit
 
 class TestsFlextMeltanoServices:
     def test_component_factory_returns_specialized_facade(
-        self,
-        meltano_component_case: tuple[str, str, str],
+        self, meltano_component_case: tuple[str, str, str]
     ) -> None:
         """Each public factory returns a specialized facade with the right name."""
         component_kind, component_name, attribute_name = meltano_component_case
@@ -26,9 +25,8 @@ class TestsFlextMeltanoServices:
             case "dbt":
                 result = meltano.dbt(component_name)
             case _:
-                raise ValueError(
-                    f"Unsupported Meltano component kind: {component_kind}",
-                )
+                msg = f"Unsupported Meltano component kind: {component_kind}"
+                raise ValueError(msg)
         tm.that(result, ok=True)
         tm.ok(result)
         service = result.value
@@ -38,42 +36,29 @@ class TestsFlextMeltanoServices:
 
     @pytest.mark.parametrize(
         ("component_kind", "component_name"),
-        [
-            ("tap", "tap-postgres"),
-            ("target", "target-postgres"),
-            ("dbt", "warehouse"),
-        ],
+        [("tap", "tap-postgres"), ("target", "target-postgres"), ("dbt", "warehouse")],
         ids=["tap", "target", "dbt"],
     )
     def test_component_factory_accepts_direct_config(
-        self,
-        component_kind: str,
-        component_name: str,
+        self, component_kind: str, component_name: str
     ) -> None:
         """Component factories accept direct settings without wrappers."""
         match component_kind:
             case "tap":
                 result = meltano.tap(
-                    component_name,
-                    host="localhost",
-                    database="testdb",
+                    component_name, host="localhost", database="testdb"
                 )
             case "target":
                 result = meltano.target(
-                    component_name,
-                    host="localhost",
-                    database="testdb",
+                    component_name, host="localhost", database="testdb"
                 )
             case "dbt":
                 result = meltano.dbt(
-                    component_name,
-                    host="localhost",
-                    database="testdb",
+                    component_name, host="localhost", database="testdb"
                 )
             case _:
-                raise ValueError(
-                    f"Unsupported Meltano component kind: {component_kind}",
-                )
+                msg = f"Unsupported Meltano component kind: {component_kind}"
+                raise ValueError(msg)
         tm.that(result, ok=True)
         tm.ok(result)
         service = result.value

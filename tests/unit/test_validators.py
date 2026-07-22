@@ -15,9 +15,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import tm
 
 from flext_meltano import meltano
+from flext_tests import tm
 
 if TYPE_CHECKING:
     from tests import t
@@ -58,9 +58,7 @@ class TestsFlextMeltanoValidators:
         ],
     )
     def test_plugin_name_business_rules_reject_invalid_names(
-        self,
-        name: str,
-        expected_fragment: str,
+        self, name: str, expected_fragment: str
     ) -> None:
         settings: t.ScalarMapping = {
             "name": name,
@@ -73,10 +71,7 @@ class TestsFlextMeltanoValidators:
         tm.that(result.error, none=False)
         tm.that(result.error, has=expected_fragment)
 
-    @pytest.mark.parametrize(
-        "name",
-        ["tap-csv", "target-postgres"],
-    )
+    @pytest.mark.parametrize("name", ["tap-csv", "target-postgres"])
     def test_plugin_name_business_rules_accept_valid_names(self, name: str) -> None:
         settings: t.ScalarMapping = {
             "name": name,
@@ -98,8 +93,7 @@ class TestsFlextMeltanoValidators:
         ],
     )
     def test_plugin_config_rejects_mappings_missing_required_fields(
-        self,
-        invalid_config: t.ScalarMapping,
+        self, invalid_config: t.ScalarMapping
     ) -> None:
         result = meltano.validate_plugin_config(invalid_config)
         tm.fail(result)

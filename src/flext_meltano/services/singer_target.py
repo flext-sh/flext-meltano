@@ -23,8 +23,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
     """
 
     def configure_sink(
-        self,
-        sink_config: m.Meltano.DataSinkConfig,
+        self, sink_config: m.Meltano.DataSinkConfig
     ) -> p.Result[m.Meltano.DataSinkDefinition]:
         """Configure a sink for a sink configuration."""
         try:
@@ -40,8 +39,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 "status": c.Meltano.OperationStatus.CONFIGURED,
             })
             self.logger.info(
-                "Sink configured successfully",
-                sink_name=sink_def.sink_name,
+                "Sink configured successfully", sink_name=sink_def.sink_name
             )
             return r[m.Meltano.DataSinkDefinition].ok(sink_def)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
@@ -49,8 +47,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             return r[m.Meltano.DataSinkDefinition].fail_op("Sink configuration", e)
 
     def create_flext_target(
-        self,
-        sink_config: m.Meltano.DataSinkConfig | t.JsonMapping,
+        self, sink_config: m.Meltano.DataSinkConfig | t.JsonMapping
     ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Create a target instance from configuration."""
         if not isinstance(sink_config, m.Meltano.DataSinkConfig):
@@ -60,15 +57,14 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 )
             except c.EXC_ATTR_KEY_TYPE_VALUE as e:
                 return r[m.Meltano.DataSinkInstance].fail(
-                    f"Invalid target settings: {e}",
+                    f"Invalid target settings: {e}"
                 )
         else:
             settings = sink_config
         return self.create_sink_instance(settings)
 
     def create_sink_instance(
-        self,
-        sink_config: m.Meltano.DataSinkConfig,
+        self, sink_config: m.Meltano.DataSinkConfig
     ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Create a sink instance from configuration."""
         try:
@@ -97,22 +93,19 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def validate_sink_config(
-        self,
-        sink_config: m.Meltano.DataSinkConfig,
+        self, sink_config: m.Meltano.DataSinkConfig
     ) -> p.Result[bool]:
         """Validate a sink configuration."""
         try:
             self.logger.debug(
-                "Validating target configuration",
-                target_name=sink_config.sink_type,
+                "Validating target configuration", target_name=sink_config.sink_type
             )
             if not sink_config.sink_type:
                 return r[bool].fail("Target configuration must have name and type")
             return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception(
-                "Target configuration validation failed",
-                error=str(e),
+                "Target configuration validation failed", error=str(e)
             )
             return r[bool].fail_op("Target configuration validation", e)
 

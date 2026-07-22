@@ -65,34 +65,27 @@ if TYPE_CHECKING:
     from flext_meltano._models.transformations import (
         FlextMeltanoModelsTransformations as FlextMeltanoModelsTransformations,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".cli_inputs": ("FlextMeltanoModelsCliInputs",),
-        ".cli_params": ("FlextMeltanoModelsCliParams",),
-        ".context": ("FlextMeltanoModelsContext",),
-        ".core": ("FlextMeltanoModelsCore",),
-        ".discovery": ("FlextMeltanoModelsDiscovery",),
-        ".instances": ("FlextMeltanoModelsInstances",),
-        ".instances_data": ("FlextMeltanoModelsInstancesData",),
-        ".logging_config": ("FlextMeltanoModelsLogging",),
-        ".payloads_data": ("FlextMeltanoModelsPayloadsData",),
-        ".projects": ("FlextMeltanoModelsProjects",),
-        ".results": ("FlextMeltanoModelsResults",),
-        ".results_dbt": ("FlextMeltanoModelsResultsDbt",),
-        ".results_pipeline": ("FlextMeltanoModelsResultsPipeline",),
-        ".singer": ("FlextMeltanoModelsSinger",),
-        ".singer_catalog": ("FlextMeltanoModelsSingerCatalog",),
-        ".singer_sdk": ("FlextMeltanoModelsSingerSdk",),
-        ".sources": ("FlextMeltanoModelsSources",),
-        ".sources_params": ("FlextMeltanoModelsSourcesParams",),
-        ".transformations": ("FlextMeltanoModelsTransformations",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".cli_inputs": ("FlextMeltanoModelsCliInputs",),
+    ".cli_params": ("FlextMeltanoModelsCliParams",),
+    ".context": ("FlextMeltanoModelsContext",),
+    ".core": ("FlextMeltanoModelsCore",),
+    ".discovery": ("FlextMeltanoModelsDiscovery",),
+    ".instances": ("FlextMeltanoModelsInstances",),
+    ".instances_data": ("FlextMeltanoModelsInstancesData",),
+    ".logging_config": ("FlextMeltanoModelsLogging",),
+    ".payloads_data": ("FlextMeltanoModelsPayloadsData",),
+    ".projects": ("FlextMeltanoModelsProjects",),
+    ".results": ("FlextMeltanoModelsResults",),
+    ".results_dbt": ("FlextMeltanoModelsResultsDbt",),
+    ".results_pipeline": ("FlextMeltanoModelsResultsPipeline",),
+    ".singer": ("FlextMeltanoModelsSinger",),
+    ".singer_catalog": ("FlextMeltanoModelsSingerCatalog",),
+    ".singer_sdk": ("FlextMeltanoModelsSingerSdk",),
+    ".sources": ("FlextMeltanoModelsSources",),
+    ".sources_params": ("FlextMeltanoModelsSourcesParams",),
+    ".transformations": ("FlextMeltanoModelsTransformations",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

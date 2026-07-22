@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from flext_tests import tm
-
 from flext_meltano import meltano
+from flext_tests import tm
 from tests import m
 
 
@@ -34,8 +33,7 @@ class TestsFlextMeltanoTapAbstractions:
     def test_build_tap_instance_returns_public_mapping(self) -> None:
         """The facade should expose the tap instance through the public mapping shape."""
         settings = m.Meltano.TapConfig(
-            tap_type="tap-csv",
-            connection_config={"file_path": "data.csv"},
+            tap_type="tap-csv", connection_config={"file_path": "data.csv"}
         )
         tap_instance = m.Meltano.TapInstance(
             tap_type="tap-csv",

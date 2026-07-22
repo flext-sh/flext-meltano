@@ -1393,12 +1393,7 @@ class RetryExecutor:
     @property
     def retryable_exceptions(self) -> Tuple[Type[Exception], ...]:
         """Exceptions that should be retried."""
-        return (
-            ConnectionError,
-            TimeoutError,
-            TemporaryServiceError,
-            RateLimitError,
-        )
+        return (ConnectionError, TimeoutError, TemporaryServiceError, RateLimitError)
 ```
 
 ### Reliability Monitoring
@@ -2959,10 +2954,7 @@ class APIResponse:
     """Consistent API response format."""
 
     def __init__(
-        self,
-        data=None,
-        error: str = None,
-        metadata: Dict[str, t.JsonValue] = None,
+        self, data=None, error: str = None, metadata: Dict[str, t.JsonValue] = None
     ):
         self.success = error is None
         self.data = data
@@ -3818,9 +3810,7 @@ class TestDataManager:
         return result
 
     def _deep_merge(
-        self,
-        base: Dict[str, t.JsonValue],
-        override: Dict[str, t.JsonValue],
+        self, base: Dict[str, t.JsonValue], override: Dict[str, t.JsonValue]
     ) -> Dict[str, t.JsonValue]:
         """Deep merge dictionaries."""
         result = base.copy()
