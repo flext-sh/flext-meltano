@@ -1,6 +1,7 @@
 # flext-meltano Integration Patterns
 
 <!-- TOC START -->
+
 - [flext-meltano Integration Patterns](#flext-meltano-integration-patterns)
   - [🎯 ELT Foundation Role](#-elt-foundation-role)
   - [🔌 Singer Ecosystem Integration](#-singer-ecosystem-integration)
@@ -25,13 +26,14 @@
   - [🔧 Integration Best Practices](#-integration-best-practices)
     - [Design Patterns](#design-patterns)
     - [Quality Standards](#quality-standards)
+
 <!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
 > **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration patterns. Full ecosystem compatibility requires abstraction layer.
 
-______________________________________________________________________
+---
 
 ## 🎯 ELT Foundation Role
 
@@ -44,7 +46,7 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 
 **Integration Authority**: All FLEXT projects requiring ELT operations must use flext-meltano patterns.
 
-______________________________________________________________________
+---
 
 ## 🔌 Singer Ecosystem Integration
 
@@ -52,7 +54,7 @@ ______________________________________________________________________
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-```python notest
+```python
 # Example: flext-tap-oracle integration
 from flext_cli import u
 from flext_core import FlextSettings
@@ -81,7 +83,7 @@ class FlextOracleTapService(s):
 
 \__Standard pattern for flext-target-_ projects\_\*:
 
-```python notest
+```python
 # Example: flext-target-oracle integration
 from flext_cli import u
 from flext_core import FlextSettings
@@ -100,7 +102,7 @@ class FlextOracleTargetService(s):
         return self._target_abstractions.load_data("target-oracle", records)
 ```
 
-______________________________________________________________________
+---
 
 ## 🛠️ dbt Integration Patterns
 
@@ -108,7 +110,7 @@ ______________________________________________________________________
 
 \__Standard pattern for flext-dbt-_ projects\_\*:
 
-```python notest
+```python
 # Example: flext-dbt-oracle integration
 from flext_cli import u
 from flext_core import FlextSettings
@@ -130,7 +132,7 @@ class FlextOracleDbtService(s):
 
 **Current Limitation**: dbt integration is placeholder implementation requiring dbt programmatic API integration.
 
-______________________________________________________________________
+---
 
 ## 🚀 Complete ELT Pipeline Integration
 
@@ -138,7 +140,7 @@ ______________________________________________________________________
 
 **Full ELT workflow using flext-meltano foundation**:
 
-```python notest
+```python
 from flext_cli import u
 from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoService, FlextMeltanoAdapter
@@ -175,7 +177,7 @@ class EnterpriseELTService(s):
         })
 ```
 
-______________________________________________________________________
+---
 
 ## 🔗 Bridge Communication Patterns
 
@@ -193,7 +195,7 @@ python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
 
 **JSON API Response Pattern**:
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
@@ -206,7 +208,7 @@ response = bridge.handle_bridge_request({
 {"success": True, "data": {"records_processed": 1000}, "error": None}
 ```
 
-______________________________________________________________________
+---
 
 ## 📊 Integration Matrix
 
@@ -227,25 +229,25 @@ ______________________________________________________________________
 \__For flext-tap-_ projects\_\*:
 
 1. Use FlextMeltanoTapAbstractions for all Singer operations
-1. Follow r patterns for error handling
-1. Implement stream discovery and data extraction
-1. Maintain Singer protocol compliance
+2. Follow r patterns for error handling
+3. Implement stream discovery and data extraction
+4. Maintain Singer protocol compliance
 
 \__For flext-target-_ projects\_\*:
 
 1. Use FlextMeltanoTargetAbstractions for all load operations
-1. Implement record loading with validation
-1. Handle Singer message processing
-1. Follow FLEXT service patterns
+2. Implement record loading with validation
+3. Handle Singer message processing
+4. Follow FLEXT service patterns
 
 \__For flext-dbt-_ projects\_\*:
 
 1. Use FlextMeltanoDbtService for transformations
-1. Plan for dbt programmatic API integration
-1. Implement model execution workflows
-1. Maintain transformation validation
+2. Plan for dbt programmatic API integration
+3. Implement model execution workflows
+4. Maintain transformation validation
 
-______________________________________________________________________
+---
 
 ## 🌍 Environment Integration
 
@@ -279,7 +281,7 @@ flext-meltano = "^0.9.9"  # Mandatory ELT foundation
 flext-cli = "^0.9.9"      # CLI development tools
 ```
 
-______________________________________________________________________
+---
 
 ## ⚠️ Integration Limitations
 
@@ -303,9 +305,9 @@ ______________________________________________________________________
 **Current Development Approach**:
 
 1. **Use Working Abstractions**: FlextMeltanoTapAbstractions and FlextMeltanoTargetAbstractions are fully functional
-1. **Follow r Patterns**: Maintain consistency for future compatibility
-1. **Plan for Updates**: Design integration patterns to accommodate resolution
-1. **Document Limitations**: Clear communication about current constraints
+2. **Follow r Patterns**: Maintain consistency for future compatibility
+3. **Plan for Updates**: Design integration patterns to accommodate resolution
+4. **Document Limitations**: Clear communication about current constraints
 
 ### Resolution Timeline
 
@@ -316,7 +318,7 @@ ______________________________________________________________________
 - **Phase 3** (2-3 weeks): Modern ELT patterns adoption
 - **Phase 4** (1-2 weeks): Complete ecosystem integration validation
 
-______________________________________________________________________
+---
 
 ## 🔧 Integration Best Practices
 
@@ -324,7 +326,7 @@ ______________________________________________________________________
 
 **1. Dependency Injection**:
 
-```python notest
+```python
 from flext_cli import u
 from flext_core import FlextSettings
 from flext_meltano import FlextMeltanoTapAbstractions
@@ -337,7 +339,7 @@ container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
 
 **2. Configuration Management**:
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettingsBuilders
 
 builder = FlextMeltanoSettingsBuilders()
@@ -346,7 +348,7 @@ settings = builder.build_pipeline_config(tap_settings, target_settings)
 
 **3. Error Handling**:
 
-```python notest
+```python
 # Consistent r patterns across all integrations
 result = tap_abstractions.discover_catalog("tap-name")
 if result.failure:
@@ -363,6 +365,6 @@ if result.failure:
 - Maintain Singer protocol compliance
 - Use FLEXT service architecture patterns
 
-______________________________________________________________________
+---
 
 **Integration Guide v0.12.0-dev** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.
