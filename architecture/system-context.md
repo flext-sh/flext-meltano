@@ -280,7 +280,9 @@ flext_meltano --> redis: Caching & queues
 
 #### FLEXT-Core Integration
 
-```python notest
+```python
+from __future__ import annotations
+
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
 from flext_core import (
     r,  # Railway-oriented error handling
@@ -306,7 +308,10 @@ class FlextMeltanoService(s):
 
 #### Meltano CLI Integration
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class MeltanoAdapter:
     """Meltano CLI integration with proper error handling."""
 
@@ -353,7 +358,10 @@ class MeltanoAdapter:
 
 #### Singer SDK Integration
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
     """FLEXT tap implementation with ecosystem integration."""
 
@@ -400,7 +408,8 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 
 #### Adapter Pattern for External Systems
 
-```python notest
+```python
+from __future__ import annotations
 # External system integration via adapters
 class ExternalSystemAdapter(Protocol):
     """Protocol for external system adapters."""
@@ -430,7 +439,8 @@ class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
 
 #### Plugin Architecture for Extensibility
 
-```python notest
+```python
+from __future__ import annotations
 class PluginManager:
     """Plugin management system for ecosystem extensibility."""
 
@@ -586,7 +596,9 @@ end note
 
 All FLEXT projects follow consistent integration patterns:
 
-```python notest
+```python
+from __future__ import annotations
+
 # Standard FLEXT project structure
 from flext_cli import u
 from flext_core import FlextSettings
@@ -616,7 +628,8 @@ class MyFLEXTProject(s):
 
 #### Plugin Ecosystem Integration
 
-```python notest
+```python
+from __future__ import annotations
 class FLEXTPluginRegistry:
     """Central plugin registry for ecosystem coordination."""
 
@@ -758,7 +771,10 @@ ______________________________________________________________________
 
 #### Request-Response Pattern
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class SynchronousIntegration:
     """Synchronous request-response integration pattern."""
 
@@ -791,7 +807,10 @@ class SynchronousIntegration:
 
 #### Circuit Breaker Pattern
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class CircuitBreakerIntegration:
     """Circuit breaker pattern for external system integration."""
 
@@ -848,7 +867,8 @@ class CircuitBreakerIntegration:
 
 #### Event-Driven Pattern
 
-```python notest
+```python
+from __future__ import annotations
 class EventDrivenIntegration:
     """Event-driven integration for asynchronous operations."""
 
@@ -903,7 +923,8 @@ class EventDrivenIntegration:
 
 #### Message Queue Integration
 
-```python notest
+```python
+from __future__ import annotations
 class MessageQueueIntegration:
     """Message queue integration for reliable asynchronous communication."""
 

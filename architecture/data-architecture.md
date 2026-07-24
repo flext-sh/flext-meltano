@@ -210,7 +210,10 @@ external --> intermediate: Data extraction
 
 #### 1. **State Management**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class PipelineState:
     """Pipeline execution state with bookmarks."""
 
@@ -228,7 +231,10 @@ class PipelineState:
 
 #### 2. **Data Buffering**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class RecordBuffer:
     """In-memory buffer for batch processing."""
 
@@ -244,7 +250,10 @@ class RecordBuffer:
 
 #### 3. **Error Handling Storage**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class ErrorStore:
     """Storage for failed records and error context."""
 
@@ -267,7 +276,10 @@ ______________________________________________________________________
 
 #### Pipeline Configuration Model
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @dataclass
 class PipelineConfig:
     """Pipeline configuration with validation."""
@@ -332,7 +344,10 @@ class PipelineConfig:
 
 #### Schema Validation
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class SchemaValidator:
     """Singer schema validation with FLEXT patterns."""
 
@@ -453,7 +468,10 @@ ______________________________________________________________________
 
 ### Data Quality Metrics
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class DataQualityMetrics:
     """Track data quality throughout pipeline."""
 
@@ -542,7 +560,10 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 
 ### Data Retention Policies
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @dataclass
 class RetentionPolicy:
     """Data retention policy configuration."""
@@ -579,7 +600,10 @@ ______________________________________________________________________
 
 #### 1. **Horizontal Scaling**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class PipelineScaler:
     """Dynamic pipeline scaling based on workload."""
 
@@ -599,7 +623,10 @@ class PipelineScaler:
 
 #### 2. **Data Partitioning**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class DataPartitioner:
     """Intelligent data partitioning for parallel processing."""
 
@@ -618,7 +645,10 @@ class DataPartitioner:
 
 #### 3. **Caching Strategy**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class PipelineCache:
     """Multi-level caching for performance optimization."""
 
@@ -648,7 +678,10 @@ class PipelineCache:
 
 #### Alerting Rules
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @dataclass
 class AlertRule:
     """Monitoring alert configuration."""

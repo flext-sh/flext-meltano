@@ -381,7 +381,9 @@ make docs
 
 Extend validation with custom rules:
 
-```python notest
+```python
+from __future__ import annotations
+
 # scripts/custom_architecture_rules.py
 from architecture_automation import ArchitectureValidator
 

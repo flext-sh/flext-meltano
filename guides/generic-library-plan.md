@@ -82,7 +82,7 @@ Implementation plan for transforming FLEXT-Meltano into a **generic, reusable li
 
 **Key Components:**
 
-```python notest
+```python
 # CLI abstraction
 adapter = FlextMeltanoAdapter()
 result = adapter.run_pipeline("tap-csv", "target-jsonl")  # No CLI knowledge needed
@@ -123,7 +123,7 @@ validation = project_service.validate_project("/path/to/project")
 
 **Implementation:**
 
-```python notest
+```python
 # Generic plugin registry
 registry = FlextPluginRegistry()
 plugins = registry.discover_plugins()  # No Meltano dependency
@@ -180,7 +180,7 @@ tap_info = registry.find_plugin("tap-gitlab")
 
 **Generic Operations:**
 
-```python notest
+```python
 # Plugin operations (no CLI dependency)
 service = FlextMeltanoService()
 plugins = service.discover_plugins()
@@ -197,7 +197,7 @@ target_result = service.execute_target(
 
 **Self-Contained Plugin Management:**
 
-```python notest
+```python
 # Independent plugin registry
 plugin_service = FlextPluginService()
 registry = plugin_service.get_plugin_registry()
@@ -211,7 +211,7 @@ settings = tap_plugin.validate_configuration(user_config)
 
 **Direct Singer Protocol Handling:**
 
-```python notest
+```python
 # Protocol-based execution
 singer_service = FlextSingerService()
 tap = singer_service.create_tap("tap-gitlab", settings)
@@ -225,7 +225,10 @@ sync_result = tap.sync(selected_streams)
 
 #### Plugin Discovery API
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # Generic plugin discovery
 def discover_plugins(
     plugin_type: str | None = None, source: PluginSource = PluginSource.AUTO
@@ -243,7 +246,10 @@ def discover_plugins(
 
 #### Plugin Installation API
 
-```python notest
+```python
+from __future__ import annotations
+
+
 def install_plugin(
     plugin_name: str, version: str | None = None, source: str | None = None
 ) -> p.Result[PluginInstallResult]:
@@ -263,7 +269,10 @@ def install_plugin(
 
 #### Tap Execution API
 
-```python notest
+```python
+from __future__ import annotations
+
+
 def execute_tap(
     tap_name: str,
     settings: m.Dict,
@@ -285,7 +294,10 @@ def execute_tap(
 
 #### Target Execution API
 
-```python notest
+```python
+from __future__ import annotations
+
+
 def execute_target(
     target_name: str, records: t.SequenceOf[m.Dict], settings: m.Dict
 ) -> p.Result[TargetExecutionResult]:
@@ -305,7 +317,10 @@ def execute_target(
 
 #### Pipeline Configuration API
 
-```python notest
+```python
+from __future__ import annotations
+
+
 def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
     """Create pipeline configuration.
 
@@ -319,7 +334,10 @@ def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
 
 #### Pipeline Execution API
 
-```python notest
+```python
+from __future__ import annotations
+
+
 def execute_pipeline(
     pipeline: Pipeline | str, options: PipelineOptions | None = None
 ) -> p.Result[PipelineResult]:

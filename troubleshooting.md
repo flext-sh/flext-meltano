@@ -43,7 +43,7 @@ grep -r "import meltano\|from meltano" src/
 
 **Solution**: Use flext-meltano abstractions only
 
-```python notest
+```python
 # ❌ Incorrect
 from meltano.core.project import Project
 
@@ -84,9 +84,11 @@ make type-check
 
 **Solution**: Fix type annotations
 
-```python notest
+```python
+from __future__ import annotations
+
 # Ensure proper type hints
-from typing import Optional
+# Use concrete union types: t.JsonMapping | None
 from flext_cli import u
 from flext_core import FlextSettings
 
@@ -228,7 +230,10 @@ ______________________________________________________________________
 
 **Problem**: Not using r for error handling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # ❌ Incorrect
 def risky_operation():
     try:
@@ -251,7 +256,10 @@ def safe_operation() -> p.Result[m.Dict]:
 
 **Problem**: Not following flext-core service patterns
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # ❌ Incorrect
 class UtilityClass:
     @staticmethod

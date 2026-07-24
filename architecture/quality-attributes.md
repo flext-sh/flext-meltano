@@ -210,7 +210,10 @@ end note
 
 #### 1. Caching Strategy
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class MultiLevelCache:
     """Multi-level caching for optimal performance."""
 
@@ -276,7 +279,10 @@ class MultiLevelCache:
 
 #### 2. Connection Pooling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class ConnectionPoolManager:
     """Intelligent connection pooling for external services."""
 
@@ -353,7 +359,10 @@ class ConnectionPoolManager:
 
 #### 3. Async Processing
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class AsyncPipelineExecutor:
     """Asynchronous pipeline execution with concurrency control."""
 
@@ -440,7 +449,10 @@ class AsyncPipelineExecutor:
 
 ### Performance Monitoring
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class PerformanceMonitor:
     """Comprehensive performance monitoring and alerting."""
 
@@ -659,7 +671,10 @@ end note
 
 #### 1. Horizontal Scaling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class HorizontalScaler:
     """Horizontal scaling management for API and worker services."""
 
@@ -825,7 +840,10 @@ class HorizontalScaler:
 
 #### 2. Data Scaling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class DataScaler:
     """Data layer scaling with sharding and replication."""
 
@@ -949,7 +967,10 @@ class DataScaler:
 
 #### 3. Functional Scaling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class FunctionalDecomposer:
     """Service decomposition for functional scaling."""
 
@@ -1141,7 +1162,10 @@ end note
 
 #### 1. Railway-Oriented Error Handling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class RailwayExecutor:
     """Railway-oriented execution with comprehensive error handling."""
 
@@ -1247,7 +1271,10 @@ class RailwayExecutor:
 
 #### 2. Circuit Breaker Pattern
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class CircuitBreaker:
     """Circuit breaker implementation for external service protection."""
 
@@ -1321,7 +1348,10 @@ class CircuitBreaker:
 
 #### 3. Retry with Exponential Backoff
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class RetryExecutor:
     """Retry executor with exponential backoff and jitter."""
 
@@ -1398,7 +1428,10 @@ class RetryExecutor:
 
 ### Reliability Monitoring
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class ReliabilityMonitor:
     """Monitor system reliability and trigger alerts."""
 
@@ -1712,7 +1745,10 @@ end note
 
 #### 1. Multi-AZ Deployment Strategy
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class AvailabilityManager:
     """Manage high availability and failover across multiple availability zones."""
 
@@ -1957,7 +1993,10 @@ class AvailabilityManager:
 
 #### 2. Disaster Recovery Implementation
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class DisasterRecoveryManager:
     """Comprehensive disaster recovery management."""
 
@@ -2399,7 +2438,10 @@ end note
 
 #### 1. Pre-commit Quality Gates
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class QualityGate:
     """Automated quality gates for code commits."""
 
@@ -2574,7 +2616,10 @@ class QualityGate:
 
 #### 2. Automated Code Review
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class AutomatedCodeReview:
     """Automated code review system."""
 
@@ -2949,7 +2994,10 @@ end note
 
 #### 1. API Response Design
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class APIResponse:
     """Consistent API response format."""
 
@@ -3033,7 +3081,10 @@ class APIResponse:
 
 #### 2. Progressive Disclosure
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class APIResource:
     """API resource with progressive disclosure."""
 
@@ -3099,7 +3150,10 @@ class APIResource:
 
 #### 3. Contextual Help System
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class APIHelpSystem:
     """Contextual help and guidance system."""
 
@@ -3379,7 +3433,10 @@ end note
 
 #### 1. Dependency Injection for Testing
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class TestableService:
     """Service designed for testability with dependency injection."""
 
@@ -3423,7 +3480,8 @@ class TestableService:
 
 #### 2. Test Data Builders
 
-```python notest
+```python
+from __future__ import annotations
 class TestDataBuilder:
     """Fluent builder for test data creation."""
 
@@ -3467,7 +3525,10 @@ def test_entity_processing():
 
 #### 3. Test Fixtures and Context Managers
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @pytest.fixture
 def test_database():
     """Database fixture for testing."""
@@ -3538,7 +3599,8 @@ def test_complex_pipeline_operation():
 
 #### 4. Property-Based Testing
 
-```python notest
+```python
+from __future__ import annotations
 from hypothesis import given, strategies as st
 
 
@@ -3610,7 +3672,8 @@ class PropertyBasedTests:
 
 #### 5. Contract Testing
 
-```python notest
+```python
+from __future__ import annotations
 from pact import Consumer, Provider
 
 
@@ -3765,7 +3828,10 @@ jobs:
 
 #### 2. Test Data Management
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class TestDataManager:
     """Centralized test data management."""
 
@@ -3830,7 +3896,10 @@ class TestDataManager:
 
 #### 3. Test Result Analysis
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class TestResultAnalyzer:
     """Analyze test results for insights and improvements."""
 

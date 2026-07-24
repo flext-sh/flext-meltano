@@ -261,7 +261,10 @@ ______________________________________________________________________
 
 ### **Railway-Oriented Testing Patterns**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # ✅ CORRECT - Test r patterns
 def test_operation_success():
     """Test successful operation returns Ok result."""
@@ -288,7 +291,9 @@ def test_operation_failure():
 
 ### **Mock Integration Patterns**
 
-```python notest
+```python
+from __future__ import annotations
+
 # ✅ CORRECT - Proper mocking for isolation
 from unittest.mock import Mock, patch
 import pytest
@@ -314,7 +319,10 @@ def test_service_with_meltano_integration(mock_meltano_adapter):
 
 ### **Fixture Best Practices**
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # ✅ CORRECT - Reusable test fixtures
 @pytest.fixture
 def sample_config():

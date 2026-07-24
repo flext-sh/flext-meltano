@@ -210,7 +210,10 @@ auth --> gateway: refreshed_tokens
 
 #### Role-Based Access Control (RBAC)
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @dataclass
 class UserRole:
     """User role with associated permissions."""
@@ -253,7 +256,10 @@ VIEWER_ROLE = UserRole(
 
 #### Attribute-Based Access Control (ABAC)
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @dataclass
 class AccessRequest:
     """Access request with context attributes."""
@@ -289,7 +295,10 @@ class ABACPolicy:
 
 ### Session Management
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class SessionManager:
     """Secure session management with automatic expiration."""
 
@@ -397,7 +406,10 @@ end note
 
 #### At-Rest Encryption
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class DataEncryptor:
     """Enterprise-grade data encryption service."""
 
@@ -447,7 +459,10 @@ class DataEncryptor:
 
 #### In-Transit Encryption
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class TLSConfig:
     """TLS configuration for secure communications."""
 
@@ -476,7 +491,10 @@ class TLSConfig:
 
 ### Data Classification and Handling
 
-```python notest
+```python
+from __future__ import annotations
+
+
 @dataclass
 class DataClassification:
     """Data classification with handling requirements."""
@@ -600,7 +618,10 @@ end note
 
 #### API Gateway Security
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class APIGatewaySecurity:
     """API Gateway security controls."""
 
@@ -744,7 +765,10 @@ end note
 
 ### Audit Logging Implementation
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class SecurityAuditor:
     """Comprehensive security audit logging."""
 
@@ -811,7 +835,8 @@ ______________________________________________________________________
 
 #### Data Privacy Controls
 
-```python notest
+```python
+from __future__ import annotations
 class DataPrivacyController:
     """GDPR/CCPA compliance controls."""
 
@@ -865,7 +890,10 @@ class DataPrivacyController:
 
 #### Audit and Reporting
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class ComplianceReporter:
     """Automated compliance reporting and attestation."""
 
@@ -1000,7 +1028,10 @@ end note
 
 #### 1. Detection and Analysis
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class IncidentDetector:
     """Automated incident detection and initial analysis."""
 
@@ -1034,7 +1065,10 @@ class IncidentDetector:
 
 #### 2. Containment and Eradication
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class IncidentContainment:
     """Automated incident containment and eradication."""
 
@@ -1075,7 +1109,10 @@ class IncidentContainment:
 
 #### 3. Recovery and Lessons Learned
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class IncidentRecovery:
     """Incident recovery and post-incident analysis."""
 
@@ -1150,7 +1187,10 @@ ______________________________________________________________________
 
 ### Security Health Dashboard
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class SecurityDashboard:
     """Real-time security health monitoring."""
 

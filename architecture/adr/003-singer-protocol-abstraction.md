@@ -53,7 +53,10 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 
 **FLEXT Ecosystem Consistency**: Ensures all Singer implementations follow FLEXT patterns
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # FLEXT pattern - Railway-oriented, type-safe
 class MyCustomTap(FlextMeltanoTap):
     def discover_streams(self) -> p.Result[List[FlextMeltanoStream]]:
@@ -62,7 +65,7 @@ class MyCustomTap(FlextMeltanoTap):
 
 **Error Handling**: Consistent error handling across all Singer operations
 
-```python notest
+```python
 # Automatic error wrapping and context preservation
 result = tap.discover_streams()
 if result.failure:
@@ -72,7 +75,10 @@ if result.failure:
 
 **Testability**: Singer components can be tested in isolation
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # Mock Singer SDK for unit testing
 @pytest.fixture
 def mock_singer_sdk():
@@ -141,7 +147,10 @@ def mock_singer_sdk():
 
 ### Abstraction Hierarchy
 
-```python notest
+```python
+from __future__ import annotations
+
+
 # Base abstractions
 class FlextMeltanoSingerBase:
     """Base class for all Singer operations with FLEXT patterns."""
@@ -161,7 +170,10 @@ class FlextMeltanoStream(FlextMeltanoSingerBase):
 
 ### Error Handling Integration
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class FlextMeltanoTap(FlextMeltanoSingerBase):
     def discover_streams(self) -> p.Result[List[FlextMeltanoStream]]:
         try:
@@ -186,7 +198,10 @@ class FlextMeltanoTap(FlextMeltanoSingerBase):
 
 ### State Management
 
-```python notest
+```python
+from __future__ import annotations
+
+
 class FlextMeltanoStream:
     def get_records(self, context: Optional[dict]) -> Iterator[dict]:
         """Get records with FLEXT state management."""

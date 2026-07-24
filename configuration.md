@@ -133,7 +133,7 @@ transforms:
 
 ### Configuration Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettings
 from flext_cli import u
 from flext_core import FlextSettings
@@ -153,7 +153,7 @@ ______________________________________________________________________
 
 ### Tap Configuration
 
-```python notest
+```python
 from flext_meltano import TapConfig, FlextMeltanoSettingsBuilders
 
 # Create tap configuration
@@ -170,7 +170,7 @@ pipeline_config = builder.build_tap_config(tap_config.dict())
 
 ### Target Configuration
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettingsBuilders
 
 target_settings = {
@@ -184,7 +184,7 @@ target_config = builder.build_target_config(target_settings)
 
 ### Singer Catalog Configuration
 
-```python notest
+```python
 from flext_meltano import StreamDefinition
 
 # Define stream configuration
@@ -257,7 +257,7 @@ models:
 
 ### dbt Service Configuration
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoDbtService
 
 # Note: Current implementation is placeholder
@@ -274,7 +274,7 @@ ______________________________________________________________________
 
 ### Complete ELT Pipeline
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoService, FlextMeltanoSettingsBuilders
 
 # Build complete pipeline configuration
@@ -299,7 +299,7 @@ execution_result = service.execute()
 
 ### Configuration Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoValidators
 
 validators = FlextMeltanoValidators()
@@ -361,7 +361,7 @@ environments:
 
 ### Environment Switching
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoSettings
 
 settings = FlextMeltanoSettings()
@@ -379,7 +379,7 @@ ______________________________________________________________________
 
 ### Reading Configuration Files
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoFileManagers
 
 file_manager = FlextMeltanoFileManagers()
@@ -396,7 +396,7 @@ dbt_profiles = file_manager.read_dbt_profiles()
 
 ### Writing Configuration Files
 
-```python notest
+```python
 # Write Singer catalog
 catalog_data = {
     "streams": [{"tap_stream_id": "users", "schema": {...}, "metadata": [...]}]
@@ -407,7 +407,7 @@ write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.j
 
 ### Configuration Backup
 
-```python notest
+```python
 # Backup critical configuration files
 backup_result = file_manager.backup_project_files()
 
@@ -422,7 +422,7 @@ ______________________________________________________________________
 
 ### Schema Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoValidators
 
 validators = FlextMeltanoValidators()
@@ -442,7 +442,7 @@ model_validation = validators.validate_dbt_models([
 
 ### Runtime Validation
 
-```python notest
+```python
 from flext_meltano import FlextMeltanoExecutor
 
 executor = FlextMeltanoExecutor()

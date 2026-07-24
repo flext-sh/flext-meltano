@@ -55,28 +55,38 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 \__Standard pattern for flext-tap-_ projects\_\*:
 
 ```python
-# Example: flext-tap-oracle integration
-from flext_cli import u
-from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoTapAbstractions, StreamDefinition
+from __future__ import annotations
+
+from typing import Annotated
+
+from flext_meltano import (
+    FlextMeltanoTapAbstractions,
+    FlextMeltanoTapServiceBase,
+    m,
+    p,
+    t,
+    u,
+)
 
 
-class FlextOracleTapService(s):
+class FlextOracleTapService(FlextMeltanoTapServiceBase):
     """Oracle tap using flext-meltano Singer abstractions."""
 
-    def __init__(self):
-        super().__init__()
-        self._tap_abstractions = FlextMeltanoTapAbstractions()
+    tap_name: t.Annotated[
+        t.NonEmptyStr, u.Field(description="Canonical tap name (e.g. tap-oracle)")
+    ] = "tap-oracle"
 
     def discover_oracle_streams(
         self, settings: dict
-    ) -> p.Result[Sequence[StreamDefinition]]:
+    ) -> p.Result[t.SequenceOf[m.Meltano.StreamDefinition]]:
         """Discover Oracle database streams using flext-meltano."""
-        return self._tap_abstractions.discover_catalog("tap-oracle")
+        abstractions = FlextMeltanoTapAbstractions()
+        return abstractions.create_tap_from_config("tap-oracle", settings)
 
     def extract_oracle_data(self, stream: str, settings: dict) -> p.Result[list]:
         """Extract data using flext-meltano abstractions."""
-        return self._tap_abstractions.extract_data("tap-oracle", settings)
+        abstractions = FlextMeltanoTapAbstractions()
+        return abstractions.process_source({"stream": stream, **settings})
 ```
 
 ### Target Implementation Pattern
@@ -84,22 +94,42 @@ class FlextOracleTapService(s):
 \__Standard pattern for flext-target-_ projects\_\*:
 
 ```python
-# Example: flext-target-oracle integration
-from flext_cli import u
-from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoTargetAbstractions
+from __future__ import annotations
+
+from typing import Annotated
+
+from flext_meltano import (
+    FlextMeltanoTargetAbstractions,
+    FlextMeltanoTargetServiceBase,
+    m,
+    p,
+    t,
+    u,
+)
 
 
-class FlextOracleTargetService(s):
+class FlextOracleTargetService(FlextMeltanoTargetServiceBase):
     """Oracle target using flext-meltano Singer abstractions."""
 
-    def __init__(self):
-        super().__init__()
-        self._target_abstractions = FlextMeltanoTargetAbstractions()
+    target_name: Annotated[
+        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)")
+    ] = "target-oracle"
 
-    def load_to_oracle(self, records: list, settings: dict) -> p.Result[m.Dict]:
+    def create_sink(
+        self, stream_name: str, schema: t.JsonMapping
+    ) -> p.Meltano.SingerDrainSink:
+        """Create an Oracle sink for a Singer stream."""
+        raise NotImplementedError
+
+    def load_to_oracle(
+        self, records: list, settings: dict
+    ) -> p.Result[m.Meltano.DataSinkInstance]:
         """Load records to Oracle using flext-meltano abstractions."""
-        return self._target_abstractions.load_data("target-oracle", records)
+        abstractions = FlextMeltanoTargetAbstractions()
+        return abstractions.create_flext_target({
+            "sink_type": "target-oracle",
+            "connection_config": settings,
+        })
 ```
 
 ---
@@ -111,23 +141,22 @@ class FlextOracleTargetService(s):
 \__Standard pattern for flext-dbt-_ projects\_\*:
 
 ```python
-# Example: flext-dbt-oracle integration
-from flext_cli import u
-from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoDbtService
+from __future__ import annotations
+
+from flext_meltano import FlextMeltanoDbtServiceBase, p, t
 
 
-class FlextOracleDbtService(s):
+class FlextOracleDbtService(FlextMeltanoDbtServiceBase):
     """Oracle dbt transformations using flext-meltano."""
 
-    def __init__(self):
-        super().__init__()
-        self._dbt_service = FlextMeltanoDbtService()
+    @property
+    def connection_profile(self) -> p.Meltano.DbtConnectionProfile:
+        """Oracle dbt connection profile."""
+        raise NotImplementedError
 
-    def run_oracle_models(self, models: t.StringList) -> p.Result[m.Dict]:
+    def run_oracle_models(self, models: t.StrSequence) -> p.Result[t.JsonMapping]:
         """Execute Oracle-specific dbt models."""
-        # Note: Current implementation returns placeholder data
-        return self._dbt_service.execute_dbt_operation()
+        return self.run_models(models)
 ```
 
 **Current Limitation**: dbt integration is placeholder implementation requiring dbt programmatic API integration.
@@ -141,12 +170,20 @@ class FlextOracleDbtService(s):
 **Full ELT workflow using flext-meltano foundation**:
 
 ```python
-from flext_cli import u
-from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoService, FlextMeltanoAdapter
+from __future__ import annotations
+
+from flext_meltano import (
+    FlextMeltanoAdapter,
+    FlextMeltanoDbtServiceBase,
+    FlextMeltanoService,
+    m,
+    p,
+    r,
+    t,
+)
 
 
-class EnterpriseELTService(s):
+class EnterpriseELTService(FlextMeltanoService):
     """Complete ELT pipeline for enterprise applications."""
 
     def __init__(self):
@@ -155,26 +192,29 @@ class EnterpriseELTService(s):
         self._adapter = FlextMeltanoAdapter()
 
     def execute_elt_pipeline(
-        self, tap_name: str, target_name: str, dbt_models: t.StringList = None
-    ) -> p.Result[m.Dict]:
+        self, tap_name: str, target_name: str, dbt_models: t.StrSequence | None = None
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Execute complete ELT pipeline."""
-
-        # 1. Extract and Load using Meltano
-        pipeline_result = self._adapter.run_pipeline(tap_name, target_name)
+        pipeline_result = self._adapter.execute()
         if pipeline_result.failure:
             return pipeline_result
 
-        # 2. Transform using dbt (if specified)
         if dbt_models:
-            # Note: Requires dbt integration completion
-            transform_result = self._execute_transformations(dbt_models)
+            transform_result = self._run_dbt_models(dbt_models)
             if transform_result.failure:
                 return transform_result
 
-        return r[m.Dict].ok({
+        return r[m.Meltano.CommandExecutionResult].ok({
             "pipeline": pipeline_result.unwrap(),
             "models_executed": dbt_models or [],
         })
+
+    def _run_dbt_models(
+        self, models: t.StrSequence
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Run dbt models."""
+        dbt_service = FlextMeltanoDbtServiceBase()
+        return dbt_service.run_models(models)
 ```
 
 ---
@@ -196,16 +236,17 @@ python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
 **JSON API Response Pattern**:
 
 ```python
+from __future__ import annotations
+
 from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
-response = bridge.handle_bridge_request({
-    "command": "run_pipeline",
-    "args": ["tap-csv", "target-jsonl"],
-})
+response = bridge.execute_bridge_command(
+    "run_pipeline", args={"tap": "tap-csv", "target": "target-jsonl"}
+)
 
 # Response format follows r structure
-{"success": True, "data": {"records_processed": 1000}, "error": None}
+print(response.unwrap())
 ```
 
 ---
@@ -327,12 +368,13 @@ flext-cli = "^0.9.9"      # CLI development tools
 **1. Dependency Injection**:
 
 ```python
-from flext_cli import u
-from flext_core import FlextSettings
-from flext_meltano import FlextMeltanoTapAbstractions
+from __future__ import annotations
+
+from flext_core import FlextContainer
+from flext_meltano import FlextMeltanoTapAbstractions, FlextMeltanoTargetAbstractions
 
 # Register services for ecosystem consumption
-container = FlextContainer.get_global()
+container = FlextContainer.shared()
 container.bind("tap_abstractions", FlextMeltanoTapAbstractions)
 container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
 ```
@@ -340,19 +382,31 @@ container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
 **2. Configuration Management**:
 
 ```python
-from flext_meltano import FlextMeltanoSettingsBuilders
+from __future__ import annotations
 
-builder = FlextMeltanoSettingsBuilders()
-settings = builder.build_pipeline_config(tap_settings, target_settings)
+from flext_meltano import FlextMeltanoSettings
+
+settings = FlextMeltanoSettings()
+print(settings.model_dump())
 ```
 
 **3. Error Handling**:
 
 ```python
-# Consistent r patterns across all integrations
-result = tap_abstractions.discover_catalog("tap-name")
-if result.failure:
-    return r[m.Dict].fail(f"Integration failed: {result.error}")
+from __future__ import annotations
+
+from flext_meltano import FlextMeltanoTapAbstractions, m, p, r
+
+
+def handle_discovery(name: str) -> p.Result[m.Meltano.DataSourceInstance]:
+    """Consistent r patterns across all integrations."""
+    abstractions = FlextMeltanoTapAbstractions()
+    result = abstractions.create_tap_from_config(name, {})
+    if result.failure:
+        return r[m.Meltano.DataSourceInstance].fail(
+            f"Integration failed: {result.error}"
+        )
+    return result
 ```
 
 ### Quality Standards
