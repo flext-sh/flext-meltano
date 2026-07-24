@@ -26,9 +26,7 @@ class TestsFlextMeltanoPluginProtocols:
     def test_catalog_builds_entries_from_payload(self) -> None:
         """model_validate exposes stream identifiers on the built entries."""
         catalog = m.Meltano.SingerCatalog.model_validate({
-            "streams": [
-                {"stream": "users", "tap_stream_id": "users", "schema": {}},
-            ],
+            "streams": [{"stream": "users", "tap_stream_id": "users", "schema": {}}]
         })
 
         entry = catalog.streams[0]
@@ -48,31 +46,22 @@ class TestsFlextMeltanoPluginProtocols:
         tm.that(len(catalog.streams), eq=0)
 
     @pytest.mark.parametrize(
-        "stream_names",
-        [
-            ("users",),
-            ("users", "orders"),
-            ("a", "b", "c"),
-        ],
+        "stream_names", [("users",), ("users", "orders"), ("a", "b", "c")]
     )
     def test_multiple_streams_preserve_input_order(
-        self,
-        stream_names: tuple[str, ...],
+        self, stream_names: tuple[str, ...]
     ) -> None:
         """Stream entries preserve the order of the validated payload."""
         payload: t.JsonMapping = {
             "streams": [
                 {"stream": name, "tap_stream_id": name, "schema": {}}
                 for name in stream_names
-            ],
+            ]
         }
 
         catalog = m.Meltano.SingerCatalog.model_validate(payload)
 
-        tm.that(
-            tuple(entry.stream for entry in catalog.streams),
-            eq=stream_names,
-        )
+        tm.that(tuple(entry.stream for entry in catalog.streams), eq=stream_names)
 
     # --- aliasing / roundtrip -------------------------------------------
 
@@ -84,8 +73,8 @@ class TestsFlextMeltanoPluginProtocols:
                     "stream": "users",
                     "tap_stream_id": "users",
                     "schema": {"type": "object"},
-                },
-            ],
+                }
+            ]
         })
 
         tm.that(catalog.streams[0].schema_definition, eq={"type": "object"})
@@ -108,18 +97,13 @@ class TestsFlextMeltanoPluginProtocols:
             "streams": [
                 {"stream": "users", "tap_stream_id": "users", "schema": {}},
                 {"stream": "orders", "tap_stream_id": "orders", "schema": {}},
-            ],
+            ]
         }
 
         first = m.Meltano.SingerCatalog.model_validate(source)
-        second = m.Meltano.SingerCatalog.model_validate(
-            first.model_dump(by_alias=True),
-        )
+        second = m.Meltano.SingerCatalog.model_validate(first.model_dump(by_alias=True))
 
-        tm.that(
-            second.model_dump(by_alias=True),
-            eq=first.model_dump(by_alias=True),
-        )
+        tm.that(second.model_dump(by_alias=True), eq=first.model_dump(by_alias=True))
 
     # --- optional fields / invariants -----------------------------------
 
@@ -146,8 +130,7 @@ class TestsFlextMeltanoPluginProtocols:
         })
 
         tm.that(
-            entry.replication_method,
-            eq=c.Meltano.SingerReplicationMethod.INCREMENTAL,
+            entry.replication_method, eq=c.Meltano.SingerReplicationMethod.INCREMENTAL
         )
 
     # --- error paths -----------------------------------------------------
@@ -161,9 +144,7 @@ class TestsFlextMeltanoPluginProtocols:
         ],
     )
     def test_missing_required_entry_field_raises_validation_error(
-        self,
-        omitted: str,
-        payload: t.JsonMapping,
+        self, omitted: str, payload: t.JsonMapping
     ) -> None:
         """Omitting any required entry field fails validation for that field."""
         with pytest.raises(m.ValidationError) as excinfo:

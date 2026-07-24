@@ -21,14 +21,10 @@ class FlextMeltanoModelsResults:
         operation: Annotated[str, u.Field(description="Operation performed")]
         status: Annotated[str, u.Field(description="Execution status")]
         start_time: Annotated[datetime, u.Field(description="Execution start time")] = (
-            u.Field(
-                default_factory=u.now,
-                description="Execution start time",
-            )
+            u.Field(default_factory=u.now, description="Execution start time")
         )
         end_time: Annotated[
-            datetime | None,
-            u.Field(default=None, description="Execution end time"),
+            datetime | None, u.Field(default=None, description="Execution end time")
         ] = None
         duration_seconds: Annotated[
             float | None,
@@ -39,12 +35,10 @@ class FlextMeltanoModelsResults:
             u.Field(default=0, description="Number of records processed"),
         ] = 0
         error_message: Annotated[
-            str | None,
-            u.Field(default=None, description="Error message if failed"),
+            str | None, u.Field(default=None, description="Error message if failed")
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping,
-            u.Field(description="Additional execution metadata"),
+            t.ConfigurationMapping, u.Field(description="Additional execution metadata")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.computed_field()

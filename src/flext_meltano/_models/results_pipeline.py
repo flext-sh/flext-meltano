@@ -39,12 +39,10 @@ class FlextMeltanoModelsResultsPipeline:
             ),
         ] = c.Meltano.OperationStatus.PENDING
         total_records: Annotated[
-            t.NonNegativeInt,
-            u.Field(default=0, description="Total records processed"),
+            t.NonNegativeInt, u.Field(default=0, description="Total records processed")
         ] = 0
         pipeline_metadata: Annotated[
-            t.ConfigurationMapping,
-            u.Field(description="Pipeline execution metadata"),
+            t.ConfigurationMapping, u.Field(description="Pipeline execution metadata")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
         @u.computed_field()

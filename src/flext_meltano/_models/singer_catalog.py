@@ -40,10 +40,7 @@ class FlextMeltanoModelsSingerCatalog:
         ]
         metadata: t.SequenceOf[
             FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
-        ] = u.Field(
-            default_factory=tuple,
-            description="Singer stream metadata blocks",
-        )
+        ] = u.Field(default_factory=tuple, description="Singer stream metadata blocks")
         key_properties: t.StrSequence = u.Field(
             default_factory=tuple,
             description="Singer key property names for the stream",
@@ -51,8 +48,7 @@ class FlextMeltanoModelsSingerCatalog:
         replication_key: Annotated[
             str | None,
             u.Field(
-                default=None,
-                description="Column used for incremental replication",
+                default=None, description="Column used for incremental replication"
             ),
         ] = None
         replication_method: Annotated[
@@ -64,12 +60,10 @@ class FlextMeltanoModelsSingerCatalog:
             u.Field(default=None, description="Whether this stream is a database view"),
         ] = None
         table_name: Annotated[
-            str | None,
-            u.Field(default=None, description="Source table name"),
+            str | None, u.Field(default=None, description="Source table name")
         ] = None
         database_name: Annotated[
-            str | None,
-            u.Field(default=None, description="Source database name"),
+            str | None, u.Field(default=None, description="Source database name")
         ] = None
         row_count: Annotated[
             int | None,
@@ -87,8 +81,5 @@ class FlextMeltanoModelsSingerCatalog:
             ),
         ] = c.Meltano.SingerMessageType.CATALOG
         streams: t.SequenceOf[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = (
-            u.Field(
-                default_factory=tuple,
-                description="Singer catalog stream entries",
-            )
+            u.Field(default_factory=tuple, description="Singer catalog stream entries")
         )

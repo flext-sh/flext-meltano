@@ -23,10 +23,7 @@ def simple_api_example() -> None:
         logger.info("Meltano version: %s", version_result.value)
     discovery_result = meltano.discover_installed_plugins()
     if discovery_result.success:
-        logger.info(
-            "Found %s installed plugins",
-            len(discovery_result.value),
-        )
+        logger.info("Found %s installed plugins", len(discovery_result.value))
 
 
 def simple_component_example() -> None:
@@ -50,8 +47,7 @@ def simple_runtime_example() -> None:
     ])
     if result.success:
         logger.info(
-            "Runtime command result: %s",
-            result.value.model_dump(mode="python"),
+            "Runtime command result: %s", result.value.model_dump(mode="python")
         )
 
 

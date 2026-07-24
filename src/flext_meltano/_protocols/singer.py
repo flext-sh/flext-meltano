@@ -28,10 +28,7 @@ class FlextMeltanoProtocolsSinger:
             """Execute the tap extraction (implements Service)."""
             ...
 
-        def sync(
-            self,
-            catalog: t.JsonMapping,
-        ) -> p.Result[t.JsonMapping]:
+        def sync(self, catalog: t.JsonMapping) -> p.Result[t.JsonMapping]:
             """Sync data from source with r."""
             ...
 
@@ -45,24 +42,19 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def handle_batch(
-            self,
-            records: t.SequenceOf[t.Meltano.OptionalScalarMap],
+            self, records: t.SequenceOf[t.Meltano.OptionalScalarMap]
         ) -> p.Result[t.JsonMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
-            self,
-            record: t.Meltano.OptionalScalarMap,
+            self, record: t.Meltano.OptionalScalarMap
         ) -> p.Result[t.JsonMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
-    class DbtRunner(
-        p.Service[t.JsonMapping],
-        Protocol,
-    ):
+    class DbtRunner(p.Service[t.JsonMapping], Protocol):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
@@ -70,17 +62,11 @@ class FlextMeltanoProtocolsSinger:
             """Execute DBT transformations (implements Service)."""
             ...
 
-        def run(
-            self,
-            models: t.StrSequence,
-        ) -> p.Result[t.JsonMapping]:
+        def run(self, models: t.StrSequence) -> p.Result[t.JsonMapping]:
             """Run DBT models with r."""
             ...
 
-        def test(
-            self,
-            models: t.StrSequence,
-        ) -> p.Result[t.JsonMapping]:
+        def test(self, models: t.StrSequence) -> p.Result[t.JsonMapping]:
             """Test DBT models with r."""
             ...
 
@@ -119,11 +105,7 @@ class FlextMeltanoProtocolsSinger:
             """Tap configuration."""
             ...
 
-        def run_cli(
-            self,
-            args: t.StrSequence,
-            prog_name: str,
-        ) -> int:
+        def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
             """Execute the tap CLI and return a normalized exit code."""
             ...
 
@@ -149,8 +131,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         def fetch(
-            self,
-            request: p.Meltano.FetchRequest,
+            self, request: p.Meltano.FetchRequest
         ) -> p.Result[p.Meltano.FetchResult]:
             """Return the records for one stream given the typed fetch request."""
             ...
@@ -172,8 +153,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def get_records(
-            self,
-            stream_name: str,
+            self, stream_name: str
         ) -> t.SequenceOf[p.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
@@ -183,9 +163,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def sync(
-            self,
-            catalog: p.Meltano.SingerCatalog,
-            state: p.Meltano.SingerStateMessage,
+            self, catalog: p.Meltano.SingerCatalog, state: p.Meltano.SingerStateMessage
         ) -> None:
             """Synchronize data from source to stdout."""
             ...
@@ -231,9 +209,7 @@ class FlextMeltanoProtocolsSinger:
         def mark_drained(self) -> None: ...
 
         def process_record(
-            self,
-            record: t.MutableJsonMapping,
-            context: t.MutableJsonMapping,
+            self, record: t.MutableJsonMapping, context: t.MutableJsonMapping
         ) -> None: ...
 
     @runtime_checkable
@@ -246,15 +222,13 @@ class FlextMeltanoProtocolsSinger:
         """
 
         def handle_schema(
-            self,
-            message: p.Meltano.SingerSchemaMessage,
+            self, message: p.Meltano.SingerSchemaMessage
         ) -> p.Result[None]:
             """Handle a SCHEMA message."""
             ...
 
         def handle_record(
-            self,
-            message: p.Meltano.SingerRecordMessage,
+            self, message: p.Meltano.SingerRecordMessage
         ) -> p.Result[None]:
             """Handle a RECORD message."""
             ...

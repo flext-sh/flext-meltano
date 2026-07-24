@@ -17,20 +17,17 @@ class FlextMeltanoModelsSourcesParams:
 
         tap_name: Annotated[str, u.Field(description="Name of the tap to run")]
         discover: Annotated[
-            bool,
-            u.Field(default=False, description="Run tap in discover mode"),
+            bool, u.Field(default=False, description="Run tap in discover mode")
         ] = False
         config_file: Annotated[
             str | None,
             u.Field(default=None, description="Path to tap configuration file"),
         ] = None
         catalog_file: Annotated[
-            str | None,
-            u.Field(default=None, description="Path to Singer catalog file"),
+            str | None, u.Field(default=None, description="Path to Singer catalog file")
         ] = None
         state_file: Annotated[
-            str | None,
-            u.Field(default=None, description="Path to Singer state file"),
+            str | None, u.Field(default=None, description="Path to Singer state file")
         ] = None
         properties_file: Annotated[
             str | None,
@@ -42,12 +39,10 @@ class FlextMeltanoModelsSourcesParams:
 
         stream_name: Annotated[str, u.Field(description="Name of the stream")]
         stream_schema: Annotated[
-            t.JsonMapping,
-            u.Field(description="JSON schema for the stream"),
+            t.JsonMapping, u.Field(description="JSON schema for the stream")
         ]
         source_type: Annotated[
-            str,
-            u.Field(description="Type of source this stream belongs to"),
+            str, u.Field(description="Type of source this stream belongs to")
         ]
         status: Annotated[
             str,
@@ -84,8 +79,7 @@ class FlextMeltanoModelsSourcesParams:
         @u.field_validator("stream_schema", mode="before")
         @classmethod
         def normalize_stream_schema(
-            cls,
-            value: t.Meltano.ValidatorInput,
+            cls, value: t.Meltano.ValidatorInput
         ) -> t.JsonMapping:
             """Normalize stream schema once at model boundary."""
             schema = t.json_dict_adapter().validate_python(value)
@@ -99,8 +93,7 @@ class FlextMeltanoModelsSourcesParams:
                 **schema,
                 c.Meltano.SchemaKey.PROPERTIES: properties,
                 c.Meltano.SchemaKey.TYPE: schema.get(
-                    c.Meltano.SchemaKey.TYPE,
-                    c.Meltano.SchemaKey.OBJECT,
+                    c.Meltano.SchemaKey.TYPE, c.Meltano.SchemaKey.OBJECT
                 ),
             }
 
@@ -130,16 +123,14 @@ class FlextMeltanoModelsSourcesParams:
 
         name: Annotated[str, u.Field(description="Singer stream identifier")]
         json_schema: Annotated[
-            t.JsonMapping,
-            u.Field(description="Singer stream JSON schema"),
+            t.JsonMapping, u.Field(description="Singer stream JSON schema")
         ]
         primary_keys: Annotated[
             t.StrSequence,
             u.Field(default=(), description="Record primary key properties"),
         ] = ()
         replication_key: Annotated[
-            str | None,
-            u.Field(default=None, description="Incremental replication key"),
+            str | None, u.Field(default=None, description="Incremental replication key")
         ] = None
 
     class TapSpec(m.BaseModel):
@@ -152,8 +143,7 @@ class FlextMeltanoModelsSourcesParams:
 
         tap_name: Annotated[str, u.Field(description="Canonical Singer tap name")]
         config_jsonschema: Annotated[
-            t.JsonMapping,
-            u.Field(description="Singer tap config JSON schema"),
+            t.JsonMapping, u.Field(description="Singer tap config JSON schema")
         ]
         streams: Annotated[
             t.SequenceOf[FlextMeltanoModelsSourcesParams.StreamSpec],

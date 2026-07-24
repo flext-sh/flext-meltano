@@ -17,40 +17,35 @@ class FlextMeltanoModelsTransformations:
         name: Annotated[t.NonEmptyStr, u.Field(description="Project name")]
         transformation_version: Annotated[str, u.Field(description="Project version")]
         profile: Annotated[str, u.Field(description="Profile name")]
-        model_paths: Annotated[
-            t.StrSequence,
-            u.Field(description="Model paths"),
-        ] = u.Field(
-            default_factory=lambda: [c.Meltano.DbtPathName.MODELS],
-            description="Model paths",
+        model_paths: Annotated[t.StrSequence, u.Field(description="Model paths")] = (
+            u.Field(
+                default_factory=lambda: [c.Meltano.DbtPathName.MODELS],
+                description="Model paths",
+            )
         )
         analysis_paths: Annotated[
-            t.StrSequence,
-            u.Field(description="Analysis paths"),
+            t.StrSequence, u.Field(description="Analysis paths")
         ] = u.Field(
             default_factory=lambda: [c.Meltano.DbtPathName.ANALYSIS],
             description="Analysis paths",
         )
-        test_paths: Annotated[
-            t.StrSequence,
-            u.Field(description="Test paths"),
-        ] = u.Field(
-            default_factory=lambda: [c.Meltano.DbtPathName.TESTS],
-            description="Test paths",
+        test_paths: Annotated[t.StrSequence, u.Field(description="Test paths")] = (
+            u.Field(
+                default_factory=lambda: [c.Meltano.DbtPathName.TESTS],
+                description="Test paths",
+            )
         )
-        seed_paths: Annotated[
-            t.StrSequence,
-            u.Field(description="Seed paths"),
-        ] = u.Field(
-            default_factory=lambda: [c.Meltano.DbtPathName.SEEDS],
-            description="Seed paths",
+        seed_paths: Annotated[t.StrSequence, u.Field(description="Seed paths")] = (
+            u.Field(
+                default_factory=lambda: [c.Meltano.DbtPathName.SEEDS],
+                description="Seed paths",
+            )
         )
-        macro_paths: Annotated[
-            t.StrSequence,
-            u.Field(description="Macro paths"),
-        ] = u.Field(
-            default_factory=lambda: [c.Meltano.DbtPathName.MACROS],
-            description="Macro paths",
+        macro_paths: Annotated[t.StrSequence, u.Field(description="Macro paths")] = (
+            u.Field(
+                default_factory=lambda: [c.Meltano.DbtPathName.MACROS],
+                description="Macro paths",
+            )
         )
 
         @u.computed_field()

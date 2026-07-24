@@ -22,13 +22,10 @@ class TestsFlextMeltanoTargetAbstractions:
     def sink_config(self) -> p.Meltano.DataSinkConfig:
         """Return a valid data-sink configuration modelled via the public m.* facade."""
         return m.Meltano.DataSinkConfig(
-            sink_type="target-jsonl",
-            connection_config={"path": "output.jsonl"},
+            sink_type="target-jsonl", connection_config={"path": "output.jsonl"}
         )
 
-    def test_target_factory_binds_sink_name_and_leaves_other_roles_unset(
-        self,
-    ) -> None:
+    def test_target_factory_binds_sink_name_and_leaves_other_roles_unset(self) -> None:
         """target() returns a success bound to the sink name, source/xform unset."""
         result = meltano.target("target-jsonl")
 
@@ -39,8 +36,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(service.transformation_name, none=True)
 
     @pytest.mark.parametrize(
-        "sink_name",
-        ["target-jsonl", "target-postgres", "target-snowflake"],
+        "sink_name", ["target-jsonl", "target-postgres", "target-snowflake"]
     )
     def test_target_factory_echoes_requested_sink_name(self, sink_name: str) -> None:
         """target() binds exactly the requested sink name for any target kind."""
@@ -50,8 +46,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(result.value.sink_name, eq=sink_name)
 
     def test_configure_sink_derives_definition_from_config(
-        self,
-        sink_config: p.Meltano.DataSinkConfig,
+        self, sink_config: p.Meltano.DataSinkConfig
     ) -> None:
         """configure_sink() maps a config to a configured DataSinkDefinition."""
         result = meltano.configure_sink(sink_config)
@@ -64,8 +59,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(definition.status, eq="configured")
 
     def test_configure_sink_is_deterministic_for_equal_input(
-        self,
-        sink_config: p.Meltano.DataSinkConfig,
+        self, sink_config: p.Meltano.DataSinkConfig
     ) -> None:
         """configure_sink() yields the same public definition for equal input."""
         first = meltano.configure_sink(sink_config)
@@ -94,8 +88,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(instance.settings.connection_config["path"], eq="output.jsonl")
 
     def test_create_flext_target_accepts_config_model_directly(
-        self,
-        sink_config: p.Meltano.DataSinkConfig,
+        self, sink_config: p.Meltano.DataSinkConfig
     ) -> None:
         """create_flext_target() passes an existing config model straight through."""
         result = meltano.create_flext_target(sink_config)
@@ -103,8 +96,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.ok(result)
         tm.that(result.value.settings.sink_type, eq=sink_config.sink_type)
         tm.that(
-            result.value.settings.connection_config,
-            eq=sink_config.connection_config,
+            result.value.settings.connection_config, eq=sink_config.connection_config
         )
 
     def test_create_flext_target_rejects_mapping_missing_sink_type(self) -> None:
@@ -116,8 +108,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(result.error, has="Invalid target settings")
 
     def test_create_sink_instance_matches_create_flext_target(
-        self,
-        sink_config: p.Meltano.DataSinkConfig,
+        self, sink_config: p.Meltano.DataSinkConfig
     ) -> None:
         """create_sink_instance() and create_flext_target() agree for a model input."""
         via_instance = meltano.create_sink_instance(sink_config)
@@ -133,8 +124,7 @@ class TestsFlextMeltanoTargetAbstractions:
         tm.that(via_instance.value.status, eq=via_target.value.status)
 
     def test_validate_sink_config_accepts_valid_config(
-        self,
-        sink_config: p.Meltano.DataSinkConfig,
+        self, sink_config: p.Meltano.DataSinkConfig
     ) -> None:
         """validate_sink_config() reports success for a well-formed config."""
         result = meltano.validate_sink_config(sink_config)

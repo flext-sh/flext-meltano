@@ -45,17 +45,13 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
         return cmd
 
     def _run_dbt_subprocess(
-        self,
-        cmd: t.MutableSequenceOf[str],
-        operation: str,
+        self, cmd: t.MutableSequenceOf[str], operation: str
     ) -> p.Result[str]:
         """Execute a dbt command via subprocess."""
 
         def _run__run_dbt_subprocess() -> p.Result[str]:
             self.logger.info(
-                "Running dbt operation",
-                operation=operation,
-                command=" ".join(cmd),
+                "Running dbt operation", operation=operation, command=" ".join(cmd)
             )
             result = u.Cli.run_raw(list(cmd))
             if result.failure:
@@ -77,32 +73,21 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             return _run__run_dbt_subprocess()
         except c.EXC_OS_RUNTIME_TYPE as e:
             self.logger.exception(
-                "dbt operation failed",
-                operation=operation,
-                error=str(e),
+                "dbt operation failed", operation=operation, error=str(e)
             )
             return r[str].fail(f"dbt {operation} failed: {e}")
 
-    def dbt_run_models(
-        self,
-        models: t.StrSequence | None = None,
-    ) -> p.Result[str]:
+    def dbt_run_models(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Run dbt models via subprocess."""
         cmd = self._build_dbt_command(c.Meltano.DbtCommand.RUN, models=models)
         return self._run_dbt_subprocess(cmd, c.Meltano.DbtCommand.RUN)
 
-    def dbt_run_tests(
-        self,
-        models: t.StrSequence | None = None,
-    ) -> p.Result[str]:
+    def dbt_run_tests(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Run dbt tests via subprocess."""
         cmd = self._build_dbt_command(c.Meltano.DbtCommand.TEST, models=models)
         return self._run_dbt_subprocess(cmd, c.Meltano.DbtCommand.TEST)
 
-    def dbt_compile(
-        self,
-        models: t.StrSequence | None = None,
-    ) -> p.Result[str]:
+    def dbt_compile(self, models: t.StrSequence | None = None) -> p.Result[str]:
         """Compile dbt models via subprocess."""
         cmd = self._build_dbt_command(c.Meltano.DbtCommand.COMPILE, models=models)
         return self._run_dbt_subprocess(cmd, c.Meltano.DbtCommand.COMPILE)
@@ -110,12 +95,10 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
     def dbt_docs_generate(self) -> p.Result[str]:
         """Generate dbt documentation via subprocess."""
         cmd = self._build_dbt_command(
-            c.Meltano.DbtCommand.DOCS,
-            extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
+            c.Meltano.DbtCommand.DOCS, extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS)
         )
         return self._run_dbt_subprocess(
-            cmd,
-            f"{c.Meltano.DbtCommand.DOCS} {c.Meltano.DbtCommand.GENERATE}",
+            cmd, f"{c.Meltano.DbtCommand.DOCS} {c.Meltano.DbtCommand.GENERATE}"
         )
 
     def configure_dbt_project_root(self, root: Path) -> None:

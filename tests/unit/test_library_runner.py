@@ -44,8 +44,7 @@ class TestsFlextMeltanoLibraryRunner:
     def elt_result() -> p.Result[t.JsonMapping]:
         """Run one complete ELT pipeline once and share its outcome."""
         return meltano.execute_complete_elt_pipeline(
-            tap_name="tap-csv",
-            target_name="target-jsonl",
+            tap_name="tap-csv", target_name="target-jsonl"
         )
 
     @pytest.fixture(scope="class")
@@ -67,8 +66,7 @@ class TestsFlextMeltanoLibraryRunner:
         assert callable(meltano.run_elt_pipeline)
 
     def test_execute_complete_elt_pipeline_succeeds(
-        self,
-        elt_result: p.Result[t.JsonMapping],
+        self, elt_result: p.Result[t.JsonMapping]
     ) -> None:
         """A complete ELT run reports a successful ``r[T]`` outcome."""
         tm.ok(elt_result)
@@ -76,16 +74,13 @@ class TestsFlextMeltanoLibraryRunner:
 
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
     def test_elt_payload_exposes_base_command_keys(
-        self,
-        elt_result: p.Result[t.JsonMapping],
-        key: str,
+        self, elt_result: p.Result[t.JsonMapping], key: str
     ) -> None:
         """The ELT payload carries every documented command-execution field."""
         tm.that(elt_result.unwrap(), has=key)
 
     def test_elt_payload_echoes_pipeline_identity(
-        self,
-        elt_result: p.Result[t.JsonMapping],
+        self, elt_result: p.Result[t.JsonMapping]
     ) -> None:
         """The ELT payload echoes the requested tap and target identity."""
         payload = elt_result.unwrap()
@@ -93,46 +88,39 @@ class TestsFlextMeltanoLibraryRunner:
         tm.that(payload["target_name"], eq="target-jsonl")
 
     def test_elt_payload_exit_code_is_int(
-        self,
-        elt_result: p.Result[t.JsonMapping],
+        self, elt_result: p.Result[t.JsonMapping]
     ) -> None:
         """Exit code is delivered as an integer, ready for callers to branch."""
         tm.that(elt_result.unwrap()["exit_code"], is_=int)
 
     def test_elt_result_supports_result_combinators(
-        self,
-        elt_result: p.Result[t.JsonMapping],
+        self, elt_result: p.Result[t.JsonMapping]
     ) -> None:
         """The outcome is a real ``r[T]`` value that chains via ``map``."""
         exit_code = elt_result.map(lambda payload: payload["exit_code"]).unwrap()
         tm.that(exit_code, is_=int)
 
     def test_run_dbt_transformation_succeeds(
-        self,
-        dbt_result: p.Result[p.Meltano.CommandExecutionResult],
+        self, dbt_result: p.Result[p.Meltano.CommandExecutionResult]
     ) -> None:
         """A DBT transformation reports a successful ``r[T]`` outcome."""
         tm.ok(dbt_result)
 
     @pytest.mark.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
     def test_dbt_result_exposes_command_execution_fields(
-        self,
-        dbt_result: p.Result[p.Meltano.CommandExecutionResult],
-        attribute: str,
+        self, dbt_result: p.Result[p.Meltano.CommandExecutionResult], attribute: str
     ) -> None:
         """The typed CommandExecutionResult carries every documented field."""
         assert hasattr(dbt_result.unwrap(), attribute)
 
     def test_dbt_result_command_targets_requested_models(
-        self,
-        dbt_result: p.Result[p.Meltano.CommandExecutionResult],
+        self, dbt_result: p.Result[p.Meltano.CommandExecutionResult]
     ) -> None:
         """The executed dbt command carries the requested model name."""
         tm.that(dbt_result.unwrap().command, has="model1")
 
     def test_run_elt_pipeline_succeeds_and_echoes_identity(
-        self,
-        elt_pipeline_result: p.Result[t.JsonMapping],
+        self, elt_pipeline_result: p.Result[t.JsonMapping]
     ) -> None:
         """A tap-to-target ELT run succeeds and echoes tap/target names."""
         tm.ok(elt_pipeline_result)
@@ -142,9 +130,7 @@ class TestsFlextMeltanoLibraryRunner:
 
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
     def test_elt_pipeline_payload_exposes_base_command_keys(
-        self,
-        elt_pipeline_result: p.Result[t.JsonMapping],
-        key: str,
+        self, elt_pipeline_result: p.Result[t.JsonMapping], key: str
     ) -> None:
         """The tap-to-target payload carries every documented command field."""
         tm.that(elt_pipeline_result.unwrap(), has=key)

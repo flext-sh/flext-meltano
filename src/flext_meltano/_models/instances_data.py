@@ -22,14 +22,12 @@ class FlextMeltanoModelsInstancesData:
 
         sink_type: Annotated[str, u.Field(description="Sink type identifier")]
         connection_config: Annotated[
-            t.JsonMapping,
-            u.Field(description="Connection configuration dictionary"),
+            t.JsonMapping, u.Field(description="Connection configuration dictionary")
         ]
         batch_size: Annotated[
             t.BatchSize,
             u.Field(
-                default=c.DEFAULT_SIZE,
-                description="Batch size for record processing",
+                default=c.DEFAULT_SIZE, description="Batch size for record processing"
             ),
         ] = c.DEFAULT_SIZE
         max_batches: Annotated[
@@ -92,14 +90,12 @@ class FlextMeltanoModelsInstancesData:
             u.Field(description="Source configuration"),
         ]
         adapter: Annotated[
-            t.JsonValue | None,
-            u.Field(default=None, description="Adapter instance"),
+            t.JsonValue | None, u.Field(default=None, description="Adapter instance")
         ] = None
         status: Annotated[
             str,
             u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED,
-                description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
@@ -111,8 +107,7 @@ class FlextMeltanoModelsInstancesData:
             u.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
-            t.ConfigurationMapping,
-            u.Field(description="Additional metadata"),
+            t.ConfigurationMapping, u.Field(description="Additional metadata")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
         source_id: Annotated[str, u.Field(description="Unique source identifier")]
 
@@ -171,27 +166,23 @@ class FlextMeltanoModelsInstancesData:
         """Generic data sink instance for pipeline operations."""
 
         sink_id: Annotated[
-            str | None,
-            u.Field(default=None, description="Unique sink identifier"),
+            str | None, u.Field(default=None, description="Unique sink identifier")
         ] = None
         sink_type: Annotated[str, u.Field(description="Type of the data sink")]
         settings: FlextMeltanoModelsInstancesData.DataSinkConfig = u.Field(
-            description="Sink configuration",
+            description="Sink configuration"
         )
         adapter: Annotated[
-            t.JsonValue | None,
-            u.Field(default=None, description="Adapter instance"),
+            t.JsonValue | None, u.Field(default=None, description="Adapter instance")
         ] = None
         status: Annotated[
             str,
             u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED,
-                description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[
-            t.BatchSize,
-            u.Field(default=1000, description="Batch processing size"),
+            t.BatchSize, u.Field(default=1000, description="Batch processing size")
         ] = 1000
         sink_count: Annotated[
             t.NonNegativeInt,

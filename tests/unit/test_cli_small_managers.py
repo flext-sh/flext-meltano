@@ -26,9 +26,7 @@ class TestsFlextMeltanoCliSmallManagers:
         return FlextMeltanoCli()
 
     def test_version_command_succeeds_and_prints_version_string(
-        self,
-        meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
     ) -> None:
         result = meltano_cli.run([c.Meltano.Command.VERSION])
 
@@ -36,9 +34,7 @@ class TestsFlextMeltanoCliSmallManagers:
         tm.that("." in capsys.readouterr().out, eq=True)
 
     def test_status_show_succeeds_with_ready_status_payload(
-        self,
-        meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
     ) -> None:
         result = meltano_cli.run([c.Meltano.Command.STATUS, "show"])
 
@@ -51,9 +47,7 @@ class TestsFlextMeltanoCliSmallManagers:
         tm.that(payload.get("status"), eq=c.Meltano.OperationStatus.READY)
 
     def test_status_health_succeeds_with_status_key_in_payload(
-        self,
-        meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
     ) -> None:
         result = meltano_cli.run([
             c.Meltano.Command.STATUS,
@@ -69,24 +63,17 @@ class TestsFlextMeltanoCliSmallManagers:
         tm.that("status" in payload, eq=True)
 
     @pytest.mark.parametrize(
-        "command",
-        [
-            c.Meltano.Command.TAP,
-            c.Meltano.Command.TARGET,
-        ],
+        "command", [c.Meltano.Command.TAP, c.Meltano.Command.TARGET]
     )
     def test_unsupported_extractor_operation_reports_failure(
-        self,
-        meltano_cli: FlextMeltanoCli,
-        command: str,
+        self, meltano_cli: FlextMeltanoCli, command: str
     ) -> None:
         result = meltano_cli.run([command, "--operation", "run", "--args", "demo"])
 
         tm.that(result.failure, eq=True)
 
     def test_plugin_info_without_plugin_type_reports_failure(
-        self,
-        meltano_cli: FlextMeltanoCli,
+        self, meltano_cli: FlextMeltanoCli
     ) -> None:
         result = meltano_cli.run([
             c.Meltano.Command.PLUGIN,
@@ -96,9 +83,7 @@ class TestsFlextMeltanoCliSmallManagers:
         tm.that(result.failure, eq=True)
 
     def test_plugin_install_is_unsupported_and_reports_failure(
-        self,
-        meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
     ) -> None:
         result = meltano_cli.run([
             c.Meltano.Command.PLUGIN,
@@ -111,9 +96,7 @@ class TestsFlextMeltanoCliSmallManagers:
         tm.that(capsys.readouterr().out, has="not supported")
 
     def test_dbt_help_option_succeeds_and_prints_dbt_help(
-        self,
-        meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
     ) -> None:
         result = meltano_cli.run([c.Meltano.Command.DBT, c.Meltano.CMD_HELP_OPTION])
 

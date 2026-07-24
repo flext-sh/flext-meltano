@@ -37,16 +37,14 @@ class TestsFlextMeltanoSingerCliTranslator:
         [
             pytest.param(
                 m.Meltano.CliDataSourceParams(
-                    source_name="tap-postgres",
-                    discover=False,
+                    source_name="tap-postgres", discover=False
                 ),
                 ["tap-postgres"],
                 id="minimal",
             ),
             pytest.param(
                 m.Meltano.CliDataSourceParams(
-                    source_name="tap-postgres",
-                    discover=True,
+                    source_name="tap-postgres", discover=True
                 ),
                 ["tap-postgres", "--discover"],
                 id="discover",
@@ -99,9 +97,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_tap_run_builds_expected_command(
-        self,
-        params: p.Meltano.CliDataSourceParams,
-        expected: list[str],
+        self, params: p.Meltano.CliDataSourceParams, expected: list[str]
     ) -> None:
         result = meltano.translate_tap_run(params)
         tm.ok(result)
@@ -132,16 +128,14 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliDataSinkParams(
-                    sink_name="target-postgres",
-                    config_file="/path/to/settings.json",
+                    sink_name="target-postgres", config_file="/path/to/settings.json"
                 ),
                 ["target-postgres", "--config", "/path/to/settings.json"],
                 id="config",
             ),
             pytest.param(
                 m.Meltano.CliDataSinkParams(
-                    sink_name="target-postgres",
-                    input_file="/path/to/input.jsonl",
+                    sink_name="target-postgres", input_file="/path/to/input.jsonl"
                 ),
                 ["target-postgres", "--input", "/path/to/input.jsonl"],
                 id="input",
@@ -164,9 +158,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_target_run_builds_expected_command(
-        self,
-        params: p.Meltano.CliDataSinkParams,
-        expected: list[str],
+        self, params: p.Meltano.CliDataSinkParams, expected: list[str]
     ) -> None:
         result = meltano.translate_target_run(params)
         tm.ok(result)
@@ -180,8 +172,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         [
             pytest.param(
                 m.Meltano.CliPipelineParams(
-                    source_name="tap-postgres",
-                    sink_name="target-postgres",
+                    source_name="tap-postgres", sink_name="target-postgres"
                 ),
                 ["tap-postgres"],
                 ["target-postgres"],
@@ -275,8 +266,7 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    models="users orders",
+                    project_dir="/dbt/project", models="users orders"
                 ),
                 [
                     "dbt",
@@ -290,8 +280,7 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    select="tag:daily",
+                    project_dir="/dbt/project", select="tag:daily"
                 ),
                 [
                     "dbt",
@@ -305,8 +294,7 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    exclude="tag:deprecated",
+                    project_dir="/dbt/project", exclude="tag:deprecated"
                 ),
                 [
                     "dbt",
@@ -320,16 +308,9 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project",
-                    full_refresh=True,
+                    project_dir="/dbt/project", full_refresh=True
                 ),
-                [
-                    "dbt",
-                    "run",
-                    "--projects-dir",
-                    "/dbt/project",
-                    "--full-refresh",
-                ],
+                ["dbt", "run", "--projects-dir", "/dbt/project", "--full-refresh"],
                 id="full-refresh",
             ),
             pytest.param(
@@ -358,9 +339,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_dbt_run_builds_expected_command(
-        self,
-        params: p.Meltano.CliTransformationParams,
-        expected: list[str],
+        self, params: p.Meltano.CliTransformationParams, expected: list[str]
     ) -> None:
         result = meltano.translate_dbt_run(params)
         tm.ok(result)
@@ -376,9 +355,11 @@ class TestsFlextMeltanoSingerCliTranslator:
         tm.that(str(result.error), has="non-empty")
 
     def test_execute_singer_command_success_returns_output_mapping(self) -> None:
-        result = meltano.execute_singer_command(
-            [sys.executable, "-c", "print('Success output')"],
-        )
+        result = meltano.execute_singer_command([
+            sys.executable,
+            "-c",
+            "print('Success output')",
+        ])
         tm.ok(result)
         output = result.value
         tm.that(str(output["stdout"]).strip(), eq="Success output")
@@ -411,11 +392,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ("command", "timeout", "expected_fragments"),
         [
             pytest.param(
-                [
-                    sys.executable,
-                    "-c",
-                    "import time; time.sleep(2)",
-                ],
+                [sys.executable, "-c", "import time; time.sleep(2)"],
                 1,
                 ["timeout"],
                 id="timeout",
@@ -429,10 +406,7 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_execute_singer_command_propagates_boundary_failure(
-        self,
-        command: list[str],
-        timeout: int,
-        expected_fragments: list[str],
+        self, command: list[str], timeout: int, expected_fragments: list[str]
     ) -> None:
         result = meltano.execute_singer_command(command, timeout=timeout)
         tm.fail(result)

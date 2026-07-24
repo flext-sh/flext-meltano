@@ -27,20 +27,13 @@ if TYPE_CHECKING:
         u,
     )
 
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".constants": ("TestsFlextMeltanoConstants", "c"),
-        ".typings": ("TestsFlextMeltanoTypes", "t"),
-        ".protocols": ("TestsFlextMeltanoProtocols", "p"),
-        ".models": ("TestsFlextMeltanoModels", "m"),
-        ".utilities": ("TestsFlextMeltanoUtilities", "u"),
-        ".base": ("TestsFlextMeltanoServiceBase", "s"),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".constants": ("TestsFlextMeltanoConstants", "c"),
+    ".typings": ("TestsFlextMeltanoTypes", "t"),
+    ".protocols": ("TestsFlextMeltanoProtocols", "p"),
+    ".models": ("TestsFlextMeltanoModels", "m"),
+    ".utilities": ("TestsFlextMeltanoUtilities", "u"),
+    ".base": ("TestsFlextMeltanoServiceBase", "s"),
+})
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

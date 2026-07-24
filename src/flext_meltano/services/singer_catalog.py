@@ -26,12 +26,11 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     """
 
     _singer_catalog: p.Meltano.SingerCatalog = u.PrivateAttr(
-        default_factory=m.Meltano.SingerCatalog,
+        default_factory=m.Meltano.SingerCatalog
     )
 
     def discover_catalog_streams(
-        self,
-        tap: p.Meltano.SingerTap,
+        self, tap: p.Meltano.SingerTap
     ) -> p.Result[p.Meltano.SingerCatalog]:
         """Discover streams from a Singer tap instance.
 
@@ -41,8 +40,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         try:
             self._singer_catalog = tap.discover()
             self.logger.info(
-                "Streams discovered",
-                stream_count=len(self._singer_catalog.streams),
+                "Streams discovered", stream_count=len(self._singer_catalog.streams)
             )
             return r[p.Meltano.SingerCatalog].ok(self._singer_catalog)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
@@ -66,7 +64,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         try:
             if not catalog_file.exists():
                 return r[p.Meltano.SingerCatalog].fail(
-                    f"Catalog file not found: {catalog_file}",
+                    f"Catalog file not found: {catalog_file}"
                 )
 
             def _store(catalog: p.Meltano.SingerCatalog) -> p.Meltano.SingerCatalog:
@@ -79,8 +77,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 return catalog
 
             return u.Cli.json_read_files_model(
-                catalog_file,
-                m.Meltano.SingerCatalog,
+                catalog_file, m.Meltano.SingerCatalog
             ).map(_store)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load catalog", error=str(e))
@@ -103,8 +100,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             return r[None].fail(f"Failed to save catalog: {e}")
 
     def select_streams(
-        self,
-        stream_names: t.StrSequence,
+        self, stream_names: t.StrSequence
     ) -> p.Result[p.Meltano.SingerCatalog]:
         """Select specific streams from cached catalog."""
         try:

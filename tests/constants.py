@@ -91,7 +91,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
                 MappingProxyType({
                     _SingerSdkAdapterValue.SETTINGS_KEY: (
                         _SingerSdkAdapterValue.SETTINGS_VALUE
-                    ),
+                    )
                 })
             )
             SINGER_SDK_ADAPTER_STREAM_USERS: Final[str] = (

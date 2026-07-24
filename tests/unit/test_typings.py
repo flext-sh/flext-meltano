@@ -27,8 +27,7 @@ class TestsFlextMeltanoTypingsUnit:
 
     @pytest.mark.parametrize("dbt_type_name", ["DbtProject", "DbtManifestData"])
     def test_dbt_types_are_flat_members_of_meltano_namespace(
-        self,
-        dbt_type_name: str,
+        self, dbt_type_name: str
     ) -> None:
         """DBT types are exposed flat (``Dbt`` prefix) directly on ``t.Meltano``."""
         assert hasattr(t.Meltano, dbt_type_name)
@@ -45,8 +44,7 @@ class TestsFlextMeltanoTypingsUnit:
         ],
     )
     def test_composition_types_are_exposed_on_meltano_namespace(
-        self,
-        composition_type_name: str,
+        self, composition_type_name: str
     ) -> None:
         """Composed types that add value over base ``t.*`` are exposed on ``t.Meltano``."""
         assert hasattr(t.Meltano, composition_type_name)
@@ -64,21 +62,9 @@ class TestsFlextMeltanoTypingsUnit:
 
     @pytest.mark.parametrize(
         "legacy_namespace",
-        [
-            "Singer",
-            "Dbt",
-            "Project",
-            "Pipeline",
-            "Bridge",
-            "CLI",
-            "ELT",
-            "Processing",
-        ],
+        ["Singer", "Dbt", "Project", "Pipeline", "Bridge", "CLI", "ELT", "Processing"],
     )
-    def test_legacy_nested_namespaces_are_absent(
-        self,
-        legacy_namespace: str,
-    ) -> None:
+    def test_legacy_nested_namespaces_are_absent(self, legacy_namespace: str) -> None:
         """Flat namespace refuses the old nested sub-namespaces."""
         assert not hasattr(t.Meltano, legacy_namespace)
 
@@ -113,8 +99,7 @@ class TestsFlextMeltanoTypingsUnit:
 
     @pytest.mark.parametrize("wrapper_name", ["SingerProperty", "SingerStringType"])
     def test_runtime_singer_sdk_wrappers_live_on_models_not_typings(
-        self,
-        wrapper_name: str,
+        self, wrapper_name: str
     ) -> None:
         """Runtime Singer SDK wrappers are exposed via ``m.Meltano``, never ``t.Meltano``."""
         tm.that(getattr(m.Meltano, wrapper_name), none=False)

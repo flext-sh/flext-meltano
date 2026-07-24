@@ -178,10 +178,7 @@ class FlextMeltanoProtocolsModels:
             ...
 
         def model_dump_json(
-            self,
-            *,
-            indent: int | None = None,
-            by_alias: bool | None = None,
+            self, *, indent: int | None = None, by_alias: bool | None = None
         ) -> str:
             """Serialize the catalog at its JSON egress boundary."""
             ...

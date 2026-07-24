@@ -18,16 +18,14 @@ class FlextMeltanoModelsPayloadsData:
         """Normalized mapping payload with string keys."""
 
         values: Annotated[
-            t.JsonMapping,
-            u.Field(description="Normalized mapping values"),
+            t.JsonMapping, u.Field(description="Normalized mapping values")
         ] = u.Field(default_factory=lambda: MappingProxyType({}))
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
 
         value: Annotated[Path, u.Field(description="Normalized path")] = u.Field(
-            default_factory=Path,
-            description="Normalized path",
+            default_factory=Path, description="Normalized path"
         )
 
         @u.field_validator("value", mode="before")
@@ -42,15 +40,13 @@ class FlextMeltanoModelsPayloadsData:
         """Normalize plugin variant from external extraction (str|list|dict)."""
 
         value: Annotated[
-            t.JsonValue | None,
-            u.Field(description="Normalized variant value"),
+            t.JsonValue | None, u.Field(description="Normalized variant value")
         ] = None
 
         @u.field_validator("value", mode="before")
         @classmethod
         def normalize_variant(
-            cls,
-            value: str | t.Meltano.ValidatorInput,
+            cls, value: str | t.Meltano.ValidatorInput
         ) -> t.JsonValue | None:
             """Normalize variant payload through canonical Pydantic models."""
             match value:

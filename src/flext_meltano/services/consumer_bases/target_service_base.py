@@ -35,19 +35,16 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     target_name: Annotated[
-        t.NonEmptyStr,
-        u.Field(description="Canonical target name (e.g. target-oracle)"),
+        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)")
     ] = "target"
 
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
-        default_factory=dict[str, p.Meltano.SingerDrainSink],
+        default_factory=dict[str, p.Meltano.SingerDrainSink]
     )
 
     @abstractmethod
     def create_sink(
-        self,
-        stream_name: str,
-        schema: t.JsonMapping,
+        self, stream_name: str, schema: t.JsonMapping
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -74,9 +71,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def fetch_or_create_sink(
-        self,
-        stream_name: str,
-        schema: t.JsonMapping,
+        self, stream_name: str, schema: t.JsonMapping
     ) -> p.Result[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream."""
         try:
@@ -110,10 +105,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def process_record(
-        self,
-        stream_name: str,
-        record: t.JsonMapping,
-        schema: t.JsonMapping,
+        self, stream_name: str, record: t.JsonMapping, schema: t.JsonMapping
     ) -> p.Result[bool]:
         """Process a single Singer RECORD message."""
         sink_result = self.fetch_or_create_sink(stream_name, schema)
