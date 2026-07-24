@@ -1,39 +1,60 @@
 # System Context Documentation
 
 <!-- TOC START -->
-- [📋 Table of Contents](#table-of-contents)
-- [🎯 System Purpose and Scope](#system-purpose-and-scope)
-  - [Primary Purpose](#primary-purpose)
-  - [Mission Statement](#mission-statement)
-  - [System Scope](#system-scope)
-  - [Success Criteria](#success-criteria)
-- [👥 Stakeholder Analysis](#stakeholder-analysis)
-  - [Primary Stakeholders](#primary-stakeholders)
-  - [Stakeholder Requirements](#stakeholder-requirements)
-  - [Stakeholder Value Proposition](#stakeholder-value-proposition)
-- [🔗 External System Integration](#external-system-integration)
-  - [Core Integration Points](#core-integration-points)
-  - [Integration Architecture](#integration-architecture)
-  - [Integration Patterns](#integration-patterns)
-- [🌐 Ecosystem Architecture](#ecosystem-architecture)
-  - [FLEXT Ecosystem Structure](#flext-ecosystem-structure)
-  - [Ecosystem Integration Patterns](#ecosystem-integration-patterns)
-- [🔲 System Boundaries](#system-boundaries)
-  - [Functional Boundaries](#functional-boundaries)
-  - [Security Boundaries](#security-boundaries)
-  - [Integration Boundaries](#integration-boundaries)
-- [🔄 Integration Patterns](#integration-patterns)
-  - [Synchronous Integration Patterns](#synchronous-integration-patterns)
-  - [Asynchronous Integration Patterns](#asynchronous-integration-patterns)
-- [🚀 Deployment Contexts](#deployment-contexts)
-  - [Development Context](#development-context)
-  - [Staging Context](#staging-context)
-  - [Production Context](#production-context)
-  - [Deployment Pattern Comparison](#deployment-pattern-comparison)
-- [📊 System Context Summary](#system-context-summary)
-  - [Key Architectural Characteristics](#key-architectural-characteristics)
-  - [System Qualities](#system-qualities)
-  - [Integration Philosophy](#integration-philosophy)
+- [System Context Documentation](#system-context-documentation)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [🎯 System Purpose and Scope](#-system-purpose-and-scope)
+    - [Primary Purpose](#primary-purpose)
+    - [Mission Statement](#mission-statement)
+    - [System Scope](#system-scope)
+      - [In Scope](#in-scope)
+      - [Out of Scope](#out-of-scope)
+    - [Success Criteria](#success-criteria)
+  - [👥 Stakeholder Analysis](#-stakeholder-analysis)
+    - [Primary Stakeholders](#primary-stakeholders)
+    - [Stakeholder Requirements](#stakeholder-requirements)
+    - [Stakeholder Value Proposition](#stakeholder-value-proposition)
+      - [For Data Engineers](#for-data-engineers)
+      - [For Platform Architects](#for-platform-architects)
+      - [For DevOps Teams](#for-devops-teams)
+      - [For Security Teams](#for-security-teams)
+  - [🔗 External System Integration](#-external-system-integration)
+    - [Core Integration Points](#core-integration-points)
+    - [Integration Architecture](#integration-architecture)
+      - [FLEXT-Core Integration](#flext-core-integration)
+      - [Meltano CLI Integration](#meltano-cli-integration)
+      - [Singer SDK Integration](#singer-sdk-integration)
+    - [Integration Patterns](#integration-patterns)
+      - [Adapter Pattern for External Systems](#adapter-pattern-for-external-systems)
+      - [Plugin Architecture for Extensibility](#plugin-architecture-for-extensibility)
+  - [🌐 Ecosystem Architecture](#-ecosystem-architecture)
+    - [FLEXT Ecosystem Structure](#flext-ecosystem-structure)
+    - [Ecosystem Integration Patterns](#ecosystem-integration-patterns)
+      - [Foundation Library Pattern](#foundation-library-pattern)
+      - [Plugin Ecosystem Integration](#plugin-ecosystem-integration)
+  - [🔲 System Boundaries](#-system-boundaries)
+    - [Functional Boundaries](#functional-boundaries)
+      - [Data Integration Boundary](#data-integration-boundary)
+      - [Application Boundary](#application-boundary)
+      - [Infrastructure Boundary](#infrastructure-boundary)
+    - [Security Boundaries](#security-boundaries)
+    - [Integration Boundaries](#integration-boundaries)
+  - [🔄 Integration Patterns](#-integration-patterns)
+    - [Synchronous Integration Patterns](#synchronous-integration-patterns)
+      - [Request-Response Pattern](#request-response-pattern)
+      - [Circuit Breaker Pattern](#circuit-breaker-pattern)
+    - [Asynchronous Integration Patterns](#asynchronous-integration-patterns)
+      - [Event-Driven Pattern](#event-driven-pattern)
+      - [Message Queue Integration](#message-queue-integration)
+  - [🚀 Deployment Contexts](#-deployment-contexts)
+    - [Development Context](#development-context)
+    - [Staging Context](#staging-context)
+    - [Production Context](#production-context)
+    - [Deployment Pattern Comparison](#deployment-pattern-comparison)
+  - [📊 System Context Summary](#-system-context-summary)
+    - [Key Architectural Characteristics](#key-architectural-characteristics)
+    - [System Qualities](#system-qualities)
+    - [Integration Philosophy](#integration-philosophy)
 <!-- TOC END -->
 
 **FLEXT-Meltano Ecosystem Integration and System Context**
@@ -567,25 +588,8 @@ All FLEXT projects follow consistent integration patterns:
 
 ```python notest
 # Standard FLEXT project structure
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_meltano import FlextMeltanoTap, FlextMeltanoTarget
 
 

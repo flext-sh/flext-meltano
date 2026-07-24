@@ -1,29 +1,30 @@
 # flext-meltano Integration Patterns
 
 <!-- TOC START -->
-- [🎯 ELT Foundation Role](#elt-foundation-role)
-- [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
-  - [Tap Implementation Pattern](#tap-implementation-pattern)
-  - [Target Implementation Pattern](#target-implementation-pattern)
-- [🛠️ dbt Integration Patterns](#dbt-integration-patterns)
-  - [dbt Project Foundation](#dbt-project-foundation)
-- [🚀 Complete ELT Pipeline Integration](#complete-elt-pipeline-integration)
-  - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
-- [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
-  - [Go ↔ Python Integration](#go-python-integration)
-- [📊 Integration Matrix](#integration-matrix)
-  - [FLEXT Project Integration Status](#flext-project-integration-status)
-  - [Integration Requirements](#integration-requirements)
-- [🌍 Environment Integration](#environment-integration)
-  - [FLEXT Workspace Setup](#flext-workspace-setup)
-  - [Consumer Project Dependencies](#consumer-project-dependencies)
-- [⚠️ Integration Limitations](#integration-limitations)
-  - [Current Constraints](#current-constraints)
-  - [Workaround Strategies](#workaround-strategies)
-  - [Resolution Timeline](#resolution-timeline)
-- [🔧 Integration Best Practices](#integration-best-practices)
-  - [Design Patterns](#design-patterns)
-  - [Quality Standards](#quality-standards)
+- [flext-meltano Integration Patterns](#flext-meltano-integration-patterns)
+  - [🎯 ELT Foundation Role](#-elt-foundation-role)
+  - [🔌 Singer Ecosystem Integration](#-singer-ecosystem-integration)
+    - [Tap Implementation Pattern](#tap-implementation-pattern)
+    - [Target Implementation Pattern](#target-implementation-pattern)
+  - [🛠️ dbt Integration Patterns](#️-dbt-integration-patterns)
+    - [dbt Project Foundation](#dbt-project-foundation)
+  - [🚀 Complete ELT Pipeline Integration](#-complete-elt-pipeline-integration)
+    - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
+  - [🔗 Bridge Communication Patterns](#-bridge-communication-patterns)
+    - [Go ↔ Python Integration](#go--python-integration)
+  - [📊 Integration Matrix](#-integration-matrix)
+    - [FLEXT Project Integration Status](#flext-project-integration-status)
+    - [Integration Requirements](#integration-requirements)
+  - [🌍 Environment Integration](#-environment-integration)
+    - [FLEXT Workspace Setup](#flext-workspace-setup)
+    - [Consumer Project Dependencies](#consumer-project-dependencies)
+  - [⚠️ Integration Limitations](#️-integration-limitations)
+    - [Current Constraints](#current-constraints)
+    - [Workaround Strategies](#workaround-strategies)
+    - [Resolution Timeline](#resolution-timeline)
+  - [🔧 Integration Best Practices](#-integration-best-practices)
+    - [Design Patterns](#design-patterns)
+    - [Quality Standards](#quality-standards)
 <!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
@@ -53,25 +54,8 @@ ______________________________________________________________________
 
 ```python notest
 # Example: flext-tap-oracle integration
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_meltano import FlextMeltanoTapAbstractions, StreamDefinition
 
 
@@ -99,25 +83,8 @@ class FlextOracleTapService(s):
 
 ```python notest
 # Example: flext-target-oracle integration
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_meltano import FlextMeltanoTargetAbstractions
 
 
@@ -143,25 +110,8 @@ ______________________________________________________________________
 
 ```python notest
 # Example: flext-dbt-oracle integration
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_meltano import FlextMeltanoDbtService
 
 
@@ -189,25 +139,8 @@ ______________________________________________________________________
 **Full ELT workflow using flext-meltano foundation**:
 
 ```python notest
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_meltano import FlextMeltanoService, FlextMeltanoAdapter
 
 
@@ -279,13 +212,13 @@ ______________________________________________________________________
 
 ### FLEXT Project Integration Status
 
-| Project Category        | Integration Pattern            | Status    | Notes                        |
-| ----------------------- | ------------------------------ | --------- | ---------------------------- |
-| **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active  | Working Singer abstractions  |
-| **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active  | Real Meltano integration     |
-| **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |
-| **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active  | Target service wrappers      |
-| **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active  | Load operation abstractions  |
+| Project Category        | Integration Pattern            | Status      | Notes                        |
+| ----------------------- | ------------------------------ | ----------- | ---------------------------- |
+| **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active   | Working Singer abstractions  |
+| **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active   | Real Meltano integration     |
+| **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active   | Singer protocol compliance   |
+| **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active   | Target service wrappers      |
+| **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active   | Load operation abstractions  |
 | **flext-dbt-oracle**    | FlextMeltanoDbtService         | 🔴 Limited | Placeholder implementation   |
 | **DataCosmos**          | Complete ELT Foundation        | 🟡 Partial | Blocked by compliance issues |
 
@@ -392,25 +325,8 @@ ______________________________________________________________________
 **1. Dependency Injection**:
 
 ```python notest
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_meltano import FlextMeltanoTapAbstractions
 
 # Register services for ecosystem consumption

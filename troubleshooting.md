@@ -1,28 +1,29 @@
 # Troubleshooting flext-meltano
 
 <!-- TOC START -->
-- [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
-  - [**Direct Import Violations**](#direct-import-violations)
-- [🔧 Development Issues](#development-issues)
-  - [**Import Errors**](#import-errors)
-  - [**Type Check Failures**](#type-check-failures)
-  - [**Test Failures**](#test-failures)
-- [📦 Dependency Issues](#dependency-issues)
-  - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
-  - [**Virtual Environment Issues**](#virtual-environment-issues)
-- [🧪 Testing Issues](#testing-issues)
-  - [**Coverage Issues**](#coverage-issues)
-  - [**Slow Tests**](#slow-tests)
-- [🔍 Quality Gate Failures](#quality-gate-failures)
-  - [**Linting Errors**](#linting-errors)
-  - [**Security Issues**](#security-issues)
-- [🚫 Common Mistakes](#common-mistakes)
-  - [**r Pattern Violations**](#r-pattern-violations)
-  - [**Service Pattern Violations**](#service-pattern-violations)
-- [🆘 Getting Help](#getting-help)
-  - [**Debug Information**](#debug-information)
-  - [**Support Channels**](#support-channels)
-- [📋 Debugging Checklist](#debugging-checklist)
+- [Troubleshooting flext-meltano](#troubleshooting-flext-meltano)
+  - [🚨 Architecture Compliance Issues](#-architecture-compliance-issues)
+    - [**Direct Import Violations**](#direct-import-violations)
+  - [🔧 Development Issues](#-development-issues)
+    - [**Import Errors**](#import-errors)
+    - [**Type Check Failures**](#type-check-failures)
+    - [**Test Failures**](#test-failures)
+  - [📦 Dependency Issues](#-dependency-issues)
+    - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
+    - [**Virtual Environment Issues**](#virtual-environment-issues)
+  - [🧪 Testing Issues](#-testing-issues)
+    - [**Coverage Issues**](#coverage-issues)
+    - [**Slow Tests**](#slow-tests)
+  - [🔍 Quality Gate Failures](#-quality-gate-failures)
+    - [**Linting Errors**](#linting-errors)
+    - [**Security Issues**](#security-issues)
+  - [🚫 Common Mistakes](#-common-mistakes)
+    - [**r Pattern Violations**](#r-pattern-violations)
+    - [**Service Pattern Violations**](#service-pattern-violations)
+  - [🆘 Getting Help](#-getting-help)
+    - [**Debug Information**](#debug-information)
+    - [**Support Channels**](#support-channels)
+  - [📋 Debugging Checklist](#-debugging-checklist)
 <!-- TOC END -->
 
 **Common issues and solutions** for flext-meltano development and usage.
@@ -86,25 +87,8 @@ make type-check
 ```python notest
 # Ensure proper type hints
 from typing import Optional
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 
 
 def process_data(data: dict) -> p.Result[Optional[m.Dict]]:
@@ -276,25 +260,8 @@ class UtilityClass:
 
 
 # ✅ Correct
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 
 
 class FlextMeltanoUtilityService(s):
