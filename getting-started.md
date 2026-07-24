@@ -60,7 +60,7 @@ ______________________________________________________________________
 poetry install --with dev,test
 
 # Verify installation
-python -c "from flext_meltano import FlextMeltanoService; print('✅ Installation successful')"
+python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Installation successful')"
 ```
 
 ______________________________________________________________________
@@ -95,7 +95,7 @@ from flext_core import u
 service = FlextMeltanoService()
 
 # Service is ready for ELT operations
-print("flext-meltano service initialized")
+u.Cli.print("flext-meltano service initialized")
 ```
 
 ### **Singer Protocol Operations**
@@ -147,9 +147,9 @@ def example_operation() -> p.Result[str]:
 result = example_operation()
 if result.success:
     data = result.unwrap()
-    print(f"Success: {data}")
+    u.Cli.print(f"Success: {data}")
 else:
-    print(f"Error: {result.error}")
+    u.Cli.print(f"Error: {result.error}")
 ```
 
 ______________________________________________________________________

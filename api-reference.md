@@ -115,7 +115,7 @@ def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
         >>> result = service.discover_plugins()
         >>> if result.success:
         ...     plugins = result.unwrap()
-        ...     print(f"Found {len(plugins)} plugins")
+        ...     u.Cli.print(f"Found {len(plugins)} plugins")
     """
 ```
 
@@ -335,7 +335,7 @@ def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
         >>> result = tap.discover()
         >>> if result.success:
         ...     catalog = result.unwrap()
-        ...     print(f"Discovered {len(catalog.streams)} streams")
+        ...     u.Cli.print(f"Discovered {len(catalog.streams)} streams")
     """
 ```
 
@@ -1048,7 +1048,7 @@ result = executor.execute_pipeline_advanced(
 )
 
 if result.success:
-    print(f"Pipeline completed in {result.unwrap().execution_time}s")
+    u.Cli.print(f"Pipeline completed in {result.unwrap().execution_time}s")
 ```
 
 ### Plugin Management
@@ -1062,7 +1062,7 @@ plugin_service = FlextPluginService()
 # Install plugin
 install_result = plugin_service.install_plugin("tap-gitlab")
 if install_result.success:
-    print(f"Installed {install_result.unwrap().plugin_name}")
+    u.Cli.print(f"Installed {install_result.unwrap().plugin_name}")
 
 # List available taps
 taps = plugin_service.discover_plugins()

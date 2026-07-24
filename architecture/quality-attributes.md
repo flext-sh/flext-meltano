@@ -3522,7 +3522,7 @@ class TestContext:
             try:
                 cleanup_func()
             except Exception as e:
-                print(f"Cleanup failed: {e}")
+                u.Cli.print(f"Cleanup failed: {e}")
 
 
 # Usage

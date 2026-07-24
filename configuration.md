@@ -159,9 +159,9 @@ settings = FlextMeltanoSettings()
 validation_result: p.Result[bool] = settings.validate_meltano_config()
 
 if validation_result.success:
-    print("Meltano configuration is valid")
+    u.Cli.print("Meltano configuration is valid")
 else:
-    print(f"Configuration error: {validation_result.error}")
+    u.Cli.print(f"Configuration error: {validation_result.error}")
 ```
 
 ______________________________________________________________________
@@ -329,7 +329,7 @@ validation_result = validators.validate_pipeline_config({
 })
 
 if validation_result.failure:
-    print(f"Pipeline validation failed: {validation_result.error}")
+    u.Cli.print(f"Pipeline validation failed: {validation_result.error}")
 ```
 
 ______________________________________________________________________
@@ -430,7 +430,7 @@ backup_result = file_manager.backup_project_files()
 
 if backup_result.success:
     backup_files = backup_result.unwrap()
-    print(f"Backed up {len(backup_files)} configuration files")
+    u.Cli.print(f"Backed up {len(backup_files)} configuration files")
 ```
 
 ______________________________________________________________________
@@ -468,7 +468,7 @@ executor = FlextMeltanoExecutor()
 env_validation = executor.validate_execution_environment()
 
 if env_validation.failure:
-    print(f"Environment validation failed: {env_validation.error}")
+    u.Cli.print(f"Environment validation failed: {env_validation.error}")
 ```
 
 ______________________________________________________________________

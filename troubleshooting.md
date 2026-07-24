@@ -66,7 +66,7 @@ ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
 
 ```bash
 # Check installation
-python -c "import flext_meltano; print(flext_meltano.__file__)"
+python -c "import flext_meltano; u.Cli.print(flext_meltano.__file__)"
 
 # Reinstall if needed
 poetry install --with dev,test

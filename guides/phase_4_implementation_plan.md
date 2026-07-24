@@ -105,7 +105,7 @@ ls -la ../flext-tests  # CONFIRMED MISSING
 # Remove or replace flext-tests dependency
 
 # Step 4: Test import resolution after changes
-PYTHONPATH=src poetry run python -c "import sys; print('Basic import works')"
+PYTHONPATH=src poetry run python -c "import sys; u.Cli.print('Basic import works')"
 ```
 
 **Estimated Effort**: 4 hours
@@ -168,7 +168,7 @@ poetry env info
 poetry install --with test
 
 # Step 3: Test execution in isolated environment
-poetry run python -c "import flext_meltano; print('Import successful')"
+poetry run python -c "import flext_meltano; u.Cli.print('Import successful')"
 
 # Step 4: Validate test discovery
 poetry run pytest --collect-only tests/unit/test_api.py
