@@ -15,7 +15,6 @@ from __future__ import annotations
 import pytest
 
 from flext_meltano import FlextMeltanoTypes
-from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
 from flext_tests import FlextTestsTypes, tm
 from tests import TestsFlextMeltanoTypes, t
 
@@ -47,7 +46,11 @@ class TestsFlextMeltanoSingerTypes:
 
     def test_meltano_namespace_composes_singer_surface(self) -> None:
         """Documented contract: Singer typing surface is composed into t.Meltano."""
-        assert issubclass(t.Meltano, FlextMeltanoTypingsSinger)
+        assert any(
+            cls.__module__ == "flext_meltano._typings.singer"
+            and cls.__name__ == "FlextMeltanoTypingsSinger"
+            for cls in t.Meltano.__mro__
+        )
 
     def test_meltano_namespace_exposes_tests_subnamespace(self) -> None:
         """Meltano namespace exposes the nested Tests type namespace."""

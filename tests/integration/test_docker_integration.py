@@ -36,9 +36,9 @@ class TestsFlextMeltanoDockerIntegration:
         return psycopg2.connect(
             host=c.Meltano.Tests.HOST,
             port=c.Meltano.Tests.POSTGRES_PORT,
-            database="flext_test",
-            user="test",
-            password="test",
+            database=c.Meltano.Tests.POSTGRES_TEST_DATABASE,
+            user=c.Meltano.Tests.POSTGRES_TEST_USER,
+            password=c.Meltano.Tests.POSTGRES_TEST_VALUE,
             connect_timeout=5,
         )
 
@@ -122,7 +122,8 @@ class TestsFlextMeltanoDockerIntegration:
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_postgres_round_trips_inserted_row(self, postgres_service: str) -> None:
+    @pytest.mark.usefixtures("postgres_service")
+    def test_postgres_round_trips_inserted_row(self) -> None:
         """A row written to PostgreSQL is read back unchanged (real round-trip)."""
         conn: psycopg2.extensions.connection | None = None
         result = None
@@ -152,7 +153,8 @@ class TestsFlextMeltanoDockerIntegration:
 
     @pytest.mark.docker
     @pytest.mark.integration
-    def test_redis_round_trips_string_and_list_values(self, redis_service: str) -> None:
+    @pytest.mark.usefixtures("redis_service")
+    def test_redis_round_trips_string_and_list_values(self) -> None:
         """Values written to Redis are read back unchanged (real round-trip)."""
         client: redis.Redis[bytes] | None = None
         try:

@@ -76,6 +76,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
             TEST_OUTPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "output").as_posix()
             TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
+            # Test service credentials (mirror docker-compose.test.yml)
+            POSTGRES_TEST_DATABASE: Final[str] = "flext_test"
+            POSTGRES_TEST_USER: Final[str] = "test"
+            POSTGRES_TEST_VALUE: Final[str] = "test"
+
             @unique
             class _SingerSdkAdapterValue(StrEnum):
                 """Deterministic values for Singer SDK adapter tests."""

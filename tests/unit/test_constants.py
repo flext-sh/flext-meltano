@@ -90,7 +90,9 @@ class TestsFlextMeltanoConstantsUnit:
             ("LOGGING_INCLUDE_RECORD_COUNT", True),
         ],
     )
-    def test_logging_flag_exposes_expected_value(self, name: str, value: bool) -> None:
+    def test_logging_flag_exposes_expected_value(
+        self, name: str, *, value: bool
+    ) -> None:
         """Logging feature flags expose their documented boolean default."""
         assert getattr(c.Meltano, name) is value
 
