@@ -7,10 +7,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from flext_meltano import t
+if TYPE_CHECKING:
+    from flext_meltano import t
 
 
 class FlextMeltanoProtocolsPlugin:
@@ -24,7 +24,7 @@ class FlextMeltanoProtocolsPlugin:
         default_variant: str | None
         variants: t.ConfigurationMapping | None
 
-        def execute(self, *args: t.Scalar, **kwargs: t.Scalar) -> t.Container:
+        def execute(self, *args: t.Scalar, **kwargs: t.Scalar) -> t.JsonValue:
             """Execute plugin with given arguments. # INTERFACE."""
             ...
 
@@ -32,7 +32,7 @@ class FlextMeltanoProtocolsPlugin:
             """Get plugin configuration."""
             ...
 
-        def validate_config(self, config: t.ConfigurationMapping) -> bool:
+        def validate_config(self, settings: t.ConfigurationMapping) -> bool:
             """Validate plugin configuration. # INTERFACE."""
             ...
 
@@ -42,12 +42,12 @@ class FlextMeltanoProtocolsPlugin:
 
         name: str
         tap_stream_id: str
-        schema: t.FlatContainerMapping
+        schema: t.JsonMapping
 
-        def get_records(self) -> Sequence[t.FlatContainerMapping]:
+        def get_records(self) -> t.SequenceOf[t.JsonMapping]:
             """Get records from the stream. # INTERFACE."""
             ...
 
-        def sync_records(self) -> Sequence[t.FlatContainerMapping]:
+        def sync_records(self) -> t.SequenceOf[t.JsonMapping]:
             """Sync records from the stream. # INTERFACE."""
             ...

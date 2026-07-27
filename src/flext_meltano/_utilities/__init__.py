@@ -1,42 +1,23 @@
-# AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
-# Regenerate with: make gen
-#
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """Utilities package."""
 
 from __future__ import annotations
 
-import typing as _t
+from typing import TYPE_CHECKING
 
-from flext_core.lazy import install_lazy_exports
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
-if _t.TYPE_CHECKING:
-    import flext_meltano._utilities.runtime as _flext_meltano__utilities_runtime
-
-    runtime = _flext_meltano__utilities_runtime
-    import flext_meltano._utilities.singer as _flext_meltano__utilities_singer
-    from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-
-    singer = _flext_meltano__utilities_singer
-    from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
-_LAZY_IMPORTS = {
-    "FlextMeltanoUtilitiesRuntime": (
-        "flext_meltano._utilities.runtime",
-        "FlextMeltanoUtilitiesRuntime",
-    ),
-    "FlextMeltanoUtilitiesSinger": (
-        "flext_meltano._utilities.singer",
-        "FlextMeltanoUtilitiesSinger",
-    ),
-    "runtime": "flext_meltano._utilities.runtime",
-    "singer": "flext_meltano._utilities.singer",
-}
-
-__all__ = [
-    "FlextMeltanoUtilitiesRuntime",
-    "FlextMeltanoUtilitiesSinger",
-    "runtime",
-    "singer",
-]
+if TYPE_CHECKING:
+    from flext_meltano._utilities.runtime import (
+        FlextMeltanoUtilitiesRuntime as FlextMeltanoUtilitiesRuntime,
+    )
+    from flext_meltano._utilities.singer import (
+        FlextMeltanoUtilitiesSinger as FlextMeltanoUtilitiesSinger,
+    )
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".runtime": ("FlextMeltanoUtilitiesRuntime",),
+    ".singer": ("FlextMeltanoUtilitiesSinger",),
+})
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

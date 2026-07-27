@@ -1,7 +1,11 @@
 """FLEXT Meltano Typings Unit Tests - Enterprise ELT testing patterns.
 
-This module provides comprehensive unit tests for the flattened Meltano
-type namespace following FLEXT canonical governance.
+Behavioral contract tests for the flattened Meltano type namespace
+(``t.Meltano``) and its companion domain models (``m.Meltano``). Tests
+assert the OBSERVABLE public contract: which symbols the flat namespace
+exposes, which legacy nested namespaces and duplicate aliases it refuses,
+where runtime Singer SDK wrappers live, and the public model behavior of
+the exported Singer catalog model.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,111 +14,134 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import pytest
+
 from flext_tests import tm
+from tests import m, t
 
-from tests import t
+__all__: list[str] = ["TestsFlextMeltanoTypingsUnit"]
 
 
-class TestFlextMeltanoTypes:
-    """Unit test suite for FlextMeltanoTypes — flat namespace validation."""
+class TestsFlextMeltanoTypingsUnit:
+    """Behavioral contract for the flat ``t.Meltano`` namespace and models."""
 
-    def test_meltano_namespace_exists(self) -> None:
-        """Test that Meltano namespace exists as top-level namespace."""
-        tm.that(hasattr(t, "Meltano"), eq=True)
+    @pytest.mark.parametrize("dbt_type_name", ["DbtProject", "DbtManifestData"])
+    def test_dbt_types_are_flat_members_of_meltano_namespace(
+        self, dbt_type_name: str
+    ) -> None:
+        """DBT types are exposed flat (``Dbt`` prefix) directly on ``t.Meltano``."""
+        assert hasattr(t.Meltano, dbt_type_name)
+        tm.that(getattr(t.Meltano, dbt_type_name), none=False)
 
-    def test_plugin_types(self) -> None:
-        """Test Plugin composition types on Meltano namespace."""
-        tm.that(hasattr(t.Meltano, "PluginDefinition"), eq=True)
-        tm.that(hasattr(t.Meltano, "PluginCatalog"), eq=True)
-        tm.that(hasattr(t.Meltano, "PluginType"), eq=True)
+    @pytest.mark.parametrize(
+        "composition_type_name",
+        [
+            "NestedStrMapping",
+            "OptionalScalarMap",
+            "ServicePayload",
+            "ValidatorInput",
+            "EnvironmentInput",
+        ],
+    )
+    def test_composition_types_are_exposed_on_meltano_namespace(
+        self, composition_type_name: str
+    ) -> None:
+        """Composed types that add value over base ``t.*`` are exposed on ``t.Meltano``."""
+        assert hasattr(t.Meltano, composition_type_name)
 
-    def test_adapters_exist(self) -> None:
-        """Test TypeAdapter instances are available."""
-        tm.that(hasattr(t.Meltano, "CONTAINER_MAP_ADAPTER"), eq=True)
-        tm.that(hasattr(t.Meltano, "INTEGER_ADAPTER"), eq=True)
+    def test_composition_types_are_distinct_symbols(self) -> None:
+        """Each composed type is a distinct object, not a shared re-alias."""
+        composed = {
+            t.Meltano.NestedStrMapping,
+            t.Meltano.OptionalScalarMap,
+            t.Meltano.ServicePayload,
+            t.Meltano.ValidatorInput,
+            t.Meltano.EnvironmentInput,
+        }
+        tm.that(len(composed), eq=5)
 
-    def test_composition_types(self) -> None:
-        """Test composed types that add value over base ``t.*``."""
-        tm.that(hasattr(t.Meltano, "ValidatorInput"), eq=True)
-        tm.that(hasattr(t.Meltano, "VariantValue"), eq=True)
-        tm.that(hasattr(t.Meltano, "FileConfigDict"), eq=True)
-        tm.that(hasattr(t.Meltano, "OptionalScalarMap"), eq=True)
-        tm.that(hasattr(t.Meltano, "CliProcessResult"), eq=True)
+    @pytest.mark.parametrize(
+        "legacy_namespace",
+        ["Singer", "Dbt", "Project", "Pipeline", "Bridge", "CLI", "ELT", "Processing"],
+    )
+    def test_legacy_nested_namespaces_are_absent(self, legacy_namespace: str) -> None:
+        """Flat namespace refuses the old nested sub-namespaces."""
+        assert not hasattr(t.Meltano, legacy_namespace)
 
-    def test_dbt_flat_types(self) -> None:
-        """Test DBT types are flat with ``Dbt`` prefix."""
-        tm.that(hasattr(t.Meltano, "DbtManifestData"), eq=True)
-        tm.that(hasattr(t.Meltano, "DbtProject"), eq=True)
-
-    def test_singer_flat_types(self) -> None:
-        """Test Singer types are flat with ``Singer`` prefix."""
-        tm.that(hasattr(t.Meltano, "SingerCatalogEntry"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerStreamCatalog"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerReplicationMethod"), eq=True)
-
-    def test_singer_sdk_typing_wrappers(self) -> None:
-        """Test Singer SDK typing wrappers prevent direct imports."""
-        tm.that(hasattr(t.Meltano, "SingerProperty"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerPropertiesList"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerStringType"), eq=True)
-        tm.that(hasattr(t.Meltano, "SingerIntegerType"), eq=True)
-
-    def test_type_annotations(self) -> None:
-        """Test that type annotations are properly defined."""
-        plugin_definition = t.Meltano.PluginDefinition
-        tm.that(str(plugin_definition), none=False)
-        singer_catalog = t.Meltano.SingerCatalogEntry
-        tm.that(str(singer_catalog), none=False)
-
-    def test_no_nested_namespaces(self) -> None:
-        """Test that old nested namespaces no longer exist."""
-        removed_namespaces = [
-            "Singer",
-            "Dbt",
-            "Project",
-            "Pipeline",
-            "Bridge",
-            "CLI",
-            "ELT",
-            "Processing",
-        ]
-        for namespace in removed_namespaces:
-            tm.that(hasattr(t.Meltano, namespace), eq=False)
-
-    def test_no_duplicate_aliases(self) -> None:
-        """Test that simple aliases to existing ``t.*`` are removed."""
-        removed_duplicates = [
+    @pytest.mark.parametrize(
+        "removed_alias",
+        [
             "MeltanoConfigDict",
             "ExecutionResultDict",
             "ResultDict",
             "DbtResultDict",
             "PluginConfiguration",
             "PluginConfigDict",
-        ]
-        for alias in removed_duplicates:
-            tm.that(hasattr(t.Meltano, alias), eq=False)
+            "JsonValue",
+            "JsonMapping",
+            "JsonMappingList",
+            "PluginDefinition",
+            "FileConfigDict",
+            "CliProcessResult",
+            "SingerCatalogEntry",
+            "SingerStreamCatalog",
+            "PluginCatalog",
+        ],
+    )
+    def test_duplicate_aliases_are_absent(self, removed_alias: str) -> None:
+        """Simple aliases duplicating existing ``t.*`` types are not on ``t.Meltano``."""
+        assert not hasattr(t.Meltano, removed_alias)
 
-    def test_type_compatibility(self) -> None:
-        """Test that types are compatible with their intended use."""
-        plugin_def = {
-            "name": "tap-users",
-            "variants": ["default"],
-            "config": {"batch_size": 1000},
-        }
-        catalog = {
+    def test_jsonmapping_remains_a_top_level_type_alias(self) -> None:
+        """``JsonMapping`` stays available at the top ``t.*`` level (not on ``t.Meltano``)."""
+        assert hasattr(t, "JsonMapping")
+        assert not hasattr(t.Meltano, "JsonMapping")
+
+    @pytest.mark.parametrize("wrapper_name", ["SingerProperty", "SingerStringType"])
+    def test_runtime_singer_sdk_wrappers_live_on_models_not_typings(
+        self, wrapper_name: str
+    ) -> None:
+        """Runtime Singer SDK wrappers are exposed via ``m.Meltano``, never ``t.Meltano``."""
+        tm.that(getattr(m.Meltano, wrapper_name), none=False)
+        assert not hasattr(t.Meltano, wrapper_name)
+
+    def test_singer_catalog_entry_is_exposed_as_domain_model(self) -> None:
+        """The Singer catalog entry is exposed as a real model on ``m.Meltano``."""
+        entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "users",
-            "schema": {"type": "t.NormalizedValue"},
-        }
-        tm.that(str(plugin_def["name"]), eq="tap-users")
-        tm.that(list(plugin_def["variants"]), is_=list)
-        tm.that(str(catalog["tap_stream_id"]), eq="users")
-        schema_val = catalog["schema"]
-        assert isinstance(schema_val, dict)
-        tm.that(schema_val, is_=dict)
+            "stream": "users",
+            "schema": {"type": "object"},
+        })
 
-    def test_type_consistency(self) -> None:
-        """Test that types are consistent across the namespace."""
-        plugin_definition = t.Meltano.PluginDefinition
-        singer_catalog = t.Meltano.SingerCatalogEntry
-        tm.that(str(plugin_definition), none=False)
-        tm.that(str(singer_catalog), none=False)
+        tm.that(m.Meltano.SingerCatalogEntry, is_=type)
+        tm.that(entry.model_dump(), has="tap_stream_id")
+
+    def test_singer_catalog_entry_constructs_and_exposes_public_state(self) -> None:
+        """A valid Singer catalog entry constructs and exposes its fields publicly."""
+        entry = m.Meltano.SingerCatalogEntry.model_validate({
+            "tap_stream_id": "users",
+            "stream": "users",
+            "schema": {"type": "object"},
+        })
+
+        tm.that(entry.tap_stream_id, eq="users")
+        tm.that(entry.stream, eq="users")
+
+    def test_singer_catalog_entry_model_dump_round_trips(self) -> None:
+        """``model_dump`` output re-validates to an equal public state (idempotence)."""
+        entry = m.Meltano.SingerCatalogEntry.model_validate({
+            "tap_stream_id": "orders",
+            "stream": "orders",
+            "schema": {"type": "object"},
+        })
+
+        dumped = entry.model_dump(by_alias=True)
+        restored = m.Meltano.SingerCatalogEntry.model_validate(dumped)
+
+        tm.that(restored.model_dump(by_alias=True), eq=dumped)
+        tm.that(restored.tap_stream_id, eq=entry.tap_stream_id)
+
+    def test_singer_catalog_entry_rejects_missing_required_fields(self) -> None:
+        """Constructing without required fields raises a validation error (error path)."""
+        with pytest.raises(m.ValidationError):
+            m.Meltano.SingerCatalogEntry.model_validate({})

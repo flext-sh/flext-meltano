@@ -1,7 +1,7 @@
 """Shared service foundation for flext-meltano components.
 
 Centralizes access to configuration singleton while maintaining inheritance
-aligned with `FlextService` from flext-core, avoiding duplication of initialization
+aligned with `s` from flext-core, avoiding duplication of initialization
 across library services.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -10,116 +10,94 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from types import ModuleType
-from typing import Annotated, override
+from collections.abc import Mapping
+from typing import Annotated, Self, override
 
-from pydantic import Field
-
-from flext_core import FlextService
-from flext_meltano import FlextMeltanoSettings, c, p, t
+from flext_cli import u
+from flext_core import FlextSettings, s
+from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
 
-class FlextMeltanoServiceBase(FlextService[t.ContainerMapping]):
+class FlextMeltanoServiceBase(s[t.JsonMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
-    `execute` method from FlextService.
+    `execute` method from s.
     """
 
-    config_type: type | None = Field(
+    # NOTE (multi-agent): mro-i6nq.12 — FlextMixins.settings_type is now a native
+    # Pydantic field; inject the Meltano default by overriding the field default
+    # (replaces the orphaned _settings_type PrivateAttr + redundant __init__ that only
+    # forwarded the now-native runtime_settings kwarg).
+    settings_type: t.SettingsClass | None = u.Field(
         default=FlextMeltanoSettings,
-        description="Configuration class for Meltano service initialization",
+        exclude=True,
+        description="Default FlextMeltanoSettings class for Meltano services.",
     )
 
     service_name: Annotated[
         t.NonEmptyStr,
-        Field(
+        u.Field(
             default="flext_meltano_service",
             description="Canonical Meltano service instance name",
         ),
     ] = "flext_meltano_service"
     service_version: Annotated[
         t.NonEmptyStr,
-        Field(
+        u.Field(
             default=c.Meltano.DEFAULT_SERVICE_VERSION,
             description="Canonical Meltano service version",
         ),
     ] = c.Meltano.DEFAULT_SERVICE_VERSION
     source_name: Annotated[
         str | None,
-        Field(default=None, description="Optional source specialization name"),
+        u.Field(default=None, description="Optional source specialization name"),
     ] = None
     sink_name: Annotated[
         str | None,
-        Field(default=None, description="Optional sink specialization name"),
+        u.Field(default=None, description="Optional sink specialization name"),
     ] = None
     transformation_name: Annotated[
         str | None,
-        Field(default=None, description="Optional transformation specialization name"),
+        u.Field(
+            default=None, description="Optional transformation specialization name"
+        ),
     ] = None
 
-    def __init__(
-        self,
-        /,
-        config: FlextMeltanoSettings | t.ContainerMapping | None = None,
-        *,
-        config_type: type[p.Settings] | None = None,
-        config_overrides: t.ContainerMapping | None = None,
-        initial_context: p.Context | None = None,
-        _subproject: str | None = None,
-        _services: Mapping[str, t.RegisterableService] | None = None,
-        _factories: Mapping[str, t.FactoryCallable] | None = None,
-        _resources: Mapping[str, t.ResourceCallable] | None = None,
-        _container_overrides: t.ScalarMapping | None = None,
-        _wire_modules: Sequence[ModuleType] | None = None,
-        _wire_packages: t.StrSequence | None = None,
-        _wire_classes: Sequence[type] | None = None,
-        service_name: t.NonEmptyStr | None = None,
-        service_version: t.NonEmptyStr | None = None,
-        source_name: str | None = None,
-        sink_name: str | None = None,
-        transformation_name: str | None = None,
-    ) -> None:
-        """Accept canonical `config` input and map it to service overrides."""
-        normalized_overrides = config_overrides
-        if normalized_overrides is None and config is not None:
-            normalized_overrides = (
-                config.model_dump()
-                if isinstance(config, FlextMeltanoSettings)
-                else {str(key): value for key, value in config.items()}
+    @u.model_validator(mode="before")
+    @classmethod
+    def _normalize_settings_alias(
+        cls, data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self
+    ) -> t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self:
+        """Accept ``settings`` as an alias for ``runtime_settings``."""
+        if isinstance(data, cls) or not isinstance(data, Mapping):
+            return data
+        normalized: dict[str, t.JsonPayload | p.Base | type | None] = dict(data)
+        settings = normalized.pop("settings", None)
+        for field_name in ("service_name", "service_version"):
+            if normalized.get(field_name) is None:
+                normalized.pop(field_name, None)
+        if settings is None or "runtime_settings" in normalized:
+            return normalized
+        if isinstance(settings, FlextSettings):
+            normalized["runtime_settings"] = settings
+        elif isinstance(settings, Mapping):
+            normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
+                settings
             )
-        super().__init__(
-            config_type=config_type,
-            config_overrides=normalized_overrides,
-            initial_context=initial_context,
-        )
-        if service_name is not None:
-            self.service_name = service_name
-        if service_version is not None:
-            self.service_version = service_version
-        if source_name is not None:
-            self.source_name = source_name
-        if sink_name is not None:
-            self.sink_name = sink_name
-        if transformation_name is not None:
-            self.transformation_name = transformation_name
+        elif isinstance(settings, m.BaseModel):
+            normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
+                settings.model_dump()
+            )
+        else:
+            normalized["runtime_settings"] = FlextMeltanoSettings.fetch_global()
+        return normalized
 
-    @property
     @override
-    def settings(self) -> FlextMeltanoSettings:
-        """Return the typed Meltano settings namespace."""
-        config = self.config
-        if isinstance(config, FlextMeltanoSettings):
-            return config
-        empty_overrides: t.MutableContainerMapping = {}
-        normalized_overrides: t.MutableContainerMapping = (
-            {str(key): value for key, value in self.config_overrides.items()}
-            if self.config_overrides
-            else empty_overrides
-        )
-        return FlextMeltanoSettings.model_validate(normalized_overrides)
+    def execute(self) -> p.Result[t.JsonMapping]:
+        """Execute the service using the canonical JSON payload contract."""
+        raise NotImplementedError
 
 
 s = FlextMeltanoServiceBase
-__all__ = ["FlextMeltanoServiceBase"]
+__all__: list[str] = ["FlextMeltanoServiceBase", "s"]

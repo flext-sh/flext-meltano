@@ -112,7 +112,7 @@ fixtures/
 
 ### **Fixture Loading Patterns**
 
-```python
+```text
 # Standard pytest fixture usage
 import pytest
 from tests import (
@@ -137,7 +137,7 @@ def test_environment(meltano_test_project, test_database_connection):
 
 ### **Sample Data Categories**
 
-```python
+```text
 # CSV data fixtures
 @pytest.fixture
 def sample_users_csv():
@@ -167,13 +167,13 @@ def sample_api_responses():
 
 ### **Schema Fixtures**
 
-```python
+```text
 # Singer schema fixtures
 @pytest.fixture
 def user_schema_fixture():
     """Standard user schema for Singer testing."""
     return {
-        "type": "t.NormalizedValue",
+        "type": "object",
         "properties": {
             "id": {"type": "integer"},
             "name": {"type": "string"},
@@ -188,7 +188,7 @@ def user_schema_fixture():
 
 ### **Meltano Project Fixtures**
 
-```python
+```text
 # Complete Meltano project fixture
 @pytest.fixture
 def meltano_test_project(tmp_path):
@@ -225,7 +225,7 @@ def meltano_test_project(tmp_path):
 
 ### **Service Configuration Fixtures**
 
-```python
+```text
 # Service configuration templates
 @pytest.fixture
 def flext_meltano_config():
@@ -242,7 +242,7 @@ def flext_meltano_config():
 
 ### **Mock Service Implementations**
 
-```python
+```text
 # Mock Meltano CLI responses
 class MockMeltanoCLI:
     """Mock Meltano CLI for unit testing."""
@@ -270,7 +270,7 @@ def mock_meltano_cli():
 
 ### **Database Mock Fixtures**
 
-```python
+```text
 # Mock database connections
 @pytest.fixture
 def mock_database_connection():
@@ -297,7 +297,7 @@ def mock_database_connection():
 
 ### **Fixture Optimization**
 
-```python
+```text
 # Optimized fixture with caching
 @pytest.fixture(scope="session")
 def expensive_fixture():
@@ -326,7 +326,7 @@ def cached_data(expensive_fixture):
 
 ### **Code Quality**
 
-```python
+```text
 # Quality standards for fixture implementation
 from typing import Dict, Iterator
 
@@ -334,7 +334,7 @@ import pytest
 
 
 @pytest.fixture
-def typed_fixture() -> t.Dict:
+def typed_fixture() -> m.Dict:
     """Properly typed fixture with clear return type."""
     return {"key": "value", "count": 42, "items": ["a", "b", "c"]}
 
@@ -357,9 +357,9 @@ def documented_fixture() -> Iterator[str]:
 
 ### **Fixture Discovery**
 
-```python
+```text
 # Fixture registration and discovery
-def pytest_configure(config):
+def pytest_configure(settings):
     """Register custom fixtures."""
     # Automatically discover fixtures in fixtures/ directory
     fixture_modules = discover_fixture_modules("tests/fixtures")
@@ -385,7 +385,7 @@ pytest tests/ --setup-show          # Show fixture setup/teardown
 
 ### **Basic Fixture Usage**
 
-```python
+```text
 # Using data fixtures in tests
 def test_csv_processing(sample_users_csv):
     """Test CSV processing with sample data."""
@@ -399,10 +399,10 @@ def test_csv_processing(sample_users_csv):
 # Using configuration fixtures
 def test_meltano_integration(meltano_test_project, flext_meltano_config):
     """Test Meltano integration with fixtures."""
-    config = flext_meltano_config
-    config.project_root = str(meltano_test_project)
+    settings = flext_meltano_config
+    settings.project_root = str(meltano_test_project)
 
-    bridge = FlextMeltanoBridge(config)
+    bridge = FlextMeltanoBridge(settings)
     result = bridge.get_version()
 
     assert result.success
@@ -410,7 +410,7 @@ def test_meltano_integration(meltano_test_project, flext_meltano_config):
 
 ### **Advanced Fixture Composition**
 
-```python
+```text
 # Composing multiple fixtures
 @pytest.fixture
 def complete_test_environment(
@@ -424,7 +424,7 @@ def complete_test_environment(
         meltano_project=meltano_test_project,
         data_source=sample_users_csv,
         database=mock_database_connection,
-        config=flext_meltano_config,
+        settings=flext_meltano_config,
     )
 ```
 
@@ -453,6 +453,6 @@ ______________________________________________________________________
 ______________________________________________________________________
 
 **Status**: Active Development — Test fixture framework functional; stabilization in progress · 1.0.0 Release Preparation
-**Version**: 0.9.9 RC-enterprise
+**Version**: 0.12.0-dev RC-enterprise
 **Last Updated**: 2025-08-02
 **Maintainer**: FLEXT Development Team

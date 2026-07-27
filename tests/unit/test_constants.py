@@ -1,97 +1,153 @@
-"""FLEXT Meltano Constants Unit Tests - Enterprise ELT testing patterns.
+"""Behavioral tests for the c.Meltano constants contract.
 
-This module provides comprehensive unit tests for c following
-FLEXT testing patterns and namespace organization.
+Asserts the OBSERVABLE public values and invariants promised by
+c.Meltano (versions, metadata, Singer/DBT identifiers, plugin
+types, validation thresholds, logging defaults) rather than any
+implementation detail. Constants are a value contract: the public
+promise is the exact value and its invariants (type, non-emptiness,
+enum membership, immutability).
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
 
-from flext_tests import tm
+from enum import StrEnum
 
+import pytest
+
+from flext_tests import tm
 from tests import c
 
+__all__: list[str] = ["TestsFlextMeltanoConstantsUnit"]
 
-class Testc:
-    """Unit test suite for c.Meltano."""
 
-    def test_meltano_namespace(self) -> None:
-        """Test Meltano namespace constants."""
-        tm.that(c.Meltano.FLEXT_MELTANO_VERSION, is_=str)
-        tm.that(c.Meltano.METADATA_APPLICATION_NAME, is_=str)
-        tm.that(c.Meltano.METADATA_APPLICATION_DESCRIPTION, is_=str)
-        tm.that(c.Meltano.PATH_PROJECT_FILE, is_=str)
-        tm.that(c.Meltano.PATH_STATE_DIR, is_=str)
+class TestsFlextMeltanoConstantsUnit:
+    """Public-contract test suite for c.Meltano constants."""
 
-    def test_singer_namespace(self) -> None:
-        """Test Singer protocol constants."""
-        tm.that(c.Meltano.SDK_VERSION_REQUIRED, is_=str)
-        tm.that(c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA, is_=str)
-        tm.that(c.Meltano.SINGER_MESSAGE_TYPE_RECORD, is_=str)
+    @pytest.mark.parametrize(
+        ("name", "expected"),
+        [
+            ("FLEXT_MELTANO_VERSION", "0.9.0"),
+            ("METADATA_APPLICATION_NAME", "flext-pipeline"),
+            (
+                "METADATA_APPLICATION_DESCRIPTION",
+                "FLEXT Generic Data Pipeline Framework",
+            ),
+            ("PATH_PROJECT_FILE", "meltano.yml"),
+            ("PATH_STATE_DIR", ".pipeline"),
+            ("SDK_VERSION_REQUIRED", "0.48.0"),
+            ("DEFAULT_VARIANT", "meltano"),
+            ("LOGGING_DEFAULT_LEVEL", "INFO"),
+        ],
+    )
+    def test_string_constant_exposes_expected_value(
+        self, name: str, expected: str
+    ) -> None:
+        """String constants expose their exact documented public value."""
+        tm.that(getattr(c.Meltano, name), eq=expected)
 
-    def test_dbt_namespace(self) -> None:
-        """Test DBT constants."""
-        tm.that(c.Meltano.DBT_PROJECT_FILE, is_=str)
-        tm.that(c.Meltano.DBT_COMMAND_RUN, is_=str)
-        tm.that(c.Meltano.DBT_COMMAND_TEST, is_=str)
+    @pytest.mark.parametrize(
+        ("name", "expected"),
+        [
+            ("SINGER_MESSAGE_TYPE_SCHEMA", "SCHEMA"),
+            ("SINGER_MESSAGE_TYPE_RECORD", "RECORD"),
+            ("DBT_PROJECT_FILE", "dbt_project.yml"),
+            ("DBT_COMMAND_RUN", "run"),
+            ("DBT_COMMAND_TEST", "test"),
+        ],
+    )
+    def test_enum_backed_constant_compares_as_its_string_value(
+        self, name: str, expected: str
+    ) -> None:
+        """Enum-backed identifiers behave as their StrEnum string value."""
+        value = getattr(c.Meltano, name)
+        tm.that(value, is_=StrEnum)
+        tm.that(value, eq=expected)
+        tm.that(str(value), eq=expected)
 
-    def test_plugin_namespace(self) -> None:
-        """Test Plugin constants."""
-        tm.that(c.Meltano.PluginType.EXTRACTORS, is_=str)
-        tm.that(c.Meltano.PluginType.LOADERS, is_=str)
-        tm.that(c.Meltano.PluginType.TRANSFORMS, is_=str)
-        tm.that(c.Meltano.DEFAULT_VARIANT, is_=str)
+    @pytest.mark.parametrize(
+        ("name", "expected"),
+        [
+            ("SERVICE_MIN_NAME_LENGTH", 3),
+            ("VALIDATION_MATURITY_MATURE_ENV_COUNT", 3),
+            ("VALIDATION_MATURITY_DEVELOPING_ENV_COUNT", 2),
+            ("VALIDATION_COMPLEXITY_MINIMAL_SETTINGS", 0),
+            ("VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS", 5),
+        ],
+    )
+    def test_integer_threshold_exposes_expected_value(
+        self, name: str, expected: int
+    ) -> None:
+        """Numeric thresholds expose their exact documented value."""
+        tm.that(getattr(c.Meltano, name), eq=expected)
 
-    def test_service_namespace(self) -> None:
-        """Test Service namespace constants."""
-        tm.that(c.Meltano.SERVICE_MIN_NAME_LENGTH, is_=int)
+    @pytest.mark.parametrize(
+        ("name", "value"),
+        [
+            ("LOGGING_INCLUDE_TRANSFORM_NAME", True),
+            ("LOGGING_INCLUDE_RECORD_COUNT", True),
+        ],
+    )
+    def test_logging_flag_exposes_expected_value(
+        self, name: str, *, value: bool
+    ) -> None:
+        """Logging feature flags expose their documented boolean default."""
+        assert getattr(c.Meltano, name) is value
 
-    def test_model_namespace(self) -> None:
-        """Test ModelValidation namespace constants."""
-        tm.that(c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT, is_=int)
-        tm.that(c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT, is_=int)
-        tm.that(c.Meltano.VALIDATION_COMPLEXITY_MINIMAL_SETTINGS, is_=int)
-        tm.that(c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS, is_=int)
+    def test_maturity_thresholds_are_strictly_ordered(self) -> None:
+        """Mature environments require strictly more envs than developing."""
+        assert (
+            c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT
+            > c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT
+        )
 
-    def test_logging_namespace(self) -> None:
-        """Test Logging namespace constants."""
-        tm.that(c.Meltano.LOGGING_DEFAULT_LEVEL, is_=str)
-        tm.that(c.Meltano.LOGGING_INCLUDE_TRANSFORM_NAME, is_=bool)
-        tm.that(c.Meltano.LOGGING_INCLUDE_RECORD_COUNT, is_=bool)
+    def test_complexity_thresholds_are_ordered(self) -> None:
+        """Simple-max setting count is above the minimal-settings floor."""
+        assert (
+            c.Meltano.VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS
+            > c.Meltano.VALIDATION_COMPLEXITY_MINIMAL_SETTINGS
+        )
 
-    def test_plugin_types_enum(self) -> None:
-        """Test PluginTypes enum."""
-        plugin_types = c.Meltano.PluginType
-        tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)
-        tm.that(hasattr(plugin_types, "LOADERS"), eq=True)
-        tm.that(hasattr(plugin_types, "TRANSFORMS"), eq=True)
-        tm.that(plugin_types.EXTRACTORS, is_=str)
-        tm.that(plugin_types.LOADERS, is_=str)
-        tm.that(plugin_types.TRANSFORMS, is_=str)
+    @pytest.mark.parametrize(
+        ("member", "expected"),
+        [
+            ("EXTRACTORS", "extractors"),
+            ("LOADERS", "loaders"),
+            ("TRANSFORMS", "transforms"),
+            ("ORCHESTRATORS", "orchestrators"),
+        ],
+    )
+    def test_plugin_type_member_exposes_expected_value(
+        self, member: str, expected: str
+    ) -> None:
+        """Each PluginType member maps to its documented plugin folder name."""
+        value = getattr(c.Meltano.PluginType, member)
+        tm.that(value, is_=StrEnum)
+        tm.that(value, eq=expected)
 
-    def test_constants_immutability(self) -> None:
-        """Test that constants are immutable (Final)."""
-        tm.that(True, eq=True)
+    def test_plugin_type_members_are_unique(self) -> None:
+        """PluginType values form a distinct, collision-free set."""
+        values = [member.value for member in c.Meltano.PluginType]
+        tm.that(len(values), eq=len(set(values)))
 
-    def test_namespace_organization(self) -> None:
-        """Test that constants are properly organized in namespaces."""
-        expected_namespaces = ["Meltano"]
-        for namespace in expected_namespaces:
-            tm.that(hasattr(c, namespace), eq=True)
-        meltano_constants = [
-            "FLEXT_MELTANO_VERSION",
-            "METADATA_APPLICATION_NAME",
-            "SINGER_MESSAGE_TYPE_SCHEMA",
-        ]
-        for constant in meltano_constants:
-            tm.that(hasattr(c.Meltano, constant), eq=True)
+    def test_default_variant_is_a_known_reference(self) -> None:
+        """DEFAULT_VARIANT is a non-empty identifier callers can rely on."""
+        assert c.Meltano.DEFAULT_VARIANT
+        tm.that(c.Meltano.DEFAULT_VARIANT.strip(), eq=c.Meltano.DEFAULT_VARIANT)
 
-    def test_export_completeness(self) -> None:
-        """Test that all necessary constants are exported."""
-        tm.that(hasattr(c, "Meltano"), eq=True)
-        tm.that(hasattr(c.Meltano, "PluginType"), eq=True)
-        plugin_types = c.Meltano.PluginType
-        tm.that(hasattr(plugin_types, "EXTRACTORS"), eq=True)
+    def test_singer_schema_and_record_are_distinct(self) -> None:
+        """Schema and record message identifiers are not interchangeable."""
+        assert (
+            c.Meltano.SINGER_MESSAGE_TYPE_SCHEMA != c.Meltano.SINGER_MESSAGE_TYPE_RECORD
+        )
+
+    def test_dbt_run_and_test_commands_are_distinct(self) -> None:
+        """DBT run and test commands resolve to different invocations."""
+        tm.that(c.Meltano.DBT_COMMAND_RUN, ne=c.Meltano.DBT_COMMAND_TEST)
+
+    def test_plugin_type_enum_is_immutable(self) -> None:
+        """PluginType members cannot be reassigned through the public enum."""
+        with pytest.raises((AttributeError, TypeError)):
+            setattr(c.Meltano.PluginType, "EXTRACTORS", "mutated")

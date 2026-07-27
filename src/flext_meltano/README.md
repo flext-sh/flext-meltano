@@ -107,10 +107,10 @@ Each module follows standardized documentation format:
 
 ## Integration Architecture
 
-### Primary Use Case: Go Service Bridge
+### Primary Use Case: FLEXT Service Bridge
 
 ```
-Go Services (FlexCore/FLEXT) → Python Bridge → Meltano CLI → Data Operations
+FLEXT Services → Python Bridge → Meltano CLI → Data Operations
 ```
 
 ### Key Integration Points

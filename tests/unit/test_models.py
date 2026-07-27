@@ -1,4 +1,4 @@
-"""Enhanced comprehensive tests for m module.
+"""Behavioral tests for the Meltano models public contract.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -7,32 +7,30 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import cast
-
 import pytest
+
 from flext_tests import tm
-from pydantic import ValidationError
+from tests import c, m
 
-from tests import m, t
+__all__ = ["TestsFlextMeltanoModelsUnit"]
 
 
-class TestTapConfigEnhanced:
-    """Enhanced tests for TapConfig model."""
+class TestsFlextMeltanoModelsUnit:
+    """Public-contract tests for Meltano tap/target/stream models."""
 
-    def test_tap_config_with_minimal_data(self) -> None:
-        """Test TapConfig with minimal required data."""
-        config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
+    # ---- TapConfig ---------------------------------------------------------
+
+    def test_tap_config_exposes_defaults_for_optional_fields(self) -> None:
+        settings = m.Meltano.TapConfig(
+            tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tm.that(config.tap_type, eq="tap-postgres")
-        tm.that(config.connection_config, eq={"host": "localhost"})
-        tm.that(config.stream_config, eq={})
-        tm.that(config.tap_version, eq="latest")
+        tm.that(settings.tap_type, eq="tap-postgres")
+        tm.that(settings.connection_config, eq={"host": "localhost"})
+        tm.that(settings.stream_config, empty=True)
+        tm.that(settings.tap_version, eq="latest")
 
-    def test_tap_config_with_full_data(self) -> None:
-        """Test TapConfig with all fields populated."""
-        config = m.Meltano.TapConfig(
+    def test_tap_config_retains_full_supplied_state(self) -> None:
+        settings = m.Meltano.TapConfig(
             tap_type="tap-mysql",
             connection_config={
                 "host": "db.example.com",
@@ -40,47 +38,66 @@ class TestTapConfigEnhanced:
                 "user": "etl_user",
                 "password": "secret",
             },
-            stream_config={
-                "users": "public",
-                "orders": "commerce",
-            },
+            stream_config={"users": "public", "orders": "commerce"},
             tap_version="1.0.0",
         )
-        tm.that(config.tap_type, eq="tap-mysql")
-        tm.that(config.connection_config["host"], eq="db.example.com")
-        tm.that(config.connection_config["port"], eq=3306)
-        tm.that(config.stream_config, has="users")
-        tm.that(config.tap_version, eq="1.0.0")
+        tm.that(settings.tap_type, eq="tap-mysql")
+        tm.that(settings.connection_config["host"], eq="db.example.com")
+        tm.that(settings.connection_config["port"], eq=3306)
+        tm.that(settings.stream_config, has="users")
+        tm.that(settings.tap_version, eq="1.0.0")
 
-    def test_tap_config_validation_empty_tap_type(self) -> None:
-        """Test TapConfig validation with empty tap_type."""
-        with pytest.raises(ValidationError, match="tap_type cannot be empty"):
-            m.Meltano.TapConfig(tap_type="", connection_config={"host": "localhost"})
+    def test_tap_config_computed_fields_derive_from_state(self) -> None:
+        settings = m.Meltano.TapConfig(
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost", "port": 5432},
+            stream_config={"users": "public"},
+            tap_version="2.1.0",
+        )
+        # config_size = connection_config keys + stream_config keys
+        tm.that(settings.config_size, eq=3)
+        tm.that(settings.has_stream_config, eq=True)
+        tm.that(settings.tap_identifier, eq="tap-postgres:2.1.0")
 
-    def test_tap_config_validation_invalid_connection_config_type(self) -> None:
-        """Test TapConfig validation with invalid connection_config type."""
-        invalid_config = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
+    def test_tap_config_has_stream_config_false_when_absent(self) -> None:
+        settings = m.Meltano.TapConfig(
+            tap_type="tap-postgres", connection_config={"host": "localhost"}
+        )
+        tm.that(settings.has_stream_config, eq=False)
+        tm.that(settings.config_size, eq=1)
+
+    @pytest.mark.parametrize("blank_tap_type", ["", "   "])
+    def test_tap_config_rejects_blank_tap_type(self, blank_tap_type: str) -> None:
+        with pytest.raises(c.ValidationError, match="tap_type cannot be empty"):
             m.Meltano.TapConfig(
-                tap_type="tap-postgres",
-                connection_config=invalid_config,
+                tap_type=blank_tap_type, connection_config={"host": "localhost"}
             )
 
+    def test_tap_config_rejects_empty_connection_config(self) -> None:
+        with pytest.raises(
+            c.ValidationError, match="Connection configuration cannot be empty"
+        ):
+            m.Meltano.TapConfig(tap_type="tap-postgres", connection_config={})
 
-class TestTargetConfigEnhanced:
-    """Enhanced tests for TargetConfig model."""
+    def test_tap_config_rejects_non_mapping_connection_config(self) -> None:
+        with pytest.raises(c.ValidationError, match="valid dictionary"):
+            m.Meltano.TapConfig.model_validate({
+                "tap_type": "tap-postgres",
+                "connection_config": "invalid",
+            })
 
-    def test_target_config_with_minimal_data(self) -> None:
-        """Test TargetConfig with minimal required data."""
-        config = m.Meltano.TargetConfig(target_type="target-csv")
-        tm.that(config.target_type, eq="target-csv")
-        tm.that(config.connection_config, eq={})
-        tm.that(config.batch_size, none=True)
-        tm.that(config.batch_wait_limit, none=True)
+    # ---- TargetConfig ------------------------------------------------------
 
-    def test_target_config_with_full_data(self) -> None:
-        """Test TargetConfig with all fields populated."""
-        config = m.Meltano.TargetConfig(
+    def test_target_config_exposes_defaults_for_optional_fields(self) -> None:
+        settings = m.Meltano.TargetConfig(target_type="target-csv")
+        tm.that(settings.target_type, eq="target-csv")
+        tm.that(settings.connection_config, empty=True)
+        tm.that(settings.batch_size, none=True)
+        tm.that(settings.batch_wait_limit, none=True)
+        tm.that(settings.target_version, eq="latest")
+
+    def test_target_config_retains_full_supplied_state(self) -> None:
+        settings = m.Meltano.TargetConfig(
             target_type="target-postgres",
             connection_config={
                 "host": "localhost",
@@ -92,261 +109,166 @@ class TestTargetConfigEnhanced:
             batch_size=1000,
             batch_wait_limit=30.0,
         )
-        tm.that(config.target_type, eq="target-postgres")
-        tm.that(config.connection_config["database"], eq="analytics")
-        tm.that(config.batch_size, eq=1000)
-        if config.batch_wait_limit is not None:
-            tm.that(abs(config.batch_wait_limit - 30.0), lt=1e-9)
+        tm.that(settings.target_type, eq="target-postgres")
+        tm.that(settings.connection_config["database"], eq="analytics")
+        tm.that(settings.batch_size, eq=1000)
+        batch_wait_limit = settings.batch_wait_limit
+        assert batch_wait_limit is not None
+        tm.that(abs(batch_wait_limit - 30.0), lt=1e-9)
 
-    def test_target_config_validation_empty_target_type(self) -> None:
-        """Test TargetConfig validation with empty target_type."""
-        with pytest.raises(ValidationError, match="target_type cannot be empty"):
+    def test_target_config_computed_fields_derive_from_state(self) -> None:
+        settings = m.Meltano.TargetConfig(
+            target_type="target-postgres",
+            connection_config={"host": "localhost", "port": 5432},
+            target_version="3.0.0",
+        )
+        tm.that(settings.config_size, eq=2)
+        tm.that(settings.has_connection_config, eq=True)
+        tm.that(settings.target_identifier, eq="target-postgres:3.0.0")
+
+    def test_target_config_has_connection_config_false_when_empty(self) -> None:
+        settings = m.Meltano.TargetConfig(target_type="target-csv")
+        tm.that(settings.has_connection_config, eq=False)
+        tm.that(settings.config_size, eq=0)
+
+    def test_target_config_rejects_blank_target_type(self) -> None:
+        with pytest.raises(c.ValidationError, match="target_type cannot be empty"):
             m.Meltano.TargetConfig(target_type="")
 
-    def test_target_config_validation_invalid_batch_size_type(self) -> None:
-        """Test TargetConfig validation with invalid batch_size type."""
-        with pytest.raises(ValidationError, match="Input should be a valid integer"):
-            m.Meltano.TargetConfig(
-                target_type="target-csv", batch_size=cast("int", "invalid")
-            )
+    def test_target_config_rejects_non_integer_batch_size(self) -> None:
+        with pytest.raises(c.ValidationError, match="valid integer"):
+            m.Meltano.TargetConfig.model_validate({
+                "target_type": "target-csv",
+                "batch_size": "invalid",
+            })
 
+    # ---- StreamInfo --------------------------------------------------------
 
-class TestStreamInfoEnhanced:
-    """Enhanced tests for StreamInfo model."""
-
-    def test_stream_info_with_minimal_data(self) -> None:
-        """Test StreamInfo with minimal required data."""
+    def test_stream_info_exposes_defaults_for_optional_fields(self) -> None:
         stream = m.Meltano.StreamInfo(
             stream_name="users",
-            stream_schema={"type": "t.NormalizedValue", "properties": "id"},
+            stream_schema={"type": "object", "properties": "id"},
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tm.that(stream.stream_name, eq="users")
-        tm.that(stream.stream_schema["type"], eq="t.NormalizedValue")
-        tm.that(stream.status, eq="initialized")
+        tm.that(stream.stream_schema["type"], eq="object")
+        tm.that(stream.status, eq=c.Meltano.StreamStatus.INITIALIZED)
         tm.that(stream.records_loaded, eq=0)
         tm.that(stream.batches_processed, eq=0)
         tm.that(stream.stream_created_at, eq="2025-01-01T00:00:00Z")
 
-    def test_stream_info_with_full_data(self) -> None:
-        """Test StreamInfo with all fields populated."""
+    def test_stream_info_retains_full_supplied_state(self) -> None:
         stream = m.Meltano.StreamInfo(
             stream_name="orders",
-            stream_schema={
-                "type": "t.NormalizedValue",
-                "properties": "id,order_date,amount",
-            },
+            stream_schema={"type": "object", "properties": "id,order_date,amount"},
             key_properties=["id"],
             replication_method="FULL_TABLE",
             replication_key="order_date",
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tm.that(stream.stream_name, eq="orders")
-        tm.that(stream.key_properties, eq=["id"])
+        tm.that(stream.key_properties, has="id")
         tm.that(stream.replication_method, eq="FULL_TABLE")
         tm.that(stream.replication_key, eq="order_date")
 
-    def test_stream_info_validation_empty_stream_name(self) -> None:
-        """Test StreamInfo validation with empty stream_name."""
-        with pytest.raises(
-            ValidationError,
-            match="String should have at least 1 character",
-        ):
+    def test_stream_info_computed_fields_for_unprocessed_stream(self) -> None:
+        stream = m.Meltano.StreamInfo(
+            stream_name="users",
+            stream_schema={"type": "object"},
+            stream_created_at="2025-01-01T00:00:00Z",
+        )
+        tm.that(stream.average_records_per_batch, eq=0.0)
+        tm.that(stream.has_processed_data, eq=False)
+        tm.that(stream.processing_status, eq=str(c.Meltano.StreamStatus.PENDING))
+
+    def test_stream_info_average_records_per_batch_divides_totals(self) -> None:
+        stream = m.Meltano.StreamInfo(
+            stream_name="users",
+            stream_schema={"type": "object"},
+            stream_created_at="2025-01-01T00:00:00Z",
+            records_loaded=10,
+            batches_processed=2,
+        )
+        tm.that(stream.average_records_per_batch, eq=5.0)
+        tm.that(stream.has_processed_data, eq=True)
+
+    @pytest.mark.parametrize(
+        ("status", "records_loaded", "batches_processed", "expected"),
+        [
+            (
+                c.Meltano.StreamStatus.COMPLETED,
+                4,
+                1,
+                str(c.Meltano.StreamStatus.SUCCESS),
+            ),
+            (c.Meltano.StreamStatus.ERROR, 0, 0, str(c.Meltano.StreamStatus.FAILED)),
+            (
+                c.Meltano.StreamStatus.PROCESSING,
+                3,
+                1,
+                str(c.Meltano.StreamStatus.IN_PROGRESS),
+            ),
+            (
+                c.Meltano.StreamStatus.INITIALIZED,
+                0,
+                0,
+                str(c.Meltano.StreamStatus.PENDING),
+            ),
+        ],
+    )
+    def test_stream_info_processing_status_reflects_progress(
+        self, status: str, records_loaded: int, batches_processed: int, expected: str
+    ) -> None:
+        stream = m.Meltano.StreamInfo(
+            stream_name="users",
+            stream_schema={"type": "object"},
+            stream_created_at="2025-01-01T00:00:00Z",
+            status=status,
+            records_loaded=records_loaded,
+            batches_processed=batches_processed,
+        )
+        tm.that(stream.processing_status, eq=expected)
+
+    def test_stream_info_rejects_empty_stream_name(self) -> None:
+        with pytest.raises(c.ValidationError, match="at least 1 character"):
             m.Meltano.StreamInfo(
                 stream_name="",
-                stream_schema={"type": "t.NormalizedValue"},
+                stream_schema={"type": "object"},
                 stream_created_at="2025-01-01T00:00:00Z",
             )
 
-    def test_stream_info_validation_invalid_schema_type(self) -> None:
-        """Test StreamInfo validation with invalid schema type."""
-        invalid_schema = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
+    def test_stream_info_rejects_records_without_batches(self) -> None:
+        with pytest.raises(
+            c.ValidationError, match="Records loaded but no batches processed"
+        ):
             m.Meltano.StreamInfo(
                 stream_name="users",
-                stream_schema=invalid_schema,
+                stream_schema={"type": "object"},
                 stream_created_at="2025-01-01T00:00:00Z",
+                records_loaded=5,
+                batches_processed=0,
             )
 
-
-class TestMeltanoProjectModelEnhanced:
-    """Enhanced tests for MeltanoProjectModel."""
-
-    def test_meltano_project_with_minimal_data(self) -> None:
-        """Test MeltanoProjectModel with minimal required data."""
-        project = m.Meltano.MeltanoProjectModel(project_id="test-project")
-        tm.that(project.project_id, eq="test-project")
-        tm.that(project.project_version, eq="1")
-        tm.that(project.default_environment, eq="dev")
-        tm.that(project.plugins, eq={})
-        tm.that(project.environments, eq={})
-
-    def test_meltano_project_with_full_data(self) -> None:
-        """Test MeltanoProjectModel with all fields populated."""
-        project = m.Meltano.MeltanoProjectModel(
-            project_id="analytics-project",
-            project_version="2.0",
-            default_environment="production",
-            plugins={
-                "extractors": "tap-postgres",
-                "loaders": "target-csv",
-            },
-            environments={
-                "dev": "development",
-                "prod": "production",
-            },
-        )
-        tm.that(project.project_id, eq="analytics-project")
-        tm.that(project.project_version, eq="2.0")
-        tm.that(project.default_environment, eq="production")
-        tm.that(project.plugins, has="extractors")
-        tm.that(project.environments, has="dev")
-        tm.that(project.environments, has="prod")
-
-    def test_meltano_project_validation_empty_project_id(self) -> None:
-        """Test MeltanoProjectModel validation with empty project_id."""
-        with pytest.raises(ValidationError, match="project_id cannot be empty"):
-            m.Meltano.MeltanoProjectModel(project_id="")
-
-    def test_meltano_project_validation_invalid_plugins_type(self) -> None:
-        """Test MeltanoProjectModel validation with invalid plugins type."""
-        invalid_plugins = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            m.Meltano.MeltanoProjectModel(
-                project_id="test-project",
-                plugins=invalid_plugins,
+    def test_stream_info_rejects_unknown_status(self) -> None:
+        with pytest.raises(c.ValidationError, match="Status must be one of"):
+            m.Meltano.StreamInfo(
+                stream_name="users",
+                stream_schema={"type": "object"},
+                stream_created_at="2025-01-01T00:00:00Z",
+                status="not-a-real-status",
             )
 
+    def test_stream_info_rejects_non_mapping_schema(self) -> None:
+        with pytest.raises(c.ValidationError, match="valid dictionary"):
+            m.Meltano.StreamInfo.model_validate({
+                "stream_name": "users",
+                "stream_schema": "invalid",
+                "stream_created_at": "2025-01-01T00:00:00Z",
+            })
 
-class TestPluginModelEnhanced:
-    """Enhanced tests for PluginModel."""
+    # ---- Composition -------------------------------------------------------
 
-    def test_plugin_model_with_minimal_data(self) -> None:
-        """Test PluginModel with minimal required data."""
-        plugin = m.Meltano.PluginModel(
-            name="tap-postgres",
-            namespace="tap_postgres",
-            pip_url="tap-postgres",
-        )
-        tm.that(plugin.name, eq="tap-postgres")
-        tm.that(plugin.namespace, eq="tap_postgres")
-        tm.that(plugin.variant, eq="standard")
-        tm.that(plugin.pip_url, eq="tap-postgres")
-        tm.that(plugin.executable, none=True)
-        tm.that(plugin.capabilities, eq=[])
-        tm.that(plugin.settings, eq={})
-        tm.that(plugin.config_files, eq=[])
-
-    def test_plugin_model_with_full_data(self) -> None:
-        """Test PluginModel with all fields populated."""
-        plugin = m.Meltano.PluginModel(
-            name="tap-postgres",
-            namespace="meltanolabs",
-            variant="meltanolabs",
-            pip_url="git+https://github.com/meltanolabs/tap-postgres.git",
-            executable="tap-postgres",
-            capabilities=["catalog", "discover", "sync"],
-            settings={
-                "host": "string",
-                "port": "integer",
-            },
-            config_files=["config.json"],
-        )
-        tm.that(plugin.name, eq="tap-postgres")
-        tm.that(plugin.namespace, eq="meltanolabs")
-        tm.that(plugin.variant, eq="meltanolabs")
-        tm.that(
-            plugin.pip_url,
-            eq="git+https://github.com/meltanolabs/tap-postgres.git",
-        )
-        tm.that(plugin.executable, eq="tap-postgres")
-        tm.that(plugin.capabilities, has="catalog")
-        tm.that(len(plugin.settings), eq=2)
-        tm.that(plugin.settings, has="host")
-
-    def test_plugin_model_validation_empty_name(self) -> None:
-        """Test PluginModel validation with empty name."""
-        with pytest.raises(
-            ValidationError,
-            match="String should have at least 1 character",
-        ):
-            m.Meltano.PluginModel(name="", namespace="")
-
-    def test_plugin_model_validation_invalid_capabilities_type(self) -> None:
-        """Test PluginModel validation with invalid capabilities type."""
-        with pytest.raises(ValidationError, match="not allowed as a Sequence value"):
-            m.Meltano.PluginModel(
-                name="tap-postgres",
-                namespace="tap-postgres",
-                capabilities="invalid",
-            )
-
-
-class TestDbtProjectModelEnhanced:
-    """Enhanced tests for DbtProjectModel."""
-
-    def test_dbt_project_with_minimal_data(self) -> None:
-        """Test DbtProjectModel with minimal required data."""
-        dbt_project = m.Meltano.DbtProjectModel(
-            name="analytics",
-            dbt_version="1.0.0",
-            profile="default",
-        )
-        tm.that(dbt_project.name, eq="analytics")
-        tm.that(dbt_project.profile, eq="default")
-        tm.that(dbt_project.dbt_version, eq="1.0.0")
-        tm.that(dbt_project.config, eq={})
-        tm.that(dbt_project.models, eq={})
-        tm.that(dbt_project.sources, eq={})
-        tm.that(dbt_project.tests, eq={})
-
-    def test_dbt_project_with_full_data(self) -> None:
-        """Test DbtProjectModel with all fields populated."""
-        dbt_project = m.Meltano.DbtProjectModel(
-            name="data-warehouse",
-            profile="postgres",
-            dbt_version="2.1.0",
-            config={"materialized": "table", "on_schema_change": "fail_safe"},
-            models={
-                "staging": "view",
-            },
-            sources={"raw_data": "users"},
-            tests={"unit": "test_user_validity"},
-        )
-        tm.that(dbt_project.name, eq="data-warehouse")
-        tm.that(dbt_project.profile, eq="postgres")
-        tm.that(dbt_project.dbt_version, eq="2.1.0")
-        tm.that(dbt_project.config["materialized"], eq="table")
-        tm.that(dbt_project.models, has="staging")
-        tm.that(dbt_project.sources, has="raw_data")
-        tm.that(dbt_project.tests, has="unit")
-
-    def test_dbt_project_validation_empty_name(self) -> None:
-        """Test DbtProjectModel validation with empty name."""
-        with pytest.raises(ValidationError, match="name cannot be empty"):
-            m.Meltano.DbtProjectModel(name="", profile="default")
-
-    def test_dbt_project_validation_empty_profile(self) -> None:
-        """Test DbtProjectModel validation with empty profile."""
-        with pytest.raises(ValidationError, match="profile cannot be empty"):
-            m.Meltano.DbtProjectModel(name="test-project", profile="")
-
-    def test_dbt_project_validation_invalid_config_type(self) -> None:
-        """Test DbtProjectModel validation with invalid config type."""
-        invalid_config = cast("t.ScalarMapping", "invalid")
-        with pytest.raises(ValidationError, match="Input should be a valid dictionary"):
-            m.Meltano.DbtProjectModel(
-                name="test-project",
-                profile="default",
-                config=invalid_config,
-            )
-
-
-class TestModelIntegration:
-    """Integration tests for model interactions."""
-
-    def test_tap_and_target_config_integration(self) -> None:
-        """Test integration between TapConfig and TargetConfig."""
+    def test_tap_and_target_configs_are_independent(self) -> None:
         tap_config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
             connection_config={"host": "source.db.com", "port": 5432},
@@ -355,30 +277,15 @@ class TestModelIntegration:
             target_type="target-postgres",
             connection_config={"host": "target.db.com", "port": 5432},
         )
-        tm.that(tap_config.tap_type, eq="tap-postgres")
-        tm.that(target_config.target_type, eq="target-postgres")
         tm.that(tap_config.connection_config["host"], eq="source.db.com")
         tm.that(target_config.connection_config["host"], eq="target.db.com")
+        tm.that(tap_config.tap_identifier, eq="tap-postgres:latest")
+        tm.that(target_config.target_identifier, eq="target-postgres:latest")
 
-    def test_plugin_model_with_project_integration(self) -> None:
-        """Test PluginModel integration with MeltanoProjectModel."""
-        plugin = m.Meltano.PluginModel(
-            name="tap-mysql",
-            namespace="meltanolabs",
-            pip_url="tap-mysql",
-        )
-        project = m.Meltano.MeltanoProjectModel(
-            project_id="mysql-etl",
-            plugins={"extractors": "tap-mysql"},
-        )
-        tm.that(str(project.plugins), has=plugin.name)
-        tm.that(project.project_id, eq="mysql-etl")
-
-    def test_stream_info_with_tap_config_integration(self) -> None:
-        """Test StreamInfo integration with TapConfig."""
+    def test_stream_name_maps_into_tap_stream_config(self) -> None:
         stream = m.Meltano.StreamInfo(
             stream_name="users",
-            stream_schema={"type": "t.NormalizedValue", "properties": "id"},
+            stream_schema={"type": "object", "properties": "id"},
             key_properties=["id"],
             stream_created_at="2025-01-01T00:00:00Z",
         )
@@ -388,4 +295,4 @@ class TestModelIntegration:
             stream_config={"users": "public"},
         )
         tm.that(tap_config.stream_config, has=stream.stream_name)
-        tm.that(stream.key_properties, eq=["id"])
+        tm.that(stream.key_properties, has="id")

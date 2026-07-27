@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, computed_field
-
-from flext_meltano import t
+from flext_cli import m, u
+from flext_meltano import FlextMeltanoTypes as t
 
 
 class FlextMeltanoModelsLogging:
     """Logging configuration models."""
 
-    class LoggingConfig(BaseModel):
+    class LoggingConfig(m.BaseModel):
         """Consolidated logging configuration for all pipeline operations.
 
         Organizes 62+ logging boolean fields into coherent categories:
@@ -129,7 +128,8 @@ class FlextMeltanoModelsLogging:
         debug_configuration: bool = False
         debug_performance_profile: bool = False
 
-        @computed_field
+        @u.computed_field()
+        @property
         def extract_dict(self) -> t.BoolMapping:
             """Extract logging as dictionary."""
             return {
@@ -143,7 +143,8 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.extract_throughput,
             }
 
-        @computed_field
+        @u.computed_field()
+        @property
         def load_dict(self) -> t.BoolMapping:
             """Load logging as dictionary."""
             return {
@@ -157,7 +158,8 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.load_throughput,
             }
 
-        @computed_field
+        @u.computed_field()
+        @property
         def pipeline_dict(self) -> t.BoolMapping:
             """Pipeline logging as dictionary."""
             return {
@@ -172,7 +174,8 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.pipeline_throughput,
             }
 
-        @computed_field
+        @u.computed_field()
+        @property
         def transform_dict(self) -> t.BoolMapping:
             """Transform logging as dictionary."""
             return {

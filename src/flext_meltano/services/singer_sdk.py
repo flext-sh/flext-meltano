@@ -1,75 +1,69 @@
-"""Singer SDK bridge — canonical re-exports for consumer projects.
-
-Module-level aliases exist for lazy-import registration: the root __init__.py
-and singer/__init__.py both reference ``flext_meltano.singer.sdk.<Name>`` in
-their _LAZY_IMPORTS tables.
-
-These are direct re-exports from singer_sdk (allowed in flext-meltano/src/)
-so that mypy recognizes them as valid types for subclassing.
-"""
+"""Singer SDK bridge for FLEXT tap service runtimes."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Protocol
+from collections.abc import Mapping, Sequence
 
-import click
 from singer_sdk import Sink
-from singer_sdk.helpers.types import Context, Record
 from singer_sdk.streams import Stream
 from singer_sdk.tap_base import Tap
 from singer_sdk.target_base import Target
 
-from flext_meltano import p, t
-
-
-class _SingerTapSdkBackend(Protocol):
-    """Raw Singer SDK tap surface consumed by the FLEXT bridge."""
-
-    @classmethod
-    def get_singer_command(cls) -> click.Command:
-        """Return the Singer SDK command bound to the tap type."""
-        ...
-
-    @property
-    def config(self) -> t.ContainerMapping:
-        """Expose the normalized tap configuration."""
-        ...
-
-    def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
-        """Return the tap streams."""
-        ...
-
-    def sync_all(self) -> None:
-        """Run a full Singer sync."""
-        ...
-
-
-FlextMeltanoSingerContext = Context
-FlextMeltanoSingerRecord = Record
-FlextMeltanoSingerSinkBase = Sink
-FlextMeltanoSingerStreamBase = Stream
-FlextMeltanoSingerTapBase = Tap
-FlextMeltanoSingerTargetBase = Target
+from flext_meltano import m, p, t
 
 
 class FlextMeltanoSingerTapAdapter:
-    """Bridge a Singer SDK tap instance into FLEXT's internal runtime contract."""
+    """Bridge a Singer SDK tap instance into the internal Meltano tap contract."""
 
-    def __init__(self, tap: _SingerTapSdkBackend) -> None:
+    def __init__(
+        self, tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend
+    ) -> None:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap
 
     @property
-    def config(self) -> t.ContainerMapping:
-        """Expose the tap configuration through the internal contract."""
-        return self._tap.config
+    def settings(self) -> t.JsonMapping:
+        """Expose tap configuration through the internal runtime contract."""
+        config_source = getattr(self._tap, "config", None)
+        empty_source: t.MappingKV[str, t.JsonPayload] = {}
+        if isinstance(config_source, Mapping):
+            source = config_source
+        else:
+            settings_source = getattr(self._tap, "settings", {})
+            source = (
+                settings_source
+                if isinstance(settings_source, Mapping)
+                else empty_source
+            )
+        normalized: t.JsonDict = {}
+        for key, value in source.items():
+            normalized[str(key)] = self._normalize_recursive(value)
+        return normalized
 
-    def run_cli(
-        self,
-        args: t.StrSequence,
-        prog_name: str,
-    ) -> int:
+    @staticmethod
+    def _normalize_recursive(value: t.JsonPayload | t.JsonValue) -> t.JsonValue:
+        """Normalize Singer config values into canonical CLI JSON values."""
+        if value is None:
+            return None
+        if isinstance(value, m.BaseModel):
+            normalized_model = value.model_dump(mode="json")
+            return {
+                key: FlextMeltanoSingerTapAdapter._normalize_recursive(model_value)
+                for key, model_value in normalized_model.items()
+            }
+        if isinstance(value, Mapping):
+            return {
+                key: FlextMeltanoSingerTapAdapter._normalize_recursive(mapping_value)
+                for key, mapping_value in value.items()
+            }
+        if isinstance(value, Sequence) and not isinstance(value, t.STR_BYTES_TYPES):
+            return [
+                FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
+                for sequence_value in value
+            ]
+        return t.Cli.JSON_VALUE_ADAPTER.validate_python(value)
+
+    def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
         """Execute the Singer CLI and normalize ``SystemExit`` into an int."""
         try:
             singer_command = self._tap.get_singer_command()
@@ -78,21 +72,14 @@ class FlextMeltanoSingerTapAdapter:
         except SystemExit as exc:
             return exc.code if isinstance(exc.code, int) else 1
 
-    def discover_streams(self) -> Sequence[p.Meltano.SingerStreamInfo]:
+    def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
         """Delegate stream discovery to the raw Singer tap."""
-        return self._tap.discover_streams()
+        streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap.discover_streams()
+        return streams
 
     def sync_all(self) -> None:
         """Delegate sync execution to the raw Singer tap."""
         self._tap.sync_all()
 
 
-__all__: t.StrSequence = [
-    "FlextMeltanoSingerContext",
-    "FlextMeltanoSingerRecord",
-    "FlextMeltanoSingerSinkBase",
-    "FlextMeltanoSingerStreamBase",
-    "FlextMeltanoSingerTapAdapter",
-    "FlextMeltanoSingerTapBase",
-    "FlextMeltanoSingerTargetBase",
-]
+__all__: list[str] = ["FlextMeltanoSingerTapAdapter", "Sink", "Stream", "Tap", "Target"]

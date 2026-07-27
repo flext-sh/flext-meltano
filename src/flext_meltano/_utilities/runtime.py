@@ -2,13 +2,22 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from flext_infra import u
-from pydantic import BaseModel
+from flext_cli import u
+from flext_meltano import (
+    FlextMeltanoConstants as c,
+    FlextMeltanoModels as m,
+    FlextMeltanoTypes as t,
+)
 
-from flext_meltano import c, m, p, t
+if TYPE_CHECKING:
+    from meltano.core.plugin.base import PluginType as MeltanoPluginType
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+
+    from flext_meltano import FlextMeltanoProtocols as p
 
 
 class FlextMeltanoUtilitiesRuntime:
@@ -18,15 +27,9 @@ class FlextMeltanoUtilitiesRuntime:
     def _normalized_parts(values: t.StrSequence) -> t.StrSequence:
         """Normalize a sequence of CLI-like values to stripped non-empty strings."""
         stripped_values = u.map(
-            u.to_str_list(values),
-            lambda part: u.to_str(part).strip(),
+            u.to_str_list(values), lambda part: u.to_str(part).strip()
         )
-        return list(
-            u.filter(
-                stripped_values,
-                lambda part: u.chk(part, empty=False),
-            ),
-        )
+        return list(u.filter(stripped_values, lambda part: u.chk(part, empty=False)))
 
     @staticmethod
     def normalize_runtime_command(command: t.StrSequence) -> t.StrSequence:
@@ -50,23 +53,8 @@ class FlextMeltanoUtilitiesRuntime:
         if plugin_type is None:
             return None
         normalized = u.normalize(u.to_str(plugin_type), case="lower").strip()
-        mapping = {
-            "extractor": c.Meltano.PluginType.EXTRACTORS.value,
-            c.Meltano.PluginType.EXTRACTORS.value: (
-                c.Meltano.PluginType.EXTRACTORS.value
-            ),
-            c.Meltano.PREFIX_TAP.rstrip("-"): c.Meltano.PluginType.EXTRACTORS.value,
-            "loader": c.Meltano.PluginType.LOADERS.value,
-            c.Meltano.PluginType.LOADERS.value: (c.Meltano.PluginType.LOADERS.value),
-            c.Meltano.PREFIX_TARGET.rstrip("-"): c.Meltano.PluginType.LOADERS.value,
-            "transformer": c.Meltano.PluginType.TRANSFORMS.value,
-            "transformers": c.Meltano.PluginType.TRANSFORMS.value,
-            c.Meltano.PluginType.TRANSFORMS.value: (
-                c.Meltano.PluginType.TRANSFORMS.value
-            ),
-            c.Meltano.PREFIX_DBT.rstrip("-"): c.Meltano.PluginType.TRANSFORMS.value,
-        }
-        return mapping.get(normalized, normalized)
+        resolved = c.Meltano.PLUGIN_GROUP_ALIASES.get(normalized)
+        return resolved.value if resolved is not None else normalized
 
     @staticmethod
     def is_help_request(args: t.StrSequence) -> bool:
@@ -78,11 +66,11 @@ class FlextMeltanoUtilitiesRuntime:
         }
 
     @staticmethod
-    def resolve_project_root(settings: t.ValueOrModel | p.Settings) -> Path | None:
+    def resolve_project_root(settings: t.JsonPayload | p.Settings) -> Path | None:
         """Extract and normalize project_root from a settings-like object."""
         if isinstance(settings, Mapping):
             raw = settings.get("project_root")
-        elif isinstance(settings, BaseModel):
+        elif isinstance(settings, m.BaseModel):
             model_data = settings.model_dump()
             raw = model_data.get("project_root")
         elif isinstance(settings, (Path, str)):
@@ -100,31 +88,27 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def normalize_environment_name(environment_name: str | None) -> str:
         """Normalize settings environment values to Meltano runtime aliases."""
+        raw_environment_name = "" if environment_name is None else environment_name
         normalized = u.normalize(
-            u.to_str(environment_name, default=""),
-            case="lower",
+            u.to_str(raw_environment_name, default=""), case="lower"
         ).strip()
-        aliases: t.StrMapping = {
-            c.Meltano.Environment.DEVELOPMENT.value: "dev",
-            c.Meltano.Environment.TESTING.value: "test",
-            c.Meltano.Environment.PRODUCTION.value: "prod",
-        }
-        return aliases.get(normalized, normalized)
+        runtime_alias = c.Meltano.ENVIRONMENT_RUNTIME_ALIASES.get(normalized)
+        return runtime_alias if runtime_alias is not None else normalized
 
     @staticmethod
     def build_pipeline_runtime_command(
-        tap_name: str,
-        target_name: str,
+        tap_name: str, target_name: str
     ) -> t.StrSequence:
         """Build the canonical Meltano ELT runtime command."""
-        return FlextMeltanoUtilitiesRuntime._normalized_parts(
-            [c.Meltano.CMD_ELT, tap_name, target_name],
-        )
+        return FlextMeltanoUtilitiesRuntime._normalized_parts([
+            c.Meltano.CMD_ELT,
+            tap_name,
+            target_name,
+        ])
 
     @staticmethod
     def build_dbt_runtime_command(
-        dbt_command: str,
-        args: t.StrSequence | None = None,
+        dbt_command: str, args: t.StrSequence | None = None
     ) -> t.StrSequence:
         """Build the canonical Meltano DBT invoke runtime command."""
         command = [
@@ -137,8 +121,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_bridge_command_args(
-        command: str,
-        args: t.ConfigurationMapping | None = None,
+        command: str, args: t.ConfigurationMapping | None = None
     ) -> t.StrSequence:
         """Build Meltano bridge command arguments from command + key/value args."""
         command_args = FlextMeltanoUtilitiesRuntime._normalized_parts([command])
@@ -153,8 +136,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_discovered_plugin(
-        raw_type: str,
-        raw_plugin: t.ContainerMapping,
+        raw_type: str, raw_plugin: t.JsonMapping
     ) -> t.StrMapping | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape."""
         name_val = raw_plugin.get("name", "")
@@ -164,7 +146,7 @@ class FlextMeltanoUtilitiesRuntime:
         ns_val = raw_plugin.get("namespace", "")
         pip_val = raw_plugin.get("pip_url", "")
         variant_val = raw_plugin.get("variant", "")
-        plugin_data: t.ContainerMapping = {
+        plugin_data: t.JsonMapping = {
             "name": plugin_name,
             "type": FlextMeltanoUtilitiesRuntime.normalize_plugin_group(raw_type)
             or u.to_str(raw_type),
@@ -172,25 +154,63 @@ class FlextMeltanoUtilitiesRuntime:
             "pip_url": str(pip_val).strip() if pip_val is not None else "",
             "variant": str(variant_val).strip() if variant_val is not None else "",
         }
-        filtered = u.filter(plugin_data, lambda value: u.chk(value, empty=False))
-        return {str(key): str(value) for key, value in filtered.items()}
+        return {
+            key: str(value)
+            for key, value in plugin_data.items()
+            if u.chk(value, empty=False)
+        }
 
     @staticmethod
-    def extract_plugin_names(
-        plugins: Sequence[t.StrMapping],
-    ) -> t.StrSequence:
+    def build_discovered_project_plugin(
+        raw_type: str, raw_plugin: ProjectPlugin
+    ) -> t.StrMapping | None:
+        """Normalize a Meltano project plugin object into discovery payload shape."""
+        plugin_mapping: t.JsonMapping = {
+            "name": raw_plugin.name,
+            "namespace": raw_plugin.namespace,
+            "pip_url": raw_plugin.pip_url,
+            "variant": raw_plugin.variant,
+        }
+        return FlextMeltanoUtilitiesRuntime.build_discovered_plugin(
+            raw_type, plugin_mapping
+        )
+
+    @staticmethod
+    def discover_project_plugins(
+        current_plugins: t.MappingKV[MeltanoPluginType, t.SequenceOf[ProjectPlugin]],
+        *,
+        selected_type: str | None = None,
+    ) -> list[t.StrMapping]:
+        """Normalize Meltano current_plugins catalog into canonical discovery mappings."""
+        discovered: list[t.StrMapping] = []
+        for raw_type, raw_plugins in current_plugins.items():
+            normalized_type = raw_type.value
+            for raw_plugin in raw_plugins:
+                plugin_data = (
+                    FlextMeltanoUtilitiesRuntime.build_discovered_project_plugin(
+                        normalized_type, raw_plugin
+                    )
+                )
+                if plugin_data is None:
+                    continue
+                if selected_type is not None and plugin_data["type"] != selected_type:
+                    continue
+                discovered.append(plugin_data)
+        return discovered
+
+    @staticmethod
+    def extract_plugin_names(plugins: t.SequenceOf[t.StrMapping]) -> t.StrSequence:
         """Extract non-empty plugin names from normalized plugin mappings."""
         return list(
             u.map(
                 u.filter(
                     plugins,
                     lambda plugin: u.chk(
-                        u.to_str(plugin.get("name", "")).strip(),
-                        empty=False,
+                        u.to_str(plugin.get("name", "")).strip(), empty=False
                     ),
                 ),
                 lambda plugin: u.to_str(plugin.get("name", "")).strip(),
-            ),
+            )
         )
 
     @staticmethod
@@ -199,7 +219,7 @@ class FlextMeltanoUtilitiesRuntime:
         plugin_type: str,
         *,
         default_variant: str = "",
-        variants: t.ContainerMapping | None = None,
+        variants: t.JsonMapping | None = None,
         description: str = "",
         logo_url: str = "",
     ) -> t.StrMapping:
@@ -216,10 +236,7 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def command_status(
-        *,
-        success: bool,
-        success_status: str,
-        failure_status: str,
+        *, success: bool, success_status: str, failure_status: str
     ) -> str:
         """Select status string from command success/failure."""
         return success_status if success else failure_status
@@ -228,14 +245,14 @@ class FlextMeltanoUtilitiesRuntime:
     def build_command_execution_payload(
         command_result: m.Meltano.CommandExecutionResult,
         *,
-        extra_fields: t.ContainerMapping | None = None,
+        extra_fields: t.JsonMapping | None = None,
         success_status: str = c.Meltano.OperationStatus.SUCCESS,
         failure_status: str = c.Meltano.OperationStatus.ERROR,
         status_field: str | None = "status",
         duration_field: str | None = "execution_time",
-    ) -> t.ContainerMapping:
+    ) -> t.JsonMapping:
         """Build a standard command payload for services over Meltano runtime."""
-        payload: t.MutableContainerMapping = {
+        payload: t.MutableJsonMapping = {
             "success": command_result.success,
             "output": u.to_str(command_result.output),
             "error": u.to_str(command_result.error),
@@ -248,22 +265,37 @@ class FlextMeltanoUtilitiesRuntime:
                 failure_status=failure_status,
             )
         if duration_field is not None:
-            payload[duration_field] = float(command_result.execution_time)
-        if extra_fields is None:
-            return payload
-        merged = u.merge_mappings(payload, extra_fields, strategy="replace")
-        if merged.is_success:
-            return merged.value
-        return {
-            **payload,
-            **extra_fields,
-        }
+            payload[duration_field] = command_result.execution_time
+        source_payload = (
+            payload if extra_fields is None else {**payload, **extra_fields}
+        )
+        return t.Cli.JSON_MAPPING_ADAPTER.validate_python(source_payload)
+
+    @staticmethod
+    def build_mutable_command_execution_payload(
+        command_result: m.Meltano.CommandExecutionResult,
+        *,
+        extra_fields: t.JsonMapping | None = None,
+        success_status: str = c.Meltano.OperationStatus.SUCCESS,
+        failure_status: str = c.Meltano.OperationStatus.ERROR,
+        status_field: str | None = "status",
+        duration_field: str | None = "execution_time",
+    ) -> t.JsonDict:
+        """Build one mutable execution payload for callers that append fields."""
+        return dict(
+            FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
+                command_result,
+                extra_fields=extra_fields,
+                success_status=success_status,
+                failure_status=failure_status,
+                status_field=status_field,
+                duration_field=duration_field,
+            ).items()
+        )
 
     @staticmethod
     def command_failure_message(
-        command_result: m.Meltano.CommandExecutionResult,
-        *,
-        default: str,
+        command_result: m.Meltano.CommandExecutionResult, *, default: str
     ) -> str:
         """Resolve the best failure/output text from a command result."""
         error_text = u.to_str(command_result.error).strip()
@@ -279,12 +311,21 @@ class FlextMeltanoUtilitiesRuntime:
         """Normalize Meltano project plugin groups to public discovery labels."""
         normalized = FlextMeltanoUtilitiesRuntime.normalize_plugin_group(plugin_type)
         if normalized == c.Meltano.PluginType.EXTRACTORS.value:
-            return c.Meltano.PREFIX_TAP.rstrip("-")
+            extractor_label: str = c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                c.Meltano.PluginType.EXTRACTORS
+            ].value
+            return extractor_label
         if normalized == c.Meltano.PluginType.LOADERS.value:
-            return c.Meltano.PREFIX_TARGET.rstrip("-")
+            loader_label: str = c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                c.Meltano.PluginType.LOADERS
+            ].value
+            return loader_label
         if (
             normalized == c.Meltano.PluginType.TRANSFORMS.value
             or plugin_name.startswith(c.Meltano.PREFIX_DBT)
         ):
-            return "transformer"
+            transform_label: str = c.Meltano.PLUGIN_DISCOVERY_LABELS[
+                c.Meltano.PluginType.TRANSFORMS
+            ].value
+            return transform_label
         return normalized or plugin_type

@@ -1,27 +1,48 @@
-# FLEXT Meltano
+<!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
-Camada de orquestracao Singer/Meltano para coordenar extracao, carga e transformacao em pipelines FLEXT.
+# flext-meltano
 
-Descricao oficial atual: "FLEXT Meltano - Enterprise Data Integration Platform".
+**Version**: `0.12.0` | **Python**: 3.13+ | **Project class**: `platform`
 
-## O que este projeto entrega
+> **Alpha (0.12.0).** This package is alpha quality. Every package in the workspace must be re-checked and re-validated at 0.12.0 before any promotion beyond alpha; treat interfaces as unstable.
 
-- Executa jobs de tap/target sob agenda operacional.
-- Padroniza integracao entre conectores e dbt.
-- Apoia operacao recorrente de pipelines de dados.
+## Purpose
 
-## Contexto operacional
+FLEXT Meltano - Enterprise Data Integration Platform
 
-- Entrada: definicao de jobs, taps, targets e schedule.
-- Saida: pipelines executados com trilha operacional.
-- Dependencias: conectores Singer e ambientes de dados conectados.
+## Module Map
 
-## Estado atual e risco de adocao
+::: flext_meltano
+    options:
+      members: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      show_source: false
 
-- Qualidade: **Alpha**
-- Uso recomendado: **Nao produtivo**
-- Nivel de estabilidade: em maturacao funcional e tecnica, sujeito a mudancas de contrato sem garantia de retrocompatibilidade.
+## Collection Rules
 
-## Diretriz para uso nesta fase
+Read [`/flext/AGENTS.md`](../AGENTS.md) §9 — Agent Execution Pre-requisites — for the canonical pre-change checklist (parent MRO chain, Scope bootstrap, skill loading, zero-debt baseline, slot registry verification).
 
-Aplicar este projeto somente em desenvolvimento, prova de conceito e homologacao controlada, com expectativa de ajustes frequentes ate maturidade de release.
+## Operation Flow
+
+- Public surface: see [`docs/index.md`](docs/index.md) and [`docs/api-reference/README.md`](docs/api-reference/README.md).
+- Generated module overview: [`docs/api-reference/generated/overview.md`](docs/api-reference/generated/overview.md).
+- Settings env prefix: see project `pyproject.toml` `[tool.flext]` and `FlextSettings` ConfigDict.
+
+## Integration Points
+
+- Parent MRO chain: read this project's `pyproject.toml` `dependencies` array filtered by `flext-*`. The MRO cascade is encoded in the inheritance lists of the facade classes listed under Module Map above.
+- Public extensions exposed by this project: `FlextMeltano`, `FlextMeltanoAbstractions`, `FlextMeltanoAbstractionsBase`, `FlextMeltanoAdapter`, `FlextMeltanoBridge`, `FlextMeltanoCli` (+28 more).
+- Library abstraction boundaries: see AGENTS.md §2.7.
+
+## Quality Gates
+
+Canonical `make` verbs (`check`, `test`, `val`, `docs`) — see `AGENTS.md` §5 (Make Contract) and the [`flext-quality-gates`](../.agents/skills/flext-quality-gates/SKILL.md) skill for selectors and thresholds.
+
+## Governance Pointer
+
+- Engineering law: [`/flext/AGENTS.md`](../AGENTS.md)
+- Governance + ADRs: [`/flext/docs/GOVERNANCE.md`](../docs/GOVERNANCE.md)
+- Skills index: [`/flext/.agents/skills/`](../.agents/skills/)
+- Onboarding: [`/flext/docs/guides/onboarding.md`](../docs/guides/onboarding.md)
+- Full project portal: [`docs/index.md`](docs/index.md).

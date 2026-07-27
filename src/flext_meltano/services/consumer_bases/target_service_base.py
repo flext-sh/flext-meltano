@@ -10,17 +10,16 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from abc import abstractmethod
-from collections.abc import MutableMapping, Sequence
-from pathlib import Path
-from typing import Annotated, ClassVar, Self, override
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Annotated, override
 
-from pydantic import Field, PrivateAttr
+from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping
 
 
-class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
+class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """Base for all FLEXT target service projects.
 
     Subclasses MUST define:
@@ -36,27 +35,16 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     """
 
     target_name: Annotated[
-        t.NonEmptyStr,
-        Field(description="Canonical target name (e.g. target-oracle)"),
+        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)")
     ] = "target"
 
-    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = PrivateAttr(
-        default_factory=dict[str, p.Meltano.SingerDrainSink],
+    _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
+        default_factory=dict[str, p.Meltano.SingerDrainSink]
     )
-    _instance: ClassVar[Self | None] = None
-
-    @classmethod
-    def get_instance(cls) -> Self:
-        """Return the shared facade instance."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
 
     @abstractmethod
     def create_sink(
-        self,
-        stream_name: str,
-        schema: t.FlatContainerMapping,
+        self, stream_name: str, schema: t.JsonMapping
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -68,13 +56,13 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point for target."""
+        """Run the main CLI entry point for target."""
         try:
             command_args = list(args) if args else sys.argv[1:]
             _ = command_args
             self.logger.info("Target CLI started", target=self.target_name)
             return 0
-        except (ValueError, TypeError, OSError, RuntimeError) as exc:
+        except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("Target CLI failed", error=str(exc))
             return 1
 
@@ -82,11 +70,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # Sink management
     # ------------------------------------------------------------------
 
-    def get_or_create_sink(
-        self,
-        stream_name: str,
-        schema: t.FlatContainerMapping,
-    ) -> r[p.Meltano.SingerDrainSink]:
+    def fetch_or_create_sink(
+        self, stream_name: str, schema: t.JsonMapping
+    ) -> p.Result[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream."""
         try:
             if stream_name in self._sinks:
@@ -98,7 +84,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[p.Meltano.SingerDrainSink].fail(str(exc))
 
-    def flush(self, stream_name: str | None = None) -> r[None]:
+    def flush(self, stream_name: str | None = None) -> p.Result[None]:
         """Flush records for a specific stream or all streams."""
         try:
             targets = (
@@ -119,21 +105,15 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def process_record(
-        self,
-        stream_name: str,
-        record: t.FlatContainerMapping,
-        schema: t.FlatContainerMapping,
-    ) -> r[bool]:
+        self, stream_name: str, record: t.JsonMapping, schema: t.JsonMapping
+    ) -> p.Result[bool]:
         """Process a single Singer RECORD message."""
-        sink_result = self.get_or_create_sink(stream_name, schema)
-        if sink_result.is_failure:
+        sink_result = self.fetch_or_create_sink(stream_name, schema)
+        if sink_result.failure:
             return r[bool].fail(sink_result.error or "Sink creation failed")
         try:
-            record_dict: dict[str, t.ContainerValue] = {
-                str(k): (str(v) if isinstance(v, Path) else v)
-                for k, v in record.items()
-            }
-            empty_context: t.MutableContainerValueMapping = {}
+            record_dict = t.json_dict_adapter().validate_python(record)
+            empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as exc:
@@ -142,14 +122,14 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     def process_batch(
         self,
         stream_name: str,
-        records: Sequence[t.FlatContainerMapping],
-        schema: t.FlatContainerMapping,
-    ) -> r[int]:
+        records: t.SequenceOf[t.JsonMapping],
+        schema: t.JsonMapping,
+    ) -> p.Result[int]:
         """Process a batch of records."""
         processed = 0
         for record in records:
             result = self.process_record(stream_name, record, schema)
-            if result.is_failure:
+            if result.failure:
                 return r[int].fail(result.error or "Batch processing failed")
             processed += 1
         return r[int].ok(processed)
@@ -158,24 +138,24 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # Connection lifecycle
     # ------------------------------------------------------------------
 
-    def connect(self) -> r[bool]:
+    def connect(self) -> p.Result[bool]:
         """Connect to the target data store. Override in consumer."""
         return r[bool].ok(value=True)
 
-    def disconnect(self) -> r[None]:
+    def disconnect(self) -> p.Result[None]:
         """Disconnect from the target data store. Override in consumer."""
         self._sinks.clear()
         return r[None].ok(None)
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute target service — returns status."""
-        return r[t.ContainerMapping].ok({
+        return r[t.JsonMapping].ok({
             "service": self.target_name,
-            "status": c.CommonStatus.ACTIVE.value,
+            "status": "active",
             "type": "target",
             "active_sinks": len(self._sinks),
         })
 
 
-__all__ = ["FlextMeltanoTargetServiceBase"]
+__all__: list[str] = ["FlextMeltanoTargetServiceBase"]

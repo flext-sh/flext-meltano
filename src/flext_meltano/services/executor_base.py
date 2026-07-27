@@ -1,0 +1,396 @@
+"""FLEXT Meltano Executor - Base class with core command execution.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
+from __future__ import annotations
+
+import os
+import time
+from contextlib import redirect_stderr, redirect_stdout, suppress
+from io import StringIO
+from pathlib import Path
+from typing import override
+
+import meltano
+from meltano.cli.cli import cli as meltano_cli
+from meltano.cli.utils import CliError
+from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
+from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.project import Project
+from meltano.core.project_init_service import (
+    ProjectInitService,
+    ProjectInitServiceError,
+)
+from sqlalchemy.exc import SQLAlchemyError
+
+from flext_cli import cli
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    settings,
+    t,
+    u,
+)
+
+
+class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
+    """Base executor providing Meltano command execution with error handling."""
+
+    def __init__(
+        self,
+        settings: FlextMeltanoSettings | None = None,
+        *,
+        service_name: t.NonEmptyStr | None = None,
+        service_version: t.NonEmptyStr | None = None,
+        source_name: str | None = None,
+        sink_name: str | None = None,
+        transformation_name: str | None = None,
+    ) -> None:
+        """Bootstrap executor with canonical Meltano service kwargs.
+
+        Mirrors :class:`FlextMeltanoServiceBase.__init__` so static analysers see
+        ``settings`` as a valid kwarg through Pydantic-regenerated subclass init.
+        """
+        super().__init__(
+            runtime_settings=settings,
+            service_name=service_name or "FlextMeltanoExecutor",
+            service_version=service_version or c.Meltano.DEFAULT_SERVICE_VERSION,
+            source_name=source_name,
+            sink_name=sink_name,
+            transformation_name=transformation_name,
+        )
+
+    @property
+    def project_root(self) -> Path:
+        """The project root directory - delegates to settings."""
+        active_settings = (
+            self.runtime_settings
+            if isinstance(self.runtime_settings, FlextMeltanoSettings)
+            else settings
+        )
+        return u.Meltano.resolve_project_root(active_settings) or Path.cwd()
+
+    @staticmethod
+    def fetch_version() -> p.Result[str]:
+        """Return the version information from the imported Meltano package."""
+        return u.try_(
+            lambda: meltano.__version__,
+            catch=(
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ),
+        ).map_error(lambda e: f"Failed to get version: {e}")
+
+    def _project_search_root(self, _cwd: Path | None = None) -> Path | None:
+        """Resolve the project root used for project-scoped Meltano operations."""
+        active_settings = (
+            self.runtime_settings
+            if isinstance(self.runtime_settings, FlextMeltanoSettings)
+            else settings
+        )
+        configured_root: Path | None = u.Meltano.resolve_project_root(active_settings)
+        if configured_root is not None:
+            return configured_root
+        if _cwd is not None:
+            return m.Meltano.PathPayload(value=_cwd).value
+        return None
+
+    @staticmethod
+    def initialize_project_root(
+        project_root: Path, *, force: bool = False
+    ) -> p.Result[Project]:
+        """Initialize a Meltano project using the library service."""
+        return u.try_(
+            lambda: ProjectInitService(project_root).init(activate=False, force=force),
+            catch=(
+                ProjectInitServiceError,
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ),
+        ).map_error(lambda e: f"Failed to initialize Meltano project: {e}")
+
+    def load_project(self, _cwd: Path | None = None) -> p.Result[Project]:
+        """Load a Meltano project using the imported runtime."""
+        search_root = self._project_search_root(_cwd)
+        return u.try_(
+            lambda: Project.find(search_root, activate=False),
+            catch=(
+                ProjectNotFound,
+                EmptyMeltanoFileException,
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ),
+        ).map_error(lambda e: f"Failed to load Meltano project: {e}")
+
+    def fetch_project_plugins(
+        self, plugin_type: str | None = None, _cwd: Path | None = None
+    ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+        """Return the project-scoped plugin definitions from Meltano runtime state."""
+        project_result = self.load_project(_cwd)
+        if project_result.failure:
+            return r[t.SequenceOf[t.StrMapping]].fail(
+                project_result.error or "Failed to load Meltano project"
+            )
+        selected_type = u.Meltano.normalize_plugin_group(plugin_type)
+        current_plugins_raw = project_result.value.plugins.current_plugins
+        discovered = u.Meltano.discover_project_plugins(
+            current_plugins_raw, selected_type=selected_type
+        )
+        return r[t.SequenceOf[t.StrMapping]].ok(discovered)
+
+    def _runtime_environment_args(self, _cwd: Path | None = None) -> t.StrSequence:
+        """Select a runtime environment explicitly to avoid leaking test env vars."""
+        active_settings = (
+            self.runtime_settings
+            if isinstance(self.runtime_settings, FlextMeltanoSettings)
+            else settings
+        )
+        selected_environment = u.Meltano.normalize_environment_name(
+            active_settings.Meltano.environment
+        )
+        if not selected_environment:
+            return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
+        project_result = self.load_project(_cwd)
+        if project_result.failure:
+            return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
+        available_environments = {
+            environment.name
+            for environment in project_result.value.meltano.environments
+        }
+        if selected_environment not in available_environments:
+            return [c.Meltano.CMD_NO_ENVIRONMENT_OPTION]
+        return [c.Meltano.CMD_ENVIRONMENT_OPTION, selected_environment]
+
+    @override
+    def execute(self) -> p.Result[t.JsonMapping]:
+        """Execute the Meltano executor service."""
+        config_data: t.JsonMapping = {
+            "status": c.Meltano.OperationStatus.READY,
+            "executor_type": "flext_meltano_executor",
+            "execution_timestamp": str(time.time()),
+            "settings": settings.model_dump(mode="json"),
+        }
+        self.logger.info("FlextMeltanoExecutor executed successfully")
+        return r[t.JsonMapping].ok(config_data)
+
+    def execute_meltano_command(
+        self,
+        command: t.StrSequence,
+        timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
+        _cwd: Path | None = None,
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Execute a Meltano runtime command in-process and capture its output."""
+        if timeout <= 0:
+            return r[m.Meltano.CommandExecutionResult].fail(
+                "Command timeout must be greater than zero"
+            )
+
+        def _run_execute_meltano_command() -> p.Result[
+            m.Meltano.CommandExecutionResult
+        ]:
+            start_time = time.monotonic()
+            normalized_command: list[str] = list(
+                u.Meltano.normalize_runtime_command(command)
+            )
+            if not normalized_command:
+                return r[m.Meltano.CommandExecutionResult].fail(
+                    "Command cannot be empty"
+                )
+            needs_project_context = normalized_command[0] not in {
+                c.Meltano.CMD_HELP_OPTION,
+                c.Meltano.CMD_VERSION_OPTION,
+            }
+            working_dir = self.project_root if _cwd is None else _cwd
+            cwd = m.Meltano.PathPayload(value=working_dir).value
+            runtime_args: list[str] = list(normalized_command)
+            if needs_project_context:
+                runtime_args = [
+                    *self._runtime_environment_args(cwd),
+                    c.Meltano.CMD_CWD_OPTION,
+                    str(cwd),
+                    *normalized_command,
+                ]
+            stdout_buffer = StringIO()
+            stderr_buffer = StringIO()
+            exit_code = 0
+            self.logger.info(
+                "Executing command",
+                command=str(runtime_args),
+                timeout=timeout,
+                cwd=str(cwd),
+            )
+            prior_cwd = Path.cwd()
+            runtime_error = ""
+            Project.deactivate()
+            try:
+                with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
+                    command_result = cli.execute_external_command(
+                        meltano_cli, args=runtime_args, prog_name=c.Meltano.CMD_BINARY
+                    )
+                if command_result.failure:
+                    exit_code = 1
+                    runtime_error = command_result.error or "Meltano CLI command failed"
+            except (
+                CliError,
+                EmptyMeltanoFileException,
+                MeltanoError,
+                PluginNotFoundError,
+                ProjectNotFound,
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+                SQLAlchemyError,
+            ) as e:
+                exit_code = 1
+                runtime_error = str(e)
+            finally:
+                Project.deactivate()
+                with suppress(OSError):
+                    os.chdir(prior_cwd)
+            execution_time = time.monotonic() - start_time
+            error_output = stderr_buffer.getvalue()
+            if runtime_error and not error_output.strip():
+                error_output = runtime_error
+            result = m.Meltano.CommandExecutionResult(
+                command=normalized_command,
+                success=exit_code == 0,
+                exit_code=exit_code,
+                output=stdout_buffer.getvalue(),
+                error=error_output,
+                execution_time=execution_time,
+            )
+            return r[m.Meltano.CommandExecutionResult].ok(result)
+
+        try:
+            return _run_execute_meltano_command()
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+            SQLAlchemyError,
+        ) as e:
+            self.logger.exception("Command execution failed", error=str(e))
+            return r[m.Meltano.CommandExecutionResult].fail(str(e))
+
+    def execute_dbt_command(
+        self, dbt_command: str, args: t.StrSequence | None = None
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Execute a DBT command."""
+        try:
+            return self.execute_meltano_command(
+                u.Meltano.build_dbt_runtime_command(dbt_command, args)
+            )
+        except c.Meltano.OPERATION_ERRORS as e:
+            return r[m.Meltano.CommandExecutionResult].fail(str(e))
+
+    def execute_pipeline(
+        self, tap_name: str, target_name: str, config: t.JsonMapping | None = None
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Execute a complete ELT pipeline."""
+        prepared_command: t.StrSequence | None = None
+        completed_result: m.Meltano.CommandExecutionResult | None = None
+
+        def resolve_command_stage(
+            _context: m.Cli.PipelineStageContext,
+        ) -> p.Result[m.Cli.PipelineStageResult]:
+            nonlocal prepared_command
+            try:
+                command = list(
+                    u.Meltano.build_pipeline_runtime_command(tap_name, target_name)
+                )
+                if config is not None:
+                    command.extend(
+                        f"--{u.to_str(key).strip()}={u.to_str(str(value))}"
+                        for key, value in config.items()
+                    )
+            except c.Meltano.OPERATION_ERRORS as e:
+                return r[m.Cli.PipelineStageResult].fail(str(e))
+            command_output = t.Cli.JSON_MAPPING_ADAPTER.validate_python({
+                c.Meltano.PIPELINE_SHARED_KEY_COMMAND: command
+            })
+            prepared_command = m.Meltano.StringListValue.model_validate({
+                "items": command_output[c.Meltano.PIPELINE_SHARED_KEY_COMMAND]
+            }).items
+            return cli.ok_stage(
+                c.Meltano.PIPELINE_STAGE_RESOLVE_COMMAND, output=command_output
+            )
+
+        def execute_command_stage(
+            _context: m.Cli.PipelineStageContext,
+        ) -> p.Result[m.Cli.PipelineStageResult]:
+            nonlocal completed_result
+            if prepared_command is None:
+                return r[m.Cli.PipelineStageResult].fail(
+                    "Pipeline command not prepared"
+                )
+            execution_result = self.execute_meltano_command(prepared_command)
+            if execution_result.failure:
+                return r[m.Cli.PipelineStageResult].fail(
+                    execution_result.error or "Failed to execute pipeline command"
+                )
+            completed = execution_result.value
+            completed_result = completed
+            return cli.ok_stage(
+                c.Meltano.PIPELINE_STAGE_EXECUTE_COMMAND,
+                output={"success": completed.success, "exit_code": completed.exit_code},
+            )
+
+        handlers: t.MutableMappingKV[str, t.Cli.PipelineHandler] = {
+            c.Meltano.PIPELINE_STAGE_RESOLVE_COMMAND: resolve_command_stage,
+            c.Meltano.PIPELINE_STAGE_EXECUTE_COMMAND: execute_command_stage,
+        }
+        pipeline_result = cli.pipeline(
+            cli.linear_pipeline(
+                (
+                    c.Meltano.PIPELINE_STAGE_RESOLVE_COMMAND,
+                    c.Meltano.PIPELINE_STAGE_EXECUTE_COMMAND,
+                ),
+                handlers,
+            ),
+            context=cli.stage_context(workspace_root=self.project_root),
+        )
+        if pipeline_result.failure:
+            return r[m.Meltano.CommandExecutionResult].fail(
+                pipeline_result.error or "Failed to run Meltano pipeline"
+            )
+        if not pipeline_result.value.success:
+            failed_stage = next(iter(pipeline_result.value.failed_stages), None)
+            return r[m.Meltano.CommandExecutionResult].fail(
+                failed_stage.error
+                if failed_stage is not None and failed_stage.error is not None
+                else "Failed to run Meltano pipeline"
+            )
+        if completed_result is None:
+            return r[m.Meltano.CommandExecutionResult].fail(
+                "Pipeline execution result missing"
+            )
+        return r[m.Meltano.CommandExecutionResult].ok(completed_result)

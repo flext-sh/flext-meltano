@@ -2,7 +2,7 @@
 
 # flext-meltano Documentation
 
-- Version: `0.12.0-dev`
+- Version: `0.12.0`
 - Project class: `platform`
 - Package: `flext_meltano`
 - Description: FLEXT Meltano - Enterprise Data Integration Platform
@@ -18,7 +18,24 @@ This project portal is generated from `pyproject.toml`, package exports, and rea
 
 ## Public Surface Summary
 
-- Primary facades: `FlextMeltano`, `FlextMeltanoCLI`, `FlextMeltanoConstants`, `FlextMeltanoModels`, `FlextMeltanoProtocols`, `FlextMeltanoServiceBase` (+3 more)
-- Alias namespaces: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `11`
-- Exported module shortcuts: `api`, `base`, `cli`, `constants`, `models`, `protocols` (+3 more)
+::: flext_meltano
+    options:
+      members: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      show_source: false
+
+## Collection Rules
+
+Read [`/flext/AGENTS.md`](https://github.com/flext-sh/flext/blob/main/AGENTS.md) §9 — Agent Execution Pre-requisites — for the canonical pre-change checklist (parent MRO chain, Scope bootstrap, skill loading, zero-debt baseline, slot registry verification).
+
+## Quality Gates
+
+Canonical `make` verbs (`check`, `test`, `val`, `docs`) — see `AGENTS.md` §5 (Make Contract) and the [`flext-quality-gates`](https://github.com/flext-sh/flext/blob/main/.agents/skills/flext-quality-gates/SKILL.md) skill for selectors and thresholds.
+
+## Governance Pointer
+
+- Engineering law: [`/flext/AGENTS.md`](https://github.com/flext-sh/flext/blob/main/AGENTS.md)
+- Governance + ADRs: [`/flext/docs/GOVERNANCE.md`](https://github.com/flext-sh/flext/blob/main/docs/GOVERNANCE.md)
+- Skills index: [`/flext/.agents/skills/`](https://github.com/flext-sh/flext/tree/main/.agents/skills/)
+- Onboarding: [`/flext/docs/guides/onboarding.md`](https://github.com/flext-sh/flext/blob/main/docs/guides/onboarding.md)

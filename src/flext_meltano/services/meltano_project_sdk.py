@@ -1,7 +1,7 @@
 """Meltano SDK Project Management — MRO mixin for FlextMeltano facade.
 
 Deep integration with meltano-core Project SDK. Moved from meltano/project.py
-and converted from standalone FlextService to facade mixin.
+and converted from standalone s to facade mixin.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,14 +9,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from meltano.core.project import Project
-from pydantic import PrivateAttr
 
-from flext_core import r
-from flext_meltano import FlextMeltanoServiceBase, c, m, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
@@ -26,60 +28,67 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     (initialize, load, get plugins).
     """
 
-    _sdk_project_root: Path | None = PrivateAttr(default=None)
-    _sdk_project: Project | None = PrivateAttr(default=None)
+    _sdk_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
+    _sdk_project: Project | None = u.PrivateAttr(default_factory=lambda: None)
 
-    def get_sdk_plugins(
-        self,
-        plugin_type: str | None = None,
-    ) -> r[Sequence[t.Meltano.PluginDefinition]]:
+    def fetch_sdk_plugins(
+        self, plugin_type: str | None = None
+    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Get plugins from the SDK project, optionally filtered by type."""
         try:
             if not self._sdk_project:
-                return r[Sequence[t.Meltano.PluginDefinition]].fail("No project loaded")
+                return r[t.SequenceOf[t.JsonMapping]].fail("No project loaded")
             plugins = self._extract_sdk_plugins(plugin_type)
             self.logger.info(
-                "Plugins retrieved",
-                count=u.count(plugins),
-                type=plugin_type or "",
+                "Plugins retrieved", count=u.count(plugins), type=plugin_type or ""
             )
-            return r[Sequence[t.Meltano.PluginDefinition]].ok(plugins)
+            return r[t.SequenceOf[t.JsonMapping]].ok(plugins)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[Sequence[t.Meltano.PluginDefinition]].fail(
-                f"Failed to get plugins: {e}"
-            )
+            return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to get plugins: {e}")
 
-    def initialize_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
+    def initialize_sdk_project(
+        self, root: Path
+    ) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Initialize a new Meltano project via SDK."""
-        try:
+
+        def _run_initialize_sdk_project() -> p.Result[t.Meltano.OptionalScalarMap]:
             try:
                 root.mkdir(parents=True, exist_ok=True)
             except OSError as e:
                 return r[t.Meltano.OptionalScalarMap].fail(
-                    f"Failed to prepare project directory: {e}",
+                    f"Failed to prepare project directory: {e}"
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
-            info = {"project_root": str(root), "state": "initialized"}
+            info = {
+                "project_root": str(root),
+                "state": c.Meltano.ProjectSdkState.INITIALIZED,
+            }
             self.logger.info("Meltano project initialized", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
+
+        try:
+            return _run_initialize_sdk_project()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.OptionalScalarMap].fail(
                 f"Failed to initialize project: {e}"
             )
 
-    def load_sdk_project(self, root: Path) -> r[t.Meltano.OptionalScalarMap]:
+    def load_sdk_project(self, root: Path) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Load an existing Meltano project via SDK."""
         try:
             if not root.exists():
                 return r[t.Meltano.OptionalScalarMap].fail(
-                    f"Project directory not found: {root}",
+                    f"Project directory not found: {root}"
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
-            info = {"project_root": str(root), "state": "loaded"}
+            info = {
+                "project_root": str(root),
+                "state": c.Meltano.ProjectSdkState.LOADED,
+            }
             self.logger.info("Meltano project loaded", root=str(root))
             return r[t.Meltano.OptionalScalarMap].ok(info)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
@@ -87,11 +96,10 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return r[t.Meltano.OptionalScalarMap].fail(f"Failed to load project: {e}")
 
     def _extract_sdk_plugins(
-        self,
-        plugin_type: str | None,
-    ) -> Sequence[t.Meltano.PluginDefinition]:
+        self, plugin_type: str | None
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Extract plugins from SDK project, optionally filtered by type."""
-        plugins: MutableSequence[t.Meltano.PluginDefinition] = []
+        plugins: t.MutableSequenceOf[t.JsonMapping] = []
         if self._sdk_project is None:
             return plugins
         try:
@@ -99,31 +107,40 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         except AttributeError:
             return plugins
         try:
-            for plugin in sdk_plugins_service.plugins():
-                try:
-                    name = plugin.name
-                    plugin_kind = plugin.type
-                except AttributeError:
-                    continue
-                if plugin_type is not None and plugin_kind != plugin_type:
-                    continue
-                plugin_def: MutableMapping[
-                    str,
-                    str | t.StrSequence | Mapping[str, t.Scalar | None],
-                ] = {"name": name, "type": plugin_kind}
-                try:
-                    variant_raw = plugin.variant
-                except AttributeError:
-                    variant_raw = None
-                variant_normalized = m.Meltano.VariantPayload.model_validate(
-                    {"value": variant_raw},
-                ).value
-                if variant_normalized is not None:
-                    plugin_def["variant"] = variant_normalized
-                plugins.append(plugin_def)
-        except (TypeError, AttributeError) as e:
+            plugins.extend(
+                self._sdk_plugin_definitions(sdk_plugins_service, plugin_type)
+            )
+        except c.EXC_ATTR_TYPE as e:
             self.logger.warning("Failed to extract plugins", error=str(e))
         return plugins
 
+    @staticmethod
+    def _sdk_plugin_definitions(
+        sdk_plugins_service: ProjectPluginsService, plugin_type: str | None
+    ) -> t.SequenceOf[t.JsonMapping]:
+        """Plugin definitions returned by the Meltano SDK service."""
+        plugins: t.MutableSequenceOf[t.JsonMapping] = []
+        for plugin in sdk_plugins_service.plugins():
+            try:
+                name = plugin.name
+                plugin_kind = plugin.type
+            except AttributeError:
+                continue
+            if plugin_type is not None and plugin_kind != plugin_type:
+                continue
+            plugin_def: t.JsonDict = {"name": name, "type": plugin_kind}
+            try:
+                variant_raw = plugin.variant
+            except AttributeError:
+                variant_raw = None
+            variant_payload = m.Meltano.VariantPayload.model_validate({
+                "value": variant_raw
+            })
+            json_variant = variant_payload.json_value()
+            if json_variant is not None:
+                plugin_def["variant"] = json_variant
+            plugins.append(plugin_def)
+        return plugins
 
-__all__ = ["FlextMeltanoProjectManager"]
+
+__all__: list[str] = ["FlextMeltanoProjectManager"]

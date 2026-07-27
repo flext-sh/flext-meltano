@@ -1,7 +1,9 @@
-"""Package version and metadata information.
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Package version and metadata for flext-meltano.
 
-Provides version information and package metadata using standard library
-metadata extraction.
+Subclass of ``FlextVersion`` — overrides only ``_metadata``.
+All derived attributes (``__version__``, ``__title__``, etc.) are
+computed automatically via ``FlextVersion.__init_subclass__``.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -11,20 +13,25 @@ from __future__ import annotations
 
 from importlib.metadata import PackageMetadata, metadata
 
-from flext_core import t
+from flext_core.__version__ import FlextVersion
 
-_metadata: PackageMetadata | t.StrMapping = metadata("flext_meltano")
-__version__ = _metadata["Version"]
-__version_info__ = tuple(
-    int(part) if part.isdigit() else part for part in __version__.split(".")
-)
-__title__ = _metadata["Name"]
-__description__ = _metadata["Summary"]
-__author__ = _metadata["Author"]
-__author_email__ = _metadata["Author-Email"]
-__license__ = _metadata.get("License", "")
-__url__ = _metadata.get("Home-Page", "")
-__all__ = [
+
+class FlextMeltanoVersion(FlextVersion):
+    """flext-meltano version — MRO-derived from FlextVersion."""
+
+    _metadata: PackageMetadata = metadata("flext-meltano")
+
+
+__version__ = FlextMeltanoVersion.__version__
+__version_info__ = FlextMeltanoVersion.__version_info__
+__title__ = FlextMeltanoVersion.__title__
+__description__ = FlextMeltanoVersion.__description__
+__author__ = FlextMeltanoVersion.__author__
+__author_email__ = FlextMeltanoVersion.__author_email__
+__license__ = FlextMeltanoVersion.__license__
+__url__ = FlextMeltanoVersion.__url__
+__all__: list[str] = [
+    "FlextMeltanoVersion",
     "__author__",
     "__author_email__",
     "__description__",

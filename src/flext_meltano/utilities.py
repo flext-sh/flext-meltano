@@ -7,32 +7,26 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_infra import FlextInfraUtilities
-
-from flext_meltano import (
-    FlextMeltanoUtilitiesRuntime,
-    FlextMeltanoUtilitiesSinger,
-)
+from flext_cli import u
+from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
+from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
 
 
-class FlextMeltanoUtilities(FlextInfraUtilities):
+class FlextMeltanoUtilities(u):
     """DOMAIN-SPECIFIC Meltano utilities.
 
     ONLY what cannot be generalized to flext-core.
     Inherits from FlextUtilities to avoid duplication and ensure consistency.
     """
 
-    class Meltano(
-        FlextMeltanoUtilitiesRuntime,
-        FlextMeltanoUtilitiesSinger,
-    ):
+    class Meltano(FlextMeltanoUtilitiesRuntime, FlextMeltanoUtilitiesSinger):
         """Meltano domain utility methods.
 
         Includes Singer protocol utilities (message emission, stdin
-        processing, catalog construction) alongside config, project,
+        processing, catalog construction) alongside settings, project,
         and YAML utilities.
         """
 
 
 u = FlextMeltanoUtilities
-__all__ = ["FlextMeltanoUtilities", "u"]
+__all__: list[str] = ["FlextMeltanoUtilities", "u"]

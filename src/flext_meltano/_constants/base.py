@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Final
 
-from pydantic import ValidationError
+from flext_cli import c
+from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsBase:
@@ -14,35 +15,36 @@ class FlextMeltanoConstantsBase:
     """
 
     CONSTANTS_VERSION: Final[str] = "1.0.0"
-    PROJECT_PREFIX: Final[str] = "flext-meltano"
-    PROJECT_NAME: Final[str] = "FLEXT Meltano"
-    FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"
-    PROJECT_FILE_DBT: Final[str] = "dbt_project.yml"
-    COMMAND_RUN_DBT: Final[str] = "dbt run"
-    COMMAND_TEST: Final[str] = "dbt test"
+    DBT_BINARY: Final[str] = "dbt"
     DEFAULT_VARIANT: Final[str] = "meltano"
+    FLEXT_MELTANO_VERSION: Final[str] = "0.9.0"
+    PROJECT_NAME: Final[str] = "FLEXT Meltano"
+    PROJECT_PREFIX: Final[str] = "flext-meltano"
 
     # Metadata
-    METADATA_APPLICATION_NAME: Final[str] = "flext-pipeline"
     METADATA_APPLICATION_DESCRIPTION: Final[str] = (
         "FLEXT Generic Data Pipeline Framework"
     )
-    METADATA_APPLICATION_AUTHOR: Final[str] = "FLEXT Team"
-    METADATA_APPLICATION_LICENSE: Final[str] = "MIT"
-    METADATA_CREATED_BY: Final[str] = "flext-pipeline"
-    METADATA_DEFAULT_ENVIRONMENTS: Final[tuple[str, ...]] = ("dev", "staging", "prod")
+    METADATA_APPLICATION_NAME: Final[str] = "flext-pipeline"
+    METADATA_DEFAULT_ENVIRONMENTS: Final[
+        tuple[FlextMeltanoConstantsEnums.ProjectEnvironment, ...]
+    ] = (
+        FlextMeltanoConstantsEnums.ProjectEnvironment.DEV,
+        FlextMeltanoConstantsEnums.ProjectEnvironment.STAGING,
+        FlextMeltanoConstantsEnums.ProjectEnvironment.PROD,
+    )
 
     # Versions
     VERSION_MELTANO_REQUIRED: Final[str] = "3.9.1"
+    VERSION_MELTANO_REQUIREMENT: Final[str] = f">={VERSION_MELTANO_REQUIRED}"
     VERSION_SINGER_SDK_REQUIRED: Final[str] = "0.48.0"
-    VERSION_DBT_REQUIRED: Final[str] = "1.10.5"
 
     SDK_VERSION_REQUIRED: Final[str] = VERSION_SINGER_SDK_REQUIRED
-    VERSION_REQUIRED_DBT: Final[str] = VERSION_DBT_REQUIRED
 
     # Paths
-    PATH_PROJECT_FILE: Final[str] = "meltano.yml"
     PATH_MELTANO_PROJECT_FILE: Final[str] = "meltano.yml"
+    PATH_PROJECT_FILE: Final[str] = PATH_MELTANO_PROJECT_FILE
+    PATH_CONFIG_DIR: Final[str] = ".meltano"
     PATH_STATE_DIR: Final[str] = ".pipeline"
     PATH_LOGS_DIR: Final[str] = "logs"
     PATH_OUTPUT_DIR: Final[str] = "output"
@@ -63,47 +65,48 @@ class FlextMeltanoConstantsBase:
     CMD_VERSION_OPTION: Final[str] = "--version"
     CMD_ADD: Final[str] = "add"
     CMD_ELT: Final[str] = "elt"
-    CMD_INIT: Final[str] = "init"
-    CMD_INSTALL: Final[str] = "install"
     CMD_INVOKE: Final[str] = "invoke"
-    CMD_RUN: Final[str] = "run"
     CMD_SELECT: Final[str] = "select"
-    CMD_PIPELINE: Final[str] = "pipeline"
+    PIPELINE_STAGE_RESOLVE_COMMAND: Final[str] = "resolve_command"
+    PIPELINE_STAGE_EXECUTE_COMMAND: Final[str] = "execute_command"
+    PIPELINE_SHARED_KEY_COMMAND: Final[str] = "command"
+    PIPELINE_SHARED_KEY_COMMAND_RESULT: Final[str] = "command_result"
+    PAYLOAD_STREAM_ENTITY: Final[str] = "Stream"
+    PAYLOAD_TAP_ID_AUTO_SUFFIX: Final[str] = "auto"
+    PAYLOAD_SINGER_CATALOG_VERSION: Final[int] = 1
+
+    # Operation labels and failure messages
+    ERROR_CATALOG_GENERATION_FAILED: Final[str] = "Catalog generation failed"
+    ERROR_DISCOVERY_FAILED: Final[str] = "Discovery failed"
+    ERROR_STREAM_DISCOVERY_FAILED: Final[str] = "Stream discovery failed"
+    ERROR_STREAM_SYNC_FAILED: Final[str] = "Stream sync failed"
+    LOG_MESSAGE_DISCOVER_STREAMS_FAILED: Final[str] = "Failed to discover streams"
+    LOG_MESSAGE_SYNC_STREAM_FAILED: Final[str] = "Failed to sync stream"
+    OPERATION_CREATE_TAP: Final[str] = "create tap"
+    OPERATION_DISCOVER_STREAMS: Final[str] = "discover streams"
+    OPERATION_SYNC_STREAM: Final[str] = "sync stream"
 
     # Network
+    NETWORK_DEFAULT_TIMEOUT: Final[int] = c.DEFAULT_TIMEOUT_SECONDS
     NETWORK_MELTANO_DEFAULT_TIMEOUT: Final[int] = 300
-    NETWORK_DEFAULT_TIMEOUT: Final[int] = 30
-    NETWORK_DISCOVERY_TIMEOUT: Final[int] = 60
-    NETWORK_REQUEST_TIMEOUT: Final[int] = 60
-    NETWORK_CONNECTION_TIMEOUT: Final[int] = 30
-    NETWORK_BUFFER_SIZE: Final[int] = 8192
-    NETWORK_MAX_PARALLEL_STREAMS: Final[int] = 4
 
     # DatabasePorts
-    DB_PORT_POSTGRES: Final[int] = 5432
-    DB_PORT_MYSQL: Final[int] = 3306
-    DB_PORT_ORACLE: Final[int] = 1521
-    DB_PORT_HIGH_MEMORY_THRESHOLD: Final[int] = 1073741824
 
     # Plugin
     PLUGIN_CONFIG_VERSION: Final[int] = 1
     PLUGIN_DBT_DEFAULT_NAME: Final[str] = "dbt-postgres"
-    PLUGIN_DISCOVERY_FILENAME: Final[str] = "catalog.json"
-    PLUGIN_STATE_FILENAME: Final[str] = "state.json"
-    PLUGIN_DEFAULT_VARIANT: Final[str] = "meltanolabs"
-    PLUGIN_HUB_URL: Final[str] = "https://hub.meltano.com"
-    PREFIX_TAP: Final[str] = "tap"
-    PREFIX_TARGET: Final[str] = "target"
-    PREFIX_DBT: Final[str] = "dbt"
     PLUGIN_INSTALLATION_TIMEOUT: Final[int] = 300
-    PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
+    PLUGIN_INFO_ARG_COUNT: Final[int] = 2
+    "Expected number of arguments (plugin type and name) for plugin info command."
     PLUGIN_MIN_TAP_PLUGIN_NAME_LENGTH: Final[int] = 5
+    PLUGIN_MIN_TARGET_PLUGIN_NAME_LENGTH: Final[int] = 8
+    PREFIX_DBT: Final[str] = "dbt"
+    PREFIX_TARGET: Final[str] = "target"
 
     # EnvironmentVariables
-    ENV_VAR_PROJECT_ROOT: Final[str] = "MELTANO_PROJECT_ROOT"
     ENV_VAR_ENVIRONMENT: Final[str] = "MELTANO_ENVIRONMENT"
     ENV_VAR_LOG_LEVEL: Final[str] = "MELTANO_LOG_LEVEL"
-
+    ENV_VAR_PROJECT_ROOT: Final[str] = "MELTANO_PROJECT_ROOT"
     OPERATION_ERRORS: Final[tuple[type[Exception], ...]] = (
         ValueError,
         TypeError,
@@ -113,12 +116,12 @@ class FlextMeltanoConstantsBase:
     )
 
     # Singer
-    SINGER_MESSAGE_TYPE_RECORD: Final[str] = "RECORD"
-    SINGER_MESSAGE_TYPE_SCHEMA: Final[str] = "SCHEMA"
-    SINGER_MESSAGE_TYPE_STATE: Final[str] = "STATE"
-    SINGER_MESSAGE_TYPE_ACTIVATE_VERSION: Final[str] = "ACTIVATE_VERSION"
-    SINGER_MESSAGE_TYPE_METRIC: Final[str] = "METRIC"
-
+    SINGER_MESSAGE_TYPE_RECORD: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.RECORD
+    )
+    SINGER_MESSAGE_TYPE_SCHEMA: Final[str] = (
+        FlextMeltanoConstantsEnums.SingerMessageType.SCHEMA
+    )
     SINGER_SAFE_EXCEPTIONS: Final[tuple[type[Exception], ...]] = (
         ValueError,
         TypeError,
@@ -127,39 +130,24 @@ class FlextMeltanoConstantsBase:
         OSError,
         RuntimeError,
         ImportError,
-        ValidationError,
+        c.ValidationError,
     )
 
     # Dbt
-    DBT_PROJECT_FILE: Final[str] = "dbt_project.yml"
-    DBT_PROFILES_FILE: Final[str] = "profiles.yml"
-    DBT_MANIFEST_FILE: Final[str] = "manifest.json"
-    DBT_COMMAND_RUN: Final[str] = "run"
-    DBT_COMMAND_TEST: Final[str] = "test"
-    DBT_COMMAND_BUILD: Final[str] = "build"
-    DBT_COMMAND_COMPILE: Final[str] = "compile"
-    DBT_FRESHNESS_ERROR_AFTER_HOURS: Final[int] = 24
-    DBT_FRESHNESS_WARN_AFTER_HOURS: Final[int] = 12
+    DBT_COMMAND_RUN: Final[str] = FlextMeltanoConstantsEnums.DbtCommand.RUN
+    DBT_COMMAND_TEST: Final[str] = FlextMeltanoConstantsEnums.DbtCommand.TEST
+    DBT_MANIFEST_FILE: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.MANIFEST
     DBT_MATERIALIZATION_TABLE: Final[str] = "table"
     DBT_MATERIALIZATION_VIEW: Final[str] = "view"
-    DBT_MATERIALIZATION_INCREMENTAL: Final[str] = "incremental"
+    DBT_PROJECT_FILE: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.PROJECT
 
     # ModelValidation
-    VALIDATION_MATURITY_MATURE_ENV_COUNT: Final[int] = 3
-    VALIDATION_MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 2
     VALIDATION_COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 0
     VALIDATION_COMPLEXITY_SIMPLE_MAX_SETTINGS: Final[int] = 5
-    VALIDATION_COMPLEXITY_MODERATE_MAX_SETTINGS: Final[int] = 15
-    VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS: Final[int] = 5
-    VALIDATION_STRUCTURE_MODERATE_MAX_PATHS: Final[int] = 10
-    VALIDATION_VERSION_PARTS_COUNT: Final[int] = 3
-    VALIDATION_TAP_SIMPLE_CONFIG_THRESHOLD: Final[int] = 3
-    VALIDATION_TAP_MODERATE_CONFIG_THRESHOLD: Final[int] = 8
-    VALIDATION_TARGET_HIGH_EFFICIENCY_THRESHOLD: Final[int] = 1000
-    VALIDATION_TARGET_MEDIUM_EFFICIENCY_THRESHOLD: Final[int] = 100
-    VALIDATION_DBT_SIMPLE_EXECUTION_THRESHOLD: Final[int] = 5
-    VALIDATION_DBT_MODERATE_EXECUTION_THRESHOLD: Final[int] = 20
-    VALIDATION_EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1000
     VALIDATION_EXECUTION_GOOD_PERFORMANCE_THRESHOLD: Final[int] = 100
+    VALIDATION_EXECUTION_HIGH_PERFORMANCE_THRESHOLD: Final[int] = 1000
     VALIDATION_EXECUTION_MODERATE_PERFORMANCE_THRESHOLD: Final[int] = 10
-    VALIDATION_MAX_WORKERS_THRESHOLD: Final[int] = 50
+    VALIDATION_MATURITY_DEVELOPING_ENV_COUNT: Final[int] = 2
+    VALIDATION_MATURITY_MATURE_ENV_COUNT: Final[int] = 3
+    VALIDATION_STRUCTURE_MODERATE_MAX_PATHS: Final[int] = 10
+    VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS: Final[int] = 5

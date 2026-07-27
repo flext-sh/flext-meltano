@@ -8,33 +8,53 @@ from __future__ import annotations
 
 from meltano.core.error import ProjectNotFound
 
-from flext_core import r
-from flext_meltano import FlextMeltanoExecutorBase, c, t, u
+from flext_meltano import FlextMeltanoSettings, c, p, r, t, u
+from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     """Core executor providing Meltano command execution with error handling."""
 
+    def __init__(
+        self,
+        settings: FlextMeltanoSettings | None = None,
+        *,
+        service_name: t.NonEmptyStr | None = None,
+        service_version: t.NonEmptyStr | None = None,
+        source_name: str | None = None,
+        sink_name: str | None = None,
+        transformation_name: str | None = None,
+    ) -> None:
+        """Forward canonical Meltano service kwargs through ``FlextMeltanoExecutorBase``."""
+        super().__init__(
+            settings=settings,
+            service_name=service_name,
+            service_version=service_version,
+            source_name=source_name,
+            sink_name=sink_name,
+            transformation_name=transformation_name,
+        )
+
     @staticmethod
-    def create_cli_runner(args: t.StrSequence) -> r[t.ContainerMapping]:
+    def create_cli_runner(args: t.StrSequence) -> p.Result[t.JsonMapping]:
         """Create CLI runner for command execution - static factory."""
         try:
             executor = FlextMeltanoExecutor()
+            args_payload: t.JsonValueList = list(args)
+            ready_payload: t.JsonDict = {
+                "status": c.Meltano.OperationStatus.READY,
+                "command_type": "cli_runner",
+                "args": args_payload,
+            }
             return (
-                executor.run(args)
+                executor.run(args).map(t.Cli.JSON_MAPPING_ADAPTER.validate_python)
                 if args
-                else r[t.ContainerMapping].ok({
-                    "status": c.Meltano.OperationStatus.READY,
-                    "command_type": "cli_runner",
-                    "args": list(args),
-                })
+                else r[t.JsonMapping].ok(ready_payload)
             )
         except c.Meltano.OPERATION_ERRORS as e:
-            return r[t.ContainerMapping].fail(
-                f"Failed to create CLI runner: {e}",
-            )
+            return r[t.JsonMapping].fail(f"Failed to create CLI runner: {e}")
 
-    def health(self) -> r[t.ContainerMapping]:
+    def health(self) -> p.Result[t.JsonMapping]:
         """Check system health by running meltano invoke."""
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.VERSION])
         return result.map(
@@ -49,7 +69,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             }
         )
 
-    def help(self) -> r[t.ContainerMapping]:
+    def help(self) -> p.Result[t.JsonMapping]:
         """Get help information from meltano --help."""
         result = self.execute_meltano_command([c.Meltano.ExecutorCommand.HELP])
         return result.map(
@@ -63,33 +83,32 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             }
         )
 
-    def run(self, args: t.StrSequence) -> r[t.ContainerMapping]:
+    def run(self, args: t.StrSequence) -> p.Result[t.JsonMapping]:
         """Run command with arguments - delegates to command router."""
         if not args:
-            return r[t.ContainerMapping].fail("Arguments cannot be empty")
+            return r[t.JsonMapping].fail("Arguments cannot be empty")
         return self._route_command(args[0], args[1:])
 
-    def run_cli(self, args: t.StrSequence | None) -> r[t.ContainerMapping]:
+    def run_cli(self, args: t.StrSequence | None) -> p.Result[t.JsonMapping]:
         """Run CLI with arguments - delegates to run or returns help."""
         if args is None or not args:
-            return r[t.ContainerMapping].ok({
+            ready_payload: t.JsonMapping = {
                 "status": c.Meltano.OperationStatus.READY,
                 "command_type": "cli",
                 "message": "CLI ready for commands",
-            })
+            }
+            return r[t.JsonMapping].ok(ready_payload)
         return self.run(args)
 
-    def run_command(self, args: t.StrSequence) -> r[int]:
+    def run_command(self, args: t.StrSequence) -> p.Result[int]:
         """Execute command and return exit code - delegates to routing."""
         if not args:
             return r[int].ok(1)
         return self._route_command(args[0], args[1:]).map(lambda _: 0)
 
     def run_pipeline_command(
-        self,
-        tap_name: str,
-        target_name: str,
-    ) -> r[t.ContainerMapping]:
+        self, tap_name: str, target_name: str
+    ) -> p.Result[t.JsonMapping]:
         """Run complete ELT pipeline command."""
         result = self.execute_pipeline(tap_name, target_name)
         return result.map(
@@ -97,12 +116,12 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 execution_result,
                 extra_fields={"command": f"{tap_name} -> {target_name}"},
                 duration_field=None,
-            ),
+            )
         )
 
-    def version(self) -> r[t.ContainerMapping]:
+    def version(self) -> p.Result[t.JsonMapping]:
         """Get version information from meltano."""
-        return self.get_version().map(
+        return self.fetch_version().map(
             lambda ver: {
                 "status": c.Meltano.OperationStatus.SUCCESS,
                 "command": c.Meltano.ExecutorCommand.VERSION,
@@ -114,36 +133,42 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         )
 
     def _route_command(
-        self,
-        command: str,
-        args: t.StrSequence,
-    ) -> r[t.ContainerMapping]:
+        self, command: str, args: t.StrSequence
+    ) -> p.Result[t.JsonMapping]:
         """Route command to appropriate handler."""
-        try:
-            if command == c.Meltano.ExecutorCommand.VERSION:
-                return self.version()
-            if command == c.Meltano.ExecutorCommand.HELP:
-                return self.help()
-            if command == c.Meltano.ExecutorCommand.HEALTH:
-                return self.health()
-            full_command: list[str] = [command, *args]
-            result = self.execute_meltano_command(full_command)
-            if result.is_failure:
-                return r[t.ContainerMapping].fail(
-                    result.error or f"Command '{command}' failed",
-                )
-            return result.map(
-                lambda cmd_result: u.Meltano.build_command_execution_payload(
-                    cmd_result,
-                    extra_fields={
+
+        def _run__route_command() -> p.Result[t.JsonMapping]:
+            match command:
+                case c.Meltano.ExecutorCommand.VERSION:
+                    return self.version()
+                case c.Meltano.ExecutorCommand.HELP:
+                    return self.help()
+                case c.Meltano.ExecutorCommand.HEALTH:
+                    return self.health()
+                case _:
+                    full_command: list[str] = [command, *args]
+                    result = self.execute_meltano_command(full_command)
+                    if result.failure:
+                        return r[t.JsonMapping].fail(
+                            result.error or f"Command '{command}' failed"
+                        )
+                    args_payload: t.JsonValueList = list(args)
+                    extra_fields: t.JsonDict = {
                         "command": command,
                         "action": command,
-                        "args": list(args),
-                    },
-                    success_status=c.Meltano.OperationStatus.EXECUTED,
-                    duration_field=None,
-                ),
-            )
+                        "args": args_payload,
+                    }
+                    return result.map(
+                        lambda cmd_result: u.Meltano.build_command_execution_payload(
+                            cmd_result,
+                            extra_fields=extra_fields,
+                            success_status=c.Meltano.OperationStatus.EXECUTED,
+                            duration_field=None,
+                        )
+                    )
+
+        try:
+            return _run__route_command()
         except (
             ProjectNotFound,
             ValueError,
@@ -153,9 +178,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             OSError,
             RuntimeError,
         ) as exc:
-            return r[t.ContainerMapping].fail(
-                f"Command routing failed: {exc}",
-            )
+            return r[t.JsonMapping].fail_op("Command routing", exc)
 
 
-__all__ = ["FlextMeltanoExecutor"]
+__all__: list[str] = ["FlextMeltanoExecutor"]

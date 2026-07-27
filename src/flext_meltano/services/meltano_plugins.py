@@ -8,20 +8,14 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import (
-    FlextMeltanoAbstractions,
+from flext_meltano import c, p, r, settings, t
+from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+from flext_meltano.services.meltano_plugin_discovery import (
     FlextMeltanoPluginDiscoveryMixin,
-    FlextMeltanoServiceBase,
-    c,
-    p,
-    r,
-    t,
 )
 
 
-class FlextMeltanoComponentService(
-    FlextMeltanoPluginDiscoveryMixin, FlextMeltanoServiceBase
-):
+class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
     """Service for pipeline component operations.
 
     Handles component discovery, addition, and management following
@@ -29,7 +23,7 @@ class FlextMeltanoComponentService(
     """
 
     @staticmethod
-    def _validate_plugin_type(plugin_type: str) -> r[str]:
+    def _validate_plugin_type(plugin_type: str) -> p.Result[str]:
         """Validate plugin type."""
         valid_types = [pt.value for pt in c.Meltano.PluginType]
         if plugin_type not in valid_types:
@@ -39,11 +33,8 @@ class FlextMeltanoComponentService(
         return r[str].ok(plugin_type)
 
     def add_plugin(
-        self,
-        project: p.Meltano.Project,
-        plugin_type: str,
-        plugin_name: str,
-    ) -> r[t.StrMapping]:
+        self, project: p.Meltano.Project, plugin_type: str, plugin_name: str
+    ) -> p.Result[t.StrMapping]:
         """Add plugin to Meltano project using railway-oriented validation chain."""
         return (
             self
@@ -54,25 +45,19 @@ class FlextMeltanoComponentService(
             )
             .flat_map(
                 lambda result: self._build_plugin_addition_result(
-                    plugin_name,
-                    plugin_type,
-                    addition_success=result,
-                ),
+                    plugin_name, plugin_type, addition_success=result
+                )
             )
         )
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the pipeline component service."""
-        return r[t.ContainerMapping].ok(self.settings.model_dump())
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def _build_plugin_addition_result(
-        self,
-        plugin_name: str,
-        plugin_type: str,
-        *,
-        addition_success: bool,
-    ) -> r[t.StrMapping]:
+        self, plugin_name: str, plugin_type: str, *, addition_success: bool
+    ) -> p.Result[t.StrMapping]:
         """Build successful plugin addition result."""
         plugin_result: t.StrMapping = {
             "success": "true" if addition_success else "false",
@@ -88,24 +73,23 @@ class FlextMeltanoComponentService(
         return r[t.StrMapping].ok(plugin_result)
 
     def _execute_plugin_addition(
-        self,
-        project: p.Meltano.Project,
-        plugin_type_str: str,
-        plugin_name: str,
-    ) -> r[bool]:
+        self, project: p.Meltano.Project, plugin_type_str: str, plugin_name: str
+    ) -> p.Result[bool]:
         """Execute the actual plugin addition using abstraction layer."""
-        plugin_config: t.ContainerMapping = {
+        plugin_config: t.JsonMapping = {
             "project_root": str(project.root_dir),
             "plugin_type": plugin_type_str,
             "plugin_name": plugin_name,
         }
         abstractions = FlextMeltanoAbstractions()
-        add_result: r[bool] = abstractions.add_plugin_by_config(plugin_config)
-        if add_result.is_failure:
+        add_result: p.Result[bool] = abstractions.add_plugin_by_config(plugin_config)
+        if add_result.failure:
             return r[bool].fail(add_result.error or "Plugin addition failed")
         return r[bool].ok(value=True)
 
-    def _log_plugin_addition_start(self, plugin_name: str, plugin_type: str) -> r[None]:
+    def _log_plugin_addition_start(
+        self, plugin_name: str, plugin_type: str
+    ) -> p.Result[None]:
         """Log plugin addition start."""
         self.logger.info(
             "Adding plugin using ProjectAddService",
@@ -115,4 +99,4 @@ class FlextMeltanoComponentService(
         return r[None].ok(None)
 
 
-__all__ = ["FlextMeltanoComponentService"]
+__all__: list[str] = ["FlextMeltanoComponentService"]

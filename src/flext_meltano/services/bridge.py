@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_core import r
-from flext_meltano import FlextMeltanoExecutorBase, FlextMeltanoServiceBase, t
+from flext_meltano import FlextMeltanoServiceBase, p, r, settings, t, u
+from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
 class FlextMeltanoBridge(FlextMeltanoServiceBase):
@@ -24,24 +24,23 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
     """
 
     @staticmethod
-    def discover_installed_plugins() -> r[t.StrSequence]:
+    def discover_installed_plugins() -> p.Result[t.StrSequence]:
         """Discover installed Meltano plugins from the active project runtime."""
         executor = FlextMeltanoExecutorBase()
-        plugins_result = executor.get_project_plugins()
-        if plugins_result.is_failure:
+        plugins_result = executor.fetch_project_plugins()
+        if plugins_result.failure:
             return r[t.StrSequence].fail(
-                plugins_result.error or "Plugin discovery failed",
+                plugins_result.error or "Plugin discovery failed"
             )
         plugin_names = [
-            str(p.get("name", "")) for p in plugins_result.value if p.get("name")
+            p.get("name", "") for p in plugins_result.value if p.get("name")
         ]
         return r[t.StrSequence].ok(plugin_names)
 
     @staticmethod
     def execute_bridge_command(
-        command: str,
-        args: t.ConfigurationMapping | None = None,
-    ) -> r[t.ContainerMapping]:
+        command: str, args: t.ConfigurationMapping | None = None
+    ) -> p.Result[t.JsonMapping]:
         """Execute a Meltano runtime command.
 
         Args:
@@ -53,32 +52,25 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
         """
         executor = FlextMeltanoExecutorBase()
-        cmd = [command]
-        if args:
-            for k, v in args.items():
-                cmd.append(f"--{k}={v}")
+        cmd = u.Meltano.build_bridge_command_args(command, args)
         command_result = executor.execute_meltano_command(cmd)
-        if command_result.is_failure:
-            return r[t.ContainerMapping].fail(
-                command_result.error or "Command failed",
-            )
+        if command_result.failure:
+            return r[t.JsonMapping].fail(command_result.error or "Command failed")
         command_execution = command_result.value
-        result: t.ContainerMapping = {
-            "command": command,
-            "output": command_execution.output,
-            "error": command_execution.error,
-        }
-        return r[t.ContainerMapping].ok(result)
+        result = u.Meltano.build_command_execution_payload(
+            command_execution, extra_fields={"command": command}, duration_field=None
+        )
+        return r[t.JsonMapping].ok(result)
 
     @staticmethod
-    def get_version() -> r[str]:
+    def fetch_version() -> p.Result[str]:
         """Get Meltano version from the imported library."""
-        return FlextMeltanoExecutorBase.get_version()
+        return FlextMeltanoExecutorBase.fetch_version()
 
     @override
-    def execute(self) -> r[t.ContainerMapping]:
+    def execute(self) -> p.Result[t.JsonMapping]:
         """Execute bridge service returning current settings."""
-        return r[t.ContainerMapping].ok(self.settings.model_dump())
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 
-__all__ = ["FlextMeltanoBridge"]
+__all__: list[str] = ["FlextMeltanoBridge"]
