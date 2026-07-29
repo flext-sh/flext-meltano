@@ -14,13 +14,23 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
+from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
 
 
-class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
+class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     """Base for all FLEXT tap service projects.
 
     Subclasses MUST define:
@@ -36,25 +46,20 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     """
 
     tap_name: Annotated[
-        t.NonEmptyStr,
-        u.Field(description="Canonical tap name (e.g. tap-oracle)"),
+        t.NonEmptyStr, u.Field(description="Canonical tap name (e.g. tap-oracle)")
     ] = "tap"
 
     _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
         default_factory=lambda: None
     )
 
-    def __init__(
-        self,
-        settings: p.Settings | None = None,
-    ) -> None:
+    def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
         """Expose the canonical settings bootstrap for tap facades."""
         super().__init__(runtime_settings=settings)
 
     @abstractmethod
     def create_tap_instance(
-        self,
-        settings: p.Settings | None = None,
+        self, settings: p.Settings | None = None
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -66,7 +71,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point through the internal Singer bridge."""
+        """Run the main CLI entry point through the internal Singer bridge."""
         try:
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
@@ -87,9 +92,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
             streams = tap.discover_streams()
             stream_names: t.StrSequence = [s.name for s in streams]
             self.logger.info(
-                "Streams discovered",
-                tap=self.tap_name,
-                count=len(stream_names),
+                "Streams discovered", tap=self.tap_name, count=len(stream_names)
             )
             return r[t.StrSequence].ok(stream_names)
         except c.EXC_BROAD_RUNTIME_OS as exc:
@@ -127,6 +130,19 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase):
         if self._tap_instance is None:
             self._tap_instance = self.create_tap_instance()
         return self._tap_instance
+
+    @staticmethod
+    def build_declarative_tap(
+        spec: m.Meltano.TapSpec, fetcher: p.Meltano.RecordFetcher
+    ) -> p.Meltano.SingerTapInstance:
+        """Build a flat-CLI Singer tap from declarative specs (no singer_sdk here).
+
+        Declarative consumer taps override ``create_tap_instance`` with a single
+        call to this helper, passing their ``m.Meltano.TapSpec`` and a
+        ``p.Meltano.RecordFetcher``. ``flext-meltano`` owns every ``singer_sdk``
+        detail behind ``FlextMeltanoDeclarativeTap``.
+        """
+        return FlextMeltanoDeclarativeTap.build(spec, fetcher)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

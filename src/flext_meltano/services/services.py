@@ -8,7 +8,16 @@ from __future__ import annotations
 
 from typing import Self, override
 
-from flext_meltano import FlextMeltanoServiceBase, FlextMeltanoSettings, c, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    p,
+    r,
+    settings,
+    t,
+    u,
+)
 
 
 class FlextMeltanoService(FlextMeltanoServiceBase):
@@ -46,14 +55,14 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 instance = instance.model_copy(
                     update={
                         "runtime_settings": FlextMeltanoSettings.model_validate(
-                            settings,
-                        ),
-                    },
+                            settings
+                        )
+                    }
                 )
             return r.ok(instance)
         except c.Meltano.OPERATION_ERRORS as ex:
             return r.fail(
-                f"Failed to create {component_label} '{component_name}': {ex}",
+                f"Failed to create {component_label} '{component_name}': {ex}"
             )
 
     @classmethod
@@ -126,8 +135,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.ServicePayload].fail("Environment name is required")
         normalized_environment = str(
             c.Meltano.ENVIRONMENT_ALIASES.get(
-                environment_name.strip().lower(),
-                environment_name.strip().lower(),
+                environment_name.strip().lower(), environment_name.strip().lower()
             )
         )
         if normalized_environment not in c.Meltano.ENVIRONMENTS_VALID:
@@ -146,9 +154,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_pipeline(
-        source_name: str,
-        sink_name: str,
-        config: t.JsonMapping | None = None,
+        source_name: str, sink_name: str, config: t.JsonMapping | None = None
     ) -> p.Result[t.JsonMapping]:
         """Configure generic data pipeline."""
         payload: t.JsonMapping = {
@@ -161,9 +167,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def install_component(
-        component_type: str,
-        component_name: str,
-        settings: t.JsonMapping | None = None,
+        component_type: str, component_name: str, settings: t.JsonMapping | None = None
     ) -> p.Result[t.Meltano.ServicePayload]:
         """Install pipeline component with validation."""
         if not component_type or not component_name:
@@ -184,9 +188,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
         return r[t.Meltano.ServicePayload].ok(payload)
 
     @staticmethod
-    def validate_service_config(
-        settings: t.JsonMapping,
-    ) -> p.Result[bool]:
+    def validate_service_config(settings: t.JsonMapping) -> p.Result[bool]:
         """Validate service configuration dictionary."""
         if not isinstance(settings, dict):
             return r[bool].fail("Configuration must be a dictionary")
@@ -208,7 +210,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     def fetch_default_config(self) -> p.Result[t.JsonMapping]:
         """Get default configuration from current settings."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def fetch_info(self) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Get service information."""
@@ -221,7 +223,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     def validate_config(self) -> p.Result[bool]:
         """Validate current service configuration."""
-        return self.validate_service_config(self.settings.model_dump())
+        return self.validate_service_config(settings.model_dump())
 
 
 __all__: list[str] = ["FlextMeltanoService"]

@@ -10,16 +10,16 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from abc import abstractmethod
-from collections.abc import (
-    MutableMapping,
-)
-from typing import Annotated, override
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
 
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping
 
-class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
+
+class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """Base for all FLEXT target service projects.
 
     Subclasses MUST define:
@@ -35,19 +35,16 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     """
 
     target_name: Annotated[
-        t.NonEmptyStr,
-        u.Field(description="Canonical target name (e.g. target-oracle)"),
+        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)")
     ] = "target"
 
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
-        default_factory=dict[str, p.Meltano.SingerDrainSink],
+        default_factory=dict[str, p.Meltano.SingerDrainSink]
     )
 
     @abstractmethod
     def create_sink(
-        self,
-        stream_name: str,
-        schema: t.JsonMapping,
+        self, stream_name: str, schema: t.JsonMapping
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -59,7 +56,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Main CLI entry point for target."""
+        """Run the main CLI entry point for target."""
         try:
             command_args = list(args) if args else sys.argv[1:]
             _ = command_args
@@ -74,9 +71,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def fetch_or_create_sink(
-        self,
-        stream_name: str,
-        schema: t.JsonMapping,
+        self, stream_name: str, schema: t.JsonMapping
     ) -> p.Result[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream."""
         try:
@@ -110,10 +105,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase):
     # ------------------------------------------------------------------
 
     def process_record(
-        self,
-        stream_name: str,
-        record: t.JsonMapping,
-        schema: t.JsonMapping,
+        self, stream_name: str, record: t.JsonMapping, schema: t.JsonMapping
     ) -> p.Result[bool]:
         """Process a single Singer RECORD message."""
         sink_result = self.fetch_or_create_sink(stream_name, schema)

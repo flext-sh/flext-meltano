@@ -10,7 +10,17 @@ import tempfile
 from pathlib import Path
 from typing import override
 
-from flext_meltano import FlextMeltanoServiceBase, c, e, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    e,
+    p,
+    r,
+    settings,
+    t,
+    u,
+)
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.validators import FlextMeltanoValidators
 
@@ -25,8 +35,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
     @staticmethod
     def _validate_project_creation_params(
-        project_name: str,
-        project_dir: Path,
+        project_name: str, project_dir: Path
     ) -> p.Result[t.JsonMapping]:
         """Validate parameters for project creation."""
         if not project_name or not project_name.strip():
@@ -83,23 +92,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         project_path = parent / name
 
         try:
-            project_path.mkdir(parents=True, exist_ok=True)
-            for d in [*c.Meltano.FILE_PATH_STANDARD_DIRS, c.Meltano.PATH_OUTPUT_DIR]:
-                (project_path / d).mkdir(parents=True, exist_ok=True)
-                (project_path / d / ".gitkeep").touch()
-
-            environments = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
-            config_content = (
-                f"version: {c.Meltano.PLUGIN_CONFIG_VERSION}\n"
-                f"default_environment: {environments[0]}\n"
-                f"project_id: {name}\n"
-                "environments:\n"
-                f"- name: {environments[0]}\n"
-                f"- name: {environments[1]}\n"
-                f"- name: {environments[2]}\n"
-            )
-            config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
-            u.write_file(config_file, config_content)
+            self._write_project_files(project_path, name)
         except OSError as exc:
             return e.fail_operation(
                 "create project files", exc, result_type=r[t.StrMapping]
@@ -107,10 +100,29 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         return self._build_creation_result(project_name, project_path)
 
+    @staticmethod
+    def _write_project_files(project_path: Path, name: str) -> None:
+        """Create project directories and base Meltano config."""
+        project_path.mkdir(parents=True, exist_ok=True)
+        for d in [*c.Meltano.FILE_PATH_STANDARD_DIRS, c.Meltano.PATH_OUTPUT_DIR]:
+            (project_path / d).mkdir(parents=True, exist_ok=True)
+            (project_path / d / ".gitkeep").touch()
+
+        environments = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS
+        config_content = (
+            f"requires_meltano: {c.Meltano.VERSION_MELTANO_REQUIREMENT}\n"
+            f"default_environment: {environments[0]}\n"
+            f"project_id: {name}\n"
+            "environments:\n"
+            f"- name: {environments[0]}\n"
+            f"- name: {environments[1]}\n"
+            f"- name: {environments[2]}\n"
+        )
+        config_file = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
+        u.write_file(config_file, config_content)
+
     def create_temporary_project(
-        self,
-        project_id: str | None = None,
-        prefix: str = "flext_meltano_",
+        self, project_id: str | None = None, prefix: str = "flext_meltano_"
     ) -> p.Result[t.Meltano.DbtProject]:
         """Create temporary Meltano project with railway-oriented validation."""
         params_r = self._validate_project_parameters(project_id, prefix)
@@ -121,7 +133,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         try:
             temp_path = Path(tempfile.mkdtemp(prefix=params["prefix"]))
             settings: t.JsonMapping = {
-                "version": c.Meltano.PLUGIN_CONFIG_VERSION,
+                "requires_meltano": c.Meltano.VERSION_MELTANO_REQUIREMENT,
                 "default_environment": c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
                 "project_id": params["project_id"],
                 "environments": [
@@ -132,9 +144,9 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
                                 "extractors": [],
                                 "loaders": [],
                                 "transformers": [],
-                            },
+                            }
                         },
-                    },
+                    }
                 ],
             }
             config_file = temp_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
@@ -161,12 +173,11 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
     @staticmethod
     def build_service_execution_payload(
-        service_type: str,
-        meltano_config: p.Settings,
+        service_type: str, meltano_config: FlextMeltanoSettings
     ) -> p.Result[t.JsonMapping]:
         """Build normalized execution payload for service health responses."""
         settings_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
-            meltano_config.model_dump(),
+            meltano_config.model_dump()
         )
         payload: t.JsonDict = {
             "status": c.Meltano.OperationStatus.READY,
@@ -179,7 +190,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the pipeline project service."""
         result = self.build_service_execution_payload(
-            "flext_meltano_project_service", self.settings
+            "flext_meltano_project_service", settings
         )
         if result.success:
             self.logger.info("FlextMeltanoProjectService executed successfully")

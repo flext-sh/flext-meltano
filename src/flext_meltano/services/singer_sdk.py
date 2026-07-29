@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from singer_sdk import Sink
-from singer_sdk.helpers.types import Context, Record
 from singer_sdk.streams import Stream
 from singer_sdk.tap_base import Tap
 from singer_sdk.target_base import Target
@@ -17,8 +16,7 @@ class FlextMeltanoSingerTapAdapter:
     """Bridge a Singer SDK tap instance into the internal Meltano tap contract."""
 
     def __init__(
-        self,
-        tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend,
+        self, tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend
     ) -> None:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap
@@ -43,9 +41,7 @@ class FlextMeltanoSingerTapAdapter:
         return normalized
 
     @staticmethod
-    def _normalize_recursive(
-        value: t.JsonPayload | t.JsonValue,
-    ) -> t.JsonValue:
+    def _normalize_recursive(value: t.JsonPayload | t.JsonValue) -> t.JsonValue:
         """Normalize Singer config values into canonical CLI JSON values."""
         if value is None:
             return None
@@ -67,11 +63,7 @@ class FlextMeltanoSingerTapAdapter:
             ]
         return t.Cli.JSON_VALUE_ADAPTER.validate_python(value)
 
-    def run_cli(
-        self,
-        args: t.StrSequence,
-        prog_name: str,
-    ) -> int:
+    def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
         """Execute the Singer CLI and normalize ``SystemExit`` into an int."""
         try:
             singer_command = self._tap.get_singer_command()
@@ -90,12 +82,4 @@ class FlextMeltanoSingerTapAdapter:
         self._tap.sync_all()
 
 
-__all__: list[str] = [
-    "Context",
-    "FlextMeltanoSingerTapAdapter",
-    "Record",
-    "Sink",
-    "Stream",
-    "Tap",
-    "Target",
-]
+__all__: list[str] = ["FlextMeltanoSingerTapAdapter", "Sink", "Stream", "Tap", "Target"]

@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     )
     from examples.protocols import (
         ExamplesFlextMeltanoProtocols as ExamplesFlextMeltanoProtocols,
-        p as p,
+        p,
     )
     from examples.typings import (
         ExamplesFlextMeltanoTypes as ExamplesFlextMeltanoTypes,
@@ -26,46 +26,17 @@ if TYPE_CHECKING:
     )
     from examples.utilities import (
         ExamplesFlextMeltanoUtilities as ExamplesFlextMeltanoUtilities,
-        u as u,
+        u,
     )
-    from flext_core import d as d, e as e, h as h, r as r, s as s, x as x
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".constants": (
-            "ExamplesFlextMeltanoConstants",
-            "c",
-        ),
-        ".models": (
-            "ExamplesFlextMeltanoModels",
-            "m",
-        ),
-        ".protocols": (
-            "ExamplesFlextMeltanoProtocols",
-            "p",
-        ),
-        ".typings": (
-            "ExamplesFlextMeltanoTypes",
-            "t",
-        ),
-        ".utilities": (
-            "ExamplesFlextMeltanoUtilities",
-            "u",
-        ),
-        "flext_core": (
-            "d",
-            "e",
-            "h",
-            "r",
-            "s",
-            "x",
-        ),
-    },
-)
+    from flext_meltano import d as d, e as e, h as h, r as r, s as s, x as x
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".constants": ("ExamplesFlextMeltanoConstants", "c"),
+    ".models": ("ExamplesFlextMeltanoModels", "m"),
+    ".protocols": ("ExamplesFlextMeltanoProtocols", "p"),
+    ".typings": ("ExamplesFlextMeltanoTypes", "t"),
+    ".utilities": ("ExamplesFlextMeltanoUtilities", "u"),
+    "flext_meltano": ("d", "e", "h", "r", "s", "x"),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

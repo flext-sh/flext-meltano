@@ -7,95 +7,93 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, override, runtime_checkable
+from collections.abc import Sequence
+from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
-from flext_meltano import t
 
-if TYPE_CHECKING:
-    from flext_meltano import m
+from flext_core import r
+from flext_meltano import m, t
 
 
 class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(p.Service[t.JsonMapping], Protocol):
+    class Tap(p.Service[t.ContainerMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> p.Result[t.JsonMapping]:
+        def discover(self) -> p.Result[t.ContainerMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.JsonMapping]:
+        def execute(self) -> p.Result[t.ContainerMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
             self,
-            catalog: t.JsonMapping,
-        ) -> p.Result[t.JsonMapping]:
+            catalog: t.FlatContainerMapping,
+        ) -> p.Result[t.ContainerMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(p.Service[t.JsonMapping], Protocol):
+    class Target(p.Service[t.ContainerMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.JsonMapping]:
+        def execute(self) -> p.Result[t.ContainerMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
             self,
-            records: t.SequenceOf[t.Meltano.OptionalScalarMap],
-        ) -> p.Result[t.JsonMapping]:
+            records: Sequence[t.Meltano.OptionalScalarMap],
+        ) -> p.Result[t.ContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
             self,
             record: t.Meltano.OptionalScalarMap,
-        ) -> p.Result[t.JsonMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
     class DbtRunner(
-        p.Service[t.JsonMapping],
+        p.Service[t.ContainerMapping],
         Protocol,
     ):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.JsonMapping]:
+        def execute(self) -> p.Result[t.ContainerMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
         def run(
             self,
             models: t.StrSequence,
-        ) -> p.Result[t.JsonMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Run DBT models with r."""
             ...
 
         def test(
             self,
             models: t.StrSequence,
-        ) -> p.Result[t.JsonMapping]:
+        ) -> p.Result[t.ContainerMapping]:
             """Test DBT models with r."""
             ...
 
-    @runtime_checkable
     class SingerStreamInfo(Protocol):
         """Minimal protocol for stream objects returned by discover_streams."""
 
         @property
         def name(self) -> str: ...
 
-    @runtime_checkable
     class SingerTapInstance(Protocol):
         """Internal tap runtime contract consumed by tap service bases.
 
@@ -104,7 +102,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def settings(self) -> t.JsonMapping:
+        def config(self) -> t.ContainerMapping:
             """Tap configuration."""
             ...
 
@@ -118,7 +116,7 @@ class FlextMeltanoProtocolsSinger:
 
         def discover_streams(
             self,
-        ) -> t.SequenceOf[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
             """Discover available streams."""
             ...
 
@@ -126,7 +124,6 @@ class FlextMeltanoProtocolsSinger:
             """Execute Singer sync for all selected streams."""
             ...
 
-    @runtime_checkable
     class SingerTap(Protocol):
         """Singer Tap protocol definition for data extraction.
 
@@ -145,7 +142,7 @@ class FlextMeltanoProtocolsSinger:
         def get_records(
             self,
             stream_name: str,
-        ) -> t.SequenceOf[m.Meltano.SingerRecordMessage]:
+        ) -> Sequence[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
 
@@ -161,7 +158,6 @@ class FlextMeltanoProtocolsSinger:
             """Synchronize data from source to stdout."""
             ...
 
-    @runtime_checkable
     class SingerTarget(Protocol):
         """Singer Target protocol definition for data loading.
 
@@ -170,9 +166,9 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        settings: t.JsonMapping
+        config: t.ContainerMapping
 
-        def consume(self, records: t.SequenceOf[m.Meltano.SingerRecordMessage]) -> int:
+        def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
 
             Args:
@@ -191,20 +187,20 @@ class FlextMeltanoProtocolsSinger:
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
 
-        Context/Record types use ``t.MutableJsonMapping`` — the canonical
-        bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, JsonValue]``.
+        Context/Record types use ``t.MutableContainerValueMapping`` — the canonical
+        bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, ContainerValue]``.
         """
 
-        def start_drain(self) -> t.MutableJsonMapping: ...
+        def start_drain(self) -> t.MutableContainerValueMapping: ...
 
-        def process_batch(self, context: t.MutableJsonMapping) -> None: ...
+        def process_batch(self, context: t.MutableContainerValueMapping) -> None: ...
 
         def mark_drained(self) -> None: ...
 
         def process_record(
             self,
-            record: t.MutableJsonMapping,
-            context: t.MutableJsonMapping,
+            record: t.MutableContainerValueMapping,
+            context: t.MutableContainerValueMapping,
         ) -> None: ...
 
     @runtime_checkable
@@ -216,66 +212,14 @@ class FlextMeltanoProtocolsSinger:
         the consumer; generic stdin parsing stays here.
         """
 
-        def handle_schema(
-            self, message: m.Meltano.SingerSchemaMessage
-        ) -> p.Result[None]:
+        def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> r[None]:
             """Handle a SCHEMA message."""
             ...
 
-        def handle_record(
-            self, message: m.Meltano.SingerRecordMessage
-        ) -> p.Result[None]:
+        def handle_record(self, message: m.Meltano.SingerRecordMessage) -> r[None]:
             """Handle a RECORD message."""
             ...
 
-        def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[None]:
+        def handle_state(self, message: m.Meltano.SingerStateMessage) -> r[None]:
             """Handle a STATE message."""
-            ...
-
-    @runtime_checkable
-    class SingerTapSdkBackend(Protocol):
-        """Raw Singer SDK tap surface consumed by the FLEXT bridge."""
-
-        @classmethod
-        def get_singer_command(cls) -> t.Cli.ExternalCli:
-            """Return the Singer SDK command bound to the tap type."""
-            ...
-
-        @property
-        def config(self) -> t.MappingKV[str, t.JsonPayload]:
-            """Expose the raw tap configuration."""
-            ...
-
-        def discover_streams(
-            self,
-        ) -> t.SequenceOf[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
-            """Return the tap streams."""
-            ...
-
-        def sync_all(self) -> None:
-            """Run a full Singer sync."""
-            ...
-
-    @runtime_checkable
-    class SingerTapSettingsBackend(Protocol):
-        """Legacy tap backend contract exposing ``settings`` only."""
-
-        @classmethod
-        def get_singer_command(cls) -> t.Cli.ExternalCli:
-            """Return the Singer SDK command bound to the tap type."""
-            ...
-
-        @property
-        def settings(self) -> t.MappingKV[str, t.JsonPayload]:
-            """Expose tap settings mapping."""
-            ...
-
-        def discover_streams(
-            self,
-        ) -> t.SequenceOf[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
-            """Return the tap streams."""
-            ...
-
-        def sync_all(self) -> None:
-            """Run a full Singer sync."""
             ...

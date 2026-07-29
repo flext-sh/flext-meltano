@@ -6,10 +6,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, settings, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoValidators(FlextMeltanoServiceBase):
@@ -28,8 +30,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_pipeline_project_business_rules(
-        cls,
-        settings: t.ConfigurationMapping,
+        cls, settings: t.ConfigurationMapping
     ) -> p.Result[bool]:
         """Validate pipeline project business rules."""
         try:
@@ -71,8 +72,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_transformation_business_rules(
-        cls,
-        settings: t.ConfigurationMapping,
+        cls, settings: t.ConfigurationMapping
     ) -> p.Result[bool]:
         """Validate transformation-specific business rules."""
         try:
@@ -84,7 +84,7 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute validators service — returns current settings."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 
 __all__: list[str] = ["FlextMeltanoValidators"]

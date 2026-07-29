@@ -18,12 +18,11 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Final
 
+from flext_meltano import c
 from flext_tests import FlextTestsConstants
 
-from flext_meltano import c
-
 if TYPE_CHECKING:
-    from tests.typings import t
+    from tests import t
 
 
 class TestsFlextMeltanoConstants(FlextTestsConstants, c):
@@ -77,6 +76,11 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
             TEST_OUTPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "output").as_posix()
             TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
 
+            # Test service credentials (mirror docker-compose.test.yml)
+            POSTGRES_TEST_DATABASE: Final[str] = "flext_test"
+            POSTGRES_TEST_USER: Final[str] = "test"
+            POSTGRES_TEST_VALUE: Final[str] = "test"
+
             @unique
             class _SingerSdkAdapterValue(StrEnum):
                 """Deterministic values for Singer SDK adapter tests."""
@@ -91,7 +95,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
                 MappingProxyType({
                     _SingerSdkAdapterValue.SETTINGS_KEY: (
                         _SingerSdkAdapterValue.SETTINGS_VALUE
-                    ),
+                    )
                 })
             )
             SINGER_SDK_ADAPTER_STREAM_USERS: Final[str] = (

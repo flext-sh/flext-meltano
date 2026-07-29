@@ -25,10 +25,15 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     `execute` method from s.
     """
 
-    settings_type: Annotated[
-        type | None,
-        u.Field(description="Settings class for Meltano service initialization"),
-    ] = FlextMeltanoSettings
+    # NOTE (multi-agent): mro-i6nq.12 — FlextMixins.settings_type is now a native
+    # Pydantic field; inject the Meltano default by overriding the field default
+    # (replaces the orphaned _settings_type PrivateAttr + redundant __init__ that only
+    # forwarded the now-native runtime_settings kwarg).
+    settings_type: t.SettingsClass | None = u.Field(
+        default=FlextMeltanoSettings,
+        exclude=True,
+        description="Default FlextMeltanoSettings class for Meltano services.",
+    )
 
     service_name: Annotated[
         t.NonEmptyStr,
@@ -62,8 +67,7 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     @u.model_validator(mode="before")
     @classmethod
     def _normalize_settings_alias(
-        cls,
-        data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self,
+        cls, data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self
     ) -> t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self:
         """Accept ``settings`` as an alias for ``runtime_settings``."""
         if isinstance(data, cls) or not isinstance(data, Mapping):
@@ -86,7 +90,7 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
                 settings.model_dump()
             )
         else:
-            normalized["runtime_settings"] = FlextMeltanoSettings()
+            normalized["runtime_settings"] = FlextMeltanoSettings.fetch_global()
         return normalized
 
     @override
@@ -94,18 +98,6 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
         """Execute the service using the canonical JSON payload contract."""
         raise NotImplementedError
 
-    @property
-    @override
-    def settings(self) -> FlextMeltanoSettings:
-        """Return the typed Meltano settings namespace."""
-        if isinstance(self.runtime_settings, FlextMeltanoSettings):
-            return self.runtime_settings
-        try:
-            return FlextMeltanoSettings.fetch_global()
-        except ValueError:
-            with FlextMeltanoSettings.singleton_disabled():
-                return FlextMeltanoSettings()
-
 
 s = FlextMeltanoServiceBase
-__all__: list[str] = ["FlextMeltanoServiceBase"]
+__all__: list[str] = ["FlextMeltanoServiceBase", "s"]

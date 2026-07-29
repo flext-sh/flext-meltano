@@ -31,7 +31,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         | m.Meltano.TapInstance,
     ) -> p.Result[m.Meltano.DataSourceInstance]:
         """Create a source instance from configuration via isinstance narrowing."""
-        try:
+
+        def _run_create_source_instance() -> p.Result[m.Meltano.DataSourceInstance]:
             if isinstance(source_config, m.Meltano.DataSourceConfig):
                 source_type = source_config.source_type
                 source_id = f"{source_type}:{source_type}"
@@ -69,6 +70,9 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "Source instance created successfully", source_name=source_type
             )
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
+
+        try:
+            return _run_create_source_instance()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail_op(
@@ -93,10 +97,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             })
             return self.create_source_instance(settings).map(
                 lambda inst: m.Meltano.TapInstance(
-                    tap_type=inst.source_type,
-                    settings=settings,
-                    tap_id=inst.source_id,
-                ),
+                    tap_type=inst.source_type, settings=settings, tap_id=inst.source_id
+                )
             )
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
@@ -116,7 +118,8 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
         items: m.Meltano.DataSourceConfig | m.Meltano.TapConfig | m.Meltano.TapInstance,
     ) -> p.Result[bool]:
         """Process a source configuration for validation via isinstance narrowing."""
-        try:
+
+        def _run_process_source() -> p.Result[bool]:
             if isinstance(items, m.Meltano.DataSourceConfig):
                 source_type = items.source_type
             elif isinstance(items, m.Meltano.TapConfig):
@@ -129,6 +132,9 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             if not source_type:
                 return r[bool].fail("Source configuration must have a type")
             return r[bool].ok(value=True)
+
+        try:
+            return _run_process_source()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception(
                 "Source configuration processing failed", error=str(e)

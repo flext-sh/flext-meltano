@@ -9,13 +9,18 @@ Access pattern: u.Meltano.emit_schema(), u.Meltano.process_stdin(), etc.
 from __future__ import annotations
 
 import sys
+from typing import TYPE_CHECKING
 
 from flext_cli import r, u as cli_u
 from flext_core import e
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.models import FlextMeltanoModels as m
-from flext_meltano.protocols import FlextMeltanoProtocols as p
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_meltano import (
+    FlextMeltanoConstants as c,
+    FlextMeltanoModels as m,
+    FlextMeltanoTypes as t,
+)
+
+if TYPE_CHECKING:
+    from flext_meltano import FlextMeltanoProtocols as p
 
 
 class FlextMeltanoUtilitiesSinger:
@@ -92,9 +97,7 @@ class FlextMeltanoUtilitiesSinger:
             )
 
     @staticmethod
-    def emit_state(
-        value: t.MutableJsonMapping,
-    ) -> p.Result[str]:
+    def emit_state(value: t.MutableJsonMapping) -> p.Result[str]:
         """Emit a Singer STATE message as JSON line to stdout.
 
         Args:
@@ -114,9 +117,7 @@ class FlextMeltanoUtilitiesSinger:
             return e.fail_operation("emit STATE", exc, result_type=r[str])
 
     @staticmethod
-    def process_stdin(
-        handler: p.Meltano.SingerTargetHandler,
-    ) -> p.Result[None]:
+    def process_stdin(handler: p.Meltano.SingerTargetHandler) -> p.Result[None]:
         """Process Singer messages from stdin and route to handler.
 
         Template method: parses JSON lines from stdin, identifies message
@@ -132,10 +133,7 @@ class FlextMeltanoUtilitiesSinger:
         """
         try:
             for line in sys.stdin:
-                result = FlextMeltanoUtilitiesSinger._process_stdin_line(
-                    line,
-                    handler,
-                )
+                result = FlextMeltanoUtilitiesSinger._process_stdin_line(line, handler)
                 if result.failure:
                     return result
             return r[None].ok(None)
@@ -144,8 +142,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _process_stdin_line(
-        line: str,
-        handler: p.Meltano.SingerTargetHandler,
+        line: str, handler: p.Meltano.SingerTargetHandler
     ) -> p.Result[None]:
         """Process one Singer JSON line from stdin."""
         stripped = line.strip()
@@ -159,8 +156,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _dispatch_singer_message(
-        raw: t.JsonMapping,
-        handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
     ) -> p.Result[None]:
         """Route a parsed Singer message to the matching handler."""
         msg_type = raw.get("type", "")
@@ -174,8 +170,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _handle_schema_message(
-        raw: t.JsonMapping,
-        handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
     ) -> p.Result[None]:
         """Handle one Singer SCHEMA message."""
         schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
@@ -190,8 +185,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _handle_record_message(
-        raw: t.JsonMapping,
-        handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
     ) -> p.Result[None]:
         """Handle one Singer RECORD message."""
         record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
@@ -206,8 +200,7 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _handle_state_message(
-        raw: t.JsonMapping,
-        handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
     ) -> p.Result[None]:
         """Handle one Singer STATE message."""
         state_msg = m.Meltano.SingerStateMessage.model_validate(raw)

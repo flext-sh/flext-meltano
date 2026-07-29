@@ -12,26 +12,23 @@ from __future__ import annotations
 
 from examples.constants import c
 from examples.utilities import u
-from flext_meltano import meltano
+from flext_meltano import FlextMeltanoSettings, meltano
 
 logger = u.fetch_logger(__name__)
 
 
 def simple_api_example() -> None:
-    """Example using the public Meltano facade."""
+    """Demonstrate the public Meltano facade."""
     version_result = meltano.fetch_version()
     if version_result.success:
         logger.info("Meltano version: %s", version_result.value)
     discovery_result = meltano.discover_installed_plugins()
     if discovery_result.success:
-        logger.info(
-            "Found %s installed plugins",
-            len(discovery_result.value),
-        )
+        logger.info("Found %s installed plugins", len(discovery_result.value))
 
 
 def simple_component_example() -> None:
-    """Example using canonical component factories."""
+    """Demonstrate canonical component factories."""
     tap_result = meltano.tap("tap-csv")
     target_result = meltano.target("target-jsonl")
     dbt_result = meltano.dbt("analytics")
@@ -44,36 +41,42 @@ def simple_component_example() -> None:
 
 
 def simple_runtime_example() -> None:
-    """Example using the public runtime command surface."""
+    """Demonstrate the public runtime command surface."""
     result = meltano.execute_meltano_command([
         c.Meltano.CMD_BINARY,
         c.Meltano.ExecutorCommand.VERSION,
     ])
     if result.success:
         logger.info(
-            "Runtime command result: %s",
-            result.value.model_dump(mode="python"),
+            "Runtime command result: %s", result.value.model_dump(mode="python")
         )
 
 
 def simple_config_example() -> None:
-    """Example using typed settings through the public facade."""
+    """Demonstrate typed settings through the public facade."""
+    typed_settings = FlextMeltanoSettings.fetch_global()
     logger.info(
-        "Config created: %s",
-        meltano.settings.model_dump(mode="python"),
+        "Config created: project_root=%s, config_dir=%s",
+        typed_settings.Meltano.project_root,
+        typed_settings.Meltano.config_dir,
     )
-    logger.info("Environment: %s", meltano.settings.environment)
+    logger.info("Environment: %s", typed_settings.Meltano.environment)
+
+
+def run_examples() -> None:
+    """Run all examples in display order."""
+    simple_api_example()
+    logger.info("")
+    simple_component_example()
+    logger.info("")
+    simple_runtime_example()
+    logger.info("")
+    simple_config_example()
 
 
 if __name__ == "__main__":
     logger.info("=== FLEXT Meltano Simple Working Examples ===")
     try:
-        simple_api_example()
-        logger.info("")
-        simple_component_example()
-        logger.info("")
-        simple_runtime_example()
-        logger.info("")
-        simple_config_example()
+        run_examples()
     except (ValueError, RuntimeError, OSError):
         logger.exception("Error executing examples")

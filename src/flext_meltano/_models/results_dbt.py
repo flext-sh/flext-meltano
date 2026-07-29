@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-)
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import Annotated
 
 from flext_cli import m, u
-from flext_meltano.typings import FlextMeltanoTypes as t
+from pydantic import Field, computed_field
+
+from flext_meltano import t
 
 
 class FlextMeltanoModelsResultsDbt:
@@ -18,43 +18,94 @@ class FlextMeltanoModelsResultsDbt:
     class DbtProjectInfo(m.ArbitraryTypesModel):
         """Information about a DBT project."""
 
-        root: Annotated[Path, u.Field(description="Project root directory")]
-        name: Annotated[str, u.Field(description="Project name")]
+        root: Annotated[Path, Field(description="Project root directory")]
+        name: Annotated[str, Field(description="Project name")]
         dbt_version: Annotated[
-            str | None, u.Field(default=None, description="DBT version")
+            str | None, Field(default=None, description="DBT version")
         ] = None
         models_count: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of models")
+            t.NonNegativeInt, Field(default=0, description="Number of models")
         ] = 0
         tests_count: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of tests")
+            t.NonNegativeInt, Field(default=0, description="Number of tests")
         ] = 0
+
+    class DbtRunResult(m.ArbitraryTypesModel):
+        """Result of a DBT model run operation."""
+
+        success: Annotated[
+            bool, Field(default=True, description="Whether the run was successful")
+        ] = True
+        models_run: Annotated[
+            t.NonNegativeInt, Field(default=0, description="Number of models executed")
+        ] = 0
+        status: Annotated[
+            str,
+            Field(
+                default="completed", description="Run status (completed, failed, etc.)"
+            ),
+        ] = "completed"
+        error_message: Annotated[
+            str | None, Field(default=None, description="Error message if run failed")
+        ] = None
+        execution_time_seconds: Annotated[
+            float | None,
+            Field(default=None, description="Total execution time in seconds"),
+        ] = None
+
+    class DbtTestResult(m.ArbitraryTypesModel):
+        """Result of a DBT test operation."""
+
+        success: Annotated[
+            bool, Field(default=True, description="Whether tests passed")
+        ] = True
+        tests_run: Annotated[
+            t.NonNegativeInt, Field(default=0, description="Number of tests executed")
+        ] = 0
+        tests_passed: Annotated[
+            t.NonNegativeInt, Field(default=0, description="Number of tests passed")
+        ] = 0
+        tests_failed: Annotated[
+            t.NonNegativeInt, Field(default=0, description="Number of tests failed")
+        ] = 0
+        status: Annotated[
+            str,
+            Field(
+                default="completed", description="Test status (completed, failed, etc.)"
+            ),
+        ] = "completed"
+        error_message: Annotated[
+            str | None, Field(default=None, description="Error message if tests failed")
+        ] = None
+        execution_time_seconds: Annotated[
+            float | None,
+            Field(default=None, description="Total execution time in seconds"),
+        ] = None
 
     class CommandExecutionResult(m.ArbitraryTypesModel):
         """Execution result model for Meltano command operations following flext-core patterns."""
 
         command: Annotated[
-            t.StrSequence, u.Field(description="Command that was executed")
+            t.StrSequence, Field(description="Command that was executed")
         ]
-        success: Annotated[bool, u.Field(description="Whether the command succeeded")]
-        exit_code: Annotated[int, u.Field(description="Process exit code")]
-        output: Annotated[str, u.Field(description="Standard output")]
-        error: Annotated[str, u.Field(description="Standard error")]
+        success: Annotated[bool, Field(description="Whether the command succeeded")]
+        exit_code: Annotated[int, Field(description="Process exit code")]
+        output: Annotated[str, Field(description="Standard output")]
+        error: Annotated[str, Field(description="Standard error")]
         execution_time: Annotated[
-            t.NonNegativeFloat, u.Field(description="Execution time in seconds")
+            t.NonNegativeFloat, Field(description="Execution time in seconds")
         ]
 
-        @u.computed_field()
-        @property
+        @computed_field
         def timestamp(self) -> str:
             """ISO timestamp of when the result was generated."""
             return u.generate_iso_timestamp()
 
-        def to_dict(self) -> t.MappingKV[str, t.Scalar | t.StrSequence]:
+        def to_dict(self) -> Mapping[str, t.Scalar | t.StrSequence]:
             """Convert to dictionary representation.
 
             Returns:
-            t.MappingKV[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
+            Mapping[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
 
             """
             dumped: MutableMapping[str, t.Scalar | t.StrSequence] = {}

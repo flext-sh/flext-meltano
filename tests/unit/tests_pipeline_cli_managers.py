@@ -1,4 +1,4 @@
-"""Real-execution tests for the flat Meltano pipeline CLI handler."""
+"""Real-execution tests for the Meltano pipeline CLI commands."""
 
 from __future__ import annotations
 
@@ -8,17 +8,23 @@ import time
 from multiprocessing.process import BaseProcess
 from pathlib import Path
 
-from flext_tests import tm
+import pytest
 
 from flext_cli import cli as flext_cli
-from flext_meltano import cli
-from tests.constants import c
-from tests.models import m
-from tests.utilities import u
+from flext_meltano.cli import FlextMeltanoCli
+from flext_tests import tm
+from tests import c, m, u
 
 
 class TestFlextMeltanoPipelineCliManagers:
-    """Exercise pipeline lifecycle commands through the flat public CLI."""
+    """Exercise pipeline lifecycle commands through the model-driven CLI."""
+
+    @pytest.fixture
+    def meltano_cli(self) -> FlextMeltanoCli:
+        """Provide the public CLI facade used by every command scenario."""
+        # mro-wkii.17 (codex): tests exercise the public Result boundary, never
+        # the private framework runner or application object.
+        return FlextMeltanoCli()
 
     @staticmethod
     def _activate_pipelines_root(tmp_path: Path) -> str | None:
@@ -38,8 +44,7 @@ class TestFlextMeltanoPipelineCliManagers:
     @staticmethod
     def _spawn_sleep_process() -> BaseProcess:
         process = multiprocessing.get_context("spawn").Process(
-            target=time.sleep,
-            args=(30,),
+            target=time.sleep, args=(30,)
         )
         process.start()
         deadline = time.monotonic() + 5
@@ -57,19 +62,30 @@ class TestFlextMeltanoPipelineCliManagers:
             process.kill()
             process.join(timeout=5)
 
-    def test_pipeline_help_request_returns_help_sentinel(self) -> None:
-        """Pipeline help stays on the flat public CLI contract."""
-        result = cli.handle_pipeline_command([c.Meltano.CMD_HELP_OPTION])
+    def test_pipeline_help_request_lists_subcommands(
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Pipeline help exposes the model-driven subcommands."""
+        result = meltano_cli.run([
+            c.Meltano.CliCommand.PIPELINE,
+            c.Meltano.CMD_HELP_OPTION,
+        ])
+        output = capsys.readouterr().out
 
         tm.ok(result)
-        tm.that(result.value, eq=c.Meltano.ExecutorCommand.HELP)
+        tm.that(output, has=c.Meltano.PipelineCommand.CREATE)
+        tm.that(output, has=c.Meltano.PipelineCommand.RUN)
+        tm.that(output, has=c.Meltano.PipelineCommand.LIST)
+        tm.that(output, has=c.Meltano.PipelineCommand.STATUS)
+        tm.that(output, has=c.Meltano.PipelineCommand.STOP)
+        tm.that(output, has=c.Meltano.PipelineCommand.DELETE)
 
     def test_pipeline_create_list_run_and_delete_use_real_storage(
-        self,
-        tmp_path: Path,
+        self, capsys: pytest.CaptureFixture[str], tmp_path: Path
     ) -> None:
         """Pipeline lifecycle commands persist and execute through real helpers."""
         previous_root = self._activate_pipelines_root(tmp_path)
+        meltano_cli = FlextMeltanoCli()
         pipeline_name = "daily-pipeline"
         config_json_result = u.Cli.json_dumps({"command": ["help"]})
         config_path = (
@@ -81,25 +97,42 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = cli.handle_pipeline_command([
+            create_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
+                "--pipeline-name",
                 pipeline_name,
+                "--config-json",
                 config_json_result.value,
             ])
-            list_result = cli.handle_pipeline_command([c.Meltano.PipelineCommand.LIST])
-            status_result = cli.handle_pipeline_command([
+            capsys.readouterr()
+            list_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
+                c.Meltano.PipelineCommand.LIST,
+            ])
+            list_output = capsys.readouterr().out
+            status_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.STATUS,
+                "--pipeline-name",
                 pipeline_name,
             ])
-            run_result = cli.handle_pipeline_command([
+            status_output = capsys.readouterr().out
+            run_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.RUN,
+                "--pipeline-name",
                 pipeline_name,
             ])
+            run_output = capsys.readouterr().out
             stored_result = flext_cli.read_json_file(config_path)
-            delete_result = cli.handle_pipeline_command([
+            delete_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.DELETE,
+                "--pipeline-name",
                 pipeline_name,
             ])
+            capsys.readouterr()
         finally:
             self._restore_pipelines_root(previous_root)
 
@@ -114,36 +147,39 @@ class TestFlextMeltanoPipelineCliManagers:
             "values": stored_result.value
         })
 
-        tm.that(list_result.value, has=pipeline_name)
-        tm.that(status_result.value, eq="stopped")
-        tm.that(run_result.value.lower(), has="usage:")
+        tm.that(list_output, has=pipeline_name)
+        tm.that(status_output, has="stopped")
+        tm.that(run_output.lower(), has="usage:")
         tm.that(stored_payload.values, eq={"command": ["help"]})
         tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
 
     def test_pipeline_create_requires_runtime_configuration(
-        self,
-        tmp_path: Path,
+        self, capsys: pytest.CaptureFixture[str], tmp_path: Path
     ) -> None:
         """Pipeline creation without JSON config fails on the real handler path."""
         previous_root = self._activate_pipelines_root(tmp_path)
+        meltano_cli = FlextMeltanoCli()
 
         try:
-            result = cli.handle_pipeline_command([
+            result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
+                "--pipeline-name",
                 "missing-config",
             ])
+            output = capsys.readouterr().out
         finally:
             self._restore_pipelines_root(previous_root)
 
-        tm.fail(result)
-        tm.that(str(result.error), has="not configured")
+        tm.fail(result, has="not configured")
+        tm.that(output, has="not configured")
 
     def test_pipeline_status_and_stop_use_real_pid_files(
-        self,
-        tmp_path: Path,
+        self, capsys: pytest.CaptureFixture[str], tmp_path: Path
     ) -> None:
         """Status and stop commands inspect a real background process pid file."""
         previous_root = self._activate_pipelines_root(tmp_path)
+        meltano_cli = FlextMeltanoCli()
         pipeline_name = "status-pipeline"
         config_json_result = u.Cli.json_dumps({"command": ["help"]})
         pid_path = (
@@ -156,11 +192,15 @@ class TestFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = cli.handle_pipeline_command([
+            create_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.CREATE,
+                "--pipeline-name",
                 pipeline_name,
+                "--config-json",
                 config_json_result.value,
             ])
+            capsys.readouterr()
             tm.ok(create_result)
 
             ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
@@ -168,20 +208,26 @@ class TestFlextMeltanoPipelineCliManagers:
             write_pid_result = u.Cli.files_write_text(pid_path, str(process.pid))
             tm.ok(write_pid_result)
 
-            running_result = cli.handle_pipeline_command([
+            running_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.STATUS,
+                "--pipeline-name",
                 pipeline_name,
             ])
-            stop_result = cli.handle_pipeline_command([
+            running_output = capsys.readouterr().out
+            stop_result = meltano_cli.run([
+                c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.STOP,
+                "--pipeline-name",
                 pipeline_name,
             ])
+            stop_output = capsys.readouterr().out
         finally:
             self._stop_process(process)
             self._restore_pipelines_root(previous_root)
 
         tm.ok(running_result)
         tm.ok(stop_result)
-        tm.that(running_result.value, eq="running")
-        tm.that(stop_result.value, eq="stopped")
+        tm.that(running_output, has="running")
+        tm.that(stop_output, has="stopped")
         tm.that(pid_path.exists(), eq=False)

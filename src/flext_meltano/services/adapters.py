@@ -8,12 +8,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import (
-    FlextMeltanoServiceBase,
-    p,
-    r,
-    t,
-)
+from flext_meltano import FlextMeltanoServiceBase, p, r, settings, t
 
 
 class FlextMeltanoAdapter(FlextMeltanoServiceBase):
@@ -22,7 +17,7 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute adapter service returning current settings."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 
 __all__: list[str] = ["FlextMeltanoAdapter"]

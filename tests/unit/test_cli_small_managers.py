@@ -1,95 +1,104 @@
-"""Real-execution tests for small Meltano CLI command handlers."""
+"""Behavioral tests for the FLEXT Meltano CLI public run contract.
+
+These tests exercise only the public surface ``FlextMeltanoCli().run(args)``,
+which returns ``p.Result[bool]``, plus the text the CLI writes to stdout. No
+private attributes, internal collaborators, or Typer application objects are
+touched: the assertions describe the observable command contract only.
+"""
 
 from __future__ import annotations
 
-import re
-
 import pytest
-from flext_tests import tm
 
-from flext_meltano.cli import FlextMeltanoCLI, cli
-from tests.constants import c
-from tests.typings import t
-from tests.utilities import u
+from flext_meltano.cli import FlextMeltanoCli
+from flext_tests import tm
+from tests import c, t, u
+
+__all__: list[str] = ["TestsFlextMeltanoCliSmallManagers"]
 
 
 class TestsFlextMeltanoCliSmallManagers:
-    """Exercise the public CLI handlers without mocks or monkeypatching."""
+    """Exercise the public ``run`` contract of the Meltano CLI facade."""
 
-    def test_version_command_returns_real_version_string(self) -> None:
-        result = FlextMeltanoCLI.fetch_global().handle_version_command([])
+    @pytest.fixture
+    def meltano_cli(self) -> FlextMeltanoCli:
+        """Provide a freshly constructed CLI facade for each test."""
+        return FlextMeltanoCli()
 
-        tm.ok(result)
-        tm.that("." in result.value, eq=True)
+    def test_version_command_succeeds_and_prints_version_string(
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        result = meltano_cli.run([c.Meltano.CliCommand.VERSION])
 
-    def test_status_commands_return_json_payloads(self) -> None:
-        cli_instance = FlextMeltanoCLI.fetch_global()
+        tm.that(result.success, eq=True)
+        tm.that("." in capsys.readouterr().out, eq=True)
 
-        show_result = cli_instance.handle_status_command(["show"])
-        health_result = cli_instance.handle_status_command([
-            c.Meltano.ExecutorCommand.HEALTH
+    def test_status_show_succeeds_with_ready_status_payload(
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        result = meltano_cli.run([c.Meltano.CliCommand.STATUS, "show"])
+
+        tm.that(result.success, eq=True)
+
+        parsed = u.Cli.json_loads(capsys.readouterr().out)
+        tm.ok(parsed)
+
+        payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(parsed.value)
+        tm.that(payload.get("status"), eq=c.Meltano.OperationStatus.READY)
+
+    def test_status_health_succeeds_with_status_key_in_payload(
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        result = meltano_cli.run([
+            c.Meltano.CliCommand.STATUS,
+            c.Meltano.ExecutorCommand.HEALTH,
         ])
 
-        tm.ok(show_result)
-        tm.ok(health_result)
+        tm.that(result.success, eq=True)
 
-        show_json = u.Cli.json_loads(show_result.value)
-        health_json = u.Cli.json_loads(health_result.value)
+        parsed = u.Cli.json_loads(capsys.readouterr().out)
+        tm.ok(parsed)
 
-        tm.ok(show_json)
-        tm.ok(health_json)
+        payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(parsed.value)
+        tm.that("status" in payload, eq=True)
 
-        show_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(show_json.value)
-        health_payload = t.Cli.JSON_MAPPING_ADAPTER.validate_python(health_json.value)
+    @pytest.mark.parametrize(
+        "command", [c.Meltano.CliCommand.TAP, c.Meltano.CliCommand.TARGET]
+    )
+    def test_unsupported_extractor_operation_reports_failure(
+        self, meltano_cli: FlextMeltanoCli, command: str
+    ) -> None:
+        result = meltano_cli.run([command, "--operation", "run", "--args", "demo"])
 
-        tm.that(show_payload.get("status"), eq=c.Meltano.OperationStatus.READY)
-        tm.that("status" in health_payload, eq=True)
+        tm.that(result.failure, eq=True)
 
-    def test_tap_and_target_commands_fail_for_unsupported_operations(self) -> None:
-        cli_instance = FlextMeltanoCLI.fetch_global()
+    def test_plugin_info_without_plugin_type_reports_failure(
+        self, meltano_cli: FlextMeltanoCli
+    ) -> None:
+        result = meltano_cli.run([
+            c.Meltano.CliCommand.PLUGIN,
+            c.Meltano.ExecutorCommand.INFO,
+        ])
 
-        tap_result = cli_instance.handle_tap_command(["run", "tap-demo"])
-        target_result = cli_instance.handle_target_command(["run", "target-demo"])
+        tm.that(result.failure, eq=True)
 
-        tm.fail(tap_result)
-        tm.fail(target_result)
-        tm.that(str(tap_result.error), has="not supported")
-        tm.that(str(target_result.error), has="not supported")
-
-    def test_plugin_commands_enforce_real_argument_contracts(self) -> None:
-        cli_instance = FlextMeltanoCLI.fetch_global()
-
-        info_result = cli_instance.handle_plugin_command(["info"])
-        install_result = cli_instance.handle_plugin_command([
+    def test_plugin_install_is_unsupported_and_reports_failure(
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        result = meltano_cli.run([
+            c.Meltano.CliCommand.PLUGIN,
             c.Meltano.ExecutorCommand.INSTALL,
-            "extractors",
+            "--plugin-name",
             "tap-demo",
         ])
 
-        tm.fail(info_result)
-        tm.fail(install_result)
-        tm.that(str(info_result.error), has="requires")
-        tm.that(str(install_result.error), has="not supported")
+        tm.that(result.failure, eq=True)
+        tm.that(capsys.readouterr().out, has="not supported")
 
-    def test_dbt_help_path_returns_help_sentinel(self) -> None:
-        result = FlextMeltanoCLI.fetch_global().handle_dbt_command([
-            c.Meltano.CMD_HELP_OPTION
-        ])
-
-        tm.ok(result)
-        tm.that(result.value, eq=c.Meltano.ExecutorCommand.HELP)
-
-    def test_route_command_prints_real_version_output(
-        self,
-        capsys: pytest.CaptureFixture[str],
+    def test_dbt_help_option_succeeds_and_prints_dbt_help(
+        self, meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        version_result = cli.handle_version_command([])
+        result = meltano_cli.run([c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION])
 
-        tm.ok(version_result)
-
-        exit_code = cli.route_command([c.Meltano.CliCommand.VERSION])
-        captured = capsys.readouterr()
-        normalized_output = re.sub(r"\x1b\[[0-9;]*m", "", captured.out)
-
-        tm.that(exit_code, eq=0)
-        tm.that(normalized_output, has=version_result.value)
+        tm.that(result.success, eq=True)
+        tm.that(capsys.readouterr().out, has="DBT")

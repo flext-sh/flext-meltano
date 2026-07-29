@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import c, p, r, t
+from flext_meltano import c, p, r, settings, t
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.meltano_plugin_discovery import (
     FlextMeltanoPluginDiscoveryMixin,
@@ -33,10 +33,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[str].ok(plugin_type)
 
     def add_plugin(
-        self,
-        project: p.Meltano.Project,
-        plugin_type: str,
-        plugin_name: str,
+        self, project: p.Meltano.Project, plugin_type: str, plugin_name: str
     ) -> p.Result[t.StrMapping]:
         """Add plugin to Meltano project using railway-oriented validation chain."""
         return (
@@ -48,24 +45,18 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
             )
             .flat_map(
                 lambda result: self._build_plugin_addition_result(
-                    plugin_name,
-                    plugin_type,
-                    addition_success=result,
-                ),
+                    plugin_name, plugin_type, addition_success=result
+                )
             )
         )
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the pipeline component service."""
-        return r[t.JsonMapping].ok(self.settings.model_dump(mode="json"))
+        return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def _build_plugin_addition_result(
-        self,
-        plugin_name: str,
-        plugin_type: str,
-        *,
-        addition_success: bool,
+        self, plugin_name: str, plugin_type: str, *, addition_success: bool
     ) -> p.Result[t.StrMapping]:
         """Build successful plugin addition result."""
         plugin_result: t.StrMapping = {
@@ -82,10 +73,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[t.StrMapping].ok(plugin_result)
 
     def _execute_plugin_addition(
-        self,
-        project: p.Meltano.Project,
-        plugin_type_str: str,
-        plugin_name: str,
+        self, project: p.Meltano.Project, plugin_type_str: str, plugin_name: str
     ) -> p.Result[bool]:
         """Execute the actual plugin addition using abstraction layer."""
         plugin_config: t.JsonMapping = {

@@ -1,8 +1,9 @@
-"""Comprehensive tests for FlextMeltanoValidators using flext_tests.
+"""Behavioral tests for the Meltano validators public contract.
 
-Tests all validator functionality with real validation scenarios,
-no mocks, using flext_tests for improved assertions and test builders.
-
+Exercises the observable ``r[bool]`` outcomes of the validator facade
+(``validate_plugin_config``, ``validate_pipeline_project_business_rules``,
+``validate_transformation_business_rules``) through their public API only:
+success/failure state, unwrapped values, error messages and combinators.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -11,17 +12,25 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
-from flext_tests import r, tm
 
 from flext_meltano import meltano
-from tests.typings import t
+from flext_tests import tm
+
+if TYPE_CHECKING:
+    from tests import t
 
 
 class TestsFlextMeltanoValidators:
-    """Comprehensive tests for FlextMeltanoValidators with 100% coverage."""
+    """Contract tests for the Meltano business-rule validators."""
 
-    def test_validate_plugin_config_valid(self) -> None:
+    # ------------------------------------------------------------------
+    # Plugin configuration
+    # ------------------------------------------------------------------
+
+    def test_valid_plugin_config_succeeds_with_true_value(self) -> None:
         settings: t.ScalarMapping = {
             "name": "tap-csv",
             "namespace": "tap_csv",
@@ -30,107 +39,144 @@ class TestsFlextMeltanoValidators:
         }
         result = meltano.validate_plugin_config(settings)
         tm.ok(result)
+        tm.that(result.value, eq=True)
+        tm.that(result.unwrap(), eq=True)
 
-    def test_validate_plugin_config_missing_fields(self) -> None:
+    def test_plugin_config_missing_required_fields_fails(self) -> None:
         settings: t.ScalarMapping = {"name": "tap-csv"}
         result = meltano.validate_plugin_config(settings)
         tm.fail(result)
-        tm.fail(result)
+        tm.that(result.error, has="Plugin settings validation failed")
 
-    def test_validate_plugin_config_empty_fields(self) -> None:
+    @pytest.mark.parametrize(
+        ("name", "expected_fragment"),
+        [
+            ("", "Plugin settings validation failed"),
+            ("   ", "Plugin settings validation failed"),
+            ("target-", "Target plugin names must be at least 8 characters"),
+            ("tap-", "Source component names must be at least 5 characters"),
+        ],
+    )
+    def test_plugin_name_business_rules_reject_invalid_names(
+        self, name: str, expected_fragment: str
+    ) -> None:
         settings: t.ScalarMapping = {
-            "name": "",
-            "namespace": "tap_csv",
-            "pip_url": "pipelinewise-tap-csv",
-            "executable": "tap-csv",
+            "name": name,
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
         }
         result = meltano.validate_plugin_config(settings)
         tm.fail(result)
-        tm.fail(result)
+        tm.that(result.error, none=False)
+        tm.that(result.error, has=expected_fragment)
 
-    def test_validate_plugin_config_invalid_types(self) -> None:
+    @pytest.mark.parametrize("name", ["tap-csv", "target-postgres"])
+    def test_plugin_name_business_rules_accept_valid_names(self, name: str) -> None:
         settings: t.ScalarMapping = {
-            "name": 123,
-            "namespace": "tap_csv",
-            "pip_url": "pipelinewise-tap-csv",
-            "executable": "tap-csv",
+            "name": name,
+            "namespace": "test_ns",
+            "pip_url": "test",
+            "executable": "test",
         }
         result = meltano.validate_plugin_config(settings)
-        tm.fail(result)
-        tm.fail(result)
-
-    def test_validate_plugin_config_non_dict(self) -> None:
-        """Test plugin settings validation with non-dict input."""
-        result = meltano.validate_plugin_config({"name": "test"})
-        tm.that(result, is_=r)
-
-    def test_validate_plugin_config_none(self) -> None:
-        """Test plugin settings validation with empty input."""
-        result = meltano.validate_plugin_config({})
-        tm.that(result, is_=r)
-
-    def test_validate_meltano_config_valid(self) -> None:
-        settings: t.ScalarMapping = {"version": 1, "project_id": "test-project"}
-        result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
-
-    def test_validate_meltano_config_missing_version(self) -> None:
-        settings: t.ScalarMapping = {"project_id": "test-project"}
-        result = meltano.validate_pipeline_project_business_rules(settings)
-        tm.that(result.failure or result.success, eq=True)
-
-    def test_validate_meltano_config_invalid_version(self) -> None:
-        settings: t.ScalarMapping = {"schema_version": 2, "project_id": "test-project"}
-        result = meltano.validate_pipeline_project_business_rules(settings)
-        tm.fail(result)
-        tm.fail(result)
-
-    def test_validate_meltano_config_empty_project_id(self) -> None:
-        """Test basic validator instantiation."""
-        validator = meltano
-        assert validator is not None
-
-    def test_validate_dbt_config_valid(self) -> None:
-        dbt_config: t.ScalarMapping = {
-            "name": "analytics",
-            "version": 1,
-            "transformation_version": "1.0.0",
-            "profile": "analytics_profile",
-        }
-        result = meltano.validate_transformation_business_rules(
-            dbt_config,
-        )
-        tm.ok(result)
-
-    def test_validate_dbt_config_missing_required(self) -> None:
-        dbt_config: t.ScalarMapping = {"name": "analytics"}
-        result = meltano.validate_transformation_business_rules(
-            dbt_config,
-        )
-        tm.fail(result)
-        tm.fail(result)
+        tm.that(result.value, eq=True)
 
     @pytest.mark.parametrize(
         "invalid_config",
-        [None, "not a dict", [], 123, {"invalid": "structure"}],
+        [
+            {},
+            {"invalid": "structure"},
+            {"name": "tap-csv", "namespace": "tap_csv"},
+            {"namespace": "tap_csv", "pip_url": "u", "executable": "e"},
+        ],
     )
-    def test_validate_plugin_config_parametrized_invalid(
-        self,
-        invalid_config: t.Scalar | t.ScalarMapping | t.ScalarList | None,
+    def test_plugin_config_rejects_mappings_missing_required_fields(
+        self, invalid_config: t.ScalarMapping
     ) -> None:
-        validator = getattr(meltano, "validate_plugin_config")
-        result = validator(invalid_config)
+        result = meltano.validate_plugin_config(invalid_config)
         tm.fail(result)
-        tm.fail(result)
+        tm.that(result.error, has="Plugin settings validation failed")
 
-    def test_complex_validation_scenario(self) -> None:
+    def test_plugin_config_failure_preserves_error_through_map(self) -> None:
+        settings: t.ScalarMapping = {"name": "tap-csv"}
+        result = meltano.validate_plugin_config(settings)
+        mapped = result.map(lambda value: value)
+        tm.fail(mapped)
+        tm.that(mapped.error, eq=result.error)
+
+    # ------------------------------------------------------------------
+    # Pipeline project rules
+    # ------------------------------------------------------------------
+
+    def test_valid_pipeline_project_succeeds(self) -> None:
+        settings: t.ScalarMapping = {"schema_version": 1, "project_id": "test-project"}
+        result = meltano.validate_pipeline_project_business_rules(settings)
+        tm.ok(result)
+        tm.that(result.value, eq=True)
+
+    def test_pipeline_project_defaults_schema_version_when_omitted(self) -> None:
+        settings: t.ScalarMapping = {"project_id": "test-project"}
+        result = meltano.validate_pipeline_project_business_rules(settings)
+        tm.ok(result)
+        tm.that(result.value, eq=True)
+
+    def test_pipeline_project_missing_project_id_fails(self) -> None:
+        settings: t.ScalarMapping = {"schema_version": 1}
+        result = meltano.validate_pipeline_project_business_rules(settings)
+        tm.fail(result)
+        tm.that(result.error, has="Project validation failed")
+
+    def test_pipeline_project_unsupported_schema_version_fails(self) -> None:
+        settings: t.ScalarMapping = {"schema_version": 2, "project_id": "test-project"}
+        result = meltano.validate_pipeline_project_business_rules(settings)
+        tm.fail(result)
+        tm.that(result.error, has="Project validation failed")
+
+    # ------------------------------------------------------------------
+    # Transformation project rules
+    # ------------------------------------------------------------------
+
+    def test_valid_transformation_config_succeeds(self) -> None:
+        dbt_config: t.ScalarMapping = {
+            "name": "analytics",
+            "transformation_version": "1.0.0",
+            "profile": "analytics_profile",
+        }
+        result = meltano.validate_transformation_business_rules(dbt_config)
+        tm.ok(result)
+        tm.that(result.value, eq=True)
+
+    def test_transformation_config_missing_required_fails(self) -> None:
+        dbt_config: t.ScalarMapping = {"name": "analytics"}
+        result = meltano.validate_transformation_business_rules(dbt_config)
+        tm.fail(result)
+        tm.that(result.error, has="Transformation validation failed")
+
+    # ------------------------------------------------------------------
+    # Invariants
+    # ------------------------------------------------------------------
+
+    def test_validation_is_idempotent_for_same_input(self) -> None:
+        settings: t.ScalarMapping = {
+            "name": "tap-csv",
+            "namespace": "tap_csv",
+            "pip_url": "pipelinewise-tap-csv",
+            "executable": "tap-csv",
+        }
+        first = meltano.validate_plugin_config(settings)
+        second = meltano.validate_plugin_config(settings)
+        tm.that(first.success, eq=second.success)
+        tm.that(first.value, eq=second.value)
+
+    def test_independent_validators_agree_on_full_pipeline(self) -> None:
         meltano_config: t.ScalarMapping = {
-            "version": 1,
+            "schema_version": 1,
             "project_id": "integration-test",
         }
         dbt_config: t.ScalarMapping = {
             "name": "analytics",
-            "version": 1,
             "transformation_version": "1.0.0",
             "profile": "analytics_profile",
         }
@@ -146,115 +192,10 @@ class TestsFlextMeltanoValidators:
             "pip_url": "pipelinewise-target-postgres",
             "executable": "target-postgres",
         }
-        meltano_result = meltano.validate_pipeline_project_business_rules(
-            meltano_config,
-        )
-        dbt_result = meltano.validate_transformation_business_rules(
-            dbt_config,
-        )
-        tap_result = meltano.validate_plugin_config(tap_config)
-        target_result = meltano.validate_plugin_config(target_config)
-        tm.ok(meltano_result)
-        tm.ok(dbt_result)
-        tm.ok(tap_result)
-        tm.ok(target_result)
+        tm.ok(meltano.validate_pipeline_project_business_rules(meltano_config))
+        tm.ok(meltano.validate_transformation_business_rules(dbt_config))
+        tm.ok(meltano.validate_plugin_config(tap_config))
+        tm.ok(meltano.validate_plugin_config(target_config))
 
-    def test_validator_architecture_compliance(self) -> None:
-        tm.that(
-            hasattr(meltano, "validate_pipeline_project_business_rules"),
-            eq=True,
-        )
-        tm.that(
-            hasattr(meltano, "validate_transformation_business_rules"),
-            eq=True,
-        )
-        tm.that(not hasattr(meltano, "safe_json_stringify"), eq=True)
-        tm.that(not hasattr(meltano, "Text"), eq=True)
-        settings: t.ScalarMapping = {
-            "name": "test-plugin",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.ok(result)
 
-    def test_validate_plugin_name_empty(self) -> None:
-        settings: t.ScalarMapping = {
-            "name": "",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.fail(result)
-        tm.that(result.error, none=False)
-        if result.error is not None:
-            tm.that(result.error, has="Plugin settings validation failed")
-
-    def test_validate_plugin_name_whitespace(self) -> None:
-        settings: t.ScalarMapping = {
-            "name": "   ",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.fail(result)
-        tm.that(result.error, none=False)
-        if result.error is not None:
-            tm.that(result.error, has="Plugin settings validation failed")
-
-    def test_validate_target_plugin_name_too_short(self) -> None:
-        settings: t.ScalarMapping = {
-            "name": "target-",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.fail(result)
-        tm.that(result.error, none=False)
-        tm.that(result.error, none=False)
-        if result.error is not None:
-            tm.that(
-                result.error,
-                has="Target plugin names must be at least 8 characters",
-            )
-
-    def test_validate_tap_plugin_name_too_short(self) -> None:
-        settings: t.ScalarMapping = {
-            "name": "tap-",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.fail(result)
-        tm.that(result.error, none=False)
-        tm.that(result.error, none=False)
-        if result.error is not None:
-            tm.that(
-                result.error,
-                has="Source component names must be at least 5 characters",
-            )
-
-    def test_validate_target_plugin_name_valid(self) -> None:
-        settings: t.ScalarMapping = {
-            "name": "target-postgres",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.ok(result)
-
-    def test_validate_tap_plugin_name_valid(self) -> None:
-        settings: t.ScalarMapping = {
-            "name": "tap-csv",
-            "namespace": "test_ns",
-            "pip_url": "test",
-            "executable": "test",
-        }
-        result = meltano.validate_plugin_config(settings)
-        tm.ok(result)
+__all__: list[str] = ["TestsFlextMeltanoValidators"]

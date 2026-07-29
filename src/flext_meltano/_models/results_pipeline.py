@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import Annotated, Self
 
-from flext_cli import m, u
-from flext_meltano._models.results import FlextMeltanoModelsResults
-from flext_meltano.constants import FlextMeltanoConstants as c
-from flext_meltano.typings import FlextMeltanoTypes as t
+from flext_cli import m
+from pydantic import Field, computed_field, field_validator, model_validator
+
+from flext_meltano import FlextMeltanoModelsResults, c, t
 
 
 class FlextMeltanoModelsResultsPipeline:
@@ -17,35 +16,33 @@ class FlextMeltanoModelsResultsPipeline:
     class PipelineResult(m.TimestampedModel):
         """Generic pipeline execution result with complete validation."""
 
-        pipeline_id: Annotated[str, u.Field(description="Pipeline identifier")]
+        pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
         source_result: Annotated[
             FlextMeltanoModelsResults.ExecutionResult | None,
-            u.Field(default=None, description="Source execution result"),
+            Field(default=None, description="Source execution result"),
         ] = None
         sink_result: Annotated[
             FlextMeltanoModelsResults.ExecutionResult | None,
-            u.Field(default=None, description="Sink execution result"),
+            Field(default=None, description="Sink execution result"),
         ] = None
-        transformation_result: Annotated[
-            FlextMeltanoModelsResults.ExecutionResult | None,
-            u.Field(default=None, description="Transformation execution result"),
-        ] = None
+        transformation_result: FlextMeltanoModelsResults.ExecutionResult | None = Field(
+            default=None, description="Transformation execution result"
+        )
         overall_status: Annotated[
             str,
-            u.Field(
+            Field(
                 default=c.Meltano.OperationStatus.PENDING,
                 description="Overall pipeline status",
             ),
         ] = c.Meltano.OperationStatus.PENDING
         total_records: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Total records processed")
+            t.NonNegativeInt, Field(default=0, description="Total records processed")
         ] = 0
         pipeline_metadata: Annotated[
-            t.ConfigurationMapping, u.Field(description="Pipeline execution metadata")
-        ] = u.Field(default_factory=lambda: MappingProxyType({}))
+            t.ConfigurationMapping, Field(description="Pipeline execution metadata")
+        ] = Field(default_factory=dict, description="Pipeline execution metadata")
 
-        @u.computed_field()
-        @property
+        @computed_field
         def completed_stages(self) -> t.StrSequence:
             """Completed pipeline stages."""
             return [
@@ -58,8 +55,7 @@ class FlextMeltanoModelsResultsPipeline:
                 if result is not None and result.end_time is not None
             ]
 
-        @u.computed_field()
-        @property
+        @computed_field
         def completion_percentage(self) -> float:
             """Pipeline completion percentage."""
             total_stages = 3
@@ -75,34 +71,27 @@ class FlextMeltanoModelsResultsPipeline:
                 completed += 1
             return (completed / total_stages) * 100
 
-        def _stage_succeeded(
-            self,
-            result: FlextMeltanoModelsResults.ExecutionResult | None,
-            success: c.Meltano.OperationStatus,
-        ) -> bool:
-            return (
-                result is not None
-                and result.status == success
-                and result.error_message is None
-            )
-
         def _all_stages_successful(self) -> bool:
             """Check if all stages completed successfully."""
-            success = c.Meltano.OperationStatus.SUCCESS
-            return (
-                self._stage_succeeded(self.source_result, success)
-                and self._stage_succeeded(self.sink_result, success)
-                and self._stage_succeeded(self.transformation_result, success)
+            s = c.Meltano.OperationStatus.SUCCESS
+            return bool(
+                self.source_result
+                and self.source_result.status == s
+                and self.source_result.error_message is None
+                and self.sink_result
+                and self.sink_result.status == s
+                and self.sink_result.error_message is None
+                and self.transformation_result
+                and self.transformation_result.status == s
+                and self.transformation_result.error_message is None,
             )
 
-        @u.computed_field()
-        @property
+        @computed_field
         def is_fully_successful(self) -> bool:
             """Check if all stages completed successfully."""
             return self._all_stages_successful()
 
-        @u.computed_field()
-        @property
+        @computed_field
         def total_duration_seconds(self) -> float:
             """Total pipeline duration."""
             total = 0.0
@@ -117,7 +106,7 @@ class FlextMeltanoModelsResultsPipeline:
                 total += self.transformation_result.duration_seconds
             return total
 
-        @u.field_validator("overall_status", mode="before")
+        @field_validator("overall_status", mode="before")
         @classmethod
         def validate_overall_status(cls, v: str) -> str:
             """Validate overall pipeline status."""
@@ -133,7 +122,7 @@ class FlextMeltanoModelsResultsPipeline:
                 raise ValueError(msg)
             return v
 
-        @u.model_validator(mode="after")
+        @model_validator(mode="after")
         def validate_pipeline_result(self) -> Self:
             """Validate pipeline result consistency."""
             total_from_stages = 0

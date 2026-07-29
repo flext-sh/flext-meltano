@@ -3,212 +3,303 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Callable
-from typing import Annotated
+from typing import ClassVar
 
-from flext_cli import cli as flext_cli_output
-from flext_meltano import FlextMeltano, c, p, r, t, u
+from flext_cli import cli
+from flext_meltano import FlextMeltano, c, e, m, p, r, t, u
 from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
 
 
-class FlextMeltanoCLI(FlextMeltano):
-    """Flat public CLI facade for FLEXT Meltano operations."""
+class FlextMeltanoCli:
+    """Model-driven CLI facade for FLEXT Meltano operations."""
 
-    service_name: Annotated[
-        t.NonEmptyStr,
-        u.Field(
-            default="FlextMeltanoCLI",
-            description="Canonical Meltano CLI service name.",
-            validate_default=True,
-        ),
-    ] = "FlextMeltanoCLI"
+    app_name: ClassVar[str] = "flext-meltano"
+    app_help: ClassVar[str] = "FLEXT Meltano operations"
 
-    def handle_pipeline_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level pipeline commands through the public CLI."""
-        return FlextMeltanoPipelineManager(self).handle_command(args)
+    def __init__(self) -> None:
+        """Initialize the CLI with service and pipeline manager facades."""
+        self._service = FlextMeltano.fetch_global()
+        self._pipeline_mgr = FlextMeltanoPipelineManager()
+        self._app = cli.create_app_with_common_params(
+            name=self.app_name, help_text=self.app_help
+        )
+        self._register_commands()
 
-    def handle_tap_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level tap commands through the public CLI."""
-        if not args or u.Meltano.is_help_request(args):
-            self.show_tap_help()
+    def run(self, args: t.StrSequence | None = None) -> p.Result[bool]:
+        """Run the CLI with the given arguments."""
+        return cli.execute_app(self._app, prog_name=self.app_name, args=args)
+
+    def _register_commands(self) -> None:
+        self._register_version_command()
+        self._register_status_commands()
+        self._register_tap_command()
+        self._register_target_command()
+        self._register_dbt_command()
+        self._register_plugin_commands()
+        self._register_pipeline_commands()
+
+    def _register_version_command(self) -> None:
+        cli.register_result_command(
+            self._app,
+            name=c.Meltano.CliCommand.VERSION,
+            help_text="Show the FLEXT Meltano version",
+            model_cls=m.Meltano.VersionInput,
+            handler=self._handle_version,
+        )
+
+    def _handle_version(self, _model: m.Meltano.VersionInput) -> p.Result[str]:
+        return self._service.fetch_version()
+
+    def _register_status_commands(self) -> None:
+        status_group = cli.create_group(
+            name=c.Meltano.CliCommand.STATUS, help_text="Meltano status operations"
+        )
+        cli.register_result_command(
+            status_group,
+            name="show",
+            help_text="Show Meltano runtime status",
+            model_cls=m.Meltano.StatusShowInput,
+            handler=self._handle_status_show,
+        )
+        cli.register_result_command(
+            status_group,
+            name=c.Meltano.ExecutorCommand.HEALTH,
+            help_text="Check Meltano service health",
+            model_cls=m.Meltano.StatusHealthInput,
+            handler=self._handle_status_health,
+        )
+        cli.add_group(self._app, name=c.Meltano.CliCommand.STATUS, group=status_group)
+
+    def _handle_status_show(self, _model: m.Meltano.StatusShowInput) -> p.Result[str]:
+        return self._service.run_cli([]).flat_map(
+            lambda payload: u.Cli.json_dumps(
+                t.json_dict_adapter().validate_python(payload)
+            )
+        )
+
+    def _handle_status_health(
+        self, _model: m.Meltano.StatusHealthInput
+    ) -> p.Result[str]:
+        return self._service.health().flat_map(
+            lambda payload: u.Cli.json_dumps(
+                t.json_dict_adapter().validate_python(payload)
+            )
+        )
+
+    def _register_tap_command(self) -> None:
+        cli.register_result_command(
+            self._app,
+            name=c.Meltano.CliCommand.TAP,
+            help_text="Tap operations",
+            model_cls=m.Meltano.TapInput,
+            handler=self._handle_tap,
+        )
+
+    def _handle_tap(self, model: m.Meltano.TapInput) -> p.Result[str]:
+        if model.operation is None or u.Meltano.is_help_request([model.operation]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
-        return r[str].fail(f"Tap operation '{args[0]}' is not supported")
+        return r[str].fail(f"Tap operation '{model.operation}' is not supported")
 
-    def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level target commands through the public CLI."""
-        if not args or u.Meltano.is_help_request(args):
-            self.show_target_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
-        return r[str].fail(f"Target operation '{args[0]}' is not supported")
+    def _register_target_command(self) -> None:
+        cli.register_result_command(
+            self._app,
+            name=c.Meltano.CliCommand.TARGET,
+            help_text="Target operations",
+            model_cls=m.Meltano.TargetInput,
+            handler=self._handle_target,
+        )
 
-    def handle_dbt_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level DBT commands through the public CLI."""
-        if not args or u.Meltano.is_help_request(args):
-            self.show_dbt_help()
+    def _handle_target(self, model: m.Meltano.TargetInput) -> p.Result[str]:
+        if model.operation is None or u.Meltano.is_help_request([model.operation]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
-        result = self.execute_dbt_command(args[0], args[1:])
+        return r[str].fail(f"Target operation '{model.operation}' is not supported")
+
+    def _register_dbt_command(self) -> None:
+        cli.register_result_command(
+            self._app,
+            name=c.Meltano.CliCommand.DBT,
+            help_text="Run DBT subcommands",
+            model_cls=m.Meltano.DbtInput,
+            handler=self._handle_dbt,
+        )
+
+    def _handle_dbt(self, model: m.Meltano.DbtInput) -> p.Result[str]:
+        if u.Meltano.is_help_request([model.subcommand]):
+            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
+        result = self._service.execute_dbt_command(model.subcommand, model.args)
         if result.failure:
             return r[str].fail(result.error or "DBT command failed")
         if not result.value.success:
             return r[str].fail(result.value.error or result.value.output)
         return r[str].ok(result.value.output)
 
-    def handle_plugin_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level plugin commands through the public CLI."""
-        if not args or u.Meltano.is_help_request(args):
-            self.show_plugin_help()
-            result = r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
-        else:
-            command, command_args = args[0], args[1:]
-            match command:
-                case c.Meltano.ExecutorCommand.LIST:
-                    plugin_type = (
-                        u.Meltano.normalize_plugin_group(command_args[0])
-                        if command_args
-                        else None
-                    )
-                    result = (
-                        self
-                        .discover_plugins()
-                        .map(
-                            lambda plugins: [
-                                t.json_dict_adapter().validate_python(plugin)
-                                for plugin in plugins
-                                if plugin_type is None
-                                or plugin.get("type") == plugin_type
-                            ]
-                        )
-                        .flat_map(
-                            lambda payload: u.Cli.json_dumps(
-                                list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload))
-                            )
-                        )
-                    )
-                case c.Meltano.ExecutorCommand.INFO:
-                    if len(command_args) < c.Meltano.PLUGIN_INFO_ARG_COUNT:
-                        result = r[str].fail(
-                            "Plugin info requires plugin type and plugin name"
-                        )
-                    else:
-                        plugin_type = u.Meltano.normalize_plugin_group(command_args[0])
-                        result = (
-                            r[str].fail("Plugin info requires a valid plugin type")
-                            if plugin_type is None
-                            else self.fetch_plugin_info(
-                                command_args[1],
-                                plugin_type,
-                            ).flat_map(
-                                lambda payload: u.Cli.json_dumps(
-                                    t.json_dict_adapter().validate_python(payload),
-                                )
-                            )
-                        )
-                case c.Meltano.ExecutorCommand.INSTALL:
-                    result = r[str].fail("Plugin install is not supported by this CLI")
-                case _:
-                    result = r[str].fail(f"Unknown plugin command: {command}")
-        return result
+    def _register_plugin_commands(self) -> None:
+        plugin_group = cli.create_group(
+            name=c.Meltano.CliCommand.PLUGIN, help_text="Meltano plugin operations"
+        )
+        cli.register_result_command(
+            plugin_group,
+            name=c.Meltano.ExecutorCommand.LIST,
+            help_text="List discovered plugins",
+            model_cls=m.Meltano.PluginListInput,
+            handler=self._handle_plugin_list,
+        )
+        cli.register_result_command(
+            plugin_group,
+            name=c.Meltano.ExecutorCommand.INFO,
+            help_text="Fetch information about a plugin",
+            model_cls=m.Meltano.PluginInfoInput,
+            handler=self._handle_plugin_info,
+        )
+        cli.register_result_command(
+            plugin_group,
+            name=c.Meltano.ExecutorCommand.INSTALL,
+            help_text="Install a plugin",
+            model_cls=m.Meltano.PluginInstallInput,
+            handler=self._handle_plugin_install,
+        )
+        cli.add_group(self._app, name=c.Meltano.CliCommand.PLUGIN, group=plugin_group)
 
-    def handle_status_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level status commands through the public CLI."""
-        if not args or u.Meltano.is_help_request(args):
-            self.show_status_help()
-            return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
-        match args[0]:
-            case "show":
-                return self.run_cli([]).flat_map(
-                    lambda payload: u.Cli.json_dumps(
-                        t.json_dict_adapter().validate_python(payload),
-                    )
+    def _handle_plugin_list(self, model: m.Meltano.PluginListInput) -> p.Result[str]:
+        plugin_type = (
+            u.Meltano.normalize_plugin_group(model.plugin_type)
+            if model.plugin_type is not None
+            else None
+        )
+        return (
+            self._service
+            .discover_plugins()
+            .map(
+                lambda plugins: [
+                    t.json_dict_adapter().validate_python(plugin)
+                    for plugin in plugins
+                    if plugin_type is None or plugin.get("type") == plugin_type
+                ]
+            )
+            .flat_map(
+                lambda payload: u.Cli.json_dumps(
+                    list(t.Cli.JSON_LIST_ADAPTER.validate_python(payload))
                 )
-            case c.Meltano.ExecutorCommand.HEALTH:
-                return self.health().flat_map(
-                    lambda payload: u.Cli.json_dumps(
-                        t.json_dict_adapter().validate_python(payload),
-                    )
-                )
-            case _:
-                return r[str].fail(f"Unknown status command: {args[0]}")
-
-    def handle_version_command(self, args: t.StrSequence) -> p.Result[str]:
-        """Handle top-level version commands through the public CLI."""
-        if args and not u.Meltano.is_help_request(args):
-            return r[str].fail("Version command does not accept arguments")
-        return self.fetch_version()
-
-    def route_command(self, args: t.StrSequence) -> int:
-        """Route one CLI command through the flat public handlers."""
-        if not args or u.Meltano.is_help_request(args):
-            self.show_banner()
-            return 0
-        command_map: dict[str, Callable[[t.StrSequence], p.Result[str]]] = {
-            c.Meltano.CliCommand.PIPELINE: self.handle_pipeline_command,
-            c.Meltano.CliCommand.TAP: self.handle_tap_command,
-            c.Meltano.CliCommand.TARGET: self.handle_target_command,
-            c.Meltano.CliCommand.DBT: self.handle_dbt_command,
-            c.Meltano.CliCommand.PLUGIN: self.handle_plugin_command,
-            c.Meltano.CliCommand.STATUS: self.handle_status_command,
-            c.Meltano.CliCommand.VERSION: self.handle_version_command,
-        }
-        handler = command_map.get(args[0])
-        if handler is None:
-            self.print_message(f"Unknown command: {args[0]}")
-            return 1
-        result = handler(args[1:])
-        if result.failure:
-            self.print_message(str(result.error))
-            return 1
-        if result.value != c.Meltano.ExecutorCommand.HELP.value:
-            self.print_message(result.value)
-        return 0
-
-    def show_banner(self) -> None:
-        """Render the root CLI banner."""
-        flext_cli_output.print("FLEXT Meltano CLI")
-        flext_cli_output.print(
-            "Commands: pipeline, tap, target, dbt, plugin, status, version"
+            )
         )
 
-    def show_dbt_help(self) -> None:
-        """Render DBT help."""
-        flext_cli_output.print("dbt <run|test|compile|docs> [args]")
+    def _handle_plugin_info(self, model: m.Meltano.PluginInfoInput) -> p.Result[str]:
+        plugin_type = u.Meltano.normalize_plugin_group(model.plugin_type)
+        if plugin_type is None:
+            return r[str].fail("Plugin info requires a valid plugin type")
+        return self._service.fetch_plugin_info(model.plugin_name, plugin_type).flat_map(
+            lambda payload: u.Cli.json_dumps(
+                t.json_dict_adapter().validate_python(payload)
+            )
+        )
 
-    def show_pipeline_help(self) -> None:
-        """Render pipeline help."""
-        flext_cli_output.print("pipeline <create|run|list|status|stop|delete> [args]")
+    def _handle_plugin_install(
+        self, _model: m.Meltano.PluginInstallInput
+    ) -> p.Result[str]:
+        return r[str].fail("Plugin install is not supported by this CLI")
 
-    def show_plugin_help(self) -> None:
-        """Render plugin help."""
-        flext_cli_output.print("plugin <list|info|install> [args]")
+    def _register_pipeline_commands(self) -> None:
+        pipeline_group = cli.create_group(
+            name=c.Meltano.CliCommand.PIPELINE, help_text="Pipeline operations"
+        )
+        cli.register_result_command(
+            pipeline_group,
+            name=c.Meltano.PipelineCommand.CREATE,
+            help_text="Create a persisted pipeline",
+            model_cls=m.Meltano.PipelineCreateInput,
+            handler=self._handle_pipeline_create,
+        )
+        cli.register_result_command(
+            pipeline_group,
+            name=c.Meltano.PipelineCommand.RUN,
+            help_text="Run a persisted pipeline",
+            model_cls=m.Meltano.PipelineRunInput,
+            handler=self._handle_pipeline_run,
+        )
+        cli.register_result_command(
+            pipeline_group,
+            name=c.Meltano.PipelineCommand.LIST,
+            help_text="List persisted pipelines",
+            model_cls=m.Meltano.PipelineListInput,
+            handler=self._handle_pipeline_list,
+        )
+        cli.register_result_command(
+            pipeline_group,
+            name=c.Meltano.PipelineCommand.STATUS,
+            help_text="Show pipeline status",
+            model_cls=m.Meltano.PipelineNameInput,
+            handler=self._handle_pipeline_status,
+        )
+        cli.register_result_command(
+            pipeline_group,
+            name=c.Meltano.PipelineCommand.STOP,
+            help_text="Stop a running pipeline",
+            model_cls=m.Meltano.PipelineNameInput,
+            handler=self._handle_pipeline_stop,
+        )
+        cli.register_result_command(
+            pipeline_group,
+            name=c.Meltano.PipelineCommand.DELETE,
+            help_text="Delete a persisted pipeline",
+            model_cls=m.Meltano.PipelineNameInput,
+            handler=self._handle_pipeline_delete,
+        )
+        cli.add_group(
+            self._app, name=c.Meltano.CliCommand.PIPELINE, group=pipeline_group
+        )
 
-    def show_status_help(self) -> None:
-        """Render status help."""
-        flext_cli_output.print("status <show|health>")
+    def _handle_pipeline_create(
+        self, model: m.Meltano.PipelineCreateInput
+    ) -> p.Result[str]:
+        config_payload: t.JsonMapping | None = None
+        if model.config_json is not None:
+            loaded_config_result = u.Cli.json_loads(model.config_json)
+            if loaded_config_result.failure:
+                return r[str].fail(
+                    loaded_config_result.error
+                    or "Pipeline configuration JSON could not be parsed"
+                )
+            try:
+                config_payload = m.Meltano.ConfigMappingPayload.model_validate({
+                    "values": loaded_config_result.value
+                }).values
+            except ValueError as exc:
+                return e.fail_validation(
+                    "pipeline configuration JSON", error=exc, result_type=r[str]
+                )
+        return self._pipeline_mgr.create_pipeline(model.pipeline_name, config_payload)
 
-    def show_tap_help(self) -> None:
-        """Render tap help."""
-        flext_cli_output.print("tap <operation> [args]")
+    def _handle_pipeline_run(self, model: m.Meltano.PipelineRunInput) -> p.Result[str]:
+        command_args = model.args or None
+        return self._pipeline_mgr.execute_pipeline(model.pipeline_name, command_args)
 
-    def show_target_help(self) -> None:
-        """Render target help."""
-        flext_cli_output.print("target <operation> [args]")
+    def _handle_pipeline_list(
+        self, _model: m.Meltano.PipelineListInput
+    ) -> p.Result[str]:
+        return self._pipeline_mgr.list_pipelines().map(
+            lambda pipelines: ", ".join(pipelines) or "none"
+        )
 
-    def print_message(self, message: str, style: str | None = None) -> None:
-        """Render a CLI message through flext-cli output."""
-        flext_cli_output.print(message, style=style)
+    def _handle_pipeline_status(
+        self, model: m.Meltano.PipelineNameInput
+    ) -> p.Result[str]:
+        return self._pipeline_mgr.fetch_pipeline_status(model.pipeline_name)
 
-    def main(self, args: t.StrSequence | None = None) -> int:
-        """Run the public CLI entrypoint."""
-        active_args = list(args) if args is not None else sys.argv[1:]
-        return self.route_command(active_args)
+    def _handle_pipeline_stop(
+        self, model: m.Meltano.PipelineNameInput
+    ) -> p.Result[str]:
+        return self._pipeline_mgr.stop_pipeline(model.pipeline_name)
+
+    def _handle_pipeline_delete(
+        self, model: m.Meltano.PipelineNameInput
+    ) -> p.Result[str]:
+        return self._pipeline_mgr.delete_pipeline(model.pipeline_name)
 
 
 def main() -> int:
-    """Main entry point for FLEXT Meltano CLI."""
-    return FlextMeltanoCLI.fetch_global().main()
+    """Run the FLEXT Meltano CLI main entry point."""
+    result = FlextMeltanoCli().run(sys.argv[1:])
+    return 0 if result.success else 1
 
 
-cli = FlextMeltanoCLI.fetch_global()
-
-
-__all__: list[str] = ["FlextMeltanoCLI", "cli", "main"]
+__all__: list[str] = ["FlextMeltanoCli", "main"]

@@ -7,10 +7,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
 from flext_cli import p
+
 from flext_meltano import t
 
 
@@ -21,7 +23,7 @@ class FlextMeltanoProtocolsProject:
     class Project(Protocol):
         """Meltano Project protocol for type-safe project operations.
 
-        Represents the interface for a Meltano project t.JsonValue that can be
+        Represents the interface for a Meltano project t.NormalizedValue that can be
         passed to plugin discovery, pipeline execution, and other operations.
         """
 
@@ -33,7 +35,7 @@ class FlextMeltanoProtocolsProject:
         def find_plugins(
             self,
             plugin_type: str,
-        ) -> t.SequenceOf[t.JsonMapping]:
+        ) -> Sequence[t.Meltano.PluginDefinition]:
             """Find plugins of specified type."""
             ...
 

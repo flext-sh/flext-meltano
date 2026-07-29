@@ -9,10 +9,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_cli import cli
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
@@ -23,7 +26,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     """
 
     _singer_catalog: m.Meltano.SingerCatalog = u.PrivateAttr(
-        default_factory=m.Meltano.SingerCatalog,
+        default_factory=m.Meltano.SingerCatalog
     )
 
     def discover_catalog_streams(
@@ -37,8 +40,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         try:
             self._singer_catalog = tap.discover()
             self.logger.info(
-                "Streams discovered",
-                stream_count=len(self._singer_catalog.streams),
+                "Streams discovered", stream_count=len(self._singer_catalog.streams)
             )
             return r[m.Meltano.SingerCatalog].ok(self._singer_catalog)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:

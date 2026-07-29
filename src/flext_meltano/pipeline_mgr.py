@@ -16,6 +16,7 @@ from flext_meltano import (
     m,
     p,
     r,
+    settings,
     t,
     u,
 )
@@ -25,14 +26,14 @@ from flext_meltano.services.executor import FlextMeltanoExecutor
 class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     """Pipeline manager for FLEXT Meltano CLI."""
 
-    _cli: p.Meltano.PipelineCli = u.PrivateAttr()
+    _cli: p.Meltano.PipelineCli | None = u.PrivateAttr(default_factory=lambda: None)
 
     def __init__(
         self,
-        cli: p.Meltano.PipelineCli,
-        settings: p.Settings | None = None,
+        cli: p.Meltano.PipelineCli | None = None,
+        settings: FlextMeltanoSettings | None = None,
     ) -> None:
-        """Initialize the pipeline manager with a CLI reference."""
+        """Initialize the pipeline manager with an optional CLI reference."""
         resolved_settings = (
             settings if settings is not None else type(self).fetch_fresh_settings()
         )
@@ -47,17 +48,23 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         """Build one fresh settings snapshot for pipeline command handling."""
         process_environment = u.resolve_process_environment()
         configured_root = process_environment.get(
-            c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV,
+            c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV
         )
         if configured_root is None:
             with FlextMeltanoSettings.singleton_disabled():
                 return FlextMeltanoSettings()
         return FlextMeltanoSettings.model_validate({
-            c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV: configured_root
+            "Meltano": {c.Meltano.CLI_DEFAULT_PIPELINES_ROOT_ENV: configured_root}
         })
 
     def _pipelines_root(self) -> Path:
-        return self.settings.pipelines_dir
+        # mro-wkii.17 (codex): use the validated snapshot injected at the CLI
+        # boundary; the module singleton may predate an external env change.
+        runtime_settings = self.runtime_settings
+        if not isinstance(runtime_settings, FlextMeltanoSettings):
+            msg = "Pipeline manager requires FlextMeltanoSettings"
+            raise TypeError(msg)
+        return Path(runtime_settings.Meltano.pipelines_dir)
 
     def _pipeline_dir(self, pipeline_name: str) -> Path:
         return self._pipelines_root() / pipeline_name
@@ -70,8 +77,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
     def _pid_path(self, pipeline_name: str) -> Path:
         return Path(
-            self._pipeline_dir(pipeline_name),
-            c.Meltano.CLI_DEFAULT_PIPELINE_PID_FILE,
+            self._pipeline_dir(pipeline_name), c.Meltano.CLI_DEFAULT_PIPELINE_PID_FILE
         )
 
     @staticmethod
@@ -85,7 +91,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         config_result = flext_cli.read_json_file(self._config_path(pipeline_name))
         if config_result.failure:
             return r[t.JsonMapping].fail(
-                config_result.error or "Pipeline configuration could not be read",
+                config_result.error or "Pipeline configuration could not be read"
             )
         try:
             config_mapping = m.Meltano.ConfigMappingPayload.model_validate({
@@ -93,21 +99,17 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             })
         except ValueError as exc:
             return e.fail_validation(
-                "pipeline configuration JSON",
-                error=exc,
-                result_type=r[t.JsonMapping],
+                "pipeline configuration JSON", error=exc, result_type=r[t.JsonMapping]
             )
         return r[t.JsonMapping].ok(config_mapping.values)
 
     def _pipeline_command(
-        self,
-        pipeline_name: str,
-        args: t.StrSequence | None = None,
+        self, pipeline_name: str, args: t.StrSequence | None = None
     ) -> p.Result[t.StrSequence]:
         config_result = self._load_pipeline_config(pipeline_name)
         if config_result.failure:
             return r[t.StrSequence].fail(
-                config_result.error or "Pipeline execution not configured",
+                config_result.error or "Pipeline execution not configured"
             )
         command_value = config_result.value.get("command")
         if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
@@ -139,9 +141,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         return True
 
     def create_pipeline(
-        self,
-        pipeline_name: str,
-        config_payload: t.JsonMapping | None,
+        self, pipeline_name: str, config_payload: t.JsonMapping | None
     ) -> p.Result[str]:
         """Create and persist a named pipeline configuration."""
         name_result = self._normalize_pipeline_name(pipeline_name)
@@ -155,29 +155,24 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             })
         except ValueError as exc:
             return e.fail_validation(
-                "pipeline configuration JSON",
-                error=exc,
-                result_type=r[str],
+                "pipeline configuration JSON", error=exc, result_type=r[str]
             )
         ensure_result = flext_cli.ensure_dir(self._pipeline_dir(name_result.value))
         if ensure_result.failure:
             return r[str].fail(
-                ensure_result.error or "Unable to create pipeline directory",
+                ensure_result.error or "Unable to create pipeline directory"
             )
         write_result = flext_cli.write_json_file(
-            self._config_path(name_result.value),
-            config_mapping.values,
+            self._config_path(name_result.value), config_mapping.values
         )
         if write_result.failure:
             return r[str].fail(
-                write_result.error or "Unable to persist pipeline configuration",
+                write_result.error or "Unable to persist pipeline configuration"
             )
         return r[str].ok(name_result.value)
 
     def execute_pipeline(
-        self,
-        pipeline_name: str,
-        args: t.StrSequence | None = None,
+        self, pipeline_name: str, args: t.StrSequence | None = None
     ) -> p.Result[str]:
         """Execute a named pipeline using the persisted command definition."""
         name_result = self._normalize_pipeline_name(pipeline_name)
@@ -189,7 +184,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
                 command_result.error or "Pipeline execution not configured"
             )
         execution_result = FlextMeltanoExecutor(
-            settings=self.settings,
+            settings=settings
         ).execute_meltano_command(command_result.value)
         if execution_result.failure:
             return r[str].fail(execution_result.error or "Pipeline execution failed")
@@ -197,7 +192,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             return r[str].fail(
                 execution_result.value.error
                 or execution_result.value.output
-                or "Pipeline execution failed",
+                or "Pipeline execution failed"
             )
         return r[str].ok(execution_result.value.output)
 
@@ -254,7 +249,8 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
     def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle pipeline command using composition."""
         if not args or u.Meltano.is_help_request(args):
-            self._cli.show_pipeline_help()
+            if self._cli is not None:
+                self._cli.show_pipeline_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)
         subcommand = args[0]
         subcommand_args = args[1:]
@@ -264,7 +260,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         """Create a new pipeline."""
         if not args:
             return r[str].fail(
-                "Pipeline creation requires pipeline name and JSON configuration",
+                "Pipeline creation requires pipeline name and JSON configuration"
             )
         pipeline_name = args[0]
         config_payload: t.JsonMapping | None = None
@@ -281,9 +277,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
                 }).values
             except ValueError as exc:
                 return e.fail_validation(
-                    "pipeline configuration JSON",
-                    error=exc,
-                    result_type=r[str],
+                    "pipeline configuration JSON", error=exc, result_type=r[str]
                 )
         return self.create_pipeline(pipeline_name, config_payload)
 
@@ -293,11 +287,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             return r[str].fail("Pipeline delete requires pipeline name")
         return self.delete_pipeline(args[0])
 
-    def _dispatch_pipeline(
-        self,
-        subcommand: str,
-        args: t.StrSequence,
-    ) -> p.Result[str]:
+    def _dispatch_pipeline(self, subcommand: str, args: t.StrSequence) -> p.Result[str]:
         """Dispatch one pipeline subcommand to the matching handler."""
         match subcommand:
             case c.Meltano.PipelineCommand.CREATE:

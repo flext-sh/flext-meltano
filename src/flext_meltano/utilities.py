@@ -19,10 +19,7 @@ class FlextMeltanoUtilities(u):
     Inherits from FlextUtilities to avoid duplication and ensure consistency.
     """
 
-    class Meltano(
-        FlextMeltanoUtilitiesRuntime,
-        FlextMeltanoUtilitiesSinger,
-    ):
+    class Meltano(FlextMeltanoUtilitiesRuntime, FlextMeltanoUtilitiesSinger):
         """Meltano domain utility methods.
 
         Includes Singer protocol utilities (message emission, stdin

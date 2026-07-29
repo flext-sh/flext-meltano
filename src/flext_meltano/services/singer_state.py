@@ -9,10 +9,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_cli import cli
 from flext_meltano import FlextMeltanoServiceBase, c, e, m, p, r, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
@@ -23,7 +26,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     """
 
     _singer_state: m.Meltano.SingerStateMessage = u.PrivateAttr(
-        default_factory=m.Meltano.SingerStateMessage,
+        default_factory=m.Meltano.SingerStateMessage
     )
 
     def fetch_bookmark(self, stream_name: str, bookmark_key: str) -> p.Result[str]:
@@ -34,15 +37,12 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                 return e.fail_not_found("Stream state", stream_name, result_type=r[str])
             if not isinstance(stream_state, dict):
                 return e.fail_validation(
-                    f"Stream state for {stream_name} is not a dict",
-                    result_type=r[str],
+                    f"Stream state for {stream_name} is not a dict", result_type=r[str]
                 )
             value = stream_state.get(bookmark_key)
             if value is None:
                 return e.fail_not_found(
-                    "Bookmark",
-                    f"{stream_name}.{bookmark_key}",
-                    result_type=r[str],
+                    "Bookmark", f"{stream_name}.{bookmark_key}", result_type=r[str]
                 )
             return r[str].ok(str(value))
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
@@ -50,8 +50,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             return e.fail_operation("get bookmark", exc, result_type=r[str])
 
     def load_state(
-        self,
-        state_file: Path | None = None,
+        self, state_file: Path | None = None
     ) -> p.Result[m.Meltano.SingerStateMessage]:
         """Load state from file or return in-memory state."""
         try:
@@ -96,13 +95,11 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         return self._singer_state
 
     def update_bookmark(
-        self,
-        stream_name: str,
-        bookmark_key: str,
-        bookmark_value: str,
+        self, stream_name: str, bookmark_key: str, bookmark_value: str
     ) -> p.Result[None]:
         """Update bookmark for a stream."""
-        try:
+
+        def _run_update_bookmark() -> p.Result[None]:
             self._singer_state.value.setdefault(stream_name, {})
             stream_bookmarks = self._singer_state.value[stream_name]
             match stream_bookmarks:
@@ -116,6 +113,9 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                     )
             self.logger.debug("Bookmark updated", stream=stream_name, key=bookmark_key)
             return r[None].ok(None)
+
+        try:
+            return _run_update_bookmark()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to update bookmark", error=str(exc))
             return e.fail_operation("update bookmark", exc, result_type=r[None])
