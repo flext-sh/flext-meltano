@@ -1,5 +1,5 @@
-# AUTO-GENERATED FILE — Regenerate with: make gen
-"""Models package."""
+# @generated AUTO-GENERATED FILE — Regenerate with: make gen
+"""Flext Meltano. Models package."""
 
 from __future__ import annotations
 
@@ -8,64 +8,45 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_meltano._models.cli_inputs import (
-        FlextMeltanoModelsCliInputs as FlextMeltanoModelsCliInputs,
-    )
-    from flext_meltano._models.cli_params import (
-        FlextMeltanoModelsCliParams as FlextMeltanoModelsCliParams,
-    )
-    from flext_meltano._models.context import (
-        FlextMeltanoModelsContext as FlextMeltanoModelsContext,
-    )
-    from flext_meltano._models.core import (
-        FlextMeltanoModelsCore as FlextMeltanoModelsCore,
-    )
-    from flext_meltano._models.discovery import (
-        FlextMeltanoModelsDiscovery as FlextMeltanoModelsDiscovery,
-    )
-    from flext_meltano._models.instances import (
-        FlextMeltanoModelsInstances as FlextMeltanoModelsInstances,
-    )
-    from flext_meltano._models.instances_data import (
+    from .cli_inputs import FlextMeltanoModelsCliInputs as FlextMeltanoModelsCliInputs
+    from .cli_params import FlextMeltanoModelsCliParams as FlextMeltanoModelsCliParams
+    from .context import FlextMeltanoModelsContext as FlextMeltanoModelsContext
+    from .core import FlextMeltanoModelsCore as FlextMeltanoModelsCore
+    from .discovery import FlextMeltanoModelsDiscovery as FlextMeltanoModelsDiscovery
+    from .instances import FlextMeltanoModelsInstances as FlextMeltanoModelsInstances
+    from .instances_data import (
         FlextMeltanoModelsInstancesData as FlextMeltanoModelsInstancesData,
     )
-    from flext_meltano._models.logging_config import (
-        FlextMeltanoModelsLogging as FlextMeltanoModelsLogging,
-    )
-    from flext_meltano._models.payloads_data import (
+    from .logging_config import FlextMeltanoModelsLogging as FlextMeltanoModelsLogging
+    from .payloads import FlextMeltanoModelsPayloads as FlextMeltanoModelsPayloads
+    from .payloads_data import (
         FlextMeltanoModelsPayloadsData as FlextMeltanoModelsPayloadsData,
     )
-    from flext_meltano._models.projects import (
-        FlextMeltanoModelsProjects as FlextMeltanoModelsProjects,
+    from .projects import FlextMeltanoModelsProjects as FlextMeltanoModelsProjects
+    from .projects_plugin import (
+        FlextMeltanoModelsProjectsPlugin as FlextMeltanoModelsProjectsPlugin,
     )
-    from flext_meltano._models.results import (
-        FlextMeltanoModelsResults as FlextMeltanoModelsResults,
-    )
-    from flext_meltano._models.results_dbt import (
+    from .results import FlextMeltanoModelsResults as FlextMeltanoModelsResults
+    from .results_dbt import (
         FlextMeltanoModelsResultsDbt as FlextMeltanoModelsResultsDbt,
     )
-    from flext_meltano._models.results_pipeline import (
+    from .results_pipeline import (
         FlextMeltanoModelsResultsPipeline as FlextMeltanoModelsResultsPipeline,
     )
-    from flext_meltano._models.singer import (
-        FlextMeltanoModelsSinger as FlextMeltanoModelsSinger,
-    )
-    from flext_meltano._models.singer_catalog import (
+    from .singer import FlextMeltanoModelsSinger as FlextMeltanoModelsSinger
+    from .singer_catalog import (
         FlextMeltanoModelsSingerCatalog as FlextMeltanoModelsSingerCatalog,
     )
-    from flext_meltano._models.singer_sdk import (
-        FlextMeltanoModelsSingerSdk as FlextMeltanoModelsSingerSdk,
-    )
-    from flext_meltano._models.sources import (
-        FlextMeltanoModelsSources as FlextMeltanoModelsSources,
-    )
-    from flext_meltano._models.sources_params import (
+    from .singer_sdk import FlextMeltanoModelsSingerSdk as FlextMeltanoModelsSingerSdk
+    from .sources import FlextMeltanoModelsSources as FlextMeltanoModelsSources
+    from .sources_params import (
         FlextMeltanoModelsSourcesParams as FlextMeltanoModelsSourcesParams,
     )
-    from flext_meltano._models.transformations import (
+    from .transformations import (
         FlextMeltanoModelsTransformations as FlextMeltanoModelsTransformations,
     )
-_LAZY_IMPORTS = build_lazy_import_map({
+
+_LAZY_MODULES: dict[str, tuple[str, ...]] = {
     ".cli_inputs": ("FlextMeltanoModelsCliInputs",),
     ".cli_params": ("FlextMeltanoModelsCliParams",),
     ".context": ("FlextMeltanoModelsContext",),
@@ -74,8 +55,10 @@ _LAZY_IMPORTS = build_lazy_import_map({
     ".instances": ("FlextMeltanoModelsInstances",),
     ".instances_data": ("FlextMeltanoModelsInstancesData",),
     ".logging_config": ("FlextMeltanoModelsLogging",),
+    ".payloads": ("FlextMeltanoModelsPayloads",),
     ".payloads_data": ("FlextMeltanoModelsPayloadsData",),
     ".projects": ("FlextMeltanoModelsProjects",),
+    ".projects_plugin": ("FlextMeltanoModelsProjectsPlugin",),
     ".results": ("FlextMeltanoModelsResults",),
     ".results_dbt": ("FlextMeltanoModelsResultsDbt",),
     ".results_pipeline": ("FlextMeltanoModelsResultsPipeline",),
@@ -85,7 +68,40 @@ _LAZY_IMPORTS = build_lazy_import_map({
     ".sources": ("FlextMeltanoModelsSources",),
     ".sources_params": ("FlextMeltanoModelsSourcesParams",),
     ".transformations": ("FlextMeltanoModelsTransformations",),
-})
+}
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
+_LAZY_ALIAS_GROUPS: dict[str, tuple[tuple[str, str], ...]] = {}
+
+
+_LAZY_IMPORTS = build_lazy_import_map(
+    _LAZY_MODULES, alias_groups=_LAZY_ALIAS_GROUPS, sort_keys=False
+)
+
+_PUBLIC_EXPORTS: tuple[str, ...] = (
+    "FlextMeltanoModelsCliInputs",
+    "FlextMeltanoModelsCliParams",
+    "FlextMeltanoModelsContext",
+    "FlextMeltanoModelsCore",
+    "FlextMeltanoModelsDiscovery",
+    "FlextMeltanoModelsInstances",
+    "FlextMeltanoModelsInstancesData",
+    "FlextMeltanoModelsLogging",
+    "FlextMeltanoModelsPayloads",
+    "FlextMeltanoModelsPayloadsData",
+    "FlextMeltanoModelsProjects",
+    "FlextMeltanoModelsProjectsPlugin",
+    "FlextMeltanoModelsResults",
+    "FlextMeltanoModelsResultsDbt",
+    "FlextMeltanoModelsResultsPipeline",
+    "FlextMeltanoModelsSinger",
+    "FlextMeltanoModelsSingerCatalog",
+    "FlextMeltanoModelsSingerSdk",
+    "FlextMeltanoModelsSources",
+    "FlextMeltanoModelsSourcesParams",
+    "FlextMeltanoModelsTransformations",
+)
+
+__all__: tuple[str, ...] = tuple(_PUBLIC_EXPORTS)
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
