@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated, Self
+from datetime import UTC, datetime
+from typing import Annotated, Self
 
-from flext_cli import m, u
-from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
+from flext_cli import m
+from pydantic import Field, computed_field, field_validator, model_validator
 
-if TYPE_CHECKING:
-    from datetime import datetime
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsResults:
@@ -18,46 +17,45 @@ class FlextMeltanoModelsResults:
     class ExecutionResult(m.TimestampedModel):
         """Generic execution result tracking with validation."""
 
-        operation: Annotated[str, u.Field(description="Operation performed")]
-        status: Annotated[str, u.Field(description="Execution status")]
-        start_time: Annotated[datetime, u.Field(description="Execution start time")] = (
-            u.Field(default_factory=u.now, description="Execution start time")
+        operation: Annotated[str, Field(description="Operation performed")]
+        status: Annotated[str, Field(description="Execution status")]
+        start_time: Annotated[datetime, Field(description="Execution start time")] = (
+            Field(
+                default_factory=lambda: datetime.now(tz=UTC),
+                description="Execution start time",
+            )
         )
         end_time: Annotated[
-            datetime | None, u.Field(default=None, description="Execution end time")
+            datetime | None, Field(default=None, description="Execution end time")
         ] = None
         duration_seconds: Annotated[
             float | None,
-            u.Field(default=None, description="Execution duration in seconds"),
+            Field(default=None, description="Execution duration in seconds"),
         ] = None
         records_processed: Annotated[
             t.NonNegativeInt,
-            u.Field(default=0, description="Number of records processed"),
+            Field(default=0, description="Number of records processed"),
         ] = 0
         error_message: Annotated[
-            str | None, u.Field(default=None, description="Error message if failed")
+            str | None, Field(default=None, description="Error message if failed")
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping, u.Field(description="Additional execution metadata")
-        ] = u.Field(default_factory=lambda: MappingProxyType({}))
+            t.ConfigurationMapping, Field(description="Additional execution metadata")
+        ] = Field(default_factory=dict, description="Additional execution metadata")
 
-        @u.computed_field()
-        @property
+        @computed_field
         def execution_rate_per_second(self) -> float:
             """Execution rate (records/second)."""
             if not self.duration_seconds or self.duration_seconds <= 0:
                 return 0.0
-            rate: float = self.records_processed / self.duration_seconds
-            return rate
+            return self.records_processed / self.duration_seconds
 
-        @u.computed_field()
-        @property
+        @computed_field
         def is_completed(self) -> bool:
             """Check if execution is completed."""
             return self.end_time is not None
 
-        @u.computed_field()
-        @property
+        @computed_field
         def is_successful(self) -> bool:
             """Check if execution was successful."""
             return (
@@ -65,8 +63,7 @@ class FlextMeltanoModelsResults:
                 and self.error_message is None
             )
 
-        @u.computed_field()
-        @property
+        @computed_field
         def performance_category(self) -> str:
             """Performance categorization."""
             if not self.duration_seconds or self.duration_seconds <= 0:
@@ -82,7 +79,7 @@ class FlextMeltanoModelsResults:
                 return "moderate_performance"
             return "low_performance"
 
-        @u.field_validator("status", mode="before")
+        @field_validator("status", mode="before")
         @classmethod
         def validate_status(cls, v: str) -> str:
             """Validate execution status."""
@@ -98,7 +95,7 @@ class FlextMeltanoModelsResults:
                 raise ValueError(msg)
             return v
 
-        @u.model_validator(mode="after")
+        @model_validator(mode="after")
         def validate_execution_result(self) -> Self:
             """Validate execution result consistency."""
             if self.start_time and self.end_time:
