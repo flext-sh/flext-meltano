@@ -25,26 +25,19 @@ class FlextMeltanoProtocolsServices:
         """Protocol for Meltano command execution."""
 
         def execute_meltano_command(
-            self,
-            command: t.StrSequence,
-            timeout: int = ...,
-            _cwd: Path | None = None,
+            self, command: t.StrSequence, timeout: int = ..., _cwd: Path | None = None
         ) -> r[m.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
         def get_project_plugins(
-            self,
-            plugin_type: str | None = None,
-            _cwd: Path | None = None,
+            self, plugin_type: str | None = None, _cwd: Path | None = None
         ) -> r[Sequence[t.StrMapping]]:
             """Return project-scoped plugin definitions."""
             ...
 
         def execute_dbt_command(
-            self,
-            dbt_command: str,
-            args: t.StrSequence | None = None,
+            self, dbt_command: str, args: t.StrSequence | None = None
         ) -> r[m.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
@@ -71,9 +64,7 @@ class FlextMeltanoProtocolsServices:
         """Service call protocol extending Service."""
 
         def call(
-            self,
-            operation: str,
-            payload: t.ConfigurationMapping,
+            self, operation: str, payload: t.ConfigurationMapping
         ) -> p.Result[t.FlatContainer]:
             """Execute service call with r."""
             ...

@@ -33,8 +33,7 @@ class FlextMeltanoProtocolsProject:
             ...
 
         def find_plugins(
-            self,
-            plugin_type: str,
+            self, plugin_type: str
         ) -> Sequence[t.Meltano.PluginDefinition]:
             """Find plugins of specified type."""
             ...

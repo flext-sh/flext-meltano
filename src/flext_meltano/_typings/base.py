@@ -38,22 +38,17 @@ class FlextMeltanoTypingsBase:
     )
 
     type PluginDefinition = Mapping[
-        str,
-        str | t.StrSequence | Mapping[str, t.Scalar | None],
+        str, str | t.StrSequence | Mapping[str, t.Scalar | None]
     ]
     type PluginCatalog = Mapping[
-        str,
-        Sequence[FlextMeltanoTypingsBase.PluginDefinition],
+        str, Sequence[FlextMeltanoTypingsBase.PluginDefinition]
     ]
     PluginType = c.Meltano.PluginType
 
     type VariantValue = str | t.StrSequence | t.ScalarMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""
 
-    type FileConfigDict = Mapping[
-        str,
-        t.NormalizedValue | t.StrSequence,
-    ]
+    type FileConfigDict = Mapping[str, t.NormalizedValue | t.StrSequence]
     type PathDict = Mapping[str, str | Path]
 
     type OptionalScalarMap = Mapping[str, t.Scalar | None]

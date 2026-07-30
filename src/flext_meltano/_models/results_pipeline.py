@@ -84,7 +84,7 @@ class FlextMeltanoModelsResultsPipeline:
                 and self.sink_result.error_message is None
                 and self.transformation_result
                 and self.transformation_result.status == s
-                and self.transformation_result.error_message is None,
+                and self.transformation_result.error_message is None
             )
 
         @computed_field

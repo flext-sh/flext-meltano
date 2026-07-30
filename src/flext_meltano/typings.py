@@ -23,9 +23,7 @@ class FlextMeltanoTypes(t):
     """
 
     class Meltano(
-        FlextMeltanoTypingsBase,
-        FlextMeltanoTypingsSinger,
-        FlextMeltanoTypingsDomains,
+        FlextMeltanoTypingsBase, FlextMeltanoTypingsSinger, FlextMeltanoTypingsDomains
     ):
         """Meltano plugin complex types namespace."""
 

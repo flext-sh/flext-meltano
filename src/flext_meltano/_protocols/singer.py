@@ -33,8 +33,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def sync(
-            self,
-            catalog: t.FlatContainerMapping,
+            self, catalog: t.FlatContainerMapping
         ) -> p.Result[t.FlatContainerMapping]:
             """Sync data from source with r."""
             ...
@@ -49,24 +48,19 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def handle_batch(
-            self,
-            records: Sequence[t.Meltano.OptionalScalarMap],
+            self, records: Sequence[t.Meltano.OptionalScalarMap]
         ) -> p.Result[t.FlatContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
-            self,
-            record: t.Meltano.OptionalScalarMap,
+            self, record: t.Meltano.OptionalScalarMap
         ) -> p.Result[t.FlatContainerMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
-    class DbtRunner(
-        p.Service[t.FlatContainerMapping],
-        Protocol,
-    ):
+    class DbtRunner(p.Service[t.FlatContainerMapping], Protocol):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
@@ -74,17 +68,11 @@ class FlextMeltanoProtocolsSinger:
             """Execute DBT transformations (implements Service)."""
             ...
 
-        def run(
-            self,
-            models: t.StrSequence,
-        ) -> p.Result[t.FlatContainerMapping]:
+        def run(self, models: t.StrSequence) -> p.Result[t.FlatContainerMapping]:
             """Run DBT models with r."""
             ...
 
-        def test(
-            self,
-            models: t.StrSequence,
-        ) -> p.Result[t.FlatContainerMapping]:
+        def test(self, models: t.StrSequence) -> p.Result[t.FlatContainerMapping]:
             """Test DBT models with r."""
             ...
 
@@ -106,11 +94,7 @@ class FlextMeltanoProtocolsSinger:
             """Tap configuration."""
             ...
 
-        def run_cli(
-            self,
-            args: t.StrSequence,
-            prog_name: str,
-        ) -> int:
+        def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
             """Execute the tap CLI and return a normalized exit code."""
             ...
 
@@ -140,8 +124,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def get_records(
-            self,
-            stream_name: str,
+            self, stream_name: str
         ) -> Sequence[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
@@ -151,9 +134,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def sync(
-            self,
-            catalog: m.Meltano.SingerCatalog,
-            state: m.Meltano.SingerStateMessage,
+            self, catalog: m.Meltano.SingerCatalog, state: m.Meltano.SingerStateMessage
         ) -> None:
             """Synchronize data from source to stdout."""
             ...

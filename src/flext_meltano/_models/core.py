@@ -26,14 +26,13 @@ class FlextMeltanoModelsCore:
             normalized = u.normalize(k, case="lower")
             sensitive_keys_list: t.StrSequence = list(sensitive_keys)
             checks_result = u.process(
-                sensitive_keys_list,
-                lambda s: r[bool].ok(s in normalized),
+                sensitive_keys_list, lambda s: r[bool].ok(s in normalized)
             )
             checks = FlextMeltanoModelsCore.BooleanListValue.model_validate({
-                "items": checks_result.unwrap_or([]),
+                "items": checks_result.unwrap_or([])
             }).items
             if checks:
-                return u.any_(*checks)
+                return any(*checks)
             return False
 
         protected: t.MutableFlatContainerMapping = {}
@@ -45,17 +44,14 @@ class FlextMeltanoModelsCore:
     def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
         """Normalize arbitrary values into a validated list of strings."""
         return FlextMeltanoModelsCore.StringListValue.model_validate({
-            "items": value,
+            "items": value
         }).items
 
     class StringListValue(m.ArbitraryTypesModel):
         """Validated string list wrapper for result normalization."""
 
         items: Annotated[
-            t.StrSequence,
-            Field(
-                description="Normalized list of string values",
-            ),
+            t.StrSequence, Field(description="Normalized list of string values")
         ] = Field(default_factory=list, description="Normalized string values")
 
         @field_validator("items", mode="before")
@@ -70,10 +66,7 @@ class FlextMeltanoModelsCore:
         """Validated boolean list wrapper for process output."""
 
         items: Annotated[
-            Sequence[bool],
-            Field(
-                description="Normalized list of boolean values",
-            ),
+            Sequence[bool], Field(description="Normalized list of boolean values")
         ] = Field(
             default_factory=lambda: list[bool](),
             description="Normalized boolean values",

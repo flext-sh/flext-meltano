@@ -138,8 +138,7 @@ class FlextMeltanoModelsInstances:
             FlextMeltanoModelsSources.TapConfig, Field(description="Tap configuration")
         ]
         adapter: Annotated[
-            t.JsonValue | None,
-            Field(default=None, description="Tap adapter instance"),
+            t.JsonValue | None, Field(default=None, description="Tap adapter instance")
         ] = None
         streams: Sequence[FlextMeltanoModelsInstances.StreamInfo] = Field(
             default_factory=lambda: list[FlextMeltanoModelsInstances.StreamInfo](),

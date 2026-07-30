@@ -22,21 +22,18 @@ class FlextMeltanoModelsInstancesData:
 
         sink_type: Annotated[str, Field(description="Sink type identifier")]
         connection_config: Annotated[
-            t.FlatContainerMapping, Field(description="Connection configuration dictionary")
+            t.FlatContainerMapping,
+            Field(description="Connection configuration dictionary"),
         ]
         batch_size: Annotated[
             t.BatchSize,
             Field(
-                default=c.DEFAULT_SIZE,
-                description="Batch size for record processing",
+                default=c.DEFAULT_SIZE, description="Batch size for record processing"
             ),
         ] = c.DEFAULT_SIZE
         max_batches: Annotated[
             t.PositiveInt,
-            Field(
-                default=c.DEFAULT_SIZE,
-                description="Maximum number of batches",
-            ),
+            Field(default=c.DEFAULT_SIZE, description="Maximum number of batches"),
         ] = c.DEFAULT_SIZE
 
         @computed_field

@@ -23,13 +23,9 @@ class FlextMeltanoTypingsSinger:
     direct imports by consumer projects.
     """
 
-    type SingerCatalogEntry = Mapping[
-        str,
-        str | Mapping[str, t.Scalar | None],
-    ]
+    type SingerCatalogEntry = Mapping[str, str | Mapping[str, t.Scalar | None]]
     type SingerStreamCatalog = Mapping[
-        str,
-        Sequence[FlextMeltanoTypingsSinger.SingerCatalogEntry],
+        str, Sequence[FlextMeltanoTypingsSinger.SingerCatalogEntry]
     ]
 
     SingerReplicationMethod = c.Meltano.SingerReplicationMethod

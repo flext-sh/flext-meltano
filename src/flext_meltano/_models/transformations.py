@@ -54,24 +54,19 @@ class FlextMeltanoModelsTransformations:
         transformation_version: Annotated[str, Field(description="Project version")]
         profile: Annotated[str, Field(description="Profile name")]
         model_paths: Annotated[
-            t.StrSequence,
-            Field(default=["models"], description="Model paths"),
+            t.StrSequence, Field(default=["models"], description="Model paths")
         ] = Field(default=["models"], description="Model paths")
         analysis_paths: Annotated[
-            t.StrSequence,
-            Field(default=["analysis"], description="Analysis paths"),
+            t.StrSequence, Field(default=["analysis"], description="Analysis paths")
         ] = Field(default=["analysis"], description="Analysis paths")
         test_paths: Annotated[
-            t.StrSequence,
-            Field(default=["tests"], description="Test paths"),
+            t.StrSequence, Field(default=["tests"], description="Test paths")
         ] = Field(default=["tests"], description="Test paths")
         seed_paths: Annotated[
-            t.StrSequence,
-            Field(default=["seeds"], description="Seed paths"),
+            t.StrSequence, Field(default=["seeds"], description="Seed paths")
         ] = Field(default=["seeds"], description="Seed paths")
         macro_paths: Annotated[
-            t.StrSequence,
-            Field(default=["macros"], description="Macro paths"),
+            t.StrSequence, Field(default=["macros"], description="Macro paths")
         ] = Field(default=["macros"], description="Macro paths")
 
         @computed_field
@@ -129,25 +124,20 @@ class FlextMeltanoModelsTransformations:
         """Generic transformation execution configuration with validation."""
 
         command: Annotated[str, Field(description="Command to execute")]
-        models: Annotated[
-            t.StrSequence,
-            Field(description="Models to execute"),
-        ] = Field(default_factory=list, description="Models to execute")
-        exclude: Annotated[
-            t.StrSequence,
-            Field(description="Models to exclude"),
-        ] = Field(default_factory=list, description="Models to exclude")
+        models: Annotated[t.StrSequence, Field(description="Models to execute")] = (
+            Field(default_factory=list, description="Models to execute")
+        )
+        exclude: Annotated[t.StrSequence, Field(description="Models to exclude")] = (
+            Field(default_factory=list, description="Models to exclude")
+        )
         full_refresh: Annotated[
-            bool,
-            Field(default=False, description="Full refresh execution"),
+            bool, Field(default=False, description="Full refresh execution")
         ] = False
         fail_fast: Annotated[
-            bool,
-            Field(default=True, description="Fail fast on first error"),
+            bool, Field(default=True, description="Fail fast on first error")
         ] = True
         threads: Annotated[
-            t.WorkerCount,
-            Field(default=1, description="Number of threads to use"),
+            t.WorkerCount, Field(default=1, description="Number of threads to use")
         ] = 1
 
         @computed_field

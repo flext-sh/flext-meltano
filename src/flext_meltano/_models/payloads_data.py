@@ -55,8 +55,7 @@ class FlextMeltanoModelsPayloadsData:
         @field_validator("records", mode="before")
         @classmethod
         def normalize_records(
-            cls,
-            value: t.Meltano.ValidatorInput,
+            cls, value: t.Meltano.ValidatorInput
         ) -> Sequence[t.FlatContainerMapping] | t.StrSequence:
             """Normalize mixed record input into dict records."""
             match value:
@@ -67,7 +66,7 @@ class FlextMeltanoModelsPayloadsData:
                             case Mapping():
                                 record_dict: t.MutableFlatContainerMapping = {}
                                 for key, item in record.items():
-                                    if u.is_primitive(item):
+                                    if u.primitive(item):
                                         record_dict[str(key)] = item
                                 records.append(record_dict)
                             case _:
@@ -93,8 +92,7 @@ class FlextMeltanoModelsPayloadsData:
         @field_validator("values", mode="before")
         @classmethod
         def normalize_values(
-            cls,
-            value: t.Meltano.ValidatorInput,
+            cls, value: t.Meltano.ValidatorInput
         ) -> Mapping[
             str,
             t.Scalar | Sequence[t.Scalar | None] | Mapping[str, t.Scalar | None] | None,
@@ -110,15 +108,15 @@ class FlextMeltanoModelsPayloadsData:
                 | None,
             ] = {}
             for key, item in value.items():
-                if u.is_scalar(item) or item is None:
+                if u.scalar(item) or item is None:
                     result[str(key)] = item
                 elif isinstance(item, list):
                     result[str(key)] = [
-                        v if u.is_scalar(v) or v is None else str(v) for v in item
+                        v if u.scalar(v) or v is None else str(v) for v in item
                     ]
                 elif isinstance(item, Mapping):
                     result[str(key)] = {
-                        str(k): v if u.is_scalar(v) or v is None else str(v)
+                        str(k): v if u.scalar(v) or v is None else str(v)
                         for k, v in item.items()
                     }
                 else:
@@ -169,8 +167,7 @@ class FlextMeltanoModelsPayloadsData:
         @field_validator("value", mode="before")
         @classmethod
         def normalize_variant(
-            cls,
-            value: str | t.Meltano.ValidatorInput,
+            cls, value: str | t.Meltano.ValidatorInput
         ) -> str | t.StrSequence | t.ScalarMapping | None:
             """Normalize variant_raw into typed union."""
             match value:
@@ -183,7 +180,7 @@ class FlextMeltanoModelsPayloadsData:
                 case Mapping():
                     result: t.MutableConfigurationMapping = {}
                     for k, v in value.items():
-                        if u.is_primitive(v):
+                        if u.primitive(v):
                             result[str(k)] = v
                         elif v is None:
                             result[str(k)] = ""

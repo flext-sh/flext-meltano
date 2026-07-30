@@ -19,8 +19,7 @@ class FlextMeltanoModelsPayloads:
         tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
         target_name: Annotated[str, Field(description="Singer target name")]
         config: Annotated[
-            t.FlatContainerMapping,
-            Field(description="Pipeline config"),
+            t.FlatContainerMapping, Field(description="Pipeline config")
         ] = Field(default_factory=dict, description="Pipeline config")
 
     class ExecutePipelinePayload(m.ArbitraryTypesModel):
@@ -28,8 +27,7 @@ class FlextMeltanoModelsPayloads:
 
         pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
         config: Annotated[
-            t.FlatContainerMapping,
-            Field(description="Execution config"),
+            t.FlatContainerMapping, Field(description="Execution config")
         ] = Field(default_factory=dict, description="Execution config")
 
     class InstallPluginPayload(m.ArbitraryTypesModel):
@@ -38,8 +36,7 @@ class FlextMeltanoModelsPayloads:
         plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
         config: Annotated[
-            t.FlatContainerMapping,
-            Field(description="Plugin config"),
+            t.FlatContainerMapping, Field(description="Plugin config")
         ] = Field(default_factory=dict, description="Plugin config")
 
     class ListPluginsPayload(m.ArbitraryTypesModel):
@@ -54,8 +51,7 @@ class FlextMeltanoModelsPayloads:
 
         environment_name: Annotated[str, Field(description="Environment name")]
         config: Annotated[
-            t.FlatContainerMapping,
-            Field(description="Environment config"),
+            t.FlatContainerMapping, Field(description="Environment config")
         ] = Field(default_factory=dict, description="Environment config")
 
     class RunDbtModelsPayload(m.ArbitraryTypesModel):

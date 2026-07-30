@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Annotated
 
-from flext_cli import m, u
+from flext_cli import m
 from pydantic import Field, field_validator
 
 from flext_meltano import c, t
@@ -97,7 +97,7 @@ class FlextMeltanoModelsContext:
                     return {
                         str(key): str(item)
                         for key, item in value.items()
-                        if u.is_type(item, (str, int, bool, float))
+                        if isinstance(item, (str, int, bool, float))
                     }
                 case _:
                     return {}

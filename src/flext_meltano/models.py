@@ -65,7 +65,4 @@ class FlextMeltanoModels(m):
 
 m = FlextMeltanoModels
 
-__all__ = [
-    "FlextMeltanoModels",
-    "m",
-]
+__all__ = ["FlextMeltanoModels", "m"]
