@@ -7,13 +7,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Protocol, runtime_checkable
 
-if TYPE_CHECKING:
-    from pathlib import Path
+from flext_cli import p
 
-    from flext_cli import p
-    from flext_meltano import t
+from flext_meltano import t
 
 
 class FlextMeltanoProtocolsProject:
@@ -23,16 +23,19 @@ class FlextMeltanoProtocolsProject:
     class Project(Protocol):
         """Meltano Project protocol for type-safe project operations.
 
-        Represents the interface for a Meltano project t.JsonValue that can be
+        Represents the interface for a Meltano project t.NormalizedValue that can be
         passed to plugin discovery, pipeline execution, and other operations.
         """
 
         @property
         def root_dir(self) -> Path:
-            """The project root directory."""
+            """Get project root directory."""
             ...
 
-        def find_plugins(self, plugin_type: str) -> t.SequenceOf[t.JsonMapping]:
+        def find_plugins(
+            self,
+            plugin_type: str,
+        ) -> Sequence[t.Meltano.PluginDefinition]:
             """Find plugins of specified type."""
             ...
 
