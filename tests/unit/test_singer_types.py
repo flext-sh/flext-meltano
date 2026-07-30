@@ -25,7 +25,7 @@ _MELTANO_TYPE_ALIASES: tuple[tuple[str, str], ...] = (
     ("DbtManifestData", "JsonMapping"),
     ("DbtProject", "JsonMapping"),
     ("EnvironmentInput", "Environment"),
-    ("NestedStrMapping", "MappingKV"),
+    ("NestedStrMapping", "Mapping"),
     ("OptionalScalarMap", "Scalar"),
     ("ServicePayload", "JsonMapping"),
     ("ValidatorInput", "JsonValue"),

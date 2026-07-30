@@ -32,9 +32,7 @@ class FlextMeltanoProtocolsProject:
             """Project root directory."""
             ...
 
-        def find_plugins(
-            self, plugin_type: str
-        ) -> Sequence[t.Meltano.PluginDefinition]:
+        def find_plugins(self, plugin_type: str) -> Sequence[t.JsonMapping]:
             """Find plugins of specified type."""
             ...
 
