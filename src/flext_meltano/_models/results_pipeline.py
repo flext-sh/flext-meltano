@@ -7,7 +7,8 @@ from typing import Annotated, Self
 from flext_cli import m
 from pydantic import Field, computed_field, field_validator, model_validator
 
-from flext_meltano import FlextMeltanoModelsResults, c, t
+from flext_meltano import c, t
+from flext_meltano._models.results import FlextMeltanoModelsResults
 
 
 class FlextMeltanoModelsResultsPipeline:

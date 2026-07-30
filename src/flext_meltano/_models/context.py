@@ -18,7 +18,7 @@ class FlextMeltanoModelsContext:
         """Typed context envelope for ELT pipeline execution."""
 
         project_root: Annotated[str, Field(description="Project root path")]
-        elt_context: t.ContainerMapping = Field(
+        elt_context: t.FlatContainerMapping = Field(
             default_factory=dict, description="ELT execution context"
         )
         extractor_name: Annotated[str, Field(description="Extractor name")]
@@ -26,7 +26,7 @@ class FlextMeltanoModelsContext:
         execution_completed: Annotated[
             bool, Field(default=False, description="Execution completion flag")
         ] = False
-        execution_result: t.ContainerMapping = Field(
+        execution_result: t.FlatContainerMapping = Field(
             default_factory=dict, description="Execution result payload"
         )
 
@@ -34,13 +34,13 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_mapping_payloads(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.ContainerMapping:
+        ) -> t.FlatContainerMapping:
             """Normalize mapping-like payloads into dictionaries."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty: t.ContainerMapping = {}
+                    empty: t.FlatContainerMapping = {}
                     return empty
 
         @field_validator("project_root", "extractor_name", "loader_name", mode="before")
@@ -56,7 +56,7 @@ class FlextMeltanoModelsContext:
         project_root: Annotated[
             str, Field(default="unknown", description="Project root path")
         ] = "unknown"
-        execution_result: t.ContainerMapping = Field(
+        execution_result: t.FlatContainerMapping = Field(
             default_factory=dict, description="Execution result payload"
         )
 
@@ -64,13 +64,13 @@ class FlextMeltanoModelsContext:
         @classmethod
         def normalize_execution_result(
             cls, value: t.Meltano.ValidatorInput
-        ) -> t.ContainerMapping:
+        ) -> t.FlatContainerMapping:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
                     return {str(key): item for key, item in value.items()}
                 case _:
-                    empty: t.ContainerMapping = {}
+                    empty: t.FlatContainerMapping = {}
                     return empty
 
         @field_validator("project_root", mode="before")

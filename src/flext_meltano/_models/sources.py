@@ -7,7 +7,9 @@ from typing import Annotated, ClassVar, Self
 from flext_cli import m, u
 from pydantic import Field, computed_field, field_serializer, model_validator
 
-from flext_meltano import FlextMeltanoModelsCore, FlextMeltanoModelsSourcesParams, t
+from flext_meltano import t
+from flext_meltano._models.core import FlextMeltanoModelsCore
+from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
 
 class FlextMeltanoModelsSources:
@@ -22,10 +24,10 @@ class FlextMeltanoModelsSources:
 
         tap_type: Annotated[str, Field(description="Type of the tap")]
         connection_config: Annotated[
-            t.ContainerMapping, Field(description="Connection configuration")
+            t.FlatContainerMapping, Field(description="Connection configuration")
         ]
         stream_config: Annotated[
-            t.ContainerMapping, Field(description="Stream-specific configuration")
+            t.FlatContainerMapping, Field(description="Stream-specific configuration")
         ] = Field(default_factory=dict, description="Stream-specific configuration")
         tap_version: Annotated[str, Field(description="Tap version")] = "latest"
 
@@ -48,8 +50,8 @@ class FlextMeltanoModelsSources:
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: t.ContainerMapping
-        ) -> t.ContainerMapping:
+            self, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -69,7 +71,7 @@ class FlextMeltanoModelsSources:
 
         target_type: Annotated[str, Field(description="Type of the target")]
         connection_config: Annotated[
-            t.ContainerMapping, Field(description="Connection configuration")
+            t.FlatContainerMapping, Field(description="Connection configuration")
         ] = Field(default_factory=dict, description="Connection configuration")
         batch_size: Annotated[
             int | None, Field(default=None, description="Batch size for data loading")
@@ -98,8 +100,8 @@ class FlextMeltanoModelsSources:
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: t.ContainerMapping
-        ) -> t.ContainerMapping:
+            self, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -116,10 +118,10 @@ class FlextMeltanoModelsSources:
 
         source_type: Annotated[str, Field(description="Type of the data source")]
         connection_config: Annotated[
-            t.ContainerMapping, Field(description="Connection configuration")
+            t.FlatContainerMapping, Field(description="Connection configuration")
         ]
         stream_config: Annotated[
-            t.ContainerMapping, Field(description="Stream-specific configuration")
+            t.FlatContainerMapping, Field(description="Stream-specific configuration")
         ] = Field(default_factory=dict, description="Stream-specific configuration")
         source_version: Annotated[
             str, Field(default="latest", description="Source version")
@@ -144,8 +146,8 @@ class FlextMeltanoModelsSources:
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: t.ContainerMapping
-        ) -> t.ContainerMapping:
+            self, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 

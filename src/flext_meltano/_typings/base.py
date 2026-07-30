@@ -24,17 +24,16 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[t.ContainerMapping]] = TypeAdapter(
-        t.ContainerMapping
+    CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[t.FlatContainerMapping]] = TypeAdapter(
+        t.FlatContainerMapping
     )
-    INTEGER_ADAPTER: ClassVar[TypeAdapter[t.IntegerValue]] = TypeAdapter(t.IntegerValue)
 
     type ValidatorInput = (
-        t.ContainerMapping
-        | Mapping[str, t.ContainerMapping | None]
-        | Sequence[t.ContainerMapping | None]
-        | tuple[t.ContainerMapping | None, ...]
-        | set[t.ContainerMapping | None]
+        t.FlatContainerMapping
+        | Mapping[str, t.FlatContainerMapping | None]
+        | Sequence[t.FlatContainerMapping | None]
+        | tuple[t.FlatContainerMapping | None, ...]
+        | set[t.FlatContainerMapping | None]
         | None
     )
 

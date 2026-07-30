@@ -53,7 +53,7 @@ class FlextMeltanoProtocolsServices:
             self,
             tap_name: str,
             target_name: str,
-            _config: t.ContainerMapping | None = None,
+            _config: t.FlatContainerMapping | None = None,
         ) -> r[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
@@ -67,19 +67,19 @@ class FlextMeltanoProtocolsServices:
             ...
 
     @runtime_checkable
-    class ServiceCall(p.Service[t.Container], Protocol):
+    class ServiceCall(p.Service[t.FlatContainer], Protocol):
         """Service call protocol extending Service."""
 
         def call(
             self,
             operation: str,
             payload: t.ConfigurationMapping,
-        ) -> p.Result[t.Container]:
+        ) -> p.Result[t.FlatContainer]:
             """Execute service call with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.Container]:
+        def execute(self) -> p.Result[t.FlatContainer]:
             """Execute service operation (implements Service)."""
             ...
 

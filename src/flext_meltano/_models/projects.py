@@ -63,10 +63,10 @@ class FlextMeltanoModelsProjects:
         default_environment: Annotated[
             str, Field(default="dev", description="Default environment name")
         ] = "dev"
-        plugins: t.ContainerMapping = Field(
+        plugins: t.FlatContainerMapping = Field(
             default_factory=dict, description="Plugin configurations"
         )
-        environments: t.ContainerMapping = Field(
+        environments: t.FlatContainerMapping = Field(
             default_factory=dict, description="Environment configurations"
         )
 

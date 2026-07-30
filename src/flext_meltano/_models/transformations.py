@@ -22,16 +22,16 @@ class FlextMeltanoModelsTransformations:
             str, Field(default="1.0.0", description="DBT project version")
         ] = "1.0.0"
         config: Annotated[
-            t.ContainerMapping, Field(description="DBT project configuration")
+            t.FlatContainerMapping, Field(description="DBT project configuration")
         ] = Field(default_factory=dict, description="DBT project configuration")
         models: Annotated[
-            t.ContainerMapping, Field(description="DBT models configuration")
+            t.FlatContainerMapping, Field(description="DBT models configuration")
         ] = Field(default_factory=dict, description="DBT models configuration")
         sources: Annotated[
-            t.ContainerMapping, Field(description="DBT sources configuration")
+            t.FlatContainerMapping, Field(description="DBT sources configuration")
         ] = Field(default_factory=dict, description="DBT sources configuration")
         tests: Annotated[
-            t.ContainerMapping, Field(description="DBT tests configuration")
+            t.FlatContainerMapping, Field(description="DBT tests configuration")
         ] = Field(default_factory=dict, description="DBT tests configuration")
 
         @model_validator(mode="after")

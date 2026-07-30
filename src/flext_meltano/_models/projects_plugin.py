@@ -28,7 +28,7 @@ class FlextMeltanoModelsProjectsPlugin:
             str, Field(default="standard", description="Plugin variant")
         ] = "standard"
         settings: Annotated[
-            t.ContainerMapping, Field(description="Plugin settings")
+            t.FlatContainerMapping, Field(description="Plugin settings")
         ] = Field(default_factory=dict, description="Plugin settings")
         capabilities: Annotated[
             t.StrSequence, Field(description="Plugin capabilities")

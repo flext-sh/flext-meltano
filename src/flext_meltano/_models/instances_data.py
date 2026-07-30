@@ -8,13 +8,10 @@ from typing import Annotated, Self
 from flext_cli import m, u
 from pydantic import Field, computed_field, field_serializer, model_validator
 
-from flext_meltano import (
-    FlextMeltanoModelsCore,
-    FlextMeltanoModelsSources,
-    FlextMeltanoModelsSourcesParams,
-    c,
-    t,
-)
+from flext_meltano import c, t
+from flext_meltano._models.core import FlextMeltanoModelsCore
+from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
 
 class FlextMeltanoModelsInstancesData:
@@ -25,7 +22,7 @@ class FlextMeltanoModelsInstancesData:
 
         sink_type: Annotated[str, Field(description="Sink type identifier")]
         connection_config: Annotated[
-            t.ContainerMapping, Field(description="Connection configuration dictionary")
+            t.FlatContainerMapping, Field(description="Connection configuration dictionary")
         ]
         batch_size: Annotated[
             t.BatchSize,
@@ -69,8 +66,8 @@ class FlextMeltanoModelsInstancesData:
 
         @field_serializer("connection_config")
         def serialize_connection_config(
-            self, value: t.ContainerMapping
-        ) -> t.ContainerMapping:
+            self, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
@@ -95,7 +92,7 @@ class FlextMeltanoModelsInstancesData:
             Field(description="Source configuration"),
         ]
         adapter: Annotated[
-            t.ContainerValue | None, Field(default=None, description="Adapter instance")
+            t.JsonValue | None, Field(default=None, description="Adapter instance")
         ] = None
         status: Annotated[
             str,
@@ -177,7 +174,7 @@ class FlextMeltanoModelsInstancesData:
             description="Sink configuration"
         )
         adapter: Annotated[
-            t.ContainerValue | None, Field(default=None, description="Adapter instance")
+            t.JsonValue | None, Field(default=None, description="Adapter instance")
         ] = None
         status: Annotated[
             str,

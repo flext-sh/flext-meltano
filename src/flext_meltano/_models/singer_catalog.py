@@ -21,7 +21,7 @@ class FlextMeltanoModelsSingerCatalog:
         breadcrumb: t.StrSequence = Field(
             default_factory=list, description="Singer metadata breadcrumb path"
         )
-        metadata: t.ContainerMapping = Field(
+        metadata: t.FlatContainerMapping = Field(
             default_factory=dict, description="Singer metadata properties"
         )
 
@@ -31,7 +31,7 @@ class FlextMeltanoModelsSingerCatalog:
         tap_stream_id: Annotated[str, Field(description="Tap stream identifier")]
         stream: Annotated[str, Field(description="Singer stream name")]
         schema_definition: Annotated[
-            t.ContainerValueMapping,
+            t.FlatContainerMapping,
             Field(
                 alias="schema",
                 serialization_alias="schema",
@@ -119,7 +119,7 @@ class FlextMeltanoModelsSingerCatalog:
             t.NonNegativeInt, Field(description="Number of records written")
         ]
         errors: Annotated[t.NonNegativeInt, Field(description="Number of errors")]
-        state: t.ContainerMapping = Field(
+        state: t.FlatContainerMapping = Field(
             default_factory=dict, description="Final state payload"
         )
         duration_seconds: Annotated[

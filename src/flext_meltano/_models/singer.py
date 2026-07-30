@@ -22,7 +22,7 @@ class FlextMeltanoModelsSinger:
         ] = "SCHEMA"
         stream: Annotated[t.NonEmptyStr, Field(description="Singer stream name")]
         schema_definition: Annotated[
-            t.ContainerValueMapping,
+            t.FlatContainerMapping,
             Field(
                 alias="schema",
                 serialization_alias="schema",
@@ -50,7 +50,7 @@ class FlextMeltanoModelsSinger:
         ] = "RECORD"
         stream: Annotated[str, Field(description="Singer stream name")]
         record: Annotated[
-            t.ContainerValueMapping, Field(description="Singer record payload")
+            t.FlatContainerMapping, Field(description="Singer record payload")
         ]
         time_extracted: Annotated[
             str | None,
@@ -75,7 +75,7 @@ class FlextMeltanoModelsSinger:
             Field(default="STATE", description="Singer message discriminator"),
         ] = "STATE"
         value: Annotated[
-            t.MutableContainerMapping,
+            t.MutableFlatContainerMapping,
             Field(description="Singer state bookmark payload"),
         ] = Field(default_factory=dict, description="Singer state bookmark payload")
 

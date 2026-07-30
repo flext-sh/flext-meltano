@@ -22,6 +22,6 @@ class FlextMeltanoTypingsDomains:
     type NestedStrMapping = Mapping[str, t.StrMapping]
     type DbtManifestData = Mapping[
         str,
-        Mapping[str, t.ContainerValue] | None,
+        Mapping[str, t.JsonValue] | None,
     ]
     type DbtProject = Mapping[str, str | bool | t.StrSequence]

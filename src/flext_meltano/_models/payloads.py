@@ -19,7 +19,7 @@ class FlextMeltanoModelsPayloads:
         tap_name: Annotated[t.NonEmptyStr, Field(description="Singer tap name")]
         target_name: Annotated[str, Field(description="Singer target name")]
         config: Annotated[
-            t.ContainerMapping,
+            t.FlatContainerMapping,
             Field(description="Pipeline config"),
         ] = Field(default_factory=dict, description="Pipeline config")
 
@@ -28,7 +28,7 @@ class FlextMeltanoModelsPayloads:
 
         pipeline_id: Annotated[str, Field(description="Pipeline identifier")]
         config: Annotated[
-            t.ContainerMapping,
+            t.FlatContainerMapping,
             Field(description="Execution config"),
         ] = Field(default_factory=dict, description="Execution config")
 
@@ -38,7 +38,7 @@ class FlextMeltanoModelsPayloads:
         plugin_type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
         config: Annotated[
-            t.ContainerMapping,
+            t.FlatContainerMapping,
             Field(description="Plugin config"),
         ] = Field(default_factory=dict, description="Plugin config")
 
@@ -54,7 +54,7 @@ class FlextMeltanoModelsPayloads:
 
         environment_name: Annotated[str, Field(description="Environment name")]
         config: Annotated[
-            t.ContainerMapping,
+            t.FlatContainerMapping,
             Field(description="Environment config"),
         ] = Field(default_factory=dict, description="Environment config")
 
@@ -65,7 +65,7 @@ class FlextMeltanoModelsPayloads:
             t.StrSequence | None, Field(default=None, description="Models to run")
         ] = None
         config: Annotated[
-            t.ContainerMapping | None,
+            t.FlatContainerMapping | None,
             Field(default=None, description="Execution config"),
         ] = None
 
@@ -78,6 +78,6 @@ class FlextMeltanoModelsPayloads:
             t.StrSequence | None, Field(default=None, description="DBT models to run")
         ] = None
         config: Annotated[
-            t.ContainerMapping | None,
+            t.FlatContainerMapping | None,
             Field(default=None, description="Pipeline config"),
         ] = None
