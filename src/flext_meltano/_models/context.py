@@ -38,7 +38,7 @@ class FlextMeltanoModelsContext:
             """Normalize mapping-like payloads into dictionaries."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return {key: item for key, item in value.items()}
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty
@@ -68,7 +68,7 @@ class FlextMeltanoModelsContext:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return {key: item for key, item in value.items()}
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty
@@ -95,7 +95,7 @@ class FlextMeltanoModelsContext:
             match value:
                 case Mapping():
                     return {
-                        str(key): str(item)
+                        key: str(item)
                         for key, item in value.items()
                         if isinstance(item, (str, int, bool, float))
                     }

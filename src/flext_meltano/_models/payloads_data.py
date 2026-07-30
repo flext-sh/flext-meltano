@@ -36,7 +36,7 @@ class FlextMeltanoModelsPayloadsData:
             """Normalize mapping input before JSON validation."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return {key: item for key, item in value.items()}
                 case _:
                     empty_schema: t.FlatContainerMapping = {}
                     return empty_schema
@@ -67,7 +67,7 @@ class FlextMeltanoModelsPayloadsData:
                                 record_dict: t.MutableFlatContainerMapping = {}
                                 for key, item in record.items():
                                     if u.primitive(item):
-                                        record_dict[str(key)] = item
+                                        record_dict[key] = item
                                 records.append(record_dict)
                             case _:
                                 continue
@@ -109,18 +109,18 @@ class FlextMeltanoModelsPayloadsData:
             ] = {}
             for key, item in value.items():
                 if u.scalar(item) or item is None:
-                    result[str(key)] = item
+                    result[key] = item
                 elif isinstance(item, list):
-                    result[str(key)] = [
+                    result[key] = [
                         v if u.scalar(v) or v is None else str(v) for v in item
                     ]
                 elif isinstance(item, Mapping):
-                    result[str(key)] = {
-                        str(k): v if u.scalar(v) or v is None else str(v)
+                    result[key] = {
+                        k: v if u.scalar(v) or v is None else str(v)
                         for k, v in item.items()
                     }
                 else:
-                    result[str(key)] = str(item)
+                    result[key] = str(item)
             return result
 
     class PathPayload(m.ArbitraryTypesModel):
@@ -176,16 +176,16 @@ class FlextMeltanoModelsPayloadsData:
                 case str():
                     return value
                 case list() | tuple():
-                    return [str(item) for item in value]
+                    return [item for item in value]
                 case Mapping():
                     result: t.MutableConfigurationMapping = {}
                     for k, v in value.items():
                         if u.primitive(v):
-                            result[str(k)] = v
+                            result[k] = v
                         elif v is None:
-                            result[str(k)] = ""
+                            result[k] = ""
                         elif isinstance(v, (list, dict)):
-                            result[str(k)] = str(v)
+                            result[k] = str(v)
                     return result
                 case _:
                     return str(value)

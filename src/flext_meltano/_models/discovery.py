@@ -42,7 +42,7 @@ class FlextMeltanoModelsDiscovery:
             """Normalize variant maps from external payloads."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return {key: item for key, item in value.items()}
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty
@@ -78,7 +78,7 @@ class FlextMeltanoModelsDiscovery:
             """Normalize plugin catalog mapping."""
             match value:
                 case Mapping():
-                    return {str(key): item for key, item in value.items()}
+                    return {key: item for key, item in value.items()}
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty
