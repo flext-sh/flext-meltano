@@ -205,7 +205,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def fetch_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
         """Get tap type from instance."""
-        return tap_instance.tap_type
+        tap_type: str = tap_instance.tap_type
+        return tap_type
 
     def fetch_registered_streams(self) -> t.StrSequence:
         """Get list of registered stream names."""

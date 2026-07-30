@@ -28,61 +28,58 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         default_factory=lambda: None
     )
 
+    def _build_manifest_node_summary(
+        self, node: m.Meltano.DbtManifestNode
+    ) -> t.Meltano.OptionalScalarMap:
+        node_data = node.model_dump()
+        return {
+            "name": str(node_data.get("name")),
+            "path": str(node_data.get("path")),
+            "description": str(node_data.get("description") or ""),
+            "fqn": str(node_data.get("fqn_string") or ""),
+        }
+
     def fetch_dbt_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
         """Get all models from manifest."""
-        try:
-            model_nodes_result = self._get_dbt_manifest_nodes(
-                c.Meltano.DbtResourceType.MODEL
+        model_nodes_result = self._get_dbt_manifest_nodes(
+            c.Meltano.DbtResourceType.MODEL
+        )
+        if model_nodes_result.failure:
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+                model_nodes_result.error or "Unknown error"
             )
-            if model_nodes_result.failure:
-                return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                    model_nodes_result.error or "Unknown error"
-                )
-            models: t.SequenceOf[t.Meltano.OptionalScalarMap] = [
-                {
-                    "name": str(node.name),
-                    "path": str(node.path),
-                    "description": node.description
-                    if node.description is not None
-                    else "",
-                    "fqn": node.fqn_string,
-                }
+        try:
+            models = [
+                self._build_manifest_node_summary(node)
                 for node in model_nodes_result.value
             ]
-            self.logger.info("Models retrieved", count=len(models))
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
         except c.Meltano.OPERATION_ERRORS as e:
             self.logger.exception("Failed to get models", error=str(e))
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
                 f"Failed to get models: {e}"
             )
+        self.logger.info("Models retrieved", count=len(models))
+        return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
 
-    def fetch_dbt_tests(self) -> p.Result[t.SequenceOf[t.AttributeMapping]]:
+    def fetch_dbt_tests(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
         """Get all tests from manifest."""
-        try:
-            test_nodes_result = self._get_dbt_manifest_nodes(
-                c.Meltano.DbtResourceType.TEST
+        test_nodes_result = self._get_dbt_manifest_nodes(c.Meltano.DbtResourceType.TEST)
+        if test_nodes_result.failure:
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+                test_nodes_result.error or "Unknown error"
             )
-            if test_nodes_result.failure:
-                return r[t.SequenceOf[t.AttributeMapping]].fail(
-                    test_nodes_result.error or "Unknown error"
-                )
-            tests: t.SequenceOf[t.AttributeMapping] = [
-                {
-                    "name": str(node.name),
-                    "path": str(node.path),
-                    "description": node.description
-                    if node.description is not None
-                    else "",
-                    "fqn": node.fqn_string,
-                }
+        try:
+            tests = [
+                self._build_manifest_node_summary(node)
                 for node in test_nodes_result.value
             ]
-            self.logger.info("Tests retrieved", count=len(tests))
-            return r[t.SequenceOf[t.AttributeMapping]].ok(tests)
         except c.EXC_OS_VALIDATION as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return r[t.SequenceOf[t.AttributeMapping]].fail(f"Failed to get tests: {e}")
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+                f"Failed to get tests: {e}"
+            )
+        self.logger.info("Tests retrieved", count=len(tests))
+        return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(tests)
 
     def _get_dbt_manifest_nodes(
         self, resource_type: str

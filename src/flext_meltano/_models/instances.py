@@ -6,7 +6,7 @@ from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import Field, computed_field, model_validator
+from pydantic import ConfigDict, Field, computed_field, model_validator
 
 from flext_meltano import c, t
 from flext_meltano._models.sources import FlextMeltanoModelsSources
@@ -26,6 +26,9 @@ class FlextMeltanoModelsInstances:
         sink_schema: Annotated[
             t.FlatContainerMapping, Field(description="Sink schema")
         ] = Field(default_factory=dict, description="Sink schema")
+        settings: Annotated[
+            t.FlatContainerMapping, Field(description="Sink settings")
+        ] = Field(default_factory=dict, description="Sink settings")
         status: Annotated[
             str,
             Field(
@@ -100,7 +103,9 @@ class FlextMeltanoModelsInstances:
         @computed_field
         def has_processed_data(self) -> bool:
             """Check if stream has processed data."""
-            return self.records_loaded > 0 or self.batches_processed > 0
+            records_loaded: int = self.records_loaded
+            batches_processed: int = self.batches_processed
+            return records_loaded > 0 or batches_processed > 0
 
         @computed_field
         def processing_status(self) -> str:
@@ -130,12 +135,15 @@ class FlextMeltanoModelsInstances:
     class TapInstance(m.Entity):
         """Generic tap instance for data extraction."""
 
+        model_config = ConfigDict(populate_by_name=True)
+
         tap_id: Annotated[
             str | None, Field(default=None, description="Unique tap identifier")
         ] = None
         tap_type: Annotated[str, Field(description="Type of the tap")]
-        config: Annotated[
-            FlextMeltanoModelsSources.TapConfig, Field(description="Tap configuration")
+        settings: Annotated[
+            FlextMeltanoModelsSources.TapConfig,
+            Field(alias="config", description="Tap configuration"),
         ]
         adapter: Annotated[
             t.JsonValue | None, Field(default=None, description="Tap adapter instance")

@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from ._settings import FlextMeltanoSettings as FlextMeltanoSettings
     from ._settings import settings as settings
     from .api import FlextMeltano as FlextMeltano
+    from .api import FlextMeltanoAbstractions as FlextMeltanoAbstractions
     from .api import meltano as meltano
     from .base import FlextMeltanoServiceBase as FlextMeltanoServiceBase
 
@@ -53,7 +54,7 @@ if TYPE_CHECKING:
 _LAZY_MODULES: dict[str, tuple[str, ...]] = {
     "._config": ("FlextMeltanoConfig", "config"),
     "._settings": ("FlextMeltanoSettings", "settings"),
-    ".api": ("FlextMeltano", "meltano"),
+    ".api": ("FlextMeltano", "FlextMeltanoAbstractions", "meltano"),
     ".base": ("FlextMeltanoServiceBase", "s"),
     ".cli": ("FlextMeltanoCli", "main"),
     ".constants": ("FlextMeltanoConstants", "c"),
@@ -74,6 +75,7 @@ _LAZY_IMPORTS = build_lazy_import_map(
 
 _PUBLIC_EXPORTS: tuple[str, ...] = (
     "FlextMeltano",
+    "FlextMeltanoAbstractions",
     "FlextMeltanoCli",
     "FlextMeltanoConfig",
     "FlextMeltanoConstants",

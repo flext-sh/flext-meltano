@@ -90,7 +90,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def config(self) -> t.FlatContainerMapping:
+        def settings(self) -> t.FlatContainerMapping:
             """Tap configuration."""
             ...
 
@@ -162,26 +162,74 @@ class FlextMeltanoProtocolsSinger:
             ...
 
     @runtime_checkable
+    class RecordFetcher(Protocol):
+        """Consumer-side fetcher contract for declarative Singer taps."""
+
+        def fetch(
+            self, request: m.Meltano.FetchRequest
+        ) -> p.Result[m.Meltano.FetchResult]:
+            """Fetch records for one stream from the consumer domain."""
+            ...
+
+    class SingerCommand(Protocol):
+        """Opaque Singer CLI command object."""
+
+        def main(self, *, args: t.StrSequence, prog_name: str) -> t.JsonValue | None:
+            """Invoke the Singer CLI command and return its output."""
+            ...
+
+    @runtime_checkable
+    class SingerTapBackend(Protocol):
+        """Raw Singer SDK tap surface consumed by the internal adapter.
+
+        Both the full SDK tap class and the settings-only backend are
+        represented by the same canonical contract so consumer code can
+        pass either without importing ``singer_sdk`` directly.
+        """
+
+        config: t.FlatContainerMapping
+        settings: t.FlatContainerMapping
+
+        def get_singer_command(self) -> FlextMeltanoProtocolsSinger.SingerCommand:
+            """Return the Singer CLI command object."""
+            ...
+
+        def discover_streams(
+            self,
+        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+            """Discover available streams."""
+            ...
+
+        def sync_all(self) -> None:
+            """Execute sync for all selected streams."""
+            ...
+
+    SingerTapSdkBackend = SingerTapBackend
+    SingerTapSettingsBackend = SingerTapBackend
+
+    @runtime_checkable
     class SingerDrainSink(Protocol):
         """Typed sink contract for target service drain and record operations.
 
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
 
-        Context/Record types use ``t.MutableContainerValueMapping`` — the canonical
+        Context/Record types use ``t.Meltano.MutableContainerValueMapping`` — the canonical
         bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, ContainerValue]``.
         """
 
-        def start_drain(self) -> t.MutableContainerValueMapping: ...
+        def start_drain(self) -> t.Meltano.MutableContainerValueMapping: ...
 
-        def process_batch(self, context: t.MutableContainerValueMapping) -> None: ...
+        def process_batch(
+            self, context: t.Meltano.MutableContainerValueMapping
+        ) -> None: ...
 
         def mark_drained(self) -> None: ...
 
         def process_record(
             self,
-            record: t.MutableContainerValueMapping,
-            context: t.MutableContainerValueMapping,
+            record: t.Meltano.MutableContainerValueMapping,
+            context: t.Meltano.MutableContainerValueMapping,
         ) -> None: ...
 
     @runtime_checkable

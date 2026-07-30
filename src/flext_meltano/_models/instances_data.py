@@ -6,7 +6,13 @@ from collections.abc import Mapping, Sequence
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import Field, computed_field, field_serializer, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    computed_field,
+    field_serializer,
+    model_validator,
+)
 
 from flext_meltano import c, t
 from flext_meltano._models.core import FlextMeltanoModelsCore
@@ -39,7 +45,9 @@ class FlextMeltanoModelsInstancesData:
         @computed_field
         def max_records_capacity(self) -> int:
             """Maximum records capacity."""
-            return self.batch_size * self.max_batches
+            batch_size: int = self.batch_size
+            max_batches: int = self.max_batches
+            return batch_size * max_batches
 
         @computed_field
         def processing_efficiency(self) -> str:
@@ -83,10 +91,12 @@ class FlextMeltanoModelsInstancesData:
     class DataSourceInstance(m.Entity):
         """Generic data source instance for pipeline operations."""
 
+        model_config = ConfigDict(populate_by_name=True)
+
         source_type: Annotated[str, Field(description="Type of the data source")]
-        config: Annotated[
+        settings: Annotated[
             FlextMeltanoModelsSources.DataSourceConfig,
-            Field(description="Source configuration"),
+            Field(alias="config", description="Source configuration"),
         ]
         adapter: Annotated[
             t.JsonValue | None, Field(default=None, description="Adapter instance")
@@ -152,7 +162,7 @@ class FlextMeltanoModelsInstancesData:
         @model_validator(mode="after")
         def validate_source_instance(self) -> Self:
             """Validate source instance consistency."""
-            if self.config.source_type != self.source_type:
+            if self.settings.source_type != self.source_type:
                 msg = "Source type must match between instance and config"
                 raise ValueError(msg)
             if self.discovered and not self.streams:
@@ -163,13 +173,16 @@ class FlextMeltanoModelsInstancesData:
     class DataSinkInstance(m.Entity):
         """Generic data sink instance for pipeline operations."""
 
+        model_config = ConfigDict(populate_by_name=True)
+
         sink_id: Annotated[
             str | None, Field(default=None, description="Unique sink identifier")
         ] = None
         sink_type: Annotated[str, Field(description="Type of the data sink")]
-        config: FlextMeltanoModelsInstancesData.DataSinkConfig = Field(
-            description="Sink configuration"
-        )
+        settings: Annotated[
+            FlextMeltanoModelsInstancesData.DataSinkConfig,
+            Field(alias="config", description="Sink configuration"),
+        ]
         adapter: Annotated[
             t.JsonValue | None, Field(default=None, description="Adapter instance")
         ] = None

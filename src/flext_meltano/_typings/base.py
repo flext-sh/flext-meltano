@@ -48,9 +48,20 @@ class FlextMeltanoTypingsBase:
     type VariantValue = str | t.StrSequence | t.ScalarMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""
 
-    type FileConfigDict = Mapping[str, t.NormalizedValue | t.StrSequence]
+    type NormalizedValue = t.Scalar
+    """Canonical scalar value after normalization (string, number, boolean, or null)."""
+
+    type FileConfigDict = Mapping[str, NormalizedValue | t.StrSequence]
     type PathDict = Mapping[str, str | Path]
 
     type OptionalScalarMap = Mapping[str, t.Scalar | None]
 
     type CliProcessResult = Mapping[str, t.Scalar | t.StrSequence]
+    type ServicePayload = t.JsonMapping
+    """Canonical payload returned by Meltano service operations."""
+
+    type EnvironmentInput = str | t.JsonMapping
+    """Environment selector input: a name or a full environment configuration mapping."""
+
+    type MutableContainerValueMapping = t.MutableFlatContainerMapping
+    """Mutable container bridge for Singer SDK record/context mappings."""

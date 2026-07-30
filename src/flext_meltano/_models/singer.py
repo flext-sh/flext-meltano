@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Annotated, Literal, Self
 
 from flext_cli import m
@@ -121,3 +122,44 @@ class FlextMeltanoModelsSinger:
                 msg = "bookmark_key and bookmark_value must both be set or both be None"
                 raise ValueError(msg)
             return self
+
+    class StreamSpec(m.Entity):
+        """Declarative Singer stream specification."""
+
+        name: Annotated[str, Field(description="Stream name")]
+        json_schema: Annotated[
+            t.FlatContainerMapping, Field(description="JSON schema for the stream")
+        ]
+        primary_keys: Annotated[
+            t.StrSequence, Field(description="Primary key properties")
+        ] = Field(default_factory=list, description="Primary key properties")
+        replication_key: Annotated[
+            str | None, Field(default=None, description="Incremental replication key")
+        ] = None
+
+    class TapSpec(m.Entity):
+        """Declarative Singer tap specification."""
+
+        tap_name: Annotated[str, Field(description="Tap name")]
+        config_jsonschema: Annotated[
+            t.FlatContainerMapping, Field(description="Tap config JSON schema")
+        ]
+        streams: Annotated[
+            tuple[FlextMeltanoModelsSinger.StreamSpec, ...],
+            Field(description="Declared tap streams"),
+        ]
+
+    class FetchRequest(m.Entity):
+        """Record fetch request passed to a declarative tap fetcher."""
+
+        stream_name: Annotated[str, Field(description="Stream name to fetch")]
+        config: Annotated[
+            t.JsonMapping, Field(description="Runtime tap configuration")
+        ] = Field(default_factory=dict, description="Runtime tap configuration")
+
+    class FetchResult(m.Entity):
+        """Record fetch result returned by a declarative tap fetcher."""
+
+        records: Annotated[
+            Sequence[t.JsonMapping], Field(description="Fetched records")
+        ] = Field(default_factory=list, description="Fetched records")

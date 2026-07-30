@@ -23,7 +23,7 @@ class FlextMeltanoProtocolsProject:
     class Project(Protocol):
         """Meltano Project protocol for type-safe project operations.
 
-        Represents the interface for a Meltano project t.NormalizedValue that can be
+        Represents the interface for a Meltano project value that can be
         passed to plugin discovery, pipeline execution, and other operations.
         """
 
@@ -36,6 +36,28 @@ class FlextMeltanoProtocolsProject:
             self, plugin_type: str
         ) -> Sequence[t.Meltano.PluginDefinition]:
             """Find plugins of specified type."""
+            ...
+
+    @runtime_checkable
+    class DbtConnectionProfile(Protocol):
+        """Canonical dbt connection profile surface.
+
+        Consumer DBT projects expose a typed model (``m.<Ns>.DbtConnectionProfile``)
+        satisfying this protocol rather than passing raw dictionaries.
+        """
+
+        @property
+        def type(self) -> str:
+            """DBT adapter type."""
+            ...
+
+        @property
+        def project(self) -> str:
+            """DBT project name."""
+            ...
+
+        def model_dump(self, *, mode: str = ...) -> t.JsonMapping:
+            """Serialize the profile to a JSON-safe mapping."""
             ...
 
     @runtime_checkable

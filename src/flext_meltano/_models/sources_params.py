@@ -98,7 +98,8 @@ class FlextMeltanoModelsSourcesParams:
         @computed_field
         def has_data(self) -> bool:
             """Check if stream has extracted data."""
-            return self.records_extracted > 0
+            records_extracted: int = self.records_extracted
+            return records_extracted > 0
 
         @computed_field
         def is_active(self) -> bool:
@@ -120,9 +121,9 @@ class FlextMeltanoModelsSourcesParams:
             self, value: t.FlatContainerMapping
         ) -> t.FlatContainerMapping:
             """Normalize stream schema structure."""
-            result: t.MutableFlatContainerMapping = dict(value)
+            result: t.JsonDict = dict(value)
             if "properties" not in result:
-                empty: t.MutableFlatContainerMapping = {}
+                empty: t.JsonDict = {}
                 result["properties"] = empty
             if "type" not in result:
                 result["type"] = "t.NormalizedValue"

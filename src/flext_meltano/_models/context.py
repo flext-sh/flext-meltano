@@ -35,10 +35,10 @@ class FlextMeltanoModelsContext:
         def normalize_mapping_payloads(
             cls, value: t.Meltano.ValidatorInput
         ) -> t.FlatContainerMapping:
-            """Normalize mapping-like payloads into dictionaries."""
+            """Normalize mapping-like payloads into JSON-safe dictionaries."""
             match value:
                 case Mapping():
-                    return {key: item for key, item in value.items()}
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty
@@ -68,7 +68,7 @@ class FlextMeltanoModelsContext:
             """Normalize execution result map payload."""
             match value:
                 case Mapping():
-                    return {key: item for key, item in value.items()}
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty

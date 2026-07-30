@@ -48,7 +48,9 @@ class FlextMeltanoModelsResults:
             """Execution rate (records/second)."""
             if not self.duration_seconds or self.duration_seconds <= 0:
                 return 0.0
-            return self.records_processed / self.duration_seconds
+            records_processed: int = self.records_processed
+            duration_seconds: float = self.duration_seconds
+            return records_processed / duration_seconds
 
         @computed_field
         def is_completed(self) -> bool:

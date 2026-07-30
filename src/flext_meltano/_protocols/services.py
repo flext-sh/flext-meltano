@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
@@ -26,19 +25,19 @@ class FlextMeltanoProtocolsServices:
 
         def execute_meltano_command(
             self, command: t.StrSequence, timeout: int = ..., _cwd: Path | None = None
-        ) -> r[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
         def get_project_plugins(
             self, plugin_type: str | None = None, _cwd: Path | None = None
-        ) -> r[Sequence[t.StrMapping]]:
+        ) -> p.Result[t.SequenceOf[t.StrMapping]]:
             """Return project-scoped plugin definitions."""
             ...
 
         def execute_dbt_command(
             self, dbt_command: str, args: t.StrSequence | None = None
-        ) -> r[m.Meltano.CommandExecutionResult]:
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 
@@ -46,8 +45,8 @@ class FlextMeltanoProtocolsServices:
             self,
             tap_name: str,
             target_name: str,
-            _config: t.FlatContainerMapping | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+            config: t.FlatContainerMapping | None = None,
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
 

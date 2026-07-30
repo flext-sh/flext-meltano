@@ -206,19 +206,25 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
-            models: t.SequenceOf[t.Meltano.OptionalScalarMap] = [
-                {
-                    "name": str(node.name),
-                    "path": str(node.path),
-                    "description": node.description or "",
-                    "fqn": node.fqn_string,
-                }
-                for node in manifest.nodes.values()
-                if node.resource_type == c.Meltano.DbtResourceType.MODEL
-            ]
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
         except c.EXC_MAPPING_TYPE as exc:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(str(exc))
+        return self._build_model_nodes(manifest)
+
+    def _build_model_nodes(
+        self, manifest: m.Meltano.DbtManifest
+    ) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
+        models: list[t.Meltano.OptionalScalarMap] = []
+        for node in manifest.nodes.values():
+            if node.resource_type != c.Meltano.DbtResourceType.MODEL:
+                continue
+            node_data = node.model_dump()
+            models.append({
+                "name": str(node_data.get("name")),
+                "path": str(node_data.get("path")),
+                "description": str(node_data.get("description") or ""),
+                "fqn": str(node_data.get("fqn_string") or ""),
+            })
+        return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

@@ -160,7 +160,8 @@ class FlextMeltanoModelsTransformations:
         @computed_field
         def is_parallel_execution(self) -> bool:
             """Check if execution uses multiple threads."""
-            return self.threads > 1
+            threads: int = self.threads
+            return threads > 1
 
         @computed_field
         def model_count(self) -> int:

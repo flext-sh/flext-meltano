@@ -75,7 +75,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
             )
             sink_instance = m.Meltano.DataSinkInstance(
                 sink_type=sink_config.sink_type,
-                settings=sink_config,
+                config=sink_config,
                 status=c.Meltano.OperationStatus.CONFIGURED,
             )
             self.logger.info(

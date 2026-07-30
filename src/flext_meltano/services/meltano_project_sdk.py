@@ -136,7 +136,11 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             variant_payload = m.Meltano.VariantPayload.model_validate({
                 "value": variant_raw
             })
-            json_variant = variant_payload.json_value()
+            json_variant = (
+                t.Cli.JSON_VALUE_ADAPTER.validate_python(variant_payload.value)
+                if variant_payload.value is not None
+                else None
+            )
             if json_variant is not None:
                 plugin_def["variant"] = json_variant
             plugins.append(plugin_def)

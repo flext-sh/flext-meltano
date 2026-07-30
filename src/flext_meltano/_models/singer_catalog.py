@@ -9,7 +9,7 @@ from typing import Annotated, Literal
 from flext_cli import m
 from pydantic import Field
 
-from flext_meltano import t
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsSingerCatalog:
@@ -77,11 +77,12 @@ class FlextMeltanoModelsSingerCatalog:
         """Singer catalog response model."""
 
         type: Annotated[
-            Literal["CATALOG"],
+            c.Meltano.SingerMessageType,
             Field(
-                default="CATALOG", description="Singer catalog message discriminator"
+                default=c.Meltano.SingerMessageType.CATALOG,
+                description="Singer catalog message discriminator",
             ),
-        ] = "CATALOG"
+        ] = c.Meltano.SingerMessageType.CATALOG
         streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = Field(
             default_factory=lambda: list[
                 FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
