@@ -62,7 +62,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             )
             source_instance = m.Meltano.DataSourceInstance(
                 source_type=source_type,
-                config=settings,
+                settings=settings,
                 status=c.Meltano.OperationStatus.CONFIGURED,
                 source_id=source_id,
             )
@@ -97,7 +97,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             })
             return self.create_source_instance(settings).map(
                 lambda inst: m.Meltano.TapInstance(
-                    tap_type=inst.source_type, config=settings, tap_id=inst.source_id
+                    tap_type=inst.source_type, settings=settings, tap_id=inst.source_id
                 )
             )
         except c.Meltano.OPERATION_ERRORS as exc:

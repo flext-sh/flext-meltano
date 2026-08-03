@@ -152,7 +152,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             )
             instance = m.Meltano.TapInstance(
                 tap_type=tap_type,
-                config=tap_cfg,
+                settings=tap_cfg,
                 tap_id=(f"{tap_type}_{c.Meltano.PAYLOAD_TAP_ID_AUTO_SUFFIX}"),
             )
             return r[m.Meltano.TapInstance].ok(instance)
