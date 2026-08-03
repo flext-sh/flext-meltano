@@ -15,9 +15,7 @@ from flext_meltano import m, p, t
 class FlextMeltanoSingerTapAdapter:
     """Bridge a Singer SDK tap instance into the internal Meltano tap contract."""
 
-    def __init__(
-        self, tap: p.Meltano.SingerTapSdkBackend | p.Meltano.SingerTapSettingsBackend
-    ) -> None:
+    def __init__(self, tap: Tap) -> None:
         """Store the raw Singer tap instance used by the bridge."""
         self._tap = tap
 

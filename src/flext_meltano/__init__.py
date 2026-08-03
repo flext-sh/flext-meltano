@@ -31,6 +31,10 @@ if TYPE_CHECKING:
     from .api import FlextMeltanoAbstractions as FlextMeltanoAbstractions
     from .api import meltano as meltano
     from .base import FlextMeltanoServiceBase as FlextMeltanoServiceBase
+    from .service_bases import FlextMeltanoDbtServiceBase as FlextMeltanoDbtServiceBase
+    from .service_bases import FlextMeltanoLibraryRunner as FlextMeltanoLibraryRunner
+    from .service_bases import FlextMeltanoTapServiceBase as FlextMeltanoTapServiceBase
+    from .service_bases import FlextMeltanoTargetServiceBase as FlextMeltanoTargetServiceBase
 
     s: type[FlextMeltanoServiceBase]
     from .cli import FlextMeltanoCli as FlextMeltanoCli
@@ -56,6 +60,12 @@ _LAZY_MODULES: dict[str, tuple[str, ...]] = {
     "._settings": ("FlextMeltanoSettings", "settings"),
     ".api": ("FlextMeltano", "FlextMeltanoAbstractions", "meltano"),
     ".base": ("FlextMeltanoServiceBase", "s"),
+    ".service_bases": (
+        "FlextMeltanoDbtServiceBase",
+        "FlextMeltanoLibraryRunner",
+        "FlextMeltanoTapServiceBase",
+        "FlextMeltanoTargetServiceBase",
+    ),
     ".cli": ("FlextMeltanoCli", "main"),
     ".constants": ("FlextMeltanoConstants", "c"),
     ".models": ("FlextMeltanoModels", "m"),
@@ -82,6 +92,10 @@ _PUBLIC_EXPORTS: tuple[str, ...] = (
     "FlextMeltanoModels",
     "FlextMeltanoProtocols",
     "FlextMeltanoServiceBase",
+    "FlextMeltanoDbtServiceBase",
+    "FlextMeltanoLibraryRunner",
+    "FlextMeltanoTapServiceBase",
+    "FlextMeltanoTargetServiceBase",
     "FlextMeltanoSettings",
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",

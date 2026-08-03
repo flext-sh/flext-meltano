@@ -187,10 +187,13 @@ class FlextMeltanoProtocolsSinger:
         pass either without importing ``singer_sdk`` directly.
         """
 
-        config: t.FlatContainerMapping
-        settings: t.FlatContainerMapping
+        @property
+        def config(self) -> t.FlatContainerMapping:
+            """Tap runtime configuration mapping."""
+            ...
 
-        def get_singer_command(self) -> FlextMeltanoProtocolsSinger.SingerCommand:
+        @classmethod
+        def get_singer_command(cls) -> FlextMeltanoProtocolsSinger.SingerCommand:
             """Return the Singer CLI command object."""
             ...
 
