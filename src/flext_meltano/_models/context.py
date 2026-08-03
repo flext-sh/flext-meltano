@@ -6,7 +6,6 @@ from collections.abc import Mapping
 from typing import Annotated
 
 from flext_cli import m
-from pydantic import Field, field_validator
 
 from flext_meltano import c, t
 
@@ -17,20 +16,20 @@ class FlextMeltanoModelsContext:
     class PipelineExecutionContext(m.FlexibleModel):
         """Typed context envelope for ELT pipeline execution."""
 
-        project_root: Annotated[str, Field(description="Project root path")]
-        elt_context: t.FlatContainerMapping = Field(
+        project_root: Annotated[str, m.Field(description="Project root path")]
+        elt_context: t.FlatContainerMapping = m.Field(
             default_factory=dict, description="ELT execution context"
         )
-        extractor_name: Annotated[str, Field(description="Extractor name")]
-        loader_name: Annotated[t.NonEmptyStr, Field(description="Loader name")]
+        extractor_name: Annotated[str, m.Field(description="Extractor name")]
+        loader_name: Annotated[t.NonEmptyStr, m.Field(description="Loader name")]
         execution_completed: Annotated[
-            bool, Field(default=False, description="Execution completion flag")
+            bool, m.Field(default=False, description="Execution completion flag")
         ] = False
-        execution_result: t.FlatContainerMapping = Field(
+        execution_result: t.FlatContainerMapping = m.Field(
             default_factory=dict, description="Execution result payload"
         )
 
-        @field_validator("elt_context", "execution_result", mode="before")
+        @m.field_validator("elt_context", "execution_result", mode="before")
         @classmethod
         def normalize_mapping_payloads(
             cls, value: t.Meltano.ValidatorInput
@@ -43,7 +42,7 @@ class FlextMeltanoModelsContext:
                     empty: t.FlatContainerMapping = {}
                     return empty
 
-        @field_validator("project_root", "extractor_name", "loader_name", mode="before")
+        @m.field_validator("project_root", "extractor_name", "loader_name", mode="before")
         @classmethod
         def normalize_required_strings(cls, value: t.Meltano.ValidatorInput) -> str:
             """Normalize required string fields from context payloads."""
@@ -54,13 +53,13 @@ class FlextMeltanoModelsContext:
         """Typed subset for extracting final pipeline result fields."""
 
         project_root: Annotated[
-            str, Field(default="unknown", description="Project root path")
+            str, m.Field(default="unknown", description="Project root path")
         ] = "unknown"
-        execution_result: t.FlatContainerMapping = Field(
+        execution_result: t.FlatContainerMapping = m.Field(
             default_factory=dict, description="Execution result payload"
         )
 
-        @field_validator("execution_result", mode="before")
+        @m.field_validator("execution_result", mode="before")
         @classmethod
         def normalize_execution_result(
             cls, value: t.Meltano.ValidatorInput
@@ -73,7 +72,7 @@ class FlextMeltanoModelsContext:
                     empty: t.FlatContainerMapping = {}
                     return empty
 
-        @field_validator("project_root", mode="before")
+        @m.field_validator("project_root", mode="before")
         @classmethod
         def normalize_project_root(cls, value: t.Meltano.ValidatorInput) -> str:
             """Normalize project root from mixed payload values."""
@@ -83,12 +82,12 @@ class FlextMeltanoModelsContext:
     class PipelineExecutionScalarMap(m.FlexibleModel):
         """Scalar-only pipeline execution values normalized to strings."""
 
-        values: t.StrMapping = Field(
+        values: t.StrMapping = m.Field(
             default_factory=dict,
             description="Execution values filtered to scalar strings",
         )
 
-        @field_validator("values", mode="before")
+        @m.field_validator("values", mode="before")
         @classmethod
         def normalize_values(cls, value: t.Meltano.ValidatorInput) -> t.StrMapping:
             """Keep scalar execution values and stringify them."""
@@ -105,13 +104,13 @@ class FlextMeltanoModelsContext:
     class PluginComponentConfig(m.Entity):
         """Validated plugin component configuration for pipeline validators."""
 
-        name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
-        namespace: Annotated[str, Field(description="Plugin namespace")]
-        pip_url: Annotated[t.NonEmptyStr, Field(description="Plugin pip URL")]
-        executable: Annotated[str, Field(description="Plugin executable")]
-        type: Annotated[str, Field(default="extractor", description="Plugin type")]
+        name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
+        namespace: Annotated[str, m.Field(description="Plugin namespace")]
+        pip_url: Annotated[t.NonEmptyStr, m.Field(description="Plugin pip URL")]
+        executable: Annotated[str, m.Field(description="Plugin executable")]
+        type: Annotated[str, m.Field(default="extractor", description="Plugin type")]
 
-        @field_validator("name")
+        @m.field_validator("name")
         @classmethod
         def validate_name_business_rules(cls, v: str) -> str:
             """Validate plugin name business rules."""

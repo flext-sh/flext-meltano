@@ -5,8 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Annotated, Self
 
-from flext_cli import m
-from pydantic import Field, computed_field, field_validator, model_validator
+from flext_cli import m, u
 
 from flext_meltano import c, t
 
@@ -17,33 +16,33 @@ class FlextMeltanoModelsResults:
     class ExecutionResult(m.TimestampedModel):
         """Generic execution result tracking with validation."""
 
-        operation: Annotated[str, Field(description="Operation performed")]
-        status: Annotated[str, Field(description="Execution status")]
-        start_time: Annotated[datetime, Field(description="Execution start time")] = (
-            Field(
+        operation: Annotated[str, m.Field(description="Operation performed")]
+        status: Annotated[str, m.Field(description="Execution status")]
+        start_time: Annotated[datetime, m.Field(description="Execution start time")] = (
+            m.Field(
                 default_factory=lambda: datetime.now(tz=UTC),
                 description="Execution start time",
             )
         )
         end_time: Annotated[
-            datetime | None, Field(default=None, description="Execution end time")
+            datetime | None, m.Field(default=None, description="Execution end time")
         ] = None
         duration_seconds: Annotated[
             float | None,
-            Field(default=None, description="Execution duration in seconds"),
+            m.Field(default=None, description="Execution duration in seconds"),
         ] = None
         records_processed: Annotated[
             t.NonNegativeInt,
-            Field(default=0, description="Number of records processed"),
+            m.Field(default=0, description="Number of records processed"),
         ] = 0
         error_message: Annotated[
-            str | None, Field(default=None, description="Error message if failed")
+            str | None, m.Field(default=None, description="Error message if failed")
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping, Field(description="Additional execution metadata")
-        ] = Field(default_factory=dict, description="Additional execution metadata")
+            t.ConfigurationMapping, m.Field(description="Additional execution metadata")
+        ] = m.Field(default_factory=dict, description="Additional execution metadata")
 
-        @computed_field
+        @m.computed_field
         def execution_rate_per_second(self) -> float:
             """Execution rate (records/second)."""
             if not self.duration_seconds or self.duration_seconds <= 0:
@@ -52,12 +51,12 @@ class FlextMeltanoModelsResults:
             duration_seconds: float = self.duration_seconds
             return records_processed / duration_seconds
 
-        @computed_field
+        @m.computed_field
         def is_completed(self) -> bool:
             """Check if execution is completed."""
             return self.end_time is not None
 
-        @computed_field
+        @m.computed_field
         def is_successful(self) -> bool:
             """Check if execution was successful."""
             return (
@@ -65,7 +64,7 @@ class FlextMeltanoModelsResults:
                 and self.error_message is None
             )
 
-        @computed_field
+        @m.computed_field
         def performance_category(self) -> str:
             """Performance categorization."""
             if not self.duration_seconds or self.duration_seconds <= 0:
@@ -81,7 +80,7 @@ class FlextMeltanoModelsResults:
                 return "moderate_performance"
             return "low_performance"
 
-        @field_validator("status", mode="before")
+        @m.field_validator("status", mode="before")
         @classmethod
         def validate_status(cls, v: str) -> str:
             """Validate execution status."""
@@ -97,7 +96,7 @@ class FlextMeltanoModelsResults:
                 raise ValueError(msg)
             return v
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_execution_result(self) -> Self:
             """Validate execution result consistency."""
             if self.start_time and self.end_time:

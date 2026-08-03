@@ -6,7 +6,6 @@ from collections.abc import Mapping
 from typing import Annotated
 
 from flext_cli import m
-from pydantic import Field, field_validator
 
 from flext_meltano import t
 
@@ -18,23 +17,23 @@ class FlextMeltanoModelsDiscovery:
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
-            str, Field(default="", description="Plugin default variant")
+            str, m.Field(default="", description="Plugin default variant")
         ] = ""
-        variants: t.FlatContainerMapping = Field(
+        variants: t.FlatContainerMapping = m.Field(
             default_factory=dict, description="Available plugin variants"
         )
-        logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
+        logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, Field(default="", description="Plugin description")
+            str, m.Field(default="", description="Plugin description")
         ] = ""
 
-        @field_validator("default_variant", "logo_url", "description", mode="before")
+        @m.field_validator("default_variant", "logo_url", "description", mode="before")
         @classmethod
         def normalize_string_fields(cls, value: t.Meltano.ValidatorInput) -> str:
             """Normalize optional string fields from external payloads."""
             return "" if value is None else str(value)
 
-        @field_validator("variants", mode="before")
+        @m.field_validator("variants", mode="before")
         @classmethod
         def normalize_variants(
             cls, value: t.Meltano.ValidatorInput
@@ -50,27 +49,27 @@ class FlextMeltanoModelsDiscovery:
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
 
-        name: Annotated[t.NonEmptyStr, Field(description="Plugin name")]
-        type: Annotated[t.NonEmptyStr, Field(description="Plugin type")]
+        name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
+        type: Annotated[t.NonEmptyStr, m.Field(description="Plugin type")]
         default_variant: Annotated[
-            str, Field(default="", description="Default plugin variant")
+            str, m.Field(default="", description="Default plugin variant")
         ] = ""
         variants: Annotated[
-            str, Field(default="", description="Comma-separated variants")
+            str, m.Field(default="", description="Comma-separated variants")
         ] = ""
-        logo_url: Annotated[str, Field(default="", description="Plugin logo URL")]
+        logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, Field(default="", description="Plugin description")
+            str, m.Field(default="", description="Plugin description")
         ] = ""
 
     class PluginDiscoveryCatalog(m.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
-            Field(default_factory=dict, description="Discovered plugins catalog")
+            m.Field(default_factory=dict, description="Discovered plugins catalog")
         )
 
-        @field_validator("plugins", mode="before")
+        @m.field_validator("plugins", mode="before")
         @classmethod
         def normalize_plugins(
             cls, value: t.Meltano.ValidatorInput

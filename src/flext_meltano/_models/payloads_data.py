@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Annotated
 
 from flext_cli import m, u
-from pydantic import Field, field_validator
 
 from flext_meltano import t
 
@@ -20,15 +19,15 @@ class FlextMeltanoModelsPayloadsData:
 
         schema_definition: Annotated[
             t.FlatContainerMapping,
-            Field(
+            m.Field(
                 alias="schema",
                 serialization_alias="schema",
                 validation_alias="schema",
                 description="Schema-like JSON payload",
             ),
-        ] = Field(default_factory=dict, description="Schema-like JSON payload")
+        ] = m.Field(default_factory=dict, description="Schema-like JSON payload")
 
-        @field_validator("schema_definition", mode="before")
+        @m.field_validator("schema_definition", mode="before")
         @classmethod
         def normalize_schema(
             cls, value: t.Meltano.ValidatorInput
@@ -46,13 +45,13 @@ class FlextMeltanoModelsPayloadsData:
 
         records: Annotated[
             Sequence[t.FlatContainerMapping],
-            Field(description="Normalized record payloads"),
-        ] = Field(
+            m.Field(description="Normalized record payloads"),
+        ] = m.Field(
             default_factory=lambda: list[t.FlatContainerMapping](),
             description="Normalized record payloads",
         )
 
-        @field_validator("records", mode="before")
+        @m.field_validator("records", mode="before")
         @classmethod
         def normalize_records(
             cls, value: t.Meltano.ValidatorInput
@@ -69,11 +68,11 @@ class FlextMeltanoModelsPayloadsData:
     class ConfigMappingPayload(m.ArbitraryTypesModel):
         """Normalized mapping payload with string keys."""
 
-        values: t.JsonMapping = Field(
+        values: t.JsonMapping = m.Field(
             default_factory=dict, description="Normalized mapping values"
         )
 
-        @field_validator("values", mode="before")
+        @m.field_validator("values", mode="before")
         @classmethod
         def normalize_values(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
             """Normalize mapping-like payloads to a JSON-safe mapping."""
@@ -84,11 +83,11 @@ class FlextMeltanoModelsPayloadsData:
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
 
-        value: Annotated[Path, Field(description="Normalized path")] = Field(
+        value: Annotated[Path, m.Field(description="Normalized path")] = m.Field(
             default_factory=Path, description="Normalized path"
         )
 
-        @field_validator("value", mode="before")
+        @m.field_validator("value", mode="before")
         @classmethod
         def normalize_path(cls, value: t.Meltano.ValidatorInput) -> Path:
             """Normalize mixed path input into Path objects."""
@@ -100,10 +99,10 @@ class FlextMeltanoModelsPayloadsData:
         """Normalize str|dict content to writable string for file operations."""
 
         content: Annotated[
-            str, Field(default="", description="Normalized writable string content")
+            str, m.Field(default="", description="Normalized writable string content")
         ] = ""
 
-        @field_validator("content", mode="before")
+        @m.field_validator("content", mode="before")
         @classmethod
         def normalize_content(cls, value: t.Meltano.ValidatorInput) -> str:
             """Normalize dict content via yaml_dump_str, pass str through."""
@@ -118,11 +117,11 @@ class FlextMeltanoModelsPayloadsData:
     class VariantPayload(m.ArbitraryTypesModel):
         """Normalize plugin variant from external extraction (str|list|dict)."""
 
-        value: t.Meltano.VariantValue = Field(
+        value: t.Meltano.VariantValue = m.Field(
             default=None, description="Normalized variant value"
         )
 
-        @field_validator("value", mode="before")
+        @m.field_validator("value", mode="before")
         @classmethod
         def normalize_variant(
             cls, value: str | t.Meltano.ValidatorInput

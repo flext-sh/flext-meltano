@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from pydantic import Field, computed_field, model_validator
 
 from flext_meltano import c, t
 
@@ -18,19 +17,19 @@ class FlextMeltanoModelsProjects:
     class DbtManifestNode(m.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
 
-        name: Annotated[str | None, Field(default=None, description="Node name")]
-        path: Annotated[str | None, Field(default=None, description="Node path")]
+        name: Annotated[str | None, m.Field(default=None, description="Node name")]
+        path: Annotated[str | None, m.Field(default=None, description="Node path")]
         description: Annotated[
-            str | None, Field(default=None, description="Node description")
+            str | None, m.Field(default=None, description="Node description")
         ] = None
-        fqn: t.StrSequence = Field(
+        fqn: t.StrSequence = m.Field(
             default_factory=list, description="Fully qualified name parts"
         )
         resource_type: Annotated[
-            str, Field(default="", description="Node resource type (model, test, etc.)")
+            str, m.Field(default="", description="Node resource type (model, test, etc.)")
         ] = ""
 
-        @computed_field
+        @m.computed_field
         def fqn_string(self) -> str:
             """Fully qualified name as dot-separated string."""
             return ".".join(self.fqn) if self.fqn else ""
@@ -38,7 +37,7 @@ class FlextMeltanoModelsProjects:
     class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
-        nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = Field(
+        nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = m.Field(
             default_factory=dict, description="Manifest nodes keyed by node_id"
         )
 
@@ -55,21 +54,21 @@ class FlextMeltanoModelsProjects:
     class MeltanoProjectModel(m.Entity):
         """Generic Meltano project configuration with validation."""
 
-        project_id: Annotated[str, Field(description="Unique project identifier")]
+        project_id: Annotated[str, m.Field(description="Unique project identifier")]
         project_version: Annotated[
-            str, Field(default="1", description="Project version")
+            str, m.Field(default="1", description="Project version")
         ] = "1"
         default_environment: Annotated[
-            str, Field(default="dev", description="Default environment name")
+            str, m.Field(default="dev", description="Default environment name")
         ] = "dev"
-        plugins: t.FlatContainerMapping = Field(
+        plugins: t.FlatContainerMapping = m.Field(
             default_factory=dict, description="Plugin configurations"
         )
-        environments: t.FlatContainerMapping = Field(
+        environments: t.FlatContainerMapping = m.Field(
             default_factory=dict, description="Environment configurations"
         )
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:
             """Validate Meltano project configuration consistency."""
             if not self.project_id or not self.project_id.strip():
@@ -82,31 +81,31 @@ class FlextMeltanoModelsProjects:
 
         schema_version: Annotated[
             int,
-            Field(
+            m.Field(
                 default=1,
                 ge=1,
                 le=1,
                 description="Pipeline schema version (only version 1 supported)",
             ),
         ] = 1
-        project_id: Annotated[str, Field(description="Project ID required")]
+        project_id: Annotated[str, m.Field(description="Project ID required")]
         default_environment: Annotated[
-            str, Field(default="dev", description="Default environment")
+            str, m.Field(default="dev", description="Default environment")
         ] = "dev"
-        project_root: Path = Field(
+        project_root: Path = m.Field(
             default_factory=Path.cwd, description="Project root directory"
         )
-        environments: t.StrSequence = Field(
+        environments: t.StrSequence = m.Field(
             default_factory=lambda: ["dev", "staging", "prod"],
             description="Available environments",
         )
 
-        @computed_field
+        @m.computed_field
         def environment_count(self) -> int:
             """Number of environments."""
             return u.count(self.environments)
 
-        @computed_field
+        @m.computed_field
         def has_production_environment(self) -> bool:
             """Check if production environment exists."""
             prod_environments = {"prod", "production", "live"}
@@ -116,7 +115,7 @@ class FlextMeltanoModelsProjects:
             prod_envs_list: t.StrSequence = list(prod_environments)
             return any(u.in_(env, prod_envs_list) for env in normalized_envs)
 
-        @computed_field
+        @m.computed_field
         def project_maturity(self) -> str:
             """Project maturity assessment."""
             prod_envs = {"prod", "production", "live"}
@@ -132,7 +131,7 @@ class FlextMeltanoModelsProjects:
                 return "developing"
             return "basic"
 
-        @model_validator(mode="after")
+        @u.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:
             """Validate project consistency."""
             if self.default_environment not in self.environments:

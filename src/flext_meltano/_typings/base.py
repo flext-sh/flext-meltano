@@ -11,8 +11,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar
 
-from flext_cli import t
-from pydantic import TypeAdapter
+from flext_cli import m, t
 
 from flext_meltano import c
 
@@ -24,7 +23,7 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[TypeAdapter[t.FlatContainerMapping]] = TypeAdapter(
+    CONTAINER_MAP_ADAPTER: ClassVar[m.TypeAdapter[t.FlatContainerMapping]] = m.TypeAdapter(
         t.FlatContainerMapping
     )
 
