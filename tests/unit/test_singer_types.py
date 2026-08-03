@@ -41,8 +41,8 @@ class TestsFlextMeltanoSingerTypes:
 
     def test_facade_composes_meltano_and_tests_type_surfaces(self) -> None:
         """The facade composes both the Meltano and flext-tests type systems."""
-        assert issubclass(t, FlextMeltanoTypes)
-        assert issubclass(t, FlextTestsTypes)
+        assert FlextMeltanoTypes in t.__mro__
+        assert FlextTestsTypes in t.__mro__
 
     def test_meltano_namespace_composes_singer_surface(self) -> None:
         """Documented contract: Singer typing surface is composed into t.Meltano."""

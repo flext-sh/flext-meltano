@@ -65,13 +65,19 @@ class TestFlextMeltanoAbstractionsComplete:
                 tap_type="tap-csv",
                 connection_config={"file_path": f"{temp_dir}/data.csv"},
             )
-            tap_instance = m.Meltano.TapInstance.model_validate({"tap_type": "tap-csv", "settings": config, "tap_id": "tap_csv_123", "status": "initialized", "streams": [
+            tap_instance = m.Meltano.TapInstance.model_validate({
+                "tap_type": "tap-csv",
+                "settings": config,
+                "tap_id": "tap_csv_123",
+                "status": "initialized",
+                "streams": [
                     m.Meltano.StreamInfo(
                         stream_name="test_stream",
                         stream_schema={},
                         stream_created_at="2025-01-01T00:00:00Z",
                     )
-                ]})
+                ],
+            })
             tm.that(tap_instance.tap_type, eq="tap-csv")
             tm.that(tap_instance.tap_id, eq="tap_csv_123")
             tm.that(len(tap_instance.streams), eq=1)
