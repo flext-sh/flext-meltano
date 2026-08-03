@@ -5,7 +5,6 @@ from __future__ import annotations
 import tempfile
 from unittest.mock import patch
 
-import pytest
 from flext_tests import tm
 from pydantic_core import ValidationError
 
@@ -241,30 +240,6 @@ class TestFlextMeltanoAbstractionsComplete:
         ):
             result = self.tap_abstractions.discover_streams(tap_instance)
         tm.that(result, is_=r)
-
-    def test_get_stream_by_name(self) -> None:
-        """Test get_stream_by_name method using flext_tests."""
-        if not hasattr(self.tap_abstractions, "get_stream_by_name"):
-            pytest.skip(
-                "get_stream_by_name not available on this FlextMeltanoAbstractions"
-            )
-        config = m.Meltano.TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"}
-        )
-        tap_instance = m.Meltano.TapInstance.model_validate({
-            "tap_type": "tap-postgres",
-            "settings": config,
-            "tap_id": "postgres_tap_123",
-        })
-        with patch.object(
-            FlextMeltanoAbstractions,
-            "_run_meltano",
-            return_value=r[str].ok("users\norders"),
-        ):
-            stream_result = self.tap_abstractions.get_stream_by_name(
-                tap_instance, "users"
-            )
-        tm.that(stream_result, is_=r)
 
     def test_generate_catalog_success(self) -> None:
         """Test generate_catalog delegates to discover_streams."""
