@@ -65,19 +65,13 @@ class TestFlextMeltanoAbstractionsComplete:
                 tap_type="tap-csv",
                 connection_config={"file_path": f"{temp_dir}/data.csv"},
             )
-            tap_instance = m.Meltano.TapInstance(
-                tap_type="tap-csv",
-                settings=config,
-                tap_id="tap_csv_123",
-                status="initialized",
-                streams=[
+            tap_instance = m.Meltano.TapInstance.model_validate({"tap_type": "tap-csv", "settings": config, "tap_id": "tap_csv_123", "status": "initialized", "streams": [
                     m.Meltano.StreamInfo(
                         stream_name="test_stream",
                         stream_schema={},
                         stream_created_at="2025-01-01T00:00:00Z",
                     )
-                ],
-            )
+                ]})
             tm.that(tap_instance.tap_type, eq="tap-csv")
             tm.that(tap_instance.tap_id, eq="tap_csv_123")
             tm.that(len(tap_instance.streams), eq=1)
@@ -110,9 +104,12 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv", settings=config, tap_id="test_tap_123", status="ready"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "test_tap_123",
+            "status": "ready",
+        })
         result = self.tap_abstractions.build_tap_instance(tap_instance)
         assert isinstance(result, dict)
         tm.that(result["tap_id"], eq="test_tap_123")
@@ -160,14 +157,18 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
-        valid_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv", settings=config, tap_id="valid_tap_123"
-        )
+        valid_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "valid_tap_123",
+        })
         try:
             invalid_config = m.Meltano.TapConfig(tap_type="", connection_config={})
-            invalid_instance = m.Meltano.TapInstance(
-                tap_type="", settings=invalid_config, tap_id=""
-            )
+            invalid_instance = m.Meltano.TapInstance.model_validate({
+                "tap_type": "",
+                "settings": invalid_config,
+                "tap_id": "",
+            })
             invalid_result = self.tap_abstractions.process_tap_config(
                 invalid_instance.settings
             )
@@ -187,9 +188,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions,
             "_run_meltano",
@@ -203,9 +206,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv", settings=config, tap_id="csv_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "csv_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions, "_run_meltano", return_value=r[str].ok("data")
         ):
@@ -218,9 +223,11 @@ class TestFlextMeltanoAbstractionsComplete:
             tap_type="tap-unknown",
             connection_config={"endpoint": "http://api.example.com"},
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-unknown", settings=config, tap_id="unknown_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-unknown",
+            "settings": config,
+            "tap_id": "unknown_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions,
             "_run_meltano",
@@ -238,9 +245,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions,
             "_run_meltano",
@@ -256,9 +265,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions,
             "_run_meltano",
@@ -272,9 +283,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_catalog"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_catalog",
+        })
         with patch.object(
             FlextMeltanoAbstractions, "_run_meltano", return_value=r[str].ok("users")
         ):
@@ -289,9 +302,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_123",
+        })
         mock_target = m.Meltano.TargetConfig(
             target_type="target-jsonl", connection_config={"loaded_records": 0}
         )
@@ -308,9 +323,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv", settings=config, tap_id="csv_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "csv_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions, "_run_meltano", return_value=r[str].ok("sync ok")
         ):
@@ -322,9 +339,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_123",
+        })
         with patch.object(
             FlextMeltanoAbstractions,
             "_run_meltano",
@@ -338,9 +357,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-csv", connection_config={"file": "test.csv"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv", settings=config, tap_id="csv_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "csv_tap_123",
+        })
         tap_type = self.tap_abstractions.fetch_tap_type(tap_instance)
         tm.that(tap_type, eq="tap-csv")
 
@@ -385,9 +406,11 @@ class TestFlextMeltanoAbstractionsComplete:
         config = m.Meltano.TapConfig(
             tap_type="tap-postgres", connection_config={"host": "localhost"}
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-postgres", settings=config, tap_id="postgres_tap_123"
-        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-postgres",
+            "settings": config,
+            "tap_id": "postgres_tap_123",
+        })
         assert self.tap_abstractions is not None
         tm.that(hasattr(self.tap_abstractions, "discover_streams"), eq=True)
         with patch.object(

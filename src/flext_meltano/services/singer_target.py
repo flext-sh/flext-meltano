@@ -73,11 +73,11 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 sink_name=sink_config.sink_type,
                 sink_type=sink_config.sink_type,
             )
-            sink_instance = m.Meltano.DataSinkInstance(
-                sink_type=sink_config.sink_type,
-                settings=sink_config,
-                status=c.Meltano.OperationStatus.CONFIGURED,
-            )
+            sink_instance = m.Meltano.DataSinkInstance.model_validate({
+                "sink_type": sink_config.sink_type,
+                "settings": sink_config,
+                "status": c.Meltano.OperationStatus.CONFIGURED,
+            })
             self.logger.info(
                 "Sink instance created successfully",
                 sink_name=sink_instance.settings.sink_type,
