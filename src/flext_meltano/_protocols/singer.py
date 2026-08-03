@@ -20,71 +20,59 @@ class FlextMeltanoProtocolsSinger:
     """Singer Tap, Target, and DbtRunner protocol definitions."""
 
     @runtime_checkable
-    class Tap(p.Service[t.ContainerMapping], Protocol):
+    class Tap(p.Service[t.FlatContainerMapping], Protocol):
         """Singer Tap protocol extending Service for ELT operations."""
 
-        def discover(self) -> p.Result[t.ContainerMapping]:
+        def discover(self) -> p.Result[t.FlatContainerMapping]:
             """Discover catalog with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.FlatContainerMapping]:
             """Execute the tap extraction (implements Service)."""
             ...
 
         def sync(
-            self,
-            catalog: t.FlatContainerMapping,
-        ) -> p.Result[t.ContainerMapping]:
+            self, catalog: t.FlatContainerMapping
+        ) -> p.Result[t.FlatContainerMapping]:
             """Sync data from source with r."""
             ...
 
     @runtime_checkable
-    class Target(p.Service[t.ContainerMapping], Protocol):
+    class Target(p.Service[t.FlatContainerMapping], Protocol):
         """Singer Target protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.FlatContainerMapping]:
             """Execute the target loading (implements Service)."""
             ...
 
         def handle_batch(
-            self,
-            records: Sequence[t.Meltano.OptionalScalarMap],
-        ) -> p.Result[t.ContainerMapping]:
+            self, records: Sequence[t.Meltano.OptionalScalarMap]
+        ) -> p.Result[t.FlatContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
-            self,
-            record: t.Meltano.OptionalScalarMap,
-        ) -> p.Result[t.ContainerMapping]:
+            self, record: t.Meltano.OptionalScalarMap
+        ) -> p.Result[t.FlatContainerMapping]:
             """Handle a single record with r."""
             ...
 
     @runtime_checkable
-    class DbtRunner(
-        p.Service[t.ContainerMapping],
-        Protocol,
-    ):
+    class DbtRunner(p.Service[t.FlatContainerMapping], Protocol):
         """DBT Runner protocol extending Service for ELT operations."""
 
         @override
-        def execute(self) -> p.Result[t.ContainerMapping]:
+        def execute(self) -> p.Result[t.FlatContainerMapping]:
             """Execute DBT transformations (implements Service)."""
             ...
 
-        def run(
-            self,
-            models: t.StrSequence,
-        ) -> p.Result[t.ContainerMapping]:
+        def run(self, models: t.StrSequence) -> p.Result[t.FlatContainerMapping]:
             """Run DBT models with r."""
             ...
 
-        def test(
-            self,
-            models: t.StrSequence,
-        ) -> p.Result[t.ContainerMapping]:
+        def test(self, models: t.StrSequence) -> p.Result[t.FlatContainerMapping]:
             """Test DBT models with r."""
             ...
 
@@ -102,15 +90,11 @@ class FlextMeltanoProtocolsSinger:
         """
 
         @property
-        def config(self) -> t.ContainerMapping:
+        def settings(self) -> t.FlatContainerMapping:
             """Tap configuration."""
             ...
 
-        def run_cli(
-            self,
-            args: t.StrSequence,
-            prog_name: str,
-        ) -> int:
+        def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
             """Execute the tap CLI and return a normalized exit code."""
             ...
 
@@ -140,8 +124,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def get_records(
-            self,
-            stream_name: str,
+            self, stream_name: str
         ) -> Sequence[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
@@ -151,9 +134,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def sync(
-            self,
-            catalog: m.Meltano.SingerCatalog,
-            state: m.Meltano.SingerStateMessage,
+            self, catalog: m.Meltano.SingerCatalog, state: m.Meltano.SingerStateMessage
         ) -> None:
             """Synchronize data from source to stdout."""
             ...
@@ -166,7 +147,7 @@ class FlextMeltanoProtocolsSinger:
         """
 
         name: str
-        config: t.ContainerMapping
+        config: t.FlatContainerMapping
 
         def consume(self, records: Sequence[m.Meltano.SingerRecordMessage]) -> int:
             """Consume records batch.
@@ -181,26 +162,77 @@ class FlextMeltanoProtocolsSinger:
             ...
 
     @runtime_checkable
+    class RecordFetcher(Protocol):
+        """Consumer-side fetcher contract for declarative Singer taps."""
+
+        def fetch(
+            self, request: m.Meltano.FetchRequest
+        ) -> p.Result[m.Meltano.FetchResult]:
+            """Fetch records for one stream from the consumer domain."""
+            ...
+
+    class SingerCommand(Protocol):
+        """Opaque Singer CLI command object."""
+
+        def main(self, *, args: t.StrSequence, prog_name: str) -> t.JsonValue | None:
+            """Invoke the Singer CLI command and return its output."""
+            ...
+
+    @runtime_checkable
+    class SingerTapBackend(Protocol):
+        """Raw Singer SDK tap surface consumed by the internal adapter.
+
+        Both the full SDK tap class and the settings-only backend are
+        represented by the same canonical contract so consumer code can
+        pass either without importing ``singer_sdk`` directly.
+        """
+
+        @property
+        def config(self) -> t.FlatContainerMapping:
+            """Tap runtime configuration mapping."""
+            ...
+
+        @classmethod
+        def get_singer_command(cls) -> FlextMeltanoProtocolsSinger.SingerCommand:
+            """Return the Singer CLI command object."""
+            ...
+
+        def discover_streams(
+            self,
+        ) -> Sequence[FlextMeltanoProtocolsSinger.SingerStreamInfo]:
+            """Discover available streams."""
+            ...
+
+        def sync_all(self) -> None:
+            """Execute sync for all selected streams."""
+            ...
+
+    SingerTapSdkBackend = SingerTapBackend
+    SingerTapSettingsBackend = SingerTapBackend
+
+    @runtime_checkable
     class SingerDrainSink(Protocol):
         """Typed sink contract for target service drain and record operations.
 
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
 
-        Context/Record types use ``t.MutableContainerValueMapping`` — the canonical
+        Context/Record types use ``t.Meltano.MutableContainerValueMapping`` — the canonical
         bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, ContainerValue]``.
         """
 
-        def start_drain(self) -> t.MutableContainerValueMapping: ...
+        def start_drain(self) -> t.Meltano.MutableContainerValueMapping: ...
 
-        def process_batch(self, context: t.MutableContainerValueMapping) -> None: ...
+        def process_batch(
+            self, context: t.Meltano.MutableContainerValueMapping
+        ) -> None: ...
 
         def mark_drained(self) -> None: ...
 
         def process_record(
             self,
-            record: t.MutableContainerValueMapping,
-            context: t.MutableContainerValueMapping,
+            record: t.Meltano.MutableContainerValueMapping,
+            context: t.Meltano.MutableContainerValueMapping,
         ) -> None: ...
 
     @runtime_checkable

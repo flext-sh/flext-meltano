@@ -7,10 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-
 import singer_sdk.typing as singer_sdk_typing
-from flext_cli import t
 
 from flext_meltano import c
 
@@ -22,15 +19,6 @@ class FlextMeltanoTypingsSinger:
     External library wrappers (singer_sdk.typing) are kept to prevent
     direct imports by consumer projects.
     """
-
-    type SingerCatalogEntry = Mapping[
-        str,
-        str | Mapping[str, t.Scalar | None],
-    ]
-    type SingerStreamCatalog = Mapping[
-        str,
-        Sequence[FlextMeltanoTypingsSinger.SingerCatalogEntry],
-    ]
 
     SingerReplicationMethod = c.Meltano.SingerReplicationMethod
 
@@ -45,6 +33,4 @@ class FlextMeltanoTypingsSinger:
     SingerNumberType = singer_sdk_typing.NumberType
     SingerObjectType = singer_sdk_typing.ObjectType
     SingerPropertiesList = singer_sdk_typing.PropertiesList
-    SingerProperty = singer_sdk_typing.Property
-    SingerStringType = singer_sdk_typing.StringType
     SingerTimeType = singer_sdk_typing.TimeType

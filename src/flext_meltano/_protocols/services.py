@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
@@ -25,27 +24,20 @@ class FlextMeltanoProtocolsServices:
         """Protocol for Meltano command execution."""
 
         def execute_meltano_command(
-            self,
-            command: t.StrSequence,
-            timeout: int = ...,
-            _cwd: Path | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+            self, command: t.StrSequence, timeout: int = ..., _cwd: Path | None = None
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a Meltano runtime command."""
             ...
 
         def get_project_plugins(
-            self,
-            plugin_type: str | None = None,
-            _cwd: Path | None = None,
-        ) -> r[Sequence[t.StrMapping]]:
+            self, plugin_type: str | None = None, _cwd: Path | None = None
+        ) -> p.Result[t.SequenceOf[t.StrMapping]]:
             """Return project-scoped plugin definitions."""
             ...
 
         def execute_dbt_command(
-            self,
-            dbt_command: str,
-            args: t.StrSequence | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+            self, dbt_command: str, args: t.StrSequence | None = None
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a DBT command."""
             ...
 
@@ -53,8 +45,8 @@ class FlextMeltanoProtocolsServices:
             self,
             tap_name: str,
             target_name: str,
-            _config: t.ContainerMapping | None = None,
-        ) -> r[m.Meltano.CommandExecutionResult]:
+            config: t.FlatContainerMapping | None = None,
+        ) -> p.Result[m.Meltano.CommandExecutionResult]:
             """Execute a complete ELT pipeline."""
             ...
 
@@ -67,19 +59,17 @@ class FlextMeltanoProtocolsServices:
             ...
 
     @runtime_checkable
-    class ServiceCall(p.Service[t.Container], Protocol):
+    class ServiceCall(p.Service[t.FlatContainer], Protocol):
         """Service call protocol extending Service."""
 
         def call(
-            self,
-            operation: str,
-            payload: t.ConfigurationMapping,
-        ) -> p.Result[t.Container]:
+            self, operation: str, payload: t.ConfigurationMapping
+        ) -> p.Result[t.FlatContainer]:
             """Execute service call with r."""
             ...
 
         @override
-        def execute(self) -> p.Result[t.Container]:
+        def execute(self) -> p.Result[t.FlatContainer]:
             """Execute service operation (implements Service)."""
             ...
 

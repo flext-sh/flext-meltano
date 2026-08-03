@@ -6,7 +6,6 @@ from collections.abc import Sequence
 from typing import Annotated
 
 from flext_cli import m, u
-from pydantic import Field, field_validator
 
 from flext_core import r
 from flext_meltano import t
@@ -17,8 +16,8 @@ class FlextMeltanoModelsCore:
 
     @staticmethod
     def protect_sensitive_config(
-        value: t.ContainerMapping,
-    ) -> t.ContainerMapping:
+        value: t.FlatContainerMapping,
+    ) -> t.FlatContainerMapping:
         """Protect sensitive keys in configuration dict."""
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
@@ -26,17 +25,16 @@ class FlextMeltanoModelsCore:
             normalized = u.normalize(k, case="lower")
             sensitive_keys_list: t.StrSequence = list(sensitive_keys)
             checks_result = u.process(
-                sensitive_keys_list,
-                lambda s: r[bool].ok(s in normalized),
+                sensitive_keys_list, lambda s: r[bool].ok(s in normalized)
             )
             checks = FlextMeltanoModelsCore.BooleanListValue.model_validate({
-                "items": checks_result.unwrap_or([]),
+                "items": checks_result.unwrap_or([])
             }).items
             if checks:
-                return u.any_(*checks)
+                return any(checks)
             return False
 
-        protected: t.MutableContainerMapping = {}
+        protected: t.MutableFlatContainerMapping = {}
         for key, item in value.items():
             protected[key] = "[PROTECTED]" if is_sensitive(key) else item
         return protected
@@ -45,20 +43,17 @@ class FlextMeltanoModelsCore:
     def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
         """Normalize arbitrary values into a validated list of strings."""
         return FlextMeltanoModelsCore.StringListValue.model_validate({
-            "items": value,
+            "items": value
         }).items
 
     class StringListValue(m.ArbitraryTypesModel):
         """Validated string list wrapper for result normalization."""
 
         items: Annotated[
-            t.StrSequence,
-            Field(
-                description="Normalized list of string values",
-            ),
-        ] = Field(default_factory=list, description="Normalized string values")
+            t.StrSequence, m.Field(description="Normalized list of string values")
+        ] = m.Field(default_factory=list, description="Normalized string values")
 
-        @field_validator("items", mode="before")
+        @m.field_validator("items", mode="before")
         @classmethod
         def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.StrSequence:
             """Convert sequence-like values into string lists."""
@@ -70,16 +65,13 @@ class FlextMeltanoModelsCore:
         """Validated boolean list wrapper for process output."""
 
         items: Annotated[
-            Sequence[bool],
-            Field(
-                description="Normalized list of boolean values",
-            ),
-        ] = Field(
+            Sequence[bool], m.Field(description="Normalized list of boolean values")
+        ] = m.Field(
             default_factory=lambda: list[bool](),
             description="Normalized boolean values",
         )
 
-        @field_validator("items", mode="before")
+        @m.field_validator("items", mode="before")
         @classmethod
         def normalize_items(cls, value: t.Meltano.ValidatorInput) -> Sequence[bool]:
             """Convert sequence-like values into booleans."""

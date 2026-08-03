@@ -9,11 +9,9 @@ from __future__ import annotations
 
 from flext_cli import t
 
-from flext_meltano import (
-    FlextMeltanoTypingsBase,
-    FlextMeltanoTypingsDomains,
-    FlextMeltanoTypingsSinger,
-)
+from flext_meltano._typings.base import FlextMeltanoTypingsBase
+from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
+from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
 
 
 class FlextMeltanoTypes(t):
@@ -25,9 +23,7 @@ class FlextMeltanoTypes(t):
     """
 
     class Meltano(
-        FlextMeltanoTypingsBase,
-        FlextMeltanoTypingsSinger,
-        FlextMeltanoTypingsDomains,
+        FlextMeltanoTypingsBase, FlextMeltanoTypingsSinger, FlextMeltanoTypingsDomains
     ):
         """Meltano plugin complex types namespace."""
 

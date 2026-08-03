@@ -150,11 +150,11 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 stream_config=stream_config if stream_config is not None else {},
                 tap_version=tap_version,
             )
-            instance = m.Meltano.TapInstance(
-                tap_type=tap_type,
-                settings=tap_cfg,
-                tap_id=(f"{tap_type}_{c.Meltano.PAYLOAD_TAP_ID_AUTO_SUFFIX}"),
-            )
+            instance = m.Meltano.TapInstance.model_validate({
+                "tap_type": tap_type,
+                "settings": tap_cfg,
+                "tap_id": (f"{tap_type}_{c.Meltano.PAYLOAD_TAP_ID_AUTO_SUFFIX}"),
+            })
             return r[m.Meltano.TapInstance].ok(instance)
         except c.Meltano.OPERATION_ERRORS as exc:
             return e.fail_operation(

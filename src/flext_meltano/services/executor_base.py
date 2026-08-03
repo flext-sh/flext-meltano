@@ -159,6 +159,12 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         )
         return r[t.SequenceOf[t.StrMapping]].ok(discovered)
 
+    def get_project_plugins(
+        self, plugin_type: str | None = None, _cwd: Path | None = None
+    ) -> p.Result[t.SequenceOf[t.StrMapping]]:
+        """Alias for ``fetch_project_plugins`` matching the executor protocol."""
+        return self.fetch_project_plugins(plugin_type, _cwd)
+
     def _runtime_environment_args(self, _cwd: Path | None = None) -> t.StrSequence:
         """Select a runtime environment explicitly to avoid leaking test env vars."""
         active_settings = (

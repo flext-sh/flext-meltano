@@ -225,14 +225,22 @@ class FlextMeltanoUtilitiesRuntime:
     ) -> t.StrMapping:
         """Build canonical plugin discovery payload from raw Meltano metadata."""
         variants_str = u.join(list(variants.keys()), separator=",") if variants else ""
-        return m.Meltano.PluginDiscoveryItem.model_validate({
+        item = m.Meltano.PluginDiscoveryItem.model_validate({
             "name": plugin_name,
             "type": plugin_type,
             "default_variant": default_variant,
             "variants": variants_str,
             "description": description,
             "logo_url": logo_url,
-        }).model_dump()
+        })
+        return {
+            "name": item.name,
+            "type": item.type,
+            "default_variant": item.default_variant,
+            "variants": item.variants,
+            "description": item.description,
+            "logo_url": item.logo_url,
+        }
 
     @staticmethod
     def command_status(

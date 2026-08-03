@@ -34,7 +34,9 @@ class TestsFlextMeltanoCliIntegration:
     def test_minimal_args_produce_model_with_defaulted_optionals(self) -> None:
         cli_args: t.JsonMapping = {"tap_name": "tap-postgres", "discover": False}
 
-        model = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
+        model: m.Meltano.TapRunParams = tm.ok(
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
+        )
 
         tm.that(model.tap_name, eq="tap-postgres")
         tm.that(model.discover, eq=False)
@@ -46,7 +48,9 @@ class TestsFlextMeltanoCliIntegration:
     def test_tap_name_only_defaults_discover_to_false(self) -> None:
         cli_args: t.JsonMapping = {"tap_name": "tap-postgres"}
 
-        model = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
+        model: m.Meltano.TapRunParams = tm.ok(
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
+        )
 
         tm.that(model.discover, eq=False)
 
@@ -54,7 +58,9 @@ class TestsFlextMeltanoCliIntegration:
     def test_discover_flag_is_preserved(self, *, discover: bool) -> None:
         cli_args: t.JsonMapping = {"tap_name": "tap-postgres", "discover": discover}
 
-        model = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
+        model: m.Meltano.TapRunParams = tm.ok(
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
+        )
 
         tm.that(model.discover, eq=discover)
 
@@ -67,7 +73,9 @@ class TestsFlextMeltanoCliIntegration:
             field_name: f"/path/to/{field_name}.json",
         }
 
-        model = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
+        model: m.Meltano.TapRunParams = tm.ok(
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
+        )
 
         tm.that(getattr(model, field_name), eq=f"/path/to/{field_name}.json")
 
@@ -81,8 +89,10 @@ class TestsFlextMeltanoCliIntegration:
             "discover": True,
         }
 
-        model = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
-        dumped = model.model_dump()
+        model: m.Meltano.TapRunParams = tm.ok(
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
+        )
+        dumped: t.JsonMapping = model.model_dump()
 
         for key, expected in cli_args.items():
             tm.that(dumped[key], eq=expected)
@@ -94,8 +104,10 @@ class TestsFlextMeltanoCliIntegration:
             "discover": True,
         }
 
-        first = tm.ok(u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args))
-        second = tm.ok(
+        first: m.Meltano.TapRunParams = tm.ok(
+            u.Cli.cli_args_to_model(m.Meltano.TapRunParams, cli_args)
+        )
+        second: m.Meltano.TapRunParams = tm.ok(
             u.Cli.cli_args_to_model(m.Meltano.TapRunParams, first.model_dump())
         )
 
