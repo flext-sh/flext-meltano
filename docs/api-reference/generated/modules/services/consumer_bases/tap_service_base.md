@@ -2,6 +2,10 @@
 
 # flext_meltano.services.consumer_bases.tap_service_base
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.consumer_bases.tap_service_base
     options:
       show_root_heading: true

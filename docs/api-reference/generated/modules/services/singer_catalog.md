@@ -2,6 +2,10 @@
 
 # flext_meltano.services.singer_catalog
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.singer_catalog
     options:
       show_root_heading: true

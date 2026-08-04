@@ -2,6 +2,10 @@
 
 # flext_meltano.services.meltano_plugin_discovery
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.meltano_plugin_discovery
     options:
       show_root_heading: true

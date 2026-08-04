@@ -2,6 +2,10 @@
 
 # flext_meltano.services.adapters
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.adapters
     options:
       show_root_heading: true
