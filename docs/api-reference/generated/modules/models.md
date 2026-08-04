@@ -2,6 +2,10 @@
 
 # flext_meltano.models
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.models
     options:
       show_root_heading: true

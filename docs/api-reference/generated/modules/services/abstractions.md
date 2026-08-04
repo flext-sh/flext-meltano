@@ -2,6 +2,10 @@
 
 # flext_meltano.services.abstractions
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.abstractions
     options:
       show_root_heading: true

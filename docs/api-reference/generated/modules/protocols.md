@@ -2,6 +2,10 @@
 
 # flext_meltano.protocols
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.protocols
     options:
       show_root_heading: true

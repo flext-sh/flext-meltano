@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Annotated, Literal, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
 
-from flext_meltano import t
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsSinger:
@@ -16,10 +16,14 @@ class FlextMeltanoModelsSinger:
     class SingerSchemaMessage(m.ArbitraryTypesModel):
         """Canonical Singer SCHEMA message model."""
 
+        # Why: mro-4p0t — accept StrEnum SSOT at call sites (flext-target-oracle-wms).
         type: Annotated[
-            Literal["SCHEMA"],
-            m.Field(default="SCHEMA", description="Singer message discriminator"),
-        ] = "SCHEMA"
+            c.Meltano.SingerMessageType,
+            m.Field(
+                default=c.Meltano.SingerMessageType.SCHEMA,
+                description="Singer message discriminator",
+            ),
+        ] = c.Meltano.SingerMessageType.SCHEMA
         stream: Annotated[t.NonEmptyStr, m.Field(description="Singer stream name")]
         schema_definition: Annotated[
             t.FlatContainerMapping,
@@ -45,9 +49,12 @@ class FlextMeltanoModelsSinger:
         """Canonical Singer RECORD message model."""
 
         type: Annotated[
-            Literal["RECORD"],
-            m.Field(default="RECORD", description="Singer message discriminator"),
-        ] = "RECORD"
+            c.Meltano.SingerMessageType,
+            m.Field(
+                default=c.Meltano.SingerMessageType.RECORD,
+                description="Singer message discriminator",
+            ),
+        ] = c.Meltano.SingerMessageType.RECORD
         stream: Annotated[str, m.Field(description="Singer stream name")]
         record: Annotated[
             t.FlatContainerMapping, m.Field(description="Singer record payload")
@@ -71,9 +78,12 @@ class FlextMeltanoModelsSinger:
         """Canonical Singer STATE message model."""
 
         type: Annotated[
-            Literal["STATE"],
-            m.Field(default="STATE", description="Singer message discriminator"),
-        ] = "STATE"
+            c.Meltano.SingerMessageType,
+            m.Field(
+                default=c.Meltano.SingerMessageType.STATE,
+                description="Singer message discriminator",
+            ),
+        ] = c.Meltano.SingerMessageType.STATE
         value: Annotated[
             t.MutableFlatContainerMapping,
             m.Field(description="Singer state bookmark payload"),
@@ -88,11 +98,12 @@ class FlextMeltanoModelsSinger:
         """
 
         type: Annotated[
-            Literal["ACTIVATE_VERSION"],
+            c.Meltano.SingerMessageType,
             m.Field(
-                default="ACTIVATE_VERSION", description="Singer message discriminator"
+                default=c.Meltano.SingerMessageType.ACTIVATE_VERSION,
+                description="Singer message discriminator",
             ),
-        ] = "ACTIVATE_VERSION"
+        ] = c.Meltano.SingerMessageType.ACTIVATE_VERSION
         stream: Annotated[str, m.Field(description="Singer stream name")]
         version: Annotated[
             t.PositiveInt, m.Field(description="Stream version to activate")

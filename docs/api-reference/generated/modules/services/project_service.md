@@ -2,6 +2,10 @@
 
 # flext_meltano.services.project_service
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.project_service
     options:
       show_root_heading: true

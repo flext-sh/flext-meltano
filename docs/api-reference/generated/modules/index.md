@@ -1,38 +1,11 @@
-<!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
-
 # flext-meltano Module Index
+
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
+<!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
 These pages are generated from public modules and their docstrings.
 
-- [flext_meltano.api](api.md)
-- [flext_meltano.base](base.md)
-- [flext_meltano.cli](cli.md)
-- [flext_meltano.constants](constants.md)
-- [flext_meltano.models](models.md)
-- [flext_meltano.protocols](protocols.md)
-- [flext_meltano.services.abstractions](services/abstractions.md)
-- [flext_meltano.services.abstractions_base](services/abstractions_base.md)
-- [flext_meltano.services.adapters](services/adapters.md)
-- [flext_meltano.services.bridge](services/bridge.md)
-- [flext_meltano.services.consumer_bases.dbt_service_base](services/consumer_bases/dbt_service_base.md)
-- [flext_meltano.services.consumer_bases.tap_service_base](services/consumer_bases/tap_service_base.md)
-- [flext_meltano.services.consumer_bases.target_service_base](services/consumer_bases/target_service_base.md)
-- [flext_meltano.services.dbt_project](services/dbt_project.md)
-- [flext_meltano.services.dbt_runner](services/dbt_runner.md)
-- [flext_meltano.services.executor](services/executor.md)
-- [flext_meltano.services.executor_base](services/executor_base.md)
-- [flext_meltano.services.library_runner](services/library_runner.md)
-- [flext_meltano.services.meltano_plugin_discovery](services/meltano_plugin_discovery.md)
-- [flext_meltano.services.meltano_plugins](services/meltano_plugins.md)
-- [flext_meltano.services.meltano_project_sdk](services/meltano_project_sdk.md)
-- [flext_meltano.services.project_service](services/project_service.md)
-- [flext_meltano.services.services](services/services.md)
-- [flext_meltano.services.singer_catalog](services/singer_catalog.md)
-- [flext_meltano.services.singer_sdk](services/singer_sdk.md)
-- [flext_meltano.services.singer_state](services/singer_state.md)
-- [flext_meltano.services.singer_tap](services/singer_tap.md)
-- [flext_meltano.services.singer_target](services/singer_target.md)
-- [flext_meltano.services.singer_translator](services/singer_translator.md)
-- [flext_meltano.services.validators](services/validators.md)
-- [flext_meltano.typings](typings.md)
-- [flext_meltano.utilities](utilities.md)
+_No public modules discovered._

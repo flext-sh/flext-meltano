@@ -2,6 +2,10 @@
 
 # flext_meltano.services.dbt_project
 
+<!-- TOC START -->
+- No sections found
+<!-- TOC END -->
+
 ::: flext_meltano.services.dbt_project
     options:
       show_root_heading: true
