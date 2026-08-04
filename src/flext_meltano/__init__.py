@@ -34,7 +34,9 @@ if TYPE_CHECKING:
     from .service_bases import FlextMeltanoDbtServiceBase as FlextMeltanoDbtServiceBase
     from .service_bases import FlextMeltanoLibraryRunner as FlextMeltanoLibraryRunner
     from .service_bases import FlextMeltanoTapServiceBase as FlextMeltanoTapServiceBase
-    from .service_bases import FlextMeltanoTargetServiceBase as FlextMeltanoTargetServiceBase
+    from .service_bases import (
+        FlextMeltanoTargetServiceBase as FlextMeltanoTargetServiceBase,
+    )
 
     s: type[FlextMeltanoServiceBase]
     from .cli import FlextMeltanoCli as FlextMeltanoCli

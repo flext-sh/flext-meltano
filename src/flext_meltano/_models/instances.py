@@ -72,7 +72,8 @@ class FlextMeltanoModelsInstances:
             str, m.Field(default="FULL_TABLE", description="Replication method")
         ] = "FULL_TABLE"
         replication_key: Annotated[
-            str | None, m.Field(default=None, description="Incremental replication field")
+            str | None,
+            m.Field(default=None, description="Incremental replication field"),
         ] = None
         status: Annotated[
             str,
@@ -145,7 +146,8 @@ class FlextMeltanoModelsInstances:
             m.Field(alias="config", description="Tap configuration"),
         ]
         adapter: Annotated[
-            t.JsonValue | None, m.Field(default=None, description="Tap adapter instance")
+            t.JsonValue | None,
+            m.Field(default=None, description="Tap adapter instance"),
         ] = None
         streams: Sequence[FlextMeltanoModelsInstances.StreamInfo] = m.Field(
             default_factory=lambda: list[FlextMeltanoModelsInstances.StreamInfo](),
@@ -153,7 +155,9 @@ class FlextMeltanoModelsInstances:
         )
         status: Annotated[
             str,
-            m.Field(default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status"),
+            m.Field(
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status"
+            ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
         @m.computed_field

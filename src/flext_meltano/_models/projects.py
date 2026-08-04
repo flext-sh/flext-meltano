@@ -26,7 +26,8 @@ class FlextMeltanoModelsProjects:
             default_factory=list, description="Fully qualified name parts"
         )
         resource_type: Annotated[
-            str, m.Field(default="", description="Node resource type (model, test, etc.)")
+            str,
+            m.Field(default="", description="Node resource type (model, test, etc.)"),
         ] = ""
 
         @m.computed_field

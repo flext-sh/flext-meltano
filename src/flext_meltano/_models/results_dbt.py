@@ -36,7 +36,8 @@ class FlextMeltanoModelsResultsDbt:
             bool, m.Field(default=True, description="Whether the run was successful")
         ] = True
         models_run: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of models executed")
+            t.NonNegativeInt,
+            m.Field(default=0, description="Number of models executed"),
         ] = 0
         status: Annotated[
             str,
@@ -74,7 +75,8 @@ class FlextMeltanoModelsResultsDbt:
             ),
         ] = "completed"
         error_message: Annotated[
-            str | None, m.Field(default=None, description="Error message if tests failed")
+            str | None,
+            m.Field(default=None, description="Error message if tests failed"),
         ] = None
         execution_time_seconds: Annotated[
             float | None,

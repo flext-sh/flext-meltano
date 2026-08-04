@@ -42,7 +42,9 @@ class FlextMeltanoModelsContext:
                     empty: t.FlatContainerMapping = {}
                     return empty
 
-        @m.field_validator("project_root", "extractor_name", "loader_name", mode="before")
+        @m.field_validator(
+            "project_root", "extractor_name", "loader_name", mode="before"
+        )
         @classmethod
         def normalize_required_strings(cls, value: t.Meltano.ValidatorInput) -> str:
             """Normalize required string fields from context payloads."""

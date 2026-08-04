@@ -76,7 +76,8 @@ class FlextMeltanoModelsSources:
             int | None, m.Field(default=None, description="Batch size for data loading")
         ] = None
         batch_wait_limit: Annotated[
-            float | None, m.Field(default=None, description="Batch wait limit in seconds")
+            float | None,
+            m.Field(default=None, description="Batch wait limit in seconds"),
         ] = None
         target_version: Annotated[
             str, m.Field(default="latest", description="Target version")

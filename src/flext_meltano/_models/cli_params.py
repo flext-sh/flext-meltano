@@ -26,11 +26,15 @@ class FlextMeltanoModelsCliParams:
         ] = None
         state_file: Annotated[
             str | None,
-            m.Field(default=None, description="Path to state file for incremental sync"),
+            m.Field(
+                default=None, description="Path to state file for incremental sync"
+            ),
         ] = None
         discover: Annotated[
             bool,
-            m.Field(default=False, description="Run in discovery mode to output schema"),
+            m.Field(
+                default=False, description="Run in discovery mode to output schema"
+            ),
         ] = False
 
     class CliDataSinkParams(m.Entity):
@@ -43,7 +47,9 @@ class FlextMeltanoModelsCliParams:
         ] = None
         input_file: Annotated[
             str | None,
-            m.Field(default=None, description="Path to input data file (default: stdin)"),
+            m.Field(
+                default=None, description="Path to input data file (default: stdin)"
+            ),
         ] = None
 
     class CliPipelineParams(m.Entity):
@@ -77,7 +83,9 @@ class FlextMeltanoModelsCliParams:
         ]
         models: Annotated[
             str | None,
-            m.Field(default=None, description="Specific models to run (space-separated)"),
+            m.Field(
+                default=None, description="Specific models to run (space-separated)"
+            ),
         ] = None
         select: Annotated[
             str | None, m.Field(default=None, description="Selection syntax for models")
@@ -95,7 +103,9 @@ class FlextMeltanoModelsCliParams:
         plugin_type: Annotated[
             str, m.Field(description="Type of plugin (source, sink, transformer)")
         ]
-        plugin_name: Annotated[str, m.Field(description="Name of the plugin to install")]
+        plugin_name: Annotated[
+            str, m.Field(description="Name of the plugin to install")
+        ]
         variant: Annotated[
             str | None, m.Field(default=None, description="Specific plugin variant")
         ] = None

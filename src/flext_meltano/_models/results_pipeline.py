@@ -25,8 +25,8 @@ class FlextMeltanoModelsResultsPipeline:
             FlextMeltanoModelsResults.ExecutionResult | None,
             m.Field(default=None, description="Sink execution result"),
         ] = None
-        transformation_result: FlextMeltanoModelsResults.ExecutionResult | None = m.Field(
-            default=None, description="Transformation execution result"
+        transformation_result: FlextMeltanoModelsResults.ExecutionResult | None = (
+            m.Field(default=None, description="Transformation execution result")
         )
         overall_status: Annotated[
             str,

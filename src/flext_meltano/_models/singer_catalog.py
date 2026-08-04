@@ -51,7 +51,9 @@ class FlextMeltanoModelsSingerCatalog:
         )
         replication_key: Annotated[
             str | None,
-            m.Field(default=None, description="Column used for incremental replication"),
+            m.Field(
+                default=None, description="Column used for incremental replication"
+            ),
         ] = None
         replication_method: Annotated[
             Literal["FULL_TABLE", "INCREMENTAL", "LOG_BASED"] | None,
@@ -96,7 +98,8 @@ class FlextMeltanoModelsSingerCatalog:
             Path | None, m.Field(default=None, description="Path to tap configuration")
         ] = None
         target_config_path: Annotated[
-            Path | None, m.Field(default=None, description="Path to target configuration")
+            Path | None,
+            m.Field(default=None, description="Path to target configuration"),
         ] = None
         catalog_path: Annotated[
             Path | None, m.Field(default=None, description="Path to catalog file")

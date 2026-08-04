@@ -189,7 +189,8 @@ class FlextMeltanoModelsInstancesData:
             t.BatchSize, m.Field(default=1000, description="Batch processing size")
         ] = 1000
         sink_count: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of configured sinks")
+            t.NonNegativeInt,
+            m.Field(default=0, description="Number of configured sinks"),
         ] = 0
 
         @m.computed_field

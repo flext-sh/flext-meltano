@@ -23,8 +23,8 @@ class FlextMeltanoTypingsBase:
     No nested classes. No duplicates. No simple aliases to existing ``t.*``.
     """
 
-    CONTAINER_MAP_ADAPTER: ClassVar[m.TypeAdapter[t.FlatContainerMapping]] = m.TypeAdapter(
-        t.FlatContainerMapping
+    CONTAINER_MAP_ADAPTER: ClassVar[m.TypeAdapter[t.FlatContainerMapping]] = (
+        m.TypeAdapter(t.FlatContainerMapping)
     )
 
     type ValidatorInput = t.JsonValue
