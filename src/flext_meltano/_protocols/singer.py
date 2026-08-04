@@ -244,14 +244,14 @@ class FlextMeltanoProtocolsSinger:
         the consumer; generic stdin parsing stays here.
         """
 
-        def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> r[None]:
+        def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> r[bool]:
             """Handle a SCHEMA message."""
             ...
 
-        def handle_record(self, message: m.Meltano.SingerRecordMessage) -> r[None]:
+        def handle_record(self, message: m.Meltano.SingerRecordMessage) -> r[bool]:
             """Handle a RECORD message."""
             ...
 
-        def handle_state(self, message: m.Meltano.SingerStateMessage) -> r[None]:
+        def handle_state(self, message: m.Meltano.SingerStateMessage) -> r[bool]:
             """Handle a STATE message."""
             ...

@@ -117,7 +117,7 @@ class FlextMeltanoUtilitiesSinger:
             return e.fail_operation("emit STATE", exc, result_type=r[str])
 
     @staticmethod
-    def process_stdin(handler: p.Meltano.SingerTargetHandler) -> p.Result[None]:
+    def process_stdin(handler: p.Meltano.SingerTargetHandler) -> p.Result[bool]:
         """Process Singer messages from stdin and route to handler.
 
         Template method: parses JSON lines from stdin, identifies message
@@ -128,7 +128,7 @@ class FlextMeltanoUtilitiesSinger:
             handler: Implementation of SingerTargetHandler protocol.
 
         Returns:
-            r[None] on success, r[None].fail on processing error.
+            r[bool] on success, r[bool].fail on processing error.
 
         """
         try:
@@ -136,28 +136,28 @@ class FlextMeltanoUtilitiesSinger:
                 result = FlextMeltanoUtilitiesSinger._process_stdin_line(line, handler)
                 if result.failure:
                     return result
-            return r[None].ok(None)
+            return r[bool].ok(True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
-            return e.fail_operation("Stdin processing", exc, result_type=r[None])
+            return e.fail_operation("Stdin processing", exc, result_type=r[bool])
 
     @staticmethod
     def _process_stdin_line(
         line: str, handler: p.Meltano.SingerTargetHandler
-    ) -> p.Result[None]:
+    ) -> p.Result[bool]:
         """Process one Singer JSON line from stdin."""
         stripped = line.strip()
         if not stripped:
-            return r[None].ok(None)
+            return r[bool].ok(True)
         raw_value: t.JsonValue = cli_u.Cli.json_loads(stripped).unwrap()
         if not isinstance(raw_value, dict):
-            return r[None].ok(None)
+            return r[bool].ok(True)
         raw = t.json_dict_adapter().validate_python(raw_value)
         return FlextMeltanoUtilitiesSinger._dispatch_singer_message(raw, handler)
 
     @staticmethod
     def _dispatch_singer_message(
         raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
-    ) -> p.Result[None]:
+    ) -> p.Result[bool]:
         """Route a parsed Singer message to the matching handler."""
         msg_type = raw.get("type", "")
         if msg_type == c.Meltano.SingerMessageType.SCHEMA:
@@ -166,12 +166,12 @@ class FlextMeltanoUtilitiesSinger:
             return FlextMeltanoUtilitiesSinger._handle_record_message(raw, handler)
         if msg_type == c.Meltano.SingerMessageType.STATE:
             return FlextMeltanoUtilitiesSinger._handle_state_message(raw, handler)
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
     @staticmethod
     def _handle_schema_message(
         raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
-    ) -> p.Result[None]:
+    ) -> p.Result[bool]:
         """Handle one Singer SCHEMA message."""
         schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
         result = handler.handle_schema(schema_msg)
@@ -179,14 +179,14 @@ class FlextMeltanoUtilitiesSinger:
             return e.fail_operation(
                 f"SCHEMA handler for {schema_msg.stream}",
                 result.error,
-                result_type=r[None],
+                result_type=r[bool],
             )
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
     @staticmethod
     def _handle_record_message(
         raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
-    ) -> p.Result[None]:
+    ) -> p.Result[bool]:
         """Handle one Singer RECORD message."""
         record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
         result = handler.handle_record(record_msg)
@@ -194,20 +194,20 @@ class FlextMeltanoUtilitiesSinger:
             return e.fail_operation(
                 f"RECORD handler for {record_msg.stream}",
                 result.error,
-                result_type=r[None],
+                result_type=r[bool],
             )
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
     @staticmethod
     def _handle_state_message(
         raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
-    ) -> p.Result[None]:
+    ) -> p.Result[bool]:
         """Handle one Singer STATE message."""
         state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
         result = handler.handle_state(state_msg)
         if result.failure:
-            return e.fail_operation("STATE handler", result.error, result_type=r[None])
-        return r[None].ok(None)
+            return e.fail_operation("STATE handler", result.error, result_type=r[bool])
+        return r[bool].ok(True)
 
     @staticmethod
     def build_catalog_entry(

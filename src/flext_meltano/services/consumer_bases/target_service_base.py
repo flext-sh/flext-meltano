@@ -84,7 +84,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[p.Meltano.SingerDrainSink].fail(str(exc))
 
-    def flush(self, stream_name: str | None = None) -> p.Result[None]:
+    def flush(self, stream_name: str | None = None) -> p.Result[bool]:
         """Flush records for a specific stream or all streams."""
         try:
             targets = (
@@ -96,9 +96,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
                 context = sink.start_drain()
                 sink.process_batch(context)
                 sink.mark_drained()
-            return r[None].ok(None)
+            return r[bool].ok(True)
         except c.Meltano.OPERATION_ERRORS as exc:
-            return r[None].fail(str(exc))
+            return r[bool].fail(str(exc))
 
     # ------------------------------------------------------------------
     # Record processing
@@ -142,10 +142,10 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         """Connect to the target data store. Override in consumer."""
         return r[bool].ok(value=True)
 
-    def disconnect(self) -> p.Result[None]:
+    def disconnect(self) -> p.Result[bool]:
         """Disconnect from the target data store. Override in consumer."""
         self._sinks.clear()
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

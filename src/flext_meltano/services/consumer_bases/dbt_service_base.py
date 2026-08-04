@@ -156,12 +156,12 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # Project management
     # ------------------------------------------------------------------
 
-    def configure_project_root(self, root: Path) -> p.Result[None]:
+    def configure_project_root(self, root: Path) -> p.Result[bool]:
         """Set dbt project root directory."""
         if not root.exists():
-            return r[None].fail(str(root))
+            return r[bool].fail(str(root))
         self._dbt_project_root = root
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
     def load_manifest(
         self, manifest_path: Path | None = None

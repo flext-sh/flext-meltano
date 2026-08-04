@@ -83,7 +83,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(f"Failed to load catalog: {e}")
 
-    def save_catalog(self, catalog_file: Path) -> p.Result[None]:
+    def save_catalog(self, catalog_file: Path) -> p.Result[bool]:
         """Save catalog to JSON file."""
         try:
             catalog_file.parent.mkdir(parents=True, exist_ok=True)
@@ -92,12 +92,12 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 self._singer_catalog.model_dump_json(indent=2, by_alias=True),
             )
             if write_result.failure:
-                return r[None].fail(write_result.error or "catalog write failed")
+                return r[bool].fail(write_result.error or "catalog write failed")
             self.logger.info("Catalog saved to file", file=str(catalog_file))
-            return r[None].ok(None)
+            return r[bool].ok(True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to save catalog", error=str(e))
-            return r[None].fail(f"Failed to save catalog: {e}")
+            return r[bool].fail(f"Failed to save catalog: {e}")
 
     def select_streams(
         self, stream_names: t.StrSequence

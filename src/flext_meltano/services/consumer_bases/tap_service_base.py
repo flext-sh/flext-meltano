@@ -117,9 +117,9 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
         """Connect to the data source. Override in consumer."""
         return r[bool].ok(value=True)
 
-    def disconnect(self) -> p.Result[None]:
+    def disconnect(self) -> p.Result[bool]:
         """Disconnect from the data source. Override in consumer."""
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
     # ------------------------------------------------------------------
     # Internal

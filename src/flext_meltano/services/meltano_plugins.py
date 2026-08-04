@@ -89,14 +89,14 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
     def _log_plugin_addition_start(
         self, plugin_name: str, plugin_type: str
-    ) -> p.Result[None]:
+    ) -> p.Result[bool]:
         """Log plugin addition start."""
         self.logger.info(
             "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return r[None].ok(None)
+        return r[bool].ok(True)
 
 
 __all__: list[str] = ["FlextMeltanoComponentService"]

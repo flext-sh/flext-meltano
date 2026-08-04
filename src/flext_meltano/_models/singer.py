@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Annotated, Self
 
+
 from flext_cli import m, u
 
 from flext_meltano import c, t
@@ -30,7 +31,7 @@ class FlextMeltanoModelsSinger:
             m.Field(
                 alias="schema",
                 serialization_alias="schema",
-                validation_alias="schema",
+                validation_alias=t.AliasChoices("schema", "schema_definition"),
                 description="Singer JSON schema payload",
             ),
         ]
