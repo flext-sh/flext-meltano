@@ -40,6 +40,8 @@ src/flext_meltano/
 - Connectors extend `Tap` / `Target` / `Dbt` and keep connector-specific behavior in their own package (ADR-006).
 - Never `import singer_sdk` in a connector — only via `services/declarative_tap.py`.
 - Do not fork executor/consumer lifecycle; extend the bases. CLI-domain `u` helpers come from `flext_cli`.
+- Config/settings canonical pattern: ADR-012.
+- Codemod governance (ast-grep + make mod): ADR-014.
 
 ## Commands
 
