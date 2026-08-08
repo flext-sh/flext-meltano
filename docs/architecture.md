@@ -13,7 +13,7 @@
   - [**ELT Pipeline Flow**](#elt-pipeline-flow)
   - [**Error Handling Flow**](#error-handling-flow)
 - [🏛️ Clean Architecture Implementation](#clean-architecture-implementation)
-  - [**Layer Dependencies**](#layer-dependencies)
+  - [**Layer Dependencies**```](#layer-dependencies)
   - [**Dependency Rules**](#dependency-rules)
 - [🔧 Integration Patterns](#integration-patterns)
   - [**FLEXT Ecosystem Integration**](#flext-ecosystem-integration)
@@ -130,9 +130,7 @@ graph TD
     B --> I[FlextMeltanoDbtService]
     I --> J[DBT Operations]
     J --> K[Data Transformation]
-    K --> H
-```
-
+    K --> H```
 ### **Error Handling Flow**
 
 ```mermaid
@@ -145,14 +143,10 @@ graph TD
     E -->|Invalid| G[r.fail()]
     D --> H[Error Logging]
     G --> H
-    F --> I[r.ok()]
-```
-
+    F --> I[r.ok()]```
 ## 🏛️ Clean Architecture Implementation
 
-### **Layer Dependencies**
-
-```
+### **Layer Dependencies**```
 ┌─────────────────────────────────────────┐
 │            Interface Layer              │
 │  (executors_cli.py, executors_bridge.py)│
@@ -165,9 +159,7 @@ graph TD
 ├─────────────────────────────────────────┤
 │          Infrastructure Layer           │
 │    (adapters.py, file_managers.py)     │
-└─────────────────────────────────────────┘
-```
-
+└─────────────────────────────────────────┘```
 ### **Dependency Rules**
 
 1. **Interface Layer** depends on Application Layer
@@ -181,8 +173,7 @@ graph TD
 
 **flext-core Foundation**:
 
-```python
-```
+```python```
 **Type System Integration**:
 
 ```python

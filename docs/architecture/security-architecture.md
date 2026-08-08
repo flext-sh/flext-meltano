@@ -392,9 +392,7 @@ note right of encryptor
     - Format-preserving encryption
     - Homomorphic encryption for analytics
 end note
-@enduml
-```
-
+@enduml```
 ### Encryption Implementation
 
 #### At-Rest Encryption
@@ -598,9 +596,7 @@ note right of data_zone
     - Audit logging
     - Backup encryption
 end note
-@enduml
-```
-
+@enduml```
 ### Network Security Controls
 
 #### API Gateway Security
@@ -681,9 +677,7 @@ spec:
             principals: ["internal.invalid/ns/flext-meltano/sa/api-service-account"]
       to:
         - operation:
-            methods: ["GET", "POST", "PUT", "DELETE"]
-```
-
+            methods: ["GET", "POST", "PUT", "DELETE"]```
 ______________________________________________________________________
 
 ## 📊 Security Monitoring and Logging
@@ -734,9 +728,7 @@ note right of alerts
     - Infrastructure attacks
     - Compliance violations
 end note
-@enduml
-```
-
+@enduml```
 ### Security Event Types
 
 | Event Category     | Event Types                             | Severity | Response                  |
@@ -996,9 +988,7 @@ note right of contain
     - Access revocation
     - Backup activation
 end note
-@enduml
-```
-
+@enduml```
 ### Incident Response Procedures
 
 #### 1. Detection and Analysis

@@ -86,7 +86,7 @@ class TestFlextMeltanoAbstractionsComplete:
         tap_abs = FlextMeltanoAbstractions()
         assert tap_abs is not None
         if hasattr(tap_abs, "service_name"):
-            service_name = getattr(tap_abs, "service_name")
+            service_name = tap_abs.service_name
             tm.that(service_name, eq="FlextMeltanoAbstractions")
         tm.that(
             hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger"), eq=True
@@ -359,7 +359,7 @@ class TestFlextMeltanoAbstractionsComplete:
             instance = result.value
             assert isinstance(instance, FlextMeltanoAbstractions)
             if hasattr(instance, "service_name"):
-                service_name_val = getattr(instance, "service_name")
+                service_name_val = instance.service_name
                 tm.that(service_name_val, eq="FlextMeltanoAbstractions")
 
     def test_tap_abstractions_error_handling(self) -> None:

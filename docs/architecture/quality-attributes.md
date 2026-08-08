@@ -643,9 +643,7 @@ note right of functional
     - Team autonomy
     - Technology diversity
 end note
-@enduml
-```
-
+@enduml```
 ### Scaling Strategies
 
 #### 1. Horizontal Scaling
@@ -1118,9 +1116,7 @@ note right of circuit_breaker
     - Enable fast failure detection
     - Support automatic recovery
 end note
-@enduml
-```
-
+@enduml```
 ### Reliability Patterns
 
 #### 1. Railway-Oriented Error Handling
@@ -1667,9 +1663,7 @@ note right of circuit_breakers
     - Enable fast recovery
     - Maintain partial functionality
 end note
-@enduml
-```
-
+@enduml```
 ### Availability Targets
 
 | Service Level                      | Target       | Measurement Period |
@@ -2338,9 +2332,7 @@ note right of type_safety
     - IDE support and refactoring
     - API contract enforcement
 end note
-@enduml
-```
-
+@enduml```
 ### Maintainability Metrics
 
 | Metric                     | Target            | Current      | Status      |
@@ -2873,9 +2865,7 @@ note right of type_safety
     - Better IDE support
     - Runtime error prevention
 end note
-@enduml
-```
-
+@enduml```
 ### Usability Metrics
 
 | Metric                         | Target         | Current  | Status               |
@@ -3307,9 +3297,7 @@ note right of pipeline_e2e
     - Integration verification
     - User experience assurance
 end note
-@enduml
-```
-
+@enduml```
 ### Testability Patterns
 
 #### 1. Dependency Injection for Testing
@@ -3689,9 +3677,7 @@ jobs:
         run: pytest tests/performance/ -v --benchmark-only
 
       - name: Generate test report
-        run: pytest --html=reports/test-report.html --self-contained-html
-```
-
+        run: pytest --html=reports/test-report.html --self-contained-html```
 #### 2. Test Data Management
 
 ```python
@@ -3971,9 +3957,7 @@ note right of audit
     - Forensic analysis
     - Change tracking
 end note
-@enduml
-```
-
+@enduml```
 ### Monitoring and Observability
 
 ```plantuml
@@ -4079,9 +4063,7 @@ note right of tracing
     - Performance bottleneck identification
     - Service dependency mapping
 end note
-@enduml
-```
-
+@enduml```
 ### Configuration Management
 
 ```plantuml
@@ -4166,9 +4148,7 @@ note right of validation
     - Type safety
     - Constraint enforcement
 end note
-@enduml
-```
-
+@enduml```
 ### Caching Strategy
 
 ```plantuml
@@ -4253,9 +4233,7 @@ note right of invalidation
     - Race condition handling
     - Performance impact
 end note
-@enduml
-```
-
+@enduml```
 ### Internationalization (i18n)
 
 ```plantuml
@@ -4340,9 +4318,7 @@ note right of detection
     - Content personalization
     - Legal compliance
 end note
-@enduml
-```
-
+@enduml```
 ______________________________________________________________________
 
 ## 📈 Architecture Evolution

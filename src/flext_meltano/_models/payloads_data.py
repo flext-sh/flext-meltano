@@ -47,7 +47,7 @@ class FlextMeltanoModelsPayloadsData:
             Sequence[t.FlatContainerMapping],
             m.Field(description="Normalized record payloads"),
         ] = m.Field(
-            default_factory=lambda: list[t.FlatContainerMapping](),
+            default_factory=list[t.FlatContainerMapping],
             description="Normalized record payloads",
         )
 

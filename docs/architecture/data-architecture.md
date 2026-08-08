@@ -329,9 +329,7 @@ class PipelineConfig:
       "required": ["type", "stream", "schema"]
     }
   ]
-}
-```
-
+}```
 ### Data Validation Rules
 
 #### Schema Validation
@@ -409,9 +407,7 @@ repeat while (More Data?)
 :Generate Execution Report;
 
 stop
-@enduml
-```
-
+@enduml```
 ### Processing Stages
 
 #### 1. **Data Extraction Stage**
@@ -533,9 +529,7 @@ dbt -> lineage: record_model_execution(model, sources, outputs)
 lineage -> metadata: update_lineage_graph()
 
 note right: Lineage tracking captures\ntransformation dependencies\nand data flow paths
-@enduml
-```
-
+@enduml```
 ### Data Classification and Security
 
 | Data Classification | Handling Requirements   | Storage Requirements |

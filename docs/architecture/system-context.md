@@ -551,9 +551,7 @@ note right of flext_meltano
     - Zero custom ELT code
     - Enterprise pipeline orchestration
 end note
-@enduml
-```
-
+@enduml```
 ### Ecosystem Integration Patterns
 
 #### Foundation Library Pattern
@@ -709,9 +707,7 @@ note right of data
     - Access auditing
     - Data masking
 end note
-@enduml
-```
-
+@enduml```
 ### Integration Boundaries
 
 | Boundary Type                | Crossing Mechanism   | Security Controls                      | Monitoring                           |
@@ -1032,9 +1028,7 @@ note right of workstation
     - Local test execution
     - Mocked external services
 end note
-@enduml
-```
-
+@enduml```
 ### Staging Context
 
 ```plantuml
@@ -1091,9 +1085,7 @@ note right of staging
     - Performance and load testing
     - Security validation
 end note
-@enduml
-```
-
+@enduml```
 ### Production Context
 
 ```plantuml
@@ -1179,9 +1171,7 @@ note right of production
     - Security hardening
     - Performance monitoring
 end note
-@enduml
-```
-
+@enduml```
 ### Deployment Pattern Comparison
 
 | Context         | Scale                  | Reliability | Security | Cost   | Purpose             |

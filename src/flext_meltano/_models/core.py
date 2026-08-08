@@ -66,10 +66,7 @@ class FlextMeltanoModelsCore:
 
         items: Annotated[
             Sequence[bool], m.Field(description="Normalized list of boolean values")
-        ] = m.Field(
-            default_factory=lambda: list[bool](),
-            description="Normalized boolean values",
-        )
+        ] = m.Field(default_factory=list[bool], description="Normalized boolean values")
 
         @m.field_validator("items", mode="before")
         @classmethod

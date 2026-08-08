@@ -122,9 +122,7 @@ ______________________________________________________________________
 make val           # Complete validation pipeline
 make lint               # Code linting
 make type-check         # Type safety validation
-make test               # Test execution
-```
-
+make test               # Test execution```
 ### **Common Commands**
 
 ```bash
@@ -137,9 +135,7 @@ pytest tests/unit/      # Unit tests only
 
 # Code quality
 make format             # Auto-format code
-make check-imports      # Validate import compliance
-```
-
+make check-imports      # Validate import compliance```
 ______________________________________________________________________
 
 ## 📚 Next Steps

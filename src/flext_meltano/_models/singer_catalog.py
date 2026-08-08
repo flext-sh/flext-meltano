@@ -39,12 +39,7 @@ class FlextMeltanoModelsSingerCatalog:
             ),
         ]
         metadata: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata] = (
-            m.Field(
-                default_factory=lambda: list[
-                    FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
-                ](),
-                description="Singer stream metadata blocks",
-            )
+            m.Field(default_factory=list, description="Singer stream metadata blocks")
         )
         key_properties: t.StrSequence = m.Field(
             default_factory=list, description="Primary key columns for this stream"
@@ -85,10 +80,7 @@ class FlextMeltanoModelsSingerCatalog:
             ),
         ] = c.Meltano.SingerMessageType.CATALOG
         streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = m.Field(
-            default_factory=lambda: list[
-                FlextMeltanoModelsSingerCatalog.SingerCatalogEntry
-            ](),
-            description="Singer catalog stream entries",
+            default_factory=list, description="Singer catalog stream entries"
         )
 
     class SingerPipelineConfig(m.Entity):
