@@ -171,7 +171,7 @@ ______________________________________________________________________
 
 - [Architecture](architecture.md) - Architecture and design patterns
 - [API Reference](api-reference.md) - Complete API documentation
-- [Examples](../examples/) - Working code examples
+- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) - Working code examples
 
 **Across Projects**:
 

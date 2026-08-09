@@ -525,8 +525,8 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md```
 
 - [c4-model.md](c4-model.md) - Complete C4 model implementation
 - [adr/README.md](adr/README.md) - ADR process and templates
-- [architecture-report.md](architecture-report.md) - Automated status reports
-- [../../scripts/architecture_automation.py](../../scripts/architecture_automation.py) - Automation tools
+- [system-context.md](system-context.md) - System context and integration
+- [quality-attributes.md](quality-attributes.md) - Quality attributes and concerns
 
 ______________________________________________________________________
 

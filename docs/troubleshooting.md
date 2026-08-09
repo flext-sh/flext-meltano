@@ -261,7 +261,7 @@ poetry show flext-core flext-meltano
 make val 2>&1 | head -50```
 ### **Support Channels**
 
-- **Documentation**: Check [docs/](../docs/) first
+- **Documentation**: Check the [documentation index](index.md) first
 - **Issues**: [GitHub Issues](https://github.com/flext-sh/flext/issues)
 - **Architecture**: Review [architecture.md](architecture.md)
 

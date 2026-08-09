@@ -358,7 +358,7 @@ ______________________________________________________________________
 
 - [Getting Started](getting-started.md) - Installation and basic usage
 - [API Reference](api-reference.md) - Complete API documentation
-- [Examples](../examples/) - Working code examples
+- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) - Working code examples
 
 **Across Projects**:
 
