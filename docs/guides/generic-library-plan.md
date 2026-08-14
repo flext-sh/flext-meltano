@@ -10,8 +10,8 @@
   - [Phase 2: Singer Protocol Independence (🚧 In Progress)](#phase-2-singer-protocol-independence-in-progress)
   - [Phase 3: Generic Plugin Registry (📋 Planned)](#phase-3-generic-plugin-registry-planned)
 - [Architecture Transformation](#architecture-transformation)
-  - [Before: CLI-Centric Architecture](#before-cli-centric-architecture)
-  - [After: Generic Library Architecture](#after-generic-library-architecture)
+  - [Before: CLI-Centric Architecture```](#before-cli-centric-architecture)
+  - [After: Generic Library Architecture```](#after-generic-library-architecture)
   - [Service Architecture](#service-architecture)
 - [API Design](#api-design)
   - [Generic Plugin Interface](#generic-plugin-interface)
@@ -128,9 +128,7 @@ plugins = registry.discover_plugins()  # No Meltano dependency
 tap_info = registry.find_plugin("tap-gitlab")```
 ## Architecture Transformation
 
-### Before: CLI-Centric Architecture
-
-```
+### Before: CLI-Centric Architecture```
 ┌─────────────────────────────────────┐
 │ FLEXT-Meltano (CLI-Dependent)      │
 ├─────────────────────────────────────┤
@@ -146,12 +144,8 @@ tap_info = registry.find_plugin("tap-gitlab")```
 │ meltano package (runtime)           │
 │ meltano.yml structure              │
 │ Singer CLI tools                   │
-└─────────────────────────────────────┘
-```
-
-### After: Generic Library Architecture
-
-```
+└─────────────────────────────────────┘```
+### After: Generic Library Architecture```
 ┌─────────────────────────────────────┐
 │ FLEXT-Meltano (Generic Library)    │
 ├─────────────────────────────────────┤
@@ -167,9 +161,7 @@ tap_info = registry.find_plugin("tap-gitlab")```
 │ flext-core (foundation)            │
 │ singer-python (protocol)           │
 │ pydantic (validation)              │
-└─────────────────────────────────────┘
-```
-
+└─────────────────────────────────────┘```
 ### Service Architecture
 
 #### FlextMeltanoService (Primary Interface)
@@ -366,9 +358,7 @@ make test-cli-integration
 make test-generic-apis
 
 # Test backward compatibility
-make test-compatibility
-```
-
+make test-compatibility```
 #### Quality Gates
 
 - **API Compatibility**: Existing APIs continue to work

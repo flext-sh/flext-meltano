@@ -449,9 +449,7 @@ make docs
 # - Documentation completeness metrics
 # - Validation results
 # - Recent changes
-# - Quality trends
-```
-
+# - Quality trends```
 ## 🛠️ Troubleshooting
 
 ### Common Issues
@@ -463,9 +461,7 @@ make docs
 python scripts/architecture_automation.py --validate
 
 # Manual rendering
-java -jar plantuml.jar docs/architecture/diagrams.puml
-```
-
+java -jar plantuml.jar docs/architecture/diagrams.puml```
 #### Cross-Reference Errors
 
 ```bash
@@ -473,9 +469,7 @@ java -jar plantuml.jar docs/architecture/diagrams.puml
 make docs
 
 # Check specific document
-grep -r "broken link" docs/architecture/
-```
-
+grep -r "broken link" docs/architecture/```
 #### ADR Template Issues
 
 ```bash
@@ -483,9 +477,7 @@ grep -r "broken link" docs/architecture/
 python scripts/adr_validator.py docs/architecture/adr/
 
 # Check against template
-diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
-```
-
+diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md```
 ### Getting Help
 
 1. **Check This Guide**: Comprehensive troubleshooting section
@@ -533,8 +525,8 @@ diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
 
 - [c4-model.md](c4-model.md) - Complete C4 model implementation
 - [adr/README.md](adr/README.md) - ADR process and templates
-- [architecture-report.md](architecture-report.md) - Automated status reports
-- [../../scripts/architecture_automation.py](../../scripts/architecture_automation.py) - Automation tools
+- [system-context.md](system-context.md) - System context and integration
+- [quality-attributes.md](quality-attributes.md) - Quality attributes and concerns
 
 ______________________________________________________________________
 

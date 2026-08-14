@@ -13,7 +13,7 @@
   - [Target Configuration](#target-configuration)
   - [Singer Catalog Configuration](#singer-catalog-configuration)
 - [🛠️ dbt Configuration](#dbt-configuration)
-  - [dbt Project Structure](#dbt-project-structure)
+  - [dbt Project Structure```](#dbt-project-structure)
   - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbtprojectyml)
   - [dbt Service Configuration](#dbt-service-configuration)
 - [🏗️ Pipeline Configuration](#pipeline-configuration)
@@ -201,9 +201,7 @@ ______________________________________________________________________
 
 ## 🛠️ dbt Configuration
 
-### dbt Project Structure
-
-```
+### dbt Project Structure```
 transform/
 ├── dbt_project.yml
 ├── profiles/
@@ -216,9 +214,7 @@ transform/
 ├── tests/
 │   └── assert_user_id_unique.sql
 └── macros/
-    └── custom_macros.sql
-```
-
+    └── custom_macros.sql```
 ### dbt Project Configuration (dbt_project.yml)
 
 ```yaml
@@ -243,9 +239,7 @@ models:
     staging:
       +materialized: view
     marts:
-      +materialized: table
-```
-
+      +materialized: table```
 ### dbt Service Configuration
 
 ```python
@@ -321,9 +315,7 @@ environments:
         loaders:
           - name: target-jsonl
             settings:
-              destination_path: dev_output/
-```
-
+              destination_path: dev_output/```
 ### Production Environment
 
 ```yaml
@@ -341,9 +333,7 @@ environments:
         loaders:
           - name: target-jsonl
             settings:
-              destination_path: /output/production/
-```
-
+              destination_path: /output/production/```
 ### Environment Switching
 
 ```python

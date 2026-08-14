@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m
@@ -19,7 +20,15 @@ class FlextMeltanoModelsPayloads:
         target_name: Annotated[str, m.Field(description="Singer target name")]
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Pipeline config")
-        ] = m.Field(default_factory=dict, description="Pipeline config")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}), description="Pipeline config"
+        )
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose pipeline configuration as read-only."""
+            return MappingProxyType(dict(value))
 
     class ExecutePipelinePayload(m.ArbitraryTypesModel):
         """Payload for execute_pipeline operation."""
@@ -27,7 +36,15 @@ class FlextMeltanoModelsPayloads:
         pipeline_id: Annotated[str, m.Field(description="Pipeline identifier")]
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Execution config")
-        ] = m.Field(default_factory=dict, description="Execution config")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}), description="Execution config"
+        )
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose execution configuration as read-only."""
+            return MappingProxyType(dict(value))
 
     class InstallPluginPayload(m.ArbitraryTypesModel):
         """Payload for install_plugin operation."""
@@ -36,7 +53,15 @@ class FlextMeltanoModelsPayloads:
         plugin_name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Plugin config")
-        ] = m.Field(default_factory=dict, description="Plugin config")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}), description="Plugin config"
+        )
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose plugin configuration as read-only."""
+            return MappingProxyType(dict(value))
 
     class ListPluginsPayload(m.ArbitraryTypesModel):
         """Payload for list_plugins operation."""
@@ -51,7 +76,16 @@ class FlextMeltanoModelsPayloads:
         environment_name: Annotated[str, m.Field(description="Environment name")]
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Environment config")
-        ] = m.Field(default_factory=dict, description="Environment config")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Environment config",
+        )
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose environment configuration as read-only."""
+            return MappingProxyType(dict(value))
 
     class RunDbtModelsPayload(m.ArbitraryTypesModel):
         """Payload for run/test dbt models operation."""

@@ -76,10 +76,11 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
             exit_code: int = tap.run_cli(command_args, self.tap_name)
-            return exit_code
         except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("Tap CLI failed", error=str(exc))
             return 1
+        else:
+            return exit_code
 
     # ------------------------------------------------------------------
     # Singer operations

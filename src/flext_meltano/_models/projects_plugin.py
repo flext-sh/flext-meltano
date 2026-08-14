@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -28,13 +29,23 @@ class FlextMeltanoModelsProjectsPlugin:
         ] = "standard"
         settings: Annotated[
             t.FlatContainerMapping, m.Field(description="Plugin settings")
-        ] = m.Field(default_factory=dict, description="Plugin settings")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}), description="Plugin settings"
+        )
         capabilities: Annotated[
-            t.StrSequence, m.Field(description="Plugin capabilities")
-        ] = m.Field(default_factory=list, description="Plugin capabilities")
+            t.StrTuple, m.Field(description="Plugin capabilities")
+        ] = m.Field(default_factory=tuple, description="Plugin capabilities")
         config_files: Annotated[
-            t.StrSequence, m.Field(description="Plugin configuration files")
-        ] = m.Field(default_factory=list, description="Plugin configuration files")
+            t.StrTuple, m.Field(description="Plugin configuration files")
+        ] = m.Field(default_factory=tuple, description="Plugin configuration files")
+
+        @m.field_validator("settings", mode="after")
+        @classmethod
+        def freeze_settings(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose plugin settings as a read-only mapping."""
+            return MappingProxyType(dict(value))
 
         @m.computed_field
         def full_plugin_name(self) -> str:
