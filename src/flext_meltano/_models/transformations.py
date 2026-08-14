@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -22,16 +23,36 @@ class FlextMeltanoModelsTransformations:
         ] = "1.0.0"
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="DBT project configuration")
-        ] = m.Field(default_factory=dict, description="DBT project configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="DBT project configuration",
+        )
         models: Annotated[
             t.FlatContainerMapping, m.Field(description="DBT models configuration")
-        ] = m.Field(default_factory=dict, description="DBT models configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="DBT models configuration",
+        )
         sources: Annotated[
             t.FlatContainerMapping, m.Field(description="DBT sources configuration")
-        ] = m.Field(default_factory=dict, description="DBT sources configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="DBT sources configuration",
+        )
         tests: Annotated[
             t.FlatContainerMapping, m.Field(description="DBT tests configuration")
-        ] = m.Field(default_factory=dict, description="DBT tests configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="DBT tests configuration",
+        )
+
+        @m.field_validator("config", "models", "sources", "tests", mode="after")
+        @classmethod
+        def freeze_mapping_fields(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose DBT project mappings as read-only values."""
+            return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")
         def validate_dbt_project(self) -> Self:
@@ -53,20 +74,20 @@ class FlextMeltanoModelsTransformations:
         transformation_version: Annotated[str, m.Field(description="Project version")]
         profile: Annotated[str, m.Field(description="Profile name")]
         model_paths: Annotated[
-            t.StrSequence, m.Field(default=["models"], description="Model paths")
-        ] = m.Field(default=["models"], description="Model paths")
+            t.StrTuple, m.Field(default=("models",), description="Model paths")
+        ] = m.Field(default=("models",), description="Model paths")
         analysis_paths: Annotated[
-            t.StrSequence, m.Field(default=["analysis"], description="Analysis paths")
-        ] = m.Field(default=["analysis"], description="Analysis paths")
+            t.StrTuple, m.Field(default=("analysis",), description="Analysis paths")
+        ] = m.Field(default=("analysis",), description="Analysis paths")
         test_paths: Annotated[
-            t.StrSequence, m.Field(default=["tests"], description="Test paths")
-        ] = m.Field(default=["tests"], description="Test paths")
+            t.StrTuple, m.Field(default=("tests",), description="Test paths")
+        ] = m.Field(default=("tests",), description="Test paths")
         seed_paths: Annotated[
-            t.StrSequence, m.Field(default=["seeds"], description="Seed paths")
-        ] = m.Field(default=["seeds"], description="Seed paths")
+            t.StrTuple, m.Field(default=("seeds",), description="Seed paths")
+        ] = m.Field(default=("seeds",), description="Seed paths")
         macro_paths: Annotated[
-            t.StrSequence, m.Field(default=["macros"], description="Macro paths")
-        ] = m.Field(default=["macros"], description="Macro paths")
+            t.StrTuple, m.Field(default=("macros",), description="Macro paths")
+        ] = m.Field(default=("macros",), description="Macro paths")
 
         @m.computed_field
         def has_custom_paths(self) -> bool:
@@ -123,11 +144,11 @@ class FlextMeltanoModelsTransformations:
         """Generic transformation execution configuration with validation."""
 
         command: Annotated[str, m.Field(description="Command to execute")]
-        models: Annotated[t.StrSequence, m.Field(description="Models to execute")] = (
-            m.Field(default_factory=list, description="Models to execute")
+        models: Annotated[t.StrTuple, m.Field(description="Models to execute")] = (
+            m.Field(default_factory=tuple, description="Models to execute")
         )
-        exclude: Annotated[t.StrSequence, m.Field(description="Models to exclude")] = (
-            m.Field(default_factory=list, description="Models to exclude")
+        exclude: Annotated[t.StrTuple, m.Field(description="Models to exclude")] = (
+            m.Field(default_factory=tuple, description="Models to exclude")
         )
         full_refresh: Annotated[
             bool, m.Field(default=False, description="Full refresh execution")

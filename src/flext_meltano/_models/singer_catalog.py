@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated, Literal
 
 from flext_cli import m
@@ -17,12 +17,21 @@ class FlextMeltanoModelsSingerCatalog:
     class SingerCatalogMetadata(m.ArbitraryTypesModel):
         """Singer catalog metadata block model."""
 
-        breadcrumb: t.StrSequence = m.Field(
-            default_factory=list, description="Singer metadata breadcrumb path"
+        breadcrumb: t.StrTuple = m.Field(
+            default_factory=tuple, description="Singer metadata breadcrumb path"
         )
         metadata: t.FlatContainerMapping = m.Field(
-            default_factory=dict, description="Singer metadata properties"
+            default_factory=lambda: MappingProxyType({}),
+            description="Singer metadata properties",
         )
+
+        @m.field_validator("metadata", mode="after")
+        @classmethod
+        def freeze_metadata(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose Singer metadata properties as read-only."""
+            return MappingProxyType(dict(value))
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
@@ -38,11 +47,11 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer stream schema payload",
             ),
         ]
-        metadata: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata] = (
-            m.Field(default_factory=list, description="Singer stream metadata blocks")
-        )
-        key_properties: t.StrSequence = m.Field(
-            default_factory=list, description="Primary key columns for this stream"
+        metadata: t.VariadicTuple[
+            FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
+        ] = m.Field(default_factory=tuple, description="Singer stream metadata blocks")
+        key_properties: t.StrTuple = m.Field(
+            default_factory=tuple, description="Primary key columns for this stream"
         )
         replication_key: Annotated[
             str | None,
@@ -79,8 +88,8 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer catalog message discriminator",
             ),
         ] = c.Meltano.SingerMessageType.CATALOG
-        streams: Sequence[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = m.Field(
-            default_factory=list, description="Singer catalog stream entries"
+        streams: t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = (
+            m.Field(default_factory=tuple, description="Singer catalog stream entries")
         )
 
     class SingerPipelineConfig(m.Entity):
@@ -115,8 +124,16 @@ class FlextMeltanoModelsSingerCatalog:
         ]
         errors: Annotated[t.NonNegativeInt, m.Field(description="Number of errors")]
         state: t.FlatContainerMapping = m.Field(
-            default_factory=dict, description="Final state payload"
+            default_factory=lambda: MappingProxyType({}),
+            description="Final state payload",
         )
+
+        @m.field_validator("state", mode="after")
+        @classmethod
+        def freeze_state(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose the final Singer state as read-only."""
+            return MappingProxyType(dict(value))
+
         duration_seconds: Annotated[
             t.NonNegativeFloat, m.Field(description="Execution duration")
         ]

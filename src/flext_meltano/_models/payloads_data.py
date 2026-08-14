@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m, u
@@ -25,7 +26,10 @@ class FlextMeltanoModelsPayloadsData:
                 validation_alias="schema",
                 description="Schema-like JSON payload",
             ),
-        ] = m.Field(default_factory=dict, description="Schema-like JSON payload")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Schema-like JSON payload",
+        )
 
         @m.field_validator("schema_definition", mode="before")
         @classmethod
@@ -40,36 +44,40 @@ class FlextMeltanoModelsPayloadsData:
                     empty_schema: t.FlatContainerMapping = {}
                     return empty_schema
 
+        @m.field_validator("schema_definition", mode="after")
+        @classmethod
+        def freeze_schema(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose the normalized schema as a read-only mapping."""
+            return MappingProxyType(dict(value))
+
     class JsonRecordBatchPayload(m.ArbitraryTypesModel):
         """Typed record batch payload used by API load flow."""
 
         records: Annotated[
-            Sequence[t.FlatContainerMapping],
+            t.VariadicTuple[t.FlatContainerMapping],
             m.Field(description="Normalized record payloads"),
-        ] = m.Field(
-            default_factory=list[t.FlatContainerMapping],
-            description="Normalized record payloads",
-        )
+        ] = m.Field(default_factory=tuple, description="Normalized record payloads")
 
         @m.field_validator("records", mode="before")
         @classmethod
         def normalize_records(
             cls, value: t.Meltano.ValidatorInput
-        ) -> Sequence[t.FlatContainerMapping]:
-            """Normalize mixed record input into JSON-safe dict records."""
+        ) -> t.VariadicTuple[t.FlatContainerMapping]:
+            """Normalize mixed record input into JSON-safe record tuples."""
             if isinstance(value, (list, tuple)):
-                return [
+                return tuple(
                     t.Cli.JSON_MAPPING_ADAPTER.validate_python(record)
                     for record in value
                     if isinstance(record, Mapping)
-                ]
-            return []
+                )
+            return ()
 
     class ConfigMappingPayload(m.ArbitraryTypesModel):
         """Normalized mapping payload with string keys."""
 
         values: t.JsonMapping = m.Field(
-            default_factory=dict, description="Normalized mapping values"
+            default_factory=lambda: MappingProxyType({}),
+            description="Normalized mapping values",
         )
 
         @m.field_validator("values", mode="before")
@@ -79,6 +87,12 @@ class FlextMeltanoModelsPayloadsData:
             if isinstance(value, Mapping):
                 return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
             return {}
+
+        @m.field_validator("values", mode="after")
+        @classmethod
+        def freeze_values(cls, value: t.JsonMapping) -> t.JsonMapping:
+            """Expose normalized mapping values as read-only."""
+            return MappingProxyType(dict(value))
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""

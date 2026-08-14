@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -103,15 +104,37 @@ class FlextMeltanoModelsInstancesData:
         streams: Annotated[
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             m.Field(description="Discovered streams"),
-        ] = m.Field(default_factory=dict, description="Discovered streams")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Discovered streams",
+        )
         discovered: Annotated[
             bool,
             m.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Additional metadata")
-        ] = m.Field(default_factory=dict, description="Additional metadata")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Additional metadata",
+        )
         source_id: Annotated[str, m.Field(description="Unique source identifier")]
+
+        @m.field_validator("streams", mode="after")
+        @classmethod
+        def freeze_streams(
+            cls, value: Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition]
+        ) -> Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition]:
+            """Expose discovered streams as a read-only mapping."""
+            return MappingProxyType(dict(value))
+
+        @m.field_validator("metadata", mode="after")
+        @classmethod
+        def freeze_metadata(
+            cls, value: t.ConfigurationMapping
+        ) -> t.ConfigurationMapping:
+            """Expose source metadata as a read-only mapping."""
+            return MappingProxyType(dict(value))
 
         @m.computed_field
         def active_stream_count(self) -> int:
