@@ -7,6 +7,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from types import MappingProxyType
+
 import pytest
 
 from flext_tests import tm
@@ -17,6 +19,29 @@ __all__ = ["TestsFlextMeltanoModelsUnit"]
 
 class TestsFlextMeltanoModelsUnit:
     """Public-contract tests for Meltano tap/target/stream models."""
+
+    def test_pipeline_context_mappings_are_normalized_and_immutable(self) -> None:
+        execution_context = m.Meltano.PipelineExecutionContext(
+            project_root=" /tmp/project ",
+            elt_context={"extractor_name": "tap-example"},
+            extractor_name=" tap-example ",
+            loader_name=" target-example ",
+            execution_result={"success": True},
+        )
+        result_context = m.Meltano.PipelineResultContext(
+            project_root=" /tmp/project ",
+            execution_result={"success": True},
+        )
+
+        tm.that(execution_context.project_root, eq="/tmp/project")
+        tm.that(execution_context.extractor_name, eq="tap-example")
+        tm.that(execution_context.loader_name, eq="target-example")
+        tm.that(execution_context.elt_context, eq={"extractor_name": "tap-example"})
+        tm.that(execution_context.execution_result, eq={"success": True})
+        tm.that(result_context.execution_result, eq={"success": True})
+        assert isinstance(execution_context.elt_context, MappingProxyType)
+        assert isinstance(execution_context.execution_result, MappingProxyType)
+        assert isinstance(result_context.execution_result, MappingProxyType)
 
     # ---- TapConfig ---------------------------------------------------------
 

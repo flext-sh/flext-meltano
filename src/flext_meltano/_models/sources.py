@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
@@ -27,7 +28,10 @@ class FlextMeltanoModelsSources:
         ]
         stream_config: Annotated[
             t.FlatContainerMapping, m.Field(description="Stream-specific configuration")
-        ] = m.Field(default_factory=dict, description="Stream-specific configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Stream-specific configuration",
+        )
         tap_version: Annotated[str, m.Field(description="Tap version")] = "latest"
 
         @m.computed_field
@@ -54,6 +58,14 @@ class FlextMeltanoModelsSources:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
+        @m.field_validator("stream_config", mode="after")
+        @classmethod
+        def freeze_stream_config(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose stream configuration as a read-only mapping."""
+            return MappingProxyType(dict(value))
+
         @u.model_validator(mode="after")
         def validate_tap_config(self) -> Self:
             """Validate tap configuration consistency."""
@@ -71,7 +83,10 @@ class FlextMeltanoModelsSources:
         target_type: Annotated[str, m.Field(description="Type of the target")]
         connection_config: Annotated[
             t.FlatContainerMapping, m.Field(description="Connection configuration")
-        ] = m.Field(default_factory=dict, description="Connection configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Connection configuration",
+        )
         batch_size: Annotated[
             int | None, m.Field(default=None, description="Batch size for data loading")
         ] = None
@@ -105,6 +120,14 @@ class FlextMeltanoModelsSources:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
+        @m.field_validator("connection_config", mode="after")
+        @classmethod
+        def freeze_connection_config(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose target connection configuration as read-only."""
+            return MappingProxyType(dict(value))
+
         @u.model_validator(mode="after")
         def validate_target_config(self) -> Self:
             """Validate target configuration consistency."""
@@ -122,7 +145,10 @@ class FlextMeltanoModelsSources:
         ]
         stream_config: Annotated[
             t.FlatContainerMapping, m.Field(description="Stream-specific configuration")
-        ] = m.Field(default_factory=dict, description="Stream-specific configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Stream-specific configuration",
+        )
         source_version: Annotated[
             str, m.Field(default="latest", description="Source version")
         ] = "latest"
@@ -150,6 +176,14 @@ class FlextMeltanoModelsSources:
         ) -> t.FlatContainerMapping:
             """Serialize connection config with sensitive data protection."""
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
+
+        @m.field_validator("stream_config", mode="after")
+        @classmethod
+        def freeze_stream_config(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose source stream configuration as read-only."""
+            return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")
         def validate_source_config(self) -> Self:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m
@@ -20,7 +21,8 @@ class FlextMeltanoModelsDiscovery:
             str, m.Field(default="", description="Plugin default variant")
         ] = ""
         variants: t.FlatContainerMapping = m.Field(
-            default_factory=dict, description="Available plugin variants"
+            default_factory=lambda: MappingProxyType({}),
+            description="Available plugin variants",
         )
         logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
@@ -46,6 +48,14 @@ class FlextMeltanoModelsDiscovery:
                     empty: t.FlatContainerMapping = {}
                     return empty
 
+        @m.field_validator("variants", mode="after")
+        @classmethod
+        def freeze_variants(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose normalized variants as a read-only mapping."""
+            return MappingProxyType(dict(value))
+
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
 
@@ -66,7 +76,10 @@ class FlextMeltanoModelsDiscovery:
         """Typed plugin discovery catalog keyed by plugin name."""
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
-            m.Field(default_factory=dict, description="Discovered plugins catalog")
+            m.Field(
+                default_factory=lambda: MappingProxyType({}),
+                description="Discovered plugins catalog",
+            )
         )
 
         @m.field_validator("plugins", mode="before")
@@ -81,3 +94,12 @@ class FlextMeltanoModelsDiscovery:
                 case _:
                     empty: t.FlatContainerMapping = {}
                     return empty
+
+        @m.field_validator("plugins", mode="after")
+        @classmethod
+        def freeze_plugins(
+            cls,
+            value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource],
+        ) -> Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]:
+            """Expose normalized plugins as a read-only mapping."""
+            return MappingProxyType(dict(value))
