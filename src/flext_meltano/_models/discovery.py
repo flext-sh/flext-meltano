@@ -98,8 +98,7 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("plugins", mode="after")
         @classmethod
         def freeze_plugins(
-            cls,
-            value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource],
+            cls, value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]
         ) -> Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]:
             """Expose normalized plugins as a read-only mapping."""
             return MappingProxyType(dict(value))

@@ -48,12 +48,18 @@ class FlextMeltanoModelsInstances:
             """Number of config keys."""
             return u.count(list(self.config.keys()))
 
-        @m.field_validator("config", "sink_schema", "settings", mode="after")
+        @m.field_validator("config", mode="after")
         @classmethod
-        def freeze_mapping_fields(
-            cls, value: t.FlatContainerMapping | t.ConfigurationMapping
-        ) -> t.FlatContainerMapping | t.ConfigurationMapping:
-            """Expose sink mappings as read-only values."""
+        def freeze_config(cls, value: t.ConfigurationMapping) -> t.ConfigurationMapping:
+            """Expose sink configuration as a read-only mapping."""
+            return MappingProxyType(dict(value))
+
+        @m.field_validator("sink_schema", "settings", mode="after")
+        @classmethod
+        def freeze_container_mapping_fields(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose sink schema and settings as read-only mappings."""
             return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")

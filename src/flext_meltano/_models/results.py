@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -40,7 +41,18 @@ class FlextMeltanoModelsResults:
         ] = None
         metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Additional execution metadata")
-        ] = m.Field(default_factory=dict, description="Additional execution metadata")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Additional execution metadata",
+        )
+
+        @m.field_validator("metadata", mode="after")
+        @classmethod
+        def freeze_metadata(
+            cls, value: t.ConfigurationMapping
+        ) -> t.ConfigurationMapping:
+            """Expose execution metadata as a read-only mapping."""
+            return MappingProxyType(dict(value))
 
         @m.computed_field
         def execution_rate_per_second(self) -> float:
