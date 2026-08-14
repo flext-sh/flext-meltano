@@ -6,8 +6,7 @@ from typing import Annotated
 
 from flext_cli import m, u
 
-from flext_core import r
-from flext_meltano import t
+from flext_meltano import r, t
 
 
 class FlextMeltanoModelsCore:
