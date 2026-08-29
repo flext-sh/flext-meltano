@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import Annotated
 
 from flext_cli import m, u
 
-from flext_core import r
-from flext_meltano import t
+from flext_meltano import r, t
 
 
 class FlextMeltanoModelsCore:
@@ -50,31 +48,31 @@ class FlextMeltanoModelsCore:
         """Validated string list wrapper for result normalization."""
 
         items: Annotated[
-            t.StrSequence, m.Field(description="Normalized list of string values")
-        ] = m.Field(default_factory=list, description="Normalized string values")
+            t.StrTuple, m.Field(description="Normalized tuple of string values")
+        ] = m.Field(default_factory=tuple, description="Normalized string values")
 
         @m.field_validator("items", mode="before")
         @classmethod
-        def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.StrSequence:
-            """Convert sequence-like values into string lists."""
+        def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.StrTuple:
+            """Convert sequence-like values into string tuples."""
             if isinstance(value, (list, tuple, set)):
-                return [str(item) for item in value if item is not None]
-            return []
+                return tuple(str(item) for item in value if item is not None)
+            return ()
 
     class BooleanListValue(m.ArbitraryTypesModel):
         """Validated boolean list wrapper for process output."""
 
         items: Annotated[
-            Sequence[bool], m.Field(description="Normalized list of boolean values")
-        ] = m.Field(
-            default_factory=lambda: list[bool](),
-            description="Normalized boolean values",
-        )
+            t.VariadicTuple[bool],
+            m.Field(description="Normalized tuple of boolean values"),
+        ] = m.Field(default_factory=tuple, description="Normalized boolean values")
 
         @m.field_validator("items", mode="before")
         @classmethod
-        def normalize_items(cls, value: t.Meltano.ValidatorInput) -> Sequence[bool]:
-            """Convert sequence-like values into booleans."""
+        def normalize_items(
+            cls, value: t.Meltano.ValidatorInput
+        ) -> t.VariadicTuple[bool]:
+            """Convert sequence-like values into a boolean tuple."""
             if isinstance(value, (list, tuple, set)):
-                return [bool(item) for item in value]
-            return []
+                return tuple(bool(item) for item in value)
+            return ()

@@ -52,12 +52,8 @@ ______________________________________________________________________
 
 ### **Import Errors**
 
-**Problem**: Module import failures
-
-```
-ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
-```
-
+**Problem**: Module import failures```
+ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'```
 **Solution**: Verify installation and environment
 
 ```bash
@@ -65,18 +61,14 @@ ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
 python -c "import flext_meltano; u.Cli.print(flext_meltano.__file__)"
 
 # Reinstall if needed
-poetry install --with dev,test
-```
-
+poetry install --with dev,test```
 ### **Type Check Failures**
 
 **Problem**: MyPy errors in source code
 
 ```bash
 # Run type checking
-make type-check
-```
-
+make type-check```
 **Solution**: Fix type annotations
 
 ```python
@@ -99,9 +91,7 @@ pytest tests/ -v
 
 # Run specific test categories
 pytest tests/unit/ -v        # Unit tests only
-pytest tests/integration/ -v  # Integration tests
-```
-
+pytest tests/integration/ -v  # Integration tests```
 **Solution**: Common test issues
 
 1. **Missing test data**: Ensure test fixtures are available
@@ -121,9 +111,7 @@ ______________________________________________________________________
 poetry update
 
 # Resolve lock file issues
-poetry lock --no-update
-```
-
+poetry lock --no-update```
 ### **Virtual Environment Issues**
 
 **Problem**: Wrong virtual environment or missing dependencies
@@ -136,9 +124,7 @@ python -m pip list | grep flext
 # Use FLEXT workspace environment
 cd ../..
 source .venv/bin/activate
-cd flext-meltano
-```
-
+cd flext-meltano```
 ______________________________________________________________________
 
 ## 🧪 Testing Issues
@@ -152,9 +138,7 @@ ______________________________________________________________________
 pytest --cov=src --cov-report=html
 
 # View HTML report
-open htmlcov/index.html
-```
-
+open htmlcov/index.html```
 **Solution**: Focus on critical paths
 
 1. **Core Services**: Ensure service classes have test coverage
@@ -170,9 +154,7 @@ open htmlcov/index.html
 pytest -m "not slow"
 
 # Run only unit tests
-pytest tests/unit/
-```
-
+pytest tests/unit/```
 ______________________________________________________________________
 
 ## 🔍 Quality Gate Failures
@@ -186,9 +168,7 @@ ______________________________________________________________________
 make format
 
 # Check remaining issues
-make lint
-```
-
+make lint```
 **Common fixes**:
 
 - **Import order**: Use ruff to auto-sort imports
@@ -204,9 +184,7 @@ make lint
 bandit -r src/
 
 # Check specific issues
-bandit -r src/ -f json
-```
-
+bandit -r src/ -f json```
 **Solution**: Address security concerns
 
 - **Hardcoded passwords**: Use environment variables
@@ -280,12 +258,10 @@ poetry --version
 poetry show flext-core flext-meltano
 
 # Error details
-make val 2>&1 | head -50
-```
-
+make val 2>&1 | head -50```
 ### **Support Channels**
 
-- **Documentation**: Check [docs/](../docs/) first
+- **Documentation**: Check the [documentation index](index.md) first
 - **Issues**: [GitHub Issues](https://github.com/flext-sh/flext/issues)
 - **Architecture**: Review [architecture.md](architecture.md)
 

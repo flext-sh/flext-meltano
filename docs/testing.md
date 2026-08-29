@@ -350,9 +350,7 @@ make test
 pytest --cov \
        --cov-report=html:reports/coverage \
        --cov-report=xml:reports/coverage.xml \
-       --cov-report=term-missing
-```
-
+       --cov-report=term-missing```
 > Coverage thresholds are configured in `pyproject.toml` under `[tool.coverage.report]`.
 
 ### **Test Execution Metrics**

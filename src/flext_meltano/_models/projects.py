@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -22,8 +23,8 @@ class FlextMeltanoModelsProjects:
         description: Annotated[
             str | None, m.Field(default=None, description="Node description")
         ] = None
-        fqn: t.StrSequence = m.Field(
-            default_factory=list, description="Fully qualified name parts"
+        fqn: t.StrTuple = m.Field(
+            default_factory=tuple, description="Fully qualified name parts"
         )
         resource_type: Annotated[
             str,
@@ -39,8 +40,17 @@ class FlextMeltanoModelsProjects:
         """Parsed dbt manifest with typed nodes."""
 
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = m.Field(
-            default_factory=dict, description="Manifest nodes keyed by node_id"
+            default_factory=lambda: MappingProxyType({}),
+            description="Manifest nodes keyed by node_id",
         )
+
+        @m.field_validator("nodes", mode="after")
+        @classmethod
+        def freeze_nodes(
+            cls, value: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]
+        ) -> Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]:
+            """Expose manifest nodes as a read-only mapping."""
+            return MappingProxyType(dict(value))
 
         def get_nodes_by_type(
             self, resource_type: str
@@ -63,11 +73,21 @@ class FlextMeltanoModelsProjects:
             str, m.Field(default="dev", description="Default environment name")
         ] = "dev"
         plugins: t.FlatContainerMapping = m.Field(
-            default_factory=dict, description="Plugin configurations"
+            default_factory=lambda: MappingProxyType({}),
+            description="Plugin configurations",
         )
         environments: t.FlatContainerMapping = m.Field(
-            default_factory=dict, description="Environment configurations"
+            default_factory=lambda: MappingProxyType({}),
+            description="Environment configurations",
         )
+
+        @m.field_validator("plugins", "environments", mode="after")
+        @classmethod
+        def freeze_mapping_fields(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose project mappings as read-only values."""
+            return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:

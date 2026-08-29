@@ -61,10 +61,11 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             command_args = list(args) if args else sys.argv[1:]
             _ = command_args
             self.logger.info("Target CLI started", target=self.target_name)
-            return 0
         except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("Target CLI failed", error=str(exc))
             return 1
+        else:
+            return 0
 
     # ------------------------------------------------------------------
     # Sink management

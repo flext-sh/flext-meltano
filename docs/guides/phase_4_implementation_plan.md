@@ -169,9 +169,7 @@ poetry install --with test
 poetry run python -c "import flext_meltano; u.Cli.print('Import successful')"
 
 # Step 4: Validate test discovery
-poetry run pytest --collect-only tests/unit/test_api.py
-```
-
+poetry run pytest --collect-only tests/unit/test_api.py```
 **Estimated Effort**: 2 hours
 **Risk Level**: Low (environment configuration)
 **Dependencies**: Proper Poetry and PYTHONPATH setup
@@ -569,9 +567,7 @@ make coverage-trends
 make test-summary
 
 # Quality gate validation
-make val-gates
-```
-
+make val-gates```
 ______________________________________________________________________
 
 ## 🎯 **PHASE 4 DELIVERABLES & MILESTONES**
