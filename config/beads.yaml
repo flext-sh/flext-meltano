@@ -1,0 +1,4 @@
+version: 1
+workspace: flext-meltano
+database: flext-meltano
+issue_prefix: flext-meltano
