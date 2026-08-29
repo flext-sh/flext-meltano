@@ -17,7 +17,7 @@
   - [3. Microservices Architecture](#3-microservices-architecture)
   - [4. Event-Driven Architecture](#4-event-driven-architecture)
 - [Implementation Details](#implementation-details)
-  - [Layer Structure](#layer-structure)
+  - [Layer Structure```](#layer-structure)
   - [Layer Interaction Rules](#layer-interaction-rules)
   - [Dependency Injection](#dependency-injection)
 - [Related ADRs](#related-adrs)
@@ -158,9 +158,7 @@ class MeltanoAdapter:
 
 ## Implementation Details
 
-### Layer Structure
-
-```
+### Layer Structure```
 src/flext_meltano/
 ├── api.py                    # 🚪 API Layer - External interfaces
 ├── services.py               # 🎯 Application Layer - Use cases
@@ -168,9 +166,7 @@ src/flext_meltano/
 ├── models.py                 # 📦 Domain Layer - Business entities
 ├── settings.py                 # ⚙️ Infrastructure Layer - Configuration
 ├── exceptions.py             # 🚨 Domain Layer - Business errors
-└── __init__.py               # 🚪 API Layer - Public interface
-```
-
+└── __init__.py               # 🚪 API Layer - Public interface```
 ### Layer Interaction Rules
 
 **API Layer → Application Layer**

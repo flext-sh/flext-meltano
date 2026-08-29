@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from types import MappingProxyType
 from typing import Annotated, Self
 
 
@@ -36,13 +36,13 @@ class FlextMeltanoModelsSinger:
             ),
         ]
         key_properties: Annotated[
-            t.StrSequence, m.Field(description="Singer stream key properties")
-        ] = m.Field(default_factory=list, description="Singer stream key properties")
+            t.StrTuple, m.Field(description="Singer stream key properties")
+        ] = m.Field(default_factory=tuple, description="Singer stream key properties")
         bookmark_properties: Annotated[
-            t.StrSequence,
+            t.StrTuple,
             m.Field(description="Singer bookmark columns for incremental replication"),
         ] = m.Field(
-            default_factory=list,
+            default_factory=tuple,
             description="Singer bookmark columns for incremental replication",
         )
 
@@ -142,8 +142,8 @@ class FlextMeltanoModelsSinger:
             t.FlatContainerMapping, m.Field(description="JSON schema for the stream")
         ]
         primary_keys: Annotated[
-            t.StrSequence, m.Field(description="Primary key properties")
-        ] = m.Field(default_factory=list, description="Primary key properties")
+            t.StrTuple, m.Field(description="Primary key properties")
+        ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_key: Annotated[
             str | None, m.Field(default=None, description="Incremental replication key")
         ] = None
@@ -166,11 +166,20 @@ class FlextMeltanoModelsSinger:
         stream_name: Annotated[str, m.Field(description="Stream name to fetch")]
         config: Annotated[
             t.JsonMapping, m.Field(description="Runtime tap configuration")
-        ] = m.Field(default_factory=dict, description="Runtime tap configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Runtime tap configuration",
+        )
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.JsonMapping) -> t.JsonMapping:
+            """Expose runtime tap configuration as read-only."""
+            return MappingProxyType(dict(value))
 
     class FetchResult(m.Entity):
         """Record fetch result returned by a declarative tap fetcher."""
 
         records: Annotated[
-            Sequence[t.JsonMapping], m.Field(description="Fetched records")
-        ] = m.Field(default_factory=list, description="Fetched records")
+            t.VariadicTuple[t.JsonMapping], m.Field(description="Fetched records")
+        ] = m.Field(default_factory=tuple, description="Fetched records")

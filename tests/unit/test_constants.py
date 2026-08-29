@@ -149,5 +149,9 @@ class TestsFlextMeltanoConstantsUnit:
 
     def test_plugin_type_enum_is_immutable(self) -> None:
         """PluginType members cannot be reassigned through the public enum."""
-        with pytest.raises((AttributeError, TypeError)):
-            setattr(c.Meltano.PluginType, "EXTRACTORS", "mutated")
+        tm.rejects_assignment(
+            c.Meltano.PluginType,
+            "EXTRACTORS",
+            "mutated",
+            expected=(AttributeError, TypeError),
+        )

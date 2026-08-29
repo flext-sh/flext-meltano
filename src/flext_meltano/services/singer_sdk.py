@@ -66,9 +66,10 @@ class FlextMeltanoSingerTapAdapter:
         try:
             singer_command = self._tap.get_singer_command()
             _ = singer_command.main(args=list(args), prog_name=prog_name)
-            return 0
         except SystemExit as exc:
             return exc.code if isinstance(exc.code, int) else 1
+        else:
+            return 0
 
     def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
         """Delegate stream discovery to the raw Singer tap."""

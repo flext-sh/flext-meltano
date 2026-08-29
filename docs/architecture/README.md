@@ -49,7 +49,7 @@ This directory contains comprehensive architecture documentation for FLEXT-Melta
 
 ### Architecture Decision Records (ADRs)
 
-- **[adr/](adr/)** - Architectural decision documentation
+- **[adr/README.md](adr/README.md)** - Architectural decision documentation
 - **Structured Process** - Decision capture, context, rationale, consequences
 - **Historical Tracking** - Evolution of architectural choices
 - **Template System** - Consistent ADR format and review process
@@ -181,10 +181,10 @@ make docs
 
 ## 📚 Related Documentation
 
-- **[../guides/MAINTENANCE_GUIDE.md](../guides/MAINTENANCE_GUIDE.md)** - Documentation maintenance procedures
-- **[../../README.md](../../README.md)** - Project overview and getting started
-- **[../../AGENTS.md](../../AGENTS.md)** - Development guidelines and standards
-- **[../guides/MAINTENANCE_GUIDE.md](../guides/MAINTENANCE_GUIDE.md)** - Quality assurance processes
+- **[../guides/maintenance-guide.md](../guides/maintenance-guide.md)** - Documentation maintenance procedures
+- **[README.md](https://github.com/flext-sh/flext/blob/0.12.0-dev/flext-meltano/README.md)** - Project overview and getting started
+- **[AGENTS.md](https://github.com/flext-sh/flext/blob/0.12.0-dev/flext-meltano/AGENTS.md)** - Development guidelines and standards
+- **[../guides/maintenance-quickstart.md](../guides/maintenance-quickstart.md)** - Quality assurance processes
 
 ## 🎯 Architecture Evolution
 

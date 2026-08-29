@@ -218,9 +218,7 @@ class EnterpriseELTService(FlextMeltanoService):
 python scripts/flext_meltano_bridge.py version
 python scripts/flext_meltano_bridge.py list_plugins
 python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-jsonl
-python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
-```
-
+python scripts/flext_meltano_bridge.py discover_catalog tap-oracle```
 **JSON API Response Pattern**:
 
 ```python
@@ -290,9 +288,7 @@ source .venv/bin/activate
 # flext-meltano specific variables
 export PYTHONPATH=..flext-meltano/src:$PYTHONPATH
 export MELTANO_PROJECT_ROOT=..flext-meltano
-export MELTANO_ENVIRONMENT=dev
-```
-
+export MELTANO_ENVIRONMENT=dev```
 ### Consumer Project Dependencies
 
 **Standard dependency pattern**:
@@ -305,9 +301,7 @@ flext-core = "^0.9.9"
 flext-meltano = "^0.9.9"  # Mandatory ELT foundation
 
 [tool.poetry.group.dev.dependencies]
-flext-cli = "^0.9.9"      # CLI development tools
-```
-
+flext-cli = "^0.9.9"      # CLI development tools```
 ---
 
 ## ⚠️ Integration Limitations

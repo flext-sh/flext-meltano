@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
@@ -21,13 +22,20 @@ class FlextMeltanoModelsInstances:
         sink_type: Annotated[str, m.Field(description="Type of the sink")]
         config: Annotated[
             t.ConfigurationMapping, m.Field(description="Sink configuration")
-        ] = m.Field(default_factory=dict, description="Sink configuration")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}),
+            description="Sink configuration",
+        )
         sink_schema: Annotated[
             t.FlatContainerMapping, m.Field(description="Sink schema")
-        ] = m.Field(default_factory=dict, description="Sink schema")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}), description="Sink schema"
+        )
         settings: Annotated[
             t.FlatContainerMapping, m.Field(description="Sink settings")
-        ] = m.Field(default_factory=dict, description="Sink settings")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType({}), description="Sink settings"
+        )
         status: Annotated[
             str,
             m.Field(
@@ -39,6 +47,20 @@ class FlextMeltanoModelsInstances:
         def config_keys_count(self) -> int:
             """Number of config keys."""
             return u.count(list(self.config.keys()))
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.ConfigurationMapping) -> t.ConfigurationMapping:
+            """Expose sink configuration as a read-only mapping."""
+            return MappingProxyType(dict(value))
+
+        @m.field_validator("sink_schema", "settings", mode="after")
+        @classmethod
+        def freeze_container_mapping_fields(
+            cls, value: t.FlatContainerMapping
+        ) -> t.FlatContainerMapping:
+            """Expose sink schema and settings as read-only mappings."""
+            return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")
         def validate_sink_definition(self) -> Self:
@@ -66,8 +88,8 @@ class FlextMeltanoModelsInstances:
             m.Field(description="Stream schema definition"),
         ]
         key_properties: Annotated[
-            t.StrSequence, m.Field(description="Primary key properties for the stream")
-        ] = m.Field(default_factory=list, description="Primary key properties")
+            t.StrTuple, m.Field(description="Primary key properties for the stream")
+        ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_method: Annotated[
             str, m.Field(default="FULL_TABLE", description="Replication method")
         ] = "FULL_TABLE"
@@ -149,9 +171,8 @@ class FlextMeltanoModelsInstances:
             t.JsonValue | None,
             m.Field(default=None, description="Tap adapter instance"),
         ] = None
-        streams: Sequence[FlextMeltanoModelsInstances.StreamInfo] = m.Field(
-            default_factory=lambda: list[FlextMeltanoModelsInstances.StreamInfo](),
-            description="Available streams",
+        streams: t.VariadicTuple[FlextMeltanoModelsInstances.StreamInfo] = m.Field(
+            default_factory=tuple, description="Available streams"
         )
         status: Annotated[
             str,
