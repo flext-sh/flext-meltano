@@ -45,7 +45,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       106      def _pipeline_command(
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 2 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_meltano/pipeline_mgr.py:112` · **Effort**: 6min
@@ -64,7 +64,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       116              return r[t.StrSequence].fail("Pipeline execution not configured")
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 3 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_meltano/pipeline_mgr.py:149` · **Effort**: 10min
@@ -83,7 +83,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       153              config_mapping = m.Meltano.ConfigMappingPayload.model_validate({
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 4 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_meltano/services/consumer_bases/dbt_service_base.py:74` · **Effort**: 7min
@@ -102,7 +102,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        78              command_args = list(args) if args else sys.argv[1:]
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 5 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_meltano/services/dbt_project.py:49` · **Effort**: 6min
@@ -121,7 +121,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        53                  self._build_manifest_node_summary(node)
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 6 · 🟠 CRITICAL · CODE_SMELL · `python:S5754`
 **Local**: `src/flext_meltano/services/declarative_tap.py:47` · **Effort**: 5min
@@ -140,7 +140,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        51          def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 7 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_meltano/services/executor_base.py:203` · **Effort**: 6min
@@ -159,7 +159,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       207          _cwd: Path | None = None,
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 8 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_meltano/services/executor_base.py:321` · **Effort**: 6min
@@ -178,7 +178,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       325          prepared_command: t.StrSequence | None = None
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 9 · 🟠 CRITICAL · CODE_SMELL · `python:S5727`
 **Local**: `src/flext_meltano/services/executor_base.py:398` · **Effort**: 10min
@@ -197,7 +197,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       402          return r[m.Meltano.CommandExecutionResult].ok(completed_result)
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 10 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_meltano/services/meltano_plugin_discovery.py:73` · **Effort**: 9min
@@ -216,7 +216,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        77          self.logger.info("Discovering Meltano plugins")
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 11 · 🟠 CRITICAL · CODE_SMELL · `python:S5754`
 **Local**: `src/flext_meltano/services/singer_sdk.py:70` · **Effort**: 5min
@@ -235,7 +235,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        74          """Delegate stream discovery to the raw Singer tap."""
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 12 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8264`
 **Local**: `.github/workflows/docs.yml:18` · **Effort**: 5min
@@ -254,7 +254,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        22  concurrency:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 13 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
 **Local**: `.github/workflows/docs.yml:19` · **Effort**: 5min
@@ -273,7 +273,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        23    group: pages
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 14 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
 **Local**: `.github/workflows/docs.yml:20` · **Effort**: 5min
@@ -292,7 +292,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        24    cancel-in-progress: false
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 15 · 🟡 MAJOR · VULNERABILITY · `text:S8565`
 **Local**: `pyproject.toml:-` · **Effort**: 5min
@@ -300,7 +300,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Dependency versions are not predictable if the lock file (uv.lock, poetry.lock, pdm.lock or pylock.toml) is missing.
 
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 16 · ⚪ MINOR · CODE_SMELL · `python:S7504`
 **Local**: `conftest.py:20` · **Effort**: 5min
@@ -319,7 +319,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        24                  sys.modules.pop(module_name, None)
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 17 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:31` · **Effort**: 2min
@@ -338,7 +338,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        35      SingerContext = Context
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 18 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:32` · **Effort**: 2min
@@ -357,7 +357,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        36      SingerRecord = Record
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 19 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:33` · **Effort**: 2min
@@ -376,7 +376,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        37      SingerArrayType = singer_sdk_typing.ArrayType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 20 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:34` · **Effort**: 2min
@@ -395,7 +395,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        38      SingerBooleanType = singer_sdk_typing.BooleanType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 21 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:35` · **Effort**: 2min
@@ -414,7 +414,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        39      SingerCustomType = singer_sdk_typing.CustomType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 22 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:36` · **Effort**: 2min
@@ -433,7 +433,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        40      SingerDateTimeType = singer_sdk_typing.DateTimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 23 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:37` · **Effort**: 2min
@@ -452,7 +452,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        41      SingerDateType = singer_sdk_typing.DateType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 24 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:38` · **Effort**: 2min
@@ -471,7 +471,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        42      SingerDurationType = singer_sdk_typing.DurationType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 25 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:39` · **Effort**: 2min
@@ -490,7 +490,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        43      SingerIntegerType = singer_sdk_typing.IntegerType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 26 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:40` · **Effort**: 2min
@@ -509,7 +509,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        44      SingerNumberType = singer_sdk_typing.NumberType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 27 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:41` · **Effort**: 2min
@@ -528,7 +528,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        45      SingerObjectType = singer_sdk_typing.ObjectType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 28 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:42` · **Effort**: 2min
@@ -547,7 +547,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        46      SingerPropertiesList = singer_sdk_typing.PropertiesList
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 29 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:43` · **Effort**: 2min
@@ -566,7 +566,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        47      SingerProperty = singer_sdk_typing.Property
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 30 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:44` · **Effort**: 2min
@@ -585,7 +585,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        48      SingerStringType = singer_sdk_typing.StringType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 31 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:45` · **Effort**: 2min
@@ -604,7 +604,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        49      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 32 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:46` · **Effort**: 2min
@@ -622,7 +622,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        49      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 33 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:47` · **Effort**: 2min
@@ -639,7 +639,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        49      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 34 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:48` · **Effort**: 2min
@@ -655,7 +655,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        49      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 35 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/singer_sdk.py:49` · **Effort**: 2min
@@ -670,7 +670,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>    49      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 36 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_models/sources.py:17` · **Effort**: 2min
@@ -689,7 +689,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        21      class TapConfig(m.Entity):
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 37 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_protocols/singer.py:210` · **Effort**: 2min
@@ -708,7 +708,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       214      class SingerDrainSink(Protocol):
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 38 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_protocols/singer.py:211` · **Effort**: 2min
@@ -727,7 +727,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       215          """Typed sink contract for target service drain and record operations.
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 39 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/base.py:32` · **Effort**: 2min
@@ -746,7 +746,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        36  
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 40 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:23` · **Effort**: 2min
@@ -765,7 +765,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        27      SingerBooleanType = singer_sdk_typing.BooleanType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 41 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:26` · **Effort**: 2min
@@ -784,7 +784,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        30      SingerDateType = singer_sdk_typing.DateType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 42 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:27` · **Effort**: 2min
@@ -803,7 +803,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        31      SingerDurationType = singer_sdk_typing.DurationType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 43 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:28` · **Effort**: 2min
@@ -822,7 +822,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        32      SingerIntegerType = singer_sdk_typing.IntegerType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 44 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:29` · **Effort**: 2min
@@ -841,7 +841,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        33      SingerNumberType = singer_sdk_typing.NumberType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 45 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:30` · **Effort**: 2min
@@ -860,7 +860,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        34      SingerObjectType = singer_sdk_typing.ObjectType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 46 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:31` · **Effort**: 2min
@@ -879,7 +879,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        35      SingerPropertiesList = singer_sdk_typing.PropertiesList
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 47 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:32` · **Effort**: 2min
@@ -898,7 +898,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        36      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 48 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:33` · **Effort**: 2min
@@ -916,7 +916,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        36      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 49 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:34` · **Effort**: 2min
@@ -933,7 +933,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        36      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 50 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:35` · **Effort**: 2min
@@ -949,7 +949,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        36      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 51 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_meltano/_typings/singer.py:36` · **Effort**: 2min
@@ -964,5 +964,4 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>    36      SingerTimeType = singer_sdk_typing.TimeType
 ```
 
-**Decisão**: 
-
+**Decisão**: pendente
