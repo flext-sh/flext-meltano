@@ -7,7 +7,7 @@
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
 - Package: `flext_meltano`
-- Version: `0.12.0rc0`
+- Version: `0.12.0`
 - Description: FLEXT Meltano - Enterprise Data Integration Platform
 - Doc summary: Flext Meltano package.
 - Classifiers: `Development Status :: 3 - Alpha`, `Intended Audience ::
