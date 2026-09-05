@@ -52,7 +52,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 else r[t.JsonMapping].ok(ready_payload)
             )
         except c.Meltano.OPERATION_ERRORS as e:
-            return r[t.JsonMapping].fail(f"Failed to create CLI runner: {e}")
+            return r[t.JsonMapping].fail(f"Failed to create CLI runner: {e}", exception=e)
 
     def health(self) -> p.Result[t.JsonMapping]:
         """Check system health by running meltano invoke."""
@@ -149,9 +149,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                     full_command: list[str] = [command, *args]
                     result = self.execute_meltano_command(full_command)
                     if result.failure:
-                        return r[t.JsonMapping].fail(
-                            result.error or f"Command '{command}' failed"
-                        )
+                        return r[t.JsonMapping].from_failure(result)
                     args_payload: t.JsonValueList = list(args)
                     extra_fields: t.JsonDict = {
                         "command": command,

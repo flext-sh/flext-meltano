@@ -183,9 +183,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
             parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
             if parsed_result.failure:
-                return r[t.Meltano.DbtManifestData].fail(
-                    parsed_result.error or "manifest read failed"
-                )
+                return r[t.Meltano.DbtManifestData].from_failure(parsed_result)
             parsed = parsed_result.value
             manifest_data: t.Meltano.DbtManifestData = {
                 "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()}
@@ -195,19 +193,17 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         try:
             return _run_load_manifest()
         except c.EXC_KEY_OS_TYPE_VALUE as exc:
-            return r[t.Meltano.DbtManifestData].fail(str(exc))
+            return r[t.Meltano.DbtManifestData].fail(str(exc), exception=exc)
 
     def fetch_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
         if manifest_result.failure:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                manifest_result.error or "Manifest load failed"
-            )
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(manifest_result)
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
         except c.EXC_MAPPING_TYPE as exc:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(str(exc))
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(str(exc), exception=exc)
         return self._build_model_nodes(manifest)
 
     def _build_model_nodes(

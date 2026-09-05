@@ -45,7 +45,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return r[t.SequenceOf[t.JsonMapping]].ok(plugins)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get plugins", error=str(e))
-            return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to get plugins: {e}")
+            return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to get plugins: {e}", exception=e)
 
     def initialize_sdk_project(
         self, root: Path
@@ -56,9 +56,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             try:
                 root.mkdir(parents=True, exist_ok=True)
             except OSError as e:
-                return r[t.Meltano.OptionalScalarMap].fail(
-                    f"Failed to prepare project directory: {e}"
-                )
+                return r[t.Meltano.OptionalScalarMap].fail(f"Failed to prepare project directory: {e}", exception=e)
             self._sdk_project = Project(root)
             self._sdk_project_root = root
             info = {
@@ -72,9 +70,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return _run_initialize_sdk_project()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to initialize project")
-            return r[t.Meltano.OptionalScalarMap].fail(
-                f"Failed to initialize project: {e}"
-            )
+            return r[t.Meltano.OptionalScalarMap].fail(f"Failed to initialize project: {e}", exception=e)
 
     def load_sdk_project(self, root: Path) -> p.Result[t.Meltano.OptionalScalarMap]:
         """Load an existing Meltano project via SDK."""
@@ -93,7 +89,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return r[t.Meltano.OptionalScalarMap].ok(info)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load project", error=str(e))
-            return r[t.Meltano.OptionalScalarMap].fail(f"Failed to load project: {e}")
+            return r[t.Meltano.OptionalScalarMap].fail(f"Failed to load project: {e}", exception=e)
 
     def _extract_sdk_plugins(
         self, plugin_type: str | None
