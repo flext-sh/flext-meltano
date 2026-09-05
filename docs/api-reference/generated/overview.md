@@ -16,16 +16,17 @@
   Software Development :: Libraries :: Python Modules` (+1 more)
 - Project class: `platform`
 - Keywords: `data-integration`, `enterprise`, `etl`, `flext`, `meltano`, `typed`
-- Main facades: `FlextMeltano`, `FlextMeltanoAbstractions`, `FlextMeltanoCli`,
-  `FlextMeltanoConfig`, `FlextMeltanoConstants`, `FlextMeltanoModels`,
-  `FlextMeltanoProtocols`, `FlextMeltanoServiceBase` (+7 more)
+- Main facades: `FlextMeltano`, `FlextMeltanoAbstractions`,
+  `FlextMeltanoAdapter`, `FlextMeltanoBridge`, `FlextMeltanoCli`,
+  `FlextMeltanoComponentService`, `FlextMeltanoConfig`, `FlextMeltanoConstants`
+  (+28 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
 - Public symbol exports: `FlextMeltano`, `FlextMeltanoAbstractions`,
-  `FlextMeltanoCli`, `FlextMeltanoConfig`, `FlextMeltanoConstants`,
-  `FlextMeltanoModels`, `FlextMeltanoProtocols`, `FlextMeltanoServiceBase`,
-  `FlextMeltanoDbtServiceBase`, `FlextMeltanoLibraryRunner` (+9 more)
-- Exported module shortcuts: _none_
-- Generated module pages: `9`
+  `FlextMeltanoAdapter`, `FlextMeltanoBridge`, `FlextMeltanoCli`,
+  `FlextMeltanoComponentService`, `FlextMeltanoConfig`, `FlextMeltanoConstants`,
+  `FlextMeltanoConsumerBases`, `FlextMeltanoDbtProjectMixin` (+34 more)
+- Exported module shortcuts: `services`
+- Generated module pages: `34`
 
 ## Next Pages
 
