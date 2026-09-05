@@ -105,7 +105,9 @@ class FlextMeltanoModelsInstancesData:
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             m.Field(description="Discovered streams"),
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[
+                str, FlextMeltanoModelsSourcesParams.StreamDefinition
+            ]({}),
             description="Discovered streams",
         )
         discovered: Annotated[
@@ -115,7 +117,7 @@ class FlextMeltanoModelsInstancesData:
         metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Additional metadata")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional metadata",
         )
         source_id: Annotated[str, m.Field(description="Unique source identifier")]

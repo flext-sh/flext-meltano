@@ -21,7 +21,7 @@ class FlextMeltanoModelsSingerCatalog:
             default_factory=tuple, description="Singer metadata breadcrumb path"
         )
         metadata: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Singer metadata properties",
         )
 
@@ -124,7 +124,7 @@ class FlextMeltanoModelsSingerCatalog:
         ]
         errors: Annotated[t.NonNegativeInt, m.Field(description="Number of errors")]
         state: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Final state payload",
         )
 
