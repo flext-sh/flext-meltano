@@ -68,7 +68,7 @@ class FlextMeltanoProtocolsProject:
 
         @property
         def is_connected(self) -> bool:
-            """Check if adapter is currently connected."""
+            """Whether adapter is currently connected."""
             ...
 
         def connect(self) -> p.Result[bool]:

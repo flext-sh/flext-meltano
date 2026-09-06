@@ -42,7 +42,7 @@ class FlextMeltanoModelsResults:
         metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Additional execution metadata")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional execution metadata",
         )
 

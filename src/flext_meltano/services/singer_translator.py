@@ -32,7 +32,7 @@ class FlextMeltanoSingerCliTranslator(FlextMeltanoServiceBase):
             list(command), timeout=timeout, input_data=process_input
         )
         if cmd_result.failure:
-            return r[t.JsonMapping].fail(cmd_result.error or "Command failed")
+            return r[t.JsonMapping].from_failure(cmd_result)
         out = cmd_result.value
         output_dict: t.JsonMapping = {
             "stdout": out.stdout,
