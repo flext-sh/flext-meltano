@@ -27,7 +27,7 @@ class FlextMeltanoModelsPayloadsData:
                 description="Schema-like JSON payload",
             ),
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Schema-like JSON payload",
         )
 
@@ -76,7 +76,7 @@ class FlextMeltanoModelsPayloadsData:
         """Normalized mapping payload with string keys."""
 
         values: t.JsonMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Normalized mapping values",
         )
 

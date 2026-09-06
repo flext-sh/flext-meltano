@@ -83,7 +83,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             self.logger.debug("Sink created", stream=stream_name)
             return r[p.Meltano.SingerDrainSink].ok(sink)
         except c.Meltano.OPERATION_ERRORS as exc:
-            return r[p.Meltano.SingerDrainSink].fail(str(exc))
+            return r[p.Meltano.SingerDrainSink].fail(str(exc), exception=exc)
 
     def flush(self, stream_name: str | None = None) -> p.Result[bool]:
         """Flush records for a specific stream or all streams."""
@@ -99,7 +99,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
                 sink.mark_drained()
             return r[bool].ok(True)
         except c.Meltano.OPERATION_ERRORS as exc:
-            return r[bool].fail(str(exc))
+            return r[bool].fail(str(exc), exception=exc)
 
     # ------------------------------------------------------------------
     # Record processing
@@ -111,14 +111,14 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         """Process a single Singer RECORD message."""
         sink_result = self.fetch_or_create_sink(stream_name, schema)
         if sink_result.failure:
-            return r[bool].fail(sink_result.error or "Sink creation failed")
+            return r[bool].from_failure(sink_result)
         try:
             record_dict = t.json_dict_adapter().validate_python(record)
             empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as exc:
-            return r[bool].fail(str(exc))
+            return r[bool].fail(str(exc), exception=exc)
 
     def process_batch(
         self,
@@ -131,7 +131,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         for record in records:
             result = self.process_record(stream_name, record, schema)
             if result.failure:
-                return r[int].fail(result.error or "Batch processing failed")
+                return r[int].from_failure(result)
             processed += 1
         return r[int].ok(processed)
 

@@ -57,7 +57,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 plugin_name,
             ])
             if cmd_result.failure:
-                return r[bool].fail(cmd_result.error or "Failed to add plugin")
+                return r[bool].from_failure(cmd_result)
             return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to add plugin: {e}"
@@ -89,9 +89,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
             return r[t.Meltano.NestedStrMapping].fail(error_msg)
         if plugins_result.failure:
-            return r[t.Meltano.NestedStrMapping].fail(
-                plugins_result.error or f"Failed to list {plugin_type}"
-            )
+            return r[t.Meltano.NestedStrMapping].from_failure(plugins_result)
         plugins: dict[str, t.StrMapping] = {}
         for plugin in plugins_result.value:
             plugin_name = plugin.get("name", "")
@@ -131,9 +129,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
                 loader_name,
             ])
             if cmd_result.failure:
-                return r[t.HeaderMapping].fail(
-                    cmd_result.error or "Pipeline execution failed"
-                )
+                return r[t.HeaderMapping].from_failure(cmd_result)
             result: t.MutableHeaderMapping = {
                 "status": c.Meltano.StreamStatus.COMPLETED,
                 "source": extractor_name,
@@ -168,7 +164,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         try:
             return r[Path].ok(Path(project_root))
         except c.Meltano.OPERATION_ERRORS as e:
-            return r[Path].fail(f"Failed to get project root: {e}")
+            return r[Path].fail(f"Failed to get project root: {e}", exception=e)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

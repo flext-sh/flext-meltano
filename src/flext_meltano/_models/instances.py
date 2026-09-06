@@ -23,18 +23,20 @@ class FlextMeltanoModelsInstances:
         config: Annotated[
             t.ConfigurationMapping, m.Field(description="Sink configuration")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Sink configuration",
         )
         sink_schema: Annotated[
             t.FlatContainerMapping, m.Field(description="Sink schema")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}), description="Sink schema"
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Sink schema",
         )
         settings: Annotated[
             t.FlatContainerMapping, m.Field(description="Sink settings")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}), description="Sink settings"
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Sink settings",
         )
         status: Annotated[
             str,

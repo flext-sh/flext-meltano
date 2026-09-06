@@ -21,7 +21,7 @@ class FlextMeltanoModelsDiscovery:
             str, m.Field(default="", description="Plugin default variant")
         ] = ""
         variants: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Available plugin variants",
         )
         logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
@@ -77,7 +77,9 @@ class FlextMeltanoModelsDiscovery:
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
             m.Field(
-                default_factory=lambda: MappingProxyType({}),
+                default_factory=lambda: MappingProxyType[
+                    str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
+                ]({}),
                 description="Discovered plugins catalog",
             )
         )

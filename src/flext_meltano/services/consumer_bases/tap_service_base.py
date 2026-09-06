@@ -98,7 +98,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             return r[t.StrSequence].ok(stream_names)
         except c.EXC_BROAD_RUNTIME_OS as exc:
             self.logger.exception("Discovery failed", error=str(exc))
-            return r[t.StrSequence].fail(str(exc))
+            return r[t.StrSequence].fail(str(exc), exception=exc)
 
     def run_sync(self) -> p.Result[str]:
         """Execute Singer sync via tap."""
@@ -108,7 +108,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             return r[str].ok(self.tap_name)
         except c.EXC_BROAD_RUNTIME_OS as exc:
             self.logger.exception("Sync failed", error=str(exc))
-            return r[str].fail(str(exc))
+            return r[str].fail(str(exc), exception=exc)
 
     # ------------------------------------------------------------------
     # Connection lifecycle

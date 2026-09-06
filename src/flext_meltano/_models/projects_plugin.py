@@ -30,7 +30,8 @@ class FlextMeltanoModelsProjectsPlugin:
         settings: Annotated[
             t.FlatContainerMapping, m.Field(description="Plugin settings")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}), description="Plugin settings"
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Plugin settings",
         )
         capabilities: Annotated[
             t.StrTuple, m.Field(description="Plugin capabilities")
