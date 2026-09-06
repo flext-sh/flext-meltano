@@ -42,7 +42,7 @@ class FlextMeltanoModelsResultsPipeline:
         pipeline_metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Pipeline execution metadata")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Pipeline execution metadata",
         )
 
