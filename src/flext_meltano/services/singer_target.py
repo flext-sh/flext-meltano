@@ -56,7 +56,9 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                     m.Meltano.DataSinkConfig.model_validate(sink_config)
                 )
             except c.EXC_ATTR_KEY_TYPE_VALUE as e:
-                return r[m.Meltano.DataSinkInstance].fail(f"Invalid target settings: {e}", exception=e)
+                return r[m.Meltano.DataSinkInstance].fail(
+                    f"Invalid target settings: {e}", exception=e
+                )
         else:
             settings = sink_config
         return self.create_sink_instance(settings)

@@ -45,7 +45,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             c.Meltano.DbtResourceType.MODEL
         )
         if model_nodes_result.failure:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(model_nodes_result)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(
+                model_nodes_result
+            )
         try:
             models = [
                 self._build_manifest_node_summary(node)
@@ -53,7 +55,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             ]
         except c.Meltano.OPERATION_ERRORS as e:
             self.logger.exception("Failed to get models", error=str(e))
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(f"Failed to get models: {e}", exception=e)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+                f"Failed to get models: {e}", exception=e
+            )
         self.logger.info("Models retrieved", count=len(models))
         return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(models)
 
@@ -61,7 +65,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         """Get all tests from manifest."""
         test_nodes_result = self._get_dbt_manifest_nodes(c.Meltano.DbtResourceType.TEST)
         if test_nodes_result.failure:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(test_nodes_result)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(
+                test_nodes_result
+            )
         try:
             tests = [
                 self._build_manifest_node_summary(node)
@@ -69,7 +75,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             ]
         except c.EXC_OS_VALIDATION as e:
             self.logger.exception("Failed to get tests", error=str(e))
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(f"Failed to get tests: {e}", exception=e)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+                f"Failed to get tests: {e}", exception=e
+            )
         self.logger.info("Tests retrieved", count=len(tests))
         return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].ok(tests)
 
@@ -82,7 +90,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             if not self._dbt_manifest:
                 manifest_result = self.load_dbt_manifest()
                 if manifest_result.failure:
-                    return r[t.SequenceOf[m.Meltano.DbtManifestNode]].from_failure(manifest_result)
+                    return r[t.SequenceOf[m.Meltano.DbtManifestNode]].from_failure(
+                        manifest_result
+                    )
             if not self._dbt_manifest:
                 return r[t.SequenceOf[m.Meltano.DbtManifestNode]].ok([])
             manifest_model = m.Meltano.DbtManifest.model_validate(self._dbt_manifest)
@@ -98,7 +108,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
         try:
             return _run__get_dbt_manifest_nodes()
         except c.EXC_OS_VALIDATION as e:
-            return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(f"Failed to read manifest nodes: {e}", exception=e)
+            return r[t.SequenceOf[m.Meltano.DbtManifestNode]].fail(
+                f"Failed to read manifest nodes: {e}", exception=e
+            )
 
     def load_dbt_manifest(
         self, manifest_path: Path | None = None
@@ -139,7 +151,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             return _run_load_dbt_manifest()
         except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             self.logger.exception("Failed to load manifest", error=str(e))
-            return r[t.Meltano.DbtManifestData].fail(f"Failed to load manifest: {e}", exception=e)
+            return r[t.Meltano.DbtManifestData].fail(
+                f"Failed to load manifest: {e}", exception=e
+            )
 
     def load_dbt_project(self, root: Path) -> p.Result[m.Meltano.DbtProjectInfo]:
         """Load a DBT project and discover models/tests from manifest."""
@@ -179,7 +193,9 @@ class FlextMeltanoDbtProjectMixin(FlextMeltanoServiceBase):
             return _run_load_dbt_project()
         except c.EXC_ATTR_KEY_OS_TYPE_VALUE as e:
             self.logger.exception("Failed to load DBT project", error=str(e))
-            return r[m.Meltano.DbtProjectInfo].fail(f"Failed to load DBT project: {e}", exception=e)
+            return r[m.Meltano.DbtProjectInfo].fail(
+                f"Failed to load DBT project: {e}", exception=e
+            )
 
 
 __all__: list[str] = ["FlextMeltanoDbtProjectMixin"]

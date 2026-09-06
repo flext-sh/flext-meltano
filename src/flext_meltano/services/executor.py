@@ -52,7 +52,9 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                 else r[t.JsonMapping].ok(ready_payload)
             )
         except c.Meltano.OPERATION_ERRORS as e:
-            return r[t.JsonMapping].fail(f"Failed to create CLI runner: {e}", exception=e)
+            return r[t.JsonMapping].fail(
+                f"Failed to create CLI runner: {e}", exception=e
+            )
 
     def health(self) -> p.Result[t.JsonMapping]:
         """Check system health by running meltano invoke."""

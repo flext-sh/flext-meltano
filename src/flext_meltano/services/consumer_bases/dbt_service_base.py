@@ -199,11 +199,15 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         """Get model list from manifest."""
         manifest_result = self.load_manifest()
         if manifest_result.failure:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(manifest_result)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(
+                manifest_result
+            )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
         except c.EXC_MAPPING_TYPE as exc:
-            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(str(exc), exception=exc)
+            return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+                str(exc), exception=exc
+            )
         return self._build_model_nodes(manifest)
 
     def _build_model_nodes(
