@@ -324,7 +324,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         completed_result: m.Meltano.CommandExecutionResult | None = None
 
         def resolve_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[m.Cli.PipelineStageResult]:
             nonlocal prepared_command
             try:
@@ -349,7 +349,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
 
         def execute_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[m.Cli.PipelineStageResult]:
             nonlocal completed_result
             if prepared_command is None:
@@ -366,7 +366,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 output={"success": completed.success, "exit_code": completed.exit_code},
             )
 
-        handlers: t.MutableMappingKV[str, t.Cli.PipelineHandler] = {
+        handlers: t.MutableMappingKV[str, p.Cli.PipelineStage] = {
             c.Meltano.PIPELINE_STAGE_RESOLVE_COMMAND: resolve_command_stage,
             c.Meltano.PIPELINE_STAGE_EXECUTE_COMMAND: execute_command_stage,
         }
