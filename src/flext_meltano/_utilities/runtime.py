@@ -26,10 +26,15 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def _normalized_parts(values: t.StrSequence) -> t.StrSequence:
         """Normalize a sequence of CLI-like values to stripped non-empty strings."""
-        stripped_values = u.map(
-            u.to_str_list(values), lambda part: u.to_str(part).strip()
-        )
-        return list(u.filter(stripped_values, lambda part: u.chk(part, empty=False)))
+
+        def _strip_part(part: str) -> str:
+            return u.to_str(part).strip()
+
+        def _is_non_empty_part(part: str) -> bool:
+            return u.chk(part, empty=False)
+
+        stripped_values = u.map(u.to_str_list(values), _strip_part)
+        return list(u.filter(stripped_values, _is_non_empty_part))
 
     @staticmethod
     def normalize_runtime_command(command: t.StrSequence) -> t.StrSequence:
@@ -201,17 +206,14 @@ class FlextMeltanoUtilitiesRuntime:
     @staticmethod
     def extract_plugin_names(plugins: t.SequenceOf[t.StrMapping]) -> t.StrSequence:
         """Extract non-empty plugin names from normalized plugin mappings."""
-        return list(
-            u.map(
-                u.filter(
-                    plugins,
-                    lambda plugin: u.chk(
-                        u.to_str(plugin.get("name", "")).strip(), empty=False
-                    ),
-                ),
-                lambda plugin: u.to_str(plugin.get("name", "")).strip(),
-            )
-        )
+
+        def _extract_name(plugin: t.StrMapping) -> str:
+            return u.to_str(plugin.get("name", "")).strip()
+
+        def _has_non_empty_name(plugin: t.StrMapping) -> bool:
+            return u.chk(_extract_name(plugin), empty=False)
+
+        return list(u.map(u.filter(plugins, _has_non_empty_name), _extract_name))
 
     @staticmethod
     def build_plugin_discovery_item(

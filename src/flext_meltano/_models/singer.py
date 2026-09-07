@@ -167,7 +167,7 @@ class FlextMeltanoModelsSinger:
         config: Annotated[
             t.JsonMapping, m.Field(description="Runtime tap configuration")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Runtime tap configuration",
         )
 

@@ -50,9 +50,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 c.Meltano.CMD_ALL_OPTION,
             ])
             if cmd_result.failure:
-                return r[t.JsonMapping].fail(
-                    cmd_result.error or c.Meltano.ERROR_STREAM_DISCOVERY_FAILED
-                )
+                return r[t.JsonMapping].from_failure(cmd_result)
             stream_defs: t.JsonValueList = []
             for line in cmd_result.value.splitlines():
                 name = line.strip()
@@ -116,9 +114,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 c.Meltano.PayloadKey.TARGET_LOADED: target_config is not None,
             }
             if cmd_result.failure:
-                return r[t.JsonMapping].fail(
-                    cmd_result.error or c.Meltano.ERROR_STREAM_SYNC_FAILED
-                )
+                return r[t.JsonMapping].from_failure(cmd_result)
             return r[t.JsonMapping].ok(result)
 
         try:
@@ -169,9 +165,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         """Generate Singer catalog by discovering streams from the tap."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
-            return r[t.JsonMapping].fail(
-                discovery.error or c.Meltano.ERROR_CATALOG_GENERATION_FAILED
-            )
+            return r[t.JsonMapping].from_failure(discovery)
         raw = discovery.value
         streams: list[m.Meltano.SingerCatalogEntry] = []
         for s in self._extract_raw_streams(raw):
@@ -198,9 +192,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         """Get stream definition by name."""
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
-            return r[t.JsonMapping].fail(
-                discovery.error or c.Meltano.ERROR_DISCOVERY_FAILED
-            )
+            return r[t.JsonMapping].from_failure(discovery)
         for stream in self._extract_raw_streams(discovery.value):
             if stream.get(c.Meltano.PayloadKey.STREAM_NAME) == stream_name:
                 result_stream: t.JsonDict = {

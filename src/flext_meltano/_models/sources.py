@@ -29,7 +29,7 @@ class FlextMeltanoModelsSources:
         stream_config: Annotated[
             t.FlatContainerMapping, m.Field(description="Stream-specific configuration")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",
         )
         tap_version: Annotated[str, m.Field(description="Tap version")] = "latest"
@@ -84,7 +84,7 @@ class FlextMeltanoModelsSources:
         connection_config: Annotated[
             t.FlatContainerMapping, m.Field(description="Connection configuration")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Connection configuration",
         )
         batch_size: Annotated[
@@ -146,7 +146,7 @@ class FlextMeltanoModelsSources:
         stream_config: Annotated[
             t.FlatContainerMapping, m.Field(description="Stream-specific configuration")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",
         )
         source_version: Annotated[
