@@ -45,7 +45,7 @@ dependencies = [
   "sqlalchemy>=2.0.52",
   "structlog>=25.5.0",
   "uvicorn>=0.52.4",
-  "wrapt>=2.3.0",
+  "wrapt>=2.4.0",
 ]
 description = "FLEXT Meltano - Enterprise Data Integration Platform"
 keywords = [
@@ -439,9 +439,12 @@ testpaths = ["tests"]
 exclude = [
   "**/.archive/**",
   "**/__pyrefly_virtual__/**",
+  "**/aihub-hooks/**",
   ".archive",
   ".archive/**",
   ".git",
+  ".github/hooks",
+  ".github/hooks/**",
   ".mypy_cache",
   ".pytest_cache",
   ".ruff_cache",
@@ -476,6 +479,7 @@ skip-magic-trailing-comma = true
 [tool.ruff.lint]
 # FLEXT Ruff suppression rationale (validated against semantic facet order):
 # FLEXT ruff[import-outside-top-level]: Public facade models are imported lazily only at validation and construction sites to preserve the c-t-p-m-u graph and prevent runtime cycles.
+# FLEXT ruff[relative-imports]: The codemod rule ban-private-import requires the opposite form. Same-owner implementation modules use relative sibling imports and every other consumer uses a public facade, because an absolute private import couples a consumer to an owner layout. Selecting both gates makes every internal import fail one of them. Converting the 304 findings produced 301 ban-private-import errors and took the suite from 1717 to 3135, so the architectural rule decides.
 ignore = [
   "ambiguous-unicode-character-comment",
   "ambiguous-unicode-character-docstring",
@@ -496,6 +500,7 @@ ignore = [
   "no-self-use",
   "non-imperative-mood",
   "pytest-fixture-autouse",
+  "relative-imports",
   "too-many-arguments",
   "too-many-branches",
   "too-many-locals",
@@ -635,7 +640,7 @@ dev = [
   "faker>=40.37.0",
   "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
   "flext-tests @ git+https://github.com/flext-sh/flext-tests.git@0.12.0-dev",
-  "hypothesis>=6.165.10",
+  "hypothesis>=6.167.1",
   "isort>=9.0.1",
   "matplotlib-stubs>=0.3.11",
   "mkdocs>=1.6.1",

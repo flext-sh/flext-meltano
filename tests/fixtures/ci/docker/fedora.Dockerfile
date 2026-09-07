@@ -20,17 +20,19 @@ RUN dnf install -y \
 # End SECTION: base packages
 
 # === SECTION: managed tool bootstrap (managed) ===
-# Source: generated bin/mise + .mise.toml + mise.lock
+# Source: generated bin/mise + .mise.toml
 # The canonical make setup verb below owns the official newest-Mise bootstrap
-# and every locked tool installation as the same unprivileged runtime user.
+# and every latest tool installation as the same unprivileged runtime user.
+# GITHUB_TOKEN (passed by ci-matrix as a build-arg) authenticates Mise's
+# GitHub API reads so provisioning never trips anonymous rate limits; mise
+# consumes it through MISE_GITHUB_TOKEN natively.
+ARG GITHUB_TOKEN
+ENV MISE_GITHUB_TOKEN=${GITHUB_TOKEN}
 ENV HOME=/home/runner \
     XDG_DATA_HOME=/home/runner/.local/share \
     XDG_CACHE_HOME=/home/runner/.cache \
     XDG_STATE_HOME=/home/runner/.local/state \
-    MISE_DATA_DIR=/home/runner/.local/share/mise \
-    MISE_CACHE_DIR=/home/runner/.cache/mise \
-    MISE_STATE_DIR=/home/runner/.local/state/mise \
-    MISE_TRUSTED_CONFIG_PATHS=/workspace
+    MISE_DATA_DIR=/home/runner/.local/share/mise
 WORKDIR /workspace
 RUN --mount=type=bind,source=.,target=/source,ro \
     cp -R /source/. /workspace/ \
@@ -48,7 +50,7 @@ ENV PATH="/home/runner/.local/share/mise/shims:${PATH}"
 # mentioned uv.lock/flext-core, which turned the proof into a bypass -- a
 # broken bootstrap still produced a green image.
 ENV CI=Y
-RUN make setup APPLY=Y
+RUN make setup
 # End SECTION: bootstrap proof
 
 ENTRYPOINT []
