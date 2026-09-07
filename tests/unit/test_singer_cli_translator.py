@@ -361,7 +361,13 @@ class TestsFlextMeltanoSingerCliTranslator:
         self, mock_run_raw: MagicMock
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(stdout="Success output", stderr="", exit_code=0)
+            m.Cli.CommandOutput(
+                stdout="Success output",
+                stderr="",
+                outcome=m.Cli.ProcessOutcome(
+                    raw_return_code=0, timed_out=False, forwarded_signal=None
+                ),
+            )
         )
         result = meltano.execute_singer_command([
             "tap-postgres",
@@ -379,7 +385,13 @@ class TestsFlextMeltanoSingerCliTranslator:
         self, mock_run_raw: MagicMock
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
-            m.Cli.CommandOutput(stdout="Success", stderr="", exit_code=0)
+            m.Cli.CommandOutput(
+                stdout="Success",
+                stderr="",
+                outcome=m.Cli.ProcessOutcome(
+                    raw_return_code=0, timed_out=False, forwarded_signal=None
+                ),
+            )
         )
         input_data = '{"type": "RECORD", "stream": "users"}'
         result = meltano.execute_singer_command(
@@ -397,7 +409,11 @@ class TestsFlextMeltanoSingerCliTranslator:
     ) -> None:
         mock_run_raw.return_value = r[m.Cli.CommandOutput].ok(
             m.Cli.CommandOutput(
-                stdout="", stderr="Error: Connection failed", exit_code=1
+                stdout="",
+                stderr="Error: Connection failed",
+                outcome=m.Cli.ProcessOutcome(
+                    raw_return_code=1, timed_out=False, forwarded_signal=None
+                ),
             )
         )
         result = meltano.execute_singer_command(["tap-postgres"])

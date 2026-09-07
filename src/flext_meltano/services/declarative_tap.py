@@ -76,7 +76,7 @@ class FlextMeltanoDeclarativeTap:
                 )
                 self._declared_primary_keys: t.StrSequence = stream_spec.primary_keys
                 self._declared_replication_key: str | None = stream_spec.replication_key
-                self._config: t.JsonMapping = config
+                self._stream_config: t.JsonMapping = config
 
             @property
             @override
@@ -108,7 +108,7 @@ class FlextMeltanoDeclarativeTap:
             ) -> Iterable[m.Meltano.SingerRecord]:
                 _ = context
                 request = m.Meltano.FetchRequest(
-                    stream_name=self.name, config=self._config
+                    stream_name=self.name, config=self._stream_config
                 )
                 result = fetcher.fetch(request)
                 if result.failure:
