@@ -9,10 +9,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from enum import StrEnum, unique
-    from pathlib import Path
-    from typing import TYPE_CHECKING, Final
-
     from flext_tests import FlextTestsConstants, d, e, h, r, td, tf, tk, tm, tv, x
 
     from . import integration as integration, unit as unit
@@ -24,12 +20,7 @@ if TYPE_CHECKING:
     from .typings import TestsFlextMeltanoTypes, TestsFlextMeltanoTypes as t
     from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
 __all__: tuple[str, ...] = (
-    "TYPE_CHECKING",
-    "Final",
     "FlextTestsConstants",
-    "MappingProxyType",
-    "Path",
-    "StrEnum",
     "TestsFlextMeltanoConstants",
     "TestsFlextMeltanoModels",
     "TestsFlextMeltanoProtocols",
@@ -53,7 +44,6 @@ __all__: tuple[str, ...] = (
     "tm",
     "tv",
     "u",
-    "unique",
     "unit",
     "x",
 )
@@ -70,7 +60,6 @@ _LAZY_IMPORTS = MappingProxyType(
             ".typings": ("TestsFlextMeltanoTypes", "t"),
             ".unit": ("unit",),
             ".utilities": ("TestsFlextMeltanoUtilities", "u"),
-            "enum": ("StrEnum", "unique"),
             "flext_tests": (
                 "FlextTestsConstants",
                 "d",
@@ -84,9 +73,6 @@ _LAZY_IMPORTS = MappingProxyType(
                 "tv",
                 "x",
             ),
-            "pathlib": ("Path",),
-            "types": ("MappingProxyType",),
-            "typing": ("Final", "TYPE_CHECKING"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

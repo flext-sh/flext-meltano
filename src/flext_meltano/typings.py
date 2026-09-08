@@ -8,9 +8,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_cli import t
-from flext_meltano._typings.base import FlextMeltanoTypingsBase
-from flext_meltano._typings.domains import FlextMeltanoTypingsDomains
-from flext_meltano._typings.singer import FlextMeltanoTypingsSinger
+
+from ._typings.base import FlextMeltanoTypingsBase
+from ._typings.domains import FlextMeltanoTypingsDomains
+from ._typings.singer import FlextMeltanoTypingsSinger
 
 
 class FlextMeltanoTypes(t):

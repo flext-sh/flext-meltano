@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import Final
 
 from flext_cli import c
-from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+
+from .enums import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsBase:
@@ -140,6 +141,7 @@ class FlextMeltanoConstantsBase:
     DBT_MATERIALIZATION_TABLE: Final[str] = "table"
     DBT_MATERIALIZATION_VIEW: Final[str] = "view"
     DBT_PROJECT_FILE: Final[str] = FlextMeltanoConstantsEnums.DbtFileName.PROJECT
+    DBT_PROJECT_DEFAULT_VERSION: Final[str] = "1.0.0"
 
     # ModelValidation
     VALIDATION_COMPLEXITY_MINIMAL_SETTINGS: Final[int] = 0

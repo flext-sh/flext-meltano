@@ -18,8 +18,12 @@ class FlextMeltanoModelsTransformations:
         name: Annotated[str, m.Field(description="DBT project name")]
         profile: Annotated[str, m.Field(description="DBT profile name")]
         dbt_version: Annotated[
-            str, m.Field(default="1.0.0", description="DBT project version")
-        ] = "1.0.0"
+            str,
+            m.Field(
+                default=c.Meltano.DBT_PROJECT_DEFAULT_VERSION,
+                description="DBT project version",
+            ),
+        ] = c.Meltano.DBT_PROJECT_DEFAULT_VERSION
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="DBT project configuration")
         ] = m.Field(
