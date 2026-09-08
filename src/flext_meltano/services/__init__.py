@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from . import consumer_bases as consumer_bases
+    from . import consumer_bases
     from .abstractions import FlextMeltanoAbstractions
     from .adapters import FlextMeltanoAdapter
     from .bridge import FlextMeltanoBridge
