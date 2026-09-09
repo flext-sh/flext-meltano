@@ -6,9 +6,10 @@ import contextlib
 import io
 from pathlib import Path
 
+from flext_tests import tm
+
 from flext_meltano import m, p, r, t
 from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
-from flext_tests import tm
 from tests import u
 
 

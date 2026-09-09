@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from flext_meltano import p
 from flext_tests import FlextTestsProtocols
+
+from flext_meltano import p
 
 
 class TestsFlextMeltanoProtocols(FlextTestsProtocols, p):

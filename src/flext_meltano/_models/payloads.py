@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m
+
 from flext_meltano import t
 
 

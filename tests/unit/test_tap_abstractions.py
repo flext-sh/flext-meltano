@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import tempfile
 
+from flext_tests import tm
 from pydantic_core import ValidationError
 
 from flext_core import r
 from flext_meltano import FlextMeltanoAbstractions
-from flext_tests import tm
 from tests import m, t
 
 

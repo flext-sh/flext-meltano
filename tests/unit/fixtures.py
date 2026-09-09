@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-
 from flext_tests import m, tf, tk, tm
+
 from tests import c, u
 
 if TYPE_CHECKING:

@@ -18,8 +18,9 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Final
 
-from flext_meltano import c
 from flext_tests import FlextTestsConstants
+
+from flext_meltano import c
 
 if TYPE_CHECKING:
     from tests import t

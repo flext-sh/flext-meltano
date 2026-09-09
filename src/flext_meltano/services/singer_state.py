@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
+
 from flext_meltano import FlextMeltanoServiceBase, c, e, m, p, r, u
 
 if TYPE_CHECKING:

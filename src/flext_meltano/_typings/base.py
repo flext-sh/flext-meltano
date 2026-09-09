@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_cli import m, t
+
 from flext_meltano import c
 
 

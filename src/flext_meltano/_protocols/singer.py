@@ -11,6 +11,7 @@ from collections.abc import Sequence
 from typing import Protocol, override, runtime_checkable
 
 from flext_cli import p
+
 from flext_core import r
 from flext_meltano import m, t
 

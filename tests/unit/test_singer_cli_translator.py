@@ -20,9 +20,9 @@ from __future__ import annotations
 import time
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import meltano
-from flext_tests import tm
 from tests import m
 
 

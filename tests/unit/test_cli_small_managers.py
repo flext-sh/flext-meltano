@@ -9,9 +9,9 @@ touched: the assertions describe the observable command contract only.
 from __future__ import annotations
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano.cli import FlextMeltanoCli
-from flext_tests import tm
 from tests import c, t, u
 
 __all__: list[str] = ["TestsFlextMeltanoCliSmallManagers"]

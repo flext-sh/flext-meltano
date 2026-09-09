@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Annotated
 
 from flext_cli import m, u
+
 from flext_meltano import t
 
 

@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import Annotated, ClassVar, Self
 
 from flext_cli import m, u
+
 from flext_meltano import t
 
 from .core import FlextMeltanoModelsCore

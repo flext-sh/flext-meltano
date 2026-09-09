@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import override
 
 import meltano
+from flext_cli import cli
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -25,7 +26,6 @@ from meltano.core.project_init_service import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_cli import cli
 from flext_meltano import (
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,

@@ -6,6 +6,7 @@ import sys
 from typing import ClassVar
 
 from flext_cli import cli
+
 from flext_meltano import FlextMeltano, c, e, m, p, r, t, u
 from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
 
