@@ -3,14 +3,14 @@
 
 # flext-meltano - Testing
 
+> Project profile: `flext-meltano`
+
 <!-- TOC START -->
 - [Test design](#test-design)
 - [Canonical execution](#canonical-execution)
 - [Generated documentation](#generated-documentation)
 - [Related guides](#related-guides)
 <!-- TOC END -->
-
-> Project profile: `flext-meltano`
 
 FLEXT tests prove observable runtime behavior through public package facades. The
 workspace root `AGENTS.md` and the nearest package scope remain authoritative.

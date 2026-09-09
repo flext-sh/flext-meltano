@@ -16,12 +16,16 @@ dependencies = [
   "annotated-types>=0.8.0",
   "beartype>=0.22.9",
   "dependency-injector>=4.49.1",
+  "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
   "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
+  "meltano>=4.2.2",
   "packaging>=26.3",
-  "pydantic>=2.13.4",
+  "pydantic>=2.13.5",
   "pydantic-settings>=2.15.0",
   "pyyaml>=6.0.3",
-  "structlog>=26.1.0",
+  "singer-sdk>=0.54.5",
+  "sqlalchemy>=2.0.52",
+  "structlog>=25.5.0",
   "typing-extensions>=4.16.0",
 ]
 description = "FLEXT Meltano - Enterprise Data Integration Platform"
@@ -62,7 +66,9 @@ codegen = [
 dev = [
   "actionlint-py>=1.7.12.24",
   "bandit>=1.9.4",
+  "deptry",
   "flext-tests @ git+https://github.com/flext-sh/flext-tests.git@0.12.0-dev",
+  "hypothesis",
   "mkdocs",
   "mkdocs-autorefs",
   "mkdocs-exclude>=1.0.2",
@@ -79,6 +85,7 @@ dev = [
   "pyrefly>=1.2.0",
   "pyright>=1.1.411",
   "pytest>=9.1.1",
+  "pytest-asyncio",
   "pytest-benchmark",
   "pytest-cov",
   "pytest-markdown-docs",
@@ -192,7 +199,6 @@ disable_error_code = ["unreachable"]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
-warn_untyped_fields = true
 
 [tool.pyrefly]
 disable-project-excludes-heuristics = true
@@ -400,6 +406,7 @@ addopts = [
   "--timeout=10",
 ]
 flext_slow_timeout_seconds = "60"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
   "error",
   "module::flext_core._constants.enforcement.FlextMroViolation",
@@ -562,4 +569,5 @@ whitelines = 1
 [tool.uv]
 link-mode = "copy"
 exclude-newer = "0 days"
+constraint-dependencies = ["structlog<26"]
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
