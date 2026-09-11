@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from typing import Final
-
     from flext_meltano import FlextMeltanoConstants, d, e, h, r, s, x
 
     from .constants import (
@@ -33,7 +31,6 @@ __all__: tuple[str, ...] = (
     "ExamplesFlextMeltanoProtocols",
     "ExamplesFlextMeltanoTypes",
     "ExamplesFlextMeltanoUtilities",
-    "Final",
     "FlextMeltanoConstants",
     "c",
     "d",
@@ -57,7 +54,6 @@ _LAZY_IMPORTS = MappingProxyType(
             ".typings": ("ExamplesFlextMeltanoTypes", "t"),
             ".utilities": ("ExamplesFlextMeltanoUtilities", "u"),
             "flext_meltano": ("FlextMeltanoConstants", "d", "e", "h", "r", "s", "x"),
-            "typing": ("Final",),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import override
 
 import meltano
+from flext_cli import cli
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -25,7 +26,6 @@ from meltano.core.project_init_service import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_cli import cli
 from flext_meltano import (
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
@@ -324,7 +324,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         completed_result: m.Meltano.CommandExecutionResult | None = None
 
         def resolve_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[m.Cli.PipelineStageResult]:
             nonlocal prepared_command
             try:
@@ -349,7 +349,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
 
         def execute_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[m.Cli.PipelineStageResult]:
             nonlocal completed_result
             if prepared_command is None:
@@ -366,7 +366,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 output={"success": completed.success, "exit_code": completed.exit_code},
             )
 
-        handlers: t.MutableMappingKV[str, t.Cli.PipelineHandler] = {
+        handlers: t.MutableMappingKV[str, p.Cli.PipelineStage] = {
             c.Meltano.PIPELINE_STAGE_RESOLVE_COMMAND: resolve_command_stage,
             c.Meltano.PIPELINE_STAGE_EXECUTE_COMMAND: execute_command_stage,
         }
@@ -378,7 +378,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 ),
                 handlers,
             ),
-            context=cli.stage_context(workspace_root=self.project_root),
+            context=cli.stage_context(repository_root=self.project_root),
         )
         if pipeline_result.failure:
             return r[m.Meltano.CommandExecutionResult].from_failure(pipeline_result)

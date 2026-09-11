@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from flext_meltano._protocols.services import FlextMeltanoProtocolsServices
+    from .services import FlextMeltanoProtocolsServices
 
 
 class FlextMeltanoProtocolsBase:

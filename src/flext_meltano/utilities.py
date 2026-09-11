@@ -8,8 +8,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_cli import u
-from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
+
+from ._utilities.runtime import FlextMeltanoUtilitiesRuntime
+from ._utilities.singer import FlextMeltanoUtilitiesSinger
 
 
 class FlextMeltanoUtilities(u):

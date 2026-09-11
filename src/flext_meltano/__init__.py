@@ -22,7 +22,7 @@ from .__version__ import (
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, x
 
-    from . import services as services
+    from . import services
     from ._config import FlextMeltanoConfig, config
     from ._settings import FlextMeltanoSettings, settings
     from .api import FlextMeltano, meltano
