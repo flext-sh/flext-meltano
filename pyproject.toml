@@ -25,7 +25,7 @@ dependencies = [
   "pyyaml>=6.0.3",
   "singer-sdk>=0.54.5",
   "sqlalchemy>=2.0.52",
-  "structlog>=25.5.0",
+  "structlog>=25.5.0,<26",
   "typing-extensions>=4.16.0",
 ]
 description = "FLEXT Meltano - Enterprise Data Integration Platform"
