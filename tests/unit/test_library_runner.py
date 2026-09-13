@@ -38,6 +38,7 @@ _COMMAND_RESULT_ATTRIBUTES: tuple[str, ...] = (
 )
 
 
+@pytest.mark.docker
 class TestsFlextMeltanoLibraryRunner:
     """Assert the public library-runner contract via the ``meltano`` facade."""
 

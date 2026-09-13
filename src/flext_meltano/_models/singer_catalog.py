@@ -6,7 +6,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated, Literal
 
-from flext_cli import m
+from flext_cli import m, u
 
 from flext_meltano import c, t
 
@@ -32,6 +32,12 @@ class FlextMeltanoModelsSingerCatalog:
         ) -> t.FlatContainerMapping:
             """Expose Singer metadata properties as read-only."""
             return MappingProxyType(dict(value))
+
+        @u.field_serializer("metadata", when_used="json")
+        @classmethod
+        def serialize_metadata(cls, value: t.FlatContainerMapping) -> dict[str, t.JsonValue]:
+            """Emit frozen metadata as a plain JSON mapping."""
+            return dict(value)
 
     class SingerCatalogEntry(m.ArbitraryTypesModel):
         """Singer catalog stream entry model."""
@@ -133,6 +139,12 @@ class FlextMeltanoModelsSingerCatalog:
         def freeze_state(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
             """Expose the final Singer state as read-only."""
             return MappingProxyType(dict(value))
+
+        @u.field_serializer("state", when_used="json")
+        @classmethod
+        def serialize_state(cls, value: t.FlatContainerMapping) -> dict[str, t.JsonValue]:
+            """Emit frozen state as a plain JSON mapping."""
+            return dict(value)
 
         duration_seconds: Annotated[
             t.NonNegativeFloat, m.Field(description="Execution duration")
