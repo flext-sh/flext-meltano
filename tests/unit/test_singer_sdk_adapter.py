@@ -9,10 +9,10 @@ absence of side effects on the shared singleton. No private state is inspected.
 from __future__ import annotations
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import meltano
 from flext_meltano.api import FlextMeltano
-from flext_tests import tm
 
 __all__ = ["TestsFlextMeltanoSingerSdkAdapter"]
 

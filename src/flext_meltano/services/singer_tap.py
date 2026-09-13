@@ -103,7 +103,9 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 })
             )
         except c.Meltano.OPERATION_ERRORS as exc:
-            return r[m.Meltano.TapInstance].fail(f"Failed to create tap: {exc}")
+            return r[m.Meltano.TapInstance].fail(
+                f"Failed to create tap: {exc}", exception=exc
+            )
 
 
 class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServiceBase):

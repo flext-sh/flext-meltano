@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from flext_meltano import FlextMeltanoSettings
 from flext_tests import FlextTestsSettings
+
+from flext_meltano import FlextMeltanoSettings
 
 
 class TestsFlextMeltanoSettings(FlextMeltanoSettings, FlextTestsSettings):

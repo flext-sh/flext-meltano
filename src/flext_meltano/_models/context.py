@@ -19,7 +19,7 @@ class FlextMeltanoModelsContext:
 
         project_root: Annotated[str, m.Field(description="Project root path")]
         elt_context: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="ELT execution context",
         )
         extractor_name: Annotated[str, m.Field(description="Extractor name")]
@@ -28,7 +28,7 @@ class FlextMeltanoModelsContext:
             bool, m.Field(default=False, description="Execution completion flag")
         ] = False
         execution_result: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Execution result payload",
         )
 
@@ -69,7 +69,7 @@ class FlextMeltanoModelsContext:
             str, m.Field(default="unknown", description="Project root path")
         ] = "unknown"
         execution_result: t.FlatContainerMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Execution result payload",
         )
 
@@ -105,7 +105,7 @@ class FlextMeltanoModelsContext:
         """Scalar-only pipeline execution values normalized to strings."""
 
         values: t.StrMapping = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, str]({}),
             description="Execution values filtered to scalar strings",
         )
 

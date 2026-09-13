@@ -84,7 +84,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         abstractions = FlextMeltanoAbstractions()
         add_result: p.Result[bool] = abstractions.add_plugin_by_config(plugin_config)
         if add_result.failure:
-            return r[bool].fail(add_result.error or "Plugin addition failed")
+            return r[bool].from_failure(add_result)
         return r[bool].ok(value=True)
 
     def _log_plugin_addition_start(

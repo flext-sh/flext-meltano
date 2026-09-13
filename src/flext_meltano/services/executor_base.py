@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import override
 
 import meltano
+from flext_cli import cli
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
@@ -25,7 +26,6 @@ from meltano.core.project_init_service import (
 )
 from sqlalchemy.exc import SQLAlchemyError
 
-from flext_cli import cli
 from flext_meltano import (
     FlextMeltanoServiceBase,
     FlextMeltanoSettings,
@@ -149,9 +149,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         """Return the project-scoped plugin definitions from Meltano runtime state."""
         project_result = self.load_project(_cwd)
         if project_result.failure:
-            return r[t.SequenceOf[t.StrMapping]].fail(
-                project_result.error or "Failed to load Meltano project"
-            )
+            return r[t.SequenceOf[t.StrMapping]].from_failure(project_result)
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
         current_plugins_raw = project_result.value.plugins.current_plugins
         discovered = u.Meltano.discover_project_plugins(
@@ -305,7 +303,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             SQLAlchemyError,
         ) as e:
             self.logger.exception("Command execution failed", error=str(e))
-            return r[m.Meltano.CommandExecutionResult].fail(str(e))
+            return r[m.Meltano.CommandExecutionResult].fail(str(e), exception=e)
 
     def execute_dbt_command(
         self, dbt_command: str, args: t.StrSequence | None = None
@@ -316,7 +314,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 u.Meltano.build_dbt_runtime_command(dbt_command, args)
             )
         except c.Meltano.OPERATION_ERRORS as e:
-            return r[m.Meltano.CommandExecutionResult].fail(str(e))
+            return r[m.Meltano.CommandExecutionResult].fail(str(e), exception=e)
 
     def execute_pipeline(
         self, tap_name: str, target_name: str, config: t.JsonMapping | None = None
@@ -326,7 +324,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         completed_result: m.Meltano.CommandExecutionResult | None = None
 
         def resolve_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[m.Cli.PipelineStageResult]:
             nonlocal prepared_command
             try:
@@ -339,7 +337,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                         for key, value in config.items()
                     )
             except c.Meltano.OPERATION_ERRORS as e:
-                return r[m.Cli.PipelineStageResult].fail(str(e))
+                return r[m.Cli.PipelineStageResult].fail(str(e), exception=e)
             command_output = t.Cli.JSON_MAPPING_ADAPTER.validate_python({
                 c.Meltano.PIPELINE_SHARED_KEY_COMMAND: command
             })
@@ -351,7 +349,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             )
 
         def execute_command_stage(
-            _context: m.Cli.PipelineStageContext,
+            _context: p.Cli.PipelineStageContext,
         ) -> p.Result[m.Cli.PipelineStageResult]:
             nonlocal completed_result
             if prepared_command is None:
@@ -360,9 +358,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 )
             execution_result = self.execute_meltano_command(prepared_command)
             if execution_result.failure:
-                return r[m.Cli.PipelineStageResult].fail(
-                    execution_result.error or "Failed to execute pipeline command"
-                )
+                return r[m.Cli.PipelineStageResult].from_failure(execution_result)
             completed = execution_result.value
             completed_result = completed
             return cli.ok_stage(
@@ -370,7 +366,7 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 output={"success": completed.success, "exit_code": completed.exit_code},
             )
 
-        handlers: t.MutableMappingKV[str, t.Cli.PipelineHandler] = {
+        handlers: t.MutableMappingKV[str, p.Cli.PipelineStage] = {
             c.Meltano.PIPELINE_STAGE_RESOLVE_COMMAND: resolve_command_stage,
             c.Meltano.PIPELINE_STAGE_EXECUTE_COMMAND: execute_command_stage,
         }
@@ -382,12 +378,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 ),
                 handlers,
             ),
-            context=cli.stage_context(workspace_root=self.project_root),
+            context=cli.stage_context(repository_root=self.project_root),
         )
         if pipeline_result.failure:
-            return r[m.Meltano.CommandExecutionResult].fail(
-                pipeline_result.error or "Failed to run Meltano pipeline"
-            )
+            return r[m.Meltano.CommandExecutionResult].from_failure(pipeline_result)
         if not pipeline_result.value.success:
             failed_stage = next(iter(pipeline_result.value.failed_stages), None)
             return r[m.Meltano.CommandExecutionResult].fail(

@@ -49,9 +49,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 tap_name, target_name, settings
             )
             if result.failure:
-                return r[t.JsonMapping].fail(
-                    result.error or "EL pipeline execution failed"
-                )
+                return r[t.JsonMapping].from_failure(result)
             execution_result = result.value
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
@@ -107,9 +105,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 tap_name, target_name, settings
             )
             if result.failure:
-                return r[t.JsonMapping].fail(
-                    result.error or "Pipeline execution failed"
-                )
+                return r[t.JsonMapping].from_failure(result)
             execution_result = result.value
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,

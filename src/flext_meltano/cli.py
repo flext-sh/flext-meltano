@@ -6,6 +6,7 @@ import sys
 from typing import ClassVar
 
 from flext_cli import cli
+
 from flext_meltano import FlextMeltano, c, e, m, p, r, t, u
 from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
 
@@ -128,7 +129,7 @@ class FlextMeltanoCli:
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         result = self._service.execute_dbt_command(model.subcommand, model.args)
         if result.failure:
-            return r[str].fail(result.error or "DBT command failed")
+            return r[str].from_failure(result)
         if not result.value.success:
             return r[str].fail(result.value.error or result.value.output)
         return r[str].ok(result.value.output)
@@ -253,15 +254,14 @@ class FlextMeltanoCli:
     ) -> p.Result[str]:
         config_payload: t.JsonMapping | None = None
         if model.config_json is not None:
+            # CLI entry: parse pipeline config JSON via flext-cli u.Cli helper
             loaded_config_result = u.Cli.json_loads(model.config_json)
             if loaded_config_result.failure:
-                return r[str].fail(
-                    loaded_config_result.error
-                    or "Pipeline configuration JSON could not be parsed"
-                )
+                return r[str].from_failure(loaded_config_result)
+            parsed_values = loaded_config_result.value
             try:
                 config_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": loaded_config_result.value
+                    "values": parsed_values
                 }).values
             except ValueError as exc:
                 return e.fail_validation(
@@ -299,7 +299,7 @@ class FlextMeltanoCli:
 def main() -> int:
     """Run the FLEXT Meltano CLI main entry point."""
     result = FlextMeltanoCli().run(sys.argv[1:])
-    return 0 if result.success else 1
+    return cli.finalize_result(result)
 
 
 __all__: list[str] = ["FlextMeltanoCli", "main"]

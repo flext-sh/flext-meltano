@@ -85,7 +85,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         """Create new Meltano project using railway-oriented file operations."""
         params_r = self._validate_project_creation_params(project_name, project_dir)
         if params_r.failure:
-            return r[t.StrMapping].fail(params_r.error or "Validation failed")
+            return r[t.StrMapping].from_failure(params_r)
 
         name = str(params_r.value["name"])
         parent = Path(str(params_r.value["parent_dir"]))
@@ -127,7 +127,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         """Create temporary Meltano project with railway-oriented validation."""
         params_r = self._validate_project_parameters(project_id, prefix)
         if params_r.failure:
-            return r[t.Meltano.DbtProject].fail(params_r.error or "Validation failed")
+            return r[t.Meltano.DbtProject].from_failure(params_r)
 
         params = params_r.value
         try:
@@ -152,9 +152,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
             config_file = temp_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
             dump_result = u.Cli.yaml_dump(config_file, settings)
             if dump_result.failure:
-                return r[t.Meltano.DbtProject].fail(
-                    dump_result.error or "YAML dump failed"
-                )
+                return r[t.Meltano.DbtProject].from_failure(dump_result)
         except OSError as exc:
             return e.fail_operation(
                 "Temp project creation", exc, result_type=r[t.Meltano.DbtProject]
@@ -162,7 +160,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         inst_r = self._initialize_project_instance(temp_path)
         if inst_r.failure:
-            return r[t.Meltano.DbtProject].fail(inst_r.error or "Init failed")
+            return r[t.Meltano.DbtProject].from_failure(inst_r)
 
         return r[t.Meltano.DbtProject].ok({
             "name": "meltano_project",
@@ -202,7 +200,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
         """Initialize Meltano project using railway pattern validation chain."""
         vpath_r = self._validate_project_path(project_root)
         if vpath_r.failure:
-            return r[t.Meltano.DbtProject].fail(vpath_r.error or "Path missing")
+            return r[t.Meltano.DbtProject].from_failure(vpath_r)
 
         meltano_yml = project_root / c.Meltano.PATH_MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
@@ -210,7 +208,7 @@ class FlextMeltanoProjectService(FlextMeltanoServiceBase):
 
         loaded_r = self._load_project_from_path(project_root)
         if loaded_r.failure:
-            return r[t.Meltano.DbtProject].fail(loaded_r.error or "Load failed")
+            return r[t.Meltano.DbtProject].from_failure(loaded_r)
 
         return r[t.Meltano.DbtProject].ok({
             "name": "meltano_project",

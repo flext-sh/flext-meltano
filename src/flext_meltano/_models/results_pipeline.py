@@ -8,7 +8,8 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.results import FlextMeltanoModelsResults
+
+from .results import FlextMeltanoModelsResults
 
 
 class FlextMeltanoModelsResultsPipeline:
@@ -42,7 +43,7 @@ class FlextMeltanoModelsResultsPipeline:
         pipeline_metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Pipeline execution metadata")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Pipeline execution metadata",
         )
 

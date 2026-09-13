@@ -57,7 +57,7 @@ class FlextMeltanoTargetAbstractions(FlextMeltanoServiceBase):
                 )
             except c.EXC_ATTR_KEY_TYPE_VALUE as e:
                 return r[m.Meltano.DataSinkInstance].fail(
-                    f"Invalid target settings: {e}"
+                    f"Invalid target settings: {e}", exception=e
                 )
         else:
             settings = sink_config

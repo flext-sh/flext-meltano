@@ -55,14 +55,14 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             )
             result = u.Cli.run_raw(list(cmd))
             if result.failure:
-                return r[str].fail(result.error or f"dbt {operation} failed")
+                return r[str].from_failure(result)
             out = result.value
-            if out.exit_code != 0:
+            if out.outcome.raw_return_code != 0:
                 stderr_msg = out.stderr or f"dbt {operation} failed"
                 self.logger.warning(
                     "dbt operation returned non-zero exit code",
                     operation=operation,
-                    exit_code=out.exit_code,
+                    exit_code=out.outcome.raw_return_code,
                     stderr=stderr_msg,
                 )
                 return r[str].fail(stderr_msg)

@@ -17,8 +17,8 @@ from typing import TYPE_CHECKING
 import psycopg2
 import pytest
 import redis
-
 from flext_tests import tm
+
 from tests import c
 
 if TYPE_CHECKING:

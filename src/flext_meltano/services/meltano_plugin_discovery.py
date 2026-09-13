@@ -83,9 +83,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 FlextMeltanoProjectService().create_temporary_project()
             )
             if temp_project_result.failure:
-                return r[t.SequenceOf[t.StrMapping]].fail(
-                    temp_project_result.error or "Failed to create temporary project"
-                )
+                return r[t.SequenceOf[t.StrMapping]].from_failure(temp_project_result)
             temp_project = temp_project_result.value
             if not self._is_meltano_project(temp_project):
                 return r[t.SequenceOf[t.StrMapping]].fail(
@@ -125,9 +123,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 project_id="temp-info-project", prefix="flext_plugin_info_"
             )
             if temp_project_result.failure:
-                return r[t.StrMapping].fail(
-                    temp_project_result.error or "Failed to create temporary project"
-                )
+                return r[t.StrMapping].from_failure(temp_project_result)
             temp_project = temp_project_result.value
             if not self._is_meltano_project(temp_project):
                 return r[t.StrMapping].fail(
@@ -138,9 +134,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 temp_project, plugin_type
             )
             if plugins_result.failure:
-                return r[t.StrMapping].fail(
-                    plugins_result.error or "Failed to get plugins"
-                )
+                return r[t.StrMapping].from_failure(plugins_result)
             return self._extract_plugin_info(
                 plugins_result.value, plugin_name, plugin_type
             )

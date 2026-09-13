@@ -9,10 +9,10 @@ from multiprocessing.process import BaseProcess
 from pathlib import Path
 
 import pytest
-
 from flext_cli import cli as flext_cli
-from flext_meltano.cli import FlextMeltanoCli
 from flext_tests import tm
+
+from flext_meltano.cli import FlextMeltanoCli
 from tests import c, m, u
 
 

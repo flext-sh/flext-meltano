@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import contextlib
 import io
-import json
 from pathlib import Path
+
+from flext_tests import tm
 
 from flext_meltano import m, p, r, t
 from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
-from flext_tests import tm
+from tests import u
 
 
 class TestsFlextMeltanoDeclarativeTap:
@@ -55,7 +56,9 @@ class TestsFlextMeltanoDeclarativeTap:
         """A flat ``--config --discover`` run emits the declared stream catalog."""
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
-        config_path.write_text(json.dumps({"base_dn": "dc=example"}))
+        config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
+        tm.ok(config_result)
+        config_path.write_text(config_result.value)
 
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
@@ -63,8 +66,11 @@ class TestsFlextMeltanoDeclarativeTap:
                 ["--config", str(config_path), "--discover"], "tap-sample"
             )
 
-        catalog = json.loads(buffer.getvalue())
-        stream = catalog["streams"][0]
+        catalog_result = u.Cli.json_loads(buffer.getvalue())
+        tm.ok(catalog_result)
+        catalog = t.json_dict_adapter().validate_python(catalog_result.value)
+        streams = t.json_list_adapter().validate_python(catalog["streams"])
+        stream = t.json_dict_adapter().validate_python(streams[0])
         tm.that(exit_code, eq=0)
         tm.that(stream["tap_stream_id"], eq="users")
         tm.that(stream["key_properties"], eq=["dn"])
@@ -74,7 +80,9 @@ class TestsFlextMeltanoDeclarativeTap:
         """A flat ``--config`` run emits the fetcher's validated Singer record."""
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
-        config_path.write_text(json.dumps({"base_dn": "dc=example"}))
+        config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
+        tm.ok(config_result)
+        config_path.write_text(config_result.value)
 
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):

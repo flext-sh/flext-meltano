@@ -29,9 +29,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         executor = FlextMeltanoExecutorBase()
         plugins_result = executor.fetch_project_plugins()
         if plugins_result.failure:
-            return r[t.StrSequence].fail(
-                plugins_result.error or "Plugin discovery failed"
-            )
+            return r[t.StrSequence].from_failure(plugins_result)
         plugin_names = [
             p.get("name", "") for p in plugins_result.value if p.get("name")
         ]
@@ -55,7 +53,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
         cmd = u.Meltano.build_bridge_command_args(command, args)
         command_result = executor.execute_meltano_command(cmd)
         if command_result.failure:
-            return r[t.JsonMapping].fail(command_result.error or "Command failed")
+            return r[t.JsonMapping].from_failure(command_result)
         command_execution = command_result.value
         result = u.Meltano.build_command_execution_payload(
             command_execution, extra_fields={"command": command}, duration_field=None

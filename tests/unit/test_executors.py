@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from flext_tests import tm
+
 from flext_meltano import meltano
 from flext_meltano.cli import FlextMeltanoCli
-from flext_tests import tm
 
 
 class TestsFlextMeltanoExecutors:

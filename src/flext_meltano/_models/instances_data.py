@@ -9,9 +9,10 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.core import FlextMeltanoModelsCore
-from flext_meltano._models.sources import FlextMeltanoModelsSources
-from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
+
+from .core import FlextMeltanoModelsCore
+from .sources import FlextMeltanoModelsSources
+from .sources_params import FlextMeltanoModelsSourcesParams
 
 
 class FlextMeltanoModelsInstancesData:
@@ -105,7 +106,9 @@ class FlextMeltanoModelsInstancesData:
             Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
             m.Field(description="Discovered streams"),
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[
+                str, FlextMeltanoModelsSourcesParams.StreamDefinition
+            ]({}),
             description="Discovered streams",
         )
         discovered: Annotated[
@@ -115,7 +118,7 @@ class FlextMeltanoModelsInstancesData:
         metadata: Annotated[
             t.ConfigurationMapping, m.Field(description="Additional metadata")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional metadata",
         )
         source_id: Annotated[str, m.Field(description="Unique source identifier")]

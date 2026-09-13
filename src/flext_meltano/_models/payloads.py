@@ -21,7 +21,8 @@ class FlextMeltanoModelsPayloads:
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Pipeline config")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}), description="Pipeline config"
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Pipeline config",
         )
 
         @m.field_validator("config", mode="after")
@@ -37,7 +38,8 @@ class FlextMeltanoModelsPayloads:
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Execution config")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}), description="Execution config"
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Execution config",
         )
 
         @m.field_validator("config", mode="after")
@@ -54,7 +56,8 @@ class FlextMeltanoModelsPayloads:
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Plugin config")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}), description="Plugin config"
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Plugin config",
         )
 
         @m.field_validator("config", mode="after")
@@ -77,7 +80,7 @@ class FlextMeltanoModelsPayloads:
         config: Annotated[
             t.FlatContainerMapping, m.Field(description="Environment config")
         ] = m.Field(
-            default_factory=lambda: MappingProxyType({}),
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Environment config",
         )
 

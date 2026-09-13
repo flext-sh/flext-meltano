@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-
 from flext_tests import m, tf, tk, tm
+
 from tests import c, u
 
 if TYPE_CHECKING:
@@ -159,7 +159,7 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
             host=c.Meltano.Tests.HOST,
             port=c.Meltano.Tests.MELTANO_PORT,
         ),
-        workspace_root=Path(__file__).resolve().parents[2],
+        repository_root=Path(__file__).resolve().parents[2],
     )
     manager.state_file_path = temp_dir / "flext_tests_docker_state.json"
     manager.dirty_container_names.clear()

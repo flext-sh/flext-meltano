@@ -11,9 +11,9 @@ from __future__ import annotations
 import operator
 
 import pytest
+from flext_tests import tm
 
 from flext_meltano import m, meltano, p, t
-from flext_tests import tm
 
 # Keys every command-execution payload must expose per the public contract
 # (u.Meltano.build_command_execution_payload): status/success/output/error/
