@@ -44,6 +44,13 @@ class FlextMeltanoModelsSinger:
             default_factory=tuple,
             description="Singer bookmark columns for incremental replication",
         )
+        intermediate_encodings: Annotated[
+            t.StrTuple,
+            m.Field(
+                default_factory=tuple,
+                description="Singer intermediate encodings (e.g. 'utf8')",
+            ),
+        ] = m.Field(default_factory=tuple, description="Singer intermediate encodings")
 
     class SingerRecordMessage(m.ArbitraryTypesModel):
         """Canonical Singer RECORD message model."""

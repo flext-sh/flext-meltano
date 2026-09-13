@@ -433,7 +433,6 @@ testpaths = ["tests"]
 exclude = [
   "**/.archive/**",
   "**/__pyrefly_virtual__/**",
-  "**/aihub-hooks/**",
   ".archive",
   ".archive/**",
   ".git",
@@ -572,7 +571,7 @@ constraint-dependencies = ["structlog<26"]
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
 
 [tool.flext.docs]
-package_name = "flext_meltano"
+project_class = "platform"
 
 
 [tool.flext.project.budget.boundary]
