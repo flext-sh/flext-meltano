@@ -27,14 +27,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
     ) -> t.StrMapping:
         """Build plugin info dict from a plugin definition."""
         source = m.Meltano.PluginDiscoverySource.model_validate(indexed_plugin)
-        return u.Meltano.build_plugin_discovery_item(
-            plugin_name,
-            plugin_type,
-            default_variant=source.default_variant,
-            variants=source.variants,
-            description=source.description,
-            logo_url=source.logo_url,
-        )
+        return u.Meltano.build_plugin_discovery_item(plugin_name, plugin_type, source)
 
     @staticmethod
     def _extract_plugin_info(
@@ -50,12 +43,7 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
                 f"Plugin '{plugin_name}' not found in {plugin_type}"
             )
         plugin_info = u.Meltano.build_plugin_discovery_item(
-            plugin_name,
-            plugin_type,
-            default_variant=plugin_value.default_variant,
-            variants=plugin_value.variants,
-            description=plugin_value.description,
-            logo_url=plugin_value.logo_url,
+            plugin_name, plugin_type, plugin_value
         )
         return r[t.StrMapping].ok(plugin_info)
 

@@ -146,7 +146,7 @@ class FlextMeltanoModelsPayloadsData:
                     return None
                 case str():
                     return value
-                case list() | tuple():
+                case list():
                     return [str(item) for item in value]
                 case Mapping():
                     result: t.MutableConfigurationMapping = {}
@@ -155,7 +155,7 @@ class FlextMeltanoModelsPayloadsData:
                             result[k] = v
                         elif v is None:
                             result[k] = ""
-                        elif isinstance(v, (list, dict)):
+                        else:
                             result[k] = str(v)
                     return result
                 case _:

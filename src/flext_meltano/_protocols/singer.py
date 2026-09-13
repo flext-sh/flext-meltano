@@ -76,12 +76,14 @@ class FlextMeltanoProtocolsSinger:
             """Test DBT models with r."""
             ...
 
+    @runtime_checkable
     class SingerStreamInfo(Protocol):
         """Minimal protocol for stream objects returned by discover_streams."""
 
         @property
         def name(self) -> str: ...
 
+    @runtime_checkable
     class SingerTapInstance(Protocol):
         """Internal tap runtime contract consumed by tap service bases.
 
@@ -108,6 +110,7 @@ class FlextMeltanoProtocolsSinger:
             """Execute Singer sync for all selected streams."""
             ...
 
+    @runtime_checkable
     class SingerTap(Protocol):
         """Singer Tap protocol definition for data extraction.
 
@@ -139,6 +142,7 @@ class FlextMeltanoProtocolsSinger:
             """Synchronize data from source to stdout."""
             ...
 
+    @runtime_checkable
     class SingerTarget(Protocol):
         """Singer Target protocol definition for data loading.
 
@@ -171,6 +175,7 @@ class FlextMeltanoProtocolsSinger:
             """Fetch records for one stream from the consumer domain."""
             ...
 
+    @runtime_checkable
     class SingerCommand(Protocol):
         """Opaque Singer CLI command object."""
 
