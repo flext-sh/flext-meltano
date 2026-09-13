@@ -63,7 +63,7 @@ class FlextMeltanoUtilitiesRuntime:
         return resolved.value if resolved is not None else normalized
 
     @staticmethod
-    def is_help_request(args: t.StrSequence) -> bool:
+    def requests_help(args: t.StrSequence) -> bool:
         """Return whether the provided args request CLI help."""
         normalized_args = FlextMeltanoUtilitiesRuntime._normalized_parts(args)
         return not normalized_args or normalized_args[0] in {
@@ -218,23 +218,26 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_plugin_discovery_item(
-        plugin_name: str,
-        plugin_type: str,
-        *,
-        default_variant: str = "",
-        variants: t.JsonMapping | None = None,
-        description: str = "",
-        logo_url: str = "",
+        plugin_name: str, plugin_type: str, source: m.Meltano.PluginDiscoverySource
     ) -> t.StrMapping:
-        """Build canonical plugin discovery payload from raw Meltano metadata."""
-        variants_str = u.join(list(variants.keys()), separator=",") if variants else ""
+        """Build canonical plugin discovery payload from raw Meltano metadata.
+
+        ``source`` carries the plugin's own normalized discovery metadata
+        (default variant, variants, description, logo URL) as one cohesive
+        domain object instead of four independent keyword arguments.
+        """
+        variants_str = (
+            u.join(list(source.variants.keys()), separator=",")
+            if source.variants
+            else ""
+        )
         item = m.Meltano.PluginDiscoveryItem.model_validate({
             "name": plugin_name,
             "type": plugin_type,
-            "default_variant": default_variant,
+            "default_variant": source.default_variant,
             "variants": variants_str,
-            "description": description,
-            "logo_url": logo_url,
+            "description": source.description,
+            "logo_url": source.logo_url,
         })
         return {
             "name": item.name,
@@ -257,26 +260,26 @@ class FlextMeltanoUtilitiesRuntime:
         command_result: m.Meltano.CommandExecutionResult,
         *,
         extra_fields: t.JsonMapping | None = None,
-        success_status: str = c.Meltano.OperationStatus.SUCCESS,
-        failure_status: str = c.Meltano.OperationStatus.ERROR,
-        status_field: str | None = "status",
-        duration_field: str | None = "execution_time",
+        policy: m.Meltano.CommandPayloadFieldPolicy | None = None,
     ) -> t.JsonMapping:
         """Build a standard command payload for services over Meltano runtime."""
+        field_policy = policy or m.Meltano.CommandPayloadFieldPolicy()
         payload: t.MutableJsonMapping = {
             "success": command_result.success,
             "output": u.to_str(command_result.output),
             "error": u.to_str(command_result.error),
             "exit_code": command_result.exit_code,
         }
-        if status_field is not None:
-            payload[status_field] = FlextMeltanoUtilitiesRuntime.command_status(
-                success=command_result.success,
-                success_status=success_status,
-                failure_status=failure_status,
+        if field_policy.status_field is not None:
+            payload[field_policy.status_field] = (
+                FlextMeltanoUtilitiesRuntime.command_status(
+                    success=command_result.success,
+                    success_status=field_policy.success_status,
+                    failure_status=field_policy.failure_status,
+                )
             )
-        if duration_field is not None:
-            payload[duration_field] = command_result.execution_time
+        if field_policy.duration_field is not None:
+            payload[field_policy.duration_field] = command_result.execution_time
         source_payload = (
             payload if extra_fields is None else {**payload, **extra_fields}
         )
@@ -287,20 +290,12 @@ class FlextMeltanoUtilitiesRuntime:
         command_result: m.Meltano.CommandExecutionResult,
         *,
         extra_fields: t.JsonMapping | None = None,
-        success_status: str = c.Meltano.OperationStatus.SUCCESS,
-        failure_status: str = c.Meltano.OperationStatus.ERROR,
-        status_field: str | None = "status",
-        duration_field: str | None = "execution_time",
+        policy: m.Meltano.CommandPayloadFieldPolicy | None = None,
     ) -> t.JsonDict:
         """Build one mutable execution payload for callers that append fields."""
         return dict(
             FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
-                command_result,
-                extra_fields=extra_fields,
-                success_status=success_status,
-                failure_status=failure_status,
-                status_field=status_field,
-                duration_field=duration_field,
+                command_result, extra_fields=extra_fields, policy=policy
             ).items()
         )
 

@@ -112,7 +112,11 @@ class FlextMeltanoDeclarativeTap:
                 )
                 result = fetcher.fetch(request)
                 if result.failure:
-                    return []
+                    msg = (
+                        f"Failed to fetch records for stream '{self.name}': "
+                        f"{result.error}"
+                    )
+                    raise RuntimeError(msg)
                 return [dict(record) for record in result.value.records]
 
         class _DeclarativeTap(Tap):

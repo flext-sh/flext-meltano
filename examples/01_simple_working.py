@@ -80,3 +80,4 @@ if __name__ == "__main__":
         run_examples()
     except (ValueError, RuntimeError, OSError):
         logger.exception("Error executing examples")
+        raise

@@ -97,7 +97,7 @@ class FlextMeltanoCli:
         )
 
     def _handle_tap(self, model: m.Meltano.TapInput) -> p.Result[str]:
-        if model.operation is None or u.Meltano.is_help_request([model.operation]):
+        if model.operation is None or u.Meltano.requests_help([model.operation]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         return r[str].fail(f"Tap operation '{model.operation}' is not supported")
 
@@ -111,7 +111,7 @@ class FlextMeltanoCli:
         )
 
     def _handle_target(self, model: m.Meltano.TargetInput) -> p.Result[str]:
-        if model.operation is None or u.Meltano.is_help_request([model.operation]):
+        if model.operation is None or u.Meltano.requests_help([model.operation]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         return r[str].fail(f"Target operation '{model.operation}' is not supported")
 
@@ -125,7 +125,7 @@ class FlextMeltanoCli:
         )
 
     def _handle_dbt(self, model: m.Meltano.DbtInput) -> p.Result[str]:
-        if u.Meltano.is_help_request([model.subcommand]):
+        if u.Meltano.requests_help([model.subcommand]):
             return r[str].ok(c.Meltano.ExecutorCommand.HELP.value)
         result = self._service.execute_dbt_command(model.subcommand, model.args)
         if result.failure:

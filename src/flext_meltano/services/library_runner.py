@@ -54,7 +54,6 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={"tap_name": tap_name, "target_name": target_name},
-                duration_field="execution_time",
             )
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
@@ -110,7 +109,6 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={"tap_name": tap_name, "target_name": target_name},
-                duration_field="execution_time",
             )
             return r[t.JsonMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:

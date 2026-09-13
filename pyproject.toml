@@ -571,7 +571,7 @@ constraint-dependencies = ["structlog<26"]
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
 
 [tool.flext.docs]
-project_class = "platform"
+package_name = "flext_meltano"
 
 
 [tool.flext.project.budget.boundary]

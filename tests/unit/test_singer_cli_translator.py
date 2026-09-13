@@ -380,9 +380,15 @@ class TestsFlextMeltanoSingerCliTranslator:
         tm.that(str(result.error), has="Connection failed")
 
     def test_execute_singer_command_missing_binary_fails_loud(self) -> None:
-        """A missing binary escapes as FileNotFoundError — no silent fallback."""
-        with pytest.raises(FileNotFoundError, match="definitely-not-a-real-tap"):
-            meltano.execute_singer_command(["definitely-not-a-real-tap"])
+        """A missing binary reports a typed Result failure — no silent fallback.
+
+        The public contract is ``r[T]`` (see module docstring): the boundary
+        never raises for a missing executable, it surfaces the spawn error
+        through the Result's failure/error fields.
+        """
+        result = meltano.execute_singer_command(["definitely-not-a-real-tap"])
+        tm.fail(result)
+        tm.that(result.error, contains="definitely-not-a-real-tap")
 
     def test_execute_singer_command_timeout_interrupts_subprocess(self) -> None:
         started = time.monotonic()

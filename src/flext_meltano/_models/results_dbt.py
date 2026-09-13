@@ -8,7 +8,7 @@ from typing import Annotated
 
 from flext_cli import m, u
 
-from flext_meltano import t
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsResultsDbt:
@@ -118,3 +118,27 @@ class FlextMeltanoModelsResultsDbt:
             dumped["execution_time"] = self.execution_time
             dumped["timestamp"] = u.generate_iso_timestamp()
             return dumped
+
+    class CommandPayloadFieldPolicy(m.ArbitraryTypesModel):
+        """Naming/status policy for rendering a CommandExecutionResult payload.
+
+        Groups the four cohesive rendering choices (status strings, and which
+        optional fields to emit) that ``build_command_execution_payload``
+        callers vary together as one domain policy object instead of four
+        independent keyword arguments.
+        """
+
+        success_status: Annotated[
+            str, m.Field(description="Status value emitted on success")
+        ] = c.Meltano.OperationStatus.SUCCESS
+        failure_status: Annotated[
+            str, m.Field(description="Status value emitted on failure")
+        ] = c.Meltano.OperationStatus.ERROR
+        status_field: Annotated[
+            str | None,
+            m.Field(description="Payload key for the status value, or None to omit"),
+        ] = "status"
+        duration_field: Annotated[
+            str | None,
+            m.Field(description="Payload key for execution_time, or None to omit"),
+        ] = "execution_time"
