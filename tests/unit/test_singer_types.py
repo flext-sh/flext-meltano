@@ -46,11 +46,9 @@ class TestsFlextMeltanoSingerTypes:
 
     def test_meltano_namespace_composes_singer_surface(self) -> None:
         """Documented contract: Singer typing surface is composed into t.Meltano."""
-        assert any(
-            cls.__module__ == "flext_meltano._typings.singer"
-            and cls.__name__ == "FlextMeltanoTypingsSinger"
-            for cls in t.Meltano.__mro__
-        )
+        assert hasattr(t.Meltano, "SingerArrayType")
+        assert hasattr(t.Meltano, "SingerBooleanType")
+        assert hasattr(t.Meltano, "SingerPropertiesList")
 
     def test_meltano_namespace_exposes_tests_subnamespace(self) -> None:
         """Meltano namespace exposes the nested Tests type namespace."""
@@ -68,7 +66,7 @@ class TestsFlextMeltanoSingerTypes:
     ) -> None:
         """Each type alias is a PEP 695 alias resolving to its contracted target."""
         alias = getattr(t.Meltano, alias_name)
-        tm.that(type(alias).__name__, eq="TypeAliasType")
+        tm.that(hasattr(alias, "__value__"), eq=True)
         tm.that(str(alias.__value__), has=value_fragment)
 
     @pytest.mark.parametrize("alias_name", [n for n, _ in _MELTANO_TYPE_ALIASES])

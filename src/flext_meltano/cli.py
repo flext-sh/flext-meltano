@@ -254,12 +254,14 @@ class FlextMeltanoCli:
     ) -> p.Result[str]:
         config_payload: t.JsonMapping | None = None
         if model.config_json is not None:
+            # CLI entry: parse pipeline config JSON via flext-cli u.Cli helper
             loaded_config_result = u.Cli.json_loads(model.config_json)
             if loaded_config_result.failure:
                 return r[str].from_failure(loaded_config_result)
+            parsed_values = loaded_config_result.value
             try:
                 config_payload = m.Meltano.ConfigMappingPayload.model_validate({
-                    "values": loaded_config_result.value
+                    "values": parsed_values
                 }).values
             except ValueError as exc:
                 return e.fail_validation(
