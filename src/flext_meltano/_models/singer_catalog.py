@@ -35,7 +35,9 @@ class FlextMeltanoModelsSingerCatalog:
 
         @u.field_serializer("metadata", when_used="json")
         @classmethod
-        def serialize_metadata(cls, value: t.FlatContainerMapping) -> dict[str, t.JsonValue]:
+        def serialize_metadata(
+            cls, value: t.FlatContainerMapping
+        ) -> dict[str, t.JsonValue]:
             """Emit frozen metadata as a plain JSON mapping."""
             return dict(value)
 
@@ -142,7 +144,9 @@ class FlextMeltanoModelsSingerCatalog:
 
         @u.field_serializer("state", when_used="json")
         @classmethod
-        def serialize_state(cls, value: t.FlatContainerMapping) -> dict[str, t.JsonValue]:
+        def serialize_state(
+            cls, value: t.FlatContainerMapping
+        ) -> dict[str, t.JsonValue]:
             """Emit frozen state as a plain JSON mapping."""
             return dict(value)
 
