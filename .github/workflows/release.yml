@@ -129,4 +129,4 @@ jobs:
       - name: Build receipt
         run: make release-build 
       - name: Publish
-        run: make publication  INDEX=Y
+        run: make publication INDEX=Y
