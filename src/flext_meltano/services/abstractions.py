@@ -204,16 +204,6 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             c.Meltano.PAYLOAD_STREAM_ENTITY, stream_name, result_type=r[t.JsonMapping]
         )
 
-    def list_streams(self, tap_instance: m.Meltano.TapInstance) -> t.StrSequence:
-        """List stream names available in tap instance."""
-        discovery = self.discover_streams(tap_instance)
-        if discovery.failure:
-            return []
-        return [
-            str(s.get(c.Meltano.PayloadKey.STREAM_NAME, c.DEFAULT_EMPTY_STRING))
-            for s in self._extract_raw_streams(discovery.value)
-        ]
-
     @staticmethod
     def _extract_raw_streams(raw: t.JsonMapping) -> t.SequenceOf[t.JsonDict]:
         """Extract stream dicts from a discovery result mapping."""

@@ -226,15 +226,12 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(validation_error, is_=Exception)
 
     def test_invalid_tap_config_creation(self) -> None:
-        """Test invalid tap config creation using flext_tests."""
-        try:
-            result = self.tap_abstractions.create_tap_from_config(
-                tap_type="", connection_config={}
-            )
-            if result.failure:
-                tm.that(result.error is not None, eq=True)
-        except (ValueError, TypeError, RuntimeError):
-            tm.that(True, eq=True)
+        """An empty tap_type is rejected — through a typed failure or a raise."""
+        result = self.tap_abstractions.create_tap_from_config(
+            tap_type="", connection_config={}
+        )
+        tm.fail(result)
+        tm.that(result.error, none=False)
 
     def test_execute_returns_config_status(self) -> None:
         """Test execute returns configuration status dict."""

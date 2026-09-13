@@ -13,8 +13,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import FlextSettings
 from flext_meltano import m
 
@@ -29,7 +27,10 @@ _ENV_ALLOWED: frozenset[str] = frozenset({"development", "testing", "production"
 class FlextMeltanoSettings(FlextSettings):
     """Runtime settings for Meltano orchestration; fields under ``settings.Meltano.*``."""
 
-    model_config = SettingsConfigDict(
+    # Why: pydantic_settings is owned by flext-core; route SettingsConfigDict
+    # through the m facade instead of importing the third-party package
+    # directly (ENFORCE-070).
+    model_config = m.SettingsConfigDict(
         env_prefix="FLEXT_MELTANO_", env_nested_delimiter="__", extra="ignore"
     )
 

@@ -32,10 +32,10 @@ if TYPE_CHECKING:
     from .models import FlextMeltanoModels, FlextMeltanoModels as m
     from .pipeline_mgr import FlextMeltanoPipelineManager
     from .protocols import FlextMeltanoProtocols, FlextMeltanoProtocols as p
-    from .service_bases import FlextMeltanoDbtServiceBase
     from .services.abstractions import FlextMeltanoAbstractions
     from .services.adapters import FlextMeltanoAdapter
     from .services.bridge import FlextMeltanoBridge
+    from .services.consumer_bases.dbt_service_base import FlextMeltanoDbtServiceBase
     from .services.consumer_bases.facade import FlextMeltanoConsumerBases
     from .services.consumer_bases.tap_service_base import FlextMeltanoTapServiceBase
     from .services.consumer_bases.target_service_base import (
@@ -148,11 +148,13 @@ _LAZY_IMPORTS = MappingProxyType(
             ".models": ("FlextMeltanoModels", "m"),
             ".pipeline_mgr": ("FlextMeltanoPipelineManager",),
             ".protocols": ("FlextMeltanoProtocols", "p"),
-            ".service_bases": ("FlextMeltanoDbtServiceBase",),
             ".services": ("services",),
             ".services.abstractions": ("FlextMeltanoAbstractions",),
             ".services.adapters": ("FlextMeltanoAdapter",),
             ".services.bridge": ("FlextMeltanoBridge",),
+            ".services.consumer_bases.dbt_service_base": (
+                "FlextMeltanoDbtServiceBase",
+            ),
             ".services.consumer_bases.facade": ("FlextMeltanoConsumerBases",),
             ".services.consumer_bases.tap_service_base": (
                 "FlextMeltanoTapServiceBase",

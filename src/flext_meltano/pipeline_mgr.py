@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import errno
 import os
 import signal
-from contextlib import suppress
 from pathlib import Path
 
 from flext_cli import cli as flext_cli
@@ -130,12 +130,27 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         return r[int].ok(pid_value)
 
     @staticmethod
-    def _process_running(pid_value: int) -> bool:
+    def _signal_process(pid_value: int, sig: int) -> bool:
+        """Send one POSIX signal to a pid, tolerating only ESRCH.
+
+        Single owner for every ``os.kill`` call this manager makes: signal 0
+        probes liveness, ``SIGTERM`` requests termination. ESRCH ("no such
+        process") means the process is already gone and is reported as such;
+        any other OSError (e.g. EPERM — the process exists but is owned by
+        another user) is a genuine failure and propagates.
+        """
         try:
-            os.kill(pid_value, 0)
-        except OSError:
-            return False
+            os.kill(pid_value, sig)
+        except OSError as exc:
+            if exc.errno == errno.ESRCH:
+                return False
+            raise
         return True
+
+    @staticmethod
+    def _process_running(pid_value: int) -> bool:
+        """Return whether ``pid_value`` currently identifies a live process."""
+        return FlextMeltanoPipelineManager._signal_process(pid_value, 0)
 
     def create_pipeline(
         self, pipeline_name: str, config_payload: t.JsonMapping | None
@@ -217,8 +232,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
             return r[str].ok("stopped")
         pid_result = self._read_pid(name_result.value)
         if pid_result.success and self._process_running(pid_result.value):
-            with suppress(OSError):
-                os.kill(pid_result.value, signal.SIGTERM)
+            self._signal_process(pid_result.value, signal.SIGTERM)
         delete_result = flext_cli.delete_path(pid_path)
         if delete_result.failure and pid_path.exists():
             return r[str].fail(delete_result.error or "Unable to delete pipeline pid")
@@ -239,7 +253,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
 
     def handle_command(self, args: t.StrSequence) -> p.Result[str]:
         """Handle pipeline command using composition."""
-        if not args or u.Meltano.is_help_request(args):
+        if not args or u.Meltano.requests_help(args):
             if self._cli is not None:
                 self._cli.show_pipeline_help()
             return r[str].ok(c.Meltano.ExecutorCommand.HELP)

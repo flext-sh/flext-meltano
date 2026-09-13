@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_meltano import FlextMeltanoServiceBase, p, r, settings, t, u
+from flext_meltano import FlextMeltanoServiceBase, m, p, r, settings, t, u
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
@@ -56,7 +56,9 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
             return r[t.JsonMapping].from_failure(command_result)
         command_execution = command_result.value
         result = u.Meltano.build_command_execution_payload(
-            command_execution, extra_fields={"command": command}, duration_field=None
+            command_execution,
+            extra_fields={"command": command},
+            policy=m.Meltano.CommandPayloadFieldPolicy(duration_field=None),
         )
         return r[t.JsonMapping].ok(result)
 

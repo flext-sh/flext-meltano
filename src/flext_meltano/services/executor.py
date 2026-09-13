@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from meltano.core.error import ProjectNotFound
 
-from flext_meltano import FlextMeltanoSettings, c, p, r, t, u
+from flext_meltano import FlextMeltanoSettings, c, m, p, r, t, u
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
@@ -117,7 +117,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             lambda execution_result: u.Meltano.build_command_execution_payload(
                 execution_result,
                 extra_fields={"command": f"{tap_name} -> {target_name}"},
-                duration_field=None,
+                policy=m.Meltano.CommandPayloadFieldPolicy(duration_field=None),
             )
         )
 
@@ -162,8 +162,10 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
                         lambda cmd_result: u.Meltano.build_command_execution_payload(
                             cmd_result,
                             extra_fields=extra_fields,
-                            success_status=c.Meltano.OperationStatus.EXECUTED,
-                            duration_field=None,
+                            policy=m.Meltano.CommandPayloadFieldPolicy(
+                                success_status=c.Meltano.OperationStatus.EXECUTED,
+                                duration_field=None,
+                            ),
                         )
                     )
 
