@@ -584,3 +584,5 @@ whitelines = 1
 link-mode = "copy"
 constraint-dependencies = ["structlog<26"]
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
+
+[tool.uv.workspace]
