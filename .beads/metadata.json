@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "flext_meltano",
+  "project_id": "bbb65745-69f3-4450-91e8-13035f5a140f"
+}
