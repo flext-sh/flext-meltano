@@ -85,7 +85,7 @@ class FlextMeltanoProtocolsServices:
     class CLIManager(Protocol):
         """Base protocol for CLI managers."""
 
-        def handle_command(self, args: t.StrSequence) -> r[str]:
+        def handle_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle CLI command."""
             ...
 
@@ -93,15 +93,15 @@ class FlextMeltanoProtocolsServices:
     class SingerManager(Protocol):
         """Protocol for Singer CLI manager."""
 
-        def handle_command(self, args: t.StrSequence) -> r[str]:
+        def handle_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle CLI command."""
             ...
 
-        def handle_tap_command(self, args: t.StrSequence) -> r[str]:
+        def handle_tap_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle tap command."""
             ...
 
-        def handle_target_command(self, args: t.StrSequence) -> r[str]:
+        def handle_target_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle target command."""
             ...
 
@@ -109,11 +109,11 @@ class FlextMeltanoProtocolsServices:
     class StatusManager(Protocol):
         """Protocol for Status CLI manager."""
 
-        def handle_command(self, args: t.StrSequence) -> r[str]:
+        def handle_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle CLI command."""
             ...
 
-        def handle_version_command(self, args: t.StrSequence) -> r[str]:
+        def handle_version_command(self, args: t.StrSequence) -> p.Result[str]:
             """Handle version command."""
             ...
 
