@@ -25,8 +25,8 @@ dependencies = [
   "pydantic-settings>=2.15.0",
   "pyyaml>=6.0.3",
   "redis>=8.1.0",
-  "singer-sdk>=0.54.5",
-  "sqlalchemy>=2.0.52",
+  "singer-sdk>=0.54.6",
+  "sqlalchemy>=2.0.54",
   "structlog>=25.5.0,<26",
   "typing-extensions>=4.16.0",
 ]
