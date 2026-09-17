@@ -65,7 +65,7 @@ cd ..flext-meltano
 source ../.venv/bin/activate
 
 # Install dependencies
-poetry install --with dev,test
+uv sync --all-packages
 
 # Verify setup
 make lint type-check test

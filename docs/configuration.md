@@ -90,7 +90,7 @@ source .venv/bin/activate
 cd flext-meltano
 
 # Install dependencies
-poetry install --with dev,test
+uv sync --all-packages
 ```
 
 ______________________________________________________________________

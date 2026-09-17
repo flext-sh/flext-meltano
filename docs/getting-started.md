@@ -57,7 +57,7 @@ ______________________________________________________________________
 
 ```bash
 # Install development dependencies
-poetry install --with dev,test
+uv sync --all-packages
 
 # Verify installation
 python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Installation successful')"

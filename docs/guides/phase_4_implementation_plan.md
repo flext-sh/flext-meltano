@@ -163,7 +163,7 @@ export PYTHONPATH="src:../flext-core/src:../flext-cli/src"
 
 # Step 2: Ensure Poetry environment is properly set up
 poetry env info
-poetry install --with test
+uv sync --all-packages
 
 # Step 3: Test execution in isolated environment
 poetry run python -c "import flext_meltano; u.Cli.print('Import successful')"
