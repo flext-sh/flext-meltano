@@ -21,9 +21,6 @@
   - [CI/CD Quality Gates](#cicd-quality-gates)
 - [🔍 Issue Resolution Guide](#issue-resolution-guide)
   - [Common Issues & Solutions](#common-issues-solutions)
-- [H2: Section](#h2-section)
-  - [H3: Subsection](#h3-subsection)
-- [H2: Another Section](#h2-another-section)
 - [⚙️ Configuration](#configuration)
   - [Maintenance Configuration](#maintenance-configuration)
   - [Custom Rules](#custom-rules)
@@ -87,14 +84,14 @@ This guide provides comprehensive documentation for the automated documentation 
 make docs
 
 # Or directly with Python
-make docs DOCS_PHASE=all PROJECT=flext-meltano
+make docs
 ```
 
 ### 2. View Quality Reports
 
 ```bash
 # View latest quality summary
-make docs DOCS_PHASE=audit
+make docs 
 
 # Open detailed report
 cat docs/reports/docs_quality_report_*.md
@@ -138,16 +135,16 @@ Calculated from weighted components:
 
 ```bash
 # Run quality audit only
-make docs DOCS_PHASE=audit
-make docs DOCS_PHASE=audit PROJECT=flext-meltano
+make docs 
+make docs
 
 # Validate external links
-make docs DOCS_PHASE=validate
-make docs DOCS_PHASE=validate PROJECT=flext-meltano
+make docs 
+make docs
 
 # Generate quality reports
 make docs
-make docs DOCS_PHASE=audit PROJECT=flext-meltano
+make docs
 ```
 
 ### Automation & CI/CD
@@ -155,11 +152,11 @@ make docs DOCS_PHASE=audit PROJECT=flext-meltano
 ```bash
 # Run CI quality checks
 make docs
-make docs DOCS_PHASE=validate PROJECT=flext-meltano
+make docs
 
 # Start scheduled monitoring
 make docs
-make docs DOCS_PHASE=audit PROJECT=flext-meltano
+make docs
 
 # Set up Git hooks
 make docs
@@ -491,7 +488,7 @@ auditor.generate_custom_report("api_quality.md")```
 ### Getting Help
 
 1. **Check This Guide**: Comprehensive troubleshooting section
-1. **Run Diagnostics**: `make docs DOCS_PHASE=all PROJECT=flext-meltano`
+1. **Run Diagnostics**: `make docs`
 1. **View Reports**: Check `docs/reports/` for detailed issue analysis
 1. **GitHub Issues**: Report bugs or request features
 

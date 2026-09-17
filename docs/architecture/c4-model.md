@@ -16,7 +16,7 @@
   - [Service Layer Code Structure](#service-layer-code-structure)
   - [Key Classes and Interfaces](#key-classes-and-interfaces)
 - [📋 Architecture Decision Records](#architecture-decision-records)
-  - [ADR-001: Railway-Oriented Programming with r[T]](#adr-001-railway-oriented-programming-with-rt)
+  - [ADR-001: Railway-Oriented Programming with r\[T\]](#adr-001-railway-oriented-programming-with-rt)
   - [ADR-002: Clean Architecture with Domain-Driven Design](#adr-002-clean-architecture-with-domain-driven-design)
   - [ADR-003: Singer Protocol Abstraction Layer](#adr-003-singer-protocol-abstraction-layer)
 - [🏆 Quality Attributes](#quality-attributes)

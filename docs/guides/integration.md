@@ -11,6 +11,7 @@
   - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
 - [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
   - [Go ↔ Python Integration](#go-python-integration)
+- [print(response.unwrap())```](#printresponseunwrap)
 - [📊 Integration Matrix](#integration-matrix)
   - [FLEXT Project Integration Status](#flext-project-integration-status)
   - [Integration Requirements](#integration-requirements)
@@ -215,10 +216,7 @@ class EnterpriseELTService(FlextMeltanoService):
 
 ```bash
 # Standard bridge operations for ecosystem consumption
-python scripts/flext_meltano_bridge.py version
-python scripts/flext_meltano_bridge.py list_plugins
-python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-jsonl
-python scripts/flext_meltano_bridge.py discover_catalog tap-oracle```
+```
 **JSON API Response Pattern**:
 
 ```python
@@ -295,13 +293,17 @@ export MELTANO_ENVIRONMENT=dev```
 
 ```toml
 # pyproject.toml for flext-tap-*/flext-target-*/flext-dbt-* projects
-[tool.poetry.dependencies]
-python = "^3.13"
-flext-core = "^0.9.9"
-flext-meltano = "^0.9.9"  # Mandatory ELT foundation
+[project]
+requires-python = ">=3.13"
+dependencies = [
+    "flext-core>=0.9.9",
+    "flext-meltano>=0.9.9",  # Mandatory ELT foundation
+]
 
-[tool.poetry.group.dev.dependencies]
-flext-cli = "^0.9.9"      # CLI development tools```
+[tool.uv]
+dev-dependencies = [
+    "flext-cli>=0.9.9",      # CLI development tools
+]```
 ---
 
 ## ⚠️ Integration Limitations

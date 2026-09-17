@@ -2,26 +2,20 @@
 
 <!-- TOC START -->
 - [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
-  - [**Direct Import Violations**](#direct-import-violations)
-- [🔧 Development Issues](#development-issues)
-  - [**Import Errors**](#import-errors)
-  - [**Type Check Failures**](#type-check-failures)
-  - [**Test Failures**](#test-failures)
-- [📦 Dependency Issues](#dependency-issues)
-  - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
-  - [**Virtual Environment Issues**](#virtual-environment-issues)
+  - [Direct Import Violations](#direct-import-violations)
+  - [Virtual Environment Issues](#virtual-environment-issues)
 - [🧪 Testing Issues](#testing-issues)
-  - [**Coverage Issues**](#coverage-issues)
-  - [**Slow Tests**](#slow-tests)
+  - [Coverage Issues](#coverage-issues)
+  - [Slow Tests](#slow-tests)
 - [🔍 Quality Gate Failures](#quality-gate-failures)
-  - [**Linting Errors**](#linting-errors)
-  - [**Security Issues**](#security-issues)
+  - [Linting Errors](#linting-errors)
+  - [Security Issues](#security-issues)
 - [🚫 Common Mistakes](#common-mistakes)
-  - [**r Pattern Violations**](#r-pattern-violations)
-  - [**Service Pattern Violations**](#service-pattern-violations)
+  - [r Pattern Violations](#r-pattern-violations)
+  - [Service Pattern Violations](#service-pattern-violations)
 - [🆘 Getting Help](#getting-help)
-  - [**Debug Information**](#debug-information)
-  - [**Support Channels**](#support-channels)
+  - [Debug Information](#debug-information)
+  - [Support Channels](#support-channels)
 - [📋 Debugging Checklist](#debugging-checklist)
 <!-- TOC END -->
 
@@ -45,15 +39,18 @@ grep -r "import meltano\|from meltano" src/
 ```python
 # ❌ Incorrect
 
-# ✅ Correct```
+# ✅ Correct
+```
 ______________________________________________________________________
 
 ## 🔧 Development Issues
 
 ### **Import Errors**
 
-**Problem**: Module import failures```
-ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'```
+**Problem**: Module import failures
+```
+ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
+```
 **Solution**: Verify installation and environment
 
 ```bash
@@ -61,14 +58,16 @@ ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'```
 python -c "import flext_meltano; u.Cli.print(flext_meltano.__file__)"
 
 # Reinstall if needed
-make setup```
+make setup
+```
 ### **Type Check Failures**
 
 **Problem**: MyPy errors in source code
 
 ```bash
 # Run type checking
-make type-check```
+make type-check
+```
 **Solution**: Fix type annotations
 
 ```python
@@ -80,7 +79,8 @@ from __future__ import annotations
 
 def process_data(data: dict) -> p.Result[Optional[m.Dict]]:
     # Implementation
-    pass```
+    pass
+```
 ### **Test Failures**
 
 **Problem**: Tests failing during development
@@ -91,7 +91,8 @@ pytest tests/ -v
 
 # Run specific test categories
 pytest tests/unit/ -v        # Unit tests only
-pytest tests/integration/ -v  # Integration tests```
+pytest tests/integration/ -v  # Integration tests
+```
 **Solution**: Common test issues
 
 1. **Missing test data**: Ensure test fixtures are available
@@ -102,7 +103,7 @@ ______________________________________________________________________
 
 ## 📦 Dependency Issues
 
-### **Poetry Lock Conflicts**
+### **Dependency Lock Conflicts**
 
 **Problem**: Dependency version conflicts
 
@@ -110,8 +111,10 @@ ______________________________________________________________________
 # Update dependencies
 make deps
 
-# Resolve lock file issues
-make deps --no-update```
+# Reconcile declared dependency floors and regenerate consumers
+make deps
+make gen
+```
 ### **Virtual Environment Issues**
 
 **Problem**: Wrong virtual environment or missing dependencies
@@ -124,7 +127,8 @@ python -m pip list | grep flext
 # Use FLEXT workspace environment
 cd ../..
 source .venv/bin/activate
-cd flext-meltano```
+cd flext-meltano
+```
 ______________________________________________________________________
 
 ## 🧪 Testing Issues
@@ -138,7 +142,8 @@ ______________________________________________________________________
 pytest --cov=src --cov-report=html
 
 # View HTML report
-open htmlcov/index.html```
+open htmlcov/index.html
+```
 **Solution**: Focus on critical paths
 
 1. **Core Services**: Ensure service classes have test coverage
@@ -154,7 +159,8 @@ open htmlcov/index.html```
 pytest -m "not slow"
 
 # Run only unit tests
-pytest tests/unit/```
+pytest tests/unit/
+```
 ______________________________________________________________________
 
 ## 🔍 Quality Gate Failures
@@ -168,7 +174,8 @@ ______________________________________________________________________
 make format
 
 # Check remaining issues
-make lint```
+make lint
+```
 **Common fixes**:
 
 - **Import order**: Use ruff to auto-sort imports
@@ -184,7 +191,8 @@ make lint```
 bandit -r src/
 
 # Check specific issues
-bandit -r src/ -f json```
+bandit -r src/ -f json
+```
 **Solution**: Address security concerns
 
 - **Hardcoded passwords**: Use environment variables
@@ -218,7 +226,8 @@ def safe_operation() -> p.Result[m.Dict]:
         # operation
         return r.ok(data)
     except Exception as e:
-        return r.fail(f"Operation failed: {e}")```
+        return r.fail(f"Operation failed: {e}")
+```
 ### **Service Pattern Violations**
 
 **Problem**: Not following flext-core service patterns
@@ -240,7 +249,8 @@ class UtilityClass:
 class FlextMeltanoUtilityService(s):
     def do_something(self) -> p.Result[m.Dict]:
         # Implementation with proper error handling
-        pass```
+        pass
+```
 ______________________________________________________________________
 
 ## 🆘 Getting Help
@@ -252,13 +262,13 @@ When reporting issues, include:
 ```bash
 # Environment information
 python --version
-poetry --version
 
 # Package versions
 make status flext-core flext-meltano
 
 # Error details
-make check 2>&1 | head -50```
+make check 2>&1 | head -50
+```
 ### **Support Channels**
 
 - **Documentation**: Check the [documentation index](index.md) first

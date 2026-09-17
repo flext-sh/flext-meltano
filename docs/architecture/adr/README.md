@@ -5,16 +5,6 @@
 - [ADR Process](#adr-process)
   - [Creating an ADR](#creating-an-adr)
   - [ADR Template](#adr-template)
-- [Context](#context)
-- [Decision](#decision)
-- [Rationale](#rationale)
-- [Consequences](#consequences)
-  - [Positive](#positive)
-  - [Negative](#negative)
-  - [Risks](#risks)
-- [Alternatives Considered](#alternatives-considered)
-- [Related ADRs](#related-adrs)
-- [Notes](#notes)
 - [Current ADRs](#current-adrs)
 - [ADR Status Definitions](#adr-status-definitions)
 - [Categories](#categories)
@@ -101,13 +91,13 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 | [ADR-001](001-railway-oriented-programming.md) | Railway-Oriented Programming with r[T] | Accepted | 2025-01-15 |
 | [ADR-002](002-clean-architecture-ddd.md) | Clean Architecture with Domain-Driven Design | Accepted | 2025-01-20 |
 | [ADR-003](003-singer-protocol-abstraction.md) | Singer Protocol Abstraction Layer | Accepted | 2025-02-01 |
-| ADR-004 | Type Safety First with Python 3.13+ | Accepted | 2025-02-05 | _Documentation coming soon_ |
-| ADR-005 | Plugin-Centric Architecture | Accepted | 2025-02-10 | _Documentation coming soon_ |
-| ADR-006 | FLEXT-Core Integration Pattern | Accepted | 2025-02-15 | _Documentation coming soon_ |
-| ADR-007 | State Management Strategy | Accepted | 2025-02-20 | _Documentation coming soon_ |
-| ADR-008 | Error Handling Strategy | Accepted | 2025-02-25 | _Documentation coming soon_ |
-| ADR-009 | API Design Principles | Accepted | 2025-03-01 | _Documentation coming soon_ |
-| ADR-010 | Testing Strategy and Infrastructure | Accepted | 2025-03-05 | _Documentation coming soon_ |
+| ADR-004 | Type Safety First with Python 3.13+ | Accepted | 2025-02-05 | _Pending_ |
+| ADR-005 | Plugin-Centric Architecture | Accepted | 2025-02-10 | _Pending_ |
+| ADR-006 | FLEXT-Core Integration Pattern | Accepted | 2025-02-15 | _Pending_ |
+| ADR-007 | State Management Strategy | Accepted | 2025-02-20 | _Pending_ |
+| ADR-008 | Error Handling Strategy | Accepted | 2025-02-25 | _Pending_ |
+| ADR-009 | API Design Principles | Accepted | 2025-03-01 | _Pending_ |
+| ADR-010 | Testing Strategy and Infrastructure | Accepted | 2025-03-05 | _Pending_ |
 
 ## ADR Status Definitions
 
@@ -186,5 +176,5 @@ ADRs must:
 
 - [Architecture Overview](../../architecture.md)
 - [C4 Model Documentation](../../c4-model.md)
-- Quality Attributes (_Documentation coming soon_)
-- Security Architecture (_Documentation coming soon_)
+- Quality Attributes (_Pending_)
+- Security Architecture (_Pending_)

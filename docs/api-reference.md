@@ -2,8 +2,8 @@
 
 <!-- TOC START -->
 - [🎯 Library Overview](#library-overview)
-  - [**Architecture Principles**](#architecture-principles)
-  - [**Core Modules**](#core-modules)
+  - [Architecture Principles](#architecture-principles)
+  - [Core Modules](#core-modules)
 - [🎯 Core Services](#core-services)
   - [FlextMeltanoService](#flextmeltanoservice)
   - [FlextMeltanoAdapter](#flextmeltanoadapter)
@@ -15,8 +15,8 @@
   - [FlextPluginService](#flextpluginservice)
   - [FlextPluginRegistry](#flextpluginregistry)
 - [🚀 Pipeline Services](#pipeline-services)
-  - [FlextMeltanoService](#flextmeltanoservice)
-  - [FlextMeltanoExecutor](#flextmeltanoexecutor)
+  - [FlextMeltanoService](#flextmeltanoservice_1)
+  - [FlextMeltanoExecutor](#flextmeltanoexecutor_1)
 - [📁 Project Management](#project-management)
   - [FlextProjectService](#flextprojectservice)
   - [FlextMeltanoProject](#flextmeltanoproject)
@@ -34,6 +34,8 @@
   - [Plugin Management](#plugin-management)
 - [Related Documentation](#related-documentation)
 <!-- TOC END -->
+
+> **Manual supplement**: This page provides hand-curated API details beyond the auto-generated reference. See the generated output for canonical completeness.
 
 **Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline Integration**
 

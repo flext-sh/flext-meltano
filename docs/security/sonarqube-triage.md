@@ -1,5 +1,62 @@
 # Triagem SonarCloud — flext-sh/flext-meltano
 
+<!-- TOC START -->
+- [Resumo](#resumo)
+- [Como usar](#como-usar)
+- [Issues](#issues)
+  - [1 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#1-critical-code_smell-pythons1192)
+  - [2 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#2-critical-code_smell-pythons1192)
+  - [3 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#3-critical-code_smell-pythons1192)
+  - [4 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#4-critical-code_smell-pythons3776)
+  - [5 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#5-critical-code_smell-pythons1192)
+  - [6 · 🟠 CRITICAL · CODE_SMELL · python:S5754](#6-critical-code_smell-pythons5754)
+  - [7 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#7-critical-code_smell-pythons3776)
+  - [8 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#8-critical-code_smell-pythons3776)
+  - [9 · 🟠 CRITICAL · CODE_SMELL · python:S5727](#9-critical-code_smell-pythons5727)
+  - [10 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#10-critical-code_smell-pythons3776)
+  - [11 · 🟠 CRITICAL · CODE_SMELL · python:S5754](#11-critical-code_smell-pythons5754)
+  - [12 · 🟡 MAJOR · VULNERABILITY · githubactions:S8264](#12-major-vulnerability-githubactionss8264)
+  - [13 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#13-major-vulnerability-githubactionss8233)
+  - [14 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#14-major-vulnerability-githubactionss8233)
+  - [15 · 🟡 MAJOR · VULNERABILITY · text:S8565](#15-major-vulnerability-texts8565)
+  - [16 · ⚪ MINOR · CODE_SMELL · python:S7504](#16-minor-code_smell-pythons7504)
+  - [17 · ⚪ MINOR · CODE_SMELL · python:S116](#17-minor-code_smell-pythons116)
+  - [18 · ⚪ MINOR · CODE_SMELL · python:S116](#18-minor-code_smell-pythons116)
+  - [19 · ⚪ MINOR · CODE_SMELL · python:S116](#19-minor-code_smell-pythons116)
+  - [20 · ⚪ MINOR · CODE_SMELL · python:S116](#20-minor-code_smell-pythons116)
+  - [21 · ⚪ MINOR · CODE_SMELL · python:S116](#21-minor-code_smell-pythons116)
+  - [22 · ⚪ MINOR · CODE_SMELL · python:S116](#22-minor-code_smell-pythons116)
+  - [23 · ⚪ MINOR · CODE_SMELL · python:S116](#23-minor-code_smell-pythons116)
+  - [24 · ⚪ MINOR · CODE_SMELL · python:S116](#24-minor-code_smell-pythons116)
+  - [25 · ⚪ MINOR · CODE_SMELL · python:S116](#25-minor-code_smell-pythons116)
+  - [26 · ⚪ MINOR · CODE_SMELL · python:S116](#26-minor-code_smell-pythons116)
+  - [27 · ⚪ MINOR · CODE_SMELL · python:S116](#27-minor-code_smell-pythons116)
+  - [28 · ⚪ MINOR · CODE_SMELL · python:S116](#28-minor-code_smell-pythons116)
+  - [29 · ⚪ MINOR · CODE_SMELL · python:S116](#29-minor-code_smell-pythons116)
+  - [30 · ⚪ MINOR · CODE_SMELL · python:S116](#30-minor-code_smell-pythons116)
+  - [31 · ⚪ MINOR · CODE_SMELL · python:S116](#31-minor-code_smell-pythons116)
+  - [32 · ⚪ MINOR · CODE_SMELL · python:S116](#32-minor-code_smell-pythons116)
+  - [33 · ⚪ MINOR · CODE_SMELL · python:S116](#33-minor-code_smell-pythons116)
+  - [34 · ⚪ MINOR · CODE_SMELL · python:S116](#34-minor-code_smell-pythons116)
+  - [35 · ⚪ MINOR · CODE_SMELL · python:S116](#35-minor-code_smell-pythons116)
+  - [36 · ⚪ MINOR · CODE_SMELL · python:S116](#36-minor-code_smell-pythons116)
+  - [37 · ⚪ MINOR · CODE_SMELL · python:S116](#37-minor-code_smell-pythons116)
+  - [38 · ⚪ MINOR · CODE_SMELL · python:S116](#38-minor-code_smell-pythons116)
+  - [39 · ⚪ MINOR · CODE_SMELL · python:S116](#39-minor-code_smell-pythons116)
+  - [40 · ⚪ MINOR · CODE_SMELL · python:S116](#40-minor-code_smell-pythons116)
+  - [41 · ⚪ MINOR · CODE_SMELL · python:S116](#41-minor-code_smell-pythons116)
+  - [42 · ⚪ MINOR · CODE_SMELL · python:S116](#42-minor-code_smell-pythons116)
+  - [43 · ⚪ MINOR · CODE_SMELL · python:S116](#43-minor-code_smell-pythons116)
+  - [44 · ⚪ MINOR · CODE_SMELL · python:S116](#44-minor-code_smell-pythons116)
+  - [45 · ⚪ MINOR · CODE_SMELL · python:S116](#45-minor-code_smell-pythons116)
+  - [46 · ⚪ MINOR · CODE_SMELL · python:S116](#46-minor-code_smell-pythons116)
+  - [47 · ⚪ MINOR · CODE_SMELL · python:S116](#47-minor-code_smell-pythons116)
+  - [48 · ⚪ MINOR · CODE_SMELL · python:S116](#48-minor-code_smell-pythons116)
+  - [49 · ⚪ MINOR · CODE_SMELL · python:S116](#49-minor-code_smell-pythons116)
+  - [50 · ⚪ MINOR · CODE_SMELL · python:S116](#50-minor-code_smell-pythons116)
+  - [51 · ⚪ MINOR · CODE_SMELL · python:S116](#51-minor-code_smell-pythons116)
+<!-- TOC END -->
+
 Gerado do dump da plataforma SonarCloud (2026-08-06).
 
 Bead: `mro-2wjm.11`
@@ -34,15 +91,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Define a constant instead of duplicating this literal "pipeline configuration JSON" 3 times.
 
 ```python
-       98                  "values": config_result.value
-       99              })
-      100          except ValueError as exc:
-      101              return e.fail_validation(
->>>   102                  "pipeline configuration JSON", error=exc, result_type=r[t.JsonMapping]
-      103              )
-      104          return r[t.JsonMapping].ok(config_mapping.values)
-      105  
-      106      def _pipeline_command(
+"values": config_result.value
+})
+except ValueError as exc:
+return e.fail_validation(
+"pipeline configuration JSON", error=exc, result_type=r[t.JsonMapping]
+)
+return r[t.JsonMapping].ok(config_mapping.values)
+
+def _pipeline_command(
 ```
 
 **Decisão**: pendente
@@ -53,15 +110,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Define a constant instead of duplicating this literal "Pipeline execution not configured" 3 times.
 
 ```python
-      108      ) -> p.Result[t.StrSequence]:
-      109          config_result = self._load_pipeline_config(pipeline_name)
-      110          if config_result.failure:
-      111              return r[t.StrSequence].fail(
->>>   112                  config_result.error or "Pipeline execution not configured"
-      113              )
-      114          command_value = config_result.value.get("command")
-      115          if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
-      116              return r[t.StrSequence].fail("Pipeline execution not configured")
+) -> p.Result[t.StrSequence]:
+config_result = self._load_pipeline_config(pipeline_name)
+if config_result.failure:
+return r[t.StrSequence].fail(
+config_result.error or "Pipeline execution not configured"
+)
+command_value = config_result.value.get("command")
+if not isinstance(command_value, t.SEQUENCE_PAIR_TYPES):
+return r[t.StrSequence].fail("Pipeline execution not configured")
 ```
 
 **Decisão**: pendente
@@ -72,15 +129,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Define a constant instead of duplicating this literal "Pipeline name is invalid" 5 times.
 
 ```python
-      145      ) -> p.Result[str]:
-      146          """Create and persist a named pipeline configuration."""
-      147          name_result = self._normalize_pipeline_name(pipeline_name)
-      148          if name_result.failure:
->>>   149              return r[str].fail(name_result.error or "Pipeline name is invalid")
-      150          if config_payload is None:
-      151              return r[str].fail("Pipeline creation not configured")
-      152          try:
-      153              config_mapping = m.Meltano.ConfigMappingPayload.model_validate({
+) -> p.Result[str]:
+"""Create and persist a named pipeline configuration."""
+name_result = self._normalize_pipeline_name(pipeline_name)
+if name_result.failure:
+return r[str].fail(name_result.error or "Pipeline name is invalid")
+if config_payload is None:
+return r[str].fail("Pipeline creation not configured")
+try:
+config_mapping = m.Meltano.ConfigMappingPayload.model_validate({
 ```
 
 **Decisão**: pendente
@@ -91,15 +148,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.
 
 ```python
-       70      # ------------------------------------------------------------------
-       71      # CLI dispatch
-       72      # ------------------------------------------------------------------
-       73  
->>>    74      def cli_main(self, args: t.StrSequence | None = None) -> int:
-       75          """Run the main CLI entry point for dbt project."""
-       76  
-       77          def _run_cli_main() -> int:
-       78              command_args = list(args) if args else sys.argv[1:]
+# ------------------------------------------------------------------
+# CLI dispatch
+# ------------------------------------------------------------------
+
+def cli_main(self, args: t.StrSequence | None = None) -> int:
+"""Run the main CLI entry point for dbt project."""
+
+def _run_cli_main() -> int:
+command_args = list(args) if args else sys.argv[1:]
 ```
 
 **Decisão**: pendente
@@ -110,15 +167,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Define a constant instead of duplicating this literal "Unknown error" 3 times.
 
 ```python
-       45              c.Meltano.DbtResourceType.MODEL
-       46          )
-       47          if model_nodes_result.failure:
-       48              return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
->>>    49                  model_nodes_result.error or "Unknown error"
-       50              )
-       51          try:
-       52              models = [
-       53                  self._build_manifest_node_summary(node)
+c.Meltano.DbtResourceType.MODEL
+)
+if model_nodes_result.failure:
+return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
+model_nodes_result.error or "Unknown error"
+)
+try:
+models = [
+self._build_manifest_node_summary(node)
 ```
 
 **Decisão**: pendente
@@ -129,15 +186,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Reraise this exception to stop the application as the user expects
 
 ```python
-       43              try:
-       44                  _ = command.main(
-       45                      args=list(args), prog_name=prog_name, standalone_mode=False
-       46                  )
->>>    47              except SystemExit as exc:
-       48                  return exc.code if isinstance(exc.code, int) else 1
-       49              return 0
-       50  
-       51          def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
+try:
+_ = command.main(
+args=list(args), prog_name=prog_name, standalone_mode=False
+)
+except SystemExit as exc:
+return exc.code if isinstance(exc.code, int) else 1
+return 0
+
+def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
 ```
 
 **Decisão**: pendente
@@ -148,15 +205,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
 ```python
-      199          }
-      200          self.logger.info("FlextMeltanoExecutor executed successfully")
-      201          return r[t.JsonMapping].ok(config_data)
-      202  
->>>   203      def execute_meltano_command(
-      204          self,
-      205          command: t.StrSequence,
-      206          timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
-      207          _cwd: Path | None = None,
+}
+self.logger.info("FlextMeltanoExecutor executed successfully")
+return r[t.JsonMapping].ok(config_data)
+
+def execute_meltano_command(
+self,
+command: t.StrSequence,
+timeout: int = c.Meltano.NETWORK_MELTANO_DEFAULT_TIMEOUT,
+_cwd: Path | None = None,
 ```
 
 **Decisão**: pendente
@@ -167,15 +224,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
 ```python
-      317              )
-      318          except c.Meltano.OPERATION_ERRORS as e:
-      319              return r[m.Meltano.CommandExecutionResult].fail(str(e))
-      320  
->>>   321      def execute_pipeline(
-      322          self, tap_name: str, target_name: str, config: t.JsonMapping | None = None
-      323      ) -> p.Result[m.Meltano.CommandExecutionResult]:
-      324          """Execute a complete ELT pipeline."""
-      325          prepared_command: t.StrSequence | None = None
+)
+except c.Meltano.OPERATION_ERRORS as e:
+return r[m.Meltano.CommandExecutionResult].fail(str(e))
+
+def execute_pipeline(
+self, tap_name: str, target_name: str, config: t.JsonMapping | None = None
+) -> p.Result[m.Meltano.CommandExecutionResult]:
+"""Execute a complete ELT pipeline."""
+prepared_command: t.StrSequence | None = None
 ```
 
 **Decisão**: pendente
@@ -186,15 +243,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Remove this identity check; it will always be True.
 
 ```python
-      394                  failed_stage.error
-      395                  if failed_stage is not None and failed_stage.error is not None
-      396                  else "Failed to run Meltano pipeline"
-      397              )
->>>   398          if completed_result is None:
-      399              return r[m.Meltano.CommandExecutionResult].fail(
-      400                  "Pipeline execution result missing"
-      401              )
-      402          return r[m.Meltano.CommandExecutionResult].ok(completed_result)
+failed_stage.error
+if failed_stage is not None and failed_stage.error is not None
+else "Failed to run Meltano pipeline"
+)
+if completed_result is None:
+return r[m.Meltano.CommandExecutionResult].fail(
+"Pipeline execution result missing"
+)
+return r[m.Meltano.CommandExecutionResult].ok(completed_result)
 ```
 
 **Decisão**: pendente
@@ -205,15 +262,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.
 
 ```python
-       69              error_msg = f"Failed to discover plugins: {e}"
-       70              self.logger.exception(error_msg, error=str(e))
-       71              return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
-       72  
->>>    73      def _discover_plugins(
-       74          self, project: t.JsonPayload | t.Meltano.DbtProject | None
-       75      ) -> p.Result[t.SequenceOf[t.StrMapping]]:
-       76          """Discover plugins without owning the exception boundary."""
-       77          self.logger.info("Discovering Meltano plugins")
+error_msg = f"Failed to discover plugins: {e}"
+self.logger.exception(error_msg, error=str(e))
+return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
+
+def _discover_plugins(
+self, project: t.JsonPayload | t.Meltano.DbtProject | None
+) -> p.Result[t.SequenceOf[t.StrMapping]]:
+"""Discover plugins without owning the exception boundary."""
+self.logger.info("Discovering Meltano plugins")
 ```
 
 **Decisão**: pendente
@@ -224,15 +281,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Reraise this exception to stop the application as the user expects
 
 ```python
-       66          try:
-       67              singer_command = self._tap.get_singer_command()
-       68              _ = singer_command.main(args=list(args), prog_name=prog_name)
-       69              return 0
->>>    70          except SystemExit as exc:
-       71              return exc.code if isinstance(exc.code, int) else 1
-       72  
-       73      def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
-       74          """Delegate stream discovery to the raw Singer tap."""
+try:
+singer_command = self._tap.get_singer_command()
+_ = singer_command.main(args=list(args), prog_name=prog_name)
+return 0
+except SystemExit as exc:
+return exc.code if isinstance(exc.code, int) else 1
+
+def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
+"""Delegate stream discovery to the raw Singer tap."""
 ```
 
 **Decisão**: pendente
@@ -247,7 +304,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        15    workflow_dispatch:
        16  
        17  permissions:
->>>    18    contents: read
+18    contents: read
        19    pages: write
        20    id-token: write
        21  
@@ -266,7 +323,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        16  
        17  permissions:
        18    contents: read
->>>    19    pages: write
+19    pages: write
        20    id-token: write
        21  
        22  concurrency:
@@ -285,7 +342,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        17  permissions:
        18    contents: read
        19    pages: write
->>>    20    id-token: write
+20    id-token: write
        21  
        22  concurrency:
        23    group: pages
@@ -307,15 +364,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Remove this unnecessary `list()` call on an already iterable object.
 
 ```python
-       16      if (
-       17          existing_package is None
-       18          or Path(getattr(existing_package, "__file__", "")).resolve() != init_file
-       19      ):
->>>    20          for module_name in list(sys.modules):
-       21              if module_name == package_name or module_name.startswith(
-       22                  f"{package_name}."
-       23              ):
-       24                  sys.modules.pop(module_name, None)
+if (
+existing_package is None
+or Path(getattr(existing_package, "__file__", "")).resolve() != init_file
+):
+for module_name in list(sys.modules):
+if module_name == package_name or module_name.startswith(
+f"{package_name}."
+):
+sys.modules.pop(module_name, None)
 ```
 
 **Decisão**: pendente
@@ -326,15 +383,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerTapBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       27      the canonical m.Meltano.Singer* namespace. Consumers subclass these
-       28      instead of importing singer_sdk directly.
-       29      """
-       30  
->>>    31      SingerTapBase = Tap
-       32      SingerSinkBase = Sink
-       33      SingerStreamBase = Stream
-       34      SingerTargetBase = Target
-       35      SingerContext = Context
+the canonical m.Meltano.Singer* namespace. Consumers subclass these
+instead of importing singer_sdk directly.
+"""
+
+SingerTapBase = Tap
+SingerSinkBase = Sink
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
 ```
 
 **Decisão**: pendente
@@ -345,15 +402,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerSinkBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       28      instead of importing singer_sdk directly.
-       29      """
-       30  
-       31      SingerTapBase = Tap
->>>    32      SingerSinkBase = Sink
-       33      SingerStreamBase = Stream
-       34      SingerTargetBase = Target
-       35      SingerContext = Context
-       36      SingerRecord = Record
+instead of importing singer_sdk directly.
+"""
+
+SingerTapBase = Tap
+SingerSinkBase = Sink
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
 ```
 
 **Decisão**: pendente
@@ -364,15 +421,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerStreamBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       29      """
-       30  
-       31      SingerTapBase = Tap
-       32      SingerSinkBase = Sink
->>>    33      SingerStreamBase = Stream
-       34      SingerTargetBase = Target
-       35      SingerContext = Context
-       36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
+"""
+
+SingerTapBase = Tap
+SingerSinkBase = Sink
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
 ```
 
 **Decisão**: pendente
@@ -383,15 +440,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerTargetBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       30  
-       31      SingerTapBase = Tap
-       32      SingerSinkBase = Sink
-       33      SingerStreamBase = Stream
->>>    34      SingerTargetBase = Target
-       35      SingerContext = Context
-       36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
+
+SingerTapBase = Tap
+SingerSinkBase = Sink
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
 ```
 
 **Decisão**: pendente
@@ -402,15 +459,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerContext" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       31      SingerTapBase = Tap
-       32      SingerSinkBase = Sink
-       33      SingerStreamBase = Stream
-       34      SingerTargetBase = Target
->>>    35      SingerContext = Context
-       36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
+SingerTapBase = Tap
+SingerSinkBase = Sink
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
 ```
 
 **Decisão**: pendente
@@ -421,15 +478,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerRecord" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       32      SingerSinkBase = Sink
-       33      SingerStreamBase = Stream
-       34      SingerTargetBase = Target
-       35      SingerContext = Context
->>>    36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerSinkBase = Sink
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
 ```
 
 **Decisão**: pendente
@@ -440,15 +497,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerArrayType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       33      SingerStreamBase = Stream
-       34      SingerTargetBase = Target
-       35      SingerContext = Context
-       36      SingerRecord = Record
->>>    37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
+SingerStreamBase = Stream
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
 ```
 
 **Decisão**: pendente
@@ -459,15 +516,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerBooleanType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       34      SingerTargetBase = Target
-       35      SingerContext = Context
-       36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
->>>    38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
+SingerTargetBase = Target
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
 ```
 
 **Decisão**: pendente
@@ -478,15 +535,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerCustomType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       35      SingerContext = Context
-       36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
->>>    39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
+SingerContext = Context
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
 ```
 
 **Decisão**: pendente
@@ -497,15 +554,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerDateTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       36      SingerRecord = Record
-       37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
->>>    40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
+SingerRecord = Record
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
 ```
 
 **Decisão**: pendente
@@ -516,15 +573,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerDateType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       37      SingerArrayType = singer_sdk_typing.ArrayType
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
->>>    41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
 ```
 
 **Decisão**: pendente
@@ -535,15 +592,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerDurationType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       38      SingerBooleanType = singer_sdk_typing.BooleanType
-       39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
->>>    42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
 ```
 
 **Decisão**: pendente
@@ -554,15 +611,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerIntegerType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       39      SingerCustomType = singer_sdk_typing.CustomType
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
->>>    43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
 ```
 
 **Decisão**: pendente
@@ -573,15 +630,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerNumberType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       40      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
->>>    44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
-       48      SingerStringType = singer_sdk_typing.StringType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
+SingerStringType = singer_sdk_typing.StringType
 ```
 
 **Decisão**: pendente
@@ -592,15 +649,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerObjectType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       41      SingerDateType = singer_sdk_typing.DateType
-       42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
->>>    45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
-       48      SingerStringType = singer_sdk_typing.StringType
-       49      SingerTimeType = singer_sdk_typing.TimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
+SingerStringType = singer_sdk_typing.StringType
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -611,14 +668,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerPropertiesList" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       42      SingerDurationType = singer_sdk_typing.DurationType
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
->>>    46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
-       48      SingerStringType = singer_sdk_typing.StringType
-       49      SingerTimeType = singer_sdk_typing.TimeType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
+SingerStringType = singer_sdk_typing.StringType
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -629,13 +686,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerProperty" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       43      SingerIntegerType = singer_sdk_typing.IntegerType
-       44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
->>>    47      SingerProperty = singer_sdk_typing.Property
-       48      SingerStringType = singer_sdk_typing.StringType
-       49      SingerTimeType = singer_sdk_typing.TimeType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
+SingerStringType = singer_sdk_typing.StringType
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -646,12 +703,12 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerStringType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       44      SingerNumberType = singer_sdk_typing.NumberType
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
->>>    48      SingerStringType = singer_sdk_typing.StringType
-       49      SingerTimeType = singer_sdk_typing.TimeType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
+SingerStringType = singer_sdk_typing.StringType
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -662,11 +719,11 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
-       48      SingerStringType = singer_sdk_typing.StringType
->>>    49      SingerTimeType = singer_sdk_typing.TimeType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerProperty = singer_sdk_typing.Property
+SingerStringType = singer_sdk_typing.StringType
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -677,15 +734,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "StreamDefinition" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       13  
-       14  class FlextMeltanoModelsSources:
-       15      """Source and configuration models."""
-       16  
->>>    17      StreamDefinition: ClassVar[
-       18          type[FlextMeltanoModelsSourcesParams.StreamDefinition]
-       19      ] = FlextMeltanoModelsSourcesParams.StreamDefinition
-       20  
-       21      class TapConfig(m.Entity):
+
+class FlextMeltanoModelsSources:
+"""Source and configuration models."""
+
+StreamDefinition: ClassVar[
+type[FlextMeltanoModelsSourcesParams.StreamDefinition]
+] = FlextMeltanoModelsSourcesParams.StreamDefinition
+
+class TapConfig(m.Entity):
 ```
 
 **Decisão**: pendente
@@ -696,15 +753,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerTapSdkBackend" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-      206          def sync_all(self) -> None:
-      207              """Execute sync for all selected streams."""
-      208              ...
-      209  
->>>   210      SingerTapSdkBackend = SingerTapBackend
-      211      SingerTapSettingsBackend = SingerTapBackend
-      212  
-      213      @runtime_checkable
-      214      class SingerDrainSink(Protocol):
+def sync_all(self) -> None:
+"""Execute sync for all selected streams."""
+...
+
+SingerTapSdkBackend = SingerTapBackend
+SingerTapSettingsBackend = SingerTapBackend
+
+@runtime_checkable
+class SingerDrainSink(Protocol):
 ```
 
 **Decisão**: pendente
@@ -715,15 +772,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerTapSettingsBackend" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-      207              """Execute sync for all selected streams."""
-      208              ...
-      209  
-      210      SingerTapSdkBackend = SingerTapBackend
->>>   211      SingerTapSettingsBackend = SingerTapBackend
-      212  
-      213      @runtime_checkable
-      214      class SingerDrainSink(Protocol):
-      215          """Typed sink contract for target service drain and record operations.
+"""Execute sync for all selected streams."""
+...
+
+SingerTapSdkBackend = SingerTapBackend
+SingerTapSettingsBackend = SingerTapBackend
+
+@runtime_checkable
+class SingerDrainSink(Protocol):
+"""Typed sink contract for target service drain and record operations.
 ```
 
 **Decisão**: pendente
@@ -734,15 +791,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "PluginType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       28      )
-       29  
-       30      type ValidatorInput = t.JsonValue
-       31  
->>>    32      PluginType = c.Meltano.PluginType
-       33  
-       34      type VariantValue = str | t.StrSequence | t.ScalarMapping | None
-       35      """Normalized plugin variant: string, string list, scalar mapping, or null."""
-       36  
+)
+
+type ValidatorInput = t.JsonValue
+
+PluginType = c.Meltano.PluginType
+
+type VariantValue = str | t.StrSequence | t.ScalarMapping | None
+"""Normalized plugin variant: string, string list, scalar mapping, or null."""
+
 ```
 
 **Decisão**: pendente
@@ -753,15 +810,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerReplicationMethod" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       19      External library wrappers (singer_sdk.typing) are kept to prevent
-       20      direct imports by consumer projects.
-       21      """
-       22  
->>>    23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-       24  
-       25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
-       26      SingerArrayType = singer_sdk_typing.ArrayType
-       27      SingerBooleanType = singer_sdk_typing.BooleanType
+External library wrappers (singer_sdk.typing) are kept to prevent
+direct imports by consumer projects.
+"""
+
+SingerReplicationMethod = c.Meltano.SingerReplicationMethod
+
+# Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
 ```
 
 **Decisão**: pendente
@@ -772,15 +829,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerArrayType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       22  
-       23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-       24  
-       25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
->>>    26      SingerArrayType = singer_sdk_typing.ArrayType
-       27      SingerBooleanType = singer_sdk_typing.BooleanType
-       28      SingerCustomType = singer_sdk_typing.CustomType
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
+
+SingerReplicationMethod = c.Meltano.SingerReplicationMethod
+
+# Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
 ```
 
 **Decisão**: pendente
@@ -791,15 +848,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerBooleanType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-       24  
-       25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
-       26      SingerArrayType = singer_sdk_typing.ArrayType
->>>    27      SingerBooleanType = singer_sdk_typing.BooleanType
-       28      SingerCustomType = singer_sdk_typing.CustomType
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
+SingerReplicationMethod = c.Meltano.SingerReplicationMethod
+
+# Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
 ```
 
 **Decisão**: pendente
@@ -810,15 +867,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerCustomType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       24  
-       25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
-       26      SingerArrayType = singer_sdk_typing.ArrayType
-       27      SingerBooleanType = singer_sdk_typing.BooleanType
->>>    28      SingerCustomType = singer_sdk_typing.CustomType
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
+
+# Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
 ```
 
 **Decisão**: pendente
@@ -829,15 +886,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerDateTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
-       26      SingerArrayType = singer_sdk_typing.ArrayType
-       27      SingerBooleanType = singer_sdk_typing.BooleanType
-       28      SingerCustomType = singer_sdk_typing.CustomType
->>>    29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
+# Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
 ```
 
 **Decisão**: pendente
@@ -848,15 +905,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerDateType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       26      SingerArrayType = singer_sdk_typing.ArrayType
-       27      SingerBooleanType = singer_sdk_typing.BooleanType
-       28      SingerCustomType = singer_sdk_typing.CustomType
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
->>>    30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
-       34      SingerObjectType = singer_sdk_typing.ObjectType
+SingerArrayType = singer_sdk_typing.ArrayType
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
 ```
 
 **Decisão**: pendente
@@ -867,15 +924,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerDurationType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       27      SingerBooleanType = singer_sdk_typing.BooleanType
-       28      SingerCustomType = singer_sdk_typing.CustomType
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
->>>    31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
-       34      SingerObjectType = singer_sdk_typing.ObjectType
-       35      SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerBooleanType = singer_sdk_typing.BooleanType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
 ```
 
 **Decisão**: pendente
@@ -886,15 +943,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerIntegerType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       28      SingerCustomType = singer_sdk_typing.CustomType
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
->>>    32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
-       34      SingerObjectType = singer_sdk_typing.ObjectType
-       35      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       36      SingerTimeType = singer_sdk_typing.TimeType
+SingerCustomType = singer_sdk_typing.CustomType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -905,14 +962,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerNumberType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       29      SingerDateTimeType = singer_sdk_typing.DateTimeType
-       30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
->>>    33      SingerNumberType = singer_sdk_typing.NumberType
-       34      SingerObjectType = singer_sdk_typing.ObjectType
-       35      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       36      SingerTimeType = singer_sdk_typing.TimeType
+SingerDateTimeType = singer_sdk_typing.DateTimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -923,13 +980,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerObjectType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       30      SingerDateType = singer_sdk_typing.DateType
-       31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
->>>    34      SingerObjectType = singer_sdk_typing.ObjectType
-       35      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       36      SingerTimeType = singer_sdk_typing.TimeType
+SingerDateType = singer_sdk_typing.DateType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -940,12 +997,12 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerPropertiesList" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       31      SingerDurationType = singer_sdk_typing.DurationType
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
-       34      SingerObjectType = singer_sdk_typing.ObjectType
->>>    35      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       36      SingerTimeType = singer_sdk_typing.TimeType
+SingerDurationType = singer_sdk_typing.DurationType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
@@ -956,11 +1013,11 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Rename this field "SingerTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
 
 ```python
-       32      SingerIntegerType = singer_sdk_typing.IntegerType
-       33      SingerNumberType = singer_sdk_typing.NumberType
-       34      SingerObjectType = singer_sdk_typing.ObjectType
-       35      SingerPropertiesList = singer_sdk_typing.PropertiesList
->>>    36      SingerTimeType = singer_sdk_typing.TimeType
+SingerIntegerType = singer_sdk_typing.IntegerType
+SingerNumberType = singer_sdk_typing.NumberType
+SingerObjectType = singer_sdk_typing.ObjectType
+SingerPropertiesList = singer_sdk_typing.PropertiesList
+SingerTimeType = singer_sdk_typing.TimeType
 ```
 
 **Decisão**: pendente
