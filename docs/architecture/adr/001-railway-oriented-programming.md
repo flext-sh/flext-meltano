@@ -1,6 +1,7 @@
 # ADR-001: Railway-Oriented Programming with r[T]
 
 <!-- TOC START -->
+
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -61,7 +62,7 @@ Implement railway-oriented programming using `r[T]` from flext-core, ensuring co
 
 **Composability**: Operations can be chained safely without exception handling clutter
 
-```python
+````python
 result = (
     service
     .discover_plugins()
@@ -222,3 +223,4 @@ def test_pipeline_failure_handling():
 - Error rates tracked via application metrics
 - Common error patterns identified for improvement
 - Error context preserved for debugging
+````

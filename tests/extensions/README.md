@@ -317,7 +317,7 @@ class EnterpriseExtension(FlextMeltanoBase, ABC):
         ])
 ```
 
-______________________________________________________________________
+---
 
 ## 📋 Extensions Testing Status
 
@@ -339,7 +339,7 @@ ______________________________________________________________________
 - **Integration Success**: 95%+ success rate for extension integrations
 - **Documentation Coverage**: 100% of extensions documented to enterprise standards
 
-______________________________________________________________________
+---
 
 **Status**: Active Development — Extension testing framework functional; stabilization in progress · 1.0.0 Release Preparation
 **Version**: 0.12.0-dev RC-enterprise

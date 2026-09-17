@@ -1,6 +1,7 @@
 # FLEXT-Meltano Generic Library Implementation Plan
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [Current State Analysis](#current-state-analysis)
   - [Current Architecture Issues](#current-architecture-issues)
@@ -25,7 +26,7 @@
   - [For Library Users](#for-library-users)
   - [For Plugin Developers](#for-plugin-developers)
   - [For Enterprise Integration](#for-enterprise-integration)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2026-04-14
 
@@ -82,7 +83,7 @@ Implementation plan for transforming FLEXT-Meltano into a **generic, reusable li
 
 **Key Components:**
 
-```python
+````python
 # CLI abstraction
 adapter = FlextMeltanoAdapter()
 result = adapter.run_pipeline("tap-csv", "target-jsonl")  # No CLI knowledge needed
@@ -439,3 +440,4 @@ make test-compatibility```
 ______________________________________________________________________
 
 **Document Status**: ✅ Complete | **Last Reviewed**: 2026-04-14
+````

@@ -1,6 +1,7 @@
 # FLEXT-Meltano API Reference
 
 <!-- TOC START -->
+
 - [🎯 Library Overview](#library-overview)
   - [**Architecture Principles**](#architecture-principles)
   - [**Core Modules**](#core-modules)
@@ -41,7 +42,7 @@
 
 Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin development tools, and enterprise data pipeline orchestration.
 
-______________________________________________________________________
+---
 
 ## 🎯 Library Overview
 
@@ -72,7 +73,7 @@ ______________________________________________________________________
 | `pipeline_service.py` | Pipeline orchestration         | `FlextMeltanoService`, `FlextMeltanoExecutor` |
 | `project_service.py`  | Project management             | `FlextProjectService`, `FlextMeltanoProject`  |
 
-______________________________________________________________________
+---
 
 ## 🎯 Core Services
 
@@ -80,7 +81,7 @@ ______________________________________________________________________
 
 **Primary service for Meltano project management and plugin operations**
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -1175,3 +1176,4 @@ ______________________________________________________________________
 
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+````

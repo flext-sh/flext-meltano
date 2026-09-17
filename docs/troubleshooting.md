@@ -1,6 +1,7 @@
 # Troubleshooting flext-meltano
 
 <!-- TOC START -->
+
 - [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
   - [**Direct Import Violations**](#direct-import-violations)
 - [🔧 Development Issues](#development-issues)
@@ -27,7 +28,7 @@
 
 **Common issues and solutions** for flext-meltano development and usage.
 
-______________________________________________________________________
+---
 
 ## 🚨 Architecture Compliance Issues
 
@@ -42,7 +43,7 @@ grep -r "import meltano\|from meltano" src/
 
 **Solution**: Use flext-meltano abstractions only
 
-```python
+````python
 # ❌ Incorrect
 
 # ✅ Correct```
@@ -281,3 +282,4 @@ Before reporting issues:
 ______________________________________________________________________
 
 **Need more help?** Check the [Development Guide](development.md) for detailed contributing guidelines.
+````

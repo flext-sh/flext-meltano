@@ -1,6 +1,7 @@
 # flext-meltano Architecture
 
 <!-- TOC START -->
+
 - [🎯 Architectural Overview](#architectural-overview)
   - [**Design Principles**](#design-principles)
 - [🏗️ Module Architecture](#module-architecture)
@@ -37,7 +38,7 @@
 
 **Version**: 0.12.0-dev | **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 🎯 Architectural Overview
 
@@ -57,7 +58,7 @@ flext-meltano serves as the foundational library for ELT operations within the F
 
 **Core Infrastructure and Type System**
 
-```python
+````python
 src/flext_meltano/
 ├── __init__.py              # Public API exports
 ├── constants.py             # MeltanoConstants extending FlextConstants
@@ -372,3 +373,4 @@ ______________________________________________________________________
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
 **Design Authority**: This architecture follows FLEXT ecosystem standards and Clean Architecture principles, ensuring maintainability, testability, and integration capability across the 32-project FLEXT ecosystem.
+````

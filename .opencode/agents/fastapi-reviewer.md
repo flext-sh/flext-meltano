@@ -1,9 +1,10 @@
 ---
-description: Reviews FastAPI applications for async correctness, dependency injection,
+description:
+  Reviews FastAPI applications for async correctness, dependency injection,
   Pydantic schemas, security, OpenAPI quality, testing, and production readiness.
 mode: subagent
 permission:
-  '*': deny
+  "*": deny
   read: allow
   grep: allow
   glob: allow

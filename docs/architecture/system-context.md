@@ -1,6 +1,7 @@
 # System Context Documentation
 
 <!-- TOC START -->
+
 - [📋 Table of Contents](#table-of-contents)
 - [🎯 System Purpose and Scope](#system-purpose-and-scope)
   - [Primary Purpose](#primary-purpose)
@@ -34,13 +35,13 @@
   - [Key Architectural Characteristics](#key-architectural-characteristics)
   - [System Qualities](#system-qualities)
   - [Integration Philosophy](#integration-philosophy)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Ecosystem Integration and System Context**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 📋 Table of Contents
 
@@ -52,7 +53,7 @@ ______________________________________________________________________
 1. [Integration Patterns](#integration-patterns)
 1. [Deployment Contexts](#deployment-contexts)
 
-______________________________________________________________________
+---
 
 ## 🎯 System Purpose and Scope
 
@@ -93,7 +94,7 @@ _To provide the enterprise data integration foundation for the FLEXT ecosystem, 
 1. **Reliability**: 99.9% uptime, comprehensive error handling
 1. **Maintainability**: Clean architecture enabling easy evolution
 
-______________________________________________________________________
+---
 
 ## 👥 Stakeholder Analysis
 
@@ -185,7 +186,7 @@ external --> ecosystem_teams: Provides upstream features
 - **Compliance Framework**: GDPR, SOC2, HIPAA support
 - **Threat Modeling**: Proactive security analysis
 
-______________________________________________________________________
+---
 
 ## 🔗 External System Integration
 
@@ -259,7 +260,7 @@ flext_meltano --> redis: Caching & queues
 
 #### FLEXT-Core Integration
 
-```python
+````python
 from __future__ import annotations
 
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
@@ -1208,3 +1209,4 @@ ______________________________________________________________________
 
 **System Context**: FLEXT-Meltano Ecosystem Integration and Boundaries
 _Comprehensive system context documentation with stakeholder analysis, integration patterns, and deployment contexts_
+````

@@ -9,17 +9,17 @@ Bead: `mro-2wjm.11`
 **51 issues** — BLOCKER 0, CRITICAL 11, MAJOR 4, MINOR 36
 Tipos: VULNERABILITY 4, BUG 0, CODE_SMELL 47 · **Debt total: 171min**
 
-| regra | issues |
-|---|---|
-| `python:S116` | 35 |
-| `python:S1192` | 4 |
-| `python:S3776` | 4 |
-| `python:S5754` | 2 |
-| `githubactions:S8233` | 2 |
-| `python:S5727` | 1 |
-| `githubactions:S8264` | 1 |
-| `text:S8565` | 1 |
-| `python:S7504` | 1 |
+| regra                 | issues |
+| --------------------- | ------ |
+| `python:S116`         | 35     |
+| `python:S1192`        | 4      |
+| `python:S3776`        | 4      |
+| `python:S5754`        | 2      |
+| `githubactions:S8233` | 2      |
+| `python:S5727`        | 1      |
+| `githubactions:S8264` | 1      |
+| `text:S8565`          | 1      |
+| `python:S7504`        | 1      |
 
 ## Como usar
 
@@ -29,6 +29,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ## Issues
 
 ### 1 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_meltano/pipeline_mgr.py:102` · **Effort**: 6min
 
 > Define a constant instead of duplicating this literal "pipeline configuration JSON" 3 times.
@@ -41,13 +42,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   102                  "pipeline configuration JSON", error=exc, result_type=r[t.JsonMapping]
       103              )
       104          return r[t.JsonMapping].ok(config_mapping.values)
-      105  
+      105
       106      def _pipeline_command(
 ```
 
 **Decisão**: pendente
 
 ### 2 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_meltano/pipeline_mgr.py:112` · **Effort**: 6min
 
 > Define a constant instead of duplicating this literal "Pipeline execution not configured" 3 times.
@@ -67,6 +69,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 3 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_meltano/pipeline_mgr.py:149` · **Effort**: 10min
 
 > Define a constant instead of duplicating this literal "Pipeline name is invalid" 5 times.
@@ -86,6 +89,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 4 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_meltano/services/consumer_bases/dbt_service_base.py:74` · **Effort**: 7min
 
 > Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.
@@ -94,10 +98,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        70      # ------------------------------------------------------------------
        71      # CLI dispatch
        72      # ------------------------------------------------------------------
-       73  
+       73
 >>>    74      def cli_main(self, args: t.StrSequence | None = None) -> int:
        75          """Run the main CLI entry point for dbt project."""
-       76  
+       76
        77          def _run_cli_main() -> int:
        78              command_args = list(args) if args else sys.argv[1:]
 ```
@@ -105,6 +109,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 5 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_meltano/services/dbt_project.py:49` · **Effort**: 6min
 
 > Define a constant instead of duplicating this literal "Unknown error" 3 times.
@@ -124,6 +129,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 6 · 🟠 CRITICAL · CODE_SMELL · `python:S5754`
+
 **Local**: `src/flext_meltano/services/declarative_tap.py:47` · **Effort**: 5min
 
 > Reraise this exception to stop the application as the user expects
@@ -136,13 +142,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>    47              except SystemExit as exc:
        48                  return exc.code if isinstance(exc.code, int) else 1
        49              return 0
-       50  
+       50
        51          def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
 ```
 
 **Decisão**: pendente
 
 ### 7 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_meltano/services/executor_base.py:203` · **Effort**: 6min
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
@@ -151,7 +158,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       199          }
       200          self.logger.info("FlextMeltanoExecutor executed successfully")
       201          return r[t.JsonMapping].ok(config_data)
-      202  
+      202
 >>>   203      def execute_meltano_command(
       204          self,
       205          command: t.StrSequence,
@@ -162,6 +169,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 8 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_meltano/services/executor_base.py:321` · **Effort**: 6min
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
@@ -170,7 +178,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       317              )
       318          except c.Meltano.OPERATION_ERRORS as e:
       319              return r[m.Meltano.CommandExecutionResult].fail(str(e))
-      320  
+      320
 >>>   321      def execute_pipeline(
       322          self, tap_name: str, target_name: str, config: t.JsonMapping | None = None
       323      ) -> p.Result[m.Meltano.CommandExecutionResult]:
@@ -181,6 +189,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 9 · 🟠 CRITICAL · CODE_SMELL · `python:S5727`
+
 **Local**: `src/flext_meltano/services/executor_base.py:398` · **Effort**: 10min
 
 > Remove this identity check; it will always be True.
@@ -200,6 +209,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 10 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_meltano/services/meltano_plugin_discovery.py:73` · **Effort**: 9min
 
 > Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.
@@ -208,7 +218,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        69              error_msg = f"Failed to discover plugins: {e}"
        70              self.logger.exception(error_msg, error=str(e))
        71              return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
-       72  
+       72
 >>>    73      def _discover_plugins(
        74          self, project: t.JsonPayload | t.Meltano.DbtProject | None
        75      ) -> p.Result[t.SequenceOf[t.StrMapping]]:
@@ -219,6 +229,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 11 · 🟠 CRITICAL · CODE_SMELL · `python:S5754`
+
 **Local**: `src/flext_meltano/services/singer_sdk.py:70` · **Effort**: 5min
 
 > Reraise this exception to stop the application as the user expects
@@ -230,7 +241,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        69              return 0
 >>>    70          except SystemExit as exc:
        71              return exc.code if isinstance(exc.code, int) else 1
-       72  
+       72
        73      def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
        74          """Delegate stream discovery to the raw Singer tap."""
 ```
@@ -238,6 +249,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 12 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8264`
+
 **Local**: `.github/workflows/docs.yml:18` · **Effort**: 5min
 
 > Move this read permission from workflow level to job level.
@@ -245,30 +257,31 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ```yaml
        14        - ".github/workflows/docs.yml"
        15    workflow_dispatch:
-       16  
+       16
        17  permissions:
 >>>    18    contents: read
        19    pages: write
        20    id-token: write
-       21  
+       21
        22  concurrency:
 ```
 
 **Decisão**: pendente
 
 ### 13 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
+
 **Local**: `.github/workflows/docs.yml:19` · **Effort**: 5min
 
 > Move this write permission from workflow level to job level.
 
 ```yaml
        15    workflow_dispatch:
-       16  
+       16
        17  permissions:
        18    contents: read
 >>>    19    pages: write
        20    id-token: write
-       21  
+       21
        22  concurrency:
        23    group: pages
 ```
@@ -276,17 +289,18 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 14 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
+
 **Local**: `.github/workflows/docs.yml:20` · **Effort**: 5min
 
 > Move this write permission from workflow level to job level.
 
 ```yaml
-       16  
+       16
        17  permissions:
        18    contents: read
        19    pages: write
 >>>    20    id-token: write
-       21  
+       21
        22  concurrency:
        23    group: pages
        24    cancel-in-progress: false
@@ -295,6 +309,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 15 · 🟡 MAJOR · VULNERABILITY · `text:S8565`
+
 **Local**: `pyproject.toml:-` · **Effort**: 5min
 
 > Dependency versions are not predictable if the lock file (uv.lock, poetry.lock, pdm.lock or pylock.toml) is missing.
@@ -302,6 +317,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 16 · ⚪ MINOR · CODE_SMELL · `python:S7504`
+
 **Local**: `conftest.py:20` · **Effort**: 5min
 
 > Remove this unnecessary `list()` call on an already iterable object.
@@ -321,15 +337,16 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 17 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:31` · **Effort**: 2min
 
-> Rename this field "SingerTapBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerTapBase" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        27      the canonical m.Meltano.Singer* namespace. Consumers subclass these
        28      instead of importing singer_sdk directly.
        29      """
-       30  
+       30
 >>>    31      SingerTapBase = Tap
        32      SingerSinkBase = Sink
        33      SingerStreamBase = Stream
@@ -340,14 +357,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 18 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:32` · **Effort**: 2min
 
-> Rename this field "SingerSinkBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerSinkBase" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        28      instead of importing singer_sdk directly.
        29      """
-       30  
+       30
        31      SingerTapBase = Tap
 >>>    32      SingerSinkBase = Sink
        33      SingerStreamBase = Stream
@@ -359,13 +377,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 19 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:33` · **Effort**: 2min
 
-> Rename this field "SingerStreamBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerStreamBase" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        29      """
-       30  
+       30
        31      SingerTapBase = Tap
        32      SingerSinkBase = Sink
 >>>    33      SingerStreamBase = Stream
@@ -378,12 +397,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 20 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:34` · **Effort**: 2min
 
-> Rename this field "SingerTargetBase" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerTargetBase" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
-       30  
+       30
        31      SingerTapBase = Tap
        32      SingerSinkBase = Sink
        33      SingerStreamBase = Stream
@@ -397,9 +417,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 21 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:35` · **Effort**: 2min
 
-> Rename this field "SingerContext" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerContext" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        31      SingerTapBase = Tap
@@ -416,9 +437,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 22 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:36` · **Effort**: 2min
 
-> Rename this field "SingerRecord" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerRecord" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        32      SingerSinkBase = Sink
@@ -435,9 +457,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 23 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:37` · **Effort**: 2min
 
-> Rename this field "SingerArrayType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerArrayType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        33      SingerStreamBase = Stream
@@ -454,9 +477,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 24 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:38` · **Effort**: 2min
 
-> Rename this field "SingerBooleanType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerBooleanType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        34      SingerTargetBase = Target
@@ -473,9 +497,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 25 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:39` · **Effort**: 2min
 
-> Rename this field "SingerCustomType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerCustomType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        35      SingerContext = Context
@@ -492,9 +517,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 26 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:40` · **Effort**: 2min
 
-> Rename this field "SingerDateTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerDateTimeType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        36      SingerRecord = Record
@@ -511,9 +537,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 27 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:41` · **Effort**: 2min
 
-> Rename this field "SingerDateType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerDateType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        37      SingerArrayType = singer_sdk_typing.ArrayType
@@ -530,9 +557,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 28 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:42` · **Effort**: 2min
 
-> Rename this field "SingerDurationType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerDurationType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        38      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -549,9 +577,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 29 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:43` · **Effort**: 2min
 
-> Rename this field "SingerIntegerType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerIntegerType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        39      SingerCustomType = singer_sdk_typing.CustomType
@@ -568,9 +597,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 30 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:44` · **Effort**: 2min
 
-> Rename this field "SingerNumberType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerNumberType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        40      SingerDateTimeType = singer_sdk_typing.DateTimeType
@@ -587,9 +617,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 31 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:45` · **Effort**: 2min
 
-> Rename this field "SingerObjectType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerObjectType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        41      SingerDateType = singer_sdk_typing.DateType
@@ -606,9 +637,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 32 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:46` · **Effort**: 2min
 
-> Rename this field "SingerPropertiesList" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerPropertiesList" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        42      SingerDurationType = singer_sdk_typing.DurationType
@@ -624,9 +656,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 33 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:47` · **Effort**: 2min
 
-> Rename this field "SingerProperty" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerProperty" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        43      SingerIntegerType = singer_sdk_typing.IntegerType
@@ -641,9 +674,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 34 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:48` · **Effort**: 2min
 
-> Rename this field "SingerStringType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerStringType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        44      SingerNumberType = singer_sdk_typing.NumberType
@@ -657,9 +691,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 35 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/singer_sdk.py:49` · **Effort**: 2min
 
-> Rename this field "SingerTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerTimeType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        45      SingerObjectType = singer_sdk_typing.ObjectType
@@ -672,37 +707,39 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 36 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_models/sources.py:17` · **Effort**: 2min
 
-> Rename this field "StreamDefinition" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "StreamDefinition" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
-       13  
+       13
        14  class FlextMeltanoModelsSources:
        15      """Source and configuration models."""
-       16  
+       16
 >>>    17      StreamDefinition: ClassVar[
        18          type[FlextMeltanoModelsSourcesParams.StreamDefinition]
        19      ] = FlextMeltanoModelsSourcesParams.StreamDefinition
-       20  
+       20
        21      class TapConfig(m.Entity):
 ```
 
 **Decisão**: pendente
 
 ### 37 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_protocols/singer.py:210` · **Effort**: 2min
 
-> Rename this field "SingerTapSdkBackend" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerTapSdkBackend" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
       206          def sync_all(self) -> None:
       207              """Execute sync for all selected streams."""
       208              ...
-      209  
+      209
 >>>   210      SingerTapSdkBackend = SingerTapBackend
       211      SingerTapSettingsBackend = SingerTapBackend
-      212  
+      212
       213      @runtime_checkable
       214      class SingerDrainSink(Protocol):
 ```
@@ -710,17 +747,18 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 38 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_protocols/singer.py:211` · **Effort**: 2min
 
-> Rename this field "SingerTapSettingsBackend" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerTapSettingsBackend" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
       207              """Execute sync for all selected streams."""
       208              ...
-      209  
+      209
       210      SingerTapSdkBackend = SingerTapBackend
 >>>   211      SingerTapSettingsBackend = SingerTapBackend
-      212  
+      212
       213      @runtime_checkable
       214      class SingerDrainSink(Protocol):
       215          """Typed sink contract for target service drain and record operations.
@@ -729,36 +767,38 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 39 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/base.py:32` · **Effort**: 2min
 
-> Rename this field "PluginType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "PluginType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        28      )
-       29  
+       29
        30      type ValidatorInput = t.JsonValue
-       31  
+       31
 >>>    32      PluginType = c.Meltano.PluginType
-       33  
+       33
        34      type VariantValue = str | t.StrSequence | t.ScalarMapping | None
        35      """Normalized plugin variant: string, string list, scalar mapping, or null."""
-       36  
+       36
 ```
 
 **Decisão**: pendente
 
 ### 40 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:23` · **Effort**: 2min
 
-> Rename this field "SingerReplicationMethod" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerReplicationMethod" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        19      External library wrappers (singer_sdk.typing) are kept to prevent
        20      direct imports by consumer projects.
        21      """
-       22  
+       22
 >>>    23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-       24  
+       24
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
        26      SingerArrayType = singer_sdk_typing.ArrayType
        27      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -767,14 +807,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 41 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:26` · **Effort**: 2min
 
-> Rename this field "SingerArrayType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerArrayType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
-       22  
+       22
        23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-       24  
+       24
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
 >>>    26      SingerArrayType = singer_sdk_typing.ArrayType
        27      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -786,13 +827,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 42 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:27` · **Effort**: 2min
 
-> Rename this field "SingerBooleanType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerBooleanType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
-       24  
+       24
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
        26      SingerArrayType = singer_sdk_typing.ArrayType
 >>>    27      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -805,12 +847,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 43 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:28` · **Effort**: 2min
 
-> Rename this field "SingerCustomType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerCustomType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
-       24  
+       24
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
        26      SingerArrayType = singer_sdk_typing.ArrayType
        27      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -824,9 +867,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 44 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:29` · **Effort**: 2min
 
-> Rename this field "SingerDateTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerDateTimeType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
@@ -843,9 +887,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 45 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:30` · **Effort**: 2min
 
-> Rename this field "SingerDateType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerDateType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        26      SingerArrayType = singer_sdk_typing.ArrayType
@@ -862,9 +907,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 46 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:31` · **Effort**: 2min
 
-> Rename this field "SingerDurationType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerDurationType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        27      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -881,9 +927,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 47 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:32` · **Effort**: 2min
 
-> Rename this field "SingerIntegerType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerIntegerType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        28      SingerCustomType = singer_sdk_typing.CustomType
@@ -900,9 +947,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 48 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:33` · **Effort**: 2min
 
-> Rename this field "SingerNumberType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerNumberType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        29      SingerDateTimeType = singer_sdk_typing.DateTimeType
@@ -918,9 +966,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 49 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:34` · **Effort**: 2min
 
-> Rename this field "SingerObjectType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerObjectType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        30      SingerDateType = singer_sdk_typing.DateType
@@ -935,9 +984,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 50 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:35` · **Effort**: 2min
 
-> Rename this field "SingerPropertiesList" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerPropertiesList" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        31      SingerDurationType = singer_sdk_typing.DurationType
@@ -951,9 +1001,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 51 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_meltano/_typings/singer.py:36` · **Effort**: 2min
 
-> Rename this field "SingerTimeType" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "SingerTimeType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
        32      SingerIntegerType = singer_sdk_typing.IntegerType

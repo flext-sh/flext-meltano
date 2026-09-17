@@ -1,6 +1,7 @@
 # ADR-003: Singer Protocol Abstraction Layer
 
 <!-- TOC START -->
+
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -53,7 +54,7 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 
 **FLEXT Ecosystem Consistency**: Ensures all Singer implementations follow FLEXT patterns
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -230,3 +231,4 @@ class FlextMeltanoStream:
 - Existing direct SDK usage migrated incrementally
 - New implementations use abstraction layer exclusively
 - Legacy code wrapped with compatibility adapters
+````

@@ -1,13 +1,14 @@
 ---
 name: fastapi-reviewer
-description: Reviews FastAPI applications for async correctness, dependency injection,
+description:
+  Reviews FastAPI applications for async correctness, dependency injection,
   Pydantic schemas, security, OpenAPI quality, testing, and production readiness.
 kind: local
 tools:
-- read_file
-- grep_search
-- glob
-- run_shell_command
+  - read_file
+  - grep_search
+  - glob
+  - run_shell_command
 ---
 
 # Prompt defense baseline

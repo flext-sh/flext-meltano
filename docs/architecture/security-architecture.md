@@ -1,6 +1,7 @@
 # Security Architecture Documentation
 
 <!-- TOC START -->
+
 - [📋 Table of Contents](#table-of-contents)
 - [🛡️ Security Architecture Overview](#security-architecture-overview)
   - [Security Principles](#security-principles)
@@ -35,13 +36,13 @@
 - [📈 Security Metrics and KPIs](#security-metrics-and-kpis)
   - [Key Security Metrics](#key-security-metrics)
   - [Security Health Dashboard](#security-health-dashboard)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Security Architecture and Compliance Framework**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 📋 Table of Contents
 
@@ -54,7 +55,7 @@ ______________________________________________________________________
 1. [Threat Model](#threat-model)
 1. [Incident Response](#incident-response)
 
-______________________________________________________________________
+---
 
 ## 🛡️ Security Architecture Overview
 
@@ -149,7 +150,7 @@ end note
 | **Infrastructure** | Firewalls, hardening          | IDS/IPS, monitoring | Patching, updates | Segmentation        |
 | **Network**        | TLS, VPN, segmentation        | Traffic monitoring  | DDoS protection   | Load balancing      |
 
-______________________________________________________________________
+---
 
 ## 🔐 Authentication and Authorization
 
@@ -210,7 +211,7 @@ auth --> gateway: refreshed_tokens
 
 #### Role-Based Access Control (RBAC)
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -1189,3 +1190,4 @@ ______________________________________________________________________
 
 **Security Architecture**: FLEXT-Meltano Enterprise Security Framework
 _Comprehensive security architecture with defense-in-depth, compliance, and incident response_
+````

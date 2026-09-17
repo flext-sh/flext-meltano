@@ -1,6 +1,7 @@
 # FLEXT-Meltano Testing Plan & Status
 
 <!-- TOC START -->
+
 - [🎯 Testing Infrastructure Status](#testing-infrastructure-status)
   - [**CURRENT STATUS: 🚧 VERIFIED BLOCKED** - Test Execution Confirmed Prevented by Critical Issues](#current-status-verified-blocked-test-execution-confirmed-prevented-by-critical-issues)
 - [📊 Current Testing Infrastructure Assessment](#current-testing-infrastructure-assessment)
@@ -43,7 +44,7 @@
 
 FLEXT-Meltano has a **comprehensive testing framework** with enterprise-grade test patterns, but execution is **verified blocked by two critical issues**: missing flext-tests dependency and FlextModels.BaseModel inheritance incompatibility. The testing infrastructure is 95% complete but requires immediate resolution of these verified blockers.
 
-______________________________________________________________________
+---
 
 ## 📊 Current Testing Infrastructure Assessment
 
@@ -77,7 +78,7 @@ ______________________________________________________________________
 - ✅ **Coverage Quality Gates**: Automated validation in CI/CD pipeline
 - ✅ **Coverage Maintenance**: Branch coverage and exclusion rules
 
-______________________________________________________________________
+---
 
 ### ❌ **VERIFIED BLOCKED TESTING COMPONENTS (5%)**
 
@@ -94,7 +95,7 @@ ______________________________________________________________________
 - ❌ **Coverage Reporting**: No coverage data available due to execution failures
 - ❌ **Quality Gate Validation**: Cannot validate coverage thresholds
 
-______________________________________________________________________
+---
 
 ## 🧪 Test Categories & Implementation Status
 
@@ -147,7 +148,7 @@ Test File: `test_pipeline_integration.py` - Status: 🚧 Planned - Coverage Targ
 - ✅ **Data Management**: Test data generation and cleanup
 - ✅ **Performance Validation**: E2E performance benchmarks
 
-______________________________________________________________________
+---
 
 ## 🚨 **CRITICAL BLOCKERS RESOLUTION PLAN**
 
@@ -201,7 +202,7 @@ ______________________________________________________________________
 **Estimated Effort**: 2 hours
 **Priority**: High
 
-______________________________________________________________________
+---
 
 ## 📋 **TEST EXECUTION & VALIDATION PLAN**
 
@@ -255,13 +256,13 @@ src/flext_meltano/
 - ✅ **Performance**: Test execution within acceptable time limits
 - ✅ **Reliability**: Consistent test results across environments
 
-______________________________________________________________________
+---
 
 ## 🧪 **TEST PATTERNS & BEST PRACTICES**
 
 ### **Railway-Oriented Testing Patterns**
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -458,3 +459,4 @@ Quality Gate: **CI/CD Integration** - Current: 0% - Target: 100% - Status: ❌ B
 ______________________________________________________________________
 
 **Document Status**: 🚧 Active - Blocked by Infrastructure Issues | **Last Updated**: 2026-04-14 | **Next Review**: After blocker resolution
+````

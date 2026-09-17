@@ -1,6 +1,7 @@
 # flext-meltano Integration Patterns
 
 <!-- TOC START -->
+
 - [🎯 ELT Foundation Role](#elt-foundation-role)
 - [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
   - [Tap Implementation Pattern](#tap-implementation-pattern)
@@ -24,7 +25,7 @@
 - [🔧 Integration Best Practices](#integration-best-practices)
   - [Design Patterns](#design-patterns)
   - [Quality Standards](#quality-standards)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
@@ -51,7 +52,7 @@ flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -396,3 +397,4 @@ def handle_discovery(name: str) -> p.Result[m.Meltano.DataSourceInstance]:
 ---
 
 **Integration Guide v0.12.0-dev** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.
+````

@@ -1,6 +1,7 @@
 # 004 Type Safety First
 
 <!-- TOC START -->
+
 - No sections found
 <!-- TOC END -->
 

@@ -1,6 +1,7 @@
 # Quality Attributes Documentation
 
 <!-- TOC START -->
+
 - [📋 Table of Contents](#table-of-contents)
 - [🎯 Quality Attributes Overview](#quality-attributes-overview)
   - [Architectural Quality Goals](#architectural-quality-goals)
@@ -45,13 +46,13 @@
   - [Architecture Roadmap](#architecture-roadmap)
   - [Technical Debt Management](#technical-debt-management)
   - [Risk Mitigation](#risk-mitigation)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Quality Attributes and Cross-Cutting Concerns**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 📋 Table of Contents
 
@@ -66,7 +67,7 @@ ______________________________________________________________________
 1. [Testability](#testability)
 1. [Cross-Cutting Concerns](#cross-cutting-concerns)
 
-______________________________________________________________________
+---
 
 ## 🎯 Quality Attributes Overview
 
@@ -92,7 +93,7 @@ FLEXT-Meltano is designed with **six primary quality attributes** that drive arc
 | **Maintainability** | New data source         | Custom tap requirement     | < 2 days implementation      | Code coverage maintained   |
 | **Usability**       | API integration         | First-time developer       | Working pipeline in < 1 hour | Documentation completeness |
 
-______________________________________________________________________
+---
 
 ## ⚡ Performance
 
@@ -210,7 +211,7 @@ end note
 
 #### 1. Caching Strategy
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -4408,3 +4409,4 @@ ______________________________________________________________________
 
 **Quality Attributes**: FLEXT-Meltano Architecture Quality Framework
 _Comprehensive quality attributes and cross-cutting concerns documentation_
+````

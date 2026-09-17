@@ -1,12 +1,13 @@
 ---
 name: fastapi-reviewer
-description: Reviews FastAPI applications for async correctness, dependency injection,
+description:
+  Reviews FastAPI applications for async correctness, dependency injection,
   Pydantic schemas, security, OpenAPI quality, testing, and production readiness.
 target: github-copilot
 tools:
-- read
-- search
-- execute
+  - read
+  - search
+  - execute
 ---
 
 # Prompt defense baseline

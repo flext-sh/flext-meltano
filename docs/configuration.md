@@ -1,6 +1,7 @@
 # flext-meltano Configuration
 
 <!-- TOC START -->
+
 - [🎯 Configuration Overview](#configuration-overview)
 - [📋 Environment Setup](#environment-setup)
   - [Required Environment Variables](#required-environment-variables)
@@ -37,13 +38,13 @@
 - [🔄 Configuration Migration](#configuration-migration)
   - [Resolution Timeline](#resolution-timeline)
   - [Migration Planning](#migration-planning)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **Configuration management for FLEXT ecosystem ELT foundation library**
 
 > **⚠️ COMPLIANCE NOTE**: Current configuration patterns require abstraction layer for full FLEXT compliance due to direct meltano.core usage.
 
-______________________________________________________________________
+---
 
 ## 🎯 Configuration Overview
 
@@ -55,7 +56,7 @@ flext-meltano provides enterprise-grade configuration management for ELT operati
 - **Environment Management** - Development, staging, and production configurations
 - **FLEXT Integration** - flext-core pattern compliance and validation
 
-______________________________________________________________________
+---
 
 ## 📋 Environment Setup
 
@@ -93,7 +94,7 @@ cd flext-meltano
 poetry install --with dev,test
 ```
 
-______________________________________________________________________
+---
 
 ## ⚙️ Meltano Project Configuration
 
@@ -133,7 +134,7 @@ transforms:
 
 ### Configuration Validation
 
-```python
+````python
 from flext_meltano import FlextMeltanoSettings
 from flext_cli import u
 
@@ -462,3 +463,4 @@ ______________________________________________________________________
 ______________________________________________________________________
 
 **Configuration Guide v0.12.0-dev** - Reflects current configuration capabilities with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.
+````

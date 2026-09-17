@@ -1,6 +1,7 @@
 # Architecture Documentation
 
 <!-- TOC START -->
+
 - [📋 Documentation Overview](#documentation-overview)
 - [🏗️ Documentation Framework](#documentation-framework)
   - [C4 Model Architecture](#c4-model-architecture)
@@ -29,7 +30,7 @@
 - [🎯 Architecture Evolution](#architecture-evolution)
   - [Current State](#current-state)
   - [Future Directions](#future-directions)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Enterprise Data Integration Platform - Architecture Documentation**
 
@@ -202,7 +203,7 @@ make docs
 - **Cloud-Native Features** - Kubernetes operators and service mesh integration
 - **AI/ML Integration** - Intelligent pipeline optimization and anomaly detection
 
-______________________________________________________________________
+---
 
 **Architecture Documentation**: FLEXT-Meltano Enterprise Architecture Framework
 _Comprehensive, automated, and maintainable architecture documentation system_

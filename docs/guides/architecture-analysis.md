@@ -1,6 +1,7 @@
 # FLEXT-Meltano Architecture Analysis
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [System Overview](#system-overview)
   - [Architecture Philosophy](#architecture-philosophy)
@@ -21,7 +22,7 @@
 - [Scalability Design](#scalability-design)
   - [Horizontal Scalability](#horizontal-scalability)
   - [Data Scalability](#data-scalability)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **Category**: Architecture | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2026-04-14
 
@@ -80,7 +81,7 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 **Key Methods:**
 
-```python
+````python
 from __future__ import annotations
 # Plugin operations
 discover_plugins() -> p.Result[Sequence[PluginInfo]]
@@ -340,3 +341,4 @@ class FlextMeltanoWorkerPool:
 ______________________________________________________________________
 
 **Document Status**: ✅ Complete | **Last Reviewed**: 2026-04-14
+````

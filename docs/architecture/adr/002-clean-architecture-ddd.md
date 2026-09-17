@@ -1,6 +1,7 @@
 # ADR-002: Clean Architecture with Domain-Driven Design
 
 <!-- TOC START -->
+
 - [Context](#context)
 - [Decision](#decision)
 - [Rationale](#rationale)
@@ -60,7 +61,7 @@ Implement Clean Architecture with Domain-Driven Design, establishing clear bound
 
 **Testability**: Business logic can be tested without external dependencies
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -243,3 +244,4 @@ class FlextMeltanoService:
 - Training provided on layered architecture concepts
 - Code reviews enforce layer boundary rules
 - Automated tools validate architectural compliance
+````

@@ -1,6 +1,7 @@
 # Data Architecture Documentation
 
 <!-- TOC START -->
+
 - [📋 Table of Contents](#table-of-contents)
 - [🏗️ Data Flow Architecture](#data-flow-architecture)
   - [High-Level Data Flow](#high-level-data-flow)
@@ -31,13 +32,13 @@
 - [📈 Architecture Evolution](#architecture-evolution)
   - [Current Limitations](#current-limitations)
   - [Future Enhancements](#future-enhancements)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**
 
 **Version**: 1.0 | **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 📋 Table of Contents
 
@@ -49,7 +50,7 @@ ______________________________________________________________________
 1. [Data Governance](#data-governance)
 1. [Performance and Scalability](#performance-and-scalability)
 
-______________________________________________________________________
+---
 
 ## 🏗️ Data Flow Architecture
 
@@ -139,7 +140,7 @@ Record Buffer ← Streaming Ingestion ← JSONL Parsing ← Schema Validation �
 | **Transformation** | Raw Tables      | DBT Models      | Analytics Tables | Business logic, cleansing          |
 | **Orchestration**  | Pipeline Config | FLEXT-Meltano   | Execution State  | Workflow coordination              |
 
-______________________________________________________________________
+---
 
 ## 💾 Data Storage Strategy
 
@@ -210,7 +211,7 @@ external --> intermediate: Data extraction
 
 #### 1. **State Management**
 
-```python
+````python
 from __future__ import annotations
 
 
@@ -694,3 +695,4 @@ ______________________________________________________________________
 
 **Data Architecture**: FLEXT-Meltano Enterprise Data Processing
 _Comprehensive data flow, storage, and processing architecture documentation_
+````

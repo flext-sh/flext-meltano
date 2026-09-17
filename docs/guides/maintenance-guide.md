@@ -1,6 +1,7 @@
 # Documentation Maintenance Guide
 
 <!-- TOC START -->
+
 - [🎯 Overview](#overview)
 - [🏗️ Architecture](#architecture)
   - [Core Components](#core-components)
@@ -48,7 +49,7 @@
 - [📞 Support & Resources](#support-resources)
   - [Getting Help](#getting-help)
   - [Related Documentation](#related-documentation)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Documentation Quality Assurance & Maintenance Framework**
 
@@ -452,7 +453,7 @@ make docs
 
 Extend the system with custom validation rules:
 
-```python
+````python
 from __future__ import annotations
 
 # scripts/custom_validators.py
@@ -506,3 +507,4 @@ ______________________________________________________________________
 
 **Documentation Maintenance Framework v1.0.0**
 _Ensuring FLEXT-Meltano documentation excellence through automated quality assurance._
+````

@@ -1,6 +1,7 @@
 # Architecture Decision Records (ADRs)
 
 <!-- TOC START -->
+
 - [Overview](#overview)
 - [ADR Process](#adr-process)
   - [Creating an ADR](#creating-an-adr)

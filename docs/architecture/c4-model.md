@@ -1,6 +1,7 @@
 # C4 Model Architecture Documentation
 
 <!-- TOC START -->
+
 - [📋 Table of Contents](#table-of-contents)
 - [🎯 Context Diagram (Level 1)](#context-diagram-level-1)
   - [System Purpose](#system-purpose)
@@ -28,13 +29,13 @@
 - [🔄 Evolution & Technical Debt](#evolution-technical-debt)
   - [Current Architecture Health](#current-architecture-health)
   - [Future Evolution Considerations](#future-evolution-considerations)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **FLEXT-Meltano Enterprise Data Integration Platform**
 
 **Framework**: C4 Model | **Version**: 1.0 | **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 📋 Table of Contents
 
@@ -45,7 +46,7 @@ ______________________________________________________________________
 1. [Architecture Decision Records](#architecture-decision-records)
 1. [Quality Attributes](#quality-attributes)
 
-______________________________________________________________________
+---
 
 ## 🎯 Context Diagram (Level 1)
 
@@ -105,7 +106,7 @@ Rel(flext_meltano, data_destinations, "Loads data to", "Singer protocol")
 | **FLEXT-Meltano → FLEXT-Core**      | Foundation patterns                 | Python imports          |
 | **FLEXT Ecosystem → FLEXT-Meltano** | 32+ dependent projects              | Python dependencies     |
 
-______________________________________________________________________
+---
 
 ## 🏗️ Container Diagram (Level 2)
 
@@ -164,7 +165,7 @@ Rel(dbt_cli, data_targets, "Transforms", "SQL")
 | **Configuration** | YAML/Python        | Settings management  | `FlextMeltanoSettings`, environment variables   |
 | **State Store**   | File System/SQLite | Persistence          | JSON files, SQLite database                     |
 
-______________________________________________________________________
+---
 
 ## 🔧 Component Diagram (Level 3)
 
@@ -248,7 +249,7 @@ Rel(dbt_adapter, file_manager, "Manages", "DBT project structure")
 | **State Manager**         | Persistence layer              | Pipeline execution tracking, bookmark storage   |
 | **Error Handler**         | Railway pattern implementation | All services for error propagation              |
 
-______________________________________________________________________
+---
 
 ## 💻 Code Diagram (Level 4)
 
@@ -343,7 +344,7 @@ end note
 | **FlextMeltanoModels**   | Data validation          | Pydantic models, type safety          | Pydantic v2                 |
 | **FlextMeltanoSettings** | Configuration management | Settings loading, validation          | YAML, environment variables |
 
-______________________________________________________________________
+---
 
 ## 📋 Architecture Decision Records
 
@@ -406,7 +407,7 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 - ⚠️ **Negative**: Additional complexity over direct SDK usage
 - ✅ **Mitigation**: Comprehensive documentation and examples
 
-______________________________________________________________________
+---
 
 ## 🏆 Quality Attributes
 
@@ -445,7 +446,7 @@ ______________________________________________________________________
 - **Configuration**: YAML-based configuration with validation
 - **Monitoring**: Comprehensive logging and metrics
 
-______________________________________________________________________
+---
 
 ## 🔄 Evolution & Technical Debt
 
@@ -463,7 +464,7 @@ ______________________________________________________________________
 - **Cloud-Native Features**: Kubernetes operators, service mesh integration
 - **Multi-Cloud Support**: Cloud-agnostic deployment patterns
 
-______________________________________________________________________
+---
 
 **C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture
 _Comprehensive system documentation following industry-standard C4 modeling approach_

@@ -1,6 +1,7 @@
 # Development Guide
 
 <!-- TOC START -->
+
 - [🎯 Project Overview](#project-overview)
 - [🛠️ Development Setup](#development-setup)
   - [**Prerequisites**](#prerequisites)
@@ -28,13 +29,13 @@
   - [**Immediate (Next Sprint)**](#immediate-next-sprint)
   - [**Short Term (Next Month)**](#short-term-next-month)
   - [**Long Term (Next Quarter)**](#long-term-next-quarter)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **Development workflow for the flext-meltano project**
 
 **Last Updated**: 2026-04-14
 
-______________________________________________________________________
+---
 
 ## 🎯 Project Overview
 
@@ -45,7 +46,7 @@ This is a dual-purpose project:
 
 **Current Status**: 7,286 lines of source code with 13,970 lines of tests. Architecture compliance needs improvement.
 
-______________________________________________________________________
+---
 
 ## 🛠️ Development Setup
 
@@ -71,7 +72,7 @@ poetry install --with dev,test
 make lint type-check test
 ```
 
-______________________________________________________________________
+---
 
 ## 🔧 Development Workflow
 
@@ -98,7 +99,7 @@ make test               # Test suite execution
 - **Integration Tests**: Real API integration where possible
 - **Test Coverage**: Current 2:1 test-to-source ratio (comprehensive)
 
-______________________________________________________________________
+---
 
 ## 🏗️ Architecture Constraints
 
@@ -115,7 +116,7 @@ ______________________________________________________________________
 - Follow single responsibility principle
 - Maintain comprehensive type safety
 
-______________________________________________________________________
+---
 
 ## 📊 Code Metrics
 
@@ -134,7 +135,7 @@ ______________________________________________________________________
 1. Expand Meltano plugin configuration
 1. Complete integration testing coverage
 
-______________________________________________________________________
+---
 
 ## 🧪 Testing Guidelines
 
@@ -162,7 +163,7 @@ pytest tests/integration/ -v
 pytest --cov=src --cov-report=html
 ```
 
-______________________________________________________________________
+---
 
 ## 🔍 Debugging and Development
 
@@ -184,7 +185,7 @@ make t          # test
 make c         # type-check
 ```
 
-______________________________________________________________________
+---
 
 ## 📚 Contributing Guidelines
 
@@ -203,7 +204,7 @@ ______________________________________________________________________
 - Implement proper error handling with r
 - Maintain comprehensive documentation
 
-______________________________________________________________________
+---
 
 ## 🎯 Development Priorities
 
@@ -225,6 +226,6 @@ ______________________________________________________________________
 1. Performance optimization
 1. Comprehensive ecosystem integration
 
-______________________________________________________________________
+---
 
 **Development Status**: Active development with focus on architecture compliance and realistic capability documentation.

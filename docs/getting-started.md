@@ -1,6 +1,7 @@
 # Getting Started with flext-meltano
 
 <!-- TOC START -->
+
 - [🎯 Overview](#overview)
 - [📋 Prerequisites](#prerequisites)
   - [**Environment Requirements**](#environment-requirements)
@@ -22,13 +23,13 @@
 
 **ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer integration.
 
-______________________________________________________________________
+---
 
 ## 🎯 Overview
 
 flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abstracting Meltano project management, Singer protocol operations, and dbt transformations behind flext-core compatible interfaces.
 
-______________________________________________________________________
+---
 
 ## 📋 Prerequisites
 
@@ -51,7 +52,7 @@ source .venv/bin/activate
 cd flext-meltano
 ```
 
-______________________________________________________________________
+---
 
 ## ⚡ Quick Installation
 
@@ -63,13 +64,13 @@ poetry install --with dev,test
 python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Installation successful')"
 ```
 
-______________________________________________________________________
+---
 
 ## 🚀 First Steps
 
 ### **Basic Service Usage**
 
-```python
+````python
 from flext_meltano import FlextMeltanoService
 from flext_cli import u
 
@@ -183,3 +184,4 @@ ______________________________________________________________________
 
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+````
