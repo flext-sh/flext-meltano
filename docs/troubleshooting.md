@@ -24,6 +24,7 @@
   - [**Debug Information**](#debug-information)
   - [**Support Channels**](#support-channels)
 - [📋 Debugging Checklist](#debugging-checklist)
+
 <!-- TOC END -->
 
 **Common issues and solutions** for flext-meltano development and usage.

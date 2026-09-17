@@ -32,6 +32,7 @@
   - [**Target State**](#target-state)
   - [**Migration Path**](#migration-path)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **Enterprise Meltano integration library architecture for the FLEXT ecosystem**

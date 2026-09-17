@@ -23,6 +23,7 @@
   - [Testing Error Scenarios](#testing-error-scenarios)
 - [Related ADRs](#related-adrs)
 - [Notes](#notes)
+
 <!-- TOC END -->
 
 **Status**: Accepted | **Date**: 2025-01-15 | **Category**: 🏗️ Architecture

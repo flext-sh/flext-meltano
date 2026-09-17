@@ -29,6 +29,7 @@
   - [Writing Effective ADRs](#writing-effective-adrs)
   - [Review Process](#review-process)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **FLEXT-Meltano Architectural Decisions and Rationale**

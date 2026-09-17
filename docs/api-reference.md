@@ -34,6 +34,7 @@
   - [Advanced Pipeline Orchestration](#advanced-pipeline-orchestration)
   - [Plugin Management](#plugin-management)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline Integration**

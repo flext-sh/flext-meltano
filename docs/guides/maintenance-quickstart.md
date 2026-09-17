@@ -31,6 +31,7 @@
   - [Custom Validators](#custom-validators)
 - [🎉 Success Metrics](#success-metrics)
 - [📞 Next Steps](#next-steps)
+
 <!-- TOC END -->
 
 **Get started with automated documentation quality assurance in 5 minutes**

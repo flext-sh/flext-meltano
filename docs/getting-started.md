@@ -19,6 +19,7 @@
   - [**Architecture Compliance**](#architecture-compliance)
   - [**Current Status**](#current-status)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer integration.
