@@ -79,7 +79,7 @@ ______________________________________________________________________
 
 ```bash
 # Pre-commit checks (must pass)
-make val           # Complete validation pipeline
+make check           # Complete validation pipeline
 make lint               # Ruff linting
 make type-check         # MyPy strict mode
 make test               # Test suite execution

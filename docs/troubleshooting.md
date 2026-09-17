@@ -108,10 +108,10 @@ ______________________________________________________________________
 
 ```bash
 # Update dependencies
-poetry update
+make deps
 
 # Resolve lock file issues
-poetry lock --no-update```
+make deps --no-update```
 ### **Virtual Environment Issues**
 
 **Problem**: Wrong virtual environment or missing dependencies
@@ -255,10 +255,10 @@ python --version
 poetry --version
 
 # Package versions
-poetry show flext-core flext-meltano
+make status flext-core flext-meltano
 
 # Error details
-make val 2>&1 | head -50```
+make check 2>&1 | head -50```
 ### **Support Channels**
 
 - **Documentation**: Check the [documentation index](index.md) first
@@ -274,7 +274,7 @@ Before reporting issues:
 - [ ] Verified correct virtual environment is active
 - [ ] Ran `make setup` from the workspace root
 - [ ] Checked for direct import violations
-- [ ] Ran `make val` to identify issues
+- [ ] Ran `make check` to identify issues
 - [ ] Reviewed error messages carefully
 - [ ] Checked documentation for similar issues
 
