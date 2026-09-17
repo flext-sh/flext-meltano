@@ -90,7 +90,7 @@ source .venv/bin/activate
 cd flext-meltano
 
 # Install dependencies
-uv sync --all-packages
+make setup
 ```
 
 ______________________________________________________________________

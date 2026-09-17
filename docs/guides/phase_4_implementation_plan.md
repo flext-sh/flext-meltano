@@ -1,5 +1,9 @@
 # FLEXT-Meltano Phase 4 Implementation Plan
 
+> Historical evidence only. This plan records an earlier execution context and
+> its command examples are not current workspace guidance. Use the root
+> `AGENTS.md` and `make help` for the active contract.
+
 <!-- TOC START -->
 - [🎯 Phase 4: Testing Infrastructure Resolution & Quality Assurance](#phase-4-testing-infrastructure-resolution-quality-assurance)
 - [📊 Phase 4 Overview](#phase-4-overview)
@@ -163,7 +167,7 @@ export PYTHONPATH="src:../flext-core/src:../flext-cli/src"
 
 # Step 2: Ensure Poetry environment is properly set up
 poetry env info
-uv sync --all-packages
+poetry install --with test
 
 # Step 3: Test execution in isolated environment
 poetry run python -c "import flext_meltano; u.Cli.print('Import successful')"

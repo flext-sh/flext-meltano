@@ -61,7 +61,7 @@ ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'```
 python -c "import flext_meltano; u.Cli.print(flext_meltano.__file__)"
 
 # Reinstall if needed
-uv sync --all-packages```
+make setup```
 ### **Type Check Failures**
 
 **Problem**: MyPy errors in source code
@@ -96,7 +96,7 @@ pytest tests/integration/ -v  # Integration tests```
 
 1. **Missing test data**: Ensure test fixtures are available
 1. **Environment setup**: Activate correct virtual environment
-1. **Dependencies**: Run `uv sync --all-packages`
+1. **Dependencies**: Run `make setup` from the workspace root
 
 ______________________________________________________________________
 
@@ -272,7 +272,7 @@ ______________________________________________________________________
 Before reporting issues:
 
 - [ ] Verified correct virtual environment is active
-- [ ] Ran `uv sync --all-packages`
+- [ ] Ran `make setup` from the workspace root
 - [ ] Checked for direct import violations
 - [ ] Ran `make val` to identify issues
 - [ ] Reviewed error messages carefully

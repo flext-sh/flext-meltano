@@ -65,7 +65,7 @@ cd ..flext-meltano
 source ../.venv/bin/activate
 
 # Install dependencies
-uv sync --all-packages
+make setup
 
 # Verify setup
 make lint type-check test

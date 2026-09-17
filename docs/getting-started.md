@@ -57,7 +57,7 @@ ______________________________________________________________________
 
 ```bash
 # Install development dependencies
-uv sync --all-packages
+make setup
 
 # Verify installation
 python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Installation successful')"
