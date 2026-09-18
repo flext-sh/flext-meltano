@@ -1,6 +1,0 @@
-# from flext-meltano/docs/security/sonarqube-triage.md:726
-       45      SingerObjectType = singer_sdk_typing.ObjectType
-       46      SingerPropertiesList = singer_sdk_typing.PropertiesList
-       47      SingerProperty = singer_sdk_typing.Property
-       48      SingerStringType = singer_sdk_typing.StringType
->>>    49      SingerTimeType = singer_sdk_typing.TimeType
