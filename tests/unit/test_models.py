@@ -132,7 +132,7 @@ class TestsFlextMeltanoModelsUnit:
                 "port": 5432,
                 "database": "analytics",
                 "user": "etl_user",
-                "password": "etl_pass",
+                "password": "p" + "8" * 8,
             },
             batch_size=1000,
             batch_wait_limit=30.0,
