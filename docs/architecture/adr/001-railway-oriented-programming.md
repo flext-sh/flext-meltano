@@ -30,7 +30,9 @@
 
 ## Context
 
-FLEXT-Meltano needs robust error handling for complex ELT operations involving multiple external systems (Meltano CLI, DBT, Singer SDK) and potential failure points. Traditional exception-based error handling becomes unwieldy in complex pipelines where:
+FLEXT-Meltano needs robust error handling for complex ELT operations involving multiple
+external systems (Meltano CLI, DBT, Singer SDK) and potential failure points.
+Traditional exception-based error handling becomes unwieldy in complex pipelines where:
 
 - Multiple operations need to be chained together
 - Partial failures need graceful handling
@@ -47,7 +49,8 @@ The system needs to handle:
 
 ## Decision
 
-Implement railway-oriented programming using `r[T]` from flext-core, ensuring composable error handling throughout the entire codebase.
+Implement railway-oriented programming using `r[T]` from flext-core, ensuring composable
+error handling throughout the entire codebase.
 
 **Key Implementation Points:**
 

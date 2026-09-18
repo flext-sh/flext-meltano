@@ -73,7 +73,8 @@
 
 ### Architectural Quality Goals
 
-FLEXT-Meltano is designed with **six primary quality attributes** that drive architectural decisions and implementation choices:
+FLEXT-Meltano is designed with **six primary quality attributes** that drive
+architectural decisions and implementation choices:
 
 1. **Performance**: Efficient execution with predictable response times
 1. **Scalability**: Horizontal and vertical scaling capabilities

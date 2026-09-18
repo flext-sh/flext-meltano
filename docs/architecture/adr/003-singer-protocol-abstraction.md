@@ -29,7 +29,9 @@
 
 ## Context
 
-FLEXT-Meltano needs to integrate with the Singer protocol for data extraction and loading, but direct use of the Singer SDK would create tight coupling and prevent FLEXT ecosystem integration. The system must:
+FLEXT-Meltano needs to integrate with the Singer protocol for data extraction and
+loading, but direct use of the Singer SDK would create tight coupling and prevent FLEXT
+ecosystem integration. The system must:
 
 - Implement Singer taps and targets following FLEXT patterns
 - Provide type-safe interfaces for Singer operations
@@ -40,7 +42,8 @@ FLEXT-Meltano needs to integrate with the Singer protocol for data extraction an
 
 ## Decision
 
-Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT ecosystem integration while maintaining protocol compliance.
+Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
+ecosystem integration while maintaining protocol compliance.
 
 **Key Abstractions:**
 
@@ -53,7 +56,8 @@ Create a comprehensive abstraction layer over the Singer SDK that provides FLEXT
 
 ### Why Abstraction Layer
 
-**FLEXT Ecosystem Consistency**: Ensures all Singer implementations follow FLEXT patterns
+**FLEXT Ecosystem Consistency**: Ensures all Singer implementations follow FLEXT
+patterns
 
 ````python
 from __future__ import annotations

@@ -28,9 +28,12 @@
   - [For Enterprise Integration](#for-enterprise-integration)
   <!-- TOC END -->
 
-**Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2026-04-14
+**Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last
+Updated**: 2026-04-14
 
-Implementation plan for transforming FLEXT-Meltano into a **generic, reusable library** following the same patterns as FLEXT-LDIF, with complete abstraction from CLI dependencies and external Meltano tooling.
+Implementation plan for transforming FLEXT-Meltano into a **generic, reusable library**
+following the same patterns as FLEXT-LDIF, with complete abstraction from CLI
+dependencies and external Meltano tooling.
 
 ## Table of Contents
 

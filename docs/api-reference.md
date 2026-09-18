@@ -37,11 +37,15 @@
 
 <!-- TOC END -->
 
-**Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline Integration**
+**Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline
+Integration**
 
-**Updated**: 2026-04-14 | **Status**: ✅ Current | **Quality**: 100% Type Safe | **Coverage**: 95%+
+**Updated**: 2026-04-14 | **Status**: ✅ Current | **Quality**: 100% Type Safe |
+**Coverage**: 95%+
 
-Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin development tools, and enterprise data pipeline orchestration.
+Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integration
+framework for the FLEXT ecosystem, providing Singer protocol implementation, plugin
+development tools, and enterprise data pipeline orchestration.
 
 ---
 
@@ -49,7 +53,8 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 
 **FLEXT-Meltano** is an **enterprise-grade Meltano integration framework** providing:
 
-- **Complete Singer Protocol Implementation** - Full tap/target development with enterprise extensions
+- **Complete Singer Protocol Implementation** - Full tap/target development with
+  enterprise extensions
 - **Plugin Development Tools** - Automated plugin scaffolding and validation framework
 - **Pipeline Orchestration** - Advanced ELT pipeline management and execution
 - **Meltano Integration** - Native Meltano project and plugin support
@@ -57,8 +62,10 @@ Complete API documentation for FLEXT-Meltano, the comprehensive Meltano integrat
 
 ### **Architecture Principles**
 
-1. **Singer Protocol Compliance** - Full Singer.io specification implementation with enterprise extensions
-1. **Plugin-Centric Design** - Plugin-first architecture with automated development tools
+1. **Singer Protocol Compliance** - Full Singer.io specification implementation with
+   enterprise extensions
+1. **Plugin-Centric Design** - Plugin-first architecture with automated development
+   tools
 1. **Pipeline Orchestration** - Advanced pipeline execution with monitoring and recovery
 1. **Enterprise Integration** - Production-ready deployment and operations support
 1. **Type Safety** - 100% type coverage with Pydantic v2 models

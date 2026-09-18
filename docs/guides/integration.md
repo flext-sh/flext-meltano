@@ -29,20 +29,24 @@
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
 
-> **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration patterns. Full ecosystem compatibility requires abstraction layer.
+> **⚠️ INTEGRATION STATUS**: Direct meltano.core imports limit some integration
+> patterns. Full ecosystem compatibility requires abstraction layer.
 
 ---
 
 ## 🎯 ELT Foundation Role
 
-flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem, providing:
+flext-meltano serves as the **mandatory ELT foundation** for the FLEXT ecosystem,
+providing:
 
-- **Singer Protocol Abstractions** - Foundation for flext-tap-_and flext-target-_ projects
+- **Singer Protocol Abstractions** - Foundation for flext-tap-_and flext-target-_
+  projects
 - **Meltano Integration** - Enterprise project management and orchestration
 - **dbt Operations** - Transformation pipeline coordination
 - **ELT Orchestration** - Complete extract-load-transform workflows
 
-**Integration Authority**: All FLEXT projects requiring ELT operations must use flext-meltano patterns.
+**Integration Authority**: All FLEXT projects requiring ELT operations must use
+flext-meltano patterns.
 
 ---
 

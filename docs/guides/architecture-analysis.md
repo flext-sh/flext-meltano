@@ -24,9 +24,12 @@
   - [Data Scalability](#data-scalability)
   <!-- TOC END -->
 
-**Category**: Architecture | **Status**: Complete | **Version**: 0.9.9 | **Last Updated**: 2026-04-14
+**Category**: Architecture | **Status**: Complete | **Version**: 0.9.9 | **Last
+Updated**: 2026-04-14
 
-Comprehensive architecture analysis for FLEXT-Meltano, the enterprise Meltano integration framework providing Singer protocol implementation and data pipeline orchestration.
+Comprehensive architecture analysis for FLEXT-Meltano, the enterprise Meltano
+integration framework providing Singer protocol implementation and data pipeline
+orchestration.
 
 ## Table of Contents
 
@@ -60,8 +63,10 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 ### Design Principles
 
-1. **Singer Protocol Compliance** - Full Singer.io specification with enterprise extensions
-1. **Plugin-Centric Architecture** - Plugin-first design with automated development tools
+1. **Singer Protocol Compliance** - Full Singer.io specification with enterprise
+   extensions
+1. **Plugin-Centric Architecture** - Plugin-first design with automated development
+   tools
 1. **Pipeline Orchestration** - Advanced execution with monitoring and recovery
 1. **Type Safety** - 100% type coverage with Pydantic v2 validation
 1. **Service-Oriented Design** - Modular services with dependency injection

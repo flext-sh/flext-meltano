@@ -55,7 +55,10 @@
 
 ## 🎯 Overview
 
-This guide provides comprehensive documentation for the automated documentation maintenance system implemented for FLEXT-Meltano. The system ensures consistent quality, validates content integrity, and provides automated quality assurance across all documentation.
+This guide provides comprehensive documentation for the automated documentation
+maintenance system implemented for FLEXT-Meltano. The system ensures consistent quality,
+validates content integrity, and provides automated quality assurance across all
+documentation.
 
 ## 🏗️ Architecture
 
@@ -372,7 +375,7 @@ Key metrics to monitor:
 
 ```bash
 # Check Python environment
-python --version  # Should be 3.13+
+python --version # Should be 3.13+
 
 # Install missing dependencies
 pip install PyYAML requests
@@ -381,7 +384,7 @@ pip install PyYAML requests
 ls -la scripts/documentation/audit.py
 
 # Check for file encoding issues
-file docs/some_file.md  # Should be UTF-8
+file docs/some_file.md # Should be UTF-8
 ```
 
 ### Link Validation Issues
@@ -396,7 +399,7 @@ curl -I https://example.com
 
 # Update timeout settings in settings
 # docs/.maintenance_config.yaml
-link_validation_timeout: 15  # Increase timeout
+link_validation_timeout: 15 # Increase timeout
 
 # Skip problematic links temporarily
 # Add to docs/.link_skip_list.txt

@@ -59,11 +59,16 @@
 
 ### Primary Purpose
 
-**FLEXT-Meltano** is an enterprise-grade data integration platform that serves as the **Meltano integration foundation** for the entire FLEXT ecosystem. It provides comprehensive Singer protocol implementation, plugin development tools, and ELT pipeline orchestration with **zero tolerance for custom ELT implementations**.
+**FLEXT-Meltano** is an enterprise-grade data integration platform that serves as the
+**Meltano integration foundation** for the entire FLEXT ecosystem. It provides
+comprehensive Singer protocol implementation, plugin development tools, and ELT pipeline
+orchestration with **zero tolerance for custom ELT implementations**.
 
 ### Mission Statement
 
-_To provide the enterprise data integration foundation for the FLEXT ecosystem, enabling seamless ELT operations across 32+ projects while maintaining the highest standards of type safety, reliability, and architectural integrity._
+_To provide the enterprise data integration foundation for the FLEXT ecosystem, enabling
+seamless ELT operations across 32+ projects while maintaining the highest standards of
+type safety, reliability, and architectural integrity._
 
 ### System Scope
 

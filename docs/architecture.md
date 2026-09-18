@@ -43,7 +43,10 @@
 
 ## 🎯 Architectural Overview
 
-flext-meltano serves as the foundational library for ELT operations within the FLEXT ecosystem, providing type-safe abstractions for Meltano, Singer protocol, and DBT operations. The architecture follows FLEXT ecosystem patterns with Clean Architecture principles and Domain-Driven Design.
+flext-meltano serves as the foundational library for ELT operations within the FLEXT
+ecosystem, providing type-safe abstractions for Meltano, Singer protocol, and DBT
+operations. The architecture follows FLEXT ecosystem patterns with Clean Architecture
+principles and Domain-Driven Design.
 
 ### **Design Principles**
 
@@ -51,7 +54,8 @@ flext-meltano serves as the foundational library for ELT operations within the F
 1. **Railway-Oriented Programming** - r[T] pattern for error handling
 1. **Single Responsibility** - One class per module with nested helpers
 1. **FLEXT Ecosystem Integration** - Built on flext-core foundation patterns
-1. **Abstraction Layers** - Clear separation between external libraries and FLEXT interfaces
+1. **Abstraction Layers** - Clear separation between external libraries and FLEXT
+   interfaces
 
 ## 🏗️ Module Architecture
 

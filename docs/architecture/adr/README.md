@@ -36,7 +36,8 @@
 
 ## Overview
 
-This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. ADRs capture important architectural decisions, their context, and rationale.
+This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. ADRs
+capture important architectural decisions, their context, and rationale.
 
 ## ADR Process
 
@@ -55,7 +56,8 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 ```markdown
 # ADR-{NUMBER}: {TITLE}
 
-**Status**: {Proposed | Accepted | Rejected | Deprecated | Superseded} | **Date**: {YYYY-MM-DD}
+**Status**: {Proposed | Accepted | Rejected | Deprecated | Superseded} | **Date**:
+{YYYY-MM-DD}
 
 ## Context
 
@@ -98,18 +100,21 @@ This directory contains Architecture Decision Records (ADRs) for FLEXT-Meltano. 
 
 ## Current ADRs
 
-| ADR | Title | Status | Date |
-| \---------------------------------------------- | ------------------------------------------------ | -------- | ---------- | --------------------------- |
-| [ADR-001](001-railway-oriented-programming.md) | Railway-Oriented Programming with r[T] | Accepted | 2025-01-15 |
-| [ADR-002](002-clean-architecture-ddd.md) | Clean Architecture with Domain-Driven Design | Accepted | 2025-01-20 |
-| [ADR-003](003-singer-protocol-abstraction.md) | Singer Protocol Abstraction Layer | Accepted | 2025-02-01 |
-| ADR-004 | Type Safety First with Python 3.13+ | Accepted | 2025-02-05 | _Documentation coming soon_ |
-| ADR-005 | Plugin-Centric Architecture | Accepted | 2025-02-10 | _Documentation coming soon_ |
-| ADR-006 | FLEXT-Core Integration Pattern | Accepted | 2025-02-15 | _Documentation coming soon_ |
-| ADR-007 | State Management Strategy | Accepted | 2025-02-20 | _Documentation coming soon_ |
-| ADR-008 | Error Handling Strategy | Accepted | 2025-02-25 | _Documentation coming soon_ |
-| ADR-009 | API Design Principles | Accepted | 2025-03-01 | _Documentation coming soon_ |
-| ADR-010 | Testing Strategy and Infrastructure | Accepted | 2025-03-05 | _Documentation coming soon_ |
+| ADR | Title | Status | Date | | \---------------------------------------------- |
+------------------------------------------------ | -------- | ---------- |
+--------------------------- | | [ADR-001](001-railway-oriented-programming.md) |
+Railway-Oriented Programming with r[T] | Accepted | 2025-01-15 | |
+[ADR-002](002-clean-architecture-ddd.md) | Clean Architecture with Domain-Driven Design
+| Accepted | 2025-01-20 | | [ADR-003](003-singer-protocol-abstraction.md) | Singer
+Protocol Abstraction Layer | Accepted | 2025-02-01 | | ADR-004 | Type Safety First with
+Python 3.13+ | Accepted | 2025-02-05 | _Documentation coming soon_ | | ADR-005 |
+Plugin-Centric Architecture | Accepted | 2025-02-10 | _Documentation coming soon_ | |
+ADR-006 | FLEXT-Core Integration Pattern | Accepted | 2025-02-15 | _Documentation coming
+soon_ | | ADR-007 | State Management Strategy | Accepted | 2025-02-20 | _Documentation
+coming soon_ | | ADR-008 | Error Handling Strategy | Accepted | 2025-02-25 |
+_Documentation coming soon_ | | ADR-009 | API Design Principles | Accepted | 2025-03-01
+| _Documentation coming soon_ | | ADR-010 | Testing Strategy and Infrastructure |
+Accepted | 2025-03-05 | _Documentation coming soon_ |
 
 ## ADR Status Definitions
 

@@ -55,7 +55,8 @@
 
 ## 🎯 Overview
 
-This guide provides comprehensive instructions for using, maintaining, and contributing to FLEXT-Meltano's architecture documentation framework.
+This guide provides comprehensive instructions for using, maintaining, and contributing
+to FLEXT-Meltano's architecture documentation framework.
 
 ## 🏗️ Documentation Framework
 
@@ -136,10 +137,10 @@ Convenient Makefile targets for common tasks:
 
 ```bash
 # Architecture validation and maintenance
-make docs     # Validate documentation
-make docs     # Generate diagrams
-make docs       # Update documentation
-make docs       # Create status report
+make docs # Validate documentation
+make docs # Generate diagrams
+make docs # Update documentation
+make docs # Create status report
 make docs # Run all tasks
 ```
 
@@ -232,7 +233,8 @@ Rel(service, external, "[Interaction]")
 ```markdown
 # ADR-{NUMBER}: {TITLE}
 
-**Status**: {Proposed | Accepted | Rejected | Deprecated | Superseded} | **Date**: {YYYY-MM-DD}
+**Status**: {Proposed | Accepted | Rejected | Deprecated | Superseded} | **Date**:
+{YYYY-MM-DD}
 
 ## Context
 

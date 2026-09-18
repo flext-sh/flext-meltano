@@ -30,7 +30,8 @@
 
 ## Context
 
-FLEXT-Meltano integrates with complex external systems (Meltano, DBT, Singer SDK) while needing to remain maintainable, testable, and evolvable. The system must:
+FLEXT-Meltano integrates with complex external systems (Meltano, DBT, Singer SDK) while
+needing to remain maintainable, testable, and evolvable. The system must:
 
 - Handle frequent changes in external APIs and protocols
 - Support testing of business logic without external dependencies
@@ -38,11 +39,13 @@ FLEXT-Meltano integrates with complex external systems (Meltano, DBT, Singer SDK
 - Maintain clear boundaries between business rules and external concerns
 - Support multiple deployment scenarios and use cases
 
-Traditional layered architecture approaches often lead to tight coupling between business logic and external systems, making testing difficult and evolution challenging.
+Traditional layered architecture approaches often lead to tight coupling between
+business logic and external systems, making testing difficult and evolution challenging.
 
 ## Decision
 
-Implement Clean Architecture with Domain-Driven Design, establishing clear boundaries between:
+Implement Clean Architecture with Domain-Driven Design, establishing clear boundaries
+between:
 
 1. **API Layer** - External interfaces and adapters
 1. **Application Layer** - Use cases and application logic

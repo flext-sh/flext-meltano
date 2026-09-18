@@ -52,7 +52,10 @@
 
 ### System Purpose
 
-**FLEXT-Meltano** is an enterprise-grade data integration platform that provides comprehensive Singer protocol implementation, plugin development tools, and Meltano project management for the FLEXT ecosystem. It serves as the foundation for all ELT operations across 32+ FLEXT projects.
+**FLEXT-Meltano** is an enterprise-grade data integration platform that provides
+comprehensive Singer protocol implementation, plugin development tools, and Meltano
+project management for the FLEXT ecosystem. It serves as the foundation for all ELT
+operations across 32+ FLEXT projects.
 
 ```plantuml
 @startuml FLEXT-Meltano Context Diagram
@@ -112,7 +115,8 @@ Rel(flext_meltano, data_destinations, "Loads data to", "Singer protocol")
 
 ### Container Overview
 
-FLEXT-Meltano is deployed as a Python library with multiple deployment options supporting different use cases.
+FLEXT-Meltano is deployed as a Python library with multiple deployment options
+supporting different use cases.
 
 ```plantuml
 @startuml FLEXT-Meltano Container Diagram
@@ -354,11 +358,13 @@ end note
 
 #### Context
 
-FLEXT-Meltano needs robust error handling for complex ELT operations involving multiple external systems and potential failure points.
+FLEXT-Meltano needs robust error handling for complex ELT operations involving multiple
+external systems and potential failure points.
 
 #### Decision
 
-Implement railway-oriented programming using r[T] from flext-core, ensuring composable error handling throughout the entire codebase.
+Implement railway-oriented programming using r[T] from flext-core, ensuring composable
+error handling throughout the entire codebase.
 
 #### Consequences
 
@@ -372,7 +378,8 @@ Implement railway-oriented programming using r[T] from flext-core, ensuring comp
 
 #### Context
 
-The system needs to be maintainable, testable, and evolvable while integrating with complex external systems (Meltano, DBT, Singer).
+The system needs to be maintainable, testable, and evolvable while integrating with
+complex external systems (Meltano, DBT, Singer).
 
 #### Decision
 
@@ -395,11 +402,13 @@ Implement Clean Architecture with clear separation between:
 
 #### Context
 
-Direct Singer SDK usage would create tight coupling and prevent FLEXT ecosystem integration.
+Direct Singer SDK usage would create tight coupling and prevent FLEXT ecosystem
+integration.
 
 #### Decision
 
-Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and error handling.
+Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and error
+handling.
 
 #### Consequences
 
@@ -466,5 +475,5 @@ Create comprehensive abstraction layer over Singer SDK with FLEXT patterns and e
 
 ---
 
-**C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture
-_Comprehensive system documentation following industry-standard C4 modeling approach_
+**C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture _Comprehensive system
+documentation following industry-standard C4 modeling approach_

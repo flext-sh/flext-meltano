@@ -24,17 +24,21 @@
 
 ## Overview
 
-FLEXT Meltano is a production-ready Python library providing Go ↔ Python bridge integration for data pipeline orchestration using Meltano, Singer, and DBT technologies within the FLEXT ecosystem.
+FLEXT Meltano is a production-ready Python library providing Go ↔ Python bridge
+integration for data pipeline orchestration using Meltano, Singer, and DBT technologies
+within the FLEXT ecosystem.
 
 ## Module Organization
 
 ### [`flext_meltano/`](flext_meltano/)
 
-Primary source code directory containing 16 core modules organized by architectural layer:
+Primary source code directory containing 16 core modules organized by architectural
+layer:
 
 #### Foundation Layer (6 modules)
 
-- **Configuration & Base Classes**: [`base.py`](flext_meltano/base.py), [`common.py`](flext_meltano/common.py)
+- **Configuration & Base Classes**: [`base.py`](flext_meltano/base.py),
+  [`common.py`](flext_meltano/common.py)
 - **Exception Handling**: [`exceptions.py`](flext_meltano/exceptions.py)
 - **Dependency Management**: [`container.py`](flext_meltano/container.py)
 - **Schema Definitions**: [`common_schemas.py`](flext_meltano/common_schemas.py)

@@ -32,7 +32,9 @@
 
 ## Overview
 
-Comprehensive test suite for FLEXT Meltano's Go ↔ Python bridge library, implementing enterprise testing standards with 90%+ coverage requirements, comprehensive test categorization, and integration with quality gates.
+Comprehensive test suite for FLEXT Meltano's Go ↔ Python bridge library, implementing
+enterprise testing standards with 90%+ coverage requirements, comprehensive test
+categorization, and integration with quality gates.
 
 ## Test Organization
 
@@ -78,16 +80,16 @@ Comprehensive test suite for FLEXT Meltano's Go ↔ Python bridge library, imple
 
 ```bash
 # Mandatory pre-commit testing
-make test                    # Run all core tests
-make test-coverage          # Generate coverage report (90% minimum)
-make test-integration       # Run integration tests
-make test-e2e              # Run end-to-end tests (CI/CD only)
+make test             # Run all core tests
+make test-coverage    # Generate coverage report (90% minimum)
+make test-integration # Run integration tests
+make test-e2e         # Run end-to-end tests (CI/CD only)
 
 # Development workflow
-pytest tests/unit/          # Fast unit tests only
-pytest tests/integration/   # Integration tests with dependencies
-pytest -m "not slow"       # Exclude slow tests for quick feedback
-pytest --lf                # Run only last failed tests
+pytest tests/unit/        # Fast unit tests only
+pytest tests/integration/ # Integration tests with dependencies
+pytest -m "not slow"      # Exclude slow tests for quick feedback
+pytest --lf               # Run only last failed tests
 ```
 
 ### Test Configuration
@@ -111,47 +113,66 @@ fail_under = 90
 
 #### **Bridge Integration**
 
-- **[`test_singer_integration.py`](test_singer_integration.py)** - ✅ Singer SDK re-exports and service creation
-- **[`test_execution_comprehensive.py`](test_execution_comprehensive.py)** - ✅ Subprocess execution and result handling
+- **[`test_singer_integration.py`](test_singer_integration.py)** - ✅ Singer SDK
+  re-exports and service creation
+- **[`test_execution_comprehensive.py`](test_execution_comprehensive.py)** - ✅
+  Subprocess execution and result handling
 
 #### **Base Components**
 
-- **[`test_base_simple.py`](test_base_simple.py)** - ✅ Foundation classes and factory functions
-- **[`test_base_coverage.py`](test_base_coverage.py)** - ✅ Comprehensive base module testing
-- **[`test_core_library.py`](test_core_library.py)** - ✅ Core library functionality validation
+- **[`test_base_simple.py`](test_base_simple.py)** - ✅ Foundation classes and factory
+  functions
+- **[`test_base_coverage.py`](test_base_coverage.py)** - ✅ Comprehensive base module
+  testing
+- **[`test_core_library.py`](test_core_library.py)** - ✅ Core library functionality
+  validation
 
 #### **Command-Line Interface**
 
-- **[`test_cli_comprehensive.py`](test_cli_comprehensive.py)** - ✅ CLI operations and command validation
-- **[`test_cli_integration.py`](test_cli_integration.py)** - ✅ CLI integration with core services
+- **[`test_cli_comprehensive.py`](test_cli_comprehensive.py)** - ✅ CLI operations and
+  command validation
+- **[`test_cli_integration.py`](test_cli_integration.py)** - ✅ CLI integration with
+  core services
 
 ### Data Integration Tests
 
 #### **Singer Protocol**
 
-- **[`test_flext_singer.py`](test_flext_singer.py)** - ✅ Singer SDK bridge and message handling
-- **[`test_flext_singer_comprehensive.py`](test_flext_singer_comprehensive.py)** - ✅ Comprehensive Singer integration
-- **[`test_flext_singer_coverage.py`](test_flext_singer_coverage.py)** - ✅ Complete Singer protocol coverage
+- **[`test_flext_singer.py`](test_flext_singer.py)** - ✅ Singer SDK bridge and message
+  handling
+- **[`test_flext_singer_comprehensive.py`](test_flext_singer_comprehensive.py)** - ✅
+  Comprehensive Singer integration
+- **[`test_flext_singer_coverage.py`](test_flext_singer_coverage.py)** - ✅ Complete
+  Singer protocol coverage
 
 #### **Meltano Integration**
 
-- **[`test_meltano_integration.py`](test_meltano_integration.py)** - ✅ Meltano CLI integration and orchestration
-- **[`test_discovery_complete.py`](test_discovery_complete.py)** - ✅ Plugin discovery and catalog management
-- **[`test_real_catalog_discovery.py`](test_real_catalog_discovery.py)** - ✅ Real-world catalog discovery scenarios
+- **[`test_meltano_integration.py`](test_meltano_integration.py)** - ✅ Meltano CLI
+  integration and orchestration
+- **[`test_discovery_complete.py`](test_discovery_complete.py)** - ✅ Plugin discovery
+  and catalog management
+- **[`test_real_catalog_discovery.py`](test_real_catalog_discovery.py)** - ✅ Real-world
+  catalog discovery scenarios
 
 #### **DBT Integration**
 
-- **[`test_dbt_integration.py`](test_dbt_integration.py)** - ✅ DBT project management and execution
-- **[`test_real_dbt_functionality.py`](test_real_dbt_functionality.py)** - ✅ Real DBT functionality validation
+- **[`test_dbt_integration.py`](test_dbt_integration.py)** - ✅ DBT project management
+  and execution
+- **[`test_real_dbt_functionality.py`](test_real_dbt_functionality.py)** - ✅ Real DBT
+  functionality validation
 
 ### Plugin Management Tests
 
 #### **Installation & Discovery**
 
-- **[`test_installation_simple.py`](test_installation_simple.py)** - ✅ Basic plugin installation workflows
-- **[`test_installation_comprehensive.py`](test_installation_comprehensive.py)** - ✅ Complex installation scenarios
-- **[`test_installation_real.py`](test_installation_real.py)** - ✅ Real plugin installation validation
-- **[`test_installation_edge_cases.py`](test_installation_edge_cases.py)** - ✅ Error handling and edge cases
+- **[`test_installation_simple.py`](test_installation_simple.py)** - ✅ Basic plugin
+  installation workflows
+- **[`test_installation_comprehensive.py`](test_installation_comprehensive.py)** - ✅
+  Complex installation scenarios
+- **[`test_installation_real.py`](test_installation_real.py)** - ✅ Real plugin
+  installation validation
+- **[`test_installation_edge_cases.py`](test_installation_edge_cases.py)** - ✅ Error
+  handling and edge cases
 
 ## Test Standards
 
@@ -220,7 +241,8 @@ The following test files are disabled or archived for historical reference:
 - **`*.disabled`** - Temporarily disabled tests (with clear reasons)
 - **`*.BROKEN`** - Known broken tests requiring investigation
 
-These files are preserved for migration patterns and historical context but are not executed in the test suite.
+These files are preserved for migration patterns and historical context but are not
+executed in the test suite.
 
 ## Test Development Workflow
 
@@ -237,7 +259,7 @@ These files are preserved for migration patterns and historical context but are 
 
 ```bash
 # Development workflow
-pytest tests/test_<module>.py -v     # Run specific test file
+pytest tests/test_ -v < module > .py # Run specific test file
 pytest tests/ -k "test_specific"     # Run tests matching pattern
 pytest tests/ --collect-only         # Show available tests
 pytest tests/ --durations=10         # Show slowest tests
@@ -246,7 +268,7 @@ pytest tests/ --durations=10         # Show slowest tests
 make test
 
 # Quality validation
-pytest tests/ --doctest-modules      # Validate docstring examples
+pytest tests/ --doctest-modules # Validate docstring examples
 pytest tests/ --mypy
 ```
 
@@ -271,7 +293,6 @@ documentation_coverage: aiming for 100%
 
 ---
 
-**Status**: ✅ **ENTERPRISE READY** - Comprehensive test suite with quality gates · 1.0.0 Release Preparation
-**Coverage**: 90%+ across all test categories
-**Last Updated**: 2025-08-02
-**Maintainer**: FLEXT Development Team
+**Status**: ✅ **ENTERPRISE READY** - Comprehensive test suite with quality gates ·
+1.0.0 Release Preparation **Coverage**: 90%+ across all test categories **Last
+Updated**: 2025-08-02 **Maintainer**: FLEXT Development Team

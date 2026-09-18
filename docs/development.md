@@ -44,7 +44,8 @@ This is a dual-purpose project:
 - **Meltano ELT Project**: Working pipeline with tap-csv configuration
 - **Python Library**: Abstractions for FLEXT ecosystem integration
 
-**Current Status**: 7,286 lines of source code with 13,970 lines of tests. Architecture compliance needs improvement.
+**Current Status**: 7,286 lines of source code with 13,970 lines of tests. Architecture
+compliance needs improvement.
 
 ---
 
@@ -80,10 +81,10 @@ make lint type-check test
 
 ```bash
 # Pre-commit checks (must pass)
-make val           # Complete validation pipeline
-make lint               # Ruff linting
-make type-check         # MyPy strict mode
-make test               # Test suite execution
+make val        # Complete validation pipeline
+make lint       # Ruff linting
+make type-check # MyPy strict mode
+make test       # Test suite execution
 ```
 
 ### **Code Standards**
@@ -143,10 +144,10 @@ make test               # Test suite execution
 
 ```bash
 tests/
-├── unit/           # Component unit tests
-├── integration/    # API integration tests
-├── e2e/           # End-to-end workflow tests
-└── fixtures/      # Test data and utilities
+├── unit/        # Component unit tests
+├── integration/ # API integration tests
+├── e2e/         # End-to-end workflow tests
+└── fixtures/    # Test data and utilities
 ```
 
 ### **Running Tests**
@@ -180,9 +181,9 @@ pytest --cov=src --cov-report=html
 make format
 
 # Quick checks
-make l          # lint
-make t          # test
-make c         # type-check
+make l # lint
+make t # test
+make c # type-check
 ```
 
 ---
@@ -228,4 +229,5 @@ make c         # type-check
 
 ---
 
-**Development Status**: Active development with focus on architecture compliance and realistic capability documentation.
+**Development Status**: Active development with focus on architecture compliance and
+realistic capability documentation.

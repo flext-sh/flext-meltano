@@ -61,7 +61,8 @@
 
 ### Security Principles
 
-FLEXT-Meltano implements a **defense-in-depth security strategy** with multiple layers of protection:
+FLEXT-Meltano implements a **defense-in-depth security strategy** with multiple layers
+of protection:
 
 1. **Zero Trust Architecture**: Never trust, always verify
 1. **Least Privilege**: Minimum required permissions

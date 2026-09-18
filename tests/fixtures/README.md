@@ -37,11 +37,14 @@
 
 <!-- TOC END -->
 
-**STATUS**: Active Development — Enterprise test fixture framework functional; stabilization in progress.
+**STATUS**: Active Development — Enterprise test fixture framework functional;
+stabilization in progress.
 
 ## 🧪 Test Fixtures Overview
 
-This directory contains **reusable test fixtures and data** for FLEXT Meltano's comprehensive testing framework, providing consistent test environments, sample data, and mock components across unit, integration, and end-to-end test suites.
+This directory contains **reusable test fixtures and data** for FLEXT Meltano's
+comprehensive testing framework, providing consistent test environments, sample data,
+and mock components across unit, integration, and end-to-end test suites.
 
 ### **Fixture Categories**
 
@@ -376,9 +379,9 @@ def discover_fixture_modules(directory):
 
 ```bash
 # Fixture validation commands
-pytest --fixtures tests/              # List all available fixtures
-pytest --fixtures-per-test tests/    # Show fixture usage per test
-pytest tests/ --setup-show          # Show fixture setup/teardown
+pytest --fixtures tests/          # List all available fixtures
+pytest --fixtures-per-test tests/ # Show fixture usage per test
+pytest tests/ --setup-show        # Show fixture setup/teardown
 ```
 
 ## 🔍 Usage Examples
@@ -432,7 +435,8 @@ def complete_test_environment(
 
 ## 📋 Test Fixtures Status
 
-**Current State**: Active Development — Comprehensive fixture framework functional; stabilization and coverage improvements in progress
+**Current State**: Active Development — Comprehensive fixture framework functional;
+stabilization and coverage improvements in progress
 
 ### **Production Readiness**
 
@@ -452,7 +456,6 @@ def complete_test_environment(
 
 ---
 
-**Status**: Active Development — Test fixture framework functional; stabilization in progress · 1.0.0 Release Preparation
-**Version**: 0.12.0-dev RC-enterprise
-**Last Updated**: 2025-08-02
-**Maintainer**: FLEXT Development Team
+**Status**: Active Development — Test fixture framework functional; stabilization in
+progress · 1.0.0 Release Preparation **Version**: 0.12.0-dev RC-enterprise **Last
+Updated**: 2025-08-02 **Maintainer**: FLEXT Development Team

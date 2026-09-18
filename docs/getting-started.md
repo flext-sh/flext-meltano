@@ -22,13 +22,16 @@
 
 <!-- TOC END -->
 
-**ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer integration.
+**ELT foundation library for the FLEXT ecosystem** providing Meltano, dbt, and Singer
+integration.
 
 ---
 
 ## 🎯 Overview
 
-flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abstracting Meltano project management, Singer protocol operations, and dbt transformations behind flext-core compatible interfaces.
+flext-meltano serves as the ELT foundation library for the FLEXT ecosystem, abstracting
+Meltano project management, Singer protocol operations, and dbt transformations behind
+flext-core compatible interfaces.
 
 ---
 

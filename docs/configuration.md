@@ -42,13 +42,15 @@
 
 **Configuration management for FLEXT ecosystem ELT foundation library**
 
-> **⚠️ COMPLIANCE NOTE**: Current configuration patterns require abstraction layer for full FLEXT compliance due to direct meltano.core usage.
+> **⚠️ COMPLIANCE NOTE**: Current configuration patterns require abstraction layer for
+> full FLEXT compliance due to direct meltano.core usage.
 
 ---
 
 ## 🎯 Configuration Overview
 
-flext-meltano provides enterprise-grade configuration management for ELT operations, supporting:
+flext-meltano provides enterprise-grade configuration management for ELT operations,
+supporting:
 
 - **Meltano Project Configuration** - Complete meltano.yml management
 - **Singer Plugin Configuration** - Tap and target settings validation

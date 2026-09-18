@@ -36,13 +36,15 @@
 
 ## 📋 Documentation Overview
 
-This directory contains comprehensive architecture documentation for FLEXT-Meltano following industry best practices and modern tooling.
+This directory contains comprehensive architecture documentation for FLEXT-Meltano
+following industry best practices and modern tooling.
 
 ## 🏗️ Documentation Framework
 
 ### C4 Model Architecture
 
-- **[c4-model.md](c4-model.md)** - Complete C4 model documentation (Context, Containers, Components, Code)
+- **[c4-model.md](c4-model.md)** - Complete C4 model documentation (Context, Containers,
+  Components, Code)
 - **Context Diagram** - System purpose and external interactions
 - **Container Diagram** - Technology choices and deployment architecture
 - **Component Diagram** - Internal system structure and relationships
@@ -67,28 +69,32 @@ This directory contains comprehensive architecture documentation for FLEXT-Melta
 
 ### System Context & Integration
 
-- **[system-context.md](system-context.md)** - System purpose, stakeholders, external integrations
+- **[system-context.md](system-context.md)** - System purpose, stakeholders, external
+  integrations
 - **Ecosystem Architecture** - FLEXT project relationships and dependencies
 - **Integration Patterns** - Communication protocols and data exchange
 - **Deployment Contexts** - Development, staging, production environments
 
 ### Data Architecture
 
-- **[data-architecture.md](data-architecture.md)** - Data flow, storage, processing architecture
+- **[data-architecture.md](data-architecture.md)** - Data flow, storage, processing
+  architecture
 - **Data Pipeline Flow** - ELT process and data transformation stages
 - **Storage Strategy** - Database design and data persistence patterns
 - **Data Quality** - Validation, cleansing, and governance frameworks
 
 ### Security Architecture
 
-- **[security-architecture.md](security-architecture.md)** - Security controls, compliance, threat model
+- **[security-architecture.md](security-architecture.md)** - Security controls,
+  compliance, threat model
 - **Authentication & Authorization** - Identity management and access control
 - **Data Protection** - Encryption, masking, and secure data handling
 - **Compliance Framework** - GDPR, SOC2, HIPAA compliance patterns
 
 ### Quality Attributes
 
-- **[quality-attributes.md](quality-attributes.md)** - Performance, scalability, reliability, maintainability
+- **[quality-attributes.md](quality-attributes.md)** - Performance, scalability,
+  reliability, maintainability
 - **Cross-Cutting Concerns** - Logging, monitoring, caching, internationalization
 - **Performance Characteristics** - Response times, throughput, resource usage
 - **Scalability Patterns** - Horizontal/vertical scaling, data partitioning
@@ -182,10 +188,14 @@ make docs
 
 ## 📚 Related Documentation
 
-- **[../guides/maintenance-guide.md](../guides/maintenance-guide.md)** - Documentation maintenance procedures
-- **[README.md](https://github.com/flext-sh/flext/blob/0.12.0-dev/flext-meltano/README.md)** - Project overview and getting started
-- **[AGENTS.md](https://github.com/flext-sh/flext/blob/0.12.0-dev/flext-meltano/AGENTS.md)** - Development guidelines and standards
-- **[../guides/maintenance-quickstart.md](../guides/maintenance-quickstart.md)** - Quality assurance processes
+- **[../guides/maintenance-guide.md](../guides/maintenance-guide.md)** - Documentation
+  maintenance procedures
+- **[README.md](https://github.com/flext-sh/flext/blob/0.12.0-dev/flext-meltano/README.md)** -
+  Project overview and getting started
+- **[AGENTS.md](https://github.com/flext-sh/flext/blob/0.12.0-dev/flext-meltano/AGENTS.md)** -
+  Development guidelines and standards
+- **[../guides/maintenance-quickstart.md](../guides/maintenance-quickstart.md)** -
+  Quality assurance processes
 
 ## 🎯 Architecture Evolution
 

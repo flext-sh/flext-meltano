@@ -122,12 +122,13 @@ More content
 ```markdown
 # Before (too long)
 
-This is a very long line that exceeds the recommended 120 character limit and makes documentation harder to read.
+This is a very long line that exceeds the recommended 120 character limit and makes
+documentation harder to read.
 
 # After (proper length)
 
-This is a very long line that exceeds the recommended
-120 character limit and makes documentation harder to read.
+This is a very long line that exceeds the recommended 120 character limit and makes
+documentation harder to read.
 ```
 
 ## 📈 Monitoring Progress
