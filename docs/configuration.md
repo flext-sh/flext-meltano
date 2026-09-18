@@ -136,7 +136,7 @@ transforms:
 
 ### Configuration Validation
 
-```python
+````python
 from flext_cli import u
 from flext_meltano import FlextMeltanoSettings
 
@@ -182,7 +182,7 @@ target_settings = {
 
 builder = FlextMeltanoSettingsBuilders()
 target_config = builder.build_target_config(target_settings)
-```
+````
 
 ### Singer Catalog Configuration
 
@@ -307,11 +307,13 @@ from flext_meltano import FlextMeltanoValidators
 validators = FlextMeltanoValidators()
 
 # Validate complete pipeline
-validation_result = validators.validate_pipeline_config({
-    "tap": tap_config,
-    "target": target_config,
-    "transform": dbt_config,
-})
+validation_result = validators.validate_pipeline_config(
+    {
+        "tap": tap_config,
+        "target": target_config,
+        "transform": dbt_config,
+    }
+)
 
 if validation_result.failure:
     u.Cli.print(f"Pipeline validation failed: {validation_result.error}")
@@ -430,16 +432,20 @@ from flext_meltano import FlextMeltanoValidators
 validators = FlextMeltanoValidators()
 
 # Validate Singer schema
-schema_validation = validators.validate_singer_schema({
-    "type": "object",
-    "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
-})
+schema_validation = validators.validate_singer_schema(
+    {
+        "type": "object",
+        "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+    }
+)
 
 # Validate dbt models
-model_validation = validators.validate_dbt_models([
-    {"name": "stg_users", "path": "models/staging/stg_users.sql"},
-    {"name": "dim_users", "path": "models/marts/dim_users.sql"},
-])
+model_validation = validators.validate_dbt_models(
+    [
+        {"name": "stg_users", "path": "models/staging/stg_users.sql"},
+        {"name": "dim_users", "path": "models/marts/dim_users.sql"},
+    ]
+)
 ```
 
 ### Runtime Validation

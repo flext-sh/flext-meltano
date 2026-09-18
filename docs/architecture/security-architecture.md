@@ -802,12 +802,14 @@ class SecurityAuditor:
 
         # Add request context
         if hasattr(self, "_current_request"):
-            audit_entry.update({
-                "request_id": self._current_request.id,
-                "client_ip": self._current_request.client_ip,
-                "user_agent": self._current_request.user_agent,
-                "endpoint": self._current_request.endpoint,
-            })
+            audit_entry.update(
+                {
+                    "request_id": self._current_request.id,
+                    "client_ip": self._current_request.client_ip,
+                    "user_agent": self._current_request.user_agent,
+                    "endpoint": self._current_request.endpoint,
+                }
+            )
 
         # Ship to centralized logging
         self.log_shipper.ship_log(audit_entry)
@@ -1205,13 +1207,15 @@ class SecurityDashboard:
         threat_metrics = self._get_threat_detection_metrics()
 
         # Calculate overall health score
-        health_score = self._calculate_health_score([
-            auth_metrics,
-            authz_metrics,
-            data_metrics,
-            infra_metrics,
-            threat_metrics,
-        ])
+        health_score = self._calculate_health_score(
+            [
+                auth_metrics,
+                authz_metrics,
+                data_metrics,
+                infra_metrics,
+                threat_metrics,
+            ]
+        )
 
         return SecurityHealthReport(
             timestamp=datetime.utcnow(),

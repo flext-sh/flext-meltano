@@ -74,7 +74,7 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 
 ### **Basic Service Usage**
 
-```python
+````python
 from flext_cli import u
 from flext_meltano import FlextMeltanoService
 
@@ -95,11 +95,11 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 
 # Example catalog discovery (requires configured tap)
 # catalog_result = tap_abstractions.discover_catalog("tap-csv")
-```
+````
 
 ### **r Pattern**
 
-```python
+````python
 from __future__ import annotations
 
 from flext_cli import u
@@ -135,7 +135,7 @@ make val           # Complete validation pipeline
 make lint               # Code linting
 make type-check         # Type safety validation
 make test               # Test execution
-```
+````
 
 ### **Common Commands**
 
