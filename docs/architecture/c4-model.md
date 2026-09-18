@@ -66,7 +66,7 @@ title FLEXT-Meltano - System Context Diagram
 Person(user, "Data Engineer/Developer", "Creates and manages ELT pipelines")
 Person(REDACTED_LDAP_BIND_PASSWORD, "Platform Administrator", "Manages Meltano infrastructure")
 
-System(flext_meltano, "FLEXT-Meltano", "Enterprise data integration platform providing Singer protocol, plugin development, and pipeline orchestration")
+System(flext_meltano, "FLEXT-Meltano", "Enterprise data integration platform providi ...
 
 System_Ext(meltano_core, "Meltano Core", "Data integration platform")
 System_Ext(singer_sdk, "Singer SDK", "Protocol implementation")
@@ -81,7 +81,7 @@ System_Ext(data_sources, "Data Sources", "Databases, APIs, files, cloud services
 System_Ext(data_destinations, "Data Destinations", "Data warehouses, lakes, applications")
 
 Rel(user, flext_meltano, "Uses", "Python API, CLI, configuration")
-Rel(REDACTED_LDAP_BIND_PASSWORD, flext_meltano, "Manages", "Infrastructure, monitoring, security")
+Rel(REDACTED_LDAP_BIND_PASSWORD, flext_meltano, "Manages", "Infrastructure, monitori ...
 
 Rel(flext_meltano, meltano_core, "Integrates with", "CLI operations, project management")
 Rel(flext_meltano, singer_sdk, "Implements", "Tap/target protocols, state management")
@@ -127,12 +127,12 @@ title FLEXT-Meltano - Container Diagram
 Person(user, "Data Engineer", "Creates and orchestrates ELT pipelines")
 
 System_Boundary(flext_meltano, "FLEXT-Meltano Platform") {
-    Container(api, "API Layer", "Python/FastAPI", "REST API for pipeline management, plugin operations, monitoring")
-    Container(service, "Service Layer", "Python", "Business logic, orchestration, error handling")
-    Container(adapter, "Adapter Layer", "Python", "External system integration (Meltano, DBT, Singer)")
-    Container(model, "Domain Model", "Python/Pydantic", "Data models, validation, business entities")
-    Container(settings, "Configuration", "Python/YAML", "Configuration management, environment settings")
-    ContainerDb(state_store, "State Store", "File System/SQLite", "Pipeline state, bookmarks, execution history")
+    Container(api, "API Layer", "Python/FastAPI", "REST API for pipeline management, ...
+    Container(service, "Service Layer", "Python", "Business logic, orchestration, er ...
+    Container(adapter, "Adapter Layer", "Python", "External system integration (Melt ...
+    Container(model, "Domain Model", "Python/Pydantic", "Data models, validation, bu ...
+    Container(settings, "Configuration", "Python/YAML", "Configuration management, e ...
+    ContainerDb(state_store, "State Store", "File System/SQLite", "Pipeline state, b ...
 }
 
 System_Ext(meltano_cli, "Meltano CLI", "Command Line", "Data integration orchestration")
@@ -184,12 +184,12 @@ title FLEXT-Meltano - Service Layer Components
 Container_Boundary(service_layer, "Service Layer") {
     Component(api_facade, "API Facade", "Python", "Unified public API for all operations")
     Component(orchestrator, "Pipeline Orchestrator", "Python", "Pipeline execution and coordination")
-    Component(plugin_manager, "Plugin Manager", "Python", "Plugin discovery, installation, validation")
+    Component(plugin_manager, "Plugin Manager", "Python", "Plugin discovery, install ...
     Component(singer_service, "Singer Service", "Python", "Singer protocol implementation")
     Component(dbt_service, "DBT Service", "Python", "DBT model orchestration")
 }
 
-Component(config_manager, "Configuration Manager", "Python", "Configuration loading and validation")
+Component(config_manager, "Configuration Manager", "Python", "Configuration loading ...
 Component(state_manager, "State Manager", "Python", "Pipeline state and bookmark management")
 Component(error_handler, "Error Handler", "Python", "Railway-oriented error handling")
 
@@ -218,7 +218,7 @@ Rel(dbt_service, state_manager, "Tracks", "Model execution state")
 title FLEXT-Meltano - Adapter Layer Components
 
 Container_Boundary(adapter_layer, "Adapter Layer") {
-    Component(meltano_adapter, "Meltano Adapter", "Python", "Meltano CLI integration and execution")
+    Component(meltano_adapter, "Meltano Adapter", "Python", "Meltano CLI integration ...
     Component(dbt_adapter, "DBT Adapter", "Python", "DBT CLI orchestration and monitoring")
     Component(singer_adapter, "Singer Adapter", "Python", "Singer protocol abstraction layer")
     Component(cli_translator, "CLI Translator", "Python", "Command translation and execution")

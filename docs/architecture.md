@@ -63,14 +63,17 @@ principles and Domain-Driven Design.
 
 **Core Infrastructure and Type System**
 
-````python
+```python
 src/flext_meltano/
 ├── __init__.py              # Public API exports
 ├── constants.py             # MeltanoConstants extending FlextConstants
 ├── typings.py              # FlextMeltanoTypes with comprehensive type system
 ├── exceptions.py           # FlextMeltanoError hierarchy
-└── validators.py           # FlextMeltanoValidators for data validation```
-**Purpose**: Provides foundational types, constants, and validation patterns that extend flext-core capabilities for ELT operations.
+└── validators.py           # FlextMeltanoValidators for data validation
+```
+
+**Purpose**: Provides foundational types, constants, and validation patterns that extend
+flext-core capabilities for ELT operations.
 
 ### **Service Layer**
 
@@ -80,11 +83,14 @@ src/flext_meltano/
 ├── services.py                    # FlextMeltanoService (core orchestration)
 ├── service_implementations.py     # Specialized service implementations
 ├── adapters.py                   # FlextMeltanoAdapter (external integration)
-└── plugin_protocols.py          # Protocol definitions for plugins```
+└── plugin_protocols.py          # Protocol definitions for plugins
+```
+
 **Key Components**:
 
 - **FlextMeltanoService**: Unified service following s pattern
-- **Service Implementations**: FlextMeltanoTapService, FlextTargetService, FlextDbtService
+- **Service Implementations**: FlextMeltanoTapService, FlextTargetService,
+  FlextDbtService
 - **Plugin Protocols**: TapService, TargetService, DbtService
 
 ### **Execution Layer**
@@ -95,8 +101,11 @@ src/flext_meltano/
 ├── executors.py              # FlextMeltanoExecutor (command orchestration)
 ├── executors_bridge.py       # FlextMeltanoBridge (Go ↔ Python communication)
 ├── executors_cli.py          # FlextMeltanoCli (CLI command processing)
-└── executors_meltano.py      # Simplified executor implementations```
-**Purpose**: Handles execution of ELT operations, CLI commands, and bridge communication with external systems.
+└── executors_meltano.py      # Simplified executor implementations
+```
+
+**Purpose**: Handles execution of ELT operations, CLI commands, and bridge communication
+with external systems.
 
 ### **Abstraction Layer**
 
@@ -106,8 +115,11 @@ src/flext_meltano/
 ├── singer_types.py           # FlextMeltanoTypes (Singer protocol abstractions)
 ├── tap_abstractions.py       # FlextMeltanoTapAbstractions with TapConfig, StreamDefinition
 ├── target_abstractions.py   # FlextMeltanoTargetAbstractions for target operations
-└── file_managers.py         # FlextMeltanoFileManagers for file operations```
-**Purpose**: Provides type-safe abstractions for Singer protocol, data streams, and file operations.
+└── file_managers.py         # FlextMeltanoFileManagers for file operations
+```
+
+**Purpose**: Provides type-safe abstractions for Singer protocol, data streams, and file
+operations.
 
 ### **Configuration Layer**
 
@@ -116,8 +128,11 @@ src/flext_meltano/
 ```python
 ├── settings.py                # FlextMeltanoSettings (configuration management)
 ├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic settings)
-└── utilities.py            # u (helper functions)```
-**Purpose**: Manages configuration, environment settings, and utility functions for ELT operations.
+└── utilities.py            # u (helper functions)
+```
+
+**Purpose**: Manages configuration, environment settings, and utility functions for ELT
+operations.
 
 ## 🔄 Data Flow Architecture
 
@@ -136,7 +151,9 @@ graph TD
     B --> I[FlextMeltanoDbtService]
     I --> J[DBT Operations]
     J --> K[Data Transformation]
-    K --> H```
+    K --> H
+```
+
 ### **Error Handling Flow**
 
 ```mermaid
@@ -149,10 +166,14 @@ graph TD
     E -->|Invalid| G[r.fail()]
     D --> H[Error Logging]
     G --> H
-    F --> I[r.ok()]```
+    F --> I[r.ok()]
+```
+
 ## 🏛️ Clean Architecture Implementation
 
-### **Layer Dependencies**```
+### **Layer Dependencies**
+
+```
 ┌─────────────────────────────────────────┐
 │            Interface Layer              │
 │  (executors_cli.py, executors_bridge.py)│
@@ -165,7 +186,9 @@ graph TD
 ├─────────────────────────────────────────┤
 │          Infrastructure Layer           │
 │    (adapters.py, file_managers.py)     │
-└─────────────────────────────────────────┘```
+└─────────────────────────────────────────┘
+```
+
 ### **Dependency Rules**
 
 1. **Interface Layer** depends on Application Layer
@@ -179,7 +202,10 @@ graph TD
 
 **flext-core Foundation**:
 
-```python```
+```python
+
+```
+
 **Type System Integration**:
 
 ```python
@@ -188,13 +214,17 @@ from flext_meltano import FlextMeltanoTypes
 # Comprehensive type system extending flext-core
 pipeline_config: FlextMeltanoTypes.ELT.PipelineConfig
 tap_config: FlextMeltanoTypes.Singer.TapConfig
-result: p.Result[FlextMeltanoTypes.ELT.PipelineResult]```
+result: p.Result[FlextMeltanoTypes.ELT.PipelineResult]
+```
+
 ### **External Library Integration**
 
 **Current Status (Direct Imports)**:
 
 ```python
-# ⚠️ ARCHITECTURE DEBT - Requires abstraction```
+# ⚠️ ARCHITECTURE DEBT - Requires abstraction
+```
+
 **Target Architecture (Abstracted)**:
 
 ```python
@@ -208,7 +238,9 @@ class _MeltanoLibraryWrapper:
     @staticmethod
     def create_project(path: Path) -> p.Result[m.Meltano.ProjectModel]:
         """Create Meltano project through library API."""
-        # Implementation with proper error handling```
+        # Implementation with proper error handling
+```
+
 ## 📊 Type System Architecture
 
 ### **FlextMeltanoTypes Hierarchy**
@@ -240,7 +272,9 @@ class FlextMeltanoTypes:
 
         type Pipeline = ConfigDict
         type PipelineResult = JsonObject
-        type ExtractResult = JsonObject```
+        type ExtractResult = JsonObject
+```
+
 ### **Pydantic Model Integration**
 
 ```python
@@ -263,7 +297,9 @@ class StreamDefinition(m.BaseModel):
     stream_schema: m.Dict
     tap_type: str
     status: str = "discovered"
-    records_extracted: int = 0```
+    records_extracted: int = 0
+```
+
 ## 🛡️ Error Handling Architecture
 
 ### **r Pattern Implementation**
@@ -289,7 +325,9 @@ def process_elt_pipeline(
     if execution_result.failure:
         return r[m.Dict].fail(f"Pipeline execution failed: {execution_result.error}")
 
-    return r[m.Dict].ok(execution_result.unwrap())```
+    return r[m.Dict].ok(execution_result.unwrap())
+```
+
 ### **Exception Hierarchy**
 
 ```python
@@ -309,13 +347,15 @@ class FlextMeltanoExecutionError(FlextMeltanoError):
 
 
 class FlextMeltanoValidationError(FlextMeltanoError):
-    """Data validation errors."""```
+    """Data validation errors."""
+```
+
 ## 🎯 Current Status and Technical Debt
 
 ### **Architecture Compliance Status**
 
-| Component                 | Status | Details                                            |
-| ------------------------- | ------ | -------------------------------------------------- |
+| Component                 | Status  | Details                                            |
+| ------------------------- | ------- | -------------------------------------------------- |
 | **Type Safety**           | 🟢 90%  | Comprehensive Pydantic models and type annotations |
 | **FLEXT Integration**     | 🟢 85%  | Strong flext-core usage with r patterns            |
 | **Single Class Pattern**  | 🟢 100% | All modules follow single class architecture       |
@@ -354,9 +394,12 @@ class FlextMeltanoValidationError(FlextMeltanoError):
 1. **Phase 3**: Complete plugin architecture foundation
 1. **Phase 4**: Performance optimization and production hardening
 
-______________________________________________________________________
+---
 
-**Architecture Summary**: flext-meltano provides a robust, type-safe foundation for ELT operations within the FLEXT ecosystem, with clear separation of concerns, comprehensive error handling, and strong integration patterns. The current architecture debt primarily involves abstracting direct library dependencies behind FLEXT-compatible interfaces.
+**Architecture Summary**: flext-meltano provides a robust, type-safe foundation for ELT
+operations within the FLEXT ecosystem, with clear separation of concerns, comprehensive
+error handling, and strong integration patterns. The current architecture debt primarily
+involves abstracting direct library dependencies behind FLEXT-compatible interfaces.
 
 ## Related Documentation
 
@@ -364,18 +407,23 @@ ______________________________________________________________________
 
 - [Getting Started](getting-started.md) - Installation and basic usage
 - [API Reference](api-reference.md) - Complete API documentation
-- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) - Working code examples
+- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) -
+  Working code examples
 
 **Across Projects**:
 
-- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
-- [flext-plugin Architecture](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/architecture.md) - Plugin architecture patterns
-- [flext-quality Automation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-quality/AGENTS.md) - Quality analysis and automation
+- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/architecture/overview.md) -
+  Clean architecture and CQRS patterns
+- [flext-plugin Architecture](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/architecture.md) -
+  Plugin architecture patterns
+- [flext-quality Automation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-quality/AGENTS.md) -
+  Quality analysis and automation
 
 **External Resources**:
 
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
 
-**Design Authority**: This architecture follows FLEXT ecosystem standards and Clean Architecture principles, ensuring maintainability, testability, and integration capability across the 32-project FLEXT ecosystem.
-````
+**Design Authority**: This architecture follows FLEXT ecosystem standards and Clean
+Architecture principles, ensuring maintainability, testability, and integration
+capability across the 32-project FLEXT ecosystem.

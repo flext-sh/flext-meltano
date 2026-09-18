@@ -74,15 +74,17 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 
 ### **Basic Service Usage**
 
-````python
-from flext_meltano import FlextMeltanoService
+```python
 from flext_cli import u
+from flext_meltano import FlextMeltanoService
 
 # Initialize ELT service
 service = FlextMeltanoService()
 
 # Service is ready for ELT operations
-u.Cli.print("flext-meltano service initialized")```
+u.Cli.print("flext-meltano service initialized")
+
+
 ### **Singer Protocol Operations**
 
 ```python
@@ -92,11 +94,14 @@ from flext_meltano import FlextMeltanoTapAbstractions
 tap_abstractions = FlextMeltanoTapAbstractions()
 
 # Example catalog discovery (requires configured tap)
-# catalog_result = tap_abstractions.discover_catalog("tap-csv")```
+# catalog_result = tap_abstractions.discover_catalog("tap-csv")
+```
+
 ### **r Pattern**
 
 ```python
 from __future__ import annotations
+
 from flext_cli import u
 
 
@@ -115,8 +120,10 @@ if result.success:
     data = result.unwrap()
     u.Cli.print(f"Success: {data}")
 else:
-    u.Cli.print(f"Error: {result.error}")```
-______________________________________________________________________
+    u.Cli.print(f"Error: {result.error}")
+
+
+---
 
 ## 🔧 Development Workflow
 
@@ -127,7 +134,9 @@ ______________________________________________________________________
 make val           # Complete validation pipeline
 make lint               # Code linting
 make type-check         # Type safety validation
-make test               # Test execution```
+make test               # Test execution
+```
+
 ### **Common Commands**
 
 ```bash
@@ -140,8 +149,10 @@ pytest tests/unit/      # Unit tests only
 
 # Code quality
 make format             # Auto-format code
-make check-imports      # Validate import compliance```
-______________________________________________________________________
+make check-imports      # Validate import compliance
+```
+
+---
 
 ## 📚 Next Steps
 
@@ -150,7 +161,7 @@ ______________________________________________________________________
 - **[Development](development.md)** - Contributing guidelines
 - **[Integration](guides/integration.md)** - Ecosystem integration patterns
 
-______________________________________________________________________
+---
 
 ## ⚠️ Important Notes
 
@@ -162,13 +173,15 @@ ______________________________________________________________________
 
 ### **Current Status**
 
-- **Architecture Compliance**: Direct meltano imports in `adapters.py` require abstraction
+- **Architecture Compliance**: Direct meltano imports in `adapters.py` require
+  abstraction
 - **Quality Gates**: All checks must pass before commits
 - **Integration**: Use only flext-core compatible patterns
 
-______________________________________________________________________
+---
 
-**Next**: Review the [Architecture Guide](architecture.md) to understand flext-meltano's design patterns and FLEXT ecosystem integration.
+**Next**: Review the [Architecture Guide](architecture.md) to understand flext-meltano's
+design patterns and FLEXT ecosystem integration.
 
 ## Related Documentation
 
@@ -176,16 +189,19 @@ ______________________________________________________________________
 
 - [Architecture](architecture.md) - Architecture and design patterns
 - [API Reference](api-reference.md) - Complete API documentation
-- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) - Working code examples
+- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) -
+  Working code examples
 
 **Across Projects**:
 
-- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
-- [flext-core Service Patterns](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/guides/service-patterns.md) - Service patterns and dependency injection
-- [flext-plugin Architecture](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/architecture.md) - Plugin architecture patterns
+- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/architecture/overview.md) -
+  Clean architecture and CQRS patterns
+- [flext-core Service Patterns](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/guides/service-patterns.md) -
+  Service patterns and dependency injection
+- [flext-plugin Architecture](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/architecture.md) -
+  Plugin architecture patterns
 
 **External Resources**:
 
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
-````

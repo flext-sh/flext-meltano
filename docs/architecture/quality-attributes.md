@@ -212,7 +212,7 @@ end note
 
 #### 1. Caching Strategy
 
-````python
+```python
 from __future__ import annotations
 
 
@@ -274,7 +274,9 @@ class MultiLevelCache:
         for key in keys_to_remove:
             del self.local_cache[key]
 
-        return len(redis_keys) + local_invalidated```
+        return len(redis_keys) + local_invalidated
+```
+
 #### 2. Connection Pooling
 
 ```python
@@ -348,7 +350,9 @@ class ConnectionPoolManager:
                 self.metrics.pool_health_check_failed(service_name, str(e))
                 health_status[service_name] = PoolHealth.UNHEALTHY
 
-        return health_status```
+        return health_status
+```
+
 #### 3. Async Processing
 
 ```python
@@ -433,7 +437,9 @@ class AsyncPipelineExecutor:
         successful_extractions = [r for r in results if not isinstance(r, Exception)]
         failed_extractions = [r for r in results if isinstance(r, Exception)]
 
-        return ExtractionResult(successful_extractions, failed_extractions)```
+        return ExtractionResult(successful_extractions, failed_extractions)
+```
+
 ### Performance Monitoring
 
 ```python
@@ -544,8 +550,10 @@ class PerformanceMonitor:
                 severity="error",
             )
 
-        return error_rate```
-______________________________________________________________________
+        return error_rate
+```
+
+---
 
 ## 📈 Scalability
 
@@ -645,7 +653,9 @@ note right of functional
     - Team autonomy
     - Technology diversity
 end note
-@enduml```
+@enduml
+```
+
 ### Scaling Strategies
 
 #### 1. Horizontal Scaling
@@ -806,12 +816,14 @@ class HorizontalScaler:
                         service_name=service_name,
                         recommendation="increase_instances",
                         reason=f"High latency: {service_metrics.latency_p95:.0f}ms",
-                        performance_impact=f"Reduce latency by ~{service_metrics.latency_p95 * 0.3:.0f}ms",
+                        performance_impact=f"Reduce latency by ~{service_metrics.lat ...
                         confidence="medium",
                     )
                 )
 
-        return recommendations```
+        return recommendations
+```
+
 #### 2. Data Scaling
 
 ```python
@@ -932,7 +944,9 @@ class DataScaler:
             # More shards for read-heavy workloads
             shard_count = base_shards * 2
 
-        return min(shard_count, self.settings.max_shards_per_table)```
+        return min(shard_count, self.settings.max_shards_per_table)
+```
+
 #### 3. Functional Scaling
 
 ```python
@@ -1029,8 +1043,10 @@ class FunctionalDecomposer:
             api_updates=api_updates,
             deployment=deployment,
             validation=validation,
-        )```
-______________________________________________________________________
+        )
+```
+
+---
 
 ## 🛡️ Reliability
 
@@ -1118,7 +1134,9 @@ note right of circuit_breaker
     - Enable fast failure detection
     - Support automatic recovery
 end note
-@enduml```
+@enduml
+```
+
 ### Reliability Patterns
 
 #### 1. Railway-Oriented Error Handling
@@ -1224,7 +1242,9 @@ class RailwayExecutor:
 
             return r.fail(
                 OperationExecutionError(f"Operation execution failed: {e!s}")
-            )```
+            )
+```
+
 #### 2. Circuit Breaker Pattern
 
 ```python
@@ -1294,7 +1314,9 @@ class CircuitBreaker:
         """Reset circuit breaker to closed state."""
         self.failure_count = 0
         self.last_failure_time = None
-        self.state = CircuitBreakerState.CLOSED```
+        self.state = CircuitBreakerState.CLOSED
+```
+
 #### 3. Retry with Exponential Backoff
 
 ```python
@@ -1331,7 +1353,7 @@ class RetryExecutor:
                 if attempt < self.max_attempts - 1:  # Not the last attempt
                     delay = self._calculate_delay(attempt)
                     self.logger.warning(
-                        f"Operation failed (attempt {attempt + 1}/{self.max_attempts}), "
+                        f"Operation failed (attempt {attempt + 1}/{self.max_attempts ...
                         f"retrying in {delay:.2f} seconds: {e}"
                     )
                     time.sleep(delay)
@@ -1370,7 +1392,9 @@ class RetryExecutor:
     @property
     def retryable_exceptions(self) -> Tuple[Type[Exception], ...]:
         """Exceptions that should be retried."""
-        return (ConnectionError, TimeoutError, TemporaryServiceError, RateLimitError)```
+        return (ConnectionError, TimeoutError, TemporaryServiceError, RateLimitError)
+```
+
 ### Reliability Monitoring
 
 ```python
@@ -1462,7 +1486,7 @@ class ReliabilityMonitor:
             self.alerts.send_alert(
                 "LowMTBF",
                 f"Mean Time Between Failures: {mtbf:.0f} seconds "
-                f"(threshold: {self.reliability_thresholds['mean_time_between_failures']} seconds)",
+                f"(threshold: {self.reliability_thresholds['mean_time_between_failur ...
                 severity="warning",
             )
 
@@ -1576,8 +1600,10 @@ class ReliabilityMonitor:
                 "Continue monitoring and maintaining current reliability practices"
             )
 
-        return recommendations```
-______________________________________________________________________
+        return recommendations
+```
+
+---
 
 ## ⏱️ Availability
 
@@ -1665,7 +1691,9 @@ note right of circuit_breakers
     - Enable fast recovery
     - Maintain partial functionality
 end note
-@enduml```
+@enduml
+```
+
 ### Availability Targets
 
 | Service Level                      | Target       | Measurement Period |
@@ -1914,7 +1942,9 @@ class AvailabilityManager:
                 "Continue monitoring and maintaining high availability practices"
             )
 
-        return recommendations```
+        return recommendations
+```
+
 #### 2. Disaster Recovery Implementation
 
 ```python
@@ -2245,8 +2275,10 @@ class DisasterRecoveryManager:
             recommendations.append("DR capabilities are well-maintained and compliant")
             recommendations.append("Continue regular testing and updates")
 
-        return recommendations```
-______________________________________________________________________
+        return recommendations
+```
+
+---
 
 ## 🔧 Maintainability
 
@@ -2334,11 +2366,13 @@ note right of type_safety
     - IDE support and refactoring
     - API contract enforcement
 end note
-@enduml```
+@enduml
+```
+
 ### Maintainability Metrics
 
-| Metric                     | Target            | Current      | Status      |
-| -------------------------- | ----------------- | ------------ | ----------- |
+| Metric                     | Target            | Current      | Status       |
+| -------------------------- | ----------------- | ------------ | ------------ |
 | **Cyclomatic Complexity**  | < 10 per function | 7.2          | ✅ Good      |
 | **Code Coverage**          | > 95%             | 0% (blocked) | ❌ Blocked   |
 | **Technical Debt Ratio**   | < 5%              | 2.1%         | ✅ Excellent |
@@ -2351,6 +2385,7 @@ end note
 
 ```python
 from __future__ import annotations
+
 import pathlib
 
 
@@ -2516,11 +2551,14 @@ class QualityGate:
 
     def _is_doc_file(self, file_path: Path) -> bool:
         """Check if file is a documentation file."""
-        return file_path.suffix in [".md", ".rst", ".txt"]```
+        return file_path.suffix in [".md", ".rst", ".txt"]
+
+
 #### 2. Automated Code Review
 
 ```python
 from __future__ import annotations
+
 import pathlib
 
 
@@ -2778,8 +2816,10 @@ class AutomatedCodeReview:
                 ):
                     blocking.append(f"{review.file_path}: {issue}")
 
-        return blocking```
-______________________________________________________________________
+        return blocking
+
+
+---
 
 ## 🎨 Usability
 
@@ -2867,16 +2907,18 @@ note right of type_safety
     - Better IDE support
     - Runtime error prevention
 end note
-@enduml```
+@enduml
+```
+
 ### Usability Metrics
 
 | Metric                         | Target         | Current  | Status               |
 | ------------------------------ | -------------- | -------- | -------------------- |
-| **API Response Time**          | < 500ms        | ~200ms   | ✅ Good               |
+| **API Response Time**          | < 500ms        | ~200ms   | ✅ Good              |
 | **Error Message Clarity**      | 95% actionable | ~90%     | ⚠️ Needs improvement |
-| **Documentation Completeness** | 100%           | 97%      | ✅ Excellent          |
-| **SDK Adoption Rate**          | > 80%          | N/A      | 📊 To be measured     |
-| **Support Ticket Volume**      | < 5/month      | ~2/month | ✅ Good               |
+| **Documentation Completeness** | 100%           | 97%      | ✅ Excellent         |
+| **SDK Adoption Rate**          | > 80%          | N/A      | 📊 To be measured    |
+| **Support Ticket Volume**      | < 5/month      | ~2/month | ✅ Good              |
 
 ### User Experience Optimization
 
@@ -2961,7 +3003,9 @@ class APIResponse:
         }
 
         error_code = self._get_error_code(error)
-        return suggestions_map.get(error_code, ["Review the API documentation"])```
+        return suggestions_map.get(error_code, ["Review the API documentation"])
+```
+
 #### 2. Progressive Disclosure
 
 ```python
@@ -3028,7 +3072,9 @@ class APIResource:
         links["update"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
         links["delete"] = f"/api/v1/{self.__class__.__name__.lower()}s/{self.id}"
 
-        return links```
+        return links
+```
+
 #### 3. Contextual Help System
 
 ```python
@@ -3210,8 +3256,10 @@ class APIHelpSystem:
                 "causes": ["Unexpected system behavior"],
                 "solutions": ["Contact support with error details"],
             },
-        )```
-______________________________________________________________________
+        )
+```
+
+---
 
 ## 🧪 Testability
 
@@ -3299,7 +3347,9 @@ note right of pipeline_e2e
     - Integration verification
     - User experience assurance
 end note
-@enduml```
+@enduml
+```
+
 ### Testability Patterns
 
 #### 1. Dependency Injection for Testing
@@ -3345,7 +3395,9 @@ class TestableService:
     def _process_entity(self, entity: Entity, request: Request) -> Result:
         """Pure business logic, easy to unit test."""
         # Complex business logic here
-        return entity.process(request.data)```
+        return entity.process(request.data)
+```
+
 #### 2. Test Data Builders
 
 ```python
@@ -3388,7 +3440,9 @@ def test_entity_processing():
     result = service.process_entity(entity)
 
     assert result.success
-    assert result.value.tags == ["important", "test"]```
+    assert result.value.tags == ["important", "test"]
+```
+
 #### 3. Test Fixtures and Context Managers
 
 ```python
@@ -3460,12 +3514,16 @@ def test_complex_pipeline_operation():
         result = service.execute_pipeline(context["pipeline"])
 
         assert result.success
-        # Context automatically cleaned up```
+        # Context automatically cleaned up
+```
+
 #### 4. Property-Based Testing
 
 ```python
 from __future__ import annotations
-from hypothesis import given, strategies as st
+
+from hypothesis import given
+from hypothesis import strategies as st
 
 
 class PropertyBasedTests:
@@ -3528,11 +3586,14 @@ class PropertyBasedTests:
         if start_time <= end_time:
             assert time_range.is_valid()
         else:
-            assert not time_range.is_valid()```
+            assert not time_range.is_valid()
+
+
 #### 5. Contract Testing
 
 ```python
 from __future__ import annotations
+
 from pact import Consumer, Provider
 
 
@@ -3608,11 +3669,13 @@ class ContractTests:
         assert "processed_at" in result
 
         # Verify schema compliance
-        validate(result, contract.output_schema)```
+        validate(result, contract.output_schema)
+
+
 ### Test Quality Metrics
 
-| Metric                  | Target  | Current      | Status    |
-| ----------------------- | ------- | ------------ | --------- |
+| Metric                  | Target  | Current      | Status     |
+| ----------------------- | ------- | ------------ | ---------- |
 | **Line Coverage**       | 95%     | 0% (blocked) | ❌ Blocked |
 | **Branch Coverage**     | 90%     | N/A          | 📊 Blocked |
 | **Mutation Score**      | 85%     | N/A          | 📊 Blocked |
@@ -3679,11 +3742,14 @@ jobs:
         run: pytest tests/performance/ -v --benchmark-only
 
       - name: Generate test report
-        run: pytest --html=reports/test-report.html --self-contained-html```
+        run: pytest --html=reports/test-report.html --self-contained-html
+```
+
 #### 2. Test Data Management
 
 ```python
 from __future__ import annotations
+
 import pathlib
 
 
@@ -3744,7 +3810,9 @@ class TestDataManager:
             else:
                 result[key] = value
 
-        return result```
+        return result
+
+
 #### 3. Test Result Analysis
 
 ```python
@@ -3870,8 +3938,10 @@ class TestResultAnalyzer:
                 "High test flakiness detected - investigate test stability"
             )
 
-        return recommendations```
-______________________________________________________________________
+        return recommendations
+```
+
+---
 
 ## 🔄 Cross-Cutting Concerns
 
@@ -3959,7 +4029,9 @@ note right of audit
     - Forensic analysis
     - Change tracking
 end note
-@enduml```
+@enduml
+```
+
 ### Monitoring and Observability
 
 ```plantuml
@@ -4065,7 +4137,9 @@ note right of tracing
     - Performance bottleneck identification
     - Service dependency mapping
 end note
-@enduml```
+@enduml
+```
+
 ### Configuration Management
 
 ```plantuml
@@ -4150,7 +4224,9 @@ note right of validation
     - Type safety
     - Constraint enforcement
 end note
-@enduml```
+@enduml
+```
+
 ### Caching Strategy
 
 ```plantuml
@@ -4235,7 +4311,9 @@ note right of invalidation
     - Race condition handling
     - Performance impact
 end note
-@enduml```
+@enduml
+```
+
 ### Internationalization (i18n)
 
 ```plantuml
@@ -4320,8 +4398,10 @@ note right of detection
     - Content personalization
     - Legal compliance
 end note
-@enduml```
-______________________________________________________________________
+@enduml
+```
+
+---
 
 ## 📈 Architecture Evolution
 
@@ -4406,8 +4486,7 @@ ______________________________________________________________________
 - **Security Vulnerabilities**: Addressed through regular updates
 - **Compliance Violations**: Prevented through automated checks
 
-______________________________________________________________________
+---
 
-**Quality Attributes**: FLEXT-Meltano Architecture Quality Framework
-_Comprehensive quality attributes and cross-cutting concerns documentation_
-````
+**Quality Attributes**: FLEXT-Meltano Architecture Quality Framework _Comprehensive
+quality attributes and cross-cutting concerns documentation_

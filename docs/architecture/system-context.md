@@ -265,7 +265,7 @@ flext_meltano --> redis: Caching & queues
 
 #### FLEXT-Core Integration
 
-````python
+```python
 from __future__ import annotations
 
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
@@ -285,7 +285,9 @@ class FlextMeltanoService(s):
             validated_plugins = [self.validate_plugin(plugin) for plugin in plugins]
             return r.ok(validated_plugins)
         except Exception as e:
-            return r.fail(MeltanoError(f"Plugin discovery failed: {e}"))```
+            return r.fail(MeltanoError(f"Plugin discovery failed: {e}"))
+```
+
 #### Meltano CLI Integration
 
 ```python
@@ -331,7 +333,9 @@ class MeltanoAdapter:
                     f"Meltano command timed out after {self.command_timeout}s",
                     command=cmd,
                 )
-            )```
+            )
+```
+
 #### Singer SDK Integration
 
 ```python
@@ -377,7 +381,9 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 
         except Exception as e:
             self.logger.error(f"Tap execution failed: {e}")
-            raise SingerExecutionError(f"Tap execution failed: {e}")```
+            raise SingerExecutionError(f"Tap execution failed: {e}")
+```
+
 ### Integration Patterns
 
 #### Adapter Pattern for External Systems
@@ -408,7 +414,9 @@ class FlextMeltanoAdapter.Dbt(ExternalSystemAdapter):
     """DBT adapter."""
 
 class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
-    """Singer protocol adapter."""```
+    """Singer protocol adapter."""
+```
+
 #### Plugin Architecture for Extensibility
 
 ```python
@@ -452,8 +460,10 @@ class PluginManager:
 
         return r.fail(
             PluginError(f"No loader found for plugin {name}")
-        )```
-______________________________________________________________________
+        )
+```
+
+---
 
 ## 🌐 Ecosystem Architecture
 
@@ -557,7 +567,9 @@ note right of flext_meltano
     - Zero custom ELT code
     - Enterprise pipeline orchestration
 end note
-@enduml```
+@enduml
+```
+
 ### Ecosystem Integration Patterns
 
 #### Foundation Library Pattern
@@ -589,7 +601,9 @@ class MyFLEXTProject(s):
             .flat_map(lambda _: self.target.initialize())
             .flat_map(lambda _: self.run_data_flow())
             .map(lambda result: PipelineResult.from_execution(result))
-        )```
+        )
+```
+
 #### Plugin Ecosystem Integration
 
 ```python
@@ -632,8 +646,10 @@ class FLEXTPluginRegistry:
             if self.plugin_meets_requirements(plugin_meta, requirements):
                 compatible.append(plugin_meta)
 
-        return sorted(compatible, key=lambda p: p.version, reverse=True)```
-______________________________________________________________________
+        return sorted(compatible, key=lambda p: p.version, reverse=True)
+```
+
+---
 
 ## 🔲 System Boundaries
 
@@ -713,7 +729,9 @@ note right of data
     - Access auditing
     - Data masking
 end note
-@enduml```
+@enduml
+```
+
 ### Integration Boundaries
 
 | Boundary Type                | Crossing Mechanism   | Security Controls                      | Monitoring                           |
@@ -723,7 +741,7 @@ end note
 | **Data Boundary**            | Database connections | Connection encryption, access controls | Query logging, data access auditing  |
 | **External System Boundary** | CLI subprocess calls | Command validation, timeout controls   | Execution monitoring, error handling |
 
-______________________________________________________________________
+---
 
 ## 🔄 Integration Patterns
 
@@ -761,7 +779,9 @@ class SynchronousIntegration:
             )
 
         except ExternalSystemError as e:
-            return r.fail(IntegrationError(f"External system error: {e.message}"))```
+            return r.fail(IntegrationError(f"External system error: {e.message}"))
+```
+
 #### Circuit Breaker Pattern
 
 ```python
@@ -816,7 +836,9 @@ class CircuitBreakerIntegration:
         time_since_failure = (
             datetime.utcnow() - self.last_failure_time
         ).total_seconds()
-        return time_since_failure >= self.recovery_timeout```
+        return time_since_failure >= self.recovery_timeout
+```
+
 ### Asynchronous Integration Patterns
 
 #### Event-Driven Pattern
@@ -872,7 +894,9 @@ class EventDrivenIntegration:
 
             except Exception as e:
                 self.logger.error(f"Event processing error: {e}")
-                time.sleep(self.error_backoff_seconds)```
+                time.sleep(self.error_backoff_seconds)
+```
+
 #### Message Queue Integration
 
 ```python
@@ -977,8 +1001,10 @@ class MessageQueueIntegration:
         self.queue_client.delete_message(
             queue_url=self.queue_url,
             receipt_handle=message.receipt_handle
-        )```
-______________________________________________________________________
+        )
+```
+
+---
 
 ## 🚀 Deployment Contexts
 
@@ -1034,7 +1060,9 @@ note right of workstation
     - Local test execution
     - Mocked external services
 end note
-@enduml```
+@enduml
+```
+
 ### Staging Context
 
 ```plantuml
@@ -1091,7 +1119,9 @@ note right of staging
     - Performance and load testing
     - Security validation
 end note
-@enduml```
+@enduml
+```
+
 ### Production Context
 
 ```plantuml
@@ -1177,7 +1207,9 @@ note right of production
     - Security hardening
     - Performance monitoring
 end note
-@enduml```
+@enduml
+```
+
 ### Deployment Pattern Comparison
 
 | Context         | Scale                  | Reliability | Security | Cost   | Purpose             |
@@ -1186,14 +1218,15 @@ end note
 | **Staging**     | Multi-instance         | Medium      | Medium   | Medium | Integration testing |
 | **Production**  | Multi-AZ, auto-scaling | High        | High     | High   | Live operations     |
 
-______________________________________________________________________
+---
 
 ## 📊 System Context Summary
 
 ### Key Architectural Characteristics
 
 1. **Ecosystem Foundation**: Central integration hub for 32+ FLEXT projects
-1. **Zero Custom ELT**: Absolute prohibition of custom Meltano/Singer/DBT implementations
+1. **Zero Custom ELT**: Absolute prohibition of custom Meltano/Singer/DBT
+   implementations
 1. **Type Safety First**: 100% Pyrefly compliance across all integrations
 1. **Railway-Oriented**: Consistent error handling with r[T] pattern
 1. **Clean Architecture**: Domain-Driven Design with clear layer separation
@@ -1208,10 +1241,13 @@ ______________________________________________________________________
 
 ### Integration Philosophy
 
-**FLEXT-Meltano serves as the "integration glue"** that binds the FLEXT ecosystem together, providing consistent patterns, shared infrastructure, and enterprise-grade capabilities while allowing domain projects to focus on their specific data integration needs.
+**FLEXT-Meltano serves as the "integration glue"** that binds the FLEXT ecosystem
+together, providing consistent patterns, shared infrastructure, and enterprise-grade
+capabilities while allowing domain projects to focus on their specific data integration
+needs.
 
-______________________________________________________________________
+---
 
-**System Context**: FLEXT-Meltano Ecosystem Integration and Boundaries
-_Comprehensive system context documentation with stakeholder analysis, integration patterns, and deployment contexts_
-````
+**System Context**: FLEXT-Meltano Ecosystem Integration and Boundaries _Comprehensive
+system context documentation with stakeholder analysis, integration patterns, and
+deployment contexts_

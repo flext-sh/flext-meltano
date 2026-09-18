@@ -56,9 +56,8 @@ flext-meltano patterns.
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-````python
+```python
 from __future__ import annotations
-
 
 from flext_meltano import (
     FlextMeltanoTapAbstractions,
@@ -87,7 +86,9 @@ class FlextOracleTapService(FlextMeltanoTapServiceBase):
     def extract_oracle_data(self, stream: str, settings: dict) -> p.Result[list]:
         """Extract data using flext-meltano abstractions."""
         abstractions = FlextMeltanoTapAbstractions()
-        return abstractions.process_source({"stream": stream, **settings})```
+        return abstractions.process_source({"stream": stream, **settings})
+
+
 ### Target Implementation Pattern
 
 \__Standard pattern for flext-target-_ projects\_\*:
@@ -128,7 +129,9 @@ class FlextOracleTargetService(FlextMeltanoTargetServiceBase):
         return abstractions.create_flext_target({
             "sink_type": "target-oracle",
             "connection_config": settings,
-        })```
+        })
+```
+
 ---
 
 ## 🛠️ dbt Integration Patterns
@@ -153,8 +156,11 @@ class FlextOracleDbtService(FlextMeltanoDbtServiceBase):
 
     def run_oracle_models(self, models: t.StrSequence) -> p.Result[t.JsonMapping]:
         """Execute Oracle-specific dbt models."""
-        return self.run_models(models)```
-**Current Limitation**: dbt integration is placeholder implementation requiring dbt programmatic API integration.
+        return self.run_models(models)
+```
+
+**Current Limitation**: dbt integration is placeholder implementation requiring dbt
+programmatic API integration.
 
 ---
 
@@ -209,7 +215,9 @@ class EnterpriseELTService(FlextMeltanoService):
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt models."""
         dbt_service = FlextMeltanoDbtServiceBase()
-        return dbt_service.run_models(models)```
+        return dbt_service.run_models(models)
+```
+
 ---
 
 ## 🔗 Bridge Communication Patterns
@@ -223,7 +231,9 @@ class EnterpriseELTService(FlextMeltanoService):
 python scripts/flext_meltano_bridge.py version
 python scripts/flext_meltano_bridge.py list_plugins
 python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-jsonl
-python scripts/flext_meltano_bridge.py discover_catalog tap-oracle```
+python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
+```
+
 **JSON API Response Pattern**:
 
 ```python
@@ -237,20 +247,22 @@ response = bridge.execute_bridge_command(
 )
 
 # Response format follows r structure
-print(response.unwrap())```
+print(response.unwrap())
+```
+
 ---
 
 ## 📊 Integration Matrix
 
 ### FLEXT Project Integration Status
 
-| Project Category        | Integration Pattern            | Status      | Notes                        |
-| ----------------------- | ------------------------------ | ----------- | ---------------------------- |
-| **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active   | Working Singer abstractions  |
-| **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active   | Real Meltano integration     |
-| **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active   | Singer protocol compliance   |
-| **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active   | Target service wrappers      |
-| **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active   | Load operation abstractions  |
+| Project Category        | Integration Pattern            | Status     | Notes                        |
+| ----------------------- | ------------------------------ | ---------- | ---------------------------- |
+| **flext-tap-csv**       | FlextMeltanoTapAbstractions    | ✅ Active  | Working Singer abstractions  |
+| **flext-tap-oracle**    | FlextMeltanoTapAbstractions    | ✅ Active  | Real Meltano integration     |
+| **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |
+| **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active  | Target service wrappers      |
+| **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active  | Load operation abstractions  |
 | **flext-dbt-oracle**    | FlextMeltanoDbtService         | 🔴 Limited | Placeholder implementation   |
 | **DataCosmos**          | Complete ELT Foundation        | 🟡 Partial | Blocked by compliance issues |
 
@@ -293,7 +305,9 @@ source .venv/bin/activate
 # flext-meltano specific variables
 export PYTHONPATH=..flext-meltano/src:$PYTHONPATH
 export MELTANO_PROJECT_ROOT=..flext-meltano
-export MELTANO_ENVIRONMENT=dev```
+export MELTANO_ENVIRONMENT=dev
+```
+
 ### Consumer Project Dependencies
 
 **Standard dependency pattern**:
@@ -306,7 +320,9 @@ flext-core = "^0.9.9"
 flext-meltano = "^0.9.9"  # Mandatory ELT foundation
 
 [tool.poetry.group.dev.dependencies]
-flext-cli = "^0.9.9"      # CLI development tools```
+flext-cli = "^0.9.9"      # CLI development tools
+```
+
 ---
 
 ## ⚠️ Integration Limitations
@@ -315,7 +331,8 @@ flext-cli = "^0.9.9"      # CLI development tools```
 
 **Architecture Compliance Issues**:
 
-- **Direct meltano.core imports** (adapters.py lines 17-25) limit some integration patterns
+- **Direct meltano.core imports** (adapters.py lines 17-25) limit some integration
+  patterns
 - **dbt placeholder implementation** affects flext-dbt-\* project functionality
 - **Modern ELT patterns** missing for 2025 industry standards
 
@@ -330,7 +347,8 @@ flext-cli = "^0.9.9"      # CLI development tools```
 
 **Current Development Approach**:
 
-1. **Use Working Abstractions**: FlextMeltanoTapAbstractions and FlextMeltanoTargetAbstractions are fully functional
+1. **Use Working Abstractions**: FlextMeltanoTapAbstractions and
+   FlextMeltanoTargetAbstractions are fully functional
 2. **Follow r Patterns**: Maintain consistency for future compatibility
 3. **Plan for Updates**: Design integration patterns to accommodate resolution
 4. **Document Limitations**: Clear communication about current constraints
@@ -361,7 +379,9 @@ from flext_meltano import FlextMeltanoTapAbstractions, FlextMeltanoTargetAbstrac
 # Register services for ecosystem consumption
 container = FlextContainer.shared()
 container.bind("tap_abstractions", FlextMeltanoTapAbstractions)
-container.bind("target_abstractions", FlextMeltanoTargetAbstractions)```
+container.bind("target_abstractions", FlextMeltanoTargetAbstractions)
+```
+
 **2. Configuration Management**:
 
 ```python
@@ -370,7 +390,9 @@ from __future__ import annotations
 from flext_meltano import FlextMeltanoSettings
 
 settings = FlextMeltanoSettings()
-print(settings.model_dump())```
+print(settings.model_dump())
+```
+
 **3. Error Handling**:
 
 ```python
@@ -387,7 +409,9 @@ def handle_discovery(name: str) -> p.Result[m.Meltano.DataSourceInstance]:
         return r[m.Meltano.DataSourceInstance].fail(
             f"Integration failed: {result.error}"
         )
-    return result```
+    return result
+```
+
 ### Quality Standards
 
 **Integration Requirements**:
@@ -400,5 +424,5 @@ def handle_discovery(name: str) -> p.Result[m.Meltano.DataSourceInstance]:
 
 ---
 
-**Integration Guide v0.12.0-dev** - Comprehensive patterns for FLEXT ecosystem ELT integration with clear guidance on current capabilities and planned improvements.
-````
+**Integration Guide v0.12.0-dev** - Comprehensive patterns for FLEXT ecosystem ELT
+integration with clear guidance on current capabilities and planned improvements.

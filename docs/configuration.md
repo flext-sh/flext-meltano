@@ -136,9 +136,9 @@ transforms:
 
 ### Configuration Validation
 
-````python
-from flext_meltano import FlextMeltanoSettings
+```python
 from flext_cli import u
+from flext_meltano import FlextMeltanoSettings
 
 settings = FlextMeltanoSettings()
 validation_result: p.Result[bool] = settings.validate_meltano_config()
@@ -146,15 +146,17 @@ validation_result: p.Result[bool] = settings.validate_meltano_config()
 if validation_result.success:
     u.Cli.print("Meltano configuration is valid")
 else:
-    u.Cli.print(f"Configuration error: {validation_result.error}")```
-______________________________________________________________________
+    u.Cli.print(f"Configuration error: {validation_result.error}")
+
+
+---
 
 ## 🔌 Singer Plugin Configuration
 
 ### Tap Configuration
 
 ```python
-from flext_meltano import TapConfig, FlextMeltanoSettingsBuilders
+from flext_meltano import FlextMeltanoSettingsBuilders, TapConfig
 
 # Create tap configuration
 tap_config = TapConfig(
@@ -165,7 +167,9 @@ tap_config = TapConfig(
 
 # Build pipeline configuration
 builder = FlextMeltanoSettingsBuilders()
-pipeline_config = builder.build_tap_config(tap_config.dict())```
+pipeline_config = builder.build_tap_config(tap_config.dict())
+
+
 ### Target Configuration
 
 ```python
@@ -177,7 +181,9 @@ target_settings = {
 }
 
 builder = FlextMeltanoSettingsBuilders()
-target_config = builder.build_target_config(target_settings)```
+target_config = builder.build_target_config(target_settings)
+```
+
 ### Singer Catalog Configuration
 
 ```python
@@ -199,12 +205,16 @@ stream = StreamDefinition(
         "replication-method": "INCREMENTAL",
         "replication-key": "updated_at",
     },
-)```
-______________________________________________________________________
+)
+```
+
+---
 
 ## 🛠️ dbt Configuration
 
-### dbt Project Structure```
+### dbt Project Structure
+
+```
 transform/
 ├── dbt_project.yml
 ├── profiles/
@@ -217,7 +227,9 @@ transform/
 ├── tests/
 │   └── assert_user_id_unique.sql
 └── macros/
-    └── custom_macros.sql```
+    └── custom_macros.sql
+```
+
 ### dbt Project Configuration (dbt_project.yml)
 
 ```yaml
@@ -242,7 +254,9 @@ models:
     staging:
       +materialized: view
     marts:
-      +materialized: table```
+      +materialized: table
+```
+
 ### dbt Service Configuration
 
 ```python
@@ -253,8 +267,10 @@ dbt_service = FlextMeltanoDbtService()
 result = dbt_service.execute_dbt_operation()
 
 # Returns placeholder data:
-# {"dbt_status": "ready", "models": []}```
-______________________________________________________________________
+# {"dbt_status": "ready", "models": []}
+```
+
+---
 
 ## 🏗️ Pipeline Configuration
 
@@ -280,7 +296,9 @@ pipeline_config = builder.build_pipeline_config(tap_config, target_config)
 
 # Initialize service
 service = FlextMeltanoService(service_type="pipeline")
-execution_result = service.execute()```
+execution_result = service.execute()
+```
+
 ### Configuration Validation
 
 ```python
@@ -296,8 +314,10 @@ validation_result = validators.validate_pipeline_config({
 })
 
 if validation_result.failure:
-    u.Cli.print(f"Pipeline validation failed: {validation_result.error}")```
-______________________________________________________________________
+    u.Cli.print(f"Pipeline validation failed: {validation_result.error}")
+```
+
+---
 
 ## 🌍 Environment Management
 
@@ -318,7 +338,9 @@ environments:
         loaders:
           - name: target-jsonl
             settings:
-              destination_path: dev_output/```
+              destination_path: dev_output/
+```
+
 ### Production Environment
 
 ```yaml
@@ -336,7 +358,9 @@ environments:
         loaders:
           - name: target-jsonl
             settings:
-              destination_path: /output/production/```
+              destination_path: /output/production/
+```
+
 ### Environment Switching
 
 ```python
@@ -348,8 +372,10 @@ settings = FlextMeltanoSettings()
 dev_config = settings.load_configuration("dev")
 
 # Load production configuration
-prod_config = settings.load_configuration("prod")```
-______________________________________________________________________
+prod_config = settings.load_configuration("prod")
+```
+
+---
 
 ## 🔧 Configuration File Management
 
@@ -367,7 +393,9 @@ meltano_config = file_manager.read_meltano_config()
 catalog_result = file_manager.read_singer_catalog("catalog.json")
 
 # Read dbt profiles
-dbt_profiles = file_manager.read_dbt_profiles()```
+dbt_profiles = file_manager.read_dbt_profiles()
+```
+
 ### Writing Configuration Files
 
 ```python
@@ -376,7 +404,9 @@ catalog_data = {
     "streams": [{"tap_stream_id": "users", "schema": {...}, "metadata": [...]}]
 }
 
-write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.json")```
+write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.json")
+```
+
 ### Configuration Backup
 
 ```python
@@ -385,8 +415,10 @@ backup_result = file_manager.backup_project_files()
 
 if backup_result.success:
     backup_files = backup_result.unwrap()
-    u.Cli.print(f"Backed up {len(backup_files)} configuration files")```
-______________________________________________________________________
+    u.Cli.print(f"Backed up {len(backup_files)} configuration files")
+```
+
+---
 
 ## 🔍 Configuration Validation
 
@@ -407,7 +439,9 @@ schema_validation = validators.validate_singer_schema({
 model_validation = validators.validate_dbt_models([
     {"name": "stg_users", "path": "models/staging/stg_users.sql"},
     {"name": "dim_users", "path": "models/marts/dim_users.sql"},
-])```
+])
+```
+
 ### Runtime Validation
 
 ```python
@@ -419,15 +453,18 @@ executor = FlextMeltanoExecutor()
 env_validation = executor.validate_execution_environment()
 
 if env_validation.failure:
-    u.Cli.print(f"Environment validation failed: {env_validation.error}")```
-______________________________________________________________________
+    u.Cli.print(f"Environment validation failed: {env_validation.error}")
+```
+
+---
 
 ## 🚨 Current Limitations
 
 ### Architecture Compliance Issues
 
 1. **Direct Import Violations**: Configuration system uses direct meltano.core imports
-1. **Abstraction Layer Missing**: Requires wrapper implementation for full FLEXT compliance
+1. **Abstraction Layer Missing**: Requires wrapper implementation for full FLEXT
+   compliance
 1. **dbt Integration**: Current configuration returns placeholder data
 
 ### Configuration Restrictions
@@ -445,7 +482,7 @@ Due to compliance issues:
 1. **Plan Migration**: Prepare for wrapper layer adoption
 1. **Validate Patterns**: Use r patterns consistently
 
-______________________________________________________________________
+---
 
 ## 🔄 Configuration Migration
 
@@ -462,7 +499,8 @@ ______________________________________________________________________
 1. **Transition Strategy**: Gradual migration with backward compatibility
 1. **Validation**: Ensure all configuration patterns maintain functionality
 
-______________________________________________________________________
+---
 
-**Configuration Guide v0.12.0-dev** - Reflects current configuration capabilities with identified compliance gaps requiring systematic resolution for full FLEXT ecosystem integration.
-````
+**Configuration Guide v0.12.0-dev** - Reflects current configuration capabilities with
+identified compliance gaps requiring systematic resolution for full FLEXT ecosystem
+integration.

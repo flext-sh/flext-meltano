@@ -212,7 +212,7 @@ auth --> gateway: refreshed_tokens
 
 #### Role-Based Access Control (RBAC)
 
-````python
+```python
 from __future__ import annotations
 
 
@@ -253,7 +253,9 @@ VIEWER_ROLE = UserRole(
     name="viewer",
     permissions={"pipelines:read", "sources:read", "targets:read"},
     scope="project",
-)```
+)
+```
+
 #### Attribute-Based Access Control (ABAC)
 
 ```python
@@ -289,7 +291,9 @@ class ABACPolicy:
             if not self._user_owns_pipeline(request.subject, pipeline_id):
                 return False
 
-        return True```
+        return True
+```
+
 ### Session Management
 
 ```python
@@ -343,8 +347,10 @@ class SessionManager:
         session["last_activity"] = datetime.utcnow().isoformat()
         self.redis.setex(session_key, self.session_timeout, json.dumps(session))
 
-        return session```
-______________________________________________________________________
+        return session
+```
+
+---
 
 ## 🔒 Data Protection and Encryption
 
@@ -394,7 +400,9 @@ note right of encryptor
     - Format-preserving encryption
     - Homomorphic encryption for analytics
 end note
-@enduml```
+@enduml
+```
+
 ### Encryption Implementation
 
 #### At-Rest Encryption
@@ -447,7 +455,9 @@ class DataEncryptor:
         # Decrypt data with data key
         return self._decrypt_with_data_key(
             encrypted_data.encrypted_data, decrypted_key.plaintext
-        )```
+        )
+```
+
 #### In-Transit Encryption
 
 ```python
@@ -477,7 +487,9 @@ class TLSConfig:
         context.check_hostname = True
         context.verify_mode = ssl.CERT_REQUIRED
 
-        return context```
+        return context
+```
+
 ### Data Classification and Handling
 
 ```python
@@ -522,8 +534,10 @@ class DataClassification:
                 "retention": 2555,
             },
         }
-        return requirements.get(self.level, requirements["internal"])```
-______________________________________________________________________
+        return requirements.get(self.level, requirements["internal"])
+```
+
+---
 
 ## 🌐 Network Security
 
@@ -598,7 +612,9 @@ note right of data_zone
     - Audit logging
     - Backup encryption
 end note
-@enduml```
+@enduml
+```
+
 ### Network Security Controls
 
 #### API Gateway Security
@@ -648,7 +664,9 @@ class APIGatewaySecurity:
         # Reset counter every minute
         self.redis.expire(key, 60)
 
-        return current_count > self.rate_limits.get(endpoint, 100)```
+        return current_count > self.rate_limits.get(endpoint, 100)
+```
+
 #### Service Mesh Security
 
 ```yaml
@@ -679,8 +697,10 @@ spec:
             principals: ["internal.invalid/ns/flext-meltano/sa/api-service-account"]
       to:
         - operation:
-            methods: ["GET", "POST", "PUT", "DELETE"]```
-______________________________________________________________________
+            methods: ["GET", "POST", "PUT", "DELETE"]
+```
+
+---
 
 ## 📊 Security Monitoring and Logging
 
@@ -730,7 +750,9 @@ note right of alerts
     - Infrastructure attacks
     - Compliance violations
 end note
-@enduml```
+@enduml
+```
+
 ### Security Event Types
 
 | Event Category     | Event Types                             | Severity | Response                  |
@@ -791,8 +813,10 @@ class SecurityAuditor:
         self.log_shipper.ship_log(audit_entry)
 
         # Local logging for redundancy
-        logger.log(severity, f"Security event: {event_type}", extra=audit_entry)```
-______________________________________________________________________
+        logger.log(severity, f"Security event: {event_type}", extra=audit_entry)
+```
+
+---
 
 ## 📋 Compliance Framework
 
@@ -800,10 +824,10 @@ ______________________________________________________________________
 
 | Standard      | Requirements                               | Implementation Status |
 | ------------- | ------------------------------------------ | --------------------- |
-| **GDPR**      | Data protection, consent, right to erasure | ✅ Implemented         |
-| **CCPA**      | Data portability, deletion rights          | ✅ Implemented         |
-| **SOC 2**     | Security, availability, confidentiality    | 🚧 In Progress         |
-| **ISO 27001** | Information security management            | ✅ Implemented         |
+| **GDPR**      | Data protection, consent, right to erasure | ✅ Implemented        |
+| **CCPA**      | Data portability, deletion rights          | ✅ Implemented        |
+| **SOC 2**     | Security, availability, confidentiality    | 🚧 In Progress        |
+| **ISO 27001** | Information security management            | ✅ Implemented        |
 | **HIPAA**     | PHI protection (if applicable)             | ⚠️ Conditional        |
 
 ### Compliance Controls
@@ -860,7 +884,9 @@ class DataPrivacyController:
             self.data_store.anonymize_user_data(user_id)
             return r.| ok(value=True)
         except Exception as e:
-            return r.fail(DataDeletionError(f"Failed to delete user data: {e}"))```
+            return r.fail(DataDeletionError(f"Failed to delete user data: {e}"))
+```
+
 #### Audit and Reporting
 
 ```python
@@ -904,8 +930,10 @@ class ComplianceReporter:
             breach_incidents=breach_incidents,
             dpia_status=dpia_completed,
             overall_compliance=self._calculate_compliance_score(),
-        )```
-______________________________________________________________________
+        )
+```
+
+---
 
 ## 🎯 Threat Model
 
@@ -938,8 +966,8 @@ ______________________________________________________________________
 
 ### Risk Assessment Matrix
 
-| Risk                    | Likelihood | Impact   | Risk Level | Mitigation Status           |
-| ----------------------- | ---------- | -------- | ---------- | --------------------------- |
+| Risk                    | Likelihood | Impact   | Risk Level | Mitigation Status            |
+| ----------------------- | ---------- | -------- | ---------- | ---------------------------- |
 | **API Key Compromise**  | Medium     | High     | High       | ✅ MFA, rotation policies    |
 | **Data Breach**         | Low        | Critical | Medium     | ✅ Encryption, monitoring    |
 | **DDoS Attack**         | Medium     | Medium   | Medium     | ✅ Rate limiting, WAF        |
@@ -947,7 +975,7 @@ ______________________________________________________________________
 | **Supply Chain Attack** | Low        | Critical | Medium     | ✅ Dependency scanning, SBOM |
 | **Configuration Error** | High       | Medium   | Medium     | ✅ Validation, testing       |
 
-______________________________________________________________________
+---
 
 ## 🚨 Incident Response
 
@@ -990,7 +1018,9 @@ note right of contain
     - Access revocation
     - Backup activation
 end note
-@enduml```
+@enduml
+```
+
 ### Incident Response Procedures
 
 #### 1. Detection and Analysis
@@ -1026,7 +1056,9 @@ class IncidentDetector:
             response_actions=response_actions,
             detection_time=datetime.utcnow(),
             assigned_team=self._get_responsible_team(incident_type),
-        )```
+        )
+```
+
 #### 2. Containment and Eradication
 
 ```python
@@ -1067,7 +1099,9 @@ class IncidentContainment:
             containment_actions=containment_actions,
             execution_results=results,
             containment_time=datetime.utcnow(),
-        )```
+        )
+```
+
 #### 3. Recovery and Lessons Learned
 
 ```python
@@ -1127,15 +1161,17 @@ class IncidentRecovery:
             impact_assessment=impact_assessment,
             recommendations=recommendations,
             report_date=datetime.utcnow(),
-        )```
-______________________________________________________________________
+        )
+```
+
+---
 
 ## 📈 Security Metrics and KPIs
 
 ### Key Security Metrics
 
-| Metric                          | Target       | Current    | Status      |
-| ------------------------------- | ------------ | ---------- | ----------- |
+| Metric                          | Target       | Current    | Status       |
+| ------------------------------- | ------------ | ---------- | ------------ |
 | **Mean Time to Detect (MTTD)**  | < 15 minutes | 12 minutes | ✅ Good      |
 | **Mean Time to Respond (MTTR)** | < 2 hours    | 1.5 hours  | ✅ Good      |
 | **Security Incident Rate**      | < 5/month    | 2/month    | ✅ Good      |
@@ -1186,9 +1222,10 @@ class SecurityDashboard:
             infrastructure=infra_metrics,
             threat_detection=threat_metrics,
             recommendations=self._generate_recommendations(health_score),
-        )```
-______________________________________________________________________
+        )
+```
 
-**Security Architecture**: FLEXT-Meltano Enterprise Security Framework
-_Comprehensive security architecture with defense-in-depth, compliance, and incident response_
-````
+---
+
+**Security Architecture**: FLEXT-Meltano Enterprise Security Framework _Comprehensive
+security architecture with defense-in-depth, compliance, and incident response_

@@ -89,7 +89,7 @@ development tools, and enterprise data pipeline orchestration.
 
 **Primary service for Meltano project management and plugin operations**
 
-````python
+```python
 from __future__ import annotations
 
 
@@ -107,7 +107,9 @@ class FlextMeltanoService(s):
             project_root: Path to Meltano project root directory
             settings: Service configuration t.JsonValue
 
-        """```
+        """
+```
+
 #### Core Operations
 
 ##### discover_plugins()
@@ -131,7 +133,9 @@ def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
         ...     plugins = result.unwrap()
         ...     u.Cli.print(f"Found {len(plugins)} plugins")
 
-    """```
+    """
+```
+
 ##### install_plugin(plugin_name, version=None)
 
 **Install a Meltano plugin**
@@ -152,7 +156,9 @@ def install_plugin(
     Returns:
         r containing installation result or error
 
-    """```
+    """
+```
+
 ##### execute_tap(tap_name, settings=None, state=None)
 
 **Execute a Singer tap**
@@ -174,7 +180,9 @@ def execute_tap(
     Returns:
         r containing execution result or error
 
-    """```
+    """
+```
+
 ##### execute_target(target_name, records, settings=None)
 
 **Execute a Singer target**
@@ -199,7 +207,9 @@ def execute_target(
     Returns:
         r containing execution result or error
 
-    """```
+    """
+```
+
 ### FlextMeltanoAdapter
 
 **Meltano CLI integration and execution adapter**
@@ -212,7 +222,9 @@ class FlextMeltanoAdapter(s):
     """Adapter for Meltano CLI integration and execution."""
 
     def __init__(self, project_root: Path | str | None = None) -> None:
-        """Initialize Meltano adapter."""```
+        """Initialize Meltano adapter."""
+```
+
 #### Pipeline Operations
 
 ##### run_pipeline(tap_name, target_name, settings=None)
@@ -236,7 +248,9 @@ def run_pipeline(
     Returns:
         r containing pipeline execution result
 
-    """```
+    """
+```
+
 ##### validate_project()
 
 **Validate Meltano project configuration**
@@ -251,7 +265,9 @@ def validate_project(self) -> p.Result[FlextMeltanoModels.ProjectValidation]:
     Returns:
         r containing validation result or error
 
-    """```
+    """
+```
+
 ##### list_plugins(plugin_type=None)
 
 **List available Meltano plugins**
@@ -271,7 +287,9 @@ def list_plugins(
     Returns:
         r containing list of plugins or error
 
-    """```
+    """
+```
+
 ### FlextMeltanoExecutor
 
 **Advanced pipeline execution engine**
@@ -281,7 +299,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoExecutor(s):
-    """Advanced pipeline execution engine with orchestration."""```
+    """Advanced pipeline execution engine with orchestration."""
+```
+
 #### Advanced Execution
 
 ##### execute_pipeline_advanced(options)
@@ -303,7 +323,9 @@ def execute_pipeline_advanced(
     Returns:
         r containing execution result
 
-    """```
+    """
+```
+
 ##### execute_parallel_pipelines(pipelines)
 
 **Execute multiple pipelines in parallel**
@@ -323,8 +345,10 @@ def execute_parallel_pipelines(
     Returns:
         r containing list of execution results
 
-    """```
-______________________________________________________________________
+    """
+```
+
+---
 
 ## 🔌 Singer Protocol Abstractions
 
@@ -349,7 +373,9 @@ class FlextSingerTap(s):
             settings: Tap configuration dictionary
             state: Initial state for incremental sync
 
-        """```
+        """
+```
+
 #### Tap Operations
 
 ##### discover()
@@ -373,7 +399,9 @@ def discover(self) -> p.Result[FlextMeltanoModels.Catalog]:
         ...     catalog = result.unwrap()
         ...     u.Cli.print(f"Discovered {len(catalog.streams)} streams")
 
-    """```
+    """
+```
+
 ##### sync(streams=None, state=None)
 
 **Execute tap synchronization**
@@ -394,7 +422,9 @@ def sync(
     Returns:
         r containing sync result or error
 
-    """```
+    """
+```
+
 ##### validate_config()
 
 **Validate tap configuration**
@@ -409,7 +439,9 @@ def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
     Returns:
         r containing validation result
 
-    """```
+    """
+```
+
 ### FlextSingerTarget
 
 **Singer target implementation with batch processing**
@@ -422,7 +454,9 @@ class FlextSingerTarget(s):
     """Singer target implementation with batch processing and error handling."""
 
     def __init__(self, target_name: str, settings: m.Dict) -> None:
-        """Initialize Singer target."""```
+        """Initialize Singer target."""
+```
+
 #### Target Operations
 
 ##### load_records(records)
@@ -444,7 +478,9 @@ def load_records(
     Returns:
         r containing load result or error
 
-    """```
+    """
+```
+
 ##### flush()
 
 **Flush any buffered records**
@@ -459,7 +495,9 @@ def flush(self) -> p.Result[FlextMeltanoModels.FlushResult]:
     Returns:
         r containing flush result
 
-    """```
+    """
+```
+
 ##### validate_config()
 
 **Validate target configuration**
@@ -474,8 +512,10 @@ def validate_config(self) -> p.Result[FlextMeltanoModels.ValidationResult]:
     Returns:
         r containing validation result
 
-    """```
-______________________________________________________________________
+    """
+```
+
+---
 
 ## 🛠️ Plugin Management Services
 
@@ -491,7 +531,9 @@ class FlextPluginService(s):
     """Service for plugin lifecycle management and operations."""
 
     def __init__(self, project_root: Path | str | None = None) -> None:
-        """Initialize plugin service."""```
+        """Initialize plugin service."""
+```
+
 #### Plugin Lifecycle
 
 ##### discover_plugins()
@@ -508,7 +550,9 @@ def discover_plugins(self) -> p.Result[Sequence[FlextMeltanoModels.PluginInfo]]:
     Returns:
         r containing list of discovered plugins
 
-    """```
+    """
+```
+
 ##### install_plugin(plugin_name, version=None)
 
 **Install a plugin**
@@ -529,7 +573,9 @@ def install_plugin(
     Returns:
         r containing installation result
 
-    """```
+    """
+```
+
 ##### uninstall_plugin(plugin_name)
 
 **Uninstall a plugin**
@@ -549,7 +595,9 @@ def uninstall_plugin(
     Returns:
         r containing uninstall result
 
-    """```
+    """
+```
+
 ##### update_plugin(plugin_name, version=None)
 
 **Update a plugin to latest or specific version**
@@ -570,7 +618,9 @@ def update_plugin(
     Returns:
         r containing update result
 
-    """```
+    """
+```
+
 ### FlextPluginRegistry
 
 **Plugin registry and discovery system**
@@ -580,7 +630,9 @@ from __future__ import annotations
 
 
 class FlextPluginRegistry(s):
-    """Plugin registry for plugin discovery and management."""```
+    """Plugin registry for plugin discovery and management."""
+```
+
 #### Registry Operations
 
 ##### register_plugin(plugin_info)
@@ -600,7 +652,9 @@ def register_plugin(self, plugin_info: FlextMeltanoModels.PluginInfo) -> p.Resul
     Returns:
         r indicating success or failure
 
-    """```
+    """
+```
+
 ##### find_plugin(plugin_name, plugin_type=None)
 
 **Find a plugin by name and type**
@@ -621,7 +675,9 @@ def find_plugin(
     Returns:
         r containing plugin info or None
 
-    """```
+    """
+```
+
 ##### list_plugins_by_type(plugin_type)
 
 **List plugins by type**
@@ -641,8 +697,10 @@ def list_plugins_by_type(
     Returns:
         r containing list of plugins
 
-    """```
-______________________________________________________________________
+    """
+```
+
+---
 
 ## 🚀 Pipeline Services
 
@@ -655,7 +713,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoService(s):
-    """Service for pipeline orchestration and execution."""```
+    """Service for pipeline orchestration and execution."""
+```
+
 #### Pipeline Management
 
 ##### create_pipeline(settings)
@@ -677,7 +737,9 @@ def create_pipeline(
     Returns:
         r containing created pipeline
 
-    """```
+    """
+```
+
 ##### execute_pipeline(pipeline_name, options=None)
 
 **Execute a configured pipeline**
@@ -698,7 +760,9 @@ def execute_pipeline(
     Returns:
         r containing execution result
 
-    """```
+    """
+```
+
 ##### monitor_pipeline(pipeline_id)
 
 **Monitor pipeline execution**
@@ -718,7 +782,9 @@ def monitor_pipeline(
     Returns:
         r containing pipeline status
 
-    """```
+    """
+```
+
 ### FlextMeltanoExecutor
 
 **Advanced pipeline execution engine**
@@ -728,7 +794,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoExecutor(s):
-    """Advanced pipeline execution engine with orchestration."""```
+    """Advanced pipeline execution engine with orchestration."""
+```
+
 #### Advanced Execution
 
 ##### execute_parallel_pipelines(pipelines)
@@ -750,7 +818,9 @@ def execute_parallel_pipelines(
     Returns:
         r containing list of execution results
 
-    """```
+    """
+```
+
 ##### execute_conditional_pipeline(condition, pipeline)
 
 **Execute pipeline based on condition**
@@ -773,8 +843,10 @@ def execute_conditional_pipeline(
     Returns:
         r containing execution result or None
 
-    """```
-______________________________________________________________________
+    """
+```
+
+---
 
 ## 📁 Project Management
 
@@ -787,7 +859,9 @@ from __future__ import annotations
 
 
 class FlextProjectService(s):
-    """Service for Meltano project management."""```
+    """Service for Meltano project management."""
+```
+
 #### Project Operations
 
 ##### create_project(project_config)
@@ -809,7 +883,9 @@ def create_project(
     Returns:
         r containing created project
 
-    """```
+    """
+```
+
 ##### validate_project(project_root)
 
 **Validate Meltano project structure**
@@ -829,7 +905,9 @@ def validate_project(
     Returns:
         r containing validation result
 
-    """```
+    """
+```
+
 ##### get_project_info(project_root)
 
 **Get project information and metadata**
@@ -849,7 +927,9 @@ def get_project_info(
     Returns:
         r containing project information
 
-    """```
+    """
+```
+
 ### FlextMeltanoProject
 
 **Meltano project representation**
@@ -859,7 +939,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoProject:
-    """Representation of a Meltano project."""```
+    """Representation of a Meltano project."""
+```
+
 #### Project Properties
 
 #### r
@@ -872,7 +954,9 @@ from __future__ import annotations
 
 @property
 def root_path(self) -> Path:
-    """Get project root directory path."""```
+    """Get project root directory path."""
+```
+
 ##### meltano_yml_path
 
 **Path to meltano.yml configuration file**
@@ -883,7 +967,9 @@ from __future__ import annotations
 
 @property
 def meltano_yml_path(self) -> Path:
-    """Get path to meltano.yml configuration file."""```
+    """Get path to meltano.yml configuration file."""
+```
+
 ##### plugins
 
 **List of configured plugins**
@@ -894,8 +980,10 @@ from __future__ import annotations
 
 @property
 def plugins(self) -> t.SequenceOf[FlextMeltanoModels.PluginInfo]:
-    """Get list of configured plugins."""```
-______________________________________________________________________
+    """Get list of configured plugins."""
+```
+
+---
 
 ## 🔧 Configuration Management
 
@@ -908,7 +996,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoSettings(FlextSettings):
-    """Meltano-specific configuration management."""```
+    """Meltano-specific configuration management."""
+```
+
 #### Configuration Sections
 
 ##### project_config
@@ -921,7 +1011,9 @@ from __future__ import annotations
 
 @property
 def project_config(self) -> FlextMeltanoModels.ProjectConfig:
-    """Get project-level configuration."""```
+    """Get project-level configuration."""
+```
+
 ##### plugin_configs
 
 **Plugin-specific configurations**
@@ -932,7 +1024,9 @@ from __future__ import annotations
 
 @property
 def plugin_configs(self) -> t.MappingKV[str, m.Dict]:
-    """Get plugin-specific configurations."""```
+    """Get plugin-specific configurations."""
+```
+
 ##### pipeline_configs
 
 **Pipeline execution configurations**
@@ -943,8 +1037,10 @@ from __future__ import annotations
 
 @property
 def pipeline_configs(self) -> t.MappingKV[str, FlextMeltanoModels.PipelineConfig]:
-    """Get pipeline execution configurations."""```
-______________________________________________________________________
+    """Get pipeline execution configurations."""
+```
+
+---
 
 ## 📊 Models and Types
 
@@ -965,7 +1061,9 @@ class Config(FlextBaseModel):
     default_environment: str = "dev"
     log_level: str = "INFO"
     plugin_dir: Path | None = None
-    state_dir: Path | None = None```
+    state_dir: Path | None = None
+```
+
 #### FlextMeltanoModels.PluginInfo
 
 **Plugin information model**
@@ -983,7 +1081,9 @@ class PluginInfo(FlextBaseModel):
     pip_url: str | None = None
     executable: str | None = None
     settings: m.Dict | None = None
-    version: str | None = None```
+    version: str | None = None
+```
+
 #### FlextMeltanoModels.PipelineConfig
 
 **Pipeline configuration model**
@@ -1001,7 +1101,9 @@ class PipelineConfig(FlextBaseModel):
     transformer: str | None = None
     schedule: str | None = None
     incremental: bool = False
-    parallelism: int = 1```
+    parallelism: int = 1
+```
+
 ### Execution Models
 
 #### FlextMeltanoModels.TapExecutionResult
@@ -1020,7 +1122,9 @@ class TapExecutionResult(FlextBaseModel):
     streams_discovered: int = 0
     execution_time: float = 0.0
     state: m.Dict | None = None
-    error: str | None = None```
+    error: str | None = None
+```
+
 #### FlextMeltanoModels.TargetExecutionResult
 
 **Target execution result model**
@@ -1035,7 +1139,9 @@ class TargetExecutionResult(FlextBaseModel):
     success: bool
     records_loaded: int = 0
     execution_time: float = 0.0
-    error: str | None = None```
+    error: str | None = None
+```
+
 #### FlextMeltanoModels.PipelineResult
 
 **Pipeline execution result model**
@@ -1052,8 +1158,10 @@ class PipelineResult(FlextBaseModel):
     target_result: TargetExecutionResult | None = None
     transformer_result: m.Dict | None = None
     execution_time: float = 0.0
-    error: str | None = None```
-______________________________________________________________________
+    error: str | None = None
+```
+
+---
 
 ## 🛡️ Exception Hierarchy
 
@@ -1066,7 +1174,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoException(FlextException):
-    """Base exception for FLEXT-Meltano errors."""```
+    """Base exception for FLEXT-Meltano errors."""
+```
+
 ### Specific Exceptions
 
 #### FlextMeltanoPluginException
@@ -1078,7 +1188,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoPluginException(FlextMeltanoException):
-    """Exception raised for plugin-related errors."""```
+    """Exception raised for plugin-related errors."""
+```
+
 #### FlextMeltanoPipelineException
 
 **Pipeline execution errors**
@@ -1088,7 +1200,9 @@ from __future__ import annotations
 
 
 class FlextMeltanoPipelineException(FlextMeltanoException):
-    """Exception raised for pipeline execution errors."""```
+    """Exception raised for pipeline execution errors."""
+```
+
 #### FlextMeltanoConfigurationException
 
 **Configuration-related errors**
@@ -1098,8 +1212,10 @@ from __future__ import annotations
 
 
 class FlextMeltanoConfigurationException(FlextMeltanoException):
-    """Exception raised for configuration errors."""```
-______________________________________________________________________
+    """Exception raised for configuration errors."""
+```
+
+---
 
 ## 🔄 Integration Examples
 
@@ -1124,7 +1240,9 @@ if tap_result.success:
         target_name="target-jsonl",
         records=records,
         settings={"destination_path": "output/sales.jsonl"},
-    )```
+    )
+```
+
 ### Advanced Pipeline Orchestration
 
 ```python
@@ -1145,7 +1263,9 @@ result = executor.execute_pipeline_advanced(
 )
 
 if result.success:
-    u.Cli.print(f"Pipeline completed in {result.unwrap().execution_time}s")```
+    u.Cli.print(f"Pipeline completed in {result.unwrap().execution_time}s")
+```
+
 ### Plugin Management
 
 ```python
@@ -1161,8 +1281,10 @@ if install_result.success:
 
 # List available taps
 taps = plugin_service.discover_plugins()
-available_taps = [p for p in taps.unwrap() if p.plugin_type == "tap"]```
-______________________________________________________________________
+available_taps = [p for p in taps.unwrap() if p.plugin_type == "tap"]
+```
+
+---
 
 **Document Status**: ✅ Complete | **Last Reviewed**: 2026-04-14
 
@@ -1172,16 +1294,19 @@ ______________________________________________________________________
 
 - [Getting Started](getting-started.md) - Installation and basic usage
 - [Architecture](architecture.md) - Architecture and design patterns
-- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) - Working code examples
+- [Examples](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-meltano/examples/) -
+  Working code examples
 
 **Across Projects**:
 
-- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/api-reference/foundation.md) - Core APIs and patterns
-- [flext-plugin API](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/api-reference.md) - Plugin API reference
-- [flext-quality Automation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-quality/AGENTS.md) - Quality analysis and automation
+- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/api-reference/foundation.md) -
+  Core APIs and patterns
+- [flext-plugin API](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-plugin/docs/api-reference.md) -
+  Plugin API reference
+- [flext-quality Automation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-quality/AGENTS.md) -
+  Quality analysis and automation
 
 **External Resources**:
 
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
-````

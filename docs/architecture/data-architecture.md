@@ -115,7 +115,7 @@ deactivate tap
 #### 1. **Extract-Load-Transform (ELT) Pattern**
 
 ```
-Source System → Singer Tap → JSONL Stream → Singer Target → Raw Storage → DBT → Transformed Data
+Source System → Singer Tap → JSONL Stream → Singer Target → Raw Storage → DBT → Tran ...
 ```
 
 #### 2. **Incremental Loading Pattern**
@@ -211,7 +211,7 @@ external --> intermediate: Data extraction
 
 #### 1. **State Management**
 
-````python
+```python
 from __future__ import annotations
 
 
@@ -227,7 +227,9 @@ class PipelineState:
         """Update bookmark for incremental sync."""
         self.bookmarks[stream] = value
         self.last_updated = datetime.utcnow()
-        self.version += 1```
+        self.version += 1
+```
+
 #### 2. **Data Buffering**
 
 ```python
@@ -244,7 +246,9 @@ class RecordBuffer:
     def add_record(self, record: dict) -> bool:
         """Add record to buffer, return True if flush needed."""
         self.records.append(record)
-        return len(self.records) >= self.max_size * self.flush_threshold```
+        return len(self.records) >= self.max_size * self.flush_threshold
+```
+
 #### 3. **Error Handling Storage**
 
 ```python
@@ -262,8 +266,10 @@ class ErrorStore:
         error_message: str
         timestamp: datetime
         retry_count: int
-        pipeline_stage: str```
-______________________________________________________________________
+        pipeline_stage: str
+```
+
+---
 
 ## 📊 Data Models and Schemas
 
@@ -296,7 +302,9 @@ class PipelineConfig:
                     tap=tap, target=target, transforms=self.transforms
                 )
             )
-        )```
+        )
+```
+
 #### Singer Message Schema
 
 ```json
@@ -330,7 +338,9 @@ class PipelineConfig:
       "required": ["type", "stream", "schema"]
     }
   ]
-}```
+}
+```
+
 ### Data Validation Rules
 
 #### Schema Validation
@@ -357,8 +367,10 @@ class SchemaValidator:
         if not all(field in schema for field in required_fields):
             return r.fail(SchemaError("Invalid Singer schema structure"))
 
-        return r.ok(ValidatedSchema(schema=schema))```
-______________________________________________________________________
+        return r.ok(ValidatedSchema(schema=schema))
+```
+
+---
 
 ## 🔄 Data Processing Pipeline
 
@@ -408,7 +420,9 @@ repeat while (More Data?)
 :Generate Execution Report;
 
 stop
-@enduml```
+@enduml
+```
+
 ### Processing Stages
 
 #### 1. **Data Extraction Stage**
@@ -439,7 +453,7 @@ stop
 - **Output**: Analytics-ready tables
 - **Error Handling**: Model validation, dependency resolution
 
-______________________________________________________________________
+---
 
 ## 🛡️ Data Quality and Validation
 
@@ -451,7 +465,7 @@ ______________________________________________________________________
 | **Data Type Consistency** | Type coercion rules     | Transform or reject       |
 | **Referential Integrity** | Foreign key validation  | Conditional loading       |
 | **Business Rules**        | Custom validation logic | Reject or flag            |
-| **Completeness**          | Required field checks | Reject incomplete records |
+| **Completeness**          | Required field checks   | Reject incomplete records |
 
 ### Data Quality Metrics
 
@@ -478,7 +492,9 @@ class DataQualityMetrics:
         valid_percentage = (self.valid_records / self.total_records) * 100
         error_penalty = min((self.invalid_records / self.total_records) * 50, 25)
 
-        return max(0, valid_percentage - error_penalty)```
+        return max(0, valid_percentage - error_penalty)
+```
+
 ### Error Handling Strategies
 
 #### 1. **Schema Validation Errors**
@@ -502,7 +518,7 @@ class DataQualityMetrics:
 - Graceful degradation strategies
 - Alert escalation for critical failures
 
-______________________________________________________________________
+---
 
 ## 🎯 Data Governance
 
@@ -530,7 +546,9 @@ dbt -> lineage: record_model_execution(model, sources, outputs)
 lineage -> metadata: update_lineage_graph()
 
 note right: Lineage tracking captures\ntransformation dependencies\nand data flow paths
-@enduml```
+@enduml
+```
+
 ### Data Classification and Security
 
 | Data Classification | Handling Requirements   | Storage Requirements |
@@ -562,8 +580,10 @@ class RetentionPolicy:
 
     def get_archive_action(self) -> str:
         """Get appropriate archive action."""
-        return self.archive_strategy```
-______________________________________________________________________
+        return self.archive_strategy
+```
+
+---
 
 ## ⚡ Performance and Scalability
 
@@ -598,7 +618,9 @@ class PipelineScaler:
             return ScalingDecision(
                 scale_down=True, instances=max(1, current_instances - 1)
             )
-        return ScalingDecision(scale_up=False, scale_down=False)```
+        return ScalingDecision(scale_up=False, scale_down=False)
+```
+
 #### 2. **Data Partitioning**
 
 ```python
@@ -618,7 +640,9 @@ class DataPartitioner:
             key = record.get(partition_key, "default")
             partitions[key].append(record)
 
-        return t.JsonMapping(partitions)```
+        return t.JsonMapping(partitions)
+```
+
 #### 3. **Caching Strategy**
 
 ```python
@@ -639,7 +663,9 @@ class PipelineCache:
             cached_item = self.schema_cache[stream_name]
             if not self._is_expired(cached_item):
                 return cached_item["schema"]
-        return None```
+        return None
+```
+
 ### Monitoring and Observability
 
 #### Key Metrics
@@ -671,8 +697,10 @@ class AlertRule:
         condition_met = self._check_condition(current_value)
         cooldown_expired = self._is_cooldown_expired(last_alert)
 
-        return condition_met and cooldown_expired```
-______________________________________________________________________
+        return condition_met and cooldown_expired
+```
+
+---
 
 ## 📈 Architecture Evolution
 
@@ -691,8 +719,7 @@ ______________________________________________________________________
 - **AI/ML Integration**: Intelligent data quality assessment
 - **Event-Driven Processing**: Asynchronous pipeline execution
 
-______________________________________________________________________
+---
 
-**Data Architecture**: FLEXT-Meltano Enterprise Data Processing
-_Comprehensive data flow, storage, and processing architecture documentation_
-````
+**Data Architecture**: FLEXT-Meltano Enterprise Data Processing _Comprehensive data
+flow, storage, and processing architecture documentation_
