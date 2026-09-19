@@ -40,7 +40,9 @@ class FlextMeltanoModelsProjects:
         """Parsed dbt manifest with typed nodes."""
 
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = m.Field(
-            default_factory=lambda: MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode]({}),
+            default_factory=lambda: MappingProxyType[
+                str, FlextMeltanoModelsProjects.DbtManifestNode
+            ]({}),
             description="Manifest nodes keyed by node_id",
         )
 
