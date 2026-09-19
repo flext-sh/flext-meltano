@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 import time
-from contextlib import redirect_stderr, redirect_stdout, suppress
+from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 from typing import override
@@ -268,8 +268,14 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 runtime_error = str(e)
             finally:
                 Project.deactivate()
-                with suppress(OSError):
+                try:
                     os.chdir(prior_cwd)
+                except OSError as restore_error:
+                    self.logger.warning(
+                        "Failed to restore working directory",
+                        path=prior_cwd,
+                        error=str(restore_error),
+                    )
             execution_time = time.monotonic() - start_time
             error_output = stderr_buffer.getvalue()
             if runtime_error and not error_output.strip():

@@ -77,9 +77,7 @@ class FlextMeltanoModelsDiscovery:
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
             m.Field(
-                default_factory=lambda: MappingProxyType[
-                    str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
-                ]({}),
+                default_factory=lambda: MappingProxyType({}),
                 description="Discovered plugins catalog",
             )
         )
