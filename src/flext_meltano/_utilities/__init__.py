@@ -12,8 +12,7 @@ if TYPE_CHECKING:
     from .runtime import FlextMeltanoUtilitiesRuntime
     from .singer import FlextMeltanoUtilitiesSinger
 __all__: tuple[str, ...] = (
-    "FlextMeltanoUtilitiesRuntime",
-    "FlextMeltanoUtilitiesSinger",
+    "FlextMeltanoUtilitiesRuntime", "FlextMeltanoUtilitiesSinger",
 )
 
 _LAZY_IMPORTS = MappingProxyType(

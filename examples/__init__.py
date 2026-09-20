@@ -26,22 +26,10 @@ if TYPE_CHECKING:
         ExamplesFlextMeltanoUtilities as u,
     )
 __all__: tuple[str, ...] = (
-    "ExamplesFlextMeltanoConstants",
-    "ExamplesFlextMeltanoModels",
-    "ExamplesFlextMeltanoProtocols",
-    "ExamplesFlextMeltanoTypes",
-    "ExamplesFlextMeltanoUtilities",
-    "FlextMeltanoConstants",
-    "c",
-    "d",
-    "e",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "u",
+    "ExamplesFlextMeltanoConstants", "ExamplesFlextMeltanoModels", "ExamplesFlextMeltanoProtocols", "ExamplesFlextMeltanoTypes",
+    "ExamplesFlextMeltanoUtilities", "FlextMeltanoConstants", "c", "d",
+    "e", "h", "m", "p",
+    "r", "s", "t", "u",
     "x",
 )
 
