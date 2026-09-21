@@ -10,6 +10,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import Annotated
+
 from flext_cli import FlextCliConfig, m
 
 
@@ -22,7 +24,10 @@ class _MeltanoNamespace(m.BaseModel):
 class FlextMeltanoConfig(FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
-    Meltano: _MeltanoNamespace = _MeltanoNamespace()
+    Meltano: Annotated[
+        _MeltanoNamespace,
+        m.Field(description="Open namespace exposing ``config/*.yaml`` under ``Meltano``."),
+    ] = _MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()
