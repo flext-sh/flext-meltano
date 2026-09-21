@@ -13,7 +13,9 @@ if TYPE_CHECKING:
     from .enums import FlextMeltanoConstantsEnums
     from .settings import FlextMeltanoConstantsSettings
 __all__: tuple[str, ...] = (
-    "FlextMeltanoConstantsBase", "FlextMeltanoConstantsEnums", "FlextMeltanoConstantsSettings",
+    "FlextMeltanoConstantsBase",
+    "FlextMeltanoConstantsEnums",
+    "FlextMeltanoConstantsSettings",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
