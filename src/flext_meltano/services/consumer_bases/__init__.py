@@ -14,7 +14,10 @@ if TYPE_CHECKING:
     from .tap_service_base import FlextMeltanoTapServiceBase
     from .target_service_base import FlextMeltanoTargetServiceBase
 __all__: tuple[str, ...] = (
-    "FlextMeltanoConsumerBases", "FlextMeltanoDbtServiceBase", "FlextMeltanoTapServiceBase", "FlextMeltanoTargetServiceBase",
+    "FlextMeltanoConsumerBases",
+    "FlextMeltanoDbtServiceBase",
+    "FlextMeltanoTapServiceBase",
+    "FlextMeltanoTargetServiceBase",
 )
 
 _LAZY_IMPORTS = MappingProxyType(

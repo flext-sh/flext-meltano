@@ -31,11 +31,26 @@ if TYPE_CHECKING:
     from .sources_params import FlextMeltanoModelsSourcesParams
     from .transformations import FlextMeltanoModelsTransformations
 __all__: tuple[str, ...] = (
-    "FlextMeltanoModelsCliInputs", "FlextMeltanoModelsCliParams", "FlextMeltanoModelsContext", "FlextMeltanoModelsCore",
-    "FlextMeltanoModelsDiscovery", "FlextMeltanoModelsInstances", "FlextMeltanoModelsInstancesData", "FlextMeltanoModelsLogging",
-    "FlextMeltanoModelsPayloads", "FlextMeltanoModelsPayloadsData", "FlextMeltanoModelsProjects", "FlextMeltanoModelsProjectsPlugin",
-    "FlextMeltanoModelsResults", "FlextMeltanoModelsResultsDbt", "FlextMeltanoModelsResultsPipeline", "FlextMeltanoModelsSinger",
-    "FlextMeltanoModelsSingerCatalog", "FlextMeltanoModelsSingerSdk", "FlextMeltanoModelsSources", "FlextMeltanoModelsSourcesParams",
+    "FlextMeltanoModelsCliInputs",
+    "FlextMeltanoModelsCliParams",
+    "FlextMeltanoModelsContext",
+    "FlextMeltanoModelsCore",
+    "FlextMeltanoModelsDiscovery",
+    "FlextMeltanoModelsInstances",
+    "FlextMeltanoModelsInstancesData",
+    "FlextMeltanoModelsLogging",
+    "FlextMeltanoModelsPayloads",
+    "FlextMeltanoModelsPayloadsData",
+    "FlextMeltanoModelsProjects",
+    "FlextMeltanoModelsProjectsPlugin",
+    "FlextMeltanoModelsResults",
+    "FlextMeltanoModelsResultsDbt",
+    "FlextMeltanoModelsResultsPipeline",
+    "FlextMeltanoModelsSinger",
+    "FlextMeltanoModelsSingerCatalog",
+    "FlextMeltanoModelsSingerSdk",
+    "FlextMeltanoModelsSources",
+    "FlextMeltanoModelsSourcesParams",
     "FlextMeltanoModelsTransformations",
 )
 

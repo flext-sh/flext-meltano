@@ -13,7 +13,9 @@ if TYPE_CHECKING:
     from .domains import FlextMeltanoTypingsDomains
     from .singer import FlextMeltanoTypingsSinger
 __all__: tuple[str, ...] = (
-    "FlextMeltanoTypingsBase", "FlextMeltanoTypingsDomains", "FlextMeltanoTypingsSinger",
+    "FlextMeltanoTypingsBase",
+    "FlextMeltanoTypingsDomains",
+    "FlextMeltanoTypingsSinger",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
