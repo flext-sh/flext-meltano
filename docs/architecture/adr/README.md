@@ -6,16 +6,6 @@
 - [ADR Process](#adr-process)
   - [Creating an ADR](#creating-an-adr)
   - [ADR Template](#adr-template)
-- [Context](#context)
-- [Decision](#decision)
-- [Rationale](#rationale)
-- [Consequences](#consequences)
-  - [Positive](#positive)
-  - [Negative](#negative)
-  - [Risks](#risks)
-- [Alternatives Considered](#alternatives-considered)
-- [Related ADRs](#related-adrs)
-- [Notes](#notes)
 - [Current ADRs](#current-adrs)
 - [ADR Status Definitions](#adr-status-definitions)
 - [Categories](#categories)
@@ -109,9 +99,9 @@ capture important architectural decisions, their context, and rationale.
 | ADR-005                                        | Plugin-Centric Architecture                  | Accepted                    | 2025-02-10 | _Documentation coming soon_ |
 | ADR-006                                        | FLEXT-Core Integration Pattern               | Accepted                    |            | _Documentation coming soon_ |
 | ADR-007                                        | State Management Strategy                    | _Documentation coming soon_ | 2025-02-20 |                             |
-| ADR-008                                        | Error Handling Strategy                      | Accepted                    |            | _Documentation coming soon_ |
+| [ADR-008](008-error-handling-strategy.md)      | Error Handling Strategy                      | Accepted                    |            |                             |
 | ADR-009                                        | API Design Principles                        | Accepted                    | 2025-03-01 | _Documentation coming soon_ |
-| [ADR-010](010-testing-strategy.md)             | Testing Strategy and Infrastructure          | Accepted                    | 2025-03-05 | _Documentation coming soon_ |
+| [ADR-010](010-testing-strategy.md)             | Testing Strategy and Infrastructure          | Accepted                    | 2025-03-05 |                             |
 
 ## ADR Status Definitions
 
@@ -190,5 +180,5 @@ ADRs must:
 
 - [Architecture Overview](../../architecture.md)
 - [C4 Model Documentation](../../c4-model.md)
-- Quality Attributes (_Documentation coming soon_)
-- Security Architecture (_Documentation coming soon_)
+- Quality Attributes (_Pending_)
+- Security Architecture (_Pending_)

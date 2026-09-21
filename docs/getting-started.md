@@ -4,20 +4,20 @@
 
 - [🎯 Overview](#overview)
 - [📋 Prerequisites](#prerequisites)
-  - [**Environment Requirements**](#environment-requirements)
-  - [**FLEXT Ecosystem Setup**](#flext-ecosystem-setup)
+  - [Environment Requirements](#environment-requirements)
+  - [FLEXT Ecosystem Setup](#flext-ecosystem-setup)
 - [⚡ Quick Installation](#quick-installation)
 - [🚀 First Steps](#first-steps)
-  - [**Basic Service Usage**](#basic-service-usage)
-  - [**Singer Protocol Operations**](#singer-protocol-operations)
-  - [**r Pattern**](#r-pattern)
+  - [Basic Service Usage](#basic-service-usage)
+  - [Singer Protocol Operations](#singer-protocol-operations)
+  - [r Pattern](#r-pattern)
 - [🔧 Development Workflow](#development-workflow)
-  - [**Quality Gates**](#quality-gates)
-  - [**Common Commands**](#common-commands)
+  - [Quality Gates](#quality-gates)
+  - [Common Commands](#common-commands)
 - [📚 Next Steps](#next-steps)
 - [⚠️ Important Notes](#important-notes)
-  - [**Architecture Compliance**](#architecture-compliance)
-  - [**Current Status**](#current-status)
+  - [Architecture Compliance](#architecture-compliance)
+  - [Current Status](#current-status)
 - [Related Documentation](#related-documentation)
 
 <!-- TOC END -->
@@ -62,7 +62,7 @@ cd flext-meltano
 
 ```bash
 # Install development dependencies
-poetry install --with dev,test
+make setup
 
 # Verify installation
 python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Installation successful')"
@@ -131,7 +131,7 @@ else:
 
 ```bash
 # Run before any commit
-make val           # Complete validation pipeline
+make check           # Complete validation pipeline
 make lint               # Code linting
 make type-check         # Type safety validation
 make test               # Test execution

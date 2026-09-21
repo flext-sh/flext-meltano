@@ -4,32 +4,32 @@
 
 - [🎯 Project Overview](#project-overview)
 - [🛠️ Development Setup](#development-setup)
-  - [**Prerequisites**](#prerequisites)
-  - [**Initial Setup**](#initial-setup)
+  - [Prerequisites](#prerequisites)
+  - [Initial Setup](#initial-setup)
 - [🔧 Development Workflow](#development-workflow)
-  - [**Quality Gates**](#quality-gates)
-  - [**Code Standards**](#code-standards)
-  - [**Testing Strategy**](#testing-strategy)
+  - [Quality Gates](#quality-gates)
+  - [Code Standards](#code-standards)
+  - [Testing Strategy](#testing-strategy)
 - [🏗️ Architecture Constraints](#architecture-constraints)
-  - [**Current Compliance Issues**](#current-compliance-issues)
-  - [**FLEXT Ecosystem Requirements**](#flext-ecosystem-requirements)
+  - [Current Compliance Issues](#current-compliance-issues)
+  - [FLEXT Ecosystem Requirements](#flext-ecosystem-requirements)
 - [📊 Code Metrics](#code-metrics)
-  - [**Current Implementation**](#current-implementation)
-  - [**Priority Improvements**](#priority-improvements)
+  - [Current Implementation](#current-implementation)
+  - [Priority Improvements](#priority-improvements)
 - [🧪 Testing Guidelines](#testing-guidelines)
-  - [**Test Organization**](#test-organization)
-  - [**Running Tests**](#running-tests)
+  - [Test Organization](#test-organization)
+  - [Running Tests](#running-tests)
 - [🔍 Debugging and Development](#debugging-and-development)
-  - [**Common Issues**](#common-issues)
-  - [**Development Tools**](#development-tools)
+  - [Common Issues](#common-issues)
+  - [Development Tools](#development-tools)
 - [📚 Contributing Guidelines](#contributing-guidelines)
-  - [**Code Review Checklist**](#code-review-checklist)
-  - [**Architecture Compliance**](#architecture-compliance)
+  - [Code Review Checklist](#code-review-checklist)
+  - [Architecture Compliance](#architecture-compliance)
 - [🎯 Development Priorities](#development-priorities)
-  - [**Immediate (Next Sprint)**](#immediate-next-sprint)
-  - [**Short Term (Next Month)**](#short-term-next-month)
-  - [**Long Term (Next Quarter)**](#long-term-next-quarter)
-  <!-- TOC END -->
+  - [Immediate (Next Sprint)](#immediate-next-sprint)
+  - [Short Term (Next Month)](#short-term-next-month)
+  - [Long Term (Next Quarter)](#long-term-next-quarter)
+<!-- TOC END -->
 
 **Development workflow for the flext-meltano project**
 
@@ -67,7 +67,7 @@ cd ..flext-meltano
 source ../.venv/bin/activate
 
 # Install dependencies
-poetry install --with dev,test
+make setup
 
 # Verify setup
 make lint type-check test
@@ -81,9 +81,9 @@ make lint type-check test
 
 ```bash
 # Pre-commit checks (must pass)
-make val        # Complete validation pipeline
-make lint       # Ruff linting
-make type-check # MyPy strict mode
+make fix        # Repair findings
+make fmt        # Format sources and docs
+make check      # Complete validation pipeline
 make test       # Test suite execution
 ```
 

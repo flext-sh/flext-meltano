@@ -15,11 +15,11 @@
   - [Singer Catalog Configuration](#singer-catalog-configuration)
 - [🛠️ dbt Configuration](#dbt-configuration)
   - [dbt Project Structure```](#dbt-project-structure)
-  - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbtprojectyml)
+  - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbt_projectyml)
   - [dbt Service Configuration](#dbt-service-configuration)
 - [🏗️ Pipeline Configuration](#pipeline-configuration)
   - [Complete ELT Pipeline](#complete-elt-pipeline)
-  - [Configuration Validation](#configuration-validation)
+  - [Configuration Validation](#configuration-validation_1)
 - [🌍 Environment Management](#environment-management)
   - [Development Environment](#development-environment)
   - [Production Environment](#production-environment)
@@ -28,7 +28,7 @@
   - [Reading Configuration Files](#reading-configuration-files)
   - [Writing Configuration Files](#writing-configuration-files)
   - [Configuration Backup](#configuration-backup)
-- [🔍 Configuration Validation](#configuration-validation)
+- [🔍 Configuration Validation](#configuration-validation_2)
   - [Schema Validation](#schema-validation)
   - [Runtime Validation](#runtime-validation)
 - [🚨 Current Limitations](#current-limitations)
@@ -93,7 +93,7 @@ source .venv/bin/activate
 cd flext-meltano
 
 # Install dependencies
-poetry install --with dev,test
+make setup
 ```
 
 ---

@@ -12,8 +12,6 @@
 - [🔧 Common Fixes](#common-fixes)
   - [Fix Broken Internal Links](#fix-broken-internal-links)
   - [Add Missing Structure](#add-missing-structure)
-- [Section 1](#section-1)
-- [Section 2](#section-2)
   - [Fix Long Lines](#fix-long-lines)
 - [📈 Monitoring Progress](#monitoring-progress)
   - [Daily Checks](#daily-checks)
@@ -54,7 +52,7 @@ ls scripts/documentation/audit.py scripts/documentation/validate.py
 make docs
 
 # View results
-make docs DOCS_PHASE=audit
+make docs
 ```
 
 ### 3. Set Up Quality Gates
@@ -137,10 +135,10 @@ documentation harder to read.
 
 ```bash
 # Quick quality check
-make docs DOCS_PHASE=audit
+make docs
 
 # View summary
-make docs DOCS_PHASE=audit
+make docs
 ```
 
 ### Weekly Maintenance
@@ -183,7 +181,7 @@ The system automatically runs quality checks on:
 
 ```bash
 # Check system status
-make docs DOCS_PHASE=audit PROJECT=flext-meltano
+make docs
 
 # View configuration
 cat docs/.maintenance_config.yaml
@@ -221,7 +219,7 @@ ls -la .git/hooks/pre-commit
 mkdir -p docs/reports
 
 # Run with verbose output
-make docs DOCS_PHASE=all PROJECT=flext-meltano
+make docs
 ```
 
 ## 📚 Advanced Usage

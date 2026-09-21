@@ -3,26 +3,20 @@
 <!-- TOC START -->
 
 - [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
-  - [**Direct Import Violations**](#direct-import-violations)
-- [🔧 Development Issues](#development-issues)
-  - [**Import Errors**](#import-errors)
-  - [**Type Check Failures**](#type-check-failures)
-  - [**Test Failures**](#test-failures)
-- [📦 Dependency Issues](#dependency-issues)
-  - [**Poetry Lock Conflicts**](#poetry-lock-conflicts)
-  - [**Virtual Environment Issues**](#virtual-environment-issues)
+  - [Direct Import Violations](#direct-import-violations)
+  - [Virtual Environment Issues](#virtual-environment-issues)
 - [🧪 Testing Issues](#testing-issues)
-  - [**Coverage Issues**](#coverage-issues)
-  - [**Slow Tests**](#slow-tests)
+  - [Coverage Issues](#coverage-issues)
+  - [Slow Tests](#slow-tests)
 - [🔍 Quality Gate Failures](#quality-gate-failures)
-  - [**Linting Errors**](#linting-errors)
-  - [**Security Issues**](#security-issues)
+  - [Linting Errors](#linting-errors)
+  - [Security Issues](#security-issues)
 - [🚫 Common Mistakes](#common-mistakes)
-  - [**r Pattern Violations**](#r-pattern-violations)
-  - [**Service Pattern Violations**](#service-pattern-violations)
+  - [r Pattern Violations](#r-pattern-violations)
+  - [Service Pattern Violations](#service-pattern-violations)
 - [🆘 Getting Help](#getting-help)
-  - [**Debug Information**](#debug-information)
-  - [**Support Channels**](#support-channels)
+  - [Debug Information](#debug-information)
+  - [Support Channels](#support-channels)
 - [📋 Debugging Checklist](#debugging-checklist)
 
 <!-- TOC END -->
@@ -69,16 +63,15 @@ ImportError: cannot import name 'FlextMeltanoService' from 'flext_meltano'
 python -c "import flext_meltano; u.Cli.print(flext_meltano.__file__)"
 
 # Reinstall if needed
-poetry install --with dev,test
+make setup
 ```
-
 ### **Type Check Failures**
 
 **Problem**: MyPy errors in source code
 
 ```bash
 # Run type checking
-make type-check
+make check
 ```
 
 **Solution**: Fix type annotations
@@ -100,36 +93,29 @@ def process_data(data: dict) -> p.Result[Optional[m.Dict]]:
 **Problem**: Tests failing during development
 
 ```bash
-# Run tests with verbose output
-pytest tests/ -v
-
-# Run specific test categories
-pytest tests/unit/ -v        # Unit tests only
-pytest tests/integration/ -v  # Integration tests
+# Run the workspace test lifecycle from its root
+make test
 ```
 
 **Solution**: Common test issues
 
 1. **Missing test data**: Ensure test fixtures are available
 1. **Environment setup**: Activate correct virtual environment
-1. **Dependencies**: Run `poetry install --with dev,test`
+1. **Dependencies**: Run `make setup` from the workspace root
 
 ---
 
 ## 📦 Dependency Issues
 
-### **Poetry Lock Conflicts**
+### **Dependency Lock Conflicts**
 
 **Problem**: Dependency version conflicts
 
 ```bash
-# Update dependencies
-poetry update
-
-# Resolve lock file issues
-poetry lock --no-update
+# Reconcile declared dependency floors and regenerate consumers
+make deps
+make gen
 ```
-
 ### **Virtual Environment Issues**
 
 **Problem**: Wrong virtual environment or missing dependencies
@@ -154,8 +140,8 @@ cd flext-meltano
 **Problem**: Low test coverage or coverage failures
 
 ```bash
-# Generate detailed coverage report
-pytest --cov=src --cov-report=html
+# Run tests using the configured coverage policy
+make test
 
 # View HTML report
 open htmlcov/index.html
@@ -172,11 +158,8 @@ open htmlcov/index.html
 **Problem**: Test suite running slowly
 
 ```bash
-# Skip slow tests during development
-pytest -m "not slow"
-
-# Run only unit tests
-pytest tests/unit/
+# Run the complete suite with the configured test-selection policy
+make test
 ```
 
 ---
@@ -189,28 +172,26 @@ pytest tests/unit/
 
 ```bash
 # Fix auto-fixable issues
-make format
+make fix
+make fmt
 
 # Check remaining issues
-make lint
+make check
 ```
 
 **Common fixes**:
 
 - **Import order**: Use ruff to auto-sort imports
 - **Line length**: Break long lines appropriately
-- **Unused imports**: Remove or add `# noqa` if intentional
+- **Unused imports**: Remove unused imports at their source
 
 ### **Security Issues**
 
 **Problem**: Bandit security warnings
 
 ```bash
-# Run security scan
-bandit -r src/
-
-# Check specific issues
-bandit -r src/ -f json
+# Run the configured quality and security gates
+make check
 ```
 
 **Solution**: Address security concerns
@@ -284,15 +265,13 @@ When reporting issues, include:
 ```bash
 # Environment information
 python --version
-poetry --version
 
 # Package versions
-poetry show flext-core flext-meltano
+make status
 
 # Error details
-make val 2>&1 | head -50
+make check
 ```
-
 ### **Support Channels**
 
 - **Documentation**: Check the [documentation index](index.md) first
@@ -306,9 +285,9 @@ make val 2>&1 | head -50
 Before reporting issues:
 
 - [ ] Verified correct virtual environment is active
-- [ ] Ran `poetry install --with dev,test`
+- [ ] Ran `make setup` from the workspace root
 - [ ] Checked for direct import violations
-- [ ] Ran `make val` to identify issues
+- [ ] Ran `make check` to identify issues
 - [ ] Reviewed error messages carefully
 - [ ] Checked documentation for similar issues
 
