@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING, Final, Self
 
 from flext_cli import c
+
 from flext_core import FlextSettings
 
 from .enums import FlextMeltanoConstantsEnums
