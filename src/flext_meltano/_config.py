@@ -26,7 +26,9 @@ class FlextMeltanoConfig(FlextCliConfig):
 
     Meltano: Annotated[
         _MeltanoNamespace,
-        m.Field(description="Open namespace exposing ``config/*.yaml`` under ``Meltano``."),
+        m.Field(
+            description="Open namespace exposing ``config/*.yaml`` under ``Meltano``."
+        ),
     ] = _MeltanoNamespace()
 
 
