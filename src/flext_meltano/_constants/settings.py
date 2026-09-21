@@ -28,6 +28,7 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     # settings singleton/validation machinery cannot leak into instantiated
     # facade composites (e.g. the ``u`` logging facade).
     def __new__(cls, *args: object, **kwargs: object) -> Self:
+        _ = args, kwargs
         return object.__new__(cls)
 
     def __init__(self, *args: object, **kwargs: object) -> None:
