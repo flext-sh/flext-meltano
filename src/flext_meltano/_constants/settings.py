@@ -59,7 +59,9 @@ class FlextMeltanoConstantsSettings(FlextSettings):
             FlextMeltanoConstantsEnums.Environment.TESTING,
         })
     )
-    SETTINGS_ENVIRONMENTS: ClassVar[tuple[FlextMeltanoConstantsEnums.Environment, ...]] = (
+    SETTINGS_ENVIRONMENTS: ClassVar[
+        tuple[FlextMeltanoConstantsEnums.Environment, ...]
+    ] = (
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
         FlextMeltanoConstantsEnums.Environment.TESTING,
         FlextMeltanoConstantsEnums.Environment.PRODUCTION,
@@ -118,7 +120,9 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     CLI_DEFAULT_PIPELINE_PID_FILE: ClassVar[str] = "pipeline.pid"
 
     # Capabilities
-    SUPPORTED_PLUGIN_TYPES: ClassVar[tuple[FlextMeltanoConstantsEnums.PluginType, ...]] = (
+    SUPPORTED_PLUGIN_TYPES: ClassVar[
+        tuple[FlextMeltanoConstantsEnums.PluginType, ...]
+    ] = (
         FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
         FlextMeltanoConstantsEnums.PluginType.LOADERS,
         FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
@@ -166,9 +170,9 @@ class FlextMeltanoConstantsSettings(FlextSettings):
         FlextMeltanoConstantsEnums.DbtCommand.COMPILE,
         FlextMeltanoConstantsEnums.DbtCommand.DOCS,
     )
-    DBT_DEFAULT_DOCS_ARGS: ClassVar[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
-        FlextMeltanoConstantsEnums.DbtCommand.GENERATE,
-    )
+    DBT_DEFAULT_DOCS_ARGS: ClassVar[
+        tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]
+    ] = (FlextMeltanoConstantsEnums.DbtCommand.GENERATE,)
     DBT_DEFAULT_PATHS: ClassVar[frozenset[FlextMeltanoConstantsEnums.DbtPathName]] = (
         frozenset({
             FlextMeltanoConstantsEnums.DbtPathName.MODELS,

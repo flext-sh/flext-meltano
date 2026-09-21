@@ -9,11 +9,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, p, r, t, u
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping
@@ -56,16 +55,41 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Run the main CLI entry point for target."""
-        try:
-            command_args = list(args) if args else sys.argv[1:]
-            _ = command_args
-            self.logger.info("Target CLI started", target=self.target_name)
-        except c.EXC_OS_RUNTIME_TYPE as exc:
-            self.logger.exception("Target CLI failed", error=str(exc))
+        """Drain the Singer message stream from stdin into the sink registry.
+
+        A Singer target owns no argument surface: messages arrive on stdin, so
+        ``args`` is accepted for symmetry with the tap and dbt bases and never
+        silently discarded. Dispatch runs through the canonical
+        ``u.Meltano.process_stdin`` router over the handler methods below.
+        """
+        _ = args
+        drain_result = u.Meltano.process_stdin(self)
+        if drain_result.failure:
+            self.logger.error("Target drain failed", error=str(drain_result.error))
             return 1
-        else:
-            return 0
+        flush_result = self.flush()
+        if flush_result.failure:
+            self.logger.error("Target flush failed", error=str(flush_result.error))
+            return 1
+        return 0
+
+    def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> p.Result[bool]:
+        """Register the stream sink declared by a SCHEMA message."""
+        sink_result = self.fetch_or_create_sink(
+            message.stream, message.schema_definition
+        )
+        if sink_result.failure:
+            return r[bool].from_failure(sink_result)
+        return r[bool].ok(True)
+
+    def handle_record(self, message: m.Meltano.SingerRecordMessage) -> p.Result[bool]:
+        """Route a RECORD message into its stream sink."""
+        return self.process_record(message.stream, message.record, {})
+
+    def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[bool]:
+        """Persist every pending sink batch at a STATE boundary."""
+        _ = message
+        return self.flush()
 
     # ------------------------------------------------------------------
     # Sink management
