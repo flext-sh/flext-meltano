@@ -63,12 +63,10 @@ if TYPE_CHECKING:
         Target,
     )
     from .services.singer_state import FlextMeltanoSingerStateMixin
-    from .services.singer_tap import (
-        FlextMeltanoTapAbstractions,
-        FlextMeltanoTapSourceMixin,
-    )
+    from .services.singer_tap import FlextMeltanoTapAbstractions
     from .services.singer_target import FlextMeltanoTargetAbstractions
     from .services.singer_translator import FlextMeltanoSingerCliTranslator
+    from .services.tap_source_mixin import FlextMeltanoTapSourceMixin
     from .services.validators import FlextMeltanoValidators
     from .typings import FlextMeltanoTypes, t
     from .utilities import FlextMeltanoUtilities, u
@@ -190,12 +188,10 @@ _LAZY_IMPORTS = MappingProxyType(
                 "Target",
             ),
             ".services.singer_state": ("FlextMeltanoSingerStateMixin",),
-            ".services.singer_tap": (
-                "FlextMeltanoTapAbstractions",
-                "FlextMeltanoTapSourceMixin",
-            ),
+            ".services.singer_tap": ("FlextMeltanoTapAbstractions",),
             ".services.singer_target": ("FlextMeltanoTargetAbstractions",),
             ".services.singer_translator": ("FlextMeltanoSingerCliTranslator",),
+            ".services.tap_source_mixin": ("FlextMeltanoTapSourceMixin",),
             ".services.validators": ("FlextMeltanoValidators",),
             ".typings": ("FlextMeltanoTypes", "t"),
             ".utilities": ("FlextMeltanoUtilities", "u"),

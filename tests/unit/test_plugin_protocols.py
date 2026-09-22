@@ -49,7 +49,7 @@ class TestsFlextMeltanoPluginProtocols:
         "stream_names", [("users",), ("users", "orders"), ("a", "b", "c")]
     )
     def test_multiple_streams_preserve_input_order(
-        self, stream_names: tuple[str, ...]
+        self, stream_names: t.VariadicTuple[str]
     ) -> None:
         """Stream entries preserve the order of the validated payload."""
         payload: t.JsonMapping = {

@@ -30,9 +30,10 @@ if TYPE_CHECKING:
     from .singer_catalog import FlextMeltanoSingerCatalogMixin
     from .singer_sdk import FlextMeltanoSingerTapAdapter, Sink, Stream, Tap, Target
     from .singer_state import FlextMeltanoSingerStateMixin
-    from .singer_tap import FlextMeltanoTapAbstractions, FlextMeltanoTapSourceMixin
+    from .singer_tap import FlextMeltanoTapAbstractions
     from .singer_target import FlextMeltanoTargetAbstractions
     from .singer_translator import FlextMeltanoSingerCliTranslator
+    from .tap_source_mixin import FlextMeltanoTapSourceMixin
     from .validators import FlextMeltanoValidators
 __all__: tuple[str, ...] = (
     "FlextMeltanoAbstractions",
@@ -97,12 +98,10 @@ _LAZY_IMPORTS = MappingProxyType(
                 "Target",
             ),
             ".singer_state": ("FlextMeltanoSingerStateMixin",),
-            ".singer_tap": (
-                "FlextMeltanoTapAbstractions",
-                "FlextMeltanoTapSourceMixin",
-            ),
+            ".singer_tap": ("FlextMeltanoTapAbstractions",),
             ".singer_target": ("FlextMeltanoTargetAbstractions",),
             ".singer_translator": ("FlextMeltanoSingerCliTranslator",),
+            ".tap_source_mixin": ("FlextMeltanoTapSourceMixin",),
             ".validators": ("FlextMeltanoValidators",),
         }),
         alias_groups=MappingProxyType({}),
