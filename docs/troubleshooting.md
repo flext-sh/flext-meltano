@@ -65,6 +65,7 @@ python -c "import flext_meltano; u.Cli.print(flext_meltano.__file__)"
 # Reinstall if needed
 make setup
 ```
+
 ### **Type Check Failures**
 
 **Problem**: MyPy errors in source code
@@ -116,6 +117,7 @@ make test
 make deps
 make gen
 ```
+
 ### **Virtual Environment Issues**
 
 **Problem**: Wrong virtual environment or missing dependencies
@@ -272,6 +274,7 @@ make status
 # Error details
 make check
 ```
+
 ### **Support Channels**
 
 - **Documentation**: Check the [documentation index](index.md) first

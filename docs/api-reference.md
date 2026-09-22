@@ -37,9 +37,11 @@
 
 <!-- TOC END -->
 
-> **Manual supplement**: This page provides hand-curated API details beyond the auto-generated reference. See the generated output for canonical completeness.
+> **Manual supplement**: This page provides hand-curated API details beyond the
+> auto-generated reference. See the generated output for canonical completeness.
 
-**Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline Integration**
+**Complete API documentation for FLEXT-Meltano v0.12.0-dev - Enterprise Data Pipeline
+Integration**
 
 **Updated**: 2026-04-14 | **Status**: ✅ Current | **Quality**: 100% Type Safe |
 **Coverage**: 95%+
