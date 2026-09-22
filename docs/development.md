@@ -29,7 +29,7 @@
   - [Immediate (Next Sprint)](#immediate-next-sprint)
   - [Short Term (Next Month)](#short-term-next-month)
   - [Long Term (Next Quarter)](#long-term-next-quarter)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **Development workflow for the flext-meltano project**
 

@@ -1,8 +1,8 @@
 # FLEXT-Meltano Phase 4 Implementation Plan
 
-> Historical evidence only. This plan records an earlier execution context and
-> its command examples are not current workspace guidance. Use the root
-> `AGENTS.md` and `make help` for the active contract.
+> Historical evidence only. This plan records an earlier execution context and its
+> command examples are not current workspace guidance. Use the root `AGENTS.md` and
+> `make help` for the active contract.
 
 <!-- TOC START -->
 
@@ -39,6 +39,7 @@
 - [📋 POST-PHASE 4 TRANSITION PLAN](#post-phase-4-transition-plan)
   - [Phase 5: Production Deployment & Maintenance](#phase-5-production-deployment-maintenance)
 - [🎉 PHASE 4 SUCCESS DEFINITION](#phase-4-success-definition)
+
   - [Current Status Assessment](#current-status-assessment)
 
   - [**Current Status Assessment**](#current-status-assessment)

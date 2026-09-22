@@ -226,9 +226,8 @@ class EnterpriseELTService(FlextMeltanoService):
 ### Go ↔ Python Integration
 
 The historical `scripts/flext_meltano_bridge.py` entry point is not present in the
-current tracked source. Do not invoke the retired script; verify integrations
-against the current public API reference.
-**JSON API Response Pattern**:
+current tracked source. Do not invoke the retired script; verify integrations against
+the current public API reference. **JSON API Response Pattern**:
 
 ```python
 from __future__ import annotations
@@ -304,8 +303,8 @@ export MELTANO_ENVIRONMENT=dev
 
 ### Consumer Project Dependencies
 
-Consumer dependency declarations and Python constraints are generated from the
-workspace topology and `flext-infra/config/codegen.yaml`. Do not edit the generated
+Consumer dependency declarations and Python constraints are generated from the workspace
+topology and `flext-infra/config/codegen.yaml`. Do not edit the generated
 `pyproject.toml` or introduce a parallel Poetry/uv dependency table. Reconcile the
 declared dependency floors and regenerate consumers from the workspace root:
 
@@ -313,6 +312,7 @@ declared dependency floors and regenerate consumers from the workspace root:
 make deps
 make gen
 ```
+
 ---
 
 ## ⚠️ Integration Limitations
