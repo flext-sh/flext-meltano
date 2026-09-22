@@ -163,11 +163,8 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src/flext_meltano"]
 
-[tool.hatch.build.targets.wheel.force-include]
-config = "flext_meltano/config"
-
 [tool.hatch.build.targets.sdist]
-only-include = ["src/flext_meltano", "config"]
+only-include = ["src/flext_meltano"]
 
 [tool.mypy]
 disable_error_code = [
