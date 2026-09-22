@@ -9,20 +9,8 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_cli import cli
-
-    from flext_core import (
-        core,
-        d,
-        e,
-        h,
-        lazy,
-        lazy_attribute,
-        normalize_lazy_imports,
-        r,
-        x,
-    )
-    from flext_meltano import config, main, meltano, s, settings
+    from flext_core import d, e, h, r, x
+    from flext_meltano import FlextMeltanoConstants, s
 
     from .constants import (
         ExamplesFlextMeltanoConstants,
@@ -44,23 +32,15 @@ __all__: tuple[str, ...] = (
     "ExamplesFlextMeltanoProtocols",
     "ExamplesFlextMeltanoTypes",
     "ExamplesFlextMeltanoUtilities",
+    "FlextMeltanoConstants",
     "c",
-    "cli",
-    "config",
-    "core",
     "d",
     "e",
     "h",
-    "lazy",
-    "lazy_attribute",
     "m",
-    "main",
-    "meltano",
-    "normalize_lazy_imports",
     "p",
     "r",
     "s",
-    "settings",
     "t",
     "u",
     "x",
@@ -74,19 +54,8 @@ _LAZY_IMPORTS = MappingProxyType(
             ".protocols": ("ExamplesFlextMeltanoProtocols", "p"),
             ".typings": ("ExamplesFlextMeltanoTypes", "t"),
             ".utilities": ("ExamplesFlextMeltanoUtilities", "u"),
-            "flext_cli": ("cli",),
-            "flext_core": (
-                "core",
-                "d",
-                "e",
-                "h",
-                "lazy",
-                "lazy_attribute",
-                "normalize_lazy_imports",
-                "r",
-                "x",
-            ),
-            "flext_meltano": ("config", "main", "meltano", "s", "settings"),
+            "flext_core": ("d", "e", "h", "r", "x"),
+            "flext_meltano": ("FlextMeltanoConstants", "s"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

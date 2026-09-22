@@ -20,34 +20,33 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from flext_cli import cli
-
-    from flext_core import core, d, e, h, lazy_attribute, r, x
+    from flext_core import d, e, h, r, x
 
     from . import services
+    from .__version__ import FlextMeltanoVersion
     from ._config import FlextMeltanoConfig, config
     from ._settings import FlextMeltanoSettings, settings
     from .api import FlextMeltano, meltano
-    from .base import FlextMeltanoServiceBase, s
+    from .base import FlextMeltanoServiceBase, FlextMeltanoServiceBase as s
     from .cli import FlextMeltanoCli, main
-    from .constants import FlextMeltanoConstants, c
-    from .models import FlextMeltanoModels, m
+    from .constants import FlextMeltanoConstants, FlextMeltanoConstants as c
+    from .models import FlextMeltanoModels, FlextMeltanoModels as m
     from .pipeline_mgr import FlextMeltanoPipelineManager
-    from .protocols import FlextMeltanoProtocols, p
+    from .protocols import FlextMeltanoProtocols, FlextMeltanoProtocols as p
+    from .service_bases import (
+        FlextMeltanoDbtServiceBase,
+        FlextMeltanoLibraryRunner,
+        FlextMeltanoTapServiceBase,
+        FlextMeltanoTargetServiceBase,
+    )
     from .services.abstractions import FlextMeltanoAbstractions
     from .services.adapters import FlextMeltanoAdapter
     from .services.bridge import FlextMeltanoBridge
-    from .services.consumer_bases.dbt_service_base import FlextMeltanoDbtServiceBase
     from .services.consumer_bases.facade import FlextMeltanoConsumerBases
-    from .services.consumer_bases.tap_service_base import FlextMeltanoTapServiceBase
-    from .services.consumer_bases.target_service_base import (
-        FlextMeltanoTargetServiceBase,
-    )
     from .services.dbt_project import FlextMeltanoDbtProjectMixin
     from .services.dbt_runner import FlextMeltanoDbtRunnerMixin
     from .services.declarative_tap import FlextMeltanoDeclarativeTap
     from .services.executor import FlextMeltanoExecutor
-    from .services.library_runner import FlextMeltanoLibraryRunner
     from .services.meltano_plugin_discovery import FlextMeltanoPluginDiscoveryMixin
     from .services.meltano_plugins import FlextMeltanoComponentService
     from .services.meltano_project_sdk import FlextMeltanoProjectManager
@@ -67,8 +66,8 @@ if TYPE_CHECKING:
     from .services.singer_translator import FlextMeltanoSingerCliTranslator
     from .services.tap_source_mixin import FlextMeltanoTapSourceMixin
     from .services.validators import FlextMeltanoValidators
-    from .typings import FlextMeltanoTypes, t
-    from .utilities import FlextMeltanoUtilities, u
+    from .typings import FlextMeltanoTypes, FlextMeltanoTypes as t
+    from .utilities import FlextMeltanoUtilities, FlextMeltanoUtilities as u
 __all__: tuple[str, ...] = (
     "FlextMeltano",
     "FlextMeltanoAbstractions",
@@ -106,6 +105,7 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoTypes",
     "FlextMeltanoUtilities",
     "FlextMeltanoValidators",
+    "FlextMeltanoVersion",
     "Sink",
     "Stream",
     "Tap",
@@ -119,13 +119,10 @@ __all__: tuple[str, ...] = (
     "__version__",
     "__version_info__",
     "c",
-    "cli",
     "config",
-    "core",
     "d",
     "e",
     "h",
-    "lazy_attribute",
     "m",
     "main",
     "meltano",
@@ -142,6 +139,7 @@ __all__: tuple[str, ...] = (
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
+            ".__version__": ("FlextMeltanoVersion",),
             "._config": ("FlextMeltanoConfig", "config"),
             "._settings": ("FlextMeltanoSettings", "settings"),
             ".api": ("FlextMeltano", "meltano"),
@@ -151,25 +149,21 @@ _LAZY_IMPORTS = MappingProxyType(
             ".models": ("FlextMeltanoModels", "m"),
             ".pipeline_mgr": ("FlextMeltanoPipelineManager",),
             ".protocols": ("FlextMeltanoProtocols", "p"),
+            ".service_bases": (
+                "FlextMeltanoDbtServiceBase",
+                "FlextMeltanoLibraryRunner",
+                "FlextMeltanoTapServiceBase",
+                "FlextMeltanoTargetServiceBase",
+            ),
             ".services": ("services",),
             ".services.abstractions": ("FlextMeltanoAbstractions",),
             ".services.adapters": ("FlextMeltanoAdapter",),
             ".services.bridge": ("FlextMeltanoBridge",),
-            ".services.consumer_bases.dbt_service_base": (
-                "FlextMeltanoDbtServiceBase",
-            ),
             ".services.consumer_bases.facade": ("FlextMeltanoConsumerBases",),
-            ".services.consumer_bases.tap_service_base": (
-                "FlextMeltanoTapServiceBase",
-            ),
-            ".services.consumer_bases.target_service_base": (
-                "FlextMeltanoTargetServiceBase",
-            ),
             ".services.dbt_project": ("FlextMeltanoDbtProjectMixin",),
             ".services.dbt_runner": ("FlextMeltanoDbtRunnerMixin",),
             ".services.declarative_tap": ("FlextMeltanoDeclarativeTap",),
             ".services.executor": ("FlextMeltanoExecutor",),
-            ".services.library_runner": ("FlextMeltanoLibraryRunner",),
             ".services.meltano_plugin_discovery": ("FlextMeltanoPluginDiscoveryMixin",),
             ".services.meltano_plugins": ("FlextMeltanoComponentService",),
             ".services.meltano_project_sdk": ("FlextMeltanoProjectManager",),
@@ -191,8 +185,7 @@ _LAZY_IMPORTS = MappingProxyType(
             ".services.validators": ("FlextMeltanoValidators",),
             ".typings": ("FlextMeltanoTypes", "t"),
             ".utilities": ("FlextMeltanoUtilities", "u"),
-            "flext_cli": ("cli",),
-            "flext_core": ("core", "d", "e", "h", "lazy_attribute", "r", "x"),
+            "flext_core": ("d", "e", "h", "r", "x"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
