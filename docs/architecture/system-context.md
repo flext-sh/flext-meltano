@@ -23,7 +23,7 @@
   - [Functional Boundaries](#functional-boundaries)
   - [Security Boundaries](#security-boundaries)
   - [Integration Boundaries](#integration-boundaries)
-- [🔄 Integration Patterns](#integration-patterns)
+- [🔄 Integration Patterns](#integration-patterns_1)
   - [Synchronous Integration Patterns](#synchronous-integration-patterns)
   - [Asynchronous Integration Patterns](#asynchronous-integration-patterns)
 - [🚀 Deployment Contexts](#deployment-contexts)

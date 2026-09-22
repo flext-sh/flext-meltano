@@ -1,40 +1,45 @@
 # FLEXT-Meltano Phase 4 Implementation Plan
 
+> Historical evidence only. This plan records an earlier execution context and
+> its command examples are not current workspace guidance. Use the root
+> `AGENTS.md` and `make help` for the active contract.
+
 <!-- TOC START -->
 
 - [🎯 Phase 4: Testing Infrastructure Resolution & Quality Assurance](#phase-4-testing-infrastructure-resolution-quality-assurance)
 - [📊 Phase 4 Overview](#phase-4-overview)
-  - [**Current Project Status: 88% Complete**](#current-project-status-88-complete)
-  - [**Phase 4 Scope & Objectives**](#phase-4-scope-objectives)
-- [🚨 **CRITICAL BLOCKERS IDENTIFIED**](#critical-blockers-identified)
-  - [**Blocker 1: Missing flext-tests Dependency (Priority: Critical)**](#blocker-1-missing-flext-tests-dependency-priority-critical)
-  - [**Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)**](#blocker-2-flextmodelsbasemodel-inheritance-issues-priority-critical)
-  - [**Blocker 3: Test Environment Configuration (Priority: High)**](#blocker-3-test-environment-configuration-priority-high)
-- [📋 **PHASE 4 IMPLEMENTATION ROADMAP**](#phase-4-implementation-roadmap)
-  - [**Immediate Actions Required (Next 24-48 Hours)**](#immediate-actions-required-next-24-48-hours)
-  - [**Week 1: Infrastructure Resolution (Days 1-3)**](#week-1-infrastructure-resolution-days-1-3)
-  - [**Week 2: Coverage Achievement (Days 4-7)**](#week-2-coverage-achievement-days-4-7)
-  - [**Week 3: Integration & Quality Assurance (Days 8-10)**](#week-3-integration-quality-assurance-days-8-10)
-- [📊 **SUCCESS METRICS & VALIDATION**](#success-metrics-validation)
-  - [**Phase 4 Completion Criteria**](#phase-4-completion-criteria)
-  - [**Coverage Targets by Module**](#coverage-targets-by-module)
-- [🧪 **TESTING STRATEGY & APPROACH**](#testing-strategy-approach)
-  - [**Test Categories Implementation**](#test-categories-implementation)
-  - [**Test Implementation Patterns**](#test-implementation-patterns)
-- [📈 **PROGRESS TRACKING & MONITORING**](#progress-tracking-monitoring)
-  - [**Daily Progress Reporting**](#daily-progress-reporting)
-  - [**Quality Metrics Dashboard**](#quality-metrics-dashboard)
-- [🎯 **PHASE 4 DELIVERABLES & MILESTONES**](#phase-4-deliverables-milestones)
-  - [**Milestone 1: Infrastructure Unblocked (End of Week 1)**](#milestone-1-infrastructure-unblocked-end-of-week-1)
-  - [**Milestone 2: Coverage Achieved (End of Week 2)**](#milestone-2-coverage-achieved-end-of-week-2)
-  - [**Milestone 3: Quality Assurance Complete (End of Week 3)**](#milestone-3-quality-assurance-complete-end-of-week-3)
-  - [**Final Deliverable: Production-Ready Release**](#final-deliverable-production-ready-release)
-- [🚨 **RISK MITIGATION & CONTINGENCY**](#risk-mitigation-contingency)
-  - [**Risk Assessment**](#risk-assessment)
-  - [**Contingency Planning**](#contingency-planning)
-- [📋 **POST-PHASE 4 TRANSITION PLAN**](#post-phase-4-transition-plan)
-  - [**Phase 5: Production Deployment & Maintenance**](#phase-5-production-deployment-maintenance)
-- [🎉 **PHASE 4 SUCCESS DEFINITION**](#phase-4-success-definition)
+  - [Current Project Status: 88% Complete](#current-project-status-88-complete)
+  - [Phase 4 Scope & Objectives](#phase-4-scope-objectives)
+- [🚨 CRITICAL BLOCKERS IDENTIFIED](#critical-blockers-identified)
+  - [Blocker 1: Missing flext-tests Dependency (Priority: Critical)](#blocker-1-missing-flext-tests-dependency-priority-critical)
+  - [Blocker 2: FlextModels.BaseModel Inheritance Issues (Priority: Critical)](#blocker-2-flextmodelsbasemodel-inheritance-issues-priority-critical)
+  - [Blocker 3: Test Environment Configuration (Priority: High)](#blocker-3-test-environment-configuration-priority-high)
+- [📋 PHASE 4 IMPLEMENTATION ROADMAP](#phase-4-implementation-roadmap)
+  - [Immediate Actions Required (Next 24-48 Hours)](#immediate-actions-required-next-24-48-hours)
+  - [Week 1: Infrastructure Resolution (Days 1-3)](#week-1-infrastructure-resolution-days-1-3)
+  - [Week 2: Coverage Achievement (Days 4-7)](#week-2-coverage-achievement-days-4-7)
+  - [Week 3: Integration & Quality Assurance (Days 8-10)](#week-3-integration-quality-assurance-days-8-10)
+- [📊 SUCCESS METRICS & VALIDATION](#success-metrics-validation)
+  - [Phase 4 Completion Criteria](#phase-4-completion-criteria)
+  - [Coverage Targets by Module](#coverage-targets-by-module)
+- [🧪 TESTING STRATEGY & APPROACH](#testing-strategy-approach)
+  - [Test Categories Implementation](#test-categories-implementation)
+  - [Test Implementation Patterns](#test-implementation-patterns)
+- [📈 PROGRESS TRACKING & MONITORING](#progress-tracking-monitoring)
+  - [Daily Progress Reporting](#daily-progress-reporting)
+  - [Quality Metrics Dashboard](#quality-metrics-dashboard)
+- [🎯 PHASE 4 DELIVERABLES & MILESTONES](#phase-4-deliverables-milestones)
+  - [Milestone 1: Infrastructure Unblocked (End of Week 1)](#milestone-1-infrastructure-unblocked-end-of-week-1)
+  - [Milestone 2: Coverage Achieved (End of Week 2)](#milestone-2-coverage-achieved-end-of-week-2)
+  - [Milestone 3: Quality Assurance Complete (End of Week 3)](#milestone-3-quality-assurance-complete-end-of-week-3)
+  - [Final Deliverable: Production-Ready Release](#final-deliverable-production-ready-release)
+- [🚨 RISK MITIGATION & CONTINGENCY](#risk-mitigation-contingency)
+  - [Risk Assessment](#risk-assessment)
+  - [Contingency Planning](#contingency-planning)
+- [📋 POST-PHASE 4 TRANSITION PLAN](#post-phase-4-transition-plan)
+  - [Phase 5: Production Deployment & Maintenance](#phase-5-production-deployment-maintenance)
+- [🎉 PHASE 4 SUCCESS DEFINITION](#phase-4-success-definition)
+  - [Current Status Assessment](#current-status-assessment)
 
   - [**Current Status Assessment**](#current-status-assessment)
   <!-- TOC END -->
@@ -115,7 +120,7 @@ ls -la ../flext-tests # CONFIRMED MISSING
 # Remove or replace flext-tests dependency
 
 # Step 4: Test import resolution after changes
-PYTHONPATH=src poetry run python -c "import sys; u.Cli.print('Basic import works')"
+# [make] PYTHONPATH=src poetry run python -c "import sys; u.Cli.print('Basic import works')"
 ```
 
 **Estimated Effort**: 4 hours **Risk Level**: Low (straightforward dependency addition)
@@ -246,8 +251,8 @@ poetry run pytest --collect-only tests/unit/test_api.py
 
 **Success Criteria:**
 
-- `poetry show flext-tests` returns valid package information
-- `PYTHONPATH=src poetry run python -c "import flext_tests"` succeeds
+- `[make] poetry show flext-tests` returns valid package information
+- `# [make] PYTHONPATH=src poetry run python -c "import flext_tests"` succeeds
 - Poetry environment shows all dependencies resolved
 
 #### **Day 2: Model Inheritance Fix**
@@ -280,7 +285,7 @@ poetry run pytest --collect-only tests/unit/test_api.py
 
 **Success Criteria:**
 
-- `make test-fast` runs without import errors
+- `# [removed] make test-fast` runs without import errors
 - At least one test file executes successfully
 - Coverage report generates without errors
 - Test collection completes in reasonable time
@@ -574,16 +579,17 @@ def test_service_with_external_dependency(mock_meltano_adapter):
 
 ```bash
 # Daily quality assessment
-make quality-dashboard
+# [removed] make quality-dashboard
 
 # Coverage trending
-make coverage-trends
+# [removed] make coverage-trends
 
 # Test execution summary
-make test-summary
+# [removed] make test-summary
 
 # Quality gate validation
-make val-gates
+make check
+make test
 ```
 
 ---

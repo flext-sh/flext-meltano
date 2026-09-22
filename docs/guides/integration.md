@@ -12,6 +12,7 @@
   - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
 - [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
   - [Go ↔ Python Integration](#go-python-integration)
+- [print(response.unwrap())```](#printresponseunwrap)
 - [📊 Integration Matrix](#integration-matrix)
   - [FLEXT Project Integration Status](#flext-project-integration-status)
   - [Integration Requirements](#integration-requirements)
@@ -226,16 +227,9 @@ class EnterpriseELTService(FlextMeltanoService):
 
 ### Go ↔ Python Integration
 
-**Bridge command patterns for ecosystem integration**:
-
-```bash
-# Standard bridge operations for ecosystem consumption
-python scripts/flext_meltano_bridge.py version
-python scripts/flext_meltano_bridge.py list_plugins
-python scripts/flext_meltano_bridge.py run_pipeline tap-csv target-jsonl
-python scripts/flext_meltano_bridge.py discover_catalog tap-oracle
-```
-
+The historical `scripts/flext_meltano_bridge.py` entry point is not present in the
+current tracked source. Do not invoke the retired script; verify integrations
+against the current public API reference.
 **JSON API Response Pattern**:
 
 ```python
@@ -312,19 +306,15 @@ export MELTANO_ENVIRONMENT=dev
 
 ### Consumer Project Dependencies
 
-**Standard dependency pattern**:
+Consumer dependency declarations and Python constraints are generated from the
+workspace topology and `flext-infra/config/codegen.yaml`. Do not edit the generated
+`pyproject.toml` or introduce a parallel Poetry/uv dependency table. Reconcile the
+declared dependency floors and regenerate consumers from the workspace root:
 
-```toml
-# pyproject.toml for flext-tap-*/flext-target-*/flext-dbt-* projects
-[tool.poetry.dependencies]
-python = "^3.13"
-flext-core = "^0.9.9"
-flext-meltano = "^0.9.9"  # Mandatory ELT foundation
-
-[tool.poetry.group.dev.dependencies]
-flext-cli = "^0.9.9"      # CLI development tools
+```bash
+make deps
+make gen
 ```
-
 ---
 
 ## ⚠️ Integration Limitations
