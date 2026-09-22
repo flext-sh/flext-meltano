@@ -205,10 +205,12 @@ class EnterpriseELTService(FlextMeltanoService):
             if transform_result.failure:
                 return transform_result
 
-        return r[m.Meltano.CommandExecutionResult].ok({
-            "pipeline": pipeline_result.unwrap(),
-            "models_executed": dbt_models or [],
-        })
+        return r[m.Meltano.CommandExecutionResult].ok(
+            {
+                "pipeline": pipeline_result.unwrap(),
+                "models_executed": dbt_models or [],
+            }
+        )
 
     def _run_dbt_models(
         self, models: t.StrSequence
