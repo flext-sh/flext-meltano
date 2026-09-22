@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import os
 import time
+from collections.abc import Mapping
 from contextlib import redirect_stderr, redirect_stdout
+from importlib import metadata
 from io import StringIO
 from pathlib import Path
 from typing import override
 
-import meltano
 from flext_cli import cli
 from meltano.cli.cli import cli as meltano_cli
 from meltano.cli.utils import CliError
@@ -77,9 +78,9 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
-        """Return the version information from the imported Meltano package."""
+        """Return the installed Meltano distribution version."""
         return u.try_(
-            lambda: meltano.__version__,
+            lambda: metadata.version("meltano"),
             catch=(
                 ValueError,
                 TypeError,
@@ -151,6 +152,10 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             return r[t.SequenceOf[t.StrMapping]].from_failure(project_result)
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
         current_plugins_raw = project_result.value.plugins.current_plugins
+        if not isinstance(current_plugins_raw, Mapping):
+            return r[t.SequenceOf[t.StrMapping]].fail(
+                "Meltano current_plugins is not a mapping"
+            )
         discovered = u.Meltano.discover_project_plugins(
             current_plugins_raw, selected_type=selected_type
         )
