@@ -294,7 +294,8 @@ class PipelineConfig:
     def validate(self) -> p.Result[ValidatedConfig]:
         """Validate complete pipeline configuration."""
         return (
-            self.tap.validate()
+            self.tap
+            .validate()
             .flat_map(lambda tap: self.target.validate())
             .map(
                 lambda target: ValidatedConfig(
