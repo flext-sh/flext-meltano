@@ -1,5 +1,62 @@
 # Triagem SonarCloud — flext-sh/flext-meltano
 
+<!-- TOC START -->
+- [Resumo](#resumo)
+- [Como usar](#como-usar)
+- [Issues](#issues)
+  - [1 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#1-critical-code_smell-pythons1192)
+  - [2 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#2-critical-code_smell-pythons1192)
+  - [3 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#3-critical-code_smell-pythons1192)
+  - [4 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#4-critical-code_smell-pythons3776)
+  - [5 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#5-critical-code_smell-pythons1192)
+  - [6 · 🟠 CRITICAL · CODE_SMELL · python:S5754](#6-critical-code_smell-pythons5754)
+  - [7 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#7-critical-code_smell-pythons3776)
+  - [8 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#8-critical-code_smell-pythons3776)
+  - [9 · 🟠 CRITICAL · CODE_SMELL · python:S5727](#9-critical-code_smell-pythons5727)
+  - [10 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#10-critical-code_smell-pythons3776)
+  - [11 · 🟠 CRITICAL · CODE_SMELL · python:S5754](#11-critical-code_smell-pythons5754)
+  - [12 · 🟡 MAJOR · VULNERABILITY · githubactions:S8264](#12-major-vulnerability-githubactionss8264)
+  - [13 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#13-major-vulnerability-githubactionss8233)
+  - [14 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#14-major-vulnerability-githubactionss8233)
+  - [15 · 🟡 MAJOR · VULNERABILITY · text:S8565](#15-major-vulnerability-texts8565)
+  - [16 · ⚪ MINOR · CODE_SMELL · python:S7504](#16-minor-code_smell-pythons7504)
+  - [17 · ⚪ MINOR · CODE_SMELL · python:S116](#17-minor-code_smell-pythons116)
+  - [18 · ⚪ MINOR · CODE_SMELL · python:S116](#18-minor-code_smell-pythons116)
+  - [19 · ⚪ MINOR · CODE_SMELL · python:S116](#19-minor-code_smell-pythons116)
+  - [20 · ⚪ MINOR · CODE_SMELL · python:S116](#20-minor-code_smell-pythons116)
+  - [21 · ⚪ MINOR · CODE_SMELL · python:S116](#21-minor-code_smell-pythons116)
+  - [22 · ⚪ MINOR · CODE_SMELL · python:S116](#22-minor-code_smell-pythons116)
+  - [23 · ⚪ MINOR · CODE_SMELL · python:S116](#23-minor-code_smell-pythons116)
+  - [24 · ⚪ MINOR · CODE_SMELL · python:S116](#24-minor-code_smell-pythons116)
+  - [25 · ⚪ MINOR · CODE_SMELL · python:S116](#25-minor-code_smell-pythons116)
+  - [26 · ⚪ MINOR · CODE_SMELL · python:S116](#26-minor-code_smell-pythons116)
+  - [27 · ⚪ MINOR · CODE_SMELL · python:S116](#27-minor-code_smell-pythons116)
+  - [28 · ⚪ MINOR · CODE_SMELL · python:S116](#28-minor-code_smell-pythons116)
+  - [29 · ⚪ MINOR · CODE_SMELL · python:S116](#29-minor-code_smell-pythons116)
+  - [30 · ⚪ MINOR · CODE_SMELL · python:S116](#30-minor-code_smell-pythons116)
+  - [31 · ⚪ MINOR · CODE_SMELL · python:S116](#31-minor-code_smell-pythons116)
+  - [32 · ⚪ MINOR · CODE_SMELL · python:S116](#32-minor-code_smell-pythons116)
+  - [33 · ⚪ MINOR · CODE_SMELL · python:S116](#33-minor-code_smell-pythons116)
+  - [34 · ⚪ MINOR · CODE_SMELL · python:S116](#34-minor-code_smell-pythons116)
+  - [35 · ⚪ MINOR · CODE_SMELL · python:S116](#35-minor-code_smell-pythons116)
+  - [36 · ⚪ MINOR · CODE_SMELL · python:S116](#36-minor-code_smell-pythons116)
+  - [37 · ⚪ MINOR · CODE_SMELL · python:S116](#37-minor-code_smell-pythons116)
+  - [38 · ⚪ MINOR · CODE_SMELL · python:S116](#38-minor-code_smell-pythons116)
+  - [39 · ⚪ MINOR · CODE_SMELL · python:S116](#39-minor-code_smell-pythons116)
+  - [40 · ⚪ MINOR · CODE_SMELL · python:S116](#40-minor-code_smell-pythons116)
+  - [41 · ⚪ MINOR · CODE_SMELL · python:S116](#41-minor-code_smell-pythons116)
+  - [42 · ⚪ MINOR · CODE_SMELL · python:S116](#42-minor-code_smell-pythons116)
+  - [43 · ⚪ MINOR · CODE_SMELL · python:S116](#43-minor-code_smell-pythons116)
+  - [44 · ⚪ MINOR · CODE_SMELL · python:S116](#44-minor-code_smell-pythons116)
+  - [45 · ⚪ MINOR · CODE_SMELL · python:S116](#45-minor-code_smell-pythons116)
+  - [46 · ⚪ MINOR · CODE_SMELL · python:S116](#46-minor-code_smell-pythons116)
+  - [47 · ⚪ MINOR · CODE_SMELL · python:S116](#47-minor-code_smell-pythons116)
+  - [48 · ⚪ MINOR · CODE_SMELL · python:S116](#48-minor-code_smell-pythons116)
+  - [49 · ⚪ MINOR · CODE_SMELL · python:S116](#49-minor-code_smell-pythons116)
+  - [50 · ⚪ MINOR · CODE_SMELL · python:S116](#50-minor-code_smell-pythons116)
+  - [51 · ⚪ MINOR · CODE_SMELL · python:S116](#51-minor-code_smell-pythons116)
+<!-- TOC END -->
+
 Gerado do dump da plataforma SonarCloud (2026-08-06).
 
 Bead: `mro-2wjm.11`
@@ -38,7 +95,7 @@ padrão.
 > Define a constant instead of duplicating this literal "pipeline configuration JSON" 3
 > times.
 
-```python
+```text
        98                  "values": config_result.value
        99              })
       100          except ValueError as exc:
@@ -59,7 +116,7 @@ padrão.
 > Define a constant instead of duplicating this literal "Pipeline execution not
 > configured" 3 times.
 
-```python
+```text
       108      ) -> p.Result[t.StrSequence]:
       109          config_result = self._load_pipeline_config(pipeline_name)
       110          if config_result.failure:
@@ -80,7 +137,7 @@ padrão.
 > Define a constant instead of duplicating this literal "Pipeline name is invalid" 5
 > times.
 
-```python
+```text
       145      ) -> p.Result[str]:
       146          """Create and persist a named pipeline configuration."""
       147          name_result = self._normalize_pipeline_name(pipeline_name)
@@ -101,7 +158,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.
 
-```python
+```text
        70      # ------------------------------------------------------------------
        71      # CLI dispatch
        72      # ------------------------------------------------------------------
@@ -121,7 +178,7 @@ padrão.
 
 > Define a constant instead of duplicating this literal "Unknown error" 3 times.
 
-```python
+```text
        45              c.Meltano.DbtResourceType.MODEL
        46          )
        47          if model_nodes_result.failure:
@@ -141,7 +198,7 @@ padrão.
 
 > Reraise this exception to stop the application as the user expects
 
-```python
+```text
        43              try:
        44                  _ = command.main(
        45                      args=list(args), prog_name=prog_name, standalone_mode=False
@@ -161,7 +218,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
-```python
+```text
       199          }
       200          self.logger.info("FlextMeltanoExecutor executed successfully")
       201          return r[t.JsonMapping].ok(config_data)
@@ -181,7 +238,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
-```python
+```text
       317              )
       318          except c.Meltano.OPERATION_ERRORS as e:
       319              return r[m.Meltano.CommandExecutionResult].fail(str(e))
@@ -201,7 +258,7 @@ padrão.
 
 > Remove this identity check; it will always be True.
 
-```python
+```text
       394                  failed_stage.error
       395                  if failed_stage is not None and failed_stage.error is not None
       396                  else "Failed to run Meltano pipeline"
@@ -222,7 +279,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.
 
-```python
+```text
        69              error_msg = f"Failed to discover plugins: {e}"
        70              self.logger.exception(error_msg, error=str(e))
        71              return r[t.SequenceOf[t.StrMapping]].fail(error_msg)
@@ -242,7 +299,7 @@ padrão.
 
 > Reraise this exception to stop the application as the user expects
 
-```python
+```text
        66          try:
        67              singer_command = self._tap.get_singer_command()
        68              _ = singer_command.main(args=list(args), prog_name=prog_name)
@@ -262,7 +319,7 @@ padrão.
 
 > Move this read permission from workflow level to job level.
 
-```yaml
+```text
        14        - ".github/workflows/docs.yml"
        15    workflow_dispatch:
        16
@@ -282,7 +339,7 @@ padrão.
 
 > Move this write permission from workflow level to job level.
 
-```yaml
+```text
        15    workflow_dispatch:
        16
        17  permissions:
@@ -302,7 +359,7 @@ padrão.
 
 > Move this write permission from workflow level to job level.
 
-```yaml
+```text
        16
        17  permissions:
        18    contents: read
@@ -331,7 +388,7 @@ padrão.
 
 > Remove this unnecessary `list()` call on an already iterable object.
 
-```python
+```text
        16      if (
        17          existing_package is None
        18          or Path(getattr(existing_package, "__file__", "")).resolve() != init_file
@@ -352,7 +409,7 @@ padrão.
 > Rename this field "SingerTapBase" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        27      the canonical m.Meltano.Singer* namespace. Consumers subclass these
        28      instead of importing singer_sdk directly.
        29      """
@@ -373,7 +430,7 @@ padrão.
 > Rename this field "SingerSinkBase" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        28      instead of importing singer_sdk directly.
        29      """
        30
@@ -394,7 +451,7 @@ padrão.
 > Rename this field "SingerStreamBase" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        29      """
        30
        31      SingerTapBase = Tap
@@ -415,7 +472,7 @@ padrão.
 > Rename this field "SingerTargetBase" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        30
        31      SingerTapBase = Tap
        32      SingerSinkBase = Sink
@@ -436,7 +493,7 @@ padrão.
 > Rename this field "SingerContext" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        31      SingerTapBase = Tap
        32      SingerSinkBase = Sink
        33      SingerStreamBase = Stream
@@ -456,7 +513,7 @@ padrão.
 
 > Rename this field "SingerRecord" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        32      SingerSinkBase = Sink
        33      SingerStreamBase = Stream
        34      SingerTargetBase = Target
@@ -477,7 +534,7 @@ padrão.
 > Rename this field "SingerArrayType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        33      SingerStreamBase = Stream
        34      SingerTargetBase = Target
        35      SingerContext = Context
@@ -498,7 +555,7 @@ padrão.
 > Rename this field "SingerBooleanType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        34      SingerTargetBase = Target
        35      SingerContext = Context
        36      SingerRecord = Record
@@ -519,7 +576,7 @@ padrão.
 > Rename this field "SingerCustomType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        35      SingerContext = Context
        36      SingerRecord = Record
        37      SingerArrayType = singer_sdk_typing.ArrayType
@@ -540,7 +597,7 @@ padrão.
 > Rename this field "SingerDateTimeType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        36      SingerRecord = Record
        37      SingerArrayType = singer_sdk_typing.ArrayType
        38      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -561,7 +618,7 @@ padrão.
 > Rename this field "SingerDateType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        37      SingerArrayType = singer_sdk_typing.ArrayType
        38      SingerBooleanType = singer_sdk_typing.BooleanType
        39      SingerCustomType = singer_sdk_typing.CustomType
@@ -582,7 +639,7 @@ padrão.
 > Rename this field "SingerDurationType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        38      SingerBooleanType = singer_sdk_typing.BooleanType
        39      SingerCustomType = singer_sdk_typing.CustomType
        40      SingerDateTimeType = singer_sdk_typing.DateTimeType
@@ -603,7 +660,7 @@ padrão.
 > Rename this field "SingerIntegerType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        39      SingerCustomType = singer_sdk_typing.CustomType
        40      SingerDateTimeType = singer_sdk_typing.DateTimeType
        41      SingerDateType = singer_sdk_typing.DateType
@@ -624,7 +681,7 @@ padrão.
 > Rename this field "SingerNumberType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        40      SingerDateTimeType = singer_sdk_typing.DateTimeType
        41      SingerDateType = singer_sdk_typing.DateType
        42      SingerDurationType = singer_sdk_typing.DurationType
@@ -645,7 +702,7 @@ padrão.
 > Rename this field "SingerObjectType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        41      SingerDateType = singer_sdk_typing.DateType
        42      SingerDurationType = singer_sdk_typing.DurationType
        43      SingerIntegerType = singer_sdk_typing.IntegerType
@@ -666,7 +723,7 @@ padrão.
 > Rename this field "SingerPropertiesList" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        42      SingerDurationType = singer_sdk_typing.DurationType
        43      SingerIntegerType = singer_sdk_typing.IntegerType
        44      SingerNumberType = singer_sdk_typing.NumberType
@@ -686,7 +743,7 @@ padrão.
 > Rename this field "SingerProperty" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        43      SingerIntegerType = singer_sdk_typing.IntegerType
        44      SingerNumberType = singer_sdk_typing.NumberType
        45      SingerObjectType = singer_sdk_typing.ObjectType
@@ -705,7 +762,7 @@ padrão.
 > Rename this field "SingerStringType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        44      SingerNumberType = singer_sdk_typing.NumberType
        45      SingerObjectType = singer_sdk_typing.ObjectType
        46      SingerPropertiesList = singer_sdk_typing.PropertiesList
@@ -723,7 +780,7 @@ padrão.
 > Rename this field "SingerTimeType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        45      SingerObjectType = singer_sdk_typing.ObjectType
        46      SingerPropertiesList = singer_sdk_typing.PropertiesList
        47      SingerProperty = singer_sdk_typing.Property
@@ -740,7 +797,7 @@ padrão.
 > Rename this field "StreamDefinition" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        13
        14  class FlextMeltanoModelsSources:
        15      """Source and configuration models."""
@@ -761,7 +818,7 @@ padrão.
 > Rename this field "SingerTapSdkBackend" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
       206          def sync_all(self) -> None:
       207              """Execute sync for all selected streams."""
       208              ...
@@ -782,7 +839,7 @@ padrão.
 > Rename this field "SingerTapSettingsBackend" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
       207              """Execute sync for all selected streams."""
       208              ...
       209
@@ -802,7 +859,7 @@ padrão.
 
 > Rename this field "PluginType" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        28      )
        29
        30      type ValidatorInput = t.JsonValue
@@ -823,7 +880,7 @@ padrão.
 > Rename this field "SingerReplicationMethod" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        19      External library wrappers (singer_sdk.typing) are kept to prevent
        20      direct imports by consumer projects.
        21      """
@@ -844,7 +901,7 @@ padrão.
 > Rename this field "SingerArrayType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        22
        23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
        24
@@ -865,7 +922,7 @@ padrão.
 > Rename this field "SingerBooleanType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        23      SingerReplicationMethod = c.Meltano.SingerReplicationMethod
        24
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
@@ -886,7 +943,7 @@ padrão.
 > Rename this field "SingerCustomType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        24
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
        26      SingerArrayType = singer_sdk_typing.ArrayType
@@ -907,7 +964,7 @@ padrão.
 > Rename this field "SingerDateTimeType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        25      # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
        26      SingerArrayType = singer_sdk_typing.ArrayType
        27      SingerBooleanType = singer_sdk_typing.BooleanType
@@ -928,7 +985,7 @@ padrão.
 > Rename this field "SingerDateType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        26      SingerArrayType = singer_sdk_typing.ArrayType
        27      SingerBooleanType = singer_sdk_typing.BooleanType
        28      SingerCustomType = singer_sdk_typing.CustomType
@@ -949,7 +1006,7 @@ padrão.
 > Rename this field "SingerDurationType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        27      SingerBooleanType = singer_sdk_typing.BooleanType
        28      SingerCustomType = singer_sdk_typing.CustomType
        29      SingerDateTimeType = singer_sdk_typing.DateTimeType
@@ -970,7 +1027,7 @@ padrão.
 > Rename this field "SingerIntegerType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        28      SingerCustomType = singer_sdk_typing.CustomType
        29      SingerDateTimeType = singer_sdk_typing.DateTimeType
        30      SingerDateType = singer_sdk_typing.DateType
@@ -991,7 +1048,7 @@ padrão.
 > Rename this field "SingerNumberType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        29      SingerDateTimeType = singer_sdk_typing.DateTimeType
        30      SingerDateType = singer_sdk_typing.DateType
        31      SingerDurationType = singer_sdk_typing.DurationType
@@ -1011,7 +1068,7 @@ padrão.
 > Rename this field "SingerObjectType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        30      SingerDateType = singer_sdk_typing.DateType
        31      SingerDurationType = singer_sdk_typing.DurationType
        32      SingerIntegerType = singer_sdk_typing.IntegerType
@@ -1030,7 +1087,7 @@ padrão.
 > Rename this field "SingerPropertiesList" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        31      SingerDurationType = singer_sdk_typing.DurationType
        32      SingerIntegerType = singer_sdk_typing.IntegerType
        33      SingerNumberType = singer_sdk_typing.NumberType
@@ -1048,7 +1105,7 @@ padrão.
 > Rename this field "SingerTimeType" to match the regular expression
 > ^[\_a-z][_a-z0-9]\*$.
 
-```python
+```text
        32      SingerIntegerType = singer_sdk_typing.IntegerType
        33      SingerNumberType = singer_sdk_typing.NumberType
        34      SingerObjectType = singer_sdk_typing.ObjectType

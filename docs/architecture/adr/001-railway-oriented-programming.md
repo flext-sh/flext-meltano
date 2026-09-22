@@ -6,7 +6,7 @@
 - [Decision](#decision)
 - [Rationale](#rationale)
   - [Why Railway-Oriented Programming](#why-railway-oriented-programming)
-  - [Why r[T] from flext-core](#why-rt-from-flext-core)
+  - [Why r\[T\] from flext-core](#why-rt-from-flext-core)
 - [Consequences](#consequences)
   - [Positive](#positive)
   - [Negative](#negative)
