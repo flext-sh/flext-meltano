@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 type MeltanoComponentCase = tuple[str, str, str]
 
 
-MELTANO_COMPONENT_CASES: tuple[MeltanoComponentCase, ...] = (
+MELTANO_COMPONENT_CASES: t.VariadicTuple[MeltanoComponentCase] = (
     ("tap", "tap-csv", "source_name"),
     ("target", "target-jsonl", "sink_name"),
     ("dbt", "analytics", "transformation_name"),

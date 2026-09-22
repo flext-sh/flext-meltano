@@ -18,7 +18,7 @@ from flext_meltano import m, meltano, p, t
 # Keys every command-execution payload must expose per the public contract
 # (u.Meltano.build_command_execution_payload): status/success/output/error/
 # exit_code plus the execution_time duration field.
-_BASE_PAYLOAD_KEYS: tuple[str, ...] = (
+_BASE_PAYLOAD_KEYS: t.VariadicTuple[str] = (
     "status",
     "success",
     "output",
@@ -28,7 +28,7 @@ _BASE_PAYLOAD_KEYS: tuple[str, ...] = (
 )
 
 # Attributes the typed CommandExecutionResult exposes per the public contract.
-_COMMAND_RESULT_ATTRIBUTES: tuple[str, ...] = (
+_COMMAND_RESULT_ATTRIBUTES: t.VariadicTuple[str] = (
     "command",
     "success",
     "output",
