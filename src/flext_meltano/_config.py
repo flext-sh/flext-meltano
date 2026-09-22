@@ -14,6 +14,8 @@ from typing import Annotated
 
 from flext_cli import FlextCliConfig, m
 
+from flext_core import FlextSettings
+
 
 class _MeltanoNamespace(m.BaseModel):
     """Open, frozen namespace exposing every ``config/*.yaml`` domain model-less."""
@@ -21,7 +23,7 @@ class _MeltanoNamespace(m.BaseModel):
     model_config = m.ConfigDict(extra="allow", frozen=True)
 
 
-class FlextMeltanoConfig(FlextCliConfig):
+class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
     Meltano: Annotated[

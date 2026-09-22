@@ -24,7 +24,6 @@ from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
-from sqlalchemy.exc import SQLAlchemyError
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
@@ -262,7 +261,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
                 OSError,
                 RuntimeError,
                 ImportError,
-                SQLAlchemyError,
             ) as e:
                 exit_code = 1
                 runtime_error = str(e)
@@ -300,7 +298,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             OSError,
             RuntimeError,
             ImportError,
-            SQLAlchemyError,
         ) as e:
             self.logger.exception("Command execution failed", error=str(e))
             return r[m.Meltano.CommandExecutionResult].fail(str(e), exception=e)
