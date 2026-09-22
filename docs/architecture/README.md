@@ -30,7 +30,8 @@
 - [🎯 Architecture Evolution](#architecture-evolution)
   - [Current State](#current-state)
   - [Future Directions](#future-directions)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Enterprise Data Integration Platform - Architecture Documentation**
 

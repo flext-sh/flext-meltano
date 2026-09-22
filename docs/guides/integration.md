@@ -5,14 +5,12 @@
 - [🎯 ELT Foundation Role](#elt-foundation-role)
 - [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
   - [Tap Implementation Pattern](#tap-implementation-pattern)
-  - [Target Implementation Pattern](#target-implementation-pattern)
 - [🛠️ dbt Integration Patterns](#dbt-integration-patterns)
   - [dbt Project Foundation](#dbt-project-foundation)
 - [🚀 Complete ELT Pipeline Integration](#complete-elt-pipeline-integration)
   - [Enterprise Pipeline Pattern](#enterprise-pipeline-pattern)
 - [🔗 Bridge Communication Patterns](#bridge-communication-patterns)
   - [Go ↔ Python Integration](#go-python-integration)
-- [print(response.unwrap())```](#printresponseunwrap)
 - [📊 Integration Matrix](#integration-matrix)
   - [FLEXT Project Integration Status](#flext-project-integration-status)
   - [Integration Requirements](#integration-requirements)
@@ -26,7 +24,8 @@
 - [🔧 Integration Best Practices](#integration-best-practices)
   - [Design Patterns](#design-patterns)
   - [Quality Standards](#quality-standards)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **ELT foundation integration patterns for the FLEXT ecosystem**
 

@@ -8,25 +8,8 @@
   - [Generic Library Requirements](#generic-library-requirements)
 - [Implementation Strategy](#implementation-strategy)
   - [Phase 1: CLI Abstraction Layer (✅ Complete)](#phase-1-cli-abstraction-layer-complete)
-  - [Phase 2: Singer Protocol Independence (🚧 In Progress)](#phase-2-singer-protocol-independence-in-progress)
-  - [Phase 3: Generic Plugin Registry (📋 Planned)](#phase-3-generic-plugin-registry-planned)
-- [Architecture Transformation](#architecture-transformation)
-  - [Before: CLI-Centric Architecture```](#before-cli-centric-architecture)
-  - [After: Generic Library Architecture```](#after-generic-library-architecture)
-  - [Service Architecture](#service-architecture)
-- [API Design](#api-design)
-  - [Generic Plugin Interface](#generic-plugin-interface)
-  - [Singer Protocol API](#singer-protocol-api)
-  - [Pipeline Orchestration API](#pipeline-orchestration-api)
-- [Migration Plan](#migration-plan)
-  - [Backward Compatibility Strategy](#backward-compatibility-strategy)
-  - [Testing Strategy](#testing-strategy)
-  - [Rollout Strategy](#rollout-strategy)
-- [Benefits of Generic Architecture](#benefits-of-generic-architecture)
-  - [For Library Users](#for-library-users)
-  - [For Plugin Developers](#for-plugin-developers)
-  - [For Enterprise Integration](#for-enterprise-integration)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **Category**: Development | **Status**: Complete | **Version**: 0.9.9 | **Last
 Updated**: 2026-04-14
@@ -93,7 +76,8 @@ result = adapter.run_pipeline("tap-csv", "target-jsonl")  # No CLI knowledge nee
 
 # Project validation
 project_service = FlextProjectService()
-validation = project_service.validate_project("/path/to/project")```
+validation = project_service.validate_project("/path/to/project")
+```
 ### Phase 2: Singer Protocol Independence (🚧 In Progress)
 
 **Target**: Direct Singer protocol implementation without Meltano CLI
@@ -129,10 +113,12 @@ validation = project_service.validate_project("/path/to/project")```
 # Generic plugin registry
 registry = FlextPluginRegistry()
 plugins = registry.discover_plugins()  # No Meltano dependency
-tap_info = registry.find_plugin("tap-gitlab")```
+tap_info = registry.find_plugin("tap-gitlab")
+```
 ## Architecture Transformation
 
-### Before: CLI-Centric Architecture```
+### Before: CLI-Centric Architecture
+```
 ┌─────────────────────────────────────┐
 │ FLEXT-Meltano (CLI-Dependent)      │
 ├─────────────────────────────────────┤
@@ -148,8 +134,10 @@ tap_info = registry.find_plugin("tap-gitlab")```
 │ meltano package (runtime)           │
 │ meltano.yml structure              │
 │ Singer CLI tools                   │
-└─────────────────────────────────────┘```
-### After: Generic Library Architecture```
+└─────────────────────────────────────┘
+```
+### After: Generic Library Architecture
+```
 ┌─────────────────────────────────────┐
 │ FLEXT-Meltano (Generic Library)    │
 ├─────────────────────────────────────┤
@@ -165,7 +153,8 @@ tap_info = registry.find_plugin("tap-gitlab")```
 │ flext-core (foundation)            │
 │ singer-python (protocol)           │
 │ pydantic (validation)              │
-└─────────────────────────────────────┘```
+└─────────────────────────────────────┘
+```
 ### Service Architecture
 
 #### FlextMeltanoService (Primary Interface)
@@ -182,7 +171,8 @@ result = service.install_plugin("tap-gitlab")
 tap_result = service.execute_tap("tap-gitlab", settings={"api_url": "..."})
 target_result = service.execute_target(
     "target-postgres", records, settings={"host": "..."}
-)```
+)
+```
 #### FlextPluginService (Plugin Management)
 
 **Self-Contained Plugin Management:**
@@ -194,7 +184,8 @@ registry = plugin_service.get_plugin_registry()
 
 # Direct plugin operations
 tap_plugin = registry.load_plugin("tap-gitlab")
-settings = tap_plugin.validate_configuration(user_config)```
+settings = tap_plugin.validate_configuration(user_config)
+```
 #### FlextSingerService (Protocol Implementation)
 
 **Direct Singer Protocol Handling:**
@@ -204,7 +195,8 @@ settings = tap_plugin.validate_configuration(user_config)```
 singer_service = FlextSingerService()
 tap = singer_service.create_tap("tap-gitlab", settings)
 catalog = tap.discover()
-sync_result = tap.sync(selected_streams)```
+sync_result = tap.sync(selected_streams)
+```
 ## API Design
 
 ### Generic Plugin Interface
@@ -228,7 +220,8 @@ def discover_plugins(
     Returns:
         List of discovered plugins with metadata
 
-    """```
+    """
+    ```
 #### Plugin Installation API
 
 ```python
@@ -248,7 +241,8 @@ def install_plugin(
     Returns:
         Installation result with success/failure status
 
-    """```
+    """
+    ```
 ### Singer Protocol API
 
 #### Tap Execution API
@@ -274,7 +268,8 @@ def execute_tap(
     Returns:
         Execution result with records and state
 
-    """```
+    """
+    ```
 #### Target Execution API
 
 ```python
@@ -294,7 +289,8 @@ def execute_target(
     Returns:
         Execution result with load statistics
 
-    """```
+    """
+    ```
 ### Pipeline Orchestration API
 
 #### Pipeline Configuration API
@@ -312,7 +308,8 @@ def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
     Returns:
         Configured pipeline ready for execution
 
-    """```
+    """
+    ```
 #### Pipeline Execution API
 
 ```python
@@ -331,7 +328,8 @@ def execute_pipeline(
     Returns:
         Execution result with timing and statistics
 
-    """```
+    """
+    ```
 ## Migration Plan
 
 ### Backward Compatibility Strategy
@@ -362,7 +360,8 @@ make test-cli-integration
 make test-generic-apis
 
 # Test backward compatibility
-make test-compatibility```
+make test-compatibility
+```
 #### Quality Gates
 
 - **API Compatibility**: Existing APIs continue to work

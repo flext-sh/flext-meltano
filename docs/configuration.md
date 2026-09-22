@@ -9,12 +9,9 @@
 - [⚙️ Meltano Project Configuration](#meltano-project-configuration)
   - [Basic meltano.yml Structure](#basic-meltanoyml-structure)
   - [Configuration Validation](#configuration-validation)
-- [🔌 Singer Plugin Configuration](#singer-plugin-configuration)
-  - [Tap Configuration](#tap-configuration)
-  - [Target Configuration](#target-configuration)
   - [Singer Catalog Configuration](#singer-catalog-configuration)
 - [🛠️ dbt Configuration](#dbt-configuration)
-  - [dbt Project Structure```](#dbt-project-structure)
+  - [dbt Project Structure](#dbt-project-structure)
   - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbt_projectyml)
   - [dbt Service Configuration](#dbt-service-configuration)
 - [🏗️ Pipeline Configuration](#pipeline-configuration)
@@ -38,7 +35,8 @@
 - [🔄 Configuration Migration](#configuration-migration)
   - [Resolution Timeline](#resolution-timeline)
   - [Migration Planning](#migration-planning)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **Configuration management for FLEXT ecosystem ELT foundation library**
 

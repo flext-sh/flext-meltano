@@ -36,7 +36,8 @@
 - [📈 Security Metrics and KPIs](#security-metrics-and-kpis)
   - [Key Security Metrics](#key-security-metrics)
   - [Security Health Dashboard](#security-health-dashboard)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Security Architecture and Compliance Framework**
 
