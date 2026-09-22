@@ -9,51 +9,15 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_tests import c, d, e, h, m, p, r, s, t, td, tf, tk, tm, tv, u, x
-
     from .test_docker_integration import TestsFlextMeltanoDockerIntegration
-__all__: tuple[str, ...] = (
-    "TestsFlextMeltanoDockerIntegration",
-    "c",
-    "d",
-    "e",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "td",
-    "tf",
-    "tk",
-    "tm",
-    "tv",
-    "u",
-    "x",
-)
+
+
+__all__: tuple[str, ...] = ("TestsFlextMeltanoDockerIntegration",)
 
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
-            ".test_docker_integration": ("TestsFlextMeltanoDockerIntegration",),
-            "flext_tests": (
-                "c",
-                "d",
-                "e",
-                "h",
-                "m",
-                "p",
-                "r",
-                "s",
-                "t",
-                "td",
-                "tf",
-                "tk",
-                "tm",
-                "tv",
-                "u",
-                "x",
-            ),
+            ".test_docker_integration": ("TestsFlextMeltanoDockerIntegration",)
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

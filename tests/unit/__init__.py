@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_tests import c, d, e, h, m, p, r, s, t, td, tf, tk, tm, tv, u, x
-
     from .test_cli_integration import TestsFlextMeltanoCliIntegration
     from .test_cli_small_managers import TestsFlextMeltanoCliSmallManagers
     from .test_constants import TestsFlextMeltanoConstantsUnit
@@ -25,6 +23,8 @@ if TYPE_CHECKING:
     from .test_target_abstractions import TestsFlextMeltanoTargetAbstractions
     from .test_typings import TestsFlextMeltanoTypingsUnit
     from .test_validators import TestsFlextMeltanoValidators
+
+
 __all__: tuple[str, ...] = (
     "TestsFlextMeltanoCliIntegration",
     "TestsFlextMeltanoCliSmallManagers",
@@ -40,22 +40,6 @@ __all__: tuple[str, ...] = (
     "TestsFlextMeltanoTargetAbstractions",
     "TestsFlextMeltanoTypingsUnit",
     "TestsFlextMeltanoValidators",
-    "c",
-    "d",
-    "e",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "td",
-    "tf",
-    "tk",
-    "tm",
-    "tv",
-    "u",
-    "x",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
@@ -75,24 +59,6 @@ _LAZY_IMPORTS = MappingProxyType(
             ".test_target_abstractions": ("TestsFlextMeltanoTargetAbstractions",),
             ".test_typings": ("TestsFlextMeltanoTypingsUnit",),
             ".test_validators": ("TestsFlextMeltanoValidators",),
-            "flext_tests": (
-                "c",
-                "d",
-                "e",
-                "h",
-                "m",
-                "p",
-                "r",
-                "s",
-                "t",
-                "td",
-                "tf",
-                "tk",
-                "tm",
-                "tv",
-                "u",
-                "x",
-            ),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

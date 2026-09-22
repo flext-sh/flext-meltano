@@ -35,6 +35,8 @@ if TYPE_CHECKING:
     from .singer_translator import FlextMeltanoSingerCliTranslator
     from .tap_source_mixin import FlextMeltanoTapSourceMixin
     from .validators import FlextMeltanoValidators
+
+
 __all__: tuple[str, ...] = (
     "FlextMeltanoAbstractions",
     "FlextMeltanoAdapter",

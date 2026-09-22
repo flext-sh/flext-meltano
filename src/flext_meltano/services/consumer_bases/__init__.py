@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     from .facade import FlextMeltanoConsumerBases
     from .tap_service_base import FlextMeltanoTapServiceBase
     from .target_service_base import FlextMeltanoTargetServiceBase
+
+
 __all__: tuple[str, ...] = (
     "FlextMeltanoConsumerBases",
     "FlextMeltanoDbtServiceBase",

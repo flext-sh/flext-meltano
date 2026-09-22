@@ -9,18 +9,37 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_tests import FlextTestsConstants, d, e, h, r, td, tf, tk, tm, tv, x
+    from flext_cli import cli
+    from flext_tests import (
+        active_rules,
+        api,
+        config,
+        discover_repository_root,
+        install_local_packages,
+        load_infra_report,
+        settings,
+        split_csv,
+        td,
+        tf,
+        tk,
+        tm,
+        tv,
+    )
+
+    from flext_core import core, d, e, h, lazy_attribute, r, x
+    from flext_meltano import main, meltano
 
     from . import integration, unit
     from .base import TestsFlextMeltanoServiceBase, TestsFlextMeltanoServiceBase as s
-    from .constants import TestsFlextMeltanoConstants, TestsFlextMeltanoConstants as c
-    from .models import TestsFlextMeltanoModels, TestsFlextMeltanoModels as m
-    from .protocols import TestsFlextMeltanoProtocols, TestsFlextMeltanoProtocols as p
+    from .constants import TestsFlextMeltanoConstants, c
+    from .models import TestsFlextMeltanoModels, m
+    from .protocols import TestsFlextMeltanoProtocols, p
     from .settings import TestsFlextMeltanoSettings
-    from .typings import TestsFlextMeltanoTypes, TestsFlextMeltanoTypes as t
-    from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
+    from .typings import TestsFlextMeltanoTypes, t
+    from .utilities import TestsFlextMeltanoUtilities, u
+
+
 __all__: tuple[str, ...] = (
-    "FlextTestsConstants",
     "TestsFlextMeltanoConstants",
     "TestsFlextMeltanoModels",
     "TestsFlextMeltanoProtocols",
@@ -28,15 +47,28 @@ __all__: tuple[str, ...] = (
     "TestsFlextMeltanoSettings",
     "TestsFlextMeltanoTypes",
     "TestsFlextMeltanoUtilities",
+    "active_rules",
+    "api",
     "c",
+    "cli",
+    "config",
+    "core",
     "d",
+    "discover_repository_root",
     "e",
     "h",
+    "install_local_packages",
     "integration",
+    "lazy_attribute",
+    "load_infra_report",
     "m",
+    "main",
+    "meltano",
     "p",
     "r",
     "s",
+    "settings",
+    "split_csv",
     "t",
     "td",
     "tf",
@@ -60,18 +92,23 @@ _LAZY_IMPORTS = MappingProxyType(
             ".typings": ("TestsFlextMeltanoTypes", "t"),
             ".unit": ("unit",),
             ".utilities": ("TestsFlextMeltanoUtilities", "u"),
+            "flext_cli": ("cli",),
+            "flext_core": ("core", "d", "e", "h", "lazy_attribute", "r", "x"),
+            "flext_meltano": ("main", "meltano"),
             "flext_tests": (
-                "FlextTestsConstants",
-                "d",
-                "e",
-                "h",
-                "r",
+                "active_rules",
+                "api",
+                "config",
+                "discover_repository_root",
+                "install_local_packages",
+                "load_infra_report",
+                "settings",
+                "split_csv",
                 "td",
                 "tf",
                 "tk",
                 "tm",
                 "tv",
-                "x",
             ),
         }),
         alias_groups=MappingProxyType({}),
