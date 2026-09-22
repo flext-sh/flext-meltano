@@ -595,7 +595,8 @@ class MyFLEXTProject(s):
     def execute_pipeline(self) -> p.Result[PipelineResult]:
         """Execute pipeline using FLEXT foundation."""
         return (
-            self.tap.discover_streams()
+            self.tap
+            .discover_streams()
             .flat_map(lambda streams: self.validate_streams(streams))
             .flat_map(lambda _: self.target.initialize())
             .flat_map(lambda _: self.run_data_flow())

@@ -1151,7 +1151,8 @@ class RailwayExecutor:
     def execute_with_railway(self, operation: Operation) -> p.Result[OperationResult]:
         """Execute operation using railway pattern with full error handling."""
         return (
-            self.validate_operation(operation)
+            self
+            .validate_operation(operation)
             .flat_map(lambda op: self.check_permissions(op))
             .flat_map(lambda op: self.reserve_resources(op))
             .flat_map(lambda op: self.execute_operation(op))
@@ -2109,14 +2110,12 @@ class DisasterRecoveryManager:
                 plan_test.communication_test = comm_test
 
                 # Overall plan test result
-                plan_test.success = all(
-                    [
-                        validation_result.success,
-                        backup_test.success,
-                        failover_test.success,
-                        comm_test.success,
-                    ]
-                )
+                plan_test.success = all([
+                    validation_result.success,
+                    backup_test.success,
+                    failover_test.success,
+                    comm_test.success,
+                ])
 
             except Exception as e:
                 plan_test.success = False
@@ -2212,13 +2211,11 @@ class DisasterRecoveryManager:
             plan_compliance.backup_compliant = self._check_backup_compliance(dr_plan)
 
             # Overall plan compliance
-            plan_compliance.overall_compliant = all(
-                [
-                    plan_compliance.rto_compliant,
-                    plan_compliance.rpo_compliant,
-                    plan_compliance.backup_compliant,
-                ]
-            )
+            plan_compliance.overall_compliant = all([
+                plan_compliance.rto_compliant,
+                plan_compliance.rpo_compliant,
+                plan_compliance.backup_compliant,
+            ])
 
             compliance.plan_compliance.append(plan_compliance)
 
@@ -3154,38 +3151,36 @@ class APIHelpSystem:
         examples = []
 
         if endpoint == "/api/v1/pipelines" and method == "POST":
-            examples.append(
-                {
-                    "title": "Create a PostgreSQL to Snowflake pipeline",
-                    "description": "Basic pipeline creation example",
-                    "request": {
-                        "name": "postgres-to-snowflake",
-                        "tap": {
-                            "name": "tap-postgres",
-                            "settings": {
-                                "host": "postgres.example.com",
-                                "database": "analytics",
-                                "user": "pipeline_user",
-                                "password": "secure_password",
-                            },
-                        },
-                        "target": {
-                            "name": "target-snowflake",
-                            "settings": {
-                                "account": "company.snowflakecomputing.com",
-                                "warehouse": "ANALYTICS_WH",
-                                "database": "ANALYTICS_DB",
-                            },
+            examples.append({
+                "title": "Create a PostgreSQL to Snowflake pipeline",
+                "description": "Basic pipeline creation example",
+                "request": {
+                    "name": "postgres-to-snowflake",
+                    "tap": {
+                        "name": "tap-postgres",
+                        "settings": {
+                            "host": "postgres.example.com",
+                            "database": "analytics",
+                            "user": "pipeline_user",
+                            "password": "secure_password",
                         },
                     },
-                    "response": {
-                        "id": "pipeline-123",
-                        "name": "postgres-to-snowflake",
-                        "status": "created",
-                        "created_at": "2026-04-14T10:00:00Z",
+                    "target": {
+                        "name": "target-snowflake",
+                        "settings": {
+                            "account": "company.snowflakecomputing.com",
+                            "warehouse": "ANALYTICS_WH",
+                            "database": "ANALYTICS_DB",
+                        },
                     },
-                }
-            )
+                },
+                "response": {
+                    "id": "pipeline-123",
+                    "name": "postgres-to-snowflake",
+                    "status": "created",
+                    "created_at": "2026-04-14T10:00:00Z",
+                },
+            })
 
         return examples
 
@@ -3199,14 +3194,12 @@ class APIHelpSystem:
         ]
 
         if "pipelines" in endpoint:
-            tips.extend(
-                [
-                    "Verify tap and target configurations are correct",
-                    "Ensure database connections are accessible",
-                    "Check that required permissions are granted",
-                    "Validate JSON schema compliance",
-                ]
-            )
+            tips.extend([
+                "Verify tap and target configurations are correct",
+                "Ensure database connections are accessible",
+                "Check that required permissions are granted",
+                "Validate JSON schema compliance",
+            ])
 
         return tips
 
