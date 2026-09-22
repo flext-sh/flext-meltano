@@ -41,12 +41,12 @@ layer:
   [`common.py`](flext_meltano/common.py)
 - **Exception Handling**: [`exceptions.py`](flext_meltano/exceptions.py)
 - **Dependency Management**: [`container.py`](flext_meltano/container.py)
-- **Schema Definitions**: [`common_schemas.py`](flext_meltano/common_schemas.py)
-- **Public API**: [`__init__.py`](flext_meltano/__init__.py)
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### Bridge Integration Layer (3 modules)
 
-- **Go Integration**: [`simple_bridge.py`](flext_meltano/simple_bridge.py)
+- runtime_bootstrap_options
 - **Subprocess Orchestration**: [`execution.py`](flext_meltano/execution.py)
 - **CLI Interface**: [`cli.py`](flext_meltano/cli.py)
 
@@ -60,9 +60,9 @@ layer:
 #### Singer Integration Layer (4 modules)
 
 - **Protocol Implementation**: [`singer.py`](flext_meltano/singer.py)
-- **Base Classes**: [`singer_base.py`](flext_meltano/singer_base.py)
-- **Unified Interface**: [`singer_unified.py`](flext_meltano/singer_unified.py)
-- **SDK Bridge**: [`flext_singer.py`](flext_meltano/flext_singer.py)
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### Data Transformation Layer (1 module)
 
