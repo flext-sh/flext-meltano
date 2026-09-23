@@ -11,6 +11,19 @@ from flext_cli import m
 from flext_meltano import t
 
 
+def _plugin_discovery_catalog_plugins_default() -> (
+    Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]
+):
+    """Late-bound empty plugin-catalog default.
+
+    Defined before the class so the class body binds the bare name while
+    resolution of the nested type happens only at call time: annotations
+    stay lazy under ``from __future__ import annotations`` and this
+    function's body runs after the module is complete.
+    """
+    return MappingProxyType[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]({})
+
+
 class FlextMeltanoModelsDiscovery:
     """Plugin discovery source, item, and catalog models."""
 
@@ -77,9 +90,7 @@ class FlextMeltanoModelsDiscovery:
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
             m.Field(
-                default_factory=lambda: MappingProxyType[
-                    str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
-                ]({}),
+                default_factory=_plugin_discovery_catalog_plugins_default,
                 description="Discovered plugins catalog",
             )
         )
