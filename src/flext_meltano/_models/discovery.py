@@ -11,9 +11,9 @@ from flext_cli import m
 from flext_meltano import t
 
 
-def _plugin_discovery_catalog_plugins_default() -> (
-    Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]
-):
+def _plugin_discovery_catalog_plugins_default() -> Mapping[
+    str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
+]:
     """Late-bound empty plugin-catalog default.
 
     Defined before the class so the class body binds the bare name while
