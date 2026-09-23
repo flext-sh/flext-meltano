@@ -12,9 +12,9 @@ from flext_cli import m, u
 from flext_meltano import c, t
 
 
-def _dbt_manifest_nodes_default() -> (
-    Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]
-):
+def _dbt_manifest_nodes_default() -> Mapping[
+    str, FlextMeltanoModelsProjects.DbtManifestNode
+]:
     """Late-bound empty manifest-nodes default.
 
     Defined before the class so the class body binds the bare name while
