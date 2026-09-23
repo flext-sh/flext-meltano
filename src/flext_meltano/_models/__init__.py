@@ -30,6 +30,8 @@ if TYPE_CHECKING:
     from .sources import FlextMeltanoModelsSources
     from .sources_params import FlextMeltanoModelsSourcesParams
     from .transformations import FlextMeltanoModelsTransformations
+
+
 __all__: tuple[str, ...] = (
     "FlextMeltanoModelsCliInputs",
     "FlextMeltanoModelsCliParams",

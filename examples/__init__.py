@@ -38,6 +38,8 @@ if TYPE_CHECKING:
         ExamplesFlextMeltanoUtilities,
         ExamplesFlextMeltanoUtilities as u,
     )
+
+
 __all__: tuple[str, ...] = (
     "ExamplesFlextMeltanoConstants",
     "ExamplesFlextMeltanoModels",

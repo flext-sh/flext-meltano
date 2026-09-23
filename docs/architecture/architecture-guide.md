@@ -22,24 +22,8 @@
   - [Code-to-Diagram Generation](#code-to-diagram-generation)
   - [Documentation Synchronization](#documentation-synchronization)
   - [Custom Validation Rules](#custom-validation-rules)
-- [👥 Team Collaboration](#team-collaboration)
-  - [Roles and Responsibilities](#roles-and-responsibilities)
-  - [Review Process](#review-process)
-  - [Communication Channels](#communication-channels)
-- [📊 Metrics and Reporting](#metrics-and-reporting)
-  - [Architecture Health Dashboard](#architecture-health-dashboard)
-  - [Automated Reporting](#automated-reporting)
-- [🛠️ Troubleshooting](#troubleshooting)
-  - [Common Issues](#common-issues)
-  - [Getting Help](#getting-help)
-- [🎯 Best Practices](#best-practices)
-  - [Documentation Principles](#documentation-principles)
-  - [Architecture Decision Making](#architecture-decision-making)
-  - [Maintenance Approach](#maintenance-approach)
-- [📚 Resources](#resources)
-  - [External References](#external-references)
-  - [Internal Documentation](#internal-documentation)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Architecture Documentation Framework and Best Practices**
 
@@ -393,7 +377,8 @@ class CustomArchitectureValidator(ArchitectureValidator):
         if "railway" not in content.lower():
             issues.append("Consider railway-oriented programming")
 
-        return issues```
+        return issues
+        ```
 ## 👥 Team Collaboration
 
 ### Roles and Responsibilities
@@ -442,7 +427,8 @@ make docs
 # - Documentation completeness metrics
 # - Validation results
 # - Recent changes
-# - Quality trends```
+# - Quality trends
+```
 ## 🛠️ Troubleshooting
 
 ### Common Issues
@@ -454,7 +440,8 @@ make docs
 python scripts/architecture_automation.py --validate
 
 # Manual rendering
-java -jar plantuml.jar docs/architecture/diagrams.puml```
+java -jar plantuml.jar docs/architecture/diagrams.puml
+```
 #### Cross-Reference Errors
 
 ```bash
@@ -462,7 +449,8 @@ java -jar plantuml.jar docs/architecture/diagrams.puml```
 make docs
 
 # Check specific document
-grep -r "broken link" docs/architecture/```
+grep -r "broken link" docs/architecture/
+```
 #### ADR Template Issues
 
 ```bash
@@ -470,7 +458,8 @@ grep -r "broken link" docs/architecture/```
 python scripts/adr_validator.py docs/architecture/adr/
 
 # Check against template
-diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md```
+diff docs/architecture/adr/template.md docs/architecture/adr/001-example.md
+```
 ### Getting Help
 
 1. **Check This Guide**: Comprehensive troubleshooting section

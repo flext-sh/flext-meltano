@@ -35,7 +35,8 @@
   - [Key Architectural Characteristics](#key-architectural-characteristics)
   - [System Qualities](#system-qualities)
   - [Integration Philosophy](#integration-philosophy)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Ecosystem Integration and System Context**
 

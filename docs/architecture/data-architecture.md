@@ -32,7 +32,8 @@
 - [📈 Architecture Evolution](#architecture-evolution)
   - [Current Limitations](#current-limitations)
   - [Future Enhancements](#future-enhancements)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Data Flow, Storage, and Processing Architecture**
 

@@ -23,6 +23,8 @@ if TYPE_CHECKING:
     from .test_target_abstractions import TestsFlextMeltanoTargetAbstractions
     from .test_typings import TestsFlextMeltanoTypingsUnit
     from .test_validators import TestsFlextMeltanoValidators
+
+
 __all__: tuple[str, ...] = (
     "TestsFlextMeltanoCliIntegration",
     "TestsFlextMeltanoCliSmallManagers",

@@ -113,66 +113,47 @@ fail_under = 90
 
 #### **Bridge Integration**
 
-- **[`test_singer_integration.py`](test_singer_integration.py)** - ✅ Singer SDK
-  re-exports and service creation
-- **[`test_execution_comprehensive.py`](test_execution_comprehensive.py)** - ✅
-  Subprocess execution and result handling
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### **Base Components**
 
-- **[`test_base_simple.py`](test_base_simple.py)** - ✅ Foundation classes and factory
-  functions
-- **[`test_base_coverage.py`](test_base_coverage.py)** - ✅ Comprehensive base module
-  testing
-- **[`test_core_library.py`](test_core_library.py)** - ✅ Core library functionality
-  validation
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### **Command-Line Interface**
 
-- **[`test_cli_comprehensive.py`](test_cli_comprehensive.py)** - ✅ CLI operations and
-  command validation
-- **[`test_cli_integration.py`](test_cli_integration.py)** - ✅ CLI integration with
-  core services
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 ### Data Integration Tests
 
 #### **Singer Protocol**
 
-- **[`test_flext_singer.py`](test_flext_singer.py)** - ✅ Singer SDK bridge and message
-  handling
-- **[`test_flext_singer_comprehensive.py`](test_flext_singer_comprehensive.py)** - ✅
-  Comprehensive Singer integration
-- **[`test_flext_singer_coverage.py`](test_flext_singer_coverage.py)** - ✅ Complete
-  Singer protocol coverage
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### **Meltano Integration**
 
-- **[`test_meltano_integration.py`](test_meltano_integration.py)** - ✅ Meltano CLI
-  integration and orchestration
-- **[`test_discovery_complete.py`](test_discovery_complete.py)** - ✅ Plugin discovery
-  and catalog management
-- **[`test_real_catalog_discovery.py`](test_real_catalog_discovery.py)** - ✅ Real-world
-  catalog discovery scenarios
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### **DBT Integration**
 
-- **[`test_dbt_integration.py`](test_dbt_integration.py)** - ✅ DBT project management
-  and execution
-- **[`test_real_dbt_functionality.py`](test_real_dbt_functionality.py)** - ✅ Real DBT
-  functionality validation
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 ### Plugin Management Tests
 
 #### **Installation & Discovery**
 
-- **[`test_installation_simple.py`](test_installation_simple.py)** - ✅ Basic plugin
-  installation workflows
-- **[`test_installation_comprehensive.py`](test_installation_comprehensive.py)** - ✅
-  Complex installation scenarios
-- **[`test_installation_real.py`](test_installation_real.py)** - ✅ Real plugin
-  installation validation
-- **[`test_installation_edge_cases.py`](test_installation_edge_cases.py)** - ✅ Error
-  handling and edge cases
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 ## Test Standards
 

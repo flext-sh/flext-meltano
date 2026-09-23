@@ -26,15 +26,11 @@
   - [Maintainability Architecture](#maintainability-architecture)
   - [Maintainability Metrics](#maintainability-metrics)
   - [Code Quality Automation](#code-quality-automation)
-- [🎨 Usability](#usability)
-  - [API Design Principles](#api-design-principles)
   - [Usability Metrics](#usability-metrics)
   - [User Experience Optimization](#user-experience-optimization)
 - [🧪 Testability](#testability)
   - [Testing Architecture](#testing-architecture)
   - [Testability Patterns](#testability-patterns)
-  - [Test Quality Metrics](#test-quality-metrics)
-  - [Testing Automation](#testing-automation)
 - [🔄 Cross-Cutting Concerns](#cross-cutting-concerns)
   - [Logging Architecture](#logging-architecture)
   - [Monitoring and Observability](#monitoring-and-observability)
@@ -46,7 +42,8 @@
   - [Architecture Roadmap](#architecture-roadmap)
   - [Technical Debt Management](#technical-debt-management)
   - [Risk Mitigation](#risk-mitigation)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Quality Attributes and Cross-Cutting Concerns**
 

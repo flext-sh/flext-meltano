@@ -4,6 +4,12 @@
 
 - [🚨 Architecture Compliance Issues](#architecture-compliance-issues)
   - [Direct Import Violations](#direct-import-violations)
+- [🔧 Development Issues](#development-issues)
+  - [Import Errors](#import-errors)
+  - [Type Check Failures](#type-check-failures)
+  - [Test Failures](#test-failures)
+- [📦 Dependency Issues](#dependency-issues)
+  - [Dependency Lock Conflicts](#dependency-lock-conflicts)
   - [Virtual Environment Issues](#virtual-environment-issues)
 - [🧪 Testing Issues](#testing-issues)
   - [Coverage Issues](#coverage-issues)

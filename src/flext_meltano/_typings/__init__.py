@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from .base import FlextMeltanoTypingsBase
     from .domains import FlextMeltanoTypingsDomains
     from .singer import FlextMeltanoTypingsSinger
+
+
 __all__: tuple[str, ...] = (
     "FlextMeltanoTypingsBase",
     "FlextMeltanoTypingsDomains",

@@ -29,7 +29,8 @@
 - [🔄 Evolution & Technical Debt](#evolution-technical-debt)
   - [Current Architecture Health](#current-architecture-health)
   - [Future Evolution Considerations](#future-evolution-considerations)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Enterprise Data Integration Platform**
 

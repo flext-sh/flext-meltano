@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from .project import FlextMeltanoProtocolsProject
     from .services import FlextMeltanoProtocolsServices
     from .singer import FlextMeltanoProtocolsSinger
+
+
 __all__: tuple[str, ...] = (
     "FlextMeltanoProtocolsBase",
     "FlextMeltanoProtocolsPlugin",

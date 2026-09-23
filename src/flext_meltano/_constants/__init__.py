@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from .base import FlextMeltanoConstantsBase
     from .enums import FlextMeltanoConstantsEnums
     from .settings import FlextMeltanoConstantsSettings
+
+
 __all__: tuple[str, ...] = (
     "FlextMeltanoConstantsBase",
     "FlextMeltanoConstantsEnums",

@@ -37,6 +37,8 @@ if TYPE_CHECKING:
     from .settings import TestsFlextMeltanoSettings
     from .typings import TestsFlextMeltanoTypes, t
     from .utilities import TestsFlextMeltanoUtilities, u
+
+
 __all__: tuple[str, ...] = (
     "TestsFlextMeltanoConstants",
     "TestsFlextMeltanoModels",

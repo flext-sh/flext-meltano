@@ -42,11 +42,8 @@
   - [Link Management](#link-management)
 - [🎯 Advanced Features](#advanced-features)
   - [Custom Validators](#custom-validators)
-  - [Integration APIs](#integration-apis)
-- [📞 Support & Resources](#support-resources)
-  - [Getting Help](#getting-help)
-  - [Related Documentation](#related-documentation)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **FLEXT-Meltano Documentation Quality Assurance & Maintenance Framework**
 
@@ -470,7 +467,8 @@ class CustomFlextValidator(DocumentationAuditor):
             if not content.count("from flext_core import"):
                 issues.append("Missing flext-core import")
 
-        return issues```
+        return issues
+        ```
 ### Integration APIs
 
 Programmatic access to quality data:
@@ -486,7 +484,8 @@ score = metrics.quality_score
 issues = len(auditor.issues)
 
 # Generate custom reports
-auditor.generate_custom_report("api_quality.md")```
+auditor.generate_custom_report("api_quality.md")
+```
 ## 📞 Support & Resources
 
 ### Getting Help

@@ -14,7 +14,7 @@
   - [ELT Pipeline Flow](#elt-pipeline-flow)
   - [Error Handling Flow](#error-handling-flow)
 - [🏛️ Clean Architecture Implementation](#clean-architecture-implementation)
-  - [Layer Dependencies```](#layer-dependencies)
+  - [Layer Dependencies](#layer-dependencies)
   - [Dependency Rules](#dependency-rules)
 - [🔧 Integration Patterns](#integration-patterns)
   - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
