@@ -11,13 +11,13 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsTypes
 
-from flext_meltano import t
+from flext_meltano import FlextMeltanoTypes
 
 
-class TestsFlextMeltanoTypes(FlextTestsTypes, t):
+class TestsFlextMeltanoTypes(FlextTestsTypes, FlextMeltanoTypes):
     """Test type aliases for flext-meltano."""
 
-    class Meltano(t.Meltano):
+    class Meltano(FlextMeltanoTypes.Meltano):
         """Meltano test types namespace."""
 
         class Tests(FlextTestsTypes.Tests):

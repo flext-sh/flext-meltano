@@ -16,17 +16,17 @@ from __future__ import annotations
 from enum import StrEnum, unique
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from flext_tests import FlextTestsConstants
 
-from flext_meltano import c
+from flext_meltano import FlextMeltanoConstants
 
 if TYPE_CHECKING:
     from tests import t
 
 
-class TestsFlextMeltanoConstants(FlextTestsConstants, c):
+class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
     MANDATORY: Inherits from FlextTestsConstants for test infrastructure (.Tests.*).
@@ -46,7 +46,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
     - All production constants come from c
     """
 
-    class Meltano(c.Meltano):
+    class Meltano(FlextMeltanoConstants.Meltano):
         """Meltano domain namespace."""
 
         class Tests(FlextTestsConstants.Tests):
@@ -60,27 +60,29 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
                 REDIS = "redis"
                 MELTANO = "meltano"
 
-            HOST: Final[str] = c.LOCALHOST
-            SERVICE_PORTS: Final[t.MappingKV[_DockerService, int]] = MappingProxyType({
-                _DockerService.POSTGRES: 5433,
-                _DockerService.REDIS: 6380,
-                _DockerService.MELTANO: 3000,
-            })
-            POSTGRES_PORT: Final[int] = SERVICE_PORTS[_DockerService.POSTGRES]
-            REDIS_PORT: Final[int] = SERVICE_PORTS[_DockerService.REDIS]
-            MELTANO_PORT: Final[int] = SERVICE_PORTS[_DockerService.MELTANO]
-            COMPOSE_FILE: Final[str] = "docker-compose.test.yml"
-            PRIMARY_SERVICE: Final[str] = _DockerService.MELTANO
-            PRIMARY_CONTAINER_NAME: Final[str] = "flext-test-meltano"
-            FIXTURES_DATA_DIR: Final[Path] = Path("tests/fixtures/data")
-            TEST_INPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "input").as_posix()
-            TEST_OUTPUT_DIR: Final[str] = (FIXTURES_DATA_DIR / "output").as_posix()
-            TEST_TEMP_PREFIX: Final[str] = "flext_meltano_test_"
+            HOST: ClassVar[str] = FlextMeltanoConstants.LOCALHOST
+            SERVICE_PORTS: ClassVar[t.MappingKV[_DockerService, int]] = (
+                MappingProxyType({
+                    _DockerService.POSTGRES: 5433,
+                    _DockerService.REDIS: 6380,
+                    _DockerService.MELTANO: 3000,
+                })
+            )
+            POSTGRES_PORT: ClassVar[int] = SERVICE_PORTS[_DockerService.POSTGRES]
+            REDIS_PORT: ClassVar[int] = SERVICE_PORTS[_DockerService.REDIS]
+            MELTANO_PORT: ClassVar[int] = SERVICE_PORTS[_DockerService.MELTANO]
+            COMPOSE_FILE: ClassVar[str] = "docker-compose.test.yml"
+            PRIMARY_SERVICE: ClassVar[str] = _DockerService.MELTANO
+            PRIMARY_CONTAINER_NAME: ClassVar[str] = "flext-test-meltano"
+            FIXTURES_DATA_DIR: ClassVar[Path] = Path("tests/fixtures/data")
+            TEST_INPUT_DIR: ClassVar[str] = (FIXTURES_DATA_DIR / "input").as_posix()
+            TEST_OUTPUT_DIR: ClassVar[str] = (FIXTURES_DATA_DIR / "output").as_posix()
+            TEST_TEMP_PREFIX: ClassVar[str] = "flext_meltano_test_"
 
             # Test service credentials (mirror docker-compose.test.yml)
-            POSTGRES_TEST_DATABASE: Final[str] = "flext_test"
-            POSTGRES_TEST_USER: Final[str] = "test"
-            POSTGRES_TEST_VALUE: Final[str] = "test"
+            POSTGRES_TEST_DATABASE: ClassVar[str] = "flext_test"
+            POSTGRES_TEST_USER: ClassVar[str] = "test"
+            POSTGRES_TEST_VALUE: ClassVar[str] = "test"
 
             @unique
             class _SingerSdkAdapterValue(StrEnum):
@@ -92,23 +94,23 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, c):
                 SUCCESS_COMMAND = "tap-ok"
                 FAILURE_COMMAND = "tap-fail"
 
-            SINGER_SDK_ADAPTER_SETTINGS: Final[t.MappingKV[str, str]] = (
+            SINGER_SDK_ADAPTER_SETTINGS: ClassVar[t.MappingKV[str, str]] = (
                 MappingProxyType({
                     _SingerSdkAdapterValue.SETTINGS_KEY: (
                         _SingerSdkAdapterValue.SETTINGS_VALUE
                     )
                 })
             )
-            SINGER_SDK_ADAPTER_STREAM_USERS: Final[str] = (
+            SINGER_SDK_ADAPTER_STREAM_USERS: ClassVar[str] = (
                 _SingerSdkAdapterValue.STREAM_USERS
             )
-            SINGER_SDK_ADAPTER_SUCCESS_COMMAND: Final[str] = (
+            SINGER_SDK_ADAPTER_SUCCESS_COMMAND: ClassVar[str] = (
                 _SingerSdkAdapterValue.SUCCESS_COMMAND
             )
-            SINGER_SDK_ADAPTER_FAILURE_COMMAND: Final[str] = (
+            SINGER_SDK_ADAPTER_FAILURE_COMMAND: ClassVar[str] = (
                 _SingerSdkAdapterValue.FAILURE_COMMAND
             )
-            SINGER_SDK_ADAPTER_FAILURE_EXIT_CODE: Final[int] = 3
+            SINGER_SDK_ADAPTER_FAILURE_EXIT_CODE: ClassVar[int] = 3
 
 
 c = TestsFlextMeltanoConstants

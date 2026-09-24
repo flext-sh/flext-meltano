@@ -11,10 +11,10 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsModels
 
-from flext_meltano import m
+from flext_meltano import FlextMeltanoModels
 
 
-class TestsFlextMeltanoModels(FlextTestsModels, m):
+class TestsFlextMeltanoModels(FlextTestsModels, FlextMeltanoModels):
     """Test models - composition of TestsFlextModels + m.
 
     Hierarchy:
@@ -27,7 +27,7 @@ class TestsFlextMeltanoModels(FlextTestsModels, m):
     - m.Meltano.* - Production domain models (inherited)
     """
 
-    class Meltano(m.Meltano):
+    class Meltano(FlextMeltanoModels.Meltano):
         """Meltano domain models test namespace."""
 
         class Tests(FlextTestsModels.Tests):

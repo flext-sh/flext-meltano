@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsProtocols
 
-from flext_meltano import p
+from flext_meltano import FlextMeltanoProtocols
 
 
-class TestsFlextMeltanoProtocols(FlextTestsProtocols, p):
+class TestsFlextMeltanoProtocols(FlextTestsProtocols, FlextMeltanoProtocols):
     """Test protocols facade for flext-meltano."""
 
-    class Meltano(p.Meltano):
+    class Meltano(FlextMeltanoProtocols.Meltano):
         """Meltano test protocols namespace."""
 
         class Tests(FlextTestsProtocols.Tests):

@@ -13,12 +13,12 @@ if TYPE_CHECKING:
 
     from . import integration, unit
     from .base import TestsFlextMeltanoServiceBase, TestsFlextMeltanoServiceBase as s
-    from .constants import TestsFlextMeltanoConstants, c
-    from .models import TestsFlextMeltanoModels, m
-    from .protocols import TestsFlextMeltanoProtocols, p
+    from .constants import TestsFlextMeltanoConstants, TestsFlextMeltanoConstants as c
+    from .models import TestsFlextMeltanoModels, TestsFlextMeltanoModels as m
+    from .protocols import TestsFlextMeltanoProtocols, TestsFlextMeltanoProtocols as p
     from .settings import TestsFlextMeltanoSettings
-    from .typings import TestsFlextMeltanoTypes, t
-    from .utilities import TestsFlextMeltanoUtilities, u
+    from .typings import TestsFlextMeltanoTypes, TestsFlextMeltanoTypes as t
+    from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
 
 
 __all__: tuple[str, ...] = (

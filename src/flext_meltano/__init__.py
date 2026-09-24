@@ -28,10 +28,10 @@ if TYPE_CHECKING:
     from .api import FlextMeltano, meltano
     from .base import FlextMeltanoServiceBase, s
     from .cli import FlextMeltanoCli, main
-    from .constants import FlextMeltanoConstants, c
-    from .models import FlextMeltanoModels, m
+    from .constants import FlextMeltanoConstants, FlextMeltanoConstants as c
+    from .models import FlextMeltanoModels, FlextMeltanoModels as m
     from .pipeline_mgr import FlextMeltanoPipelineManager
-    from .protocols import FlextMeltanoProtocols, p
+    from .protocols import FlextMeltanoProtocols, FlextMeltanoProtocols as p
     from .services.abstractions import FlextMeltanoAbstractions
     from .services.adapters import FlextMeltanoAdapter
     from .services.bridge import FlextMeltanoBridge
@@ -65,8 +65,8 @@ if TYPE_CHECKING:
     from .services.singer_translator import FlextMeltanoSingerCliTranslator
     from .services.tap_source_mixin import FlextMeltanoTapSourceMixin
     from .services.validators import FlextMeltanoValidators
-    from .typings import FlextMeltanoTypes, t
-    from .utilities import FlextMeltanoUtilities, u
+    from .typings import FlextMeltanoTypes, FlextMeltanoTypes as t
+    from .utilities import FlextMeltanoUtilities, FlextMeltanoUtilities as u
 
 
 __all__: tuple[str, ...] = (
