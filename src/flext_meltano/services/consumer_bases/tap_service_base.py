@@ -78,7 +78,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             exit_code: int = tap.run_cli(command_args, self.tap_name)
         except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("Tap CLI failed", error=str(exc))
-            return 1
+            raise SystemExit(1) from exc
         else:
             return exit_code
 

@@ -29,6 +29,6 @@ This section is generated from public exports and real docstrings.
 
 - Primary facades: `FlextMeltano`, `FlextMeltanoAbstractions`, `FlextMeltanoAdapter`,
   `FlextMeltanoBridge`, `FlextMeltanoCli`, `FlextMeltanoComponentService` (+30 more)
-- Generated module pages: `35`
+- Generated module pages: `32`
 
 Back to [project docs](../index.md).
