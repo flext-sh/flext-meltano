@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import singer_sdk.singerlib as singer_sdk_singerlib
 import singer_sdk.typing as singer_sdk_typing
 
 from flext_meltano import c
@@ -21,6 +22,10 @@ class FlextMeltanoTypingsSinger:
     """
 
     SingerReplicationMethod = c.Meltano.SingerReplicationMethod
+
+    # Singer SDK wire-format schema — the tap-facing runtime class for
+    # isinstance and schema construction (flext-meltano owns singer_sdk).
+    SingerSchema = singer_sdk_singerlib.Schema
 
     # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
     SingerArrayType = singer_sdk_typing.ArrayType

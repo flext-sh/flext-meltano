@@ -27,7 +27,7 @@
   `FlextMeltanoComponentService`, `FlextMeltanoConfig`, `FlextMeltanoConstants`,
   `FlextMeltanoConsumerBases`, `FlextMeltanoDbtProjectMixin` (+34 more)
 - Exported module shortcuts: `services`
-- Generated module pages: `35`
+- Generated module pages: `32`
 
 ## Next Pages
 
