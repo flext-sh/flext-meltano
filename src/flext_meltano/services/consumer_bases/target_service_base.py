@@ -66,11 +66,11 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         drain_result = u.Meltano.process_stdin(self)
         if drain_result.failure:
             self.logger.error("Target drain failed", error=str(drain_result.error))
-            return 1
+            raise SystemExit(1)
         flush_result = self.flush()
         if flush_result.failure:
             self.logger.error("Target flush failed", error=str(flush_result.error))
-            return 1
+            raise SystemExit(1)
         return 0
 
     def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> p.Result[bool]:

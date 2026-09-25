@@ -100,14 +100,14 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
                     subcommand=subcommand,
                     error=result.error or "",
                 )
-                return 1
+                raise SystemExit(1)
             return 0
 
         try:
             return _run_cli_main()
         except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("dbt CLI failed", error=str(exc))
-            return 1
+            raise SystemExit(1) from exc
 
     # ------------------------------------------------------------------
     # dbt command execution
