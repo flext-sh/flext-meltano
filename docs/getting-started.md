@@ -71,7 +71,7 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 
 ### **Basic Service Usage**
 
-````python
+```python
 from flext_cli import u
 from flext_meltano import FlextMeltanoService
 
@@ -80,7 +80,7 @@ service = FlextMeltanoService()
 
 # Service is ready for ELT operations
 u.Cli.print("flext-meltano service initialized")
-
+```
 
 ### **Singer Protocol Operations**
 
@@ -92,11 +92,11 @@ tap_abstractions = FlextMeltanoTapAbstractions()
 
 # Example catalog discovery (requires configured tap)
 # catalog_result = tap_abstractions.discover_catalog("tap-csv")
-````
+```
 
 ### **r Pattern**
 
-````python
+```python
 from __future__ import annotations
 
 from flext_cli import u
@@ -118,7 +118,7 @@ if result.success:
     u.Cli.print(f"Success: {data}")
 else:
     u.Cli.print(f"Error: {result.error}")
-
+```
 
 ---
 
@@ -132,7 +132,7 @@ make check           # Complete validation pipeline
 make lint               # Code linting
 make type-check         # Type safety validation
 make test               # Test execution
-````
+```
 
 ### **Common Commands**
 

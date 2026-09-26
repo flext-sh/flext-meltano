@@ -134,7 +134,7 @@ transforms:
 
 ### Configuration Validation
 
-````python
+```python
 from flext_cli import u
 from flext_meltano import FlextMeltanoSettings
 
@@ -145,7 +145,7 @@ if validation_result.success:
     u.Cli.print("Meltano configuration is valid")
 else:
     u.Cli.print(f"Configuration error: {validation_result.error}")
-
+```
 
 ---
 
@@ -166,7 +166,7 @@ tap_config = TapConfig(
 # Build pipeline configuration
 builder = FlextMeltanoSettingsBuilders()
 pipeline_config = builder.build_tap_config(tap_config.dict())
-
+```
 
 ### Target Configuration
 
@@ -180,7 +180,7 @@ target_settings = {
 
 builder = FlextMeltanoSettingsBuilders()
 target_config = builder.build_target_config(target_settings)
-````
+```
 
 ### Singer Catalog Configuration
 

@@ -48,7 +48,7 @@ between:
 
 **Testability**: Business logic can be tested without external dependencies
 
-````python
+```python
 from __future__ import annotations
 
 
@@ -57,16 +57,21 @@ def test_pipeline_validation():
     validator = PipelineValidator()
     result = validator.validate_config(invalid_config)
     assert result.failure
-    ```
+```
+
 **Maintainability**: Changes to external systems don't affect business logic
 
 ```python
 from __future__ import annotations
+
+
 # Adapter pattern allows external system changes
 class MeltanoAdapter:
     def run_tap(self, settings) -> p.Result[TapResult]:
         # Implementation can change without affecting callers
-        ```
+        return self.tap.run(settings)
+```
+
 **Evolvability**: System can evolve independently in each layer
 
 - Domain rules can change without affecting external integrations
@@ -149,16 +154,18 @@ class MeltanoAdapter:
 ## Implementation Details
 
 ### Layer Structure
-```
+
+```text
 src/flext_meltano/
-├── api.py                    # 🚪 API Layer - External interfaces
-├── services.py               # 🎯 Application Layer - Use cases
-├── adapters.py               # 🔌 Infrastructure Layer - External integrations
-├── models.py                 # 📦 Domain Layer - Business entities
-├── settings.py                 # ⚙️ Infrastructure Layer - Configuration
-├── exceptions.py             # 🚨 Domain Layer - Business errors
-└── __init__.py               # 🚪 API Layer - Public interface
+├── api.py                    # API Layer - External interfaces
+├── services.py               # Application Layer - Use cases
+├── adapters.py               # Infrastructure Layer - External integrations
+├── models.py                 # Domain Layer - Business entities
+├── settings.py                 # Infrastructure Layer - Configuration
+├── exceptions.py             # Domain Layer - Business errors
+└── __init__.py               # API Layer - Public interface
 ```
+
 ### Layer Interaction Rules
 
 **API Layer → Application Layer**
@@ -170,7 +177,8 @@ from __future__ import annotations
 # api.py
 def create_pipeline(settings: dict) -> p.Result[Pipeline]:
     return FlextMeltanoService().create_pipeline(settings)
-    ```
+```
+
 **Application Layer → Domain Layer**
 
 ```python
@@ -181,7 +189,8 @@ from __future__ import annotations
 def create_pipeline(self, settings: dict) -> p.Result[Pipeline]:
     validated_config = self.config_validator.validate(settings)
     return validated_config.map(lambda cfg: Pipeline.create(cfg))
-    ```
+```
+
 **Application Layer → Infrastructure Layer**
 
 ```python
@@ -191,7 +200,8 @@ from __future__ import annotations
 # services.py
 def execute_pipeline(self, pipeline: Pipeline) -> p.Result[ExecutionResult]:
     return self.meltano_adapter.run_pipeline(pipeline)
-    ```
+```
+
 ### Dependency Injection
 
 ```python
@@ -213,7 +223,8 @@ class FlextMeltanoService:
             .flat_map(lambda _: self.meltano_adapter.run_pipeline(pipeline))
             .flat_map(lambda result: self.dbt_adapter.run_transformations(result))
         )
-        ```
+```
+
 ## Related ADRs
 
 - [ADR-001](001-railway-oriented-programming.md) - Error handling patterns
@@ -239,4 +250,3 @@ class FlextMeltanoService:
 - Training provided on layered architecture concepts
 - Code reviews enforce layer boundary rules
 - Automated tools validate architectural compliance
-````

@@ -776,9 +776,7 @@ class HorizontalScaler:
             except Exception as e:
                 results.append(
                     ScalingResult(
-                        action=action,
-                        success=False,
-                        message=f"Scaling failed: {e!s}",
+                        action=action, success=False, message=f"Scaling failed: {e!s}"
                     )
                 )
 
@@ -813,7 +811,9 @@ class HorizontalScaler:
                         service_name=service_name,
                         recommendation="increase_instances",
                         reason=f"High latency: {service_metrics.latency_p95:.0f}ms",
-                        performance_impact=f"Reduce latency by ~{service_metrics.lat ...
+                        performance_impact=(
+                            f"Reduce latency by ~{service_metrics.latency_p95:.0f}ms"
+                        ),
                         confidence="medium",
                     )
                 )
@@ -1348,7 +1348,8 @@ class RetryExecutor:
                 if attempt < self.max_attempts - 1:  # Not the last attempt
                     delay = self._calculate_delay(attempt)
                     self.logger.warning(
-                        f"Operation failed (attempt {attempt + 1}/{self.max_attempts ...
+                        f"Operation failed "
+                        f"(attempt {attempt + 1}/{self.max_attempts}), "
                         f"retrying in {delay:.2f} seconds: {e}"
                     )
                     time.sleep(delay)
@@ -1481,7 +1482,7 @@ class ReliabilityMonitor:
             self.alerts.send_alert(
                 "LowMTBF",
                 f"Mean Time Between Failures: {mtbf:.0f} seconds "
-                f"(threshold: {self.reliability_thresholds['mean_time_between_failur ...
+                f"(threshold: {self.reliability_thresholds['mean_time_between_failures']})",
                 severity="warning",
             )
 
@@ -2378,7 +2379,7 @@ end note
 
 #### 1. Pre-commit Quality Gates
 
-````python
+```python
 from __future__ import annotations
 
 import pathlib
@@ -2547,7 +2548,7 @@ class QualityGate:
     def _is_doc_file(self, file_path: Path) -> bool:
         """Check if file is a documentation file."""
         return file_path.suffix in [".md", ".rst", ".txt"]
-
+```
 
 #### 2. Automated Code Review
 
@@ -2812,7 +2813,7 @@ class AutomatedCodeReview:
                     blocking.append(f"{review.file_path}: {issue}")
 
         return blocking
-
+```
 
 ---
 
@@ -2903,7 +2904,7 @@ note right of type_safety
     - Runtime error prevention
 end note
 @enduml
-````
+```
 
 ### Usability Metrics
 
@@ -3397,6 +3398,8 @@ class TestableService:
 
 ```python
 from __future__ import annotations
+
+
 class TestDataBuilder:
     """Fluent builder for test data creation."""
 
@@ -3407,9 +3410,7 @@ class TestDataBuilder:
         self.data["name"] = name
         return self
 
-    def u.with_config(
-        self, settings: Dict[str, t.JsonValue]
-    ) -> "TestDataBuilder":
+    def with_config(self, settings: Dict[str, t.JsonValue]) -> "TestDataBuilder":
         self.data["settings"] = settings
         return self
 
@@ -3665,7 +3666,7 @@ class ContractTests:
 
         # Verify schema compliance
         validate(result, contract.output_schema)
-
+```
 
 ### Test Quality Metrics
 
@@ -3738,11 +3739,11 @@ jobs:
 
       - name: Generate test report
         run: pytest --html=reports/test-report.html --self-contained-html
-````
+```
 
 #### 2. Test Data Management
 
-````python
+```python
 from __future__ import annotations
 
 import pathlib
@@ -3806,7 +3807,7 @@ class TestDataManager:
                 result[key] = value
 
         return result
-
+```
 
 #### 3. Test Result Analysis
 
@@ -3934,7 +3935,7 @@ class TestResultAnalyzer:
             )
 
         return recommendations
-````
+```
 
 ---
 
@@ -4485,3 +4486,4 @@ end note
 
 **Quality Attributes**: FLEXT-Meltano Architecture Quality Framework _Comprehensive
 quality attributes and cross-cutting concerns documentation_
+````

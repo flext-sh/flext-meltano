@@ -391,6 +391,8 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 
 ```python
 from __future__ import annotations
+
+
 # External system integration via adapters
 class ExternalSystemAdapter(Protocol):
     """Protocol for external system adapters."""
@@ -407,14 +409,17 @@ class ExternalSystemAdapter(Protocol):
         """Clean up connection to external system."""
         ...
 
+
 # Concrete adapter implementations
 class MeltanoAdapter(ExternalSystemAdapter):
     """Meltano CLI adapter."""
 
-class FlextMeltanoAdapter.Dbt(ExternalSystemAdapter):
+
+class DbtAdapter(ExternalSystemAdapter):
     """DBT adapter."""
 
-class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
+
+class SingerAdapter(ExternalSystemAdapter):
     """Singer protocol adapter."""
 ```
 
@@ -422,6 +427,8 @@ class FlextMeltanoAdapter.Singer(ExternalSystemAdapter):
 
 ```python
 from __future__ import annotations
+
+
 class PluginManager:
     """Plugin management system for ecosystem extensibility."""
 
@@ -432,9 +439,7 @@ class PluginManager:
     def register_plugin(self, plugin_info: PluginInfo) -> p.Result[bool]:
         """Register a plugin in the ecosystem."""
         if plugin_info.name in self.plugin_registry:
-            return r.fail(
-                PluginError(f"Plugin {plugin_info.name} already registered")
-            )
+            return r.fail(PluginError(f"Plugin {plugin_info.name} already registered"))
 
         # Validate plugin compatibility
         validation_result = self.validate_plugin_compatibility(plugin_info)
@@ -443,14 +448,12 @@ class PluginManager:
 
         self.plugin_registry[plugin_info.name] = plugin_info
         self.logger.info(f"Registered plugin: {plugin_info.name}")
-        return r.| ok(value=True)
+        return r.ok(value=True)
 
     def load_plugin(self, name: str) -> p.Result[Plugin]:
         """Load and initialize a plugin."""
         if name not in self.plugin_registry:
-            return r.fail(
-                PluginError(f"Plugin {name} not found in registry")
-            )
+            return r.fail(PluginError(f"Plugin {name} not found in registry"))
 
         plugin_info = self.plugin_registry[name]
 
@@ -459,9 +462,7 @@ class PluginManager:
             if loader.can_load(plugin_info):
                 return loader.load_plugin(plugin_info)
 
-        return r.fail(
-            PluginError(f"No loader found for plugin {name}")
-        )
+        return r.fail(PluginError(f"No loader found for plugin {name}"))
 ```
 
 ---
@@ -609,6 +610,8 @@ class MyFLEXTProject(s):
 
 ```python
 from __future__ import annotations
+
+
 class FLEXTPluginRegistry:
     """Central plugin registry for ecosystem coordination."""
 
@@ -634,12 +637,14 @@ class FLEXTPluginRegistry:
             version=plugin.version,
             type=plugin.plugin_type,
             dependencies=plugin.dependencies,
-            capabilities=plugin.capabilities
+            capabilities=plugin.capabilities,
         )
 
-        return r.| ok(value=True)
+        return r.ok(value=True)
 
-    def discover_compatible_plugins(self, requirements: PluginRequirements) -> List[PluginMetadata]:
+    def discover_compatible_plugins(
+        self, requirements: PluginRequirements
+    ) -> List[PluginMetadata]:
         """Discover plugins that meet specific requirements."""
         compatible = []
 
@@ -846,6 +851,8 @@ class CircuitBreakerIntegration:
 
 ```python
 from __future__ import annotations
+
+
 class EventDrivenIntegration:
     """Event-driven integration for asynchronous operations."""
 
@@ -868,7 +875,7 @@ class EventDrivenIntegration:
             # Log event
             self.logger.info(f"Published event: {event.event_type}")
 
-            return r.| ok(value=True)
+            return r.ok(value=True)
 
         except Exception as e:
             return r.fail(EventPublishingError(f"Failed to publish event: {e}"))
@@ -891,7 +898,9 @@ class EventDrivenIntegration:
                         else:
                             self.handle_processing_error(event, result.error)
                     else:
-                        self.logger.warning(f"No handler for event type: {event.event_type}")
+                        self.logger.warning(
+                            f"No handler for event type: {event.event_type}"
+                        )
 
             except Exception as e:
                 self.logger.error(f"Event processing error: {e}")
@@ -902,6 +911,8 @@ class EventDrivenIntegration:
 
 ```python
 from __future__ import annotations
+
+
 class MessageQueueIntegration:
     """Message queue integration for reliable asynchronous communication."""
 
@@ -921,11 +932,11 @@ class MessageQueueIntegration:
             message_id = self.queue_client.send_message(
                 queue_url=self.queue_url,
                 message_body=json.dumps(enriched_message),
-                message_attributes=self.get_message_attributes(enriched_message)
+                message_attributes=self.get_message_attributes(enriched_message),
             )
 
             self.logger.info(f"Sent message: {message_id}")
-            return r.| ok(value=True)
+            return r.ok(value=True)
 
         except Exception as e:
             return r.fail(QueueError(f"Failed to send message: {e}"))
@@ -937,9 +948,7 @@ class MessageQueueIntegration:
             try:
                 # Receive messages
                 messages = self.queue_client.receive_messages(
-                    queue_url=self.queue_url,
-                    max_messages=10,
-                    wait_time_seconds=20
+                    queue_url=self.queue_url, max_messages=10, wait_time_seconds=20
                 )
 
                 for message in messages:
@@ -952,7 +961,7 @@ class MessageQueueIntegration:
                             # Delete processed message
                             self.queue_client.delete_message(
                                 queue_url=self.queue_url,
-                                receipt_handle=message.receipt_handle
+                                receipt_handle=message.receipt_handle,
                             )
                         else:
                             # Handle processing failure
@@ -968,23 +977,25 @@ class MessageQueueIntegration:
     def handle_processing_failure(self, message, error) -> None:
         """Handle message processing failure with retry logic."""
 
-        retry_count = message.attributes.get('retry_count', 0)
+        retry_count = message.attributes.get("retry_count", 0)
 
         if retry_count < self.max_retries:
             # Retry with backoff
             retry_count += 1
-            delay_seconds = 2 ** retry_count  # Exponential backoff
+            delay_seconds = 2**retry_count  # Exponential backoff
 
             # Update message for retry
-            message.attributes['retry_count'] = retry_count
-            message.attributes['next_retry_time'] = datetime.utcnow().timestamp() + delay_seconds
+            message.attributes["retry_count"] = retry_count
+            message.attributes["next_retry_time"] = (
+                datetime.utcnow().timestamp() + delay_seconds
+            )
 
             # Re-queue message
             self.queue_client.send_message(
                 queue_url=self.queue_url,
                 message_body=message.body,
                 message_attributes=message.attributes,
-                delay_seconds=delay_seconds
+                delay_seconds=delay_seconds,
             )
         else:
             # Move to dead letter queue
@@ -993,15 +1004,14 @@ class MessageQueueIntegration:
                 message_body=message.body,
                 message_attributes={
                     **message.attributes,
-                    'final_error': str(error),
-                    'failed_at': datetime.utcnow().isoformat()
-                }
+                    "final_error": str(error),
+                    "failed_at": datetime.utcnow().isoformat(),
+                },
             )
 
         # Delete original message
         self.queue_client.delete_message(
-            queue_url=self.queue_url,
-            receipt_handle=message.receipt_handle
+            queue_url=self.queue_url, receipt_handle=message.receipt_handle
         )
 ```
 
