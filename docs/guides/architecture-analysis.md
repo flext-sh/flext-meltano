@@ -117,24 +117,35 @@ validate_configuration() -> p.Result[bool]
 
 ```python
 from __future__ import annotations
+
+
 class FlextSingerTap(s):
     """Singer tap with discovery, sync, and state management."""
 
-    def __init__(self, tap_name: str, settings: m.Dict, state: m.Dict | None = None)
-    async def discover(self) -> p.Result[Catalog]
-    async def sync(self, streams: t.StringList | None = None) -> p.Result[SyncResult]
-    ```
+    def __init__(
+        self, tap_name: str, settings: m.Dict, state: m.Dict | None = None
+    ) -> None: ...
+    async def discover(self) -> p.Result[Catalog]: ...
+    async def sync(
+        self, streams: t.StringList | None = None
+    ) -> p.Result[SyncResult]: ...
+```
+
 **FlextSingerTarget Architecture:**
 
 ```python
 from __future__ import annotations
+
+
 class FlextSingerTarget(s):
     """Singer target with batch processing and error handling."""
 
-    def __init__(self, target_name: str, settings: m.Dict)
-    async def load_records(self, records: t.SequenceOf[m.Dict]) -> p.Result[LoadResult]
-    async def flush(self) -> p.Result[FlushResult]
-    ```
+    def __init__(self, target_name: str, settings: m.Dict) -> None: ...
+    async def load_records(
+        self, records: t.SequenceOf[m.Dict]
+    ) -> p.Result[LoadResult]: ...
+    async def flush(self) -> p.Result[FlushResult]: ...
+```
 ### Plugin Architecture
 
 #### Plugin Development Framework
@@ -226,7 +237,7 @@ container.register_singleton(FlextMeltanoAdapter, create_meltano_adapter)
 result = meltano_service.execute_tap("tap-csv", settings)
 if result.failure:
     logger.error("Tap execution failed", extra=result.error_context)
-    ```
+```
 #### flext-cli Integration
 
 ```python
@@ -305,6 +316,8 @@ sync_result = tap.sync(catalog.streams[:5]).unwrap()
 
 ```python
 from __future__ import annotations
+
+
 # Worker pool management
 class FlextMeltanoWorkerPool:
     def __init__(self, max_workers: int = 4):
@@ -315,7 +328,8 @@ class FlextMeltanoWorkerPool:
         # Distribute pipelines across workers
         # Monitor worker health and redistribute load
         # Handle worker failures and recovery
-        ```
+        ...
+```
 #### Load Distribution Strategies
 
 - **Round-Robin Distribution**: Even distribution across available workers

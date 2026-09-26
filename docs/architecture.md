@@ -63,7 +63,7 @@ principles and Domain-Driven Design.
 
 **Core Infrastructure and Type System**
 
-```python
+```text
 src/flext_meltano/
 ├── __init__.py              # Public API exports
 ├── constants.py             # MeltanoConstants extending FlextConstants
@@ -79,7 +79,7 @@ flext-core capabilities for ELT operations.
 
 **Business Logic and Services**
 
-```python
+```text
 ├── services.py                    # FlextMeltanoService (core orchestration)
 ├── service_implementations.py     # Specialized service implementations
 ├── adapters.py                   # FlextMeltanoAdapter (external integration)
@@ -97,7 +97,7 @@ flext-core capabilities for ELT operations.
 
 **Command Processing and Integration**
 
-```python
+```text
 ├── executors.py              # FlextMeltanoExecutor (command orchestration)
 ├── executors_bridge.py       # FlextMeltanoBridge (Go ↔ Python communication)
 ├── executors_cli.py          # FlextMeltanoCli (CLI command processing)
@@ -111,7 +111,7 @@ with external systems.
 
 **Protocol and Data Integration**
 
-```python
+```text
 ├── singer_types.py           # FlextMeltanoTypes (Singer protocol abstractions)
 ├── tap_abstractions.py       # FlextMeltanoTapAbstractions with TapConfig, StreamDefinition
 ├── target_abstractions.py   # FlextMeltanoTargetAbstractions for target operations
@@ -125,7 +125,7 @@ operations.
 
 **Settings and Environment Management**
 
-```python
+```text
 ├── settings.py                # FlextMeltanoSettings (configuration management)
 ├── config_builders.py       # FlextMeltanoSettingsBuilders (dynamic settings)
 └── utilities.py            # u (helper functions)

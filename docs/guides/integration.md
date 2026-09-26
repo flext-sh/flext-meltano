@@ -56,7 +56,7 @@ flext-meltano patterns.
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-````python
+```python
 from __future__ import annotations
 
 from flext_meltano import (
@@ -87,7 +87,7 @@ class FlextOracleTapService(FlextMeltanoTapServiceBase):
         """Extract data using flext-meltano abstractions."""
         abstractions = FlextMeltanoTapAbstractions()
         return abstractions.process_source({"stream": stream, **settings})
-
+```
 
 ### Target Implementation Pattern
 
@@ -130,7 +130,7 @@ class FlextOracleTargetService(FlextMeltanoTargetServiceBase):
             "sink_type": "target-oracle",
             "connection_config": settings,
         })
-````
+```
 
 ---
 

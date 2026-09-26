@@ -310,7 +310,7 @@ def test_operation_failure():
 
 ### **Mock Integration Patterns**
 
-````python
+```python
 from __future__ import annotations
 
 # ✅ CORRECT - Proper mocking for isolation
@@ -335,7 +335,7 @@ def test_service_with_meltano_integration(mock_meltano_adapter):
 
     assert result.success
     mock_meltano_adapter.return_value.run_tap.assert_called_once()
-
+```
 
 ### **Fixture Best Practices**
 
@@ -360,7 +360,7 @@ def mock_plugin_service():
     service = Mock(spec=FlextMeltanoPluginService)
     service.discover_plugins.return_value = r.ok([])
     return service
-````
+```
 
 ---
 
