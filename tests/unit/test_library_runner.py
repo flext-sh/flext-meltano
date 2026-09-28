@@ -137,6 +137,3 @@ class TestsFlextMeltanoLibraryRunner:
     ) -> None:
         """The tap-to-target payload carries every documented command field."""
         tm.that(elt_pipeline_result.unwrap(), has=key)
-
-
-__all__: list[str] = ["TestsFlextMeltanoLibraryRunner"]

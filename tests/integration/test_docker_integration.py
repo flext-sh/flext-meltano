@@ -24,8 +24,6 @@ from tests import c
 if TYPE_CHECKING:
     from flext_tests import tk
 
-__all__ = ["TestsFlextMeltanoDockerIntegration"]
-
 
 class TestsFlextMeltanoDockerIntegration:
     """Behavioral Docker-based integration tests."""

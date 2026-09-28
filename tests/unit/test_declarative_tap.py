@@ -100,6 +100,3 @@ class TestsFlextMeltanoDeclarativeTap:
             records,
             has={"dn": "cn=users,dc=example", "updated_at": "2026-07-17T00:00:00Z"},
         )
-
-
-__all__: list[str] = ["TestsFlextMeltanoDeclarativeTap"]

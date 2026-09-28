@@ -125,6 +125,3 @@ class TestsFlextMeltanoTargetAbstractions:
 
         tm.ok(result)
         tm.that(result.value, eq=True)
-
-
-__all__: list[str] = ["TestsFlextMeltanoTargetAbstractions"]
