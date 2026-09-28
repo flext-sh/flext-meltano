@@ -722,5 +722,5 @@ class AlertRule:
 
 ---
 
-**Data Architecture**: FLEXT-Meltano Enterprise Data Processing _Comprehensive data
-flow, storage, and processing architecture documentation_
+**Data Architecture**: FLEXT-Meltano Enterprise Data Processing
+_Comprehensive data flow, storage, and processing architecture documentation_

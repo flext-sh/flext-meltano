@@ -347,5 +347,5 @@ class EnterpriseExtension(FlextMeltanoBase, ABC):
 ---
 
 **Status**: Active Development — Extension testing framework functional; stabilization
-in progress · 1.0.0 Release Preparation **Version**: 0.12.0-dev RC-enterprise **Last
-Updated**: 2025-08-02 **Maintainer**: FLEXT Development Team
+in progress · 1.0.0 Release Preparation **Version**: 0.12.0-dev RC-enterprise
+**Last Updated**: 2025-08-02 **Maintainer**: FLEXT Development Team

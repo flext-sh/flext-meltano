@@ -476,5 +476,5 @@ handling.
 
 ---
 
-**C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture _Comprehensive system
-documentation following industry-standard C4 modeling approach_
+**C4 Model Documentation**: FLEXT-Meltano Enterprise Architecture
+_Comprehensive system documentation following industry-standard C4 modeling approach_
