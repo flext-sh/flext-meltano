@@ -12,19 +12,6 @@ from flext_cli import m, u
 from flext_meltano import c, t
 
 
-def _dbt_manifest_nodes_default() -> Mapping[
-    str, FlextMeltanoModelsProjects.DbtManifestNode
-]:
-    """Late-bound empty manifest-nodes default.
-
-    Defined before the class so the class body binds the bare name while
-    resolution of the nested type happens only at call time: annotations
-    stay lazy under ``from __future__ import annotations`` and this
-    function's body runs after the module is complete.
-    """
-    return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode]({})
-
-
 class FlextMeltanoModelsProjects:
     """Project configuration models."""
 
@@ -52,8 +39,24 @@ class FlextMeltanoModelsProjects:
     class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
+        @staticmethod
+        def _nodes_default() -> Mapping[
+            str, FlextMeltanoModelsProjects.DbtManifestNode
+        ]:
+            """Late-bound empty manifest-nodes default.
+
+            Declared inside the model that consumes it (NS-STRUCT) so the bare
+            name resolves in this class body. The annotation stays lazy under
+            ``from __future__ import annotations`` and the body runs only at
+            validation time, once the module is complete, so the nested
+            ``DbtManifestNode`` type resolves.
+            """
+            return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode](
+                {}
+            )
+
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = m.Field(
-            default_factory=_dbt_manifest_nodes_default,
+            default_factory=_nodes_default,
             description="Manifest nodes keyed by node_id",
         )
 

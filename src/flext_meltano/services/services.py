@@ -23,27 +23,39 @@ from flext_meltano import (
 class FlextMeltanoService(FlextMeltanoServiceBase):
     """Generic data pipeline service with factory methods."""
 
+    @staticmethod
+    def _settings_payload(
+        config: t.MappingKV[str, t.Scalar],
+    ) -> t.JsonDict | None:
+        """Normalize loose scalar ``config`` into one JSON settings payload.
+
+        Returns ``None`` for empty config so the specialized factory skips the
+        settings copy entirely instead of validating an empty mapping.
+        """
+        if not config:
+            return None
+        return {key: u.normalize_to_json_value(value) for key, value in config.items()}
+
     @classmethod
-    def _create_specialized_service(
+    def _create_component_service(
         cls,
         component_name: str,
-        *,
         field_name: str,
         component_label: str,
-        settings: t.JsonMapping | None = None,
+        config: t.MappingKV[str, t.Scalar],
     ) -> p.Result[Self]:
-        """Create a specialized Meltano service.
+        """Create one specialized Meltano component service.
 
         Pydantic v2 owns every validation step:
         - ``cls.model_validate(payload)`` validates the construction payload
           and raises ``ValidationError`` for unknown ``field_name``;
-        - ``FlextMeltanoSettings.model_validate(settings)`` validates the
-          runtime settings payload (per-field coercion + type narrowing).
+        - ``FlextMeltanoSettings.model_validate`` validates the runtime
+          settings payload (per-field coercion + type narrowing).
 
-        ``settings`` is typed as ``t.MappingKV[str, object]`` because the
-        downstream Pydantic validator handles every concrete value type —
-        keeps the signature broad enough for both ``Scalar`` and ``JsonValue``
-        callers without manual coercion at the boundary.
+        ``config`` stays broad because the downstream Pydantic validator
+        handles every concrete value type — it keeps one call site for both
+        ``Scalar`` and ``JsonValue`` callers without manual coercion at the
+        boundary.
         """
         try:
             instance = cls.model_validate({
@@ -51,11 +63,12 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
                 "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
                 field_name: component_name,
             })
-            if settings is not None:
+            settings_payload = cls._settings_payload(config)
+            if settings_payload is not None:
                 instance = instance.model_copy(
                     update={
                         "runtime_settings": FlextMeltanoSettings.model_validate(
-                            settings
+                            settings_payload
                         )
                     }
                 )
@@ -67,63 +80,27 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @classmethod
     def create_sink_service(cls, sink_name: str, **config: t.Scalar) -> p.Result[Self]:
-        """Create data sink service.
-
-        Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
-        inside ``_create_specialized_service``.
-        """
-        settings_payload: t.JsonDict | None = (
-            {key: u.normalize_to_json_value(value) for key, value in config.items()}
-            if config
-            else None
-        )
-        return cls._create_specialized_service(
-            sink_name,
-            field_name="sink_name",
-            component_label="sink service",
-            settings=settings_payload,
+        """Create data sink service from the shared component contract."""
+        return cls._create_component_service(
+            sink_name, "sink_name", "sink service", config
         )
 
     @classmethod
     def create_source_service(
         cls, source_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
-        """Create data source service.
-
-        Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
-        inside ``_create_specialized_service``.
-        """
-        settings_payload: t.JsonDict | None = (
-            {key: u.normalize_to_json_value(value) for key, value in config.items()}
-            if config
-            else None
-        )
-        return cls._create_specialized_service(
-            source_name,
-            field_name="source_name",
-            component_label="source service",
-            settings=settings_payload,
+        """Create data source service from the shared component contract."""
+        return cls._create_component_service(
+            source_name, "source_name", "source service", config
         )
 
     @classmethod
     def create_transformation_service(
         cls, transformation_name: str, **config: t.Scalar
     ) -> p.Result[Self]:
-        """Create transformation service.
-
-        Pydantic validates ``config`` via ``FlextMeltanoSettings.model_validate``
-        inside ``_create_specialized_service``.
-        """
-        settings_payload: t.JsonDict | None = (
-            {key: u.normalize_to_json_value(value) for key, value in config.items()}
-            if config
-            else None
-        )
-        return cls._create_specialized_service(
-            transformation_name,
-            field_name="transformation_name",
-            component_label="transformation service",
-            settings=settings_payload,
+        """Create transformation service from the shared component contract."""
+        return cls._create_component_service(
+            transformation_name, "transformation_name", "transformation service", config
         )
 
     @staticmethod

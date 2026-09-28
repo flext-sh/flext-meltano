@@ -82,12 +82,3 @@ class FlextMeltanoSingerTapAdapter:
 
 
 __all__: list[str] = ["FlextMeltanoSingerTapAdapter", "Sink", "Stream", "Tap", "Target"]
-
-Sink: type[Sink]
-"""Singer SDK Sink base class - re-exported for internal use."""
-Stream: type[Stream]
-"""Singer SDK Stream base class - re-exported for internal use."""
-Tap: type[Tap]
-"""Singer SDK Tap base class - re-exported for internal use."""
-Target: type[Target]
-"""Singer SDK Target base class - re-exported for internal use."""

@@ -15,8 +15,6 @@ from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 from .._settings import FlextMeltanoSettings
 
-settings = FlextMeltanoSettings.fetch_global()
-
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     """Base abstraction wrapping the imported Meltano runtime with r[T] results."""
@@ -28,9 +26,20 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         validate_default=True,
     )
 
+    @staticmethod
+    def _settings() -> FlextMeltanoSettings:
+        """Resolve the shared settings singleton at the point of use.
+
+        Importing this module must not materialize settings, so composition
+        happens here instead of at module scope (NS-CONTRACT-001).
+        ``fetch_global`` is a lazy thread-safe singleton, so every access
+        yields the same instance without extra work.
+        """
+        return FlextMeltanoSettings.fetch_global()
+
     def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
         """Run a Meltano runtime command and return stdout on success."""
-        cwd = Path(settings.Meltano.project_root)
+        cwd = Path(self._settings().Meltano.project_root)
         run_result: p.Result[m.Meltano.CommandExecutionResult] = (
             FlextMeltanoExecutorBase().execute_meltano_command(list(args), _cwd=cwd)
         )
@@ -159,7 +168,7 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     def fetch_project_root(self) -> p.Result[Path]:
         """Get the root directory from settings."""
-        project_root = settings.Meltano.project_root
+        project_root = self._settings().Meltano.project_root
         if not project_root:
             return r[Path].fail("No project root configured in settings")
         try:
@@ -170,11 +179,12 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute abstractions service and return real configuration state."""
+        meltano_settings = self._settings().Meltano
         payload: t.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
-            "project_root": settings.Meltano.project_root,
-            "environment": settings.Meltano.environment,
-            "meltano_version": settings.Meltano.meltano_version,
+            "project_root": meltano_settings.project_root,
+            "environment": meltano_settings.environment,
+            "meltano_version": meltano_settings.meltano_version,
         }
         return r[t.JsonMapping].ok(payload)
 
