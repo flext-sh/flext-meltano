@@ -457,5 +457,5 @@ stabilization and coverage improvements in progress
 ---
 
 **Status**: Active Development — Test fixture framework functional; stabilization in
-progress · 1.0.0 Release Preparation **Version**: 0.12.0-dev RC-enterprise **Last
-Updated**: 2025-08-02 **Maintainer**: FLEXT Development Team
+progress · 1.0.0 Release Preparation **Version**: 0.12.0-dev RC-enterprise
+**Last Updated**: 2025-08-02 **Maintainer**: FLEXT Development Team
