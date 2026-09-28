@@ -125,6 +125,3 @@ class TestsFlextMeltanoCliIntegration:
         )
 
         tm.fail(result, has=["Validation error", "TapRunParams"])
-
-
-__all__: list[str] = ["TestsFlextMeltanoCliIntegration"]

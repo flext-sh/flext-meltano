@@ -14,14 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
 from flext_core import FlextSettings
-from flext_meltano import m
-
-_ENV_ALIAS: dict[str, str] = {
-    "dev": "development",
-    "test": "testing",
-    "prod": "production",
-}
-_ENV_ALLOWED: frozenset[str] = frozenset({"development", "testing", "production"})
+from flext_meltano import c, m
 
 
 class FlextMeltanoSettings(FlextSettings):
@@ -103,11 +96,14 @@ class FlextMeltanoSettings(FlextSettings):
         @classmethod
         def _validate_environment(cls, value: str) -> str:
             normalized = value.strip().lower()
-            normalized = _ENV_ALIAS.get(normalized, normalized)
-            if normalized not in _ENV_ALLOWED:
-                msg = "Environment must be one of: development, testing, production"
-                raise ValueError(msg)
-            return normalized
+            aliased = c.Meltano.ENVIRONMENT_ALIASES.get(normalized)
+            if aliased is not None:
+                return str(aliased.value)
+            if normalized in {env.value for env in c.Meltano.SETTINGS_ENVIRONMENTS}:
+                return normalized
+            allowed = ", ".join(env.value for env in c.Meltano.SETTINGS_ENVIRONMENTS)
+            msg = f"Environment must be one of: {allowed}"
+            raise ValueError(msg)
 
     if TYPE_CHECKING:
         Meltano: _Meltano

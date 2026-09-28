@@ -177,6 +177,3 @@ class TestsFlextMeltanoPluginProtocols:
             "PluginDefinition",
         ):
             assert not hasattr(t.Meltano, legacy)
-
-
-__all__: list[str] = ["TestsFlextMeltanoPluginProtocols"]

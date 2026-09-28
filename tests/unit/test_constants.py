@@ -20,8 +20,6 @@ from flext_tests import tm
 
 from tests import c
 
-__all__: list[str] = ["TestsFlextMeltanoConstantsUnit"]
-
 
 class TestsFlextMeltanoConstantsUnit:
     """Public-contract test suite for c.Meltano constants."""

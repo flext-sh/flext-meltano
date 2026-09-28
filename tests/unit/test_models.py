@@ -15,8 +15,6 @@ from flext_tests import tm
 
 from tests import c, m
 
-__all__ = ["TestsFlextMeltanoModelsUnit"]
-
 
 class TestsFlextMeltanoModelsUnit:
     """Public-contract tests for Meltano tap/target/stream models."""

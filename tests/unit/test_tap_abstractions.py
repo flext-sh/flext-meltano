@@ -84,12 +84,8 @@ class TestFlextMeltanoAbstractionsComplete:
         """Test FlextMeltanoAbstractions initialization."""
         tap_abs = FlextMeltanoAbstractions()
         assert tap_abs is not None
-        if hasattr(tap_abs, "service_name"):
-            service_name = tap_abs.service_name
-            tm.that(service_name, eq="FlextMeltanoAbstractions")
-        tm.that(
-            hasattr(tap_abs, "_stream_registry") or hasattr(tap_abs, "logger"), eq=True
-        )
+        tm.that(tap_abs.service_name, eq="FlextMeltanoAbstractions")
+        tm.that(tap_abs.fetch_registered_streams(), is_=list)
 
     def test_serviceprocessor_process_method(self) -> None:
         """Test ServiceProcessor process method using flext_tests."""

@@ -18,8 +18,6 @@ from flext_tests import FlextTestsTypes, tm
 from flext_meltano import FlextMeltanoTypes
 from tests import TestsFlextMeltanoTypes, t
 
-__all__: list[str] = ["TestsFlextMeltanoSingerTypes"]
-
 # (alias name, resolved __value__ repr fragment) — real public contract table.
 _MELTANO_TYPE_ALIASES: tuple[tuple[str, str], ...] = (
     ("DbtManifestData", "JsonMapping"),

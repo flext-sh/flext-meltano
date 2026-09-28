@@ -118,9 +118,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             self.logger.warning("Failed to extract plugins", error=str(e))
         return plugins
 
-    @staticmethod
     def _sdk_plugin_definitions(
-        sdk_plugins_service: ProjectPluginsService, plugin_type: str | None
+        self, sdk_plugins_service: ProjectPluginsService, plugin_type: str | None
     ) -> t.SequenceOf[t.JsonMapping]:
         """Plugin definitions returned by the Meltano SDK service."""
         plugins: t.MutableSequenceOf[t.JsonMapping] = []
@@ -128,7 +127,11 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             try:
                 name = plugin.name
                 plugin_kind = plugin.type
-            except AttributeError:
+            except AttributeError as error:
+                self.logger.warning(
+                    "Skipping a Meltano plugin that violates the SDK definition contract",
+                    error=str(error),
+                )
                 continue
             if plugin_type is not None and plugin_kind != plugin_type:
                 continue

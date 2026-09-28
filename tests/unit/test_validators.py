@@ -196,6 +196,3 @@ class TestsFlextMeltanoValidators:
         tm.ok(meltano.validate_transformation_business_rules(dbt_config))
         tm.ok(meltano.validate_plugin_config(tap_config))
         tm.ok(meltano.validate_plugin_config(target_config))
-
-
-__all__: list[str] = ["TestsFlextMeltanoValidators"]
