@@ -14,22 +14,6 @@ from flext_meltano import t
 class FlextMeltanoModelsDiscovery:
     """Plugin discovery source, item, and catalog models."""
 
-    @staticmethod
-    def _plugins_default() -> Mapping[
-        str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
-    ]:
-        """Late-bound empty plugin-catalog default.
-
-        Nested in the module class (NS-STRUCT) and declared before the models
-        that consume it. The annotation stays lazy under
-        ``from __future__ import annotations`` and the body runs only at
-        validation time, once the module is complete, so the nested
-        ``PluginDiscoverySource`` type resolves.
-        """
-        return MappingProxyType[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource](
-            {}
-        )
-
     class PluginDiscoverySource(m.FlexibleModel):
         """Normalized raw plugin discovery payload from external sources."""
 
@@ -91,11 +75,25 @@ class FlextMeltanoModelsDiscovery:
     class PluginDiscoveryCatalog(m.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
+        @staticmethod
+        def _plugins_default() -> Mapping[
+            str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
+        ]:
+            """Late-bound empty plugin-catalog default.
+
+            Declared inside the model that consumes it (NS-STRUCT) so the bare
+            name resolves in this class body. The annotation stays lazy under
+            ``from __future__ import annotations`` and the body runs only at
+            validation time, once the module is complete, so the nested
+            ``PluginDiscoverySource`` type resolves.
+            """
+            return MappingProxyType[
+                str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
+            ]({})
+
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
             m.Field(
-                default_factory=lambda: (
-                    FlextMeltanoModelsDiscovery._plugins_default()
-                ),
+                default_factory=_plugins_default,
                 description="Discovered plugins catalog",
             )
         )
