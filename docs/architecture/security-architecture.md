@@ -849,7 +849,6 @@ class DataPrivacyController:
         self, request: DataSubjectRequest
     ) -> p.Result[ComplianceAction]:
         """Handle data subject access/deletion requests."""
-
         if request.request_type == "access":
             # Provide data inventory
             user_data = self._collect_user_data(request.user_id)
@@ -859,7 +858,7 @@ class DataPrivacyController:
                 )
             )
 
-        elif request.request_type == "deletion":
+        if request.request_type == "deletion":
             # Delete user data (right to be forgotten)
             deletion_result = self._delete_user_data(request.user_id)
             if deletion_result.success:
@@ -869,8 +868,7 @@ class DataPrivacyController:
                         action_type="data_deleted", confirmation_id=str(uuid.uuid4())
                     )
                 )
-            else:
-                return deletion_result
+            return deletion_result
 
         return r.fail(ValidationError("Invalid request type"))
 

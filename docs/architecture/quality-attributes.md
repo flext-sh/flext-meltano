@@ -26,22 +26,13 @@
   - [Maintainability Architecture](#maintainability-architecture)
   - [Maintainability Metrics](#maintainability-metrics)
   - [Code Quality Automation](#code-quality-automation)
+- [🎨 Usability](#usability)
+  - [API Design Principles](#api-design-principles)
   - [Usability Metrics](#usability-metrics)
   - [User Experience Optimization](#user-experience-optimization)
 - [🧪 Testability](#testability)
   - [Testing Architecture](#testing-architecture)
   - [Testability Patterns](#testability-patterns)
-- [🔄 Cross-Cutting Concerns](#cross-cutting-concerns)
-  - [Logging Architecture](#logging-architecture)
-  - [Monitoring and Observability](#monitoring-and-observability)
-  - [Configuration Management](#configuration-management)
-  - [Caching Strategy](#caching-strategy)
-  - [Internationalization (i18n)](#internationalization-i18n)
-- [📈 Architecture Evolution](#architecture-evolution)
-  - [Current Architecture Assessment](#current-architecture-assessment)
-  - [Architecture Roadmap](#architecture-roadmap)
-  - [Technical Debt Management](#technical-debt-management)
-  - [Risk Mitigation](#risk-mitigation)
 
 <!-- TOC END -->
 
@@ -3406,15 +3397,15 @@ class TestDataBuilder:
     def __init__(self):
         self.data = {}
 
-    def with_name(self, name: str) -> "TestDataBuilder":
+    def with_name(self, name: str) -> TestDataBuilder:
         self.data["name"] = name
         return self
 
-    def with_config(self, settings: Dict[str, t.JsonValue]) -> "TestDataBuilder":
+    def with_config(self, settings: Dict[str, t.JsonValue]) -> TestDataBuilder:
         self.data["settings"] = settings
         return self
 
-    def with_tags(self, *tags: str) -> "TestDataBuilder":
+    def with_tags(self, *tags: str) -> TestDataBuilder:
         self.data["tags"] = list(tags)
         return self
 

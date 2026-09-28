@@ -22,6 +22,7 @@
 - [🧪 TEST PATTERNS & BEST PRACTICES](#test-patterns-best-practices)
   - [Railway-Oriented Testing Patterns](#railway-oriented-testing-patterns)
   - [Mock Integration Patterns](#mock-integration-patterns)
+  - [Fixture Best Practices](#fixture-best-practices)
 - [📊 TEST METRICS & MONITORING](#test-metrics-monitoring)
   - [Coverage Dashboard Configuration](#coverage-dashboard-configuration)
   - [Test Execution Metrics](#test-execution-metrics)

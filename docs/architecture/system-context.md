@@ -399,15 +399,12 @@ class ExternalSystemAdapter(Protocol):
 
     def connect(self) -> p.Result[Connection]:
         """Establish connection to external system."""
-        ...
 
     def execute_operation(self, operation: Operation) -> p.Result[Result]:
         """Execute operation on external system."""
-        ...
 
     def disconnect(self) -> p.Result[bool]:
         """Clean up connection to external system."""
-        ...
 
 
 # Concrete adapter implementations
@@ -620,7 +617,6 @@ class FLEXTPluginRegistry:
 
     def register_flext_plugin(self, plugin: FLEXTPlugin) -> p.Result[bool]:
         """Register a FLEXT plugin in the ecosystem."""
-
         # Validate plugin compatibility
         compatibility_result = self.validate_plugin_compatibility(plugin)
         if compatibility_result.failure:
@@ -862,7 +858,6 @@ class EventDrivenIntegration:
 
     def publish_event(self, event: IntegrationEvent) -> p.Result[bool]:
         """Publish integration event to queue."""
-
         try:
             # Validate event
             validation_result = self.validate_event(event)
@@ -882,7 +877,6 @@ class EventDrivenIntegration:
 
     def process_events(self) -> None:
         """Process incoming integration events."""
-
         while True:
             try:
                 # Get next event
@@ -923,7 +917,6 @@ class MessageQueueIntegration:
 
     def send_message(self, message: QueueMessage) -> p.Result[bool]:
         """Send message to queue with reliability guarantees."""
-
         try:
             # Add message metadata
             enriched_message = self.enrich_message(message)
@@ -943,7 +936,6 @@ class MessageQueueIntegration:
 
     def receive_and_process_messages(self, message_processor: Callable) -> None:
         """Receive and process messages from queue."""
-
         while True:
             try:
                 # Receive messages
@@ -976,7 +968,6 @@ class MessageQueueIntegration:
 
     def handle_processing_failure(self, message, error) -> None:
         """Handle message processing failure with retry logic."""
-
         retry_count = message.attributes.get("retry_count", 0)
 
         if retry_count < self.max_retries:
