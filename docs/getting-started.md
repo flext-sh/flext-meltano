@@ -9,7 +9,10 @@
 - [⚡ Quick Installation](#quick-installation)
 - [🚀 First Steps](#first-steps)
   - [Basic Service Usage](#basic-service-usage)
+  - [Singer Protocol Operations](#singer-protocol-operations)
   - [r Pattern](#r-pattern)
+- [🔧 Development Workflow](#development-workflow)
+  - [Quality Gates](#quality-gates)
   - [Common Commands](#common-commands)
 - [📚 Next Steps](#next-steps)
 - [⚠️ Important Notes](#important-notes)
@@ -73,6 +76,7 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 
 ```python
 from flext_cli import u
+
 from flext_meltano import FlextMeltanoService
 
 # Initialize ELT service

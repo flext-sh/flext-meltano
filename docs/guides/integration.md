@@ -5,6 +5,7 @@
 - [🎯 ELT Foundation Role](#elt-foundation-role)
 - [🔌 Singer Ecosystem Integration](#singer-ecosystem-integration)
   - [Tap Implementation Pattern](#tap-implementation-pattern)
+  - [Target Implementation Pattern](#target-implementation-pattern)
 - [🛠️ dbt Integration Patterns](#dbt-integration-patterns)
   - [dbt Project Foundation](#dbt-project-foundation)
 - [🚀 Complete ELT Pipeline Integration](#complete-elt-pipeline-integration)

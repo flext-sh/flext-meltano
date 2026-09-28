@@ -9,6 +9,9 @@
 - [⚙️ Meltano Project Configuration](#meltano-project-configuration)
   - [Basic meltano.yml Structure](#basic-meltanoyml-structure)
   - [Configuration Validation](#configuration-validation)
+- [🔌 Singer Plugin Configuration](#singer-plugin-configuration)
+  - [Tap Configuration](#tap-configuration)
+  - [Target Configuration](#target-configuration)
   - [Singer Catalog Configuration](#singer-catalog-configuration)
 - [🛠️ dbt Configuration](#dbt-configuration)
   - [dbt Project Structure](#dbt-project-structure)
@@ -136,6 +139,7 @@ transforms:
 
 ```python
 from flext_cli import u
+
 from flext_meltano import FlextMeltanoSettings
 
 settings = FlextMeltanoSettings()
