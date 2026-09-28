@@ -14,8 +14,6 @@ from flext_tests import tm
 from flext_meltano import meltano
 from flext_meltano.api import FlextMeltano
 
-__all__ = ["TestsFlextMeltanoSingerSdkAdapter"]
-
 
 class TestsFlextMeltanoSingerSdkAdapter:
     """Validate the public tap/target/dbt factory contract."""

@@ -8,17 +8,13 @@ from typing import TYPE_CHECKING
 
 from flext_cli import u
 
-from flext_meltano import (
-    FlextMeltanoConstants as c,
-    FlextMeltanoModels as m,
-    FlextMeltanoTypes as t,
-)
+from flext_meltano import c, m, t
 
 if TYPE_CHECKING:
     from meltano.core.plugin.base import PluginType as MeltanoPluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
-    from flext_meltano import FlextMeltanoProtocols as p
+    from flext_meltano import p
 
 
 class FlextMeltanoUtilitiesRuntime:

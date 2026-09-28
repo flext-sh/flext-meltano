@@ -14,8 +14,6 @@ from flext_tests import tm
 from flext_meltano.cli import FlextMeltanoCli
 from tests import c, t, u
 
-__all__: list[str] = ["TestsFlextMeltanoCliSmallManagers"]
-
 
 class TestsFlextMeltanoCliSmallManagers:
     """Exercise the public ``run`` contract of the Meltano CLI facade."""

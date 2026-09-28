@@ -19,8 +19,6 @@ from flext_tests import tm
 
 from tests import m, t
 
-__all__: list[str] = ["TestsFlextMeltanoTypingsUnit"]
-
 
 class TestsFlextMeltanoTypingsUnit:
     """Behavioral contract for the flat ``t.Meltano`` namespace and models."""

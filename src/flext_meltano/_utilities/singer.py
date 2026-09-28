@@ -14,14 +14,10 @@ from typing import TYPE_CHECKING
 from flext_cli import r, u as cli_u
 
 from flext_core import e
-from flext_meltano import (
-    FlextMeltanoConstants as c,
-    FlextMeltanoModels as m,
-    FlextMeltanoTypes as t,
-)
+from flext_meltano import c, m, t
 
 if TYPE_CHECKING:
-    from flext_meltano import FlextMeltanoProtocols as p
+    from flext_meltano import p
 
 
 class FlextMeltanoUtilitiesSinger:

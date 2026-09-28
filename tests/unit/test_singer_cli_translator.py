@@ -399,6 +399,3 @@ class TestsFlextMeltanoSingerCliTranslator:
         # The boundary timeout genuinely interrupts the subprocess: the call
         # returns promptly instead of waiting out the command's full runtime.
         tm.that(elapsed < 4, eq=True)
-
-
-__all__: list[str] = ["TestsFlextMeltanoSingerCliTranslator"]
