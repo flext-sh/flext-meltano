@@ -160,9 +160,8 @@ def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
             port=c.Meltano.Tests.MELTANO_PORT,
         ),
         repository_root=Path(__file__).resolve().parents[2],
+        state_dir=temp_dir,
     )
-    manager.state_file_path = temp_dir / "flext_tests_docker_state.json"
-    manager.dirty_container_names.clear()
     return manager
 
 
