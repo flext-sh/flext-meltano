@@ -139,7 +139,6 @@ transforms:
 
 ```python
 from flext_cli import u
-
 from flext_meltano import FlextMeltanoSettings
 
 settings = FlextMeltanoSettings()

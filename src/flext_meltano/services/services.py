@@ -24,9 +24,7 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
     """Generic data pipeline service with factory methods."""
 
     @staticmethod
-    def _settings_payload(
-        config: t.MappingKV[str, t.Scalar],
-    ) -> t.JsonDict | None:
+    def _settings_payload(config: t.MappingKV[str, t.Scalar]) -> t.JsonDict | None:
         """Normalize loose scalar ``config`` into one JSON settings payload.
 
         Returns ``None`` for empty config so the specialized factory skips the
