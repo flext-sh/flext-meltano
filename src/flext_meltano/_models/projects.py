@@ -51,9 +51,7 @@ class FlextMeltanoModelsProjects:
             validation time, once the module is complete, so the nested
             ``DbtManifestNode`` type resolves.
             """
-            return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode](
-                {}
-            )
+            return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode]({})
 
         nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = m.Field(
             default_factory=_nodes_default,
