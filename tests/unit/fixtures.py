@@ -148,9 +148,12 @@ def singer_state() -> t.JsonMapping:
 
 
 @pytest.fixture
-def docker_manager(tmp_path_factory: pytest.TempPathFactory) -> tk:
+def docker_manager() -> tk:
     """Docker manager fixture for Docker-based tests."""
+<<<<<<< HEAD
     temp_dir = tmp_path_factory.mktemp("flext_tests_docker")
+=======
+>>>>>>> origin/0.12.0-dev
     return tk.stack(
         c.Meltano.Tests.COMPOSE_FILE,
         target=m.Tests.ContainerConfig(
