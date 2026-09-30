@@ -232,7 +232,7 @@ class UserRole:
 
 # Predefined roles
 ADMIN_ROLE = UserRole(
-    name="REDACTED_LDAP_BIND_PASSWORD",
+    name="admin",
     permissions={"*"},  # All permissions
     scope="global",
 )
