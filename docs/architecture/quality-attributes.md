@@ -2980,7 +2980,7 @@ class APIResponse:
             "unauthorized": [
                 "Verify your authentication credentials",
                 "Check your permissions for this resource",
-                "Contact your REDACTED_LDAP_BIND_PASSWORDistrator",
+                "Contact your administrator",
             ],
             "validation_error": [
                 "Review the API documentation",
@@ -3218,7 +3218,7 @@ class APIHelpSystem:
                 "solutions": [
                     "Refresh authentication tokens",
                     "Verify API key configuration",
-                    "Contact REDACTED_LDAP_BIND_PASSWORDistrator for permissions",
+                    "Contact administrator for permissions",
                 ],
             },
             "RESOURCE_NOT_FOUND": {
@@ -3457,7 +3457,7 @@ def mock_external_service():
 @pytest.fixture
 def authenticated_user():
     """Authenticated user fixture."""
-    user = User(id=123, name="Test User", role="REDACTED_LDAP_BIND_PASSWORD")
+    user = User(id=123, name="Test User", role="admin")
     # Set up authentication context
     with authenticated_context(user):
         yield user
