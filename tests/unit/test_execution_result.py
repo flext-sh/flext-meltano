@@ -8,17 +8,15 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import tm
 
-from tests import m
-
-if TYPE_CHECKING:
-    from tests import t
+from tests import m, t
 
 _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
+
+_ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
 
 
 class _ExecutionResultJson(m.BaseModel):
@@ -35,7 +33,7 @@ class TestsFlextMeltanoExecutionResult:
     """Behavioral contract of ``m.Meltano.CommandExecutionResult``."""
 
     @pytest.mark.parametrize(
-        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        "case",
         [
             (
                 ["meltano", "run", "tap-postgres", "target-csv"],
@@ -57,16 +55,10 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_public_fields_reflect_constructor_arguments(
-        self,
-        command: t.StrSequence,
-        *,
-        success: bool,
-        exit_code: int,
-        output: str,
-        error: str,
-        execution_time: float,
+        self, case: _ExecutionResultCase
     ) -> None:
         """Public fields expose exactly the values supplied at construction."""
+        command, success, exit_code, output, error, execution_time = case
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=success,
@@ -95,7 +87,7 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result.timestamp, match=_ISO_TIMESTAMP.pattern)
 
     @pytest.mark.parametrize(
-        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        "case",
         [
             (["meltano", "version"], True, 0, "meltano, version 1.0.0", "", 0.2),
             (
@@ -117,16 +109,10 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_to_dict_carries_full_public_contract(
-        self,
-        command: t.StrSequence,
-        *,
-        success: bool,
-        exit_code: int,
-        output: str,
-        error: str,
-        execution_time: float,
+        self, case: _ExecutionResultCase
     ) -> None:
         """``to_dict`` mirrors every public field plus an ISO timestamp."""
+        command, success, exit_code, output, error, execution_time = case
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=success,
@@ -145,7 +131,7 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(str(result_dict["timestamp"]), match=_ISO_TIMESTAMP.pattern)
 
     @pytest.mark.parametrize(
-        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        "case",
         [
             (
                 ["meltano", "invoke", "tap-postgres", "discover"],
@@ -174,16 +160,10 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_model_dump_json_round_trips_through_public_schema(
-        self,
-        command: t.StrSequence,
-        *,
-        success: bool,
-        exit_code: int,
-        output: str,
-        error: str,
-        execution_time: float,
+        self, case: _ExecutionResultCase
     ) -> None:
         """Serialized JSON validates back into the documented public shape."""
+        command, success, exit_code, output, error, execution_time = case
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=success,
