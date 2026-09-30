@@ -21,16 +21,16 @@ dependencies = [
   "annotated-types>=0.8.0",
   "beartype>=0.22.9",
   "dependency-injector>=4.49.1",
-  "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
+  "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@c825e0c0559a6fb328a34cd51215ad4285021923",
   "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
-  "meltano>=4.3.0",
+  "meltano>=4.4.0",
   "packaging>=26.3",
   "psycopg2-binary>=2.9.13",
   "pydantic>=2.13.5",
   "pydantic-settings>=2.14.2,<2.16",
   "pyyaml>=6.0.3",
   "redis>=8.1.0",
-  "singer-sdk>=0.54.6",
+  "singer-sdk>=0.54.7",
   "sqlalchemy>=2.0.54",
   "structlog>=25.5.0,<27",
   "typing-extensions>=4.16.0",
@@ -68,7 +68,7 @@ Repository = "https://github.com/flext-sh/flext"
 
 [dependency-groups]
 codegen = [
-  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
+  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@4fc588381637df52a0ec305ae2fbe49bb42df292",
 ]
 dev = [
   "actionlint-py>=1.7.12.24",
@@ -336,8 +336,6 @@ exclude = [
   "**/node_modules",
   "**/site-packages",
   "**/site-packages/**",
-  "**/tests/fixtures",
-  "**/tests/fixtures/**",
   "**/venv",
   "**/venv/**",
   ".git",
@@ -405,7 +403,7 @@ reportAttributeAccessIssue = "none"
 reportGeneralTypeIssues = "none"
 reportInvalidTypeForm = "none"
 reportPrivateImportUsage = "none"
-reportPrivateUsage = "none"
+reportPrivateUsage = "error"
 reportReturnType = "none"
 reportUnknownArgumentType = "none"
 reportUnknownLambdaType = "none"
@@ -490,7 +488,7 @@ namespace-packages = ["tests", "examples", "scripts"]
 preview = true
 respect-gitignore = true
 show-fixes = true
-src = ["examples", "scripts", "src", "tests"]
+src = ["examples", "src", "tests"]
 target-version = "py313"
 
 [tool.ruff.format]
@@ -501,6 +499,7 @@ quote-style = "double"
 skip-magic-trailing-comma = true
 
 [tool.ruff.lint]
+extend-safe-fixes = []
 ignore = [
   "ambiguous-unicode-character-comment",
   "ambiguous-unicode-character-docstring",
@@ -535,6 +534,17 @@ ignore = [
   "typing-only-third-party-import",
 ]
 select = ["ALL"]
+unfixable = [
+  "duplicate-value",
+  "multi-value-repeated-key-literal",
+  "multi-value-repeated-key-variable",
+  "outdated-version-block",
+  "p-print",
+  "print",
+  "pytest-duplicate-parametrize-test-cases",
+  "redefined-while-unused",
+  "unused-variable",
+]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.argparse]
 msg = "Use cli.register_result_command + Pydantic model from flext_cli."
@@ -544,6 +554,9 @@ msg = "Use flext_cli.cli application, registration, execution, and invocation me
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.rich]
 msg = "Use cli.print / cli.display_message / cli.render_panel / cli.render_table."
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api.tabulate]
+msg = "Use cli.render_table from flext_cli."
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.typer]
 msg = "Use cli.create_app_with_common_params / cli.register_command from flext_cli."

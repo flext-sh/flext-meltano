@@ -3,6 +3,13 @@
 # run the project's canonical generation surface (`make gen`).
 version: 3
 name: flext-meltano
+candidate_dependencies:
+  - distribution: flext-cli
+    url: https://github.com/flext-sh/flext-cli.git
+    commit: c825e0c0559a6fb328a34cd51215ad4285021923
+  - distribution: flext-infra
+    url: https://github.com/flext-sh/flext-infra.git
+    commit: 4fc588381637df52a0ec305ae2fbe49bb42df292
 # Why (green mandate, cosmos-3flk9 decision A): production sources are the
 # namespace validator's declared scope — tests host pytest conventions and
 # scripts/examples are thin command and documentation surfaces. Lint, type,
