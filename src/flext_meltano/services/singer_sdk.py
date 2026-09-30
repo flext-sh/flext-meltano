@@ -9,7 +9,7 @@ from singer_sdk.streams import Stream
 from singer_sdk.tap_base import Tap
 from singer_sdk.target_base import Target
 
-from flext_meltano import m, p, t
+from flext_meltano import c, m, p, t
 
 
 class FlextMeltanoSingerTapAdapter:
@@ -54,7 +54,7 @@ class FlextMeltanoSingerTapAdapter:
                 key: FlextMeltanoSingerTapAdapter._normalize_recursive(mapping_value)
                 for key, mapping_value in value.items()
             }
-        if isinstance(value, Sequence) and not isinstance(value, t.STR_BYTES_TYPES):
+        if isinstance(value, Sequence) and not isinstance(value, c.STR_BYTES_TYPES):
             return [
                 FlextMeltanoSingerTapAdapter._normalize_recursive(sequence_value)
                 for sequence_value in value
