@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
+    from .base import FlextMeltanoModelsBase
     from .cli_inputs import FlextMeltanoModelsCliInputs
     from .cli_params import FlextMeltanoModelsCliParams
     from .context import FlextMeltanoModelsContext
@@ -33,6 +34,7 @@ if TYPE_CHECKING:
 
 
 __all__: tuple[str, ...] = (
+    "FlextMeltanoModelsBase",
     "FlextMeltanoModelsCliInputs",
     "FlextMeltanoModelsCliParams",
     "FlextMeltanoModelsContext",
@@ -59,6 +61,7 @@ __all__: tuple[str, ...] = (
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
+            ".base": ("FlextMeltanoModelsBase",),
             ".cli_inputs": ("FlextMeltanoModelsCliInputs",),
             ".cli_params": ("FlextMeltanoModelsCliParams",),
             ".context": ("FlextMeltanoModelsContext",),

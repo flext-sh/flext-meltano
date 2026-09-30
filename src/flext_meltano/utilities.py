@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from flext_cli import FlextCliUtilities
 
+from ._utilities.base import FlextMeltanoUtilitiesBase
 from ._utilities.runtime import FlextMeltanoUtilitiesRuntime
 from ._utilities.singer import FlextMeltanoUtilitiesSinger
 
@@ -20,7 +21,11 @@ class FlextMeltanoUtilities(FlextCliUtilities):
     Inherits from FlextUtilities to avoid duplication and ensure consistency.
     """
 
-    class Meltano(FlextMeltanoUtilitiesRuntime, FlextMeltanoUtilitiesSinger):
+    class Meltano(
+        FlextMeltanoUtilitiesBase,
+        FlextMeltanoUtilitiesRuntime,
+        FlextMeltanoUtilitiesSinger,
+    ):
         """Meltano domain utility methods.
 
         Includes Singer protocol utilities (message emission, stdin

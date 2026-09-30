@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Annotated, override
+from pathlib import Path
+from typing import Annotated, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
@@ -25,9 +26,6 @@ from flext_meltano import (
     u,
 )
 from flext_meltano.services.executor import FlextMeltanoExecutor
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
@@ -71,40 +69,48 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # CLI dispatch
     # ------------------------------------------------------------------
 
+    def _cli_arguments(self, args: t.StrSequence | None) -> list[str]:
+        """Resolve the effective CLI argument vector for dispatch."""
+        return list(args) if args else sys.argv[1:]
+
+    def _dispatch_dbt_subcommand(
+        self, subcommand: str, rest: list[str]
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
+        """Dispatch one resolved dbt subcommand to its typed service call."""
+        models: t.StrSequence | None = rest or None
+        match subcommand:
+            case c.Meltano.DbtCommand.RUN:
+                return self.run_models(models)
+            case c.Meltano.DbtCommand.TEST:
+                return self.run_tests(models)
+            case c.Meltano.DbtCommand.COMPILE:
+                return self.compile_models(models)
+            case c.Meltano.DbtCommand.DOCS:
+                return self.generate_docs()
+            case _:
+                return r[m.Meltano.CommandExecutionResult].fail(subcommand)
+
+    def _finalize_dbt_cli_result(
+        self, subcommand: str, result: p.Result[m.Meltano.CommandExecutionResult]
+    ) -> int:
+        """Translate one dbt command result into the CLI exit contract."""
+        if result.failure:
+            self.logger.warning(
+                "dbt command failed", subcommand=subcommand, error=result.error or ""
+            )
+            raise SystemExit(1)
+        return 0
+
     def cli_main(self, args: t.StrSequence | None = None) -> int:
         """Run the main CLI entry point for dbt project."""
-
-        def _run_cli_main() -> int:
-            command_args = list(args) if args else sys.argv[1:]
+        try:
+            command_args = self._cli_arguments(args)
             if not command_args:
                 self.logger.info("dbt CLI: no arguments, showing help")
                 return 0
             subcommand = command_args[0]
-            match subcommand:
-                case c.Meltano.DbtCommand.RUN:
-                    models = command_args[1:] if len(command_args) > 1 else None
-                    result = self.run_models(models)
-                case c.Meltano.DbtCommand.TEST:
-                    models = command_args[1:] if len(command_args) > 1 else None
-                    result = self.run_tests(models)
-                case c.Meltano.DbtCommand.COMPILE:
-                    models = command_args[1:] if len(command_args) > 1 else None
-                    result = self.compile_models(models)
-                case c.Meltano.DbtCommand.DOCS:
-                    result = self.generate_docs()
-                case _:
-                    result = r[m.Meltano.CommandExecutionResult].fail(subcommand)
-            if result.failure:
-                self.logger.warning(
-                    "dbt command failed",
-                    subcommand=subcommand,
-                    error=result.error or "",
-                )
-                raise SystemExit(1)
-            return 0
-
-        try:
-            return _run_cli_main()
+            result = self._dispatch_dbt_subcommand(subcommand, command_args[1:])
+            return self._finalize_dbt_cli_result(subcommand, result)
         except c.EXC_OS_RUNTIME_TYPE as exc:
             self.logger.exception("dbt CLI failed", error=str(exc))
             raise SystemExit(1) from exc
@@ -163,35 +169,41 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         self._dbt_project_root = root
         return r[bool].ok(True)
 
+    def _resolve_manifest_path(self, manifest_path: Path | None) -> p.Result[Path]:
+        """Resolve the effective dbt manifest location."""
+        if manifest_path is not None:
+            return r[Path].ok(manifest_path)
+        if self._dbt_project_root is None:
+            return r[Path].fail("No project root set")
+        return r[Path].ok(
+            self._dbt_project_root
+            / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
+            / c.Meltano.DBT_MANIFEST_FILE
+        )
+
+    def _parse_manifest(self, path: Path) -> p.Result[t.Meltano.DbtManifestData]:
+        """Parse the dbt manifest file into the public manifest contract."""
+        parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
+        if parsed_result.failure:
+            return r[t.Meltano.DbtManifestData].from_failure(parsed_result)
+        parsed = parsed_result.value
+        manifest_data: t.Meltano.DbtManifestData = {
+            "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()}
+        }
+        return r[t.Meltano.DbtManifestData].ok(manifest_data)
+
     def load_manifest(
         self, manifest_path: Path | None = None
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json."""
-
-        def _run_load_manifest() -> p.Result[t.Meltano.DbtManifestData]:
-            path = manifest_path
-            if path is None:
-                if self._dbt_project_root is None:
-                    return r[t.Meltano.DbtManifestData].fail("No project root set")
-                path = (
-                    self._dbt_project_root
-                    / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
-                    / c.Meltano.DBT_MANIFEST_FILE
-                )
+        try:
+            path_result = self._resolve_manifest_path(manifest_path)
+            if path_result.failure:
+                return r[t.Meltano.DbtManifestData].from_failure(path_result)
+            path = path_result.value
             if not path.exists():
                 return r[t.Meltano.DbtManifestData].fail(str(path))
-
-            parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
-            if parsed_result.failure:
-                return r[t.Meltano.DbtManifestData].from_failure(parsed_result)
-            parsed = parsed_result.value
-            manifest_data: t.Meltano.DbtManifestData = {
-                "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()}
-            }
-            return r[t.Meltano.DbtManifestData].ok(manifest_data)
-
-        try:
-            return _run_load_manifest()
+            return self._parse_manifest(path)
         except c.EXC_KEY_OS_TYPE_VALUE as exc:
             return r[t.Meltano.DbtManifestData].fail(str(exc), exception=exc)
 

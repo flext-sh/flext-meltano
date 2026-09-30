@@ -13,58 +13,38 @@ from flext_meltano import t
 class FlextMeltanoModelsPayloads:
     """API payload models for pipeline operations."""
 
-    class CreatePipelinePayload(m.ArbitraryTypesModel):
+    class FrozenConfigPayload(m.ArbitraryTypesModel):
+        """Payload base owning a read-only flat operation config mapping."""
+
+        config: Annotated[
+            t.FlatContainerMapping, m.Field(description="Operation config")
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Operation config",
+        )
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
+            """Expose the operation configuration as read-only."""
+            return MappingProxyType(dict(value))
+
+    class CreatePipelinePayload(FrozenConfigPayload):
         """Payload for create_pipeline operation."""
 
         tap_name: Annotated[t.NonEmptyStr, m.Field(description="Singer tap name")]
         target_name: Annotated[str, m.Field(description="Singer target name")]
-        config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Pipeline config")
-        ] = m.Field(
-            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
-            description="Pipeline config",
-        )
 
-        @m.field_validator("config", mode="after")
-        @classmethod
-        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
-            """Expose pipeline configuration as read-only."""
-            return MappingProxyType(dict(value))
-
-    class ExecutePipelinePayload(m.ArbitraryTypesModel):
+    class ExecutePipelinePayload(FrozenConfigPayload):
         """Payload for execute_pipeline operation."""
 
         pipeline_id: Annotated[str, m.Field(description="Pipeline identifier")]
-        config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Execution config")
-        ] = m.Field(
-            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
-            description="Execution config",
-        )
 
-        @m.field_validator("config", mode="after")
-        @classmethod
-        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
-            """Expose execution configuration as read-only."""
-            return MappingProxyType(dict(value))
-
-    class InstallPluginPayload(m.ArbitraryTypesModel):
+    class InstallPluginPayload(FrozenConfigPayload):
         """Payload for install_plugin operation."""
 
         plugin_type: Annotated[t.NonEmptyStr, m.Field(description="Plugin type")]
         plugin_name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
-        config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Plugin config")
-        ] = m.Field(
-            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
-            description="Plugin config",
-        )
-
-        @m.field_validator("config", mode="after")
-        @classmethod
-        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
-            """Expose plugin configuration as read-only."""
-            return MappingProxyType(dict(value))
 
     class ListPluginsPayload(m.ArbitraryTypesModel):
         """Payload for list_plugins operation."""
@@ -73,22 +53,10 @@ class FlextMeltanoModelsPayloads:
             str | None, m.Field(default=None, description="Filter by plugin type")
         ] = None
 
-    class ConfigureEnvironmentPayload(m.ArbitraryTypesModel):
+    class ConfigureEnvironmentPayload(FrozenConfigPayload):
         """Payload for configure_environment operation."""
 
         environment_name: Annotated[str, m.Field(description="Environment name")]
-        config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Environment config")
-        ] = m.Field(
-            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
-            description="Environment config",
-        )
-
-        @m.field_validator("config", mode="after")
-        @classmethod
-        def freeze_config(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
-            """Expose environment configuration as read-only."""
-            return MappingProxyType(dict(value))
 
     class RunDbtModelsPayload(m.ArbitraryTypesModel):
         """Payload for run/test dbt models operation."""

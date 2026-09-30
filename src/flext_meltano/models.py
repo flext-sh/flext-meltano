@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from flext_cli import FlextCliModels
 
+from ._models.base import FlextMeltanoModelsBase
 from ._models.cli_inputs import FlextMeltanoModelsCliInputs
 from ._models.cli_params import FlextMeltanoModelsCliParams
 from ._models.context import FlextMeltanoModelsContext
@@ -40,6 +41,7 @@ class FlextMeltanoModels(FlextCliModels):
     """
 
     class Meltano(
+        FlextMeltanoModelsBase,
         FlextMeltanoModelsCore,
         FlextMeltanoModelsLogging,
         FlextMeltanoModelsCliInputs,

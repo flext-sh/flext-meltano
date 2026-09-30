@@ -10,14 +10,9 @@ from flext_cli import m
 class FlextMeltanoModelsCliParams:
     """CLI parameter models for pipeline operations."""
 
-    class CliDataSourceParams(m.Entity):
-        """Generic parameters for data source operations."""
+    class CatalogStateParams(m.Entity):
+        """Shared catalog/state file parameters for data operations."""
 
-        source_name: Annotated[str, m.Field(description="Name of the data source")]
-        config_file: Annotated[
-            str | None,
-            m.Field(default=None, description="Path to source configuration file"),
-        ] = None
         catalog_file: Annotated[
             str | None,
             m.Field(
@@ -29,6 +24,15 @@ class FlextMeltanoModelsCliParams:
             m.Field(
                 default=None, description="Path to state file for incremental sync"
             ),
+        ] = None
+
+    class CliDataSourceParams(CatalogStateParams):
+        """Generic parameters for data source operations."""
+
+        source_name: Annotated[str, m.Field(description="Name of the data source")]
+        config_file: Annotated[
+            str | None,
+            m.Field(default=None, description="Path to source configuration file"),
         ] = None
         discover: Annotated[
             bool,
@@ -52,7 +56,7 @@ class FlextMeltanoModelsCliParams:
             ),
         ] = None
 
-    class CliPipelineParams(m.Entity):
+    class CliPipelineParams(CatalogStateParams):
         """Generic parameters for pipeline operations."""
 
         source_name: Annotated[str, m.Field(description="Name of the data source")]
@@ -64,12 +68,6 @@ class FlextMeltanoModelsCliParams:
         sink_config: Annotated[
             str | None,
             m.Field(default=None, description="Path to sink configuration file"),
-        ] = None
-        catalog_file: Annotated[
-            str | None, m.Field(default=None, description="Path to catalog file")
-        ] = None
-        state_file: Annotated[
-            str | None, m.Field(default=None, description="Path to state file")
         ] = None
         state_output_file: Annotated[
             str | None, m.Field(default=None, description="Path to write final state")
@@ -110,17 +108,11 @@ class FlextMeltanoModelsCliParams:
             str | None, m.Field(default=None, description="Specific plugin variant")
         ] = None
 
-    class PipelineRunParams(m.Entity):
+    class PipelineRunParams(CatalogStateParams):
         """Parameters for pipeline run operations."""
 
         tap_name: Annotated[str, m.Field(description="Name of the tap to run")]
         target_name: Annotated[str, m.Field(description="Name of the target to run")]
-        catalog_file: Annotated[
-            str | None, m.Field(default=None, description="Path to catalog file")
-        ] = None
-        state_file: Annotated[
-            str | None, m.Field(default=None, description="Path to state file")
-        ] = None
         state_output_file: Annotated[
             str | None, m.Field(default=None, description="Path to write final state")
         ] = None
