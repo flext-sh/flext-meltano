@@ -4,7 +4,7 @@
 title FLEXT-Meltano - System Context Diagram
 
 Person(user, "Data Engineer/Developer", "Creates and manages ELT pipelines")
-Person(REDACTED_LDAP_BIND_PASSWORD, "Platform Administrator", "Manages Meltano infrastructure")
+Person(admin, "Platform Administrator", "Manages Meltano infrastructure")
 
 System(flext_meltano, "FLEXT-Meltano", "Enterprise data integration platform providing Singer protocol, plugin development, and pipeline orchestration")
 
@@ -21,7 +21,7 @@ System_Ext(data_sources, "Data Sources", "Databases, APIs, files, cloud services
 System_Ext(data_destinations, "Data Destinations", "Data warehouses, lakes, applications")
 
 Rel(user, flext_meltano, "Uses", "Python API, CLI, configuration")
-Rel(REDACTED_LDAP_BIND_PASSWORD, flext_meltano, "Manages", "Infrastructure, monitoring, security")
+Rel(admin, flext_meltano, "Manages", "Infrastructure, monitoring, security")
 
 Rel(flext_meltano, meltano_core, "Integrates with", "CLI operations, project management")
 Rel(flext_meltano, singer_sdk, "Implements", "Tap/target protocols, state management")
@@ -137,7 +137,7 @@ api --> user: success result
 title FLEXT-Meltano - Security Architecture
 
 actor "User" as user
-actor "Admin" as REDACTED_LDAP_BIND_PASSWORD
+actor "Admin" as admin
 
 rectangle "Security Boundary" as boundary {
     rectangle "API Layer" as api {
@@ -181,8 +181,8 @@ external --> targets: data loading
 adapter --> state: persist state
 state --> adapter: retrieve state
 
-REDACTED_LDAP_BIND_PASSWORD --> audit: review logs
-REDACTED_LDAP_BIND_PASSWORD --> authz: manage permissions
+admin --> audit: review logs
+admin --> authz: manage permissions
 @enduml
 
 @startuml FLEXT-Meltano Deployment Architecture

@@ -65,7 +65,7 @@ operations across 32+ FLEXT projects.
 title FLEXT-Meltano - System Context Diagram
 
 Person(user, "Data Engineer/Developer", "Creates and manages ELT pipelines")
-Person(REDACTED_LDAP_BIND_PASSWORD, "Platform Administrator", "Manages Meltano infrastructure")
+Person(admin, "Platform Administrator", "Manages Meltano infrastructure")
 
 System(flext_meltano, "FLEXT-Meltano", "Enterprise data integration platform providi ...
 
@@ -82,7 +82,7 @@ System_Ext(data_sources, "Data Sources", "Databases, APIs, files, cloud services
 System_Ext(data_destinations, "Data Destinations", "Data warehouses, lakes, applications")
 
 Rel(user, flext_meltano, "Uses", "Python API, CLI, configuration")
-Rel(REDACTED_LDAP_BIND_PASSWORD, flext_meltano, "Manages", "Infrastructure, monitori ...
+Rel(admin, flext_meltano, "Manages", "Infrastructure, monitori ...
 
 Rel(flext_meltano, meltano_core, "Integrates with", "CLI operations, project management")
 Rel(flext_meltano, singer_sdk, "Implements", "Tap/target protocols, state management")
