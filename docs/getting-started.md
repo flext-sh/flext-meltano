@@ -76,7 +76,6 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 
 ```python
 from flext_cli import u
-
 from flext_meltano import FlextMeltanoService
 
 # Initialize ELT service

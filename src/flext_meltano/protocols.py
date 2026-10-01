@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from flext_cli import FlextCliProtocols
 
-from ._protocols.cli import FlextMeltanoProtocolsBase
+from ._protocols.base import FlextMeltanoProtocolsBase
 from ._protocols.plugin import FlextMeltanoProtocolsPlugin
 from ._protocols.project import FlextMeltanoProtocolsProject
 from ._protocols.services import FlextMeltanoProtocolsServices

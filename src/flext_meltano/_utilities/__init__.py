@@ -9,11 +9,13 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
+    from .base import FlextMeltanoUtilitiesBase
     from .runtime import FlextMeltanoUtilitiesRuntime
     from .singer import FlextMeltanoUtilitiesSinger
 
 
 __all__: tuple[str, ...] = (
+    "FlextMeltanoUtilitiesBase",
     "FlextMeltanoUtilitiesRuntime",
     "FlextMeltanoUtilitiesSinger",
 )
@@ -21,6 +23,7 @@ __all__: tuple[str, ...] = (
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
+            ".base": ("FlextMeltanoUtilitiesBase",),
             ".runtime": ("FlextMeltanoUtilitiesRuntime",),
             ".singer": ("FlextMeltanoUtilitiesSinger",),
         }),
