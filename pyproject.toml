@@ -168,6 +168,10 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/flext_meltano"]
+only-include = ["src/flext_meltano"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/flext_meltano" = "flext_meltano"
 
 [tool.hatch.build.targets.sdist]
 only-include = ["src/flext_meltano"]
@@ -336,8 +340,6 @@ exclude = [
   "**/node_modules",
   "**/site-packages",
   "**/site-packages/**",
-  "**/tests/fixtures",
-  "**/tests/fixtures/**",
   "**/venv",
   "**/venv/**",
   ".git",
@@ -405,7 +407,7 @@ reportAttributeAccessIssue = "none"
 reportGeneralTypeIssues = "none"
 reportInvalidTypeForm = "none"
 reportPrivateImportUsage = "none"
-reportPrivateUsage = "none"
+reportPrivateUsage = "error"
 reportReturnType = "none"
 reportUnknownArgumentType = "none"
 reportUnknownLambdaType = "none"
@@ -556,6 +558,9 @@ msg = "Use flext_cli.cli application, registration, execution, and invocation me
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.rich]
 msg = "Use cli.print / cli.display_message / cli.render_panel / cli.render_table."
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api.tabulate]
+msg = "Use cli.render_table from flext_cli."
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.typer]
 msg = "Use cli.create_app_with_common_params / cli.register_command from flext_cli."
