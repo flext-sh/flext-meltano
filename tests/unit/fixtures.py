@@ -162,14 +162,28 @@ def docker_manager() -> tk:
     )
 
 
+_DOCKER_MANAGER_KEY: pytest.StashKey[tk] = pytest.StashKey()
+
+
+@pytest.fixture(scope="session")
+def _docker_stack_release(request: pytest.FixtureRequest) -> Generator[None]:
+    """Tear the leased docker stack down once after the whole session."""
+    yield
+    manager = request.config.stash.get(_DOCKER_MANAGER_KEY, None)
+    if manager is not None:
+        _ = manager.down()
+
+
 @pytest.fixture
-def docker_services(docker_manager: tk) -> Generator[tk]:
-    """Function-scoped Docker services fixture."""
+def docker_services(
+    docker_manager: tk, _docker_stack_release: None, request: pytest.FixtureRequest
+) -> tk:
+    """Function-scoped Docker services fixture over the leased stack."""
     result = docker_manager.execute()
     if result.failure:
         pytest.skip(f"Docker stack unavailable: {result.error}")
-    yield docker_manager
-    _ = docker_manager.down()
+    request.config.stash[_DOCKER_MANAGER_KEY] = docker_manager
+    return docker_manager
 
 
 def require_docker_service(docker_services: tk, port: int, service_name: str) -> str:
