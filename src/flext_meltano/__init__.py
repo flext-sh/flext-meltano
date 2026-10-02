@@ -1,72 +1,77 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Flext Meltano package."""
+"""Flext Meltano package.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import build_lazy_import_map, install_lazy_exports
-
-from .__version__ import (
-    __author__ as __author__,
-    __author_email__ as __author_email__,
-    __description__ as __description__,
-    __license__ as __license__,
-    __title__ as __title__,
-    __url__ as __url__,
-    __version__ as __version__,
-    __version_info__ as __version_info__,
+from flext_core import build_lazy_import_map, install_lazy_exports
+from flext_meltano.__version__ import (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
 )
 
 if TYPE_CHECKING:
     from flext_cli import d, e, h, r, x
 
-    from . import services
-    from ._config import FlextMeltanoConfig, config
-    from ._settings import FlextMeltanoSettings, settings
-    from .api import FlextMeltano, meltano
-    from .base import FlextMeltanoServiceBase, s
-    from .cli import FlextMeltanoCli, main
-    from .constants import FlextMeltanoConstants, FlextMeltanoConstants as c
-    from .models import FlextMeltanoModels, FlextMeltanoModels as m
-    from .pipeline_mgr import FlextMeltanoPipelineManager
-    from .protocols import FlextMeltanoProtocols, FlextMeltanoProtocols as p
-    from .service_bases import (
+    from flext_meltano import services
+    from flext_meltano._config import FlextMeltanoConfig, config
+    from flext_meltano._settings import FlextMeltanoSettings, settings
+    from flext_meltano.api import FlextMeltano, meltano
+    from flext_meltano.base import FlextMeltanoServiceBase, s
+    from flext_meltano.cli import FlextMeltanoCli, main
+    from flext_meltano.constants import FlextMeltanoConstants, c
+    from flext_meltano.models import FlextMeltanoModels, m
+    from flext_meltano.pipeline_mgr import FlextMeltanoPipelineManager
+    from flext_meltano.protocols import FlextMeltanoProtocols, p
+    from flext_meltano.service_bases import (
         FlextMeltanoDbtServiceBase,
         FlextMeltanoLibraryRunner,
         FlextMeltanoTapServiceBase,
         FlextMeltanoTargetServiceBase,
     )
-    from .services.abstractions import FlextMeltanoAbstractions
-    from .services.adapters import FlextMeltanoAdapter
-    from .services.bridge import FlextMeltanoBridge
-    from .services.consumer_bases.facade import FlextMeltanoConsumerBases
-    from .services.dbt_project import FlextMeltanoDbtProjectMixin
-    from .services.dbt_runner import FlextMeltanoDbtRunnerMixin
-    from .services.declarative_tap import FlextMeltanoDeclarativeTap
-    from .services.executor import FlextMeltanoExecutor
-    from .services.meltano_plugin_discovery import FlextMeltanoPluginDiscoveryMixin
-    from .services.meltano_plugins import FlextMeltanoComponentService
-    from .services.meltano_project_sdk import FlextMeltanoProjectManager
-    from .services.project_service import FlextMeltanoProjectService
-    from .services.services import FlextMeltanoService
-    from .services.singer_catalog import FlextMeltanoSingerCatalogMixin
-    from .services.singer_sdk import (
+    from flext_meltano.services.abstractions import FlextMeltanoAbstractions
+    from flext_meltano.services.adapters import FlextMeltanoAdapter
+    from flext_meltano.services.bridge import FlextMeltanoBridge
+    from flext_meltano.services.consumer_bases.facade import FlextMeltanoConsumerBases
+    from flext_meltano.services.dbt_project import FlextMeltanoDbtProjectMixin
+    from flext_meltano.services.dbt_runner import FlextMeltanoDbtRunnerMixin
+    from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
+    from flext_meltano.services.executor import FlextMeltanoExecutor
+    from flext_meltano.services.meltano_plugin_discovery import (
+        FlextMeltanoPluginDiscoveryMixin,
+    )
+    from flext_meltano.services.meltano_plugins import FlextMeltanoComponentService
+    from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
+    from flext_meltano.services.project_service import FlextMeltanoProjectService
+    from flext_meltano.services.services import FlextMeltanoService
+    from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
+    from flext_meltano.services.singer_sdk import (
         FlextMeltanoSingerTapAdapter,
         Sink,
         Stream,
         Tap,
         Target,
     )
-    from .services.singer_state import FlextMeltanoSingerStateMixin
-    from .services.singer_tap import FlextMeltanoTapAbstractions
-    from .services.singer_target import FlextMeltanoTargetAbstractions
-    from .services.singer_translator import FlextMeltanoSingerCliTranslator
-    from .services.tap_source_mixin import FlextMeltanoTapSourceMixin
-    from .services.validators import FlextMeltanoValidators
-    from .typings import FlextMeltanoTypes, FlextMeltanoTypes as t
-    from .utilities import FlextMeltanoUtilities, FlextMeltanoUtilities as u
+    from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
+    from flext_meltano.services.singer_tap import FlextMeltanoTapAbstractions
+    from flext_meltano.services.singer_target import FlextMeltanoTargetAbstractions
+    from flext_meltano.services.singer_translator import FlextMeltanoSingerCliTranslator
+    from flext_meltano.services.tap_source_mixin import FlextMeltanoTapSourceMixin
+    from flext_meltano.services.validators import FlextMeltanoValidators
+    from flext_meltano.typings import FlextMeltanoTypes, t
+    from flext_meltano.utilities import FlextMeltanoUtilities, u
 
 
 __all__: tuple[str, ...] = (
@@ -188,7 +193,7 @@ _LAZY_IMPORTS = MappingProxyType(
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
-    )
+    ),
 )
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
