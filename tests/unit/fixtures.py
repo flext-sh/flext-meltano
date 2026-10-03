@@ -1,4 +1,8 @@
-"""Shared pytest fixtures for flext-meltano tests."""
+"""Shared pytest fixtures for flext-meltano tests.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -28,10 +32,14 @@ MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
 
 
 @pytest.fixture(
-    params=tuple(range(len(MELTANO_COMPONENT_CASES))), ids=MELTANO_COMPONENT_IDS
+    params=tuple(range(len(MELTANO_COMPONENT_CASES))), ids=MELTANO_COMPONENT_IDS,
 )
 def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCase:
-    """Canonical public Meltano component factories with expected selectors."""
+    """Canonical public Meltano component factories with expected selectors.
+
+    Returns:
+        The resulting ``MeltanoComponentCase``.
+    """
     case_index = request.param
     tm.that(case_index, is_=int)
     return MELTANO_COMPONENT_CASES[case_index]
@@ -48,7 +56,11 @@ def meltano_execute_field(request: pytest.FixtureRequest) -> str:
 
 @pytest.fixture
 def test_meltano_project_dir() -> Generator[Path]:
-    """Temporary Meltano project directory for testing."""
+    """Temporary Meltano project directory for testing.
+
+    Yields:
+        Each ``Path``.
+    """
     with tf().temporary_directory() as temp_dir:
         project_dir = temp_dir / "test_meltano_project"
         project_dir.mkdir()
@@ -57,7 +69,11 @@ def test_meltano_project_dir() -> Generator[Path]:
 
 @pytest.fixture
 def meltano_yml_config() -> t.JsonMapping:
-    """Sample pipeline.yml configuration for testing."""
+    """Sample pipeline.yml configuration for testing.
+
+    Returns:
+        The resulting ``t.JsonMapping``.
+    """
     return {
         "requires_meltano": c.Meltano.VERSION_MELTANO_REQUIREMENT,
         "default_environment": "test",
@@ -72,18 +88,18 @@ def meltano_yml_config() -> t.JsonMapping:
                                 "name": "tap-csv",
                                 "variant": "meltanolabs",
                                 "pip_url": "pipelinewise-tap-csv",
-                            }
+                            },
                         ],
                         "loaders": [
                             {
                                 "name": "target-csv",
                                 "variant": "meltanolabs",
                                 "pip_url": "pipelinewise-target-csv",
-                            }
+                            },
                         ],
-                    }
+                    },
                 },
-            }
+            },
         ],
         "plugins": {
             "extractors": [
@@ -97,10 +113,10 @@ def meltano_yml_config() -> t.JsonMapping:
                                 "entity": "test_data",
                                 "path": "test_data.csv",
                                 "keys": ["id"],
-                            }
-                        ]
+                            },
+                        ],
                     },
-                }
+                },
             ],
             "loaders": [
                 {
@@ -108,7 +124,7 @@ def meltano_yml_config() -> t.JsonMapping:
                     "variant": "meltanolabs",
                     "pip_url": "pipelinewise-target-csv",
                     "settings": {"destination_path": "output"},
-                }
+                },
             ],
         },
     }
@@ -116,9 +132,13 @@ def meltano_yml_config() -> t.JsonMapping:
 
 @pytest.fixture
 def meltano_project(
-    test_meltano_project_dir: Path, meltano_yml_config: t.JsonMapping
+    test_meltano_project_dir: Path, meltano_yml_config: t.JsonMapping,
 ) -> dict[str, str | Path | t.JsonMapping]:
-    """Meltano project for testing."""
+    """Meltano project for testing.
+
+    Returns:
+        The resulting ``dict[str, str | Path | t.JsonMapping]``.
+    """
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
     return {
@@ -133,7 +153,11 @@ def meltano_project(
 
 @pytest.fixture
 def singer_state() -> t.JsonMapping:
-    """Sample Singer state for testing."""
+    """Sample Singer state for testing.
+
+    Returns:
+        The resulting ``t.JsonMapping``.
+    """
     return {
         "type": "STATE",
         "value": {
@@ -141,15 +165,19 @@ def singer_state() -> t.JsonMapping:
                 "test_entity": {
                     "replication_key": "created_at",
                     "replication_key_value": "2023-01-02T00:00:00Z",
-                }
-            }
+                },
+            },
         },
     }
 
 
 @pytest.fixture
 def docker_manager() -> tk:
-    """Docker manager fixture for Docker-based tests."""
+    """Docker manager fixture for Docker-based tests.
+
+    Returns:
+        The resulting ``tk``.
+    """
     return tk.stack(
         c.Meltano.Tests.COMPOSE_FILE,
         target=m.Tests.ContainerConfig(
@@ -176,9 +204,13 @@ def _docker_stack_release(request: pytest.FixtureRequest) -> Generator[None]:
 
 @pytest.fixture
 def docker_services(
-    docker_manager: tk, _docker_stack_release: None, request: pytest.FixtureRequest
+    docker_manager: tk, _docker_stack_release: None, request: pytest.FixtureRequest,
 ) -> tk:
-    """Function-scoped Docker services fixture over the leased stack."""
+    """Function-scoped Docker services fixture over the leased stack.
+
+    Returns:
+        The resulting ``tk``.
+    """
     result = docker_manager.execute()
     if result.failure:
         pytest.skip(f"Docker stack unavailable: {result.error}")
@@ -196,21 +228,33 @@ def require_docker_service(docker_services: tk, port: int, service_name: str) ->
 
 @pytest.fixture
 def postgres_service(docker_services: tk) -> str:
-    """PostgreSQL service fixture."""
+    """PostgreSQL service fixture.
+
+    Returns:
+        The resulting ``str``.
+    """
     return require_docker_service(
-        docker_services, c.Meltano.Tests.POSTGRES_PORT, "PostgreSQL"
+        docker_services, c.Meltano.Tests.POSTGRES_PORT, "PostgreSQL",
     )
 
 
 @pytest.fixture
 def redis_service(docker_services: tk) -> str:
-    """Redis service fixture."""
+    """Redis service fixture.
+
+    Returns:
+        The resulting ``str``.
+    """
     return require_docker_service(docker_services, c.Meltano.Tests.REDIS_PORT, "Redis")
 
 
 @pytest.fixture
 def meltano_service(docker_services: tk) -> str:
-    """Meltano service fixture."""
+    """Meltano service fixture.
+
+    Returns:
+        The resulting ``str``.
+    """
     info = docker_services.fetch_container_info(c.Meltano.Tests.PRIMARY_CONTAINER_NAME)
     if info.failure:
         pytest.skip(f"Meltano container unavailable: {info.error}")

@@ -1,4 +1,8 @@
-"""Real tests for the declarative Singer tap builder (flat Singer CLI)."""
+"""Real tests for the declarative Singer tap builder (flat Singer CLI).
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -19,8 +23,9 @@ class TestsFlextMeltanoDeclarativeTap:
     class _Fetcher:
         """A record fetcher that echoes one record derived from the config."""
 
+        @staticmethod
         def fetch(
-            self, request: m.Meltano.FetchRequest
+            request: m.Meltano.FetchRequest,
         ) -> p.Result[m.Meltano.FetchResult]:
             base_dn = request.config.get("base_dn", "")
             record: t.JsonMapping = {
@@ -63,7 +68,7 @@ class TestsFlextMeltanoDeclarativeTap:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(
-                ["--config", str(config_path), "--discover"], "tap-sample"
+                ["--config", str(config_path), "--discover"], "tap-sample",
             )
 
         catalog_result = u.Cli.json_loads(buffer.getvalue())

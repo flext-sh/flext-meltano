@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - CLI parameter models."""
+"""FLEXT Meltano models - CLI parameter models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -16,13 +20,13 @@ class FlextMeltanoModelsCliParams:
         catalog_file: Annotated[
             str | None,
             m.Field(
-                default=None, description="Path to catalog file for schema discovery"
+                default=None, description="Path to catalog file for schema discovery",
             ),
         ] = None
         state_file: Annotated[
             str | None,
             m.Field(
-                default=None, description="Path to state file for incremental sync"
+                default=None, description="Path to state file for incremental sync",
             ),
         ] = None
 
@@ -37,7 +41,7 @@ class FlextMeltanoModelsCliParams:
         discover: Annotated[
             bool,
             m.Field(
-                default=False, description="Run in discovery mode to output schema"
+                default=False, description="Run in discovery mode to output schema",
             ),
         ] = False
 
@@ -52,7 +56,7 @@ class FlextMeltanoModelsCliParams:
         input_file: Annotated[
             str | None,
             m.Field(
-                default=None, description="Path to input data file (default: stdin)"
+                default=None, description="Path to input data file (default: stdin)",
             ),
         ] = None
 
@@ -70,42 +74,42 @@ class FlextMeltanoModelsCliParams:
             m.Field(default=None, description="Path to sink configuration file"),
         ] = None
         state_output_file: Annotated[
-            str | None, m.Field(default=None, description="Path to write final state")
+            str | None, m.Field(default=None, description="Path to write final state"),
         ] = None
 
     class CliTransformationParams(m.Entity):
         """Generic parameters for transformation operations."""
 
         project_dir: Annotated[
-            str, m.Field(description="Transformation project directory")
+            str, m.Field(description="Transformation project directory"),
         ]
         models: Annotated[
             str | None,
             m.Field(
-                default=None, description="Specific models to run (space-separated)"
+                default=None, description="Specific models to run (space-separated)",
             ),
         ] = None
         select: Annotated[
-            str | None, m.Field(default=None, description="Selection syntax for models")
+            str | None, m.Field(default=None, description="Selection syntax for models"),
         ] = None
         exclude: Annotated[
-            str | None, m.Field(default=None, description="Exclusion syntax for models")
+            str | None, m.Field(default=None, description="Exclusion syntax for models"),
         ] = None
         full_refresh: Annotated[
-            bool, m.Field(default=False, description="Run with full refresh")
+            bool, m.Field(default=False, description="Run with full refresh"),
         ] = False
 
     class CliPluginInstallParams(m.Entity):
         """Generic parameters for plugin installation."""
 
         plugin_type: Annotated[
-            str, m.Field(description="Type of plugin (source, sink, transformer)")
+            str, m.Field(description="Type of plugin (source, sink, transformer)"),
         ]
         plugin_name: Annotated[
-            str, m.Field(description="Name of the plugin to install")
+            str, m.Field(description="Name of the plugin to install"),
         ]
         variant: Annotated[
-            str | None, m.Field(default=None, description="Specific plugin variant")
+            str | None, m.Field(default=None, description="Specific plugin variant"),
         ] = None
 
     class PipelineRunParams(CatalogStateParams):
@@ -114,7 +118,7 @@ class FlextMeltanoModelsCliParams:
         tap_name: Annotated[str, m.Field(description="Name of the tap to run")]
         target_name: Annotated[str, m.Field(description="Name of the target to run")]
         state_output_file: Annotated[
-            str | None, m.Field(default=None, description="Path to write final state")
+            str | None, m.Field(default=None, description="Path to write final state"),
         ] = None
         tap_config: Annotated[
             str | None,
@@ -125,5 +129,5 @@ class FlextMeltanoModelsCliParams:
             m.Field(default=None, description="Path to target configuration file"),
         ] = None
         full_refresh: Annotated[
-            bool, m.Field(default=False, description="Run with full refresh")
+            bool, m.Field(default=False, description="Run with full refresh"),
         ] = False

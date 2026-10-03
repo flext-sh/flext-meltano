@@ -46,11 +46,11 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     tap_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical tap name (e.g. tap-oracle)")
+        t.NonEmptyStr, u.Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
     _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
-        default_factory=lambda: None
+        default_factory=lambda: None,
     )
 
     def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
@@ -59,7 +59,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
     @abstractmethod
     def create_tap_instance(
-        self, settings: p.Settings | None = None
+        self, settings: p.Settings | None = None,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -71,7 +71,14 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Run the main CLI entry point through the internal Singer bridge."""
+        """Run the main CLI entry point through the internal Singer bridge.
+
+        Returns:
+            The resulting ``int``.
+
+        Raises:
+            SystemExit: If a ``c.EXC_OS_RUNTIME_TYPE`` is caught.
+        """
         try:
             tap = self._get_or_create_tap()
             command_args = list(args) if args else sys.argv[1:]
@@ -87,13 +94,17 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def run_discover(self) -> p.Result[t.StrSequence]:
-        """Discover stream names from the tap."""
+        """Discover stream names from the tap.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
         try:
             tap = self._get_or_create_tap()
             streams = tap.discover_streams()
             stream_names: t.StrSequence = [s.name for s in streams]
             self.logger.info(
-                "Streams discovered", tap=self.tap_name, count=len(stream_names)
+                "Streams discovered", tap=self.tap_name, count=len(stream_names),
             )
             return r[t.StrSequence].ok(stream_names)
         except c.EXC_BROAD_RUNTIME_OS as exc:
@@ -101,7 +112,11 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             return r[t.StrSequence].fail(str(exc), exception=exc)
 
     def run_sync(self) -> p.Result[str]:
-        """Execute Singer sync via tap."""
+        """Execute Singer sync via tap.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         try:
             tap = self._get_or_create_tap()
             tap.sync_all()
@@ -114,12 +129,22 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # Connection lifecycle
     # ------------------------------------------------------------------
 
-    def connect(self) -> p.Result[bool]:
-        """Connect to the data source. Override in consumer."""
+    @staticmethod
+    def connect() -> p.Result[bool]:
+        """Connect to the data source. Override in consumer.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return r[bool].ok(value=True)
 
-    def disconnect(self) -> p.Result[bool]:
-        """Disconnect from the data source. Override in consumer."""
+    @staticmethod
+    def disconnect() -> p.Result[bool]:
+        """Disconnect from the data source. Override in consumer.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return r[bool].ok(True)
 
     # ------------------------------------------------------------------
@@ -127,14 +152,18 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def _get_or_create_tap(self) -> p.Meltano.SingerTapInstance:
-        """Lazy-create and cache the tap instance."""
+        """Lazy-create and cache the tap instance.
+
+        Returns:
+            The resulting ``p.Meltano.SingerTapInstance``.
+        """
         if self._tap_instance is None:
             self._tap_instance = self.create_tap_instance()
         return self._tap_instance
 
     @staticmethod
     def build_declarative_tap(
-        spec: m.Meltano.TapSpec, fetcher: p.Meltano.RecordFetcher
+        spec: m.Meltano.TapSpec, fetcher: p.Meltano.RecordFetcher,
     ) -> p.Meltano.SingerTapInstance:
         """Build a flat-CLI Singer tap from declarative specs (no singer_sdk here).
 
@@ -142,12 +171,19 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
         call to this helper, passing their ``m.Meltano.TapSpec`` and a
         ``p.Meltano.RecordFetcher``. ``flext-meltano`` owns every ``singer_sdk``
         detail behind ``FlextMeltanoDeclarativeTap``.
+
+        Returns:
+            The resulting ``p.Meltano.SingerTapInstance``.
         """
         return FlextMeltanoDeclarativeTap.build(spec, fetcher)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute tap service — returns status."""
+        """Execute tap service — returns status.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok({
             "service": self.tap_name,
             "status": "active",

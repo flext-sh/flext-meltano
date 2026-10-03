@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Execution result models."""
+"""FLEXT Meltano models - Execution result models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -26,7 +30,7 @@ class FlextMeltanoModelsResults:
             )
         )
         end_time: Annotated[
-            datetime | None, m.Field(default=None, description="Execution end time")
+            datetime | None, m.Field(default=None, description="Execution end time"),
         ] = None
         duration_seconds: Annotated[
             float | None,
@@ -37,10 +41,10 @@ class FlextMeltanoModelsResults:
             m.Field(default=0, description="Number of records processed"),
         ] = 0
         error_message: Annotated[
-            str | None, m.Field(default=None, description="Error message if failed")
+            str | None, m.Field(default=None, description="Error message if failed"),
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping, m.Field(description="Additional execution metadata")
+            t.ConfigurationMapping, m.Field(description="Additional execution metadata"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional execution metadata",
@@ -49,14 +53,22 @@ class FlextMeltanoModelsResults:
         @m.field_validator("metadata", mode="after")
         @classmethod
         def freeze_metadata(
-            cls, value: t.ConfigurationMapping
+            cls, value: t.ConfigurationMapping,
         ) -> t.ConfigurationMapping:
-            """Expose execution metadata as a read-only mapping."""
+            """Expose execution metadata as a read-only mapping.
+
+            Returns:
+                The resulting ``t.ConfigurationMapping``.
+            """
             return MappingProxyType(dict(value))
 
         @m.computed_field
         def execution_rate_per_second(self) -> float:
-            """Execution rate (records/second)."""
+            """Execution rate (records/second).
+
+            Returns:
+                The resulting ``float``.
+            """
             if not self.duration_seconds or self.duration_seconds <= 0:
                 return 0.0
             records_processed: int = self.records_processed
@@ -65,12 +77,20 @@ class FlextMeltanoModelsResults:
 
         @m.computed_field
         def is_completed(self) -> bool:
-            """Check if execution is completed."""
+            """Check if execution is completed.
+
+            Returns:
+                The resulting ``bool``.
+            """
             return self.end_time is not None
 
         @m.computed_field
         def is_successful(self) -> bool:
-            """Check if execution was successful."""
+            """Check if execution was successful.
+
+            Returns:
+                The resulting ``bool``.
+            """
             return (
                 self.status == c.Meltano.OperationStatus.SUCCESS
                 and self.error_message is None
@@ -78,7 +98,11 @@ class FlextMeltanoModelsResults:
 
         @m.computed_field
         def performance_category(self) -> str:
-            """Performance categorization."""
+            """Performance categorization.
+
+            Returns:
+                The resulting ``str``.
+            """
             if not self.duration_seconds or self.duration_seconds <= 0:
                 rate = 0.0
             else:
@@ -95,7 +119,14 @@ class FlextMeltanoModelsResults:
         @m.field_validator("status", mode="before")
         @classmethod
         def validate_status(cls, v: str) -> str:
-            """Validate execution status."""
+            """Validate execution status.
+
+            Returns:
+                The resulting ``str``.
+
+            Raises:
+                ValueError: If Status must be one of.
+            """
             valid_statuses = [
                 c.Meltano.OperationStatus.PENDING,
                 c.Meltano.OperationStatus.RUNNING,
@@ -110,7 +141,15 @@ class FlextMeltanoModelsResults:
 
         @u.model_validator(mode="after")
         def validate_execution_result(self) -> Self:
-            """Validate execution result consistency."""
+            """Validate execution result consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If Error status requires error message; or if Duration
+                    inconsistent with start/end times.
+            """
             if self.start_time and self.end_time:
                 calculated_duration = (self.end_time - self.start_time).total_seconds()
                 if self.duration_seconds is None:

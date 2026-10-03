@@ -17,30 +17,48 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
 
     @classmethod
     def create_abstractions_instance(cls) -> p.Result[Self]:
-        """Create a FlextMeltanoAbstractions instance."""
+        """Create a FlextMeltanoAbstractions instance.
+
+        Returns:
+            The resulting ``p.Result[Self]``.
+        """
         instance: Self = cls()
         ok_result: p.Result[Self] = r.ok(instance)
         return ok_result
 
     # -- Tap-specific operations (discovery, sync, catalog) --
 
+    @staticmethod
     def process_tap_config(
-        self, settings: m.Meltano.TapConfig
+        settings: m.Meltano.TapConfig,
     ) -> p.Result[m.Meltano.TapConfig]:
-        """Validate and return tap configuration."""
+        """Validate and return tap configuration.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.TapConfig]``.
+        """
         return r[m.Meltano.TapConfig].ok(settings)
 
-    def build_tap_instance(self, tap_instance: m.Meltano.TapInstance) -> t.JsonMapping:
-        """Build tap instance representation."""
+    @staticmethod
+    def build_tap_instance(tap_instance: m.Meltano.TapInstance) -> t.JsonMapping:
+        """Build tap instance representation.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         return {
             c.Meltano.PayloadKey.TAP_ID: tap_instance.tap_id,
             c.Meltano.PayloadKey.TAP_TYPE: tap_instance.tap_type,
         }
 
     def discover_streams(
-        self, tap_instance: m.Meltano.TapInstance
+        self, tap_instance: m.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
-        """Discover available streams via ``meltano select --list``."""
+        """Discover available streams via ``meltano select --list``.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
 
         def _run_discover_streams() -> p.Result[t.JsonMapping]:
             cmd_result = self._run_meltano([
@@ -75,10 +93,10 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             return _run_discover_streams()
         except c.Meltano.OPERATION_ERRORS as exc:
             self.logger.exception(
-                c.Meltano.LOG_MESSAGE_DISCOVER_STREAMS_FAILED, error=str(exc)
+                c.Meltano.LOG_MESSAGE_DISCOVER_STREAMS_FAILED, error=str(exc),
             )
             return e.fail_operation(
-                c.Meltano.OPERATION_DISCOVER_STREAMS, exc, result_type=r[t.JsonMapping]
+                c.Meltano.OPERATION_DISCOVER_STREAMS, exc, result_type=r[t.JsonMapping],
             )
 
     def sync_stream(
@@ -87,7 +105,11 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         stream_name: str,
         target_config: m.Meltano.TargetConfig | None = None,
     ) -> p.Result[t.JsonMapping]:
-        """Sync a single stream via ``meltano elt`` with stream selection."""
+        """Sync a single stream via ``meltano elt`` with stream selection.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
 
         def _run_sync_stream() -> p.Result[t.JsonMapping]:
             loader_name = (
@@ -131,14 +153,18 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 result_type=r[t.JsonMapping],
             )
 
+    @staticmethod
     def create_tap_from_config(
-        self,
         tap_type: str,
         connection_config: t.JsonMapping,
         stream_config: t.JsonMapping | None = None,
         tap_version: str = "1.0.0",
     ) -> p.Result[m.Meltano.TapInstance]:
-        """Create a TapInstance from configuration."""
+        """Create a TapInstance from configuration.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.TapInstance]``.
+        """
         try:
             tap_cfg = m.Meltano.TapConfig(
                 tap_type=tap_type,
@@ -160,9 +186,13 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             )
 
     def generate_catalog(
-        self, tap_instance: m.Meltano.TapInstance
+        self, tap_instance: m.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
-        """Generate Singer catalog by discovering streams from the tap."""
+        """Generate Singer catalog by discovering streams from the tap.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
             return r[t.JsonMapping].from_failure(discovery)
@@ -172,13 +202,13 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             name = str(s.get(c.Meltano.PayloadKey.STREAM_NAME, c.DEFAULT_EMPTY_STRING))
             if name in self._stream_registry:
                 entry_r = self._create_catalog_entry_from_stream(
-                    self._stream_registry[name]
+                    self._stream_registry[name],
                 )
                 if entry_r.success:
                     streams.append(entry_r.value)
         catalog_model = m.Meltano.SingerCatalog(streams=streams)
         catalog_payload = t.json_dict_adapter().validate_python(
-            catalog_model.model_dump(mode="json", by_alias=True)
+            catalog_model.model_dump(mode="json", by_alias=True),
         )
         catalog: t.JsonDict = {
             c.Meltano.PayloadKey.VERSION: c.Meltano.PAYLOAD_SINGER_CATALOG_VERSION,
@@ -187,9 +217,13 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         return r[t.JsonMapping].ok(catalog)
 
     def fetch_stream_by_name(
-        self, tap_instance: m.Meltano.TapInstance, stream_name: str
+        self, tap_instance: m.Meltano.TapInstance, stream_name: str,
     ) -> p.Result[t.JsonMapping]:
-        """Get stream definition by name."""
+        """Get stream definition by name.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         discovery = self.discover_streams(tap_instance)
         if discovery.failure:
             return r[t.JsonMapping].from_failure(discovery)
@@ -201,14 +235,18 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 }
                 return r[t.JsonMapping].ok(result_stream)
         return e.fail_not_found(
-            c.Meltano.PAYLOAD_STREAM_ENTITY, stream_name, result_type=r[t.JsonMapping]
+            c.Meltano.PAYLOAD_STREAM_ENTITY, stream_name, result_type=r[t.JsonMapping],
         )
 
     @staticmethod
     def _extract_raw_streams(raw: t.JsonMapping) -> t.SequenceOf[t.JsonDict]:
-        """Extract stream dicts from a discovery result mapping."""
+        """Extract stream dicts from a discovery result mapping.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonDict]``.
+        """
         return t.json_dict_sequence_adapter().validate_python(
-            raw.get(c.Meltano.PayloadKey.STREAMS, [])
+            raw.get(c.Meltano.PayloadKey.STREAMS, []),
         )
 
 

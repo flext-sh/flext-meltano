@@ -19,9 +19,13 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_component_rules(
-        cls, settings: t.ConfigurationMapping
+        cls, settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
-        """Validate pipeline component business rules with model validation."""
+        """Validate pipeline component business rules with model validation.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             m.Meltano.PluginComponentConfig.model_validate(settings)
             return r[bool].ok(value=True)
@@ -30,9 +34,13 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_pipeline_project_business_rules(
-        cls, settings: t.ConfigurationMapping
+        cls, settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
-        """Validate pipeline project business rules."""
+        """Validate pipeline project business rules.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             m.Meltano.PipelineProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
@@ -41,7 +49,11 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_pipeline_project_structure(cls, project_path: Path) -> p.Result[bool]:
-        """Validate pipeline project structure with domain-specific business rules."""
+        """Validate pipeline project structure with domain-specific business rules.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         if not project_path.exists() or not project_path.is_dir():
             error_msg = (
                 f"Project path {project_path} does not exist or is not a directory"
@@ -67,14 +79,22 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_plugin_config(cls, settings: t.ConfigurationMapping) -> p.Result[bool]:
-        """Validate plugin configuration with complete business rules."""
+        """Validate plugin configuration with complete business rules.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return cls.validate_component_rules(settings)
 
     @classmethod
     def validate_transformation_business_rules(
-        cls, settings: t.ConfigurationMapping
+        cls, settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
-        """Validate transformation-specific business rules."""
+        """Validate transformation-specific business rules.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             m.Meltano.TransformationProjectModel.model_validate(settings)
             return r[bool].ok(value=True)
@@ -83,7 +103,11 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute validators service — returns current settings."""
+        """Execute validators service — returns current settings.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 

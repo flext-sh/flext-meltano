@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Singer protocol message models."""
+"""FLEXT Meltano models - Singer protocol message models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -35,7 +39,7 @@ class FlextMeltanoModelsSinger:
             ),
         ]
         key_properties: Annotated[
-            t.StrTuple, m.Field(description="Singer stream key properties")
+            t.StrTuple, m.Field(description="Singer stream key properties"),
         ] = m.Field(default_factory=tuple, description="Singer stream key properties")
         bookmark_properties: Annotated[
             t.StrTuple,
@@ -64,7 +68,7 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.RECORD
         stream: Annotated[str, m.Field(description="Singer stream name")]
         record: Annotated[
-            t.FlatContainerMapping, m.Field(description="Singer record payload")
+            t.FlatContainerMapping, m.Field(description="Singer record payload"),
         ]
         time_extracted: Annotated[
             str | None,
@@ -113,7 +117,7 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.ACTIVATE_VERSION
         stream: Annotated[str, m.Field(description="Singer stream name")]
         version: Annotated[
-            t.PositiveInt, m.Field(description="Stream version to activate")
+            t.PositiveInt, m.Field(description="Stream version to activate"),
         ]
 
     class SingerStateEntry(m.Entity):
@@ -129,12 +133,20 @@ class FlextMeltanoModelsSinger:
             m.Field(default=None, description="Bookmark field for incremental"),
         ] = None
         bookmark_value: Annotated[
-            str | None, m.Field(default=None, description="Current bookmark value")
+            str | None, m.Field(default=None, description="Current bookmark value"),
         ] = None
 
         @u.model_validator(mode="after")
         def validate_bookmark(self) -> Self:
-            """Ensure bookmark_key and bookmark_value are both set or both None."""
+            """Ensure bookmark_key and bookmark_value are both set or both None.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If bookmark_key and bookmark_value must both be set or both
+                    be None.
+            """
             if (self.bookmark_key is None) != (self.bookmark_value is None):
                 msg = "bookmark_key and bookmark_value must both be set or both be None"
                 raise ValueError(msg)
@@ -145,13 +157,13 @@ class FlextMeltanoModelsSinger:
 
         name: Annotated[str, m.Field(description="Stream name")]
         json_schema: Annotated[
-            t.FlatContainerMapping, m.Field(description="JSON schema for the stream")
+            t.FlatContainerMapping, m.Field(description="JSON schema for the stream"),
         ]
         primary_keys: Annotated[
-            t.StrTuple, m.Field(description="Primary key properties")
+            t.StrTuple, m.Field(description="Primary key properties"),
         ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_key: Annotated[
-            str | None, m.Field(default=None, description="Incremental replication key")
+            str | None, m.Field(default=None, description="Incremental replication key"),
         ] = None
 
     class TapSpec(m.Entity):
@@ -159,7 +171,7 @@ class FlextMeltanoModelsSinger:
 
         tap_name: Annotated[str, m.Field(description="Tap name")]
         config_jsonschema: Annotated[
-            t.FlatContainerMapping, m.Field(description="Tap config JSON schema")
+            t.FlatContainerMapping, m.Field(description="Tap config JSON schema"),
         ]
         streams: Annotated[
             tuple[FlextMeltanoModelsSinger.StreamSpec, ...],
@@ -171,7 +183,7 @@ class FlextMeltanoModelsSinger:
 
         stream_name: Annotated[str, m.Field(description="Stream name to fetch")]
         config: Annotated[
-            t.JsonMapping, m.Field(description="Runtime tap configuration")
+            t.JsonMapping, m.Field(description="Runtime tap configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Runtime tap configuration",
@@ -180,12 +192,16 @@ class FlextMeltanoModelsSinger:
         @m.field_validator("config", mode="after")
         @classmethod
         def freeze_config(cls, value: t.JsonMapping) -> t.JsonMapping:
-            """Expose runtime tap configuration as read-only."""
+            """Expose runtime tap configuration as read-only.
+
+            Returns:
+                The resulting ``t.JsonMapping``.
+            """
             return MappingProxyType(dict(value))
 
     class FetchResult(m.Entity):
         """Record fetch result returned by a declarative tap fetcher."""
 
         records: Annotated[
-            t.VariadicTuple[t.JsonMapping], m.Field(description="Fetched records")
+            t.VariadicTuple[t.JsonMapping], m.Field(description="Fetched records"),
         ] = m.Field(default_factory=tuple, description="Fetched records")

@@ -1,4 +1,8 @@
-"""FLEXT Meltano base constants — project metadata, paths, network, plugins."""
+"""FLEXT Meltano base constants — project metadata, paths, network, plugins.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -6,7 +10,7 @@ from typing import ClassVar
 
 from flext_cli import c
 
-from .enums import FlextMeltanoConstantsEnums
+from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsBase:

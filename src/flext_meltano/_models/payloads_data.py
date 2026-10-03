@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Data normalization payload models."""
+"""FLEXT Meltano models - Data normalization payload models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -34,9 +38,13 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("schema_definition", mode="before")
         @classmethod
         def normalize_schema(
-            cls, value: t.Meltano.ValidatorInput
+            cls, value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
-            """Normalize mapping input before JSON validation."""
+            """Normalize mapping input before JSON validation.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             match value:
                 case Mapping():
                     return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
@@ -47,7 +55,11 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("schema_definition", mode="after")
         @classmethod
         def freeze_schema(cls, value: t.FlatContainerMapping) -> t.FlatContainerMapping:
-            """Expose the normalized schema as a read-only mapping."""
+            """Expose the normalized schema as a read-only mapping.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             return MappingProxyType(dict(value))
 
     class JsonRecordBatchPayload(m.ArbitraryTypesModel):
@@ -61,9 +73,13 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("records", mode="before")
         @classmethod
         def normalize_records(
-            cls, value: t.Meltano.ValidatorInput
+            cls, value: t.Meltano.ValidatorInput,
         ) -> t.VariadicTuple[t.FlatContainerMapping]:
-            """Normalize mixed record input into JSON-safe record tuples."""
+            """Normalize mixed record input into JSON-safe record tuples.
+
+            Returns:
+                The resulting ``t.VariadicTuple[t.FlatContainerMapping]``.
+            """
             if isinstance(value, (list, tuple)):
                 return tuple(
                     t.Cli.JSON_MAPPING_ADAPTER.validate_python(record)
@@ -83,7 +99,11 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("values", mode="before")
         @classmethod
         def normalize_values(cls, value: t.Meltano.ValidatorInput) -> t.JsonMapping:
-            """Normalize mapping-like payloads to a JSON-safe mapping."""
+            """Normalize mapping-like payloads to a JSON-safe mapping.
+
+            Returns:
+                The resulting ``t.JsonMapping``.
+            """
             if isinstance(value, Mapping):
                 return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
             return {}
@@ -91,20 +111,28 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("values", mode="after")
         @classmethod
         def freeze_values(cls, value: t.JsonMapping) -> t.JsonMapping:
-            """Expose normalized mapping values as read-only."""
+            """Expose normalized mapping values as read-only.
+
+            Returns:
+                The resulting ``t.JsonMapping``.
+            """
             return MappingProxyType(dict(value))
 
     class PathPayload(m.ArbitraryTypesModel):
         """Path normalization payload for runtime path conversions."""
 
         value: Annotated[Path, m.Field(description="Normalized path")] = m.Field(
-            default_factory=Path, description="Normalized path"
+            default_factory=Path, description="Normalized path",
         )
 
         @m.field_validator("value", mode="before")
         @classmethod
         def normalize_path(cls, value: t.Meltano.ValidatorInput) -> Path:
-            """Normalize mixed path input into Path objects."""
+            """Normalize mixed path input into Path objects.
+
+            Returns:
+                The resulting ``Path``.
+            """
             if value is None:
                 return Path()
             return Path(str(value))
@@ -113,13 +141,17 @@ class FlextMeltanoModelsPayloadsData:
         """Normalize str|dict content to writable string for file operations."""
 
         content: Annotated[
-            str, m.Field(default="", description="Normalized writable string content")
+            str, m.Field(default="", description="Normalized writable string content"),
         ] = ""
 
         @m.field_validator("content", mode="before")
         @classmethod
         def normalize_content(cls, value: t.Meltano.ValidatorInput) -> str:
-            """Normalize dict content via yaml_dump_str, pass str through."""
+            """Normalize dict content via yaml_dump_str, pass str through.
+
+            Returns:
+                The resulting ``str``.
+            """
             match value:
                 case Mapping():
                     return u.Cli.yaml_dump_str(dict(value))
@@ -132,15 +164,19 @@ class FlextMeltanoModelsPayloadsData:
         """Normalize plugin variant from external extraction (str|list|dict)."""
 
         value: t.Meltano.VariantValue = m.Field(
-            default=None, description="Normalized variant value"
+            default=None, description="Normalized variant value",
         )
 
         @m.field_validator("value", mode="before")
         @classmethod
         def normalize_variant(
-            cls, value: str | t.Meltano.ValidatorInput
+            cls, value: str | t.Meltano.ValidatorInput,
         ) -> str | t.StrSequence | t.ScalarMapping | None:
-            """Normalize variant_raw into typed union."""
+            """Normalize variant_raw into typed union.
+
+            Returns:
+                The resulting ``str | t.StrSequence | t.ScalarMapping | None``.
+            """
             match value:
                 case None:
                     return None

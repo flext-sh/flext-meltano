@@ -23,14 +23,16 @@ from tests import m, t
 class TestsFlextMeltanoTypingsUnit:
     """Behavioral contract for the flat ``t.Meltano`` namespace and models."""
 
+    @staticmethod
     @pytest.mark.parametrize("dbt_type_name", ["DbtProject", "DbtManifestData"])
     def test_dbt_types_are_flat_members_of_meltano_namespace(
-        self, dbt_type_name: str
+        dbt_type_name: str,
     ) -> None:
         """DBT types are exposed flat (``Dbt`` prefix) directly on ``t.Meltano``."""
         assert hasattr(t.Meltano, dbt_type_name)
         tm.that(getattr(t.Meltano, dbt_type_name), none=False)
 
+    @staticmethod
     @pytest.mark.parametrize(
         "composition_type_name",
         [
@@ -42,12 +44,13 @@ class TestsFlextMeltanoTypingsUnit:
         ],
     )
     def test_composition_types_are_exposed_on_meltano_namespace(
-        self, composition_type_name: str
+        composition_type_name: str,
     ) -> None:
         """Composed types that add value over base ``t.*`` are exposed on ``t.Meltano``."""
         assert hasattr(t.Meltano, composition_type_name)
 
-    def test_composition_types_are_distinct_symbols(self) -> None:
+    @staticmethod
+    def test_composition_types_are_distinct_symbols() -> None:
         """Each composed type is a distinct object, not a shared re-alias."""
         composed = {
             t.Meltano.NestedStrMapping,
@@ -58,14 +61,16 @@ class TestsFlextMeltanoTypingsUnit:
         }
         tm.that(len(composed), eq=5)
 
+    @staticmethod
     @pytest.mark.parametrize(
         "legacy_namespace",
         ["Singer", "Dbt", "Project", "Pipeline", "Bridge", "CLI", "ELT", "Processing"],
     )
-    def test_legacy_nested_namespaces_are_absent(self, legacy_namespace: str) -> None:
+    def test_legacy_nested_namespaces_are_absent(legacy_namespace: str) -> None:
         """Flat namespace refuses the old nested sub-namespaces."""
         assert not hasattr(t.Meltano, legacy_namespace)
 
+    @staticmethod
     @pytest.mark.parametrize(
         "removed_alias",
         [
@@ -86,24 +91,27 @@ class TestsFlextMeltanoTypingsUnit:
             "PluginCatalog",
         ],
     )
-    def test_duplicate_aliases_are_absent(self, removed_alias: str) -> None:
+    def test_duplicate_aliases_are_absent(removed_alias: str) -> None:
         """Simple aliases duplicating existing ``t.*`` types are not on ``t.Meltano``."""
         assert not hasattr(t.Meltano, removed_alias)
 
-    def test_jsonmapping_remains_a_top_level_type_alias(self) -> None:
+    @staticmethod
+    def test_jsonmapping_remains_a_top_level_type_alias() -> None:
         """``JsonMapping`` stays available at the top ``t.*`` level (not on ``t.Meltano``)."""
         assert hasattr(t, "JsonMapping")
         assert not hasattr(t.Meltano, "JsonMapping")
 
+    @staticmethod
     @pytest.mark.parametrize("wrapper_name", ["SingerProperty", "SingerStringType"])
     def test_runtime_singer_sdk_wrappers_live_on_models_not_typings(
-        self, wrapper_name: str
+        wrapper_name: str,
     ) -> None:
         """Runtime Singer SDK wrappers are exposed via ``m.Meltano``, never ``t.Meltano``."""
         tm.that(getattr(m.Meltano, wrapper_name), none=False)
         assert not hasattr(t.Meltano, wrapper_name)
 
-    def test_singer_catalog_entry_is_exposed_as_domain_model(self) -> None:
+    @staticmethod
+    def test_singer_catalog_entry_is_exposed_as_domain_model() -> None:
         """The Singer catalog entry is exposed as a real model on ``m.Meltano``."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "users",
@@ -114,7 +122,8 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(m.Meltano.SingerCatalogEntry, is_=type)
         tm.that(entry.model_dump(), has="tap_stream_id")
 
-    def test_singer_catalog_entry_constructs_and_exposes_public_state(self) -> None:
+    @staticmethod
+    def test_singer_catalog_entry_constructs_and_exposes_public_state() -> None:
         """A valid Singer catalog entry constructs and exposes its fields publicly."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "users",
@@ -125,7 +134,8 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(entry.tap_stream_id, eq="users")
         tm.that(entry.stream, eq="users")
 
-    def test_singer_catalog_entry_model_dump_round_trips(self) -> None:
+    @staticmethod
+    def test_singer_catalog_entry_model_dump_round_trips() -> None:
         """``model_dump`` output re-validates to an equal public state (idempotence)."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": "orders",
@@ -139,7 +149,8 @@ class TestsFlextMeltanoTypingsUnit:
         tm.that(restored.model_dump(by_alias=True), eq=dumped)
         tm.that(restored.tap_stream_id, eq=entry.tap_stream_id)
 
-    def test_singer_catalog_entry_rejects_missing_required_fields(self) -> None:
+    @staticmethod
+    def test_singer_catalog_entry_rejects_missing_required_fields() -> None:
         """Constructing without required fields raises a validation error (error path)."""
         with pytest.raises(m.ValidationError):
             m.Meltano.SingerCatalogEntry.model_validate({})

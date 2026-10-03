@@ -27,23 +27,27 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     """
 
     _singer_state: m.Meltano.SingerStateMessage = u.PrivateAttr(
-        default_factory=m.Meltano.SingerStateMessage
+        default_factory=m.Meltano.SingerStateMessage,
     )
 
     def fetch_bookmark(self, stream_name: str, bookmark_key: str) -> p.Result[str]:
-        """Get current bookmark value for a stream."""
+        """Get current bookmark value for a stream.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         try:
             stream_state = self._singer_state.value.get(stream_name)
             if stream_state is None:
                 return e.fail_not_found("Stream state", stream_name, result_type=r[str])
             if not isinstance(stream_state, dict):
                 return e.fail_validation(
-                    f"Stream state for {stream_name} is not a dict", result_type=r[str]
+                    f"Stream state for {stream_name} is not a dict", result_type=r[str],
                 )
             value = stream_state.get(bookmark_key)
             if value is None:
                 return e.fail_not_found(
-                    "Bookmark", f"{stream_name}.{bookmark_key}", result_type=r[str]
+                    "Bookmark", f"{stream_name}.{bookmark_key}", result_type=r[str],
                 )
             return r[str].ok(str(value))
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
@@ -51,13 +55,17 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             return e.fail_operation("get bookmark", exc, result_type=r[str])
 
     def load_state(
-        self, state_file: Path | None = None
+        self, state_file: Path | None = None,
     ) -> p.Result[m.Meltano.SingerStateMessage]:
-        """Load state from file or return in-memory state."""
+        """Load state from file or return in-memory state.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.SingerStateMessage]``.
+        """
         try:
             if state_file and state_file.exists():
                 load_result = u.Cli.files_read_json_model(
-                    state_file, m.Meltano.SingerStateMessage
+                    state_file, m.Meltano.SingerStateMessage,
                 )
                 if load_result.failure:
                     return r[m.Meltano.SingerStateMessage].from_failure(load_result)
@@ -71,15 +79,19 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to load state", error=str(exc))
             return e.fail_operation(
-                "load state", exc, result_type=r[m.Meltano.SingerStateMessage]
+                "load state", exc, result_type=r[m.Meltano.SingerStateMessage],
             )
 
     def save_state(self, state_file: Path) -> p.Result[bool]:
-        """Save state to file."""
+        """Save state to file.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
             write_result = cli.atomic_write_text_file(
-                state_file, self._singer_state.model_dump_json(indent=2)
+                state_file, self._singer_state.model_dump_json(indent=2),
             )
             if write_result.failure:
                 return r[bool].from_failure(write_result)
@@ -94,9 +106,13 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
         return self._singer_state
 
     def update_bookmark(
-        self, stream_name: str, bookmark_key: str, bookmark_value: str
+        self, stream_name: str, bookmark_key: str, bookmark_value: str,
     ) -> p.Result[bool]:
-        """Update bookmark for a stream."""
+        """Update bookmark for a stream.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
 
         def _run_update_bookmark() -> p.Result[bool]:
             self._singer_state.value.setdefault(stream_name, {})

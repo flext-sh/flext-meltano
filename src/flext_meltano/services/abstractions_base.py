@@ -11,9 +11,8 @@ from pathlib import Path
 from typing import ClassVar, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano._settings import FlextMeltanoSettings
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
-
-from .._settings import FlextMeltanoSettings
 
 
 class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
@@ -34,11 +33,18 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         happens here instead of at module scope (NS-CONTRACT-001).
         ``fetch_global`` is a lazy thread-safe singleton, so every access
         yields the same instance without extra work.
+
+        Returns:
+            The resulting ``FlextMeltanoSettings``.
         """
         return FlextMeltanoSettings.fetch_global()
 
     def _run_meltano(self, args: t.StrSequence) -> p.Result[str]:
-        """Run a Meltano runtime command and return stdout on success."""
+        """Run a Meltano runtime command and return stdout on success.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         cwd = Path(self._settings().Meltano.project_root)
         run_result: p.Result[m.Meltano.CommandExecutionResult] = (
             FlextMeltanoExecutorBase().execute_meltano_command(list(args), _cwd=cwd)
@@ -50,12 +56,16 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         if completed.exit_code != 0:
             stderr_out = completed.error.strip() or completed.output.strip()
             return r[str].fail(
-                stderr_out or f"meltano exited with code {completed.exit_code}"
+                stderr_out or f"meltano exited with code {completed.exit_code}",
             )
         return r[str].ok(completed.output.strip())
 
     def add_plugin_by_config(self, plugin_config: t.JsonMapping) -> p.Result[bool]:
-        """Add a plugin to the Meltano project via ``meltano add``."""
+        """Add a plugin to the Meltano project via ``meltano add``.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             plugin_type = str(plugin_config.get("plugin_type", ""))
             plugin_name = str(plugin_config.get("plugin_name", ""))
@@ -77,7 +87,11 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
     def _resolve_project_root(
         project: t.JsonPayload | t.JsonMapping | None,
     ) -> Path | None:
-        """Extract a project root path from supported project-like objects."""
+        """Extract a project root path from supported project-like objects.
+
+        Returns:
+            The resulting ``Path | None``.
+        """
         if isinstance(project, Mapping):
             project_mapping = t.Cli.JSON_MAPPING_ADAPTER.validate_python(project)
             for key in ("root_dir", "root"):
@@ -87,13 +101,17 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         return None
 
     def fetch_plugins_of_type(
-        self, _project: t.JsonPayload | t.JsonMapping | None, plugin_type: str
+        self, _project: t.JsonPayload | t.JsonMapping | None, plugin_type: str,
     ) -> p.Result[t.Meltano.NestedStrMapping]:
-        """List installed project plugins of *plugin_type* via Meltano runtime."""
+        """List installed project plugins of *plugin_type* via Meltano runtime.
+
+        Returns:
+            The resulting ``p.Result[t.Meltano.NestedStrMapping]``.
+        """
         try:
             cwd = self._resolve_project_root(_project)
             plugins_result = FlextMeltanoExecutorBase().fetch_project_plugins(
-                plugin_type=u.Meltano.normalize_plugin_group(plugin_type), _cwd=cwd
+                plugin_type=u.Meltano.normalize_plugin_group(plugin_type), _cwd=cwd,
             )
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
@@ -118,7 +136,11 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         extractor_plugin: t.JsonMapping | None,
         loader_plugin: t.JsonMapping | None,
     ) -> p.Result[t.HeaderMapping]:
-        """Execute a Singer ELT pipeline via ``meltano elt``."""
+        """Execute a Singer ELT pipeline via ``meltano elt``.
+
+        Returns:
+            The resulting ``p.Result[t.HeaderMapping]``.
+        """
 
         def _run_execute_singer_pipeline() -> p.Result[t.HeaderMapping]:
             extractor_mapping = extractor_plugin
@@ -126,12 +148,12 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             extractor_name = str(
                 elt_context.get("extractor_name", c.IDENTIFIER_UNKNOWN)
                 if extractor_mapping is None
-                else extractor_mapping.get("name") or c.IDENTIFIER_UNKNOWN
+                else extractor_mapping.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             loader_name = str(
                 elt_context.get("loader_name", c.IDENTIFIER_UNKNOWN)
                 if loader_mapping is None
-                else loader_mapping.get("name") or c.IDENTIFIER_UNKNOWN
+                else loader_mapping.get("name") or c.IDENTIFIER_UNKNOWN,
             )
             cmd_result = self._run_meltano([
                 c.Meltano.CMD_ELT,
@@ -154,12 +176,17 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             error_msg = f"Failed to execute singer pipeline: {e}"
             return r[t.HeaderMapping].fail(error_msg)
 
-    def find_project(self, project_root: Path) -> p.Result[Path]:
-        """Find and validate a Meltano project directory."""
+    @staticmethod
+    def find_project(project_root: Path) -> p.Result[Path]:
+        """Find and validate a Meltano project directory.
+
+        Returns:
+            The resulting ``p.Result[Path]``.
+        """
         try:
             if not project_root.exists() or not project_root.is_dir():
                 return r[Path].fail(
-                    f"Project path is not a valid directory: {project_root}"
+                    f"Project path is not a valid directory: {project_root}",
                 )
             return r[Path].ok(project_root)
         except c.Meltano.OPERATION_ERRORS as e:
@@ -167,7 +194,11 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
             return r[Path].fail(error_msg)
 
     def fetch_project_root(self) -> p.Result[Path]:
-        """Get the root directory from settings."""
+        """Get the root directory from settings.
+
+        Returns:
+            The resulting ``p.Result[Path]``.
+        """
         project_root = self._settings().Meltano.project_root
         if not project_root:
             return r[Path].fail("No project root configured in settings")
@@ -178,7 +209,11 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute abstractions service and return real configuration state."""
+        """Execute abstractions service and return real configuration state.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         meltano_settings = self._settings().Meltano
         payload: t.JsonMapping = {
             "status": c.Meltano.StreamStatus.COMPLETED,
@@ -188,10 +223,15 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         }
         return r[t.JsonMapping].ok(payload)
 
+    @staticmethod
     def _create_catalog_entry_from_stream(
-        self, stream: m.Meltano.StreamDefinition
+        stream: m.Meltano.StreamDefinition,
     ) -> p.Result[m.Meltano.SingerCatalogEntry]:
-        """Create Singer catalog entry from stream definition."""
+        """Create Singer catalog entry from stream definition.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.SingerCatalogEntry]``.
+        """
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "tap_stream_id": stream.stream_name,
             "stream": stream.stream_name,
@@ -200,21 +240,35 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         })
         return r[m.Meltano.SingerCatalogEntry].ok(entry)
 
+    @staticmethod
     def fetch_stream_config(
-        self, settings: m.Meltano.TapConfig, stream_name: str
+        settings: m.Meltano.TapConfig, stream_name: str,
     ) -> t.JsonMapping:
-        """Get configuration for a specific stream."""
+        """Get configuration for a specific stream.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         if settings.stream_config and stream_name in settings.stream_config:
             val = settings.stream_config[stream_name]
             if isinstance(val, Mapping):
                 return t.Cli.JSON_MAPPING_ADAPTER.validate_python(val)
         return {}
 
-    def fetch_tap_type(self, tap_instance: m.Meltano.TapInstance) -> str:
-        """Get tap type from instance."""
+    @staticmethod
+    def fetch_tap_type(tap_instance: m.Meltano.TapInstance) -> str:
+        """Get tap type from instance.
+
+        Returns:
+            The resulting ``str``.
+        """
         tap_type: str = tap_instance.tap_type
         return tap_type
 
     def fetch_registered_streams(self) -> t.StrSequence:
-        """Get list of registered stream names."""
+        """Get list of registered stream names.
+
+        Returns:
+            The resulting ``t.StrSequence``.
+        """
         return [*self._stream_registry.keys()]

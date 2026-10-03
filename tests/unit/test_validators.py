@@ -30,7 +30,9 @@ class TestsFlextMeltanoValidators:
     # Plugin configuration
     # ------------------------------------------------------------------
 
-    def test_valid_plugin_config_succeeds_with_true_value(self) -> None:
+    @staticmethod
+    def test_valid_plugin_config_succeeds_with_true_value() -> None:
+        """Test valid plugin config succeeds with true value."""
         settings: t.ScalarMapping = {
             "name": "tap-csv",
             "namespace": "tap_csv",
@@ -42,12 +44,15 @@ class TestsFlextMeltanoValidators:
         tm.that(result.value, eq=True)
         tm.that(result.unwrap(), eq=True)
 
-    def test_plugin_config_missing_required_fields_fails(self) -> None:
+    @staticmethod
+    def test_plugin_config_missing_required_fields_fails() -> None:
+        """Test plugin config missing required fields fails."""
         settings: t.ScalarMapping = {"name": "tap-csv"}
         result = meltano.validate_plugin_config(settings)
         tm.fail(result)
         tm.that(result.error, has="Plugin settings validation failed")
 
+    @staticmethod
     @pytest.mark.parametrize(
         ("name", "expected_fragment"),
         [
@@ -58,8 +63,9 @@ class TestsFlextMeltanoValidators:
         ],
     )
     def test_plugin_name_business_rules_reject_invalid_names(
-        self, name: str, expected_fragment: str
+        name: str, expected_fragment: str,
     ) -> None:
+        """Test plugin name business rules reject invalid names."""
         settings: t.ScalarMapping = {
             "name": name,
             "namespace": "test_ns",
@@ -71,8 +77,10 @@ class TestsFlextMeltanoValidators:
         tm.that(result.error, none=False)
         tm.that(result.error, has=expected_fragment)
 
+    @staticmethod
     @pytest.mark.parametrize("name", ["tap-csv", "target-postgres"])
-    def test_plugin_name_business_rules_accept_valid_names(self, name: str) -> None:
+    def test_plugin_name_business_rules_accept_valid_names(name: str) -> None:
+        """Test plugin name business rules accept valid names."""
         settings: t.ScalarMapping = {
             "name": name,
             "namespace": "test_ns",
@@ -83,6 +91,7 @@ class TestsFlextMeltanoValidators:
         tm.ok(result)
         tm.that(result.value, eq=True)
 
+    @staticmethod
     @pytest.mark.parametrize(
         "invalid_config",
         [
@@ -93,13 +102,16 @@ class TestsFlextMeltanoValidators:
         ],
     )
     def test_plugin_config_rejects_mappings_missing_required_fields(
-        self, invalid_config: t.ScalarMapping
+        invalid_config: t.ScalarMapping,
     ) -> None:
+        """Test plugin config rejects mappings missing required fields."""
         result = meltano.validate_plugin_config(invalid_config)
         tm.fail(result)
         tm.that(result.error, has="Plugin settings validation failed")
 
-    def test_plugin_config_failure_preserves_error_through_map(self) -> None:
+    @staticmethod
+    def test_plugin_config_failure_preserves_error_through_map() -> None:
+        """Test plugin config failure preserves error through map."""
         settings: t.ScalarMapping = {"name": "tap-csv"}
         result = meltano.validate_plugin_config(settings)
         mapped = result.map(lambda value: value)
@@ -110,25 +122,33 @@ class TestsFlextMeltanoValidators:
     # Pipeline project rules
     # ------------------------------------------------------------------
 
-    def test_valid_pipeline_project_succeeds(self) -> None:
+    @staticmethod
+    def test_valid_pipeline_project_succeeds() -> None:
+        """Test valid pipeline project succeeds."""
         settings: t.ScalarMapping = {"schema_version": 1, "project_id": "test-project"}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
         tm.that(result.value, eq=True)
 
-    def test_pipeline_project_defaults_schema_version_when_omitted(self) -> None:
+    @staticmethod
+    def test_pipeline_project_defaults_schema_version_when_omitted() -> None:
+        """Test pipeline project defaults schema version when omitted."""
         settings: t.ScalarMapping = {"project_id": "test-project"}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.ok(result)
         tm.that(result.value, eq=True)
 
-    def test_pipeline_project_missing_project_id_fails(self) -> None:
+    @staticmethod
+    def test_pipeline_project_missing_project_id_fails() -> None:
+        """Test pipeline project missing project id fails."""
         settings: t.ScalarMapping = {"schema_version": 1}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.fail(result)
         tm.that(result.error, has="Project validation failed")
 
-    def test_pipeline_project_unsupported_schema_version_fails(self) -> None:
+    @staticmethod
+    def test_pipeline_project_unsupported_schema_version_fails() -> None:
+        """Test pipeline project unsupported schema version fails."""
         settings: t.ScalarMapping = {"schema_version": 2, "project_id": "test-project"}
         result = meltano.validate_pipeline_project_business_rules(settings)
         tm.fail(result)
@@ -138,7 +158,9 @@ class TestsFlextMeltanoValidators:
     # Transformation project rules
     # ------------------------------------------------------------------
 
-    def test_valid_transformation_config_succeeds(self) -> None:
+    @staticmethod
+    def test_valid_transformation_config_succeeds() -> None:
+        """Test valid transformation config succeeds."""
         dbt_config: t.ScalarMapping = {
             "name": "analytics",
             "transformation_version": "1.0.0",
@@ -148,7 +170,9 @@ class TestsFlextMeltanoValidators:
         tm.ok(result)
         tm.that(result.value, eq=True)
 
-    def test_transformation_config_missing_required_fails(self) -> None:
+    @staticmethod
+    def test_transformation_config_missing_required_fails() -> None:
+        """Test transformation config missing required fails."""
         dbt_config: t.ScalarMapping = {"name": "analytics"}
         result = meltano.validate_transformation_business_rules(dbt_config)
         tm.fail(result)
@@ -158,7 +182,9 @@ class TestsFlextMeltanoValidators:
     # Invariants
     # ------------------------------------------------------------------
 
-    def test_validation_is_idempotent_for_same_input(self) -> None:
+    @staticmethod
+    def test_validation_is_idempotent_for_same_input() -> None:
+        """Test validation is idempotent for same input."""
         settings: t.ScalarMapping = {
             "name": "tap-csv",
             "namespace": "tap_csv",
@@ -170,7 +196,9 @@ class TestsFlextMeltanoValidators:
         tm.that(first.success, eq=second.success)
         tm.that(first.value, eq=second.value)
 
-    def test_independent_validators_agree_on_full_pipeline(self) -> None:
+    @staticmethod
+    def test_independent_validators_agree_on_full_pipeline() -> None:
+        """Test independent validators agree on full pipeline."""
         meltano_config: t.ScalarMapping = {
             "schema_version": 1,
             "project_id": "integration-test",

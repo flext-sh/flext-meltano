@@ -32,34 +32,42 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
     _sdk_project: Project | None = u.PrivateAttr(default_factory=lambda: None)
 
     def fetch_sdk_plugins(
-        self, plugin_type: str | None = None
+        self, plugin_type: str | None = None,
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-        """Get plugins from the SDK project, optionally filtered by type."""
+        """Get plugins from the SDK project, optionally filtered by type.
+
+        Returns:
+            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+        """
         try:
             if not self._sdk_project:
                 return r[t.SequenceOf[t.JsonMapping]].fail("No project loaded")
             plugins = self._extract_sdk_plugins(plugin_type)
             self.logger.info(
-                "Plugins retrieved", count=u.count(plugins), type=plugin_type or ""
+                "Plugins retrieved", count=u.count(plugins), type=plugin_type or "",
             )
             return r[t.SequenceOf[t.JsonMapping]].ok(plugins)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to get plugins", error=str(e))
             return r[t.SequenceOf[t.JsonMapping]].fail(
-                f"Failed to get plugins: {e}", exception=e
+                f"Failed to get plugins: {e}", exception=e,
             )
 
     def initialize_sdk_project(
-        self, root: Path
+        self, root: Path,
     ) -> p.Result[t.Meltano.OptionalScalarMap]:
-        """Initialize a new Meltano project via SDK."""
+        """Initialize a new Meltano project via SDK.
+
+        Returns:
+            The resulting ``p.Result[t.Meltano.OptionalScalarMap]``.
+        """
 
         def _run_initialize_sdk_project() -> p.Result[t.Meltano.OptionalScalarMap]:
             try:
                 root.mkdir(parents=True, exist_ok=True)
             except OSError as e:
                 return r[t.Meltano.OptionalScalarMap].fail(
-                    f"Failed to prepare project directory: {e}", exception=e
+                    f"Failed to prepare project directory: {e}", exception=e,
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
@@ -75,15 +83,19 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to initialize project")
             return r[t.Meltano.OptionalScalarMap].fail(
-                f"Failed to initialize project: {e}", exception=e
+                f"Failed to initialize project: {e}", exception=e,
             )
 
     def load_sdk_project(self, root: Path) -> p.Result[t.Meltano.OptionalScalarMap]:
-        """Load an existing Meltano project via SDK."""
+        """Load an existing Meltano project via SDK.
+
+        Returns:
+            The resulting ``p.Result[t.Meltano.OptionalScalarMap]``.
+        """
         try:
             if not root.exists():
                 return r[t.Meltano.OptionalScalarMap].fail(
-                    f"Project directory not found: {root}"
+                    f"Project directory not found: {root}",
                 )
             self._sdk_project = Project(root)
             self._sdk_project_root = root
@@ -96,13 +108,17 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load project", error=str(e))
             return r[t.Meltano.OptionalScalarMap].fail(
-                f"Failed to load project: {e}", exception=e
+                f"Failed to load project: {e}", exception=e,
             )
 
     def _extract_sdk_plugins(
-        self, plugin_type: str | None
+        self, plugin_type: str | None,
     ) -> t.SequenceOf[t.JsonMapping]:
-        """Extract plugins from SDK project, optionally filtered by type."""
+        """Extract plugins from SDK project, optionally filtered by type.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         plugins: t.MutableSequenceOf[t.JsonMapping] = []
         if self._sdk_project is None:
             return plugins
@@ -112,16 +128,20 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             return plugins
         try:
             plugins.extend(
-                self._sdk_plugin_definitions(sdk_plugins_service, plugin_type)
+                self._sdk_plugin_definitions(sdk_plugins_service, plugin_type),
             )
         except c.EXC_ATTR_TYPE as e:
             self.logger.warning("Failed to extract plugins", error=str(e))
         return plugins
 
     def _sdk_plugin_definitions(
-        self, sdk_plugins_service: ProjectPluginsService, plugin_type: str | None
+        self, sdk_plugins_service: ProjectPluginsService, plugin_type: str | None,
     ) -> t.SequenceOf[t.JsonMapping]:
-        """Plugin definitions returned by the Meltano SDK service."""
+        """Plugin definitions returned by the Meltano SDK service.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         plugins: t.MutableSequenceOf[t.JsonMapping] = []
         for plugin in sdk_plugins_service.plugins():
             try:
@@ -141,7 +161,7 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
             except AttributeError:
                 variant_raw = None
             variant_payload = m.Meltano.VariantPayload.model_validate({
-                "value": variant_raw
+                "value": variant_raw,
             })
             json_variant = (
                 t.Cli.JSON_VALUE_ADAPTER.validate_python(variant_payload.value)

@@ -9,9 +9,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import ClassVar
 
-from flext_cli import m, t
+from flext_cli import t
 
 from flext_meltano import c
 

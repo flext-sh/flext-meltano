@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Project configuration models."""
+"""FLEXT Meltano models - Project configuration models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -21,10 +25,10 @@ class FlextMeltanoModelsProjects:
         name: Annotated[str | None, m.Field(default=None, description="Node name")]
         path: Annotated[str | None, m.Field(default=None, description="Node path")]
         description: Annotated[
-            str | None, m.Field(default=None, description="Node description")
+            str | None, m.Field(default=None, description="Node description"),
         ] = None
         fqn: t.StrTuple = m.Field(
-            default_factory=tuple, description="Fully qualified name parts"
+            default_factory=tuple, description="Fully qualified name parts",
         )
         resource_type: Annotated[
             str,
@@ -33,7 +37,11 @@ class FlextMeltanoModelsProjects:
 
         @m.computed_field
         def fqn_string(self) -> str:
-            """Fully qualified name as dot-separated string."""
+            """Fully qualified name as dot-separated string.
+
+            Returns:
+                The resulting ``str``.
+            """
             return ".".join(self.fqn) if self.fqn else ""
 
     class DbtManifest(m.FlexibleModel):
@@ -41,7 +49,7 @@ class FlextMeltanoModelsProjects:
 
         @staticmethod
         def _nodes_default() -> Mapping[
-            str, FlextMeltanoModelsProjects.DbtManifestNode
+            str, FlextMeltanoModelsProjects.DbtManifestNode,
         ]:
             """Late-bound empty manifest-nodes default.
 
@@ -50,6 +58,10 @@ class FlextMeltanoModelsProjects:
             ``from __future__ import annotations`` and the body runs only at
             validation time, once the module is complete, so the nested
             ``DbtManifestNode`` type resolves.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsProjects.DbtManifestNode]``.
             """
             return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode]({})
 
@@ -61,15 +73,24 @@ class FlextMeltanoModelsProjects:
         @m.field_validator("nodes", mode="after")
         @classmethod
         def freeze_nodes(
-            cls, value: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]
+            cls, value: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode],
         ) -> Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]:
-            """Expose manifest nodes as a read-only mapping."""
+            """Expose manifest nodes as a read-only mapping.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsProjects.DbtManifestNode]``.
+            """
             return MappingProxyType(dict(value))
 
         def get_nodes_by_type(
-            self, resource_type: str
+            self, resource_type: str,
         ) -> Sequence[FlextMeltanoModelsProjects.DbtManifestNode]:
-            """Get all nodes of a specific resource type."""
+            """Get all nodes of a specific resource type.
+
+            Returns:
+                The resulting ``Sequence[FlextMeltanoModelsProjects.DbtManifestNode]``.
+            """
             return [
                 node
                 for node in self.nodes.values()
@@ -81,10 +102,10 @@ class FlextMeltanoModelsProjects:
 
         project_id: Annotated[str, m.Field(description="Unique project identifier")]
         project_version: Annotated[
-            str, m.Field(default="1", description="Project version")
+            str, m.Field(default="1", description="Project version"),
         ] = "1"
         default_environment: Annotated[
-            str, m.Field(default="dev", description="Default environment name")
+            str, m.Field(default="dev", description="Default environment name"),
         ] = "dev"
         plugins: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -98,14 +119,25 @@ class FlextMeltanoModelsProjects:
         @m.field_validator("plugins", "environments", mode="after")
         @classmethod
         def freeze_mapping_fields(
-            cls, value: t.FlatContainerMapping
+            cls, value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
-            """Expose project mappings as read-only values."""
+            """Expose project mappings as read-only values.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:
-            """Validate Meltano project configuration consistency."""
+            """Validate Meltano project configuration consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If project_id cannot be empty.
+            """
             if not self.project_id or not self.project_id.strip():
                 msg = "project_id cannot be empty"
                 raise ValueError(msg)
@@ -125,10 +157,10 @@ class FlextMeltanoModelsProjects:
         ] = 1
         project_id: Annotated[str, m.Field(description="Project ID required")]
         default_environment: Annotated[
-            str, m.Field(default="dev", description="Default environment")
+            str, m.Field(default="dev", description="Default environment"),
         ] = "dev"
         project_root: Path = m.Field(
-            default_factory=Path.cwd, description="Project root directory"
+            default_factory=Path.cwd, description="Project root directory",
         )
         environments: t.StrSequence = m.Field(
             default_factory=lambda: ["dev", "staging", "prod"],
@@ -137,12 +169,20 @@ class FlextMeltanoModelsProjects:
 
         @m.computed_field
         def environment_count(self) -> int:
-            """Number of environments."""
+            """Number of environments.
+
+            Returns:
+                The resulting ``int``.
+            """
             return u.count(self.environments)
 
         @m.computed_field
         def has_production_environment(self) -> bool:
-            """Check if production environment exists."""
+            """Check if production environment exists.
+
+            Returns:
+                The resulting ``bool``.
+            """
             prod_environments = {"prod", "production", "live"}
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
@@ -152,7 +192,11 @@ class FlextMeltanoModelsProjects:
 
         @m.computed_field
         def project_maturity(self) -> str:
-            """Project maturity assessment."""
+            """Project maturity assessment.
+
+            Returns:
+                The resulting ``str``.
+            """
             prod_envs = {"prod", "production", "live"}
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
@@ -168,7 +212,15 @@ class FlextMeltanoModelsProjects:
 
         @u.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:
-            """Validate project consistency."""
+            """Validate project consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If Default environment; or if Project root directory does
+                    not exist.
+            """
             if self.default_environment not in self.environments:
                 msg = (
                     f"Default environment '{self.default_environment}' "

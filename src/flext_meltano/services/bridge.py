@@ -25,7 +25,11 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
     @staticmethod
     def discover_installed_plugins() -> p.Result[t.StrSequence]:
-        """Discover installed Meltano plugins from the active project runtime."""
+        """Discover installed Meltano plugins from the active project runtime.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
         executor = FlextMeltanoExecutorBase()
         plugins_result = executor.fetch_project_plugins()
         if plugins_result.failure:
@@ -37,7 +41,7 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
     @staticmethod
     def execute_bridge_command(
-        command: str, args: t.ConfigurationMapping | None = None
+        command: str, args: t.ConfigurationMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Execute a Meltano runtime command.
 
@@ -64,12 +68,20 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
     @staticmethod
     def fetch_version() -> p.Result[str]:
-        """Get Meltano version from the imported library."""
+        """Get Meltano version from the imported library.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         return FlextMeltanoExecutorBase.fetch_version()
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute bridge service returning current settings."""
+        """Execute bridge service returning current settings.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 

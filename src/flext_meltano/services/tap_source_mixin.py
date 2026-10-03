@@ -19,7 +19,11 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
 
     @classmethod
     def create_tap_source_instance(cls) -> p.Result[Self]:
-        """Create a tap abstractions instance wrapped in Result."""
+        """Create a tap abstractions instance wrapped in Result.
+
+        Returns:
+            The resulting ``p.Result[Self]``.
+        """
         instance: Self = cls()
         ok_result: p.Result[Self] = r.ok(instance)
         return ok_result
@@ -30,7 +34,11 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         | m.Meltano.TapConfig
         | m.Meltano.TapInstance,
     ) -> p.Result[m.Meltano.DataSourceInstance]:
-        """Create a source instance from configuration via isinstance narrowing."""
+        """Create a source instance from configuration via isinstance narrowing.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.DataSourceInstance]``.
+        """
 
         def _run_create_source_instance() -> p.Result[m.Meltano.DataSourceInstance]:
             if isinstance(source_config, m.Meltano.DataSourceConfig):
@@ -67,7 +75,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "source_id": source_id,
             })
             self.logger.info(
-                "Source instance created successfully", source_name=source_type
+                "Source instance created successfully", source_name=source_type,
             )
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
 
@@ -76,7 +84,7 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail_op(
-                "Source instance creation", e
+                "Source instance creation", e,
             )
 
     def create_tap_from_config(
@@ -86,7 +94,11 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         stream_config: t.JsonMapping | None = None,
         tap_version: str = "1.0.0",
     ) -> p.Result[m.Meltano.TapInstance]:
-        """Create a tap instance from raw configuration data."""
+        """Create a tap instance from raw configuration data.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.TapInstance]``.
+        """
         try:
             settings = m.Meltano.TapConfig.model_validate({
                 "tap_type": tap_type,
@@ -100,11 +112,11 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                     "tap_type": inst.source_type,
                     "settings": settings,
                     "tap_id": inst.source_id,
-                })
+                }),
             )
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[m.Meltano.TapInstance].fail(
-                f"Failed to create tap: {exc}", exception=exc
+                f"Failed to create tap: {exc}", exception=exc,
             )
 
 

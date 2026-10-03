@@ -34,16 +34,16 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     target_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)")
+        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
-        default_factory=dict[str, p.Meltano.SingerDrainSink]
+        default_factory=dict[str, p.Meltano.SingerDrainSink],
     )
 
     @abstractmethod
     def create_sink(
-        self, stream_name: str, schema: t.JsonMapping
+        self, stream_name: str, schema: t.JsonMapping,
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -61,6 +61,12 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         ``args`` is accepted for symmetry with the tap and dbt bases and never
         silently discarded. Dispatch runs through the canonical
         ``u.Meltano.process_stdin`` router over the handler methods below.
+
+        Returns:
+            The resulting ``int``.
+
+        Raises:
+            SystemExit: If ``drain_result.failure``; or if ``flush_result.failure``.
         """
         _ = args
         drain_result = u.Meltano.process_stdin(self)
@@ -74,20 +80,32 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         return 0
 
     def handle_schema(self, message: m.Meltano.SingerSchemaMessage) -> p.Result[bool]:
-        """Register the stream sink declared by a SCHEMA message."""
+        """Register the stream sink declared by a SCHEMA message.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         sink_result = self.fetch_or_create_sink(
-            message.stream, message.schema_definition
+            message.stream, message.schema_definition,
         )
         if sink_result.failure:
             return r[bool].from_failure(sink_result)
         return r[bool].ok(True)
 
     def handle_record(self, message: m.Meltano.SingerRecordMessage) -> p.Result[bool]:
-        """Route a RECORD message into its stream sink."""
+        """Route a RECORD message into its stream sink.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return self.process_record(message.stream, message.record, {})
 
     def handle_state(self, message: m.Meltano.SingerStateMessage) -> p.Result[bool]:
-        """Persist every pending sink batch at a STATE boundary."""
+        """Persist every pending sink batch at a STATE boundary.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         _ = message
         return self.flush()
 
@@ -96,9 +114,13 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def fetch_or_create_sink(
-        self, stream_name: str, schema: t.JsonMapping
+        self, stream_name: str, schema: t.JsonMapping,
     ) -> p.Result[p.Meltano.SingerDrainSink]:
-        """Get existing sink or create new one for a stream."""
+        """Get existing sink or create new one for a stream.
+
+        Returns:
+            The resulting ``p.Result[p.Meltano.SingerDrainSink]``.
+        """
         try:
             if stream_name in self._sinks:
                 return r[p.Meltano.SingerDrainSink].ok(self._sinks[stream_name])
@@ -110,7 +132,11 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             return r[p.Meltano.SingerDrainSink].fail(str(exc), exception=exc)
 
     def flush(self, stream_name: str | None = None) -> p.Result[bool]:
-        """Flush records for a specific stream or all streams."""
+        """Flush records for a specific stream or all streams.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             targets = (
                 [self._sinks[stream_name]]
@@ -130,9 +156,13 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def process_record(
-        self, stream_name: str, record: t.JsonMapping, schema: t.JsonMapping
+        self, stream_name: str, record: t.JsonMapping, schema: t.JsonMapping,
     ) -> p.Result[bool]:
-        """Process a single Singer RECORD message."""
+        """Process a single Singer RECORD message.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         sink_result = self.fetch_or_create_sink(stream_name, schema)
         if sink_result.failure:
             return r[bool].from_failure(sink_result)
@@ -150,7 +180,11 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         records: t.SequenceOf[t.JsonMapping],
         schema: t.JsonMapping,
     ) -> p.Result[int]:
-        """Process a batch of records."""
+        """Process a batch of records.
+
+        Returns:
+            The resulting ``p.Result[int]``.
+        """
         processed = 0
         for record in records:
             result = self.process_record(stream_name, record, schema)
@@ -163,18 +197,31 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # Connection lifecycle
     # ------------------------------------------------------------------
 
-    def connect(self) -> p.Result[bool]:
-        """Connect to the target data store. Override in consumer."""
+    @staticmethod
+    def connect() -> p.Result[bool]:
+        """Connect to the target data store. Override in consumer.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return r[bool].ok(value=True)
 
     def disconnect(self) -> p.Result[bool]:
-        """Disconnect from the target data store. Override in consumer."""
+        """Disconnect from the target data store. Override in consumer.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         self._sinks.clear()
         return r[bool].ok(True)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute target service — returns status."""
+        """Execute target service — returns status.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok({
             "service": self.target_name,
             "status": "active",

@@ -44,12 +44,12 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     dbt_project_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical dbt project name")
+        t.NonEmptyStr, u.Field(description="Canonical dbt project name"),
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
     _executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
-        default_factory=FlextMeltanoExecutor
+        default_factory=FlextMeltanoExecutor,
     )
 
     def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
@@ -69,14 +69,23 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # CLI dispatch
     # ------------------------------------------------------------------
 
-    def _cli_arguments(self, args: t.StrSequence | None) -> list[str]:
-        """Resolve the effective CLI argument vector for dispatch."""
+    @staticmethod
+    def _cli_arguments(args: t.StrSequence | None) -> list[str]:
+        """Resolve the effective CLI argument vector for dispatch.
+
+        Returns:
+            The resulting ``list[str]``.
+        """
         return list(args) if args else sys.argv[1:]
 
     def _dispatch_dbt_subcommand(
-        self, subcommand: str, rest: list[str]
+        self, subcommand: str, rest: list[str],
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Dispatch one resolved dbt subcommand to its typed service call."""
+        """Dispatch one resolved dbt subcommand to its typed service call.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+        """
         models: t.StrSequence | None = rest or None
         match subcommand:
             case c.Meltano.DbtCommand.RUN:
@@ -91,18 +100,32 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
                 return r[m.Meltano.CommandExecutionResult].fail(subcommand)
 
     def _finalize_dbt_cli_result(
-        self, subcommand: str, result: p.Result[m.Meltano.CommandExecutionResult]
+        self, subcommand: str, result: p.Result[m.Meltano.CommandExecutionResult],
     ) -> int:
-        """Translate one dbt command result into the CLI exit contract."""
+        """Translate one dbt command result into the CLI exit contract.
+
+        Returns:
+            The resulting ``int``.
+
+        Raises:
+            SystemExit: If ``result.failure``.
+        """
         if result.failure:
             self.logger.warning(
-                "dbt command failed", subcommand=subcommand, error=result.error or ""
+                "dbt command failed", subcommand=subcommand, error=result.error or "",
             )
             raise SystemExit(1)
         return 0
 
     def cli_main(self, args: t.StrSequence | None = None) -> int:
-        """Run the main CLI entry point for dbt project."""
+        """Run the main CLI entry point for dbt project.
+
+        Returns:
+            The resulting ``int``.
+
+        Raises:
+            SystemExit: If a ``c.EXC_OS_RUNTIME_TYPE`` is caught.
+        """
         try:
             command_args = self._cli_arguments(args)
             if not command_args:
@@ -125,7 +148,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         models: t.StrSequence | None = None,
         extra_args: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Execute a dbt command via the canonical typed executor (SSOT)."""
+        """Execute a dbt command via the canonical typed executor (SSOT).
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+        """
         # NOTE (multi-agent, bead mro-wfc8.3.9): delegate to the single typed
         # executor (FlextMeltanoExecutorBase.execute_dbt_command) — no parallel
         # u.Cli.run_raw path, no str degradation. Returns CommandExecutionResult.
@@ -135,27 +162,43 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return self._executor.execute_dbt_command(subcommand, args or None)
 
     def run_models(
-        self, models: t.StrSequence | None = None
+        self, models: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Run dbt models."""
+        """Run dbt models.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+        """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
 
     def run_tests(
-        self, models: t.StrSequence | None = None
+        self, models: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Run dbt tests."""
+        """Run dbt tests.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+        """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
 
     def compile_models(
-        self, models: t.StrSequence | None = None
+        self, models: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Compile dbt models."""
+        """Compile dbt models.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+        """
         return self._run_dbt_cmd(c.Meltano.DbtCommand.COMPILE, models=models)
 
     def generate_docs(self) -> p.Result[m.Meltano.CommandExecutionResult]:
-        """Generate dbt documentation."""
+        """Generate dbt documentation.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
+        """
         return self._run_dbt_cmd(
-            c.Meltano.DbtCommand.DOCS, extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS)
+            c.Meltano.DbtCommand.DOCS, extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
         )
 
     # ------------------------------------------------------------------
@@ -163,14 +206,22 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def configure_project_root(self, root: Path) -> p.Result[bool]:
-        """Set dbt project root directory."""
+        """Set dbt project root directory.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         if not root.exists():
             return r[bool].fail(str(root))
         self._dbt_project_root = root
         return r[bool].ok(True)
 
     def _resolve_manifest_path(self, manifest_path: Path | None) -> p.Result[Path]:
-        """Resolve the effective dbt manifest location."""
+        """Resolve the effective dbt manifest location.
+
+        Returns:
+            The resulting ``p.Result[Path]``.
+        """
         if manifest_path is not None:
             return r[Path].ok(manifest_path)
         if self._dbt_project_root is None:
@@ -178,24 +229,33 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return r[Path].ok(
             self._dbt_project_root
             / c.Meltano.FILE_PATH_DBT_OUTPUT_DIR
-            / c.Meltano.DBT_MANIFEST_FILE
+            / c.Meltano.DBT_MANIFEST_FILE,
         )
 
-    def _parse_manifest(self, path: Path) -> p.Result[t.Meltano.DbtManifestData]:
-        """Parse the dbt manifest file into the public manifest contract."""
+    @staticmethod
+    def _parse_manifest(path: Path) -> p.Result[t.Meltano.DbtManifestData]:
+        """Parse the dbt manifest file into the public manifest contract.
+
+        Returns:
+            The resulting ``p.Result[t.Meltano.DbtManifestData]``.
+        """
         parsed_result = u.Cli.files_read_json_model(path, m.Meltano.DbtManifest)
         if parsed_result.failure:
             return r[t.Meltano.DbtManifestData].from_failure(parsed_result)
         parsed = parsed_result.value
         manifest_data: t.Meltano.DbtManifestData = {
-            "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()}
+            "nodes": {k: v.model_dump() for k, v in parsed.nodes.items()},
         }
         return r[t.Meltano.DbtManifestData].ok(manifest_data)
 
     def load_manifest(
-        self, manifest_path: Path | None = None
+        self, manifest_path: Path | None = None,
     ) -> p.Result[t.Meltano.DbtManifestData]:
-        """Load dbt manifest.json."""
+        """Load dbt manifest.json.
+
+        Returns:
+            The resulting ``p.Result[t.Meltano.DbtManifestData]``.
+        """
         try:
             path_result = self._resolve_manifest_path(manifest_path)
             if path_result.failure:
@@ -208,22 +268,27 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             return r[t.Meltano.DbtManifestData].fail(str(exc), exception=exc)
 
     def fetch_models(self) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
-        """Get model list from manifest."""
+        """Get model list from manifest.
+
+        Returns:
+            The resulting ``p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]``.
+        """
         manifest_result = self.load_manifest()
         if manifest_result.failure:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].from_failure(
-                manifest_result
+                manifest_result,
             )
         try:
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
         except c.EXC_MAPPING_TYPE as exc:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                str(exc), exception=exc
+                str(exc), exception=exc,
             )
         return self._build_model_nodes(manifest)
 
+    @staticmethod
     def _build_model_nodes(
-        self, manifest: m.Meltano.DbtManifest
+        manifest: m.Meltano.DbtManifest,
     ) -> p.Result[t.SequenceOf[t.Meltano.OptionalScalarMap]]:
         models: list[t.Meltano.OptionalScalarMap] = []
         for node in manifest.nodes.values():
@@ -240,7 +305,11 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute dbt service — returns status."""
+        """Execute dbt service — returns status.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok({
             "service": self.dbt_project_name,
             "status": "active",

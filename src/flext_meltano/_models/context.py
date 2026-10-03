@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Pipeline context and configuration models."""
+"""FLEXT Meltano models - Pipeline context and configuration models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -25,7 +29,7 @@ class FlextMeltanoModelsContext:
         extractor_name: Annotated[str, m.Field(description="Extractor name")]
         loader_name: Annotated[t.NonEmptyStr, m.Field(description="Loader name")]
         execution_completed: Annotated[
-            bool, m.Field(default=False, description="Execution completion flag")
+            bool, m.Field(default=False, description="Execution completion flag"),
         ] = False
         execution_result: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -35,9 +39,13 @@ class FlextMeltanoModelsContext:
         @m.field_validator("elt_context", "execution_result", mode="before")
         @classmethod
         def normalize_mapping_payloads(
-            cls, value: t.Meltano.ValidatorInput
+            cls, value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
-            """Normalize mapping-like payloads into JSON-safe dictionaries."""
+            """Normalize mapping-like payloads into JSON-safe dictionaries.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             match value:
                 case Mapping():
                     return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
@@ -48,17 +56,25 @@ class FlextMeltanoModelsContext:
         @m.field_validator("elt_context", "execution_result", mode="after")
         @classmethod
         def freeze_mapping_payloads(
-            cls, value: t.FlatContainerMapping
+            cls, value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
-            """Expose normalized pipeline mappings as read-only values."""
+            """Expose normalized pipeline mappings as read-only values.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             return MappingProxyType(dict(value))
 
         @m.field_validator(
-            "project_root", "extractor_name", "loader_name", mode="before"
+            "project_root", "extractor_name", "loader_name", mode="before",
         )
         @classmethod
         def normalize_required_strings(cls, value: t.Meltano.ValidatorInput) -> str:
-            """Normalize required string fields from context payloads."""
+            """Normalize required string fields from context payloads.
+
+            Returns:
+                The resulting ``str``.
+            """
             normalized = "" if value is None else str(value)
             return normalized.strip()
 
@@ -66,7 +82,7 @@ class FlextMeltanoModelsContext:
         """Typed subset for extracting final pipeline result fields."""
 
         project_root: Annotated[
-            str, m.Field(default="unknown", description="Project root path")
+            str, m.Field(default="unknown", description="Project root path"),
         ] = "unknown"
         execution_result: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -76,9 +92,13 @@ class FlextMeltanoModelsContext:
         @m.field_validator("execution_result", mode="before")
         @classmethod
         def normalize_execution_result(
-            cls, value: t.Meltano.ValidatorInput
+            cls, value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
-            """Normalize execution result map payload."""
+            """Normalize execution result map payload.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             match value:
                 case Mapping():
                     return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
@@ -89,15 +109,23 @@ class FlextMeltanoModelsContext:
         @m.field_validator("execution_result", mode="after")
         @classmethod
         def freeze_execution_result(
-            cls, value: t.FlatContainerMapping
+            cls, value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
-            """Expose the normalized result payload as a read-only mapping."""
+            """Expose the normalized result payload as a read-only mapping.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             return MappingProxyType(dict(value))
 
         @m.field_validator("project_root", mode="before")
         @classmethod
         def normalize_project_root(cls, value: t.Meltano.ValidatorInput) -> str:
-            """Normalize project root from mixed payload values."""
+            """Normalize project root from mixed payload values.
+
+            Returns:
+                The resulting ``str``.
+            """
             normalized = "unknown" if value is None else str(value)
             return normalized.strip() or "unknown"
 
@@ -112,7 +140,11 @@ class FlextMeltanoModelsContext:
         @m.field_validator("values", mode="before")
         @classmethod
         def normalize_values(cls, value: t.Meltano.ValidatorInput) -> t.StrMapping:
-            """Keep scalar execution values and stringify them."""
+            """Keep scalar execution values and stringify them.
+
+            Returns:
+                The resulting ``t.StrMapping``.
+            """
             match value:
                 case Mapping():
                     return {
@@ -126,7 +158,11 @@ class FlextMeltanoModelsContext:
         @m.field_validator("values", mode="after")
         @classmethod
         def freeze_values(cls, value: t.StrMapping) -> t.StrMapping:
-            """Expose normalized scalar values as a read-only mapping."""
+            """Expose normalized scalar values as a read-only mapping.
+
+            Returns:
+                The resulting ``t.StrMapping``.
+            """
             return MappingProxyType(dict(value))
 
     class PluginComponentConfig(m.Entity):
@@ -141,7 +177,16 @@ class FlextMeltanoModelsContext:
         @m.field_validator("name")
         @classmethod
         def validate_name_business_rules(cls, v: str) -> str:
-            """Validate plugin name business rules."""
+            """Validate plugin name business rules.
+
+            Returns:
+                The resulting ``str``.
+
+            Raises:
+                ValueError: If Plugin name cannot be empty; or if Target plugin names
+                    must be at least 8 characters; or if Source component names must be
+                    at least 5 characters.
+            """
             v = v.strip()
             if not v:
                 msg = "Plugin name cannot be empty"

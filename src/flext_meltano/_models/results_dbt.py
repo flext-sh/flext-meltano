@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - DBT result models."""
+"""FLEXT Meltano models - DBT result models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -20,20 +24,20 @@ class FlextMeltanoModelsResultsDbt:
         root: Annotated[Path, m.Field(description="Project root directory")]
         name: Annotated[str, m.Field(description="Project name")]
         dbt_version: Annotated[
-            str | None, m.Field(default=None, description="DBT version")
+            str | None, m.Field(default=None, description="DBT version"),
         ] = None
         models_count: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of models")
+            t.NonNegativeInt, m.Field(default=0, description="Number of models"),
         ] = 0
         tests_count: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of tests")
+            t.NonNegativeInt, m.Field(default=0, description="Number of tests"),
         ] = 0
 
     class DbtRunResult(m.ArbitraryTypesModel):
         """Result of a DBT model run operation."""
 
         success: Annotated[
-            bool, m.Field(default=True, description="Whether the run was successful")
+            bool, m.Field(default=True, description="Whether the run was successful"),
         ] = True
         models_run: Annotated[
             t.NonNegativeInt,
@@ -42,11 +46,11 @@ class FlextMeltanoModelsResultsDbt:
         status: Annotated[
             str,
             m.Field(
-                default="completed", description="Run status (completed, failed, etc.)"
+                default="completed", description="Run status (completed, failed, etc.)",
             ),
         ] = "completed"
         error_message: Annotated[
-            str | None, m.Field(default=None, description="Error message if run failed")
+            str | None, m.Field(default=None, description="Error message if run failed"),
         ] = None
         execution_time_seconds: Annotated[
             float | None,
@@ -57,21 +61,21 @@ class FlextMeltanoModelsResultsDbt:
         """Result of a DBT test operation."""
 
         success: Annotated[
-            bool, m.Field(default=True, description="Whether tests passed")
+            bool, m.Field(default=True, description="Whether tests passed"),
         ] = True
         tests_run: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of tests executed")
+            t.NonNegativeInt, m.Field(default=0, description="Number of tests executed"),
         ] = 0
         tests_passed: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of tests passed")
+            t.NonNegativeInt, m.Field(default=0, description="Number of tests passed"),
         ] = 0
         tests_failed: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of tests failed")
+            t.NonNegativeInt, m.Field(default=0, description="Number of tests failed"),
         ] = 0
         status: Annotated[
             str,
             m.Field(
-                default="completed", description="Test status (completed, failed, etc.)"
+                default="completed", description="Test status (completed, failed, etc.)",
             ),
         ] = "completed"
         error_message: Annotated[
@@ -87,19 +91,24 @@ class FlextMeltanoModelsResultsDbt:
         """Execution result model for Meltano command operations following flext-core patterns."""
 
         command: Annotated[
-            t.StrSequence, m.Field(description="Command that was executed")
+            t.StrSequence, m.Field(description="Command that was executed"),
         ]
         success: Annotated[bool, m.Field(description="Whether the command succeeded")]
         exit_code: Annotated[int, m.Field(description="Process exit code")]
         output: Annotated[str, m.Field(description="Standard output")]
         error: Annotated[str, m.Field(description="Standard error")]
         execution_time: Annotated[
-            t.NonNegativeFloat, m.Field(description="Execution time in seconds")
+            t.NonNegativeFloat, m.Field(description="Execution time in seconds"),
         ]
 
+        @staticmethod
         @m.computed_field
-        def timestamp(self) -> str:
-            """ISO timestamp of when the result was generated."""
+        def timestamp() -> str:
+            """ISO timestamp of when the result was generated.
+
+            Returns:
+                The resulting ``str``.
+            """
             return u.generate_iso_timestamp()
 
         def to_dict(self) -> Mapping[str, t.Scalar | t.StrSequence]:
@@ -129,10 +138,10 @@ class FlextMeltanoModelsResultsDbt:
         """
 
         success_status: Annotated[
-            str, m.Field(description="Status value emitted on success")
+            str, m.Field(description="Status value emitted on success"),
         ] = c.Meltano.OperationStatus.SUCCESS
         failure_status: Annotated[
-            str, m.Field(description="Status value emitted on failure")
+            str, m.Field(description="Status value emitted on failure"),
         ] = c.Meltano.OperationStatus.ERROR
         status_field: Annotated[
             str | None,
