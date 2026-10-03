@@ -9,9 +9,8 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import ClassVar
 
-from flext_cli import m, t
+from flext_cli import t
 
 from flext_meltano import c
 
@@ -41,7 +40,8 @@ class FlextMeltanoTypingsBase:
     """Canonical payload returned by Meltano service operations."""
 
     type EnvironmentInput = c.Meltano.Environment | t.JsonMapping
-    """Environment selector input: a named environment or a full environment configuration mapping."""
+    """Environment selector input: a named environment or a full environment
+    configuration mapping."""
 
     type MutableContainerValueMapping = t.MutableFlatContainerMapping
     """Mutable container bridge for Singer SDK record/context mappings."""

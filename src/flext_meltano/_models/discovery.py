@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Plugin discovery models."""
+"""FLEXT Meltano models - Plugin discovery models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -18,7 +22,7 @@ class FlextMeltanoModelsDiscovery:
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
-            str, m.Field(default="", description="Plugin default variant")
+            str, m.Field(default="", description="Plugin default variant"),
         ] = ""
         variants: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -26,21 +30,29 @@ class FlextMeltanoModelsDiscovery:
         )
         logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, m.Field(default="", description="Plugin description")
+            str, m.Field(default="", description="Plugin description"),
         ] = ""
 
         @m.field_validator("default_variant", "logo_url", "description", mode="before")
         @classmethod
         def normalize_string_fields(cls, value: t.Meltano.ValidatorInput) -> str:
-            """Normalize optional string fields from external payloads."""
+            """Normalize optional string fields from external payloads.
+
+            Returns:
+                The resulting ``str``.
+            """
             return "" if value is None else str(value)
 
         @m.field_validator("variants", mode="before")
         @classmethod
         def normalize_variants(
-            cls, value: t.Meltano.ValidatorInput
+            cls, value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
-            """Normalize variant maps from external payloads."""
+            """Normalize variant maps from external payloads.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             match value:
                 case Mapping():
                     return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
@@ -51,9 +63,13 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("variants", mode="after")
         @classmethod
         def freeze_variants(
-            cls, value: t.FlatContainerMapping
+            cls, value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
-            """Expose normalized variants as a read-only mapping."""
+            """Expose normalized variants as a read-only mapping.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             return MappingProxyType(dict(value))
 
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
@@ -62,14 +78,14 @@ class FlextMeltanoModelsDiscovery:
         name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
         type: Annotated[t.NonEmptyStr, m.Field(description="Plugin type")]
         default_variant: Annotated[
-            str, m.Field(default="", description="Default plugin variant")
+            str, m.Field(default="", description="Default plugin variant"),
         ] = ""
         variants: Annotated[
-            str, m.Field(default="", description="Comma-separated variants")
+            str, m.Field(default="", description="Comma-separated variants"),
         ] = ""
         logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, m.Field(default="", description="Plugin description")
+            str, m.Field(default="", description="Plugin description"),
         ] = ""
 
     class PluginDiscoveryCatalog(m.FlexibleModel):
@@ -77,7 +93,7 @@ class FlextMeltanoModelsDiscovery:
 
         @staticmethod
         def _plugins_default() -> Mapping[
-            str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
+            str, FlextMeltanoModelsDiscovery.PluginDiscoverySource,
         ]:
             """Late-bound empty plugin-catalog default.
 
@@ -86,9 +102,13 @@ class FlextMeltanoModelsDiscovery:
             ``from __future__ import annotations`` and the body runs only at
             validation time, once the module is complete, so the nested
             ``PluginDiscoverySource`` type resolves.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
             """
             return MappingProxyType[
-                str, FlextMeltanoModelsDiscovery.PluginDiscoverySource
+                str, FlextMeltanoModelsDiscovery.PluginDiscoverySource,
             ]({})
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
@@ -101,9 +121,13 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("plugins", mode="before")
         @classmethod
         def normalize_plugins(
-            cls, value: t.Meltano.ValidatorInput
+            cls, value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
-            """Normalize plugin catalog mapping."""
+            """Normalize plugin catalog mapping.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
             match value:
                 case Mapping():
                     return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
@@ -114,7 +138,12 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("plugins", mode="after")
         @classmethod
         def freeze_plugins(
-            cls, value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]
+            cls, value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource],
         ) -> Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]:
-            """Expose normalized plugins as a read-only mapping."""
+            """Expose normalized plugins as a read-only mapping.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
+            """
             return MappingProxyType(dict(value))

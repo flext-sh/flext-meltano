@@ -1,7 +1,7 @@
 """Constants for flext-meltano tests.
 
-Provides TestsFlextMeltanoConstants, extending FlextTestsConstants with flext-meltano-specific
-constants using COMPOSITION INHERITANCE.
+Provides TestsFlextMeltanoConstants, extending FlextTestsConstants with
+flext-meltano-specific constants using COMPOSITION INHERITANCE.
 
 Inheritance hierarchy:
 - FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
@@ -41,7 +41,8 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
 
     Rules:
     - NEVER duplicate constants from FlextTestsConstants or c
-    - Only flext-meltano-specific test constants allowed (not generic for other projects)
+    - Only flext-meltano-specific test constants allowed (not generic for
+    other projects)
     - All generic constants come from FlextTestsConstants
     - All production constants come from c
     """
@@ -98,7 +99,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
                 MappingProxyType({
                     _SingerSdkAdapterValue.SETTINGS_KEY: (
                         _SingerSdkAdapterValue.SETTINGS_VALUE
-                    )
+                    ),
                 })
             )
             SINGER_SDK_ADAPTER_STREAM_USERS: ClassVar[str] = (

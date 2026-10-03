@@ -1,24 +1,28 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Tests package."""
+"""Tests package.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import build_lazy_import_map, install_lazy_exports
+from flext_core import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_tests import api, d, e, h, r, td, tf, tk, tm, tv, x
+    from flext_tests import api, d, e, h, r, td, tf, tk, tm, x
 
-    from . import integration, unit
-    from .base import TestsFlextMeltanoServiceBase, TestsFlextMeltanoServiceBase as s
-    from .constants import TestsFlextMeltanoConstants, TestsFlextMeltanoConstants as c
-    from .models import TestsFlextMeltanoModels, TestsFlextMeltanoModels as m
-    from .protocols import TestsFlextMeltanoProtocols, TestsFlextMeltanoProtocols as p
-    from .settings import TestsFlextMeltanoSettings
-    from .typings import TestsFlextMeltanoTypes, TestsFlextMeltanoTypes as t
-    from .utilities import TestsFlextMeltanoUtilities, TestsFlextMeltanoUtilities as u
+    from tests import integration, unit
+    from tests.base import TestsFlextMeltanoServiceBase, s
+    from tests.constants import TestsFlextMeltanoConstants, c
+    from tests.models import TestsFlextMeltanoModels, m
+    from tests.protocols import TestsFlextMeltanoProtocols, p
+    from tests.settings import TestsFlextMeltanoSettings
+    from tests.typings import TestsFlextMeltanoTypes, t
+    from tests.utilities import TestsFlextMeltanoUtilities, u
 
 
 __all__: tuple[str, ...] = (
@@ -44,7 +48,6 @@ __all__: tuple[str, ...] = (
     "tf",
     "tk",
     "tm",
-    "tv",
     "u",
     "unit",
     "x",
@@ -62,23 +65,11 @@ _LAZY_IMPORTS = MappingProxyType(
             ".typings": ("TestsFlextMeltanoTypes", "t"),
             ".unit": ("unit",),
             ".utilities": ("TestsFlextMeltanoUtilities", "u"),
-            "flext_tests": (
-                "api",
-                "d",
-                "e",
-                "h",
-                "r",
-                "td",
-                "tf",
-                "tk",
-                "tm",
-                "tv",
-                "x",
-            ),
+            "flext_tests": ("api", "d", "e", "h", "r", "td", "tf", "tk", "tm", "x"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
-    )
+    ),
 )
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

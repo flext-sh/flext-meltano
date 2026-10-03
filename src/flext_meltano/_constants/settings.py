@@ -1,4 +1,8 @@
-"""FLEXT Meltano settings constants — logging, service, defaults, capabilities."""
+"""FLEXT Meltano settings constants — logging, service, defaults, capabilities.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -8,8 +12,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from flext_cli import c
 
 from flext_core import FlextSettings
-
-from .enums import FlextMeltanoConstantsEnums
+from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 
 if TYPE_CHECKING:
     from flext_cli import t

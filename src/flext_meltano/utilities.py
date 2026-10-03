@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from flext_cli import FlextCliUtilities
 
-from ._utilities.base import FlextMeltanoUtilitiesBase
-from ._utilities.runtime import FlextMeltanoUtilitiesRuntime
-from ._utilities.singer import FlextMeltanoUtilitiesSinger
+from flext_meltano._utilities.base import FlextMeltanoUtilitiesBase
+from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
+from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
 
 
 class FlextMeltanoUtilities(FlextCliUtilities):

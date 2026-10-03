@@ -18,13 +18,16 @@ from flext_meltano import c, m
 
 
 class FlextMeltanoSettings(FlextSettings):
-    """Runtime settings for Meltano orchestration; fields under ``settings.Meltano.*``."""
+    """Runtime settings for Meltano orchestration.
+
+    Fields under ``settings.Meltano.*``.
+    """
 
     # Why: pydantic_settings is owned by flext-core; route SettingsConfigDict
     # through the m facade instead of importing the third-party package
     # directly (ENFORCE-070).
     model_config = m.SettingsConfigDict(
-        env_prefix="FLEXT_MELTANO_", env_nested_delimiter="__", extra="ignore"
+        env_prefix="FLEXT_MELTANO_", env_nested_delimiter="__", extra="ignore",
     )
 
     class _Meltano(m.BaseModel):
@@ -43,7 +46,7 @@ class FlextMeltanoSettings(FlextSettings):
             m.Field(default=".meltano", description="Meltano configuration directory"),
         ]
         logs_dir: Annotated[
-            str, m.Field(default="logs", description="Meltano logs directory")
+            str, m.Field(default="logs", description="Meltano logs directory"),
         ]
         environment: Annotated[
             str,
@@ -54,13 +57,13 @@ class FlextMeltanoSettings(FlextSettings):
             ),
         ]
         log_level: Annotated[
-            str, m.Field(default="INFO", description="Meltano runtime log level")
+            str, m.Field(default="INFO", description="Meltano runtime log level"),
         ]
         meltano_version: Annotated[
-            str, m.Field(default="3.9.1", description="Required Meltano version")
+            str, m.Field(default="3.9.1", description="Required Meltano version"),
         ]
         singer_sdk_version: Annotated[
-            str, m.Field(default="0.48.0", description="Required Singer SDK version")
+            str, m.Field(default="0.48.0", description="Required Singer SDK version"),
         ]
         pipelines_dir: Annotated[
             str,
@@ -109,11 +112,14 @@ class FlextMeltanoSettings(FlextSettings):
         Meltano: _Meltano
     else:
         Meltano: _Meltano = m.Field(
-            default_factory=_Meltano, description="Namespaced Meltano settings."
+            default_factory=_Meltano, description="Namespaced Meltano settings.",
         )
 
 
 settings: FlextMeltanoSettings = FlextMeltanoSettings.fetch_global()
-"""Pre-instantiated project settings singleton — ``from flext_meltano import settings``."""
+"""Pre-instantiated project settings singleton.
+
+``from flext_meltano import settings``.
+"""
 
 __all__: list[str] = ["FlextMeltanoSettings", "settings"]

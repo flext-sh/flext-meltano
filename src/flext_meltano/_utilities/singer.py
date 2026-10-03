@@ -4,6 +4,9 @@ Centralizes Singer protocol operations that were duplicated across consumer
 projects. All methods return r[T] and use canonical m.Meltano.* models.
 
 Access pattern: u.Meltano.emit_schema(), u.Meltano.process_stdin(), etc.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -55,7 +58,7 @@ class FlextMeltanoUtilitiesSinger:
             return r[str].ok(line)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation(
-                f"emit SCHEMA for {stream_name}", exc, result_type=r[str]
+                f"emit SCHEMA for {stream_name}", exc, result_type=r[str],
             )
 
     @staticmethod
@@ -90,7 +93,7 @@ class FlextMeltanoUtilitiesSinger:
             return r[str].ok(line)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation(
-                f"emit RECORD for {stream_name}", exc, result_type=r[str]
+                f"emit RECORD for {stream_name}", exc, result_type=r[str],
             )
 
     @staticmethod
@@ -133,29 +136,37 @@ class FlextMeltanoUtilitiesSinger:
                 result = FlextMeltanoUtilitiesSinger._process_stdin_line(line, handler)
                 if result.failure:
                     return result
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation("Stdin processing", exc, result_type=r[bool])
 
     @staticmethod
     def _process_stdin_line(
-        line: str, handler: p.Meltano.SingerTargetHandler
+        line: str, handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
-        """Process one Singer JSON line from stdin."""
+        """Process one Singer JSON line from stdin.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         stripped = line.strip()
         if not stripped:
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         raw_value: t.JsonValue = cli_u.Cli.json_loads(stripped).unwrap()
         if not isinstance(raw_value, dict):
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         raw = t.json_dict_adapter().validate_python(raw_value)
         return FlextMeltanoUtilitiesSinger._dispatch_singer_message(raw, handler)
 
     @staticmethod
     def _dispatch_singer_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
-        """Route a parsed Singer message to the matching handler."""
+        """Route a parsed Singer message to the matching handler.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         msg_type = raw.get("type", "")
         if msg_type == c.Meltano.SingerMessageType.SCHEMA:
             return FlextMeltanoUtilitiesSinger._handle_schema_message(raw, handler)
@@ -163,13 +174,17 @@ class FlextMeltanoUtilitiesSinger:
             return FlextMeltanoUtilitiesSinger._handle_record_message(raw, handler)
         if msg_type == c.Meltano.SingerMessageType.STATE:
             return FlextMeltanoUtilitiesSinger._handle_state_message(raw, handler)
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def _handle_schema_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
-        """Handle one Singer SCHEMA message."""
+        """Handle one Singer SCHEMA message.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         schema_msg = m.Meltano.SingerSchemaMessage.model_validate(raw)
         result = handler.handle_schema(schema_msg)
         if result.failure:
@@ -178,13 +193,17 @@ class FlextMeltanoUtilitiesSinger:
                 result.error,
                 result_type=r[bool],
             )
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def _handle_record_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
-        """Handle one Singer RECORD message."""
+        """Handle one Singer RECORD message.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         record_msg = m.Meltano.SingerRecordMessage.model_validate(raw)
         result = handler.handle_record(record_msg)
         if result.failure:
@@ -193,18 +212,22 @@ class FlextMeltanoUtilitiesSinger:
                 result.error,
                 result_type=r[bool],
             )
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def _handle_state_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler
+        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
-        """Handle one Singer STATE message."""
+        """Handle one Singer STATE message.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         state_msg = m.Meltano.SingerStateMessage.model_validate(raw)
         result = handler.handle_state(state_msg)
         if result.failure:
             return e.fail_operation("STATE handler", result.error, result_type=r[bool])
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def build_catalog_entry(

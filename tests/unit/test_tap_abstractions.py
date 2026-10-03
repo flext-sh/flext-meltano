@@ -1,4 +1,8 @@
-"""Test module for flext-meltano."""
+"""Test module for flext-meltano.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -21,7 +25,8 @@ class TestFlextMeltanoAbstractionsComplete:
         """Setup for each test."""
         self.tap_abstractions = FlextMeltanoAbstractions()
 
-    def test_tap_config_validation(self) -> None:
+    @staticmethod
+    def test_tap_config_validation() -> None:
         """Test m.Meltano.TapConfig Pydantic validation."""
         connection_config: t.HeaderMapping = {
             "host": "localhost",
@@ -39,7 +44,8 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(config.tap_version, eq="v1.2.0")
         tm.that(config.stream_config, has="users")
 
-    def test_stream_definition_validation(self) -> None:
+    @staticmethod
+    def test_stream_definition_validation() -> None:
         """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
         stream_schema: t.FlatContainerMapping = {
             "type": "t.NormalizedValue",
@@ -56,7 +62,8 @@ class TestFlextMeltanoAbstractionsComplete:
         tm.that(stream_def.source_type, eq="tap-postgres")
         tm.that(stream_def.records_extracted, eq=42)
 
-    def test_tap_instance_validation(self) -> None:
+    @staticmethod
+    def test_tap_instance_validation() -> None:
         """Test m.Meltano.TapInstance Pydantic validation using flext_tests."""
         with tempfile.TemporaryDirectory() as temp_dir:
             config = m.Meltano.TapConfig(
@@ -73,14 +80,15 @@ class TestFlextMeltanoAbstractionsComplete:
                         stream_name="test_stream",
                         stream_schema={},
                         stream_created_at="2025-01-01T00:00:00Z",
-                    )
+                    ),
                 ],
             })
             tm.that(tap_instance.tap_type, eq="tap-csv")
             tm.that(tap_instance.tap_id, eq="tap_csv_123")
             tm.that(len(tap_instance.streams), eq=1)
 
-    def test_tap_abstractions_initialization(self) -> None:
+    @staticmethod
+    def test_tap_abstractions_initialization() -> None:
         """Test FlextMeltanoAbstractions initialization."""
         tap_abs = FlextMeltanoAbstractions()
         assert tap_abs is not None
@@ -102,7 +110,7 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv", connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance.model_validate({
             "tap_type": "tap-csv",
@@ -155,7 +163,7 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_validate_tap_instance(self) -> None:
         """Test tap instance validation using process method and flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv", connection_config={"file": "test.csv"},
         )
         valid_instance = m.Meltano.TapInstance.model_validate({
             "tap_type": "tap-csv",
@@ -170,11 +178,11 @@ class TestFlextMeltanoAbstractionsComplete:
                 "tap_id": "",
             })
             invalid_result = self.tap_abstractions.process_tap_config(
-                invalid_instance.settings
+                invalid_instance.settings,
             )
         except (ValidationError, ValueError):
             invalid_result = r[m.Meltano.TapConfig].fail(
-                "Validation failed at creation"
+                "Validation failed at creation",
             )
         valid_result = self.tap_abstractions.process_tap_config(valid_instance.settings)
         tm.that(valid_result, is_=r)
@@ -186,7 +194,7 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_fetch_tap_type(self) -> None:
         """Test fetch_tap_type method using flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"}
+            tap_type="tap-csv", connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance.model_validate({
             "tap_type": "tap-csv",
@@ -201,7 +209,8 @@ class TestFlextMeltanoAbstractionsComplete:
         initial_streams = self.tap_abstractions.fetch_registered_streams()
         tm.that(isinstance(initial_streams, list), eq=True)
 
-    def test_create_instance_factory(self) -> None:
+    @staticmethod
+    def test_create_instance_factory() -> None:
         """Test create_abstractions_instance factory method using flext_tests."""
         result = FlextMeltanoAbstractions.create_abstractions_instance()
         tm.that(result, is_=r)
@@ -212,19 +221,20 @@ class TestFlextMeltanoAbstractionsComplete:
                 service_name_val = instance.service_name
                 tm.that(service_name_val, eq="FlextMeltanoAbstractions")
 
-    def test_tap_abstractions_error_handling(self) -> None:
+    @staticmethod
+    def test_tap_abstractions_error_handling() -> None:
         """Test tap abstractions error handling."""
         timeout_error = TimeoutError("Connection timed out")
         tm.that(timeout_error, is_=Exception)
         validation_error = ValidationError.from_exception_data(
-            title="Validation Error", line_errors=[]
+            title="Validation Error", line_errors=[],
         )
         tm.that(validation_error, is_=Exception)
 
     def test_invalid_tap_config_creation(self) -> None:
         """An empty tap_type is rejected — through a typed failure or a raise."""
         result = self.tap_abstractions.create_tap_from_config(
-            tap_type="", connection_config={}
+            tap_type="", connection_config={},
         )
         tm.fail(result)
         tm.that(result.error, none=False)

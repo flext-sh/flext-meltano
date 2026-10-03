@@ -14,8 +14,9 @@ from flext_meltano.services.executor import FlextMeltanoExecutor
 if TYPE_CHECKING:
     from pathlib import Path
 
-    # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return; runtime
-    # import not needed (from __future__ import annotations makes the annotation lazy).
+    # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return;
+    # runtime import not needed (from __future__ import annotations makes the
+    # annotation lazy).
     from flext_meltano import m
 
 
@@ -26,7 +27,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
     """
 
     _elt_executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
-        default_factory=FlextMeltanoExecutor
+        default_factory=FlextMeltanoExecutor,
     )
 
     def execute_complete_elt_pipeline(
@@ -36,7 +37,11 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         dbt_models: t.StrSequence | None = None,
         settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
-        """Execute complete ELT pipeline with optional DBT transformations."""
+        """Execute complete ELT pipeline with optional DBT transformations.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
 
         def _run_execute_complete_elt_pipeline() -> p.Result[t.JsonMapping]:
             self.logger.info(
@@ -46,7 +51,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 dbt_models=str(dbt_models or []),
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings
+                tap_name, target_name, settings,
             )
             if result.failure:
                 return r[t.JsonMapping].from_failure(result)
@@ -73,7 +78,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
             return r[t.JsonMapping].fail(error_msg)
 
     def run_dbt_transformation(
-        self, models: t.StrSequence | None = None, project_dir: Path | None = None
+        self, models: t.StrSequence | None = None, project_dir: Path | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run DBT transformation using the configured Meltano executor.
 
@@ -82,10 +87,13 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         degradation (# NOTE multi-agent, bead mro-wfc8.3: was r[t.JsonMapping] via
         build_mutable_command_execution_payload; that flattened the typed model to a
         dict whose models_run/execution_method keys never existed).
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
         """
         executor = (
             FlextMeltanoExecutor(
-                settings=settings.model_copy(update={"project_root": project_dir})
+                settings=settings.model_copy(update={"project_root": project_dir}),
             )
             if project_dir is not None
             else self._elt_executor
@@ -93,15 +101,19 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         return executor.execute_dbt_command(c.Meltano.DbtCommand.RUN, models)
 
     def run_elt_pipeline(
-        self, tap_name: str, target_name: str, settings: t.JsonMapping | None = None
+        self, tap_name: str, target_name: str, settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
-        """Run a complete ELT pipeline from tap to target."""
+        """Run a complete ELT pipeline from tap to target.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         try:
             self.logger.info(
-                "Starting ELT pipeline", tap_name=tap_name, target_name=target_name
+                "Starting ELT pipeline", tap_name=tap_name, target_name=target_name,
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings
+                tap_name, target_name, settings,
             )
             if result.failure:
                 return r[t.JsonMapping].from_failure(result)

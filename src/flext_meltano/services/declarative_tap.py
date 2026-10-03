@@ -38,20 +38,28 @@ class FlextMeltanoDeclarativeTap:
             return empty
 
         def run_cli(self, args: t.StrSequence, prog_name: str) -> int:
-            """Run the Singer flat CLI (``--config/--discover/--catalog/--state``)."""
+            """Run the Singer flat CLI (``--config/--discover/--catalog/--state``).
+
+            Returns:
+                The resulting ``int``.
+            """
             command = self._tap_class.get_singer_command()
             try:
                 _ = command.main(
-                    args=list(args), prog_name=prog_name, standalone_mode=False
+                    args=list(args), prog_name=prog_name, standalone_mode=False,
                 )
             except SystemExit as exc:
                 return exc.code if isinstance(exc.code, int) else 1
             return 0
 
         def discover_streams(self) -> t.SequenceOf[p.Meltano.SingerStreamInfo]:
-            """Discover streams through a config-free tap instance."""
+            """Discover streams through a config-free tap instance.
+
+            Returns:
+                The resulting ``t.SequenceOf[p.Meltano.SingerStreamInfo]``.
+            """
             streams: t.SequenceOf[p.Meltano.SingerStreamInfo] = self._tap_class(
-                config=None, validate_config=False
+                config=None, validate_config=False,
             ).discover_streams()
             return streams
 
@@ -60,7 +68,7 @@ class FlextMeltanoDeclarativeTap:
 
     @classmethod
     def build(
-        cls, spec: m.Meltano.TapSpec, fetcher: p.Meltano.RecordFetcher
+        cls, spec: m.Meltano.TapSpec, fetcher: p.Meltano.RecordFetcher,
     ) -> p.Meltano.SingerTapInstance:
         """Return a Singer tap instance driven by ``spec`` and ``fetcher``."""
         stream_specs = tuple(spec.streams)
@@ -69,10 +77,11 @@ class FlextMeltanoDeclarativeTap:
             """A Singer stream whose records come from the FLEXT fetcher."""
 
             def __init__(
-                self, tap: Tap, stream_spec: m.Meltano.StreamSpec, config: t.JsonMapping
+                self, tap: Tap, stream_spec: m.Meltano.StreamSpec, config:
+                t.JsonMapping,
             ) -> None:
                 super().__init__(
-                    tap, schema=dict(stream_spec.json_schema), name=stream_spec.name
+                    tap, schema=dict(stream_spec.json_schema), name=stream_spec.name,
                 )
                 self._declared_primary_keys: t.StrSequence = stream_spec.primary_keys
                 self._declared_replication_key: str | None = stream_spec.replication_key
@@ -104,11 +113,11 @@ class FlextMeltanoDeclarativeTap:
 
             @override
             def get_records(
-                self, context: m.Meltano.SingerContext | None
+                self, context: m.Meltano.SingerContext | None,
             ) -> Iterable[m.Meltano.SingerRecord]:
                 _ = context
                 request = m.Meltano.FetchRequest(
-                    stream_name=self.name, config=self._stream_config
+                    stream_name=self.name, config=self._stream_config,
                 )
                 result = fetcher.fetch(request)
                 if result.failure:

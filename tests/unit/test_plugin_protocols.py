@@ -23,40 +23,44 @@ class TestsFlextMeltanoPluginProtocols:
 
     # --- construction / return values -----------------------------------
 
-    def test_catalog_builds_entries_from_payload(self) -> None:
+    @staticmethod
+    def test_catalog_builds_entries_from_payload() -> None:
         """model_validate exposes stream identifiers on the built entries."""
         catalog = m.Meltano.SingerCatalog.model_validate({
-            "streams": [{"stream": "users", "tap_stream_id": "users", "schema": {}}]
+            "streams": [{"stream": "users", "tap_stream_id": "users", "schema": {}}],
         })
 
         entry = catalog.streams[0]
         tm.that(entry.stream, eq="users")
         tm.that(entry.tap_stream_id, eq="users")
 
-    def test_catalog_defaults_message_type_to_catalog(self) -> None:
+    @staticmethod
+    def test_catalog_defaults_message_type_to_catalog() -> None:
         """A catalog without an explicit type defaults to the CATALOG marker."""
         catalog = m.Meltano.SingerCatalog.model_validate({"streams": []})
 
         tm.that(catalog.type.value, eq="CATALOG")
 
-    def test_empty_streams_validate_to_empty_sequence(self) -> None:
+    @staticmethod
+    def test_empty_streams_validate_to_empty_sequence() -> None:
         """An empty stream list is a valid catalog with no entries."""
         catalog = m.Meltano.SingerCatalog.model_validate({"streams": []})
 
         tm.that(len(catalog.streams), eq=0)
 
+    @staticmethod
     @pytest.mark.parametrize(
-        "stream_names", [("users",), ("users", "orders"), ("a", "b", "c")]
+        "stream_names", [("users",), ("users", "orders"), ("a", "b", "c")],
     )
     def test_multiple_streams_preserve_input_order(
-        self, stream_names: t.VariadicTuple[str]
+        stream_names: t.VariadicTuple[str],
     ) -> None:
         """Stream entries preserve the order of the validated payload."""
         payload: t.JsonMapping = {
             "streams": [
                 {"stream": name, "tap_stream_id": name, "schema": {}}
                 for name in stream_names
-            ]
+            ],
         }
 
         catalog = m.Meltano.SingerCatalog.model_validate(payload)
@@ -65,7 +69,8 @@ class TestsFlextMeltanoPluginProtocols:
 
     # --- aliasing / roundtrip -------------------------------------------
 
-    def test_schema_alias_populates_schema_definition(self) -> None:
+    @staticmethod
+    def test_schema_alias_populates_schema_definition() -> None:
         """The 'schema' input key is exposed via the schema_definition field."""
         catalog = m.Meltano.SingerCatalog.model_validate({
             "streams": [
@@ -73,13 +78,14 @@ class TestsFlextMeltanoPluginProtocols:
                     "stream": "users",
                     "tap_stream_id": "users",
                     "schema": {"type": "object"},
-                }
-            ]
+                },
+            ],
         })
 
         tm.that(catalog.streams[0].schema_definition, eq={"type": "object"})
 
-    def test_dump_by_alias_re_emits_schema_key(self) -> None:
+    @staticmethod
+    def test_dump_by_alias_re_emits_schema_key() -> None:
         """Serializing by alias round-trips schema_definition back to 'schema'."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "stream": "users",
@@ -91,13 +97,14 @@ class TestsFlextMeltanoPluginProtocols:
 
         tm.that(dumped["schema"], eq={"type": "object"})
 
-    def test_catalog_roundtrip_is_idempotent(self) -> None:
+    @staticmethod
+    def test_catalog_roundtrip_is_idempotent() -> None:
         """Re-validating a by-alias dump reproduces the same public payload."""
         source: t.JsonMapping = {
             "streams": [
                 {"stream": "users", "tap_stream_id": "users", "schema": {}},
                 {"stream": "orders", "tap_stream_id": "orders", "schema": {}},
-            ]
+            ],
         }
 
         first = m.Meltano.SingerCatalog.model_validate(source)
@@ -107,7 +114,8 @@ class TestsFlextMeltanoPluginProtocols:
 
     # --- optional fields / invariants -----------------------------------
 
-    def test_optional_entry_fields_default_to_none(self) -> None:
+    @staticmethod
+    def test_optional_entry_fields_default_to_none() -> None:
         """Unset optional entry fields expose None through the public API."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "stream": "users",
@@ -120,7 +128,8 @@ class TestsFlextMeltanoPluginProtocols:
         tm.that(entry.table_name, none=True)
         tm.that(entry.row_count, none=True)
 
-    def test_entry_accepts_replication_method_enum_value(self) -> None:
+    @staticmethod
+    def test_entry_accepts_replication_method_enum_value() -> None:
         """A supplied replication method surfaces as the typed enum value."""
         entry = m.Meltano.SingerCatalogEntry.model_validate({
             "stream": "users",
@@ -130,11 +139,12 @@ class TestsFlextMeltanoPluginProtocols:
         })
 
         tm.that(
-            entry.replication_method, eq=c.Meltano.SingerReplicationMethod.INCREMENTAL
+            entry.replication_method, eq=c.Meltano.SingerReplicationMethod.INCREMENTAL,
         )
 
     # --- error paths -----------------------------------------------------
 
+    @staticmethod
     @pytest.mark.parametrize(
         ("omitted", "payload"),
         [
@@ -144,7 +154,7 @@ class TestsFlextMeltanoPluginProtocols:
         ],
     )
     def test_missing_required_entry_field_raises_validation_error(
-        self, omitted: str, payload: t.JsonMapping
+        omitted: str, payload: t.JsonMapping,
     ) -> None:
         """Omitting any required entry field fails validation for that field."""
         with pytest.raises(m.ValidationError) as excinfo:
@@ -157,7 +167,8 @@ class TestsFlextMeltanoPluginProtocols:
 
     # --- plugin definition mapping contract -----------------------------
 
-    def test_plugin_definition_honors_json_mapping_contract(self) -> None:
+    @staticmethod
+    def test_plugin_definition_honors_json_mapping_contract() -> None:
         """Plugin definitions behave as the canonical JSON mapping contract."""
         plugin_def: t.JsonMapping = {
             "name": "tap-postgres",
@@ -168,7 +179,8 @@ class TestsFlextMeltanoPluginProtocols:
         tm.that(plugin_def["name"], eq="tap-postgres")
         tm.that(len(plugin_def), eq=3)
 
-    def test_meltano_typing_namespace_excludes_legacy_singer_aliases(self) -> None:
+    @staticmethod
+    def test_meltano_typing_namespace_excludes_legacy_singer_aliases() -> None:
         """t.Meltano exposes no legacy Singer/plugin typing aliases."""
         for legacy in (
             "SingerCatalogEntry",

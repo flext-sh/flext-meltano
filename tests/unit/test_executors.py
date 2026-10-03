@@ -1,4 +1,8 @@
-"""Real-execution tests for the Meltano public executor surface."""
+"""Real-execution tests for the Meltano public executor surface.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -13,18 +17,21 @@ from flext_meltano.cli import FlextMeltanoCli
 class TestsFlextMeltanoExecutors:
     """Validate the public executor APIs through real Meltano execution paths."""
 
-    def test_executor_initialization(self) -> None:
+    @staticmethod
+    def test_executor_initialization() -> None:
         """The public Meltano facade is available as a singleton executor."""
         tm.that(meltano, none=False)
 
-    def test_run_command_no_args_returns_one(self) -> None:
+    @staticmethod
+    def test_run_command_no_args_returns_one() -> None:
         """Empty command execution returns the CLI failure exit code."""
         result = meltano.run_command([])
 
         tm.ok(result)
         tm.that(result.value, eq=1)
 
-    def test_run_version_and_help_commands_return_payloads(self) -> None:
+    @staticmethod
+    def test_run_version_and_help_commands_return_payloads() -> None:
         """Version and help route through the real public command runner."""
         version_result = meltano.run(["version"])
         help_result = meltano.run(["help"])
@@ -35,13 +42,15 @@ class TestsFlextMeltanoExecutors:
         tm.that(version_result.value, has="version")
         tm.that(str(help_result.value["help"]), has="Usage: meltano")
 
-    def test_run_method_empty_args_fails(self) -> None:
+    @staticmethod
+    def test_run_method_empty_args_fails() -> None:
         """Empty public run requests fail with the documented validation message."""
         result = meltano.run([])
 
         tm.fail(result, has="cannot be empty")
 
-    def test_health_version_help_and_execute_surfaces(self) -> None:
+    @staticmethod
+    def test_health_version_help_and_execute_surfaces() -> None:
         """Health, version, help, and execute expose stable public payloads."""
         health_result = meltano.health()
         version_result = meltano.version()
@@ -60,8 +69,9 @@ class TestsFlextMeltanoExecutors:
         tm.that(execute_result.value["service_name"], eq=meltano.service_name)
         tm.that(execute_result.value["status"], eq="active")
 
-    def test_fetch_version_and_run_cli_surfaces(self) -> None:
-        """Version lookup and CLI entrypoints stay available through the public facade."""
+    @staticmethod
+    def test_fetch_version_and_run_cli_surfaces() -> None:
+        """Version lookup and CLI entrypoints stay available via the public facade."""
         fetch_result = meltano.fetch_version()
         ready_none_result = meltano.run_cli(None)
         ready_empty_result = meltano.run_cli([])
@@ -76,8 +86,9 @@ class TestsFlextMeltanoExecutors:
         tm.that(ready_empty_result.value["status"], eq="ready")
         tm.that(version_cli_result.value["command"], eq="version")
 
-    def test_create_cli_runner_surfaces(self) -> None:
-        """CLI runner creation returns ready and version payloads through public APIs."""
+    @staticmethod
+    def test_create_cli_runner_surfaces() -> None:
+        """CLI runner creation returns ready and version payloads via public APIs."""
         ready_result = meltano.create_cli_runner([])
         version_result = meltano.create_cli_runner(["version"])
 
@@ -87,7 +98,8 @@ class TestsFlextMeltanoExecutors:
         tm.that(ready_result.value["status"], eq="ready")
         tm.that(version_result.value["command"], eq="version")
 
-    def test_execute_meltano_command_normalizes_runtime_commands(self) -> None:
+    @staticmethod
+    def test_execute_meltano_command_normalizes_runtime_commands() -> None:
         """Executor runtime commands normalize both prefixed and unprefixed forms."""
         prefixed_result = meltano.execute_meltano_command(["meltano", "version"])
         unprefixed_result = meltano.execute_meltano_command(["help"])
@@ -99,24 +111,28 @@ class TestsFlextMeltanoExecutors:
         tm.that(prefixed_result.value.command[0], eq="--version")
         tm.that(unprefixed_result.value.command[0], eq="--help")
 
-    def test_execute_meltano_command_rejects_empty_command(self) -> None:
+    @staticmethod
+    def test_execute_meltano_command_rejects_empty_command() -> None:
         """Executor runtime commands fail fast on an empty command sequence."""
         result = meltano.execute_meltano_command([])
 
         tm.fail(result, has="empty")
 
-    def test_multiple_version_calls_are_repeatable(self) -> None:
+    @staticmethod
+    def test_multiple_version_calls_are_repeatable() -> None:
         """Repeated version queries stay stable across multiple real calls."""
         for _ in range(3):
             result = meltano.version()
             tm.ok(result)
             tm.that(result.value["command"], eq="version")
 
-    def test_project_root_property_returns_path(self) -> None:
+    @staticmethod
+    def test_project_root_property_returns_path() -> None:
         """Executor project_root remains a concrete filesystem path."""
         tm.that(meltano.project_root, is_=Path)
 
-    def test_cli_run_version_returns_successful_result(self) -> None:
+    @staticmethod
+    def test_cli_run_version_returns_successful_result() -> None:
         """The public CLI runs the version command and returns a successful result."""
         cli_instance = FlextMeltanoCli()
 

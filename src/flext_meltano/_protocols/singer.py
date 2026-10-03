@@ -35,7 +35,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def sync(
-            self, catalog: t.FlatContainerMapping
+            self, catalog: t.FlatContainerMapping,
         ) -> p.Result[t.FlatContainerMapping]:
             """Sync data from source with r."""
             ...
@@ -50,13 +50,13 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def handle_batch(
-            self, records: Sequence[t.Meltano.OptionalScalarMap]
+            self, records: Sequence[t.Meltano.OptionalScalarMap],
         ) -> p.Result[t.FlatContainerMapping]:
             """Handle a batch of records with r."""
             ...
 
         def handle_record(
-            self, record: t.Meltano.OptionalScalarMap
+            self, record: t.Meltano.OptionalScalarMap,
         ) -> p.Result[t.FlatContainerMapping]:
             """Handle a single record with r."""
             ...
@@ -129,7 +129,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def get_records(
-            self, stream_name: str
+            self, stream_name: str,
         ) -> Sequence[m.Meltano.SingerRecordMessage]:
             """Get records for a specific stream."""
             ...
@@ -139,7 +139,7 @@ class FlextMeltanoProtocolsSinger:
             ...
 
         def sync(
-            self, catalog: m.Meltano.SingerCatalog, state: m.Meltano.SingerStateMessage
+            self, catalog: m.Meltano.SingerCatalog, state: m.Meltano.SingerStateMessage,
         ) -> None:
             """Synchronize data from source to stdout."""
             ...
@@ -172,7 +172,7 @@ class FlextMeltanoProtocolsSinger:
         """Consumer-side fetcher contract for declarative Singer taps."""
 
         def fetch(
-            self, request: m.Meltano.FetchRequest
+            self, request: m.Meltano.FetchRequest,
         ) -> p.Result[m.Meltano.FetchResult]:
             """Fetch records for one stream from the consumer domain."""
             ...
@@ -224,14 +224,15 @@ class FlextMeltanoProtocolsSinger:
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
 
-        Context/Record types use ``t.Meltano.MutableContainerValueMapping`` — the canonical
-        bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, ContainerValue]``.
+        Context/Record types use ``t.Meltano.MutableContainerValueMapping`` — the
+        canonical bridge from singer_sdk's ``dict[str, Any]`` to
+        ``MutableMapping[str, ContainerValue]``.
         """
 
         def start_drain(self) -> t.Meltano.MutableContainerValueMapping: ...
 
         def process_batch(
-            self, context: t.Meltano.MutableContainerValueMapping
+            self, context: t.Meltano.MutableContainerValueMapping,
         ) -> None: ...
 
         def mark_drained(self) -> None: ...
@@ -252,13 +253,13 @@ class FlextMeltanoProtocolsSinger:
         """
 
         def handle_schema(
-            self, message: m.Meltano.SingerSchemaMessage
+            self, message: m.Meltano.SingerSchemaMessage,
         ) -> p.Result[bool]:
             """Handle a SCHEMA message."""
             ...
 
         def handle_record(
-            self, message: m.Meltano.SingerRecordMessage
+            self, message: m.Meltano.SingerRecordMessage,
         ) -> p.Result[bool]:
             """Handle a RECORD message."""
             ...

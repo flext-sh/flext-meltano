@@ -24,41 +24,57 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
     @staticmethod
     def _validate_plugin_type(plugin_type: str) -> p.Result[str]:
-        """Validate plugin type."""
+        """Validate plugin type.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         valid_types = [pt.value for pt in c.Meltano.PluginType]
         if plugin_type not in valid_types:
             return r[str].fail(
-                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}"
+                f"Invalid plugin type: {plugin_type}. Valid types: {valid_types}",
             )
         return r[str].ok(plugin_type)
 
     def add_plugin(
-        self, project: p.Meltano.Project, plugin_type: str, plugin_name: str
+        self, project: p.Meltano.Project, plugin_type: str, plugin_name: str,
     ) -> p.Result[t.StrMapping]:
-        """Add plugin to Meltano project using railway-oriented validation chain."""
+        """Add plugin to Meltano project using railway-oriented validation chain.
+
+        Returns:
+            The resulting ``p.Result[t.StrMapping]``.
+        """
         return (
             self
             ._log_plugin_addition_start(plugin_name, plugin_type)
             .flat_map(lambda _: self._validate_plugin_type(plugin_type))
             .flat_map(
-                lambda pt: self._execute_plugin_addition(project, pt, plugin_name)
+                lambda pt: self._execute_plugin_addition(project, pt, plugin_name),
             )
             .flat_map(
                 lambda result: self._build_plugin_addition_result(
-                    plugin_name, plugin_type, addition_success=result
-                )
+                    plugin_name, plugin_type, addition_success=result,
+                ),
             )
         )
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute the pipeline component service."""
+        """Execute the pipeline component service.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def _build_plugin_addition_result(
-        self, plugin_name: str, plugin_type: str, *, addition_success: bool
+        self, plugin_name: str, plugin_type: str, *, addition_success: bool,
     ) -> p.Result[t.StrMapping]:
-        """Build successful plugin addition result."""
+        """Build successful plugin addition result.
+
+        Returns:
+            The resulting ``p.Result[t.StrMapping]``.
+        """
         plugin_result: t.StrMapping = {
             "success": "true" if addition_success else "false",
             "plugin_name": plugin_name,
@@ -72,10 +88,15 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         )
         return r[t.StrMapping].ok(plugin_result)
 
+    @staticmethod
     def _execute_plugin_addition(
-        self, project: p.Meltano.Project, plugin_type_str: str, plugin_name: str
+        project: p.Meltano.Project, plugin_type_str: str, plugin_name: str,
     ) -> p.Result[bool]:
-        """Execute the actual plugin addition using abstraction layer."""
+        """Execute the actual plugin addition using abstraction layer.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         plugin_config: t.JsonMapping = {
             "project_root": str(project.root_dir),
             "plugin_type": plugin_type_str,
@@ -88,15 +109,19 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[bool].ok(value=True)
 
     def _log_plugin_addition_start(
-        self, plugin_name: str, plugin_type: str
+        self, plugin_name: str, plugin_type: str,
     ) -> p.Result[bool]:
-        """Log plugin addition start."""
+        """Log plugin addition start.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         self.logger.info(
             "Adding plugin using ProjectAddService",
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
 
 __all__: list[str] = ["FlextMeltanoComponentService"]

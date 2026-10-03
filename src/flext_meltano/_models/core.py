@@ -1,4 +1,8 @@
-"""FLEXT Meltano models - Core helpers and value types."""
+"""FLEXT Meltano models - Core helpers and value types.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -16,7 +20,11 @@ class FlextMeltanoModelsCore:
     def protect_sensitive_config(
         value: t.FlatContainerMapping,
     ) -> t.FlatContainerMapping:
-        """Protect sensitive keys in configuration dict."""
+        """Protect sensitive keys in configuration dict.
+
+        Returns:
+            The resulting ``t.FlatContainerMapping``.
+        """
         sensitive_keys = {"password", "token", "api_key", "secret", "credentials"}
 
         def is_sensitive(k: str) -> bool:
@@ -30,7 +38,11 @@ class FlextMeltanoModelsCore:
 
     @staticmethod
     def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
-        """Normalize arbitrary values into a validated list of strings."""
+        """Normalize arbitrary values into a validated list of strings.
+
+        Returns:
+            The resulting ``t.StrSequence``.
+        """
         validated: FlextMeltanoModelsCore.StringListValue = (
             FlextMeltanoModelsCore.StringListValue.model_validate({"items": value})
         )
@@ -41,13 +53,17 @@ class FlextMeltanoModelsCore:
         """Validated string list wrapper for result normalization."""
 
         items: Annotated[
-            t.StrTuple, m.Field(description="Normalized tuple of string values")
+            t.StrTuple, m.Field(description="Normalized tuple of string values"),
         ] = m.Field(default_factory=tuple, description="Normalized string values")
 
         @m.field_validator("items", mode="before")
         @classmethod
         def normalize_items(cls, value: t.Meltano.ValidatorInput) -> t.StrTuple:
-            """Convert sequence-like values into string tuples."""
+            """Convert sequence-like values into string tuples.
+
+            Returns:
+                The resulting ``t.StrTuple``.
+            """
             if isinstance(value, (list, tuple, set)):
                 return tuple(str(item) for item in value if item is not None)
             return ()

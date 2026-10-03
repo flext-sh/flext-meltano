@@ -1,12 +1,16 @@
-"""FLEXT Meltano constants."""
+"""FLEXT Meltano constants.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from flext_cli import FlextCliConstants
 
-from ._constants.base import FlextMeltanoConstantsBase
-from ._constants.enums import FlextMeltanoConstantsEnums
-from ._constants.settings import FlextMeltanoConstantsSettings
+from flext_meltano._constants.base import FlextMeltanoConstantsBase
+from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
 
 
 class FlextMeltanoConstants(FlextCliConstants):
