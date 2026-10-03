@@ -114,7 +114,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             if write_result.failure:
                 return r[bool].from_failure(write_result)
             self.logger.info("Catalog saved to file", file=str(catalog_file))
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to save catalog", error=str(e))
             return r[bool].fail(f"Failed to save catalog: {e}", exception=e)

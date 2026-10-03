@@ -71,7 +71,7 @@ class TestsFlextMeltanoExecutors:
 
     @staticmethod
     def test_fetch_version_and_run_cli_surfaces() -> None:
-        """Version lookup and CLI entrypoints stay available through the public facade."""
+        """Version lookup and CLI entrypoints stay available via the public facade."""
         fetch_result = meltano.fetch_version()
         ready_none_result = meltano.run_cli(None)
         ready_empty_result = meltano.run_cli([])
@@ -88,7 +88,7 @@ class TestsFlextMeltanoExecutors:
 
     @staticmethod
     def test_create_cli_runner_surfaces() -> None:
-        """CLI runner creation returns ready and version payloads through public APIs."""
+        """CLI runner creation returns ready and version payloads via public APIs."""
         ready_result = meltano.create_cli_runner([])
         version_result = meltano.create_cli_runner(["version"])
 

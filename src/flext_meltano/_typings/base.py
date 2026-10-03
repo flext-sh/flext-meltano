@@ -40,7 +40,8 @@ class FlextMeltanoTypingsBase:
     """Canonical payload returned by Meltano service operations."""
 
     type EnvironmentInput = c.Meltano.Environment | t.JsonMapping
-    """Environment selector input: a named environment or a full environment configuration mapping."""
+    """Environment selector input: a named environment or a full environment
+    configuration mapping."""
 
     type MutableContainerValueMapping = t.MutableFlatContainerMapping
     """Mutable container bridge for Singer SDK record/context mappings."""

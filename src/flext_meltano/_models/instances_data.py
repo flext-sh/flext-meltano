@@ -127,7 +127,8 @@ class FlextMeltanoModelsInstancesData:
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED
+                , description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
@@ -269,7 +270,8 @@ class FlextMeltanoModelsInstancesData:
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED
+                , description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[

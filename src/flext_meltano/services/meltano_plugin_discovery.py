@@ -39,7 +39,8 @@ class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):
 
     @staticmethod
     def _extract_plugin_info(
-        plugins_data: t.MappingKV[str, t.StrMapping], plugin_name: str, plugin_type: str,
+        plugins_data: t.MappingKV[str, t.StrMapping], plugin_name: str, plugin_type:
+        str,
     ) -> p.Result[t.StrMapping]:
         """Extract plugin info from plugins dict.
 

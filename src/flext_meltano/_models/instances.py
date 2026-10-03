@@ -45,7 +45,8 @@ class FlextMeltanoModelsInstances:
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED
+                , description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
@@ -130,7 +131,8 @@ class FlextMeltanoModelsInstances:
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         records_loaded: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of records loaded"),
+            t.NonNegativeInt
+            , m.Field(default=0, description="Number of records loaded"),
         ] = 0
         batches_processed: Annotated[
             t.NonNegativeInt,

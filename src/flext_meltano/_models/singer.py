@@ -163,7 +163,8 @@ class FlextMeltanoModelsSinger:
             t.StrTuple, m.Field(description="Primary key properties"),
         ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_key: Annotated[
-            str | None, m.Field(default=None, description="Incremental replication key"),
+            str | None
+            , m.Field(default=None, description="Incremental replication key"),
         ] = None
 
     class TapSpec(m.Entity):

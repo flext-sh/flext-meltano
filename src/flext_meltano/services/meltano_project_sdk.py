@@ -149,7 +149,8 @@ class FlextMeltanoProjectManager(FlextMeltanoServiceBase):
                 plugin_kind = plugin.type
             except AttributeError as error:
                 self.logger.warning(
-                    "Skipping a Meltano plugin that violates the SDK definition contract",
+                    "Skipping a Meltano plugin that violates "
+                    "the SDK definition contract",
                     error=str(error),
                 )
                 continue

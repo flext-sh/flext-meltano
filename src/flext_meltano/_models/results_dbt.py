@@ -50,7 +50,8 @@ class FlextMeltanoModelsResultsDbt:
             ),
         ] = "completed"
         error_message: Annotated[
-            str | None, m.Field(default=None, description="Error message if run failed"),
+            str | None
+            , m.Field(default=None, description="Error message if run failed"),
         ] = None
         execution_time_seconds: Annotated[
             float | None,
@@ -64,7 +65,8 @@ class FlextMeltanoModelsResultsDbt:
             bool, m.Field(default=True, description="Whether tests passed"),
         ] = True
         tests_run: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Number of tests executed"),
+            t.NonNegativeInt
+            , m.Field(default=0, description="Number of tests executed"),
         ] = 0
         tests_passed: Annotated[
             t.NonNegativeInt, m.Field(default=0, description="Number of tests passed"),
@@ -75,7 +77,8 @@ class FlextMeltanoModelsResultsDbt:
         status: Annotated[
             str,
             m.Field(
-                default="completed", description="Test status (completed, failed, etc.)",
+                default="completed"
+                , description="Test status (completed, failed, etc.)",
             ),
         ] = "completed"
         error_message: Annotated[
@@ -88,7 +91,10 @@ class FlextMeltanoModelsResultsDbt:
         ] = None
 
     class CommandExecutionResult(m.ArbitraryTypesModel):
-        """Execution result model for Meltano command operations following flext-core patterns."""
+        """Execution result model for Meltano command operations.
+
+        Following flext-core patterns.
+        """
 
         command: Annotated[
             t.StrSequence, m.Field(description="Command that was executed"),
@@ -115,7 +121,8 @@ class FlextMeltanoModelsResultsDbt:
             """Convert to dictionary representation.
 
             Returns:
-            Mapping[str, t.Primitives | t.StrSequence]: Dictionary representation of execution result.
+            Mapping[str, t.Primitives | t.StrSequence]: Dictionary representation of
+            execution result.
 
             """
             dumped: MutableMapping[str, t.Scalar | t.StrSequence] = {}

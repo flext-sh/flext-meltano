@@ -34,7 +34,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     target_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical target name (e.g. target-oracle)"),
+        t.NonEmptyStr
+        , u.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
@@ -90,7 +91,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         )
         if sink_result.failure:
             return r[bool].from_failure(sink_result)
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     def handle_record(self, message: m.Meltano.SingerRecordMessage) -> p.Result[bool]:
         """Route a RECORD message into its stream sink.
@@ -147,7 +148,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
                 context = sink.start_drain()
                 sink.process_batch(context)
                 sink.mark_drained()
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[bool].fail(str(exc), exception=exc)
 
@@ -213,7 +214,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             The resulting ``p.Result[bool]``.
         """
         self._sinks.clear()
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:

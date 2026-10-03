@@ -90,10 +90,12 @@ class FlextMeltanoModelsCliParams:
             ),
         ] = None
         select: Annotated[
-            str | None, m.Field(default=None, description="Selection syntax for models"),
+            str | None
+            , m.Field(default=None, description="Selection syntax for models"),
         ] = None
         exclude: Annotated[
-            str | None, m.Field(default=None, description="Exclusion syntax for models"),
+            str | None
+            , m.Field(default=None, description="Exclusion syntax for models"),
         ] = None
         full_refresh: Annotated[
             bool, m.Field(default=False, description="Run with full refresh"),

@@ -31,7 +31,8 @@ class FlextMeltanoModelsSources:
             t.FlatContainerMapping, m.Field(description="Connection configuration"),
         ]
         stream_config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Stream-specific configuration"),
+            t.FlatContainerMapping
+            , m.Field(description="Stream-specific configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",
@@ -121,7 +122,8 @@ class FlextMeltanoModelsSources:
             description="Connection configuration",
         )
         batch_size: Annotated[
-            int | None, m.Field(default=None, description="Batch size for data loading"),
+            int | None
+            , m.Field(default=None, description="Batch size for data loading"),
         ] = None
         batch_wait_limit: Annotated[
             float | None,
@@ -205,7 +207,8 @@ class FlextMeltanoModelsSources:
             t.FlatContainerMapping, m.Field(description="Connection configuration"),
         ]
         stream_config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Stream-specific configuration"),
+            t.FlatContainerMapping
+            , m.Field(description="Stream-specific configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",

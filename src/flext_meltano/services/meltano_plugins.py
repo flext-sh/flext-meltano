@@ -121,7 +121,7 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
             plugin_name=plugin_name,
             plugin_type=plugin_type,
         )
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
 
 __all__: list[str] = ["FlextMeltanoComponentService"]

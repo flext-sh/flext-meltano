@@ -49,7 +49,8 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="Path to tap configuration file"),
         ] = None
         catalog_file: Annotated[
-            str | None, m.Field(default=None, description="Path to Singer catalog file"),
+            str | None
+            , m.Field(default=None, description="Path to Singer catalog file"),
         ] = None
         state_file: Annotated[
             str | None, m.Field(default=None, description="Path to Singer state file"),

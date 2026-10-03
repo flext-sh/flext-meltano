@@ -46,7 +46,10 @@ class TestsFlextMeltanoTypingsUnit:
     def test_composition_types_are_exposed_on_meltano_namespace(
         composition_type_name: str,
     ) -> None:
-        """Composed types that add value over base ``t.*`` are exposed on ``t.Meltano``."""
+        """Composed types that add value over base ``t.*``.
+
+        Exposed on ``t.Meltano``.
+        """
         assert hasattr(t.Meltano, composition_type_name)
 
     @staticmethod
@@ -92,12 +95,18 @@ class TestsFlextMeltanoTypingsUnit:
         ],
     )
     def test_duplicate_aliases_are_absent(removed_alias: str) -> None:
-        """Simple aliases duplicating existing ``t.*`` types are not on ``t.Meltano``."""
+        """Simple aliases duplicating existing ``t.*`` types.
+
+        Not exposed on ``t.Meltano``.
+        """
         assert not hasattr(t.Meltano, removed_alias)
 
     @staticmethod
     def test_jsonmapping_remains_a_top_level_type_alias() -> None:
-        """``JsonMapping`` stays available at the top ``t.*`` level (not on ``t.Meltano``)."""
+        """``JsonMapping`` stays available at the top ``t.*`` level.
+
+        Not exposed on ``t.Meltano``.
+        """
         assert hasattr(t, "JsonMapping")
         assert not hasattr(t.Meltano, "JsonMapping")
 
@@ -106,7 +115,10 @@ class TestsFlextMeltanoTypingsUnit:
     def test_runtime_singer_sdk_wrappers_live_on_models_not_typings(
         wrapper_name: str,
     ) -> None:
-        """Runtime Singer SDK wrappers are exposed via ``m.Meltano``, never ``t.Meltano``."""
+        """Runtime Singer SDK wrappers are exposed via ``m.Meltano``.
+
+        Never on ``t.Meltano``.
+        """
         tm.that(getattr(m.Meltano, wrapper_name), none=False)
         assert not hasattr(t.Meltano, wrapper_name)
 
@@ -151,6 +163,6 @@ class TestsFlextMeltanoTypingsUnit:
 
     @staticmethod
     def test_singer_catalog_entry_rejects_missing_required_fields() -> None:
-        """Constructing without required fields raises a validation error (error path)."""
+        """Constructing without required fields raises a validation error."""
         with pytest.raises(m.ValidationError):
             m.Meltano.SingerCatalogEntry.model_validate({})

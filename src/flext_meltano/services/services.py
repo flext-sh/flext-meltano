@@ -116,7 +116,8 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             The resulting ``p.Result[Self]``.
         """
         return cls._create_component_service(
-            transformation_name, "transformation_name", "transformation service", config,
+            transformation_name, "transformation_name", "transformation service",
+            config,
         )
 
     @staticmethod

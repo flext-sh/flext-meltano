@@ -18,7 +18,10 @@ from flext_meltano import c, m
 
 
 class FlextMeltanoSettings(FlextSettings):
-    """Runtime settings for Meltano orchestration; fields under ``settings.Meltano.*``."""
+    """Runtime settings for Meltano orchestration.
+
+    Fields under ``settings.Meltano.*``.
+    """
 
     # Why: pydantic_settings is owned by flext-core; route SettingsConfigDict
     # through the m facade instead of importing the third-party package
@@ -114,6 +117,9 @@ class FlextMeltanoSettings(FlextSettings):
 
 
 settings: FlextMeltanoSettings = FlextMeltanoSettings.fetch_global()
-"""Pre-instantiated project settings singleton — ``from flext_meltano import settings``."""
+"""Pre-instantiated project settings singleton.
+
+``from flext_meltano import settings``.
+"""
 
 __all__: list[str] = ["FlextMeltanoSettings", "settings"]

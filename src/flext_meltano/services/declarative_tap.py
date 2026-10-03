@@ -77,7 +77,8 @@ class FlextMeltanoDeclarativeTap:
             """A Singer stream whose records come from the FLEXT fetcher."""
 
             def __init__(
-                self, tap: Tap, stream_spec: m.Meltano.StreamSpec, config: t.JsonMapping,
+                self, tap: Tap, stream_spec: m.Meltano.StreamSpec, config:
+                t.JsonMapping,
             ) -> None:
                 super().__init__(
                     tap, schema=dict(stream_spec.json_schema), name=stream_spec.name,

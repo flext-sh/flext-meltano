@@ -145,7 +145,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
         Returns:
             The resulting ``p.Result[bool]``.
         """
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     # ------------------------------------------------------------------
     # Internal

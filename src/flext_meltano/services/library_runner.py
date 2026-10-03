@@ -14,8 +14,9 @@ from flext_meltano.services.executor import FlextMeltanoExecutor
 if TYPE_CHECKING:
     from pathlib import Path
 
-    # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return; runtime
-    # import not needed (from __future__ import annotations makes the annotation lazy).
+    # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return;
+    # runtime import not needed (from __future__ import annotations makes the
+    # annotation lazy).
     from flext_meltano import m
 
 

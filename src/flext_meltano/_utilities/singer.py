@@ -136,7 +136,7 @@ class FlextMeltanoUtilitiesSinger:
                 result = FlextMeltanoUtilitiesSinger._process_stdin_line(line, handler)
                 if result.failure:
                     return result
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation("Stdin processing", exc, result_type=r[bool])
 
@@ -151,10 +151,10 @@ class FlextMeltanoUtilitiesSinger:
         """
         stripped = line.strip()
         if not stripped:
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         raw_value: t.JsonValue = cli_u.Cli.json_loads(stripped).unwrap()
         if not isinstance(raw_value, dict):
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         raw = t.json_dict_adapter().validate_python(raw_value)
         return FlextMeltanoUtilitiesSinger._dispatch_singer_message(raw, handler)
 
@@ -174,7 +174,7 @@ class FlextMeltanoUtilitiesSinger:
             return FlextMeltanoUtilitiesSinger._handle_record_message(raw, handler)
         if msg_type == c.Meltano.SingerMessageType.STATE:
             return FlextMeltanoUtilitiesSinger._handle_state_message(raw, handler)
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def _handle_schema_message(
@@ -193,7 +193,7 @@ class FlextMeltanoUtilitiesSinger:
                 result.error,
                 result_type=r[bool],
             )
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def _handle_record_message(
@@ -212,7 +212,7 @@ class FlextMeltanoUtilitiesSinger:
                 result.error,
                 result_type=r[bool],
             )
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def _handle_state_message(
@@ -227,7 +227,7 @@ class FlextMeltanoUtilitiesSinger:
         result = handler.handle_state(state_msg)
         if result.failure:
             return e.fail_operation("STATE handler", result.error, result_type=r[bool])
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     @staticmethod
     def build_catalog_entry(

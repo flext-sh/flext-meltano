@@ -44,7 +44,8 @@ class FlextMeltanoModelsResults:
             str | None, m.Field(default=None, description="Error message if failed"),
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping, m.Field(description="Additional execution metadata"),
+            t.ConfigurationMapping
+            , m.Field(description="Additional execution metadata"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional execution metadata",

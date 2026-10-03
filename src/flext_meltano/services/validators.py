@@ -63,7 +63,10 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
         meltano_yml = project_path / c.Meltano.PATH_MELTANO_PROJECT_FILE
         if not meltano_yml.exists():
-            error_msg = f"Project path {project_path} does not contain {c.Meltano.PATH_MELTANO_PROJECT_FILE}"
+            error_msg = (
+                f"Project path {project_path} does not contain "
+                f"{c.Meltano.PATH_MELTANO_PROJECT_FILE}"
+            )
             u.fetch_logger(__name__).exception(error_msg)
             return r[bool].fail(error_msg)
 

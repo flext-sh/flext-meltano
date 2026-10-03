@@ -83,7 +83,8 @@ class FlextMeltanoModelsPayloads:
         tap_name: Annotated[t.NonEmptyStr, m.Field(description="Singer tap name")]
         target_name: Annotated[str, m.Field(description="Singer target name")]
         dbt_models: Annotated[
-            t.StrSequence | None, m.Field(default=None, description="DBT models to run"),
+            t.StrSequence | None
+            , m.Field(default=None, description="DBT models to run"),
         ] = None
         config: Annotated[
             t.FlatContainerMapping | None,

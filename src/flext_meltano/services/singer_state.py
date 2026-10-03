@@ -96,7 +96,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             if write_result.failure:
                 return r[bool].from_failure(write_result)
             self.logger.info("State saved to file", file=str(state_file))
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to save state", error=str(exc))
             return e.fail_operation("save state", exc, result_type=r[bool])
@@ -127,7 +127,7 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                         state_type=type(stream_bookmarks).__name__,
                     )
             self.logger.debug("Bookmark updated", stream=stream_name, key=bookmark_key)
-            return r[bool].ok(True)
+            return r[bool].ok(value=True)
 
         try:
             return _run_update_bookmark()

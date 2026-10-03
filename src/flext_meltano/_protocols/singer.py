@@ -224,8 +224,9 @@ class FlextMeltanoProtocolsSinger:
         Used by ``FlextMeltanoTargetServiceBase.flush()`` to process
         batches through the Singer sink lifecycle.
 
-        Context/Record types use ``t.Meltano.MutableContainerValueMapping`` — the canonical
-        bridge from singer_sdk's ``dict[str, Any]`` to ``MutableMapping[str, ContainerValue]``.
+        Context/Record types use ``t.Meltano.MutableContainerValueMapping`` — the
+        canonical bridge from singer_sdk's ``dict[str, Any]`` to
+        ``MutableMapping[str, ContainerValue]``.
         """
 
         def start_drain(self) -> t.Meltano.MutableContainerValueMapping: ...

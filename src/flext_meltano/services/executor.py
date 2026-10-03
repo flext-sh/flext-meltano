@@ -25,7 +25,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         sink_name: str | None = None,
         transformation_name: str | None = None,
     ) -> None:
-        """Forward canonical Meltano service kwargs through ``FlextMeltanoExecutorBase``."""
+        """Forward canonical Meltano service kwargs via ``FlextMeltanoExecutorBase``."""
         super().__init__(
             settings=settings,
             service_name=service_name,

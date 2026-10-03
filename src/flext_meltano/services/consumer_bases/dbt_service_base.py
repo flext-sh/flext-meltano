@@ -214,7 +214,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         if not root.exists():
             return r[bool].fail(str(root))
         self._dbt_project_root = root
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     def _resolve_manifest_path(self, manifest_path: Path | None) -> p.Result[Path]:
         """Resolve the effective dbt manifest location.
