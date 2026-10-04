@@ -46,7 +46,8 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     tap_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical tap name (e.g. tap-oracle)"),
+        t.NonEmptyStr,
+        u.Field(description="Canonical tap name (e.g. tap-oracle)"),
     ] = "tap"
 
     _tap_instance: p.Meltano.SingerTapInstance | None = u.PrivateAttr(
@@ -59,7 +60,8 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
     @abstractmethod
     def create_tap_instance(
-        self, settings: p.Settings | None = None,
+        self,
+        settings: p.Settings | None = None,
     ) -> p.Meltano.SingerTapInstance:
         """Create the singer_sdk Tap subclass instance.
 
@@ -104,7 +106,9 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
             streams = tap.discover_streams()
             stream_names: t.StrSequence = [s.name for s in streams]
             self.logger.info(
-                "Streams discovered", tap=self.tap_name, count=len(stream_names),
+                "Streams discovered",
+                tap=self.tap_name,
+                count=len(stream_names),
             )
             return r[t.StrSequence].ok(stream_names)
         except c.EXC_BROAD_RUNTIME_OS as exc:
@@ -163,7 +167,8 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
 
     @staticmethod
     def build_declarative_tap(
-        spec: m.Meltano.TapSpec, fetcher: p.Meltano.RecordFetcher,
+        spec: m.Meltano.TapSpec,
+        fetcher: p.Meltano.RecordFetcher,
     ) -> p.Meltano.SingerTapInstance:
         """Build a flat-CLI Singer tap from declarative specs (no singer_sdk here).
 

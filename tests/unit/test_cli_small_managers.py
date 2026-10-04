@@ -33,7 +33,8 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     def test_version_command_succeeds_and_prints_version_string(
-        meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str],
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test version command succeeds and prints version string."""
         result = meltano_cli.run([c.Meltano.CliCommand.VERSION])
@@ -43,7 +44,8 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     def test_status_show_succeeds_with_ready_status_payload(
-        meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str],
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test status show succeeds with ready status payload."""
         result = meltano_cli.run([c.Meltano.CliCommand.STATUS, "show"])
@@ -58,7 +60,8 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     def test_status_health_succeeds_with_status_key_in_payload(
-        meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str],
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test status health succeeds with status key in payload."""
         result = meltano_cli.run([
@@ -76,10 +79,12 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     @pytest.mark.parametrize(
-        "command", [c.Meltano.CliCommand.TAP, c.Meltano.CliCommand.TARGET],
+        "command",
+        [c.Meltano.CliCommand.TAP, c.Meltano.CliCommand.TARGET],
     )
     def test_unsupported_extractor_operation_reports_failure(
-        meltano_cli: FlextMeltanoCli, command: str,
+        meltano_cli: FlextMeltanoCli,
+        command: str,
     ) -> None:
         """Test unsupported extractor operation reports failure."""
         result = meltano_cli.run([command, "--operation", "run", "--args", "demo"])
@@ -100,7 +105,8 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     def test_plugin_install_is_unsupported_and_reports_failure(
-        meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str],
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test plugin install is unsupported and reports failure."""
         result = meltano_cli.run([
@@ -115,7 +121,8 @@ class TestsFlextMeltanoCliSmallManagers:
 
     @staticmethod
     def test_dbt_help_option_succeeds_and_prints_dbt_help(
-        meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str],
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test dbt help option succeeds and prints dbt help."""
         result = meltano_cli.run([c.Meltano.CliCommand.DBT, c.Meltano.CMD_HELP_OPTION])

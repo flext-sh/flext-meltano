@@ -37,7 +37,10 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[str].ok(plugin_type)
 
     def add_plugin(
-        self, project: p.Meltano.Project, plugin_type: str, plugin_name: str,
+        self,
+        project: p.Meltano.Project,
+        plugin_type: str,
+        plugin_name: str,
     ) -> p.Result[t.StrMapping]:
         """Add plugin to Meltano project using railway-oriented validation chain.
 
@@ -53,7 +56,9 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
             )
             .flat_map(
                 lambda result: self._build_plugin_addition_result(
-                    plugin_name, plugin_type, addition_success=result,
+                    plugin_name,
+                    plugin_type,
+                    addition_success=result,
                 ),
             )
         )
@@ -68,7 +73,11 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
     def _build_plugin_addition_result(
-        self, plugin_name: str, plugin_type: str, *, addition_success: bool,
+        self,
+        plugin_name: str,
+        plugin_type: str,
+        *,
+        addition_success: bool,
     ) -> p.Result[t.StrMapping]:
         """Build successful plugin addition result.
 
@@ -90,7 +99,9 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
 
     @staticmethod
     def _execute_plugin_addition(
-        project: p.Meltano.Project, plugin_type_str: str, plugin_name: str,
+        project: p.Meltano.Project,
+        plugin_type_str: str,
+        plugin_name: str,
     ) -> p.Result[bool]:
         """Execute the actual plugin addition using abstraction layer.
 
@@ -109,7 +120,9 @@ class FlextMeltanoComponentService(FlextMeltanoPluginDiscoveryMixin):
         return r[bool].ok(value=True)
 
     def _log_plugin_addition_start(
-        self, plugin_name: str, plugin_type: str,
+        self,
+        plugin_name: str,
+        plugin_type: str,
     ) -> p.Result[bool]:
         """Log plugin addition start.
 

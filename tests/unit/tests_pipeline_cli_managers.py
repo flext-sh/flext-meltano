@@ -53,7 +53,8 @@ class TestFlextMeltanoPipelineCliManagers:
     @staticmethod
     def _spawn_sleep_process() -> BaseProcess:
         process = multiprocessing.get_context("spawn").Process(
-            target=time.sleep, args=(30,),
+            target=time.sleep,
+            args=(30,),
         )
         process.start()
         deadline = time.monotonic() + 5
@@ -73,7 +74,8 @@ class TestFlextMeltanoPipelineCliManagers:
 
     @staticmethod
     def test_pipeline_help_request_lists_subcommands(
-        meltano_cli: FlextMeltanoCli, capsys: pytest.CaptureFixture[str],
+        meltano_cli: FlextMeltanoCli,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Pipeline help exposes the model-driven subcommands."""
         result = meltano_cli.run([
@@ -91,7 +93,9 @@ class TestFlextMeltanoPipelineCliManagers:
         tm.that(output, has=c.Meltano.PipelineCommand.DELETE)
 
     def test_pipeline_create_list_run_and_delete_use_real_storage(
-        self, capsys: pytest.CaptureFixture[str], tmp_path: Path,
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
     ) -> None:
         """Pipeline lifecycle commands persist and execute through real helpers."""
         previous_root = self._activate_pipelines_root(tmp_path)
@@ -164,7 +168,9 @@ class TestFlextMeltanoPipelineCliManagers:
         tm.that((tmp_path / "pipelines" / pipeline_name).exists(), eq=False)
 
     def test_pipeline_create_requires_runtime_configuration(
-        self, capsys: pytest.CaptureFixture[str], tmp_path: Path,
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
     ) -> None:
         """Pipeline creation without JSON config fails on the real handler path."""
         previous_root = self._activate_pipelines_root(tmp_path)
@@ -185,7 +191,9 @@ class TestFlextMeltanoPipelineCliManagers:
         tm.that(output, has="not configured")
 
     def test_pipeline_status_and_stop_use_real_pid_files(
-        self, capsys: pytest.CaptureFixture[str], tmp_path: Path,
+        self,
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: Path,
     ) -> None:
         """Status and stop commands inspect a real background process pid file."""
         previous_root = self._activate_pipelines_root(tmp_path)

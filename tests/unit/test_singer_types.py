@@ -66,7 +66,8 @@ class TestsFlextMeltanoSingerTypes:
     @staticmethod
     @pytest.mark.parametrize(("alias_name", "value_fragment"), _MELTANO_TYPE_ALIASES)
     def test_type_alias_resolves_to_expected_value(
-        alias_name: str, value_fragment: str,
+        alias_name: str,
+        value_fragment: str,
     ) -> None:
         """Each type alias is a PEP 695 alias resolving to its contracted target."""
         alias = getattr(t.Meltano, alias_name)

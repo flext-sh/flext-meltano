@@ -41,10 +41,12 @@ class FlextMeltanoModelsResultsPipeline:
             ),
         ] = c.Meltano.OperationStatus.PENDING
         total_records: Annotated[
-            t.NonNegativeInt, m.Field(default=0, description="Total records processed"),
+            t.NonNegativeInt,
+            m.Field(default=0, description="Total records processed"),
         ] = 0
         pipeline_metadata: Annotated[
-            t.ConfigurationMapping, m.Field(description="Pipeline execution metadata"),
+            t.ConfigurationMapping,
+            m.Field(description="Pipeline execution metadata"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Pipeline execution metadata",
@@ -53,7 +55,8 @@ class FlextMeltanoModelsResultsPipeline:
         @m.field_validator("pipeline_metadata", mode="after")
         @classmethod
         def freeze_pipeline_metadata(
-            cls, value: t.ConfigurationMapping,
+            cls,
+            value: t.ConfigurationMapping,
         ) -> t.ConfigurationMapping:
             """Expose pipeline metadata as a read-only mapping.
 

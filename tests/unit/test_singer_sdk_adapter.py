@@ -64,7 +64,9 @@ class TestsFlextMeltanoSingerSdkAdapter:
         ],
     )
     def test_factory_derives_service_name_from_component_name(
-        factory: str, name: str, role_field: str,
+        factory: str,
+        name: str,
+        role_field: str,
     ) -> None:
         """Each factory derives ``<name>_service`` as the public service name."""
         result = getattr(meltano, factory)(name)
@@ -83,7 +85,9 @@ class TestsFlextMeltanoSingerSdkAdapter:
         ],
     )
     def test_factory_role_field_survives_public_model_dump(
-        factory: str, name: str, role_field: str,
+        factory: str,
+        name: str,
+        role_field: str,
     ) -> None:
         """The bound role and the two cleared roles appear in the public dump."""
         facade = getattr(meltano, factory)(name).unwrap()
@@ -129,7 +133,8 @@ class TestsFlextMeltanoSingerSdkAdapter:
         [("tap", "tap-csv"), ("target", "target-jsonl"), ("dbt", "analytics")],
     )
     def test_factory_is_idempotent_across_repeated_calls(
-        factory: str, name: str,
+        factory: str,
+        name: str,
     ) -> None:
         """Repeated calls yield equal public state on distinct instances."""
         first = getattr(meltano, factory)(name).unwrap()

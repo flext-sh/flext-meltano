@@ -26,7 +26,8 @@ class FlextMeltanoCli:
         self._service = FlextMeltano.fetch_global()
         self._pipeline_mgr = FlextMeltanoPipelineManager()
         self._app = cli.create_app_with_common_params(
-            name=self.app_name, help_text=self.app_help,
+            name=self.app_name,
+            help_text=self.app_help,
         )
         self._register_commands()
 
@@ -61,7 +62,8 @@ class FlextMeltanoCli:
 
     def _register_status_commands(self) -> None:
         status_group = cli.create_group(
-            name=c.Meltano.CliCommand.STATUS, help_text="Meltano status operations",
+            name=c.Meltano.CliCommand.STATUS,
+            help_text="Meltano status operations",
         )
         cli.register_result_command(
             status_group,
@@ -87,7 +89,8 @@ class FlextMeltanoCli:
         )
 
     def _handle_status_health(
-        self, _model: m.Meltano.StatusHealthInput,
+        self,
+        _model: m.Meltano.StatusHealthInput,
     ) -> p.Result[str]:
         return self._service.health().flat_map(
             lambda payload: u.Cli.json_dumps(
@@ -146,7 +149,8 @@ class FlextMeltanoCli:
 
     def _register_plugin_commands(self) -> None:
         plugin_group = cli.create_group(
-            name=c.Meltano.CliCommand.PLUGIN, help_text="Meltano plugin operations",
+            name=c.Meltano.CliCommand.PLUGIN,
+            help_text="Meltano plugin operations",
         )
         cli.register_result_command(
             plugin_group,
@@ -212,7 +216,8 @@ class FlextMeltanoCli:
 
     def _register_pipeline_commands(self) -> None:
         pipeline_group = cli.create_group(
-            name=c.Meltano.CliCommand.PIPELINE, help_text="Pipeline operations",
+            name=c.Meltano.CliCommand.PIPELINE,
+            help_text="Pipeline operations",
         )
         cli.register_result_command(
             pipeline_group,
@@ -257,11 +262,14 @@ class FlextMeltanoCli:
             handler=self._handle_pipeline_delete,
         )
         cli.add_group(
-            self._app, name=c.Meltano.CliCommand.PIPELINE, group=pipeline_group,
+            self._app,
+            name=c.Meltano.CliCommand.PIPELINE,
+            group=pipeline_group,
         )
 
     def _handle_pipeline_create(
-        self, model: m.Meltano.PipelineCreateInput,
+        self,
+        model: m.Meltano.PipelineCreateInput,
     ) -> p.Result[str]:
         config_payload: t.JsonMapping | None = None
         if model.config_json is not None:
@@ -276,7 +284,9 @@ class FlextMeltanoCli:
                 }).values
             except ValueError as exc:
                 return e.fail_validation(
-                    "pipeline configuration JSON", error=exc, result_type=r[str],
+                    "pipeline configuration JSON",
+                    error=exc,
+                    result_type=r[str],
                 )
         return self._pipeline_mgr.create_pipeline(model.pipeline_name, config_payload)
 
@@ -285,24 +295,28 @@ class FlextMeltanoCli:
         return self._pipeline_mgr.execute_pipeline(model.pipeline_name, command_args)
 
     def _handle_pipeline_list(
-        self, _model: m.Meltano.PipelineListInput,
+        self,
+        _model: m.Meltano.PipelineListInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.list_pipelines().map(
             lambda pipelines: ", ".join(pipelines) or "none",
         )
 
     def _handle_pipeline_status(
-        self, model: m.Meltano.PipelineNameInput,
+        self,
+        model: m.Meltano.PipelineNameInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.fetch_pipeline_status(model.pipeline_name)
 
     def _handle_pipeline_stop(
-        self, model: m.Meltano.PipelineNameInput,
+        self,
+        model: m.Meltano.PipelineNameInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.stop_pipeline(model.pipeline_name)
 
     def _handle_pipeline_delete(
-        self, model: m.Meltano.PipelineNameInput,
+        self,
+        model: m.Meltano.PipelineNameInput,
     ) -> p.Result[str]:
         return self._pipeline_mgr.delete_pipeline(model.pipeline_name)
 

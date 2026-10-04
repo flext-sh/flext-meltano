@@ -61,14 +61,16 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     transformation_name: Annotated[
         str | None,
         u.Field(
-            default=None, description="Optional transformation specialization name",
+            default=None,
+            description="Optional transformation specialization name",
         ),
     ] = None
 
     @u.model_validator(mode="before")
     @classmethod
     def _normalize_settings_alias(
-        cls, data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self,
+        cls,
+        data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self,
     ) -> t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self:
         """Accept ``settings`` as an alias for ``runtime_settings``.
 

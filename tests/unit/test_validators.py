@@ -63,7 +63,8 @@ class TestsFlextMeltanoValidators:
         ],
     )
     def test_plugin_name_business_rules_reject_invalid_names(
-        name: str, expected_fragment: str,
+        name: str,
+        expected_fragment: str,
     ) -> None:
         """Test plugin name business rules reject invalid names."""
         settings: t.ScalarMapping = {

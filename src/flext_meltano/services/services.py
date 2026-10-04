@@ -90,12 +90,17 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             The resulting ``p.Result[Self]``.
         """
         return cls._create_component_service(
-            sink_name, "sink_name", "sink service", config,
+            sink_name,
+            "sink_name",
+            "sink service",
+            config,
         )
 
     @classmethod
     def create_source_service(
-        cls, source_name: str, **config: t.Scalar,
+        cls,
+        source_name: str,
+        **config: t.Scalar,
     ) -> p.Result[Self]:
         """Create data source service from the shared component contract.
 
@@ -103,12 +108,17 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             The resulting ``p.Result[Self]``.
         """
         return cls._create_component_service(
-            source_name, "source_name", "source service", config,
+            source_name,
+            "source_name",
+            "source service",
+            config,
         )
 
     @classmethod
     def create_transformation_service(
-        cls, transformation_name: str, **config: t.Scalar,
+        cls,
+        transformation_name: str,
+        **config: t.Scalar,
     ) -> p.Result[Self]:
         """Create transformation service from the shared component contract.
 
@@ -116,13 +126,16 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             The resulting ``p.Result[Self]``.
         """
         return cls._create_component_service(
-            transformation_name, "transformation_name", "transformation service",
+            transformation_name,
+            "transformation_name",
+            "transformation service",
             config,
         )
 
     @staticmethod
     def configure_environment(
-        environment_name: str, settings: t.JsonMapping | None = None,
+        environment_name: str,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[t.Meltano.ServicePayload]:
         """Configure environment.
 
@@ -133,7 +146,8 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             return r[t.Meltano.ServicePayload].fail("Environment name is required")
         normalized_environment = str(
             c.Meltano.ENVIRONMENT_ALIASES.get(
-                environment_name.strip().lower(), environment_name.strip().lower(),
+                environment_name.strip().lower(),
+                environment_name.strip().lower(),
             ),
         )
         if normalized_environment not in c.Meltano.ENVIRONMENTS_VALID:
@@ -152,7 +166,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def configure_pipeline(
-        source_name: str, sink_name: str, config: t.JsonMapping | None = None,
+        source_name: str,
+        sink_name: str,
+        config: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Configure generic data pipeline.
 
@@ -169,7 +185,9 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
 
     @staticmethod
     def install_component(
-        component_type: str, component_name: str, settings: t.JsonMapping | None = None,
+        component_type: str,
+        component_name: str,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[t.Meltano.ServicePayload]:
         """Install pipeline component with validation.
 

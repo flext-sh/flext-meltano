@@ -32,7 +32,8 @@ MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
 
 
 @pytest.fixture(
-    params=tuple(range(len(MELTANO_COMPONENT_CASES))), ids=MELTANO_COMPONENT_IDS,
+    params=tuple(range(len(MELTANO_COMPONENT_CASES))),
+    ids=MELTANO_COMPONENT_IDS,
 )
 def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCase:
     """Canonical public Meltano component factories with expected selectors.
@@ -132,7 +133,8 @@ def meltano_yml_config() -> t.JsonMapping:
 
 @pytest.fixture
 def meltano_project(
-    test_meltano_project_dir: Path, meltano_yml_config: t.JsonMapping,
+    test_meltano_project_dir: Path,
+    meltano_yml_config: t.JsonMapping,
 ) -> dict[str, str | Path | t.JsonMapping]:
     """Meltano project for testing.
 
@@ -204,7 +206,9 @@ def _docker_stack_release(request: pytest.FixtureRequest) -> Generator[None]:
 
 @pytest.fixture
 def docker_services(
-    docker_manager: tk, _docker_stack_release: None, request: pytest.FixtureRequest,
+    docker_manager: tk,
+    _docker_stack_release: None,
+    request: pytest.FixtureRequest,
 ) -> tk:
     """Function-scoped Docker services fixture over the leased stack.
 
@@ -234,7 +238,9 @@ def postgres_service(docker_services: tk) -> str:
         The resulting ``str``.
     """
     return require_docker_service(
-        docker_services, c.Meltano.Tests.POSTGRES_PORT, "PostgreSQL",
+        docker_services,
+        c.Meltano.Tests.POSTGRES_PORT,
+        "PostgreSQL",
     )
 
 

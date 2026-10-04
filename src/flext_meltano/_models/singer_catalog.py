@@ -22,7 +22,8 @@ class FlextMeltanoModelsSingerCatalog:
         """Singer catalog metadata block model."""
 
         breadcrumb: t.StrTuple = m.Field(
-            default_factory=tuple, description="Singer metadata breadcrumb path",
+            default_factory=tuple,
+            description="Singer metadata breadcrumb path",
         )
         metadata: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -32,7 +33,8 @@ class FlextMeltanoModelsSingerCatalog:
         @m.field_validator("metadata", mode="after")
         @classmethod
         def freeze_metadata(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose Singer metadata properties as read-only.
 
@@ -69,12 +71,14 @@ class FlextMeltanoModelsSingerCatalog:
             FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
         ] = m.Field(default_factory=tuple, description="Singer stream metadata blocks")
         key_properties: t.StrTuple = m.Field(
-            default_factory=tuple, description="Primary key columns for this stream",
+            default_factory=tuple,
+            description="Primary key columns for this stream",
         )
         replication_key: Annotated[
             str | None,
             m.Field(
-                default=None, description="Column used for incremental replication",
+                default=None,
+                description="Column used for incremental replication",
             ),
         ] = None
         replication_method: Annotated[
@@ -86,10 +90,12 @@ class FlextMeltanoModelsSingerCatalog:
             m.Field(default=None, description="Whether this stream is a database view"),
         ] = None
         table_name: Annotated[
-            str | None, m.Field(default=None, description="Source table name"),
+            str | None,
+            m.Field(default=None, description="Source table name"),
         ] = None
         database_name: Annotated[
-            str | None, m.Field(default=None, description="Source database name"),
+            str | None,
+            m.Field(default=None, description="Source database name"),
         ] = None
         row_count: Annotated[
             int | None,
@@ -114,17 +120,20 @@ class FlextMeltanoModelsSingerCatalog:
         """Configuration for a Singer ELT pipeline."""
 
         tap_config_path: Annotated[
-            Path | None, m.Field(default=None, description="Path to tap configuration"),
+            Path | None,
+            m.Field(default=None, description="Path to tap configuration"),
         ] = None
         target_config_path: Annotated[
             Path | None,
             m.Field(default=None, description="Path to target configuration"),
         ] = None
         catalog_path: Annotated[
-            Path | None, m.Field(default=None, description="Path to catalog file"),
+            Path | None,
+            m.Field(default=None, description="Path to catalog file"),
         ] = None
         state_path: Annotated[
-            Path | None, m.Field(default=None, description="Path to state file"),
+            Path | None,
+            m.Field(default=None, description="Path to state file"),
         ] = None
         selected_streams: Annotated[
             t.StrSequence | None,
@@ -135,10 +144,12 @@ class FlextMeltanoModelsSingerCatalog:
         """Result of a Singer sync operation."""
 
         records_processed: Annotated[
-            t.NonNegativeInt, m.Field(description="Number of records processed"),
+            t.NonNegativeInt,
+            m.Field(description="Number of records processed"),
         ]
         records_written: Annotated[
-            t.NonNegativeInt, m.Field(description="Number of records written"),
+            t.NonNegativeInt,
+            m.Field(description="Number of records written"),
         ]
         errors: Annotated[t.NonNegativeInt, m.Field(description="Number of errors")]
         state: t.FlatContainerMapping = m.Field(
@@ -167,5 +178,6 @@ class FlextMeltanoModelsSingerCatalog:
             return dict(value)
 
         duration_seconds: Annotated[
-            t.NonNegativeFloat, m.Field(description="Execution duration"),
+            t.NonNegativeFloat,
+            m.Field(description="Execution duration"),
         ]

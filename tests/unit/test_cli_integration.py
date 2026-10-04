@@ -72,7 +72,8 @@ class TestsFlextMeltanoCliIntegration:
 
     @staticmethod
     @pytest.mark.parametrize(
-        "field_name", ["config_file", "catalog_file", "state_file", "properties_file"],
+        "field_name",
+        ["config_file", "catalog_file", "state_file", "properties_file"],
     )
     def test_each_optional_path_field_round_trips(*, field_name: str) -> None:
         """Test each optional path field round trips."""

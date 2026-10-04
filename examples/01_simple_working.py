@@ -48,7 +48,8 @@ def simple_runtime_example() -> None:
     ])
     if result.success:
         logger.info(
-            "Runtime command result: %s", result.value.model_dump(mode="python"),
+            "Runtime command result: %s",
+            result.value.model_dump(mode="python"),
         )
 
 

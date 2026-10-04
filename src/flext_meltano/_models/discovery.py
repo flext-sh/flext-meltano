@@ -22,7 +22,8 @@ class FlextMeltanoModelsDiscovery:
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
-            str, m.Field(default="", description="Plugin default variant"),
+            str,
+            m.Field(default="", description="Plugin default variant"),
         ] = ""
         variants: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -30,7 +31,8 @@ class FlextMeltanoModelsDiscovery:
         )
         logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, m.Field(default="", description="Plugin description"),
+            str,
+            m.Field(default="", description="Plugin description"),
         ] = ""
 
         @m.field_validator("default_variant", "logo_url", "description", mode="before")
@@ -46,7 +48,8 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("variants", mode="before")
         @classmethod
         def normalize_variants(
-            cls, value: t.Meltano.ValidatorInput,
+            cls,
+            value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
             """Normalize variant maps from external payloads.
 
@@ -63,7 +66,8 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("variants", mode="after")
         @classmethod
         def freeze_variants(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose normalized variants as a read-only mapping.
 
@@ -78,14 +82,17 @@ class FlextMeltanoModelsDiscovery:
         name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
         type: Annotated[t.NonEmptyStr, m.Field(description="Plugin type")]
         default_variant: Annotated[
-            str, m.Field(default="", description="Default plugin variant"),
+            str,
+            m.Field(default="", description="Default plugin variant"),
         ] = ""
         variants: Annotated[
-            str, m.Field(default="", description="Comma-separated variants"),
+            str,
+            m.Field(default="", description="Comma-separated variants"),
         ] = ""
         logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, m.Field(default="", description="Plugin description"),
+            str,
+            m.Field(default="", description="Plugin description"),
         ] = ""
 
     class PluginDiscoveryCatalog(m.FlexibleModel):
@@ -93,7 +100,8 @@ class FlextMeltanoModelsDiscovery:
 
         @staticmethod
         def _plugins_default() -> Mapping[
-            str, FlextMeltanoModelsDiscovery.PluginDiscoverySource,
+            str,
+            FlextMeltanoModelsDiscovery.PluginDiscoverySource,
         ]:
             """Late-bound empty plugin-catalog default.
 
@@ -108,7 +116,8 @@ class FlextMeltanoModelsDiscovery:
                     FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
             """
             return MappingProxyType[
-                str, FlextMeltanoModelsDiscovery.PluginDiscoverySource,
+                str,
+                FlextMeltanoModelsDiscovery.PluginDiscoverySource,
             ]({})
 
         plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
@@ -121,7 +130,8 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("plugins", mode="before")
         @classmethod
         def normalize_plugins(
-            cls, value: t.Meltano.ValidatorInput,
+            cls,
+            value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
             """Normalize plugin catalog mapping.
 
@@ -138,7 +148,8 @@ class FlextMeltanoModelsDiscovery:
         @m.field_validator("plugins", mode="after")
         @classmethod
         def freeze_plugins(
-            cls, value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource],
+            cls,
+            value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource],
         ) -> Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]:
             """Expose normalized plugins as a read-only mapping.
 

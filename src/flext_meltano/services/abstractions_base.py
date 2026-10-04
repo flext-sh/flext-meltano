@@ -101,7 +101,9 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         return None
 
     def fetch_plugins_of_type(
-        self, _project: t.JsonPayload | t.JsonMapping | None, plugin_type: str,
+        self,
+        _project: t.JsonPayload | t.JsonMapping | None,
+        plugin_type: str,
     ) -> p.Result[t.Meltano.NestedStrMapping]:
         """List installed project plugins of *plugin_type* via Meltano runtime.
 
@@ -111,7 +113,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
         try:
             cwd = self._resolve_project_root(_project)
             plugins_result = FlextMeltanoExecutorBase().fetch_project_plugins(
-                plugin_type=u.Meltano.normalize_plugin_group(plugin_type), _cwd=cwd,
+                plugin_type=u.Meltano.normalize_plugin_group(plugin_type),
+                _cwd=cwd,
             )
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"Failed to get plugins of type {plugin_type}: {e}"
@@ -242,7 +245,8 @@ class FlextMeltanoAbstractionsBase(FlextMeltanoServiceBase):
 
     @staticmethod
     def fetch_stream_config(
-        settings: m.Meltano.TapConfig, stream_name: str,
+        settings: m.Meltano.TapConfig,
+        stream_name: str,
     ) -> t.JsonMapping:
         """Get configuration for a specific stream.
 

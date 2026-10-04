@@ -50,7 +50,8 @@ class TestsFlextMeltanoPluginProtocols:
 
     @staticmethod
     @pytest.mark.parametrize(
-        "stream_names", [("users",), ("users", "orders"), ("a", "b", "c")],
+        "stream_names",
+        [("users",), ("users", "orders"), ("a", "b", "c")],
     )
     def test_multiple_streams_preserve_input_order(
         stream_names: t.VariadicTuple[str],
@@ -139,7 +140,8 @@ class TestsFlextMeltanoPluginProtocols:
         })
 
         tm.that(
-            entry.replication_method, eq=c.Meltano.SingerReplicationMethod.INCREMENTAL,
+            entry.replication_method,
+            eq=c.Meltano.SingerReplicationMethod.INCREMENTAL,
         )
 
     # --- error paths -----------------------------------------------------
@@ -154,7 +156,8 @@ class TestsFlextMeltanoPluginProtocols:
         ],
     )
     def test_missing_required_entry_field_raises_validation_error(
-        omitted: str, payload: t.JsonMapping,
+        omitted: str,
+        payload: t.JsonMapping,
     ) -> None:
         """Omitting any required entry field fails validation for that field."""
         with pytest.raises(m.ValidationError) as excinfo:

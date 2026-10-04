@@ -52,7 +52,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         }
 
     def discover_streams(
-        self, tap_instance: m.Meltano.TapInstance,
+        self,
+        tap_instance: m.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
         """Discover available streams via ``meltano select --list``.
 
@@ -93,10 +94,13 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             return _run_discover_streams()
         except c.Meltano.OPERATION_ERRORS as exc:
             self.logger.exception(
-                c.Meltano.LOG_MESSAGE_DISCOVER_STREAMS_FAILED, error=str(exc),
+                c.Meltano.LOG_MESSAGE_DISCOVER_STREAMS_FAILED,
+                error=str(exc),
             )
             return e.fail_operation(
-                c.Meltano.OPERATION_DISCOVER_STREAMS, exc, result_type=r[t.JsonMapping],
+                c.Meltano.OPERATION_DISCOVER_STREAMS,
+                exc,
+                result_type=r[t.JsonMapping],
             )
 
     def sync_stream(
@@ -186,7 +190,8 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
             )
 
     def generate_catalog(
-        self, tap_instance: m.Meltano.TapInstance,
+        self,
+        tap_instance: m.Meltano.TapInstance,
     ) -> p.Result[t.JsonMapping]:
         """Generate Singer catalog by discovering streams from the tap.
 
@@ -217,7 +222,9 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         return r[t.JsonMapping].ok(catalog)
 
     def fetch_stream_by_name(
-        self, tap_instance: m.Meltano.TapInstance, stream_name: str,
+        self,
+        tap_instance: m.Meltano.TapInstance,
+        stream_name: str,
     ) -> p.Result[t.JsonMapping]:
         """Get stream definition by name.
 
@@ -235,7 +242,9 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 }
                 return r[t.JsonMapping].ok(result_stream)
         return e.fail_not_found(
-            c.Meltano.PAYLOAD_STREAM_ENTITY, stream_name, result_type=r[t.JsonMapping],
+            c.Meltano.PAYLOAD_STREAM_ENTITY,
+            stream_name,
+            result_type=r[t.JsonMapping],
         )
 
     @staticmethod

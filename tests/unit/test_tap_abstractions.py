@@ -110,7 +110,8 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_serviceprocessor_build_method(self) -> None:
         """Test ServiceProcessor build method using flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"},
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance.model_validate({
             "tap_type": "tap-csv",
@@ -163,7 +164,8 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_validate_tap_instance(self) -> None:
         """Test tap instance validation using process method and flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"},
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         valid_instance = m.Meltano.TapInstance.model_validate({
             "tap_type": "tap-csv",
@@ -194,7 +196,8 @@ class TestFlextMeltanoAbstractionsComplete:
     def test_fetch_tap_type(self) -> None:
         """Test fetch_tap_type method using flext_tests."""
         config = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file": "test.csv"},
+            tap_type="tap-csv",
+            connection_config={"file": "test.csv"},
         )
         tap_instance = m.Meltano.TapInstance.model_validate({
             "tap_type": "tap-csv",
@@ -227,14 +230,16 @@ class TestFlextMeltanoAbstractionsComplete:
         timeout_error = TimeoutError("Connection timed out")
         tm.that(timeout_error, is_=Exception)
         validation_error = ValidationError.from_exception_data(
-            title="Validation Error", line_errors=[],
+            title="Validation Error",
+            line_errors=[],
         )
         tm.that(validation_error, is_=Exception)
 
     def test_invalid_tap_config_creation(self) -> None:
         """An empty tap_type is rejected — through a typed failure or a raise."""
         result = self.tap_abstractions.create_tap_from_config(
-            tap_type="", connection_config={},
+            tap_type="",
+            connection_config={},
         )
         tm.fail(result)
         tm.that(result.error, none=False)

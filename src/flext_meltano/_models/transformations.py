@@ -30,25 +30,29 @@ class FlextMeltanoModelsTransformations:
             ),
         ] = c.Meltano.DBT_PROJECT_DEFAULT_VERSION
         config: Annotated[
-            t.FlatContainerMapping, m.Field(description="DBT project configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="DBT project configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="DBT project configuration",
         )
         models: Annotated[
-            t.FlatContainerMapping, m.Field(description="DBT models configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="DBT models configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="DBT models configuration",
         )
         sources: Annotated[
-            t.FlatContainerMapping, m.Field(description="DBT sources configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="DBT sources configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="DBT sources configuration",
         )
         tests: Annotated[
-            t.FlatContainerMapping, m.Field(description="DBT tests configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="DBT tests configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="DBT tests configuration",
@@ -57,7 +61,8 @@ class FlextMeltanoModelsTransformations:
         @m.field_validator("config", "models", "sources", "tests", mode="after")
         @classmethod
         def freeze_mapping_fields(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose DBT project mappings as read-only values.
 
@@ -93,19 +98,24 @@ class FlextMeltanoModelsTransformations:
         transformation_version: Annotated[str, m.Field(description="Project version")]
         profile: Annotated[str, m.Field(description="Profile name")]
         model_paths: Annotated[
-            t.StrTuple, m.Field(default=("models",), description="Model paths"),
+            t.StrTuple,
+            m.Field(default=("models",), description="Model paths"),
         ] = m.Field(default=("models",), description="Model paths")
         analysis_paths: Annotated[
-            t.StrTuple, m.Field(default=("analysis",), description="Analysis paths"),
+            t.StrTuple,
+            m.Field(default=("analysis",), description="Analysis paths"),
         ] = m.Field(default=("analysis",), description="Analysis paths")
         test_paths: Annotated[
-            t.StrTuple, m.Field(default=("tests",), description="Test paths"),
+            t.StrTuple,
+            m.Field(default=("tests",), description="Test paths"),
         ] = m.Field(default=("tests",), description="Test paths")
         seed_paths: Annotated[
-            t.StrTuple, m.Field(default=("seeds",), description="Seed paths"),
+            t.StrTuple,
+            m.Field(default=("seeds",), description="Seed paths"),
         ] = m.Field(default=("seeds",), description="Seed paths")
         macro_paths: Annotated[
-            t.StrTuple, m.Field(default=("macros",), description="Macro paths"),
+            t.StrTuple,
+            m.Field(default=("macros",), description="Macro paths"),
         ] = m.Field(default=("macros",), description="Macro paths")
 
         @m.computed_field
@@ -189,13 +199,16 @@ class FlextMeltanoModelsTransformations:
             m.Field(default_factory=tuple, description="Models to exclude")
         )
         full_refresh: Annotated[
-            bool, m.Field(default=False, description="Full refresh execution"),
+            bool,
+            m.Field(default=False, description="Full refresh execution"),
         ] = False
         fail_fast: Annotated[
-            bool, m.Field(default=True, description="Fail fast on first error"),
+            bool,
+            m.Field(default=True, description="Fail fast on first error"),
         ] = True
         threads: Annotated[
-            t.WorkerCount, m.Field(default=1, description="Number of threads to use"),
+            t.WorkerCount,
+            m.Field(default=1, description="Number of threads to use"),
         ] = 1
 
         @m.computed_field

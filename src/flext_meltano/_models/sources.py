@@ -28,11 +28,12 @@ class FlextMeltanoModelsSources:
 
         tap_type: Annotated[str, m.Field(description="Type of the tap")]
         connection_config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Connection configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="Connection configuration"),
         ]
         stream_config: Annotated[
-            t.FlatContainerMapping
-            , m.Field(description="Stream-specific configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="Stream-specific configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",
@@ -83,7 +84,8 @@ class FlextMeltanoModelsSources:
         @m.field_validator("stream_config", mode="after")
         @classmethod
         def freeze_stream_config(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose stream configuration as a read-only mapping.
 
@@ -116,21 +118,23 @@ class FlextMeltanoModelsSources:
 
         target_type: Annotated[str, m.Field(description="Type of the target")]
         connection_config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Connection configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="Connection configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Connection configuration",
         )
         batch_size: Annotated[
-            int | None
-            , m.Field(default=None, description="Batch size for data loading"),
+            int | None,
+            m.Field(default=None, description="Batch size for data loading"),
         ] = None
         batch_wait_limit: Annotated[
             float | None,
             m.Field(default=None, description="Batch wait limit in seconds"),
         ] = None
         target_version: Annotated[
-            str, m.Field(default="latest", description="Target version"),
+            str,
+            m.Field(default="latest", description="Target version"),
         ] = "latest"
 
         @m.computed_field
@@ -175,7 +179,8 @@ class FlextMeltanoModelsSources:
         @m.field_validator("connection_config", mode="after")
         @classmethod
         def freeze_connection_config(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose target connection configuration as read-only.
 
@@ -204,17 +209,19 @@ class FlextMeltanoModelsSources:
 
         source_type: Annotated[str, m.Field(description="Type of the data source")]
         connection_config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Connection configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="Connection configuration"),
         ]
         stream_config: Annotated[
-            t.FlatContainerMapping
-            , m.Field(description="Stream-specific configuration"),
+            t.FlatContainerMapping,
+            m.Field(description="Stream-specific configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Stream-specific configuration",
         )
         source_version: Annotated[
-            str, m.Field(default="latest", description="Source version"),
+            str,
+            m.Field(default="latest", description="Source version"),
         ] = "latest"
 
         @m.computed_field
@@ -261,7 +268,8 @@ class FlextMeltanoModelsSources:
         @m.field_validator("stream_config", mode="after")
         @classmethod
         def freeze_stream_config(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose source stream configuration as read-only.
 

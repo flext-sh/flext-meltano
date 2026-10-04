@@ -52,7 +52,9 @@ class TestsFlextMeltanoDockerIntegration:
             The resulting ``redis.Redis[bytes]``.
         """
         return redis.Redis(
-            host=c.Meltano.Tests.HOST, port=c.Meltano.Tests.REDIS_PORT, db=0,
+            host=c.Meltano.Tests.HOST,
+            port=c.Meltano.Tests.REDIS_PORT,
+            db=0,
         )
 
     @staticmethod
