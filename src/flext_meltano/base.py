@@ -15,11 +15,11 @@ from typing import Annotated, Self, override
 
 from flext_cli import u
 
-from flext_core import FlextSettings, s
+from flext_core import FlextService, FlextSettings
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
 
-class FlextMeltanoServiceBase(s[t.JsonMapping]):
+class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
     """Base class for flext-meltano services with typed configuration access.
 
     Note: This is an abstract base class. Subclasses must implement the
