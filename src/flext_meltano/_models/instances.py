@@ -1,15 +1,19 @@
-"""FLEXT Meltano models - Instance and stream models."""
+"""FLEXT Meltano models - Instance and stream models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated, Self
+from typing import Annotated, Self
 
 from flext_cli import m, u
-from flext_meltano import c, t
 
-if TYPE_CHECKING:
-    from flext_meltano._models.sources import FlextMeltanoModelsSources
+from flext_meltano import c, t
+from flext_meltano._models.sources import FlextMeltanoModelsSources
 
 
 class FlextMeltanoModelsInstances:
@@ -18,31 +22,75 @@ class FlextMeltanoModelsInstances:
     class DataSinkDefinition(m.Entity):
         """Generic data sink definition for pipeline operations."""
 
-        sink_name: Annotated[str, u.Field(description="Name of the sink")]
-        sink_type: Annotated[str, u.Field(description="Type of the sink")]
+        sink_name: Annotated[str, m.Field(description="Name of the sink")]
+        sink_type: Annotated[str, m.Field(description="Type of the sink")]
+        config: Annotated[
+            t.ConfigurationMapping, m.Field(description="Sink configuration"),
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
+            description="Sink configuration",
+        )
+        sink_schema: Annotated[
+            t.FlatContainerMapping, m.Field(description="Sink schema"),
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Sink schema",
+        )
         settings: Annotated[
-            t.ConfigurationMapping, u.Field(description="Sink configuration")
-        ] = u.Field(default_factory=lambda: MappingProxyType({}))
-        sink_schema: Annotated[t.JsonMapping, u.Field(description="Sink schema")] = (
-            u.Field(default_factory=lambda: MappingProxyType({}))
+            t.FlatContainerMapping, m.Field(description="Sink settings"),
+        ] = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Sink settings",
         )
         status: Annotated[
             str,
-            u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Current status"
+            m.Field(
+                default=c.Meltano.StreamStatus.INITIALIZED
+                , description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def config_keys_count(self) -> int:
-            """Number of settings keys."""
-            # mro-wkii.17.26.24: the count belongs to this sink definition.
-            return u.count(list(self.settings.keys()))
+            """Number of config keys.
+
+            Returns:
+                The resulting ``int``.
+            """
+            return u.count(list(self.config.keys()))
+
+        @m.field_validator("config", mode="after")
+        @classmethod
+        def freeze_config(cls, value: t.ConfigurationMapping) -> t.ConfigurationMapping:
+            """Expose sink configuration as a read-only mapping.
+
+            Returns:
+                The resulting ``t.ConfigurationMapping``.
+            """
+            return MappingProxyType(dict(value))
+
+        @m.field_validator("sink_schema", "settings", mode="after")
+        @classmethod
+        def freeze_container_mapping_fields(
+            cls, value: t.FlatContainerMapping,
+        ) -> t.FlatContainerMapping:
+            """Expose sink schema and settings as read-only mappings.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
+            return MappingProxyType(dict(value))
 
         @u.model_validator(mode="after")
         def validate_sink_definition(self) -> Self:
-            """Validate sink definition consistency."""
+            """Validate sink definition consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If Status must be one of.
+            """
             valid_statuses = {
                 c.Meltano.StreamStatus.INITIALIZED,
                 "configured",
@@ -59,73 +107,92 @@ class FlextMeltanoModelsInstances:
         """Generic stream information for data pipeline operations."""
 
         stream_name: Annotated[
-            t.NonEmptyStr, u.Field(description="Stream name identifier")
+            t.NonEmptyStr, m.Field(description="Stream name identifier"),
         ]
         stream_schema: Annotated[
-            t.MappingKV[str, t.Scalar | t.ScalarMapping],
-            u.Field(description="Stream schema definition"),
+            Mapping[str, t.Scalar | t.ScalarMapping],
+            m.Field(description="Stream schema definition"),
         ]
         key_properties: Annotated[
-            t.StrSequence, u.Field(description="Primary key properties for the stream")
-        ] = u.Field(default_factory=tuple)
+            t.StrTuple, m.Field(description="Primary key properties for the stream"),
+        ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_method: Annotated[
-            str, u.Field(default="FULL_TABLE", description="Replication method")
+            str, m.Field(default="FULL_TABLE", description="Replication method"),
         ] = "FULL_TABLE"
         replication_key: Annotated[
             str | None,
-            u.Field(default=None, description="Incremental replication field"),
+            m.Field(default=None, description="Incremental replication field"),
         ] = None
         status: Annotated[
             str,
-            u.Field(
+            m.Field(
                 default=c.Meltano.StreamStatus.INITIALIZED,
                 description="Stream processing status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         records_loaded: Annotated[
-            t.NonNegativeInt, u.Field(default=0, description="Number of records loaded")
+            t.NonNegativeInt
+            , m.Field(default=0, description="Number of records loaded"),
         ] = 0
         batches_processed: Annotated[
             t.NonNegativeInt,
-            u.Field(default=0, description="Number of batches processed"),
+            m.Field(default=0, description="Number of batches processed"),
         ] = 0
-        stream_created_at: Annotated[str, u.Field(description="Creation timestamp")]
+        stream_created_at: Annotated[str, m.Field(description="Creation timestamp")]
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def average_records_per_batch(self) -> float:
-            """Average records per batch."""
+            """Average records per batch.
+
+            Returns:
+                The resulting ``float``.
+            """
             return (
                 0.0
                 if self.batches_processed == 0
                 else self.records_loaded / self.batches_processed
             )
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def has_processed_data(self) -> bool:
-            """Whether stream has processed data."""
-            has: bool = self.records_loaded > 0 or self.batches_processed > 0
-            return has
+            """Check if stream has processed data.
 
-        @u.computed_field()
-        @property
+            Returns:
+                The resulting ``bool``.
+            """
+            records_loaded: int = self.records_loaded
+            batches_processed: int = self.batches_processed
+            return records_loaded > 0 or batches_processed > 0
+
+        @m.computed_field
         def processing_status(self) -> str:
-            """Processing status assessment."""
+            """Processing status assessment.
+
+            Returns:
+                The resulting ``str``.
+            """
             if (
                 self.status == c.Meltano.StreamStatus.COMPLETED
                 and self.records_loaded > 0
             ):
-                return str(c.Meltano.StreamStatus.SUCCESS)
+                return c.Meltano.StreamStatus.SUCCESS
             if self.status == c.Meltano.StreamStatus.ERROR:
-                return str(c.Meltano.StreamStatus.FAILED)
+                return c.Meltano.StreamStatus.FAILED
             if self.records_loaded > 0:
-                return str(c.Meltano.StreamStatus.IN_PROGRESS)
-            return str(c.Meltano.StreamStatus.PENDING)
+                return c.Meltano.StreamStatus.IN_PROGRESS
+            return c.Meltano.StreamStatus.PENDING
 
         @u.model_validator(mode="after")
         def validate_stream_info(self) -> Self:
-            """Validate stream information consistency."""
+            """Validate stream information consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If Records loaded but no batches processed; or if Status
+                    must be one of.
+            """
             if self.records_loaded > 0 and self.batches_processed == 0:
                 msg = "Records loaded but no batches processed"
                 raise ValueError(msg)
@@ -137,38 +204,44 @@ class FlextMeltanoModelsInstances:
     class TapInstance(m.Entity):
         """Generic tap instance for data extraction."""
 
+        model_config = m.ConfigDict(populate_by_name=True)
+
         tap_id: Annotated[
-            str | None, u.Field(default=None, description="Unique tap identifier")
+            str | None, m.Field(default=None, description="Unique tap identifier"),
         ] = None
-        tap_type: Annotated[str, u.Field(description="Type of the tap")]
+        tap_type: Annotated[str, m.Field(description="Type of the tap")]
         settings: Annotated[
             FlextMeltanoModelsSources.TapConfig,
-            u.Field(description="Tap configuration"),
+            m.Field(alias="config", description="Tap configuration"),
         ]
         adapter: Annotated[
             t.JsonValue | None,
-            u.Field(default=None, description="Tap adapter instance"),
+            m.Field(default=None, description="Tap adapter instance"),
         ] = None
-        streams: t.SequenceOf[FlextMeltanoModelsInstances.StreamInfo] = u.Field(
-            default_factory=tuple, description="Available streams"
+        streams: t.VariadicTuple[FlextMeltanoModelsInstances.StreamInfo] = m.Field(
+            default_factory=tuple, description="Available streams",
         )
         status: Annotated[
             str,
-            u.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status"
+            m.Field(
+                default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
-        @u.computed_field()
-        @property
-        def active_streams(
-            self,
-        ) -> t.SequenceOf[FlextMeltanoModelsInstances.StreamInfo]:
-            """Active streams for extraction."""
+        @m.computed_field
+        def active_streams(self) -> Sequence[FlextMeltanoModelsInstances.StreamInfo]:
+            """Active streams for extraction.
+
+            Returns:
+                The resulting ``Sequence[FlextMeltanoModelsInstances.StreamInfo]``.
+            """
             return [s for s in self.streams if s.status in c.Meltano.ACTIVE_STATUSES]
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def stream_count(self) -> int:
-            """Number of available streams."""
+            """Number of available streams.
+
+            Returns:
+                The resulting ``int``.
+            """
             return len(self.streams)

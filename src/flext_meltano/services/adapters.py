@@ -16,7 +16,11 @@ class FlextMeltanoAdapter(FlextMeltanoServiceBase):
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute adapter service returning current settings."""
+        """Execute adapter service returning current settings.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return r[t.JsonMapping].ok(settings.model_dump(mode="json"))
 
 

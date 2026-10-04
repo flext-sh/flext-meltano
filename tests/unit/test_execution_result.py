@@ -16,6 +16,8 @@ from tests import m, t
 
 _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
 
+_ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
+
 
 class _ExecutionResultJson(m.BaseModel):
     command: list[str]
@@ -30,8 +32,9 @@ class _ExecutionResultJson(m.BaseModel):
 class TestsFlextMeltanoExecutionResult:
     """Behavioral contract of ``m.Meltano.CommandExecutionResult``."""
 
+    @staticmethod
     @pytest.mark.parametrize(
-        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        "case",
         [
             (
                 ["meltano", "run", "tap-postgres", "target-csv"],
@@ -53,16 +56,10 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_public_fields_reflect_constructor_arguments(
-        self,
-        command: t.StrSequence,
-        *,
-        success: bool,
-        exit_code: int,
-        output: str,
-        error: str,
-        execution_time: float,
+        case: _ExecutionResultCase,
     ) -> None:
         """Public fields expose exactly the values supplied at construction."""
+        command, success, exit_code, output, error, execution_time = case
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=success,
@@ -78,7 +75,8 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result.error, eq=error)
         tm.that(abs(result.execution_time - execution_time), lt=1e-9)
 
-    def test_timestamp_is_populated_iso_string(self) -> None:
+    @staticmethod
+    def test_timestamp_is_populated_iso_string() -> None:
         """The computed ``timestamp`` field is a non-empty ISO-8601 string."""
         result = m.Meltano.CommandExecutionResult(
             command=["meltano", "version"],
@@ -90,8 +88,9 @@ class TestsFlextMeltanoExecutionResult:
         )
         tm.that(result.timestamp, match=_ISO_TIMESTAMP.pattern)
 
+    @staticmethod
     @pytest.mark.parametrize(
-        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        "case",
         [
             (["meltano", "version"], True, 0, "meltano, version 1.0.0", "", 0.2),
             (
@@ -113,16 +112,10 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_to_dict_carries_full_public_contract(
-        self,
-        command: t.StrSequence,
-        *,
-        success: bool,
-        exit_code: int,
-        output: str,
-        error: str,
-        execution_time: float,
+        case: _ExecutionResultCase,
     ) -> None:
         """``to_dict`` mirrors every public field plus an ISO timestamp."""
+        command, success, exit_code, output, error, execution_time = case
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=success,
@@ -140,8 +133,9 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result_dict["execution_time"], eq=execution_time)
         tm.that(str(result_dict["timestamp"]), match=_ISO_TIMESTAMP.pattern)
 
+    @staticmethod
     @pytest.mark.parametrize(
-        ("command", "success", "exit_code", "output", "error", "execution_time"),
+        "case",
         [
             (
                 ["meltano", "invoke", "tap-postgres", "discover"],
@@ -170,16 +164,10 @@ class TestsFlextMeltanoExecutionResult:
         ],
     )
     def test_model_dump_json_round_trips_through_public_schema(
-        self,
-        command: t.StrSequence,
-        *,
-        success: bool,
-        exit_code: int,
-        output: str,
-        error: str,
-        execution_time: float,
+        case: _ExecutionResultCase,
     ) -> None:
         """Serialized JSON validates back into the documented public shape."""
+        command, success, exit_code, output, error, execution_time = case
         result = m.Meltano.CommandExecutionResult(
             command=command,
             success=success,
@@ -198,7 +186,8 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(abs(parsed.execution_time - execution_time), lt=1e-9)
         tm.that(parsed.timestamp, match=_ISO_TIMESTAMP.pattern)
 
-    def test_special_characters_survive_serialization(self) -> None:
+    @staticmethod
+    def test_special_characters_survive_serialization() -> None:
         """Newlines and quotes in output/error are preserved verbatim."""
         error = (
             "Error: Connection failed to host 'localhost:5432'\nCheck your credentials!"
@@ -216,7 +205,8 @@ class TestsFlextMeltanoExecutionResult:
         tm.that(result_dict["command"], eq=["meltano", "run", "tap-postgres"])
         tm.that(result_dict["success"], eq=False)
 
-    def test_negative_execution_time_is_rejected(self) -> None:
+    @staticmethod
+    def test_negative_execution_time_is_rejected() -> None:
         """The non-negative execution-time invariant is enforced on construction."""
         with pytest.raises(m.ValidationError):
             m.Meltano.CommandExecutionResult(
@@ -227,6 +217,3 @@ class TestsFlextMeltanoExecutionResult:
                 error="",
                 execution_time=-1.0,
             )
-
-
-__all__: list[str] = ["TestsFlextMeltanoExecutionResult"]

@@ -13,32 +13,29 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
-from pydantic import BaseModel, Field, field_validator
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import FlextSettings
-
-_ENV_ALIAS: dict[str, str] = {
-    "dev": "development",
-    "test": "testing",
-    "prod": "production",
-}
-_ENV_ALLOWED: frozenset[str] = frozenset({"development", "testing", "production"})
+from flext_meltano import c, m
 
 
 class FlextMeltanoSettings(FlextSettings):
-    """Runtime settings for Meltano orchestration; fields under ``settings.Meltano.*``."""
+    """Runtime settings for Meltano orchestration.
 
-    model_config = SettingsConfigDict(
-        env_prefix="FLEXT_MELTANO_", env_nested_delimiter="__", extra="ignore"
+    Fields under ``settings.Meltano.*``.
+    """
+
+    # Why: pydantic_settings is owned by flext-core; route SettingsConfigDict
+    # through the m facade instead of importing the third-party package
+    # directly (ENFORCE-070).
+    model_config = m.SettingsConfigDict(
+        env_prefix="FLEXT_MELTANO_", env_nested_delimiter="__", extra="ignore",
     )
 
-    class _Meltano(BaseModel):
+    class _Meltano(m.BaseModel):
         """Namespaced Meltano orchestration settings."""
 
         project_root: Annotated[
             str,
-            Field(
+            m.Field(
                 default="",
                 validation_alias="MELTANO_PROJECT_ROOT",
                 description="Root directory of the Meltano project",
@@ -46,31 +43,31 @@ class FlextMeltanoSettings(FlextSettings):
         ]
         config_dir: Annotated[
             str,
-            Field(default=".meltano", description="Meltano configuration directory"),
+            m.Field(default=".meltano", description="Meltano configuration directory"),
         ]
         logs_dir: Annotated[
-            str, Field(default="logs", description="Meltano logs directory")
+            str, m.Field(default="logs", description="Meltano logs directory"),
         ]
         environment: Annotated[
             str,
-            Field(
+            m.Field(
                 default="development",
                 validation_alias="MELTANO_ENVIRONMENT",
                 description="Active Meltano runtime environment",
             ),
         ]
         log_level: Annotated[
-            str, Field(default="INFO", description="Meltano runtime log level")
+            str, m.Field(default="INFO", description="Meltano runtime log level"),
         ]
         meltano_version: Annotated[
-            str, Field(default="3.9.1", description="Required Meltano version")
+            str, m.Field(default="3.9.1", description="Required Meltano version"),
         ]
         singer_sdk_version: Annotated[
-            str, Field(default="0.48.0", description="Required Singer SDK version")
+            str, m.Field(default="0.48.0", description="Required Singer SDK version"),
         ]
         pipelines_dir: Annotated[
             str,
-            Field(
+            m.Field(
                 default="",
                 # mro-wkii.17 (codex): validate the default so direct singleton
                 # access always exposes the canonical resolved pipeline root.
@@ -80,7 +77,7 @@ class FlextMeltanoSettings(FlextSettings):
             ),
         ]
 
-        @field_validator("pipelines_dir", mode="before")
+        @m.field_validator("pipelines_dir", mode="before")
         @classmethod
         def _coerce_pipelines_dir(cls, value: str | None) -> str:
             text = value.strip() if value is not None else ""
@@ -88,35 +85,41 @@ class FlextMeltanoSettings(FlextSettings):
                 return str(Path(text).expanduser().resolve())
             return str((Path.cwd() / ".flext-meltano" / "pipelines").resolve())
 
-        @field_validator("project_root", mode="before")
+        @m.field_validator("project_root", mode="before")
         @classmethod
         def _coerce_project_root(cls, value: str | None) -> str:
             return str(Path(value).resolve()) if value else ""
 
-        @field_validator("config_dir", "logs_dir", mode="before")
+        @m.field_validator("config_dir", "logs_dir", mode="before")
         @classmethod
         def _coerce_path(cls, value: str | None) -> str:
             return value or ""
 
-        @field_validator("environment")
+        @m.field_validator("environment")
         @classmethod
         def _validate_environment(cls, value: str) -> str:
             normalized = value.strip().lower()
-            normalized = _ENV_ALIAS.get(normalized, normalized)
-            if normalized not in _ENV_ALLOWED:
-                msg = "Environment must be one of: development, testing, production"
-                raise ValueError(msg)
-            return normalized
+            aliased = c.Meltano.ENVIRONMENT_ALIASES.get(normalized)
+            if aliased is not None:
+                return str(aliased.value)
+            if normalized in {env.value for env in c.Meltano.SETTINGS_ENVIRONMENTS}:
+                return normalized
+            allowed = ", ".join(env.value for env in c.Meltano.SETTINGS_ENVIRONMENTS)
+            msg = f"Environment must be one of: {allowed}"
+            raise ValueError(msg)
 
     if TYPE_CHECKING:
         Meltano: _Meltano
     else:
-        Meltano: _Meltano = Field(
-            default_factory=_Meltano, description="Namespaced Meltano settings."
+        Meltano: _Meltano = m.Field(
+            default_factory=_Meltano, description="Namespaced Meltano settings.",
         )
 
 
 settings: FlextMeltanoSettings = FlextMeltanoSettings.fetch_global()
-"""Pre-instantiated project settings singleton — ``from flext_meltano import settings``."""
+"""Pre-instantiated project settings singleton.
+
+``from flext_meltano import settings``.
+"""
 
 __all__: list[str] = ["FlextMeltanoSettings", "settings"]

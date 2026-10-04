@@ -1,14 +1,18 @@
-"""FLEXT Meltano models - Plugin discovery models."""
+"""FLEXT Meltano models - Plugin discovery models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
-from flext_cli import m, u
+from flext_cli import m
 
-if TYPE_CHECKING:
-    from flext_meltano import FlextMeltanoTypes as t
+from flext_meltano import t
 
 
 class FlextMeltanoModelsDiscovery:
@@ -18,45 +22,128 @@ class FlextMeltanoModelsDiscovery:
         """Normalized raw plugin discovery payload from external sources."""
 
         default_variant: Annotated[
-            str, u.Field(default="", description="Plugin default variant")
+            str, m.Field(default="", description="Plugin default variant"),
         ] = ""
-        variants: t.JsonMapping = u.Field(
-            default_factory=lambda: MappingProxyType({}),
-            description="Available plugin variants keyed by variant name",
+        variants: t.FlatContainerMapping = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Available plugin variants",
         )
-        logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
+        logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, u.Field(default="", description="Plugin description")
+            str, m.Field(default="", description="Plugin description"),
         ] = ""
 
-        @u.field_validator("default_variant", "logo_url", "description", mode="before")
+        @m.field_validator("default_variant", "logo_url", "description", mode="before")
         @classmethod
         def normalize_string_fields(cls, value: t.Meltano.ValidatorInput) -> str:
-            """Normalize optional string fields from external payloads."""
+            """Normalize optional string fields from external payloads.
+
+            Returns:
+                The resulting ``str``.
+            """
             return "" if value is None else str(value)
+
+        @m.field_validator("variants", mode="before")
+        @classmethod
+        def normalize_variants(
+            cls, value: t.Meltano.ValidatorInput,
+        ) -> t.FlatContainerMapping:
+            """Normalize variant maps from external payloads.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
+            match value:
+                case Mapping():
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                case _:
+                    empty: t.FlatContainerMapping = {}
+                    return empty
+
+        @m.field_validator("variants", mode="after")
+        @classmethod
+        def freeze_variants(
+            cls, value: t.FlatContainerMapping,
+        ) -> t.FlatContainerMapping:
+            """Expose normalized variants as a read-only mapping.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
+            return MappingProxyType(dict(value))
 
     class PluginDiscoveryItem(m.ArbitraryTypesModel):
         """Typed plugin discovery response item."""
 
-        name: Annotated[t.NonEmptyStr, u.Field(description="Plugin name")]
-        type: Annotated[t.NonEmptyStr, u.Field(description="Plugin type")]
+        name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
+        type: Annotated[t.NonEmptyStr, m.Field(description="Plugin type")]
         default_variant: Annotated[
-            str, u.Field(default="", description="Default plugin variant")
+            str, m.Field(default="", description="Default plugin variant"),
         ] = ""
         variants: Annotated[
-            str, u.Field(default="", description="Comma-separated variants")
+            str, m.Field(default="", description="Comma-separated variants"),
         ] = ""
-        logo_url: Annotated[str, u.Field(default="", description="Plugin logo URL")]
+        logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
         description: Annotated[
-            str, u.Field(default="", description="Plugin description")
+            str, m.Field(default="", description="Plugin description"),
         ] = ""
 
     class PluginDiscoveryCatalog(m.FlexibleModel):
         """Typed plugin discovery catalog keyed by plugin name."""
 
-        plugins: t.MappingKV[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
-            u.Field(
-                default_factory=lambda: MappingProxyType({}),
-                description="Plugin discovery entries keyed by plugin name",
+        @staticmethod
+        def _plugins_default() -> Mapping[
+            str, FlextMeltanoModelsDiscovery.PluginDiscoverySource,
+        ]:
+            """Late-bound empty plugin-catalog default.
+
+            Declared inside the model that consumes it (NS-STRUCT) so the bare
+            name resolves in this class body. The annotation stays lazy under
+            ``from __future__ import annotations`` and the body runs only at
+            validation time, once the module is complete, so the nested
+            ``PluginDiscoverySource`` type resolves.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
+            """
+            return MappingProxyType[
+                str, FlextMeltanoModelsDiscovery.PluginDiscoverySource,
+            ]({})
+
+        plugins: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource] = (
+            m.Field(
+                default_factory=_plugins_default,
+                description="Discovered plugins catalog",
             )
         )
+
+        @m.field_validator("plugins", mode="before")
+        @classmethod
+        def normalize_plugins(
+            cls, value: t.Meltano.ValidatorInput,
+        ) -> t.FlatContainerMapping:
+            """Normalize plugin catalog mapping.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
+            match value:
+                case Mapping():
+                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+                case _:
+                    empty: t.FlatContainerMapping = {}
+                    return empty
+
+        @m.field_validator("plugins", mode="after")
+        @classmethod
+        def freeze_plugins(
+            cls, value: Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource],
+        ) -> Mapping[str, FlextMeltanoModelsDiscovery.PluginDiscoverySource]:
+            """Expose normalized plugins as a read-only mapping.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsDiscovery.PluginDiscoverySource]``.
+            """
+            return MappingProxyType(dict(value))

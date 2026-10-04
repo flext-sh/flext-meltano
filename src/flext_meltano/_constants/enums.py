@@ -1,9 +1,13 @@
-"""FLEXT Meltano enum constants — domain-specific enumerations."""
+"""FLEXT Meltano enum constants — domain-specific enumerations.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from enum import StrEnum, unique
-from typing import Final
+from typing import ClassVar
 
 from flext_cli import c
 
@@ -273,13 +277,13 @@ class FlextMeltanoConstantsEnums:
         SELECTED = "selected"
         SUCCESS = c.Status.SUCCESS.value
 
-    VALID_STATUSES: Final[frozenset[StreamStatus]] = frozenset({
+    VALID_STATUSES: ClassVar[frozenset[StreamStatus]] = frozenset({
         StreamStatus.INITIALIZED,
         StreamStatus.PROCESSING,
         StreamStatus.COMPLETED,
         StreamStatus.ERROR,
     })
-    ACTIVE_STATUSES: Final[frozenset[StreamStatus]] = frozenset({
+    ACTIVE_STATUSES: ClassVar[frozenset[StreamStatus]] = frozenset({
         StreamStatus.DISCOVERED,
         StreamStatus.SELECTED,
         StreamStatus.EXTRACTING,

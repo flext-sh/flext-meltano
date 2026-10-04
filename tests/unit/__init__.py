@@ -1,49 +1,24 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Unit package."""
+"""Tests.unit package.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
-from flext_core.lazy import build_lazy_import_map, install_lazy_exports
+from types import MappingProxyType
 
-_LAZY_IMPORTS = build_lazy_import_map({
-    ".fixtures": ("fixtures",),
-    ".test_api": ("TestsFlextMeltanoApi",),
-    ".test_cli_integration": ("TestsFlextMeltanoCliIntegration",),
-    ".test_cli_small_managers": ("TestsFlextMeltanoCliSmallManagers",),
-    ".test_constants": ("TestsFlextMeltanoConstantsUnit",),
-    ".test_execution_result": ("TestsFlextMeltanoExecutionResult",),
-    ".test_executors": ("TestsFlextMeltanoExecutors",),
-    ".test_library_runner": ("TestsFlextMeltanoLibraryRunner",),
-    ".test_models": ("TestsFlextMeltanoModelsUnit",),
-    ".test_plugin_protocols": ("TestsFlextMeltanoPluginProtocols",),
-    ".test_services": ("TestsFlextMeltanoServices",),
-    ".test_singer_cli_translator": ("TestsFlextMeltanoSingerCliTranslator",),
-    ".test_singer_sdk_adapter": ("TestsFlextMeltanoSingerSdkAdapter",),
-    ".test_singer_types": ("TestsFlextMeltanoSingerTypes",),
-    ".test_tap_abstractions": ("TestsFlextMeltanoTapAbstractions",),
-    ".test_target_abstractions": ("TestsFlextMeltanoTargetAbstractions",),
-    ".test_typings": ("TestsFlextMeltanoTypingsUnit",),
-    ".test_validators": ("TestsFlextMeltanoValidators",),
-    ".tests_pipeline_cli_managers": ("TestFlextMeltanoPipelineCliManagers",),
-    "flext_tests": (
-        "c",
-        "d",
-        "e",
-        "h",
-        "m",
-        "p",
-        "r",
-        "s",
-        "t",
-        "td",
-        "tf",
-        "tk",
-        "tm",
-        "tv",
-        "u",
-        "x",
+from flext_core import build_lazy_import_map, install_lazy_exports
+
+__all__: tuple[str, ...] = ()
+
+_LAZY_IMPORTS = MappingProxyType(
+    build_lazy_import_map(
+        MappingProxyType({}),
+        alias_groups=MappingProxyType({}),
+        sort_keys=False,
     ),
-})
+)
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

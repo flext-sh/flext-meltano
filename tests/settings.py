@@ -1,8 +1,12 @@
-"""Runtime settings for flext-meltano tests."""
+"""Runtime settings for flext-meltano tests.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
-from flext_tests._settings import FlextTestsSettings
+from flext_tests import FlextTestsSettings
 
 from flext_meltano import FlextMeltanoSettings
 

@@ -10,21 +10,28 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from typing import Annotated
 
-from flext_cli import FlextCliConfig
+from flext_cli import FlextCliConfig, m
+
+from flext_core import FlextSettings
 
 
-class _MeltanoNamespace(BaseModel):
+class _MeltanoNamespace(m.BaseModel):
     """Open, frozen namespace exposing every ``config/*.yaml`` domain model-less."""
 
-    model_config = ConfigDict(extra="allow", frozen=True)
+    model_config = m.ConfigDict(extra="allow", frozen=True)
 
 
-class FlextMeltanoConfig(FlextCliConfig):
+class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
-    Meltano: _MeltanoNamespace = _MeltanoNamespace()
+    Meltano: Annotated[
+        _MeltanoNamespace,
+        m.Field(
+            description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
+        ),
+    ] = _MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()

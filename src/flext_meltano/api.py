@@ -1,10 +1,15 @@
-"""Public API facade for flext-meltano."""
+"""Public API facade for flext-meltano.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from typing import Self, override
 
 from flext_cli import r
+
 from flext_meltano import c, p, t, u
 from flext_meltano.services.abstractions import FlextMeltanoAbstractions
 from flext_meltano.services.adapters import FlextMeltanoAdapter
@@ -49,20 +54,36 @@ class FlextMeltano(
     """MRO facade over all Meltano services. All operations return r[T]."""
 
     def tap(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
-        """Create a specialized Tap facade instance through the public API."""
+        """Create a specialized Tap facade instance through the public API.
+
+        Returns:
+            The resulting ``p.Result[Self]``.
+        """
         return type(self).create_source_service(name, **settings)
 
     def target(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
-        """Create a specialized Target facade instance through the public API."""
+        """Create a specialized Target facade instance through the public API.
+
+        Returns:
+            The resulting ``p.Result[Self]``.
+        """
         return type(self).create_sink_service(name, **settings)
 
     def dbt(self, name: str, **settings: t.Scalar) -> p.Result[Self]:
-        """Create a specialized DBT facade instance through the public API."""
+        """Create a specialized DBT facade instance through the public API.
+
+        Returns:
+            The resulting ``p.Result[Self]``.
+        """
         return type(self).create_transformation_service(name, **settings)
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute Meltano service with railway pattern."""
+        """Execute Meltano service with railway pattern.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         handlers_payload: t.JsonValueList = [
             handler.value for handler in c.Meltano.HANDLER_ALL
         ]

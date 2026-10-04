@@ -1,19 +1,20 @@
-"""Real tests for the declarative Singer tap builder (flat Singer CLI)."""
+"""Real tests for the declarative Singer tap builder (flat Singer CLI).
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 import contextlib
 import io
-import json
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 from flext_tests import tm
 
 from flext_meltano import m, p, r, t
 from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from tests import u
 
 
 class TestsFlextMeltanoDeclarativeTap:
@@ -22,18 +23,19 @@ class TestsFlextMeltanoDeclarativeTap:
     class _Fetcher:
         """A record fetcher that echoes one record derived from the config."""
 
+        @staticmethod
         def fetch(
-            self, request: p.Meltano.FetchRequest
-        ) -> p.Result[p.Meltano.FetchResult]:
+            request: m.Meltano.FetchRequest,
+        ) -> p.Result[m.Meltano.FetchResult]:
             base_dn = request.config.get("base_dn", "")
             record: t.JsonMapping = {
                 "dn": f"cn={request.stream_name},{base_dn}",
                 "updated_at": "2026-07-17T00:00:00Z",
             }
-            return r[p.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=[record]))
+            return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=[record]))
 
     @staticmethod
-    def _spec() -> p.Meltano.TapSpec:
+    def _spec() -> m.Meltano.TapSpec:
         stream = m.Meltano.StreamSpec(
             name="users",
             json_schema={
@@ -59,16 +61,21 @@ class TestsFlextMeltanoDeclarativeTap:
         """A flat ``--config --discover`` run emits the declared stream catalog."""
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
-        config_path.write_text(json.dumps({"base_dn": "dc=example"}))
+        config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
+        tm.ok(config_result)
+        config_path.write_text(config_result.value)
 
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(
-                ["--config", str(config_path), "--discover"], "tap-sample"
+                ["--config", str(config_path), "--discover"], "tap-sample",
             )
 
-        catalog = json.loads(buffer.getvalue())
-        stream = catalog["streams"][0]
+        catalog_result = u.Cli.json_loads(buffer.getvalue())
+        tm.ok(catalog_result)
+        catalog = t.json_dict_adapter().validate_python(catalog_result.value)
+        streams = t.json_list_adapter().validate_python(catalog["streams"])
+        stream = t.json_dict_adapter().validate_python(streams[0])
         tm.that(exit_code, eq=0)
         tm.that(stream["tap_stream_id"], eq="users")
         tm.that(stream["key_properties"], eq=["dn"])
@@ -78,7 +85,9 @@ class TestsFlextMeltanoDeclarativeTap:
         """A flat ``--config`` run emits the fetcher's validated Singer record."""
         instance = FlextMeltanoDeclarativeTap.build(self._spec(), self._Fetcher())
         config_path = tmp_path / "config.json"
-        config_path.write_text(json.dumps({"base_dn": "dc=example"}))
+        config_result = u.Cli.json_dumps({"base_dn": "dc=example"})
+        tm.ok(config_result)
+        config_path.write_text(config_result.value)
 
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
@@ -96,6 +105,3 @@ class TestsFlextMeltanoDeclarativeTap:
             records,
             has={"dn": "cn=users,dc=example", "updated_at": "2026-07-17T00:00:00Z"},
         )
-
-
-__all__: list[str] = ["TestsFlextMeltanoDeclarativeTap"]

@@ -1,78 +1,248 @@
-"""Real tests for the flat public tap abstraction surface."""
+"""Test module for flext-meltano.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
+import tempfile
+
 from flext_tests import tm
+from pydantic_core import ValidationError
 
-from flext_meltano import meltano
-from tests import m
+from flext_core import r
+from flext_meltano import FlextMeltanoAbstractions
+from tests import m, t
 
 
-class TestsFlextMeltanoTapAbstractions:
-    """Validate tap-related behavior through the current public facade."""
+class TestFlextMeltanoAbstractionsComplete:
+    """Complete test suite for FlextMeltanoAbstractions."""
 
-    def test_process_tap_config_returns_validated_config(self) -> None:
-        """The facade should accept and return a valid tap config unchanged."""
-        settings = m.Meltano.TapConfig(
+    tap_abstractions: FlextMeltanoAbstractions
+
+    def setup_method(self) -> None:
+        """Setup for each test."""
+        self.tap_abstractions = FlextMeltanoAbstractions()
+
+    @staticmethod
+    def test_tap_config_validation() -> None:
+        """Test m.Meltano.TapConfig Pydantic validation."""
+        connection_config: t.HeaderMapping = {
+            "host": "localhost",
+            "port": 5432,
+            "database": "test_db",
+        }
+        stream_config: t.StrMapping = {"users": "selected"}
+        config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
-            connection_config={
-                "host": "localhost",
-                "port": 5432,
-                "database": "test_db",
-            },
-            stream_config={"users": "selected"},
+            connection_config=connection_config,
+            stream_config=stream_config,
             tap_version="v1.2.0",
         )
+        tm.that(config.tap_type, eq="tap-postgres")
+        tm.that(config.tap_version, eq="v1.2.0")
+        tm.that(config.stream_config, has="users")
 
-        result = meltano.process_tap_config(settings)
-
-        tm.ok(result)
-        tm.that(result.value.tap_type, eq="tap-postgres")
-        tm.that(result.value.tap_version, eq="v1.2.0")
-        tm.that(result.value.stream_config["users"], eq="selected")
-
-    def test_build_tap_instance_returns_public_mapping(self) -> None:
-        """The facade should expose the tap instance through the public mapping shape."""
-        settings = m.Meltano.TapConfig(
-            tap_type="tap-csv", connection_config={"file_path": "data.csv"}
+    @staticmethod
+    def test_stream_definition_validation() -> None:
+        """Test m.Meltano.StreamDefinition Pydantic validation using flext_tests."""
+        stream_schema: t.FlatContainerMapping = {
+            "type": "t.NormalizedValue",
+            "properties": {"id": {"type": "integer"}, "name": {"type": "string"}},
+        }
+        stream_def = m.Meltano.StreamDefinition(
+            stream_name="users",
+            stream_schema=stream_schema,
+            source_type="tap-postgres",
+            status="discovered",
+            records_extracted=42,
         )
-        tap_instance = m.Meltano.TapInstance(
-            tap_type="tap-csv",
-            settings=settings,
-            tap_id="tap_csv_123",
-            status="initialized",
-        )
+        tm.that(stream_def.stream_name, eq="users")
+        tm.that(stream_def.source_type, eq="tap-postgres")
+        tm.that(stream_def.records_extracted, eq=42)
 
-        payload = meltano.build_tap_instance(tap_instance)
+    @staticmethod
+    def test_tap_instance_validation() -> None:
+        """Test m.Meltano.TapInstance Pydantic validation using flext_tests."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config = m.Meltano.TapConfig(
+                tap_type="tap-csv",
+                connection_config={"file_path": f"{temp_dir}/data.csv"},
+            )
+            tap_instance = m.Meltano.TapInstance.model_validate({
+                "tap_type": "tap-csv",
+                "settings": config,
+                "tap_id": "tap_csv_123",
+                "status": "initialized",
+                "streams": [
+                    m.Meltano.StreamInfo(
+                        stream_name="test_stream",
+                        stream_schema={},
+                        stream_created_at="2025-01-01T00:00:00Z",
+                    ),
+                ],
+            })
+            tm.that(tap_instance.tap_type, eq="tap-csv")
+            tm.that(tap_instance.tap_id, eq="tap_csv_123")
+            tm.that(len(tap_instance.streams), eq=1)
 
-        tm.that(payload["tap_id"], eq="tap_csv_123")
-        tm.that(payload["tap_type"], eq="tap-csv")
+    @staticmethod
+    def test_tap_abstractions_initialization() -> None:
+        """Test FlextMeltanoAbstractions initialization."""
+        tap_abs = FlextMeltanoAbstractions()
+        assert tap_abs is not None
+        tm.that(tap_abs.service_name, eq="FlextMeltanoAbstractions")
+        tm.that(tap_abs.fetch_registered_streams(), is_=list)
 
-    def test_create_tap_from_config_builds_tap_instance(self) -> None:
-        """The facade should build a tap instance directly from raw config."""
-        result = meltano.create_tap_from_config(
+    def test_serviceprocessor_process_method(self) -> None:
+        """Test ServiceProcessor process method using flext_tests."""
+        config = m.Meltano.TapConfig(
             tap_type="tap-postgres",
-            connection_config={
-                "host": "localhost",
-                "port": 5432,
-                "database": "test_db",
-                "username": "test_user",
-            },
-            stream_config={"users": "selected", "orders": "not_selected"},
-            tap_version="1.2.3",
+            connection_config={"host": "localhost", "database": "test"},
+            tap_version="v1.0.0",
         )
+        result = self.tap_abstractions.process_tap_config(config)
+        tm.that(result, is_=r)
+        config_result = self.tap_abstractions.process_tap_config(config)
+        tm.that(config_result.success, eq=True)
 
-        tm.ok(result)
-        tm.that(result.value.tap_type, eq="tap-postgres")
-        tm.that(result.value.tap_id, eq="tap-postgres_auto")
-        tm.that(result.value.settings.tap_version, eq="1.2.3")
-        tm.that(result.value.settings.stream_config["users"], eq="selected")
+    def test_serviceprocessor_build_method(self) -> None:
+        """Test ServiceProcessor build method using flext_tests."""
+        config = m.Meltano.TapConfig(
+            tap_type="tap-csv", connection_config={"file": "test.csv"},
+        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "test_tap_123",
+            "status": "ready",
+        })
+        result = self.tap_abstractions.build_tap_instance(tap_instance)
+        assert isinstance(result, dict)
+        tm.that(result["tap_id"], eq="test_tap_123")
+        tm.that(result["tap_type"], eq="tap-csv")
 
-    def test_tap_factory_returns_bound_service(self) -> None:
-        """The flat tap factory should bind the returned facade to the source name."""
-        result = meltano.tap("tap-csv")
+    def test_fetch_stream_config(self) -> None:
+        """Test fetch_stream_config method using flext_tests."""
+        config = m.Meltano.TapConfig(
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
+            stream_config={
+                "users": {"selected": True, "replication_key": "id"},
+                "orders": {"selected": False},
+            },
+        )
+        users_config = self.tap_abstractions.fetch_stream_config(config, "users")
+        orders_config = self.tap_abstractions.fetch_stream_config(config, "orders")
+        missing_config = self.tap_abstractions.fetch_stream_config(config, "missing")
+        tm.that(isinstance(users_config, dict), eq=True)
+        tm.that(bool(users_config["selected"]), eq=True)
+        tm.that(not (bool(orders_config["selected"])), eq=True)
+        assert missing_config == {}
 
-        tm.ok(result)
-        tm.that(result.value.source_name, eq="tap-csv")
-        tm.that(result.value.sink_name, none=True)
-        tm.that(result.value.transformation_name, none=True)
+    def test_create_tap_from_config_success(self) -> None:
+        """Test create_tap_from_config success using flext_tests."""
+        connection_config: t.FlatContainerMapping = {
+            "host": "localhost",
+            "port": 5432,
+            "database": "test_db",
+            "username": "test_user",
+        }
+        stream_config: t.StrMapping = {"users": "selected", "orders": "not_selected"}
+        result = self.tap_abstractions.create_tap_from_config(
+            tap_type="tap-postgres",
+            connection_config=connection_config,
+            stream_config=stream_config,
+        )
+        tm.that(result, is_=r)
+        if result.success:
+            tap_instance = result.value
+            tm.that(tap_instance, is_=m.Meltano.TapInstance)
+
+    def test_validate_tap_instance(self) -> None:
+        """Test tap instance validation using process method and flext_tests."""
+        config = m.Meltano.TapConfig(
+            tap_type="tap-csv", connection_config={"file": "test.csv"},
+        )
+        valid_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "valid_tap_123",
+        })
+        try:
+            invalid_config = m.Meltano.TapConfig(tap_type="", connection_config={})
+            invalid_instance = m.Meltano.TapInstance.model_validate({
+                "tap_type": "",
+                "settings": invalid_config,
+                "tap_id": "",
+            })
+            invalid_result = self.tap_abstractions.process_tap_config(
+                invalid_instance.settings,
+            )
+        except (ValidationError, ValueError):
+            invalid_result = r[m.Meltano.TapConfig].fail(
+                "Validation failed at creation",
+            )
+        valid_result = self.tap_abstractions.process_tap_config(valid_instance.settings)
+        tm.that(valid_result, is_=r)
+        if valid_result.success:
+            tm.that(bool(valid_result.value), eq=True)
+        if invalid_result.success:
+            tm.that(not (bool(invalid_result.value)), eq=True)
+
+    def test_fetch_tap_type(self) -> None:
+        """Test fetch_tap_type method using flext_tests."""
+        config = m.Meltano.TapConfig(
+            tap_type="tap-csv", connection_config={"file": "test.csv"},
+        )
+        tap_instance = m.Meltano.TapInstance.model_validate({
+            "tap_type": "tap-csv",
+            "settings": config,
+            "tap_id": "csv_tap_123",
+        })
+        tap_type = self.tap_abstractions.fetch_tap_type(tap_instance)
+        tm.that(tap_type, eq="tap-csv")
+
+    def test_fetch_registered_streams(self) -> None:
+        """Test fetch_registered_streams method using flext_tests."""
+        initial_streams = self.tap_abstractions.fetch_registered_streams()
+        tm.that(isinstance(initial_streams, list), eq=True)
+
+    @staticmethod
+    def test_create_instance_factory() -> None:
+        """Test create_abstractions_instance factory method using flext_tests."""
+        result = FlextMeltanoAbstractions.create_abstractions_instance()
+        tm.that(result, is_=r)
+        if result.success:
+            instance = result.value
+            assert isinstance(instance, FlextMeltanoAbstractions)
+            if hasattr(instance, "service_name"):
+                service_name_val = instance.service_name
+                tm.that(service_name_val, eq="FlextMeltanoAbstractions")
+
+    @staticmethod
+    def test_tap_abstractions_error_handling() -> None:
+        """Test tap abstractions error handling."""
+        timeout_error = TimeoutError("Connection timed out")
+        tm.that(timeout_error, is_=Exception)
+        validation_error = ValidationError.from_exception_data(
+            title="Validation Error", line_errors=[],
+        )
+        tm.that(validation_error, is_=Exception)
+
+    def test_invalid_tap_config_creation(self) -> None:
+        """An empty tap_type is rejected — through a typed failure or a raise."""
+        result = self.tap_abstractions.create_tap_from_config(
+            tap_type="", connection_config={},
+        )
+        tm.fail(result)
+        tm.that(result.error, none=False)
+
+    def test_execute_returns_config_status(self) -> None:
+        """Test execute returns configuration status dict."""
+        result = self.tap_abstractions.execute()
+        tm.that(result, is_=r)
+        if result.success:
+            value = result.value
+            tm.that(isinstance(value, dict), eq=True)

@@ -24,25 +24,29 @@
 
 ## Overview
 
-FLEXT Meltano is a production-ready Python library providing Go ↔ Python bridge integration for data pipeline orchestration using Meltano, Singer, and DBT technologies within the FLEXT ecosystem.
+FLEXT Meltano is a production-ready Python library providing Go ↔ Python bridge
+integration for data pipeline orchestration using Meltano, Singer, and DBT technologies
+within the FLEXT ecosystem.
 
 ## Module Organization
 
 ### [`flext_meltano/`](flext_meltano/)
 
-Primary source code directory containing 16 core modules organized by architectural layer:
+Primary source code directory containing 16 core modules organized by architectural
+layer:
 
 #### Foundation Layer (6 modules)
 
-- **Configuration & Base Classes**: [`base.py`](flext_meltano/base.py), [`common.py`](flext_meltano/common.py)
+- **Configuration & Base Classes**: [`base.py`](flext_meltano/base.py),
+  [`common.py`](flext_meltano/common.py)
 - **Exception Handling**: [`exceptions.py`](flext_meltano/exceptions.py)
 - **Dependency Management**: [`container.py`](flext_meltano/container.py)
-- **Schema Definitions**: [`common_schemas.py`](flext_meltano/common_schemas.py)
-- **Public API**: [`__init__.py`](flext_meltano/__init__.py)
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### Bridge Integration Layer (3 modules)
 
-- **Go Integration**: [`simple_bridge.py`](flext_meltano/simple_bridge.py)
+- runtime_bootstrap_options
 - **Subprocess Orchestration**: [`execution.py`](flext_meltano/execution.py)
 - **CLI Interface**: [`cli.py`](flext_meltano/cli.py)
 
@@ -56,9 +60,9 @@ Primary source code directory containing 16 core modules organized by architectu
 #### Singer Integration Layer (4 modules)
 
 - **Protocol Implementation**: [`singer.py`](flext_meltano/singer.py)
-- **Base Classes**: [`singer_base.py`](flext_meltano/singer_base.py)
-- **Unified Interface**: [`singer_unified.py`](flext_meltano/singer_unified.py)
-- **SDK Bridge**: [`flext_singer.py`](flext_meltano/flext_singer.py)
+- runtime_bootstrap_options
+- runtime_bootstrap_options
+- runtime_bootstrap_options
 
 #### Data Transformation Layer (1 module)
 
@@ -137,7 +141,7 @@ FLEXT Services → Python Bridge → Meltano CLI → Data Operations
 - **Enterprise Tests**: r patterns and error handling validation
 - **Performance Tests**: Subprocess execution timing and resource usage
 
-______________________________________________________________________
+---
 
 **Maintainer**: FLEXT Development Team\
 **Status**: Production Ready - All critical issues resolved · 1.0.0 Release Preparation

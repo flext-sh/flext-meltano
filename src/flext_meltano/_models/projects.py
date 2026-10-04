@@ -1,13 +1,19 @@
-"""FLEXT Meltano models - Project configuration models."""
+"""FLEXT Meltano models - Project configuration models.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from types import MappingProxyType
 from typing import Annotated, Self
 
 from flext_cli import m, u
-from flext_meltano import FlextMeltanoConstants as c, FlextMeltanoTypes as t
+
+from flext_meltano import c, t
 
 
 class FlextMeltanoModelsProjects:
@@ -16,100 +22,205 @@ class FlextMeltanoModelsProjects:
     class DbtManifestNode(m.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
 
-        name: Annotated[str | None, u.Field(default=None, description="Node name")]
-        path: Annotated[str | None, u.Field(default=None, description="Node path")]
+        name: Annotated[str | None, m.Field(default=None, description="Node name")]
+        path: Annotated[str | None, m.Field(default=None, description="Node path")]
         description: Annotated[
-            str | None, u.Field(default=None, description="Node description")
+            str | None, m.Field(default=None, description="Node description"),
         ] = None
-        fqn: t.StrSequence = u.Field(
-            default_factory=tuple, description="Fully qualified dbt node path segments"
+        fqn: t.StrTuple = m.Field(
+            default_factory=tuple, description="Fully qualified name parts",
         )
         resource_type: Annotated[
             str,
-            u.Field(default="", description="Node resource type (model, test, etc.)"),
+            m.Field(default="", description="Node resource type (model, test, etc.)"),
         ] = ""
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def fqn_string(self) -> str:
-            """Fully qualified name as dot-separated string."""
+            """Fully qualified name as dot-separated string.
+
+            Returns:
+                The resulting ``str``.
+            """
             return ".".join(self.fqn) if self.fqn else ""
 
     class DbtManifest(m.FlexibleModel):
         """Parsed dbt manifest with typed nodes."""
 
-        nodes: t.MappingKV[str, FlextMeltanoModelsProjects.DbtManifestNode] = u.Field(
-            default_factory=lambda: MappingProxyType({}),
-            description="dbt manifest nodes keyed by unique node id",
+        @staticmethod
+        def _nodes_default() -> Mapping[
+            str, FlextMeltanoModelsProjects.DbtManifestNode,
+        ]:
+            """Late-bound empty manifest-nodes default.
+
+            Declared inside the model that consumes it (NS-STRUCT) so the bare
+            name resolves in this class body. The annotation stays lazy under
+            ``from __future__ import annotations`` and the body runs only at
+            validation time, once the module is complete, so the nested
+            ``DbtManifestNode`` type resolves.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsProjects.DbtManifestNode]``.
+            """
+            return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode]({})
+
+        nodes: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode] = m.Field(
+            default_factory=_nodes_default,
+            description="Manifest nodes keyed by node_id",
         )
+
+        @m.field_validator("nodes", mode="after")
+        @classmethod
+        def freeze_nodes(
+            cls, value: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode],
+        ) -> Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]:
+            """Expose manifest nodes as a read-only mapping.
+
+            Returns:
+                The resulting ``Mapping[str,
+                    FlextMeltanoModelsProjects.DbtManifestNode]``.
+            """
+            return MappingProxyType(dict(value))
+
+        def get_nodes_by_type(
+            self, resource_type: str,
+        ) -> Sequence[FlextMeltanoModelsProjects.DbtManifestNode]:
+            """Get all nodes of a specific resource type.
+
+            Returns:
+                The resulting ``Sequence[FlextMeltanoModelsProjects.DbtManifestNode]``.
+            """
+            return [
+                node
+                for node in self.nodes.values()
+                if node.resource_type == resource_type
+            ]
+
+    class MeltanoProjectModel(m.Entity):
+        """Generic Meltano project configuration with validation."""
+
+        project_id: Annotated[str, m.Field(description="Unique project identifier")]
+        project_version: Annotated[
+            str, m.Field(default="1", description="Project version"),
+        ] = "1"
+        default_environment: Annotated[
+            str, m.Field(default="dev", description="Default environment name"),
+        ] = "dev"
+        plugins: t.FlatContainerMapping = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Plugin configurations",
+        )
+        environments: t.FlatContainerMapping = m.Field(
+            default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+            description="Environment configurations",
+        )
+
+        @m.field_validator("plugins", "environments", mode="after")
+        @classmethod
+        def freeze_mapping_fields(
+            cls, value: t.FlatContainerMapping,
+        ) -> t.FlatContainerMapping:
+            """Expose project mappings as read-only values.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
+            return MappingProxyType(dict(value))
+
+        @u.model_validator(mode="after")
+        def validate_meltano_project(self) -> Self:
+            """Validate Meltano project configuration consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If project_id cannot be empty.
+            """
+            if not self.project_id or not self.project_id.strip():
+                msg = "project_id cannot be empty"
+                raise ValueError(msg)
+            return self
 
     class PipelineProjectModel(m.Entity):
         """Generic pipeline project configuration with validation."""
 
         schema_version: Annotated[
             int,
-            u.Field(
+            m.Field(
                 default=1,
                 ge=1,
                 le=1,
                 description="Pipeline schema version (only version 1 supported)",
             ),
         ] = 1
-        project_id: Annotated[str, u.Field(description="Project ID required")]
+        project_id: Annotated[str, m.Field(description="Project ID required")]
         default_environment: Annotated[
-            c.Meltano.ProjectEnvironment,
-            u.Field(
-                default=c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0],
-                description="Default environment",
-            ),
-        ] = c.Meltano.METADATA_DEFAULT_ENVIRONMENTS[0]
-        project_root: Path = u.Field(
-            default_factory=Path.cwd, description="Project root directory"
+            str, m.Field(default="dev", description="Default environment"),
+        ] = "dev"
+        project_root: Path = m.Field(
+            default_factory=Path.cwd, description="Project root directory",
         )
-        environments: t.SequenceOf[c.Meltano.ProjectEnvironment] = u.Field(
-            default_factory=lambda: c.Meltano.METADATA_DEFAULT_ENVIRONMENTS,
+        environments: t.StrSequence = m.Field(
+            default_factory=lambda: ["dev", "staging", "prod"],
             description="Available environments",
         )
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def environment_count(self) -> int:
-            """Number of environments."""
+            """Number of environments.
+
+            Returns:
+                The resulting ``int``.
+            """
             return u.count(self.environments)
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def has_production_environment(self) -> bool:
-            """Whether production environment exists."""
+            """Check if production environment exists.
+
+            Returns:
+                The resulting ``bool``.
+            """
+            prod_environments = {"prod", "production", "live"}
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
             ]
-            prod_envs_list: t.StrSequence = list(
-                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS
-            )
+            prod_envs_list: t.StrSequence = list(prod_environments)
             return any(u.in_(env, prod_envs_list) for env in normalized_envs)
 
-        @u.computed_field()
-        @property
+        @m.computed_field
         def project_maturity(self) -> str:
-            """Project maturity assessment."""
+            """Project maturity assessment.
+
+            Returns:
+                The resulting ``str``.
+            """
+            prod_envs = {"prod", "production", "live"}
             normalized_envs = [
                 u.normalize(env, case="lower") for env in self.environments
             ]
-            prod_envs_list: t.StrSequence = list(
-                c.Meltano.PRODUCTION_ENVIRONMENT_MARKERS
-            )
+            prod_envs_list: t.StrSequence = list(prod_envs)
             has_prod = any(u.in_(env, prod_envs_list) for env in normalized_envs)
             env_count = u.count(self.environments)
             if has_prod and env_count >= c.Meltano.VALIDATION_MATURITY_MATURE_ENV_COUNT:
-                return str(c.Meltano.ProjectMaturity.MATURE)
+                return "mature"
             if env_count >= c.Meltano.VALIDATION_MATURITY_DEVELOPING_ENV_COUNT:
-                return str(c.Meltano.ProjectMaturity.DEVELOPING)
-            return str(c.Meltano.ProjectMaturity.BASIC)
+                return "developing"
+            return "basic"
 
         @u.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:
-            """Validate project consistency."""
+            """Validate project consistency.
+
+            Returns:
+                The resulting ``Self``.
+
+            Raises:
+                ValueError: If Default environment; or if Project root directory does
+                    not exist.
+            """
             if self.default_environment not in self.environments:
                 msg = (
                     f"Default environment '{self.default_environment}' "

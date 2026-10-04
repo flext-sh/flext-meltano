@@ -8,12 +8,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-# p owns the typed dbt contract; concrete values are constructed behind the executor.
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, settings, t, u
 from flext_meltano.services.executor import FlextMeltanoExecutor
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    # NOTE (multi-agent, bead mro-wfc8.3): m only annotates the typed dbt return;
+    # runtime import not needed (from __future__ import annotations makes the
+    # annotation lazy).
+    from flext_meltano import m
 
 
 class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
@@ -22,8 +26,8 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
     Provides ELT pipeline execution and DBT transformation orchestration.
     """
 
-    _elt_executor: p.Meltano.Executor = u.PrivateAttr(
-        default_factory=FlextMeltanoExecutor
+    _elt_executor: p.Meltano.MeltanoExecutor = u.PrivateAttr(
+        default_factory=FlextMeltanoExecutor,
     )
 
     def execute_complete_elt_pipeline(
@@ -33,7 +37,11 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         dbt_models: t.StrSequence | None = None,
         settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
-        """Execute complete ELT pipeline with optional DBT transformations."""
+        """Execute complete ELT pipeline with optional DBT transformations.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
 
         def _run_execute_complete_elt_pipeline() -> p.Result[t.JsonMapping]:
             self.logger.info(
@@ -43,17 +51,14 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 dbt_models=str(dbt_models or []),
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings
+                tap_name, target_name, settings,
             )
             if result.failure:
-                return r[t.JsonMapping].fail(
-                    result.error or "EL pipeline execution failed"
-                )
+                return r[t.JsonMapping].from_failure(result)
             execution_result = result.value
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={"tap_name": tap_name, "target_name": target_name},
-                duration_field="execution_time",
             )
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
@@ -73,8 +78,8 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
             return r[t.JsonMapping].fail(error_msg)
 
     def run_dbt_transformation(
-        self, models: t.StrSequence | None = None, project_dir: Path | None = None
-    ) -> p.Result[p.Meltano.CommandExecutionResult]:
+        self, models: t.StrSequence | None = None, project_dir: Path | None = None,
+    ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run DBT transformation using the configured Meltano executor.
 
         Returns the executor's typed CommandExecutionResult directly (SSOT). Callers
@@ -82,10 +87,13 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         degradation (# NOTE multi-agent, bead mro-wfc8.3: was r[t.JsonMapping] via
         build_mutable_command_execution_payload; that flattened the typed model to a
         dict whose models_run/execution_method keys never existed).
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
         """
         executor = (
             FlextMeltanoExecutor(
-                settings=settings.model_copy(update={"project_root": project_dir})
+                settings=settings.model_copy(update={"project_root": project_dir}),
             )
             if project_dir is not None
             else self._elt_executor
@@ -93,25 +101,26 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         return executor.execute_dbt_command(c.Meltano.DbtCommand.RUN, models)
 
     def run_elt_pipeline(
-        self, tap_name: str, target_name: str, settings: t.JsonMapping | None = None
+        self, tap_name: str, target_name: str, settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
-        """Run a complete ELT pipeline from tap to target."""
+        """Run a complete ELT pipeline from tap to target.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         try:
             self.logger.info(
-                "Starting ELT pipeline", tap_name=tap_name, target_name=target_name
+                "Starting ELT pipeline", tap_name=tap_name, target_name=target_name,
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings
+                tap_name, target_name, settings,
             )
             if result.failure:
-                return r[t.JsonMapping].fail(
-                    result.error or "Pipeline execution failed"
-                )
+                return r[t.JsonMapping].from_failure(result)
             execution_result = result.value
             elt_result = u.Meltano.build_mutable_command_execution_payload(
                 execution_result,
                 extra_fields={"tap_name": tap_name, "target_name": target_name},
-                duration_field="execution_time",
             )
             return r[t.JsonMapping].ok(elt_result)
         except c.Meltano.OPERATION_ERRORS as e:

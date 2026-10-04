@@ -1,4 +1,8 @@
-"""Behavior contract for the canonical dbt connection profile protocol."""
+"""Behavior contract for the canonical dbt connection profile protocol.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -17,6 +21,7 @@ def _accept_profile(
 
 
 def test_dbt_connection_profile_accepts_typed_serializable_model() -> None:
+    """Test dbt connection profile accepts typed serializable model."""
     profile = _Profile(type="test", project="dbt-test")
 
     accepted = _accept_profile(profile)

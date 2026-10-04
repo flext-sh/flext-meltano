@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
+
 from flext_meltano import FlextMeltanoServiceBase, c, e, m, p, r, u
 
 if TYPE_CHECKING:
@@ -25,24 +26,28 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
     syncs with proper error handling and r patterns.
     """
 
-    _singer_state: p.Meltano.SingerStateMessage = u.PrivateAttr(
-        default_factory=m.Meltano.SingerStateMessage
+    _singer_state: m.Meltano.SingerStateMessage = u.PrivateAttr(
+        default_factory=m.Meltano.SingerStateMessage,
     )
 
     def fetch_bookmark(self, stream_name: str, bookmark_key: str) -> p.Result[str]:
-        """Get current bookmark value for a stream."""
+        """Get current bookmark value for a stream.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         try:
             stream_state = self._singer_state.value.get(stream_name)
             if stream_state is None:
                 return e.fail_not_found("Stream state", stream_name, result_type=r[str])
             if not isinstance(stream_state, dict):
                 return e.fail_validation(
-                    f"Stream state for {stream_name} is not a dict", result_type=r[str]
+                    f"Stream state for {stream_name} is not a dict", result_type=r[str],
                 )
             value = stream_state.get(bookmark_key)
             if value is None:
                 return e.fail_not_found(
-                    "Bookmark", f"{stream_name}.{bookmark_key}", result_type=r[str]
+                    "Bookmark", f"{stream_name}.{bookmark_key}", result_type=r[str],
                 )
             return r[str].ok(str(value))
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
@@ -50,56 +55,66 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
             return e.fail_operation("get bookmark", exc, result_type=r[str])
 
     def load_state(
-        self, state_file: Path | None = None
-    ) -> p.Result[p.Meltano.SingerStateMessage]:
-        """Load state from file or return in-memory state."""
+        self, state_file: Path | None = None,
+    ) -> p.Result[m.Meltano.SingerStateMessage]:
+        """Load state from file or return in-memory state.
+
+        Returns:
+            The resulting ``p.Result[m.Meltano.SingerStateMessage]``.
+        """
         try:
             if state_file and state_file.exists():
-                load_result = u.Cli.json_read_files_model(
-                    state_file, m.Meltano.SingerStateMessage
+                load_result = u.Cli.files_read_json_model(
+                    state_file, m.Meltano.SingerStateMessage,
                 )
                 if load_result.failure:
-                    return r[p.Meltano.SingerStateMessage].fail(
-                        load_result.error or "state read failed"
-                    )
+                    return r[m.Meltano.SingerStateMessage].from_failure(load_result)
                 self._singer_state = load_result.value
                 self.logger.info(
                     "State loaded from file",
                     file=str(state_file),
                     entries=len(self._singer_state.value),
                 )
-            return r[p.Meltano.SingerStateMessage].ok(self._singer_state)
+            return r[m.Meltano.SingerStateMessage].ok(self._singer_state)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to load state", error=str(exc))
             return e.fail_operation(
-                "load state", exc, result_type=r[p.Meltano.SingerStateMessage]
+                "load state", exc, result_type=r[m.Meltano.SingerStateMessage],
             )
 
-    def save_state(self, state_file: Path) -> p.Result[None]:
-        """Save state to file."""
+    def save_state(self, state_file: Path) -> p.Result[bool]:
+        """Save state to file.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         try:
             state_file.parent.mkdir(parents=True, exist_ok=True)
             write_result = cli.atomic_write_text_file(
-                state_file, self._singer_state.model_dump_json(indent=2)
+                state_file, self._singer_state.model_dump_json(indent=2),
             )
             if write_result.failure:
-                return r[None].fail(write_result.error or "state write failed")
+                return r[bool].from_failure(write_result)
             self.logger.info("State saved to file", file=str(state_file))
-            return r[None].ok(None)
+            return r[bool].ok(value=True)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to save state", error=str(exc))
-            return e.fail_operation("save state", exc, result_type=r[None])
+            return e.fail_operation("save state", exc, result_type=r[bool])
 
-    def to_state_message(self) -> p.Meltano.SingerStateMessage:
+    def to_state_message(self) -> m.Meltano.SingerStateMessage:
         """Return current state as SingerStateMessage."""
         return self._singer_state
 
     def update_bookmark(
-        self, stream_name: str, bookmark_key: str, bookmark_value: str
-    ) -> p.Result[None]:
-        """Update bookmark for a stream."""
+        self, stream_name: str, bookmark_key: str, bookmark_value: str,
+    ) -> p.Result[bool]:
+        """Update bookmark for a stream.
 
-        def _run_update_bookmark() -> p.Result[None]:
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
+
+        def _run_update_bookmark() -> p.Result[bool]:
             self._singer_state.value.setdefault(stream_name, {})
             stream_bookmarks = self._singer_state.value[stream_name]
             match stream_bookmarks:
@@ -112,13 +127,13 @@ class FlextMeltanoSingerStateMixin(FlextMeltanoServiceBase):
                         state_type=type(stream_bookmarks).__name__,
                     )
             self.logger.debug("Bookmark updated", stream=stream_name, key=bookmark_key)
-            return r[None].ok(None)
+            return r[bool].ok(value=True)
 
         try:
             return _run_update_bookmark()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             self.logger.exception("Failed to update bookmark", error=str(exc))
-            return e.fail_operation("update bookmark", exc, result_type=r[None])
+            return e.fail_operation("update bookmark", exc, result_type=r[bool])
 
 
 __all__: list[str] = ["FlextMeltanoSingerStateMixin"]

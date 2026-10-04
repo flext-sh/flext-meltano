@@ -14,6 +14,7 @@ from collections.abc import Mapping
 from typing import Annotated, Self, override
 
 from flext_cli import u
+
 from flext_core import FlextSettings, s
 from flext_meltano import FlextMeltanoSettings, c, m, p, t
 
@@ -60,19 +61,26 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
     transformation_name: Annotated[
         str | None,
         u.Field(
-            default=None, description="Optional transformation specialization name"
+            default=None, description="Optional transformation specialization name",
         ),
     ] = None
 
     @u.model_validator(mode="before")
     @classmethod
     def _normalize_settings_alias(
-        cls, data: t.MappingKV[str, t.JsonPayload | p.BaseModel | type | None] | Self
-    ) -> t.MappingKV[str, t.JsonPayload | p.BaseModel | type | None] | Self:
-        """Accept ``settings`` as an alias for ``runtime_settings``."""
+        cls, data: t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self,
+    ) -> t.MappingKV[str, t.JsonPayload | p.Base | type | None] | Self:
+        """Accept ``settings`` as an alias for ``runtime_settings``.
+
+        Returns:
+            The resulting ``t.MappingKV[str, t.JsonPayload | p.Base | type | None] |
+                Self``.
+        """
         if isinstance(data, cls) or not isinstance(data, Mapping):
             return data
-        normalized: dict[str, t.JsonPayload | p.BaseModel | type | None] = dict(data)
+        normalized: t.MutableMappingKV[str, t.JsonPayload | p.Base | type | None] = (
+            dict(data)
+        )
         settings = normalized.pop("settings", None)
         for field_name in ("service_name", "service_version"):
             if normalized.get(field_name) is None:
@@ -83,11 +91,11 @@ class FlextMeltanoServiceBase(s[t.JsonMapping]):
             normalized["runtime_settings"] = settings
         elif isinstance(settings, Mapping):
             normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
-                settings
+                settings,
             )
         elif isinstance(settings, m.BaseModel):
             normalized["runtime_settings"] = FlextMeltanoSettings.model_validate(
-                settings.model_dump()
+                settings.model_dump(),
             )
         else:
             normalized["runtime_settings"] = FlextMeltanoSettings.fetch_global()

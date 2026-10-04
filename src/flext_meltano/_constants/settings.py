@@ -1,31 +1,60 @@
-"""FLEXT Meltano settings constants — logging, service, defaults, capabilities."""
+"""FLEXT Meltano settings constants — logging, service, defaults, capabilities.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import Final
+from typing import TYPE_CHECKING, ClassVar, Self
 
-from flext_cli import c, t
+from flext_cli import c
+
+from flext_core import FlextSettings
 from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
 
+if TYPE_CHECKING:
+    from flext_cli import t
 
-class FlextMeltanoConstantsSettings:
+
+class FlextMeltanoConstantsSettings(FlextSettings):
     """Meltano configuration, defaults, and operational constants.
 
     All constants are flat with descriptive prefixes to explain their usage.
+    The MRO carries ``FlextSettings`` (ENFORCE-042); the class is a namespace
+    holder, never instantiated — class-attribute access resolves via the MRO.
     """
 
+    # ENFORCE-042 namespace-holder contract: ``FlextSettings`` contributes
+    # namespacing only — instance machinery stays plain object semantics so the
+    # settings singleton/validation machinery cannot leak into instantiated
+    # facade composites (e.g. the ``u`` logging facade).
+    def __new__(cls, *args: object, **kwargs: object) -> Self:
+        _ = args, kwargs
+        return object.__new__(cls)
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        _ = self, args, kwargs
+
+    def __setattr__(self, name: str, value: object) -> None:
+        object.__setattr__(self, name, value)
+
+    __eq__ = object.__eq__
+
+    __hash__ = object.__hash__
+
     # Logging
-    LOGGING_DEFAULT_LEVEL: Final[str] = "INFO"
-    LOGGING_INCLUDE_RECORD_COUNT: Final[bool] = True
-    LOGGING_INCLUDE_TRANSFORM_NAME: Final[bool] = True
-    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: Final[int] = 10000
+    LOGGING_DEFAULT_LEVEL: ClassVar[str] = "INFO"
+    LOGGING_INCLUDE_RECORD_COUNT: ClassVar[bool] = True
+    LOGGING_INCLUDE_TRANSFORM_NAME: ClassVar[bool] = True
+    LOGGING_MELTANO_PERFORMANCE_THRESHOLD_CRITICAL: ClassVar[int] = 10000
 
     # Service
-    SERVICE_MIN_NAME_LENGTH: Final[int] = 3
+    SERVICE_MIN_NAME_LENGTH: ClassVar[int] = 3
 
     # Environments
-    ENVIRONMENTS_VALID: Final[frozenset[FlextMeltanoConstantsEnums.Environment]] = (
+    ENVIRONMENTS_VALID: ClassVar[frozenset[FlextMeltanoConstantsEnums.Environment]] = (
         frozenset({
             FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
             FlextMeltanoConstantsEnums.Environment.STAGING,
@@ -33,12 +62,14 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.Environment.TESTING,
         })
     )
-    SETTINGS_ENVIRONMENTS: Final[tuple[FlextMeltanoConstantsEnums.Environment, ...]] = (
+    SETTINGS_ENVIRONMENTS: ClassVar[
+        tuple[FlextMeltanoConstantsEnums.Environment, ...]
+    ] = (
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT,
         FlextMeltanoConstantsEnums.Environment.TESTING,
         FlextMeltanoConstantsEnums.Environment.PRODUCTION,
     )
-    ENVIRONMENT_ALIASES: Final[
+    ENVIRONMENT_ALIASES: ClassVar[
         t.MappingKV[str, FlextMeltanoConstantsEnums.Environment]
     ] = MappingProxyType({
         FlextMeltanoConstantsEnums.EnvironmentAlias.DEV: (
@@ -51,7 +82,7 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.Environment.PRODUCTION
         ),
     })
-    ENVIRONMENT_RUNTIME_ALIASES: Final[t.StrMapping] = MappingProxyType({
+    ENVIRONMENT_RUNTIME_ALIASES: ClassVar[t.StrMapping] = MappingProxyType({
         FlextMeltanoConstantsEnums.Environment.DEVELOPMENT.value: (
             FlextMeltanoConstantsEnums.ProjectEnvironment.DEV
         ),
@@ -62,7 +93,7 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.ProjectEnvironment.PROD
         ),
     })
-    PRODUCTION_ENVIRONMENT_MARKERS: Final[
+    PRODUCTION_ENVIRONMENT_MARKERS: ClassVar[
         frozenset[FlextMeltanoConstantsEnums.ProductionEnvironmentToken]
     ] = frozenset({
         FlextMeltanoConstantsEnums.ProductionEnvironmentToken.PROD,
@@ -71,7 +102,7 @@ class FlextMeltanoConstantsSettings:
     })
 
     # ComponentTypes
-    COMPONENT_TYPES_VALID: Final[
+    COMPONENT_TYPES_VALID: ClassVar[
         frozenset[FlextMeltanoConstantsEnums.ComponentType]
     ] = frozenset({
         FlextMeltanoConstantsEnums.ComponentType.SOURCES,
@@ -81,23 +112,25 @@ class FlextMeltanoConstantsSettings:
     })
 
     # Defaults
-    DEFAULT_SERVICE_VERSION: Final[str] = "0.9.9"
-    DEFAULT_API_VERSION: Final[str] = "0.9.0"
-    DEFAULT_TIMEOUT_SECONDS: Final[int] = 300
+    DEFAULT_SERVICE_VERSION: ClassVar[str] = "0.9.9"
+    DEFAULT_API_VERSION: ClassVar[str] = "0.9.0"
+    DEFAULT_TIMEOUT_SECONDS: ClassVar[int] = 300
 
     # CliDefaults
-    CLI_DEFAULT_MIN_ARGS_WITH_CONFIG: Final[int] = 2
-    CLI_DEFAULT_PIPELINES_ROOT_ENV: Final[str] = "FLEXT_MELTANO_PIPELINES_DIR"
-    CLI_DEFAULT_PIPELINE_CONFIG_FILE: Final[str] = "pipeline.json"
-    CLI_DEFAULT_PIPELINE_PID_FILE: Final[str] = "pipeline.pid"
+    CLI_DEFAULT_MIN_ARGS_WITH_CONFIG: ClassVar[int] = 2
+    CLI_DEFAULT_PIPELINES_ROOT_ENV: ClassVar[str] = "FLEXT_MELTANO_PIPELINES_DIR"
+    CLI_DEFAULT_PIPELINE_CONFIG_FILE: ClassVar[str] = "pipeline.json"
+    CLI_DEFAULT_PIPELINE_PID_FILE: ClassVar[str] = "pipeline.pid"
 
     # Capabilities
-    SUPPORTED_PLUGIN_TYPES: Final[tuple[FlextMeltanoConstantsEnums.PluginType, ...]] = (
+    SUPPORTED_PLUGIN_TYPES: ClassVar[
+        tuple[FlextMeltanoConstantsEnums.PluginType, ...]
+    ] = (
         FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
         FlextMeltanoConstantsEnums.PluginType.LOADERS,
         FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
     )
-    PLUGIN_GROUP_ALIASES: Final[
+    PLUGIN_GROUP_ALIASES: ClassVar[
         t.MappingKV[str, FlextMeltanoConstantsEnums.PluginType]
     ] = MappingProxyType({
         "extractor": FlextMeltanoConstantsEnums.PluginType.EXTRACTORS,
@@ -117,7 +150,7 @@ class FlextMeltanoConstantsSettings:
         ),
         "dbt": FlextMeltanoConstantsEnums.PluginType.TRANSFORMS,
     })
-    PLUGIN_DISCOVERY_LABELS: Final[
+    PLUGIN_DISCOVERY_LABELS: ClassVar[
         t.MappingKV[
             FlextMeltanoConstantsEnums.PluginType,
             FlextMeltanoConstantsEnums.PluginDiscoveryLabel,
@@ -133,17 +166,17 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.PluginDiscoveryLabel.TRANSFORMER
         ),
     })
-    DBT_COMMANDS: Final[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
+    DBT_COMMANDS: ClassVar[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
         FlextMeltanoConstantsEnums.DbtCommand.RUN,
         FlextMeltanoConstantsEnums.DbtCommand.TEST,
         FlextMeltanoConstantsEnums.DbtCommand.BUILD,
         FlextMeltanoConstantsEnums.DbtCommand.COMPILE,
         FlextMeltanoConstantsEnums.DbtCommand.DOCS,
     )
-    DBT_DEFAULT_DOCS_ARGS: Final[tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]] = (
-        FlextMeltanoConstantsEnums.DbtCommand.GENERATE,
-    )
-    DBT_DEFAULT_PATHS: Final[frozenset[FlextMeltanoConstantsEnums.DbtPathName]] = (
+    DBT_DEFAULT_DOCS_ARGS: ClassVar[
+        tuple[FlextMeltanoConstantsEnums.DbtCommand, ...]
+    ] = (FlextMeltanoConstantsEnums.DbtCommand.GENERATE,)
+    DBT_DEFAULT_PATHS: ClassVar[frozenset[FlextMeltanoConstantsEnums.DbtPathName]] = (
         frozenset({
             FlextMeltanoConstantsEnums.DbtPathName.MODELS,
             FlextMeltanoConstantsEnums.DbtPathName.ANALYSIS,
@@ -152,7 +185,7 @@ class FlextMeltanoConstantsSettings:
             FlextMeltanoConstantsEnums.DbtPathName.MACROS,
         })
     )
-    SUPPORTED_LOG_LEVELS: Final[tuple[c.LogLevel, ...]] = (
+    SUPPORTED_LOG_LEVELS: ClassVar[tuple[c.LogLevel, ...]] = (
         c.LogLevel.DEBUG,
         c.LogLevel.INFO,
         c.LogLevel.WARNING,
@@ -163,7 +196,7 @@ class FlextMeltanoConstantsSettings:
     # Operations
 
     # Handlers
-    HANDLER_ALL: Final[tuple[FlextMeltanoConstantsEnums.HandlerType, ...]] = (
+    HANDLER_ALL: ClassVar[tuple[FlextMeltanoConstantsEnums.HandlerType, ...]] = (
         FlextMeltanoConstantsEnums.HandlerType.SOURCE,
         FlextMeltanoConstantsEnums.HandlerType.SINK,
         FlextMeltanoConstantsEnums.HandlerType.PIPELINE,
@@ -172,8 +205,8 @@ class FlextMeltanoConstantsSettings:
     # MockValues
 
     # FilePaths
-    FILE_PATH_DBT_OUTPUT_DIR: Final[str] = "target"
-    FILE_PATH_STANDARD_DIRS: Final[
+    FILE_PATH_DBT_OUTPUT_DIR: ClassVar[str] = "target"
+    FILE_PATH_STANDARD_DIRS: ClassVar[
         tuple[FlextMeltanoConstantsEnums.PipelineDirectory, ...]
     ] = (
         FlextMeltanoConstantsEnums.PipelineDirectory.EXTRACT,
@@ -185,5 +218,5 @@ class FlextMeltanoConstantsSettings:
     )
 
     # BatchDefaults
-    BATCH_DEFAULT_COMMAND_TIMEOUT: Final[int] = 300
-    BATCH_DEFAULT_DEFAULT_BATCH_SIZE: Final[int] = 1000
+    BATCH_DEFAULT_COMMAND_TIMEOUT: ClassVar[int] = 300
+    BATCH_DEFAULT_DEFAULT_BATCH_SIZE: ClassVar[int] = 1000
