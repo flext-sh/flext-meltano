@@ -51,7 +51,9 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 dbt_models=str(dbt_models or []),
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings,
+                tap_name,
+                target_name,
+                settings,
             )
             if result.failure:
                 return r[t.JsonMapping].from_failure(result)
@@ -78,7 +80,9 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
             return r[t.JsonMapping].fail(error_msg)
 
     def run_dbt_transformation(
-        self, models: t.StrSequence | None = None, project_dir: Path | None = None,
+        self,
+        models: t.StrSequence | None = None,
+        project_dir: Path | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run DBT transformation using the configured Meltano executor.
 
@@ -101,7 +105,10 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         return executor.execute_dbt_command(c.Meltano.DbtCommand.RUN, models)
 
     def run_elt_pipeline(
-        self, tap_name: str, target_name: str, settings: t.JsonMapping | None = None,
+        self,
+        tap_name: str,
+        target_name: str,
+        settings: t.JsonMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Run a complete ELT pipeline from tap to target.
 
@@ -110,10 +117,14 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         """
         try:
             self.logger.info(
-                "Starting ELT pipeline", tap_name=tap_name, target_name=target_name,
+                "Starting ELT pipeline",
+                tap_name=tap_name,
+                target_name=target_name,
             )
             result = self._elt_executor.execute_pipeline(
-                tap_name, target_name, settings,
+                tap_name,
+                target_name,
+                settings,
             )
             if result.failure:
                 return r[t.JsonMapping].from_failure(result)

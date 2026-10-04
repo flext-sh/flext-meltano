@@ -19,7 +19,8 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_component_rules(
-        cls, settings: t.ConfigurationMapping,
+        cls,
+        settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
         """Validate pipeline component business rules with model validation.
 
@@ -34,7 +35,8 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_pipeline_project_business_rules(
-        cls, settings: t.ConfigurationMapping,
+        cls,
+        settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
         """Validate pipeline project business rules.
 
@@ -91,7 +93,8 @@ class FlextMeltanoValidators(FlextMeltanoServiceBase):
 
     @classmethod
     def validate_transformation_business_rules(
-        cls, settings: t.ConfigurationMapping,
+        cls,
+        settings: t.ConfigurationMapping,
     ) -> p.Result[bool]:
         """Validate transformation-specific business rules.
 

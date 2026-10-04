@@ -17,6 +17,7 @@ pytestmark = pytest.mark.unit
 
 class TestsFlextMeltanoServices:
     """Tests for ``FlextMeltanoServices``."""
+
     @staticmethod
     def test_component_factory_returns_specialized_facade(
         meltano_component_case: tuple[str, str, str],
@@ -51,7 +52,8 @@ class TestsFlextMeltanoServices:
         ids=["tap", "target", "dbt"],
     )
     def test_component_factory_accepts_direct_config(
-        component_kind: str, component_name: str,
+        component_kind: str,
+        component_name: str,
     ) -> None:
         """Component factories accept direct settings without wrappers.
 
@@ -61,15 +63,21 @@ class TestsFlextMeltanoServices:
         match component_kind:
             case "tap":
                 result = meltano.tap(
-                    component_name, host="localhost", database="testdb",
+                    component_name,
+                    host="localhost",
+                    database="testdb",
                 )
             case "target":
                 result = meltano.target(
-                    component_name, host="localhost", database="testdb",
+                    component_name,
+                    host="localhost",
+                    database="testdb",
                 )
             case "dbt":
                 result = meltano.dbt(
-                    component_name, host="localhost", database="testdb",
+                    component_name,
+                    host="localhost",
+                    database="testdb",
                 )
             case _:
                 msg = f"Unsupported Meltano component kind: {component_kind}"

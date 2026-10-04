@@ -25,19 +25,22 @@ class FlextMeltanoModelsInstances:
         sink_name: Annotated[str, m.Field(description="Name of the sink")]
         sink_type: Annotated[str, m.Field(description="Type of the sink")]
         config: Annotated[
-            t.ConfigurationMapping, m.Field(description="Sink configuration"),
+            t.ConfigurationMapping,
+            m.Field(description="Sink configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Sink configuration",
         )
         sink_schema: Annotated[
-            t.FlatContainerMapping, m.Field(description="Sink schema"),
+            t.FlatContainerMapping,
+            m.Field(description="Sink schema"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Sink schema",
         )
         settings: Annotated[
-            t.FlatContainerMapping, m.Field(description="Sink settings"),
+            t.FlatContainerMapping,
+            m.Field(description="Sink settings"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Sink settings",
@@ -45,8 +48,8 @@ class FlextMeltanoModelsInstances:
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED
-                , description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 
@@ -72,7 +75,8 @@ class FlextMeltanoModelsInstances:
         @m.field_validator("sink_schema", "settings", mode="after")
         @classmethod
         def freeze_container_mapping_fields(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose sink schema and settings as read-only mappings.
 
@@ -107,17 +111,20 @@ class FlextMeltanoModelsInstances:
         """Generic stream information for data pipeline operations."""
 
         stream_name: Annotated[
-            t.NonEmptyStr, m.Field(description="Stream name identifier"),
+            t.NonEmptyStr,
+            m.Field(description="Stream name identifier"),
         ]
         stream_schema: Annotated[
             Mapping[str, t.Scalar | t.ScalarMapping],
             m.Field(description="Stream schema definition"),
         ]
         key_properties: Annotated[
-            t.StrTuple, m.Field(description="Primary key properties for the stream"),
+            t.StrTuple,
+            m.Field(description="Primary key properties for the stream"),
         ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_method: Annotated[
-            str, m.Field(default="FULL_TABLE", description="Replication method"),
+            str,
+            m.Field(default="FULL_TABLE", description="Replication method"),
         ] = "FULL_TABLE"
         replication_key: Annotated[
             str | None,
@@ -131,8 +138,8 @@ class FlextMeltanoModelsInstances:
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         records_loaded: Annotated[
-            t.NonNegativeInt
-            , m.Field(default=0, description="Number of records loaded"),
+            t.NonNegativeInt,
+            m.Field(default=0, description="Number of records loaded"),
         ] = 0
         batches_processed: Annotated[
             t.NonNegativeInt,
@@ -207,7 +214,8 @@ class FlextMeltanoModelsInstances:
         model_config = m.ConfigDict(populate_by_name=True)
 
         tap_id: Annotated[
-            str | None, m.Field(default=None, description="Unique tap identifier"),
+            str | None,
+            m.Field(default=None, description="Unique tap identifier"),
         ] = None
         tap_type: Annotated[str, m.Field(description="Type of the tap")]
         settings: Annotated[
@@ -219,12 +227,14 @@ class FlextMeltanoModelsInstances:
             m.Field(default=None, description="Tap adapter instance"),
         ] = None
         streams: t.VariadicTuple[FlextMeltanoModelsInstances.StreamInfo] = m.Field(
-            default_factory=tuple, description="Available streams",
+            default_factory=tuple,
+            description="Available streams",
         )
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED, description="Tap status",
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Tap status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
 

@@ -32,7 +32,8 @@ class FlextMeltanoModelsInstancesData:
         batch_size: Annotated[
             t.BatchSize,
             m.Field(
-                default=c.DEFAULT_SIZE, description="Batch size for record processing",
+                default=c.DEFAULT_SIZE,
+                description="Batch size for record processing",
             ),
         ] = c.DEFAULT_SIZE
         max_batches: Annotated[
@@ -122,13 +123,14 @@ class FlextMeltanoModelsInstancesData:
             m.Field(alias="config", description="Source configuration"),
         ]
         adapter: Annotated[
-            t.JsonValue | None, m.Field(default=None, description="Adapter instance"),
+            t.JsonValue | None,
+            m.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED
-                , description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         streams: Annotated[
@@ -136,7 +138,8 @@ class FlextMeltanoModelsInstancesData:
             m.Field(description="Discovered streams"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[
-                str, FlextMeltanoModelsSourcesParams.StreamDefinition,
+                str,
+                FlextMeltanoModelsSourcesParams.StreamDefinition,
             ]({}),
             description="Discovered streams",
         )
@@ -145,7 +148,8 @@ class FlextMeltanoModelsInstancesData:
             m.Field(default=False, description="Whether streams have been discovered"),
         ] = False
         metadata: Annotated[
-            t.ConfigurationMapping, m.Field(description="Additional metadata"),
+            t.ConfigurationMapping,
+            m.Field(description="Additional metadata"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional metadata",
@@ -155,7 +159,8 @@ class FlextMeltanoModelsInstancesData:
         @m.field_validator("streams", mode="after")
         @classmethod
         def freeze_streams(
-            cls, value: Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
+            cls,
+            value: Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition],
         ) -> Mapping[str, FlextMeltanoModelsSourcesParams.StreamDefinition]:
             """Expose discovered streams as a read-only mapping.
 
@@ -168,7 +173,8 @@ class FlextMeltanoModelsInstancesData:
         @m.field_validator("metadata", mode="after")
         @classmethod
         def freeze_metadata(
-            cls, value: t.ConfigurationMapping,
+            cls,
+            value: t.ConfigurationMapping,
         ) -> t.ConfigurationMapping:
             """Expose source metadata as a read-only mapping.
 
@@ -257,7 +263,8 @@ class FlextMeltanoModelsInstancesData:
         model_config = m.ConfigDict(populate_by_name=True)
 
         sink_id: Annotated[
-            str | None, m.Field(default=None, description="Unique sink identifier"),
+            str | None,
+            m.Field(default=None, description="Unique sink identifier"),
         ] = None
         sink_type: Annotated[str, m.Field(description="Type of the data sink")]
         settings: Annotated[
@@ -265,17 +272,19 @@ class FlextMeltanoModelsInstancesData:
             m.Field(alias="config", description="Sink configuration"),
         ]
         adapter: Annotated[
-            t.JsonValue | None, m.Field(default=None, description="Adapter instance"),
+            t.JsonValue | None,
+            m.Field(default=None, description="Adapter instance"),
         ] = None
         status: Annotated[
             str,
             m.Field(
-                default=c.Meltano.StreamStatus.INITIALIZED
-                , description="Current status",
+                default=c.Meltano.StreamStatus.INITIALIZED,
+                description="Current status",
             ),
         ] = c.Meltano.StreamStatus.INITIALIZED
         batch_size: Annotated[
-            t.BatchSize, m.Field(default=1000, description="Batch processing size"),
+            t.BatchSize,
+            m.Field(default=1000, description="Batch processing size"),
         ] = 1000
         sink_count: Annotated[
             t.NonNegativeInt,

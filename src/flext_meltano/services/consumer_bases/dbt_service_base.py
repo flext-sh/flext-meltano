@@ -44,7 +44,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     dbt_project_name: Annotated[
-        t.NonEmptyStr, u.Field(description="Canonical dbt project name"),
+        t.NonEmptyStr,
+        u.Field(description="Canonical dbt project name"),
     ] = c.Meltano.ServiceType.DBT
 
     _dbt_project_root: Path | None = u.PrivateAttr(default_factory=lambda: None)
@@ -79,7 +80,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return list(args) if args else sys.argv[1:]
 
     def _dispatch_dbt_subcommand(
-        self, subcommand: str, rest: list[str],
+        self,
+        subcommand: str,
+        rest: list[str],
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Dispatch one resolved dbt subcommand to its typed service call.
 
@@ -100,7 +103,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
                 return r[m.Meltano.CommandExecutionResult].fail(subcommand)
 
     def _finalize_dbt_cli_result(
-        self, subcommand: str, result: p.Result[m.Meltano.CommandExecutionResult],
+        self,
+        subcommand: str,
+        result: p.Result[m.Meltano.CommandExecutionResult],
     ) -> int:
         """Translate one dbt command result into the CLI exit contract.
 
@@ -112,7 +117,9 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         """
         if result.failure:
             self.logger.warning(
-                "dbt command failed", subcommand=subcommand, error=result.error or "",
+                "dbt command failed",
+                subcommand=subcommand,
+                error=result.error or "",
             )
             raise SystemExit(1)
         return 0
@@ -162,7 +169,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return self._executor.execute_dbt_command(subcommand, args or None)
 
     def run_models(
-        self, models: t.StrSequence | None = None,
+        self,
+        models: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt models.
 
@@ -172,7 +180,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return self._run_dbt_cmd(c.Meltano.DbtCommand.RUN, models=models)
 
     def run_tests(
-        self, models: t.StrSequence | None = None,
+        self,
+        models: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Run dbt tests.
 
@@ -182,7 +191,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return self._run_dbt_cmd(c.Meltano.DbtCommand.TEST, models=models)
 
     def compile_models(
-        self, models: t.StrSequence | None = None,
+        self,
+        models: t.StrSequence | None = None,
     ) -> p.Result[m.Meltano.CommandExecutionResult]:
         """Compile dbt models.
 
@@ -198,7 +208,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             The resulting ``p.Result[m.Meltano.CommandExecutionResult]``.
         """
         return self._run_dbt_cmd(
-            c.Meltano.DbtCommand.DOCS, extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
+            c.Meltano.DbtCommand.DOCS,
+            extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
         )
 
     # ------------------------------------------------------------------
@@ -249,7 +260,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         return r[t.Meltano.DbtManifestData].ok(manifest_data)
 
     def load_manifest(
-        self, manifest_path: Path | None = None,
+        self,
+        manifest_path: Path | None = None,
     ) -> p.Result[t.Meltano.DbtManifestData]:
         """Load dbt manifest.json.
 
@@ -282,7 +294,8 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
             manifest = m.Meltano.DbtManifest.model_validate(manifest_result.value)
         except c.EXC_MAPPING_TYPE as exc:
             return r[t.SequenceOf[t.Meltano.OptionalScalarMap]].fail(
-                str(exc), exception=exc,
+                str(exc),
+                exception=exc,
             )
         return self._build_model_nodes(manifest)
 

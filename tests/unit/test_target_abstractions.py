@@ -26,7 +26,8 @@ class TestsFlextMeltanoTargetAbstractions:
     def sink_config() -> m.Meltano.DataSinkConfig:
         """Return a valid data-sink configuration modelled via the public m.* facade."""
         return m.Meltano.DataSinkConfig(
-            sink_type="target-jsonl", connection_config={"path": "output.jsonl"},
+            sink_type="target-jsonl",
+            connection_config={"path": "output.jsonl"},
         )
 
     @staticmethod
@@ -42,7 +43,8 @@ class TestsFlextMeltanoTargetAbstractions:
 
     @staticmethod
     @pytest.mark.parametrize(
-        "sink_name", ["target-jsonl", "target-postgres", "target-snowflake"],
+        "sink_name",
+        ["target-jsonl", "target-postgres", "target-snowflake"],
     )
     def test_target_factory_echoes_requested_sink_name(sink_name: str) -> None:
         """target() binds exactly the requested sink name for any target kind."""

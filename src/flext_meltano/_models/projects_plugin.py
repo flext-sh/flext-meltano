@@ -23,31 +23,38 @@ class FlextMeltanoModelsProjectsPlugin:
         name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]
         namespace: Annotated[str, m.Field(description="Plugin namespace")]
         pip_url: Annotated[
-            str | None, m.Field(default=None, description="Plugin pip URL"),
+            str | None,
+            m.Field(default=None, description="Plugin pip URL"),
         ] = None
         executable: Annotated[
-            str | None, m.Field(default=None, description="Plugin executable"),
+            str | None,
+            m.Field(default=None, description="Plugin executable"),
         ] = None
         variant: Annotated[
-            str, m.Field(default="standard", description="Plugin variant"),
+            str,
+            m.Field(default="standard", description="Plugin variant"),
         ] = "standard"
         settings: Annotated[
-            t.FlatContainerMapping, m.Field(description="Plugin settings"),
+            t.FlatContainerMapping,
+            m.Field(description="Plugin settings"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Plugin settings",
         )
         capabilities: Annotated[
-            t.StrTuple, m.Field(description="Plugin capabilities"),
+            t.StrTuple,
+            m.Field(description="Plugin capabilities"),
         ] = m.Field(default_factory=tuple, description="Plugin capabilities")
         config_files: Annotated[
-            t.StrTuple, m.Field(description="Plugin configuration files"),
+            t.StrTuple,
+            m.Field(description="Plugin configuration files"),
         ] = m.Field(default_factory=tuple, description="Plugin configuration files")
 
         @m.field_validator("settings", mode="after")
         @classmethod
         def freeze_settings(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose plugin settings as a read-only mapping.
 

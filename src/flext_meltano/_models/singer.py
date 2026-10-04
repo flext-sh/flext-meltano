@@ -39,7 +39,8 @@ class FlextMeltanoModelsSinger:
             ),
         ]
         key_properties: Annotated[
-            t.StrTuple, m.Field(description="Singer stream key properties"),
+            t.StrTuple,
+            m.Field(description="Singer stream key properties"),
         ] = m.Field(default_factory=tuple, description="Singer stream key properties")
         bookmark_properties: Annotated[
             t.StrTuple,
@@ -68,7 +69,8 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.RECORD
         stream: Annotated[str, m.Field(description="Singer stream name")]
         record: Annotated[
-            t.FlatContainerMapping, m.Field(description="Singer record payload"),
+            t.FlatContainerMapping,
+            m.Field(description="Singer record payload"),
         ]
         time_extracted: Annotated[
             str | None,
@@ -117,7 +119,8 @@ class FlextMeltanoModelsSinger:
         ] = c.Meltano.SingerMessageType.ACTIVATE_VERSION
         stream: Annotated[str, m.Field(description="Singer stream name")]
         version: Annotated[
-            t.PositiveInt, m.Field(description="Stream version to activate"),
+            t.PositiveInt,
+            m.Field(description="Stream version to activate"),
         ]
 
     class SingerStateEntry(m.Entity):
@@ -133,7 +136,8 @@ class FlextMeltanoModelsSinger:
             m.Field(default=None, description="Bookmark field for incremental"),
         ] = None
         bookmark_value: Annotated[
-            str | None, m.Field(default=None, description="Current bookmark value"),
+            str | None,
+            m.Field(default=None, description="Current bookmark value"),
         ] = None
 
         @u.model_validator(mode="after")
@@ -157,14 +161,16 @@ class FlextMeltanoModelsSinger:
 
         name: Annotated[str, m.Field(description="Stream name")]
         json_schema: Annotated[
-            t.FlatContainerMapping, m.Field(description="JSON schema for the stream"),
+            t.FlatContainerMapping,
+            m.Field(description="JSON schema for the stream"),
         ]
         primary_keys: Annotated[
-            t.StrTuple, m.Field(description="Primary key properties"),
+            t.StrTuple,
+            m.Field(description="Primary key properties"),
         ] = m.Field(default_factory=tuple, description="Primary key properties")
         replication_key: Annotated[
-            str | None
-            , m.Field(default=None, description="Incremental replication key"),
+            str | None,
+            m.Field(default=None, description="Incremental replication key"),
         ] = None
 
     class TapSpec(m.Entity):
@@ -172,7 +178,8 @@ class FlextMeltanoModelsSinger:
 
         tap_name: Annotated[str, m.Field(description="Tap name")]
         config_jsonschema: Annotated[
-            t.FlatContainerMapping, m.Field(description="Tap config JSON schema"),
+            t.FlatContainerMapping,
+            m.Field(description="Tap config JSON schema"),
         ]
         streams: Annotated[
             tuple[FlextMeltanoModelsSinger.StreamSpec, ...],
@@ -184,7 +191,8 @@ class FlextMeltanoModelsSinger:
 
         stream_name: Annotated[str, m.Field(description="Stream name to fetch")]
         config: Annotated[
-            t.JsonMapping, m.Field(description="Runtime tap configuration"),
+            t.JsonMapping,
+            m.Field(description="Runtime tap configuration"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Runtime tap configuration",
@@ -204,5 +212,6 @@ class FlextMeltanoModelsSinger:
         """Record fetch result returned by a declarative tap fetcher."""
 
         records: Annotated[
-            t.VariadicTuple[t.JsonMapping], m.Field(description="Fetched records"),
+            t.VariadicTuple[t.JsonMapping],
+            m.Field(description="Fetched records"),
         ] = m.Field(default_factory=tuple, description="Fetched records")

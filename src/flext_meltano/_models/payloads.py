@@ -21,7 +21,8 @@ class FlextMeltanoModelsPayloads:
         """Payload base owning a read-only flat operation config mapping."""
 
         config: Annotated[
-            t.FlatContainerMapping, m.Field(description="Operation config"),
+            t.FlatContainerMapping,
+            m.Field(description="Operation config"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Operation config",
@@ -58,7 +59,8 @@ class FlextMeltanoModelsPayloads:
         """Payload for list_plugins operation."""
 
         plugin_type: Annotated[
-            str | None, m.Field(default=None, description="Filter by plugin type"),
+            str | None,
+            m.Field(default=None, description="Filter by plugin type"),
         ] = None
 
     class ConfigureEnvironmentPayload(FrozenConfigPayload):
@@ -70,7 +72,8 @@ class FlextMeltanoModelsPayloads:
         """Payload for run/test dbt models operation."""
 
         models: Annotated[
-            t.StrSequence | None, m.Field(default=None, description="Models to run"),
+            t.StrSequence | None,
+            m.Field(default=None, description="Models to run"),
         ] = None
         config: Annotated[
             t.FlatContainerMapping | None,
@@ -83,8 +86,8 @@ class FlextMeltanoModelsPayloads:
         tap_name: Annotated[t.NonEmptyStr, m.Field(description="Singer tap name")]
         target_name: Annotated[str, m.Field(description="Singer target name")]
         dbt_models: Annotated[
-            t.StrSequence | None
-            , m.Field(default=None, description="DBT models to run"),
+            t.StrSequence | None,
+            m.Field(default=None, description="DBT models to run"),
         ] = None
         config: Annotated[
             t.FlatContainerMapping | None,

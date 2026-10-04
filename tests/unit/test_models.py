@@ -33,7 +33,8 @@ class TestsFlextMeltanoModelsUnit:
             execution_result={"success": True},
         )
         result_context = m.Meltano.PipelineResultContext(
-            project_root=f" {project_root} ", execution_result={"success": True},
+            project_root=f" {project_root} ",
+            execution_result={"success": True},
         )
 
         tm.that(execution_context.project_root, eq=str(project_root))
@@ -52,7 +53,8 @@ class TestsFlextMeltanoModelsUnit:
     def test_tap_config_exposes_defaults_for_optional_fields() -> None:
         """Test tap config exposes defaults for optional fields."""
         settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tm.that(settings.tap_type, eq="tap-postgres")
         tm.that(settings.connection_config, eq={"host": "localhost"})
@@ -97,7 +99,8 @@ class TestsFlextMeltanoModelsUnit:
     def test_tap_config_has_stream_config_false_when_absent() -> None:
         """Test tap config has stream config false when absent."""
         settings = m.Meltano.TapConfig(
-            tap_type="tap-postgres", connection_config={"host": "localhost"},
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
         )
         tm.that(settings.has_stream_config, eq=False)
         tm.that(settings.config_size, eq=1)
@@ -108,14 +111,16 @@ class TestsFlextMeltanoModelsUnit:
         """Test tap config rejects blank tap type."""
         with pytest.raises(c.ValidationError, match="tap_type cannot be empty"):
             m.Meltano.TapConfig(
-                tap_type=blank_tap_type, connection_config={"host": "localhost"},
+                tap_type=blank_tap_type,
+                connection_config={"host": "localhost"},
             )
 
     @staticmethod
     def test_tap_config_rejects_empty_connection_config() -> None:
         """Test tap config rejects empty connection config."""
         with pytest.raises(
-            c.ValidationError, match="Connection configuration cannot be empty",
+            c.ValidationError,
+            match="Connection configuration cannot be empty",
         ):
             m.Meltano.TapConfig(tap_type="tap-postgres", connection_config={})
 
@@ -280,7 +285,10 @@ class TestsFlextMeltanoModelsUnit:
         ],
     )
     def test_stream_info_processing_status_reflects_progress(
-        status: str, records_loaded: int, batches_processed: int, expected: str,
+        status: str,
+        records_loaded: int,
+        batches_processed: int,
+        expected: str,
     ) -> None:
         """Test stream info processing status reflects progress."""
         stream = m.Meltano.StreamInfo(
@@ -307,7 +315,8 @@ class TestsFlextMeltanoModelsUnit:
     def test_stream_info_rejects_records_without_batches() -> None:
         """Test stream info rejects records without batches."""
         with pytest.raises(
-            c.ValidationError, match="Records loaded but no batches processed",
+            c.ValidationError,
+            match="Records loaded but no batches processed",
         ):
             m.Meltano.StreamInfo(
                 stream_name="users",

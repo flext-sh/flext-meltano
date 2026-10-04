@@ -30,7 +30,8 @@ class FlextMeltanoModelsResults:
             )
         )
         end_time: Annotated[
-            datetime | None, m.Field(default=None, description="Execution end time"),
+            datetime | None,
+            m.Field(default=None, description="Execution end time"),
         ] = None
         duration_seconds: Annotated[
             float | None,
@@ -41,11 +42,12 @@ class FlextMeltanoModelsResults:
             m.Field(default=0, description="Number of records processed"),
         ] = 0
         error_message: Annotated[
-            str | None, m.Field(default=None, description="Error message if failed"),
+            str | None,
+            m.Field(default=None, description="Error message if failed"),
         ] = None
         metadata: Annotated[
-            t.ConfigurationMapping
-            , m.Field(description="Additional execution metadata"),
+            t.ConfigurationMapping,
+            m.Field(description="Additional execution metadata"),
         ] = m.Field(
             default_factory=lambda: MappingProxyType[str, t.Scalar]({}),
             description="Additional execution metadata",
@@ -54,7 +56,8 @@ class FlextMeltanoModelsResults:
         @m.field_validator("metadata", mode="after")
         @classmethod
         def freeze_metadata(
-            cls, value: t.ConfigurationMapping,
+            cls,
+            value: t.ConfigurationMapping,
         ) -> t.ConfigurationMapping:
             """Expose execution metadata as a read-only mapping.
 

@@ -25,10 +25,12 @@ class FlextMeltanoModelsProjects:
         name: Annotated[str | None, m.Field(default=None, description="Node name")]
         path: Annotated[str | None, m.Field(default=None, description="Node path")]
         description: Annotated[
-            str | None, m.Field(default=None, description="Node description"),
+            str | None,
+            m.Field(default=None, description="Node description"),
         ] = None
         fqn: t.StrTuple = m.Field(
-            default_factory=tuple, description="Fully qualified name parts",
+            default_factory=tuple,
+            description="Fully qualified name parts",
         )
         resource_type: Annotated[
             str,
@@ -49,7 +51,8 @@ class FlextMeltanoModelsProjects:
 
         @staticmethod
         def _nodes_default() -> Mapping[
-            str, FlextMeltanoModelsProjects.DbtManifestNode,
+            str,
+            FlextMeltanoModelsProjects.DbtManifestNode,
         ]:
             """Late-bound empty manifest-nodes default.
 
@@ -73,7 +76,8 @@ class FlextMeltanoModelsProjects:
         @m.field_validator("nodes", mode="after")
         @classmethod
         def freeze_nodes(
-            cls, value: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode],
+            cls,
+            value: Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode],
         ) -> Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]:
             """Expose manifest nodes as a read-only mapping.
 
@@ -84,7 +88,8 @@ class FlextMeltanoModelsProjects:
             return MappingProxyType(dict(value))
 
         def get_nodes_by_type(
-            self, resource_type: str,
+            self,
+            resource_type: str,
         ) -> Sequence[FlextMeltanoModelsProjects.DbtManifestNode]:
             """Get all nodes of a specific resource type.
 
@@ -102,10 +107,12 @@ class FlextMeltanoModelsProjects:
 
         project_id: Annotated[str, m.Field(description="Unique project identifier")]
         project_version: Annotated[
-            str, m.Field(default="1", description="Project version"),
+            str,
+            m.Field(default="1", description="Project version"),
         ] = "1"
         default_environment: Annotated[
-            str, m.Field(default="dev", description="Default environment name"),
+            str,
+            m.Field(default="dev", description="Default environment name"),
         ] = "dev"
         plugins: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -119,7 +126,8 @@ class FlextMeltanoModelsProjects:
         @m.field_validator("plugins", "environments", mode="after")
         @classmethod
         def freeze_mapping_fields(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose project mappings as read-only values.
 
@@ -157,10 +165,12 @@ class FlextMeltanoModelsProjects:
         ] = 1
         project_id: Annotated[str, m.Field(description="Project ID required")]
         default_environment: Annotated[
-            str, m.Field(default="dev", description="Default environment"),
+            str,
+            m.Field(default="dev", description="Default environment"),
         ] = "dev"
         project_root: Path = m.Field(
-            default_factory=Path.cwd, description="Project root directory",
+            default_factory=Path.cwd,
+            description="Project root directory",
         )
         environments: t.StrSequence = m.Field(
             default_factory=lambda: ["dev", "staging", "prod"],

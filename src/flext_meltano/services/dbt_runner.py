@@ -49,7 +49,9 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
         return cmd
 
     def _run_dbt_subprocess(
-        self, cmd: t.MutableSequenceOf[str], operation: str,
+        self,
+        cmd: t.MutableSequenceOf[str],
+        operation: str,
     ) -> p.Result[str]:
         """Execute a dbt command via subprocess.
 
@@ -59,7 +61,9 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
 
         def _run__run_dbt_subprocess() -> p.Result[str]:
             self.logger.info(
-                "Running dbt operation", operation=operation, command=" ".join(cmd),
+                "Running dbt operation",
+                operation=operation,
+                command=" ".join(cmd),
             )
             result = u.Cli.run_raw(list(cmd))
             if result.failure:
@@ -81,7 +85,9 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             return _run__run_dbt_subprocess()
         except c.EXC_OS_RUNTIME_TYPE as e:
             self.logger.exception(
-                "dbt operation failed", operation=operation, error=str(e),
+                "dbt operation failed",
+                operation=operation,
+                error=str(e),
             )
             return r[str].fail(f"dbt {operation} failed: {e}")
 
@@ -119,10 +125,12 @@ class FlextMeltanoDbtRunnerMixin(FlextMeltanoServiceBase):
             The resulting ``p.Result[str]``.
         """
         cmd = self._build_dbt_command(
-            c.Meltano.DbtCommand.DOCS, extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
+            c.Meltano.DbtCommand.DOCS,
+            extra_args=list(c.Meltano.DBT_DEFAULT_DOCS_ARGS),
         )
         return self._run_dbt_subprocess(
-            cmd, f"{c.Meltano.DbtCommand.DOCS} {c.Meltano.DbtCommand.GENERATE}",
+            cmd,
+            f"{c.Meltano.DbtCommand.DOCS} {c.Meltano.DbtCommand.GENERATE}",
         )
 
     def configure_dbt_project_root(self, root: Path) -> None:

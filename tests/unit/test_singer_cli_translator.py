@@ -38,14 +38,16 @@ class TestsFlextMeltanoSingerCliTranslator:
         [
             pytest.param(
                 m.Meltano.CliDataSourceParams(
-                    source_name="tap-postgres", discover=False,
+                    source_name="tap-postgres",
+                    discover=False,
                 ),
                 ["tap-postgres"],
                 id="minimal",
             ),
             pytest.param(
                 m.Meltano.CliDataSourceParams(
-                    source_name="tap-postgres", discover=True,
+                    source_name="tap-postgres",
+                    discover=True,
                 ),
                 ["tap-postgres", "--discover"],
                 id="discover",
@@ -98,7 +100,8 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_tap_run_builds_expected_command(
-        params: m.Meltano.CliDataSourceParams, expected: list[str],
+        params: m.Meltano.CliDataSourceParams,
+        expected: list[str],
     ) -> None:
         """Test translate tap run builds expected command."""
         result = meltano.translate_tap_run(params)
@@ -133,14 +136,16 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliDataSinkParams(
-                    sink_name="target-postgres", config_file="/path/to/settings.json",
+                    sink_name="target-postgres",
+                    config_file="/path/to/settings.json",
                 ),
                 ["target-postgres", "--config", "/path/to/settings.json"],
                 id="config",
             ),
             pytest.param(
                 m.Meltano.CliDataSinkParams(
-                    sink_name="target-postgres", input_file="/path/to/input.jsonl",
+                    sink_name="target-postgres",
+                    input_file="/path/to/input.jsonl",
                 ),
                 ["target-postgres", "--input", "/path/to/input.jsonl"],
                 id="input",
@@ -163,7 +168,8 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_target_run_builds_expected_command(
-        params: m.Meltano.CliDataSinkParams, expected: list[str],
+        params: m.Meltano.CliDataSinkParams,
+        expected: list[str],
     ) -> None:
         """Test translate target run builds expected command."""
         result = meltano.translate_target_run(params)
@@ -179,7 +185,8 @@ class TestsFlextMeltanoSingerCliTranslator:
         [
             pytest.param(
                 m.Meltano.CliPipelineParams(
-                    source_name="tap-postgres", sink_name="target-postgres",
+                    source_name="tap-postgres",
+                    sink_name="target-postgres",
                 ),
                 ["tap-postgres"],
                 ["target-postgres"],
@@ -274,7 +281,8 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project", models="users orders",
+                    project_dir="/dbt/project",
+                    models="users orders",
                 ),
                 [
                     "dbt",
@@ -288,7 +296,8 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project", select="tag:daily",
+                    project_dir="/dbt/project",
+                    select="tag:daily",
                 ),
                 [
                     "dbt",
@@ -302,7 +311,8 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project", exclude="tag:deprecated",
+                    project_dir="/dbt/project",
+                    exclude="tag:deprecated",
                 ),
                 [
                     "dbt",
@@ -316,7 +326,8 @@ class TestsFlextMeltanoSingerCliTranslator:
             ),
             pytest.param(
                 m.Meltano.CliTransformationParams(
-                    project_dir="/dbt/project", full_refresh=True,
+                    project_dir="/dbt/project",
+                    full_refresh=True,
                 ),
                 ["dbt", "run", "--projects-dir", "/dbt/project", "--full-refresh"],
                 id="full-refresh",
@@ -347,7 +358,8 @@ class TestsFlextMeltanoSingerCliTranslator:
         ],
     )
     def test_translate_dbt_run_builds_expected_command(
-        params: m.Meltano.CliTransformationParams, expected: list[str],
+        params: m.Meltano.CliTransformationParams,
+        expected: list[str],
     ) -> None:
         """Test translate dbt run builds expected command."""
         result = meltano.translate_dbt_run(params)

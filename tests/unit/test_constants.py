@@ -42,7 +42,8 @@ class TestsFlextMeltanoConstantsUnit:
         ],
     )
     def test_string_constant_exposes_expected_value(
-        name: str, expected: str,
+        name: str,
+        expected: str,
     ) -> None:
         """String constants expose their exact documented public value."""
         tm.that(getattr(c.Meltano, name), eq=expected)
@@ -59,7 +60,8 @@ class TestsFlextMeltanoConstantsUnit:
         ],
     )
     def test_enum_backed_constant_compares_as_its_string_value(
-        name: str, expected: str,
+        name: str,
+        expected: str,
     ) -> None:
         """Enum-backed identifiers behave as their StrEnum string value."""
         value = getattr(c.Meltano, name)
@@ -79,7 +81,8 @@ class TestsFlextMeltanoConstantsUnit:
         ],
     )
     def test_integer_threshold_exposes_expected_value(
-        name: str, expected: int,
+        name: str,
+        expected: int,
     ) -> None:
         """Numeric thresholds expose their exact documented value."""
         tm.that(getattr(c.Meltano, name), eq=expected)
@@ -93,7 +96,9 @@ class TestsFlextMeltanoConstantsUnit:
         ],
     )
     def test_logging_flag_exposes_expected_value(
-        name: str, *, value: bool,
+        name: str,
+        *,
+        value: bool,
     ) -> None:
         """Logging feature flags expose their documented boolean default."""
         assert getattr(c.Meltano, name) is value
@@ -125,7 +130,8 @@ class TestsFlextMeltanoConstantsUnit:
         ],
     )
     def test_plugin_type_member_exposes_expected_value(
-        member: str, expected: str,
+        member: str,
+        expected: str,
     ) -> None:
         """Each PluginType member maps to its documented plugin folder name."""
         value = getattr(c.Meltano.PluginType, member)

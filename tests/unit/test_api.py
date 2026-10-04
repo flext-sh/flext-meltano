@@ -43,14 +43,16 @@ class TestsFlextMeltanoApi:
     def test_create_project_rejects_empty_name(tmp_path: Path) -> None:
         """Project creation fails fast on invalid input."""
         tm.fail(
-            meltano.create_project(project_name="", project_dir=tmp_path), has="empty",
+            meltano.create_project(project_name="", project_dir=tmp_path),
+            has="empty",
         )
 
     @staticmethod
     def test_create_project_writes_meltano_project_file(tmp_path: Path) -> None:
         """Project creation persists the canonical Meltano project file."""
         result = meltano.create_project(
-            project_name="config_test", project_dir=tmp_path,
+            project_name="config_test",
+            project_dir=tmp_path,
         )
         tm.that(result, ok=True)
         tm.ok(result)
@@ -75,7 +77,8 @@ class TestsFlextMeltanoApi:
         """Component installation enforces canonical Meltano component types."""
         error = tm.fail(
             meltano.install_component(
-                component_type="invalid_type", component_name="tap-csv",
+                component_type="invalid_type",
+                component_name="tap-csv",
             ),
         )
         tm.that(error.lower(), has=["invalid"])

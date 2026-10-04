@@ -31,7 +31,8 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
     )
 
     def discover_catalog_streams(
-        self, tap: p.Meltano.SingerTap,
+        self,
+        tap: p.Meltano.SingerTap,
     ) -> p.Result[m.Meltano.SingerCatalog]:
         """Discover streams from a Singer tap instance.
 
@@ -44,13 +45,15 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         try:
             self._singer_catalog = tap.discover()
             self.logger.info(
-                "Streams discovered", stream_count=len(self._singer_catalog.streams),
+                "Streams discovered",
+                stream_count=len(self._singer_catalog.streams),
             )
             return r[m.Meltano.SingerCatalog].ok(self._singer_catalog)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to discover streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(
-                f"Failed to discover: {e}", exception=e,
+                f"Failed to discover: {e}",
+                exception=e,
             )
 
     def fetch_stream_schema(self, stream_name: str) -> p.Result[t.JsonMapping]:
@@ -91,12 +94,14 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 return catalog
 
             return u.Cli.files_read_json_model(
-                catalog_file, m.Meltano.SingerCatalog,
+                catalog_file,
+                m.Meltano.SingerCatalog,
             ).map(_store)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to load catalog", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(
-                f"Failed to load catalog: {e}", exception=e,
+                f"Failed to load catalog: {e}",
+                exception=e,
             )
 
     def save_catalog(self, catalog_file: Path) -> p.Result[bool]:
@@ -120,7 +125,8 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
             return r[bool].fail(f"Failed to save catalog: {e}", exception=e)
 
     def select_streams(
-        self, stream_names: t.StrSequence,
+        self,
+        stream_names: t.StrSequence,
     ) -> p.Result[m.Meltano.SingerCatalog]:
         """Select specific streams from cached catalog.
 
@@ -143,7 +149,8 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Failed to select streams", error=str(e))
             return r[m.Meltano.SingerCatalog].fail(
-                f"Failed to select: {e}", exception=e,
+                f"Failed to select: {e}",
+                exception=e,
             )
 
     def configure_singer_catalog(self, catalog: m.Meltano.SingerCatalog) -> None:

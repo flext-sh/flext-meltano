@@ -75,7 +75,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
                 "source_id": source_id,
             })
             self.logger.info(
-                "Source instance created successfully", source_name=source_type,
+                "Source instance created successfully",
+                source_name=source_type,
             )
             return r[m.Meltano.DataSourceInstance].ok(source_instance)
 
@@ -84,7 +85,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception("Source instance creation failed", error=str(e))
             return r[m.Meltano.DataSourceInstance].fail_op(
-                "Source instance creation", e,
+                "Source instance creation",
+                e,
             )
 
     def create_tap_from_config(
@@ -116,7 +118,8 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             )
         except c.Meltano.OPERATION_ERRORS as exc:
             return r[m.Meltano.TapInstance].fail(
-                f"Failed to create tap: {exc}", exception=exc,
+                f"Failed to create tap: {exc}",
+                exception=exc,
             )
 
 

@@ -116,14 +116,16 @@ class FlextMeltanoUtilitiesRuntime:
         """
         raw_environment_name = "" if environment_name is None else environment_name
         normalized = u.normalize(
-            u.to_str(raw_environment_name, default=""), case="lower",
+            u.to_str(raw_environment_name, default=""),
+            case="lower",
         ).strip()
         runtime_alias = c.Meltano.ENVIRONMENT_RUNTIME_ALIASES.get(normalized)
         return runtime_alias if runtime_alias is not None else normalized
 
     @staticmethod
     def build_pipeline_runtime_command(
-        tap_name: str, target_name: str,
+        tap_name: str,
+        target_name: str,
     ) -> t.StrSequence:
         """Build the canonical Meltano ELT runtime command.
 
@@ -138,7 +140,8 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_dbt_runtime_command(
-        dbt_command: str, args: t.StrSequence | None = None,
+        dbt_command: str,
+        args: t.StrSequence | None = None,
     ) -> t.StrSequence:
         """Build the canonical Meltano DBT invoke runtime command.
 
@@ -155,7 +158,8 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_bridge_command_args(
-        command: str, args: t.ConfigurationMapping | None = None,
+        command: str,
+        args: t.ConfigurationMapping | None = None,
     ) -> t.StrSequence:
         """Build Meltano bridge command arguments from command + key/value args.
 
@@ -174,7 +178,8 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_discovered_plugin(
-        raw_type: str, raw_plugin: t.JsonMapping,
+        raw_type: str,
+        raw_plugin: t.JsonMapping,
     ) -> t.StrMapping | None:
         """Normalize a Meltano runtime plugin mapping to discovery payload shape.
 
@@ -204,7 +209,8 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_discovered_project_plugin(
-        raw_type: str, raw_plugin: ProjectPlugin,
+        raw_type: str,
+        raw_plugin: ProjectPlugin,
     ) -> t.StrMapping | None:
         """Normalize a Meltano project plugin object into discovery payload shape.
 
@@ -218,7 +224,8 @@ class FlextMeltanoUtilitiesRuntime:
             "variant": raw_plugin.variant,
         }
         return FlextMeltanoUtilitiesRuntime.build_discovered_plugin(
-            raw_type, plugin_mapping,
+            raw_type,
+            plugin_mapping,
         )
 
     @staticmethod
@@ -238,7 +245,8 @@ class FlextMeltanoUtilitiesRuntime:
             for raw_plugin in raw_plugins:
                 plugin_data = (
                     FlextMeltanoUtilitiesRuntime.build_discovered_project_plugin(
-                        normalized_type, raw_plugin,
+                        normalized_type,
+                        raw_plugin,
                     )
                 )
                 if plugin_data is None:
@@ -266,7 +274,9 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def build_plugin_discovery_item(
-        plugin_name: str, plugin_type: str, source: m.Meltano.PluginDiscoverySource,
+        plugin_name: str,
+        plugin_type: str,
+        source: m.Meltano.PluginDiscoverySource,
     ) -> t.StrMapping:
         """Build canonical plugin discovery payload from raw Meltano metadata.
 
@@ -301,7 +311,10 @@ class FlextMeltanoUtilitiesRuntime:
 
     @staticmethod
     def command_status(
-        *, success: bool, success_status: str, failure_status: str,
+        *,
+        success: bool,
+        success_status: str,
+        failure_status: str,
     ) -> str:
         """Select status string from command success/failure.
 
@@ -358,13 +371,17 @@ class FlextMeltanoUtilitiesRuntime:
         """
         return dict(
             FlextMeltanoUtilitiesRuntime.build_command_execution_payload(
-                command_result, extra_fields=extra_fields, policy=policy,
+                command_result,
+                extra_fields=extra_fields,
+                policy=policy,
             ).items(),
         )
 
     @staticmethod
     def command_failure_message(
-        command_result: m.Meltano.CommandExecutionResult, *, default: str,
+        command_result: m.Meltano.CommandExecutionResult,
+        *,
+        default: str,
     ) -> str:
         """Resolve the best failure/output text from a command result.
 

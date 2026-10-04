@@ -38,7 +38,8 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("schema_definition", mode="before")
         @classmethod
         def normalize_schema(
-            cls, value: t.Meltano.ValidatorInput,
+            cls,
+            value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
             """Normalize mapping input before JSON validation.
 
@@ -73,7 +74,8 @@ class FlextMeltanoModelsPayloadsData:
         @m.field_validator("records", mode="before")
         @classmethod
         def normalize_records(
-            cls, value: t.Meltano.ValidatorInput,
+            cls,
+            value: t.Meltano.ValidatorInput,
         ) -> t.VariadicTuple[t.FlatContainerMapping]:
             """Normalize mixed record input into JSON-safe record tuples.
 
@@ -122,7 +124,8 @@ class FlextMeltanoModelsPayloadsData:
         """Path normalization payload for runtime path conversions."""
 
         value: Annotated[Path, m.Field(description="Normalized path")] = m.Field(
-            default_factory=Path, description="Normalized path",
+            default_factory=Path,
+            description="Normalized path",
         )
 
         @m.field_validator("value", mode="before")
@@ -141,7 +144,8 @@ class FlextMeltanoModelsPayloadsData:
         """Normalize str|dict content to writable string for file operations."""
 
         content: Annotated[
-            str, m.Field(default="", description="Normalized writable string content"),
+            str,
+            m.Field(default="", description="Normalized writable string content"),
         ] = ""
 
         @m.field_validator("content", mode="before")
@@ -164,13 +168,15 @@ class FlextMeltanoModelsPayloadsData:
         """Normalize plugin variant from external extraction (str|list|dict)."""
 
         value: t.Meltano.VariantValue = m.Field(
-            default=None, description="Normalized variant value",
+            default=None,
+            description="Normalized variant value",
         )
 
         @m.field_validator("value", mode="before")
         @classmethod
         def normalize_variant(
-            cls, value: str | t.Meltano.ValidatorInput,
+            cls,
+            value: str | t.Meltano.ValidatorInput,
         ) -> str | t.StrSequence | t.ScalarMapping | None:
             """Normalize variant_raw into typed union.
 

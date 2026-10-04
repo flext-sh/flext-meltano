@@ -41,7 +41,8 @@ class FlextMeltanoBridge(FlextMeltanoServiceBase):
 
     @staticmethod
     def execute_bridge_command(
-        command: str, args: t.ConfigurationMapping | None = None,
+        command: str,
+        args: t.ConfigurationMapping | None = None,
     ) -> p.Result[t.JsonMapping]:
         """Execute a Meltano runtime command.
 

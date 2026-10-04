@@ -58,7 +58,9 @@ class FlextMeltanoUtilitiesSinger:
             return r[str].ok(line)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation(
-                f"emit SCHEMA for {stream_name}", exc, result_type=r[str],
+                f"emit SCHEMA for {stream_name}",
+                exc,
+                result_type=r[str],
             )
 
     @staticmethod
@@ -93,7 +95,9 @@ class FlextMeltanoUtilitiesSinger:
             return r[str].ok(line)
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as exc:
             return e.fail_operation(
-                f"emit RECORD for {stream_name}", exc, result_type=r[str],
+                f"emit RECORD for {stream_name}",
+                exc,
+                result_type=r[str],
             )
 
     @staticmethod
@@ -142,7 +146,8 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _process_stdin_line(
-        line: str, handler: p.Meltano.SingerTargetHandler,
+        line: str,
+        handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
         """Process one Singer JSON line from stdin.
 
@@ -160,7 +165,8 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _dispatch_singer_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping,
+        handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
         """Route a parsed Singer message to the matching handler.
 
@@ -178,7 +184,8 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _handle_schema_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping,
+        handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
         """Handle one Singer SCHEMA message.
 
@@ -197,7 +204,8 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _handle_record_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping,
+        handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
         """Handle one Singer RECORD message.
 
@@ -216,7 +224,8 @@ class FlextMeltanoUtilitiesSinger:
 
     @staticmethod
     def _handle_state_message(
-        raw: t.JsonMapping, handler: p.Meltano.SingerTargetHandler,
+        raw: t.JsonMapping,
+        handler: p.Meltano.SingerTargetHandler,
     ) -> p.Result[bool]:
         """Handle one Singer STATE message.
 

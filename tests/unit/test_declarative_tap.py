@@ -68,7 +68,8 @@ class TestsFlextMeltanoDeclarativeTap:
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             exit_code = instance.run_cli(
-                ["--config", str(config_path), "--discover"], "tap-sample",
+                ["--config", str(config_path), "--discover"],
+                "tap-sample",
             )
 
         catalog_result = u.Cli.json_loads(buffer.getvalue())

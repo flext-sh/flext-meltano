@@ -57,7 +57,8 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
             )
         except c.Meltano.OPERATION_ERRORS as e:
             return r[t.JsonMapping].fail(
-                f"Failed to create CLI runner: {e}", exception=e,
+                f"Failed to create CLI runner: {e}",
+                exception=e,
             )
 
     def health(self) -> p.Result[t.JsonMapping]:
@@ -133,7 +134,9 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         return self._route_command(args[0], args[1:]).map(lambda _: 0)
 
     def run_pipeline_command(
-        self, tap_name: str, target_name: str,
+        self,
+        tap_name: str,
+        target_name: str,
     ) -> p.Result[t.JsonMapping]:
         """Run complete ELT pipeline command.
 
@@ -167,7 +170,9 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         )
 
     def _route_command(
-        self, command: str, args: t.StrSequence,
+        self,
+        command: str,
+        args: t.StrSequence,
     ) -> p.Result[t.JsonMapping]:
         """Route command to appropriate handler.
 

@@ -39,7 +39,8 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             else:
                 source_type = items.tap_type
             self.logger.debug(
-                "Processing source configuration", source_name=source_type,
+                "Processing source configuration",
+                source_name=source_type,
             )
             if not source_type:
                 return r[bool].fail("Source configuration must have a type")
@@ -49,12 +50,14 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
             return _run_process_source()
         except c.Meltano.SINGER_SAFE_EXCEPTIONS as e:
             self.logger.exception(
-                "Source configuration processing failed", error=str(e),
+                "Source configuration processing failed",
+                error=str(e),
             )
             return r[bool].fail_op("Source configuration processing", e)
 
     def validate_stream_schema(
-        self, stream_def: m.Meltano.StreamDefinition,
+        self,
+        stream_def: m.Meltano.StreamDefinition,
     ) -> p.Result[bool]:
         """Validate a stream definition's schema.
 
@@ -63,7 +66,8 @@ class FlextMeltanoTapAbstractions(FlextMeltanoTapSourceMixin, FlextMeltanoServic
         """
         try:
             self.logger.debug(
-                "Validating stream schema", stream_name=stream_def.stream_name,
+                "Validating stream schema",
+                stream_name=stream_def.stream_name,
             )
             if not stream_def.stream_schema:
                 return r[bool].fail("Stream schema cannot be empty")

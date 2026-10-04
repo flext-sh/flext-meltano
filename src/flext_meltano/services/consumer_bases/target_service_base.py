@@ -34,8 +34,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     """
 
     target_name: Annotated[
-        t.NonEmptyStr
-        , u.Field(description="Canonical target name (e.g. target-oracle)"),
+        t.NonEmptyStr,
+        u.Field(description="Canonical target name (e.g. target-oracle)"),
     ] = "target"
 
     _sinks: MutableMapping[str, p.Meltano.SingerDrainSink] = u.PrivateAttr(
@@ -44,7 +44,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
 
     @abstractmethod
     def create_sink(
-        self, stream_name: str, schema: t.JsonMapping,
+        self,
+        stream_name: str,
+        schema: t.JsonMapping,
     ) -> p.Meltano.SingerDrainSink:
         """Create a Sink instance for a stream.
 
@@ -87,7 +89,8 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
             The resulting ``p.Result[bool]``.
         """
         sink_result = self.fetch_or_create_sink(
-            message.stream, message.schema_definition,
+            message.stream,
+            message.schema_definition,
         )
         if sink_result.failure:
             return r[bool].from_failure(sink_result)
@@ -115,7 +118,9 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def fetch_or_create_sink(
-        self, stream_name: str, schema: t.JsonMapping,
+        self,
+        stream_name: str,
+        schema: t.JsonMapping,
     ) -> p.Result[p.Meltano.SingerDrainSink]:
         """Get existing sink or create new one for a stream.
 
@@ -157,7 +162,10 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
     # ------------------------------------------------------------------
 
     def process_record(
-        self, stream_name: str, record: t.JsonMapping, schema: t.JsonMapping,
+        self,
+        stream_name: str,
+        record: t.JsonMapping,
+        schema: t.JsonMapping,
     ) -> p.Result[bool]:
         """Process a single Singer RECORD message.
 

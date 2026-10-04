@@ -29,7 +29,8 @@ class FlextMeltanoModelsContext:
         extractor_name: Annotated[str, m.Field(description="Extractor name")]
         loader_name: Annotated[t.NonEmptyStr, m.Field(description="Loader name")]
         execution_completed: Annotated[
-            bool, m.Field(default=False, description="Execution completion flag"),
+            bool,
+            m.Field(default=False, description="Execution completion flag"),
         ] = False
         execution_result: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -39,7 +40,8 @@ class FlextMeltanoModelsContext:
         @m.field_validator("elt_context", "execution_result", mode="before")
         @classmethod
         def normalize_mapping_payloads(
-            cls, value: t.Meltano.ValidatorInput,
+            cls,
+            value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
             """Normalize mapping-like payloads into JSON-safe dictionaries.
 
@@ -56,7 +58,8 @@ class FlextMeltanoModelsContext:
         @m.field_validator("elt_context", "execution_result", mode="after")
         @classmethod
         def freeze_mapping_payloads(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose normalized pipeline mappings as read-only values.
 
@@ -66,7 +69,10 @@ class FlextMeltanoModelsContext:
             return MappingProxyType(dict(value))
 
         @m.field_validator(
-            "project_root", "extractor_name", "loader_name", mode="before",
+            "project_root",
+            "extractor_name",
+            "loader_name",
+            mode="before",
         )
         @classmethod
         def normalize_required_strings(cls, value: t.Meltano.ValidatorInput) -> str:
@@ -82,7 +88,8 @@ class FlextMeltanoModelsContext:
         """Typed subset for extracting final pipeline result fields."""
 
         project_root: Annotated[
-            str, m.Field(default="unknown", description="Project root path"),
+            str,
+            m.Field(default="unknown", description="Project root path"),
         ] = "unknown"
         execution_result: t.FlatContainerMapping = m.Field(
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
@@ -92,7 +99,8 @@ class FlextMeltanoModelsContext:
         @m.field_validator("execution_result", mode="before")
         @classmethod
         def normalize_execution_result(
-            cls, value: t.Meltano.ValidatorInput,
+            cls,
+            value: t.Meltano.ValidatorInput,
         ) -> t.FlatContainerMapping:
             """Normalize execution result map payload.
 
@@ -109,7 +117,8 @@ class FlextMeltanoModelsContext:
         @m.field_validator("execution_result", mode="after")
         @classmethod
         def freeze_execution_result(
-            cls, value: t.FlatContainerMapping,
+            cls,
+            value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
             """Expose the normalized result payload as a read-only mapping.
 

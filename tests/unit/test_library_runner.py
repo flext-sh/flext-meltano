@@ -54,7 +54,8 @@ class TestsFlextMeltanoLibraryRunner:
             The resulting ``p.Result[t.JsonMapping]``.
         """
         return meltano.execute_complete_elt_pipeline(
-            tap_name="tap-csv", target_name="target-jsonl",
+            tap_name="tap-csv",
+            target_name="target-jsonl",
         )
 
     @pytest.fixture(scope="class")
@@ -95,7 +96,8 @@ class TestsFlextMeltanoLibraryRunner:
     @staticmethod
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
     def test_elt_payload_exposes_base_command_keys(
-        elt_result: p.Result[t.JsonMapping], key: str,
+        elt_result: p.Result[t.JsonMapping],
+        key: str,
     ) -> None:
         """The ELT payload carries every documented command-execution field."""
         tm.that(elt_result.unwrap(), has=key)
@@ -134,7 +136,8 @@ class TestsFlextMeltanoLibraryRunner:
     @staticmethod
     @pytest.mark.parametrize("attribute", _COMMAND_RESULT_ATTRIBUTES)
     def test_dbt_result_exposes_command_execution_fields(
-        dbt_result: p.Result[m.Meltano.CommandExecutionResult], attribute: str,
+        dbt_result: p.Result[m.Meltano.CommandExecutionResult],
+        attribute: str,
     ) -> None:
         """The typed CommandExecutionResult carries every documented field."""
         assert hasattr(dbt_result.unwrap(), attribute)
@@ -159,7 +162,8 @@ class TestsFlextMeltanoLibraryRunner:
     @staticmethod
     @pytest.mark.parametrize("key", _BASE_PAYLOAD_KEYS)
     def test_elt_pipeline_payload_exposes_base_command_keys(
-        elt_pipeline_result: p.Result[t.JsonMapping], key: str,
+        elt_pipeline_result: p.Result[t.JsonMapping],
+        key: str,
     ) -> None:
         """The tap-to-target payload carries every documented command field."""
         tm.that(elt_pipeline_result.unwrap(), has=key)
