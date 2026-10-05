@@ -178,6 +178,7 @@ include = ["/src/flext_meltano/**"]
 [tool.mypy]
 mypy_path = ["src"]
 plugins = ["pydantic.mypy"]
+disable_error_code = ["prop-decorator", "call-arg"]
 python_version = "3.13"
 allow_redefinition = true
 check_untyped_defs = true
@@ -414,7 +415,11 @@ quote-style = "double"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
-extend-safe-fixes = ["camelcase-imported-as-lowercase", "relative-imports"]
+extend-safe-fixes = [
+  "camelcase-imported-as-lowercase",
+  "relative-imports",
+  "typing-only-first-party-import",
+]
 ignore = [
   "camelcase-imported-as-lowercase",
   "implicit-namespace-package",
@@ -438,6 +443,55 @@ unfixable = [
 
 [tool.ruff.lint.flake8-copyright]
 notice-rgx = "Copyright \\(c\\) \\d{4} \\S[^\\n]*\\. All rights reserved\\."
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+  "flext_cli.FlextCliConfig",
+  "flext_cli.m.ArbitraryTypesModel",
+  "flext_cli.m.BaseModel",
+  "flext_cli.m.Entity",
+  "flext_cli.m.FlexibleModel",
+  "flext_cli.m.TimestampedModel",
+  "flext_core.FlextService",
+  "flext_core.FlextSettings",
+  "flext_meltano.FlextMeltanoConstants.Meltano",
+  "flext_meltano.FlextMeltanoServiceBase",
+  "flext_meltano.FlextMeltanoSettings",
+  "flext_meltano._constants.settings.FlextMeltanoConstantsSettings",
+  "flext_meltano._models.cli_params.CatalogStateParams",
+  "flext_meltano._models.payloads.FrozenConfigPayload",
+  "flext_meltano.m.BaseModel",
+  "flext_meltano.m.Value",
+  "flext_meltano.services.abstractions.FlextMeltanoAbstractions",
+  "flext_meltano.services.abstractions_base.FlextMeltanoAbstractionsBase",
+  "flext_meltano.services.adapters.FlextMeltanoAdapter",
+  "flext_meltano.services.bridge.FlextMeltanoBridge",
+  "flext_meltano.services.consumer_bases.dbt_service_base.FlextMeltanoDbtServiceBase",
+  "flext_meltano.services.consumer_bases.tap_service_base.FlextMeltanoTapServiceBase",
+  "flext_meltano.services.consumer_bases.target_service_base.FlextMeltanoTargetServiceBase",
+  "flext_meltano.services.dbt_project.FlextMeltanoDbtProjectMixin",
+  "flext_meltano.services.dbt_runner.FlextMeltanoDbtRunnerMixin",
+  "flext_meltano.services.executor.FlextMeltanoExecutor",
+  "flext_meltano.services.executor_base.FlextMeltanoExecutorBase",
+  "flext_meltano.services.library_runner.FlextMeltanoLibraryRunner",
+  "flext_meltano.services.meltano_plugin_discovery.FlextMeltanoPluginDiscoveryMixin",
+  "flext_meltano.services.meltano_plugins.FlextMeltanoComponentService",
+  "flext_meltano.services.meltano_project_sdk.FlextMeltanoProjectManager",
+  "flext_meltano.services.project_service.FlextMeltanoProjectService",
+  "flext_meltano.services.service.FlextMeltanoService",
+  "flext_meltano.services.singer_catalog.FlextMeltanoSingerCatalogMixin",
+  "flext_meltano.services.singer_state.FlextMeltanoSingerStateMixin",
+  "flext_meltano.services.singer_tap.FlextMeltanoTapAbstractions",
+  "flext_meltano.services.singer_target.FlextMeltanoTargetAbstractions",
+  "flext_meltano.services.singer_translator.FlextMeltanoSingerCliTranslator",
+  "flext_meltano.services.tap_source_mixin.FlextMeltanoTapSourceMixin",
+  "flext_meltano.services.validators.FlextMeltanoValidators",
+  "flext_tests.FlextTestsServiceBase",
+  "flext_tests.FlextTestsSettings",
+  "flext_tests.FlextTestsUtilities.Tests",
+  "pydantic.BaseModel",
+  "tests.m.BaseModel",
+]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
