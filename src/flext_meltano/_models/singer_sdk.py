@@ -35,8 +35,8 @@ class FlextMeltanoModelsSingerSdk:
     SingerSinkBase = Sink
     SingerStreamBase = Stream
     SingerTargetBase = Target
-    SingerContext = Context
-    SingerRecord = Record
+    type SingerContext = Context
+    type SingerRecord = Record
     SingerArrayType = singer_sdk_typing.ArrayType
     SingerBooleanType = singer_sdk_typing.BooleanType
     SingerCustomType = singer_sdk_typing.CustomType

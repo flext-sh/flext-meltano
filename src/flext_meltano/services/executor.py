@@ -6,7 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from meltano.core.error import ProjectNotFound
+# Why: upstream Meltano ships no type stubs for these modules; the fleet
+# stub-file rule forbids authoring stubs in-repo, so the untyped third-party
+# import is admitted explicitly and narrowly per module.
+from meltano.core.error import ProjectNotFound  # pyright: ignore[reportMissingTypeStubs]
 
 from flext_meltano import FlextMeltanoSettings, c, m, p, r, t, u
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
@@ -21,18 +24,12 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
-        source_name: str | None = None,
-        sink_name: str | None = None,
-        transformation_name: str | None = None,
     ) -> None:
         """Forward canonical Meltano service kwargs via ``FlextMeltanoExecutorBase``."""
         super().__init__(
             settings=settings,
             service_name=service_name,
             service_version=service_version,
-            source_name=source_name,
-            sink_name=sink_name,
-            transformation_name=transformation_name,
         )
 
     @staticmethod

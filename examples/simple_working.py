@@ -33,11 +33,11 @@ def simple_component_example() -> None:
     target_result = meltano.target("target-jsonl")
     dbt_result = meltano.dbt("analytics")
     if tap_result.success:
-        logger.info(f"Tap source: {tap_result.value.source_name}")
+        logger.info("Tap source: %s", tap_result.value.source_name)
     if target_result.success:
-        logger.info(f"Target sink: {target_result.value.sink_name}")
+        logger.info("Target sink: %s", target_result.value.sink_name)
     if dbt_result.success:
-        logger.info(f"DBT transformation: {dbt_result.value.transformation_name}")
+        logger.info("DBT transformation: %s", dbt_result.value.transformation_name)
 
 
 def simple_runtime_example() -> None:

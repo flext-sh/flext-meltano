@@ -9,7 +9,9 @@ from __future__ import annotations
 import errno
 import os
 import signal
+from collections.abc import Callable
 from pathlib import Path
+from types import MappingProxyType
 
 from flext_cli import cli as flext_cli
 
@@ -196,7 +198,9 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
                 error=exc,
                 result_type=r[str],
             )
-        ensure_result = flext_cli.ensure_dir(self._pipeline_dir(name_result.value))
+        ensure_result = flext_cli.ensure_dir(
+            self._pipeline_dir(name_result.value),
+        )
         if ensure_result.failure:
             return r[str].from_failure(ensure_result)
         write_result = flext_cli.write_json_file(
@@ -355,21 +359,22 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         Returns:
             The resulting ``p.Result[str]``.
         """
-        match subcommand:
-            case c.Meltano.PipelineCommand.CREATE:
-                return self._create_pipeline(args)
-            case c.Meltano.PipelineCommand.RUN:
-                return self._run_pipeline(args)
-            case c.Meltano.PipelineCommand.LIST:
-                return self._list_pipelines()
-            case c.Meltano.PipelineCommand.STATUS:
-                return self._fetch_pipeline_status(args)
-            case c.Meltano.PipelineCommand.STOP:
-                return self._stop_pipeline(args)
-            case c.Meltano.PipelineCommand.DELETE:
-                return self._delete_pipeline(args)
-            case _:
-                return r[str].fail(f"Unknown pipeline command: {subcommand}")
+        handlers: MappingProxyType[str, Callable[[t.StrSequence], p.Result[str]]] = (
+            MappingProxyType({
+                c.Meltano.PipelineCommand.CREATE: self._create_pipeline,
+                c.Meltano.PipelineCommand.RUN: self._run_pipeline,
+                c.Meltano.PipelineCommand.DELETE: self._delete_pipeline,
+                c.Meltano.PipelineCommand.STOP: self._stop_pipeline,
+                c.Meltano.PipelineCommand.STATUS: self._fetch_pipeline_status,
+            })
+        )
+        handler = handlers.get(subcommand)
+        if handler is not None:
+            return handler(args)
+        lister: Callable[[], p.Result[str]] = self._list_pipelines
+        if subcommand == c.Meltano.PipelineCommand.LIST:
+            return lister()
+        return r[str].fail(f"Unknown pipeline command: {subcommand}")
 
     def _fetch_pipeline_status(self, args: t.StrSequence) -> p.Result[str]:
         """Fetch one pipeline status.

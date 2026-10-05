@@ -14,6 +14,7 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsProjects:
@@ -29,7 +30,7 @@ class FlextMeltanoModelsProjects:
             m.Field(default=None, description="Node description"),
         ] = None
         fqn: t.StrTuple = m.Field(
-            default_factory=tuple,
+            default_factory=tuple[str, ...],
             description="Fully qualified name parts",
         )
         resource_type: Annotated[
@@ -102,7 +103,7 @@ class FlextMeltanoModelsProjects:
                 if node.resource_type == resource_type
             ]
 
-    class MeltanoProjectModel(m.Entity):
+    class MeltanoProjectModel(FlextMeltanoModelsBase.EventedEntity):
         """Generic Meltano project configuration with validation."""
 
         project_id: Annotated[str, m.Field(description="Unique project identifier")]
@@ -136,7 +137,7 @@ class FlextMeltanoModelsProjects:
             """
             return MappingProxyType(dict(value))
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_meltano_project(self) -> Self:
             """Validate Meltano project configuration consistency.
 
@@ -151,7 +152,7 @@ class FlextMeltanoModelsProjects:
                 raise ValueError(msg)
             return self
 
-    class PipelineProjectModel(m.Entity):
+    class PipelineProjectModel(FlextMeltanoModelsBase.EventedEntity):
         """Generic pipeline project configuration with validation."""
 
         schema_version: Annotated[
@@ -220,7 +221,7 @@ class FlextMeltanoModelsProjects:
                 return "developing"
             return "basic"
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:
             """Validate project consistency.
 

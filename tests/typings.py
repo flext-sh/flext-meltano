@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from flext_tests import FlextTestsTypes
 
 from flext_meltano import FlextMeltanoTypes
@@ -19,6 +21,12 @@ class TestsFlextMeltanoTypes(FlextTestsTypes, FlextMeltanoTypes):
 
     class Meltano(FlextMeltanoTypes.Meltano):
         """Meltano test types namespace."""
+
+        type ComponentCase = tuple[str, str, str]
+        """One canonical component-factory case: kind, name, selector field."""
+
+        type ProjectEnv = dict[str, str | Path | t.JsonMapping]
+        """Environment mapping exported for one test Meltano project."""
 
         class Tests(FlextTestsTypes.Tests):
             """Meltano-specific test type aliases."""

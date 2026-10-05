@@ -266,7 +266,7 @@ class FlextMeltanoUtilitiesSinger:
         """
         try:
             metadata_entry = m.Meltano.SingerCatalogMetadata(
-                breadcrumb=[],
+                breadcrumb=(),
                 metadata={
                     "selected": is_selected,
                     "replication-key": replication_key or "",

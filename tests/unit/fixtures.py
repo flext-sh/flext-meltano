@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import m, tf, tk, tm
+from flext_tests import m, tf, tm
+from flext_tests.docker import FlextTestsDocker
 
 from tests import c, u
 
@@ -19,10 +20,7 @@ if TYPE_CHECKING:
 
     from tests import t
 
-type MeltanoComponentCase = tuple[str, str, str]
-
-
-MELTANO_COMPONENT_CASES: t.VariadicTuple[MeltanoComponentCase] = (
+MELTANO_COMPONENT_CASES: t.VariadicTuple[t.Meltano.ComponentCase] = (
     ("tap", "tap-csv", "source_name"),
     ("target", "target-jsonl", "sink_name"),
     ("dbt", "analytics", "transformation_name"),
@@ -35,13 +33,13 @@ MELTANO_COMPONENT_IDS: t.StrSequence = ("tap", "target", "dbt")
     params=tuple(range(len(MELTANO_COMPONENT_CASES))),
     ids=MELTANO_COMPONENT_IDS,
 )
-def meltano_component_case(request: pytest.FixtureRequest) -> MeltanoComponentCase:
+def meltano_component_case(request: pytest.FixtureRequest) -> t.Meltano.ComponentCase:
     """Canonical public Meltano component factories with expected selectors.
 
     Returns:
         The resulting ``MeltanoComponentCase``.
     """
-    case_index = request.param
+    case_index: int = request.param
     tm.that(case_index, is_=int)
     return MELTANO_COMPONENT_CASES[case_index]
 
@@ -135,11 +133,11 @@ def meltano_yml_config() -> t.JsonMapping:
 def meltano_project(
     test_meltano_project_dir: Path,
     meltano_yml_config: t.JsonMapping,
-) -> dict[str, str | Path | t.JsonMapping]:
+) -> t.Meltano.ProjectEnv:
     """Meltano project for testing.
 
     Returns:
-        The resulting ``dict[str, str | Path | t.JsonMapping]``.
+        The resulting ``t.Meltano.ProjectEnv``.
     """
     meltano_yml = test_meltano_project_dir / "pipeline.yml"
     u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
@@ -174,13 +172,13 @@ def singer_state() -> t.JsonMapping:
 
 
 @pytest.fixture
-def docker_manager() -> tk:
+def docker_manager() -> FlextTestsDocker:
     """Docker manager fixture for Docker-based tests.
 
     Returns:
-        The resulting ``tk``.
+        The resulting ``FlextTestsDocker``.
     """
-    return tk.stack(
+    return FlextTestsDocker.stack(
         c.Meltano.Tests.COMPOSE_FILE,
         target=m.Tests.ContainerConfig(
             container_name="flext-test-meltano",
@@ -192,7 +190,7 @@ def docker_manager() -> tk:
     )
 
 
-_DOCKER_MANAGER_KEY: pytest.StashKey[tk] = pytest.StashKey()
+_DOCKER_MANAGER_KEY: pytest.StashKey[FlextTestsDocker] = pytest.StashKey()
 
 
 @pytest.fixture(scope="session")
@@ -206,14 +204,14 @@ def _docker_stack_release(request: pytest.FixtureRequest) -> Generator[None]:
 
 @pytest.fixture
 def docker_services(
-    docker_manager: tk,
+    docker_manager: FlextTestsDocker,
     _docker_stack_release: None,
     request: pytest.FixtureRequest,
-) -> tk:
+) -> FlextTestsDocker:
     """Function-scoped Docker services fixture over the leased stack.
 
     Returns:
-        The resulting ``tk``.
+        The resulting ``FlextTestsDocker``.
     """
     result = docker_manager.execute()
     if result.failure:
@@ -222,7 +220,11 @@ def docker_services(
     return docker_manager
 
 
-def require_docker_service(docker_services: tk, port: int, service_name: str) -> str:
+def require_docker_service(
+    docker_services: FlextTestsDocker,
+    port: int,
+    service_name: str,
+) -> str:
     """Return a ready Docker service endpoint or skip the test."""
     ready = docker_services.ready(port=port)
     if ready.failure or not ready.value:
@@ -231,7 +233,7 @@ def require_docker_service(docker_services: tk, port: int, service_name: str) ->
 
 
 @pytest.fixture
-def postgres_service(docker_services: tk) -> str:
+def postgres_service(docker_services: FlextTestsDocker) -> str:
     """PostgreSQL service fixture.
 
     Returns:
@@ -245,7 +247,7 @@ def postgres_service(docker_services: tk) -> str:
 
 
 @pytest.fixture
-def redis_service(docker_services: tk) -> str:
+def redis_service(docker_services: FlextTestsDocker) -> str:
     """Redis service fixture.
 
     Returns:
@@ -255,7 +257,7 @@ def redis_service(docker_services: tk) -> str:
 
 
 @pytest.fixture
-def meltano_service(docker_services: tk) -> str:
+def meltano_service(docker_services: FlextTestsDocker) -> str:
     """Meltano service fixture.
 
     Returns:

@@ -12,6 +12,7 @@ from typing import Annotated, ClassVar, Self
 from flext_cli import m, u
 
 from flext_meltano import t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 from flext_meltano._models.core import FlextMeltanoModelsCore
 from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
@@ -23,7 +24,7 @@ class FlextMeltanoModelsSources:
         type[FlextMeltanoModelsSourcesParams.StreamDefinition]
     ] = FlextMeltanoModelsSourcesParams.StreamDefinition
 
-    class TapConfig(m.Entity):
+    class TapConfig(FlextMeltanoModelsBase.EventedEntity):
         """Generic tap configuration for data extraction."""
 
         tap_type: Annotated[str, m.Field(description="Type of the tap")]
@@ -94,7 +95,7 @@ class FlextMeltanoModelsSources:
             """
             return MappingProxyType(dict(value))
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_tap_config(self) -> Self:
             """Validate tap configuration consistency.
 
@@ -113,7 +114,7 @@ class FlextMeltanoModelsSources:
                 raise ValueError(msg)
             return self
 
-    class TargetConfig(m.Entity):
+    class TargetConfig(FlextMeltanoModelsBase.EventedEntity):
         """Generic target configuration for data loading."""
 
         target_type: Annotated[str, m.Field(description="Type of the target")]
@@ -189,7 +190,7 @@ class FlextMeltanoModelsSources:
             """
             return MappingProxyType(dict(value))
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_target_config(self) -> Self:
             """Validate target configuration consistency.
 
@@ -204,7 +205,7 @@ class FlextMeltanoModelsSources:
                 raise ValueError(msg)
             return self
 
-    class DataSourceConfig(m.Entity):
+    class DataSourceConfig(FlextMeltanoModelsBase.EventedEntity):
         """Generic data source configuration with validation."""
 
         source_type: Annotated[str, m.Field(description="Type of the data source")]
@@ -278,7 +279,7 @@ class FlextMeltanoModelsSources:
             """
             return MappingProxyType(dict(value))
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_source_config(self) -> Self:
             """Validate source configuration consistency.
 

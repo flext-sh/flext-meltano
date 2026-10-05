@@ -44,11 +44,14 @@ class FlextMeltanoModelsProjectsPlugin:
         capabilities: Annotated[
             t.StrTuple,
             m.Field(description="Plugin capabilities"),
-        ] = m.Field(default_factory=tuple, description="Plugin capabilities")
+        ] = m.Field(default_factory=tuple[str, ...], description="Plugin capabilities")
         config_files: Annotated[
             t.StrTuple,
             m.Field(description="Plugin configuration files"),
-        ] = m.Field(default_factory=tuple, description="Plugin configuration files")
+        ] = m.Field(
+            default_factory=tuple[str, ...],
+            description="Plugin configuration files",
+        )
 
         @m.field_validator("settings", mode="after")
         @classmethod
@@ -108,7 +111,7 @@ class FlextMeltanoModelsProjectsPlugin:
             keys: t.StrSequence = list(self.settings.keys())
             return u.count(keys)
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_plugin_consistency(self) -> Self:
             """Validate plugin consistency.
 

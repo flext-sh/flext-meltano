@@ -69,7 +69,10 @@ class FlextMeltanoModelsPayloadsData:
         records: Annotated[
             t.VariadicTuple[t.FlatContainerMapping],
             m.Field(description="Normalized record payloads"),
-        ] = m.Field(default_factory=tuple, description="Normalized record payloads")
+        ] = m.Field(
+            default_factory=tuple[t.JsonMapping, ...],
+            description="Normalized record payloads",
+        )
 
         @m.field_validator("records", mode="before")
         @classmethod

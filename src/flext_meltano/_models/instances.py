@@ -13,13 +13,14 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 from flext_meltano._models.sources import FlextMeltanoModelsSources
 
 
 class FlextMeltanoModelsInstances:
     """Instance and stream models."""
 
-    class DataSinkDefinition(m.Entity):
+    class DataSinkDefinition(FlextMeltanoModelsBase.EventedEntity):
         """Generic data sink definition for pipeline operations."""
 
         sink_name: Annotated[str, m.Field(description="Name of the sink")]
@@ -85,7 +86,7 @@ class FlextMeltanoModelsInstances:
             """
             return MappingProxyType(dict(value))
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_sink_definition(self) -> Self:
             """Validate sink definition consistency.
 
@@ -107,7 +108,7 @@ class FlextMeltanoModelsInstances:
                 raise ValueError(msg)
             return self
 
-    class StreamInfo(m.Entity):
+    class StreamInfo(FlextMeltanoModelsBase.EventedEntity):
         """Generic stream information for data pipeline operations."""
 
         stream_name: Annotated[
@@ -121,7 +122,10 @@ class FlextMeltanoModelsInstances:
         key_properties: Annotated[
             t.StrTuple,
             m.Field(description="Primary key properties for the stream"),
-        ] = m.Field(default_factory=tuple, description="Primary key properties")
+        ] = m.Field(
+            default_factory=tuple[str, ...],
+            description="Primary key properties",
+        )
         replication_method: Annotated[
             str,
             m.Field(default="FULL_TABLE", description="Replication method"),
@@ -189,7 +193,7 @@ class FlextMeltanoModelsInstances:
                 return c.Meltano.StreamStatus.IN_PROGRESS
             return c.Meltano.StreamStatus.PENDING
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_stream_info(self) -> Self:
             """Validate stream information consistency.
 
@@ -208,7 +212,7 @@ class FlextMeltanoModelsInstances:
                 raise ValueError(msg)
             return self
 
-    class TapInstance(m.Entity):
+    class TapInstance(FlextMeltanoModelsBase.EventedEntity):
         """Generic tap instance for data extraction."""
 
         model_config = m.ConfigDict(populate_by_name=True)
@@ -226,10 +230,13 @@ class FlextMeltanoModelsInstances:
             t.JsonValue | None,
             m.Field(default=None, description="Tap adapter instance"),
         ] = None
-        streams: t.VariadicTuple[FlextMeltanoModelsInstances.StreamInfo] = m.Field(
-            default_factory=tuple,
-            description="Available streams",
-        )
+        # Why: the parameterized factory cannot reference the sibling nested
+        # class before the namespace body finishes executing; the assigned
+        # empty tuple keeps the same default with full checker visibility.
+        streams: Annotated[
+            t.VariadicTuple[FlextMeltanoModelsInstances.StreamInfo],
+            m.Field(description="Available streams"),
+        ] = ()
         status: Annotated[
             str,
             m.Field(

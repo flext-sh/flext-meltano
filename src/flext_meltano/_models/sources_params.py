@@ -11,12 +11,13 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsSourcesParams:
     """Run parameters and stream definition models."""
 
-    class DbtRunParams(m.Entity):
+    class DbtRunParams(FlextMeltanoModelsBase.EventedEntity):
         """Generic parameters for dbt run operations."""
 
         project_dir: Annotated[str, m.Field(description="dbt project directory")]
@@ -41,7 +42,7 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="dbt variables"),
         ] = None
 
-    class TapRunParams(m.Entity):
+    class TapRunParams(FlextMeltanoModelsBase.EventedEntity):
         """Generic parameters for tap run operations."""
 
         tap_name: Annotated[str, m.Field(description="Name of the tap to run")]
@@ -66,7 +67,7 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="Path to Singer properties file"),
         ] = None
 
-    class TargetRunParams(m.Entity):
+    class TargetRunParams(FlextMeltanoModelsBase.EventedEntity):
         """Generic parameters for target run operations."""
 
         target_name: Annotated[str, m.Field(description="Name of the target to run")]
@@ -83,7 +84,7 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="Batch size for target operations"),
         ] = None
 
-    class StreamDefinition(m.Entity):
+    class StreamDefinition(FlextMeltanoModelsBase.EventedEntity):
         """Generic stream definition for data pipeline operations."""
 
         stream_name: Annotated[str, m.Field(description="Name of the stream")]
@@ -158,7 +159,7 @@ class FlextMeltanoModelsSourcesParams:
                 result["type"] = "t.NormalizedValue"
             return result
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_stream_definition(self) -> Self:
             """Validate stream definition consistency.
 

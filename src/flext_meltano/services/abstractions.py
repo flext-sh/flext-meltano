@@ -211,7 +211,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 )
                 if entry_r.success:
                     streams.append(entry_r.value)
-        catalog_model = m.Meltano.SingerCatalog(streams=streams)
+        catalog_model = m.Meltano.SingerCatalog(streams=tuple(streams))
         catalog_payload = t.json_dict_adapter().validate_python(
             catalog_model.model_dump(mode="json", by_alias=True),
         )

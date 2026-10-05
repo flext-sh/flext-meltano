@@ -10,11 +10,13 @@ from typing import Annotated
 
 from flext_cli import m
 
+from flext_meltano._models.base import FlextMeltanoModelsBase
+
 
 class FlextMeltanoModelsCliParams:
     """CLI parameter models for pipeline operations."""
 
-    class CatalogStateParams(m.Entity):
+    class CatalogStateParams(FlextMeltanoModelsBase.EventedEntity):
         """Shared catalog/state file parameters for data operations."""
 
         catalog_file: Annotated[
@@ -48,7 +50,7 @@ class FlextMeltanoModelsCliParams:
             ),
         ] = False
 
-    class CliDataSinkParams(m.Entity):
+    class CliDataSinkParams(FlextMeltanoModelsBase.EventedEntity):
         """Generic parameters for data sink operations."""
 
         sink_name: Annotated[str, m.Field(description="Name of the data sink")]
@@ -82,7 +84,7 @@ class FlextMeltanoModelsCliParams:
             m.Field(default=None, description="Path to write final state"),
         ] = None
 
-    class CliTransformationParams(m.Entity):
+    class CliTransformationParams(FlextMeltanoModelsBase.EventedEntity):
         """Generic parameters for transformation operations."""
 
         project_dir: Annotated[
@@ -109,7 +111,7 @@ class FlextMeltanoModelsCliParams:
             m.Field(default=False, description="Run with full refresh"),
         ] = False
 
-    class CliPluginInstallParams(m.Entity):
+    class CliPluginInstallParams(FlextMeltanoModelsBase.EventedEntity):
         """Generic parameters for plugin installation."""
 
         plugin_type: Annotated[
