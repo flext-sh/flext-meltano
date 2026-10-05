@@ -9,23 +9,32 @@ from __future__ import annotations
 from flext_meltano import m, p, u
 
 
-class FlextMeltanoProfileModel(m.Value):
+class TestsFlextMeltanoProfileModel(m.Value):
     """Tests for ``FlextMeltanoProfile``."""
 
     type: str = u.Field(description="Dbt adapter type")
     project: str = u.Field(description="Dbt project name")
 
 
-def _accept_profile(
-    profile: p.Meltano.DbtConnectionProfile,
-) -> p.Meltano.DbtConnectionProfile:
-    return profile
+class TestsFlextMeltanoDbtConnectionProfile:
+    """Behavior contract of ``p.Meltano.DbtConnectionProfile``."""
 
+    @staticmethod
+    def _accept_profile(
+        profile: p.Meltano.DbtConnectionProfile,
+    ) -> p.Meltano.DbtConnectionProfile:
+        """Accept one typed profile through the protocol boundary.
 
-def test_dbt_connection_profile_accepts_typed_serializable_model() -> None:
-    """Test dbt connection profile accepts typed serializable model."""
-    profile = FlextMeltanoProfileModel(type="test", project="dbt-test")
+        Returns:
+            The resulting ``p.Meltano.DbtConnectionProfile``.
+        """
+        return profile
 
-    accepted = _accept_profile(profile)
+    @staticmethod
+    def test_dbt_connection_profile_accepts_typed_serializable_model() -> None:
+        """Test dbt connection profile accepts typed serializable model."""
+        profile = TestsFlextMeltanoProfileModel(type="test", project="dbt-test")
 
-    assert accepted.model_dump() == {"type": "test", "project": "dbt-test"}
+        accepted = TestsFlextMeltanoDbtConnectionProfile._accept_profile(profile)
+
+        assert accepted.model_dump() == {"type": "test", "project": "dbt-test"}
