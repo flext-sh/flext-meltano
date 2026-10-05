@@ -10,7 +10,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core import build_lazy_import_map, install_lazy_exports
+from flext_core import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_meltano.services.consumer_bases.dbt_service_base import (
@@ -32,17 +32,14 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoTargetServiceBase",
 )
 
-_LAZY_IMPORTS = MappingProxyType(
-    build_lazy_import_map(
-        MappingProxyType({
-            ".dbt_service_base": ("FlextMeltanoDbtServiceBase",),
-            ".facade": ("FlextMeltanoConsumerBases",),
-            ".tap_service_base": ("FlextMeltanoTapServiceBase",),
-            ".target_service_base": ("FlextMeltanoTargetServiceBase",),
-        }),
-        alias_groups=MappingProxyType({}),
-        sort_keys=False,
-    ),
+install_lazy_exports(
+    __name__,
+    globals(),
+    MappingProxyType({
+        "FlextMeltanoConsumerBases": ".facade",
+        "FlextMeltanoDbtServiceBase": ".dbt_service_base",
+        "FlextMeltanoTapServiceBase": ".tap_service_base",
+        "FlextMeltanoTargetServiceBase": ".target_service_base",
+    }),
+    public_exports=__all__,
 )
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
