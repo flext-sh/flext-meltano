@@ -13,14 +13,13 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 from flext_meltano._models.sources import FlextMeltanoModelsSources
 
 
 class FlextMeltanoModelsInstances:
     """Instance and stream models."""
 
-    class DataSinkDefinition(FlextMeltanoModelsBase.EventedEntity):
+    class DataSinkDefinition(m.Entity):
         """Generic data sink definition for pipeline operations."""
 
         sink_name: Annotated[str, m.Field(description="Name of the sink")]
@@ -108,7 +107,7 @@ class FlextMeltanoModelsInstances:
                 raise ValueError(msg)
             return self
 
-    class StreamInfo(FlextMeltanoModelsBase.EventedEntity):
+    class StreamInfo(m.Entity):
         """Generic stream information for data pipeline operations."""
 
         stream_name: Annotated[
@@ -212,7 +211,7 @@ class FlextMeltanoModelsInstances:
                 raise ValueError(msg)
             return self
 
-    class TapInstance(FlextMeltanoModelsBase.EventedEntity):
+    class TapInstance(m.Entity):
         """Generic tap instance for data extraction."""
 
         model_config = m.ConfigDict(populate_by_name=True)

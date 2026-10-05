@@ -13,7 +13,6 @@ from typing import Annotated, Literal
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsSingerCatalog:
@@ -123,7 +122,7 @@ class FlextMeltanoModelsSingerCatalog:
             m.Field(description="Singer catalog stream entries"),
         ] = ()
 
-    class SingerPipelineConfig(FlextMeltanoModelsBase.EventedEntity):
+    class SingerPipelineConfig(m.Entity):
         """Configuration for a Singer ELT pipeline."""
 
         tap_config_path: Annotated[
@@ -147,7 +146,7 @@ class FlextMeltanoModelsSingerCatalog:
             m.Field(default=None, description="Specific streams to sync"),
         ] = None
 
-    class SingerSyncResult(FlextMeltanoModelsBase.EventedEntity):
+    class SingerSyncResult(m.Entity):
         """Result of a Singer sync operation."""
 
         records_processed: Annotated[
