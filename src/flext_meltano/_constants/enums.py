@@ -16,6 +16,18 @@ class FlextMeltanoConstantsEnums:
     """Meltano domain enumerations."""
 
     @unique
+    class CliCommand(StrEnum):
+        """Top-level CLI command routing identifiers."""
+
+        PIPELINE = "pipeline"
+        TAP = "tap"
+        TARGET = "target"
+        DBT = "dbt"
+        PLUGIN = "plugin"
+        STATUS = "status"
+        VERSION = "version"
+
+    @unique
     class PluginType(StrEnum):
         """Supported Meltano plugin categories.
 

@@ -13,6 +13,7 @@ from typing import Annotated, Literal
 from flext_cli import m, u
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsSingerCatalog:
@@ -22,7 +23,7 @@ class FlextMeltanoModelsSingerCatalog:
         """Singer catalog metadata block model."""
 
         breadcrumb: t.StrTuple = m.Field(
-            default_factory=tuple,
+            default_factory=tuple[str, ...],
             description="Singer metadata breadcrumb path",
         )
         metadata: t.FlatContainerMapping = m.Field(
@@ -67,11 +68,16 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer stream schema payload",
             ),
         ]
-        metadata: t.VariadicTuple[
-            FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata
-        ] = m.Field(default_factory=tuple, description="Singer stream metadata blocks")
+        # Why: annotated-metadata FieldInfo defaults are invisible to the
+        # checkers' dataclass_transform synthesis, and a parameterized factory
+        # cannot reference a sibling nested class before the namespace body
+        # finishes executing; the assigned empty tuple keeps the same default.
+        metadata: Annotated[
+            t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogMetadata],
+            m.Field(description="Singer stream metadata blocks"),
+        ] = ()
         key_properties: t.StrTuple = m.Field(
-            default_factory=tuple,
+            default_factory=tuple[str, ...],
             description="Primary key columns for this stream",
         )
         replication_key: Annotated[
@@ -112,11 +118,12 @@ class FlextMeltanoModelsSingerCatalog:
                 description="Singer catalog message discriminator",
             ),
         ] = c.Meltano.SingerMessageType.CATALOG
-        streams: t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry] = (
-            m.Field(default_factory=tuple, description="Singer catalog stream entries")
-        )
+        streams: Annotated[
+            t.VariadicTuple[FlextMeltanoModelsSingerCatalog.SingerCatalogEntry],
+            m.Field(description="Singer catalog stream entries"),
+        ] = ()
 
-    class SingerPipelineConfig(m.Entity):
+    class SingerPipelineConfig(FlextMeltanoModelsBase.EventedEntity):
         """Configuration for a Singer ELT pipeline."""
 
         tap_config_path: Annotated[
@@ -140,7 +147,7 @@ class FlextMeltanoModelsSingerCatalog:
             m.Field(default=None, description="Specific streams to sync"),
         ] = None
 
-    class SingerSyncResult(m.Entity):
+    class SingerSyncResult(FlextMeltanoModelsBase.EventedEntity):
         """Result of a Singer sync operation."""
 
         records_processed: Annotated[

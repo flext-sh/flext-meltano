@@ -9,9 +9,10 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Annotated, Self
 
-from flext_cli import m, u
+from flext_cli import m
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsSinger:
@@ -41,21 +42,27 @@ class FlextMeltanoModelsSinger:
         key_properties: Annotated[
             t.StrTuple,
             m.Field(description="Singer stream key properties"),
-        ] = m.Field(default_factory=tuple, description="Singer stream key properties")
+        ] = m.Field(
+            default_factory=tuple[str, ...],
+            description="Singer stream key properties",
+        )
         bookmark_properties: Annotated[
             t.StrTuple,
             m.Field(description="Singer bookmark columns for incremental replication"),
         ] = m.Field(
-            default_factory=tuple,
+            default_factory=tuple[str, ...],
             description="Singer bookmark columns for incremental replication",
         )
         intermediate_encodings: Annotated[
             t.StrTuple,
             m.Field(
-                default_factory=tuple,
+                default_factory=tuple[str, ...],
                 description="Singer intermediate encodings (e.g. 'utf8')",
             ),
-        ] = m.Field(default_factory=tuple, description="Singer intermediate encodings")
+        ] = m.Field(
+            default_factory=tuple[str, ...],
+            description="Singer intermediate encodings",
+        )
 
     class SingerRecordMessage(m.ArbitraryTypesModel):
         """Canonical Singer RECORD message model."""
@@ -100,7 +107,10 @@ class FlextMeltanoModelsSinger:
         value: Annotated[
             t.MutableFlatContainerMapping,
             m.Field(description="Singer state bookmark payload"),
-        ] = m.Field(default_factory=dict, description="Singer state bookmark payload")
+        ] = m.Field(
+            default_factory=dict[str, t.JsonValue],
+            description="Singer state bookmark payload",
+        )
 
     class SingerActivateVersionMessage(m.ArbitraryTypesModel):
         """Canonical Singer ACTIVATE_VERSION message model.
@@ -123,7 +133,7 @@ class FlextMeltanoModelsSinger:
             m.Field(description="Stream version to activate"),
         ]
 
-    class SingerStateEntry(m.Entity):
+    class SingerStateEntry(FlextMeltanoModelsBase.EventedEntity):
         """Singer state entry for a stream bookmark.
 
         Tracks per-stream incremental sync bookmarks with validation
@@ -140,7 +150,7 @@ class FlextMeltanoModelsSinger:
             m.Field(default=None, description="Current bookmark value"),
         ] = None
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_bookmark(self) -> Self:
             """Ensure bookmark_key and bookmark_value are both set or both None.
 
@@ -156,7 +166,7 @@ class FlextMeltanoModelsSinger:
                 raise ValueError(msg)
             return self
 
-    class StreamSpec(m.Entity):
+    class StreamSpec(FlextMeltanoModelsBase.EventedEntity):
         """Declarative Singer stream specification."""
 
         name: Annotated[str, m.Field(description="Stream name")]
@@ -167,13 +177,16 @@ class FlextMeltanoModelsSinger:
         primary_keys: Annotated[
             t.StrTuple,
             m.Field(description="Primary key properties"),
-        ] = m.Field(default_factory=tuple, description="Primary key properties")
+        ] = m.Field(
+            default_factory=tuple[str, ...],
+            description="Primary key properties",
+        )
         replication_key: Annotated[
             str | None,
             m.Field(default=None, description="Incremental replication key"),
         ] = None
 
-    class TapSpec(m.Entity):
+    class TapSpec(FlextMeltanoModelsBase.EventedEntity):
         """Declarative Singer tap specification."""
 
         tap_name: Annotated[str, m.Field(description="Tap name")]
@@ -186,7 +199,7 @@ class FlextMeltanoModelsSinger:
             m.Field(description="Declared tap streams"),
         ]
 
-    class FetchRequest(m.Entity):
+    class FetchRequest(FlextMeltanoModelsBase.EventedEntity):
         """Record fetch request passed to a declarative tap fetcher."""
 
         stream_name: Annotated[str, m.Field(description="Stream name to fetch")]
@@ -208,10 +221,13 @@ class FlextMeltanoModelsSinger:
             """
             return MappingProxyType(dict(value))
 
-    class FetchResult(m.Entity):
+    class FetchResult(FlextMeltanoModelsBase.EventedEntity):
         """Record fetch result returned by a declarative tap fetcher."""
 
         records: Annotated[
             t.VariadicTuple[t.JsonMapping],
             m.Field(description="Fetched records"),
-        ] = m.Field(default_factory=tuple, description="Fetched records")
+        ] = m.Field(
+            default_factory=tuple[t.JsonMapping, ...],
+            description="Fetched records",
+        )

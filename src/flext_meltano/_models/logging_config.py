@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_cli import m, u
+from flext_cli import m
 
 from flext_meltano import t
 
@@ -133,10 +133,13 @@ class FlextMeltanoModelsLogging:
         debug_configuration: bool = False
         debug_performance_profile: bool = False
 
-        @u.computed_field
-        @property
+        @m.computed_field
         def extract_dict(self) -> t.BoolMapping:
-            """Extract logging as dictionary."""
+            """Extract logging as dictionary.
+
+            Returns:
+                The resulting ``t.BoolMapping``.
+            """
             return {
                 "operations": self.extract_operations,
                 "queries": self.extract_queries,
@@ -148,10 +151,13 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.extract_throughput,
             }
 
-        @u.computed_field
-        @property
+        @m.computed_field
         def load_dict(self) -> t.BoolMapping:
-            """Load logging as dictionary."""
+            """Load logging as dictionary.
+
+            Returns:
+                The resulting ``t.BoolMapping``.
+            """
             return {
                 "operations": self.load_operations,
                 "batches": self.load_batches,
@@ -163,10 +169,13 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.load_throughput,
             }
 
-        @u.computed_field
-        @property
+        @m.computed_field
         def pipeline_dict(self) -> t.BoolMapping:
-            """Pipeline logging as dictionary."""
+            """Pipeline logging as dictionary.
+
+            Returns:
+                The resulting ``t.BoolMapping``.
+            """
             return {
                 "execution": self.pipeline_execution,
                 "stages": self.pipeline_stages,
@@ -179,10 +188,13 @@ class FlextMeltanoModelsLogging:
                 "throughput": self.pipeline_throughput,
             }
 
-        @u.computed_field
-        @property
+        @m.computed_field
         def transform_dict(self) -> t.BoolMapping:
-            """Transform logging as dictionary."""
+            """Transform logging as dictionary.
+
+            Returns:
+                The resulting ``t.BoolMapping``.
+            """
             return {
                 "operations": self.transform_operations,
                 "sql": self.transform_sql,

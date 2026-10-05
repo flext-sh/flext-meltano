@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from flext_cli import FlextCliConfig, m
 
@@ -25,6 +25,15 @@ class _MeltanoNamespace(m.BaseModel):
 
 class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
+
+    # Why: the two bases each declare the singleton slot with their own class
+    # as the value type. The concrete subclass is assignable to both, which
+    # resolves the mypy MRO conflict, but pyright checks variable overrides
+    # invariantly against each base separately and no single type satisfies
+    # both declarations; the family-wide diamond (FlextSettings, FlextCliConfig)
+    # is the upstream owner shape, so the unsatisfiable invariant check is
+    # admitted explicitly on this one line.
+    _instance: ClassVar[FlextMeltanoConfig | None] = None  # pyright: ignore[reportIncompatibleVariableOverride]
 
     Meltano: Annotated[
         _MeltanoNamespace,

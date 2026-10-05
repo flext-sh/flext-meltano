@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r
 
 
 class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
@@ -87,39 +87,6 @@ class FlextMeltanoTapSourceMixin(FlextMeltanoServiceBase):
             return r[m.Meltano.DataSourceInstance].fail_op(
                 "Source instance creation",
                 e,
-            )
-
-    def create_tap_from_config(
-        self,
-        tap_type: str,
-        connection_config: t.JsonMapping,
-        stream_config: t.JsonMapping | None = None,
-        tap_version: str = "1.0.0",
-    ) -> p.Result[m.Meltano.TapInstance]:
-        """Create a tap instance from raw configuration data.
-
-        Returns:
-            The resulting ``p.Result[m.Meltano.TapInstance]``.
-        """
-        try:
-            settings = m.Meltano.TapConfig.model_validate({
-                "tap_type": tap_type,
-                "connection_config": connection_config,
-                "stream_config": stream_config or {},
-                "tap_version": tap_version,
-                "domain_events": [],
-            })
-            return self.create_source_instance(settings).map(
-                lambda inst: m.Meltano.TapInstance.model_validate({
-                    "tap_type": inst.source_type,
-                    "settings": settings,
-                    "tap_id": inst.source_id,
-                }),
-            )
-        except c.Meltano.OPERATION_ERRORS as exc:
-            return r[m.Meltano.TapInstance].fail(
-                f"Failed to create tap: {exc}",
-                exception=exc,
             )
 
 

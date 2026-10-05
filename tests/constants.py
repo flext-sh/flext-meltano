@@ -5,7 +5,7 @@ flext-meltano-specific constants using COMPOSITION INHERITANCE.
 
 Inheritance hierarchy:
 - FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
-- c (production) - Provides .Meltano.* namespace
+- c.Meltano inner namespace - Provides .Meltano.* from production constants
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from tests import t
 
 
-class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
+class TestsFlextMeltanoConstants(FlextTestsConstants):
     """Constants for flext-meltano tests using COMPOSITION INHERITANCE.
 
     MANDATORY: Inherits from FlextTestsConstants for test infrastructure (.Tests.*).
@@ -37,7 +37,6 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
     - c.Tests.* (assertion messages)
     - c.Tests.Factory.* (test data generation)
     - c.Meltano.* (domain constants from production)
-    - c.Paths.* (project-specific test data)
 
     Rules:
     - NEVER duplicate constants from FlextTestsConstants or c
@@ -99,7 +98,7 @@ class TestsFlextMeltanoConstants(FlextTestsConstants, FlextMeltanoConstants):
                 MappingProxyType({
                     _SingerSdkAdapterValue.SETTINGS_KEY: (
                         _SingerSdkAdapterValue.SETTINGS_VALUE
-                    )
+                    ),
                 })
             )
             SINGER_SDK_ADAPTER_STREAM_USERS: ClassVar[str] = (

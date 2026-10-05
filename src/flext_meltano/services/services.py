@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Self, override
+from typing import Self, cast, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
@@ -62,24 +62,34 @@ class FlextMeltanoService(FlextMeltanoServiceBase):
             The resulting ``p.Result[Self]``.
         """
         try:
-            instance = cls.model_validate({
+            instance: Self = cls.model_validate({
                 "service_name": f"{component_name}_service",
                 "service_version": c.Meltano.DEFAULT_SERVICE_VERSION,
                 field_name: component_name,
             })
             settings_payload = cls._settings_payload(config)
             if settings_payload is not None:
-                instance = instance.model_copy(
+                # Why: model_copy's checker-facing return loses the caller's
+                # Self; the copied snapshot is re-declared at the owner type so
+                # the result factory binds its value parameter exactly.
+                copied: Self = instance.model_copy(
                     update={
                         "runtime_settings": FlextMeltanoSettings.model_validate(
                             settings_payload,
                         ),
                     },
                 )
+                instance = copied
             return r.ok(instance)
         except c.Meltano.OPERATION_ERRORS as ex:
-            return r.fail(
-                f"Failed to create {component_label} '{component_name}': {ex}",
+            # Why: fail() binds its payload type from the result class's own
+            # parameter, which no caller-side spelling carries through both
+            # checkers; the declared owner contract is cast once here.
+            return cast(
+                "p.Result[Self]",
+                r.fail(
+                    f"Failed to create {component_label} '{component_name}': {ex}",
+                ),
             )
 
     @classmethod

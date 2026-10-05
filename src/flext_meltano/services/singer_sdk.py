@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from typing import cast
 
 from singer_sdk import Sink
 from singer_sdk.streams import Stream
@@ -26,20 +27,25 @@ class FlextMeltanoSingerTapAdapter:
     @property
     def settings(self) -> t.JsonMapping:
         """Expose tap configuration through the internal runtime contract."""
-        config_source = getattr(self._tap, "config", None)
+        # Why: the Singer SDK Tap declares neither attribute in its typed
+        # surface; the candidates are read as unknown objects and narrowed to
+        # the declared mapping contract through isinstance.
+        # Why: the Singer SDK Tap declares neither attribute in its typed
+        # surface; the candidates are read as JSON values, guarded with
+        # isinstance, and re-declared at the contract mapping type.
+        config_candidate: t.JsonValue | None = getattr(self._tap, "config", None)
+        settings_candidate: t.JsonValue | None = getattr(self._tap, "settings", {})
         empty_source: t.MappingKV[str, t.JsonPayload] = {}
-        if isinstance(config_source, Mapping):
-            source = config_source
+        source: Mapping[str, t.JsonPayload]
+        if isinstance(config_candidate, Mapping):
+            source = cast("Mapping[str, t.JsonPayload]", config_candidate)
+        elif isinstance(settings_candidate, Mapping):
+            source = cast("Mapping[str, t.JsonPayload]", settings_candidate)
         else:
-            settings_source = getattr(self._tap, "settings", {})
-            source = (
-                settings_source
-                if isinstance(settings_source, Mapping)
-                else empty_source
-            )
+            source = empty_source
         normalized: t.JsonDict = {}
         for key, value in source.items():
-            normalized[str(key)] = self._normalize_recursive(value)
+            normalized[key] = self._normalize_recursive(value)
         return normalized
 
     @staticmethod

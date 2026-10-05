@@ -9,14 +9,13 @@ from __future__ import annotations
 import tempfile
 
 from flext_tests import tm
-from pydantic_core import ValidationError
 
 from flext_core import r
 from flext_meltano import FlextMeltanoAbstractions
-from tests import m, t
+from tests import c, m, t
 
 
-class TestFlextMeltanoAbstractionsComplete:
+class TestsFlextMeltanoAbstractionsComplete:
     """Complete test suite for FlextMeltanoAbstractions."""
 
     tap_abstractions: FlextMeltanoAbstractions
@@ -182,7 +181,7 @@ class TestFlextMeltanoAbstractionsComplete:
             invalid_result = self.tap_abstractions.process_tap_config(
                 invalid_instance.settings,
             )
-        except (ValidationError, ValueError):
+        except (c.ValidationError, ValueError):
             invalid_result = r[m.Meltano.TapConfig].fail(
                 "Validation failed at creation",
             )
@@ -229,7 +228,7 @@ class TestFlextMeltanoAbstractionsComplete:
         """Test tap abstractions error handling."""
         timeout_error = TimeoutError("Connection timed out")
         tm.that(timeout_error, is_=Exception)
-        validation_error = ValidationError.from_exception_data(
+        validation_error = c.ValidationError.from_exception_data(
             title="Validation Error",
             line_errors=[],
         )

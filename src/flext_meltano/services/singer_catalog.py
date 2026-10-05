@@ -139,7 +139,7 @@ class FlextMeltanoSingerCatalogMixin(FlextMeltanoServiceBase):
                 for entry in self._singer_catalog.streams
                 if entry.stream in stream_names
             ]
-            filtered_catalog = m.Meltano.SingerCatalog(streams=selected)
+            filtered_catalog = m.Meltano.SingerCatalog(streams=tuple(selected))
             self.logger.info(
                 "Streams selected",
                 total=len(self._singer_catalog.streams),

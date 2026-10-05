@@ -1,7 +1,8 @@
 """Docker integration tests for FLEXT Meltano.
 
 Behavioral integration tests that exercise the observable contract of the
-Docker test stack (`tk`) and the real PostgreSQL/Redis services it brings up.
+Docker test stack (``FlextTestsDocker``) and the real PostgreSQL/Redis
+services it brings up.
 Assertions target public behavior only: fixture endpoints, the `r[T]` outcome
 of stack operations (`execute`/`down`/`ready`), and real data round-trips
 through each service. No stack internals are inspected.
@@ -12,17 +13,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import psycopg2
 import pytest
 import redis
 from flext_tests import tm
+from flext_tests.docker import FlextTestsDocker
 
 from tests import c
-
-if TYPE_CHECKING:
-    from flext_tests import tk
 
 
 class TestsFlextMeltanoDockerIntegration:
@@ -99,7 +96,7 @@ class TestsFlextMeltanoDockerIntegration:
     @pytest.mark.docker
     @pytest.mark.integration
     def test_ready_probe_returns_boolean_result_for_each_service(
-        docker_services: tk,
+        docker_services: FlextTestsDocker,
     ) -> None:
         """`ready` yields an ``r[bool]`` per service port (observable contract)."""
         postgres_ready = docker_services.ready(port=c.Meltano.Tests.POSTGRES_PORT)
@@ -116,7 +113,7 @@ class TestsFlextMeltanoDockerIntegration:
     @pytest.mark.integration
     @pytest.mark.slow
     def test_manual_stack_lifecycle_starts_and_stops_successfully(
-        docker_manager: tk,
+        docker_manager: FlextTestsDocker,
     ) -> None:
         """`execute` then `down` each yield a successful ``r[T]`` outcome."""
         start_result = docker_manager.execute()

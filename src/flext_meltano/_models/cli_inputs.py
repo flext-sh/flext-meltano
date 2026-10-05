@@ -41,7 +41,7 @@ class FlextMeltanoModelsCliInputs:
         args: Annotated[
             t.StrSequence,
             u.Field(
-                default_factory=tuple,
+                default_factory=tuple[str, ...],
                 description="Extra arguments forwarded to the pipeline command",
             ),
         ]
@@ -95,7 +95,7 @@ class FlextMeltanoModelsCliInputs:
         args: Annotated[
             t.StrSequence,
             u.Field(
-                default_factory=tuple,
+                default=(),
                 description="Extra arguments forwarded to DBT",
             ),
         ]
@@ -110,7 +110,7 @@ class FlextMeltanoModelsCliInputs:
         args: Annotated[
             t.StrSequence,
             u.Field(
-                default_factory=tuple,
+                default=(),
                 description="Extra arguments forwarded to the tap operation",
             ),
         ]
@@ -125,7 +125,7 @@ class FlextMeltanoModelsCliInputs:
         args: Annotated[
             t.StrSequence,
             u.Field(
-                default_factory=tuple,
+                default=(),
                 description="Extra arguments forwarded to the target operation",
             ),
         ]
