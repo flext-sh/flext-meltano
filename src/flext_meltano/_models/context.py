@@ -13,6 +13,7 @@ from typing import Annotated
 from flext_cli import m
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsContext:
@@ -174,7 +175,7 @@ class FlextMeltanoModelsContext:
             """
             return MappingProxyType(dict(value))
 
-    class PluginComponentConfig(m.Entity):
+    class PluginComponentConfig(FlextMeltanoModelsBase.EventedEntity):
         """Validated plugin component configuration for pipeline validators."""
 
         name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]

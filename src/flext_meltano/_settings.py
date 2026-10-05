@@ -38,50 +38,47 @@ class FlextMeltanoSettings(FlextSettings):
         project_root: Annotated[
             str,
             m.Field(
-                default="",
                 validation_alias="MELTANO_PROJECT_ROOT",
                 description="Root directory of the Meltano project",
             ),
-        ]
+        ] = ""
         config_dir: Annotated[
             str,
-            m.Field(default=".meltano", description="Meltano configuration directory"),
-        ]
+            m.Field(description="Meltano configuration directory"),
+        ] = ".meltano"
         logs_dir: Annotated[
             str,
-            m.Field(default="logs", description="Meltano logs directory"),
-        ]
+            m.Field(description="Meltano logs directory"),
+        ] = "logs"
         environment: Annotated[
             str,
             m.Field(
-                default="development",
                 validation_alias="MELTANO_ENVIRONMENT",
                 description="Active Meltano runtime environment",
             ),
-        ]
+        ] = "development"
         log_level: Annotated[
             str,
-            m.Field(default="INFO", description="Meltano runtime log level"),
-        ]
+            m.Field(description="Meltano runtime log level"),
+        ] = "INFO"
         meltano_version: Annotated[
             str,
-            m.Field(default="3.9.1", description="Required Meltano version"),
-        ]
+            m.Field(description="Required Meltano version"),
+        ] = "3.9.1"
         singer_sdk_version: Annotated[
             str,
-            m.Field(default="0.48.0", description="Required Singer SDK version"),
-        ]
+            m.Field(description="Required Singer SDK version"),
+        ] = "0.48.0"
         pipelines_dir: Annotated[
             str,
             m.Field(
-                default="",
                 # mro-wkii.17 (codex): validate the default so direct singleton
                 # access always exposes the canonical resolved pipeline root.
                 validate_default=True,
                 validation_alias="FLEXT_MELTANO_PIPELINES_DIR",
                 description="Root directory for pipeline configurations",
             ),
-        ]
+        ] = ""
 
         @m.field_validator("pipelines_dir", mode="before")
         @classmethod
@@ -115,7 +112,12 @@ class FlextMeltanoSettings(FlextSettings):
             raise ValueError(msg)
 
     if TYPE_CHECKING:
-        Meltano: _Meltano
+        # The assigned per-field defaults above make the namespace constructible
+        # for the checkers; runtime keeps the pydantic-recommended factory.
+        Meltano: _Meltano = m.Field(
+            default=_Meltano(),
+            description="Namespaced Meltano settings.",
+        )
     else:
         Meltano: _Meltano = m.Field(
             default_factory=_Meltano,

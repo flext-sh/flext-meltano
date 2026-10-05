@@ -66,7 +66,7 @@ class FlextMeltanoServiceBase(FlextService[t.JsonMapping]):
         ),
     ] = None
 
-    @u.model_validator(mode="before")
+    @m.model_validator(mode="before")
     @classmethod
     def _normalize_settings_alias(
         cls,

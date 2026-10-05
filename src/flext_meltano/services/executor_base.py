@@ -16,12 +16,16 @@ from pathlib import Path
 from typing import override
 
 from flext_cli import cli
-from meltano.cli.cli import cli as meltano_cli
-from meltano.cli.utils import CliError
-from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound
-from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.project import Project
-from meltano.core.project_init_service import (
+
+# Why: upstream Meltano ships no type stubs for these modules; the fleet
+# stub-file rule forbids authoring stubs in-repo, so the untyped third-party
+# import is admitted explicitly and narrowly per module.
+from meltano.cli.cli import cli as meltano_cli  # pyright: ignore[reportMissingTypeStubs]
+from meltano.cli.utils import CliError  # pyright: ignore[reportMissingTypeStubs]
+from meltano.core.error import EmptyMeltanoFileException, MeltanoError, ProjectNotFound  # pyright: ignore[reportMissingTypeStubs]
+from meltano.core.plugin.error import PluginNotFoundError  # pyright: ignore[reportMissingTypeStubs]
+from meltano.core.project import Project  # pyright: ignore[reportMissingTypeStubs]
+from meltano.core.project_init_service import (  # pyright: ignore[reportMissingTypeStubs]
     ProjectInitService,
     ProjectInitServiceError,
 )
@@ -48,9 +52,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,
-        source_name: str | None = None,
-        sink_name: str | None = None,
-        transformation_name: str | None = None,
     ) -> None:
         """Bootstrap executor with canonical Meltano service kwargs.
 
@@ -61,9 +62,6 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
             runtime_settings=settings,
             service_name=service_name or "FlextMeltanoExecutor",
             service_version=service_version or c.Meltano.DEFAULT_SERVICE_VERSION,
-            source_name=source_name,
-            sink_name=sink_name,
-            transformation_name=transformation_name,
         )
 
     @property

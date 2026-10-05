@@ -12,12 +12,13 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsTransformations:
     """Transformation project and execution models."""
 
-    class DbtProjectModel(m.Entity):
+    class DbtProjectModel(FlextMeltanoModelsBase.EventedEntity):
         """Generic DBT project configuration with validation."""
 
         name: Annotated[str, m.Field(description="DBT project name")]
@@ -71,7 +72,7 @@ class FlextMeltanoModelsTransformations:
             """
             return MappingProxyType(dict(value))
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_dbt_project(self) -> Self:
             """Validate DBT project configuration consistency.
 
@@ -91,7 +92,7 @@ class FlextMeltanoModelsTransformations:
 
             return self
 
-    class TransformationProjectModel(m.Entity):
+    class TransformationProjectModel(FlextMeltanoModelsBase.EventedEntity):
         """Generic transformation project configuration with validation."""
 
         name: Annotated[t.NonEmptyStr, m.Field(description="Project name")]
@@ -172,7 +173,7 @@ class FlextMeltanoModelsTransformations:
                 + u.count(self.macro_paths)
             )
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_project_consistency(self) -> Self:
             """Validate project consistency.
 
@@ -188,15 +189,15 @@ class FlextMeltanoModelsTransformations:
 
             return self
 
-    class TransformationExecutionModel(m.Entity):
+    class TransformationExecutionModel(FlextMeltanoModelsBase.EventedEntity):
         """Generic transformation execution configuration with validation."""
 
         command: Annotated[str, m.Field(description="Command to execute")]
         models: Annotated[t.StrTuple, m.Field(description="Models to execute")] = (
-            m.Field(default_factory=tuple, description="Models to execute")
+            m.Field(default_factory=tuple[str, ...], description="Models to execute")
         )
         exclude: Annotated[t.StrTuple, m.Field(description="Models to exclude")] = (
-            m.Field(default_factory=tuple, description="Models to exclude")
+            m.Field(default_factory=tuple[str, ...], description="Models to exclude")
         )
         full_refresh: Annotated[
             bool,
@@ -255,7 +256,7 @@ class FlextMeltanoModelsTransformations:
             """
             return len(self.models)
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_execution_consistency(self) -> Self:
             """Validate execution consistency.
 

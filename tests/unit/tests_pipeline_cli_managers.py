@@ -20,7 +20,7 @@ from flext_meltano.cli import FlextMeltanoCli
 from tests import c, m, u
 
 
-class TestFlextMeltanoPipelineCliManagers:
+class TestsFlextMeltanoPipelineCliManagers:
     """Exercise pipeline lifecycle commands through the model-driven CLI."""
 
     @staticmethod

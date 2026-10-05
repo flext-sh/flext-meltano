@@ -13,6 +13,7 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
+from flext_meltano._models.base import FlextMeltanoModelsBase
 from flext_meltano._models.core import FlextMeltanoModelsCore
 from flext_meltano._models.sources import FlextMeltanoModelsSources
 from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
@@ -21,7 +22,7 @@ from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 class FlextMeltanoModelsInstancesData:
     """Data source and sink instance and config models."""
 
-    class DataSinkConfig(m.Entity):
+    class DataSinkConfig(FlextMeltanoModelsBase.EventedEntity):
         """Generic data sink configuration with validation."""
 
         sink_type: Annotated[str, m.Field(description="Sink type identifier")]
@@ -92,7 +93,7 @@ class FlextMeltanoModelsInstancesData:
             """
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_sink_config(self) -> Self:
             """Validate sink configuration consistency.
 
@@ -112,7 +113,7 @@ class FlextMeltanoModelsInstancesData:
                 raise ValueError(msg)
             return self
 
-    class DataSourceInstance(m.Entity):
+    class DataSourceInstance(FlextMeltanoModelsBase.EventedEntity):
         """Generic data source instance for pipeline operations."""
 
         model_config = m.ConfigDict(populate_by_name=True)
@@ -238,7 +239,7 @@ class FlextMeltanoModelsInstancesData:
                 case _:
                     return 0
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_source_instance(self) -> Self:
             """Validate source instance consistency.
 
@@ -257,7 +258,7 @@ class FlextMeltanoModelsInstancesData:
                 raise ValueError(msg)
             return self
 
-    class DataSinkInstance(m.Entity):
+    class DataSinkInstance(FlextMeltanoModelsBase.EventedEntity):
         """Generic data sink instance for pipeline operations."""
 
         model_config = m.ConfigDict(populate_by_name=True)

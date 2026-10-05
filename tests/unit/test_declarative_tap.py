@@ -32,7 +32,7 @@ class TestsFlextMeltanoDeclarativeTap:
                 "dn": f"cn={request.stream_name},{base_dn}",
                 "updated_at": "2026-07-17T00:00:00Z",
             }
-            return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=[record]))
+            return r[m.Meltano.FetchResult].ok(m.Meltano.FetchResult(records=(record,)))
 
     @staticmethod
     def _spec() -> m.Meltano.TapSpec:

@@ -55,7 +55,10 @@ class FlextMeltanoModelsCore:
         items: Annotated[
             t.StrTuple,
             m.Field(description="Normalized tuple of string values"),
-        ] = m.Field(default_factory=tuple, description="Normalized string values")
+        ] = m.Field(
+            default_factory=tuple[str, ...],
+            description="Normalized string values",
+        )
 
         @m.field_validator("items", mode="before")
         @classmethod

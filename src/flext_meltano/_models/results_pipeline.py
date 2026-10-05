@@ -9,7 +9,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Annotated, Self
 
-from flext_cli import m, u
+from flext_cli import m
 
 from flext_meltano import c, t
 from flext_meltano._models.results import FlextMeltanoModelsResults
@@ -172,7 +172,7 @@ class FlextMeltanoModelsResultsPipeline:
                 raise ValueError(msg)
             return v
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def validate_pipeline_result(self) -> Self:
             """Validate pipeline result consistency.
 

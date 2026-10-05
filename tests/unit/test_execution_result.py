@@ -19,7 +19,9 @@ _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
 _ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
 
 
-class _ExecutionResultJson(m.BaseModel):
+class FlextMeltanoExecutionResultJsonModel(m.BaseModel):
+    """Tests for ``FlextMeltanoExecutionResultJson``."""
+
     command: list[str]
     success: bool
     exit_code: int
@@ -177,7 +179,7 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=execution_time,
         )
         json_str = result.model_dump_json()
-        parsed = _ExecutionResultJson.model_validate_json(json_str)
+        parsed = FlextMeltanoExecutionResultJsonModel.model_validate_json(json_str)
         tm.that(list(parsed.command), eq=list(command))
         tm.that(parsed.success, eq=success)
         tm.that(parsed.exit_code, eq=exit_code)

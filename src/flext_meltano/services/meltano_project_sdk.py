@@ -11,14 +11,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from meltano.core.project import Project
+# Why: upstream Meltano ships no type stubs for these modules; the fleet
+# stub-file rule forbids authoring stubs in-repo, so the untyped third-party
+# import is admitted explicitly and narrowly per module.
+from meltano.core.project import Project  # pyright: ignore[reportMissingTypeStubs]
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from meltano.core.project_plugins_service import ProjectPluginsService
+    from meltano.core.project_plugins_service import ProjectPluginsService  # pyright: ignore[reportMissingTypeStubs]
 
 
 class FlextMeltanoProjectManager(FlextMeltanoServiceBase):

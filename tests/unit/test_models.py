@@ -201,6 +201,45 @@ class TestsFlextMeltanoModelsUnit:
                 "batch_size": "invalid",
             })
 
+    # ---- Composition -------------------------------------------------------
+
+    @staticmethod
+    def test_tap_and_target_configs_are_independent() -> None:
+        """Test tap and target configs are independent."""
+        tap_config = m.Meltano.TapConfig(
+            tap_type="tap-postgres",
+            connection_config={"host": "source.db.com", "port": 5432},
+        )
+        target_config = m.Meltano.TargetConfig(
+            target_type="target-postgres",
+            connection_config={"host": "target.db.com", "port": 5432},
+        )
+        tm.that(tap_config.connection_config["host"], eq="source.db.com")
+        tm.that(target_config.connection_config["host"], eq="target.db.com")
+        tm.that(tap_config.tap_identifier, eq="tap-postgres:latest")
+        tm.that(target_config.target_identifier, eq="target-postgres:latest")
+
+    @staticmethod
+    def test_stream_name_maps_into_tap_stream_config() -> None:
+        """Test stream name maps into tap stream config."""
+        stream = m.Meltano.StreamInfo(
+            stream_name="users",
+            stream_schema={"type": "object", "properties": "id"},
+            key_properties=["id"],
+            stream_created_at="2025-01-01T00:00:00Z",
+        )
+        tap_config = m.Meltano.TapConfig(
+            tap_type="tap-postgres",
+            connection_config={"host": "localhost"},
+            stream_config={"users": "public"},
+        )
+        tm.that(tap_config.stream_config, has=stream.stream_name)
+        tm.that(stream.key_properties, has="id")
+
+
+class TestsFlextMeltanoModelsStreamInfo:
+    """StreamInfo model contract tests."""
+
     # ---- StreamInfo --------------------------------------------------------
 
     @staticmethod
@@ -346,38 +385,3 @@ class TestsFlextMeltanoModelsUnit:
                 "stream_schema": "invalid",
                 "stream_created_at": "2025-01-01T00:00:00Z",
             })
-
-    # ---- Composition -------------------------------------------------------
-
-    @staticmethod
-    def test_tap_and_target_configs_are_independent() -> None:
-        """Test tap and target configs are independent."""
-        tap_config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "source.db.com", "port": 5432},
-        )
-        target_config = m.Meltano.TargetConfig(
-            target_type="target-postgres",
-            connection_config={"host": "target.db.com", "port": 5432},
-        )
-        tm.that(tap_config.connection_config["host"], eq="source.db.com")
-        tm.that(target_config.connection_config["host"], eq="target.db.com")
-        tm.that(tap_config.tap_identifier, eq="tap-postgres:latest")
-        tm.that(target_config.target_identifier, eq="target-postgres:latest")
-
-    @staticmethod
-    def test_stream_name_maps_into_tap_stream_config() -> None:
-        """Test stream name maps into tap stream config."""
-        stream = m.Meltano.StreamInfo(
-            stream_name="users",
-            stream_schema={"type": "object", "properties": "id"},
-            key_properties=["id"],
-            stream_created_at="2025-01-01T00:00:00Z",
-        )
-        tap_config = m.Meltano.TapConfig(
-            tap_type="tap-postgres",
-            connection_config={"host": "localhost"},
-            stream_config={"users": "public"},
-        )
-        tm.that(tap_config.stream_config, has=stream.stream_name)
-        tm.that(stream.key_properties, has="id")
