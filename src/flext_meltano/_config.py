@@ -15,7 +15,6 @@ from typing import Annotated, ClassVar
 from flext_cli import FlextCliConfig
 
 from flext_core import FlextSettings
-
 from flext_meltano.models import m
 
 
