@@ -19,7 +19,6 @@ from typing import Annotated, override
 
 from flext_meltano import (
     FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
     c,
     m,
     p,
@@ -54,7 +53,7 @@ class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):
         default_factory=lambda: None,
     )
 
-    def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
+    def __init__(self, settings: p.Settings | None = None) -> None:
         """Expose the canonical settings bootstrap for tap facades."""
         super().__init__(runtime_settings=settings)
 

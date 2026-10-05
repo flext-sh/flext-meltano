@@ -12,7 +12,6 @@ from typing import Annotated, Self
 from flext_cli import m
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsSinger:
@@ -133,7 +132,7 @@ class FlextMeltanoModelsSinger:
             m.Field(description="Stream version to activate"),
         ]
 
-    class SingerStateEntry(FlextMeltanoModelsBase.EventedEntity):
+    class SingerStateEntry(m.Entity):
         """Singer state entry for a stream bookmark.
 
         Tracks per-stream incremental sync bookmarks with validation
@@ -166,7 +165,7 @@ class FlextMeltanoModelsSinger:
                 raise ValueError(msg)
             return self
 
-    class StreamSpec(FlextMeltanoModelsBase.EventedEntity):
+    class StreamSpec(m.Entity):
         """Declarative Singer stream specification."""
 
         name: Annotated[str, m.Field(description="Stream name")]
@@ -186,7 +185,7 @@ class FlextMeltanoModelsSinger:
             m.Field(default=None, description="Incremental replication key"),
         ] = None
 
-    class TapSpec(FlextMeltanoModelsBase.EventedEntity):
+    class TapSpec(m.Entity):
         """Declarative Singer tap specification."""
 
         tap_name: Annotated[str, m.Field(description="Tap name")]
@@ -199,7 +198,7 @@ class FlextMeltanoModelsSinger:
             m.Field(description="Declared tap streams"),
         ]
 
-    class FetchRequest(FlextMeltanoModelsBase.EventedEntity):
+    class FetchRequest(m.Entity):
         """Record fetch request passed to a declarative tap fetcher."""
 
         stream_name: Annotated[str, m.Field(description="Stream name to fetch")]
@@ -221,7 +220,7 @@ class FlextMeltanoModelsSinger:
             """
             return MappingProxyType(dict(value))
 
-    class FetchResult(FlextMeltanoModelsBase.EventedEntity):
+    class FetchResult(m.Entity):
         """Record fetch result returned by a declarative tap fetcher."""
 
         records: Annotated[

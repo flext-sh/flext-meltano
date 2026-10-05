@@ -13,6 +13,7 @@ from flext_cli import FlextCliModels
 from flext_meltano._models.base import FlextMeltanoModelsBase
 from flext_meltano._models.cli_inputs import FlextMeltanoModelsCliInputs
 from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
+from flext_meltano._models.config import FlextMeltanoModelsConfig
 from flext_meltano._models.context import FlextMeltanoModelsContext
 from flext_meltano._models.core import FlextMeltanoModelsCore
 from flext_meltano._models.discovery import FlextMeltanoModelsDiscovery
@@ -42,6 +43,7 @@ class FlextMeltanoModels(FlextCliModels):
 
     class Meltano(
         FlextMeltanoModelsBase,
+        FlextMeltanoModelsConfig,
         FlextMeltanoModelsCore,
         FlextMeltanoModelsLogging,
         FlextMeltanoModelsCliInputs,

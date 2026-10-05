@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Annotated
 
 from flext_cli import m, u
@@ -15,6 +16,22 @@ from flext_meltano import t
 
 class FlextMeltanoModelsCore:
     """Core model helpers and value types."""
+
+    @staticmethod
+    def normalize_json_mapping(
+        value: t.Meltano.ValidatorInput,
+    ) -> t.FlatContainerMapping:
+        """Normalize mapping-like payloads into JSON-safe dictionaries.
+
+        Returns:
+            The resulting ``t.FlatContainerMapping``.
+        """
+        match value:
+            case Mapping():
+                return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
+            case _:
+                empty: t.FlatContainerMapping = {}
+                return empty
 
     @staticmethod
     def protect_sensitive_config(
@@ -48,6 +65,26 @@ class FlextMeltanoModelsCore:
         )
         items: t.StrTuple = validated.items
         return items
+
+    class SensitiveConfigSerializer:
+        """Mixin serializing ``connection_config`` with sensitive data protection.
+
+        One owner for the ``connection_config`` field serializer shared by every
+        model carrying that field; consumers list this class first in their
+        bases so the pydantic decorator machinery collects it through the MRO.
+        """
+
+        @staticmethod
+        @u.field_serializer("connection_config")
+        def serialize_connection_config(
+            value: t.FlatContainerMapping,
+        ) -> t.FlatContainerMapping:
+            """Serialize connection config with sensitive data protection.
+
+            Returns:
+                The resulting ``t.FlatContainerMapping``.
+            """
+            return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
     class StringListValue(m.ArbitraryTypesModel):
         """Validated string list wrapper for result normalization."""

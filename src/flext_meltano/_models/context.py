@@ -13,7 +13,7 @@ from typing import Annotated
 from flext_cli import m
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
+from flext_meltano._models.core import FlextMeltanoModelsCore
 
 
 class FlextMeltanoModelsContext:
@@ -49,12 +49,7 @@ class FlextMeltanoModelsContext:
             Returns:
                 The resulting ``t.FlatContainerMapping``.
             """
-            match value:
-                case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                case _:
-                    empty: t.FlatContainerMapping = {}
-                    return empty
+            return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
         @m.field_validator("elt_context", "execution_result", mode="after")
         @classmethod
@@ -175,7 +170,7 @@ class FlextMeltanoModelsContext:
             """
             return MappingProxyType(dict(value))
 
-    class PluginComponentConfig(FlextMeltanoModelsBase.EventedEntity):
+    class PluginComponentConfig(m.Entity):
         """Validated plugin component configuration for pipeline validators."""
 
         name: Annotated[t.NonEmptyStr, m.Field(description="Plugin name")]

@@ -10,7 +10,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core import build_lazy_import_map, install_lazy_exports
+from flext_core import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_meltano._models.base import FlextMeltanoModelsBase
@@ -62,35 +62,32 @@ __all__: tuple[str, ...] = (
     "FlextMeltanoModelsTransformations",
 )
 
-_LAZY_IMPORTS = MappingProxyType(
-    build_lazy_import_map(
-        MappingProxyType({
-            ".base": ("FlextMeltanoModelsBase",),
-            ".cli_inputs": ("FlextMeltanoModelsCliInputs",),
-            ".cli_params": ("FlextMeltanoModelsCliParams",),
-            ".context": ("FlextMeltanoModelsContext",),
-            ".core": ("FlextMeltanoModelsCore",),
-            ".discovery": ("FlextMeltanoModelsDiscovery",),
-            ".instances": ("FlextMeltanoModelsInstances",),
-            ".instances_data": ("FlextMeltanoModelsInstancesData",),
-            ".logging_config": ("FlextMeltanoModelsLogging",),
-            ".payloads": ("FlextMeltanoModelsPayloads",),
-            ".payloads_data": ("FlextMeltanoModelsPayloadsData",),
-            ".projects": ("FlextMeltanoModelsProjects",),
-            ".projects_plugin": ("FlextMeltanoModelsProjectsPlugin",),
-            ".results": ("FlextMeltanoModelsResults",),
-            ".results_dbt": ("FlextMeltanoModelsResultsDbt",),
-            ".results_pipeline": ("FlextMeltanoModelsResultsPipeline",),
-            ".singer": ("FlextMeltanoModelsSinger",),
-            ".singer_catalog": ("FlextMeltanoModelsSingerCatalog",),
-            ".singer_sdk": ("FlextMeltanoModelsSingerSdk",),
-            ".sources": ("FlextMeltanoModelsSources",),
-            ".sources_params": ("FlextMeltanoModelsSourcesParams",),
-            ".transformations": ("FlextMeltanoModelsTransformations",),
-        }),
-        alias_groups=MappingProxyType({}),
-        sort_keys=False,
-    ),
+install_lazy_exports(
+    __name__,
+    globals(),
+    MappingProxyType({
+        "FlextMeltanoModelsBase": ".base",
+        "FlextMeltanoModelsCliInputs": ".cli_inputs",
+        "FlextMeltanoModelsCliParams": ".cli_params",
+        "FlextMeltanoModelsContext": ".context",
+        "FlextMeltanoModelsCore": ".core",
+        "FlextMeltanoModelsDiscovery": ".discovery",
+        "FlextMeltanoModelsInstances": ".instances",
+        "FlextMeltanoModelsInstancesData": ".instances_data",
+        "FlextMeltanoModelsLogging": ".logging_config",
+        "FlextMeltanoModelsPayloads": ".payloads",
+        "FlextMeltanoModelsPayloadsData": ".payloads_data",
+        "FlextMeltanoModelsProjects": ".projects",
+        "FlextMeltanoModelsProjectsPlugin": ".projects_plugin",
+        "FlextMeltanoModelsResults": ".results",
+        "FlextMeltanoModelsResultsDbt": ".results_dbt",
+        "FlextMeltanoModelsResultsPipeline": ".results_pipeline",
+        "FlextMeltanoModelsSinger": ".singer",
+        "FlextMeltanoModelsSingerCatalog": ".singer_catalog",
+        "FlextMeltanoModelsSingerSdk": ".singer_sdk",
+        "FlextMeltanoModelsSources": ".sources",
+        "FlextMeltanoModelsSourcesParams": ".sources_params",
+        "FlextMeltanoModelsTransformations": ".transformations",
+    }),
+    public_exports=__all__,
 )
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

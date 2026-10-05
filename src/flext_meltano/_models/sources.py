@@ -12,7 +12,6 @@ from typing import Annotated, ClassVar, Self
 from flext_cli import m, u
 
 from flext_meltano import t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 from flext_meltano._models.core import FlextMeltanoModelsCore
 from flext_meltano._models.sources_params import FlextMeltanoModelsSourcesParams
 
@@ -24,7 +23,10 @@ class FlextMeltanoModelsSources:
         type[FlextMeltanoModelsSourcesParams.StreamDefinition]
     ] = FlextMeltanoModelsSourcesParams.StreamDefinition
 
-    class TapConfig(FlextMeltanoModelsBase.EventedEntity):
+    class TapConfig(
+        FlextMeltanoModelsCore.SensitiveConfigSerializer,
+        m.Entity,
+    ):
         """Generic tap configuration for data extraction."""
 
         tap_type: Annotated[str, m.Field(description="Type of the tap")]
@@ -70,18 +72,6 @@ class FlextMeltanoModelsSources:
             """
             return f"{self.tap_type}:{self.tap_version}"
 
-        @staticmethod
-        @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            value: t.FlatContainerMapping,
-        ) -> t.FlatContainerMapping:
-            """Serialize connection config with sensitive data protection.
-
-            Returns:
-                The resulting ``t.FlatContainerMapping``.
-            """
-            return FlextMeltanoModelsCore.protect_sensitive_config(value)
-
         @m.field_validator("stream_config", mode="after")
         @classmethod
         def freeze_stream_config(
@@ -114,7 +104,10 @@ class FlextMeltanoModelsSources:
                 raise ValueError(msg)
             return self
 
-    class TargetConfig(FlextMeltanoModelsBase.EventedEntity):
+    class TargetConfig(
+        FlextMeltanoModelsCore.SensitiveConfigSerializer,
+        m.Entity,
+    ):
         """Generic target configuration for data loading."""
 
         target_type: Annotated[str, m.Field(description="Type of the target")]
@@ -165,18 +158,6 @@ class FlextMeltanoModelsSources:
             """
             return f"{self.target_type}:{self.target_version}"
 
-        @staticmethod
-        @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            value: t.FlatContainerMapping,
-        ) -> t.FlatContainerMapping:
-            """Serialize connection config with sensitive data protection.
-
-            Returns:
-                The resulting ``t.FlatContainerMapping``.
-            """
-            return FlextMeltanoModelsCore.protect_sensitive_config(value)
-
         @m.field_validator("connection_config", mode="after")
         @classmethod
         def freeze_connection_config(
@@ -205,7 +186,10 @@ class FlextMeltanoModelsSources:
                 raise ValueError(msg)
             return self
 
-    class DataSourceConfig(FlextMeltanoModelsBase.EventedEntity):
+    class DataSourceConfig(
+        FlextMeltanoModelsCore.SensitiveConfigSerializer,
+        m.Entity,
+    ):
         """Generic data source configuration with validation."""
 
         source_type: Annotated[str, m.Field(description="Type of the data source")]
@@ -253,18 +237,6 @@ class FlextMeltanoModelsSources:
                 The resulting ``str``.
             """
             return f"{self.source_type}:{self.source_version}"
-
-        @staticmethod
-        @u.field_serializer("connection_config")
-        def serialize_connection_config(
-            value: t.FlatContainerMapping,
-        ) -> t.FlatContainerMapping:
-            """Serialize connection config with sensitive data protection.
-
-            Returns:
-                The resulting ``t.FlatContainerMapping``.
-            """
-            return FlextMeltanoModelsCore.protect_sensitive_config(value)
 
         @m.field_validator("stream_config", mode="after")
         @classmethod
