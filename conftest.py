@@ -1,4 +1,4 @@
-"""AI Hub governance hook projection: conftest.
+"""Pytest bootstrap for flext-meltano local package resolution.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
