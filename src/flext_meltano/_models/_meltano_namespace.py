@@ -1,3 +1,4 @@
+# Copyright (c) 2025 FLEXT Team. All rights reserved.
 from __future__ import annotations
 
 from flext_meltano import m
