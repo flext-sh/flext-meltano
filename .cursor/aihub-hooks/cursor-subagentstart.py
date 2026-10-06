@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
+"""AI Hub governance hook projection: cursor subagentstart."""
 from __future__ import annotations
 
 import json
