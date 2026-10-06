@@ -4,8 +4,6 @@ Model-less: business rules live in ``config/*.yaml`` under the ``Meltano:`` key 
 are exposed through the open ``config.Meltano`` namespace (``extra="allow"``), with
 no per-domain model. Access is ``config.Meltano.<domain>[<key>...]``.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -21,12 +19,6 @@ from flext_core import FlextSettings
 from flext_meltano import m
 
 
-class _MeltanoNamespace(m.BaseModel):
-    """Open, frozen namespace exposing every ``config/*.yaml`` domain model-less."""
-
-    model_config = m.ConfigDict(extra="allow", frozen=True)
-
-
 class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
@@ -40,11 +32,11 @@ class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     _instance: ClassVar[FlextMeltanoConfig | None] = None  # pyright: ignore[reportIncompatibleVariableOverride]
 
     Meltano: Annotated[
-        _MeltanoNamespace,
+        m.Meltano.MeltanoNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
         ),
-    ] = _MeltanoNamespace()
+    ] = m.Meltano.MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()
