@@ -236,7 +236,8 @@ from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
 response = bridge.execute_bridge_command(
-    "run_pipeline", args={"tap": "tap-csv", "target": "target-jsonl"},
+    "run_pipeline",
+    args={"tap": "tap-csv", "target": "target-jsonl"},
 )
 
 # Response format follows r structure

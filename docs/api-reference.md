@@ -1232,7 +1232,8 @@ service = FlextMeltanoService()
 
 # Execute tap
 tap_result = service.execute_tap(
-    tap_name="tap-csv", settings={"files": ["data/sales.csv"]},
+    tap_name="tap-csv",
+    settings={"files": ["data/sales.csv"]},
 )
 
 if tap_result.success:

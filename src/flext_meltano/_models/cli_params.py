@@ -11,7 +11,6 @@ from typing import Annotated
 from flext_cli import m
 
 
-
 class FlextMeltanoModelsCliParams:
     """CLI parameter models for pipeline operations."""
 

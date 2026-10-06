@@ -90,7 +90,9 @@ def greet_handler(model: GreetInput) -> t.JsonValue:
 
 
 command = FlextCliCli.model_command(
-    model_cls=GreetInput, handler=greet_handler, settings=settings,
+    model_cls=GreetInput,
+    handler=greet_handler,
+    settings=settings,
 )
 cli = FlextCliCli()
 app = cli.create_app_with_common_params(name="greeting", help_text="Greeting commands")

@@ -40,14 +40,26 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     # The rule has no dunder-override carve-out, so each directive below is a
     # scoped, dated admission of the tooling conflict, not a code dodge; the
     # durable cure is a dunder carve-out in the flext-infra rule owner.
-    def __new__(cls, *args: object, **kwargs: object) -> Self:  # ast-grep-ignore: ban-broad-annotation
+    def __new__(
+        cls,
+        *args: object,
+        **kwargs: object,
+    ) -> Self:  # ast-grep-ignore: ban-broad-annotation
         _ = args, kwargs
         return object.__new__(cls)
 
-    def __init__(self, *args: object, **kwargs: object) -> None:  # ast-grep-ignore: ban-broad-annotation
+    def __init__(
+        self,
+        *args: object,
+        **kwargs: object,
+    ) -> None:  # ast-grep-ignore: ban-broad-annotation
         _ = self, args, kwargs
 
-    def __setattr__(self, name: str, value: object) -> None:  # ast-grep-ignore: ban-broad-annotation
+    def __setattr__(
+        self,
+        name: str,
+        value: object,
+    ) -> None:  # ast-grep-ignore: ban-broad-annotation
         object.__setattr__(self, name, value)
 
     def __eq__(self, other: object) -> bool:  # ast-grep-ignore: ban-broad-annotation
