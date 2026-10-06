@@ -166,7 +166,7 @@ install_lazy_exports(
         "FlextMeltanoProjectManager": ".services.meltano_project_sdk",
         "FlextMeltanoProjectService": ".services.project_service",
         "FlextMeltanoProtocols": ".protocols",
-        "FlextMeltanoService": ".service",
+        "FlextMeltanoService": ".services.service",
         "FlextMeltanoServiceBase": ".base",
         "FlextMeltanoSettings": "._settings",
         "FlextMeltanoSingerCatalogMixin": ".services.singer_catalog",
