@@ -212,7 +212,7 @@ external --> intermediate: Data extraction
 
 #### 1. **State Management**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -233,7 +233,7 @@ class PipelineState:
 
 #### 2. **Data Buffering**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -252,7 +252,7 @@ class RecordBuffer:
 
 #### 3. **Error Handling Storage**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -278,7 +278,7 @@ class ErrorStore:
 
 #### Pipeline Configuration Model
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -346,7 +346,7 @@ class PipelineConfig:
 
 #### Schema Validation
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -470,7 +470,7 @@ stop
 
 ### Data Quality Metrics
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -562,7 +562,7 @@ note right: Lineage tracking captures\ntransformation dependencies\nand data flo
 
 ### Data Retention Policies
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -602,7 +602,7 @@ class RetentionPolicy:
 
 #### 1. **Horizontal Scaling**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -624,7 +624,7 @@ class PipelineScaler:
 
 #### 2. **Data Partitioning**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -646,7 +646,7 @@ class DataPartitioner:
 
 #### 3. **Caching Strategy**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -679,7 +679,7 @@ class PipelineCache:
 
 #### Alerting Rules
 
-```python
+```text
 from __future__ import annotations
 
 

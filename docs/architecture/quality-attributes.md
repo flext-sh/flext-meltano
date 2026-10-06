@@ -33,6 +33,19 @@
 - [🧪 Testability](#testability)
   - [Testing Architecture](#testing-architecture)
   - [Testability Patterns](#testability-patterns)
+  - [Test Quality Metrics](#test-quality-metrics)
+  - [Testing Automation](#testing-automation)
+- [🔄 Cross-Cutting Concerns](#cross-cutting-concerns)
+  - [Logging Architecture](#logging-architecture)
+  - [Monitoring and Observability](#monitoring-and-observability)
+  - [Configuration Management](#configuration-management)
+  - [Caching Strategy](#caching-strategy)
+  - [Internationalization (i18n)](#internationalization-i18n)
+- [📈 Architecture Evolution](#architecture-evolution)
+  - [Current Architecture Assessment](#current-architecture-assessment)
+  - [Architecture Roadmap](#architecture-roadmap)
+  - [Technical Debt Management](#technical-debt-management)
+  - [Risk Mitigation](#risk-mitigation)
 
 <!-- TOC END -->
 
@@ -200,7 +213,7 @@ end note
 
 #### 1. Caching Strategy
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -267,7 +280,7 @@ class MultiLevelCache:
 
 #### 2. Connection Pooling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -343,7 +356,7 @@ class ConnectionPoolManager:
 
 #### 3. Async Processing
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -430,7 +443,7 @@ class AsyncPipelineExecutor:
 
 ### Performance Monitoring
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -648,7 +661,7 @@ end note
 
 #### 1. Horizontal Scaling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -814,7 +827,7 @@ class HorizontalScaler:
 
 #### 2. Data Scaling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -937,7 +950,7 @@ class DataScaler:
 
 #### 3. Functional Scaling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1129,7 +1142,7 @@ end note
 
 #### 1. Railway-Oriented Error Handling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1233,7 +1246,7 @@ class RailwayExecutor:
 
 #### 2. Circuit Breaker Pattern
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1305,7 +1318,7 @@ class CircuitBreaker:
 
 #### 3. Retry with Exponential Backoff
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1384,7 +1397,7 @@ class RetryExecutor:
 
 ### Reliability Monitoring
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1695,7 +1708,7 @@ end note
 
 #### 1. Multi-AZ Deployment Strategy
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1934,7 +1947,7 @@ class AvailabilityManager:
 
 #### 2. Disaster Recovery Implementation
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -2370,7 +2383,7 @@ end note
 
 #### 1. Pre-commit Quality Gates
 
-```python
+```text
 from __future__ import annotations
 
 import pathlib
@@ -2543,7 +2556,7 @@ class QualityGate:
 
 #### 2. Automated Code Review
 
-```python
+```text
 from __future__ import annotations
 
 import pathlib
@@ -2911,7 +2924,7 @@ end note
 
 #### 1. API Response Design
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -2995,7 +3008,7 @@ class APIResponse:
 
 #### 2. Progressive Disclosure
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -3064,7 +3077,7 @@ class APIResource:
 
 #### 3. Contextual Help System
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -3341,7 +3354,7 @@ end note
 
 #### 1. Dependency Injection for Testing
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -3387,7 +3400,7 @@ class TestableService:
 
 #### 2. Test Data Builders
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -3432,7 +3445,7 @@ def test_entity_processing():
 
 #### 3. Test Fixtures and Context Managers
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -3506,7 +3519,7 @@ def test_complex_pipeline_operation():
 
 #### 4. Property-Based Testing
 
-````python
+````tex
 from __future__ import annotations
 
 from hypothesis import given
@@ -3578,7 +3591,7 @@ class PropertyBasedTests:
 
 #### 5. Contract Testing
 
-```python
+```text
 from __future__ import annotations
 
 from pact import Consumer, Provider
@@ -3657,7 +3670,7 @@ class ContractTests:
 
         # Verify schema compliance
         validate(result, contract.output_schema)
-```
+````
 
 ### Test Quality Metrics
 
@@ -3734,7 +3747,7 @@ jobs:
 
 #### 2. Test Data Management
 
-```python
+```text
 from __future__ import annotations
 
 import pathlib
@@ -3802,7 +3815,7 @@ class TestDataManager:
 
 #### 3. Test Result Analysis
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -4477,4 +4490,3 @@ end note
 
 **Quality Attributes**: FLEXT-Meltano Architecture Quality Framework _Comprehensive
 quality attributes and cross-cutting concerns documentation_
-````

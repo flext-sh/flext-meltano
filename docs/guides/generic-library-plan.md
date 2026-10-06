@@ -87,7 +87,7 @@ dependencies and external Meltano tooling.
 
 **Key Components:**
 
-```python
+```text
 # CLI abstraction
 adapter = FlextMeltanoAdapter()
 result = adapter.run_pipeline("tap-csv", "target-jsonl")  # No CLI knowledge needed
@@ -128,7 +128,7 @@ validation = project_service.validate_project("/path/to/project")
 
 **Implementation:**
 
-```python
+```text
 # Generic plugin registry
 registry = FlextPluginRegistry()
 plugins = registry.discover_plugins()  # No Meltano dependency
@@ -185,7 +185,7 @@ tap_info = registry.find_plugin("tap-gitlab")
 
 **Generic Operations:**
 
-```python
+```text
 # Plugin operations (no CLI dependency)
 service = FlextMeltanoService()
 plugins = service.discover_plugins()
@@ -202,7 +202,7 @@ target_result = service.execute_target(
 
 **Self-Contained Plugin Management:**
 
-```python
+```text
 # Independent plugin registry
 plugin_service = FlextPluginService()
 registry = plugin_service.get_plugin_registry()
@@ -216,7 +216,7 @@ settings = tap_plugin.validate_configuration(user_config)
 
 **Direct Singer Protocol Handling:**
 
-```python
+```text
 # Protocol-based execution
 singer_service = FlextSingerService()
 tap = singer_service.create_tap("tap-gitlab", settings)
@@ -230,7 +230,7 @@ sync_result = tap.sync(selected_streams)
 
 #### Plugin Discovery API
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -252,7 +252,7 @@ def discover_plugins(
 
 #### Plugin Installation API
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -276,7 +276,7 @@ def install_plugin(
 
 #### Tap Execution API
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -302,7 +302,7 @@ def execute_tap(
 
 #### Target Execution API
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -326,7 +326,7 @@ def execute_target(
 
 #### Pipeline Configuration API
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -344,7 +344,7 @@ def create_pipeline(settings: PipelineConfig) -> p.Result[Pipeline]:
 
 #### Pipeline Execution API
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -385,16 +385,11 @@ def execute_pipeline(
 
 #### Compatibility Testing
 
-```bash
-# Test existing CLI integration
-make test-cli-integration
+Backward compatibility validation covers:
 
-# Test new generic APIs
-make test-generic-apis
-
-# Test backward compatibility
-make test-compatibility
-```
+- Existing CLI integration test suites
+- The new generic API test suites
+- Cross-version contract tests against the pre-refactor behavior
 
 #### Quality Gates
 

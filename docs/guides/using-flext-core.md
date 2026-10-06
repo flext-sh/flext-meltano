@@ -50,7 +50,7 @@ The examples below import only the aliases they consume from `flext_core`.
 Use `r[T]` to construct explicit success or domain-failure results. Do not convert
 unexpected runtime exceptions into success or ad-hoc error dictionaries.
 
-```python
+```text
 from __future__ import annotations
 
 from math import isclose
@@ -80,7 +80,7 @@ assert isinstance(settings.model_dump(), dict)
 
 Subprojects extend `FlextSettings` with their own `env_prefix`:
 
-```python
+```text
 from flext_core import FlextSettings, m
 
 

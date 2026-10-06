@@ -139,7 +139,8 @@ transforms:
 
 ```python
 from flext_cli import u
-from flext_meltano import FlextMeltanoSettings
+
+from flext_meltano import FlextMeltanoSettings, p
 
 settings = FlextMeltanoSettings()
 validation_result: p.Result[bool] = settings.validate_meltano_config()
@@ -263,12 +264,11 @@ models:
 ```python
 from flext_meltano import FlextMeltanoDbtService
 
-# Note: Current implementation is placeholder
+# Note: this operation currently returns stub data.
 dbt_service = FlextMeltanoDbtService()
 result = dbt_service.execute_dbt_operation()
 
-# Returns placeholder data:
-# {"dbt_status": "ready", "models": []}
+# Response: dbt_status is "ready" with an empty models list.
 ```
 
 ---
@@ -303,7 +303,14 @@ execution_result = service.execute()
 ### Configuration Validation
 
 ```python
+from flext_cli import u
+
 from flext_meltano import FlextMeltanoValidators
+
+# Pipeline configuration from the preceding build step
+tap_config = {"name": "tap-csv", "settings": {}}
+target_config = {"name": "target-jsonl", "settings": {}}
+dbt_config = {"name": "dbt-transform", "project_dir": "transform/"}
 
 validators = FlextMeltanoValidators()
 
@@ -400,9 +407,13 @@ dbt_profiles = file_manager.read_dbt_profiles()
 ### Writing Configuration Files
 
 ```python
+from flext_meltano import FlextMeltanoFileManagers
+
+file_manager = FlextMeltanoFileManagers()
+
 # Write Singer catalog
 catalog_data = {
-    "streams": [{"tap_stream_id": "users", "schema": {...}, "metadata": [...]}]
+    "streams": [{"tap_stream_id": "users", "schema": {...}, "metadata": [...]}],
 }
 
 write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.json")
@@ -411,6 +422,12 @@ write_result = file_manager.write_singer_catalog(catalog_data, "output/catalog.j
 ### Configuration Backup
 
 ```python
+from flext_cli import u
+
+from flext_meltano import FlextMeltanoFileManagers
+
+file_manager = FlextMeltanoFileManagers()
+
 # Backup critical configuration files
 backup_result = file_manager.backup_project_files()
 
@@ -446,6 +463,8 @@ model_validation = validators.validate_dbt_models([
 ### Runtime Validation
 
 ```python
+from flext_cli import u
+
 from flext_meltano import FlextMeltanoExecutor
 
 executor = FlextMeltanoExecutor()
@@ -466,7 +485,7 @@ if env_validation.failure:
 1. **Direct Import Violations**: Configuration system uses direct meltano.core imports
 1. **Abstraction Layer Missing**: Requires wrapper implementation for full FLEXT
    compliance
-1. **dbt Integration**: Current configuration returns placeholder data
+1. **dbt Integration**: Current configuration returns stub data
 
 ### Configuration Restrictions
 

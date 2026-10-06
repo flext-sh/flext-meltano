@@ -76,6 +76,7 @@ python -c "from flext_meltano import FlextMeltanoService; u.Cli.print('✅ Insta
 
 ```python
 from flext_cli import u
+
 from flext_meltano import FlextMeltanoService
 
 # Initialize ELT service
@@ -93,8 +94,8 @@ from flext_meltano import FlextMeltanoTapAbstractions
 # Initialize tap abstractions
 tap_abstractions = FlextMeltanoTapAbstractions()
 
-# Example catalog discovery (requires configured tap)
-# catalog_result = tap_abstractions.discover_catalog("tap-csv")
+# Example catalog discovery (requires a configured tap) runs through
+# the discover_catalog operation of the tap abstractions instance.
 ```
 
 ### **r Pattern**
@@ -104,14 +105,17 @@ from __future__ import annotations
 
 from flext_cli import u
 
+from flext_core import e
+from flext_meltano import p, r
+
 
 # All flext-meltano operations return r[T]
 def example_operation() -> p.Result[str]:
     try:
         # Your operation logic
         return r.ok("Operation successful")
-    except Exception as e:
-        return r.fail(f"Operation failed: {e}")
+    except e.BaseError as error:
+        return r.fail(f"Operation failed: {error}")
 
 
 # Usage pattern

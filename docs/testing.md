@@ -281,7 +281,7 @@ src/flext_meltano/
 
 ### **Railway-Oriented Testing Patterns**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -311,7 +311,7 @@ def test_operation_failure():
 
 ### **Mock Integration Patterns**
 
-```python
+```text
 from __future__ import annotations
 
 # ✅ CORRECT - Proper mocking for isolation
@@ -340,7 +340,7 @@ def test_service_with_meltano_integration(mock_meltano_adapter):
 
 ### **Fixture Best Practices**
 
-```python
+```text
 from __future__ import annotations
 
 

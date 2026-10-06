@@ -57,7 +57,7 @@ flext-meltano patterns.
 
 \__Standard pattern for flext-tap-_ projects\_\*:
 
-```python
+```text
 from __future__ import annotations
 
 from flext_meltano import (
@@ -94,7 +94,7 @@ class FlextOracleTapService(FlextMeltanoTapServiceBase):
 
 \__Standard pattern for flext-target-_ projects\_\*:
 
-```python
+```text
 from __future__ import annotations
 
 from typing import Annotated
@@ -141,7 +141,7 @@ class FlextOracleTargetService(FlextMeltanoTargetServiceBase):
 
 \__Standard pattern for flext-dbt-_ projects\_\*:
 
-```python
+```text
 from __future__ import annotations
 
 from flext_meltano import FlextMeltanoDbtServiceBase, p, t
@@ -160,7 +160,7 @@ class FlextOracleDbtService(FlextMeltanoDbtServiceBase):
         return self.run_models(models)
 ```
 
-**Current Limitation**: dbt integration is placeholder implementation requiring dbt
+**Current Limitation**: dbt integration is a stub implementation requiring dbt
 programmatic API integration.
 
 ---
@@ -171,7 +171,7 @@ programmatic API integration.
 
 **Full ELT workflow using flext-meltano foundation**:
 
-```python
+```text
 from __future__ import annotations
 
 from flext_meltano import (
@@ -236,7 +236,7 @@ from flext_meltano import FlextMeltanoBridge
 
 bridge = FlextMeltanoBridge()
 response = bridge.execute_bridge_command(
-    "run_pipeline", args={"tap": "tap-csv", "target": "target-jsonl"}
+    "run_pipeline", args={"tap": "tap-csv", "target": "target-jsonl"},
 )
 
 # Response format follows r structure
@@ -256,7 +256,7 @@ print(response.unwrap())
 | **flext-tap-ldap**      | FlextMeltanoTapAbstractions    | ✅ Active  | Singer protocol compliance   |
 | **flext-target-oracle** | FlextMeltanoTargetAbstractions | ✅ Active  | Target service wrappers      |
 | **flext-target-ldap**   | FlextMeltanoTargetAbstractions | ✅ Active  | Load operation abstractions  |
-| **flext-dbt-oracle**    | FlextMeltanoDbtService         | 🔴 Limited | Placeholder implementation   |
+| **flext-dbt-oracle**    | FlextMeltanoDbtService         | 🔴 Limited | Stub implementation          |
 | **DataCosmos**          | Complete ELT Foundation        | 🟡 Partial | Blocked by compliance issues |
 
 ### Integration Requirements
@@ -309,7 +309,7 @@ topology and `flext-infra/config/codegen.yaml`. Do not edit the generated
 declared dependency floors and regenerate consumers from the workspace root:
 
 ```bash
-make deps
+make upg
 make gen
 ```
 
@@ -323,14 +323,14 @@ make gen
 
 - **Direct meltano.core imports** (adapters.py lines 17-25) limit some integration
   patterns
-- **dbt placeholder implementation** affects flext-dbt-\* project functionality
+- **dbt stub implementation** affects flext-dbt-\* project functionality
 - **Modern ELT patterns** missing for 2025 industry standards
 
 **Integration Impact**:
 
 - **Singer Operations**: ✅ Fully functional through abstractions
 - **Meltano Integration**: 🟡 Working but non-compliant
-- **dbt Operations**: 🔴 Limited to placeholder data
+- **dbt Operations**: 🔴 Limited to stub data
 - **Enterprise Use**: 🔴 Not recommended for production
 
 ### Workaround Strategies
@@ -385,7 +385,7 @@ print(settings.model_dump())
 
 **3. Error Handling**:
 
-```python
+```text
 from __future__ import annotations
 
 from flext_meltano import FlextMeltanoTapAbstractions, m, p, r
