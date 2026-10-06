@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""AI Hub governance hook projection: gemini sessionstart.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 # Copyright (c) 2025 FLEXT Team. All rights reserved.
 """AI Hub governance hook projection: gemini sessionstart."""
 from __future__ import annotations
