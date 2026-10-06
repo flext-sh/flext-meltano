@@ -14,7 +14,6 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsProjects:
@@ -103,7 +102,7 @@ class FlextMeltanoModelsProjects:
                 if node.resource_type == resource_type
             ]
 
-    class MeltanoProjectModel(FlextMeltanoModelsBase.EventedEntity):
+    class MeltanoProjectModel(m.Entity):
         """Generic Meltano project configuration with validation."""
 
         project_id: Annotated[str, m.Field(description="Unique project identifier")]
@@ -152,7 +151,7 @@ class FlextMeltanoModelsProjects:
                 raise ValueError(msg)
             return self
 
-    class PipelineProjectModel(FlextMeltanoModelsBase.EventedEntity):
+    class PipelineProjectModel(m.Entity):
         """Generic pipeline project configuration with validation."""
 
         schema_version: Annotated[

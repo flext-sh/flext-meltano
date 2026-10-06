@@ -11,13 +11,12 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsSourcesParams:
     """Run parameters and stream definition models."""
 
-    class DbtRunParams(FlextMeltanoModelsBase.EventedEntity):
+    class DbtRunParams(m.Entity):
         """Generic parameters for dbt run operations."""
 
         project_dir: Annotated[str, m.Field(description="dbt project directory")]
@@ -42,7 +41,7 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="dbt variables"),
         ] = None
 
-    class TapRunParams(FlextMeltanoModelsBase.EventedEntity):
+    class TapRunParams(m.Entity):
         """Generic parameters for tap run operations."""
 
         tap_name: Annotated[str, m.Field(description="Name of the tap to run")]
@@ -67,7 +66,7 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="Path to Singer properties file"),
         ] = None
 
-    class TargetRunParams(FlextMeltanoModelsBase.EventedEntity):
+    class TargetRunParams(m.Entity):
         """Generic parameters for target run operations."""
 
         target_name: Annotated[str, m.Field(description="Name of the target to run")]
@@ -84,7 +83,7 @@ class FlextMeltanoModelsSourcesParams:
             m.Field(default=None, description="Batch size for target operations"),
         ] = None
 
-    class StreamDefinition(FlextMeltanoModelsBase.EventedEntity):
+    class StreamDefinition(m.Entity):
         """Generic stream definition for data pipeline operations."""
 
         stream_name: Annotated[str, m.Field(description="Name of the stream")]

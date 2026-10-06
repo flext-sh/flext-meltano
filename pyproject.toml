@@ -482,7 +482,7 @@ runtime-evaluated-base-classes = [
   "flext_meltano.services.meltano_plugins.FlextMeltanoComponentService",
   "flext_meltano.services.meltano_project_sdk.FlextMeltanoProjectManager",
   "flext_meltano.services.project_service.FlextMeltanoProjectService",
-  "flext_meltano.services.services.FlextMeltanoService",
+  "flext_meltano.services.service.FlextMeltanoService",
   "flext_meltano.services.singer_catalog.FlextMeltanoSingerCatalogMixin",
   "flext_meltano.services.singer_state.FlextMeltanoSingerStateMixin",
   "flext_meltano.services.singer_tap.FlextMeltanoTapAbstractions",

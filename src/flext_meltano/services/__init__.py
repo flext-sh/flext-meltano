@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from flext_meltano.services.meltano_plugins import FlextMeltanoComponentService
     from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
     from flext_meltano.services.project_service import FlextMeltanoProjectService
-    from flext_meltano.services.services import FlextMeltanoService
+    from flext_meltano.services.service import FlextMeltanoService
     from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
     from flext_meltano.services.singer_sdk import (
         FlextMeltanoSingerTapAdapter,
@@ -106,7 +106,7 @@ install_lazy_exports(
         "FlextMeltanoPluginDiscoveryMixin": ".meltano_plugin_discovery",
         "FlextMeltanoProjectManager": ".meltano_project_sdk",
         "FlextMeltanoProjectService": ".project_service",
-        "FlextMeltanoService": ".services",
+        "FlextMeltanoService": ".service",
         "FlextMeltanoSingerCatalogMixin": ".singer_catalog",
         "FlextMeltanoSingerCliTranslator": ".singer_translator",
         "FlextMeltanoSingerStateMixin": ".singer_state",
