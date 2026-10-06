@@ -17,7 +17,15 @@ import sys
 from abc import ABC, abstractmethod
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
 
 

@@ -15,7 +15,15 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Annotated, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services.executor import FlextMeltanoExecutor
 
 

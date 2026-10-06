@@ -14,9 +14,9 @@ from typing import Annotated, ClassVar
 
 from flext_cli import FlextCliConfig
 
-import flext_meltano._models._meltano_namespace
 from flext_core import FlextSettings
-from flext_meltano import m
+
+from flext_meltano.models import m
 
 
 class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
@@ -32,11 +32,11 @@ class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     _instance: ClassVar[FlextMeltanoConfig | None] = None  # pyright: ignore[reportIncompatibleVariableOverride]
 
     Meltano: Annotated[
-        flext_meltano._models._meltano_namespace._MeltanoNamespace,
+        m.Meltano.Config.MeltanoNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
         ),
-    ] = flext_meltano._models._meltano_namespace._MeltanoNamespace()
+    ] = m.Meltano.Config.MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()
