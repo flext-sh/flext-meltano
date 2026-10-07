@@ -11,7 +11,7 @@ from __future__ import annotations
 # import is admitted explicitly and narrowly per module.
 from meltano.core.error import ProjectNotFound  # pyright: ignore[reportMissingTypeStubs]
 
-from flext_meltano import FlextMeltanoSettings, c, m, p, r, t, u
+from flext_meltano import c, m, p, r, t, u
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 
@@ -20,7 +20,7 @@ class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
 
     def __init__(
         self,
-        settings: FlextMeltanoSettings | None = None,
+        settings: p.Settings | None = None,
         *,
         service_name: t.NonEmptyStr | None = None,
         service_version: t.NonEmptyStr | None = None,

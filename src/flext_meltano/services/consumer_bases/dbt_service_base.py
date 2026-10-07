@@ -15,16 +15,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Annotated, override
 
-from flext_meltano import (
-    FlextMeltanoServiceBase,
-    FlextMeltanoSettings,
-    c,
-    m,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
 from flext_meltano.services.executor import FlextMeltanoExecutor
 
 
@@ -53,7 +44,7 @@ class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):
         default_factory=FlextMeltanoExecutor,
     )
 
-    def __init__(self, settings: FlextMeltanoSettings | None = None) -> None:
+    def __init__(self, settings: p.Settings | None = None) -> None:
         """Expose the canonical settings bootstrap for dbt consumers."""
         super().__init__(runtime_settings=settings)
 

@@ -30,17 +30,39 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     # namespacing only — instance machinery stays plain object semantics so the
     # settings singleton/validation machinery cannot leak into instantiated
     # facade composites (e.g. the ``u`` logging facade).
-    def __new__(cls, *args: object, **kwargs: object) -> Self:
+    #
+    # Tooling ruling 2026-10-05 (bead gc-eqvqx5, PR #158): the ``object``
+    # annotations on this plumbing are the narrowest spellings pyright's LSP
+    # override contract admits for ``__new__``/``__init__``/``__setattr__``/
+    # ``__eq__`` (the family's own canonical plumbing — flext-core
+    # ``FlextSettings.__new__`` and ``Entity.__eq__`` — uses the same), while
+    # the ``ban-broad-annotation`` codemod rule bans that identifier outright.
+    # The rule has no dunder-override carve-out, so each directive below is a
+    # scoped, dated admission of the tooling conflict, not a code dodge; the
+    # durable cure is a dunder carve-out in the flext-infra rule owner.
+    def __new__(
+        cls,
+        *args: object,
+        **kwargs: object,
+    ) -> Self:  # ast-grep-ignore: ban-broad-annotation
         _ = args, kwargs
         return object.__new__(cls)
 
-    def __init__(self, *args: object, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        **kwargs: object,
+    ) -> None:  # ast-grep-ignore: ban-broad-annotation
         _ = self, args, kwargs
 
-    def __setattr__(self, name: str, value: object) -> None:
+    def __setattr__(
+        self,
+        name: str,
+        value: object,
+    ) -> None:  # ast-grep-ignore: ban-broad-annotation
         object.__setattr__(self, name, value)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: object) -> bool:  # ast-grep-ignore: ban-broad-annotation
         """Identity equality per the namespace-holder contract.
 
         Returns:

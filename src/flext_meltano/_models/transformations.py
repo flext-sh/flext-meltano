@@ -12,13 +12,12 @@ from typing import Annotated, Self
 from flext_cli import m, u
 
 from flext_meltano import c, t
-from flext_meltano._models.base import FlextMeltanoModelsBase
 
 
 class FlextMeltanoModelsTransformations:
     """Transformation project and execution models."""
 
-    class DbtProjectModel(FlextMeltanoModelsBase.EventedEntity):
+    class DbtProjectModel(m.Entity):
         """Generic DBT project configuration with validation."""
 
         name: Annotated[str, m.Field(description="DBT project name")]
@@ -92,7 +91,7 @@ class FlextMeltanoModelsTransformations:
 
             return self
 
-    class TransformationProjectModel(FlextMeltanoModelsBase.EventedEntity):
+    class TransformationProjectModel(m.Entity):
         """Generic transformation project configuration with validation."""
 
         name: Annotated[t.NonEmptyStr, m.Field(description="Project name")]
@@ -189,7 +188,7 @@ class FlextMeltanoModelsTransformations:
 
             return self
 
-    class TransformationExecutionModel(FlextMeltanoModelsBase.EventedEntity):
+    class TransformationExecutionModel(m.Entity):
         """Generic transformation execution configuration with validation."""
 
         command: Annotated[str, m.Field(description="Command to execute")]

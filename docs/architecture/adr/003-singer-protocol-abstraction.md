@@ -6,6 +6,22 @@
 - [Decision](#decision)
 - [Rationale](#rationale)
   - [Why Abstraction Layer](#why-abstraction-layer)
+  - [Why Not Direct SDK Usage](#why-not-direct-sdk-usage)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Risks](#risks)
+  - [Mitigation Strategies](#mitigation-strategies)
+- [Alternatives Considered](#alternatives-considered)
+  - [1. Direct Singer SDK Usage](#1-direct-singer-sdk-usage)
+  - [2. Thin Wrapper Only](#2-thin-wrapper-only)
+  - [3. Complete Protocol Reimplementation](#3-complete-protocol-reimplementation)
+- [Implementation Details](#implementation-details)
+  - [Abstraction Hierarchy](#abstraction-hierarchy)
+  - [Error Handling Integration](#error-handling-integration)
+  - [State Management](#state-management)
+- [Related ADRs](#related-adrs)
+- [Notes](#notes)
 
 <!-- TOC END -->
 
@@ -43,7 +59,7 @@ ecosystem integration while maintaining protocol compliance.
 **FLEXT Ecosystem Consistency**: Ensures all Singer implementations follow FLEXT
 patterns
 
-````python
+```text
 from __future__ import annotations
 
 
@@ -51,19 +67,21 @@ from __future__ import annotations
 class MyCustomTap(FlextMeltanoTap):
     def discover_streams(self) -> p.Result[List[FlextMeltanoStream]]:
         return r.ok([MyStream(self)])
-        ```
+```
+
 **Error Handling**: Consistent error handling across all Singer operations
 
-```python
+```text
 # Automatic error wrapping and context preservation
 result = tap.discover_streams()
 if result.failure:
     # FLEXT error handling patterns
     logger.error(f"Stream discovery failed: {result.error}")
-    ```
+```
+
 **Testability**: Singer components can be tested in isolation
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -72,7 +90,8 @@ from __future__ import annotations
 def mock_singer_sdk():
     with patch("singer_sdk.Tap"):
         yield
-        ```
+```
+
 ### Why Not Direct SDK Usage
 
 **Tight Coupling**: Direct Singer SDK usage creates external dependencies
@@ -134,7 +153,7 @@ def mock_singer_sdk():
 
 ### Abstraction Hierarchy
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -153,10 +172,11 @@ class FlextMeltanoTarget(FlextMeltanoSingerBase, SingerTarget):
 
 class FlextMeltanoStream(FlextMeltanoSingerBase):
     """Stream abstraction with FLEXT state management."""
-    ```
+```
+
 ### Error Handling Integration
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -180,10 +200,11 @@ class FlextMeltanoTap(FlextMeltanoSingerBase):
             .flat_map(lambda _: self.execute_streams())
             .map(lambda result: TapResult.from_execution(result))
         )
-        ```
+```
+
 ### State Management
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -200,7 +221,8 @@ class FlextMeltanoStream:
             # FLEXT error handling
             logger.error(f"Record retrieval failed: {e}")
             raise SingerStreamError(f"Stream {self.name} failed: {e}")
-            ```
+```
+
 ## Related ADRs
 
 - [ADR-001](001-railway-oriented-programming.md) - Error handling patterns
@@ -226,4 +248,3 @@ class FlextMeltanoStream:
 - Existing direct SDK usage migrated incrementally
 - New implementations use abstraction layer exclusively
 - Legacy code wrapped with compatibility adapters
-````

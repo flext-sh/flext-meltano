@@ -266,7 +266,7 @@ flext_meltano --> redis: Caching & queues
 
 #### FLEXT-Core Integration
 
-```python
+```text
 from __future__ import annotations
 
 # FLEXT-Meltano uses FLEXT-Core patterns extensively
@@ -291,7 +291,7 @@ class FlextMeltanoService(s):
 
 #### Meltano CLI Integration
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -339,7 +339,7 @@ class MeltanoAdapter:
 
 #### Singer SDK Integration
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -389,7 +389,7 @@ class FlextMeltanoTap(FlextMeltanoSingerBase, SingerTap):
 
 #### Adapter Pattern for External Systems
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -422,7 +422,7 @@ class SingerAdapter(ExternalSystemAdapter):
 
 #### Plugin Architecture for Extensibility
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -575,7 +575,7 @@ end note
 
 All FLEXT projects follow consistent integration patterns:
 
-```python
+```text
 from __future__ import annotations
 
 # Standard FLEXT project structure
@@ -605,7 +605,7 @@ class MyFLEXTProject(s):
 
 #### Plugin Ecosystem Integration
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -751,7 +751,7 @@ end note
 
 #### Request-Response Pattern
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -786,7 +786,7 @@ class SynchronousIntegration:
 
 #### Circuit Breaker Pattern
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -845,7 +845,7 @@ class CircuitBreakerIntegration:
 
 #### Event-Driven Pattern
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -903,7 +903,7 @@ class EventDrivenIntegration:
 
 #### Message Queue Integration
 
-```python
+```text
 from __future__ import annotations
 
 

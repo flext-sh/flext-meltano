@@ -8,6 +8,20 @@
   - [Design Principles](#design-principles)
 - [Core Architecture](#core-architecture)
   - [Service Layer Architecture](#service-layer-architecture)
+  - [Protocol Implementation Architecture](#protocol-implementation-architecture)
+  - [Plugin Architecture](#plugin-architecture)
+- [Component Analysis](#component-analysis)
+  - [Service Components](#service-components)
+  - [Protocol Components](#protocol-components)
+- [Integration Patterns](#integration-patterns)
+  - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
+  - [External System Integration](#external-system-integration)
+- [Performance Considerations](#performance-considerations)
+  - [Execution Optimization](#execution-optimization)
+  - [Monitoring and Observability](#monitoring-and-observability)
+- [Scalability Design](#scalability-design)
+  - [Horizontal Scalability](#horizontal-scalability)
+  - [Data Scalability](#data-scalability)
 
 <!-- TOC END -->
 
@@ -73,7 +87,7 @@ FLEXT-Meltano implements a **layered architecture** with clear separation of con
 
 **Key Methods:**
 
-````python
+```text
 from __future__ import annotations
 # Plugin operations
 discover_plugins() -> p.Result[Sequence[PluginInfo]]
@@ -84,6 +98,7 @@ execute_tap(name: str, settings: dict) -> p.Result[TapExecutionResult]
 execute_pipeline(tap: str, target: str) -> p.Result[PipelineResult]
 validate_configuration() -> p.Result[bool]
 ```
+
 #### FlextMeltanoAdapter (CLI Integration)
 
 **Responsibilities:**
@@ -115,7 +130,7 @@ validate_configuration() -> p.Result[bool]
 
 **FlextSingerTap Architecture:**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -133,7 +148,7 @@ class FlextSingerTap(s):
 
 **FlextSingerTarget Architecture:**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -146,6 +161,7 @@ class FlextSingerTarget(s):
     ) -> p.Result[LoadResult]: ...
     async def flush(self) -> p.Result[FlushResult]: ...
 ```
+
 ### Plugin Architecture
 
 #### Plugin Development Framework
@@ -226,7 +242,7 @@ class FlextSingerTarget(s):
 
 #### flext-core Integration
 
-```python
+```text
 # Foundation patterns
 
 # Service registration
@@ -238,18 +254,20 @@ result = meltano_service.execute_tap("tap-csv", settings)
 if result.failure:
     logger.error("Tap execution failed", extra=result.error_context)
 ```
+
 #### flext-cli Integration
 
-```python
+```text
 # CLI command integration
 from flext_cli import cli
 
 cli.register_command("meltano", MeltanoCommandHandler())
 cli.register_command("pipeline", PipelineCommandHandler())
 ```
+
 #### flext-quality Integration
 
-```python
+```text
 # Quality gate integration
 from flext_quality import FlextQualityGates
 
@@ -257,23 +275,26 @@ gates = FlextQualityGates()
 gates.register_plugin_validator("meltano", MeltanoPluginValidator())
 gates.register_pipeline_validator("meltano", MeltanoPipelineValidator())
 ```
+
 ### External System Integration
 
 #### Meltano CLI Integration
 
-```python
+```text
 # Direct CLI execution
 adapter = FlextMeltanoAdapter()
 result = adapter.execute_cli_command(["meltano", "run", "tap-csv", "target-jsonl"])
 ```
+
 #### Singer Protocol Integration
 
-```python
+```text
 # Native Singer protocol usage
 tap = FlextSingerTap("tap-gitlab", settings={"api_url": "https://gitlab.com"})
 catalog = tap.discover().unwrap()
 sync_result = tap.sync(catalog.streams[:5]).unwrap()
 ```
+
 ## Performance Considerations
 
 ### Execution Optimization
@@ -314,7 +335,7 @@ sync_result = tap.sync(catalog.streams[:5]).unwrap()
 
 #### Multi-Worker Architecture
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -330,6 +351,7 @@ class FlextMeltanoWorkerPool:
         # Handle worker failures and recovery
         ...
 ```
+
 #### Load Distribution Strategies
 
 - **Round-Robin Distribution**: Even distribution across available workers
@@ -353,7 +375,6 @@ class FlextMeltanoWorkerPool:
 - **State Synchronization**: Cross-worker state synchronization
 - **State Compression**: State file compression for storage efficiency
 
-______________________________________________________________________
+---
 
 **Document Status**: ✅ Complete | **Last Reviewed**: 2026-04-14
-````

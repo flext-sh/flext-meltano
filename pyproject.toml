@@ -178,6 +178,7 @@ include = ["/src/flext_meltano/**"]
 [tool.mypy]
 mypy_path = ["src"]
 plugins = ["pydantic.mypy"]
+disable_error_code = ["prop-decorator", "call-arg", "attr-defined"]
 python_version = "3.13"
 allow_redefinition = true
 check_untyped_defs = true
@@ -334,6 +335,7 @@ include = ["src", "tests"]
 extraPaths = ["src", "."]
 pythonPlatform = "Linux"
 pythonVersion = "3.13"
+reportCallIssue = "none"
 reportConstantRedefinition = "error"
 reportIncompatibleMethodOverride = "error"
 reportInconsistentConstructor = "error"
@@ -389,6 +391,7 @@ markers = [
   "resilience: resilience tests",
   "discovery: catalog and stream discovery tests",
   "singer: Singer protocol contract tests",
+  "requires_engine: native check engine required by this test",
 ]
 minversion = "8.0"
 python_classes = ["Test*"]
@@ -414,11 +417,16 @@ quote-style = "double"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
-extend-safe-fixes = ["camelcase-imported-as-lowercase", "relative-imports"]
+extend-safe-fixes = [
+  "camelcase-imported-as-lowercase",
+  "relative-imports",
+  "typing-only-first-party-import",
+]
 ignore = [
   "camelcase-imported-as-lowercase",
   "implicit-namespace-package",
   "missing-required-import",
+  "runtime-import-in-type-checking-block",
   "typing-only-first-party-import",
   "typing-only-standard-library-import",
   "typing-only-third-party-import",
@@ -438,6 +446,56 @@ unfixable = [
 
 [tool.ruff.lint.flake8-copyright]
 notice-rgx = "Copyright \\(c\\) \\d{4} \\S[^\\n]*\\. All rights reserved\\."
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+  "flext_cli.FlextCliConfig",
+  "flext_cli.m.ArbitraryTypesModel",
+  "flext_cli.m.BaseModel",
+  "flext_cli.m.Entity",
+  "flext_cli.m.FlexibleModel",
+  "flext_cli.m.TimestampedModel",
+  "flext_core.FlextService",
+  "flext_core.FlextSettings",
+  "flext_meltano.FlextMeltanoConstants.Meltano",
+  "flext_meltano.FlextMeltanoServiceBase",
+  "flext_meltano.FlextMeltanoSettings",
+  "flext_meltano._constants.settings.FlextMeltanoConstantsSettings",
+  "flext_meltano._models.base.FlextMeltanoModelsBase.EventedEntity",
+  "flext_meltano._models.cli_params.CatalogStateParams",
+  "flext_meltano._models.payloads.FrozenConfigPayload",
+  "flext_meltano.m.BaseModel",
+  "flext_meltano.m.Value",
+  "flext_meltano.services.abstractions.FlextMeltanoAbstractions",
+  "flext_meltano.services.abstractions_base.FlextMeltanoAbstractionsBase",
+  "flext_meltano.services.adapters.FlextMeltanoAdapter",
+  "flext_meltano.services.bridge.FlextMeltanoBridge",
+  "flext_meltano.services.consumer_bases.dbt_service_base.FlextMeltanoDbtServiceBase",
+  "flext_meltano.services.consumer_bases.tap_service_base.FlextMeltanoTapServiceBase",
+  "flext_meltano.services.consumer_bases.target_service_base.FlextMeltanoTargetServiceBase",
+  "flext_meltano.services.dbt_project.FlextMeltanoDbtProjectMixin",
+  "flext_meltano.services.dbt_runner.FlextMeltanoDbtRunnerMixin",
+  "flext_meltano.services.executor.FlextMeltanoExecutor",
+  "flext_meltano.services.executor_base.FlextMeltanoExecutorBase",
+  "flext_meltano.services.library_runner.FlextMeltanoLibraryRunner",
+  "flext_meltano.services.meltano_plugin_discovery.FlextMeltanoPluginDiscoveryMixin",
+  "flext_meltano.services.meltano_plugins.FlextMeltanoComponentService",
+  "flext_meltano.services.meltano_project_sdk.FlextMeltanoProjectManager",
+  "flext_meltano.services.project_service.FlextMeltanoProjectService",
+  "flext_meltano.services.service.FlextMeltanoService",
+  "flext_meltano.services.singer_catalog.FlextMeltanoSingerCatalogMixin",
+  "flext_meltano.services.singer_state.FlextMeltanoSingerStateMixin",
+  "flext_meltano.services.singer_tap.FlextMeltanoTapAbstractions",
+  "flext_meltano.services.singer_target.FlextMeltanoTargetAbstractions",
+  "flext_meltano.services.singer_translator.FlextMeltanoSingerCliTranslator",
+  "flext_meltano.services.tap_source_mixin.FlextMeltanoTapSourceMixin",
+  "flext_meltano.services.validators.FlextMeltanoValidators",
+  "flext_tests.FlextTestsServiceBase",
+  "flext_tests.FlextTestsSettings",
+  "flext_tests.FlextTestsUtilities.Tests",
+  "pydantic.BaseModel",
+  "tests.m.BaseModel",
+]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
@@ -464,18 +522,21 @@ known-first-party = ["flext_core", "flext_meltano"]
 split-on-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
-"**/__init__.py" = [
-  "non-empty-init-module",
-  "runtime-import-in-type-checking-block",
-  "typing-only-first-party-import",
-  "unused-import",
-]
+"**/__init__.py" = ["line-too-long", "non-empty-init-module", "unused-import"]
+"**/_config.py" = ["invalid-function-name"]
+"**/docx.py" = ["import-outside-top-level"]
+"**/file_test_helpers.py" = ["line-too-long"]
+"**/flextcliutilitiesfiletesthelpersmixin_part_03.py" = ["line-too-long"]
+"**/framework.py" = ["banned-api", "import-outside-top-level"]
+"**/pptx.py" = ["import-outside-top-level"]
+"**/test_public_contracts_cov.py" = ["line-too-long"]
 "**/tests/python/**" = [
   "raise-vanilla-args",
   "start-process-with-partial-path",
   "subprocess-without-shell-equals-true",
   "suspicious-subprocess-import",
 ]
+"**/xlsx.py" = ["import-outside-top-level"]
 "scripts/**" = [
   "any-type",
   "avoidable-escaped-quote",

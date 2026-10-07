@@ -6,13 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Annotated
 
 from flext_cli import m
 
 from flext_meltano import t
+from flext_meltano._models.core import FlextMeltanoModelsCore
 
 
 class FlextMeltanoModelsDiscovery:
@@ -56,12 +56,7 @@ class FlextMeltanoModelsDiscovery:
             Returns:
                 The resulting ``t.FlatContainerMapping``.
             """
-            match value:
-                case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                case _:
-                    empty: t.FlatContainerMapping = {}
-                    return empty
+            return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
         @m.field_validator("variants", mode="after")
         @classmethod
@@ -138,12 +133,7 @@ class FlextMeltanoModelsDiscovery:
             Returns:
                 The resulting ``t.FlatContainerMapping``.
             """
-            match value:
-                case Mapping():
-                    return t.Cli.JSON_MAPPING_ADAPTER.validate_python(value)
-                case _:
-                    empty: t.FlatContainerMapping = {}
-                    return empty
+            return FlextMeltanoModelsCore.normalize_json_mapping(value)
 
         @m.field_validator("plugins", mode="after")
         @classmethod

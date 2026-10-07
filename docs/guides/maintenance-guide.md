@@ -42,6 +42,10 @@
   - [Link Management](#link-management)
 - [🎯 Advanced Features](#advanced-features)
   - [Custom Validators](#custom-validators)
+  - [Integration APIs](#integration-apis)
+- [📞 Support & Resources](#support-resources)
+  - [Getting Help](#getting-help)
+  - [Related Documentation](#related-documentation)
 
 <!-- TOC END -->
 
@@ -450,7 +454,7 @@ make docs
 
 Extend the system with custom validation rules:
 
-````python
+```text
 from __future__ import annotations
 
 # scripts/custom_validators.py
@@ -468,7 +472,8 @@ class CustomFlextValidator(DocumentationAuditor):
                 issues.append("Missing flext-core import")
 
         return issues
-        ```
+```
+
 ### Integration APIs
 
 Programmatic access to quality data:
@@ -486,6 +491,7 @@ issues = len(auditor.issues)
 # Generate custom reports
 auditor.generate_custom_report("api_quality.md")
 ```
+
 ## 📞 Support & Resources
 
 ### Getting Help
@@ -502,8 +508,7 @@ auditor.generate_custom_report("api_quality.md")
 - **Configuration**: `docs/.maintenance_config.yaml`
 - **Quality Reports**: `docs/reports/`
 
-______________________________________________________________________
+---
 
 **Documentation Maintenance Framework v1.0.0**
 _Ensuring FLEXT-Meltano documentation excellence through automated quality assurance._
-````

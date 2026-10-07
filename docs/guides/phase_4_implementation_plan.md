@@ -140,7 +140,7 @@ ls -la ../flext-tests # CONFIRMED MISSING
 
 **Resolution Plan:**
 
-```python
+```text
 # Step 1: Analyze current flext-core FlextModels implementation
 # Check ../flext-core/src/flext_core/models.py for available classes
 
@@ -173,22 +173,15 @@ inheritance changes) **Dependencies**: Understanding of flext-core v1.0.0 model 
 **Resolution Plan:**
 
 ```bash
-# Step 1: Verify PYTHONPATH configuration
-export PYTHONPATH="src:../flext-core/src:../flext-cli/src"
+# Step 1: Verify toolchain and environment configuration
+make setup
 
-# Step 2: Ensure Poetry environment is properly set up
-poetry env info
-poetry install --with test
-
-# Step 3: Test execution in isolated environment
-poetry run python -c "import flext_meltano; u.Cli.print('Import successful')"
-
-# Step 4: Validate test discovery
-poetry run pytest --collect-only tests/unit/test_api.py
+# Step 2: Execute the test suite
+make test
 ```
 
 **Estimated Effort**: 2 hours **Risk Level**: Low (environment configuration)
-**Dependencies**: Proper Poetry and PYTHONPATH setup
+**Dependencies**: Proper toolchain environment configuration
 
 ---
 
@@ -489,7 +482,7 @@ poetry run pytest --collect-only tests/unit/test_api.py
 
 #### **r Testing Pattern**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -526,28 +519,13 @@ def test_operation_failure_path():
     assert isinstance(error, FlextMeltanoError)
 ```
 
-#### **Mock Integration Pattern**
+#### **External Dependency Boundary Testing**
 
-```python
-from __future__ import annotations
-
-
-@pytest.fixture
-def mock_meltano_adapter():
-    """Provide mocked Meltano adapter."""
-    with patch("flext_meltano.adapters.FlextMeltanoAdapter") as mock:
-        mock.return_value.run_tap.return_value = r.ok({"status": "success"})
-        yield mock
-
-
-def test_service_with_external_dependency(mock_meltano_adapter):
-    """Test service operation with mocked external dependency."""
-    service = FlextMeltanoService()
-
-    result = service.execute_pipeline("tap-csv", "target-postgres")
-
-    assert result.success
-    mock_meltano_adapter.assert_called_once()
+```text
+Tests exercise behavior through the public facade only. External Meltano
+runtimes stay behind the adapter boundary and are covered by integration
+tests; in-process test doubles are prohibited by fleet test law, so the
+earlier fixture-based simulation pattern was removed from this plan.
 ```
 
 ---
