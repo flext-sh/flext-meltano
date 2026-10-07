@@ -9,15 +9,14 @@ from __future__ import annotations
 from flext_meltano import m, p, u
 
 
-class TestsFlextMeltanoProfileModel(m.Value):
-    """Tests for ``FlextMeltanoProfile``."""
-
-    type: str = u.Field(description="Dbt adapter type")
-    project: str = u.Field(description="Dbt project name")
-
-
 class TestsFlextMeltanoDbtConnectionProfile:
     """Behavior contract of ``p.Meltano.DbtConnectionProfile``."""
+
+    class ProfileModelFixture(m.Value):
+        """Fixture model for the ``FlextMeltanoProfile`` behavior contract."""
+
+        type: str = u.Field(description="Dbt adapter type")
+        project: str = u.Field(description="Dbt project name")
 
     @staticmethod
     def _accept_profile(
@@ -33,7 +32,10 @@ class TestsFlextMeltanoDbtConnectionProfile:
     @staticmethod
     def test_dbt_connection_profile_accepts_typed_serializable_model() -> None:
         """Test dbt connection profile accepts typed serializable model."""
-        profile = TestsFlextMeltanoProfileModel(type="test", project="dbt-test")
+        profile = TestsFlextMeltanoDbtConnectionProfile.ProfileModelFixture(
+            type="test",
+            project="dbt-test",
+        )
 
         accepted = TestsFlextMeltanoDbtConnectionProfile._accept_profile(profile)
 

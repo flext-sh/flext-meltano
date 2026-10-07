@@ -1,8 +1,7 @@
 """Behavioral tests for FlextMeltanoExecutionResult module.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
+Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
@@ -19,20 +18,19 @@ _ISO_TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}")
 _ExecutionResultCase = tuple[t.StrSequence, bool, int, str, str, float]
 
 
-class TestsFlextMeltanoExecutionResultJsonModel(m.BaseModel):
-    """Tests for ``FlextMeltanoExecutionResultJson``."""
-
-    command: list[str]
-    success: bool
-    exit_code: int
-    output: str
-    error: str
-    execution_time: float
-    timestamp: str
-
-
 class TestsFlextMeltanoExecutionResult:
     """Behavioral contract of ``m.Meltano.CommandExecutionResult``."""
+
+    class ExecutionResultJsonFixture(m.BaseModel):
+        """Fixture model mirroring the ``CommandExecutionResult`` JSON shape."""
+
+        command: list[str]
+        success: bool
+        exit_code: int
+        output: str
+        error: str
+        execution_time: float
+        timestamp: str
 
     @staticmethod
     @pytest.mark.parametrize(
@@ -179,7 +177,8 @@ class TestsFlextMeltanoExecutionResult:
             execution_time=execution_time,
         )
         json_str = result.model_dump_json()
-        parsed = TestsFlextMeltanoExecutionResultJsonModel.model_validate_json(json_str)
+        fixture = TestsFlextMeltanoExecutionResult.ExecutionResultJsonFixture
+        parsed = fixture.model_validate_json(json_str)
         tm.that(list(parsed.command), eq=list(command))
         tm.that(parsed.success, eq=success)
         tm.that(parsed.exit_code, eq=exit_code)
