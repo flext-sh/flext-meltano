@@ -117,9 +117,9 @@ class FlextMeltanoModelsResultsDbt:
             m.Field(description="Execution time in seconds"),
         ]
 
-        @staticmethod
         @m.computed_field
-        def timestamp() -> str:
+        @property
+        def timestamp(self) -> str:
             """ISO timestamp of when the result was generated.
 
             Returns:

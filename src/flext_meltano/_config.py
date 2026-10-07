@@ -4,7 +4,8 @@ Model-less: business rules live in ``config/*.yaml`` under the ``Meltano:`` key 
 are exposed through the open ``config.Meltano`` namespace (``extra="allow"``), with
 no per-domain model. Access is ``config.Meltano.<domain>[<key>...]``.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
@@ -14,7 +15,6 @@ from typing import Annotated, ClassVar
 
 from flext_cli import FlextCliConfig
 
-import flext_meltano._models._meltano_namespace
 from flext_core import FlextSettings
 from flext_meltano import m
 
@@ -32,11 +32,11 @@ class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     _instance: ClassVar[FlextMeltanoConfig | None] = None  # pyright: ignore[reportIncompatibleVariableOverride]
 
     Meltano: Annotated[
-        flext_meltano._models._meltano_namespace._MeltanoNamespace,
+        m.Meltano.MeltanoNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
         ),
-    ] = flext_meltano._models._meltano_namespace._MeltanoNamespace()
+    ] = m.Meltano.MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()

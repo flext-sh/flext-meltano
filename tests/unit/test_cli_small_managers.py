@@ -106,7 +106,6 @@ class TestsFlextMeltanoCliSmallManagers:
     @staticmethod
     def test_plugin_install_is_unsupported_and_reports_failure(
         meltano_cli: FlextMeltanoCli,
-        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test plugin install is unsupported and reports failure."""
         result = meltano_cli.run([
@@ -117,7 +116,7 @@ class TestsFlextMeltanoCliSmallManagers:
         ])
 
         tm.that(result.failure, eq=True)
-        tm.that(capsys.readouterr().out, has="not supported")
+        tm.that(result.error, has="not supported")
 
     @staticmethod
     def test_dbt_help_option_succeeds_and_prints_dbt_help(
