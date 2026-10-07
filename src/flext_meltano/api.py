@@ -22,7 +22,7 @@ from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
 from flext_meltano.services.meltano_plugins import FlextMeltanoComponentService
 from flext_meltano.services.meltano_project_sdk import FlextMeltanoProjectManager
 from flext_meltano.services.project_service import FlextMeltanoProjectService
-from flext_meltano.services.services import FlextMeltanoService
+from flext_meltano.services.service import FlextMeltanoService
 from flext_meltano.services.singer_catalog import FlextMeltanoSingerCatalogMixin
 from flext_meltano.services.singer_state import FlextMeltanoSingerStateMixin
 from flext_meltano.services.singer_tap import FlextMeltanoTapAbstractions

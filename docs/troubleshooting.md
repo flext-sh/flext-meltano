@@ -44,7 +44,7 @@ grep -r "import meltano\|from meltano" src/
 
 **Solution**: Use flext-meltano abstractions only
 
-```python
+```text
 # ❌ Incorrect
 
 # ✅ Correct
@@ -83,7 +83,7 @@ make check
 
 **Solution**: Fix type annotations
 
-```python
+```text
 from __future__ import annotations
 
 # Ensure proper type hints
@@ -216,7 +216,7 @@ make check
 
 **Problem**: Not using r for error handling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -242,7 +242,7 @@ def safe_operation() -> p.Result[m.Dict]:
 
 **Problem**: Not following flext-core service patterns
 
-```python
+```text
 from __future__ import annotations
 
 

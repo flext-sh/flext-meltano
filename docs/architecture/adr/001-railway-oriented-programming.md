@@ -6,6 +6,23 @@
 - [Decision](#decision)
 - [Rationale](#rationale)
   - [Why Railway-Oriented Programming](#why-railway-oriented-programming)
+  - [Why r\[T\] from flext-core](#why-rt-from-flext-core)
+- [Consequences](#consequences)
+  - [Positive](#positive)
+  - [Negative](#negative)
+  - [Risks](#risks)
+  - [Mitigation Strategies](#mitigation-strategies)
+- [Alternatives Considered](#alternatives-considered)
+  - [1. Traditional Exception Handling](#1-traditional-exception-handling)
+  - [2. Custom Result Type](#2-custom-result-type)
+  - [3. Async Exception Handling](#3-async-exception-handling)
+  - [4. Callback-Based Error Handling](#4-callback-based-error-handling)
+- [Implementation Details](#implementation-details)
+  - [Error Type Hierarchy](#error-type-hierarchy)
+  - [Railway Pattern Usage](#railway-pattern-usage)
+  - [Testing Error Scenarios](#testing-error-scenarios)
+- [Related ADRs](#related-adrs)
+- [Notes](#notes)
 
 <!-- TOC END -->
 
@@ -49,7 +66,7 @@ error handling throughout the entire codebase.
 
 **Composability**: Operations can be chained safely without exception handling clutter
 
-````python
+```text
 result = (
     service
     .discover_plugins()
@@ -57,16 +74,18 @@ result = (
     .map(lambda valid_plugins: service.install_plugins(valid_plugins))
 )
 ```
+
 **Type Safety**: Error types are preserved through the entire flow
 
-```python
+```text
 from __future__ import annotations
 
 
 def process_pipeline(settings: dict) -> p.Result[PipelineResult]:
     # Type checker knows result is either Success[PipelineResult] or Failure[Error]
     return r.ok(PipelineResult(...))
-    ```
+```
+
 **Clarity**: Error handling is explicit and visible in the code structure
 
 ### Why r[T] from flext-core
@@ -154,10 +173,11 @@ class PluginError(FlextMeltanoError):
 
 class PipelineError(FlextMeltanoError):
     """Pipeline execution errors."""
-    ```
+```
+
 ### Railway Pattern Usage
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -170,10 +190,11 @@ def create_and_run_pipeline(settings: PipelineConfig) -> p.Result[PipelineResult
         .flat_map(lambda installed: run_pipeline(installed, settings))
         .map(lambda result: PipelineResult.from_execution(result))
     )
-    ```
+```
+
 ### Testing Error Scenarios
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -188,7 +209,8 @@ def test_pipeline_failure_handling():
     assert result.failure
     assert isinstance(result.error_value, ConfigurationError)
     assert "invalid_param" in str(result.error_value)
-    ```
+```
+
 ## Related ADRs
 
 - [ADR-002](002-clean-architecture-ddd.md) - Clean Architecture patterns
@@ -215,4 +237,3 @@ def test_pipeline_failure_handling():
 - Error rates tracked via application metrics
 - Common error patterns identified for improvement
 - Error context preserved for debugging
-````

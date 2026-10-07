@@ -202,14 +202,14 @@ graph TD
 
 **flext-core Foundation**:
 
-```python
+```text
 
 ```
 
 **Type System Integration**:
 
 ```python
-from flext_meltano import FlextMeltanoTypes
+from flext_meltano import FlextMeltanoTypes, p
 
 # Comprehensive type system extending flext-core
 pipeline_config: FlextMeltanoTypes.ELT.PipelineConfig
@@ -221,13 +221,13 @@ result: p.Result[FlextMeltanoTypes.ELT.PipelineResult]
 
 **Current Status (Direct Imports)**:
 
-```python
+```text
 # ⚠️ ARCHITECTURE DEBT - Requires abstraction
 ```
 
 **Target Architecture (Abstracted)**:
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -245,7 +245,7 @@ class _MeltanoLibraryWrapper:
 
 ### **FlextMeltanoTypes Hierarchy**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -277,7 +277,7 @@ class FlextMeltanoTypes:
 
 ### **Pydantic Model Integration**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -304,7 +304,7 @@ class StreamDefinition(m.BaseModel):
 
 ### **r Pattern Implementation**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -330,7 +330,7 @@ def process_elt_pipeline(
 
 ### **Exception Hierarchy**
 
-```python
+```text
 from __future__ import annotations
 
 

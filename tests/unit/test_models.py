@@ -225,7 +225,7 @@ class TestsFlextMeltanoModelsUnit:
         stream = m.Meltano.StreamInfo(
             stream_name="users",
             stream_schema={"type": "object", "properties": "id"},
-            key_properties=["id"],
+            key_properties=("id",),
             stream_created_at="2025-01-01T00:00:00Z",
         )
         tap_config = m.Meltano.TapConfig(
@@ -263,7 +263,7 @@ class TestsFlextMeltanoModelsStreamInfo:
         stream = m.Meltano.StreamInfo(
             stream_name="orders",
             stream_schema={"type": "object", "properties": "id,order_date,amount"},
-            key_properties=["id"],
+            key_properties=("id",),
             replication_method="FULL_TABLE",
             replication_key="order_date",
             stream_created_at="2025-01-01T00:00:00Z",

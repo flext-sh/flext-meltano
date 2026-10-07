@@ -54,7 +54,7 @@ def meltano_execute_field(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture
-def test_meltano_project_dir() -> Generator[Path]:
+def meltano_project_dir() -> Generator[Path]:
     """Temporary Meltano project directory for testing.
 
     Yields:
@@ -131,7 +131,7 @@ def meltano_yml_config() -> t.JsonMapping:
 
 @pytest.fixture
 def meltano_project(
-    test_meltano_project_dir: Path,
+    meltano_project_dir: Path,
     meltano_yml_config: t.JsonMapping,
 ) -> t.Meltano.ProjectEnv:
     """Meltano project for testing.
@@ -139,12 +139,12 @@ def meltano_project(
     Returns:
         The resulting ``t.Meltano.ProjectEnv``.
     """
-    meltano_yml = test_meltano_project_dir / "pipeline.yml"
+    meltano_yml = meltano_project_dir / "pipeline.yml"
     u.Cli.yaml_dump(meltano_yml, meltano_yml_config)
     return {
         "name": "test-project",
-        "directory": test_meltano_project_dir,
-        "config_path": test_meltano_project_dir / "pipeline.yml",
+        "directory": meltano_project_dir,
+        "config_path": meltano_project_dir / "pipeline.yml",
         "description": "Test project for flext-meltano",
         "version": "1",
         "settings": meltano_yml_config,

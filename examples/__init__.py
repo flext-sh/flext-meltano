@@ -10,7 +10,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core import build_lazy_import_map, install_lazy_exports
+from flext_core import install_lazy_exports
 
 if TYPE_CHECKING:
     from examples.constants import ExamplesFlextMeltanoConstants, c
@@ -40,19 +40,26 @@ __all__: tuple[str, ...] = (
     "x",
 )
 
-_LAZY_IMPORTS = MappingProxyType(
-    build_lazy_import_map(
-        MappingProxyType({
-            ".constants": ("ExamplesFlextMeltanoConstants", "c"),
-            ".models": ("ExamplesFlextMeltanoModels", "m"),
-            ".protocols": ("ExamplesFlextMeltanoProtocols", "p"),
-            ".typings": ("ExamplesFlextMeltanoTypes", "t"),
-            ".utilities": ("ExamplesFlextMeltanoUtilities", "u"),
-            "flext_meltano": ("d", "e", "h", "r", "s", "x"),
-        }),
-        alias_groups=MappingProxyType({}),
-        sort_keys=False,
-    ),
+install_lazy_exports(
+    __name__,
+    globals(),
+    MappingProxyType({
+        "ExamplesFlextMeltanoConstants": ".constants",
+        "ExamplesFlextMeltanoModels": ".models",
+        "ExamplesFlextMeltanoProtocols": ".protocols",
+        "ExamplesFlextMeltanoTypes": ".typings",
+        "ExamplesFlextMeltanoUtilities": ".utilities",
+        "c": ".constants",
+        "d": "flext_meltano",
+        "e": "flext_meltano",
+        "h": "flext_meltano",
+        "m": ".models",
+        "p": ".protocols",
+        "r": "flext_meltano",
+        "s": "flext_meltano",
+        "t": ".typings",
+        "u": ".utilities",
+        "x": "flext_meltano",
+    }),
+    public_exports=__all__,
 )
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

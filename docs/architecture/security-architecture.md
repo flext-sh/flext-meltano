@@ -216,16 +216,18 @@ auth --> gateway: refreshed_tokens
 ```python
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 
 @dataclass
 class UserRole:
     """User role with associated permissions."""
 
     name: str
-    permissions: Set[str]
+    permissions: set[str]
     scope: str  # 'global', 'project', 'pipeline'
 
-    def has_permission(self, permission: str, resource: str) -> bool:
+    def has_permission(self, permission: str) -> bool:
         """Check if role has specific permission."""
         return permission in self.permissions
 
@@ -259,7 +261,7 @@ VIEWER_ROLE = UserRole(
 
 #### Attribute-Based Access Control (ABAC)
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -297,7 +299,7 @@ class ABACPolicy:
 
 ### Session Management
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -408,7 +410,7 @@ end note
 
 #### At-Rest Encryption
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -461,7 +463,7 @@ class DataEncryptor:
 
 #### In-Transit Encryption
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -493,7 +495,7 @@ class TLSConfig:
 
 ### Data Classification and Handling
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -620,7 +622,7 @@ end note
 
 #### API Gateway Security
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -766,7 +768,7 @@ end note
 
 ### Audit Logging Implementation
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -835,7 +837,7 @@ class SecurityAuditor:
 
 #### Data Privacy Controls
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -893,7 +895,7 @@ class DataPrivacyController:
 
 #### Audit and Reporting
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1029,7 +1031,7 @@ end note
 
 #### 1. Detection and Analysis
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1065,7 +1067,7 @@ class IncidentDetector:
 
 #### 2. Containment and Eradication
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1108,7 +1110,7 @@ class IncidentContainment:
 
 #### 3. Recovery and Lessons Learned
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -1184,7 +1186,7 @@ class IncidentRecovery:
 
 ### Security Health Dashboard
 
-```python
+```text
 from __future__ import annotations
 
 

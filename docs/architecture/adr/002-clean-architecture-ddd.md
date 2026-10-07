@@ -65,7 +65,7 @@ between:
 
 **Testability**: Business logic can be tested without external dependencies
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -78,7 +78,7 @@ def test_pipeline_validation():
 
 **Maintainability**: Changes to external systems don't affect business logic
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -187,7 +187,7 @@ src/flext_meltano/
 
 **API Layer → Application Layer**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -198,7 +198,7 @@ def create_pipeline(settings: dict) -> p.Result[Pipeline]:
 
 **Application Layer → Domain Layer**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -210,7 +210,7 @@ def create_pipeline(self, settings: dict) -> p.Result[Pipeline]:
 
 **Application Layer → Infrastructure Layer**
 
-```python
+```text
 from __future__ import annotations
 
 
@@ -221,7 +221,7 @@ def execute_pipeline(self, pipeline: Pipeline) -> p.Result[ExecutionResult]:
 
 ### Dependency Injection
 
-```python
+```text
 from __future__ import annotations
 
 
