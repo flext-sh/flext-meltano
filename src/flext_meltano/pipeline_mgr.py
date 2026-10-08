@@ -228,7 +228,7 @@ class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):
         if command_result.failure:
             return r[str].from_failure(command_result)
         execution_result = FlextMeltanoExecutor(
-            settings=settings,
+            runtime_settings=settings,
         ).execute_meltano_command(command_result.value)
         if execution_result.failure:
             return r[str].from_failure(execution_result)
