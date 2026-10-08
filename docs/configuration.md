@@ -15,7 +15,7 @@
   - [Singer Catalog Configuration](#singer-catalog-configuration)
 - [🛠️ dbt Configuration](#dbt-configuration)
   - [dbt Project Structure](#dbt-project-structure)
-  - [dbt Project Configuration (dbt\_project.yml)](#dbt-project-configuration-dbt_projectyml)
+  - [dbt Project Configuration (dbt_project.yml)](#dbt-project-configuration-dbt_projectyml)
   - [dbt Service Configuration](#dbt-service-configuration)
 - [🏗️ Pipeline Configuration](#pipeline-configuration)
   - [Complete ELT Pipeline](#complete-elt-pipeline)
