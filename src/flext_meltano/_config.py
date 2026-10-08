@@ -29,7 +29,7 @@ class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
     # both declarations; the family-wide diamond (FlextSettings, FlextCliConfig)
     # is the upstream owner shape, so the unsatisfiable invariant check is
     # admitted explicitly on this one line.
-    _instance: ClassVar[FlextMeltanoConfig | None] = None  # pyright: ignore[reportIncompatibleVariableOverride]
+    _instance: ClassVar[FlextMeltanoConfig | None] = None
 
     Meltano: Annotated[
         m.Meltano.MeltanoNamespace,
