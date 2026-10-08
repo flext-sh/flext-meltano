@@ -16,7 +16,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from importlib import metadata
 from io import StringIO
 from pathlib import Path
-from typing import override
+from typing import Annotated, override
 
 from flext_cli import cli
 
@@ -49,23 +49,13 @@ from flext_meltano import (
 class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
     """Base executor providing Meltano command execution with error handling."""
 
-    def __init__(
-        self,
-        settings: p.Settings | None = None,
-        *,
-        service_name: t.NonEmptyStr | None = None,
-        service_version: t.NonEmptyStr | None = None,
-    ) -> None:
-        """Bootstrap executor with canonical Meltano service kwargs.
-
-        Mirrors :class:`FlextMeltanoServiceBase.__init__` so static analysers see
-        ``settings`` as a valid kwarg through Pydantic-regenerated subclass init.
-        """
-        super().__init__(
-            runtime_settings=settings,
-            service_name=service_name or "FlextMeltanoExecutor",
-            service_version=service_version or c.Meltano.DEFAULT_SERVICE_VERSION,
-        )
+    service_name: Annotated[
+        t.NonEmptyStr,
+        u.Field(
+            default="FlextMeltanoExecutor",
+            description="Canonical Meltano executor service name",
+        ),
+    ] = "FlextMeltanoExecutor"
 
     @property
     def project_root(self) -> Path:

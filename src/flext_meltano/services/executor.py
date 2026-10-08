@@ -21,20 +21,6 @@ from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 class FlextMeltanoExecutor(FlextMeltanoExecutorBase):
     """Core executor providing Meltano command execution with error handling."""
 
-    def __init__(
-        self,
-        settings: p.Settings | None = None,
-        *,
-        service_name: t.NonEmptyStr | None = None,
-        service_version: t.NonEmptyStr | None = None,
-    ) -> None:
-        """Forward canonical Meltano service kwargs via ``FlextMeltanoExecutorBase``."""
-        super().__init__(
-            settings=settings,
-            service_name=service_name,
-            service_version=service_version,
-        )
-
     @staticmethod
     def create_cli_runner(args: t.StrSequence) -> p.Result[t.JsonMapping]:
         """Create CLI runner for command execution - static factory.
