@@ -51,10 +51,12 @@ class FlextMeltanoCli:
     def _register_version_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.VERSION,
-            help_text="Show the FLEXT Meltano version",
-            model_cls=m.Meltano.VersionInput,
-            handler=self._handle_version,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.CliCommand.VERSION,
+                help_text="Show the FLEXT Meltano version",
+                model_cls=m.Meltano.VersionInput,
+                handler=self._handle_version,
+            ),
         )
 
     def _handle_version(self, _model: m.Meltano.VersionInput) -> p.Result[str]:
@@ -67,17 +69,21 @@ class FlextMeltanoCli:
         )
         cli.register_result_command(
             status_group,
-            name="show",
-            help_text="Show Meltano runtime status",
-            model_cls=m.Meltano.StatusShowInput,
-            handler=self._handle_status_show,
+            route=m.Cli.ResultCommandRoute(
+                name="show",
+                help_text="Show Meltano runtime status",
+                model_cls=m.Meltano.StatusShowInput,
+                handler=self._handle_status_show,
+            ),
         )
         cli.register_result_command(
             status_group,
-            name=c.Meltano.ExecutorCommand.HEALTH,
-            help_text="Check Meltano service health",
-            model_cls=m.Meltano.StatusHealthInput,
-            handler=self._handle_status_health,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.ExecutorCommand.HEALTH,
+                help_text="Check Meltano service health",
+                model_cls=m.Meltano.StatusHealthInput,
+                handler=self._handle_status_health,
+            ),
         )
         cli.add_group(self._app, name=c.Meltano.CliCommand.STATUS, group=status_group)
 
@@ -101,10 +107,12 @@ class FlextMeltanoCli:
     def _register_tap_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.TAP,
-            help_text="Tap operations",
-            model_cls=m.Meltano.TapInput,
-            handler=self._handle_tap,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.CliCommand.TAP,
+                help_text="Tap operations",
+                model_cls=m.Meltano.TapInput,
+                handler=self._handle_tap,
+            ),
         )
 
     @staticmethod
@@ -116,10 +124,12 @@ class FlextMeltanoCli:
     def _register_target_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.TARGET,
-            help_text="Target operations",
-            model_cls=m.Meltano.TargetInput,
-            handler=self._handle_target,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.CliCommand.TARGET,
+                help_text="Target operations",
+                model_cls=m.Meltano.TargetInput,
+                handler=self._handle_target,
+            ),
         )
 
     @staticmethod
@@ -131,10 +141,12 @@ class FlextMeltanoCli:
     def _register_dbt_command(self) -> None:
         cli.register_result_command(
             self._app,
-            name=c.Meltano.CliCommand.DBT,
-            help_text="Run DBT subcommands",
-            model_cls=m.Meltano.DbtInput,
-            handler=self._handle_dbt,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.CliCommand.DBT,
+                help_text="Run DBT subcommands",
+                model_cls=m.Meltano.DbtInput,
+                handler=self._handle_dbt,
+            ),
         )
 
     def _handle_dbt(self, model: m.Meltano.DbtInput) -> p.Result[str]:
@@ -154,24 +166,30 @@ class FlextMeltanoCli:
         )
         cli.register_result_command(
             plugin_group,
-            name=c.Meltano.ExecutorCommand.LIST,
-            help_text="List discovered plugins",
-            model_cls=m.Meltano.PluginListInput,
-            handler=self._handle_plugin_list,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.ExecutorCommand.LIST,
+                help_text="List discovered plugins",
+                model_cls=m.Meltano.PluginListInput,
+                handler=self._handle_plugin_list,
+            ),
         )
         cli.register_result_command(
             plugin_group,
-            name=c.Meltano.ExecutorCommand.INFO,
-            help_text="Fetch information about a plugin",
-            model_cls=m.Meltano.PluginInfoInput,
-            handler=self._handle_plugin_info,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.ExecutorCommand.INFO,
+                help_text="Fetch information about a plugin",
+                model_cls=m.Meltano.PluginInfoInput,
+                handler=self._handle_plugin_info,
+            ),
         )
         cli.register_result_command(
             plugin_group,
-            name=c.Meltano.ExecutorCommand.INSTALL,
-            help_text="Install a plugin",
-            model_cls=m.Meltano.PluginInstallInput,
-            handler=self._handle_plugin_install,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.ExecutorCommand.INSTALL,
+                help_text="Install a plugin",
+                model_cls=m.Meltano.PluginInstallInput,
+                handler=self._handle_plugin_install,
+            ),
         )
         cli.add_group(self._app, name=c.Meltano.CliCommand.PLUGIN, group=plugin_group)
 
@@ -221,45 +239,57 @@ class FlextMeltanoCli:
         )
         cli.register_result_command(
             pipeline_group,
-            name=c.Meltano.PipelineCommand.CREATE,
-            help_text="Create a persisted pipeline",
-            model_cls=m.Meltano.PipelineCreateInput,
-            handler=self._handle_pipeline_create,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.PipelineCommand.CREATE,
+                help_text="Create a persisted pipeline",
+                model_cls=m.Meltano.PipelineCreateInput,
+                handler=self._handle_pipeline_create,
+            ),
         )
         cli.register_result_command(
             pipeline_group,
-            name=c.Meltano.PipelineCommand.RUN,
-            help_text="Run a persisted pipeline",
-            model_cls=m.Meltano.PipelineRunInput,
-            handler=self._handle_pipeline_run,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.PipelineCommand.RUN,
+                help_text="Run a persisted pipeline",
+                model_cls=m.Meltano.PipelineRunInput,
+                handler=self._handle_pipeline_run,
+            ),
         )
         cli.register_result_command(
             pipeline_group,
-            name=c.Meltano.PipelineCommand.LIST,
-            help_text="List persisted pipelines",
-            model_cls=m.Meltano.PipelineListInput,
-            handler=self._handle_pipeline_list,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.PipelineCommand.LIST,
+                help_text="List persisted pipelines",
+                model_cls=m.Meltano.PipelineListInput,
+                handler=self._handle_pipeline_list,
+            ),
         )
         cli.register_result_command(
             pipeline_group,
-            name=c.Meltano.PipelineCommand.STATUS,
-            help_text="Show pipeline status",
-            model_cls=m.Meltano.PipelineNameInput,
-            handler=self._handle_pipeline_status,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.PipelineCommand.STATUS,
+                help_text="Show pipeline status",
+                model_cls=m.Meltano.PipelineNameInput,
+                handler=self._handle_pipeline_status,
+            ),
         )
         cli.register_result_command(
             pipeline_group,
-            name=c.Meltano.PipelineCommand.STOP,
-            help_text="Stop a running pipeline",
-            model_cls=m.Meltano.PipelineNameInput,
-            handler=self._handle_pipeline_stop,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.PipelineCommand.STOP,
+                help_text="Stop a running pipeline",
+                model_cls=m.Meltano.PipelineNameInput,
+                handler=self._handle_pipeline_stop,
+            ),
         )
         cli.register_result_command(
             pipeline_group,
-            name=c.Meltano.PipelineCommand.DELETE,
-            help_text="Delete a persisted pipeline",
-            model_cls=m.Meltano.PipelineNameInput,
-            handler=self._handle_pipeline_delete,
+            route=m.Cli.ResultCommandRoute(
+                name=c.Meltano.PipelineCommand.DELETE,
+                help_text="Delete a persisted pipeline",
+                model_cls=m.Meltano.PipelineNameInput,
+                handler=self._handle_pipeline_delete,
+            ),
         )
         cli.add_group(
             self._app,
