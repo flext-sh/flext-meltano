@@ -100,7 +100,9 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         """
         executor = (
             FlextMeltanoExecutor(
-                settings=settings.model_copy(update={"project_root": project_dir}),
+                runtime_settings=settings.model_copy(
+                    update={"project_root": project_dir}
+                ),
             )
             if project_dir is not None
             else self._elt_executor

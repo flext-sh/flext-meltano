@@ -12,7 +12,7 @@ from __future__ import annotations
 # Why: upstream Meltano ships no type stubs for these modules; the fleet
 # stub-file rule forbids authoring stubs in-repo, so the untyped third-party
 # import is admitted explicitly and narrowly per module.
-from meltano.core.error import ProjectNotFound  # pyright: ignore[reportMissingTypeStubs]
+from meltano.core.error import ProjectNotFound
 
 from flext_meltano import c, m, p, r, t, u
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
