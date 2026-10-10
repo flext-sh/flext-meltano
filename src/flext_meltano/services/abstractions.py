@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext_meltano import c, e, m, p, r, t
+from flext_meltano import c, e, m, p, r, t, u
 from flext_meltano.services.abstractions_base import FlextMeltanoAbstractionsBase
 
 
@@ -215,7 +215,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
                 if entry_r.success:
                     streams.append(entry_r.value)
         catalog_model = m.Meltano.SingerCatalog(streams=tuple(streams))
-        catalog_payload = t.json_dict_adapter().validate_python(
+        catalog_payload = u.json_dict_adapter().validate_python(
             catalog_model.model_dump(mode="json", by_alias=True),
         )
         catalog: t.JsonDict = {

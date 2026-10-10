@@ -160,7 +160,7 @@ class FlextMeltanoUtilitiesSinger:
         raw_value: t.JsonValue = cli_u.Cli.json_loads(stripped).unwrap()
         if not isinstance(raw_value, dict):
             return r[bool].ok(value=True)
-        raw = t.json_dict_adapter().validate_python(raw_value)
+        raw = u.json_dict_adapter().validate_python(raw_value)
         return FlextMeltanoUtilitiesSinger._dispatch_singer_message(raw, handler)
 
     @staticmethod
