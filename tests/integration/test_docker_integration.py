@@ -58,17 +58,6 @@ class TestsFlextMeltanoDockerIntegration:
         )
 
     @staticmethod
-    def _is_transient_postgres_error(err_msg: str) -> bool:
-        """Return True for known transient PostgreSQL startup/connection errors."""
-        return (
-            "connection" in err_msg
-            or "closed" in err_msg
-            or "refused" in err_msg
-            or "timeout" in err_msg
-            or "starting up" in err_msg
-        )
-
-    @staticmethod
     @pytest.mark.docker
     @pytest.mark.integration
     def test_postgres_service_endpoint_is_published(
@@ -137,11 +126,7 @@ class TestsFlextMeltanoDockerIntegration:
     @pytest.mark.integration
     @pytest.mark.usefixtures("postgres_service")
     def test_postgres_round_trips_inserted_row(self) -> None:
-        """A row written to PostgreSQL is read back unchanged (real round-trip).
-
-        Raises:
-            Error: If a ``psycopg2.Error`` is caught.
-        """
+        """A row written to PostgreSQL is read back unchanged (real round-trip)."""
         conn: psycopg2.extensions.connection | None = None
         result = None
         try:
@@ -157,10 +142,6 @@ class TestsFlextMeltanoDockerIntegration:
                 )
                 result = cursor.fetchone()
                 cursor.execute("DROP TABLE test_table")
-        except psycopg2.Error as exc:
-            if self._is_transient_postgres_error(str(exc).lower()):
-                pytest.skip(f"PostgreSQL not ready for operations: {exc}")
-            raise
         finally:
             if conn is not None:
                 conn.close()

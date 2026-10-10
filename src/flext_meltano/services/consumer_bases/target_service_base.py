@@ -179,7 +179,7 @@ class FlextMeltanoTargetServiceBase(FlextMeltanoServiceBase, ABC):
         if sink_result.failure:
             return r[bool].from_failure(sink_result)
         try:
-            record_dict = t.json_dict_adapter().validate_python(record)
+            record_dict = u.json_dict_adapter().validate_python(record)
             empty_context: t.MutableJsonMapping = {}
             sink_result.value.process_record(record_dict, empty_context)
             return r[bool].ok(value=True)

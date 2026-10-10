@@ -90,7 +90,7 @@ class FlextMeltanoCli:
     def _handle_status_show(self, _model: m.Meltano.StatusShowInput) -> p.Result[str]:
         return self._service.run_cli([]).flat_map(
             lambda payload: u.Cli.json_dumps(
-                t.json_dict_adapter().validate_python(payload),
+                u.json_dict_adapter().validate_python(payload),
             ),
         )
 
@@ -100,7 +100,7 @@ class FlextMeltanoCli:
     ) -> p.Result[str]:
         return self._service.health().flat_map(
             lambda payload: u.Cli.json_dumps(
-                t.json_dict_adapter().validate_python(payload),
+                u.json_dict_adapter().validate_python(payload),
             ),
         )
 
@@ -204,7 +204,7 @@ class FlextMeltanoCli:
             .discover_plugins()
             .map(
                 lambda plugins: [
-                    t.json_dict_adapter().validate_python(plugin)
+                    u.json_dict_adapter().validate_python(plugin)
                     for plugin in plugins
                     if plugin_type is None or plugin.get("type") == plugin_type
                 ],
@@ -222,7 +222,7 @@ class FlextMeltanoCli:
             return r[str].fail("Plugin info requires a valid plugin type")
         return self._service.fetch_plugin_info(model.plugin_name, plugin_type).flat_map(
             lambda payload: u.Cli.json_dumps(
-                t.json_dict_adapter().validate_python(payload),
+                u.json_dict_adapter().validate_python(payload),
             ),
         )
 

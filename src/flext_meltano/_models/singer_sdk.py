@@ -31,10 +31,18 @@ class FlextMeltanoModelsSingerSdk:
     instead of importing singer_sdk directly.
     """
 
-    SingerTapBase = Tap
-    SingerSinkBase = Sink
-    SingerStreamBase = Stream
-    SingerTargetBase = Target
+    class SingerTapBase(Tap):
+        """Typed re-export: real nested class so mypy accepts it as a base."""
+
+    class SingerSinkBase(Sink):  # pyrefly: ignore -- abstract re-export base: consumers implement the singer_sdk abstract hooks
+        """Typed re-export base: real nested class so mypy accepts it as a base."""
+
+    class SingerStreamBase(Stream):  # pyrefly: ignore -- abstract re-export base: consumers implement the singer_sdk abstract hooks
+        """Typed re-export base: real nested class so mypy accepts it as a base."""
+
+    class SingerTargetBase(Target):
+        """Typed re-export: real nested class so mypy accepts it as a base."""
+
     type SingerContext = Context
     type SingerRecord = Record
     SingerArrayType = singer_sdk_typing.ArrayType

@@ -215,7 +215,7 @@ def docker_services(
     """
     result = docker_manager.execute()
     if result.failure:
-        pytest.skip(f"Docker stack unavailable: {result.error}")
+        pytest.fail("Docker stack setup failed after readiness")
     request.config.stash[_DOCKER_MANAGER_KEY] = docker_manager
     return docker_manager
 
