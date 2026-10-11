@@ -14,10 +14,9 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from flext_cli import r, u as cli_u
+from flext_cli import u
 
-from flext_core import e
-from flext_meltano import c, m, t
+from flext_meltano import c, e, m, r, t
 
 if TYPE_CHECKING:
     from flext_meltano import p
@@ -157,7 +156,7 @@ class FlextMeltanoUtilitiesSinger:
         stripped = line.strip()
         if not stripped:
             return r[bool].ok(value=True)
-        raw_value: t.JsonValue = cli_u.Cli.json_loads(stripped).unwrap()
+        raw_value: t.JsonValue = u.Cli.json_loads(stripped).unwrap()
         if not isinstance(raw_value, dict):
             return r[bool].ok(value=True)
         raw = u.json_dict_adapter().validate_python(raw_value)
