@@ -53,13 +53,18 @@ src/flext_meltano/
 
 ## Commands
 
-Run from the workspace root (selector-free; the root dispatcher routes to every
-member — `PROJECT=` is not a root Make variable):
+Run Meltano gates from the workspace root through its member Makefile, using the
+route documented in the parent's Build & Test section:
 
 ```bash
-make check
-make test
+make -f flext-meltano/Makefile check
+make -f flext-meltano/Makefile test
+make -f flext-meltano/Makefile build
 ```
+
+Root `make check` alone does not check Meltano. Attached Meltano uses the workspace's
+runtime environment; a standalone checkout or member worktree without a containing
+superproject owns its runtime environment and runs `make <verb>` from its own root.
 
 <!-- AIHUB-AGENTS-SCOPE-LOCAL-END -->
 

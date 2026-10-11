@@ -72,9 +72,9 @@ class TestsFlextMeltanoDeclarativeTap:
 
         catalog_result = u.Cli.json_loads(buffer.getvalue())
         tm.ok(catalog_result)
-        catalog = t.json_dict_adapter().validate_python(catalog_result.value)
-        streams = t.json_list_adapter().validate_python(catalog["streams"])
-        stream = t.json_dict_adapter().validate_python(streams[0])
+        catalog = u.json_dict_adapter().validate_python(catalog_result.value)
+        streams = u.json_list_adapter().validate_python(catalog["streams"])
+        stream = u.json_dict_adapter().validate_python(streams[0])
         tm.that(exit_code, eq=0)
         tm.that(stream["tap_stream_id"], eq="users")
         tm.that(stream["key_properties"], eq=["dn"])
@@ -93,7 +93,7 @@ class TestsFlextMeltanoDeclarativeTap:
             exit_code = instance.run_cli(["--config", str(config_path)], "tap-sample")
 
         messages: list[t.JsonMapping] = [
-            t.json_dict_adapter().validate_json(line)
+            u.json_dict_adapter().validate_json(line)
             for line in buffer.getvalue().splitlines()
         ]
         records = [

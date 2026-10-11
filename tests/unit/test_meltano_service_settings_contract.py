@@ -6,16 +6,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import pytest
+from pathlib import Path
 
-from flext_meltano import meltano, settings
-from tests import tm
+import pytest
+from flext_cli import config as cli_config
+
+from flext_meltano import FlextMeltanoConfig, config, m, meltano, settings
+from tests import tm, u
 
 pytestmark = pytest.mark.unit
 
 
 class TestsFlextMeltanoServiceSettingsContract:
     """Tests for the settings contract of ``FlextMeltanoServiceBase`` services."""
+
+    class YamlConfig(FlextMeltanoConfig):
+        """Real config subclass consuming the typed SSOT round-trip payload."""
 
     @staticmethod
     def test_facade_settings_resolve_project_settings() -> None:
@@ -24,3 +30,50 @@ class TestsFlextMeltanoServiceSettingsContract:
         resolved = meltano.settings
         tm.that(resolved, is_=type(settings))
         tm.that(resolved.model_dump(), eq=settings.model_dump())
+
+    @staticmethod
+    def test_config_has_frozen_per_subclass_identity() -> None:
+        """Public config access stays frozen and distinct from upstream settings."""
+        current = FlextMeltanoConfig.fetch_global()
+        assert current is config
+        assert FlextMeltanoConfig.fetch_global() is current
+        assert cli_config is not current
+        before = current.model_dump()
+        for field_name, value in before.items():
+            with pytest.raises(m.ValidationError, match="frozen_instance"):
+                setattr(current, field_name, value)
+        tm.that(current.model_dump(), eq=before)
+
+    @staticmethod
+    def test_adjustable_settings_do_not_change_config() -> None:
+        """Runtime settings can be adjusted without changing business-rule config."""
+        before = config.model_dump()
+        adjusted = settings.clone(debug=not settings.debug)
+        tm.that(adjusted.debug, eq=not settings.debug)
+        assert adjusted is not settings
+        assert FlextMeltanoConfig.fetch_global() is config
+        tm.that(config.model_dump(), eq=before)
+
+    @staticmethod
+    def test_config_fetch_global_loads_yaml_roundtrip(tmp_path: Path) -> None:
+        """A child config loads YAML independently without changing its parent."""
+        owner = TestsFlextMeltanoServiceSettingsContract.YamlConfig
+        namespace = config.Meltano.model_copy(
+            update={"lifecycle_probe": "yaml-roundtrip"},
+        )
+        expected = config.model_copy(update={"Meltano": namespace})
+        tm.ok(u.Cli.yaml_dump(tmp_path / "roundtrip.yaml", expected.model_dump()))
+        prefix = owner.__module__.split(".", 1)[0].upper()
+        with u.Tests.env_vars_context({f"{prefix}_CONFIG_DIR": str(tmp_path)}):
+            owner.reset_for_testing()
+            try:
+                loaded = owner.fetch_global()
+                assert loaded is owner.fetch_global()
+                assert loaded is not config
+                tm.that(loaded.model_dump(), eq=expected.model_dump())
+                for field_name, value in loaded.model_dump().items():
+                    with pytest.raises(m.ValidationError, match="frozen_instance"):
+                        setattr(loaded, field_name, value)
+            finally:
+                owner.reset_for_testing()
+        assert FlextMeltanoConfig.fetch_global() is config

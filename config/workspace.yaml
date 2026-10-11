@@ -22,4 +22,5 @@ repository:
   package: true
   editable: true
   read_only: false
+  examples_module: examples.simple_working
 members: []
