@@ -172,7 +172,7 @@ class FlextMeltanoModelsContext:
         namespace: Annotated[str, m.Field(description="Plugin namespace")]
         pip_url: Annotated[t.NonEmptyStr, m.Field(description="Plugin pip URL")]
         executable: Annotated[str, m.Field(description="Plugin executable")]
-        type: Annotated[str, m.Field(default="extractor", description="Plugin type")]
+        type: Annotated[str, m.Field(description="Plugin type")] = "extractor"
 
         @m.field_validator("name")
         @classmethod

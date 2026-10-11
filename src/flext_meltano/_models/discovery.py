@@ -30,7 +30,7 @@ class FlextMeltanoModelsDiscovery:
             default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
             description="Available plugin variants",
         )
-        logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
+        logo_url: Annotated[str, m.Field(description="Plugin logo URL")] = ""
         description: Annotated[
             str,
             m.Field(default="", description="Plugin description"),
@@ -85,7 +85,7 @@ class FlextMeltanoModelsDiscovery:
             str,
             m.Field(default="", description="Comma-separated variants"),
         ] = ""
-        logo_url: Annotated[str, m.Field(default="", description="Plugin logo URL")]
+        logo_url: Annotated[str, m.Field(description="Plugin logo URL")] = ""
         description: Annotated[
             str,
             m.Field(default="", description="Plugin description"),
