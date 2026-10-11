@@ -8,13 +8,54 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_meltano import meltano
-from flext_meltano.cli import FlextMeltanoCli
-from tests import tm
+from flext_meltano import FlextMeltano, FlextMeltanoCli, FlextMeltanoSettings, meltano
+from tests import c, tm, u
 
 
 class TestsFlextMeltanoExecutors:
     """Validate the public executor APIs through real Meltano execution paths."""
+
+    @staticmethod
+    def test_discovery_reads_real_project_plugins_without_resolving_parents(
+        tmp_path: Path,
+    ) -> None:
+        """Local discovery reads SDK plugin groups without a Hub or installed plugin."""
+        project = FlextMeltano.initialize_project_root(
+            tmp_path / "discovery-project",
+        ).unwrap()
+        executor = FlextMeltano(
+            runtime_settings=FlextMeltanoSettings.model_validate({
+                "Meltano": {"MELTANO_PROJECT_ROOT": str(project.root)},
+            }),
+        )
+        tm.that(executor.fetch_project_plugins(_cwd=project.root).unwrap(), empty=True)
+        plugin_cases = (
+            (c.Meltano.PluginType.EXTRACTORS.value, "tap-regression-unresolved"),
+            (c.Meltano.PluginType.LOADERS.value, "target-regression-unresolved"),
+        )
+        configuration = u.Cli.yaml_safe_load(project.meltanofile).unwrap()
+        u.Cli.yaml_dump(
+            project.meltanofile,
+            {
+                **configuration,
+                "plugins": {
+                    plugin_type: [{"name": plugin_name}]
+                    for plugin_type, plugin_name in plugin_cases
+                },
+            },
+        ).unwrap()
+
+        discovered = executor.fetch_project_plugins(_cwd=project.root).unwrap()
+        tm.that(
+            {(plugin["type"], plugin["name"]) for plugin in discovered},
+            eq=set(plugin_cases),
+        )
+        for plugin_type, plugin_name in plugin_cases:
+            filtered = executor.fetch_project_plugins(
+                plugin_type=plugin_type,
+                _cwd=project.root,
+            ).unwrap()
+            tm.that([item["name"] for item in filtered], eq=[plugin_name])
 
     @staticmethod
     def test_executor_initialization() -> None:

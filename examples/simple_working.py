@@ -24,7 +24,12 @@ logger = u.fetch_logger(__name__)
 def serialization_example() -> None:
     """Exercise public serialization against the actual JSON Schema consumer."""
     marker = "serialization-input-marker"
-    connection = {"password": marker, "display_name": "serialization-consumer"}
+    connection = {
+        "password": marker,
+        "display_name": "serialization-consumer",
+        "database": {"password": marker, "name": "serialization-consumer"},
+        "options": [{"token": marker, "enabled": True}],
+    }
     tap = m.Meltano.TapConfig.model_validate({
         "tap_type": "tap-serialization-consumer",
         "connection_config": connection,
@@ -47,8 +52,26 @@ def serialization_example() -> None:
             if exported["display_name"] != connection["display_name"]:
                 msg = "Serialization changed a non-sensitive input"
                 raise ValueError(msg)
+            database = adapter.validate_python(exported["database"])
+            options = u.type_adapter(TypeForm(t.JsonValue)).validate_python(
+                exported["options"]
+            )
+            if database["password"] == marker:
+                msg = "Serialized nested configuration exposed sensitive input"
+                raise ValueError(msg)
+            if not isinstance(options, list) or not options:
+                msg = "Serialization changed a configuration list"
+                raise ValueError(msg)
+            option = adapter.validate_python(options[0])
+            if option["token"] == marker or option["enabled"] is not True:
+                msg = "Serialized configuration list violated its contract"
+                raise ValueError(msg)
         if config.connection_config["password"] != marker:
             msg = "Serialization mutated the original connection configuration"
+            raise ValueError(msg)
+        original_database = adapter.validate_python(config.connection_config["database"])
+        if original_database["password"] != marker:
+            msg = "Serialization mutated a retained nested configuration"
             raise ValueError(msg)
     stream = m.Meltano.StreamDefinition.model_validate({
         "stream_name": "serialization-consumer",
@@ -72,9 +95,9 @@ def serialization_example() -> None:
 def simple_api_example() -> None:
     """Demonstrate the public Meltano facade."""
     version = meltano.fetch_version().unwrap()
-    logger.info("Meltano version: %s", version)
+    logger.info("Meltano version", version=version)
     plugins = meltano.discover_installed_plugins().unwrap()
-    logger.info("Found %s installed plugins", len(plugins))
+    logger.info("Installed plugins discovered", count=len(plugins))
 
 
 def simple_component_example() -> None:
@@ -82,9 +105,9 @@ def simple_component_example() -> None:
     tap = meltano.tap("tap-csv").unwrap()
     target = meltano.target("target-jsonl").unwrap()
     dbt = meltano.dbt("analytics").unwrap()
-    logger.info("Tap source: %s", tap.source_name)
-    logger.info("Target sink: %s", target.sink_name)
-    logger.info("DBT transformation: %s", dbt.transformation_name)
+    logger.info("Tap source", name=tap.source_name)
+    logger.info("Target sink", name=target.sink_name)
+    logger.info("DBT transformation", name=dbt.transformation_name)
 
 
 def simple_runtime_example() -> None:
@@ -96,18 +119,18 @@ def simple_runtime_example() -> None:
     if not command.success or command.exit_code != 0:
         msg = "The actual Meltano runtime command failed"
         raise RuntimeError(msg)
-    logger.info("Runtime command result: %s", command.model_dump(mode="python"))
+    logger.info("Runtime command result", result=command.model_dump(mode="python"))
 
 
 def simple_config_example() -> None:
     """Demonstrate typed settings through the public facade."""
     typed_settings = FlextMeltanoSettings.fetch_global()
     logger.info(
-        "Config created: project_root=%s, config_dir=%s",
-        typed_settings.Meltano.project_root,
-        typed_settings.Meltano.config_dir,
+        "Config created",
+        project_root=typed_settings.Meltano.project_root,
+        config_dir=typed_settings.Meltano.config_dir,
     )
-    logger.info("Environment: %s", typed_settings.Meltano.environment)
+    logger.info("Environment", environment=typed_settings.Meltano.environment)
 
 
 def run_examples() -> None:

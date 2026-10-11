@@ -1,20 +1,21 @@
 """Behavioral tests for the Meltano models public contract.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
+from collections.abc import MutableMapping
+from operator import methodcaller
 from pathlib import Path
 from types import MappingProxyType
 
 import pytest
+from jsonschema import Draft202012Validator
+from jsonschema.protocols import Validator
 
-from tests import c, m, tm
+from tests import c, m, t, tm
 
 
 class TestsFlextMeltanoModelsUnit:
@@ -60,7 +61,10 @@ class TestsFlextMeltanoModelsUnit:
         tm.that(settings.tap_type, eq="tap-postgres")
         tm.that(settings.connection_config, eq={"host": "localhost"})
         tm.that(settings.stream_config, empty=True)
-        tm.that(settings.tap_version, eq="latest")
+        tm.that(
+            settings.tap_version,
+            eq=m.Meltano.TapConfig.model_fields["tap_version"].default,
+        )
 
     @staticmethod
     def test_tap_config_retains_full_supplied_state() -> None:
@@ -142,9 +146,18 @@ class TestsFlextMeltanoModelsUnit:
         settings = m.Meltano.TargetConfig(target_type="target-csv")
         tm.that(settings.target_type, eq="target-csv")
         tm.that(settings.connection_config, empty=True)
-        tm.that(settings.batch_size, none=True)
-        tm.that(settings.batch_wait_limit, none=True)
-        tm.that(settings.target_version, eq="latest")
+        tm.that(
+            settings.batch_size,
+            eq=m.Meltano.TargetConfig.model_fields["batch_size"].default,
+        )
+        tm.that(
+            settings.batch_wait_limit,
+            eq=m.Meltano.TargetConfig.model_fields["batch_wait_limit"].default,
+        )
+        tm.that(
+            settings.target_version,
+            eq=m.Meltano.TargetConfig.model_fields["target_version"].default,
+        )
 
     @staticmethod
     def test_target_config_retains_full_supplied_state() -> None:
@@ -217,8 +230,106 @@ class TestsFlextMeltanoModelsUnit:
         )
         tm.that(tap_config.connection_config["host"], eq="source.db.com")
         tm.that(target_config.connection_config["host"], eq="target.db.com")
-        tm.that(tap_config.tap_identifier, eq="tap-postgres:latest")
-        tm.that(target_config.target_identifier, eq="target-postgres:latest")
+        tm.that(
+            tap_config.tap_identifier,
+            eq=f"{tap_config.tap_type}:{tap_config.tap_version}",
+        )
+        tm.that(
+            target_config.target_identifier,
+            eq=f"{target_config.target_type}:{target_config.target_version}",
+        )
+
+    @staticmethod
+    def test_connection_serialization_redacts_without_mutating_inputs() -> None:
+        """Public dumps redact secrets while preserving supplied non-sensitive data."""
+        marker = "serialization-input-marker"
+        database: t.JsonDict = {"password": marker, "name": "analytics"}
+        option: t.JsonDict = {"token": marker, "label": "nested-option"}
+        connection: t.JsonDict = {
+            "password": marker,
+            "api_token": marker,
+            "display_name": "serialization-consumer",
+            "database": database,
+            "options": [option],
+        }
+        configs = (
+            m.Meltano.TapConfig(
+                tap_type="tap-serialization-consumer",
+                connection_config=connection,
+            ),
+            m.Meltano.TargetConfig(
+                target_type="target-serialization-consumer",
+                connection_config=connection,
+            ),
+            m.Meltano.DataSourceConfig(
+                source_type="serialization-consumer",
+                connection_config=connection,
+            ),
+        )
+        for config in configs:
+            payloads = (
+                t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                    config.model_dump(mode="json"),
+                ),
+                t.Cli.JSON_MAPPING_ADAPTER.validate_json(config.model_dump_json()),
+            )
+            for payload in payloads:
+                exported = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                    payload["connection_config"],
+                )
+                tm.that(exported["display_name"], eq=connection["display_name"])
+                assert marker not in exported.values()
+                exported_database = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                    exported["database"],
+                )
+                assert exported_database["password"] != marker
+                tm.that(exported_database["name"], eq=database["name"])
+                exported_options = exported["options"]
+                assert isinstance(exported_options, list)
+                exported_option = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                    exported_options[0],
+                )
+                assert exported_option["token"] != marker
+                tm.that(exported_option["label"], eq=option["label"])
+            tm.that(config.connection_config, eq=connection)
+        tm.that(connection["password"], eq=marker)
+        tm.that(connection["api_token"], eq=marker)
+        tm.that(database["password"], eq=marker)
+        tm.that(option["token"], eq=marker)
+
+    @staticmethod
+    @pytest.mark.parametrize("supplied", [False, True])
+    def test_readonly_stream_config_serialization_roundtrip(supplied: bool) -> None:
+        """Exporting default or supplied stream mappings keeps their readonly state."""
+        stream_input: t.JsonDict = {"users": "public"}
+        payload: t.JsonDict = {"connection_config": {"host": "source.example"}}
+        if supplied:
+            payload["stream_config"] = stream_input
+        configs = (
+            m.Meltano.TapConfig.model_validate({
+                **payload,
+                "tap_type": "tap-serialization-consumer",
+            }),
+            m.Meltano.DataSourceConfig.model_validate({
+                **payload,
+                "source_type": "serialization-consumer",
+            }),
+        )
+        for config in configs:
+            original = dict(config.stream_config)
+            exported = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                config.model_dump(mode="json")["stream_config"],
+            )
+            tm.that(exported, eq=original)
+            restored = type(config).model_validate_json(
+                config.model_dump_json(round_trip=True),
+            )
+            for stream_config in (config.stream_config, restored.stream_config):
+                assert not isinstance(stream_config, MutableMapping)
+                with pytest.raises(AttributeError, match="update"):
+                    methodcaller("update", {"users": "changed"})(stream_config)
+                tm.that(stream_config, eq=original)
+        tm.that(stream_input, eq={"users": "public"})
 
     @staticmethod
     def test_stream_name_maps_into_tap_stream_config() -> None:
@@ -240,6 +351,37 @@ class TestsFlextMeltanoModelsUnit:
 
 class TestsFlextMeltanoModelsStreamInfo:
     """StreamInfo model contract tests."""
+
+    @staticmethod
+    def test_stream_definition_exports_a_schema_for_real_record_validation() -> None:
+        """The exported schema accepts integer IDs and rejects protocol violations."""
+        schema_input: t.JsonDict = {
+            "properties": {"id": {"type": "integer"}},
+            "required": ["id"],
+        }
+        stream = m.Meltano.StreamDefinition(
+            stream_name="serialization-consumer",
+            source_type="serialization-consumer",
+            stream_schema=schema_input,
+        )
+        payloads = (
+            t.Cli.JSON_MAPPING_ADAPTER.validate_python(stream.model_dump(mode="json")),
+            t.Cli.JSON_MAPPING_ADAPTER.validate_json(stream.model_dump_json()),
+        )
+        validators: t.MutableSequenceOf[Validator] = []
+        for payload in payloads:
+            schema = t.Cli.JSON_MAPPING_ADAPTER.validate_python(
+                payload["stream_schema"],
+            )
+            Draft202012Validator.check_schema(schema)
+            validators.append(Draft202012Validator(schema))
+        for validator in validators:
+            validator.validate({"id": 1})
+            assert not validator.is_valid({"id": "not-an-integer"})
+            assert not validator.is_valid({})
+            assert not validator.is_valid([{"id": 1}])
+        tm.that(stream.stream_schema, eq=schema_input)
+        assert "type" not in schema_input
 
     # ---- StreamInfo --------------------------------------------------------
 

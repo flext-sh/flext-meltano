@@ -48,10 +48,22 @@ class FlextMeltanoModelsCore:
             normalized = u.normalize(k, case="lower")
             return any(sensitive_key in normalized for sensitive_key in sensitive_keys)
 
-        protected: t.MutableFlatContainerMapping = {}
-        for key, item in value.items():
-            protected[key] = "[PROTECTED]" if is_sensitive(key) else item
-        return protected
+        def redact(item: t.JsonValue) -> t.JsonValue:
+            match item:
+                case dict():
+                    return {
+                        key: "[PROTECTED]" if is_sensitive(key) else redact(nested)
+                        for key, nested in item.items()
+                    }
+                case list():
+                    return [redact(nested) for nested in item]
+                case _:
+                    return item
+
+        return {
+            key: "[PROTECTED]" if is_sensitive(key) else redact(item)
+            for key, item in value.items()
+        }
 
     @staticmethod
     def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
