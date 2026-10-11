@@ -13,9 +13,8 @@ from pathlib import Path
 from types import MappingProxyType
 
 import pytest
-from flext_tests import tm
 
-from tests import c, m
+from tests import c, m, tm
 
 
 class TestsFlextMeltanoModelsUnit:

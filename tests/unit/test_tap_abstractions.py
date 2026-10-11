@@ -8,11 +8,9 @@ from __future__ import annotations
 
 import tempfile
 
-from flext_tests import tm
-
 from flext_core import r
 from flext_meltano import FlextMeltanoAbstractions
-from tests import c, m, t
+from tests import c, m, t, tm
 
 
 class TestsFlextMeltanoAbstractionsComplete:

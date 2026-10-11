@@ -7,10 +7,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import tm
 
 from flext_meltano import meltano
-from tests import c
+from tests import c, tm
 
 pytestmark = pytest.mark.unit
 
