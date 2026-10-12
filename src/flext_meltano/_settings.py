@@ -13,7 +13,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
-from flext_core import FlextSettings, c, m
+from flext_core import FlextSettings, m
+from flext_meltano._constants.settings import FlextMeltanoConstantsSettings
 
 
 class FlextMeltanoSettings(FlextSettings):
@@ -101,12 +102,16 @@ class FlextMeltanoSettings(FlextSettings):
         @classmethod
         def _validate_environment(cls, value: str) -> str:
             normalized = value.strip().lower()
-            aliased = c.Meltano.ENVIRONMENT_ALIASES.get(normalized)
+            aliased = FlextMeltanoConstantsSettings.ENVIRONMENT_ALIASES.get(normalized)
             if aliased is not None:
                 return str(aliased.value)
-            if normalized in {env.value for env in c.Meltano.SETTINGS_ENVIRONMENTS}:
+            if normalized in {
+                env.value for env in FlextMeltanoConstantsSettings.SETTINGS_ENVIRONMENTS
+            }:
                 return normalized
-            allowed = ", ".join(env.value for env in c.Meltano.SETTINGS_ENVIRONMENTS)
+            allowed = ", ".join(
+                env.value for env in FlextMeltanoConstantsSettings.SETTINGS_ENVIRONMENTS
+            )
             msg = f"Environment must be one of: {allowed}"
             raise ValueError(msg)
 
