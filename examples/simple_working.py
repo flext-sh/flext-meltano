@@ -22,7 +22,17 @@ logger = u.fetch_logger(__name__)
 
 
 def serialization_example() -> None:
-    """Exercise public serialization against the actual JSON Schema consumer."""
+    """Exercise public serialization against the actual JSON Schema consumer.
+
+    Raises:
+        ValueError: If Serialization mutated the original connection configuration; or
+            if Serialization mutated a
+            retained nested configuration; or if Serialized connection configuration
+            exposed sensitive input; or if Serialization changed a non-sensitive input;
+            or if Serialized nested configuration exposed sensitive input; or if
+            Serialization changed a configuration list; or if Serialized configuration
+            list violated its contract.
+    """
     marker = "serialization-input-marker"
     connection = {
         "password": marker,
@@ -75,6 +85,18 @@ def serialization_example() -> None:
         if original_database["password"] != marker:
             msg = "Serialization mutated a retained nested configuration"
             raise ValueError(msg)
+    schema_serialization_example()
+    logger.info("Public serialization and JSON Schema consumer validated")
+
+
+def schema_serialization_example() -> None:
+    """Exercise the exported stream schema with the actual JSON Schema validator.
+
+    Raises:
+        ValueError: The serialized schema accepted an invalid record.
+
+    """
+    adapter = u.type_adapter(TypeForm(t.JsonMapping))
     stream = m.Meltano.StreamDefinition.model_validate({
         "stream_name": "serialization-consumer",
         "source_type": "serialization-consumer",
@@ -91,7 +113,6 @@ def serialization_example() -> None:
     if validator.is_valid({"id": "not-an-integer"}):
         msg = "Serialized schema accepted an invalid record"
         raise ValueError(msg)
-    logger.info("Public serialization and JSON Schema consumer validated")
 
 
 def simple_api_example() -> None:
@@ -113,7 +134,11 @@ def simple_component_example() -> None:
 
 
 def simple_runtime_example() -> None:
-    """Demonstrate the public runtime command surface."""
+    """Demonstrate the public runtime command surface.
+
+    Raises:
+        RuntimeError: If The actual Meltano runtime command failed.
+    """
     command = meltano.execute_meltano_command([
         c.Meltano.CMD_BINARY,
         c.Meltano.CMD_VERSION_OPTION,

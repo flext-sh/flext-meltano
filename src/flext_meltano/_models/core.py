@@ -101,7 +101,11 @@ class FlextMeltanoModelsCore:
         @u.field_serializer("stream_config", check_fields=False)
         @staticmethod
         def serialize_stream_config(value: t.FlatContainerMapping) -> t.JsonDict:
-            """Export readonly stream mappings without changing their stored values."""
+            """Export readonly stream mappings without changing their stored values.
+
+            Returns:
+                The resulting ``t.JsonDict``.
+            """
             return dict(value)
 
     class StringListValue(m.ArbitraryTypesModel):
