@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping
 from contextlib import redirect_stderr, redirect_stdout
 from importlib import metadata
 from io import StringIO

@@ -69,7 +69,9 @@ def serialization_example() -> None:
         if config.connection_config["password"] != marker:
             msg = "Serialization mutated the original connection configuration"
             raise ValueError(msg)
-        original_database = adapter.validate_python(config.connection_config["database"])
+        original_database = adapter.validate_python(
+            config.connection_config["database"]
+        )
         if original_database["password"] != marker:
             msg = "Serialization mutated a retained nested configuration"
             raise ValueError(msg)
