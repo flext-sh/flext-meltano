@@ -13,20 +13,20 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from flext_cli import FlextCliConfig
+from flext_cli import FlextCliConfig, m
 
-from flext_meltano import m
+from flext_meltano._models.config import FlextMeltanoModelsConfig
 
 
 class FlextMeltanoConfig(FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
     Meltano: Annotated[
-        m.Meltano.MeltanoNamespace,
+        FlextMeltanoModelsConfig.MeltanoNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
         ),
-    ] = m.Meltano.MeltanoNamespace()
+    ] = FlextMeltanoModelsConfig.MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()
