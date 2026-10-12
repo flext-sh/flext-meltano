@@ -43,8 +43,8 @@ class TestsFlextMeltanoSingerTypes:
     @staticmethod
     def test_facade_composes_meltano_and_tests_type_surfaces() -> None:
         """The facade composes both the Meltano and flext-tests type systems."""
-        assert FlextMeltanoTypes in t.__mro__
-        assert FlextTestsTypes in t.__mro__
+        assert issubclass(t, FlextMeltanoTypes)
+        assert issubclass(t, FlextTestsTypes)
 
     @staticmethod
     def test_meltano_namespace_composes_singer_surface() -> None:
