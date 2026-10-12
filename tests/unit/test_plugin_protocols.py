@@ -5,9 +5,6 @@ models (validation, defaults, aliasing, roundtrip, error paths) plus the
 canonical t.JsonMapping plugin-definition contract. No private attributes,
 collaborators, or internal data structures are asserted.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

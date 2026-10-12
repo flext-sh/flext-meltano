@@ -2,9 +2,6 @@
 
 Provides Pydantic models for data pipeline operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -13,8 +10,8 @@ from __future__ import annotations
 
 from flext_cli import FlextCliModels
 
+from flext_meltano._models import FlextMeltanoModelsCliInputs
 from flext_meltano._models.base import FlextMeltanoModelsBase
-from flext_meltano._models.cli_inputs import FlextMeltanoModelsCliInputs
 from flext_meltano._models.cli_params import FlextMeltanoModelsCliParams
 from flext_meltano._models.config import FlextMeltanoModelsConfig
 from flext_meltano._models.context import FlextMeltanoModelsContext

@@ -7,9 +7,6 @@ instance with FLEXT service patterns (``r[T]``, typed settings, lifecycle).
 
 Consumer projects inherit this and override ``create_tap_instance()`` only.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -21,7 +18,7 @@ from abc import ABC, abstractmethod
 from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano.services.declarative_tap import FlextMeltanoDeclarativeTap
+from flext_meltano.services import FlextMeltanoDeclarativeTap
 
 
 class FlextMeltanoTapServiceBase(FlextMeltanoServiceBase, ABC):

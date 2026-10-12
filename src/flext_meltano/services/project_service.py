@@ -1,8 +1,5 @@
 """FLEXT Pipeline Project Service - Enterprise project management foundation.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -24,8 +21,7 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.validators import FlextMeltanoValidators
+from flext_meltano.services import FlextMeltanoAbstractions, FlextMeltanoValidators
 
 
 class FlextMeltanoProjectService(FlextMeltanoServiceBase):

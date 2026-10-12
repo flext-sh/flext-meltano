@@ -3,9 +3,6 @@
 This module provides the FlextMeltanoBridge class for JSON-based communication
 between Go and Python components using the imported Meltano runtime.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

@@ -4,9 +4,6 @@ Composed into ``FlextMeltano`` via MRO so ``flext-(tap|target|dbt)-*`` projects
 subclass ``meltano.Tap`` / ``meltano.Target`` / ``meltano.Dbt`` and never import a
 private ``consumer_bases`` module.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -15,13 +12,9 @@ from __future__ import annotations
 
 from abc import ABC
 
-from flext_meltano.services.consumer_bases.dbt_service_base import (
+from flext_meltano.services.consumer_bases import (
     FlextMeltanoDbtServiceBase,
-)
-from flext_meltano.services.consumer_bases.tap_service_base import (
     FlextMeltanoTapServiceBase,
-)
-from flext_meltano.services.consumer_bases.target_service_base import (
     FlextMeltanoTargetServiceBase,
 )
 

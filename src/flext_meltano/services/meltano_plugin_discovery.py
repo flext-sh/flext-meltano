@@ -1,8 +1,5 @@
 """Plugin discovery operations for FlextMeltanoComponentService.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -10,8 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.project_service import FlextMeltanoProjectService
+from flext_meltano.services import FlextMeltanoAbstractions, FlextMeltanoProjectService
 
 
 class FlextMeltanoPluginDiscoveryMixin(FlextMeltanoServiceBase):

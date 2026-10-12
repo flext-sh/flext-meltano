@@ -5,9 +5,6 @@ exposed through ``t`` (``TestsFlextMeltanoTypes``): MRO composition of the
 Singer surface, the exposed ``t.Meltano`` type aliases, their resolved values,
 and stable/idempotent access. No private access, no mocks, no I/O.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

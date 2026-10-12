@@ -7,9 +7,6 @@ Assertions target public behavior only: fixture endpoints, the `r[T]` outcome
 of stack operations (`execute`/`down`/`ready`), and real data round-trips
 through each service. No stack internals are inspected.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

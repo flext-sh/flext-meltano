@@ -1,8 +1,5 @@
 """FLEXT Meltano Library Runner - Unified library runner for Meltano operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -12,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flext_meltano import FlextMeltanoServiceBase, c, p, r, settings, t, u
-from flext_meltano.services.executor import FlextMeltanoExecutor
+from flext_meltano.services import FlextMeltanoExecutor
 
 if TYPE_CHECKING:
     from pathlib import Path

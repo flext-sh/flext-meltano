@@ -1,8 +1,5 @@
 """FLEXT Meltano typings - Singer protocol types.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -27,7 +24,10 @@ class FlextMeltanoTypingsSinger:
 
     # Singer SDK wire-format schema — the tap-facing runtime class for
     # isinstance and schema construction (flext-meltano owns singer_sdk).
-    SingerSchema = singer_sdk_singerlib.Schema
+    # Explicit ``TypeAlias`` keeps it usable in type position for the static
+    # checkers while the runtime binding stays the real ``Schema`` class, so
+    # consumer ``isinstance``/construction keep working.
+    type SingerSchema = singer_sdk_singerlib.Schema
 
     # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
     SingerArrayType = singer_sdk_typing.ArrayType

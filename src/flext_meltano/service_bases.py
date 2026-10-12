@@ -3,25 +3,15 @@
 Consumer packages import these from ``flext_meltano`` (package root ABI).
 Implementations live under ``flext_meltano.services.consumer_bases``.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
-from flext_meltano.services.consumer_bases.dbt_service_base import (
-    FlextMeltanoDbtServiceBase,
-)
-from flext_meltano.services.consumer_bases.tap_service_base import (
-    FlextMeltanoTapServiceBase,
-)
-from flext_meltano.services.consumer_bases.target_service_base import (
-    FlextMeltanoTargetServiceBase,
-)
-from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
+from types import MappingProxyType
+
+from flext_core.lazy import install_lazy_exports
 
 __all__: list[str] = [
     "FlextMeltanoDbtServiceBase",
@@ -29,3 +19,21 @@ __all__: list[str] = [
     "FlextMeltanoTapServiceBase",
     "FlextMeltanoTargetServiceBase",
 ]
+
+install_lazy_exports(
+    __name__,
+    globals(),
+    MappingProxyType({
+        "FlextMeltanoDbtServiceBase": (
+            "flext_meltano.services.consumer_bases.dbt_service_base"
+        ),
+        "FlextMeltanoLibraryRunner": "flext_meltano.services",
+        "FlextMeltanoTapServiceBase": (
+            "flext_meltano.services.consumer_bases.tap_service_base"
+        ),
+        "FlextMeltanoTargetServiceBase": (
+            "flext_meltano.services.consumer_bases.target_service_base"
+        ),
+    }),
+    public_exports=__all__,
+)

@@ -1,8 +1,5 @@
 """FLEXT Pipeline Abstractions - Base class with in-process Meltano operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -13,8 +10,16 @@ from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano._settings import FlextMeltanoSettings
+from flext_meltano import (
+    FlextMeltanoServiceBase,
+    FlextMeltanoSettings,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
 from flext_meltano.services.executor_base import FlextMeltanoExecutorBase
 
 

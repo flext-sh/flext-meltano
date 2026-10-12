@@ -4,9 +4,6 @@ Provides dbt project management, model/test execution, manifest parsing,
 and CLI dispatch via MRO. Consumer dbt projects override
 ``connection_profile`` only.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -19,7 +16,7 @@ from pathlib import Path
 from typing import Annotated, override
 
 from flext_meltano import FlextMeltanoServiceBase, c, m, p, r, t, u
-from flext_meltano.services.executor import FlextMeltanoExecutor
+from flext_meltano.services import FlextMeltanoExecutor
 
 
 class FlextMeltanoDbtServiceBase(FlextMeltanoServiceBase, ABC):

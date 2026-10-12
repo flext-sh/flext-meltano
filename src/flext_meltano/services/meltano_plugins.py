@@ -1,8 +1,5 @@
 """FLEXT Pipeline Component Service - Single unified class for component operations.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
@@ -12,8 +9,8 @@ from __future__ import annotations
 from typing import override
 
 from flext_meltano import c, p, r, settings, t
-from flext_meltano.services.abstractions import FlextMeltanoAbstractions
-from flext_meltano.services.meltano_plugin_discovery import (
+from flext_meltano.services import (
+    FlextMeltanoAbstractions,
     FlextMeltanoPluginDiscoveryMixin,
 )
 

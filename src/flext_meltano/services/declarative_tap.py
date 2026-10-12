@@ -5,9 +5,6 @@ into a real ``singer_sdk`` tap with a working flat Singer CLI. Consumer tap
 projects declare streams as data and fetch records with their own domain library;
 they never import ``singer_sdk`` — this module is the single place that does.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

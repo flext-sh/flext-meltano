@@ -27,7 +27,7 @@ from flext_meltano import (
     t,
     u,
 )
-from flext_meltano.services.executor import FlextMeltanoExecutor
+from flext_meltano.services import FlextMeltanoExecutor
 
 
 class FlextMeltanoPipelineManager(FlextMeltanoServiceBase):

@@ -4,9 +4,6 @@ Strict, dependency-free leaf: stdlib + pydantic + pydantic-settings + the public
 ``FlextSettings`` base. Universal fields come via MRO; all project fields live in
 the ``Meltano`` namespace group with simple scalar types (env-settable).
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """

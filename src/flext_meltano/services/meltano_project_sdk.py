@@ -3,9 +3,6 @@
 Deep integration with meltano-core Project SDK. Moved from meltano/project.py
 and converted from standalone s to facade mixin.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
 Copyright (c) 2026 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
