@@ -11,32 +11,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Annotated, ClassVar
+from typing import Annotated
 
-from flext_cli import FlextCliConfig
+from flext_cli import FlextCliConfig, m
 
-from flext_core import FlextSettings
-from flext_meltano import m
+from flext_meltano._models.config import FlextMeltanoModelsConfig
 
 
-class FlextMeltanoConfig(FlextSettings, FlextCliConfig):
+class FlextMeltanoConfig(FlextCliConfig):
     """Meltano config auto-loaded model-less from ``config/*.yaml``."""
 
-    # Why: the two bases each declare the singleton slot with their own class
-    # as the value type. The concrete subclass is assignable to both, which
-    # resolves the mypy MRO conflict, but pyright checks variable overrides
-    # invariantly against each base separately and no single type satisfies
-    # both declarations; the family-wide diamond (FlextSettings, FlextCliConfig)
-    # is the upstream owner shape, so the unsatisfiable invariant check is
-    # admitted explicitly on this one line.
-    _instance: ClassVar[FlextMeltanoConfig | None] = None
-
     Meltano: Annotated[
-        m.Meltano.MeltanoNamespace,
+        FlextMeltanoModelsConfig.MeltanoNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Meltano``.",
         ),
-    ] = m.Meltano.MeltanoNamespace()
+    ] = FlextMeltanoModelsConfig.MeltanoNamespace()
 
 
 config: FlextMeltanoConfig = FlextMeltanoConfig.fetch_global()

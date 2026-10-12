@@ -22,8 +22,8 @@ class FlextMeltanoModelsProjects:
     class DbtManifestNode(m.FlexibleModel):
         """Parsed dbt manifest node with typed fields."""
 
-        name: Annotated[str | None, m.Field(default=None, description="Node name")]
-        path: Annotated[str | None, m.Field(default=None, description="Node path")]
+        name: Annotated[str | None, m.Field(description="Node name")] = None
+        path: Annotated[str | None, m.Field(description="Node path")] = None
         description: Annotated[
             str | None,
             m.Field(default=None, description="Node description"),

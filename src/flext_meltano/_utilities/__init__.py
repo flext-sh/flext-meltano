@@ -8,29 +8,14 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import TYPE_CHECKING
 
-from flext_core import install_lazy_exports
+from flext_core.lazy import install_lazy_exports
 
-if TYPE_CHECKING:
-    from flext_meltano._utilities.base import FlextMeltanoUtilitiesBase
-    from flext_meltano._utilities.runtime import FlextMeltanoUtilitiesRuntime
-    from flext_meltano._utilities.singer import FlextMeltanoUtilitiesSinger
-
-
-__all__: tuple[str, ...] = (
-    "FlextMeltanoUtilitiesBase",
-    "FlextMeltanoUtilitiesRuntime",
-    "FlextMeltanoUtilitiesSinger",
-)
+__all__: tuple[str, ...] = ()
 
 install_lazy_exports(
     __name__,
     globals(),
-    MappingProxyType({
-        "FlextMeltanoUtilitiesBase": ".base",
-        "FlextMeltanoUtilitiesRuntime": ".runtime",
-        "FlextMeltanoUtilitiesSinger": ".singer",
-    }),
+    MappingProxyType({}),
     public_exports=__all__,
 )

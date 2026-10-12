@@ -16,8 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
-from flext_core import FlextSettings
-from flext_meltano import c, m
+from flext_core import FlextSettings, c, m
 
 
 class FlextMeltanoSettings(FlextSettings):

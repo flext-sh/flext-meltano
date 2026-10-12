@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping
 from contextlib import redirect_stderr, redirect_stdout
 from importlib import metadata
 from io import StringIO
@@ -158,11 +157,9 @@ class FlextMeltanoExecutorBase(FlextMeltanoServiceBase):
         if project_result.failure:
             return r[t.SequenceOf[t.StrMapping]].from_failure(project_result)
         selected_type = u.Meltano.normalize_plugin_group(plugin_type)
-        current_plugins_raw = project_result.value.plugins.current_plugins
-        if not isinstance(current_plugins_raw, Mapping):
-            return r[t.SequenceOf[t.StrMapping]].fail(
-                "Meltano current_plugins is not a mapping",
-            )
+        current_plugins_raw = project_result.value.plugins.plugins_by_type(
+            ensure_parent=False,
+        )
         discovered = u.Meltano.discover_project_plugins(
             current_plugins_raw,
             selected_type=selected_type,

@@ -55,9 +55,9 @@ verification).
 - Parent FLEXT chain: read this project's `pyproject.toml` `dependencies` array filtered
   by `flext-*`. The FLEXT cascade is encoded in the inheritance lists of the facade
   classes listed under Module Map above.
-- Public extensions exposed by this project: `FlextMeltano`, `FlextMeltanoAbstractions`,
-  `FlextMeltanoAdapter`, `FlextMeltanoBridge`, `FlextMeltanoCli`,
-  `FlextMeltanoComponentService` (+30 more).
+- Public extensions exposed by this project: `FlextMeltano`, `FlextMeltanoCli`,
+  `FlextMeltanoConfig`, `FlextMeltanoConstants`, `FlextMeltanoDbtServiceBase`,
+  `FlextMeltanoLibraryRunner` (+10 more).
 - Library abstraction boundaries: see AGENTS.md §2.7.
 
 ## Quality Gates

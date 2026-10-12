@@ -48,10 +48,22 @@ class FlextMeltanoModelsCore:
             normalized = u.normalize(k, case="lower")
             return any(sensitive_key in normalized for sensitive_key in sensitive_keys)
 
-        protected: t.MutableFlatContainerMapping = {}
-        for key, item in value.items():
-            protected[key] = "[PROTECTED]" if is_sensitive(key) else item
-        return protected
+        def redact(item: t.JsonValue) -> t.JsonValue:
+            match item:
+                case dict():
+                    return {
+                        key: "[PROTECTED]" if is_sensitive(key) else redact(nested)
+                        for key, nested in item.items()
+                    }
+                case list():
+                    return [redact(nested) for nested in item]
+                case _:
+                    return item
+
+        return {
+            key: "[PROTECTED]" if is_sensitive(key) else redact(item)
+            for key, item in value.items()
+        }
 
     @staticmethod
     def _validated_string_list(value: t.Meltano.ValidatorInput) -> t.StrSequence:
@@ -74,8 +86,8 @@ class FlextMeltanoModelsCore:
         bases so the pydantic decorator machinery collects it through the MRO.
         """
 
-        @staticmethod
         @u.field_serializer("connection_config")
+        @staticmethod
         def serialize_connection_config(
             value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
@@ -85,6 +97,16 @@ class FlextMeltanoModelsCore:
                 The resulting ``t.FlatContainerMapping``.
             """
             return FlextMeltanoModelsCore.protect_sensitive_config(value)
+
+        @u.field_serializer("stream_config", check_fields=False)
+        @staticmethod
+        def serialize_stream_config(value: t.FlatContainerMapping) -> t.JsonDict:
+            """Export readonly stream mappings without changing their stored values.
+
+            Returns:
+                The resulting ``t.JsonDict``.
+            """
+            return dict(value)
 
     class StringListValue(m.ArbitraryTypesModel):
         """Validated string list wrapper for result normalization."""

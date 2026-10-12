@@ -14,10 +14,9 @@ from pathlib import Path
 
 import pytest
 from flext_cli import cli as flext_cli
-from flext_tests import tm
 
 from flext_meltano.cli import FlextMeltanoCli
-from tests import c, m, u
+from tests import c, m, tm, u
 
 
 class TestsFlextMeltanoPipelineCliManagers:

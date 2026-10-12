@@ -19,10 +19,9 @@ from __future__ import annotations
 import psycopg2
 import pytest
 import redis
-from flext_tests import tm
 from flext_tests.docker import FlextTestsDocker
 
-from tests import c
+from tests import c, tm
 
 
 class TestsFlextMeltanoDockerIntegration:

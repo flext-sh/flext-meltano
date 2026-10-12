@@ -45,11 +45,11 @@ class FlextMeltanoModels(FlextCliModels):
     """
 
     class Meltano(
+        FlextMeltanoModelsCliInputs,
         FlextMeltanoModelsBase,
         FlextMeltanoModelsConfig,
         FlextMeltanoModelsCore,
         FlextMeltanoModelsLogging,
-        FlextMeltanoModelsCliInputs,
         FlextMeltanoModelsCliParams,
         FlextMeltanoModelsSourcesParams,
         FlextMeltanoModelsSources,

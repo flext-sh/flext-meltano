@@ -257,7 +257,7 @@ class FlextMeltanoAbstractions(FlextMeltanoAbstractionsBase):
         Returns:
             The resulting ``t.SequenceOf[t.JsonDict]``.
         """
-        return t.json_dict_sequence_adapter().validate_python(
+        return u.json_dict_sequence_adapter().validate_python(
             raw.get(c.Meltano.PayloadKey.STREAMS, []),
         )
 

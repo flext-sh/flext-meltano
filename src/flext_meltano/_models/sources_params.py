@@ -140,8 +140,8 @@ class FlextMeltanoModelsSourcesParams:
                 case _:
                     return 0
 
-        @staticmethod
         @u.field_serializer("stream_schema")
+        @staticmethod
         def serialize_stream_schema(
             value: t.FlatContainerMapping,
         ) -> t.FlatContainerMapping:
@@ -155,7 +155,7 @@ class FlextMeltanoModelsSourcesParams:
                 empty: t.JsonDict = {}
                 result["properties"] = empty
             if "type" not in result:
-                result["type"] = "t.NormalizedValue"
+                result["type"] = "object"
             return result
 
         @m.model_validator(mode="after")

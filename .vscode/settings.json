@@ -8,7 +8,6 @@
   "ruff.format.preview": true,
   "ruff.importStrategy": "fromEnvironment",
   "ruff.lint.preview": true,
-  "ruff.nativeServer": true,
   "shellcheck.useWorkspaceRootAsCwd": true,
   "python-envs.workspaceSearchPaths": [
     "./.venv",
@@ -152,7 +151,7 @@
   "python.analysis.includeAliasesFromUserFiles": false,
   "python.analysis.includeExtraPathSymbolsInSymbolSearch": false,
   "python.analysis.includeVenvInWorkspaceSymbols": false,
-  "python.analysis.useNearestConfiguration": true,
+  "python.analysis.useNearestConfiguration": false,
   "python.analysis.usePerProjectEnvironments": false,
   "python.analysis.userFileIndexingLimit": 2000,
   "python.languageServer": "Pylance",
