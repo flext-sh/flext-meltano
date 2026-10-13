@@ -11,8 +11,6 @@ from pathlib import Path
 
 from flext_cli import t
 
-from flext_meltano import c
-
 
 class FlextMeltanoTypingsBase:
     """Base Meltano type aliases and plugin type definitions.
@@ -22,8 +20,6 @@ class FlextMeltanoTypingsBase:
     """
 
     type ValidatorInput = t.JsonValue
-
-    PluginType = c.Meltano.PluginType
 
     type VariantValue = str | t.StrSequence | t.ScalarMapping | None
     """Normalized plugin variant: string, string list, scalar mapping, or null."""
@@ -37,10 +33,6 @@ class FlextMeltanoTypingsBase:
 
     type ServicePayload = t.JsonMapping
     """Canonical payload returned by Meltano service operations."""
-
-    type EnvironmentInput = c.Meltano.Environment | t.JsonMapping
-    """Environment selector input: a named environment or a full environment
-    configuration mapping."""
 
     type MutableContainerValueMapping = t.MutableFlatContainerMapping
     """Mutable container bridge for Singer SDK record/context mappings."""
