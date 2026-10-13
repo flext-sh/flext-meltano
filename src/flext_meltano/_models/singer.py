@@ -107,7 +107,7 @@ class FlextMeltanoModelsSinger:
             t.MutableFlatContainerMapping,
             m.Field(description="Singer state bookmark payload"),
         ] = m.Field(
-            default_factory=dict[str, t.JsonValue],
+            default_factory=t.JsonDict,
             description="Singer state bookmark payload",
         )
 
