@@ -635,3 +635,6 @@ constraint-dependencies = ["mypy<2.4.0"]
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
 link-mode = "copy"
 override-dependencies = ["flext-meltano"]
+
+[tool.uv.sources.flext-meltano]
+workspace = true
