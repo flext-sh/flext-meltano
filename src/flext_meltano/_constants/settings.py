@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from flext_cli import c
 
 from flext_core import FlextSettings
-from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+from flext_meltano._constants.base import FlextMeltanoConstantsEnums
 
 if TYPE_CHECKING:
     from flext_cli import t
@@ -42,24 +42,24 @@ class FlextMeltanoConstantsSettings(FlextSettings):
     # durable cure is a dunder carve-out in the flext-infra rule owner.
     def __new__(
         cls,
-        *args: object,
-        **kwargs: object,
-    ) -> Self:  # ast-grep-ignore: ban-broad-annotation
+        *args: object,  # ast-grep-ignore: ban-broad-annotation
+        **kwargs: object,  # ast-grep-ignore: ban-broad-annotation
+    ) -> Self:
         _ = args, kwargs
         return object.__new__(cls)
 
     def __init__(
         self,
-        *args: object,
-        **kwargs: object,
-    ) -> None:  # ast-grep-ignore: ban-broad-annotation
+        *args: object,  # ast-grep-ignore: ban-broad-annotation
+        **kwargs: object,  # ast-grep-ignore: ban-broad-annotation
+    ) -> None:
         _ = self, args, kwargs
 
     def __setattr__(
         self,
         name: str,
-        value: object,
-    ) -> None:  # ast-grep-ignore: ban-broad-annotation
+        value: object,  # ast-grep-ignore: ban-broad-annotation
+    ) -> None:
         object.__setattr__(self, name, value)
 
     def __eq__(self, other: object) -> bool:  # ast-grep-ignore: ban-broad-annotation

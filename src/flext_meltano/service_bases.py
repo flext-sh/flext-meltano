@@ -9,18 +9,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from types import MappingProxyType
-from typing import TYPE_CHECKING
-
-from flext_core.lazy import install_lazy_exports
-
-if TYPE_CHECKING:
-    from flext_meltano.services import FlextMeltanoLibraryRunner
-    from flext_meltano.services.consumer_bases import (
-        FlextMeltanoDbtServiceBase,
-        FlextMeltanoTapServiceBase,
-        FlextMeltanoTargetServiceBase,
-    )
+from flext_meltano.services.consumer_bases.dbt_service_base import (
+    FlextMeltanoDbtServiceBase,
+)
+from flext_meltano.services.consumer_bases.tap_service_base import (
+    FlextMeltanoTapServiceBase,
+)
+from flext_meltano.services.consumer_bases.target_service_base import (
+    FlextMeltanoTargetServiceBase,
+)
+from flext_meltano.services.library_runner import FlextMeltanoLibraryRunner
 
 __all__: list[str] = [
     "FlextMeltanoDbtServiceBase",
@@ -28,21 +26,3 @@ __all__: list[str] = [
     "FlextMeltanoTapServiceBase",
     "FlextMeltanoTargetServiceBase",
 ]
-
-install_lazy_exports(
-    __name__,
-    globals(),
-    MappingProxyType({
-        "FlextMeltanoDbtServiceBase": (
-            "flext_meltano.services.consumer_bases.dbt_service_base"
-        ),
-        "FlextMeltanoLibraryRunner": "flext_meltano.services",
-        "FlextMeltanoTapServiceBase": (
-            "flext_meltano.services.consumer_bases.tap_service_base"
-        ),
-        "FlextMeltanoTargetServiceBase": (
-            "flext_meltano.services.consumer_bases.target_service_base"
-        ),
-    }),
-    public_exports=__all__,
-)

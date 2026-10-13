@@ -17,6 +17,12 @@ from flext_meltano import meltano
 from flext_meltano.api import FlextMeltano
 from tests import tm
 
+_FACTORY_CASES: tuple[tuple[str, str, str], ...] = (
+    ("tap", "tap-csv", "source_name"),
+    ("target", "target-jsonl", "sink_name"),
+    ("dbt", "analytics", "transformation_name"),
+)
+
 
 class TestsFlextMeltanoSingerSdkAdapter:
     """Validate the public tap/target/dbt factory contract."""
@@ -57,11 +63,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
     @staticmethod
     @pytest.mark.parametrize(
         ("factory", "name", "role_field"),
-        [
-            ("tap", "tap-csv", "source_name"),
-            ("target", "target-jsonl", "sink_name"),
-            ("dbt", "analytics", "transformation_name"),
-        ],
+        _FACTORY_CASES,
     )
     def test_factory_derives_service_name_from_component_name(
         factory: str,
@@ -78,11 +80,7 @@ class TestsFlextMeltanoSingerSdkAdapter:
     @staticmethod
     @pytest.mark.parametrize(
         ("factory", "name", "role_field"),
-        [
-            ("tap", "tap-csv", "source_name"),
-            ("target", "target-jsonl", "sink_name"),
-            ("dbt", "analytics", "transformation_name"),
-        ],
+        _FACTORY_CASES,
     )
     def test_factory_role_field_survives_public_model_dump(
         factory: str,

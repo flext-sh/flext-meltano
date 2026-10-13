@@ -10,7 +10,7 @@ from typing import ClassVar
 
 from flext_cli import c
 
-from flext_meltano._constants.enums import FlextMeltanoConstantsEnums
+from flext_meltano._constants._base_parts import FlextMeltanoConstantsEnums
 
 
 class FlextMeltanoConstantsBase:
@@ -160,3 +160,9 @@ class FlextMeltanoConstantsBase:
     VALIDATION_MATURITY_MATURE_ENV_COUNT: ClassVar[int] = 3
     VALIDATION_STRUCTURE_MODERATE_MAX_PATHS: ClassVar[int] = 10
     VALIDATION_STRUCTURE_SIMPLE_MAX_PATHS: ClassVar[int] = 5
+
+
+__all__: list[str] = [
+    "FlextMeltanoConstantsBase",
+    "FlextMeltanoConstantsEnums",
+]

@@ -30,6 +30,28 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
         default_factory=FlextMeltanoExecutor,
     )
 
+    def _execute_elt(
+        self,
+        tap_name: str,
+        target_name: str,
+        settings: t.JsonMapping | None,
+    ) -> p.Result[t.JsonMapping]:
+        """Execute the ELT pipeline and build the mutable execution payload.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]`` carrying the payload, or the
+            executor failure.
+        """
+        result = self._elt_executor.execute_pipeline(tap_name, target_name, settings)
+        if result.failure:
+            return r[t.JsonMapping].from_failure(result)
+        return r[t.JsonMapping].ok(
+            u.Meltano.build_mutable_command_execution_payload(
+                result.value,
+                extra_fields={"tap_name": tap_name, "target_name": target_name},
+            )
+        )
+
     def execute_complete_elt_pipeline(
         self,
         tap_name: str,
@@ -50,18 +72,10 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 target_name=target_name,
                 dbt_models=str(dbt_models or []),
             )
-            result = self._elt_executor.execute_pipeline(
-                tap_name,
-                target_name,
-                settings,
-            )
-            if result.failure:
-                return r[t.JsonMapping].from_failure(result)
-            execution_result = result.value
-            elt_result = u.Meltano.build_mutable_command_execution_payload(
-                execution_result,
-                extra_fields={"tap_name": tap_name, "target_name": target_name},
-            )
+            base_result = self._execute_elt(tap_name, target_name, settings)
+            if base_result.failure:
+                return base_result
+            elt_result: t.JsonDict = dict(base_result.value)
             if dbt_models:
                 dbt_result = self.run_dbt_transformation(dbt_models)
                 if dbt_result.failure:
@@ -123,19 +137,7 @@ class FlextMeltanoLibraryRunner(FlextMeltanoServiceBase):
                 tap_name=tap_name,
                 target_name=target_name,
             )
-            result = self._elt_executor.execute_pipeline(
-                tap_name,
-                target_name,
-                settings,
-            )
-            if result.failure:
-                return r[t.JsonMapping].from_failure(result)
-            execution_result = result.value
-            elt_result = u.Meltano.build_mutable_command_execution_payload(
-                execution_result,
-                extra_fields={"tap_name": tap_name, "target_name": target_name},
-            )
-            return r[t.JsonMapping].ok(elt_result)
+            return self._execute_elt(tap_name, target_name, settings)
         except c.Meltano.OPERATION_ERRORS as e:
             error_msg = f"ELT pipeline execution failed: {e}"
             self.logger.exception(error_msg)

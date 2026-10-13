@@ -16,11 +16,34 @@ import pytest
 from flext_cli import cli as flext_cli
 
 from flext_meltano.cli import FlextMeltanoCli
-from tests import c, m, tm, u
+from tests import c, m, p, tm, u
 
 
 class TestsFlextMeltanoPipelineCliManagers:
     """Exercise pipeline lifecycle commands through the model-driven CLI."""
+
+    @staticmethod
+    def _create_pipeline(
+        meltano_cli: FlextMeltanoCli,
+        pipeline_name: str,
+        config_json: str,
+        capsys: pytest.CaptureFixture[str],
+    ) -> p.Result[bool]:
+        """Create a pipeline through the real CLI, draining captured output.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
+        result = meltano_cli.run([
+            c.Meltano.CliCommand.PIPELINE,
+            c.Meltano.PipelineCommand.CREATE,
+            "--pipeline-name",
+            pipeline_name,
+            "--config-json",
+            config_json,
+        ])
+        capsys.readouterr()
+        return result
 
     @staticmethod
     @pytest.fixture
@@ -110,15 +133,12 @@ class TestsFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.CREATE,
-                "--pipeline-name",
+            create_result = self._create_pipeline(
+                meltano_cli,
                 pipeline_name,
-                "--config-json",
                 config_json_result.value,
-            ])
-            capsys.readouterr()
+                capsys,
+            )
             list_result = meltano_cli.run([
                 c.Meltano.CliCommand.PIPELINE,
                 c.Meltano.PipelineCommand.LIST,
@@ -209,15 +229,12 @@ class TestsFlextMeltanoPipelineCliManagers:
 
         try:
             tm.ok(config_json_result)
-            create_result = meltano_cli.run([
-                c.Meltano.CliCommand.PIPELINE,
-                c.Meltano.PipelineCommand.CREATE,
-                "--pipeline-name",
+            create_result = self._create_pipeline(
+                meltano_cli,
                 pipeline_name,
-                "--config-json",
                 config_json_result.value,
-            ])
-            capsys.readouterr()
+                capsys,
+            )
             tm.ok(create_result)
 
             ensure_pid_dir_result = flext_cli.ensure_dir(pid_path.parent)
