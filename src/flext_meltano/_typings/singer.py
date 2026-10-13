@@ -22,11 +22,10 @@ class FlextMeltanoTypingsSinger:
 
     SingerReplicationMethod = c.Meltano.SingerReplicationMethod
 
-    # Singer SDK wire-format schema — the tap-facing runtime class for
-    # isinstance and schema construction (flext-meltano owns singer_sdk).
-    # Explicit ``TypeAlias`` keeps it usable in type position for the static
-    # checkers while the runtime binding stays the real ``Schema`` class, so
-    # consumer ``isinstance``/construction keep working.
+    # Singer SDK wire-format schema. ``t.Meltano.SingerSchema`` is the PEP 695
+    # alias for type positions; the tap-facing runtime class for ``isinstance``
+    # and schema construction is ``m.Meltano.SingerSchema`` (flext-meltano owns
+    # singer_sdk).
     type SingerSchema = singer_sdk_singerlib.Schema
 
     # Singer SDK typing wrappers — prevents direct ``singer_sdk.typing`` imports
