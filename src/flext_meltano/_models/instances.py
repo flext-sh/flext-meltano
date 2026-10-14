@@ -55,10 +55,11 @@ class FlextMeltanoModelsInstances:
 
         @m.computed_field
         def config_keys_count(self) -> int:
-            """Number of config keys.
+            """Return the number of config keys.
 
             Returns:
                 The resulting ``int``.
+
             """
             return u.count(list(self.config.keys()))
 
@@ -67,8 +68,12 @@ class FlextMeltanoModelsInstances:
         def freeze_config(cls, value: t.ConfigurationMapping) -> t.ConfigurationMapping:
             """Expose sink configuration as a read-only mapping.
 
+            Args:
+                value: The validated configuration mapping.
+
             Returns:
                 The resulting ``t.ConfigurationMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -80,8 +85,12 @@ class FlextMeltanoModelsInstances:
         ) -> t.FlatContainerMapping:
             """Expose sink schema and settings as read-only mappings.
 
+            Args:
+                value: The validated container mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -93,7 +102,8 @@ class FlextMeltanoModelsInstances:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Status must be one of.
+                ValueError: If the status is not one of the supported statuses.
+
             """
             valid_statuses = {
                 c.Meltano.StreamStatus.INITIALIZED,
@@ -152,10 +162,11 @@ class FlextMeltanoModelsInstances:
 
         @m.computed_field
         def average_records_per_batch(self) -> float:
-            """Average records per batch.
+            """Return the average records per batch.
 
             Returns:
                 The resulting ``float``.
+
             """
             return (
                 0.0
@@ -169,6 +180,7 @@ class FlextMeltanoModelsInstances:
 
             Returns:
                 The resulting ``bool``.
+
             """
             records_loaded: int = self.records_loaded
             batches_processed: int = self.batches_processed
@@ -176,10 +188,11 @@ class FlextMeltanoModelsInstances:
 
         @m.computed_field
         def processing_status(self) -> str:
-            """Processing status assessment.
+            """Determine the current processing status.
 
             Returns:
                 The resulting ``str``.
+
             """
             if (
                 self.status == c.Meltano.StreamStatus.COMPLETED
@@ -200,8 +213,9 @@ class FlextMeltanoModelsInstances:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Records loaded but no batches processed; or if Status
-                    must be one of.
+                ValueError: If records were loaded without processed batches, or the
+                    status is not one of the valid statuses.
+
             """
             if self.records_loaded > 0 and self.batches_processed == 0:
                 msg = "Records loaded but no batches processed"
@@ -246,18 +260,20 @@ class FlextMeltanoModelsInstances:
 
         @m.computed_field
         def active_streams(self) -> Sequence[FlextMeltanoModelsInstances.StreamInfo]:
-            """Active streams for extraction.
+            """Return the active streams for extraction.
 
             Returns:
                 The resulting ``Sequence[FlextMeltanoModelsInstances.StreamInfo]``.
+
             """
             return [s for s in self.streams if s.status in c.Meltano.ACTIVE_STATUSES]
 
         @m.computed_field
         def stream_count(self) -> int:
-            """Number of available streams.
+            """Return the number of available streams.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len(self.streams)

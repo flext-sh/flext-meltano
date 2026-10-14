@@ -43,10 +43,11 @@ class FlextMeltanoModelsSources:
 
         @m.computed_field
         def config_size(self) -> int:
-            """Total number of configuration parameters.
+            """Return the total number of configuration parameters.
 
             Returns:
                 The resulting ``int``.
+
             """
             return u.count(list(self.connection_config.keys())) + u.count(
                 list(self.stream_config.keys()),
@@ -58,6 +59,7 @@ class FlextMeltanoModelsSources:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return bool(self.stream_config)
 
@@ -69,8 +71,12 @@ class FlextMeltanoModelsSources:
         ) -> t.FlatContainerMapping:
             """Expose stream configuration as a read-only mapping.
 
+            Args:
+                value: The validated stream configuration mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -82,10 +88,11 @@ class FlextMeltanoModelsSources:
 
         @m.computed_field
         def tap_identifier(self) -> str:
-            """Unique tap identifier.
+            """Return the unique tap identifier.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.tap_type}:{self.tap_version}"
 
@@ -97,8 +104,9 @@ class FlextMeltanoModelsSources:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If tap_type cannot be empty; or if Connection configuration
-                    cannot be empty.
+                ValueError: If the tap type is empty, or the connection configuration
+                    is empty.
+
             """
             if not self.tap_type or not self.tap_type.strip():
                 msg = "tap_type cannot be empty"
@@ -137,10 +145,11 @@ class FlextMeltanoModelsSources:
 
         @m.computed_field
         def config_size(self) -> int:
-            """Total number of configuration parameters.
+            """Return the total number of configuration parameters.
 
             Returns:
                 The resulting ``int``.
+
             """
             return len(self.connection_config)
 
@@ -150,15 +159,17 @@ class FlextMeltanoModelsSources:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return bool(self.connection_config)
 
         @m.computed_field
         def target_identifier(self) -> str:
-            """Unique target identifier.
+            """Return the unique target identifier.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.target_type}:{self.target_version}"
 
@@ -170,8 +181,12 @@ class FlextMeltanoModelsSources:
         ) -> t.FlatContainerMapping:
             """Expose target connection configuration as read-only.
 
+            Args:
+                value: The validated connection configuration mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -183,7 +198,8 @@ class FlextMeltanoModelsSources:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If target_type cannot be empty.
+                ValueError: If the target type is empty.
+
             """
             if not self.target_type or not self.target_type.strip():
                 msg = "target_type cannot be empty"
@@ -201,10 +217,11 @@ class FlextMeltanoModelsSources:
 
         @m.computed_field
         def source_identifier(self) -> str:
-            """Unique source identifier.
+            """Return the unique source identifier.
 
             Returns:
                 The resulting ``str``.
+
             """
             return f"{self.source_type}:{self.source_version}"
 
@@ -216,8 +233,9 @@ class FlextMeltanoModelsSources:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Source type cannot be empty; or if Connection
-                    configuration cannot be empty.
+                ValueError: If the source type is empty, or the connection
+                    configuration is empty.
+
             """
             if not self.source_type or not self.source_type.strip():
                 msg = "Source type cannot be empty"

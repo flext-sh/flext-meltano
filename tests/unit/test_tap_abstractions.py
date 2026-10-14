@@ -19,7 +19,7 @@ class TestsFlextMeltanoAbstractionsComplete:
     tap_abstractions: FlextMeltanoAbstractions
 
     def setup_method(self) -> None:
-        """Setup for each test."""
+        """Set up the abstractions under test for each test."""
         self.tap_abstractions = FlextMeltanoAbstractions()
 
     @staticmethod

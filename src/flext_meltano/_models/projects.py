@@ -39,10 +39,11 @@ class FlextMeltanoModelsProjects:
 
         @m.computed_field
         def fqn_string(self) -> str:
-            """Fully qualified name as dot-separated string.
+            """Return the fully qualified name as a dot-separated string.
 
             Returns:
                 The resulting ``str``.
+
             """
             return ".".join(self.fqn) if self.fqn else ""
 
@@ -65,6 +66,7 @@ class FlextMeltanoModelsProjects:
             Returns:
                 The resulting ``Mapping[str,
                     FlextMeltanoModelsProjects.DbtManifestNode]``.
+
             """
             return MappingProxyType[str, FlextMeltanoModelsProjects.DbtManifestNode]({})
 
@@ -81,9 +83,13 @@ class FlextMeltanoModelsProjects:
         ) -> Mapping[str, FlextMeltanoModelsProjects.DbtManifestNode]:
             """Expose manifest nodes as a read-only mapping.
 
+            Args:
+                value: The validated manifest node mapping.
+
             Returns:
                 The resulting ``Mapping[str,
                     FlextMeltanoModelsProjects.DbtManifestNode]``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -93,8 +99,12 @@ class FlextMeltanoModelsProjects:
         ) -> Sequence[FlextMeltanoModelsProjects.DbtManifestNode]:
             """Get all nodes of a specific resource type.
 
+            Args:
+                resource_type: Resource type to filter manifest nodes by.
+
             Returns:
                 The resulting ``Sequence[FlextMeltanoModelsProjects.DbtManifestNode]``.
+
             """
             return [
                 node
@@ -131,8 +141,12 @@ class FlextMeltanoModelsProjects:
         ) -> t.FlatContainerMapping:
             """Expose project mappings as read-only values.
 
+            Args:
+                value: The validated project mapping.
+
             Returns:
                 The resulting ``t.FlatContainerMapping``.
+
             """
             return MappingProxyType(dict(value))
 
@@ -144,7 +158,8 @@ class FlextMeltanoModelsProjects:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If project_id cannot be empty.
+                ValueError: If the project ID is empty.
+
             """
             if not self.project_id or not self.project_id.strip():
                 msg = "project_id cannot be empty"
@@ -179,10 +194,11 @@ class FlextMeltanoModelsProjects:
 
         @m.computed_field
         def environment_count(self) -> int:
-            """Number of environments.
+            """Return the number of environments.
 
             Returns:
                 The resulting ``int``.
+
             """
             return u.count(self.environments)
 
@@ -192,6 +208,7 @@ class FlextMeltanoModelsProjects:
 
             Returns:
                 The resulting ``bool``.
+
             """
             prod_environments = {"prod", "production", "live"}
             normalized_envs = [
@@ -202,10 +219,11 @@ class FlextMeltanoModelsProjects:
 
         @m.computed_field
         def project_maturity(self) -> str:
-            """Project maturity assessment.
+            """Assess the project maturity.
 
             Returns:
                 The resulting ``str``.
+
             """
             prod_envs = {"prod", "production", "live"}
             normalized_envs = [
@@ -228,8 +246,9 @@ class FlextMeltanoModelsProjects:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Default environment; or if Project root directory does
-                    not exist.
+                ValueError: If the default environment is missing from the environments
+                    list, or the project root directory does not exist.
+
             """
             if self.default_environment not in self.environments:
                 msg = (

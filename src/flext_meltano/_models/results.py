@@ -63,15 +63,17 @@ class FlextMeltanoModelsResults:
 
             Returns:
                 The resulting ``t.ConfigurationMapping``.
+
             """
             return MappingProxyType(dict(value))
 
         @m.computed_field
         def execution_rate_per_second(self) -> float:
-            """Execution rate (records/second).
+            """Return the execution rate in records per second.
 
             Returns:
                 The resulting ``float``.
+
             """
             if not self.duration_seconds or self.duration_seconds <= 0:
                 return 0.0
@@ -85,6 +87,7 @@ class FlextMeltanoModelsResults:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return self.end_time is not None
 
@@ -94,6 +97,7 @@ class FlextMeltanoModelsResults:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return (
                 self.status == c.Meltano.OperationStatus.SUCCESS
@@ -102,10 +106,11 @@ class FlextMeltanoModelsResults:
 
         @m.computed_field
         def performance_category(self) -> str:
-            """Performance categorization.
+            """Categorize the execution performance.
 
             Returns:
                 The resulting ``str``.
+
             """
             if not self.duration_seconds or self.duration_seconds <= 0:
                 rate = 0.0
@@ -125,11 +130,16 @@ class FlextMeltanoModelsResults:
         def validate_status(cls, v: str) -> str:
             """Validate execution status.
 
+            Args:
+                v: The status value to validate.
+
             Returns:
                 The resulting ``str``.
 
             Raises:
-                ValueError: If Status must be one of.
+                ValueError: If the status is not one of the supported operation
+                    statuses.
+
             """
             valid_statuses = [
                 c.Meltano.OperationStatus.PENDING,
@@ -151,8 +161,9 @@ class FlextMeltanoModelsResults:
                 The resulting ``Self``.
 
             Raises:
-                ValueError: If Error status requires error message; or if Duration
-                    inconsistent with start/end times.
+                ValueError: If an error status has no error message, or the duration
+                    is inconsistent with the start/end times.
+
             """
             if self.start_time and self.end_time:
                 calculated_duration = (self.end_time - self.start_time).total_seconds()
